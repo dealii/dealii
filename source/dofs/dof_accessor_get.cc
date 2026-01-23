@@ -46,6 +46,20 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
   Vector<Number>           &interpolated_values,
   const types::fe_index     fe_index_) const
 {
+  return this->get_interpolated_dof_values(
+    values,
+    make_array_view(interpolated_values.begin(), interpolated_values.end()),
+    fe_index_);
+}
+
+template <int dim, int spacedim, bool lda>
+template <typename Number>
+void
+DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
+  const ReadVector<Number> &values,
+  ArrayView<Number>         interpolated_values,
+  const types::fe_index     fe_index_) const
+{
   const types::fe_index fe_index =
     (this->dof_handler->hp_capability_enabled == false &&
      fe_index_ == numbers::invalid_fe_index) ?
@@ -63,7 +77,9 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
           // or that you specify the correct one
           (fe_index == this->active_fe_index()) ||
           (fe_index == numbers::invalid_fe_index))
-        this->get_dof_values(values, interpolated_values);
+        this->get_dof_values(values,
+                             interpolated_values.begin(),
+                             interpolated_values.end());
       else
         {
           // well, here we need to first get the values from the current
@@ -72,19 +88,23 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
           const unsigned int dofs_per_cell = this->get_fe().n_dofs_per_cell();
           if (dofs_per_cell == 0)
             {
-              interpolated_values = 0;
+              std::fill(interpolated_values.begin(),
+                        interpolated_values.end(),
+                        Number(0.0));
             }
           else
             {
-              Vector<Number> tmp(dofs_per_cell);
-              this->get_dof_values(values, tmp);
+              Vector<Number> dof_values(dofs_per_cell),
+                tmp(interpolated_values.size());
+              this->get_dof_values(values, dof_values);
 
               FullMatrix<double> interpolation(
                 this->dof_handler->get_fe(fe_index).n_dofs_per_cell(),
                 this->get_fe().n_dofs_per_cell());
               this->dof_handler->get_fe(fe_index).get_interpolation_matrix(
                 this->get_fe(), interpolation);
-              interpolation.vmult(interpolated_values, tmp);
+              interpolation.vmult(tmp, dof_values);
+              std::copy(tmp.begin(), tmp.end(), interpolated_values.begin());
             }
         }
     }
@@ -130,8 +150,9 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
         {
           Vector<Number> tmp1(dofs_per_cell);
           Vector<Number> tmp2(dofs_per_cell);
-
-          interpolated_values = 0;
+          std::fill(interpolated_values.begin(),
+                    interpolated_values.end(),
+                    Number(0.0));
 
           // later on we will have to push the values interpolated from the
           // child to the mother cell into the output vector. unfortunately,
@@ -174,9 +195,9 @@ DoFCellAccessor<dim, spacedim, lda>::get_interpolated_dof_values(
               // and add up or set them in the output vector
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 if (fe.restriction_is_additive(i))
-                  interpolated_values(i) += tmp2(i);
+                  interpolated_values[i] += tmp2(i);
                 else if (tmp2(i) != Number())
-                  interpolated_values(i) = tmp2(i);
+                  interpolated_values[i] = tmp2(i);
             }
         }
     }

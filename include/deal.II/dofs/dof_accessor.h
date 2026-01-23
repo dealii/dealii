@@ -1691,6 +1691,17 @@ public:
   void
   get_interpolated_dof_values(
     const ReadVector<Number> &values,
+    ArrayView<Number>         interpolated_values,
+    const types::fe_index     fe_index = numbers::invalid_fe_index) const;
+
+  /**
+   * Same as the other DoFAccessor::get_interpolated_dof_values(), except with a
+   * Vector instead of an ArrayView.
+   */
+  template <typename Number>
+  void
+  get_interpolated_dof_values(
+    const ReadVector<Number> &values,
     Vector<Number>           &interpolated_values,
     const types::fe_index     fe_index = numbers::invalid_fe_index) const;
 
