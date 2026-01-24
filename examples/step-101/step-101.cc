@@ -903,15 +903,17 @@ namespace Step101
     print_cell_debug_table(h_char, cms.density_scaling, cms.dt_target);
 
     // We summarize time step targeting.
-    std::cout << "\nTargeting:\n";
-    std::cout << "dt_factor = " << parameters.dt_factor << '\n';
-    std::cout << "dt_crit_global (before) = " << cms.dt_crit_global_before << '\n';
-    std::cout << "dt_target = " << cms.dt_target << '\n';
-    std::cout << "dt_crit_global (after) = " << cms.dt_crit_global_after << "\n";
-    std::cout << "improvement factor = " << (cms.dt_crit_global_after / cms.dt_crit_global_before) << "\n";
+    std::cout << "\nSummary:\n";
+    std::cout << "Target improvement factor = " << parameters.dt_factor << " ("<< (parameters.dt_factor - 1) * 100 <<"%)\n";
+    std::cout << "Global critical time step before CMS = " << cms.dt_crit_global_before << '\n';
+    std::cout << "Target critical time step = " << cms.dt_target << '\n';
+    std::cout << "Global critical time step after CMS = " << cms.dt_crit_global_after << "\n";
+    std::cout << "Real improvement factor = " << (cms.dt_crit_global_after / cms.dt_crit_global_before) 
+              << " ("<< ((cms.dt_crit_global_after / cms.dt_crit_global_before) - 1) * 100 <<"%)\n";
 
     // We summarize CMS impact.
     std::cout << "\nCMS impact:\n";
+    std::cout << "Added mass ratio: " << cms.added_mass_ratio * 100 << "%\n";
     std::cout << "Scaled cells: " << cms.n_scaled << " / " << cms.density_scaling.size() << " (" << 100.0 * cms.scaled_fraction << "%)\n";
 
     // We check the acceptability criteria.
