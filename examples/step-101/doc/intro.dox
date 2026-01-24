@@ -8,8 +8,12 @@ This program was contributed by Lucía Agulló Martí in 2026.
 
 This tutorial focuses on Classical Mass Scaling (CMS), a method to
 artificially increase the critical time step in explicit time integration
-schemes. Therefore, this tutorial is based on step-8, which already introduced
-the concept of linear elasticity. 
+schemes. Therefore, this tutorial is conceptually based on step-8, which 
+already introduced linear elasticity using <code>FE_Q(1)</code> elements.
+However, unlike step-8, the present tutorial does not solve a boundary
+value problem. Instead, it reuses the elastic material model and finite
+element setting solely to demonstrate how the critical time step is computed
+and modified when applying CMS. 
 
 Broadly speaking, two classes of time integration schemes are commonly used
 in finite element (FE) simulations: implicit and explicit methods. Implicit
@@ -29,7 +33,7 @@ computing nodal accelerations, and updating velocities and displacement using
 simple time stepping formulas. No global linear systems need to be solved, which
 significantly reduces the computational effort. Nevertheless, their main
 disadvantage lies in the stability since explicit time integration schemes are
-conditionally stable. Their stability depend on the size of the time step.
+conditionally stable. Their stability depends on the size of the time step.
 If the time step is too big, the solution becomes rapidly unstable, leading to
 growing, non-physical oscillations. However, if the time step is too small,
 the overall computation time grows rapidly; computing only a few-seconds long
@@ -46,7 +50,7 @@ numerically unstable, which manifests as rapidly growing, non-physical
 oscillations in the solution.
 
 This condition actually also has a physical meaning, and is not purely
-mathetical. It ensures that elastic waves do not travel more than one
+mathematical. It ensures that elastic waves do not travel more than one
 element length within a single time step.
 
 For linear elastic problems, the CFL condition can be written in the
@@ -69,7 +73,7 @@ increase the critical time step.
 
 <h3>Characteristic element length</h3>
 
-Since this tutorial is based on step-8 so that the focuse lies solely on
+Since this tutorial is based on step-8 so that the focus lies solely on
 CMS, we restrict ourselves to using <code>FE_Q(1)</code> elements and
 2-dimensional problems. This means that we use bilinear functions for each
 component of the vector-valued finite element. The formulation of these
@@ -98,7 +102,7 @@ can be found in the literature.
 
 The material wave speed is the speed with which the information, which in
 the case of FEM simulations of structural/solid mechanics would be a
-mechanical perturbance, is propagated inside a solid. In other words, it is
+mechanical perturbation, is propagated inside a solid. In other words, it is
 the speed at which one part of the material "learns" that another part has
 been moved, deformed, or loaded.
 
@@ -228,17 +232,17 @@ critical time step.
 
 <h3>Assessing the impact of artificially added mass on the physical response</h3>
 
-In CMS the density is scaled uniformly accross the entire computational
-domain. This modifies the overall inertia of the system, and therefore, the
+In CMS the density is selectively increased in parts of the computational domain,
+but uniformly across all eigenmodes. This modifies the overall inertia of the system, and therefore, the
 eigenmodes. So, while it improves computational efficiency by increasing the
 critical time step, it alters the dynamic response of the system. Nevertheless,
 CMS is still a powerful tool when we make sure that the additional mass does
 not have a dominating effect in the dynamic response of the system and it only
 results in small acceptable changes in its behavior.
 
-In this tutorial, we asses the impact of CMS through two safety caps. We
-accept CMS if the total added mass is below a set maximum allowed mass ratio, which 
-consists of and if the only a small portion of the mesh needs scaling. For this 
+In this tutorial, we assess the impact of CMS through two safety caps. We
+accept CMS if the total added mass remains below a prescribed maximum mass ratio,
+and if only a small portion of the mesh requires density scaling. For this 
 tutorial, both values of these ratios have been set to certain numbers that would
 be appropriate for this specific model. When applying CMS to any model, one
 should ask themselves what specific acceptance criteria they should set.
