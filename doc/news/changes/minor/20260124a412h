@@ -1,0 +1,5 @@
+New: The GridGenerator::uniform_channel_with_sphere() function
+creates the three-dimensional mesh of a channel with a sphere inside. The mesh
+created is conformal.
+<br>
+(Quentin Viville, 2026/01/24)
