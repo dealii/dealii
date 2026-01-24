@@ -3,7 +3,7 @@
 ##
 
 # Set the name of the project and target:
-set(TARGET "step-8")
+set(TARGET "step-101")
 
 # Declare all source files the target consists of. Here, this is only
 # the one step-X.cc file, but as you expand your project you may wish
