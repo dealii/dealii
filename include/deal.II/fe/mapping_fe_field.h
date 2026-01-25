@@ -711,7 +711,15 @@ private:
   mutable FEValues<dim, spacedim> fe_values;
 
   /**
-   * A variable to guard access to the fe_values variable.
+   * DoF indices of the current cell.
+   */
+  mutable std::vector<types::global_dof_index> dof_indices;
+
+  /**
+   * A variable to guard access to fe_values and dof_indices.
+   *
+   * @note These three variables are only used in get_vertices(): all other
+   * functions use InternalData to store temporary values.
    */
   mutable Threads::Mutex fe_values_mutex;
 
