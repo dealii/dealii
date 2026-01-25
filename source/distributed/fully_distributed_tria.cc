@@ -120,16 +120,20 @@ namespace parallel
             construction_data.coarse_cell_index_to_coarse_cell_id;
 
           // 2) set up `coarse-cell id to coarse-cell index`-mapping
-          std::map<types::coarse_cell_id, unsigned int>
-            coarse_cell_id_to_coarse_cell_index_vector;
+          this->coarse_cell_id_to_coarse_cell_index_vector.resize(
+            construction_data.coarse_cell_index_to_coarse_cell_id.size());
           for (unsigned int i = 0;
                i < construction_data.coarse_cell_index_to_coarse_cell_id.size();
                ++i)
-            coarse_cell_id_to_coarse_cell_index_vector
-              [construction_data.coarse_cell_index_to_coarse_cell_id[i]] = i;
+            this->coarse_cell_id_to_coarse_cell_index_vector[i] =
+              std::make_pair(
+                construction_data.coarse_cell_index_to_coarse_cell_id[i], i);
 
-          for (auto i : coarse_cell_id_to_coarse_cell_index_vector)
-            this->coarse_cell_id_to_coarse_cell_index_vector.emplace_back(i);
+          std::sort(this->coarse_cell_id_to_coarse_cell_index_vector.begin(),
+                    this->coarse_cell_id_to_coarse_cell_index_vector.end(),
+                    [](const auto &a, const auto &b) {
+                      return a.first < b.first;
+                    });
 
           // create locally-relevant
           currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
