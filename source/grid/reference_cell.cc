@@ -453,8 +453,11 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
   if (is_hyper_cube())
     return std::make_unique<MappingQ<dim, spacedim>>(degree);
   else if (is_simplex())
-    return std::make_unique<MappingFE<dim, spacedim>>(
-      FE_SimplexP<dim, spacedim>(degree));
+    if (degree == 1)
+      return std::make_unique<MappingP1<dim, spacedim>>();
+    else
+      return std::make_unique<MappingFE<dim, spacedim>>(
+        FE_SimplexP<dim, spacedim>(degree));
   else if (*this == ReferenceCells::Pyramid)
     return std::make_unique<MappingFE<dim, spacedim>>(
       FE_PyramidP<dim, spacedim>(degree));
