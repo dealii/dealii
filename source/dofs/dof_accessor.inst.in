@@ -58,7 +58,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       get_cell_dof_indices<deal_II_dimension, deal_II_space_dimension, lda>(
         const dealii::
           DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda> &,
-        boost::container::small_vector<types::global_dof_index, 27> &,
+        internal::DoFAccessorImplementation::Implementation::
+          dof_index_vector_type &,
         const unsigned int);
 #endif
   }

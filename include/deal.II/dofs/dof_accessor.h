@@ -2354,13 +2354,13 @@ namespace internal
       /**
        * In several applications of DoFAccessor::get_dof_values(), we want to
        * extract some indices without having to allocate memory. We do this by
-       * setting a boost small_vector with 27 elements on the stack, and only
-       * allocate when we exceed 27. The number 27 is heuristic and allows up
-       * to quadratic shape functions on scalar problems in 3d, or linear
-       * shape functions on systems (elasticity).
+       * setting a boost small_vector with 100 elements on the stack, and only
+       * allocate when we exceed 100. This value is large enough to cover
+       * Taylor-Hood elements in 3d (i.e., Q2^3-Q1, so 27*3 + 8 = 89 DoFs per
+       * cell) with some additional room to spare.
        */
       using dof_index_vector_type =
-        boost::container::small_vector<dealii::types::global_dof_index, 27>;
+        boost::container::small_vector<dealii::types::global_dof_index, 100>;
 
       /**
        * Process the @p local_index-th degree of freedom corresponding to the
@@ -4652,8 +4652,8 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_dof_values(
   internal::DoFAccessorImplementation::get_cell_dof_indices(
     *this, dof_indices, this->active_fe_index());
 
-  boost::container::small_vector<Number, 27> values_temp(local_values_end -
-                                                         local_values_begin);
+  boost::container::small_vector<Number, 100> values_temp(local_values_end -
+                                                          local_values_begin);
   auto view = make_array_view(values_temp.begin(), values_temp.end());
   values.extract_subvector_to(make_array_view(dof_indices.begin(),
                                               dof_indices.end()),
