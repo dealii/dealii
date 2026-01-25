@@ -313,6 +313,8 @@ namespace VectorTools
 
     Number                                            mean = Number();
     typename numbers::NumberTraits<Number>::real_type area = 0.;
+    unsigned int last_n_quadrature_points = numbers::invalid_unsigned_int;
+    const Vector<Number> exemplar(n_components);
     // Compute mean value
     for (const auto &cell :
          dof.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
@@ -321,8 +323,8 @@ namespace VectorTools
         const FEValues<dim, spacedim> &fe_values =
           fe_values_collection.get_present_fe_values();
 
-        values.resize(fe_values.n_quadrature_points,
-                      Vector<Number>(n_components));
+        if (last_n_quadrature_points != fe_values.n_quadrature_points)
+          values.resize(fe_values.n_quadrature_points, exemplar);
         fe_values.get_function_values(v, values);
         for (unsigned int k = 0; k < fe_values.n_quadrature_points; ++k)
           {
