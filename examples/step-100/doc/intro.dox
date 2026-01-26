@@ -8,116 +8,169 @@ Compute Canada and Calcul Québec.  </i>
 As a follow up to the Helmholtz equation "with the nice
 sign" of step-7, here we will consider the version of the <a
 href="https://en.wikipedia.org/wiki/Helmholtz_equation">equation with the
-"bad sign"</a> , commonly referred as the indefinite Helmholtz equation:
+"bad sign"</a> , commonly referred as the indefinite Helmholtz equation: 
 @f[
   -\Delta u - \alpha u = f.
 @f]
-This equation naturally arises in the study of time-harmonic wave phenomena, such as electromagnetic or acoustic propagation. In particular, it corresponds to the time-independent form of the wave equation when $\alpha = \omega^2$ is the square of the angular frequency.
+This equation naturally arises in the study of time-harmonic wave
+phenomena, such as electromagnetic or acoustic propagation. In particular,
+it corresponds to the time-independent form of the wave equation when $\alpha
+= \omega^2$ is the square of the angular frequency.
 
-From a numerical perspective, solving this equation poses a number of well-known challenges, which become increasingly severe as the parameter $\alpha > 0$ grows. Notably, the oscillatory nature of the solution requires the wavelength to be adequately resolved by the discretization and $\alpha$
-must not coincide with an eigenvalue of $-\Delta$ or the resulting operator will not be invertible. Among all the numerical difficulties that arise from this equation,
-one that is really challenging is the indefiniteness of the
-operator. It hinders the ability of classical iterative methods
-to solve the linear system of equations. Furthermore, most blackbox
-preconditioners fail to improve convergence as explained in details by O. Ernst
-and M. J. Gander @cite ernst2012. A solution to this
-problem is to make our discretized system of equations
-positive definite, which brings us to the subject of this tutorial, the
-Discontinuous Petrov-Galerkin (DPG) method @cite demkowicz2025. This approach can be classified
-as a residual minimization method and always yields an Hermitian positive
-definite stiffness matrix system. It follows that using this method allows
-for the use of the preconditioned conjugate gradient (CG) linear solver
-instead of a direct solver or a more complex iterative method such as GMRES. This alone has the desired effect of reducing the memory consumption of the simulation, which enables the simulation of larger problems (i.e., higher frequencies or larger domains).
+From a numerical perspective, solving this equation poses a number of
+well-known challenges, which become increasingly severe as the parameter
+$\alpha > 0$ grows. Notably, the oscillatory nature of the solution requires
+the wavelength to be adequately resolved by the discretization and $\alpha$
+must not coincide with an eigenvalue of $-\Delta$ or the resulting operator
+will not be invertible. Among all the numerical difficulties that arise from
+this equation, one that is really challenging is the indefiniteness of the
+operator. It hinders the ability of classical iterative methods to solve the
+linear system of equations. Furthermore, most blackbox preconditioners fail to
+improve convergence as explained in details by O. Ernst and M. J. Gander @cite
+ernst2012. A solution to this problem is to make our discretized system of
+equations positive definite, which brings us to the subject of this tutorial,
+the Discontinuous Petrov-Galerkin (DPG) method @cite demkowicz2025. This
+approach can be classified as a residual minimization method and always
+yields an Hermitian positive definite stiffness matrix system. It follows
+that using this method allows for the use of the preconditioned conjugate
+gradient (CG) linear solver instead of a direct solver or a more complex
+iterative method such as GMRES. This alone has the desired effect of reducing
+the memory consumption of the simulation, which enables the simulation of
+larger problems (i.e., higher frequencies or larger domains).
 
 The numerical implementation of DPG shares many similarities with hybridizable
 discontinuous Galerkin (HDG) methods. In particular, it relies on trace
-elements to couple neighboring cells and on discontinuous Galerkin elements for
-the interior unknowns. In addition, the resulting linear system has an analogous structure that allows static condensation to reduce the system
-size by eliminating interior unknowns through a Schur-complement procedure. For readers who want to learn more about the implementation of trace
-unknowns, static condensation, and HDG formulations, step-51 provides a
-detailed introduction.
+elements to couple neighboring cells and on discontinuous Galerkin elements
+for the interior unknowns. In addition, the resulting linear system has an
+analogous structure that allows static condensation to reduce the system size
+by eliminating interior unknowns through a Schur-complement procedure. For
+readers who want to learn more about the implementation of trace unknowns,
+static condensation, and HDG formulations, step-51 provides a detailed
+introduction.
 
 
 <h3>The time-harmonic Helmholtz equation</h3>
 
-For our case study of the indefinite Helmholtz equation, we consider the linear
-acoustic equations in a 2D square domain $[0,1] \times [0,1]$. These equations arise from the linearization of the compressible fluid equations about a quiescent background state and read :
+For our case study of the indefinite Helmholtz equation, we consider the
+linear acoustic equations in a 2D square domain $[0,1] \times [0,1]$. These
+equations arise from the linearization of the compressible fluid equations
+about a quiescent background state and read : 
 @f{align*}{
-    \frac{\partial \mathbf{U}}{\partial t} & = - \frac{1}{\rho }\nabla P \quad \text{in } \Omega, \qquad \text{(Linear momentum),}\\
-    \frac{1}{\kappa}\frac{\partial P}{\partial t} & = - \nabla \cdot \mathbf{U}, \quad \text{in }
-    \Omega \qquad \text{(Mass conservation)}.
+    \frac{\partial \mathbf{U}}{\partial t} & = - \frac{1}{\rho }\nabla
+    P \quad \text{in } \Omega, \qquad \text{(Linear momentum),}\\
+    \frac{1}{\kappa}\frac{\partial P}{\partial t} & = - \nabla \cdot
+    \mathbf{U}, \quad \text{in } \Omega \qquad \text{(Mass conservation)}.
 @f}
-Here, $\mathbf{U}(\mathbf{x},t)$ denotes the velocity perturbation, $P(\mathbf{x},t)$ the pressure perturbation, $\rho$ the mean fluid density, and $\kappa$ its bulk modulus. Assuming that both pressure and velocity perturbations are time harmonic with angular frequency $\omega$, i.e.,
+Here, $\mathbf{U}(\mathbf{x},t)$ denotes the velocity perturbation,
+$P(\mathbf{x},t)$ the pressure perturbation, $\rho$ the mean fluid density,
+and $\kappa$ its bulk modulus. Assuming that both pressure and velocity
+perturbations are time harmonic with angular frequency $\omega$, i.e.,
+
+@f{align*}{ \mathbf{U}(\mathbf{x},t)= \mathbf{u}(\mathbf{x})e^{i\omega
+t}, \qquad P(\mathbf{x},t)= p(\mathbf{x})e^{i\omega t}, 
+@f}
+we can substitute this ansatz into the time-dependent equations to evaluate the
+time derivative. Than, by dividing out the common factor $e^{i\omega t}$,
+we recover the frequency-domain system of equation: 
 @f{align*}{
-\mathbf{U}(\mathbf{x},t)= \mathbf{u}(\mathbf{x})e^{i\omega t}, \qquad
-P(\mathbf{x},t)= p(\mathbf{x})e^{i\omega t},
+    i\omega \mathbf{u} + \nabla p^*                         & = 0, \quad
+    \text{in } \Omega,\\ i \frac{\omega}{c_s^2} p^* + \nabla \cdot \mathbf{u}
+    & = 0, \quad \text{in } \Omega.
 @f}
-we can substitute this ansatz into the time-dependent equations to evaluate the time derivative. Than, by dividing out the common factor $e^{i\omega t}$, we recover the frequency-domain system of equation:
-@f{align*}{
-    i\omega \mathbf{u} + \nabla p^*                         & = 0,
-    \quad \text{in } \Omega,\\ i
-    \frac{\omega}{c_s^2} p^* + \nabla \cdot \mathbf{u}     & = 0, \quad \text{in }
-    \Omega.
-@f}
-In the above, we introduced the kinematic pressure $p^* = p/\rho$ and the speed of
-sound $c_s = \sqrt{\kappa/\rho}$ for notational convenience. At first glance, this first-order system does not resemble the indefinite Helmholtz equation for the acoustic pressure. However, by isolating $\mathbf{u}$ from the linear momentum equation, substituting it into the mass conservation equation, and multiplying the resulting expression by $i\omega$, we recover the classical second-order form :
+In the above, we introduced the kinematic pressure $p^* = p/\rho$ and the
+speed of sound $c_s = \sqrt{\kappa/\rho}$ for notational convenience. At first
+glance, this first-order system does not resemble the indefinite Helmholtz
+equation for the acoustic pressure. However, by isolating $\mathbf{u}$ from
+the linear momentum equation, substituting it into the mass conservation
+equation, and multiplying the resulting expression by $i\omega$, we recover
+the classical second-order form : 
 @f{align*}{
     -\Delta p^* - \frac{\omega^2}{c_s^2}p^* & = 0,
 @f}
-This corresponds to the homogeneous Helmholtz equation with $\alpha = \omega^2 / c_s^2$, and the special case $f = 0$ of the general indefinite Helmholtz problem. In what follows, we will keep $f=0$, but that the source term $f$ could be reintroduced, if desired, in the mass conservation equation. This would simply implies that there is mass injection or extraction in the domain. Another simplification that we will do in this tutorial is to consider $c_s=1$ for simplicity. 
+This corresponds to the homogeneous Helmholtz equation with $\alpha =
+\omega^2 / c_s^2$, and the special case $f = 0$ of the general indefinite
+Helmholtz problem. In what follows, we will keep $f=0$, but that the
+source term $f$ could be reintroduced, if desired, in the mass conservation
+equation. This would simply implies that there is mass injection or extraction
+in the domain. Another simplification that we will do in this tutorial is
+to consider $c_s=1$ for simplicity.
 
-Nonetheless, we will define our problem in such a way that we can implement and describe all the possible types of boundary conditions on $\Gamma$
-to showcase their different definition in a DPG framework. Those are defined as:
+Nonetheless, we will define our problem in such a way that we can implement
+and describe all the possible types of boundary conditions on $\Gamma$ to
+showcase their different definition in a DPG framework. Those are defined
+as: 
 @f{align*}{
     p^* & = g_D, \quad \text{on } \Gamma_0, \\ \mathbf{u} \cdot \mathbf{n}
     & = g_N, \quad \text{on } \Gamma_2, \\ \mathbf{u} \cdot \mathbf{n}  -
     \frac{ k_n }{\omega} p^* & = g_R, \quad \text{on } \Gamma_1 \cup \Gamma_3,
 @f}
 where the subscript numbers follow the same nomenclature as the one
-for a rectangular geometry obtained from the GridGenerator::hyper_cube() function, $k_n$
-is the wavenumber in the direction of the surface normal and $g_{D,N,R}$
-refers to Dirichlet, Neumann and Robin boundary conditions terms. To validate our implementation and showcase how DPG enable the computation of high frequency regime problem (i.e., $\omega L / c_s \gg 1$ or in our case study $\omega \gg 1$), we choose the boundaries so the expected solution
-is a plane-wave travelling in the direction $\theta \in [0, \pi /2]$, i.e.:
+for a rectangular geometry obtained from the GridGenerator::hyper_cube()
+function, $k_n$ is the wavenumber in the direction of the surface normal
+and $g_{D,N,R}$ refers to Dirichlet, Neumann and Robin boundary conditions
+terms. To validate our implementation and showcase how DPG enable the
+computation of high frequency regime problem (i.e., $\omega L / c_s \gg
+1$ or in our case study $\omega \gg 1$), we choose the boundaries so the
+expected solution is a plane-wave travelling in the direction $\theta \in
+[0, \pi /2]$, i.e.: 
 @f{align*}{
-    g_D &= e^{-i k y \sin(\theta)},\\ g_N &= -\sin(\theta) e^{-i
-    k x \cos(\theta)},\\ g_R &= 0.
+    g_D &= e^{-i k y \sin(\theta)},\\ g_N &= -\sin(\theta) e^{-i k x
+    \cos(\theta)},\\ g_R &= 0.
 @f}
-The expected analytical solution of our problem is therefore:
+The expected analytical solution of our problem is therefore: 
 @f{align*}{
-p^*        & = e^{-i k (x \cos(\theta) + y \sin(\theta))},
-\\
+p^*        & = e^{-i k (x \cos(\theta) + y \sin(\theta))}, \\
     \mathbf{u} & = \frac{1}{c_s} \begin{pmatrix} \cos(\theta)  \\ \sin(\theta)
     \end{pmatrix} e^{-i k (x \cos(\theta) + y \sin(\theta))}.
 @f}
-Note that the wavenumber $k$ introduced above for the plane-wave solution is chosen to satisfy $k = \omega/c_s = \sqrt{\alpha}$. In this way, the oscillation scale of the solution is consistent with the natural wavelength of the Helmholtz operator.
+Note that the wavenumber $k$ introduced above for the plane-wave solution
+is chosen to satisfy $k = \omega/c_s = \sqrt{\alpha}$. In this way, the
+oscillation scale of the solution is consistent with the natural wavelength
+of the Helmholtz operator.
 
-To solve the acoustic linear system presented above using FEM, it its
-common to use the classical second-order form and multiply it by a test function $q$ to obtain the following weak variational formulation:
+To solve the acoustic linear system presented above using FEM, it its common
+to use the classical second-order form and multiply it by a test function $q$
+to obtain the following weak variational formulation: 
 @f{align*}{
-  \text{Find } & p^* \in H^1(\Omega) \text{ so that}\\ & (\nabla q, \nabla p^*) - \omega^2 (q, p^*) - \langle
-  q, \frac{\partial p^*}{\partial n} \rangle_{\Gamma} = 0, \quad \forall q \in H^1(\Omega).  @f}
-Note that in this tutorial, we used everywhere the following definitions for the (sesquilinear) $L^2$ complex inner products on the domain $\Omega$ and its boundary $\Gamma$ :
+  \text{Find } & p^* \in H^1(\Omega) \text{ so that}\\ & (\nabla q, \nabla
+  p^*) - \omega^2 (q, p^*) - \langle q, \frac{\partial p^*}{\partial n}
+  \rangle_{\Gamma} = 0, \quad \forall q \in H^1(\Omega).
+@f}
+Note that in this tutorial, we used everywhere the following definitions
+for the (sesquilinear) $L^2$ complex inner products on the domain $\Omega$
+and its boundary $\Gamma$ : 
 @f{align*}{
-  (a,b)_\Omega & := \int_{\Omega} \overline{a} b
-  \text{d}x \approx \sum_{K\in \Omega_h} \int_{K} \overline{a} b
-  \text{d}x &  & \langle a,b \rangle_{\Gamma} := \int_{\Gamma} \overline{a}b \text{d}s \approx \sum_{\partial K \in\Gamma_h}
-  \int_{\partial K} \overline{a}b \text{d}s ,
-  @f}
-where $\Omega_h = \bigcup K$ is the discretized domain with elements $K$, and $\Gamma_h = \bigcup \partial K$ is the discretized boundary with $dim-1$ elements $\partial K$.
+  (a,b)_\Omega & := \int_{\Omega} \overline{a} b \text{d}x \approx
+  \sum_{K\in \Omega_h} \int_{K} \overline{a} b \text{d}x &  & \langle
+  a,b \rangle_{\Gamma} := \int_{\Gamma} \overline{a}b \text{d}s \approx
+  \sum_{\partial K \in\Gamma_h} \int_{\partial K} \overline{a}b \text{d}s, 
+@f}
+where $\Omega_h = \bigcup K$ is the discretized domain with elements $K$,
+and $\Gamma_h = \bigcup \partial K$ is the discretized boundary with $dim-1$
+elements $\partial K$.
 
-In the DPG literature, this weak formulation of the second-order equation is referred to as the primal formulation. While widely used, there are other ways to weaken the strong form of the problem notably one that is referred to as the ultraweak formulation. This alternative representation is obtained by using the first-order system presented above and relaxing both equations independently. This is the form that we will use and solve in this tutorial since previous DPG studies showed that the problem formulated in this manner leads to better results because of its approximability properties. To obtain it, we will use the vector-valued test function $\mathbf{v}$ to weaken the mass conservation equation and the scalar test function $q$ to weaken the linear momentum equation. The resulting ultraweak variational formulation of our indefinite Helmholtz problem is then:
+In the DPG literature, this weak formulation of the second-order equation is
+referred to as the primal formulation. While widely used, there are other
+ways to weaken the strong form of the problem notably one that is referred
+to as the ultraweak formulation. This alternative representation is obtained
+by using the first-order system presented above and relaxing both equations
+independently. This is the form that we will use and solve in this tutorial
+since previous DPG studies showed that the problem formulated in this manner
+leads to better results because of its approximability properties. To obtain
+it, we will use the vector-valued test function $\mathbf{v}$ to weaken the
+mass conservation equation and the scalar test function $q$ to weaken the
+linear momentum equation. The resulting ultraweak variational formulation
+of our indefinite Helmholtz problem is then: 
 @f{align*}{
-  \text{Find } & p^* \in L^2(\Omega) \text{ and } \mathbf{u} \in
-  (L^2(\Omega))^d \text{ so that} \\ & ( \mathbf{v}, i \omega \mathbf{u})_{\Omega_h}
-  - (\nabla \cdot \mathbf{v}, p^*)_{\Omega_h} + \langle \mathbf{v} \cdot \mathbf{n}, p^*
-  \rangle_{\Gamma} = 0, \quad \forall
-  \mathbf{v} \in H(\text{div}, \Omega), \\
-  &(q, i\omega p^*)_{\Omega_h} - (\nabla
-  q, \mathbf{u})_{\Omega_h} + \langle q, \mathbf{u} \cdot \mathbf{n}
-  \rangle_{\Gamma} = 0, \quad \forall q \in
-  H^1(\Omega).
-  @f}
-
+  \text{Find } & p^* \in L^2(\Omega) \text{ and } \mathbf{u}
+  \in (L^2(\Omega))^d \text{ so that} \\ & ( \mathbf{v}, i \omega
+  \mathbf{u})_{\Omega_h} - (\nabla \cdot \mathbf{v}, p^*)_{\Omega_h} +
+  \langle \mathbf{v} \cdot \mathbf{n}, p^* \rangle_{\Gamma} = 0, \quad \forall
+  \mathbf{v} \in H(\text{div}, \Omega), \\ &(q, i\omega p^*)_{\Omega_h} -
+  (\nabla q, \mathbf{u})_{\Omega_h} + \langle q, \mathbf{u} \cdot \mathbf{n}
+  \rangle_{\Gamma} = 0, \quad \forall q \in H^1(\Omega).
+@f}
+  
 <h3>The Discontinuous Petrov-Galerkin Method</h3>
 
 There are numerous papers that describe the mathematics behind the DPG method,
@@ -125,50 +178,59 @@ here we will focus mainly on the key elements necessary to understand the
 numerical implementation. Let’s start with a standard abstract problem
 defined on the product of the trial and test Hilbert spaces $U \times V$
 such that:
- @f{equation*}{
+@f{equation*}{
     \begin{cases}
         b(v,u) = l(v) \quad \forall v \in V, \\ u \in U,
     \end{cases}
-@f} where $b(u,v)$ is a continuous bilinear form and $l(v)$ is a continuous
+@f}
+where $b(u,v)$ is a continuous bilinear form and $l(v)$ is a continuous
 linear form. Furthermore, we assume that the problem is well-posed (i.e.,
- $b$ is coercive, or satisfies a continuous inf-sup condition). This can be reformulated as an
-operator equation by defining the operator $B: U \rightarrow V'$ such that :
+$b$ is coercive, or satisfies a continuous inf-sup condition). This can be
+reformulated as an operator equation by defining the operator 
+$B: U \rightarrow V'$ such that: 
 @f{equation*}{
     b(v,u) = \langle v, B u \rangle_{V \times V'},
 @f}
 where $V'$ is the dual space of $V$ and the $\langle \cdot, \cdot
-\rangle_{V \times V'}$ denotes the duality pairing. This is one possible FEM discretization, typically referred to as the "Galerkin least squares method", where the residual in the dual norm is minimized over a finite-dimensional trial space. This finite element discretization leads to the following minimal residual formulation of the problem:
+\rangle_{V \times V'}$ denotes the duality pairing. This is one possible FEM
+discretization, typically referred to as the "Galerkin least squares method",
+where the residual in the dual norm is minimized over a finite-dimensional
+trial space. This finite element discretization leads to the following
+minimal residual formulation of the problem: 
 @f{equation*}{
     u_h = \arg \min_{w_h \in U_h} J(w_h), \quad \text{where} \quad J(w_h)
     = \frac{1}{2} \| l - B w_h \|_{V'}^2
 @f}
 where $u_h$ is the discrete approximated solution. However, numerically
 computing the dual norm is not always feasible, so it is avoided by introducing
-a Riesz operator $R: V \rightarrow V'$. Using the inverse Riesz operator,
-it is now possible to formulate an alternative discrete problem as:
+a Riesz operator $R: V \rightarrow V'$. Using the inverse Riesz operator, it
+is now possible to formulate an alternative discrete problem as: 
 @f{equation*}{
     u_h = \arg \min_{w_h \in U_h} \frac{1}{2} \| R^{-1}(l - B w_h) \|_{V}^2.
 @f}
 This solves the problem of computing the norm of the dual space. Still,
 we now require the inverse Riesz operator. This is not achievable numerically
 because the Riesz map is related to the infinite-dimensional space $V$ and
-its inversion is equivalent to solving a partial differential equation. To overcome this, the test space is "broken" between each individual element and enriched by raising its
-polynomial degree by $\Delta p$ (typically chosen to be 1 or 2) compared to the
-trial space. The resulting finite-dimensional space  $V^r \subset V$ is now a
-truncated version of the original space, nonetheless, it can fully represent
-the Riesz map on each element by the Gram matrix. The broken test functions
-have no conformity assumptions across the inter-element boundaries, but they leave
-uncanceled interface terms, and thus require the introduction of interface
-unknowns (often called trace variables, or Lagrange multipliers $\hat{u}$)
-that live on the mesh skeleton and weakly enforce the continuity. With all those additionnal requirements, the final
-form of the abstract problem that needs to be solved in a DPG setting is:
+its inversion is equivalent to solving a partial differential equation. To
+overcome this, the test space is "broken" between each individual element and
+enriched by raising its polynomial degree by $\Delta p$ (typically chosen to
+be 1 or 2) compared to the trial space. The resulting finite-dimensional space
+$V^r \subset V$ is now a truncated version of the original space, nonetheless,
+it can fully represent the Riesz map on each element by the Gram matrix. The
+broken test functions have no conformity assumptions across the inter-element
+boundaries, but they leave uncanceled interface terms, and thus require the
+introduction of interface unknowns (often called trace variables, or Lagrange
+multipliers $\hat{u}$) that live on the mesh skeleton and weakly enforce the
+continuity. With all those additionnal requirements, the final form of the
+abstract problem that needs to be solved in a DPG setting is: 
 @f{equation*}{
     \label{eq:DPG_abstract_problem} \begin{cases}
-        \text{Find } u_h \in U_h \subset U, \quad \hat{u}_h \in \hat{U}_h \subset \hat{U} \text{ and }
-        \quad \Psi^r \in V^r(\Omega_h) \text{ so that }           \\ (v^r, \Psi^r )_V + b_h(v^r, u_h) + \langle v^r, \hat{u}_h \rangle = l(v^r), \quad \forall v^r \in
-        V^r(\Omega_h), \\ b_h(w_h, \Psi^r) = 0, \quad \forall w_h \in U_h,
-        \\ \langle \hat{w}_h, \Psi^r \rangle = 0, \quad \forall \hat{w}_h
-        \in \hat{U}_h,
+        \text{Find } u_h \in U_h \subset U, \quad \hat{u}_h \in \hat{U}_h
+        \subset \hat{U} \text{ and } \quad \Psi^r \in V^r(\Omega_h) \text{ so
+        that }           \\ (v^r, \Psi^r )_V + b_h(v^r, u_h) + \langle v^r,
+        \hat{u}_h \rangle = l(v^r), \quad \forall v^r \in V^r(\Omega_h), \\
+        b_h(w_h, \Psi^r) = 0, \quad \forall w_h \in U_h, \\ \langle \hat{w}_h,
+        \Psi^r \rangle = 0, \quad \forall \hat{w}_h \in \hat{U}_h,
     \end{cases}
 @f}
 where $\Psi^r = R^{-1}_r(l-Bu_h)$. Finally, by defining the bases for
@@ -176,12 +238,13 @@ discretized trial space $U_h \times \hat{U}_h$ and the discretized broken test
 space $V^r(\Omega_h)$, such that $U_h = \text{span}\{ \phi_i \}_{i=1}^{N_u}$,
 $\hat{U}_h = \text{span}\{ \hat{\phi}_i \}_{i=1}^{N_{\hat{u}}}$ and $V^r=
 \text{span}\{ \Psi_i \}_{i=1}^{N_v}$, where $N_v > N_u + N_{\hat{u}}$,
-the problem can be solved numerically by:
+the problem can be solved numerically by: 
 @f{equation*}{
     \text{Finding the set of coefficients }
     \mathbf{w} = [w_i]_{i=1}^{N_u} \in \mathbb{F}^{N_u}, \hat{\mathbf{w}}
     = [\hat{w}_i]_{\hat{i}=1}^{N_{\hat{u}}} \in \mathbb{F}^{N_{\hat{u}}},
-     \text{ and } \mathbf{t} = [t_i]_{i=1}^{N_v} \in \mathbb{F}^{N_v}, \text{ so that }\\
+     \text{ and } \mathbf{t} = [t_i]_{i=1}^{N_v} \in \mathbb{F}^{N_v}, 
+     \text{ so that }\\
     u_h = \sum_{i=1}^{N_u} w_i \phi_i, \quad \hat{u}_h =
     \sum_{i=1}^{N_{\hat{u}}} \hat{w}_i \hat{\phi}_i, \quad \Psi^r =
     \sum_{i=1}^{N_v} t_i \Psi_i  \text{ satisfy } \\
@@ -194,7 +257,10 @@ the problem can be solved numerically by:
         l \\ 0 \\ 0
     \end{pmatrix}.
 @f}
-Note that in the above matrix, we made use of the $\dagger$ symbol to denote the conjugate transpose operation and the Number set symbol $\mathbb{F} = \mathbb{R}$ or $\mathbb{C}$ as a place holder for real or complex sets. Solving this system of linear equation is analogous to solving
+Note that in the above matrix, we made use of the $\dagger$ symbol
+to denote the conjugate transpose operation and the Number set symbol
+$\mathbb{F} = \mathbb{R}$ or $\mathbb{C}$ as a place holder for real or
+complex sets. Solving this system of linear equation is analogous to solving
 a general overdetermined system in a least squares sense with a residual
 $\Psi^r$. This is why the DPG method always produces hermitian positive
 definite systems of equations. Furthermore, it shows that $\Psi^r$ can be
@@ -207,73 +273,74 @@ is not bound to the same space as the one for the trial space and that it
 can be chosen to maximize the accuracy and the stability of the numerical
 method. Consequently, to implement the DPG method for any set of equations,
 one needs to be able to discretize the whole exact sequence of energy spaces,
-which in 3D takes the form:
+which in 3D takes the form: 
 @f[
     H^1 \xrightarrow{\nabla} H(\mathrm{curl}) \xrightarrow{\nabla \times}
     H(\mathrm{div}) \xrightarrow{\nabla \cdot} L^2
 @f]
-These spaces are defined as:
+These spaces are defined as: 
 @f{align*}{
-     & H^1(\Omega) = \{ u : \Omega \to \mathbb{R}(\mathbb{C})
-     : u \in L^2(\Omega), \nabla u \in (L^2(\Omega))^3 \}
-     \\ & H(\text{curl}, \Omega) = \{ \mathbf{E} : \Omega \to
-     \mathbb{R}^3(\mathbb{C}^3) : \mathbf{E} \in (L^2(\Omega))^3, \nabla
-     \times \mathbf{E} \in (L^2(\Omega))^3 \} \\ & H(\text{div}, \Omega) =
-     \{ \mathbf{v} : \Omega \to \mathbb{R}^3(\mathbb{C}^3) : \mathbf{v} \in
-     (L^2(\Omega))^3, \nabla \cdot \mathbf{v} \in L^2(\Omega) \}       \\ &
-     L^2(\Omega) = \{ q : \Omega \to \mathbb{R}(\mathbb{C}) : \|q\| < \infty \}
+     & H^1(\Omega) = \{ u : \Omega \to \mathbb{R}(\mathbb{C}) : u \in
+     L^2(\Omega), \nabla u \in (L^2(\Omega))^3 \} \\ & H(\text{curl},
+     \Omega) = \{ \mathbf{E} : \Omega \to \mathbb{R}^3(\mathbb{C}^3)
+     : \mathbf{E} \in (L^2(\Omega))^3, \nabla \times \mathbf{E} \in
+     (L^2(\Omega))^3 \} \\ & H(\text{div}, \Omega) = \{ \mathbf{v} : \Omega
+     \to \mathbb{R}^3(\mathbb{C}^3) : \mathbf{v} \in (L^2(\Omega))^3, \nabla
+     \cdot \mathbf{v} \in L^2(\Omega) \}       \\ & L^2(\Omega) = \{ q :
+     \Omega \to \mathbb{R}(\mathbb{C}) : \|q\| < \infty \}
 @f}
 In addition, the continuity requirements along faces and edges (the
 skeleton of the mesh), is also enforced with a different space because it
 lives in $dim -1$ dimensions. Thus, we also need to define this sequence of
-energy space for the skeleton:
+energy space for the skeleton: 
 @f{align*}{
-    H^{1/2}(\partial K)               & =
-    \text{tr}_{\text{grad}}(H^1(\Omega_h))
-    :=  \prod_{K \in \Omega_h} u\big|_{\partial K}
-    \\ H^{-1/2}(\text{curl}, \partial K) & = \text{tr}_{\text{curl},
-    \top}(H(\text{curl}, \Omega_h)) := \prod_{K \in \Omega_h} (\mathbf{n}_K
-    \times \mathbf{E}) \times \mathbf{n}_K \big|_{\partial K} \\
-    H^{-1/2}(\text{div}, \partial K)  & = \text{tr}_{\text{curl}, \dashv
-    }(H(\text{curl}, \Omega_h)) := \prod_{K \in \Omega_h} (\mathbf{n}_K \times
-    \mathbf{E}) \big|_{\partial K}                  \\ H^{-1/2}(\partial
-    K)              & = \text{tr}_{\text{div}}(H(\text{div}, \Omega_h)) :=
-    \prod_{K \in \Omega_h}  (\mathbf{n}_K \cdot \textbf{v} ) \big|_{\partial K}
+    H^{1/2}(\partial K)               &
+    = \text{tr}_{\text{grad}}(H^1(\Omega_h)) :=  \prod_{K \in
+    \Omega_h} u\big|_{\partial K} \\ H^{-1/2}(\text{curl}, \partial
+    K) & = \text{tr}_{\text{curl}, \top}(H(\text{curl}, \Omega_h))
+    := \prod_{K \in \Omega_h} (\mathbf{n}_K \times \mathbf{E})
+    \times \mathbf{n}_K \big|_{\partial K} \\ H^{-1/2}(\text{div},
+    \partial K)  & = \text{tr}_{\text{curl}, \dashv }(H(\text{curl},
+    \Omega_h)) := \prod_{K \in \Omega_h} (\mathbf{n}_K \times \mathbf{E})
+    \big|_{\partial K}                  \\ H^{-1/2}(\partial K)              &
+    = \text{tr}_{\text{div}}(H(\text{div}, \Omega_h)) := \prod_{K \in \Omega_h}
+    (\mathbf{n}_K \cdot \textbf{v} ) \big|_{\partial K}
 @f}
 
 <h4>Application to the acoustic Helmholtz equation</h4>
 
-Now if we apply the DPG method to the acoustic Helmholtz ultraweak
-formulation presented above, we get the following :
+Now if we apply the DPG method to the acoustic Helmholtz ultraweak formulation
+presented above, we get the following : 
 @f{align*}{
-   \text{Find } & p^* \in L^2(\Omega_h), \mathbf{u} \in (L^2(\Omega_h))^d, \hat{p}^* \in H^{1/2}(\partial \Omega_h) \text{ and } \hat{u}_n \in H^{-1/2}(\partial \Omega_h)
-   \text{ so that} \\ & (
-\mathbf{v}, i \omega\mathbf{u})_{\Omega_h} - (\nabla
-\cdot \mathbf{v}, p^*)_{\Omega_h} + \langle \mathbf{v}
-\cdot \mathbf{n}, \hat{p}^* \rangle_{\partial \Omega_h} = 0, \quad \forall
-\mathbf{v} \in H(\text{div}, K), \\
-    &(q, i\omega p^*)_{\Omega_h} - (\nabla
-    q, \mathbf{u})_{\Omega_h} + \langle q, \hat{u}_n \rangle_{\partial
-    \Omega_h} = 0, \quad \forall q \in H^1(K).
+   \text{Find } & p^* \in L^2(\Omega_h), \mathbf{u} \in (L^2(\Omega_h))^d,
+   \hat{p}^* \in H^{1/2}(\partial \Omega_h) \text{ and } \hat{u}_n \in
+   H^{-1/2}(\partial \Omega_h) \text{ so that} \\ & (
+\mathbf{v}, i \omega\mathbf{u})_{\Omega_h} - (\nabla \cdot \mathbf{v},
+p^*)_{\Omega_h} + \langle \mathbf{v} \cdot \mathbf{n}, \hat{p}^*
+\rangle_{\partial \Omega_h} = 0, \quad \forall \mathbf{v} \in H(\text{div},
+K), \\
+    &(q, i\omega p^*)_{\Omega_h} - (\nabla q, \mathbf{u})_{\Omega_h} + \langle
+    q, \hat{u}_n \rangle_{\partial \Omega_h} = 0, \quad \forall q \in H^1(K).
 @f}
-where we make explicit the difference between the the interior terms $\mathbf{u}$ and $p^*$ and the mesh interface terms
-$\hat{u}_n$ and $\hat{p}^*$ which lives on the skeleton ($\partial \Omega_h$). From this ultraweak formulation, we can identify the
-functional space of our problem:
+where we make explicit the difference between the the interior terms
+$\mathbf{u}$ and $p^*$ and the mesh interface terms $\hat{u}_n$ and $\hat{p}^*$
+which lives on the skeleton ($\partial \Omega_h$). From this ultraweak
+formulation, we can identify the functional space of our problem: 
 @f{align*}{
      & U = (L^2(\Omega))^{dim} \times L^2(\Omega) \times H^{-1/2}(\partial
      \Omega_h) \times H^{1/2}(\partial \Omega_h) , \\ & V = H(\text{div},
      K) \times H^1(K).
 @f}
-We can also directly define the adjoint graph norm which will
-be used to build the Gram matrix and control the residual: @f{equation*}{
+We can also directly define the adjoint graph norm which will be used
+to build the Gram matrix and control the residual: 
+@f{equation*}{
      \|(\mathbf{v}, q)\|^2_V := \|A^* (\mathbf{v}, q)\|^2 + \beta^2
-     (\|\mathbf{v}\|^2 + \|q\|^2 )= \|\ i\omega \mathbf{v} +
-     \nabla q \|^2 + \| i\omega q + \nabla \cdot \mathbf{v}\|^2 +
-     \|\mathbf{v}\|^2 + \|q\|^2,
+     (\|\mathbf{v}\|^2 + \|q\|^2 )= \|\ i\omega \mathbf{v} + \nabla q \|^2 +
+     \| i\omega q + \nabla \cdot \mathbf{v}\|^2 + \|\mathbf{v}\|^2 + \|q\|^2,
 @f}
-where $\beta = \mathcal{O}(1)$ is a scaling parameter necessary for
-the stability of the method (here chosen to be one as it is commonly done
-in the literature).
+where $\beta = \mathcal{O}(1)$ is a scaling parameter necessary for the
+stability of the method (here chosen to be one as it is commonly done in
+the literature).
 
 <h4>Implementation of the boundary conditions</h4>
 
@@ -281,23 +348,23 @@ When using the ultraweak form, we can readily implement both Dirichlet
 and Neumann boundary conditions. The latter are in fact a Dirichlet
 boundary condition on the flux variable of our problem, here the fluid
 velocity. However, careful attention needs to be made with Robin boundary
-conditions because they tie together the two fields of interest and we do
-not want to overconstrain the system. To do so, here we will present the
-method proposed by
-J. Gopalakrishnan and J.  Schöberl @cite gopalakrishnan2014. We therefore add an approximate
-version of the $\mathbf{u} \cdot \mathbf{n}  - \frac{ k_n }{\omega} p^* =
-g_R$ into our system by adding the term:
+conditions because they tie together the two fields of interest and we do not
+want to overconstrain the system. To do so, here we will present the method
+proposed by J. Gopalakrishnan and J.  Schöberl @cite gopalakrishnan2014. We
+therefore add an approximate version of the $\mathbf{u} \cdot \mathbf{n}  -
+\frac{ k_n }{\omega} p^* = g_R$ into our system by adding the term: 
 @f{align*}{
-    \pm  \bigg\langle \hat{w}_n - \frac{ k_n}{\omega} \hat{r}^*, \hat{u}_n - \frac{ k_n}{\omega} \hat{p}^*
+    \pm  \bigg\langle \hat{w}_n - \frac{ k_n}{\omega} \hat{r}^*, \hat{u}_n -
+    \frac{ k_n}{\omega} \hat{p}^*
       \bigg
-    \rangle_{\Gamma_1 \cup \Gamma_3} = \pm \bigg\langle \hat{w}_n
-    - \frac{ k_n}{\omega} \hat{r}^*, g_R \bigg \rangle_{\Gamma_1 \cup \Gamma_3},
+    \rangle_{\Gamma_1 \cup \Gamma_3} = \pm \bigg\langle \hat{w}_n - \frac{
+    k_n}{\omega} \hat{r}^*, g_R \bigg \rangle_{\Gamma_1 \cup \Gamma_3},
     \quad \forall \hat{w}_n \in H^{1/2}(\Gamma_1 \cup \Gamma_3), \hat{r}^*
     \in H^{-1/2}(\Gamma_1 \cup \Gamma_3)
 @f}
 on the appropriate boundaries. This extra relation adds new terms in
 the third equation of the DPG abstract formulation and change the overall
-structure to the following:
+structure to the following: 
 @f{equation*}{
     \begin{pmatrix}
         G               & B & \hat{B} \\ B^\dagger       & 0 & 0       \\
@@ -308,71 +375,70 @@ structure to the following:
         l \\ 0 \\ g_R
     \end{pmatrix}.
 @f}
-In the above, we choose the sign so that the whole system remains positive
-definite (i.e., the matrix $D$ needs to be negative semidefinite, so we choose
-the sign to be the negative). As a final consequence of the Robin boundary
-condition, we also want to control the residual on this type of boundary. Therefore,
-we need to modify the adjoint graph norm to take the new terms into account as follows:
+In the above, we choose the sign so that the whole system remains
+positive definite (i.e., the matrix $D$ needs to be negative semidefinite,
+so we choose the sign to be the negative). As a final consequence of the
+Robin boundary condition, we also want to control the residual on this type
+of boundary. Therefore, we need to modify the adjoint graph norm to take
+the new terms into account as follows: 
 @f{align*}{
-    \|(\mathbf{v}, q)\|^2_E = \|i\omega \mathbf{v} + \nabla q \|^2 +
-    \|i\omega q + \nabla \cdot \mathbf{v}\|^2 + \|\mathbf{v}\|^2 +
-    \|q\|^2 + \|\mathbf{v} \cdot \mathbf{n} + \frac{k_n}{\omega}
-    q||^2_{\Gamma_1 \cup \Gamma_3}.
+    \|(\mathbf{v}, q)\|^2_E = \|i\omega \mathbf{v} + \nabla q \|^2 + \|i\omega
+    q + \nabla \cdot \mathbf{v}\|^2 + \|\mathbf{v}\|^2 + \|q\|^2 + \|\mathbf{v}
+    \cdot \mathbf{n} + \frac{k_n}{\omega} q||^2_{\Gamma_1 \cup \Gamma_3}.
 @f}
 We are now finally ready to build out the following DPG system for
 our problem:
-
-@f{equation*}{ \begin{pmatrix}
-  (\mathbf{v}, \mathbf{v})_{\Omega_h} + (\nabla \cdot
-  \mathbf{v}, \nabla \cdot \mathbf{v})_{\Omega_h} +
-  (i\omega\mathbf{v}, i\omega \mathbf{v})_{\Omega_h} +
-  \langle \mathbf{v} \cdot \mathbf{n}, \mathbf{v} \cdot \mathbf{n}
+@f{equation*}{ 
+  \begin{pmatrix}
+  (\mathbf{v}, \mathbf{v})_{\Omega_h} + (\nabla \cdot \mathbf{v}, \nabla \cdot
+  \mathbf{v})_{\Omega_h} + (i\omega\mathbf{v}, i\omega \mathbf{v})_{\Omega_h}
+  + \langle \mathbf{v} \cdot \mathbf{n}, \mathbf{v} \cdot \mathbf{n}
   \rangle_{\Gamma_1 \cup \Gamma_3}
 
-  &   (i\omega \mathbf{v}, \nabla q)_{\Omega_h} + (\nabla
-  \cdot \mathbf{v}, i\omega q)_{\Omega_h} + \langle \mathbf{v}
-  \cdot \mathbf{n}, \frac{k_n}{\omega}q \rangle_{\Gamma_1 \cup
-  \Gamma_3} & ( \mathbf{v}, i\omega \mathbf{u})_{\Omega_h} & -( \nabla \cdot
-  \mathbf{v}, p^*)_{\Omega_h} & 0 & \langle \mathbf{v}
-  \cdot \mathbf{n}, \hat{p}^* \rangle_{\partial \Omega_h} \\
+  &   (i\omega \mathbf{v}, \nabla q)_{\Omega_h} + (\nabla \cdot
+  \mathbf{v}, i\omega q)_{\Omega_h} + \langle \mathbf{v} \cdot \mathbf{n},
+  \frac{k_n}{\omega}q \rangle_{\Gamma_1 \cup \Gamma_3} & ( \mathbf{v}, i\omega
+  \mathbf{u})_{\Omega_h} & -( \nabla \cdot \mathbf{v}, p^*)_{\Omega_h} & 0 &
+  \langle \mathbf{v} \cdot \mathbf{n}, \hat{p}^* \rangle_{\partial \Omega_h} \\
 
 (\nabla q, i\omega \mathbf{v})_{\Omega_h} + (
-  i\omega q, \nabla \cdot \mathbf{v})_{\Omega_h} +
-  \langle \frac{k_n}{\omega}q, \mathbf{v} \cdot
-  \mathbf{n} \rangle_{\Gamma_1 \cup \Gamma_3}
+  i\omega q, \nabla \cdot \mathbf{v})_{\Omega_h} + \langle \frac{k_n}{\omega}q,
+  \mathbf{v} \cdot \mathbf{n} \rangle_{\Gamma_1 \cup \Gamma_3}
 
 
-  & (q, q)_{\Omega_h} + (\nabla q, \nabla q)_{\Omega_h}
-  + ( i\omega q, i\omega q)_{\Omega_h} + \langle
-  \frac{k_n}{\omega}q, \frac{k_n}{\omega}q
-  \rangle_{\Gamma_1 \cup \Gamma_3} & - (\nabla q,\mathbf{u})_{\Omega_h} & (q, i\omega p^*)_{\Omega_h}&  \langle q, \hat{u}_n \rangle_{\partial \Omega_h} & 0 \\
+  & (q, q)_{\Omega_h} + (\nabla q, \nabla q)_{\Omega_h} + ( i\omega q,
+  i\omega q)_{\Omega_h} + \langle \frac{k_n}{\omega}q, \frac{k_n}{\omega}q
+  \rangle_{\Gamma_1 \cup \Gamma_3} & - (\nabla q,\mathbf{u})_{\Omega_h} & (q,
+  i\omega p^*)_{\Omega_h}&  \langle q, \hat{u}_n \rangle_{\partial \Omega_h}
+  & 0 \\
 
   (i\omega \mathbf{u}, \mathbf{v})_{\Omega_h} & -(\mathbf{u},
    \nabla q )_{\Omega_h} & 0 & 0 & 0 & 0 \\ -(p^*, \nabla \cdot
-  \mathbf{v} )_{\Omega_h} & ( i\omega p^*, q)_{\Omega_h} & 0 &
-  0 & 0 & 0 \\
+  \mathbf{v} )_{\Omega_h} & ( i\omega p^*, q)_{\Omega_h} & 0 & 0 & 0 & 0 \\
 
-  0 & \langle \hat{u}_n, q \rangle_{\partial \Omega_h} & 0 & 0 &
-  - \langle \hat{u}_n, \hat{u}_n \rangle_{\Gamma_1 \cup \Gamma_3} &
-  \langle \hat{u}_n, \frac{k_n}{\omega} \hat{p}^* \rangle_{\Gamma_1
-  \cup \Gamma_3} \\ \langle \hat{p}^*, \mathbf{v} \cdot \mathbf{n} \rangle_{\partial \Omega_h} & 0 & 0 & 0 & \langle \frac{k_n}{\omega}
-  \hat{p}^*, \hat{u}_n \rangle_{\Gamma_1 \cup \Gamma_3} &
-  - \langle \frac{k_n}{\omega} \hat{p}^*, \frac{k_n}{\omega}
+  0 & \langle \hat{u}_n, q \rangle_{\partial \Omega_h} & 0 & 0 & - \langle
+  \hat{u}_n, \hat{u}_n \rangle_{\Gamma_1 \cup \Gamma_3} & \langle \hat{u}_n,
+  \frac{k_n}{\omega} \hat{p}^* \rangle_{\Gamma_1 \cup \Gamma_3} \\ \langle
+  \hat{p}^*, \mathbf{v} \cdot \mathbf{n} \rangle_{\partial \Omega_h} & 0 &
+  0 & 0 & \langle \frac{k_n}{\omega} \hat{p}^*, \hat{u}_n \rangle_{\Gamma_1
+  \cup \Gamma_3} & - \langle \frac{k_n}{\omega} \hat{p}^*, \frac{k_n}{\omega}
   \hat{p}^* \rangle_{\Gamma_1 \cup \Gamma_3}
 \end{pmatrix}
 
 \begin{pmatrix} \mathbf{v} \\ q \\ \mathbf{u} \\ p^* \\ \hat{u}_n \\ \hat{p}^*
-\end{pmatrix} = \begin{pmatrix} (\mathbf{v}, l)_{\Omega_h} \\ (q,l)_{\Omega_h} \\ 0 \\
-0 \\ - \langle \hat{u}_n, g_R \rangle_{\Gamma_1 \cup \Gamma_3}
-\\ \langle \frac{k_n}{\omega} \hat{p}^*, g_R \rangle_{\Gamma_1
-\cup \Gamma_3} \end{pmatrix}  @f},
-where we left the term $l$ and $g_R$ in the formulation even if those are null in our case study for clarity.
+\end{pmatrix} = \begin{pmatrix} (\mathbf{v}, l)_{\Omega_h} \\ (q,l)_{\Omega_h}
+\\ 0 \\ 0 \\ - \langle \hat{u}_n, g_R \rangle_{\Gamma_1 \cup \Gamma_3} \\
+\langle \frac{k_n}{\omega} \hat{p}^*, g_R \rangle_{\Gamma_1 \cup \Gamma_3}
+\end{pmatrix} 
+@f}
+where we left the term $l$ and $g_R$ in the formulation even if those are null
+in our case study for clarity.
 
 <h4>Final elementary system and condensation</h4>
 
-Finally, because the Gramm matrix is block-diagonal where each block corresponds to a cell, it is common
-to condense it in order to remove the residual unknowns. The resulting system
-is:
+Finally, because the Gramm matrix is block-diagonal where each block
+corresponds to a cell, it is common to condense it in order to remove the
+residual unknowns. The resulting system is: 
 @f{equation*}{
     \begin{pmatrix}
         B^\dagger G^{-1}B       & B^\dagger G^{-1}\hat{B}           \\
@@ -384,22 +450,23 @@ is:
     \end{pmatrix},
 @f}
 where $u_h = \{\mathbf{u},p^*\}$ and $\hat{u}_h = \{\hat{u}_n,\hat{p}^*\}$.
-To avoid extra computational cost when solving the
-matrix, the system can be further condensed to solve only for the interface
-degrees of freedom since the interior degrees of freedom are discontinuous
-across element and can be locally condensed. By posing the following:
+To avoid extra computational cost when solving the matrix, the system can be
+further condensed to solve only for the interface degrees of freedom since
+the interior degrees of freedom are discontinuous across element and can be
+locally condensed. By posing the following: 
 @f{align*}{
  & M_1 = B^\dagger G^{-1}B, & M_2 = B^\dagger G^{-1}\hat{B}, && M_3 =
  \hat{B}^\dagger G^{-1}\hat{B} - D, && M_4 = B^\dagger G^{-1} && M_5 =
  \hat{B}^\dagger G^{-1},
 @f}
-we can simply solve the system:
+we can simply solve the system: 
 @f{equation*}{
     (M_3 - M_2^\dagger M_1^{-1} M_2) \hat{u}_h = (M_5 - M_2^\dagger M_1^{-1}
     M_4) l - g,
 @f}
-to obtain the solution on the faces of the mesh and then use it to recover the solution
-$u_h$ in the interiors of cells, with the following relation:
+to obtain the solution on the faces of the mesh and then use it to
+recover the solution $u_h$ in the interiors of cells, with the following
+relation: 
 @f{equation*}{
     u_h = M_1^{-1} (M_4 l - M_2 \hat{u}_h).
 @f}
