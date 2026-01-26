@@ -351,6 +351,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   , fe_values(this->euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
+  , dof_indices(fe_values.dofs_per_cell)
 {
   AssertDimension(euler_dof_handler.n_dofs(), euler_vector.size());
 }
@@ -374,6 +375,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   , fe_values(this->euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
+  , dof_indices(fe_values.dofs_per_cell)
 {
   Assert(euler_dof_handler.has_level_dofs(),
          ExcMessage("The underlying DoFHandler object did not call "
@@ -409,6 +411,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   , fe_values(this->euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
+  , dof_indices(fe_values.dofs_per_cell)
 {
   Assert(euler_dof_handler.has_level_dofs(),
          ExcMessage("The underlying DoFHandler object did not call "
@@ -441,6 +444,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   , fe_values(mapping.euler_dof_handler->get_fe(),
               reference_cell.template get_nodal_type_quadrature<dim>(),
               update_values)
+  , dof_indices(fe_values.dofs_per_cell)
 {}
 
 
@@ -510,13 +514,8 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
   else
     AssertDimension(euler_vector[0]->size(), euler_dof_handler->n_dofs());
 
-  {
-    std::lock_guard<std::mutex> lock(fe_values_mutex);
-    fe_values.reinit(dof_cell);
-  }
-  const unsigned int dofs_per_cell =
-    euler_dof_handler->get_fe().n_dofs_per_cell();
-  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
+  std::lock_guard<std::mutex> lock(fe_values_mutex);
+  fe_values.reinit(dof_cell);
   if (uses_level_dofs)
     dof_cell->get_mg_dof_indices(dof_indices);
   else
