@@ -207,8 +207,8 @@ namespace Step100
   // VectorTools::interpolate_boundary_values. This space has 4 components,
   // because the skeleton unknowns on faces for the velocity field are scalars
   // from the definition $\hat{u}_n = \mathbf{u} \cdot n$ and there are the real
-  // and imaginary part of both fields. The returned value will therefore be
-  // based on a the component with the convention:
+  // and imaginary part of both fields. The returned value will be
+  // based on the following component convention:
   // - <code>component == 0</code> : real part of velocity skeleton;
   // - <code>component == 1</code> : imaginary part of velocity skeleton;
   // - <code>component == 2</code> : real part of pressure skeleton;
@@ -275,13 +275,13 @@ namespace Step100
   // The same applies for the three FESystem:
   // <code>fe_system_trial_interior</code>,
   // <code>fe_system_trial_skeleton</code> and <code>fe_system_test</code>. In
-  // each one of these, we will store the relevant finite element space in the
-  // same order to avoid confusion. The first component will therefore always be
-  // related to the real part of the velocity, the second component to the its
-  // imaginary part, the third component to the real part of the pressure and
-  // the fourth component to its imaginary part.
+  // each one of these objects, we will store the relevant finite element space
+  // in the same order as for the BoundaryValues function. The first component
+  // will therefore always be related to the real part of the velocity, the
+  // second component to the its imaginary part, the third component to the real
+  // part of the pressure and the fourth component to its imaginary part.
 
-  // The constructor of the class takes four arguments to define the problem.
+  // The constructor of the class takes four arguments that define the problem.
   // The first two are related to the finite element spaces degree, i.e.,
   // <code>degree</code> defines the polynomial degree of the trial space and
   // <code>delta_degree</code> defines the difference in degree between the
@@ -297,34 +297,30 @@ namespace Step100
   // The class also provides a number of member functions that are responsible
   // for setting up, solving, and postprocessing the DPG formulation. The
   // <code>setup_system()</code> function initializes the three DoFHandler
-  // objects associated with the interior trial space, the skeleton trial space,
-  // and the test space. In addition, it sets up the sparsity pattern, the
-  // system matrix, and the right-hand side vector, and establishes the boundary
-  // conditions using AffineConstraints, including both Dirichlet and Neumann
-  // conditions.
-
-  // The assembly of the linear system is handled by
-  // <code>assemble_system()</code>, which is called twice for each problem.
-  // When <code>solve_interior = false</code>, the bilinear and linear forms are
-  // assembled and the system is locally condensed so that the resulting global
-  // system only involves the skeleton unknowns. When
-  // <code>solve_interior = true</code>, the system is assembled again and the
-  // previously computed skeleton solution is used to reconstruct the interior
-  // solution variables. This two-step approach is interesting to reduces the
-  // size of the global system that needs to be solve which helps for memory
-  // consumption, but requires assembling the system twice. To avoid duplication
-  // of the assembly process, we introduce a boolean flag that indicates whether
-  // we are assembling for the skeleton solve or for the interior
-  // reconstruction.
-
-  // The function <code>solve_linear_system_skeleton()</code> solves the
-  // resulting linear system for the skeleton degrees of freedom. Mesh
-  // refinement is performed by <code>refine_grid()</code>, which applies
-  // uniform refinement to the triangulation. The function
-  // <code>output_results()</code> writes both the skeleton and interior
-  // solutions to separate VTU files for visualization, while
-  // <code>calculate_L2_error()</code> computes the $L^2$ norm of the error
-  // using the known analytical solution.
+  // objects, the sparsity pattern, the
+  // system matrix, and the right-hand side vector. It also imposes both
+  // Dirichlet and Neumann boundary conditions using AffineConstraints. The
+  // function <code>assemble_system(bool solve_interior)</code> handles the
+  // assembly of the DPG system. It takes a boolean argument as input to
+  // indicate whether the assembly is being performed for the skeleton solve or
+  // for the interior reconstruction. When <code>solve_interior = false</code>,
+  // the bilinear and linear forms are assembled and the system is locally
+  // condensed so that the resulting global system only involves the skeleton
+  // unknowns. When <code>solve_interior = true</code>, the system is assembled
+  // again and the previously computed skeleton solution is used to reconstruct
+  // the interior solution variables. As mentionned in the introduction, this
+  // two-step approach is interesting to reduces the size of the global system
+  // that needs to be solve which helps for memory consumption and for the
+  // iterative solver convergence, but this requires assembling the system
+  // twice. The boolean flag introduced is interesting since it allows to reuse
+  // the same assembly function for both steps and avoid code duplication. The
+  // last functions of the class are pretty standard and include
+  // <code>solve_linear_system_skeleton()</code>, that solves the resulting
+  // linear system, <code>refine_grid()</code>, which applies uniform refinement
+  // to the triangulation, <code>output_results()</code>, that writes both the
+  // skeleton and interior solutions to separate VTU files for visualization,
+  // and finally <code>calculate_L2_error()</code>, which computes the $L^2$
+  // norm of the error using the known analytical solution.
 
   // In addition to these member functions, the class defines a number of member
   // variables that are used throughout the implementation. These include the
@@ -332,16 +328,16 @@ namespace Step100
   // vectors, linear system data structures, and a ConvergenceTable used to
   // store the $L^2$ error and related quantities. The coefficients defining the
   // incident plane wave, namely the wavenumber and the angle of incidence, are
-  // also stored as class members.
+  // also stored as class members. The class defines also several
+  // FEValuesExtractors variables that are reused at multiple points in the
+  // implementation to select the appropriate components of the finite element
+  // spaces for both the trial and test functions. These extractors provide
+  // access to the real and imaginary parts of the velocity and pressure
+  // variables. Since the skeleton space does not have the same number of
+  // components as the interior or test spaces (because the $H^{-1/2}$ space
+  // associated with the velocity field is scalar) additional extractors are
+  // defined specifically for the skeleton variables.
 
-  // Finally, the class defines several FEValuesExtractors that are reused at
-  // multiple points in the implementation to select the appropriate components
-  // of the solution fields. These extractors provide access to the real and
-  // imaginary parts of the velocity and pressure variables. Since the skeleton
-  // space does not have the same number of components as the interior or test
-  // spaces (because the $H^{-1/2}$ space associated with the velocity field is
-  // scalar) additional extractors are defined specifically for the skeleton
-  // variables.
   template <int dim>
   class DPGHelmholtz
   {
@@ -395,7 +391,7 @@ namespace Step100
 
   // @sect3{<code>DPGHelmholtz</code> Constructor}
   // In the constructor, we assign the relevant finite element to each FESystem
-  // following the nomenclature described above in the class description:
+  // following the nomenclature described above:
   // - <code>fe_system_trial_interior</code> contains $\Re(\mathbf{u})$,
   // $\Im(\mathbf{u})$, $\Re(p^*)$, $\Im(p^*)$ ;
   // - <code>fe_system_trial_skeleton</code> contains $\Re(\hat{u}_n)$,
@@ -403,21 +399,22 @@ namespace Step100
   // - <code>fe_system_test</code> contains $\Re(\mathbf{v})$,
   // $\Im(\mathbf{v})$, $\Re(q)$, $\Im(q)$.
 
-  // Note that the Q and FE_TraceQ elements have a higher degree than the others
-  // because their numbering start at 1 instead of 0. This is to ensure that the
-  // spaces chosen follow the exact sequence of energy spaces $Q_{k+1}
-  // \rightarrow Nédélec_k \rightarrow Raviart-Thomas_k \rightarrow DGQ_k$.
-
-  // We also initialize the FEValuesExtractors that will be used according
-  // to our FESystems nomenclature put the assertions to check if everything is
-  // correctly defined for our problem. The first assertion checks that the
-  // dimension is 2 because the problem is not implemented in 3D. We also verify
-  // that the `delta_degree` variable is at least 1 since the degree of the test
-  // space must be at least one degree higher than the trial space. Finally, we
-  // check that the wavenumber is positive since it is the magnitude of the wave
-  // vector and that the angle theta is in the interval $[0, \pi/2]$ because, as
-  // stated above, other angles would not be compatible with the current
-  // boundary definitions.
+  // Note that the FE_Q and FE_TraceQ elements have a higher degree than the
+  // others because their numbering start at 1 instead of 0. This is to ensure
+  // that the spaces chosen follow the exact sequence of energy spaces
+  // $\text{Q}_{k+1} \rightarrow \text{Nédélec}_k \rightarrow
+  // \text{Raviart-Thomas}_k \rightarrow \text{DGQ}_k$. We also initialize the
+  // FEValuesExtractors that will be used according to our FESystems
+  // nomenclature. The constructor also includes assertions to check that the
+  // provided template parameter <code>dim</code> is equal to 2. The dimension
+  // is 2 because the problem is not implemented in 3D. We also verify that the
+  // <code>delta_degree</code> variable is at least 1 since the degree of the
+  // test space must be at least one degree higher than the trial space.
+  // Finally, we check that the <code>wavenumber</code> is positive since it is
+  // the magnitude of the wave vector and that the angle <code>theta</code> is
+  // in the interval
+  // $[0, \pi/2]$ because, as stated above, other angles would not be compatible
+  // with the current boundary definitions.
 
   template <int dim>
   DPGHelmholtz<dim>::DPGHelmholtz(const unsigned int degree,
@@ -465,25 +462,21 @@ namespace Step100
   }
 
   // @sect3{DPGHelmholtz::setup_system}
-  // This function is similar to the other examples. The main difference lies in
-  // the fact that we need to set up multiple DOFHandlers for the interior, the
-  // skeleton and the test space. The corresponding degrees of freedom are
-  // distributed first, and the number of DoFs associated with each space is
-  // printed and recorded in the ConvergenceTable for later reference.
-
-  // Since the global linear system is posed exclusively in terms of the
-  // skeleton unknowns, constraints are only built for the corresponding
-  // DoFHandler. These include hanging-node constraints as well as boundary
-  // conditions imposed weakly or strongly depending on their type. In
-  // particular, Dirichlet boundary conditions are enforced on selected
+  // This function sets up the multiple DOFHandlers and record the number of
+  // DoFs associated with each space in the ConvergenceTable for later
+  // reference. It also defines the constraints, but since the global linear
+  // system is posed exclusively in terms of the skeleton unknowns, constraints
+  // are only built for this corresponding DoFHandler. These include
+  // hanging-node constraints as well as boundary conditions. In particular,
+  // Dirichlet and Neumann boundary conditions are enforced on selected
   // components of the skeleton variables by interpolating analytical boundary
   // data onto the appropriate trace spaces using component masks and
   // FEValuesExtractors. A Dirichlet condition is first applied to the pressure
   // trace on the left boundary (id=0), while a Neumann condition on the
   // pressure is enforced by prescribing the normal component of the velocity
-  // trace on the bottom boundary (id=2). Robin boundary conditions are not
-  // enforced through constraints and are instead incorporated later during the
-  // assembly of the bilinear and linear forms.
+  // trace on the bottom boundary (id=2). Note that the Robin boundary
+  // conditions are not enforced through constraints and are instead
+  // incorporated later during the assembly of the bilinear and linear forms.
 
   // Once all constraints have been specified and closed, the vectors and
   // matrices associated with the global linear system are initialized. Because
@@ -562,72 +555,77 @@ namespace Step100
 
   // @sect3{DPGHelmholtz::assemble_system}
 
-  // This function implements the core of the DPG method by assembling the local
-  // contributions of the bilinear and linear forms and, depending on the value
-  // of <code>solve_interior</code>, either performing local static condensation
-  // or reconstructing the interior solution from the skeleton unknowns.
-
-  // We begin by defining volume and face quadrature rules. Since the test space
+  // This function incorporates the core difference of a DPG solver by
+  // assembling the local contributions of the bilinear and linear forms. In it,
+  // we begin by defining volume and face quadrature rules. Since the test space
   // has a higher polynomial degree than the trial spaces by construction, the
   // quadrature order is chosen based on the test finite element to ensure
   // sufficient accuracy for all integrals. The number of quadrature points for
-  // both cell and face integration is stored for later use.
+  // both cell and face integration is also stored for later use.
 
   // Next, we create FEValues and FEFaceValues objects for the interior trial,
   // skeleton trial, and test spaces. In the ultraweak formulation used here,
   // gradients are only required for the test functions, while values are needed
   // for all spaces. Because all spaces are defined on the same triangulation,
-  // the update of quadrature points and JxW values is only required for one of
-  // the FEValues objects, which we choose to be the interior trial space.
+  // the update of quadrature points and the transformation jacobian values is
+  // only required for one of the FEValues objects, which we choose to be the
+  // interior trial space.
 
   // We then query and store the number of degrees of freedom per cell
   // associated with each finite element space. These values determine the sizes
-  // of all local matrices and vectors used during assembly.
+  // of all local matrices and vectors used during assembly. Notably, they are
+  // used to build containers to store shape function values, gradients,
+  // divergences, and their complex conjugates at each quadrature point to avoid
+  // repeated queries to FEValues objects. The first group of containers defined
+  // below corresponds to the test space quantities, including vector-valued
+  // test functions, their divergence, scalar test functions, and their
+  // gradients, both in the cell interior and on faces. The second group stores
+  // the interior trial variables, namely the velocity and pressure fields. The
+  // third group contains the skeleton trial variables, which represent the
+  // normal velocity and pressure traces and their complex conjugates.
 
-  // To avoid repeated queries to FEValues objects at each quadrature point, we
-  // allocate containers to store shape function values, gradients, divergences,
-  // and their complex conjugates. The first group of containers corresponds to
-  // the test space quantities, including vector-valued test functions, their
-  // divergence, scalar test functions, and their gradients, both in the cell
-  // interior and on faces. The second group stores the interior trial
-  // variables, namely the velocity and pressure fields. The third group
-  // contains the skeleton trial variables, which represent the normal velocity
-  // and pressure traces and their complex conjugates. Also with the goal of
-  // avoiding repeated queries when determining the to which element a shape
-  // function belongs, we define an <code>enum ShapeFunctionType</code> that
-  // classifies shape functions into four categories: velocity real part,
-  // velocity imaginary part, pressure real part, and pressure imaginary part.
-  // This enumeration is using bits as boolean flags to facilitate efficient
-  // checks during assembly of each DPG matrices and vectors.
+  // Also with the goal of avoiding repeated queries when determining to which
+  // element a shape function belongs, we define an <code>enum
+  // ShapeFunctionType</code> that classifies shape functions into four
+  // categories: velocity real part, velocity imaginary part, pressure real
+  // part, and pressure imaginary part. It also defines two composite
+  // categories, one for all velocity shape functions and another for all
+  // pressure shape functions. This enumeration is using bits as boolean flags
+  // to facilitate efficient checks during assembly of each DPG matrices and
+  // vectors. Containers for these classifications are defined for each of the
+  // three finite element spaces with the size corresponding to the number of
+  // DoFs per cell in each space.
 
-  // The local DPG matrices are then allocated. These include the Gram matrix
+  // Then, the local DPG matrices are allocated. These include the Gram matrix
   // $G$ of the test space, the coupling matrix between test and interior trial
   // spaces $B$, the coupling matrix between test and skeleton trial spaces
-  // $\hat{B}$, and a matrix associated with skeleton-only terms $D$. Together,
-  // these matrices define the uncondensed local DPG system. In addition, local
-  // vectors corresponding to the linear functional in the test space $l$ and to
-  // the skeleton trial space $g$ are defined. These vectors are later combined
-  // with the local matrices during condensation.
+  // $\hat{B}$, and the matrix $D$ associated with skeleton coupling terms
+  // arising from Robin boundary conditions. In addition, local vectors
+  // corresponding to the linear functional in the test space $l$ and to the
+  // skeleton trial space $g$ are defined. Together, these matrices and vectors
+  // define the uncondensed local DPG system.
 
-  // To perform local static condensation, we allocate a set of auxiliary
-  // matrices that represent intermediate block operators arising in the
-  // elimination of interior degrees of freedom ($M_1$, $M_2$, $M_3$, $M_4$ and
-  // $M_5$). Further temporary matrices and vectors are also created to store
-  // intermediate results during matrix–matrix and matrix–vector products. These
-  // temporary objects are labeled with a "temp" prefix for clarity.
+  // To perform the local static condensation, we need to allocate a set of
+  // auxiliary matrices that represent intermediate block operators arising in
+  // the elimination of interior degrees of freedom ($M_1$, $M_2$, $M_3$, $M_4$
+  // and $M_5$ define in the last section of the introduction). Further
+  // temporary matrices and vectors are also created to store intermediate
+  // results during matrix–matrix and matrix–vector products. These temporary
+  // objects are labeled with a "tmp" prefix.
 
-  // We also define local cell matrix and right-hand side vector associated with
-  // the skeleton degrees of freedom that will be used to solve our system,
-  // together with a local-to-global DoF index map used for distribution into
-  // the global system. In addition, we define vectors to store the interior
-  // solution that will be use when <code>solve_interior</code> is set to
-  // <code>true</code>.
-
-  // Finally, since the Helmholtz problem is complex-valued, we also define the
-  // imaginary unit and several complex constants that appear in the bilinear
-  // and linear forms. Although the global linear system is real-valued, complex
-  // arithmetic from the C++ standard library is used locally to simplify the
-  // formulation, in the same spirit as in step-81.
+  // Finally, we define local cell matrix and right-hand side vector
+  // associated with the skeleton degrees of freedom that will be used to solve
+  // our system, together with a local-to-global DoF index map used for
+  // distribution into the global system. These are relevant to obtain the
+  // solution when <code>solve_interior = false </code>, but when
+  // <code>solve_interior = true</code>, we need to define additional vectors to
+  // store the interior solution, interior right-hand side, and the skeleton
+  // solution that will be used for the interior reconstruction step. Note that
+  // since the Helmholtz problem is complex-valued, we also define the imaginary
+  // unit and several complex constants that appear in the bilinear and linear
+  // forms. Although the global linear system that is built is real-valued,
+  // complex arithmetic from the C++ standard library is used locally to
+  // simplify the formulation, in the same spirit as in step-81.
 
   template <int dim>
   void DPGHelmholtz<dim>::assemble_system(const bool solve_interior)
@@ -747,13 +745,14 @@ namespace Step100
     const std::complex<double>     iomega      = imag * wavenumber;
     const std::complex<double>     iomega_conj = std::conj(iomega);
 
-    // We now assemble the local contributions of the DPG formulation. As usual,
-    // we loop over all active cells of the triangulation. We choose the
-    // DoFHandler associated with the interior trial space as the primary
-    // iterator, since the cell-wise assembly is naturally tied to the interior
-    // unknowns. For each such cell, we explicitly obtain the corresponding
-    // iterators for the test space and for the skeleton trial space to ensure
-    // that all FEValues objects are reinitialized on the same physical cell.
+    // After defining all the variables for our assemby, we now assemble the
+    // local contributions of the DPG formulation. As usual, we loop over all
+    // active cells of the triangulation. We choose the DoFHandler associated
+    // with the interior trial space as the primary iterator, since the
+    // cell-wise assembly is naturally tied to the interior unknowns. For each
+    // such cell, we explicitly obtain the corresponding iterators for the test
+    // space and for the skeleton trial space to ensure that all FEValues
+    // objects are reinitialized on the same physical cell.
 
     // The loop on cells is used to assemble all the local matrices and vectors
     // entering the DPG static condensation procedure ($G$, $B$, $\hat{B}$, $D$,
