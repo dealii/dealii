@@ -261,8 +261,8 @@ namespace internal
     void
     get_cell_dof_indices(
       const dealii::DoFCellAccessor<dim, spacedim, level_dof_access> &accessor,
-      boost::container::small_vector<types::global_dof_index, 27> &dof_indices,
-      const unsigned int                                           fe_index)
+      Implementation::dof_index_vector_type &dof_indices,
+      const unsigned int                     fe_index)
     {
       Implementation::process_dof_indices(
         accessor,
