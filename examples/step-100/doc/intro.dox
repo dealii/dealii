@@ -221,7 +221,7 @@ broken test functions have no conformity assumptions across the inter-element
 boundaries, but they leave uncanceled interface terms, and thus require the
 introduction of interface unknowns (often called trace variables, or Lagrange
 multipliers $\hat{u}$) that live on the mesh skeleton and weakly enforce the
-continuity. With all those additionnal requirements, the final form of the
+continuity. With all those additional requirements, the final form of the
 abstract problem that needs to be solved in a DPG setting is:
 @f{equation*}{
     \label{eq:DPG_abstract_problem} \begin{cases}

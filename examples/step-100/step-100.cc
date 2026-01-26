@@ -308,7 +308,7 @@ namespace Step100
   // condensed so that the resulting global system only involves the skeleton
   // unknowns. When <code>solve_interior = true</code>, the system is assembled
   // again and the previously computed skeleton solution is used to reconstruct
-  // the interior solution variables. As mentionned in the introduction, this
+  // the interior solution variables. As mentioned in the introduction, this
   // two-step approach is interesting to reduces the size of the global system
   // that needs to be solve which helps for memory consumption and for the
   // iterative solver convergence, but this requires assembling the system
@@ -745,7 +745,7 @@ namespace Step100
     const std::complex<double>     iomega      = imag * wavenumber;
     const std::complex<double>     iomega_conj = std::conj(iomega);
 
-    // After defining all the variables for our assemby, we now assemble the
+    // After defining all the variables for our assembly, we now assemble the
     // local contributions of the DPG formulation. As usual, we loop over all
     // active cells of the triangulation. We choose the DoFHandler associated
     // with the interior trial space as the primary iterator, since the
