@@ -1824,6 +1824,40 @@ namespace GridTools
   compute_local_to_global_vertex_index_map(
     const Triangulation<dim, spacedim> &triangulation);
 
+  /**
+   * Map vertex indices in a coarse parallel::fullydistributed::Triangulation to
+   * the corresponding vertex indices in the coarse serial Triangulation that
+   * was used to the generate the parallel one.
+   *
+   * For objects of type parallel::distributed::Triangulation and
+   * parallel::shared::Triangulation this function returns the identity map
+   * (i.e., each processor knows about all vertices of the coarse Triangulation,
+   * and those vertices do not change). This function is mainly useful for
+   * objects of type parallel::fullydistributed::Triangulation where each
+   * processor only knows about the vertices that are locally owned or ghost
+   * vertices.
+   *
+   * This function returns a vector that has size parallel_tria.n_vertices().
+   * For each locally owned vertex that belongs to a locally owned cell, it
+   * contains the corresponding vertex index of the serial Triangulation. If a
+   * vertex is not locally owned, or it is locally owned but it belongs to a
+   * ghost cell, the corresponding serial index is
+   * `numbers::invalid_unsigned_int`. In other words, the returned vector has
+   * valid indices in a subset of the `true` entries of the vector returned by
+   * GridTools::get_locally_owned_vertices().
+   *
+   * The parallel Triangulation must have been generated from the serial one for
+   * this function to be any meaningful at all.
+   *
+   * @param serial_tria The serial Triangulation
+   * @param parallel_tria The parallel Triangulation
+   */
+  template <int dim, int spacedim>
+  std::vector<types::global_vertex_index>
+  parallel_to_serial_vertex_indices(
+    const Triangulation<dim, spacedim> &serial_tria,
+    const Triangulation<dim, spacedim> &parallel_tria);
+
   /** @} */
   /**
    * @name Partitions and subdomains of triangulations

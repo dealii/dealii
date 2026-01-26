@@ -1,0 +1,5 @@
+New: The function GridTools::parallel_to_serial_vertex_indices() returns a
+vector mapping each vertex of a parallel Triangulation to the corresponding
+vertex index in the originating serial Triangulation.
+<br>
+(Luca Heltai, 2025/12/23)
