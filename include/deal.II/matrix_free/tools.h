@@ -813,18 +813,10 @@ namespace MatrixFreeTools
         // STEP 2: setup CSR storage of transposed locally-relevant
         //   constraint matrix
 
-        // (constrained local index, global index of dof
-        // constraints, weight)
-        std::vector<std::tuple<unsigned int, unsigned int, Number>>
-          locally_relevant_constraints, locally_relevant_constraints_tmp;
-        locally_relevant_constraints.reserve(dofs_per_cell);
-        std::vector<unsigned int>  constraint_position;
-        std::vector<unsigned char> is_constrained_hn;
-
         const std::array<unsigned int, n_lanes> &cells =
           this->phi->get_cell_ids();
 
-        std::vector<unsigned int> inverse_lookup_count(dofs_per_cell);
+        inverse_lookup_count.resize(dofs_per_cell);
         for (unsigned int v = 0; v < n_lanes_filled; ++v)
           {
             Assert(cells[v] != numbers::invalid_unsigned_int,
@@ -1328,8 +1320,16 @@ namespace MatrixFreeTools
         std::vector<std::tuple<unsigned int, unsigned int, Number>>>
         locally_relevant_constraints_hn_map;
 
-      // scratch array
+      // scratch arrays
       AlignedVector<VectorizedArrayType> values_dofs;
+
+      std::vector<std::tuple<unsigned int, unsigned int, Number>>
+        locally_relevant_constraints;
+      std::vector<std::tuple<unsigned int, unsigned int, Number>>
+                                 locally_relevant_constraints_tmp;
+      std::vector<unsigned int>  constraint_position;
+      std::vector<unsigned char> is_constrained_hn;
+      std::vector<unsigned int>  inverse_lookup_count;
 
       bool has_simple_constraints_;
     };
