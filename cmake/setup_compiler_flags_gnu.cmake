@@ -95,6 +95,35 @@ enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-literal-suffix")
 #
 enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-psabi")
 
+#
+# Disable warnings about incorrectly formatted lines. This is, in
+# principle, a useful warning but (i) it is not relevant to our own
+# code base because we auto-indent everything and so there are *never*
+# any instances of incorrectly formatted lines in our code base, and
+# (ii) GCC has issues tracking indenting on very large code bases such
+# as codes that build on deal.II and perhaps use unity builds (where
+# translation units pull in substantial fractions of the deal.II code
+# base). In the latter case, one ends up with warnings such as these
+# for pretty much every file being compiled:
+#
+# In file included from ...include/deal.II/matrix_free/portable_fe_evaluation.h:28,
+#                  from ...include/deal.II/matrix_free/tools.h:24,
+#                  from ...include/deal.II/matrix_free/operators.h:31,
+#                  from ...aspect/include/aspect/simulator/solver/matrix_free_operators.h:29,
+#                  from ...aspect/include/aspect/simulator/solver/stokes_matrix_free.h:24,
+#                  from ...aspect/source/simulator/solver/stokes_matrix_free.cc:22,
+#                  from ...aspect-build/CMakeFiles/aspect.exe.release.dir/Unity/unity_47_cxx.cxx:4:
+# ...include/deal.II/matrix_free/portable_matrix_free.templates.h: In member function ‘void dealii::Portable::internal::ReinitHelper<dim, Number>::resize(unsigned int)’:
+# ...include/deal.II/matrix_free/portable_matrix_free.templates.h:144: note: ‘-Wmisleading-indentation’ is disabled from this point onwards, since column-tracking was disabled due to the size of the code/headers
+#   144 |       if (update_flags & update_JxW_values)
+# ...include/deal.II/matrix_free/portable_matrix_free.templates.h:144: note: adding ‘-flarge-source-files’ will allow for more column-tracking support, at the expense of compilation time and memory
+#
+# These warnings are not useful because they obscure everything else
+# in a file that might be worth warning about.
+#
+enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-misleading-indentation")
+
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "IntelLLVM")
   # Enable warnings for conversion from real types to integer types.
   # The warning is too noisy in gcc and therefore only enabled for clang.
