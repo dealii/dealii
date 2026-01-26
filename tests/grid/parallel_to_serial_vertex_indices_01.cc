@@ -22,6 +22,9 @@
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
+#include <algorithm>
+#include <cstdio>
+
 #include "../tests.h"
 
 
@@ -29,27 +32,72 @@ template <int dim, int spacedim>
 void
 test()
 {
-  Triangulation<dim, spacedim> tria;
-  GridGenerator::subdivided_hyper_cube(tria, 5 - dim);
+  deallog << "Test " << dim << "d in " << spacedim << "d" << std::endl;
 
-  parallel::fullydistributed::Triangulation<dim, spacedim> distributed_tria;
-  distributed_tria.copy_triangulation(tria);
+  Triangulation<dim, spacedim> serial_tria;
+  GridGenerator::subdivided_hyper_cube(serial_tria, 5 - dim);
+
+  parallel::fullydistributed::Triangulation<dim, spacedim> parallel_tria(
+    MPI_COMM_WORLD);
+  parallel_tria.copy_triangulation(serial_tria);
 
   const auto vertex_indices =
-    GridTools::parallel_to_serial_vertex_indices(tria, distributed_tria);
+    GridTools::parallel_to_serial_vertex_indices(serial_tria, parallel_tria);
 
-  unsigned int vertex_id = 0;
-  for (const auto &v = distributed_tria.get_vertices())
+  const auto locally_owned_vertices =
+    GridTools::get_locally_owned_vertices(parallel_tria);
+  const auto n_locally_owned_vertices =
+    std::count(locally_owned_vertices.begin(),
+               locally_owned_vertices.end(),
+               true);
+
+  deallog << " serial vertices: " << serial_tria.n_vertices()
+          << ", parallel vertices: " << parallel_tria.n_vertices()
+          << " (owned vertices: " << n_locally_owned_vertices << ")"
+          << std::endl;
+
+  const auto &serial_vertices   = serial_tria.get_vertices();
+  const auto &parallel_vertices = parallel_tria.get_vertices();
+
+  unsigned int n_checked_vertices = 0;
+  for (unsigned int i = 0; i < vertex_indices.size(); ++i)
     {
+      auto serial_vertex_index = vertex_indices[i];
+      if (serial_vertex_index != numbers::invalid_unsigned_int)
+        {
+          const auto &v_parallel = parallel_vertices[i];
+          const auto &v_serial   = serial_vertices[serial_vertex_index];
+          ++n_checked_vertices;
+          if (v_parallel.distance(v_serial) > 1e-12)
+            {
+              deallog << "Error: vertex " << n_checked_vertices - 1
+                      << " differs: parallel " << v_parallel << ", serial "
+                      << v_serial << std::endl;
+            }
+        }
     }
 
+  deallog << "Checked " << n_checked_vertices << " locally owned vertices."
+          << std::endl;
+}
 
 
-  int main()
-  {
-    initlog();
 
-    test();
+int
+main(int argc, char **argv)
+{
+  Utilities::MPI::MPI_InitFinalize mpi_init(argc, argv);
 
-    return 0;
-  }
+  MPILogInitAll mpi_log_init_all;
+
+  test<1, 1>();
+  test<1, 2>();
+  test<1, 3>();
+
+  test<2, 2>();
+  test<2, 3>();
+
+  test<3, 3>();
+
+  return 0;
+}

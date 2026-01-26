@@ -1842,7 +1842,9 @@ namespace GridTools
    * contains the corresponding vertex index of the serial Triangulation. If a
    * vertex is not locally owned, or it is locally owned but it belongs to a
    * ghost cell, the corresponding serial index is
-   * `numbers::invalid_unsigned_int`
+   * `numbers::invalid_unsigned_int`. In other words, the returned vector has
+   * valid indices in a subset of the `true` entries of the vector returned by
+   * GridTools::get_locally_owned_vertices().
    *
    * The parallel Triangulation must have been generated from the serial one for
    * this function to be any meaningful at all.
