@@ -44,10 +44,10 @@
 <         std::cout << "===========================================" << std::endl
 <                   << "Cycle " << cycle << ':' << std::endl;
 1870c1837
-<       int    degree       = 2;
+<       const int    degree       = 2;
 ---
->       int    degree       = 1;
+>       const int    degree       = 1;
 1872c1839
-<       double wavenumber   = 20 * pi;
+<       const double wavenumber   = 20 * pi;
 ---
->       double wavenumber   = 2 * pi;
+>       const double wavenumber   = 2 * pi;
