@@ -168,7 +168,7 @@ namespace Step70
   // members of this class and the corresponding entries in the
   // ParameterHandler. Thanks to the use of the
   // ParameterHandler::add_parameter() method, this connection is trivial, but
-  // requires all members of this class to be writeable.
+  // requires all members of this class to be writable.
   template <int dim, int spacedim = dim>
   class StokesImmersedProblemParameters : public ParameterAcceptor
   {

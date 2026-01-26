@@ -679,7 +679,7 @@ public:
   operator()(const size_type i) const;
 
   /**
-   * Access the @p ith component as a writeable reference.
+   * Access the @p ith component as a writable reference.
    */
   Number &
   operator()(const size_type i);
@@ -693,7 +693,7 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access the @p ith component as a writeable reference.
+   * Access the @p ith component as a writable reference.
    *
    * Exactly the same as operator().
    */

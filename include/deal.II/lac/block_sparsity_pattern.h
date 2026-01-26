@@ -711,7 +711,7 @@ namespace TrilinosWrappers
     BlockSparsityPattern(
       const std::vector<IndexSet> &row_parallel_partitioning,
       const std::vector<IndexSet> &column_parallel_partitioning,
-      const std::vector<IndexSet> &writeable_rows,
+      const std::vector<IndexSet> &writable_rows,
       const MPI_Comm               communicator = MPI_COMM_WORLD);
 
     /**
@@ -756,7 +756,7 @@ namespace TrilinosWrappers
     void
     reinit(const std::vector<IndexSet> &row_parallel_partitioning,
            const std::vector<IndexSet> &column_parallel_partitioning,
-           const std::vector<IndexSet> &writeable_rows,
+           const std::vector<IndexSet> &writable_rows,
            const MPI_Comm               communicator = MPI_COMM_WORLD);
 
     /**
