@@ -16,15 +16,16 @@
 // @sect3{Include files}
 
 // The DPG method requires a large breadth of element types which are included
-// below:
+// first below. Beside these, the rest of the includes are some well-known files
+// used in many other tutorials. We also define the constant <code>pi</code> for
+// later use across the file and encapsulate everything in the Step100
+// namespace.
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_face.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_trace.h>
-
-// The rest of the includes are some well-known files:
 
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
@@ -63,9 +64,9 @@ namespace Step100
 {
   using namespace dealii;
 
-  // In the following function declaration, we create the analytical
+  // We first create the analytical
   // solutions of the velocity field ($\mathbf{u}$) and the pressure field
-  // ($p^*$) as well as the associated boundary values. However, in this
+  // ($p^*$) in the following Function classes declaration. However, in this
   // tutorial, we will avoid the use of deal.II complex arithmetic capabilities
   // and only use the complex functions that are defined in the C++ standard
   // library. Consequently, in what follows, we will separate the real and
@@ -199,20 +200,25 @@ namespace Step100
     return return_value;
   }
 
-  // Similar classes are required for the boundary values functions. The main
-  // difference is that the number of components will now be 4 because those
-  // functions will be applied to our space of skeleton unknowns via
+  // A similar class is required for the boundary values functions that will be
+  // applied to constrain the dofs. The main difference with the above function
+  // declaration is that the number of components will now be 4 because this
+  // function will be applied to our space of skeleton unknowns via
   // VectorTools::interpolate_boundary_values. This space has 4 components,
   // because the skeleton unknowns on faces for the velocity field are scalars
   // from the definition $\hat{u}_n = \mathbf{u} \cdot n$ and there are the real
-  // and imaginary part of both fields. When the function is not called with the
-  // right component index, it will simply return 0.0.
+  // and imaginary part of both fields. The returned value will therefore be
+  // based on a the component with the convention:
+  // - <code>component == 0</code> : real part of velocity skeleton;
+  // - <code>component == 1</code> : imaginary part of velocity skeleton;
+  // - <code>component == 2</code> : real part of pressure skeleton;
+  // - <code>component == 3</code> : imaginary part of pressure skeleton.
 
   template <int dim>
-  class BoundaryValues_p_real : public Function<dim>
+  class BoundaryValues : public Function<dim>
   {
   public:
-    BoundaryValues_p_real(const double wavenumber, const double theta)
+    BoundaryValues(const double wavenumber, const double theta)
       : Function<dim>(4)
       , wavenumber(wavenumber)
       , theta(theta)
@@ -226,104 +232,31 @@ namespace Step100
   };
 
   template <int dim>
-  double BoundaryValues_p_real<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
-  {
-    if (component == 2)
-      {
-        return std::cos(wavenumber * p[1] * std::sin(theta));
-      }
-
-    return 0.0;
-  }
-
-  template <int dim>
-  class BoundaryValues_p_imag : public Function<dim>
-  {
-  public:
-    BoundaryValues_p_imag(const double wavenumber, const double theta)
-      : Function<dim>(4)
-      , wavenumber(wavenumber)
-      , theta(theta)
-    {}
-    virtual double value(const Point<dim>  &p,
-                         const unsigned int component) const override;
-
-  private:
-    double wavenumber;
-    double theta;
-  };
-
-  template <int dim>
-  double BoundaryValues_p_imag<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
-  {
-    if (component == 3)
-      {
-        return -std::sin(wavenumber * p[1] * std::sin(theta));
-      }
-    return 0.0;
-  }
-
-  template <int dim>
-  class BoundaryValues_u_real : public Function<dim>
-  {
-  public:
-    BoundaryValues_u_real(const double wavenumber, const double theta)
-      : Function<dim>(4)
-      , wavenumber(wavenumber)
-      , theta(theta)
-    {}
-    virtual double value(const Point<dim>  &p,
-                         const unsigned int component) const override;
-
-  private:
-    double wavenumber;
-    double theta;
-  };
-
-  template <int dim>
-  double BoundaryValues_u_real<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
+  double BoundaryValues<dim>::value(const Point<dim>  &p,
+                                    const unsigned int component) const
   {
     if (component == 0)
       {
         return -1 * (std::sin(theta) *
                      std::cos(wavenumber * p[0] * std::cos(theta)));
       }
-    return 0.0;
-  }
-
-  template <int dim>
-  class BoundaryValues_u_imag : public Function<dim>
-  {
-  public:
-    BoundaryValues_u_imag(const double wavenumber, const double theta)
-      : Function<dim>(4)
-      , wavenumber(wavenumber)
-      , theta(theta)
-    {}
-    virtual double value(const Point<dim>  &p,
-                         const unsigned int component) const override;
-
-  private:
-    double wavenumber;
-    double theta;
-  };
-
-  template <int dim>
-  double BoundaryValues_u_imag<dim>::value(
-    const Point<dim>                   &p,
-    [[maybe_unused]] const unsigned int component) const
-  {
-    if (component == 1)
+    else if (component == 1)
       {
         return std::sin(theta) * std::sin(wavenumber * p[0] * std::cos(theta));
       }
-    return 0.0;
+    else if (component == 2)
+      {
+        return std::cos(wavenumber * p[1] * std::sin(theta));
+      }
+    else if (component == 3)
+      {
+        return -std::sin(wavenumber * p[1] * std::sin(theta));
+      }
+    else
+      {
+        AssertThrow(false, ExcMessage("Invalid component for BoundaryValues"));
+        return 0.0;
+      }
   }
 
   // @sect3{The <code>DPGHelmholtz</code> class declaration}
@@ -569,17 +502,14 @@ namespace Step100
     std::cout << std::endl
               << "Number of dofs for the interior: "
               << dof_handler_trial_interior.n_dofs() << std::endl;
-
     error_table.add_value("dofs_interior", dof_handler_trial_interior.n_dofs());
 
     std::cout << "Number of dofs for the skeleton: "
               << dof_handler_trial_skeleton.n_dofs() << std::endl;
-
     error_table.add_value("dofs_skeleton", dof_handler_trial_skeleton.n_dofs());
 
     std::cout << "Number of dofs for the test space: "
               << dof_handler_test.n_dofs() << std::endl;
-
     error_table.add_value("dofs_test", dof_handler_test.n_dofs());
 
     constraints.clear();
@@ -587,33 +517,30 @@ namespace Step100
     DoFTools::make_hanging_node_constraints(dof_handler_trial_skeleton,
                                             constraints);
 
-    const BoundaryValues_p_real<dim> p_real(wavenumber, theta);
-    const BoundaryValues_p_imag<dim> p_imag(wavenumber, theta);
-    const BoundaryValues_u_real<dim> u_real(wavenumber, theta);
-    const BoundaryValues_u_imag<dim> u_imag(wavenumber, theta);
+    const BoundaryValues<dim> boundary_values(wavenumber, theta);
 
     VectorTools::interpolate_boundary_values(dof_handler_trial_skeleton,
                                              types::boundary_id(0),
-                                             p_real,
+                                             boundary_values,
                                              constraints,
                                              fe_trial_skeleton.component_mask(
                                                extractor_p_hat_real));
     VectorTools::interpolate_boundary_values(dof_handler_trial_skeleton,
                                              types::boundary_id(0),
-                                             p_imag,
+                                             boundary_values,
                                              constraints,
                                              fe_trial_skeleton.component_mask(
                                                extractor_p_hat_imag));
 
     VectorTools::interpolate_boundary_values(dof_handler_trial_skeleton,
                                              types::boundary_id(2),
-                                             u_real,
+                                             boundary_values,
                                              constraints,
                                              fe_trial_skeleton.component_mask(
                                                extractor_u_hat_real));
     VectorTools::interpolate_boundary_values(dof_handler_trial_skeleton,
                                              types::boundary_id(2),
-                                             u_imag,
+                                             boundary_values,
                                              constraints,
                                              fe_trial_skeleton.component_mask(
                                                extractor_u_hat_imag));
@@ -1927,7 +1854,7 @@ namespace Step100
     std::cout << "Convergence table:" << std::endl;
     error_table.write_text(std::cout);
   }
-} // namespace Step100
+} // End of namespace Step100
 
 // @sect3{The <code>main</code> function}
 
