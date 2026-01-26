@@ -39,7 +39,7 @@
 1816c1785
 <     for (unsigned int cycle = 0; cycle < 8; ++cycle)
 ---
->     for (unsigned int cycle = 0; cycle < 4; ++cycle)
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)
 1818,1819d1786
 <         std::cout << "===========================================" << std::endl
 <                   << "Cycle " << cycle << ':' << std::endl;
