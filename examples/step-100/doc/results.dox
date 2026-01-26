@@ -29,7 +29,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <th>Norm</th><th>Order</th>
     <th>Norm</th><th>Order</th>
   </tr>
-
   <tr>
     <td align="center">0</td><td align="center">4</td><td align="center">0.7071</td>
     <td align="center">216</td><td align="center">138</td><td align="center">450</td><td align="center">78</td>
@@ -42,7 +41,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">1.3819</td><td align="center">–</td>
     <td align="center">1.9864</td><td align="center">–</td>
   </tr>
-
   <tr>
     <td align="center">1</td><td align="center">16</td><td align="center">0.3536</td>
     <td align="center">864</td><td align="center">450</td><td align="center">1666</td><td align="center">102</td>
@@ -55,7 +53,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">2.3013</td><td align="center">-0.74</td>
     <td align="center">2.3266</td><td align="center">-0.23</td>
   </tr>
-
   <tr>
     <td align="center">2</td><td align="center">64</td><td align="center">0.1768</td>
     <td align="center">3456</td><td align="center">1602</td><td align="center">6402</td><td align="center">208</td>
@@ -68,7 +65,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">2.7158</td><td align="center">-0.24</td>
     <td align="center">2.7309</td><td align="center">-0.23</td>
   </tr>
-
   <tr>
     <td align="center">3</td><td align="center">256</td><td align="center">0.0884</td>
     <td align="center">13824</td><td align="center">6018</td><td align="center">25090</td><td align="center">1547</td>
@@ -81,7 +77,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">0.5232</td><td align="center">2.38</td>
     <td align="center">0.6859</td><td align="center">1.99</td>
   </tr>
-
   <tr>
     <td align="center">4</td><td align="center">1024</td><td align="center">0.0442</td>
     <td align="center">55296</td><td align="center">23298</td><td align="center">99330</td><td align="center">2233</td>
@@ -94,7 +89,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">0.0179</td><td align="center">4.87</td>
     <td align="center">0.0204</td><td align="center">5.07</td>
   </tr>
-
   <tr>
     <td align="center">5</td><td align="center">4096</td><td align="center">0.0221</td>
     <td align="center">221184</td><td align="center">91650</td><td align="center">395266</td><td align="center">5297</td>
@@ -107,7 +101,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">0.0015</td><td align="center">3.58</td>
     <td align="center">0.0015</td><td align="center">3.74</td>
   </tr>
-
   <tr>
     <td align="center">6</td><td align="center">16384</td><td align="center">0.0110</td>
     <td align="center">884736</td><td align="center">363522</td><td align="center">1576962</td><td align="center">10166</td>
@@ -120,7 +113,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">0.0001</td><td align="center">3.50</td>
     <td align="center">0.0001</td><td align="center">3.54</td>
   </tr>
-
   <tr>
     <td align="center">7</td><td align="center">65536</td><td align="center">0.0055</td>
     <td align="center">3538944</td><td align="center">1447938</td><td align="center">6299650</td><td align="center">19647</td>
@@ -134,8 +126,6 @@ The solutions of the above program are written to .vtk files for both the interi
     <td align="center">0.0000</td><td align="center">3.47</td>
   </tr>
 </table>
-
-
 
 The most refined solution should look similar to the following figure where we present the pressure field solution -- the velocity fields have basically the same profile but it is vector valued so we do not show them here -- depending on your visualization tool (here we used Paraview). We cropped the domain in 4 to show both the real and imaginary components for the interior and the mesh skeleton.
 

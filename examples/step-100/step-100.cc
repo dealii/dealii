@@ -665,7 +665,13 @@ namespace Step100
   // interior and on faces. The second group stores the interior trial
   // variables, namely the velocity and pressure fields. The third group
   // contains the skeleton trial variables, which represent the normal velocity
-  // and pressure traces and their complex conjugates.
+  // and pressure traces and their complex conjugates. Also with the goal of
+  // avoiding repeated queries when determining the to which element a shape
+  // function belongs, we define an <code>enum ShapeFunctionType</code> that
+  // classifies shape functions into four categories: velocity real part,
+  // velocity imaginary part, pressure real part, and pressure imaginary part.
+  // This enumeration is using bits as boolean flags to facilitate efficient
+  // checks during assembly of each DPG matrices and vectors.
 
   // The local DPG matrices are then allocated. These include the Gram matrix
   // $G$ of the test space, the coupling matrix between test and interior trial
@@ -689,7 +695,7 @@ namespace Step100
   // the global system. In addition, we define vectors to store the interior
   // solution that will be use when <code>solve_interior</code> is set to
   // <code>true</code>.
-  //
+
   // Finally, since the Helmholtz problem is complex-valued, we also define the
   // imaginary unit and several complex constants that appear in the bilinear
   // and linear forms. Although the global linear system is real-valued, complex
@@ -753,6 +759,22 @@ namespace Step100
       dofs_per_cell_trial_skeleton);
     std::vector<std::complex<double>> p_hat(dofs_per_cell_trial_skeleton);
     std::vector<std::complex<double>> p_hat_conj(dofs_per_cell_trial_skeleton);
+
+    enum ShapeFunctionType : unsigned char
+    {
+      velocity_real = 1u << 0,
+      velocity_imag = 1u << 1,
+      pressure_real = 1u << 2,
+      pressure_imag = 1u << 3,
+
+      is_velocity = velocity_real | velocity_imag,
+      is_pressure = pressure_real | pressure_imag
+    };
+    std::vector<unsigned char> shape_function_type_test(dofs_per_cell_test);
+    std::vector<unsigned char> shape_function_type_trial_interior(
+      dofs_per_cell_trial_interior);
+    std::vector<unsigned char> shape_function_type_trial_skeleton(
+      dofs_per_cell_trial_skeleton);
 
     LAPACKFullMatrix<double> G_matrix(dofs_per_cell_test, dofs_per_cell_test);
     LAPACKFullMatrix<double> B_matrix(dofs_per_cell_test,
@@ -820,6 +842,11 @@ namespace Step100
     // ($\mathbf{u}$ and $p$). These quantities are stored as complex-valued
     // expressions, together with their complex conjugates, in order to directly
     // form the sesquilinear forms appearing in the time-harmonic formulation.
+    // In addition, we check and store in the
+    // <code>shape_function_type_test</code>,
+    // <code>shape_function_type_trial_interior</code>, and
+    // <code>shape_function_type_trial_skeleton</code> vectors which field each
+    // shape function is associated to.
 
     // For each quadrature point, we then loop over the test space degrees of
     // freedom. In a first nested loop over test indices, we assemble the Gram
@@ -916,6 +943,15 @@ namespace Step100
                 grad_q_conj[k] =
                   fe_values_test[extractor_p_real].gradient(k, q_point) -
                   imag * fe_values_test[extractor_p_imag].gradient(k, q_point);
+
+                if (fe_test.shape_function_belongs_to(k, extractor_u_real))
+                  shape_function_type_test[k] |= velocity_real;
+                if (fe_test.shape_function_belongs_to(k, extractor_u_imag))
+                  shape_function_type_test[k] |= velocity_imag;
+                if (fe_test.shape_function_belongs_to(k, extractor_p_real))
+                  shape_function_type_test[k] |= pressure_real;
+                if (fe_test.shape_function_belongs_to(k, extractor_p_imag))
+                  shape_function_type_test[k] |= pressure_imag;
               }
 
             for (unsigned int k : fe_values_trial_interior.dof_indices())
@@ -931,20 +967,32 @@ namespace Step100
                   imag *
                     fe_values_trial_interior[extractor_p_imag].value(k,
                                                                      q_point);
+
+                if (fe_trial_interior.shape_function_belongs_to(
+                      k, extractor_u_real))
+                  shape_function_type_trial_interior[k] |= velocity_real;
+                if (fe_trial_interior.shape_function_belongs_to(
+                      k, extractor_u_imag))
+                  shape_function_type_trial_interior[k] |= velocity_imag;
+                if (fe_trial_interior.shape_function_belongs_to(
+                      k, extractor_p_real))
+                  shape_function_type_trial_interior[k] |= pressure_real;
+                if (fe_trial_interior.shape_function_belongs_to(
+                      k, extractor_p_imag))
+                  shape_function_type_trial_interior[k] |= pressure_imag;
               }
 
             for (const auto i : fe_values_test.dof_indices())
               {
+                const unsigned char test_type_i = shape_function_type_test[i];
+
                 for (const auto j : fe_values_test.dof_indices())
                   {
-                    if ((fe_test.shape_function_belongs_to(i,
-                                                           extractor_u_real) ||
-                         fe_test.shape_function_belongs_to(i,
-                                                           extractor_u_imag)) &&
-                        (fe_test.shape_function_belongs_to(j,
-                                                           extractor_u_real) ||
-                         fe_test.shape_function_belongs_to(j,
-                                                           extractor_u_imag)))
+                    const unsigned char test_type_j =
+                      shape_function_type_test[j];
+
+                    if ((test_type_i & is_velocity) &&
+                        (test_type_j & is_velocity))
                       {
                         G_matrix(i, j) +=
                           (((v_conj[i] * v[j]) + (div_v_conj[i] * div_v[j]) +
@@ -953,14 +1001,8 @@ namespace Step100
                             .real();
                       }
 
-                    else if ((fe_test.shape_function_belongs_to(
-                                i, extractor_u_real) ||
-                              fe_test.shape_function_belongs_to(
-                                i, extractor_u_imag)) &&
-                             (fe_test.shape_function_belongs_to(
-                                j, extractor_p_real) ||
-                              fe_test.shape_function_belongs_to(
-                                j, extractor_p_imag)))
+                    else if ((test_type_i & is_velocity) &&
+                             (test_type_j & is_pressure))
                       {
                         G_matrix(i, j) +=
                           (((iomega_conj * v_conj[i] * grad_q[j]) +
@@ -969,14 +1011,8 @@ namespace Step100
                             .real();
                       }
 
-                    else if ((fe_test.shape_function_belongs_to(
-                                i, extractor_p_real) ||
-                              fe_test.shape_function_belongs_to(
-                                i, extractor_p_imag)) &&
-                             (fe_test.shape_function_belongs_to(
-                                j, extractor_u_real) ||
-                              fe_test.shape_function_belongs_to(
-                                j, extractor_u_imag)))
+                    else if ((test_type_i & is_pressure) &&
+                             (test_type_j & is_velocity))
                       {
                         G_matrix(i, j) +=
                           (((grad_q_conj[i] * iomega * v[j]) +
@@ -985,14 +1021,8 @@ namespace Step100
                             .real();
                       }
 
-                    else if ((fe_test.shape_function_belongs_to(
-                                i, extractor_p_real) ||
-                              fe_test.shape_function_belongs_to(
-                                i, extractor_p_imag)) &&
-                             (fe_test.shape_function_belongs_to(
-                                j, extractor_p_real) ||
-                              fe_test.shape_function_belongs_to(
-                                j, extractor_p_imag)))
+                    else if ((test_type_i & is_pressure) &&
+                             (test_type_j & is_pressure))
                       {
                         G_matrix(i, j) +=
                           (((q_conj[i] * q[j]) + (grad_q[j] * grad_q_conj[i]) +
@@ -1004,60 +1034,38 @@ namespace Step100
 
                 for (const auto j : fe_values_trial_interior.dof_indices())
                   {
-                    if ((fe_test.shape_function_belongs_to(i,
-                                                           extractor_u_real) ||
-                         fe_test.shape_function_belongs_to(i,
-                                                           extractor_u_imag)) &&
-                        (fe_trial_interior.shape_function_belongs_to(
-                           j, extractor_u_real) ||
-                         fe_trial_interior.shape_function_belongs_to(
-                           j, extractor_u_imag)))
+                    const unsigned char trial_type_j =
+                      shape_function_type_trial_interior[j];
+
+                    if ((test_type_i & is_velocity) &&
+                        (trial_type_j & is_velocity))
                       {
                         B_matrix(i, j) +=
                           ((v_conj[i] * iomega * u[j]) * JxW).real();
                       }
 
-                    else if ((fe_test.shape_function_belongs_to(
-                                i, extractor_u_real) ||
-                              fe_test.shape_function_belongs_to(
-                                i, extractor_u_imag)) &&
-                             (fe_trial_interior.shape_function_belongs_to(
-                                j, extractor_p_real) ||
-                              fe_trial_interior.shape_function_belongs_to(
-                                j, extractor_p_imag)))
+                    else if ((test_type_i & is_velocity) &&
+                             (trial_type_j & is_pressure))
                       {
                         B_matrix(i, j) -= ((div_v_conj[i] * p[j]) * JxW).real();
                       }
 
-                    else if ((fe_test.shape_function_belongs_to(
-                                i, extractor_p_real) ||
-                              fe_test.shape_function_belongs_to(
-                                i, extractor_p_imag)) &&
-                             (fe_trial_interior.shape_function_belongs_to(
-                                j, extractor_u_real) ||
-                              fe_trial_interior.shape_function_belongs_to(
-                                j, extractor_u_imag)))
+                    else if ((test_type_i & is_pressure) &&
+                             (trial_type_j & is_velocity))
                       {
                         B_matrix(i, j) -=
                           ((grad_q_conj[i] * u[j]) * JxW).real();
                       }
 
-                    else if ((fe_test.shape_function_belongs_to(
-                                i, extractor_p_real) ||
-                              fe_test.shape_function_belongs_to(
-                                i, extractor_p_imag)) &&
-                             (fe_trial_interior.shape_function_belongs_to(
-                                j, extractor_p_real) ||
-                              fe_trial_interior.shape_function_belongs_to(
-                                j, extractor_p_imag)))
+                    else if ((test_type_i & is_pressure) &&
+                             (trial_type_j & is_pressure))
                       {
                         B_matrix(i, j) +=
                           ((q_conj[i] * iomega * p[j]) * JxW).real();
                       }
                   }
 
-                if (fe_test.shape_function_belongs_to(i, extractor_p_real) ||
-                    fe_test.shape_function_belongs_to(i, extractor_p_imag))
+                if (test_type_i & is_pressure)
                   {
                     double source_term = 0.0;
                     l_vector(i) += (q_conj[i] * source_term * JxW).real();
@@ -1092,7 +1100,7 @@ namespace Step100
         // Now, as for the cell-wise assembly, we loop over the face quadrature
         // points. We evaluate and cache the relevant quantities to assemble
         // both the Gram matrix face contributions and the face operator matrix
-        // \hat{B}. And then, we loop over the test space face degrees of
+        // $\hat{B}$. And then, we loop over the test space face degrees of
         // freedom and trial space face degrees of freedom to assemble the
         // corresponding contributions. The face contributions to the Gram
         // matrix only arise when the face lies on a Robin boundary. In that
@@ -1117,17 +1125,16 @@ namespace Step100
         // \cup \Gamma_3}$.
         //
         // Independently of the boundary type, we also assemble the face
-        // operator matrix \hat{B} by looping over the skeleton trial space
+        // operator matrix $\hat{B}$ by looping over the skeleton trial space
         // degrees of freedom. The two terms are :
         //  - If dof <code>i</code> in test function $\mathbf{v}$ and dof
         //  <code>j</code> in trial function $\hat{p}^*$ we build the
-        //  term$\left\langle
+        //  term $\left\langle
         // \mathbf{v} \cdot \mathbf{n}, \hat{p}^*
         // \right\rangle_{\partial \Omega_h}$;
         //  - If dof <code>i</code> in test function $q$ and dof <code>j</code>
-        //  in trial function $\hat{u}_n$ we build the term $\left\langle q,
-        //  \hat{u}_n
-        // \right\rangle_{\partial \Omega_h}$.
+        //  in trial function $\hat{u}_n$ we build the term
+        //  $\left\langle q, \hat{u}_n \right\rangle_{\partial \Omega_h}$.
         //
         // Since the FE_FaceQ elements used to represent the trace of H(div)
         // conforming fields do not encode an intrinsic orientation, special
@@ -1139,8 +1146,9 @@ namespace Step100
         // oriented from the cell with the smaller active cell index toward the
         // cell with the larger one. On boundary faces, we recover the standard
         // convention in which the flux is aligned with the outward normal by
-        // defining the neighbor cell index as std::numeric_limits<unsigned
-        // int>::max().This local rule guarantees that the flux contributions
+        // defining the neighbor cell index as
+        // <code>std::numeric_limits@<unsigned int@>::%max()</code>. This local
+        // rule guarantees that the flux contributions
         // are consistent across neighboring cells without requiring a global
         // orientation of the mesh.
 
@@ -1186,6 +1194,15 @@ namespace Step100
                       fe_face_values_test[extractor_p_real].value(k, q_point) -
                       imag *
                         fe_face_values_test[extractor_p_imag].value(k, q_point);
+
+                    if (fe_test.shape_function_belongs_to(k, extractor_u_real))
+                      shape_function_type_test[k] |= velocity_real;
+                    if (fe_test.shape_function_belongs_to(k, extractor_u_imag))
+                      shape_function_type_test[k] |= velocity_imag;
+                    if (fe_test.shape_function_belongs_to(k, extractor_p_real))
+                      shape_function_type_test[k] |= pressure_real;
+                    if (fe_test.shape_function_belongs_to(k, extractor_p_imag))
+                      shape_function_type_test[k] |= pressure_imag;
                   }
                 for (unsigned int k : fe_values_trial_skeleton.dof_indices())
                   {
@@ -1210,64 +1227,58 @@ namespace Step100
                         k, q_point) -
                       imag * fe_values_trial_skeleton[extractor_p_hat_imag]
                                .value(k, q_point);
+
+                    if (fe_trial_skeleton.shape_function_belongs_to(
+                          k, extractor_u_hat_real))
+                      shape_function_type_trial_skeleton[k] |= velocity_real;
+                    if (fe_trial_skeleton.shape_function_belongs_to(
+                          k, extractor_u_hat_imag))
+                      shape_function_type_trial_skeleton[k] |= velocity_imag;
+                    if (fe_trial_skeleton.shape_function_belongs_to(
+                          k, extractor_p_hat_real))
+                      shape_function_type_trial_skeleton[k] |= pressure_real;
+                    if (fe_trial_skeleton.shape_function_belongs_to(
+                          k, extractor_p_hat_imag))
+                      shape_function_type_trial_skeleton[k] |= pressure_imag;
                   }
 
                 for (const auto i : fe_face_values_test.dof_indices())
                   {
+                    const unsigned char face_test_type_i =
+                      shape_function_type_test[i];
+
                     if (current_boundary_id == 1 || current_boundary_id == 3)
                       {
                         for (const auto j : fe_face_values_test.dof_indices())
                           {
-                            if ((fe_test.shape_function_belongs_to(
-                                   i, extractor_u_real) ||
-                                 fe_test.shape_function_belongs_to(
-                                   i, extractor_u_imag)) &&
-                                (fe_test.shape_function_belongs_to(
-                                   j, extractor_u_real) ||
-                                 fe_test.shape_function_belongs_to(
-                                   j, extractor_u_imag)))
+                            const unsigned char face_test_type_j =
+                              shape_function_type_test[j];
+                            if ((face_test_type_i & is_velocity) &&
+                                (face_test_type_j & is_velocity))
                               {
                                 G_matrix(i, j) +=
                                   (v_face_n_conj[i] * v_face_n[j] * JxW_face)
                                     .real();
                               }
 
-                            else if ((fe_test.shape_function_belongs_to(
-                                        i, extractor_u_real) ||
-                                      fe_test.shape_function_belongs_to(
-                                        i, extractor_u_imag)) &&
-                                     ((fe_test.shape_function_belongs_to(
-                                         j, extractor_p_real) ||
-                                       fe_test.shape_function_belongs_to(
-                                         j, extractor_p_imag))))
+                            else if ((face_test_type_i & is_velocity) &&
+                                     (face_test_type_j & is_pressure))
                               {
                                 G_matrix(i, j) += (v_face_n_conj[i] * kn_omega *
                                                    q_face[j] * JxW_face)
                                                     .real();
                               }
 
-                            else if ((fe_test.shape_function_belongs_to(
-                                        i, extractor_p_real) ||
-                                      fe_test.shape_function_belongs_to(
-                                        i, extractor_p_imag)) &&
-                                     (fe_test.shape_function_belongs_to(
-                                        j, extractor_u_real) ||
-                                      fe_test.shape_function_belongs_to(
-                                        j, extractor_u_imag)))
+                            else if ((face_test_type_i & is_pressure) &&
+                                     (face_test_type_j & is_velocity))
                               {
                                 G_matrix(i, j) += (kn_omega * q_face_conj[i] *
                                                    v_face_n[j] * JxW_face)
                                                     .real();
                               }
 
-                            else if ((fe_test.shape_function_belongs_to(
-                                        i, extractor_p_real) ||
-                                      fe_test.shape_function_belongs_to(
-                                        i, extractor_p_imag)) &&
-                                     ((fe_test.shape_function_belongs_to(
-                                         j, extractor_p_real) ||
-                                       fe_test.shape_function_belongs_to(
-                                         j, extractor_p_imag))))
+                            else if ((face_test_type_i & is_pressure) &&
+                                     (face_test_type_j & is_pressure))
                               {
                                 G_matrix(i, j) +=
                                   (kn_omega * q_face_conj[i] * kn_omega *
@@ -1279,27 +1290,18 @@ namespace Step100
 
                     for (const auto j : fe_values_trial_skeleton.dof_indices())
                       {
-                        if ((fe_test.shape_function_belongs_to(
-                               i, extractor_u_real) ||
-                             fe_test.shape_function_belongs_to(
-                               i, extractor_u_imag)) &&
-                            (fe_trial_skeleton.shape_function_belongs_to(
-                               j, extractor_p_hat_real) ||
-                             fe_trial_skeleton.shape_function_belongs_to(
-                               j, extractor_p_hat_imag)))
+                        const unsigned char face_trial_type_j =
+                          shape_function_type_trial_skeleton[j];
+
+                        if ((face_test_type_i & is_velocity) &&
+                            (face_trial_type_j & is_pressure))
                           {
                             B_hat_matrix(i, j) +=
                               ((v_face_n_conj[i] * p_hat[j]) * JxW_face).real();
                           }
 
-                        else if ((fe_test.shape_function_belongs_to(
-                                    i, extractor_p_real) ||
-                                  fe_test.shape_function_belongs_to(
-                                    i, extractor_p_imag)) &&
-                                 (fe_trial_skeleton.shape_function_belongs_to(
-                                    j, extractor_u_hat_real) ||
-                                  fe_trial_skeleton.shape_function_belongs_to(
-                                    j, extractor_u_hat_imag)))
+                        else if ((face_test_type_i & is_pressure) &&
+                                 (face_trial_type_j & is_velocity))
                           {
                             const unsigned int neighbor_cell_id =
                               face->at_boundary() ?
@@ -1381,36 +1383,16 @@ namespace Step100
 
                     for (const auto i : fe_values_trial_skeleton.dof_indices())
                       {
-                        double source_term = 0.;
-                        if (fe_trial_skeleton.shape_function_belongs_to(
-                              i, extractor_u_hat_real) ||
-                            fe_trial_skeleton.shape_function_belongs_to(
-                              i, extractor_u_hat_imag))
-                          {
-                            g_vector(i) -=
-                              (u_hat_n_conj[i] * source_term).real() * JxW_face;
-                          }
-                        else if (fe_trial_skeleton.shape_function_belongs_to(
-                                   i, extractor_p_hat_real) ||
-                                 fe_trial_skeleton.shape_function_belongs_to(
-                                   i, extractor_p_hat_imag))
-                          {
-                            g_vector(i) +=
-                              (kn_omega * p_hat_conj[i] * source_term).real() *
-                              JxW_face;
-                          }
-
+                        const unsigned char face_trial_type_i =
+                          shape_function_type_trial_skeleton[i];
                         for (const auto j :
                              fe_values_trial_skeleton.dof_indices())
                           {
-                            if ((fe_trial_skeleton.shape_function_belongs_to(
-                                   i, extractor_u_hat_real) ||
-                                 fe_trial_skeleton.shape_function_belongs_to(
-                                   i, extractor_u_hat_imag)) &&
-                                (fe_trial_skeleton.shape_function_belongs_to(
-                                   j, extractor_u_hat_real) ||
-                                 fe_trial_skeleton.shape_function_belongs_to(
-                                   j, extractor_u_hat_imag)))
+                            const unsigned char face_trial_type_j =
+                              shape_function_type_trial_skeleton[j];
+
+                            if ((face_trial_type_i & is_velocity) &&
+                                (face_trial_type_j & is_velocity))
                               {
                                 D_matrix(i, j) -=
                                   (flux_orientation * u_hat_n_conj[i] *
@@ -1418,18 +1400,8 @@ namespace Step100
                                     .real();
                               }
 
-                            else if ((fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          i, extractor_u_hat_real) ||
-                                      fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          i, extractor_u_hat_imag)) &&
-                                     (fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          j, extractor_p_hat_real) ||
-                                      fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          j, extractor_p_hat_imag)))
+                            else if ((face_trial_type_i & is_velocity) &&
+                                     (face_trial_type_j & is_pressure))
                               {
                                 D_matrix(i, j) +=
                                   (flux_orientation * u_hat_n_conj[i] *
@@ -1437,18 +1409,8 @@ namespace Step100
                                     .real();
                               }
 
-                            else if ((fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          i, extractor_p_hat_real) ||
-                                      fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          i, extractor_p_hat_imag)) &&
-                                     (fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          j, extractor_u_hat_real) ||
-                                      fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          j, extractor_u_hat_imag)))
+                            else if ((face_trial_type_i & is_pressure) &&
+                                     (face_trial_type_j & is_velocity))
                               {
                                 D_matrix(i, j) +=
                                   (kn_omega * p_hat_conj[i] * flux_orientation *
@@ -1456,24 +1418,27 @@ namespace Step100
                                     .real();
                               }
 
-                            else if ((fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          i, extractor_p_hat_real) ||
-                                      fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          i, extractor_p_hat_imag)) &&
-                                     (fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          j, extractor_p_hat_real) ||
-                                      fe_trial_skeleton
-                                        .shape_function_belongs_to(
-                                          j, extractor_p_hat_imag)))
+                            else if ((face_trial_type_i & is_pressure) &&
+                                     (face_trial_type_j & is_pressure))
                               {
                                 D_matrix(i, j) -=
                                   (kn_omega * p_hat_conj[i] * kn_omega *
                                    p_hat[j] * JxW_face)
                                     .real();
                               }
+                          }
+
+                        double source_term = 0.;
+                        if (face_trial_type_i & is_velocity)
+                          {
+                            g_vector(i) -=
+                              (u_hat_n_conj[i] * source_term).real() * JxW_face;
+                          }
+                        else if (face_trial_type_i & is_pressure)
+                          {
+                            g_vector(i) +=
+                              (kn_omega * p_hat_conj[i] * source_term).real() *
+                              JxW_face;
                           }
                       }
                   }
@@ -1482,14 +1447,16 @@ namespace Step100
         // After assembling all local matrices and vectors, we perform the
         // cell-wise static condensation associated with the DPG formulation. We
         // first invert the test-space Gram matrix G and use it to form the
-        // auxiliary operators $M_4 = B^\dagger G^{-1}$ and $M_5 =
-        // \hat{B}^\dagger G^{-1}$ . These are then used to construct the
-        // condensed blocks $M_1 = B^\dagger G^{-1} B$, $M_2 = B^\dagger G^{-1}
-        // \hat{B}$ and $M_3 = \hat{B}^\dagger G^{-1} \hat{B} - D$. Then, if
+        // auxiliary operators $M_4 = B^\dagger G^{-1}$ and
+        // $M_5 = \hat{B}^\dagger G^{-1}$. These are then used to construct the
+        // condensed blocks $M_1 = B^\dagger G^{-1} B$,
+        // $M_2 = B^\dagger G^{-1} \hat{B}$ and
+        // $M_3 = \hat{B}^\dagger G^{-1} \hat{B} - D$. Then, if
         // <code>solve_interior</code> is <code>true</code>, the skeleton
         // solution $\hat{u}_h$ is assumed known and we recover the interior
-        // unknowns on each cell by solving $u_h = M1^{-1} (M4 l - M2
-        // \hat{u}_h)$, followed by distribution to the global interior solution
+        // unknowns on each cell by solving
+        // $u_h = M1^{-1} (M4 l - M2 \hat{u}_h)$, followed by distribution to
+        // the global interior solution
         // vector. Otherwise, we assemble the fully condensed local system for
         // the skeleton unknowns by forming the Schur complement $(M3 - M2^†
         // M1^{-1} M2)$, together with the corresponding right-hand side $(M5 -
