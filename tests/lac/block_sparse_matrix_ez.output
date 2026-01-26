@@ -1,0 +1,46 @@
+
+DEAL:get/set/add/scalar::M(0,0) 1.00
+DEAL:get/set/add/scalar::M(0,1) 10.00
+DEAL:get/set/add/scalar::M(3,3) 4.00
+DEAL:get/set/add/scalar::M(3,4) 13.00
+DEAL:get/set/add/scalar::after add M(3,4) 18.00
+DEAL:get/set/add/scalar::after *=2 M(3,4) 36.00
+DEAL:get/set/add/scalar::after /=4 M(3,4) 9.00
+DEAL:get/set/add/scalar::vmult_scaled 10.50 18.50 28.50 53.00 19.50
+DEAL:ctors/operators::default empty 1
+DEAL:ctors/operators::ctor blocks 2 3
+DEAL:ctors/operators::ctor empty 1
+DEAL:ctors/operators::copy_ctor blocks 2 3
+DEAL:ctors/operators::copy_ctor empty 1
+DEAL:ctors/operators::copy_assign blocks 2 3
+DEAL:ctors/operators::copy_assign empty 1
+DEAL:ctors/operators::reinit_collect_sizes m n 0 0
+DEAL:ctors/operators::before eq0 M(3,4) 13.00
+DEAL:ctors/operators::after eq0 M(3,4) 0.00
+DEAL:ctors/operators::after clear empty 1
+DEAL:ctors/operators::block:	0	0
+DEAL:ctors/operators::used:10
+DEAL:ctors/operators::allocated:10
+DEAL:ctors/operators::reserved:10
+DEAL:ctors/operators::Total
+DEAL:ctors/operators::used:10
+DEAL:ctors/operators::allocated:10
+DEAL:ctors/operators::reserved:10
+DEAL:ctors/operators::block:	0	0
+DEAL:ctors/operators::used:10
+DEAL:ctors/operators::allocated:10
+DEAL:ctors/operators::reserved:10
+DEAL:ctors/operators::row-entries	2	rows	5
+DEAL:ctors/operators::Total
+DEAL:ctors/operators::used:10
+DEAL:ctors/operators::allocated:10
+DEAL:ctors/operators::reserved:10
+DEAL:ctors/operators::row-entries	2	rows	5
+DEAL:vmult/Tvmult block-block::vmult 21.00 37.00 57.00 81.00 39.00
+DEAL:vmult/Tvmult block-block::Tvmult 71.00 14.00 31.00 52.00 77.00
+DEAL:vmult block-Vector + Tvmult Vector-block::vmult 21.00 37.00 57.00 81.00 39.00
+DEAL:vmult block-Vector + Tvmult Vector-block::Tvmult 71.00 14.00 31.00 52.00 77.00
+DEAL:vmult Vector-block + Tvmult block-Vector::vmult 21.00 37.00 57.00 81.00 39.00
+DEAL:vmult Vector-block + Tvmult block-Vector::Tvmult 71.00 14.00 31.00 52.00 77.00
+DEAL:vmult/Tvmult Vector-Vector::vmult 21.00 37.00 57.00 81.00 39.00
+DEAL:vmult/Tvmult Vector-Vector::Tvmult 71.00 14.00 31.00 52.00 77.00
