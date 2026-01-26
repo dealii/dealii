@@ -28,6 +28,7 @@
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/table.h>
 
+#include "deal.II/lac/block_matrix_base.h"
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
 
@@ -57,9 +58,14 @@ class BlockVector;
  * @ref GlossBlockLA "Block (linear algebra)"
  */
 template <typename Number>
-class BlockSparseMatrixEZ : public EnableObserverPointer
+class BlockSparseMatrixEZ : public BlockMatrixBase<SparseMatrixEZ<Number>>
 {
 public:
+  /**
+   * Typedef the base class for simpler access to its own alias.
+   */
+  using BaseClass = BlockMatrixBase<SparseMatrixEZ<Number>>;
+
   /**
    * Declare type for container size.
    */
@@ -79,8 +85,8 @@ public:
 
   /**
    * Copy constructor. This is needed for some container classes. It creates
-   * an object of the same number of block rows and columns. Since it calls
-   * the copy constructor of SparseMatrixEZ, the block s must be empty.
+   * an object of the same number of block rows and columns. To avoid unwanted
+   * loss of information, the blocks of the other matrix must be empty.
    */
   BlockSparseMatrixEZ(const BlockSparseMatrixEZ<Number> &);
 
@@ -102,7 +108,6 @@ public:
   BlockSparseMatrixEZ &
   operator=(const double d);
 
-
   /**
    * Set matrix to zero dimensions and release memory.
    */
@@ -118,6 +123,7 @@ public:
    */
   void
   reinit(const unsigned int n_block_rows, const unsigned int n_block_cols);
+
   /**
    * This function collects the sizes of the sub-objects and stores them in
    * internal arrays, in order to be able to relay global indices into the
@@ -126,32 +132,6 @@ public:
    */
   void
   collect_sizes();
-
-  /**
-   * Access the block with the given coordinates.
-   */
-  SparseMatrixEZ<Number> &
-  block(const unsigned int row, const unsigned int column);
-
-
-  /**
-   * Access the block with the given coordinates. Version for constant
-   * objects.
-   */
-  const SparseMatrixEZ<Number> &
-  block(const unsigned int row, const unsigned int column) const;
-
-  /**
-   * Return the number of blocks in a column.
-   */
-  unsigned int
-  n_block_rows() const;
-
-  /**
-   * Return the number of blocks in a row.
-   */
-  unsigned int
-  n_block_cols() const;
 
   /**
    * Return whether the object is empty. It is empty if no memory is
@@ -163,77 +143,81 @@ public:
   empty() const;
 
   /**
-   * Return number of rows of this matrix, which equals the dimension of the
-   * codomain (or range) space. It is the sum of the number of rows over the
-   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
-   * times n().
+   * @name Multiplications
    */
-  size_type
-  m() const;
-
-  /**
-   * Return number of columns of this matrix, which equals the dimension of
-   * the domain space. It is the sum of the number of columns over the
-   * sub-matrix blocks of this matrix. Recall that the matrix is of size m()
-   * times n().
-   */
-  size_type
-  n() const;
-
-  /**
-   * Set the element <tt>(i,j)</tt> to @p value.  Throws an error if the entry
-   * does not exist or if <tt>value</tt> is not a finite number. Still, it is
-   * allowed to store zero values in non-existent fields.
-   */
-  void
-  set(const size_type i, const size_type j, const Number value);
-
-  /**
-   * Add @p value to the element <tt>(i,j)</tt>.  Throws an error if the entry
-   * does not exist or if <tt>value</tt> is not a finite number. Still, it is
-   * allowed to store zero values in non-existent fields.
-   */
-  void
-  add(const size_type i, const size_type j, const Number value);
-
-
+  /** @{ */
   /**
    * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
    * matrix.
    */
-  template <typename somenumber>
+  template <typename block_number>
   void
-  vmult(BlockVector<somenumber> &dst, const BlockVector<somenumber> &src) const;
+  vmult(BlockVector<block_number>       &dst,
+        const BlockVector<block_number> &src) const;
+
+  /**
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block column.
+   */
+  template <typename block_number, typename nonblock_number>
+  void
+  vmult(BlockVector<block_number>     &dst,
+        const Vector<nonblock_number> &src) const;
+
+  /**
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block row.
+   */
+  template <typename block_number, typename nonblock_number>
+  void
+  vmult(Vector<nonblock_number>         &dst,
+        const BlockVector<block_number> &src) const;
+
+  /**
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block.
+   */
+  template <typename nonblock_number>
+  void
+  vmult(Vector<nonblock_number> &dst, const Vector<nonblock_number> &src) const;
 
   /**
    * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
    * matrix. This function does the same as vmult() but takes the transposed
    * matrix.
    */
-  template <typename somenumber>
+  template <typename block_number>
   void
-  Tvmult(BlockVector<somenumber>       &dst,
-         const BlockVector<somenumber> &src) const;
+  Tvmult(BlockVector<block_number>       &dst,
+         const BlockVector<block_number> &src) const;
 
   /**
-   * Adding Matrix-vector multiplication. Add $M*src$ on $dst$ with $M$ being
-   * this matrix.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block row.
    */
-  template <typename somenumber>
+  template <typename block_number, typename nonblock_number>
   void
-  vmult_add(BlockVector<somenumber>       &dst,
-            const BlockVector<somenumber> &src) const;
+  Tvmult(BlockVector<block_number>     &dst,
+         const Vector<nonblock_number> &src) const;
 
   /**
-   * Adding Matrix-vector multiplication. Add $M^T*src$ to $dst$ with $M$
-   * being this matrix. This function does the same as vmult_add() but takes
-   * the transposed matrix.
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block column.
    */
-  template <typename somenumber>
+  template <typename block_number, typename nonblock_number>
   void
-  Tvmult_add(BlockVector<somenumber>       &dst,
-             const BlockVector<somenumber> &src) const;
+  Tvmult(Vector<nonblock_number>         &dst,
+         const BlockVector<block_number> &src) const;
 
+  /**
+   * Matrix-vector multiplication. Just like the previous function, but only
+   * applicable if the matrix has only one block.
+   */
+  template <typename nonblock_number>
+  void
+  Tvmult(Vector<nonblock_number>       &dst,
+         const Vector<nonblock_number> &src) const;
+  /** @} */
 
   /**
    * Print statistics. If @p full is @p true, prints a histogram of all
@@ -243,201 +227,85 @@ public:
   template <typename StreamType>
   void
   print_statistics(StreamType &s, bool full = false);
-
-private:
-  /**
-   * Object storing and managing the transformation of row indices to indices
-   * of the sub-objects.
-   */
-  BlockIndices row_indices;
-
-  /**
-   * Object storing and managing the transformation of column indices to
-   * indices of the sub-objects.
-   */
-  BlockIndices column_indices;
-
-  /**
-   * The actual matrices
-   */
-  Table<2, SparseMatrixEZ<Number>> blocks;
 };
 
 /** @} */
 /*----------------------------------------------------------------------*/
 
 
-template <typename Number>
-inline unsigned int
-BlockSparseMatrixEZ<Number>::n_block_rows() const
-{
-  return row_indices.size();
-}
 
-
-
-template <typename Number>
-inline unsigned int
-BlockSparseMatrixEZ<Number>::n_block_cols() const
-{
-  return column_indices.size();
-}
-
-
-
-template <typename Number>
-inline SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block(const unsigned int row,
-                                   const unsigned int column)
-{
-  AssertIndexRange(row, n_block_rows());
-  AssertIndexRange(column, n_block_cols());
-
-  return blocks[row][column];
-}
-
-
-
-template <typename Number>
-inline const SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block(const unsigned int row,
-                                   const unsigned int column) const
-{
-  AssertIndexRange(row, n_block_rows());
-  AssertIndexRange(column, n_block_cols());
-
-  return blocks[row][column];
-}
-
-
-
-template <typename Number>
-inline typename BlockSparseMatrixEZ<Number>::size_type
-BlockSparseMatrixEZ<Number>::m() const
-{
-  return row_indices.total_size();
-}
-
-
-
-template <typename Number>
-inline typename BlockSparseMatrixEZ<Number>::size_type
-BlockSparseMatrixEZ<Number>::n() const
-{
-  return column_indices.total_size();
-}
-
-
-
-template <typename Number>
+template <typename number>
+template <typename block_number>
 inline void
-BlockSparseMatrixEZ<Number>::set(const size_type i,
-                                 const size_type j,
-                                 const Number    value)
+BlockSparseMatrixEZ<number>::vmult(BlockVector<block_number>       &dst,
+                                   const BlockVector<block_number> &src) const
 {
-  AssertIsFinite(value);
-
-  const std::pair<size_type, size_type> row_index =
-                                          row_indices.global_to_local(i),
-                                        col_index =
-                                          column_indices.global_to_local(j);
-  block(row_index.first, col_index.first)
-    .set(row_index.second, col_index.second, value);
+  BaseClass::vmult_block_block(dst, src);
 }
 
-
-
-template <typename Number>
+template <typename number>
+template <typename block_number, typename nonblock_number>
 inline void
-BlockSparseMatrixEZ<Number>::add(const size_type i,
-                                 const size_type j,
-                                 const Number    value)
+BlockSparseMatrixEZ<number>::vmult(BlockVector<block_number>     &dst,
+                                   const Vector<nonblock_number> &src) const
 {
-  AssertIsFinite(value);
-
-  const std::pair<unsigned int, size_type> row_index =
-                                             row_indices.global_to_local(i),
-                                           col_index =
-                                             column_indices.global_to_local(j);
-  block(row_index.first, col_index.first)
-    .add(row_index.second, col_index.second, value);
+  BaseClass::vmult_block_nonblock(dst, src);
 }
 
-
-template <typename Number>
-template <typename somenumber>
-void
-BlockSparseMatrixEZ<Number>::vmult(BlockVector<somenumber>       &dst,
-                                   const BlockVector<somenumber> &src) const
+template <typename number>
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrixEZ<number>::vmult(Vector<nonblock_number>         &dst,
+                                   const BlockVector<block_number> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
-
-  dst = 0.;
-
-  for (unsigned int row = 0; row < n_block_rows(); ++row)
-    for (unsigned int col = 0; col < n_block_cols(); ++col)
-      block(row, col).vmult_add(dst.block(row), src.block(col));
+  BaseClass::vmult_nonblock_block(dst, src);
 }
 
-
-
-template <typename Number>
-template <typename somenumber>
-void
-BlockSparseMatrixEZ<Number>::vmult_add(BlockVector<somenumber>       &dst,
-                                       const BlockVector<somenumber> &src) const
+template <typename number>
+template <typename nonblock_number>
+inline void
+BlockSparseMatrixEZ<number>::vmult(Vector<nonblock_number>       &dst,
+                                   const Vector<nonblock_number> &src) const
 {
-  Assert(dst.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_rows()));
-  Assert(src.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
-
-  for (unsigned int row = 0; row < n_block_rows(); ++row)
-    for (unsigned int col = 0; col < n_block_cols(); ++col)
-      block(row, col).vmult_add(dst.block(row), src.block(col));
+  BaseClass::vmult_nonblock_nonblock(dst, src);
 }
 
-
-
-template <typename Number>
-template <typename somenumber>
-void
-BlockSparseMatrixEZ<Number>::Tvmult(BlockVector<somenumber>       &dst,
-                                    const BlockVector<somenumber> &src) const
+template <typename number>
+template <typename block_number>
+inline void
+BlockSparseMatrixEZ<number>::Tvmult(BlockVector<block_number>       &dst,
+                                    const BlockVector<block_number> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
-
-  dst = 0.;
-
-  for (unsigned int row = 0; row < n_block_rows(); ++row)
-    for (unsigned int col = 0; col < n_block_cols(); ++col)
-      block(row, col).Tvmult_add(dst.block(col), src.block(row));
+  BaseClass::Tvmult_block_block(dst, src);
 }
 
-
-
-template <typename Number>
-template <typename somenumber>
-void
-BlockSparseMatrixEZ<Number>::Tvmult_add(
-  BlockVector<somenumber>       &dst,
-  const BlockVector<somenumber> &src) const
+template <typename number>
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrixEZ<number>::Tvmult(BlockVector<block_number>     &dst,
+                                    const Vector<nonblock_number> &src) const
 {
-  Assert(dst.n_blocks() == n_block_cols(),
-         ExcDimensionMismatch(dst.n_blocks(), n_block_cols()));
-  Assert(src.n_blocks() == n_block_rows(),
-         ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
-
-  for (unsigned int row = 0; row < n_block_rows(); ++row)
-    for (unsigned int col = 0; col < n_block_cols(); ++col)
-      block(row, col).Tvmult_add(dst.block(col), src.block(row));
+  BaseClass::Tvmult_block_nonblock(dst, src);
 }
+
+template <typename number>
+template <typename block_number, typename nonblock_number>
+inline void
+BlockSparseMatrixEZ<number>::Tvmult(Vector<nonblock_number>         &dst,
+                                    const BlockVector<block_number> &src) const
+{
+  BaseClass::Tvmult_nonblock_block(dst, src);
+}
+
+template <typename number>
+template <typename nonblock_number>
+inline void
+BlockSparseMatrixEZ<number>::Tvmult(Vector<nonblock_number>       &dst,
+                                    const Vector<nonblock_number> &src) const
+{
+  BaseClass::Tvmult_nonblock_nonblock(dst, src);
+}
+
 
 
 template <typename number>
@@ -455,12 +323,12 @@ BlockSparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
   size_type              reserved;
   std::vector<size_type> used_by_line;
 
-  for (size_type i = 0; i < n_block_rows(); ++i)
-    for (size_type j = 0; j < n_block_cols(); ++j)
+  for (size_type i = 0; i < this->n_block_rows(); ++i)
+    for (size_type j = 0; j < this->n_block_cols(); ++j)
       {
         used_by_line.clear();
         out << "block:\t" << i << '\t' << j << std::endl;
-        block(i, j).compute_statistics(
+        this->sub_objects(i, j)->compute_statistics(
           used, allocated, reserved, used_by_line, full);
 
         out << "used:" << used << std::endl

@@ -112,6 +112,21 @@ public:
   using size_type = types::global_dof_index;
 
   /**
+   * A structure that describes some of the traits of this class in terms of
+   * its run-time behavior. Some other classes (such as the block matrix
+   * classes) that take one or other of the matrix classes as its template
+   * parameters can tune their behavior based on the variables in this class.
+   */
+  struct Traits
+  {
+    /**
+     * It is safe to elide additions of zeros to individual elements of this
+     * matrix.
+     */
+    static const bool zero_addition_can_be_elided = true;
+  };
+
+  /**
    * The class for storing the column number of an entry together with its
    * value.
    */
@@ -542,6 +557,19 @@ public:
       const bool       elide_zero_values      = true,
       const bool       col_indices_are_sorted = false);
 
+
+  /**
+   * Multiply the entire matrix by a fixed factor.
+   */
+  SparseMatrixEZ &
+  operator*=(const number factor);
+
+  /**
+   * Divide the entire matrix by a fixed factor.
+   */
+  SparseMatrixEZ &
+  operator/=(const number factor);
+
   /**
    * Copy the matrix given as argument into the current object.
    *
@@ -600,6 +628,26 @@ public:
    */
   number
   el(const size_type i, const size_type j) const;
+
+  /**
+   * Return the main diagonal element in the <i>i</i>th row. This function
+   * throws an error if the matrix is not quadratic.
+   *
+   * This function is considerably faster than the operator()(), since for
+   * quadratic matrices, the diagonal entry may be the first to be stored in
+   * each row and access therefore does not involve searching for the right
+   * column number.
+   */
+  number
+  diag_element(const size_type i) const;
+
+  /**
+   * Same as above, but return a writeable reference. You're sure you know
+   * what you do?
+   */
+  number &
+  diag_element(const size_type i);
+
   /** @} */
   /**
    * @name Multiplications
@@ -828,6 +876,28 @@ public:
                  << "An entry with index (" << arg1 << ',' << arg2
                  << ") cannot be allocated.");
   /** @} */
+
+protected:
+  /**
+   * For some matrix storage formats, in particular for the PETSc distributed
+   * blockmatrices, set and add operations on individual elements can not be
+   * freely mixed. Rather, one has to synchronize operations when one wants to
+   * switch from setting elements to adding to elements.  BlockMatrixBase
+   * automatically synchronizes the access by calling this helper function for
+   * each block.  This function ensures that the matrix is in a state that
+   * allows adding elements; if it previously already was in this state, the
+   * function does nothing.
+   */
+  void
+  prepare_add();
+
+  /**
+   * Same as prepare_add() but prepare the matrix for setting elements if the
+   * representation of elements in this class requires such an operation.
+   */
+  void
+  prepare_set();
+
 private:
   /**
    * Find an entry and return a const pointer. Return a zero-pointer if the
@@ -910,6 +980,10 @@ private:
    * Remember the user provided default row length.
    */
   unsigned int saved_default_row_length;
+
+  // To allow it calling private prepare_add() and prepare_set().
+  template <typename>
+  friend class BlockMatrixBase;
 };
 
 /**
@@ -1352,6 +1426,32 @@ SparseMatrixEZ<number>::add(const size_type  row,
 }
 
 
+template <typename number>
+inline SparseMatrixEZ<number> &
+SparseMatrixEZ<number>::operator*=(const number factor)
+{
+  for (Entry &entry : data)
+    entry.value *= factor;
+
+  return *this;
+}
+
+
+
+template <typename number>
+inline SparseMatrixEZ<number> &
+SparseMatrixEZ<number>::operator/=(const number factor)
+{
+  Assert(factor != number(), ExcDivideByZero());
+
+  const number factor_inv = number(1.) / factor;
+
+  for (Entry &entry : data)
+    entry.value *= factor_inv;
+
+  return *this;
+}
+
 
 template <typename number>
 inline number
@@ -1361,6 +1461,35 @@ SparseMatrixEZ<number>::el(const size_type i, const size_type j) const
   if (entry)
     return entry->value;
   return 0.;
+}
+
+template <typename number>
+inline number
+SparseMatrixEZ<number>::diag_element(const size_type i) const
+{
+  Assert(m() == n(), ExcNotQuadratic());
+  AssertIndexRange(i, m());
+
+  const Entry *entry = locate(i, i);
+  if (entry)
+    return entry->value;
+  return 0.;
+}
+
+
+
+template <typename number>
+inline number &
+SparseMatrixEZ<number>::diag_element(const size_type i)
+{
+  Assert(m() == n(), ExcNotQuadratic());
+  AssertIndexRange(i, m());
+
+  Entry *entry = locate(i, i);
+  if (!entry)
+    set(i, i, number());
+
+  return entry->value;
 }
 
 
@@ -1599,6 +1728,22 @@ SparseMatrixEZ<number>::print_statistics(StreamType &out, bool full)
     }
 }
 
+
+template <typename number>
+inline void
+SparseMatrixEZ<number>::prepare_add()
+{
+  // nothing to do here
+}
+
+
+
+template <typename number>
+inline void
+SparseMatrixEZ<number>::prepare_set()
+{
+  // nothing to do here
+}
 
 DEAL_II_NAMESPACE_CLOSE
 
