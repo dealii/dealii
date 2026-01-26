@@ -318,6 +318,15 @@ namespace LinearAlgebra
       /**
        * Sets all elements of the vector to the scalar @p s. This operation is
        * only allowed if @p s is equal to zero.
+       *
+       * Because this operation modifies the vector, it is only allowed to
+       * call this function on vectors that have no ghost entries. However, as
+       * a special case, assigning zero to the entire vector by writing
+       * `v=0;` where `v` is a variable of the current type is allowed as
+       * we interpret it as equivalent to creating a new, zero-initialized
+       * vector.
+       * See @ref GlossGhostedVector "vectors with ghost elements" for
+       * more on writing into vectors with ghost elements.
        */
       Vector &
       operator=(const double s);

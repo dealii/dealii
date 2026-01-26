@@ -181,9 +181,8 @@ namespace LinearAlgebra
     Vector &
     Vector::operator=(const double s)
     {
-      // if we have ghost values, do not allow
-      // writing to this vector at all.
-      Assert(!has_ghost_elements(), ExcGhostsPresent());
+      if (s != 0.)
+        Assert(!has_ghost_elements(), ExcGhostsPresent());
       Assert(s == 0., ExcMessage("Only 0 can be assigned to a vector."));
 
       const int ierr = vector->PutScalar(s);
