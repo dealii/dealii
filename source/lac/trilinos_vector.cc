@@ -737,7 +737,7 @@ namespace TrilinosWrappers
                       ExcDimensionMismatch(size(), v.size()));
 
           Epetra_Import data_exchange(vector->Map(), v.vector->Map());
-          int           ierr =
+          const int     ierr =
             vector->Import(*v.vector, data_exchange, Epetra_AddLocalAlso);
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
           last_action = Add;
