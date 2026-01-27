@@ -48,6 +48,7 @@
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
@@ -455,13 +456,17 @@ namespace Step75
       {
         const auto &dof_handler = this->matrix_free.get_dof_handler();
 
-        TrilinosWrappers::SparsityPattern dsp(
-          dof_handler.locally_owned_dofs(),
-          dof_handler.get_triangulation().get_mpi_communicator());
-
+        const IndexSet locally_relevant_dofs =
+          DoFTools::extract_locally_relevant_dofs(dof_handler);
+        DynamicSparsityPattern dsp(locally_relevant_dofs);
         DoFTools::make_sparsity_pattern(dof_handler, dsp, this->constraints);
 
-        dsp.compress();
+        SparsityTools::distribute_sparsity_pattern(
+          dsp,
+          dof_handler.locally_owned_dofs(),
+          dof_handler.get_triangulation().get_mpi_communicator(),
+          locally_relevant_dofs);
+
         system_matrix.reinit(dsp);
 
         MatrixFreeTools::compute_matrix(

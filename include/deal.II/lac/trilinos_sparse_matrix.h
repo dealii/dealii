@@ -753,8 +753,21 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * prior to use (in the compress() step).
      */
     SparseMatrix(const IndexSet    &parallel_partitioning,
-                 const MPI_Comm     communicator          = MPI_COMM_WORLD,
-                 const unsigned int n_max_entries_per_row = 0);
+                 const MPI_Comm     communicator,
+                 const unsigned int n_max_entries_per_row);
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparseMatrix(const IndexSet &parallel_partitioning,
+                 const MPI_Comm  communicator)
+      : SparseMatrix(parallel_partitioning, communicator, 0)
+    {}
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the MPI communicator and the number of entries per row!")
+    SparseMatrix(const IndexSet &parallel_partitioning)
+      : SparseMatrix(parallel_partitioning, MPI_COMM_WORLD, 0)
+    {}
 
     /**
      * Same as before, but now set the number of nonzeros in each matrix row
@@ -783,8 +796,29 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      */
     SparseMatrix(const IndexSet &row_parallel_partitioning,
                  const IndexSet &col_parallel_partitioning,
-                 const MPI_Comm  communicator          = MPI_COMM_WORLD,
-                 const size_type n_max_entries_per_row = 0);
+                 const MPI_Comm  communicator,
+                 const size_type n_max_entries_per_row);
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the number of entries per row!")
+    SparseMatrix(const IndexSet &row_parallel_partitioning,
+                 const IndexSet &col_parallel_partitioning,
+                 const MPI_Comm  communicator)
+      : SparseMatrix(row_parallel_partitioning,
+                     col_parallel_partitioning,
+                     communicator,
+                     0)
+    {}
+
+    DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Use the overload specifying the MPI communicator and the number of entries per row!")
+    SparseMatrix(const IndexSet &row_parallel_partitioning,
+                 const IndexSet &col_parallel_partitioning)
+      : SparseMatrix(row_parallel_partitioning,
+                     col_parallel_partitioning,
+                     MPI_COMM_WORLD,
+                     0)
+    {}
 
     /**
      * This constructor is similar to the one above, but it now takes two

@@ -55,7 +55,8 @@ test()
   TrilinosWrappers::SparsityPattern sp(dh.locally_owned_dofs(),
                                        dh.locally_owned_dofs(),
                                        relevant_partitioning,
-                                       MPI_COMM_WORLD);
+                                       MPI_COMM_WORLD,
+                                       9);
 
   DoFTools::make_sparsity_pattern(dh,
                                   sp,

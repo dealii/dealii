@@ -46,7 +46,10 @@ main(int argc, char **argv)
   col_partitioning.add_range(0, 4);
 
   // Add element (2,3) to the matrix
-  TrilinosWrappers::SparsityPattern sp(row_partitioning, col_partitioning);
+  TrilinosWrappers::SparsityPattern sp(row_partitioning,
+                                       col_partitioning,
+                                       MPI_COMM_WORLD,
+                                       1);
   sp.add(2, 3);
   sp.compress();
 
