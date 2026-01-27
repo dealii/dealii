@@ -183,7 +183,7 @@ template <typename Number>
 void
 FEValuesBase<dim, spacedim>::CellIteratorWrapper::get_interpolated_dof_values(
   const ReadVector<Number> &in,
-  Vector<Number>           &out) const
+  ArrayView<Number>         out) const
 {
   Assert(is_initialized(), ExcNotReinited());
 
@@ -724,10 +724,10 @@ FEValuesBase<dim, spacedim>::get_function_values(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_values(make_array_view(dof_values.begin(),
-                                               dof_values.end()),
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
+  internal::do_function_values(view,
                                this->finite_element_output.shape_values,
                                values);
 }
@@ -771,10 +771,11 @@ FEValuesBase<dim, spacedim>::get_function_values(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
   internal::do_function_values(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_values,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -859,10 +860,10 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_derivatives(make_array_view(dof_values.begin(),
-                                                    dof_values.end()),
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
+  internal::do_function_derivatives(view,
                                     this->finite_element_output.shape_gradients,
                                     gradients);
 }
@@ -905,10 +906,11 @@ FEValuesBase<dim, spacedim>::get_function_gradients(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_gradients,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -962,10 +964,10 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_derivatives(make_array_view(dof_values.begin(),
-                                                    dof_values.end()),
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
+  internal::do_function_derivatives(view,
                                     this->finite_element_output.shape_hessians,
                                     hessians);
 }
@@ -1009,10 +1011,11 @@ FEValuesBase<dim, spacedim>::get_function_hessians(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -1065,10 +1068,10 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
-  internal::do_function_laplacians(make_array_view(dof_values.begin(),
-                                                   dof_values.end()),
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
+  internal::do_function_laplacians(view,
                                    this->finite_element_output.shape_hessians,
                                    laplacians);
 }
@@ -1111,10 +1114,11 @@ FEValuesBase<dim, spacedim>::get_function_laplacians(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
   internal::do_function_laplacians(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_hessians,
     *fe,
     this->finite_element_output.shape_function_to_row_table,
@@ -1196,12 +1200,11 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
-    this->finite_element_output.shape_3rd_derivatives,
-    third_derivatives);
+    view, this->finite_element_output.shape_3rd_derivatives, third_derivatives);
 }
 
 
@@ -1242,10 +1245,11 @@ FEValuesBase<dim, spacedim>::get_function_third_derivatives(
   AssertDimension(fe_function.size(), present_cell.n_dofs_for_dof_handler());
 
   // get function values of dofs on this cell
-  Vector<Number> dof_values(dofs_per_cell);
-  present_cell.get_interpolated_dof_values(fe_function, dof_values);
+  boost::container::small_vector<Number, 200> dof_values(dofs_per_cell);
+  auto view = make_array_view(dof_values.begin(), dof_values.end());
+  present_cell.get_interpolated_dof_values(fe_function, view);
   internal::do_function_derivatives(
-    make_array_view(dof_values.begin(), dof_values.end()),
+    view,
     this->finite_element_output.shape_3rd_derivatives,
     *fe,
     this->finite_element_output.shape_function_to_row_table,

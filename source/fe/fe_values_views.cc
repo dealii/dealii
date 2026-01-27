@@ -375,13 +375,13 @@ namespace FEValuesViews
            (typename FEValuesBase<dim, spacedim>::ExcNotReinited()));
     AssertDimension(values.size(), fe_values->n_quadrature_points);
 
-    // get function values of dofs on this cell and call internal worker
-    // function
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    // get function values of dofs on this cell
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_values<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_values,
       shape_function_data,
       values);
@@ -431,11 +431,12 @@ namespace FEValuesViews
     AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_derivatives<1, dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       gradients);
@@ -485,11 +486,13 @@ namespace FEValuesViews
     AssertDimension(hessians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_derivatives<2, dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
+
       fe_values->finite_element_output.shape_hessians,
       shape_function_data,
       hessians);
@@ -539,11 +542,12 @@ namespace FEValuesViews
     AssertDimension(laplacians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_laplacians<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_hessians,
       shape_function_data,
       laplacians);
@@ -594,11 +598,12 @@ namespace FEValuesViews
     AssertDimension(third_derivatives.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_derivatives<3, dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_3rd_derivatives,
       shape_function_data,
       third_derivatives);
@@ -647,11 +652,12 @@ namespace FEValuesViews
     AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_values<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_values,
       shape_function_data,
       values);
@@ -701,11 +707,12 @@ namespace FEValuesViews
     AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_derivatives<1, dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       gradients);
@@ -756,11 +763,12 @@ namespace FEValuesViews
     AssertDimension(symmetric_gradients.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_symmetric_gradients<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       symmetric_gradients);
@@ -810,13 +818,13 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
     AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
-    // get function values of dofs
-    // on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    // get function values of dofs on this cell
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_divergences<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       divergences);
@@ -866,11 +874,12 @@ namespace FEValuesViews
     AssertDimension(curls.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_curls<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       curls);
@@ -920,11 +929,12 @@ namespace FEValuesViews
     AssertDimension(hessians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_derivatives<2, dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_hessians,
       shape_function_data,
       hessians);
@@ -979,11 +989,12 @@ namespace FEValuesViews
     AssertDimension(laplacians.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_laplacians<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_hessians,
       shape_function_data,
       laplacians);
@@ -1037,11 +1048,12 @@ namespace FEValuesViews
     AssertDimension(third_derivatives.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_derivatives<3, dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_3rd_derivatives,
       shape_function_data,
       third_derivatives);
@@ -1090,11 +1102,12 @@ namespace FEValuesViews
     AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_values<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_values,
       shape_function_data,
       values);
@@ -1143,13 +1156,13 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
     AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
-    // get function values of dofs
-    // on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    // get function values of dofs on this cell
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_divergences<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       divergences);
@@ -1198,11 +1211,12 @@ namespace FEValuesViews
     AssertDimension(values.size(), fe_values->n_quadrature_points);
 
     // get function values of dofs on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_values<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_values,
       shape_function_data,
       values);
@@ -1251,13 +1265,13 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
     AssertDimension(divergences.size(), fe_values->n_quadrature_points);
 
-    // get function values of dofs
-    // on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    // get function values of dofs on this cell
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_divergences<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       divergences);
@@ -1306,13 +1320,13 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
     AssertDimension(gradients.size(), fe_values->n_quadrature_points);
 
-    // get function values of dofs
-    // on this cell
-    dealii::Vector<Number> dof_values(fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(fe_function,
-                                                        dof_values);
+    // get function values of dofs on this cell
+    boost::container::small_vector<Number, 200> dof_values(
+      fe_values->dofs_per_cell);
+    fe_values->present_cell.get_interpolated_dof_values(
+      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
     internal::do_function_gradients<dim, spacedim>(
-      make_const_array_view(dof_values),
+      make_array_view(dof_values.cbegin(), dof_values.cend()),
       fe_values->finite_element_output.shape_gradients,
       shape_function_data,
       gradients);

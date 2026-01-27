@@ -1636,7 +1636,7 @@ protected:
     template <typename Number>
     void
     get_interpolated_dof_values(const ReadVector<Number> &in,
-                                Vector<Number>           &out) const;
+                                ArrayView<Number>         out) const;
 
   private:
     /**

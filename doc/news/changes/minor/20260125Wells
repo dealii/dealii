@@ -1,0 +1,5 @@
+Improved: Added an overload of DoFAccessor::get_interpolated_dof_values() which
+takes an ArrayView, instead of a Vector, as an argument. This function enables
+callers like FEValues to avoid allocating memory for many low-order elements.
+<br>
+(David Wells, 2026/01/25)
