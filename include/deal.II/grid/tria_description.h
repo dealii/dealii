@@ -162,7 +162,7 @@ namespace TriangulationDescription
   /**
    * Data used in the Triangulation::create_triangulation() overloads that
    * builds a triangulation out of objects of the current type. The contents
-   * of this kind of object are typically creates by functions such as
+   * of this kind of object are typically created by functions such as
    * TriangulationDescription::Utilities::create_description_from_triangulation().
    */
   template <int dim, int spacedim = dim>
