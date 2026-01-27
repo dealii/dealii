@@ -632,17 +632,14 @@ public:
   /**
    * Return the main diagonal element in the <i>i</i>th row. This function
    * throws an error if the matrix is not quadratic.
-   *
-   * This function is considerably faster than the operator()(), since for
-   * quadratic matrices, the diagonal entry may be the first to be stored in
-   * each row and access therefore does not involve searching for the right
-   * column number.
    */
   number
   diag_element(const size_type i) const;
 
   /**
-   * Same as above, but return a writable reference.
+   * Return a writable reference to the main diagonal element in the <i>i</i>th
+   * row. This function throws an error if the matrix is not quadratic. If the
+   * entry does not exist, it will be created.
    */
   number &
   diag_element(const size_type i);
@@ -1487,7 +1484,10 @@ SparseMatrixEZ<number>::diag_element(const size_type i)
 
   Entry *entry = locate(i, i);
   if (!entry)
-    set(i, i, number());
+    {
+      set(i, i, number());
+      *entry = locate(i, i);
+    }
 
   return entry->value;
 }
