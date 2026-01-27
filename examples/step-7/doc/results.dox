@@ -216,9 +216,10 @@ then no: That's not small, and your error is most certainly not
 sufficiently small; you need a finer mesh.
 
 In other words, when we look at these sorts of numbers, we generally
-need to compare against a "scale". One way to do that is to not look
-at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the *relative*
-error $\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
+need to compare against a "scale", i.e., a typical number of the units in
+question. One way to do that is to not look
+at the *absolute* error $\|u-u_h\|$ in whatever norm, but at the *relative* error
+$\|u-u_h\|/\|u\|$. If this ratio is $10^{-5}$, then
 you know that *on average*, the difference between $u$ and $u_h$ is
 0.001 per cent -- probably small enough for engineering purposes.
 
@@ -258,6 +259,21 @@ norms into one global norm as we already do in the program, by calling
                                         VectorTools::L2_norm);
 @endcode
 
+What you will find if you inserted this kind of code into the program
+is that $\|u\|_{L_2(\Omega)} \approx 0.27135$. So in the computations
+above, if you have $\|u-u_h\|_{L_2(\Omega)} = 3.140e-04$ (the last
+value for adaptive refinement using $Q_1$ elements, then this means
+that the *relative* error is
+@f{align*}{
+  \frac{\|u-u_h\|_{L_2(\Omega)}}{\|u\|_{L_2(\Omega)}}
+  \approx 0.00116,
+@f}
+or an error of approximately around 0.1 per cent -- that's good enough
+for most applications! It only took some 14,000 cells to achieve this,
+and a few seconds. Of course, the equation here is also particularly
+easy to solve, and you will find that for many other problems, and in
+particular in 3d, one needs *far* more effort to solve problems to
+this level of accuracy.
 
 
 <h3> Possibilities for extensions </h3>
