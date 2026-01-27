@@ -1487,7 +1487,7 @@ SparseMatrixEZ<number>::diag_element(const size_type i)
   if (!entry)
     {
       set(i, i, number());
-      *entry = locate(i, i);
+      entry = locate(i, i);
     }
 
   return entry->value;
