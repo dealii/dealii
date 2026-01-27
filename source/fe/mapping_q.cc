@@ -97,7 +97,7 @@ MappingQ<dim, spacedim>::InternalData::reinit(const UpdateFlags update_flags,
   if (polynomial_degree < 2 || n_q_points == 1)
     tensor_product_quadrature = false;
 
-  if (dim > 1)
+  if constexpr (dim > 1)
     {
       // find out if the one-dimensional formula is the same
       // in all directions
@@ -178,14 +178,14 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
         Utilities::pow(polynomial_degree + 1, dim);
     }
 
-  if (dim > 1)
+  if constexpr (dim > 1)
     {
       if (this->update_each &
           (update_boundary_forms | update_normal_vectors | update_JxW_values))
         {
           aux.resize(dim - 1);
           aux[0].resize(n_original_q_points);
-          if (dim > 2)
+          if constexpr (dim > 2)
             aux[1].resize(n_original_q_points);
 
           // Compute tangentials to the unit cell.
@@ -195,7 +195,7 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
               std::fill(unit_tangentials[i].begin(),
                         unit_tangentials[i].end(),
                         GeometryInfo<dim>::unit_tangential_vectors[i][0]);
-              if (dim > 2)
+              if constexpr (dim > 2)
                 {
                   unit_tangentials[GeometryInfo<dim>::faces_per_cell + i]
                     .resize(n_original_q_points);
@@ -435,7 +435,7 @@ MappingQ<1, 2>::transform_real_to_unit_cell_internal(
   const Quadrature<dim> point_quadrature(initial_p_unit);
 
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim > dim)
+  if constexpr (spacedim > dim)
     update_flags |= update_jacobian_grads;
   auto mdata = Utilities::dynamic_unique_cast<InternalData>(
     get_data(update_flags, point_quadrature));
@@ -468,7 +468,7 @@ MappingQ<2, 3>::transform_real_to_unit_cell_internal(
   const Quadrature<dim> point_quadrature(initial_p_unit);
 
   UpdateFlags update_flags = update_quadrature_points | update_jacobians;
-  if (spacedim > dim)
+  if constexpr (spacedim > dim)
     update_flags |= update_jacobian_grads;
   auto mdata = Utilities::dynamic_unique_cast<InternalData>(
     get_data(update_flags, point_quadrature));
@@ -547,7 +547,7 @@ MappingQ<dim, spacedim>::transform_real_to_unit_cell(
               case 1:
                 {
                   // formula not subject to any issues in 1d
-                  if (spacedim == 1)
+                  if constexpr (spacedim == 1)
                     return internal::MappingQ1::transform_real_to_unit_cell(
                       vertices, p);
                   else
@@ -976,7 +976,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
       if (computed_cell_similarity != CellSimilarity::translation)
         for (unsigned int point = 0; point < n_q_points; ++point)
           {
-            if (dim == spacedim)
+            if constexpr (dim == spacedim)
               {
                 const double det = data.volume_elements[point];
 
@@ -1033,7 +1033,7 @@ MappingQ<dim, spacedim>::fill_fe_values(
                                  "space dimension is one greater than the "
                                  "dimensionality of the mesh cells."));
 
-                        if (dim == 1)
+                        if constexpr (dim == 1)
                           output_data.normal_vectors[point] =
                             cross_product_2d(-DX_t[0]);
                         else // dim == 2
@@ -1744,7 +1744,7 @@ MappingQ<dim, spacedim>::compute_mapping_support_points(
             if (&cell->face(f)->get_manifold() != &cell->get_manifold())
               all_manifold_ids_are_equal = false;
 
-          if (dim == 3)
+          if constexpr (dim == 3)
             for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
               if (&cell->line(l)->get_manifold() != &cell->get_manifold())
                 all_manifold_ids_are_equal = false;
