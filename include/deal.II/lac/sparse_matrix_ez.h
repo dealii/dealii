@@ -1456,7 +1456,8 @@ SparseMatrixEZ<number>::el(const size_type i, const size_type j) const
   const Entry *entry = locate(i, j);
   if (entry)
     return entry->value;
-  return 0.;
+  else
+    return 0.;
 }
 
 template <typename number>
