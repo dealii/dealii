@@ -999,9 +999,10 @@ namespace internal
          */
         template <int dim, int spacedim>
         static types::global_dof_index
-        unify_dof_indices(const DoFHandler<dim, spacedim> &dof_handler,
-                          const unsigned int n_dofs_before_identification,
-                          const bool         check_validity)
+        unify_dof_indices(
+          const DoFHandler<dim, spacedim> &dof_handler,
+          const types::global_dof_index    n_dofs_before_identification,
+          const bool                       check_validity)
         {
           if (dof_handler.hp_capability_enabled == false)
             return n_dofs_before_identification;
@@ -2979,7 +2980,7 @@ namespace internal
         const std::vector<types::subdomain_id> subdomain_association =
           get_dof_subdomain_association(*this->dof_handler, n_dofs, n_procs);
 
-        for (unsigned int i = 1; i < n_dofs; ++i)
+        for (types::global_dof_index i = 1; i < n_dofs; ++i)
           Assert(subdomain_association[i] >= subdomain_association[i - 1],
                  ExcInternalError());
 
@@ -2994,8 +2995,8 @@ namespace internal
           // and filling IndexSets for those subdomains; subdomains
           // that don't appear will lead to IndexSets that are simply
           // never touched and remain empty as initialized above.
-          unsigned int start_index = 0;
-          unsigned int end_index   = 0;
+          types::global_dof_index start_index = 0;
+          types::global_dof_index end_index   = 0;
           while (start_index < n_dofs)
             {
               while ((end_index < n_dofs) &&
@@ -3007,7 +3008,7 @@ namespace internal
               // range in the corresponding IndexSet
               if (end_index > start_index)
                 {
-                  const unsigned int subdomain_owner =
+                  const types::subdomain_id subdomain_owner =
                     subdomain_association[start_index];
                   locally_owned_dofs_per_processor[subdomain_owner].add_range(
                     start_index, end_index);
@@ -3156,7 +3157,7 @@ namespace internal
                                                   n_procs,
                                                   lvl);
 
-            for (unsigned int i = 1; i < n_dofs_on_level; ++i)
+            for (types::global_dof_index i = 1; i < n_dofs_on_level; ++i)
               Assert(level_subdomain_association[i] >=
                        level_subdomain_association[i - 1],
                      ExcInternalError());
