@@ -1,22 +1,24 @@
-549,551d548
+496,498d495
 <     std::cout << std::endl
 <               << "Number of dofs for the interior: "
 <               << dof_handler_trial_interior.n_dofs() << std::endl;
-555,556d551
+501,502d497
 <     std::cout << "Number of dofs for the skeleton: "
 <               << dof_handler_trial_skeleton.n_dofs() << std::endl;
-560,561d554
+505,506d499
 <     std::cout << "Number of dofs for the test space: "
 <               << dof_handler_test.n_dofs() << std::endl;
-1444d1436
+1442,1443d1434
 <     std::cout << std::endl << "Solving the DPG system..." << std::endl;
-1454,1458d1445
+< 
+1451,1456d1441
+< 
 <     std::cout << "   " << solver_control.last_step()
 <               << " CG iterations needed to obtain convergence. \n"
 <               << std::endl;
 < 
 <     error_table.add_value("n_iter", solver_control.last_step());
-1749,1764d1735
+1729,1745d1713
 <     std::cout << "Velocity real part L2 error is : "
 <               << std::sqrt(L2_error_u_real) << std::endl;
 <     std::cout << "Velocity imag part L2 error is : "
@@ -33,21 +35,24 @@
 <               << std::sqrt(L2_error_p_hat_real) << std::endl;
 <     std::cout << "Pressure skeleton imag part L2 error is : "
 <               << std::sqrt(L2_error_p_hat_imag) << std::endl;
-1798,1799d1768
+< 
+1778,1780d1745
 <     std::cout << "Number of active cells: " << triangulation.n_active_cells()
 <               << std::endl;
-1816c1785
+< 
+1794c1759
 <     for (unsigned int cycle = 0; cycle < 8; ++cycle)
 ---
 >     for (unsigned int cycle = 0; cycle < 3; ++cycle)
-1818,1819d1786
+1796,1798d1760
 <         std::cout << "===========================================" << std::endl
 <                   << "Cycle " << cycle << ':' << std::endl;
-1870c1837
+< 
+1845c1807
 <       const int    degree       = 2;
 ---
 >       const int    degree       = 1;
-1872c1839
+1847c1809
 <       const double wavenumber   = 20 * pi;
 ---
 >       const double wavenumber   = 2 * pi;
