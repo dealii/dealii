@@ -2135,215 +2135,6 @@ namespace VectorTools
 
 
 
-  namespace internals
-  {
-    // This function computes the projection of the boundary function on the
-    // boundary in 2d.
-    template <typename cell_iterator, typename number, typename number2>
-    void
-    compute_face_projection_div_conforming(
-      const cell_iterator                        &cell,
-      const unsigned int                          face,
-      const FEFaceValues<2>                      &fe_values,
-      const unsigned int                          first_vector_component,
-      const Function<2, number2>                 &boundary_function,
-      const std::vector<DerivativeForm<1, 2, 2>> &jacobians,
-      AffineConstraints<number>                  &constraints)
-    {
-      // Compute the integral over the product of the normal components of
-      // the boundary function times the normal components of the shape
-      // functions supported on the boundary.
-      const FEValuesExtractors::Vector vec(first_vector_component);
-      const FiniteElement<2>          &fe      = cell->get_fe();
-      const std::vector<Tensor<1, 2>> &normals = fe_values.get_normal_vectors();
-      const unsigned int
-        face_coordinate_direction[GeometryInfo<2>::faces_per_cell] = {1,
-                                                                      1,
-                                                                      0,
-                                                                      0};
-      std::vector<Vector<number2>> values(fe_values.n_quadrature_points,
-                                          Vector<number2>(2));
-      Vector<number2>              dof_values(fe.n_dofs_per_face(face));
-
-      // Get the values of the boundary function at the quadrature points.
-      {
-        const std::vector<Point<2>> &quadrature_points =
-          fe_values.get_quadrature_points();
-
-        boundary_function.vector_value_list(quadrature_points, values);
-      }
-
-      for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-           ++q_point)
-        {
-          number2 tmp = 0.0;
-
-          for (unsigned int d = 0; d < 2; ++d)
-            tmp += normals[q_point][d] * values[q_point](d);
-
-          tmp *=
-            fe_values.JxW(q_point) *
-            std::sqrt(jacobians[q_point][0][face_coordinate_direction[face]] *
-                        jacobians[q_point][0][face_coordinate_direction[face]] +
-                      jacobians[q_point][1][face_coordinate_direction[face]] *
-                        jacobians[q_point][1][face_coordinate_direction[face]]);
-
-          for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
-            dof_values(i) +=
-              tmp * (normals[q_point] *
-                     fe_values[vec].value(
-                       fe.face_to_cell_index(
-                         i, face, cell->combined_face_orientation(face)),
-                       q_point));
-        }
-
-      std::vector<types::global_dof_index> face_dof_indices(
-        fe.n_dofs_per_face(face));
-
-      cell->face(face)->get_dof_indices(face_dof_indices,
-                                        cell->active_fe_index());
-
-      // Copy the computed values in the AffineConstraints only, if the degree
-      // of freedom is not already constrained.
-      for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
-        if (!(constraints.is_constrained(face_dof_indices[i])) &&
-            fe.get_nonzero_components(fe.face_to_cell_index(
-              i,
-              face,
-              cell->combined_face_orientation(face)))[first_vector_component])
-          constraints.add_constraint(face_dof_indices[i],
-                                     {},
-                                     (std::abs(dof_values[i]) > 1e-14 ?
-                                        dof_values[i] :
-                                        0));
-    }
-
-    // dummy implementation of above function for all other dimensions
-    template <int dim,
-              typename cell_iterator,
-              typename number,
-              typename number2>
-    void
-    compute_face_projection_div_conforming(
-      const cell_iterator &,
-      const unsigned int,
-      const FEFaceValues<dim> &,
-      const unsigned int,
-      const Function<dim, number2> &,
-      const std::vector<DerivativeForm<1, dim, dim>> &,
-      AffineConstraints<number> &)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
-
-    // This function computes the projection of the boundary function on the
-    // boundary in 3d.
-    template <typename cell_iterator, typename number, typename number2>
-    void
-    compute_face_projection_div_conforming(
-      const cell_iterator                        &cell,
-      const unsigned int                          face,
-      const FEFaceValues<3>                      &fe_values,
-      const unsigned int                          first_vector_component,
-      const Function<3, number2>                 &boundary_function,
-      const std::vector<DerivativeForm<1, 3, 3>> &jacobians,
-      std::vector<number>                        &dof_values,
-      std::vector<types::global_dof_index>       &projected_dofs)
-    {
-      // Compute the integral over the product of the normal components of
-      // the boundary function times the normal components of the shape
-      // functions supported on the boundary.
-      const FEValuesExtractors::Vector vec(first_vector_component);
-      const FiniteElement<3>          &fe      = cell->get_fe();
-      const std::vector<Tensor<1, 3>> &normals = fe_values.get_normal_vectors();
-      const unsigned int
-        face_coordinate_directions[GeometryInfo<3>::faces_per_cell][2] = {
-          {1, 2}, {1, 2}, {2, 0}, {2, 0}, {0, 1}, {0, 1}};
-      std::vector<Vector<number2>> values(fe_values.n_quadrature_points,
-                                          Vector<number2>(3));
-      Vector<number2>              dof_values_local(fe.n_dofs_per_face(face));
-
-      {
-        const std::vector<Point<3>> &quadrature_points =
-          fe_values.get_quadrature_points();
-
-        boundary_function.vector_value_list(quadrature_points, values);
-      }
-
-      for (unsigned int q_point = 0; q_point < fe_values.n_quadrature_points;
-           ++q_point)
-        {
-          number2 tmp = 0.0;
-
-          for (unsigned int d = 0; d < 3; ++d)
-            tmp += normals[q_point][d] * values[q_point](d);
-
-          tmp *=
-            fe_values.JxW(q_point) *
-            std::sqrt(
-              (jacobians[q_point][0][face_coordinate_directions[face][0]] *
-                 jacobians[q_point][0][face_coordinate_directions[face][0]] +
-               jacobians[q_point][1][face_coordinate_directions[face][0]] *
-                 jacobians[q_point][1][face_coordinate_directions[face][0]] +
-               jacobians[q_point][2][face_coordinate_directions[face][0]] *
-                 jacobians[q_point][2][face_coordinate_directions[face][0]]) *
-              (jacobians[q_point][0][face_coordinate_directions[face][1]] *
-                 jacobians[q_point][0][face_coordinate_directions[face][1]] +
-               jacobians[q_point][1][face_coordinate_directions[face][1]] *
-                 jacobians[q_point][1][face_coordinate_directions[face][1]] +
-               jacobians[q_point][2][face_coordinate_directions[face][1]] *
-                 jacobians[q_point][2][face_coordinate_directions[face][1]]));
-
-          for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
-            dof_values_local(i) +=
-              tmp * (normals[q_point] *
-                     fe_values[vec].value(
-                       fe.face_to_cell_index(
-                         i, face, cell->combined_face_orientation(face)),
-                       q_point));
-        }
-
-      std::vector<types::global_dof_index> face_dof_indices(
-        fe.n_dofs_per_face(face));
-
-      cell->face(face)->get_dof_indices(face_dof_indices,
-                                        cell->active_fe_index());
-
-      for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
-        if (projected_dofs[face_dof_indices[i]] < fe.degree &&
-            fe.get_nonzero_components(fe.face_to_cell_index(
-              i,
-              face,
-              cell->combined_face_orientation(face)))[first_vector_component])
-          {
-            dof_values[face_dof_indices[i]]     = dof_values_local(i);
-            projected_dofs[face_dof_indices[i]] = fe.degree;
-          }
-    }
-
-    // dummy implementation of above
-    // function for all other
-    // dimensions
-    template <int dim,
-              typename cell_iterator,
-              typename number,
-              typename number2>
-    void
-    compute_face_projection_div_conforming(
-      const cell_iterator &,
-      const unsigned int,
-      const FEFaceValues<dim> &,
-      const unsigned int,
-      const Function<dim, number2> &,
-      const std::vector<DerivativeForm<1, dim, dim>> &,
-      std::vector<number> &,
-      std::vector<types::global_dof_index> &)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
-  } // namespace internals
-
-
   template <int dim, typename number, typename number2>
   void
   project_boundary_values_div_conforming(
@@ -2354,169 +2145,12 @@ namespace VectorTools
     AffineConstraints<number>    &constraints,
     const Mapping<dim>           &mapping)
   {
-    const unsigned int spacedim = dim;
-    // Interpolate the normal components
-    // of the boundary functions. Since
-    // the Raviart-Thomas elements are
-    // constructed from a Lagrangian
-    // basis, it suffices to compute
-    // the integral over the product
-    // of the normal components of the
-    // boundary function times the
-    // normal components of the shape
-    // functions supported on the
-    // boundary.
-    const FiniteElement<dim>        &fe = dof_handler.get_fe();
-    QGauss<dim - 1>                  face_quadrature(fe.degree + 1);
-    FEFaceValues<dim>                fe_face_values(mapping,
-                                     fe,
-                                     face_quadrature,
-                                     update_JxW_values | update_normal_vectors |
-                                       update_quadrature_points |
-                                       update_values);
-    hp::FECollection<dim>            fe_collection(fe);
-    const hp::MappingCollection<dim> mapping_collection(mapping);
-    hp::QCollection<dim>             quadrature_collection;
-
-    for (const unsigned int face : GeometryInfo<dim>::face_indices())
-      quadrature_collection.push_back(QProjector<dim>::project_to_face(
-        ReferenceCells::get_hypercube<dim>(),
-        face_quadrature,
-        face,
-        numbers::default_geometric_orientation));
-
-    hp::FEValues<dim> fe_values(mapping_collection,
-                                fe_collection,
-                                quadrature_collection,
-                                update_jacobians);
-
-    switch (dim)
-      {
-        case 2:
-          {
-            for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
-                    {
-                      const FiniteElement<dim> &fe = cell->get_fe();
-
-                      // if the FE is a
-                      // FE_Nothing object
-                      // there is no work to
-                      // do
-                      if (dynamic_cast<const FE_Nothing<dim> *>(&fe) != nullptr)
-                        return;
-
-                      // This is only
-                      // implemented, if the
-                      // FE is a Raviart-Thomas
-                      // element. If the FE is
-                      // a FESystem we cannot
-                      // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(&fe) == nullptr)
-                        {
-                          AssertThrow(
-                            dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
-                                nullptr ||
-                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
-                                &fe) != nullptr,
-                            typename FiniteElement<
-                              dim>::ExcInterpolationNotImplemented());
-                        }
-
-                      fe_values.reinit(cell,
-                                       face + cell->active_fe_index() *
-                                                cell->n_faces());
-
-                      const std::vector<DerivativeForm<1, dim, spacedim>>
-                        &jacobians =
-                          fe_values.get_present_fe_values().get_jacobians();
-
-                      fe_face_values.reinit(cell, face);
-                      internals::compute_face_projection_div_conforming(
-                        cell,
-                        face,
-                        fe_face_values,
-                        first_vector_component,
-                        boundary_function,
-                        jacobians,
-                        constraints);
-                    }
-
-            break;
-          }
-
-        case 3:
-          {
-            // In three dimensions the edges between two faces are treated
-            // twice. Therefore we store the computed values in a vector
-            // and copy them over in the AffineConstraints after all values
-            // have been computed. If we have two values for one edge, we
-            // choose the one, which was computed with the higher order
-            // element. If both elements are of the same order, we just
-            // keep the first value and do not compute a second one.
-            const unsigned int                   n_dofs = dof_handler.n_dofs();
-            std::vector<double>                  dof_values(n_dofs);
-            std::vector<types::global_dof_index> projected_dofs(n_dofs);
-
-            for (unsigned int dof = 0; dof < n_dofs; ++dof)
-              projected_dofs[dof] = 0;
-
-            for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
-                    {
-                      // This is only implemented, if the FE is a
-                      // Raviart-Thomas element. If the FE is a FESystem we
-                      // cannot check this.
-                      if (dynamic_cast<const FESystem<dim> *>(&fe) == nullptr)
-                        {
-                          AssertThrow(
-                            dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
-                                nullptr ||
-                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
-                                &fe) != nullptr,
-                            typename FiniteElement<
-                              dim>::ExcInterpolationNotImplemented());
-                        }
-
-                      fe_values.reinit(cell,
-                                       face + cell->active_fe_index() *
-                                                cell->n_faces());
-
-                      const std::vector<DerivativeForm<1, dim, spacedim>>
-                        &jacobians =
-                          fe_values.get_present_fe_values().get_jacobians();
-
-                      fe_face_values.reinit(cell, face);
-                      internals::compute_face_projection_div_conforming(
-                        cell,
-                        face,
-                        fe_face_values,
-                        first_vector_component,
-                        boundary_function,
-                        jacobians,
-                        dof_values,
-                        projected_dofs);
-                    }
-
-            for (unsigned int dof = 0; dof < n_dofs; ++dof)
-              if ((projected_dofs[dof] != 0) &&
-                  !(constraints.is_constrained(dof)))
-                constraints.add_constraint(dof,
-                                           {},
-                                           (std::abs(dof_values[dof]) > 1e-14 ?
-                                              dof_values[dof] :
-                                              0));
-
-            break;
-          }
-
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
+    project_boundary_values_div_conforming(dof_handler,
+                                           first_vector_component,
+                                           boundary_function,
+                                           boundary_component,
+                                           constraints,
+                                           hp::MappingCollection<dim>(mapping));
   }
 
 
@@ -2550,134 +2184,145 @@ namespace VectorTools
             numbers::default_geometric_orientation));
       }
 
-    hp::FEFaceValues<dim> fe_face_values(mapping_collection,
-                                         fe_collection,
-                                         face_quadrature_collection,
-                                         update_JxW_values |
-                                           update_normal_vectors |
-                                           update_quadrature_points |
-                                           update_values);
+    hp::FEFaceValues<dim> hp_fe_face_values(mapping_collection,
+                                            fe_collection,
+                                            face_quadrature_collection,
+                                            update_JxW_values |
+                                              update_normal_vectors |
+                                              update_quadrature_points |
+                                              update_values);
     hp::FEValues<dim>     fe_values(mapping_collection,
                                 fe_collection,
                                 quadrature_collection,
                                 update_jacobians);
 
-    switch (dim)
-      {
-        case 2:
-          {
-            for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
+    std::vector<Vector<number2>>         function_values;
+    Vector<number2>                      dof_values;
+    std::vector<types::global_dof_index> face_dof_indices;
+
+    const FEValuesExtractors::Vector vec(first_vector_component);
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      if (cell->at_boundary() && cell->is_locally_owned())
+        for (const unsigned int face : cell->face_indices())
+          if (cell->face(face)->boundary_id() == boundary_component)
+            {
+              const FiniteElement<dim> &fe = cell->get_fe();
+
+              // if the FE is a FE_Nothing object there is no work to do
+              if (dynamic_cast<const FE_Nothing<dim> *>(&fe) != nullptr)
+                return;
+
+              // This is only implemented, if the FE is a Raviart-Thomas
+              // element. If the FE is a FESystem we cannot check this.
+              if (dynamic_cast<const FESystem<dim> *>(&fe) == nullptr)
+                {
+                  AssertThrow(
+                    dynamic_cast<const FE_RaviartThomas<dim> *>(&fe) !=
+                        nullptr ||
+                      dynamic_cast<const FE_RaviartThomasNodal<dim> *>(&fe) !=
+                        nullptr,
+                    typename FiniteElement<
+                      dim>::ExcInterpolationNotImplemented());
+                }
+
+              fe_values.reinit(cell,
+                               face +
+                                 cell->active_fe_index() * cell->n_faces());
+
+              hp_fe_face_values.reinit(cell, face);
+              const FEFaceValues<dim, spacedim> &fe_face_values =
+                hp_fe_face_values.get_present_fe_values();
+
+              // Compute the integral over the product of the normal
+              // components of the boundary function times the normal
+              // components of the shape functions supported on the boundary.
+              const std::vector<Tensor<1, dim>> &normals =
+                fe_face_values.get_normal_vectors();
+
+              // This code does not correctly compute the reference directions
+              // for non-hypercube elements
+              Assert(fe.reference_cell().is_hyper_cube(),
+                     ExcNotImplemented(
+                       "The reference directions for non-hypercube "
+                       "elements are currently not computed correctly."));
+              std::array<unsigned int, dim - 1> face_coordinate_direction;
+              for (unsigned int d = 0; d < dim - 1; ++d)
+                face_coordinate_direction[d] = (face / 2 + 1 + d) % dim;
+
+              if (function_values.size() != fe_face_values.n_quadrature_points)
+                function_values.resize(fe_face_values.n_quadrature_points,
+                                       Vector<number2>(dim));
+              if (dof_values.size() != fe.n_dofs_per_face(face))
+                dof_values.reinit(fe.n_dofs_per_face(face));
+              else
+                std::fill(dof_values.begin(), dof_values.end(), 0.0);
+
+              // Get the values of the boundary function at the quadrature
+              // points.
+              {
+                const std::vector<Point<dim>> &quadrature_points =
+                  fe_face_values.get_quadrature_points();
+
+                boundary_function.vector_value_list(quadrature_points,
+                                                    function_values);
+              }
+
+              for (const unsigned int q_point :
+                   fe_face_values.quadrature_point_indices())
+                {
+                  number2 tmp = 0.0;
+
+                  for (unsigned int d = 0; d < dim; ++d)
+                    tmp += normals[q_point][d] * function_values[q_point](d);
+
+                  const DerivativeForm<1, dim, spacedim> jacobian =
+                    fe_values.get_present_fe_values().jacobian(q_point);
+
+                  double area_element = 1;
+                  for (unsigned int d = 0; d < dim - 1; ++d)
                     {
-                      // This is only
-                      // implemented, if the
-                      // FE is a Raviart-Thomas
-                      // element. If the FE is
-                      // a FESystem we cannot
-                      // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
-                        {
-                          AssertThrow(
-                            dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr ||
-                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
-                                &cell->get_fe()) != nullptr,
-                            typename FiniteElement<
-                              dim>::ExcInterpolationNotImplemented());
-                        }
-
-                      fe_values.reinit(cell,
-                                       face + cell->active_fe_index() *
-                                                cell->n_faces());
-
-                      const std::vector<DerivativeForm<1, dim, spacedim>>
-                        &jacobians =
-                          fe_values.get_present_fe_values().get_jacobians();
-
-                      fe_face_values.reinit(cell, face);
-                      internals::compute_face_projection_div_conforming(
-                        cell,
-                        face,
-                        fe_face_values.get_present_fe_values(),
-                        first_vector_component,
-                        boundary_function,
-                        jacobians,
-                        constraints);
+                      double factor_d = 0;
+                      for (unsigned int e = 0; e < dim; ++e)
+                        factor_d += jacobian[e][face_coordinate_direction[d]] *
+                                    jacobian[e][face_coordinate_direction[d]];
+                      area_element *= factor_d;
                     }
 
-            break;
-          }
+                  tmp *= fe_face_values.JxW(q_point) * std::sqrt(area_element);
 
-        case 3:
-          {
-            const unsigned int                   n_dofs = dof_handler.n_dofs();
-            std::vector<number2>                 dof_values(n_dofs);
-            std::vector<types::global_dof_index> projected_dofs(n_dofs);
+                  for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
+                    dof_values(i) +=
+                      tmp *
+                      (normals[q_point] *
+                       fe_face_values[vec].value(
+                         fe.face_to_cell_index(
+                           i, face, cell->combined_face_orientation(face)),
+                         q_point));
+                }
 
-            for (unsigned int dof = 0; dof < n_dofs; ++dof)
-              projected_dofs[dof] = 0;
 
-            for (const auto &cell : dof_handler.active_cell_iterators())
-              if (cell->at_boundary() && cell->is_locally_owned())
-                for (const unsigned int face : cell->face_indices())
-                  if (cell->face(face)->boundary_id() == boundary_component)
-                    {
-                      // This is only
-                      // implemented, if the
-                      // FE is a Raviart-Thomas
-                      // element. If the FE is
-                      // a FESystem we cannot
-                      // check this.
-                      if (dynamic_cast<const FESystem<dim> *>(
-                            &cell->get_fe()) == nullptr)
-                        {
-                          AssertThrow(
-                            dynamic_cast<const FE_RaviartThomas<dim> *>(
-                              &cell->get_fe()) != nullptr ||
-                              dynamic_cast<const FE_RaviartThomasNodal<dim> *>(
-                                &cell->get_fe()) != nullptr,
-                            typename FiniteElement<
-                              dim>::ExcInterpolationNotImplemented());
-                        }
+              if (face_dof_indices.size() != fe.n_dofs_per_face(face))
+                face_dof_indices.resize(fe.n_dofs_per_face(face));
 
-                      fe_values.reinit(cell,
-                                       face + cell->active_fe_index() *
-                                                cell->n_faces());
+              cell->face(face)->get_dof_indices(face_dof_indices,
+                                                cell->active_fe_index());
 
-                      const std::vector<DerivativeForm<1, dim, spacedim>>
-                        &jacobians =
-                          fe_values.get_present_fe_values().get_jacobians();
-
-                      fe_face_values.reinit(cell, face);
-                      internals::compute_face_projection_div_conforming(
-                        cell,
-                        face,
-                        fe_face_values.get_present_fe_values(),
-                        first_vector_component,
-                        boundary_function,
-                        jacobians,
-                        dof_values,
-                        projected_dofs);
-                    }
-
-            for (unsigned int dof = 0; dof < n_dofs; ++dof)
-              if ((projected_dofs[dof] != 0) &&
-                  !(constraints.is_constrained(dof)))
-                constraints.add_constraint(dof,
-                                           {},
-                                           (std::abs(dof_values[dof]) > 1e-14 ?
-                                              dof_values[dof] :
-                                              0));
-
-            break;
-          }
-
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
+              // Copy the computed values in the AffineConstraints only, if
+              // the degree of freedom is not already constrained.
+              for (unsigned int i = 0; i < fe.n_dofs_per_face(face); ++i)
+                if (!(constraints.is_constrained(face_dof_indices[i])) &&
+                    fe.get_nonzero_components(
+                      fe.face_to_cell_index(i,
+                                            face,
+                                            cell->combined_face_orientation(
+                                              face)))[first_vector_component])
+                  constraints.add_constraint(face_dof_indices[i],
+                                             {},
+                                             (std::abs(dof_values[i]) > 1e-14 ?
+                                                dof_values[i] :
+                                                0));
+            }
   }
 } // namespace VectorTools
 

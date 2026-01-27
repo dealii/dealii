@@ -1,0 +1,6 @@
+Fixed: The function VectorTools::project_boundary_values_div_conforming()
+would previously allocate an array of length equal to the global number of
+degrees of freedom. This is now fixed, making sure that also large-scale
+parallel programs can fit into memory.
+<br>
+(Martin Kronbichler, 2026/01/26)
