@@ -729,7 +729,7 @@ namespace GridGenerator
    * 
    * It is implemented in 3d, and takes the following arguments:
    * 
-   * @param triangulation The triangulation to be filled.
+   * @param tria The triangulation to be filled.
    * @param inner_radius  Radius of the internal sphere.
    * @param outer_radius Half of the edge length of the cube.
    * @param colorize Whether to assign different boundary indicators to
