@@ -1,0 +1,5 @@
+Fixed: Various minor issues with algorithms operating
+on large problems with DEAL_II_WITH_64BIT_INDICES=ON have
+been addressed.
+<br>
+(Timo Heister, 2026/01/27)
