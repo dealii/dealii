@@ -1106,16 +1106,6 @@ namespace SUNDIALS
   };
 
 
-  /**
-   * Handle ARKode exceptions.
-   */
-  DeclException1(ExcARKodeError,
-                 int,
-                 << "One of the SUNDIALS ARKode internal functions "
-                 << " returned a negative error code: " << arg1
-                 << ". Please consult SUNDIALS manual.");
-
-
   template <typename VectorType>
   ARKode<VectorType>::AdditionalData::AdditionalData(
     // Initial parameters
