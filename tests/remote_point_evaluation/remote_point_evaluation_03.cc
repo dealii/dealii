@@ -217,24 +217,16 @@ test_1(const Triangulation<dim, spacedim> &surface_mesh,
     std::vector<types::global_dof_index> local_dof_indices;
     std::vector<types::global_dof_index> local_dof_indices_dim;
 
-    for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
+    for (const auto cell_index : cell_data.cell_indices())
       {
-        typename DoFHandler<spacedim>::active_cell_iterator cell_dim = {
-          &eval.get_triangulation(),
-          cell_data.cells[i].first,
-          cell_data.cells[i].second,
-          &dof_handler_dim};
+        typename DoFHandler<spacedim>::active_cell_iterator cell_dim =
+          cell_data.get_active_cell_iterator(cell_index)
+            ->as_dof_handler_iterator(dof_handler_dim);
 
-        const ArrayView<const Point<spacedim>> unit_points(
-          cell_data.reference_point_values.data() +
-            cell_data.reference_point_ptrs[i],
-          cell_data.reference_point_ptrs[i + 1] -
-            cell_data.reference_point_ptrs[i]);
-
-        const ArrayView<const T> JxW(values.data() +
-                                       cell_data.reference_point_ptrs[i],
-                                     cell_data.reference_point_ptrs[i + 1] -
-                                       cell_data.reference_point_ptrs[i]);
+        const ArrayView<const Point<spacedim>> unit_points =
+          cell_data.get_unit_points(cell_index);
+        const ArrayView<const T> JxW =
+          cell_data.get_data_view(cell_index, values);
 
         // gather_evaluate normal
         {
