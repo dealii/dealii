@@ -4,7 +4,7 @@ members — i.e., including you! It is our goal to build an inclusive and
 participatory community so we are happy that you are interested in
 participating. This document partly duplicates some extra information on
 participating available
-[on the project website](https://dealii.org/participate.html).
+[on the project website](https://dealii.org/community).
 
 ## Getting started with git and GitHub
 If you are new to using git or the GitHub platform you may find it helpful
@@ -18,7 +18,7 @@ The deal.II community maintains an active mailing list hosted by google
 groups [here](https://groups.google.com/forum/#!forum/dealii). The mailing
 list is for questions about the library of all levels. For more information
 see the website page describing our mailing lists
-[here](https://dealii.org/mail.html).
+[here](https://dealii.org/getting_help/contact).
 
 ## Bug reports
 It is a great help to the community if you report any bugs in the library
