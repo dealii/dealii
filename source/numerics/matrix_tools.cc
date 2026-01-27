@@ -62,7 +62,7 @@ namespace MatrixTools
     template <typename Iterator>
     bool
     column_less_than(const typename Iterator::value_type p,
-                     const unsigned int                  column)
+                     const types::global_dof_index       column)
     {
       return (p.column() < column);
     }
@@ -101,7 +101,7 @@ namespace MatrixTools
     // element of the matrix, or 1 if
     // there is no such thing
     number first_nonzero_diagonal_entry = 1;
-    for (unsigned int i = 0; i < n_dofs; ++i)
+    for (types::global_dof_index i = 0; i < n_dofs; ++i)
       if (matrix.diag_element(i) != number())
         {
           first_nonzero_diagonal_entry = matrix.diag_element(i);
@@ -189,7 +189,7 @@ namespace MatrixTools
                 // (row,dof_number)
                 bool (*comp)(
                   const typename SparseMatrix<number>::iterator::value_type p,
-                  const unsigned int column) =
+                  const types::global_dof_index column) =
                   &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator p =
                   Utilities::lower_bound(matrix.begin(row) + 1,
@@ -274,7 +274,8 @@ namespace MatrixTools
     number first_nonzero_diagonal_entry = 0;
     for (unsigned int diag_block = 0; diag_block < blocks; ++diag_block)
       {
-        for (unsigned int i = 0; i < matrix.block(diag_block, diag_block).n();
+        for (types::global_dof_index i = 0;
+             i < matrix.block(diag_block, diag_block).n();
              ++i)
           if (matrix.block(diag_block, diag_block).diag_element(i) != number{})
             {
@@ -438,7 +439,7 @@ namespace MatrixTools
                     // take care of special cases with square sub-matrices
                     bool (*comp)(
                       typename SparseMatrix<number>::iterator::value_type p,
-                      const unsigned int column) =
+                      const types::global_dof_index column) =
                       &column_less_than<
                         typename SparseMatrix<number>::iterator>;
 
