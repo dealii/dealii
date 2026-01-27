@@ -472,9 +472,10 @@ namespace Step100
   // components of the skeleton variables by interpolating analytical boundary
   // data onto the appropriate trace spaces using component masks and
   // FEValuesExtractors. A Dirichlet condition is first applied to the pressure
-  // trace on the left boundary (id=0), while a Neumann condition on the
-  // pressure is enforced by prescribing the normal component of the velocity
-  // trace on the bottom boundary (id=2). Note that the Robin boundary
+  // trace on the left boundary (<code>types::boundary_id(0)</code>), while a
+  // Neumann condition on the pressure is enforced by prescribing the normal
+  // component of the velocity trace on the bottom boundary
+  // (<code>types::boundary_id(2)</code>). Note that the Robin boundary
   // conditions are not enforced through constraints and are instead
   // incorporated later during the assembly of the bilinear and linear forms.
 
@@ -752,27 +753,26 @@ namespace Step100
     // cell-wise assembly is naturally tied to the interior unknowns. For each
     // such cell, we explicitly obtain the corresponding iterators for the test
     // space and for the skeleton trial space to ensure that all FEValues
-    // objects are reinitialized on the same physical cell.
+    // objects are reinitialized on the same physical cell. The loop on cells is
+    // used to assemble all the local matrices and vectors entering the DPG
+    // static condensation procedure ($G$, $B$, $\hat{B}$, $D$, $g$, $l$). It
+    // follows that all these objects are reinitialized to zero at the beginning
+    // of each cell loop. In addition, we need to reset the local condensation
+    // matrix $M_1$ because LAPACKFullMatrix keeps track of its inverse status
+    // between iterations and forbids to invert it again if it has the inverted
+    // status.
 
-    // The loop on cells is used to assemble all the local matrices and vectors
-    // entering the DPG static condensation procedure ($G$, $B$, $\hat{B}$, $D$,
-    // $g$, $l$). It follows that all these objects are reinitialized to zero at
-    // the beginning of each cell loop. In addition, we need to reset the local
-    // condensation matrix $M_1$ because LAPACKFullMatrix keeps track of its
-    // inverse status between iterations and forbids to invert it again if it
-    // has the inverted status.
-
-    // To avoid unnecessary computations, at each quadrature point, we evaluate
+    // At each quadrature point, we evaluate
     // and cache the values, gradients, and divergences of the test functions
     // ($\mathbf{v}$ and $q$), as well as the values of the trial functions
-    // ($\mathbf{u}$ and $p$). These quantities are stored as complex-valued
-    // expressions, together with their complex conjugates, in order to directly
-    // form the sesquilinear forms appearing in the time-harmonic formulation.
-    // In addition, we check and store in the
+    // ($\mathbf{u}$ and $p$) in the the relevant containers. These quantities
+    // are stored as complex-valued expressions, together with their complex
+    // conjugates, in order to directly form the sesquilinear forms appearing in
+    // the time-harmonic formulation. In addition, we check and store in the
     // <code>shape_function_type_test</code>,
     // <code>shape_function_type_trial_interior</code>, and
-    // <code>shape_function_type_trial_skeleton</code> vectors which field each
-    // shape function is associated to.
+    // <code>shape_function_type_trial_skeleton</code> vectors to which field
+    // each shape function is associated.
 
     // For each quadrature point, we then loop over the test space degrees of
     // freedom. In a first nested loop over test indices, we assemble the Gram
@@ -792,12 +792,12 @@ namespace Step100
     //  <code>j</code> is in the test function $\mathbf{v}$, we build the terms
     //  $(\nabla q, i\omega \mathbf{v})_{\Omega_h} + (i\omega q, \nabla \cdot
     //  \mathbf{v})_{\Omega_h}$;
-    //  - Finally, if both in test functions are in $q$, we build the terms $(q,
-    //  q)_{\Omega_h} + (\nabla q,\nabla q)_{\Omega_h} + (i\omega q, i\omega
-    //  q)_{\Omega_h}$.
+    //  - Finally, <code>i</code> and <code>j</code> are in test space
+    //  associated to $q$, we build the terms $(q, q)_{\Omega_h} + (\nabla
+    //  q,\nabla q)_{\Omega_h} + (i\omega q, i\omega q)_{\Omega_h}$.
 
     // In a second nested loop over interior trial space degrees of freedom, we
-    // assemble the operator matrix B. Here again, the contributions depend on
+    // assemble the operator matrix $B$. Here again, the contributions depend on
     // the pairing of test and trial components:
     //  - If dof <code>i</code> in test function $\mathbf{v}$ and dof
     //  <code>j</code> in trial function $\mathbf{u}$ we build the term
@@ -810,11 +810,10 @@ namespace Step100
     //  \mathbf{u})_{\Omega_h}$;
     //  -  If dof <code>i</code> in test function $q$ and dof <code>j</code> in
     //  trial function $p$ we build the term $(q, i\omega p^*)_{\Omega_h}$.
-    //
-    // Finally, we assemble the load vector l. In the present plane-wave
+
+    // Finally, we assemble the load vector $l$. In the present plane wave
     // configuration, the volumetric source term is zero, but we nevertheless
-    // include the corresponding code path for completeness by assembling
-    //  $(q, l)_{\Omega_h}$ over the cell.
+    // assemble $(q, l)_{\Omega_h}$ over the cell for completeness.
     for (const auto &cell : dof_handler_trial_interior.active_cell_iterators())
       {
         fe_values_trial_interior.reinit(cell);
@@ -999,7 +998,7 @@ namespace Step100
               }
           }
 
-        // We now assemble the skeleton (face) contributions of the DPG
+        // We now need to assemble the skeleton (face) contributions of the DPG
         // formulation. For this purpose, we loop over all faces of the current
         // cell using the DoFHandler associated with the skeleton trial space.
         // On each face, we reinitialize the FEFaceValues objects for both the
@@ -1007,31 +1006,30 @@ namespace Step100
         // are evaluated on the same geometric entity.
 
         // In addition to the standard face integrals, this loop also accounts
-        // for Robin boundary conditions, which in the present plane-wave
-        // configuration are imposed on two boundaries of the domain (id=1 and
-        // id=3). We therefore record both the boundary id. We also record the
-        // face number that will be used to consistently determine the
-        // orientation of normal fluxes.
+        // for Robin boundary conditions, which in the present plane wave
+        // configuration are imposed on two boundaries of the domain
+        // (<code>types::boundary_id(1)</code> and
+        // <code>types::boundary_id(3)</code>).The Robin terms involve the
+        // factor
+        // $\frac{k_n}{\omega}$, but in our configuration,
+        // $\omega = k c_s$ with $c_s=1$, and the geometry of the domain implies
+        // that $k_n =\mathbf{k} \cdot \mathbf{n}$ reduces to either
+        // $k\cos{\theta}$ for the right boundary
+        // (<code>types::boundary_id(1)</code>) or $k\sin{\theta}$ for the top
+        // boundary (<code>types::boundary_id(3)</code>). Consequently the
+        // wavenumber cancels out, and we are left with the cosine and sine of
+        // the propagation direction as the factor in front of the pressure
+        // term.
 
-        // The Robin terms involve the factor $\frac{\mathbf{k} \cdot
-        // \mathbf{n}}{\omega}$. In our configuration, $\omega = k c_s$ with
-        // $c_s=1$, and the geometry of the domain implies that $\mathbf{k}
-        // \cdot \mathbf{n}$ reduces to either $k\cos{\theta}$ for the right
-        // boundary (id=1) or $k\sin{\theta}$ for the top boundary (id=3). The
-        // wavenumber cancels out,  and we are left with the cosine and sine of
-        // the propagation direction. Note that, in our case study, the term is
-        // always real and
-        // $\overline{\frac{k_n}{\omega}} = \frac{k_n}{\omega}$ in what follows.
-
-        // Now, as for the cell-wise assembly, we loop over the face quadrature
+        // As for the cell-wise assembly, we loop over the face quadrature
         // points. We evaluate and cache the relevant quantities to assemble
         // both the Gram matrix face contributions and the face operator matrix
-        // $\hat{B}$. And then, we loop over the test space face degrees of
-        // freedom and trial space face degrees of freedom to assemble the
-        // corresponding contributions. The face contributions to the Gram
-        // matrix only arise when the face lies on a Robin boundary. In that
-        // case, we add the appropriate terms based on the shape function the
-        // dofs belong to (as for the cell loop):
+        // $\hat{B}$. We also store the shape function types for the test and
+        // skeleton trial spaces for the current face dofs. After precomputing
+        // these quantities, we loop over the test space degrees of freedom and
+        // trial space face degrees of freedom to assemble the corresponding
+        // contributions. The face contributions to the Gram matrix only arise
+        // when the face lies on a Robin boundary and are assembled as follows:
         //  - If both <code>i</code> and <code>j</code> are in test space
         //  associated to the test functions $\mathbf{v}$ we build, $\langle
         //  \mathbf{v} \cdot \mathbf{n}, \mathbf{v} \cdot \mathbf{n}
@@ -1045,14 +1043,14 @@ namespace Step100
         //  $\langle \frac{k_n}{\omega}q, \mathbf{v}
         // \cdot \mathbf{n} \rangle_{\Gamma_1 \cup
         // \Gamma_3}$;
-        //  - Finally, if both in test functions are in $q$, we build t$\langle
+        //  - Finally, If both <code>i</code> and <code>j</code> are in test
+        //  space associated to the test functions $q$, we build t$\langle
         //  \frac{k_n}{\omega}q,
         // \frac{k_n}{\omega}q \rangle_{\Gamma_1
         // \cup \Gamma_3}$.
-        //
-        // Independently of the boundary type, we also assemble the face
-        // operator matrix $\hat{B}$ by looping over the skeleton trial space
-        // degrees of freedom. The two terms are :
+        // For all faces of the mesh (regardless of boundary type) we also
+        // assemble the face operator matrix $\hat{B}$ by looping over the
+        // skeleton trial space degrees of freedom. The two terms are :
         //  - If dof <code>i</code> in test function $\mathbf{v}$ and dof
         //  <code>j</code> in trial function $\hat{p}^*$ we build the
         //  term $\left\langle
@@ -1061,22 +1059,23 @@ namespace Step100
         //  - If dof <code>i</code> in test function $q$ and dof <code>j</code>
         //  in trial function $\hat{u}_n$ we build the term
         //  $\left\langle q, \hat{u}_n \right\rangle_{\partial \Omega_h}$.
-        //
-        // Since the FE_FaceQ elements used to represent the trace of H(div)
-        // conforming fields do not encode an intrinsic orientation, special
-        // care must be taken to ensure consistency of the numerical flux across
-        // shared faces (i.e., the flux that cross a face in a given cell is
-        // equal to the flux that crosses the same face in the adjacent cell for
-        // which the normal is opposite). To this end, we introduce a sign
-        // factor that enforces a unique orientation rule: the flux is always
-        // oriented from the cell with the smaller active cell index toward the
-        // cell with the larger one. On boundary faces, we recover the standard
-        // convention in which the flux is aligned with the outward normal by
-        // defining the neighbor cell index as
-        // <code>std::numeric_limits@<unsigned int@>::%max()</code>. This local
-        // rule guarantees that the flux contributions
-        // are consistent across neighboring cells without requiring a global
-        // orientation of the mesh.
+
+        // An important detail when assembling the face contributions related to
+        // the velocity trace $\hat{u}_n$. Indeed, since the FE_FaceQ elements
+        // used to represent the trace of H(div) conforming fields do not encode
+        // an intrinsic orientation, special care must be taken to ensure
+        // consistency of the numerical flux across shared faces (i.e., the flux
+        // that cross a face in a given cell is equal to the flux that crosses
+        // the same face in the adjacent cell for which the normal is opposite).
+        // To this end, we introduce a sign factor that enforces a unique
+        // orientation rule: the flux is always oriented from the cell with the
+        // smaller active cell index toward the cell with the larger one. On
+        // boundary faces, we recover the standard convention in which the flux
+        // is aligned with the outward normal by defining the neighbor cell
+        // index as <code>std::numeric_limits@<unsigned int@>::%max()</code>.
+        // This local rule guarantees that the flux contributions are consistent
+        // across neighboring cells without requiring a global orientation of
+        // the mesh.
 
         for (const auto &face : cell_skeleton->face_iterators())
           {
@@ -1247,28 +1246,18 @@ namespace Step100
                   }
 
                 // Finally, we assemble the matrix $D$ and the corresponding
-                // source-term vector $g$ associated with the Robin boundary
-                // conditions. We first verify whether the current face belongs
-                // to one of the Robin boundaries, which in this configuration
-                // correspond to boundary ids 1 and 3.
-
-                // On these boundaries, the numerical flux orientation is
-                // unambiguous: since the face lies on the exterior boundary of
-                // the domain, the flux is always aligned with the outward
-                // normal. Consequently, the flux orientation factor is set to
-                // +1.
-
-                // We then loop over the skeleton trial-space degrees of freedom
-                // and assemble both the boundary load vector $g$ and the $D$
-                // matrix.
-
-                // The matrix $D$ couples the skeleton trial space with itself,
-                // and its entries are therefore obtained by looping again over
-                // the skeleton trial-space degrees of freedom. Depending on
-                // whether the basis functions correspond to velocity or
-                // pressure traces, we assemble the following Robin boundary
-                // contributions:
-                //  //  - If both <code>i</code> and <code>j</code> are in the
+                // source-term vector $g$. Note that this is only required on
+                // faces where Robin boundary conditions are applied and that
+                // the orientation of $\hat{u}_n$ is unambiguous: since the face
+                // lies on the exterior boundary of the domain, the flux is
+                // always aligned with the outward normal. Consequently, the
+                // flux orientation factor is set to +1. As for the other
+                // matrices, we loop over the relevant <code>dof_indices</code>,
+                // here the ones of the skeleton trial-space degrees.However,
+                // here we already have stored the terms involving the skeleton
+                // trial-space basis functions and the shape function types, so
+                // we can directly assemble the matrix $D$ and vector $g$.:
+                //  - If both <code>i</code> and <code>j</code> are in the
                 //  skeleton trace associated to $\hat{u}_n$, we build the term
                 //  $- \langle \hat{u}_n, \hat{u}_n \rangle_{\Gamma_1 \cup
                 //  \Gamma_3}$;
@@ -1287,19 +1276,13 @@ namespace Step100
                 //  skeleton trace associated to $\hat{p}$, we build the term $-
                 //  \langle \frac{k_n}{\omega} \hat{p}^*, \frac{k_n}{\omega}
                 //  \hat{p}^* \rangle_{\Gamma_1 \cup \Gamma_3}$.
-
-                // Although the source term associated with the Robin condition
-                // $g$ is zero for the present plane-wave problem, we still
-                // assemble it explicitly in order to illustrate the general
-                // procedure:
-                //
-                //  -  If both <code>i</code> are in the skeleton trace
+                //  -  If <code>i</code> is in the skeleton trace
                 //  associated to
                 //  $\hat{u}_n$, we assemble the term $- \langle \hat{u}_n, g_R
                 //  \rangle_{\Gamma_1 \cup \Gamma_3}$;
-                //  -  If both <code>i</code> are in the skeleton trace
+                //  -  If <code>i</code> is in the skeleton trace
                 //  associated to
-                //  $\hat{p}$, we assemble the term $\langle (k_n / \omega)
+                //  $\hat{p}$, we assemble the term $\langle \frac{k_n}{\omega}
                 //  \hat{p}^*, g_R \rangle_{\Gamma_1 \cup \Gamma_3}$.
                 //
 
@@ -1372,7 +1355,7 @@ namespace Step100
           }
         // After assembling all local matrices and vectors, we perform the
         // cell-wise static condensation associated with the DPG formulation. We
-        // first invert the test-space Gram matrix G and use it to form the
+        // first invert the Gram matrix $G$ and use it to form the
         // auxiliary operators $M_4 = B^\dagger G^{-1}$ and
         // $M_5 = \hat{B}^\dagger G^{-1}$. These are then used to construct the
         // condensed blocks $M_1 = B^\dagger G^{-1} B$,
@@ -1381,13 +1364,14 @@ namespace Step100
         // <code>solve_interior</code> is <code>true</code>, the skeleton
         // solution $\hat{u}_h$ is assumed known and we recover the interior
         // unknowns on each cell by solving
-        // $u_h = M1^{-1} (M4 l - M2 \hat{u}_h)$, followed by distribution to
+        // $u_h = M_1^{-1} (M_4 l - M_2 \hat{u}_h)$, followed by distribution to
         // the global interior solution
         // vector. Otherwise, we assemble the fully condensed local system for
-        // the skeleton unknowns by forming the Schur complement $(M3 - M2^†
-        // M1^{-1} M2)$, together with the corresponding right-hand side $(M5 -
-        // M2^† M1^{-1} M4) l - g$, and distribute the resulting local matrix
-        // and vector to the global skeleton system while enforcing constraints.
+        // the skeleton unknowns by forming the Schur complement $(M_3 -
+        // M_2^\dagger M_1^{-1} M_2)$, together with the corresponding
+        // right-hand side $(M_5 - M_2^\dagger M_1^{-1} M_4) l - g$, and
+        // distribute the resulting local matrix and vector to the global
+        // skeleton system while enforcing constraints.
         G_matrix.invert();
 
         B_matrix.Tmmult(M4_matrix, G_matrix);
@@ -1448,10 +1432,10 @@ namespace Step100
   // quite high. For simplicity, we put a high upper limit on the number of
   // iterations, but in practice one would want to change this function to have
   // a more robust solver. The tolerance for the convergence here is defined
-  // proportional to the $l^2$ norm of the RHS vector so the stopping criterion
-  // independent of whatever scaling we apply to the equation. Note that the
-  // tolerance is quite small, but this is needed to recover the accurate order
-  // of convergence for the smallest mesh sizes.
+  // proportional to the $L^2$ norm of the RHS vector so the stopping criterion
+  // independent of whatever scaling we apply to the equation. The chosen
+  // tolerance is rather stiff, but it is required to reproduce the convergence
+  // plots of the results section.
   template <int dim>
   void DPGHelmholtz<dim>::solve_linear_system_skeleton()
   {
@@ -1481,10 +1465,9 @@ namespace Step100
   // fields, while the real and imaginary parts of the pressure are treated as
   // scalar fields. The skeleton solution, which is defined only on mesh faces,
   // is handled separately using the DataOutFaces class like presented in
-  // step-51 for the HDG method. Note also that in this case all components are
-  // scalar-valued. For both outputs, visualization patches are built using the
-  // corresponding polynomial degree, and the results are written to
-  // cycle-dependent VTU files.
+  // step-51 for the HDG method. For both outputs, visualization patches are
+  // built using the corresponding polynomial degree, and the results are
+  // written using names dependent on the current mesh adaption cycle.
   template <int dim>
   void DPGHelmholtz<dim>::output_results(const unsigned int cycle)
   {
@@ -1554,23 +1537,14 @@ namespace Step100
   }
 
   // @sect3{DPGHelmholtz::calculate_L2_error}
-  // In this function, we compute the $L_2$ error of each component of the
+  // In this function, we compute the $L^2$ error of each component of the
   // numerical solution, namely the real and imaginary parts of the velocity and
   // pressure, for both the interior and skeleton unknowns. Because we want to
   // have errors for the skeleton components, we cannot use the
   // VectorTools::integrate_difference function as it does not have a mechanism
   // to avoid visiting faces twice (i.e., counting the error on each cell
   // sharing the face). Therefore, we will perform the computation "by hand" for
-  // both interior and skeleton solutionsby looping over all cells and faces,
-  // interpolating the numerical solution at the corresponding quadrature
-  // points, and comparing it to the analytical solution. To this end, FEValues
-  // and FEFaceValues objects are instantiated in the same manner as during
-  // assembly, appropriate volume and face quadrature rules are used, and
-  // containers are allocated to store the interpolated interior and skeleton
-  // fields at quadrature points. Separate accumulators are maintained for the
-  // $L_2$ errors of each solution component. Finally, analytical solution
-  // objects are initialized to provide the exact reference values used in the
-  // error evaluation.
+  // both interior and skeleton solutions.
 
   template <int dim>
   void DPGHelmholtz<dim>::calculate_L2_error()
@@ -1619,29 +1593,30 @@ namespace Step100
     const AnalyticalSolution_u_imag<dim> analytical_solution_u_imag(wavenumber,
                                                                     theta);
 
-    // We compute the $L_2$ error by looping over all active cells of the mesh
-    // and evaluating both the interior and skeleton contributions. For each
-    // cell, the interior velocity and pressure (real and imaginary parts) are
-    // first interpolated at volume quadrature points using FEValues, and their
-    // squared differences with the corresponding analytical solutions are
-    // accumulated using the Jacobian-weighted quadrature weights. The skeleton
-    // error is then computed by looping over the faces of the same cell and
-    // interpolating the trace unknowns at face quadrature points using
-    // FEFaceValues. To avoid double-counting interior faces shared by two
-    // cells, we use a similar idea than the one used to define the flux
-    // orientation during the assembly : each face is integrated only once by
-    // retaining the contribution from the cell with the smallest active cell
-    // index (boundary faces are always included). An additional important
-    // detail concerns the error computation for the velocity trace variable.
-    // Indeed, for the normal flux trace variable
+    // To compute the $L^2$ error, we start by looping over all active cells of
+    // the mesh and evaluating both the interior contributions. For
+    // each cell, the interior velocity and pressure are first interpolated at
+    // volume quadrature points using FEValues, and their squared differences
+    // with the corresponding analytical solutions are accumulated using the
+    // Jacobian quadrature weights. The skeleton error is then computed in a
+    // similar way by looping over the faces of that same cell and interpolating
+    // the trace unknowns at face quadrature points using FEFaceValues. However,
+    // to avoid double-counting interior faces shared by two cells, we use a
+    // similar idea than the one used to define the flux orientation during the
+    // assembly: each face is integrated only once by retaining the contribution
+    // from the cell with the smallest active cell index (this does not include
+    // boundary faces which are always included). Finally, the accumulated
+    // errors are printed to the terminal, and stored in the
+    // <code>error_table</code> for post-processing.
+
+    // An additional detail worth mentioning concerns the error computation for
+    // the velocity trace variable. Indeed, for the normal flux trace variable
     // $\hat{u}_n$, the analytical velocity is projected onto the outward normal
     // at each quadrature point, and the error is computed using the only the
     // magnitude (absolute value) of both numerical and analytical quantities.
     // This choice removes spurious sign changes induced by face-normal
     // orientation conventions, which may differ between neighboring cells and
-    // are not physically meaningful for error estimation. Finally, the
-    // accumulated errors are printed to the terminal, and stored in the
-    // <code>error_table</code> for post-processing.
+    // are not physically meaningful for error estimation.
     for (const auto &cell : dof_handler_trial_interior.active_cell_iterators())
       {
         fe_values_trial_interior.reinit(cell);
@@ -1812,9 +1787,7 @@ namespace Step100
   // @sect3{DPGHelmholtz::run}
   // This function is the main loop of the program using all the previously
   // defined functions. It is also where the convergence rates are obtained
-  // after all the refinement cycles. Note again, after solving the skeleton
-  // system, we call the assembly function another time to solve for the
-  // interior.
+  // after all the refinement cycles.
   template <int dim>
   void DPGHelmholtz<dim>::run()
   {
@@ -1859,11 +1832,10 @@ namespace Step100
 
 // This is the main function of the program. It creates an instance of the
 // <code>DPGHelmholtz</code> class and calls its run method. It defines the
-// necessary variables for our 2D DPG Helmholtz, i.e., the degree $p$ of the
-// trial space <code>degree</code>, the degree difference $\Delta p$ between the
-// test and trial spaces <code>delta_degree</code>, the wavenumber $k$
-// <code>wavenumber</code>, and the angle of incidence of the plane wave
-// $\theta$ <code>theta</code> in radians.
+// necessary variables for our 2D DPG Helmholtz, i.e., the <code>degree</code>
+// $p$ of the trial space, the degree difference <code>delta_degree</code>
+// between the test and trial spaces, the <code>wavenumber</code> $k$, and the
+// angle of incidence of the plane wave <code>theta</code> in radians.
 int main()
 {
   const unsigned int dim = 2;
