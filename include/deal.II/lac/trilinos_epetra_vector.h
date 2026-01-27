@@ -55,7 +55,9 @@ namespace LinearAlgebra
      * This class defines type aliases that are used in vector classes
      * within the EpetraWrappers namespace.
      */
-    class VectorTraits
+    class DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Transition to functionality provided in TrilinosWrappers or TpetraWrappers!")
+      VectorTraits
     {
     public:
       using value_type = double;
@@ -223,7 +225,9 @@ namespace LinearAlgebra
      * @ingroup TrilinosWrappers
      * @ingroup Vectors
      */
-    class Vector : public ReadVector<VectorTraits::value_type>
+    class DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+      "Transition to functionality provided in TrilinosWrappers or TpetraWrappers!")
+      Vector : public ReadVector<VectorTraits::value_type>
     {
     public:
       using value_type      = VectorTraits::value_type;
