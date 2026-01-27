@@ -1,155 +1,202 @@
-<h1>Results</h1>
-The solutions of the above program are written to .vtk files for both the interior solution and the skeleton one. Each file contains four components, the real and imaginary part of the pressure and velocity field. With degree $p=2$ polynomial space, a difference of $\Delta p =1$ degree between the test and the trial space, a plane wave propagating in the direction $\theta = \pi/4$ and an angular frequency $\omega =  20 \pi$, the program should output the following table at the end:
+<h1>Results</h1> 
+The solutions of the above program are written to .vtu files for both the 
+interior solution and the skeleton one. Each file contains four components, 
+the real and imaginary part of the pressure and velocity field. With degree 
+$p=2$ polynomial space, a difference of $\Delta p =1$ degree between the test 
+and the trial space, a plane wave propagating in the direction $\theta = \pi/4$ 
+and an angular frequency $\omega =  20 \pi$, the program should output the 
+following table at the end:
 
 <table align="center" class="doxtable">
   <tr>
-    <th rowspan="2">Cycle</th>
-    <th rowspan="2">Cells</th>
-    <th rowspan="2">h</th>
-    <th rowspan="2">DoFs<br/>interior</th>
-    <th rowspan="2">DoFs<br/>skeleton</th>
-    <th rowspan="2">DoFs<br/>test</th>
-    <th rowspan="2">Iterations</th>
-    <th colspan="2">‖Re{u}‖<sub>L2</sub></th>
+    <th rowspan="2">Cycle</th> <th rowspan="2">Cells</th> <th
+    rowspan="2">h</th> <th rowspan="2">DoFs<br/>interior</th> <th
+    rowspan="2">DoFs<br/>skeleton</th> <th rowspan="2">DoFs<br/>test</th> <th
+    rowspan="2">Iterations</th> <th colspan="2">‖Re{u}‖<sub>L2</sub></th>
     <th colspan="2">‖Im{u}‖<sub>L2</sub></th>
     <th colspan="2">‖Re{p*}‖<sub>L2</sub></th>
-    <th colspan="2">‖Im{p*}‖<sub>L2</sub></th>
-    <th colspan="2">‖Re{û<sub>n</sub>}‖<sub>L2</sub></th>
+    <th colspan="2">‖Im{p*}‖<sub>L2</sub></th> <th
+    colspan="2">‖Re{û<sub>n</sub>}‖<sub>L2</sub></th>
     <th colspan="2">‖Im{û<sub>n</sub>}‖<sub>L2</sub></th>
-    <th colspan="2">‖Re{p̂*}‖<sub>L2</sub></th>
-    <th colspan="2">‖Im{p̂*}‖<sub>L2</sub></th>
-  </tr>
-  <tr>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-    <th>Norm</th><th>Order</th>
-  </tr>
-  <tr>
-    <td align="center">0</td><td align="center">4</td><td align="center">0.7071</td>
-    <td align="center">216</td><td align="center">138</td><td align="center">450</td><td align="center">78</td>
-    <td align="center">0.8139</td><td align="center">–</td>
-    <td align="center">0.5738</td><td align="center">–</td>
-    <td align="center">0.8061</td><td align="center">–</td>
-    <td align="center">0.5736</td><td align="center">–</td>
-    <td align="center">0.8489</td><td align="center">–</td>
-    <td align="center">1.2310</td><td align="center">–</td>
-    <td align="center">1.3819</td><td align="center">–</td>
-    <td align="center">1.9864</td><td align="center">–</td>
-  </tr>
-  <tr>
-    <td align="center">1</td><td align="center">16</td><td align="center">0.3536</td>
-    <td align="center">864</td><td align="center">450</td><td align="center">1666</td><td align="center">102</td>
-    <td align="center">0.7118</td><td align="center">0.19</td>
-    <td align="center">0.7097</td><td align="center">-0.31</td>
-    <td align="center">0.7106</td><td align="center">0.18</td>
-    <td align="center">0.7087</td><td align="center">-0.31</td>
-    <td align="center">1.4091</td><td align="center">-0.73</td>
-    <td align="center">1.4210</td><td align="center">-0.21</td>
-    <td align="center">2.3013</td><td align="center">-0.74</td>
-    <td align="center">2.3266</td><td align="center">-0.23</td>
-  </tr>
-  <tr>
-    <td align="center">2</td><td align="center">64</td><td align="center">0.1768</td>
-    <td align="center">3456</td><td align="center">1602</td><td align="center">6402</td><td align="center">208</td>
-    <td align="center">0.6600</td><td align="center">0.11</td>
-    <td align="center">0.6641</td><td align="center">0.10</td>
-    <td align="center">0.6618</td><td align="center">0.10</td>
-    <td align="center">0.6597</td><td align="center">0.10</td>
-    <td align="center">1.8172</td><td align="center">-0.37</td>
-    <td align="center">1.7966</td><td align="center">-0.34</td>
-    <td align="center">2.7158</td><td align="center">-0.24</td>
-    <td align="center">2.7309</td><td align="center">-0.23</td>
-  </tr>
-  <tr>
-    <td align="center">3</td><td align="center">256</td><td align="center">0.0884</td>
-    <td align="center">13824</td><td align="center">6018</td><td align="center">25090</td><td align="center">1547</td>
-    <td align="center">0.1334</td><td align="center">2.31</td>
-    <td align="center">0.1091</td><td align="center">2.61</td>
-    <td align="center">0.1093</td><td align="center">2.60</td>
-    <td align="center">0.1337</td><td align="center">2.30</td>
-    <td align="center">0.5128</td><td align="center">1.83</td>
-    <td align="center">0.4169</td><td align="center">2.11</td>
-    <td align="center">0.5232</td><td align="center">2.38</td>
-    <td align="center">0.6859</td><td align="center">1.99</td>
-  </tr>
-  <tr>
-    <td align="center">4</td><td align="center">1024</td><td align="center">0.0442</td>
-    <td align="center">55296</td><td align="center">23298</td><td align="center">99330</td><td align="center">2233</td>
-    <td align="center">0.0087</td><td align="center">3.94</td>
-    <td align="center">0.0086</td><td align="center">3.66</td>
-    <td align="center">0.0085</td><td align="center">3.69</td>
-    <td align="center">0.0086</td><td align="center">3.96</td>
-    <td align="center">0.0370</td><td align="center">3.79</td>
-    <td align="center">0.0365</td><td align="center">3.51</td>
-    <td align="center">0.0179</td><td align="center">4.87</td>
-    <td align="center">0.0204</td><td align="center">5.07</td>
-  </tr>
-  <tr>
-    <td align="center">5</td><td align="center">4096</td><td align="center">0.0221</td>
-    <td align="center">221184</td><td align="center">91650</td><td align="center">395266</td><td align="center">5297</td>
-    <td align="center">0.0011</td><td align="center">3.02</td>
-    <td align="center">0.0011</td><td align="center">3.00</td>
-    <td align="center">0.0011</td><td align="center">3.01</td>
-    <td align="center">0.0011</td><td align="center">3.02</td>
-    <td align="center">0.0061</td><td align="center">2.59</td>
-    <td align="center">0.0061</td><td align="center">2.57</td>
-    <td align="center">0.0015</td><td align="center">3.58</td>
-    <td align="center">0.0015</td><td align="center">3.74</td>
-  </tr>
-  <tr>
-    <td align="center">6</td><td align="center">16384</td><td align="center">0.0110</td>
-    <td align="center">884736</td><td align="center">363522</td><td align="center">1576962</td><td align="center">10166</td>
-    <td align="center">0.0001</td><td align="center">3.00</td>
-    <td align="center">0.0001</td><td align="center">3.00</td>
-    <td align="center">0.0001</td><td align="center">3.00</td>
-    <td align="center">0.0001</td><td align="center">3.00</td>
-    <td align="center">0.0011</td><td align="center">2.53</td>
-    <td align="center">0.0011</td><td align="center">2.52</td>
-    <td align="center">0.0001</td><td align="center">3.50</td>
-    <td align="center">0.0001</td><td align="center">3.54</td>
-  </tr>
-  <tr>
-    <td align="center">7</td><td align="center">65536</td><td align="center">0.0055</td>
-    <td align="center">3538944</td><td align="center">1447938</td><td align="center">6299650</td><td align="center">19647</td>
-    <td align="center">0.0000</td><td align="center">3.00</td>
-    <td align="center">0.0000</td><td align="center">3.00</td>
-    <td align="center">0.0000</td><td align="center">3.00</td>
-    <td align="center">0.0000</td><td align="center">3.00</td>
-    <td align="center">0.0002</td><td align="center">2.51</td>
-    <td align="center">0.0002</td><td align="center">2.51</td>
-    <td align="center">0.0000</td><td align="center">3.47</td>
-    <td align="center">0.0000</td><td align="center">3.47</td>
+    <th colspan="2">‖Re{p̂*}‖<sub>L2</sub></th> <th
+    colspan="2">‖Im{p̂*}‖<sub>L2</sub></th>
+  </tr> <tr>
+    <th>Norm</th><th>Order</th> <th>Norm</th><th>Order</th>
+    <th>Norm</th><th>Order</th> <th>Norm</th><th>Order</th>
+    <th>Norm</th><th>Order</th> <th>Norm</th><th>Order</th>
+    <th>Norm</th><th>Order</th> <th>Norm</th><th>Order</th>
+  </tr> <tr>
+    <td align="center">0</td><td align="center">4</td><td
+    align="center">0.7071</td> <td align="center">216</td><td
+    align="center">138</td><td align="center">450</td><td
+    align="center">78</td> <td align="center">0.8139</td><td
+    align="center">–</td> <td align="center">0.5738</td><td
+    align="center">–</td> <td align="center">0.8061</td><td
+    align="center">–</td> <td align="center">0.5736</td><td
+    align="center">–</td> <td align="center">0.8489</td><td
+    align="center">–</td> <td align="center">1.2310</td><td
+    align="center">–</td> <td align="center">1.3819</td><td
+    align="center">–</td> <td align="center">1.9864</td><td
+    align="center">–</td>
+  </tr> <tr>
+    <td align="center">1</td><td align="center">16</td><td
+    align="center">0.3536</td> <td align="center">864</td><td
+    align="center">450</td><td align="center">1666</td><td
+    align="center">102</td> <td align="center">0.7118</td><td
+    align="center">0.19</td> <td align="center">0.7097</td><td
+    align="center">-0.31</td> <td align="center">0.7106</td><td
+    align="center">0.18</td> <td align="center">0.7087</td><td
+    align="center">-0.31</td> <td align="center">1.4091</td><td
+    align="center">-0.73</td> <td align="center">1.4210</td><td
+    align="center">-0.21</td> <td align="center">2.3013</td><td
+    align="center">-0.74</td> <td align="center">2.3266</td><td
+    align="center">-0.23</td>
+  </tr> <tr>
+    <td align="center">2</td><td align="center">64</td><td
+    align="center">0.1768</td> <td align="center">3456</td><td
+    align="center">1602</td><td align="center">6402</td><td
+    align="center">208</td> <td align="center">0.6600</td><td
+    align="center">0.11</td> <td align="center">0.6641</td><td
+    align="center">0.10</td> <td align="center">0.6618</td><td
+    align="center">0.10</td> <td align="center">0.6597</td><td
+    align="center">0.10</td> <td align="center">1.8172</td><td
+    align="center">-0.37</td> <td align="center">1.7966</td><td
+    align="center">-0.34</td> <td align="center">2.7158</td><td
+    align="center">-0.24</td> <td align="center">2.7309</td><td
+    align="center">-0.23</td>
+  </tr> <tr>
+    <td align="center">3</td><td align="center">256</td><td
+    align="center">0.0884</td> <td align="center">13824</td><td
+    align="center">6018</td><td align="center">25090</td><td
+    align="center">1547</td> <td align="center">0.1334</td><td
+    align="center">2.31</td> <td align="center">0.1091</td><td
+    align="center">2.61</td> <td align="center">0.1093</td><td
+    align="center">2.60</td> <td align="center">0.1337</td><td
+    align="center">2.30</td> <td align="center">0.5128</td><td
+    align="center">1.83</td> <td align="center">0.4169</td><td
+    align="center">2.11</td> <td align="center">0.5232</td><td
+    align="center">2.38</td> <td align="center">0.6859</td><td
+    align="center">1.99</td>
+  </tr> <tr>
+    <td align="center">4</td><td align="center">1024</td><td
+    align="center">0.0442</td> <td align="center">55296</td><td
+    align="center">23298</td><td align="center">99330</td><td
+    align="center">2233</td> <td align="center">0.0087</td><td
+    align="center">3.94</td> <td align="center">0.0086</td><td
+    align="center">3.66</td> <td align="center">0.0085</td><td
+    align="center">3.69</td> <td align="center">0.0086</td><td
+    align="center">3.96</td> <td align="center">0.0370</td><td
+    align="center">3.79</td> <td align="center">0.0365</td><td
+    align="center">3.51</td> <td align="center">0.0179</td><td
+    align="center">4.87</td> <td align="center">0.0204</td><td
+    align="center">5.07</td>
+  </tr> <tr>
+    <td align="center">5</td><td align="center">4096</td><td
+    align="center">0.0221</td> <td align="center">221184</td><td
+    align="center">91650</td><td align="center">395266</td><td
+    align="center">5297</td> <td align="center">0.0011</td><td
+    align="center">3.02</td> <td align="center">0.0011</td><td
+    align="center">3.00</td> <td align="center">0.0011</td><td
+    align="center">3.01</td> <td align="center">0.0011</td><td
+    align="center">3.02</td> <td align="center">0.0061</td><td
+    align="center">2.59</td> <td align="center">0.0061</td><td
+    align="center">2.57</td> <td align="center">0.0015</td><td
+    align="center">3.58</td> <td align="center">0.0015</td><td
+    align="center">3.74</td>
+  </tr> <tr>
+    <td align="center">6</td><td align="center">16384</td><td
+    align="center">0.0110</td> <td align="center">884736</td><td
+    align="center">363522</td><td align="center">1576962</td><td
+    align="center">10166</td> <td align="center">0.0001</td><td
+    align="center">3.00</td> <td align="center">0.0001</td><td
+    align="center">3.00</td> <td align="center">0.0001</td><td
+    align="center">3.00</td> <td align="center">0.0001</td><td
+    align="center">3.00</td> <td align="center">0.0011</td><td
+    align="center">2.53</td> <td align="center">0.0011</td><td
+    align="center">2.52</td> <td align="center">0.0001</td><td
+    align="center">3.50</td> <td align="center">0.0001</td><td
+    align="center">3.54</td>
+  </tr> <tr>
+    <td align="center">7</td><td align="center">65536</td><td
+    align="center">0.0055</td> <td align="center">3538944</td><td
+    align="center">1447938</td><td align="center">6299650</td><td
+    align="center">19647</td> <td align="center">0.0000</td><td
+    align="center">3.00</td> <td align="center">0.0000</td><td
+    align="center">3.00</td> <td align="center">0.0000</td><td
+    align="center">3.00</td> <td align="center">0.0000</td><td
+    align="center">3.00</td> <td align="center">0.0002</td><td
+    align="center">2.51</td> <td align="center">0.0002</td><td
+    align="center">2.51</td> <td align="center">0.0000</td><td
+    align="center">3.47</td> <td align="center">0.0000</td><td
+    align="center">3.47</td>
   </tr>
 </table>
 
-The most refined solution should look similar to the following figure where we present the pressure field solution -- the velocity fields have basically the same profile but it is vector valued so we do not show them here -- depending on your visualization tool (here we used Paraview). We cropped the domain in 4 to show both the real and imaginary components for the interior and the mesh skeleton.
+The most refined solution should look similar to the following figure where
+we present the pressure field solution -- the velocity fields have basically
+the same profile but it is vector valued so we do not show them here --
+depending on your visualization tool (here we used Paraview). We cropped the
+domain in 4 to show both the real and imaginary components for the interior
+and the mesh skeleton.
 
-<img src="https://www.dealii.org/images/steps/developer/step-100-pressure.png" style="width:80%" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-100-pressure.png"
+style="width:80%" alt="">
 
 
 <h3>Convergence</h3>
 
-To validate that the code falls back on the analytical solution of the plane wave with the expected order, we did a convergence plot for all the different fields which are presented below. As expected for degree $p=2$ polynomial DGQ element in the interior, all field converge to the order 3. On the faces, it is expected that we lose half an order compared to the interior and that is what we observe for the normal velocity component. However, for the pressure skeleton unknowns, they are associated to the trace of Q elements and for the same sequence of energy space the Q elements are one degree higher than the DGQ element. It follows that for DGQ of order 2 as used here, the corresponding Q element would be order 3 so the trace of those elements should converge with a slope of 3.5 as observed.
+To validate that the code falls back on the analytical solution of the plane
+wave with the expected order, we did a convergence plot for all the different
+fields which are presented below. As expected for degree $p=2$ polynomial
+DGQ element in the interior, all field converge to the order 3. On the
+faces, it is expected that we lose half an order compared to the interior
+and that is what we observe for the normal velocity component. However,
+for the pressure skeleton unknowns, they are associated to the trace of Q
+elements and for the same sequence of energy space the Q elements are one
+degree higher than the DGQ element. It follows that for DGQ of order 2 as
+used here, the corresponding Q element would be order 3 so the trace of
+those elements should converge with a slope of 3.5 as observed.
 
-<img src="https://www.dealii.org/images/steps/developer/step-100-error.svg" style="width:80%" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-100-error.svg"
+style="width:80%" alt="">
 
 
 <h3>Linear solver iterations</h3>
 
-In time-harmonic problem, the number of iterations to solve the system increases as the resolution of the wave increases (we have more dofs in our linear system). The DPG method is no exception to this. To show this, we recorded the number of iterations as we refined the mesh for 3 different angular frequency and we present the result in the last figure below. In it, we show the number of iterations as a function of the number of dofs along with the total error of the interior fields. From it, we can see that the error does not start converging until the Nyquist criterion is respected, which requires the spatial discretization to resolve the wave with at least two points per wavelength. At that point there is a jump in the number of iterations to achieve convergence. After that the number of iterations approximately doubles each time we double the resolution.
+In time-harmonic problem, the number of iterations to solve the system
+increases as the resolution of the wave increases (there are more dofs in
+the linear system). The DPG method is no exception to this. To show this,
+we recorded the number of iterations as we refined the mesh for 3 different
+angular frequency and we present the result in the last figure below. In it,
+we show the number of iterations as a function of the number of dofs along
+with the total error of the interior fields. From it, we can see that the
+error does not start converging until the Nyquist criterion is respected,
+which requires the spatial discretization to resolve the wave with at least
+two points per wavelength. At that point there is a jump in the number
+of iterations to achieve convergence. After that the number of iterations
+approximately doubles each time we double the resolution. Nonetheless, because
+the DPG method enables the use of a Conjugate Gradient solver we are able to
+obtain a solution even for high frequencies without exceeding available memory.
 
-<img src="https://www.dealii.org/images/steps/developer/step-100-iteration.svg" style="width:80%" alt="">
+<img src="https://www.dealii.org/images/steps/developer/step-100-iteration.svg"
+style="width:80%" alt="">
 
 <h3>Possibilities for extension </h3>
 
-As an extension to get a feeling of the method, one could first try to implement the 3D version of the plane wave problem in the unit cube by adding a second angle $\phi$. The analytical solution to this problem is also known and is described by:
-@f{align*}{
-    p^*        & = e^{-i k (x \cos(\theta) \sin{\phi} + y \sin(\theta) \sin(\phi) + z \cos(\phi))},                                                                                                                                                    \\
-    \mathbf{u} & = \frac{1}{c_s} \begin{pmatrix} \cos(\theta) \sin(\phi)  \\ \sin(\theta) \sin(\phi) \\ \cos(\phi) \end{pmatrix} e^{-i k (x \cos(\theta) \sin{\phi} + y \sin(\theta) \sin(\phi) + z \cos(\phi))}.
-@f}
-Another interesting extension would be to reconstruct the residual $\Psi^r$ when the solutions on the faces and interior dofs are known and use it to build an error estimator that can be utilized for adaptive hp-refinement @cite petrides2017. Finally, if one is interested more specifically in time-harmonic problems, the implementation of an adequate preconditioner to improve the algorithm convergence of the linear solver would remedy to one of the inherent difficulties for this type of problem as stated by O. Ernst and M. J. Gander @cite ernst2012.
+As an extension to get a feeling of the method, one could first try to
+implement the 3D version of the plane wave problem in the unit cube by adding
+a second angle $\phi$. The analytical solution to this problem is also known
+and is described by: @f{align*}{
+    p^*        & = e^{-i k (x \cos(\theta) \sin{\phi}
+    + y \sin(\theta) \sin(\phi) + z \cos(\phi))},
+    \\ \mathbf{u} & = \frac{1}{c_s} \begin{pmatrix} \cos(\theta) \sin(\phi)  \\
+    \sin(\theta) \sin(\phi) \\ \cos(\phi) \end{pmatrix} e^{-i k (x \cos(\theta)
+    \sin{\phi} + y \sin(\theta) \sin(\phi) + z \cos(\phi))}.
+@f} Another interesting extension would be to reconstruct the residual $\Psi^r$
+when the solutions on the faces and interior dofs are known and use it to
+build an error estimator that can be utilized for adaptive hp-refinement
+@cite petrides2017. Finally, if one is interested more specifically in
+time-harmonic problems, the implementation of an adequate preconditioner to
+improve the algorithm convergence of the linear solver would remedy to one
+of the inherent difficulties for this type of problem as stated by O. Ernst
+and M. J. Gander @cite ernst2012.
