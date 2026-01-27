@@ -86,8 +86,6 @@ namespace SUNDIALS
   template <typename VectorType>
   ARKode<VectorType>::~ARKode()
   {
-    ARKStepFree(&arkode_mem);
-
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     const int status = SUNContext_Free(&arkode_ctx);
     (void)status;
@@ -124,7 +122,8 @@ namespace SUNDIALS
         "The requested intermediate time is smaller than the last requested "
         "intermediate time."));
 
-    const bool   do_reset = reset_solver || arkode_mem == nullptr;
+    const bool do_reset =
+      reset_solver || stepper->get_arkode_memory() == nullptr;
     DiscreteTime time(last_end_time, intermediate_time, data.initial_step_size);
     return do_evolve_time(solution, time, do_reset);
   }
@@ -151,7 +150,8 @@ namespace SUNDIALS
         // In SUNDIALS 6 and later, SUNDIALS will not do timesteps if the
         // current time is past the set end point (i.e., ARKStepEvolve will
         // return ARK_TSTOP_RETURN).
-        const int status = ARKStepSetStopTime(arkode_mem, time.get_end_time());
+        const int status =
+          ARKStepSetStopTime(stepper->get_arkode_memory(), time.get_end_time());
         (void)status;
         AssertARKode(status);
       }
@@ -176,7 +176,7 @@ namespace SUNDIALS
         // - If no exception, test that SUNDIALS really did successfully return
         Assert(pending_exception == nullptr, ExcInternalError());
         double     actual_next_time;
-        const auto status = ARKStepEvolve(arkode_mem,
+        const auto status = ARKStepEvolve(stepper->get_arkode_memory(),
                                           time.get_next_time(),
                                           solution_nvector,
                                           &actual_next_time,
@@ -223,7 +223,8 @@ namespace SUNDIALS
     last_end_time = time.get_current_time();
 
     long int   n_steps;
-    const auto status = ARKStepGetNumSteps(arkode_mem, &n_steps);
+    const auto status =
+      ARKStepGetNumSteps(stepper->get_arkode_memory(), &n_steps);
     (void)status;
     AssertARKode(status);
 
