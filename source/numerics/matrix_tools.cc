@@ -57,17 +57,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MatrixTools
 {
-  namespace
-  {
-    template <typename Iterator>
-    bool
-    column_less_than(const typename Iterator::value_type p,
-                     const types::global_dof_index       column)
-    {
-      return (p.column() < column);
-    }
-  } // namespace
-
   // TODO:[WB] I don't think that the optimized storage of diagonals is needed
   // (GK)
   template <typename number>
@@ -184,18 +173,14 @@ namespace MatrixTools
               {
                 const types::global_dof_index row = q->column();
 
-                // find the position of
-                // element
-                // (row,dof_number)
-                bool (*comp)(
-                  const typename SparseMatrix<number>::iterator::value_type p,
-                  const types::global_dof_index column) =
-                  &column_less_than<typename SparseMatrix<number>::iterator>;
+                // find the position of element (row,dof_number)
                 const typename SparseMatrix<number>::iterator p =
                   Utilities::lower_bound(matrix.begin(row) + 1,
                                          matrix.end(row),
                                          dof_number,
-                                         comp);
+                                         [](const auto &a, const auto &b) {
+                                           return a.column() < b;
+                                         });
 
                 // check whether this line has an entry in the
                 // regarding column (check for ==dof_number and !=
@@ -437,12 +422,6 @@ namespace MatrixTools
                     // find the position of element (row,dof_number) in this
                     // block (not in the transpose one). note that we have to
                     // take care of special cases with square sub-matrices
-                    bool (*comp)(
-                      typename SparseMatrix<number>::iterator::value_type p,
-                      const types::global_dof_index column) =
-                      &column_less_than<
-                        typename SparseMatrix<number>::iterator>;
-
                     typename SparseMatrix<number>::iterator p =
                       this_matrix.end();
 
@@ -455,13 +434,19 @@ namespace MatrixTools
                           p = Utilities::lower_bound(this_matrix.begin(row) + 1,
                                                      this_matrix.end(row),
                                                      block_index.second,
-                                                     comp);
+                                                     [](const auto &a,
+                                                        const auto &b) {
+                                                       return a.column() < b;
+                                                     });
                       }
                     else
                       p = Utilities::lower_bound(this_matrix.begin(row),
                                                  this_matrix.end(row),
                                                  block_index.second,
-                                                 comp);
+                                                 [](const auto &a,
+                                                    const auto &b) {
+                                                   return a.column() < b;
+                                                 });
 
                     // check whether this line has an entry in the
                     // regarding column (check for ==dof_number and !=
