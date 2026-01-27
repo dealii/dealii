@@ -610,7 +610,6 @@ namespace VectorTools
       const std::map<types::boundary_id, const Function<spacedim, number> *>
                                       &function_map,
       hp::FEFaceValues<dim, spacedim> &x_fe_face_values,
-      const unsigned int               n_dofs,
       const IndexSet                  &refinement_edge_indices,
       const unsigned int               level,
       std::multimap<
@@ -687,11 +686,11 @@ namespace VectorTools
                       {
                         vector_dofs.dof_indices[d] =
                           face_dofs[local_vector_indices[d]];
-                      }
 
-                    for (unsigned int d = 0; d < dim; ++d)
-                      Assert(vector_dofs.dof_indices[d] < n_dofs,
-                             ExcInternalError());
+                        Assert(vector_dofs.dof_indices[d] !=
+                                 numbers::invalid_dof_index,
+                               ExcInternalError());
+                      }
 
                     // we need the normal vector on this face. we know that
                     // it is a vector of length 1 but at least with higher
@@ -874,8 +873,6 @@ namespace VectorTools
 
       DoFToNormalsMap dof_to_normals_map;
 
-      const unsigned int n_dof = dof_handler.n_dofs();
-
       if (level == numbers::invalid_unsigned_int)
         {
           // active cells
@@ -888,7 +885,6 @@ namespace VectorTools
                   boundary_ids,
                   function_map,
                   x_fe_face_values,
-                  n_dof,
                   refinement_edge_indices,
                   level,
                   dof_to_normals_map,
@@ -910,7 +906,6 @@ namespace VectorTools
                   boundary_ids,
                   function_map,
                   x_fe_face_values,
-                  n_dof,
                   refinement_edge_indices,
                   level,
                   dof_to_normals_map,
