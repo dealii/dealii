@@ -55,12 +55,16 @@ error norms than for the assembly of the linear system.
 The function VectorTools::integrate_difference() evaluates the desired norm on each
 cell $K$ of the triangulation and returns a vector which holds these
 values for each cell. From the local values, we can then obtain the global error. For
-example, if the vector $\mathbf e$ with element $e_K$ for all cells
-$K$ contains the local $L_2$ norms $\|u-u_h\|_K$, then
+example, when asked to compute the $L_2$ norm of the error, then it
+will give us a vector $\mathbf e$ with elements $e_K$ for all cells
+$K$ with $e_K=\|u-u_h\|_{L_2(K)}$. From this, we can compute the global
+error
 @f[
-  E = \| {\mathbf e} \| = \left( \sum_K e_K^2 \right)^{1/2}
+  E = \|u-u_h\|_{L_2(\Omega)}
+   = \left( \sum_K \|u-u_h\|_{L_2(K)}^2 \right)^{1/2}
+   = \left( \sum_K e_K^2 \right)^{1/2}
+   = \| {\mathbf e} \|.
 @f]
-is the global $L_2$ error $E=\|u-u_h\|_\Omega$.
 
 In the program, we will show how to evaluate and use these quantities, and we
 will monitor their values under mesh refinement. Of course, we have to choose
