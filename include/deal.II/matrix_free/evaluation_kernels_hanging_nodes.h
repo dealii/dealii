@@ -120,7 +120,9 @@ namespace internal
           const unsigned int my_offset =
             offset + (structdim > 1 ? g * outer_stride : 0);
 
-          // extract values to interpolate
+          // extract values to interpolate, setting the first variable to zero
+          // to avoid compile warnings about possibly uninitialized variables
+          temp[0] = 0;
           for (unsigned int k = 0; k < points; ++k)
             temp[k] = values[my_offset + k * stride];
 
