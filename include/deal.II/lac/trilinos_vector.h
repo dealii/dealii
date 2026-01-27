@@ -2180,10 +2180,23 @@ namespace TrilinosWrappers
         }
       else
         {
-          (*this) *= s;
-          Vector tmp = v;
-          tmp *= a;
-          this->add(tmp, true);
+          // The two vectors are partitioned differently, or 'v'
+          // has ghost entries. In that case, we first have to create
+          // a temporary vector that holds a re-partitioned 'v'
+          // and to which we can then apply the current operation.
+          Vector tmp(locally_owned_elements(), get_mpi_communicator());
+          tmp = v;
+
+          // Now that we have vectors of the right kind, simply forward
+          // to the current function again, which should land us in the
+          // 'if' branch above. (Note that unlike in the function above,
+          // we cannot easily forward to the add() function without the
+          // need for a temporary vector because here we also have to
+          // scale the addition -- it needs to be a*v, not just v, and
+          // so one way or the other we need a temporary vector. If
+          // we already need such a temp vector, we might as well forward
+          // to the current function.)
+          sadd(s, a, tmp);
         }
     }
 
