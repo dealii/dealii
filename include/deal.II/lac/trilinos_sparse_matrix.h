@@ -530,7 +530,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * TrilinosWrappers::SparsityPattern object that in turn has been
    * initialized with the reinit function specifying three index sets, one for
    * the rows, one for the columns and for the larger set of @p
-   * writeable_rows, and the operation is an addition. At some point in the
+   * writable_rows, and the operation is an addition. At some point in the
    * future, Trilinos support might be complete enough such that initializing
    * from a TrilinosWrappers::SparsityPattern that has been filled by a
    * function similar to DoFTools::make_sparsity_pattern always results in a
@@ -683,7 +683,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      *
      * If you want to write to the matrix from several threads and use MPI,
      * you need to use this reinit method with a sparsity pattern that has
-     * been created with explicitly stating writeable rows. In all other
+     * been created with explicitly stating writable rows. In all other
      * cases, you cannot mix MPI with multithreaded writing into the matrix.
      */
     void

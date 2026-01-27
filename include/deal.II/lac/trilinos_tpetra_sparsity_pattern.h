@@ -616,7 +616,7 @@ namespace LinearAlgebra
       void
       reinit(const IndexSet &row_parallel_partitioning,
              const IndexSet &col_parallel_partitioning,
-             const IndexSet &writeable_rows,
+             const IndexSet &writable_rows,
              const MPI_Comm  communicator      = MPI_COMM_WORLD,
              const size_type n_entries_per_row = 0);
 

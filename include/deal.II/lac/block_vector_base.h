@@ -609,7 +609,7 @@ public:
   operator()(const size_type i) const;
 
   /**
-   * Access components, returns U(i) as a writeable reference.
+   * Access components, returns U(i) as a writable reference.
    */
   reference
   operator()(const size_type i);
@@ -623,7 +623,7 @@ public:
   operator[](const size_type i) const;
 
   /**
-   * Access components, returns U(i) as a writeable reference.
+   * Access components, returns U(i) as a writable reference.
    *
    * Exactly the same as operator().
    */

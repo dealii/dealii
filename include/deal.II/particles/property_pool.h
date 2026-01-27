@@ -161,7 +161,7 @@ namespace Particles
     get_location(const Handle handle) const;
 
     /**
-     * Return a writeable reference to the location of a particle
+     * Return a writable reference to the location of a particle
      * identified by the given `handle`.
      */
     Point<spacedim> &
