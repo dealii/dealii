@@ -642,8 +642,7 @@ public:
   diag_element(const size_type i) const;
 
   /**
-   * Same as above, but return a writeable reference. You're sure you know
-   * what you do?
+   * Same as above, but return a writable reference.
    */
   number &
   diag_element(const size_type i);
