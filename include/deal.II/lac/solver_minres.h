@@ -280,16 +280,18 @@ void SolverMinRes<VectorType>::solve(const MatrixType         &A,
   SolverControl::State conv = this->iteration_status(0, r_l2, x);
   while (conv == SolverControl::iterate)
     {
+      const double beta     = std::sqrt(delta[1]);
+      const double inv_beta = 1.0 / beta; // Compute inverse once
       if (delta[1] != 0)
-        v *= 1. / std::sqrt(delta[1]);
+        v *= inv_beta;
       else
         v.reinit(b);
 
       A.vmult(*u[2], v);
-      u[2]->add(-std::sqrt(delta[1] / delta[0]), *u[0]);
+      u[2]->add(-beta / std::sqrt(delta[0]), *u[0]);
 
       const double gamma = *u[2] * v;
-      u[2]->add(-gamma / std::sqrt(delta[1]), *u[1]);
+      u[2]->add(-gamma * inv_beta, *u[1]);
       *m[0] = v;
 
       // precondition: solve M v = u[2]
@@ -314,14 +316,15 @@ void SolverMinRes<VectorType>::solve(const MatrixType         &A,
           e[1] = -c * std::sqrt(delta[2]);
         }
 
-      const double d = std::sqrt(d_ * d_ + delta[2]);
+      const double d     = std::sqrt(d_ * d_ + delta[2]);
+      const double inv_d = 1.0 / d; // Compute inverse once
 
       if (j > 1)
         tau *= s / c;
-      c = d_ / d;
+      c = d_ * inv_d;
       tau *= c;
 
-      s = std::sqrt(delta[2]) / d;
+      s = std::sqrt(delta[2]) * inv_d;
 
       if (j == 1)
         tau = r0 * c;
@@ -329,7 +332,7 @@ void SolverMinRes<VectorType>::solve(const MatrixType         &A,
       m[0]->add(-e[0], *m[1]);
       if (j > 1)
         m[0]->add(-f[0], *m[2]);
-      *m[0] *= 1. / d;
+      *m[0] *= inv_d;
       x.add(tau, *m[0]);
       r_l2 *= std::fabs(s);
 
