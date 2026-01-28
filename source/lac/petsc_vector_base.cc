@@ -424,14 +424,21 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator=(const PetscScalar s)
   {
-    Assert(!has_ghost_elements(), ExcGhostsPresent());
+    if (s != PetscScalar(0))
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
     AssertIsFinite(s);
 
     // TODO[TH]: assert(is_compressed())
 
+    // First set the elements of the locally owned part of
+    // the vector to 's':
     PetscErrorCode ierr = VecSet(vector, s);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
+    // If the vector has ghost elements, then the assertion
+    // above checks that s==0. In that case, we're simply
+    // zeroing out the entire vector and need to also do
+    // that for the ghost entries of the vector.
     if (has_ghost_elements())
       {
         Vec ghost = nullptr;

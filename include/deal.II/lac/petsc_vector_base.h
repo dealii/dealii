@@ -317,12 +317,19 @@ namespace PETScWrappers
      * this function to make the example given in the discussion about making
      * the constructor explicit work.
      *
-     *
      * Since the semantics of assigning a scalar to a vector are not
      * immediately clear, this operator should really only be used if you want
      * to set the entire vector to zero. This allows the intuitive notation
      * <tt>v=0</tt>. Assigning other values is deprecated and may be
      * disallowed in the future.
+     *
+     * Because this operation modifies the vector, it is only allowed to
+     * call this function on vectors that have no ghost entries. However, as
+     * a special case, assigning zero to the entire vector by writing
+     * `v=0;` where `v` is a variable of the current type is allowed as
+     * we interpret it as equivalent to creating a new, zero-initialized vector.
+     * See @ref GlossGhostedVector "vectors with ghost elements" for
+     * more on writing into vectors with ghost elements.
      */
     VectorBase &
     operator=(const PetscScalar s);
