@@ -81,6 +81,29 @@ namespace SUNDIALS
     (void)status;
     AssertARKode(status);
 #  endif
+
+    // Set up the proxy objects to provide backwards compatibiltiy with the old
+    // interface
+    auto ark_stepper =
+      std::dynamic_pointer_cast<ARKStepper<VectorType>>(stepper);
+    if (ark_stepper)
+      {
+        explicit_function     = &ark_stepper->explicit_function;
+        implicit_function     = &ark_stepper->implicit_function;
+        mass_times_vector     = &ark_stepper->mass_times_vector;
+        mass_times_setup      = &ark_stepper->mass_times_setup;
+        jacobian_times_vector = &ark_stepper->jacobian_times_vector;
+        jacobian_times_setup  = &ark_stepper->jacobian_times_setup;
+
+        solve_linearized_system = &ark_stepper->solve_linearized_system;
+        solve_mass              = &ark_stepper->solve_mass;
+        jacobian_preconditioner_solve =
+          &ark_stepper->jacobian_preconditioner_solve;
+        jacobian_preconditioner_setup =
+          &ark_stepper->jacobian_preconditioner_setup;
+        mass_preconditioner_solve = &ark_stepper->mass_preconditioner_solve;
+        mass_preconditioner_setup = &ark_stepper->mass_preconditioner_setup;
+      }
   }
 
 

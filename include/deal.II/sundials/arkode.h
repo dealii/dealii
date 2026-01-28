@@ -62,6 +62,40 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace SUNDIALS
 {
+  namespace internal
+  {
+    template <class Fn>
+    struct FunctionProxy
+    {
+      std::function<Fn> *target;
+
+      FunctionProxy(std::function<Fn> *t = nullptr)
+        : target(t)
+      {}
+
+      FunctionProxy &
+      operator=(std::function<Fn> *t)
+      {
+        target = t;
+        return *this;
+      }
+
+      FunctionProxy &
+      operator=(std::function<Fn> f)
+      {
+        Assert(
+          target,
+          ExcMessage(
+            "Unable to assign the function since the target is not set in the "
+            "proxy. Most probably, you tried to use it with a stepper that does "
+            "not support this type of callback."));
+
+        *target = std::move(f);
+        return *this;
+      }
+    };
+  } // namespace internal
+
   /**
    * Interface to SUNDIALS additive Runge-Kutta methods (ARKode).
    *
@@ -586,7 +620,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<
+    internal::FunctionProxy<
       void(const double t, const VectorType &y, VectorType &explicit_f)>
       explicit_function;
 
@@ -606,7 +640,8 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t, const VectorType &y, VectorType &res)>
+    internal::FunctionProxy<
+      void(const double t, const VectorType &y, VectorType &res)>
       implicit_function;
 
     /**
@@ -626,7 +661,8 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t, const VectorType &v, VectorType &Mv)>
+    internal::FunctionProxy<
+      void(const double t, const VectorType &v, VectorType &Mv)>
       mass_times_vector;
 
     /**
@@ -663,7 +699,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t)> mass_times_setup;
+    internal::FunctionProxy<void(const double t)> mass_times_setup;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -691,11 +727,11 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const VectorType &v,
-                       VectorType       &Jv,
-                       const double      t,
-                       const VectorType &y,
-                       const VectorType &fy)>
+    internal::FunctionProxy<void(const VectorType &v,
+                                 VectorType       &Jv,
+                                 const double      t,
+                                 const VectorType &y,
+                                 const VectorType &fy)>
       jacobian_times_vector;
 
     /**
@@ -732,7 +768,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<
+    internal::FunctionProxy<
       void(const double t, const VectorType &y, const VectorType &fy)>
       jacobian_times_setup;
 
@@ -762,7 +798,12 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    LinearSolveFunction<VectorType> solve_linearized_system;
+    internal::FunctionProxy<void(SundialsOperator<VectorType>       &op,
+                                 SundialsPreconditioner<VectorType> &prec,
+                                 VectorType                         &x,
+                                 const VectorType                   &b,
+                                 double                              tol)>
+      solve_linearized_system;
 
     /**
      * A LinearSolveFunction object that users may supply and that is intended
@@ -786,7 +827,12 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    LinearSolveFunction<VectorType> solve_mass;
+    internal::FunctionProxy<void(SundialsOperator<VectorType>       &op,
+                                 SundialsPreconditioner<VectorType> &prec,
+                                 VectorType                         &x,
+                                 const VectorType                   &b,
+                                 double                              tol)>
+      solve_mass;
 
     /**
      * A function object that users may supply to either pass a preconditioner
@@ -819,14 +865,14 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double      t,
-                       const VectorType &y,
-                       const VectorType &fy,
-                       const VectorType &r,
-                       VectorType       &z,
-                       const double      gamma,
-                       const double      tol,
-                       const int         lr)>
+    internal::FunctionProxy<void(const double      t,
+                                 const VectorType &y,
+                                 const VectorType &fy,
+                                 const VectorType &r,
+                                 VectorType       &z,
+                                 const double      gamma,
+                                 const double      tol,
+                                 const int         lr)>
       jacobian_preconditioner_solve;
 
     /**
@@ -871,12 +917,12 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double      t,
-                       const VectorType &y,
-                       const VectorType &fy,
-                       const int         jok,
-                       int              &jcur,
-                       const double      gamma)>
+    internal::FunctionProxy<void(const double      t,
+                                 const VectorType &y,
+                                 const VectorType &fy,
+                                 const int         jok,
+                                 int              &jcur,
+                                 const double      gamma)>
       jacobian_preconditioner_setup;
 
     /**
@@ -906,11 +952,11 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double      t,
-                       const VectorType &r,
-                       VectorType       &z,
-                       const double      tol,
-                       const int         lr)>
+    internal::FunctionProxy<void(const double      t,
+                                 const VectorType &r,
+                                 VectorType       &z,
+                                 const double      tol,
+                                 const int         lr)>
       mass_preconditioner_solve;
 
     /**
@@ -937,7 +983,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t)> mass_preconditioner_setup;
+    internal::FunctionProxy<void(const double t)> mass_preconditioner_setup;
 
     /**
      * A function object that users may supply and that is intended to
