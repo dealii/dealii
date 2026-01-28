@@ -546,7 +546,7 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
 
       const types::global_cell_index n_active_cells =
         dh.get_triangulation().n_global_active_cells();
-      const unsigned int n_dofs = dh.n_dofs();
+      const types::global_dof_index n_dofs = dh.n_dofs();
 
       for (const auto &col : extra_columns)
         if (col == "cells")
