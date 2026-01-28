@@ -1030,24 +1030,6 @@ namespace SUNDIALS
                    const bool            do_reset);
 
     /**
-     * Set up the (non)linear solver and preconditioners in the ARKODE memory
-     * object based on the user-specified functions.
-     * @param solution The solution vector which is used as a template to create
-     *   new vectors.
-     */
-    void
-    setup_system_solver(const VectorType &solution);
-
-    /**
-     * Set up the solver and preconditioner for a non-identity @ref GlossMassMatrix "mass matrix" in
-     * the ARKODE memory object based on the user-specified functions.
-     * @param solution The solution vector which is used as a template to create
-     *   new vectors.
-     */
-    void
-    setup_mass_solver(const VectorType &solution);
-
-    /**
      * This function is executed at construction time to set the
      * std::function above to trigger an assert if they are not
      * implemented.
@@ -1059,11 +1041,6 @@ namespace SUNDIALS
      * ARKode configuration data.
      */
     AdditionalData data;
-
-    /**
-     * ARKode memory object.
-     */
-    void *arkode_mem;
 
     /**
      * Stepper object.
@@ -1087,9 +1064,6 @@ namespace SUNDIALS
      * The final time in the last call to solve_ode().
      */
     double last_end_time;
-
-    std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
-    std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
 
     /**
      * A pointer to any exception that may have been thrown in user-defined
