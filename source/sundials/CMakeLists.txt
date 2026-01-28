@@ -19,6 +19,7 @@ set(_inst)
 if (DEAL_II_WITH_SUNDIALS)
   set(_src
     ${_src}
+    arkode_stepper.cc
     arkode.cc
     ida.cc
     kinsol.cc
@@ -28,6 +29,7 @@ if (DEAL_II_WITH_SUNDIALS)
 
   set(_inst
     ${_inst}
+    arkode_stepper.inst.in
     arkode.inst.in
     n_vector.inst.in
     sunlinsol_wrapper.inst.in
