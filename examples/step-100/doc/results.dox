@@ -1,10 +1,10 @@
-<h1>Results</h1> 
-The solutions of the above program are written to .vtu files for both the 
-interior solution and the skeleton one. Each file contains four components, 
-the real and imaginary part of the pressure and velocity field. With degree 
-$p=2$ polynomial space, a difference of $\Delta p =1$ degree between the test 
-and the trial space, a plane wave propagating in the direction $\theta = \pi/4$ 
-and an angular frequency $\omega =  20 \pi$, the program should output the 
+<h1>Results</h1>
+The solutions of the above program are written to .vtu files for both the
+interior solution and the skeleton one. Each file contains four components,
+the real and imaginary part of the pressure and velocity field. With degree
+$p=2$ polynomial space, a difference of $\Delta p =1$ degree between the test
+and the trial space, a plane wave propagating in the direction $\theta = \pi/4$
+and an angular frequency $\omega =  20 \pi$, the program should output the
 following table at the end:
 
 <table align="center" class="doxtable">
