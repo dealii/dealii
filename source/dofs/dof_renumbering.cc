@@ -110,8 +110,9 @@ namespace DoFRenumbering
           DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 
           // submit the entries to the boost graph
-          for (unsigned int row = 0; row < dsp.n_rows(); ++row)
-            for (unsigned int col = 0; col < dsp.row_length(row); ++col)
+          for (types::global_dof_index row = 0; row < dsp.n_rows(); ++row)
+            for (types::global_dof_index col = 0; col < dsp.row_length(row);
+                 ++col)
               add_edge(row, dsp.column_number(row, col), graph);
         }
 
@@ -286,9 +287,9 @@ namespace DoFRenumbering
       // must be BGL directed graph now
       using Graph = adjacency_list<vecS, vecS, directedS>;
 
-      int n = dof_handler.n_dofs();
+      const types::global_dof_index n_dofs = dof_handler.n_dofs();
 
-      Graph G(n);
+      Graph G(n_dofs);
 
       std::vector<dealii::types::global_dof_index> dofs_on_this_cell;
 
@@ -309,22 +310,25 @@ namespace DoFRenumbering
         }
 
 
-      using Vector = std::vector<int>;
+      // We would like to use the (unsigned) global_dof_index type,
+      // but the boost library only works correctly with signed integer
+      // types:
+      using Vector = std::vector<types::signed_global_dof_index>;
 
 
-      Vector inverse_perm(n, 0);
+      Vector inverse_perm(n_dofs, 0);
 
-      Vector perm(n, 0);
+      Vector perm(n_dofs, 0);
 
 
-      Vector supernode_sizes(n, 1);
+      Vector supernode_sizes(n_dofs, 1);
       // init has to be 1
 
       ::boost::property_map<Graph, vertex_index_t>::type id =
         get(vertex_index, G);
 
 
-      Vector degree(n, 0);
+      Vector degree(n_dofs, 0);
 
 
       minimum_degree_ordering(
@@ -339,14 +343,16 @@ namespace DoFRenumbering
         id);
 
 
-      for (int i = 0; i < n; ++i)
+      for (types::global_dof_index i = 0; i < n_dofs; ++i)
         {
           Assert(std::find(perm.begin(), perm.end(), i) != perm.end(),
                  ExcInternalError());
           Assert(std::find(inverse_perm.begin(), inverse_perm.end(), i) !=
                    inverse_perm.end(),
                  ExcInternalError());
-          Assert(inverse_perm[perm[i]] == i, ExcInternalError());
+          Assert(inverse_perm[perm[i]] ==
+                   static_cast<types::signed_global_dof_index>(i),
+                 ExcInternalError());
         }
 
       if (reversed_numbering == true)
@@ -1549,7 +1555,7 @@ namespace DoFRenumbering
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcDoFHandlerNotInitialized());
 
-    const unsigned int n_dofs = dof_handler.n_dofs(level);
+    const types::global_dof_index n_dofs = dof_handler.n_dofs(level);
     Assert(selected_dofs.size() == n_dofs,
            ExcDimensionMismatch(selected_dofs.size(), n_dofs));
 
@@ -1558,12 +1564,12 @@ namespace DoFRenumbering
     Assert(new_indices.size() == n_dofs,
            ExcDimensionMismatch(new_indices.size(), n_dofs));
 
-    const unsigned int n_selected_dofs =
+    const types::global_dof_index n_selected_dofs =
       std::count(selected_dofs.begin(), selected_dofs.end(), false);
 
-    unsigned int next_unselected = 0;
-    unsigned int next_selected   = n_selected_dofs;
-    for (unsigned int i = 0; i < n_dofs; ++i)
+    types::global_dof_index next_unselected = 0;
+    types::global_dof_index next_selected   = n_selected_dofs;
+    for (types::global_dof_index i = 0; i < n_dofs; ++i)
       if (selected_dofs[i] == false)
         {
           new_indices[i] = next_unselected;
@@ -1632,7 +1638,7 @@ namespace DoFRenumbering
 
     const auto &owned_dofs = dof.locally_owned_dofs();
 
-    unsigned int index = 0;
+    types::global_dof_index index = 0;
 
     for (const auto &cell : cells)
       {
@@ -1707,13 +1713,13 @@ namespace DoFRenumbering
     Assert(reverse.size() == dof.n_dofs(level),
            ExcDimensionMismatch(reverse.size(), dof.n_dofs(level)));
 
-    unsigned int n_global_dofs = dof.n_dofs(level);
-    unsigned int n_cell_dofs   = dof.get_fe().n_dofs_per_cell();
+    const types::global_dof_index n_global_dofs = dof.n_dofs(level);
+    const unsigned int            n_cell_dofs = dof.get_fe().n_dofs_per_cell();
 
     std::vector<bool>                    already_sorted(n_global_dofs, false);
     std::vector<types::global_dof_index> cell_dofs(n_cell_dofs);
 
-    unsigned int global_index = 0;
+    types::global_dof_index global_index = 0;
 
     for (const auto &cell : cells)
       {
@@ -1904,7 +1910,7 @@ namespace DoFRenumbering
       {
         Assert(dof.get_fe().has_support_points(),
                typename FiniteElement<dim>::ExcFEHasNoSupportPoints());
-        const unsigned int n_dofs = dof.n_dofs(level);
+        const types::global_dof_index n_dofs = dof.n_dofs(level);
         std::vector<std::pair<Point<spacedim>, unsigned int>>
           support_point_list(n_dofs);
 
