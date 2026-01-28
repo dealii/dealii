@@ -8,9 +8,12 @@
 505,506d499
 <     std::cout << "Number of dofs for the test space: "
 <               << dof_handler_test.n_dofs() << std::endl;
-1442,1443d1434
+1442,1444c1435
 <     std::cout << std::endl << "Solving the DPG system..." << std::endl;
 < 
+<     SolverControl solver_control(100000, 1e-10 * system_rhs.l2_norm());
+---
+>     SolverControl solver_control(100000, 1e-6 * system_rhs.l2_norm());
 1451,1456d1441
 < 
 <     std::cout << "   " << solver_control.last_step()
@@ -48,11 +51,13 @@
 <         std::cout << "===========================================" << std::endl
 <                   << "Cycle " << cycle << ':' << std::endl;
 < 
-1845c1807
+1805d1766
+<         output_results(cycle);
+1845c1806
 <       const int    degree       = 2;
 ---
 >       const int    degree       = 1;
-1847c1809
+1847c1808
 <       const double wavenumber   = 20 * pi;
 ---
 >       const double wavenumber   = 2 * pi;
