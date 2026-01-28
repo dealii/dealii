@@ -3323,15 +3323,18 @@ namespace internal
             // put new numbers according to the current
             // locally_owned_dofs_per_processor IndexSets
             types::global_dof_index shift = 0;
-            // flag_1 and flag_2 are
-            // used to control that there is a
-            // one-to-one relation between old and new DoFs.
-            std::vector<unsigned int> flag_1(this->dof_handler->n_dofs(), 0);
-            std::vector<unsigned int> flag_2(this->dof_handler->n_dofs(), 0);
-            std::vector<IndexSet>     locally_owned_dofs_per_processor =
+            // Make sure we have one-to-one relation between old and new DoFs by
+            // counting:
+            std::vector<unsigned int> count_rename_from(
+              this->dof_handler->n_dofs(), 0);
+            std::vector<unsigned int> count_rename_to(
+              this->dof_handler->n_dofs(), 0);
+
+            const std::vector<IndexSet> locally_owned_dofs_per_processor =
               Utilities::MPI::all_gather(
                 tr->get_mpi_communicator(),
                 this->dof_handler->locally_owned_dofs());
+
             for (unsigned int i = 0; i < n_cpu; ++i)
               {
                 const IndexSet &iset = locally_owned_dofs_per_processor[i];
@@ -3347,19 +3350,23 @@ namespace internal
                     Assert(value < this->dof_handler->n_dofs(),
                            ExcInternalError());
                     global_gathered_numbers[target] = value;
-                    flag_1[target]++;
-                    flag_2[value]++;
+                    count_rename_to[target]++;
+                    count_rename_from[value]++;
                   }
                 shift += iset.n_elements();
               }
 
-            Assert(*std::max_element(flag_1.begin(), flag_1.end()) == 1,
+            Assert(*std::max_element(count_rename_from.begin(),
+                                     count_rename_from.end()) == 1,
                    ExcInternalError());
-            Assert(*std::min_element(flag_1.begin(), flag_1.end()) == 1,
+            Assert(*std::min_element(count_rename_from.begin(),
+                                     count_rename_from.end()) == 1,
                    ExcInternalError());
-            Assert((*std::max_element(flag_2.begin(), flag_2.end())) == 1,
+            Assert((*std::max_element(count_rename_to.begin(),
+                                      count_rename_to.end())) == 1,
                    ExcInternalError());
-            Assert((*std::min_element(flag_2.begin(), flag_2.end())) == 1,
+            Assert((*std::min_element(count_rename_to.begin(),
+                                      count_rename_to.end())) == 1,
                    ExcInternalError());
           }
 
