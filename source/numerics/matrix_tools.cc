@@ -57,17 +57,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace MatrixTools
 {
-  namespace
-  {
-    template <typename Iterator>
-    bool
-    column_less_than(const typename Iterator::value_type p,
-                     const unsigned int                  column)
-    {
-      return (p.column() < column);
-    }
-  } // namespace
-
   // TODO:[WB] I don't think that the optimized storage of diagonals is needed
   // (GK)
   template <typename number>
@@ -101,7 +90,7 @@ namespace MatrixTools
     // element of the matrix, or 1 if
     // there is no such thing
     number first_nonzero_diagonal_entry = 1;
-    for (unsigned int i = 0; i < n_dofs; ++i)
+    for (types::global_dof_index i = 0; i < n_dofs; ++i)
       if (matrix.diag_element(i) != number())
         {
           first_nonzero_diagonal_entry = matrix.diag_element(i);
@@ -184,18 +173,14 @@ namespace MatrixTools
               {
                 const types::global_dof_index row = q->column();
 
-                // find the position of
-                // element
-                // (row,dof_number)
-                bool (*comp)(
-                  const typename SparseMatrix<number>::iterator::value_type p,
-                  const unsigned int column) =
-                  &column_less_than<typename SparseMatrix<number>::iterator>;
+                // find the position of element (row,dof_number)
                 const typename SparseMatrix<number>::iterator p =
                   Utilities::lower_bound(matrix.begin(row) + 1,
                                          matrix.end(row),
                                          dof_number,
-                                         comp);
+                                         [](const auto &a, const auto &b) {
+                                           return a.column() < b;
+                                         });
 
                 // check whether this line has an entry in the
                 // regarding column (check for ==dof_number and !=
@@ -274,7 +259,8 @@ namespace MatrixTools
     number first_nonzero_diagonal_entry = 0;
     for (unsigned int diag_block = 0; diag_block < blocks; ++diag_block)
       {
-        for (unsigned int i = 0; i < matrix.block(diag_block, diag_block).n();
+        for (types::global_dof_index i = 0;
+             i < matrix.block(diag_block, diag_block).n();
              ++i)
           if (matrix.block(diag_block, diag_block).diag_element(i) != number{})
             {
@@ -436,12 +422,6 @@ namespace MatrixTools
                     // find the position of element (row,dof_number) in this
                     // block (not in the transpose one). note that we have to
                     // take care of special cases with square sub-matrices
-                    bool (*comp)(
-                      typename SparseMatrix<number>::iterator::value_type p,
-                      const unsigned int column) =
-                      &column_less_than<
-                        typename SparseMatrix<number>::iterator>;
-
                     typename SparseMatrix<number>::iterator p =
                       this_matrix.end();
 
@@ -454,13 +434,19 @@ namespace MatrixTools
                           p = Utilities::lower_bound(this_matrix.begin(row) + 1,
                                                      this_matrix.end(row),
                                                      block_index.second,
-                                                     comp);
+                                                     [](const auto &a,
+                                                        const auto &b) {
+                                                       return a.column() < b;
+                                                     });
                       }
                     else
                       p = Utilities::lower_bound(this_matrix.begin(row),
                                                  this_matrix.end(row),
                                                  block_index.second,
-                                                 comp);
+                                                 [](const auto &a,
+                                                    const auto &b) {
+                                                   return a.column() < b;
+                                                 });
 
                     // check whether this line has an entry in the
                     // regarding column (check for ==dof_number and !=
