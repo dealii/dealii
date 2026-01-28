@@ -1462,7 +1462,7 @@ namespace internal
 
           if (cell_similarity != CellSimilarity::translation)
             {
-              double tmp[spacedim][spacedim][spacedim];
+              dealii::ndarray<double, spacedim, spacedim, spacedim> tmp;
               for (unsigned int point = 0; point < n_q_points; ++point)
                 {
                   const SymmetricTensor<2, dim, Tensor<1, spacedim>> second =
