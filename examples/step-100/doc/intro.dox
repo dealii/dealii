@@ -1,7 +1,11 @@
 <i> This program was contributed by Oreste Marquis (Polytechnique Montréal),
 Bruno Blais (Polytechnique Montréal) and Matthias Maier (Texas A&M).
-Bruno Blais was supported by NSERC Discovery grant RGPIN-2020-04510, by
-Compute Canada and Calcul Québec.  </i>
+Bruno Blais acknowledges the support from the Natural Sciences and Engineering
+Research Council of Canada (NSERC) through the RGPIN-2020-04510 Discovery Grant
+and the funding from the Multiphysics Multiphase Intensification Automatization
+Workbench (MMIAOW) Canadian Research Chair Level 2 in computer-assisted design
+and scale-up of alternative energy vectors for sustainable chemical processes
+(CRC-2022-00340), by Compute Canada and Calcul Québec.  </i>
 
 <h1>Introduction</h1>
 
@@ -22,13 +26,13 @@ well-known challenges, which become increasingly severe as the parameter
 $\alpha > 0$ grows. Notably, the oscillatory nature of the solution requires
 the wavelength to be adequately resolved by the discretization and $\alpha$
 must not coincide with an eigenvalue of $-\Delta$ or the resulting operator
-will not be invertible. Among all the numerical difficulties that arise from
-this equation, one that is really challenging is the indefiniteness of the
-operator. It hinders the ability of classical iterative methods to solve the
-linear system of equations. Furthermore, most blackbox preconditioners fail to
-improve convergence as explained in details by O. Ernst and M. J. Gander @cite
-ernst2012. A solution to this problem is to make our discretized system of
-equations positive definite, which brings us to the subject of this tutorial,
+will not be invertible. Another difficulty that is really challenging
+is the indefiniteness of the operator. It hinders the ability of classical
+iterative methods (e.g. Krylov subspace methods)  to solve the linear system
+of equations. Furthermore, most blackbox preconditioners fail to improve
+convergence as explained in details by O. Ernst and M. J. Gander @cite ernst2012.
+A solution to this problem is to make our discretized system of
+equations positive definite, which brings us to the subject of this tutorial:
 the Discontinuous Petrov-Galerkin (DPG) method @cite demkowicz2025. This
 approach can be classified as a residual minimization method and always
 yields an Hermitian positive definite stiffness matrix system. It follows
@@ -53,8 +57,8 @@ introduction.
 
 For our case study of the indefinite Helmholtz equation, we consider the
 linear acoustic equations in a 2D square domain $[0,1] \times [0,1]$. These
-equations arise from the linearization of the compressible fluid equations
-about a quiescent background state and read :
+equations arise from the linearization of the compressible fluid dynamics
+equations about a quiescent background state (no flow) and read :
 @f{align*}{
     \frac{\partial \mathbf{U}}{\partial t} & = - \frac{1}{\rho }\nabla
     P \quad \text{in } \Omega, \qquad \text{(Linear momentum),}\\
@@ -64,20 +68,19 @@ about a quiescent background state and read :
 Here, $\mathbf{U}(\mathbf{x},t)$ denotes the velocity perturbation,
 $P(\mathbf{x},t)$ the pressure perturbation, $\rho$ the mean fluid density,
 and $\kappa$ its bulk modulus. Assuming that both pressure and velocity
-perturbations are time harmonic with angular frequency $\omega$, i.e.,
-
+perturbations are time-harmonic with angular frequency $\omega$, i.e.,
 @f{align*}{ \mathbf{U}(\mathbf{x},t)= \mathbf{u}(\mathbf{x})e^{i\omega
 t}, \qquad P(\mathbf{x},t)= p(\mathbf{x})e^{i\omega t},
 @f}
 we can substitute this ansatz into the time-dependent equations to evaluate the
-time derivative. Than, by dividing out the common factor $e^{i\omega t}$,
+time derivative. Then, by dividing out the common factor $e^{i\omega t}$,
 we recover the frequency-domain system of equation:
 @f{align*}{
     i\omega \mathbf{u} + \nabla p^*                         & = 0, \quad
     \text{in } \Omega,\\ i \frac{\omega}{c_s^2} p^* + \nabla \cdot \mathbf{u}
     & = 0, \quad \text{in } \Omega.
 @f}
-In the above, we introduced the kinematic pressure $p^* = p/\rho$ and the
+In the above, we have introduced the kinematic pressure $p^* = p/\rho$ and the
 speed of sound $c_s = \sqrt{\kappa/\rho}$ for notational convenience. At first
 glance, this first-order system does not resemble the indefinite Helmholtz
 equation for the acoustic pressure. However, by isolating $\mathbf{u}$ from
@@ -89,11 +92,11 @@ the classical second-order form :
 @f}
 This corresponds to the homogeneous Helmholtz equation with $\alpha =
 \omega^2 / c_s^2$, and the special case $f = 0$ of the general indefinite
-Helmholtz problem. In what follows, we will keep $f=0$, but that the
+Helmholtz problem. In what follows, we will keep $f=0$, but the
 source term $f$ could be reintroduced, if desired, in the mass conservation
-equation. This would simply implies that there is mass injection or extraction
+equation. This would simply imply that there is mass injection or extraction
 in the domain. Another simplification that we will do in this tutorial is
-to consider $c_s=1$ for simplicity.
+to consider $c_s=1$.
 
 Nonetheless, we will define our problem in such a way that we can implement
 and describe all the possible types of boundary conditions on $\Gamma$ to
@@ -108,7 +111,7 @@ where the subscript numbers follow the same nomenclature as the one
 for a rectangular geometry obtained from the GridGenerator::hyper_cube()
 function, $k_n$ is the wavenumber in the direction of the surface normal
 and $g_{D,N,R}$ refers to Dirichlet, Neumann and Robin boundary conditions
-terms. To validate our implementation and showcase how DPG enable the
+terms. To validate our implementation and showcase how DPG enables the
 computation of high frequency regime problem (i.e., $\omega L / c_s \gg
 1$ or in our case study $\omega \gg 1$), we choose the boundaries so the
 expected solution is a plane-wave travelling in the direction $\theta \in
@@ -125,7 +128,7 @@ p^*        & = e^{-i k (x \cos(\theta) + y \sin(\theta))}, \\
 @f}
 Note that the wavenumber $k$ introduced above for the plane-wave solution
 is chosen to satisfy $k = \omega/c_s = \sqrt{\alpha}$. In this way, the
-oscillation scale of the solution is consistent with the natural wavelength
+scale of the oscillations in the solution is consistent with the natural wavelength
 of the Helmholtz operator.
 
 To solve the acoustic linear system presented above using FEM, it its common
@@ -151,12 +154,12 @@ elements $\partial K$.
 
 In the DPG literature, this weak formulation of the second-order equation is
 referred to as the primal formulation. While widely used, there are other
-ways to weaken the strong form of the problem notably one that is referred
-to as the ultraweak formulation. This alternative representation is obtained
-by using the first-order system presented above and relaxing both equations
-independently. This is the form that we will use and solve in this tutorial
-since previous DPG studies showed that the problem formulated in this manner
-leads to better results because of its approximability properties. To obtain
+ways to weaken the strong form of the problem. Notably one, there is one
+that is referred to as the ultraweak formulation. This alternative representation
+is obtained by using the first-order system presented above and relaxing both
+equations independently. This is the form that we will use and solve in this
+tutorial since previous DPG studies have shown that the problem formulated in this
+manner leads to better results because of its approximability properties. To obtain
 it, we will use the vector-valued test function $\mathbf{v}$ to weaken the
 mass conservation equation and the scalar test function $q$ to weaken the
 linear momentum equation. The resulting ultraweak variational formulation
@@ -262,7 +265,7 @@ to denote the conjugate transpose operation and the Number set symbol
 $\mathbb{F} = \mathbb{R}$ or $\mathbb{C}$ as a place holder for real or
 complex sets. Solving this system of linear equation is analogous to solving
 a general overdetermined system in a least squares sense with a residual
-$\Psi^r$. This is why the DPG method always produces hermitian positive
+$\Psi^r$. This is why the DPG method always produces Hermitian positive
 definite systems of equations. Furthermore, it shows that $\Psi^r$ can be
 used to obtain an error indicator for adaptive hp-refinement.
 
@@ -436,7 +439,7 @@ in our case study for clarity.
 
 <h4>Final elementary system and condensation</h4>
 
-Finally, because the Gramm matrix is block-diagonal where each block
+Finally, because the Gramm matrix is block-diagonal, where each block
 corresponds to a cell, it is common to condense it in order to remove the
 residual unknowns. The resulting system is:
 @f{equation*}{
