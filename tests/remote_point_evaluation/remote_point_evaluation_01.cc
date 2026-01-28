@@ -350,30 +350,26 @@ compute_force_vector_sharp_interface(
     std::vector<double>                  buffer;
     std::vector<types::global_dof_index> local_dof_indices;
 
-    for (unsigned int i = 0; i < cell_data.cells.size(); ++i)
+    for (const auto cell_index : cell_data.cell_indices())
       {
-        typename DoFHandler<spacedim>::active_cell_iterator cell = {
-          &eval.get_triangulation(),
-          cell_data.cells[i].first,
-          cell_data.cells[i].second,
-          &dof_handler};
+        typename DoFHandler<spacedim>::active_cell_iterator cell =
+          cell_data.get_active_cell_iterator(cell_index)
+            ->as_dof_handler_iterator(dof_handler);
 
         local_dof_indices.resize(cell->get_fe().n_dofs_per_cell());
         buffer.resize(cell->get_fe().n_dofs_per_cell());
 
         cell->get_dof_indices(local_dof_indices);
 
-        const ArrayView<const Point<spacedim>> unit_points(
-          cell_data.reference_point_values.data() +
-            cell_data.reference_point_ptrs[i],
-          cell_data.reference_point_ptrs[i + 1] -
-            cell_data.reference_point_ptrs[i]);
+        const ArrayView<const Point<spacedim>> unit_points =
+          cell_data.get_unit_points(cell_index);
 
-        const ArrayView<const Tensor<1, spacedim, T>> force_JxW(
-          reinterpret_cast<const Tensor<1, spacedim, T> *>(values.data()) +
-            cell_data.reference_point_ptrs[i],
-          cell_data.reference_point_ptrs[i + 1] -
-            cell_data.reference_point_ptrs[i]);
+        // Reinterpret spacedim doubles as Tensors:
+        const ArrayView<const Tensor<1, spacedim, T>> values_as_tensors(
+          reinterpret_cast<const Tensor<1, spacedim, T> *>(values.data()),
+          values.size() / spacedim);
+        const auto force_JxW =
+          cell_data.get_data_view(cell_index, values_as_tensors);
 
         phi_force.reinit(cell, unit_points);
 
