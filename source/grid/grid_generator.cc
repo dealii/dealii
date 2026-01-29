@@ -9690,73 +9690,141 @@ namespace GridGenerator
 
   template <>
   void
+  hyper_cube_with_spherical_hole(
+    Triangulation<3>   &tria,
+    const double        inner_radius,
+    const double        outer_radius,
+    const bool          colorize)
+  {
+    Assert(inner_radius > 0, ExcMessage("inner_radius must be positive."));
+    Assert(inner_radius < outer_radius,
+      ExcMessage("outer_radius has to be bigger than inner_radius."));
+
+    const Point<3> center;
+
+    hyper_shell(tria, center, inner_radius, outer_radius, 6);
+    for (const auto &cell : tria.active_cell_iterators())
+      {
+        for (auto f : GeometryInfo<3>::face_indices())
+          if (cell->face(f)->at_boundary())
+            for (const unsigned int v : cell->face(f)->vertex_indices())
+              if ( std::fabs(cell->face(f)->vertex(v).norm() - outer_radius) < 1e-12 * outer_radius )
+                {
+                  const double ax = std::fabs(cell->face(f)->vertex(v)[0]);
+                  const double ay = std::fabs(cell->face(f)->vertex(v)[1]);
+                  const double az = std::fabs(cell->face(f)->vertex(v)[2]);
+                  const double max_coord = std::max(std::max(ax, ay), az);
+                  cell->face(f)->vertex(v) *= outer_radius / max_coord;
+                }
+      }
+
+    // Set boundary and manifold IDs
+    const double eps = 1e-6 * outer_radius;
+    tria.set_all_manifold_ids(numbers::flat_manifold_id);
+
+    for (const auto &cell : tria.active_cell_iterators())
+      for (const unsigned int f : cell->face_indices())
+        if (cell->face(f)->at_boundary())
+        {
+          bool vertex_on_sphere = true;
+          for (const unsigned int v : cell->face(f)->vertex_indices())
+            if (std::abs(cell->face(f)->vertex(v).norm() - inner_radius) > eps)
+            {
+              vertex_on_sphere = false;
+              break;
+            }
+
+          if (vertex_on_sphere)
+          {
+            cell->face(f)->set_all_manifold_ids(0);
+            cell->face(f)->set_boundary_id(colorize ? 6 : 1);
+          }
+          else if (colorize)
+          {
+            const Point<3> fc = cell->face(f)->center();
+            if (std::abs(fc[0] + outer_radius) < eps)      cell->face(f)->set_boundary_id(0);
+            else if (std::abs(fc[0] - outer_radius) < eps) cell->face(f)->set_boundary_id(1);
+            else if (std::abs(fc[1] + outer_radius) < eps) cell->face(f)->set_boundary_id(2);
+            else if (std::abs(fc[1] - outer_radius) < eps) cell->face(f)->set_boundary_id(3);
+            else if (std::abs(fc[2] + outer_radius) < eps) cell->face(f)->set_boundary_id(4);
+            else if (std::abs(fc[2] - outer_radius) < eps) cell->face(f)->set_boundary_id(5);
+          }
+        }
+    tria.set_manifold(0, SphericalManifold<3>(Point<3>()));
+  }
+
+
+
+  template <>
+  void
+  hyper_cube_with_spherical_hole(
+    Triangulation<1>   &tria,
+    const double        inner_radius,
+    const double        outer_radius,
+    const bool          colorize)
+  {
+    DEAL_II_NOT_IMPLEMENTED();  
+  }
+
+
+  template <>
+  void
+  hyper_cube_with_spherical_hole(
+    Triangulation<2>   &tria,
+    const double        inner_radius,
+    const double        outer_radius,
+    const bool          colorize)
+  {
+    DEAL_II_NOT_IMPLEMENTED();  
+  }  
+
+
+  template <>
+  void
   uniform_channel_with_sphere(
     Triangulation<3>                &tria,
-    const std::vector<unsigned int> &lengths_heights_widths,
-    const std::vector<unsigned int> &lengths_heights_widths_repetitions,
+    const std::vector<double>       &lengths_heights_widths,
+    const double                     inner_radius,
+    const double                     outer_radius,
     const bool                       use_transfinite_region,
     const bool                       colorize)
   {
-    const double radius = 0.5;
-    const double box_radius = 1;
-    const unsigned int inner_cube_repetitions = 1;
+    Assert(inner_radius > 0, ExcMessage("inner_radius must be positive."));
+    Assert(inner_radius < outer_radius,
+      ExcMessage("outer_radius has to be bigger than inner_radius."));
 
-    const unsigned int length_pre   = lengths_heights_widths[0];
-    const unsigned int length_post  = lengths_heights_widths[1];
-    const unsigned int height_below = lengths_heights_widths[2];
-    const unsigned int height_above = lengths_heights_widths[3];
-    const unsigned int width_front  = lengths_heights_widths[4];
-    const unsigned int width_back   = lengths_heights_widths[5];
+    // Distances
+    const double length_pre   = lengths_heights_widths[0] * 2 * outer_radius;
+    const double length_post  = lengths_heights_widths[1] * 2 * outer_radius;
+    const double height_below = lengths_heights_widths[2] * 2 * outer_radius;
+    const double height_above = lengths_heights_widths[3] * 2 * outer_radius;
+    const double width_front  = lengths_heights_widths[4] * 2 * outer_radius;
+    const double width_back   = lengths_heights_widths[5] * 2 * outer_radius;
 
     // Repetitions for resp. length, height and width
-    const unsigned int length_pre_repetitions = lengths_heights_widths_repetitions[0];
-    const unsigned int length_post_repetitions = lengths_heights_widths_repetitions[1];
-    const unsigned int height_below_repetitions = lengths_heights_widths_repetitions[2];
-    const unsigned int height_above_repetitions = lengths_heights_widths_repetitions[3];
-    const unsigned int width_front_repetitions = lengths_heights_widths_repetitions[4];
-    const unsigned int width_back_repetitions = lengths_heights_widths_repetitions[5];
+    const unsigned int length_pre_repetitions = lengths_heights_widths[0];
+    const unsigned int length_post_repetitions = lengths_heights_widths[1];
+    const unsigned int height_below_repetitions = lengths_heights_widths[2];
+    const unsigned int height_above_repetitions = lengths_heights_widths[3];
+    const unsigned int width_front_repetitions = lengths_heights_widths[4];
+    const unsigned int width_back_repetitions = lengths_heights_widths[5];
 
-    // Define patches and repetitions (3**3 patches)
-    std::vector<Triangulation<3>> triangulations(27);
-    std::array<std::array<std::array<double, 2>, 3>, 3> coordinates = {{
-        {{ {{-1. - length_pre, -1.}}, {{-1., 1.}}, {{1., 1. + length_post}} }},    // x
-        {{ {{-1. - height_below, -1.}}, {{-1., 1.}}, {{1., 1. + height_above}} }}, // y
-        {{ {{-1. - width_front, -1.}}, {{-1., 1.}}, {{1., 1. + width_back}} }}     // z
-    }};
-    std::array<std::array<unsigned int, 3>, 3> repetitions = {{
-      {{length_pre_repetitions, inner_cube_repetitions, length_post_repetitions}},    // x
-      {{height_below_repetitions, inner_cube_repetitions, height_above_repetitions}}, // y
-      {{width_front_repetitions, inner_cube_repetitions, width_back_repetitions}},    // z
-    }};
-
-    for (int i = 0; i < 3; ++i)     // x
-      for (int j = 0; j < 3; ++j)   // y
-        for (int k = 0; k < 3; ++k) // z
-        {
-          int idx = i * 9 + j * 3 + k;
-          GridGenerator::subdivided_hyper_rectangle(
-            triangulations[idx],
-            {repetitions[0][i], repetitions[1][j], repetitions[2][k]},
-            Point<3>(coordinates[0][i][0], coordinates[1][j][0], coordinates[2][k][0]),
-            Point<3>(coordinates[0][i][1], coordinates[1][j][1], coordinates[2][k][1]));
-        }
-
-    // Pointer vector
-    std::vector<const Triangulation<3>*> tria_ptrs;
-    tria_ptrs.reserve(27);
-    for (const auto &t : triangulations)
-      tria_ptrs.push_back(&t);    
-    
     Triangulation<3> bulk_tria;
-    GridGenerator::merge_triangulations(tria_ptrs, bulk_tria);    
+    GridGenerator::subdivided_hyper_rectangle(
+      bulk_tria,
+      {length_pre_repetitions + length_post_repetitions + 1, height_below_repetitions + height_above_repetitions + 1, width_front_repetitions + width_back_repetitions + 1},
+      Point<3>(-double(length_pre + outer_radius), -double(height_below + outer_radius), -double(width_front + outer_radius)),
+      Point<3>(double(length_post + outer_radius), double(height_above + outer_radius), double(width_back + outer_radius))
+      );
 
+    Triangulation<3> tria_without_cylinder;
     std::set<Triangulation<3>::active_cell_iterator> cells_to_remove;
     for (const auto &cell : bulk_tria.active_cell_iterators())
     {
       const Point<3> center = cell->center();
-      if (std::abs(center[0]) < box_radius &&
-          std::abs(center[1]) < box_radius &&
-          std::abs(center[2]) < box_radius)
+      if (std::abs(center[0]) < outer_radius &&
+          std::abs(center[1]) < outer_radius &&
+          std::abs(center[2]) < outer_radius)
       cells_to_remove.insert(cell);
     }
 
@@ -9765,14 +9833,27 @@ namespace GridGenerator
       bulk_tria, cells_to_remove, tria_without_sphere);
 
     Triangulation<3> sphere_tria;
-    hyper_shell(sphere_tria, Point<3>(), radius, std::sqrt(3), 6);
+    const double shell_radius = 0.5 * (inner_radius + outer_radius);
+    hyper_cube_with_spherical_hole(sphere_tria, shell_radius, outer_radius, false);
 
+    Triangulation<3> shell_tria;
+    concentric_hyper_shells(shell_tria, Point<3>(), inner_radius, shell_radius, 1, 0.1, 6, false);
+
+    const double vertex_tol =
+      std::min(internal::minimal_vertex_distance(shell_tria),
+               internal::minimal_vertex_distance(sphere_tria)) * 0.5;
+
+    Triangulation<3> temp;
+    GridGenerator::merge_triangulations(
+      shell_tria, sphere_tria, temp, vertex_tol, true);
+    sphere_tria = std::move(temp);
+    
     const double vertex_tolerance =
       std::min(internal::minimal_vertex_distance(tria_without_sphere),
-               internal::minimal_vertex_distance(sphere_tria));
+               internal::minimal_vertex_distance(sphere_tria)) / 10;
 
     GridGenerator::merge_triangulations(
-      tria_without_sphere, sphere_tria, tria, vertex_tolerance * 0.75, true);
+      tria_without_sphere, sphere_tria, tria, vertex_tolerance, true);
 
     tria.reset_all_manifolds();
     tria.set_all_manifold_ids(0);
@@ -9781,13 +9862,13 @@ namespace GridGenerator
     {
       for (const auto &face : cell->face_iterators())
         {
-          bool face_at_sphere_boundary = true;
+          bool face_spherical = true;
           for (const auto v : face->vertex_indices())
             {
-              if (std::abs(face->vertex(v).norm_square() - 0.25) > 1e-12)
-                face_at_sphere_boundary = false;
+              if (std::abs(face->vertex(v).norm_square() > std::sqrt(inner_radius)))
+                face_spherical = false;
             }
-          if (face_at_sphere_boundary)
+          if (face_spherical)
             face->set_all_manifold_ids(1);
         }
     }
@@ -9812,25 +9893,25 @@ namespace GridGenerator
         {
           const Point<3> center = face->center();
           // Left
-          if (std::abs(center[0] - (-static_cast<double>(1 + length_pre * 2))) < tol)
+          if (std::abs(center[0] - (-static_cast<double>(length_pre + outer_radius))) < tol)
             face->set_boundary_id(0);
           // Right
-          else if (std::abs(center[0] - static_cast<double>(1 + length_post * 2)) < tol)
+          else if (std::abs(center[0] - static_cast<double>(length_post + outer_radius)) < tol)
             face->set_boundary_id(1);
           // Sphere boundary
           else if (face->manifold_id() == 1)
             face->set_boundary_id(2);
           // Bottom
-          else if (std::abs(center[1] - (-static_cast<double>(1 + height_below * 2))) < tol)
+          else if (std::abs(center[1] - (-static_cast<double>(height_below + outer_radius))) < tol)
             face->set_boundary_id(3);
           // Top
-          else if (std::abs(center[1] - static_cast<double>(1 + height_above * 2)) < tol)
+          else if (std::abs(center[1] - static_cast<double>(height_above + outer_radius)) < tol)
             face->set_boundary_id(4);
           // Front (z negative)
-          else if (std::abs(center[2] - (-static_cast<double>(1 + width_front * 2) )) < tol)
+          else if (std::abs(center[2] - (-static_cast<double>(width_front + outer_radius) )) < tol)
             face->set_boundary_id(5);
           // Back (z positive)
-          else if (std::abs(center[2] - static_cast<double>(1 + width_back * 2)) < tol)
+          else if (std::abs(center[2] - static_cast<double>(width_back + outer_radius)) < tol)
             face->set_boundary_id(6);
         }
     }
@@ -9841,8 +9922,9 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<1> &,
-                              const std::vector<unsigned int> &,
-                              const std::vector<unsigned int> &,
+                              const std::vector<double> &,
+                              const double,
+                              const double,
                               const bool,
                               const bool)
   {
@@ -9854,8 +9936,9 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<2> &,
-                              const std::vector<unsigned int> &,
-                              const std::vector<unsigned int> &,
+                              const std::vector<double> &,
+                              const double,
+                              const double,
                               const bool,
                               const bool)
   {
