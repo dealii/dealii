@@ -16,9 +16,9 @@
 // @sect3{Include files}
 
 // The DPG method requires a large breadth of element types which are included
-// first below. Beside these, the rest of the includes are some well-known files
+// below. Beside these, the rest of the includes are some well-known files
 // used in many other tutorials. We also define the constant <code>pi</code> for
-// later use across the file and encapsulate everything in the Step100
+// later use across the file and we encapsulate everything in the Step100
 // namespace.
 
 #include <deal.II/fe/fe_dgq.h>
@@ -263,7 +263,7 @@ namespace Step100
 
   // Next let's declare the main class of this program. The main difference from
   // other examples lies in the fact that we rely on multiple DoFHandler and
-  // FESystem. The DoFHandlers that we rely on are the following:
+  // FESystems. The DoFHandlers that we rely on are the following:
   // - The <code>dof_handler_trial_interior</code> is for the unknowns in the
   // interior of the cells;
   // - The <code>dof_handler_trial_skeleton</code> is for the unknowns in the
