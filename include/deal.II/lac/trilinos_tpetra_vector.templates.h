@@ -456,16 +456,23 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace> &
     Vector<Number, MemorySpace>::operator=(const Number s)
     {
-      Assert(!has_ghost_elements(), ExcGhostsPresent());
+      if (s != Number(0))
+        Assert(!has_ghost_elements(), ExcGhostsPresent());
       Assert(s == Number(0.0),
              ExcMessage("Only 0 can be assigned to a vector."));
 
-      // As checked above, we are only allowed to use d==0.0, so pass
-      // a constant zero (instead of a run-time value 'd' that *happens* to
+      // First set the elements of the locally owned part of
+      // the vector to 's'.
+      // As checked above, we are only allowed to use s==0.0, so pass
+      // a constant zero (instead of a run-time value 's' that *happens* to
       // have a zero value) to the underlying class in hopes that the compiler
       // can optimize this somehow.
       vector->putScalar(/*s=*/0.0);
 
+      // If the vector has ghost elements, then the assertion
+      // above checks that s==0. In that case, we're simply
+      // zeroing out the entire vector and need to also do
+      // that for the ghost entries of the vector.
       if (!nonlocal_vector.is_null())
         nonlocal_vector->putScalar(/*s=*/0.0);
 

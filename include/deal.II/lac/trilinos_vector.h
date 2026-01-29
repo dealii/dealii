@@ -673,6 +673,15 @@ namespace TrilinosWrappers
        * immediately clear, this operator can only be used if you want
        * to set the entire vector to zero. This allows the intuitive notation
        * <tt>v=0</tt>.
+       *
+       * Because this operation modifies the vector, it is only allowed to
+       * call this function on vectors that have no ghost entries. However, as
+       * a special case, assigning zero to the entire vector by writing
+       * `v=0;` where `v` is a variable of the current type is allowed as
+       * we interpret it as equivalent to creating a new, zero-initialized
+       * vector.
+       * See @ref GlossGhostedVector "vectors with ghost elements" for
+       * more on writing into vectors with ghost elements.
        */
       Vector &
       operator=(const TrilinosScalar s);
@@ -2290,15 +2299,22 @@ namespace TrilinosWrappers
     inline Vector &
     Vector::operator=(const TrilinosScalar s)
     {
-      Assert(!has_ghost_elements(), ExcGhostsPresent());
+      if (s != TrilinosScalar(0))
+        Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(s);
 
-      int ierr = vector->PutScalar(s);
+      // First set the elements of the locally owned part of
+      // the vector to 's':
+      const int ierr = vector->PutScalar(s);
       AssertThrow(ierr == 0, ExcTrilinosError(ierr));
 
+      // If the vector has ghost elements, then the assertion
+      // above checks that s==0. In that case, we're simply
+      // zeroing out the entire vector and need to also do
+      // that for the ghost entries of the vector.
       if (nonlocal_vector.get() != nullptr)
         {
-          ierr = nonlocal_vector->PutScalar(0.);
+          const int ierr = nonlocal_vector->PutScalar(0.);
           AssertThrow(ierr == 0, ExcTrilinosError(ierr));
         }
 

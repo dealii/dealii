@@ -1181,13 +1181,13 @@
  * On the other hand, there are many situations where one *needs* to
  * know vector elements that aren't locally owned, for example to
  * evaluate the solution on a locally owned cell (see
- * @ref GlossLocallyOwnedCell) for which one of the degrees of freedom
- * is at an interface to a cell that we do not own locally (which,
+ * @ref GlossLocallyOwnedCell) for which one or more of the degrees of freedom
+ * are at an interface to a cell that we do not own locally (which,
  * in this case must then be a @ref GlossGhostCell "ghost cell")
  * and for which the neighboring cell may be the owner -- in other
- * words, the degree of freedom is not a
- * @ref GlossLocallyOwnedDof "locally owned" but instead only a
- * @ref GlossLocallyActiveDof "locally active" DoF. The values of such
+ * words, there are degrees of freedom on this cell that are not
+ * @ref GlossLocallyOwnedDof "locally owned" but instead only
+ * @ref GlossLocallyActiveDof "locally active" DoFs. The values of such
  * degrees of freedom are typically stored on the machine that owns the
  * degree of freedom and, consequently, would not be accessible on the
  * current machine.
@@ -1204,6 +1204,11 @@
  * write into ghosted vectors, the only way to initialize such a vector
  * is by assignment from a non-ghosted vector. This implies having to
  * import those elements we locally want to store from other processors.
+ * In practice, as a special case, we also allow the modifying operation
+ * `v=0;` on vectors that have ghost entries as that should be thought of
+ * as creating a new, zero-initialized vector with ghost entries. However,
+ * you can't write `v=3.14159;` to set all entries to `3.14159` because
+ * this falls under the prohibition of modifying vectors with ghost entries.
  *
  * The way ghosted vectors are actually stored is different between the
  * various implementations of parallel vectors. For PETSc (and the corresponding
@@ -1234,7 +1239,8 @@
  * In the end, there are two key take-away messages from the separation between
  * ghosted and non-ghosted vectors:
  * - Ghosted vectors are read-only. You cannot write into them, or add
- *   one such vector into another.
+ *   one such vector into another, with the exception of zeroing out
+ *   the entire vector.
  * - Even if every process participates in storing a vector with
  *   ghost elements, not all elements of the vector may be stored anywhere;
  *   some elements may be stored on multiple processes but no process may
