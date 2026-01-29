@@ -1,0 +1,28 @@
+
+DEAL::Reading Triangulation<1, 1> from file: data/data_1_1.vtk
+DEAL::All data size: 76
+DEAL::Dealii vector size: 76
+DEAL::Reading Triangulation<1, 2> from file: data/data_1_1.vtk
+DEAL::All data size: 76
+DEAL::Dealii vector size: 76
+DEAL::Reading Triangulation<1, 3> from file: data/data_1_1.vtk
+DEAL::All data size: 76
+DEAL::Dealii vector size: 76
+DEAL::Reading Triangulation<2, 2> from file: data/data_2_2_simplex.vtk
+DEAL::All data size: 72
+DEAL::Dealii vector size: 72
+DEAL::Reading Triangulation<2, 3> from file: data/data_2_2_simplex.vtk
+DEAL::All data size: 72
+DEAL::Dealii vector size: 72
+DEAL::Reading Triangulation<2, 2> from file: data/data_2_2_quad.vtk
+DEAL::All data size: 52
+DEAL::Dealii vector size: 52
+DEAL::Reading Triangulation<2, 3> from file: data/data_2_2_quad.vtk
+DEAL::All data size: 52
+DEAL::Dealii vector size: 52
+DEAL::Reading Triangulation<3, 3> from file: data/data_3_3_tets.vtk
+DEAL::All data size: 268
+DEAL::Dealii vector size: 268
+DEAL::Reading Triangulation<3, 3> from file: data/data_3_3_hexes.vtk
+DEAL::All data size: 140
+DEAL::Dealii vector size: 140
