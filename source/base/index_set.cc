@@ -479,6 +479,8 @@ IndexSet::split_by_block(
 void
 IndexSet::subtract_set(const IndexSet &other)
 {
+  AssertDimension(size(), other.size());
+
   compress();
   other.compress();
   is_compressed = false;
