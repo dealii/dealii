@@ -259,6 +259,13 @@ public:
     const std::vector<BarycentricPolynomial<dim>> &polynomials);
 
   /**
+   * Destructor.
+   */
+  // We need to define the destructor to work around a compiler bug with hipcc
+  // 6.4. Using default also triggers the error.
+  virtual ~BarycentricPolynomials(){};
+
+  /**
    * Access operator.
    */
   const BarycentricPolynomial<dim> &
