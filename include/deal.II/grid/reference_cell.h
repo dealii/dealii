@@ -4000,7 +4000,7 @@ ReferenceCell::face_to_cell_line_orientation(
       // same orientation, then switching vertices 1 and 2 reverses the
       // orientation (i.e. in the first array the 2nd, the 4th and the last
       // entry) but rotating the triangle does not switch the orientation (the
-      // remaining entires)
+      // remaining entries)
       // if the line in the face and the line on the reference cell do not have
       // the same orientation, then it is the other way around
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
