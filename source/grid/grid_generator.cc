@@ -9696,8 +9696,8 @@ namespace GridGenerator
     const double        outer_radius,
     const bool          colorize)
   {
-    Assert(inner_radius > 0, ExcMessage("inner_radius must be positive."));
-    Assert(inner_radius < outer_radius,
+    AssertThrow(inner_radius > 0, ExcMessage("inner_radius must be positive."));
+    AssertThrow(inner_radius < outer_radius,
       ExcMessage("outer_radius has to be bigger than inner_radius."));
 
     const Point<3> center;
@@ -9789,8 +9789,8 @@ namespace GridGenerator
     const bool                       use_transfinite_region,
     const bool                       colorize)
   {
-    Assert(inner_radius > 0, ExcMessage("inner_radius must be positive."));
-    Assert(inner_radius < outer_radius,
+    AssertThrow(inner_radius > 0, ExcMessage("inner_radius must be positive."));
+    AssertThrow(inner_radius < outer_radius,
       ExcMessage("outer_radius has to be bigger than inner_radius."));
 
     // Distances
