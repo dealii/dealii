@@ -9764,10 +9764,10 @@ namespace GridGenerator
 
   template <>
   void
-  hyper_cube_with_spherical_hole(Triangulation<1> &tria,
+  hyper_cube_with_spherical_hole(/*Triangulation<1> &tria,
                                  const double      inner_radius,
                                  const double      outer_radius,
-                                 const bool        colorize)
+                                 const bool        colorize*/)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
@@ -9775,10 +9775,10 @@ namespace GridGenerator
 
   template <>
   void
-  hyper_cube_with_spherical_hole(Triangulation<2> &tria,
+  hyper_cube_with_spherical_hole(/*Triangulation<2> &tria,
                                  const double      inner_radius,
                                  const double      outer_radius,
-                                 const bool        colorize)
+                                 const bool        colorize*/)
   {
     DEAL_II_NOT_IMPLEMENTED();
   }
