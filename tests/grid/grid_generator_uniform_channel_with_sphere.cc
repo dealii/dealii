@@ -30,7 +30,7 @@ dim_3(std::ostream &os)
   const unsigned int d = 3;
   Triangulation<d>   tr;
   GridGenerator::uniform_channel_with_sphere(
-    tr, {1,6,1,1,1,1}, 0.5, 0.6, true, true);
+    tr, {1, 6, 1, 1, 1, 1}, 0.5, 0.6, true, true);
   GridOut gout;
   gout.write_vtk(tr, os);
 }
