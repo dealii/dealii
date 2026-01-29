@@ -652,7 +652,7 @@ namespace GridGenerator
   void
   uniform_channel_with_sphere(
     Triangulation<dim>              &tria,
-    const std::vector<unsigned int> &lengths_heights,
+    const std::vector<unsigned int> &lengths_and_heights,
     const unsigned int               depth                = 1, 
     const bool                       colorize             = false);
 
