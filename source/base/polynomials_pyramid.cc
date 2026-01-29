@@ -151,6 +151,8 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
   const unsigned int k,
   const Point<dim>  &p) const
 {
+  AssertDimension(dim, 3);
+
   AssertThrow(std::abs(p[2] - 1.0) > 1e-14,
               ExcMessage("The derivative at the tip is not defined."));
   // e.g. for i,j,k=1,1,0 the gradient is [y/(1-z),x/(1-z),xy/(1-z)**2] which is

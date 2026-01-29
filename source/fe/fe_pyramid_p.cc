@@ -336,7 +336,7 @@ FE_PyramidPoly<dim, spacedim>::FE_PyramidPoly(
           else if (face_reference_cell == ReferenceCells::Triangle)
             {
               FE_SimplexP<2> fe_face(degree);
-              for (auto &face_support_point : fe_face.get_unit_support_points())
+              for (const auto &face_support_point : fe_face.get_unit_support_points())
                 {
                   Point<dim - 1> p;
                   for (unsigned int d = 0; d < dim - 1; ++d)
