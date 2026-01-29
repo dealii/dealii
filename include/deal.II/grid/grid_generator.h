@@ -645,6 +645,18 @@ namespace GridGenerator
     const bool                       colorize               = false);
 
   /**
+   * Generate a 3D grid consisting of a channel with a sphere where the length,
+   * the height and the depth of the channel can be defined by the user.
+   */
+  template <int dim>
+  void
+  uniform_channel_with_sphere(
+    Triangulation<dim>              &tria,
+    const std::vector<unsigned int> &lengths_heights,
+    const unsigned int               depth                = 1, 
+    const bool                       colorize             = false);
+
+  /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
    * if @p dim is 2, or a hexahedron if @p dim is 3) immersed in a
    * @p spacedim -dimensional space. It is the responsibility of the user to
@@ -3136,6 +3148,27 @@ namespace GridGenerator
                         const unsigned int,
                         const double,
                         const bool);
+  
+  template <>
+  void
+  uniform_channel_with_sphere(Triangulation<1> &,
+                              const std::vector<unsigned int> &,
+                              const unsigned int,
+                              const bool);
+
+  template <>
+  void
+  uniform_channel_with_sphere(Triangulation<2> &,
+                              const std::vector<unsigned int> &,
+                              const unsigned int,
+                              const bool);                              
+
+  template <>
+  void
+  uniform_channel_with_sphere(Triangulation<3> &,
+                              const std::vector<unsigned int> &,
+                              const unsigned int,
+                              const bool);  
 
 
 
