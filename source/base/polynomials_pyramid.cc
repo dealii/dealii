@@ -151,8 +151,6 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
   const unsigned int k,
   const Point<dim>  &p) const
 {
-  static_assert(dim == 3, "Pyramid elements only make sense for dim=3.");
-
   AssertThrow(std::abs(p[2] - 1.0) > 1e-14,
               ExcMessage("The derivative at the tip is not defined."));
   // e.g. for i,j,k=1,1,0 the gradient is [y/(1-z),x/(1-z),xy/(1-z)**2] which is
@@ -174,37 +172,43 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
     Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
     std::pow((1.0 - z), max_ij) *
     Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
-  grad[1] =
-    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
-    Polynomials::jacobi_polynomial_derivative<double>(
-      j, 0, 0, y * ratio, false) *
-    ratio * std::pow((1.0 - z), max_ij) *
-    Polynomials::jacobi_polynomial_value<double>(k, 2 * max_ij + 2, 0, z, true);
-  grad[2] =
-    Polynomials::jacobi_polynomial_derivative<double>(
-      i, 0, 0, x * ratio, false) *
-      x * ratio * ratio *
-      Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
-      std::pow((1.0 - z), max_ij) *
-      Polynomials::jacobi_polynomial_value<double>(
-        k, 2 * max_ij + 2, 0, z, true) +
-    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+  if constexpr (dim > 1)
+    grad[1] =
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
       Polynomials::jacobi_polynomial_derivative<double>(
         j, 0, 0, y * ratio, false) *
-      y * ratio * ratio * std::pow((1.0 - z), max_ij) *
+      ratio * std::pow((1.0 - z), max_ij) *
       Polynomials::jacobi_polynomial_value<double>(
-        k, 2 * max_ij + 2, 0, z, true) +
-    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
-      Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
-      (-1.0) * max_ij * std::pow((1.0 - z), max_ij - 1) *
-      Polynomials::jacobi_polynomial_value<double>(
-        k, 2 * max_ij + 2, 0, z, true) +
-    Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
-      Polynomials::jacobi_polynomial_value<double>(j, 0, 0, y * ratio, false) *
-      std::pow((1.0 - z), max_ij) *
+        k, 2 * max_ij + 2, 0, z, true);
+  if constexpr (dim > 2)
+    grad[2] =
       Polynomials::jacobi_polynomial_derivative<double>(
-        k, 2 * max_ij + 2, 0, 2.0 * z - 1.0, false) *
-      2.0;
+        i, 0, 0, x * ratio, false) *
+        x * ratio * ratio *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          j, 0, 0, y * ratio, false) *
+        y * ratio * ratio * std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        (-1.0) * max_ij * std::pow((1.0 - z), max_ij - 1) *
+        Polynomials::jacobi_polynomial_value<double>(
+          k, 2 * max_ij + 2, 0, z, true) +
+      Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x * ratio, false) *
+        Polynomials::jacobi_polynomial_value<double>(
+          j, 0, 0, y * ratio, false) *
+        std::pow((1.0 - z), max_ij) *
+        Polynomials::jacobi_polynomial_derivative<double>(
+          k, 2 * max_ij + 2, 0, 2.0 * z - 1.0, false) *
+        2.0;
 
   for (unsigned int d = 0; d < dim; ++d)
     if (std::fabs(grad[d]) < 1e-14)
@@ -245,7 +249,7 @@ ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
   AssertDimension(dim, 3);
   AssertIndexRange(i, vandermonde_matrix_inverse.m());
 
-  double result = 0;
+  double result = 0.;
   for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
     result +=
       vandermonde_matrix_inverse[i][j] * this->compute_jacobi_basis(j, p);
@@ -266,8 +270,9 @@ ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
   AssertDimension(dim, 3);
   AssertIndexRange(i, vandermonde_matrix_inverse.m());
 
-  Tensor<1, dim> grad();
+  Tensor<1, dim> grad;
 
+  grad = 0.;
   for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
     grad +=
       vandermonde_matrix_inverse[i][j] * this->compute_jacobi_derivative(j, p);
