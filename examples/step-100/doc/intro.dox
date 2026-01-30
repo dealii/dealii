@@ -5,14 +5,14 @@ Research Council of Canada (NSERC) through the RGPIN-2020-04510 Discovery Grant
 and the funding from the Multiphysics Multiphase Intensification Automatization
 Workbench (MMIAOW) Canadian Research Chair Level 2 in computer-assisted design
 and scale-up of alternative energy vectors for sustainable chemical processes
-(CRC-2022-00340), by Compute Canada and Calcul Québec.  </i>
+(CRC-2022-00340), by Compute Canada and Calcul Québec. </i>
 
 <h1>Introduction</h1>
 
 As a follow up to the Helmholtz equation "with the nice
 sign" of step-7, here we will consider the version of the <a
 href="https://en.wikipedia.org/wiki/Helmholtz_equation">equation with the
-"bad sign"</a> , commonly referred as the indefinite Helmholtz equation:
+"bad sign"</a>, commonly referred to as the indefinite Helmholtz equation:
 @f[
   -\Delta u - \alpha u = f.
 @f]
@@ -30,7 +30,7 @@ will not be invertible. Another difficulty that is really challenging
 is the indefiniteness of the operator. It hinders the ability of classical
 iterative methods (e.g. Krylov subspace methods)  to solve the linear system
 of equations. Furthermore, most blackbox preconditioners fail to improve
-convergence as explained in details by O. Ernst and M. J. Gander @cite ernst2012.
+convergence as explained in detail by O. Ernst and M. J. Gander @cite ernst2012.
 A solution to this problem is to make our discretized system of
 equations positive definite, which brings us to the subject of this tutorial:
 the Discontinuous Petrov-Galerkin (DPG) method @cite demkowicz2025. This
@@ -58,7 +58,7 @@ introduction.
 For our case study of the indefinite Helmholtz equation, we consider the
 linear acoustic equations in a 2D square domain $[0,1] \times [0,1]$. These
 equations arise from the linearization of the compressible fluid dynamics
-equations about a quiescent background state (no flow) and read :
+equations about a quiescent background state (no flow) and read:
 @f{align*}{
     \frac{\partial \mathbf{U}}{\partial t} & = - \frac{1}{\rho }\nabla
     P \quad \text{in } \Omega, \qquad \text{(Linear momentum),}\\
@@ -74,7 +74,7 @@ t}, \qquad P(\mathbf{x},t)= p(\mathbf{x})e^{i\omega t},
 @f}
 we can substitute this ansatz into the time-dependent equations to evaluate the
 time derivative. Then, by dividing out the common factor $e^{i\omega t}$,
-we recover the frequency-domain system of equation:
+we recover the frequency-domain system of equations:
 @f{align*}{
     i\omega \mathbf{u} + \nabla p^*                         & = 0, \quad
     \text{in } \Omega,\\ i \frac{\omega}{c_s^2} p^* + \nabla \cdot \mathbf{u}
@@ -86,7 +86,7 @@ glance, this first-order system does not resemble the indefinite Helmholtz
 equation for the acoustic pressure. However, by isolating $\mathbf{u}$ from
 the linear momentum equation, substituting it into the mass conservation
 equation, and multiplying the resulting expression by $i\omega$, we recover
-the classical second-order form :
+the classical second-order form:
 @f{align*}{
     -\Delta p^* - \frac{\omega^2}{c_s^2}p^* & = 0,
 @f}
@@ -131,7 +131,7 @@ is chosen to satisfy $k = \omega/c_s = \sqrt{\alpha}$. In this way, the
 scale of the oscillations in the solution is consistent with the natural wavelength
 of the Helmholtz operator.
 
-To solve the acoustic linear system presented above using FEM, it its common
+To solve the acoustic linear system presented above using FEM, it is common
 to use the classical second-order form and multiply it by a test function $q$
 to obtain the following weak variational formulation:
 @f{align*}{
@@ -141,7 +141,7 @@ to obtain the following weak variational formulation:
 @f}
 Note that in this tutorial, we used everywhere the following definitions
 for the (sesquilinear) $L^2$ complex inner products on the domain $\Omega$
-and its boundary $\Gamma$ :
+and its boundary $\Gamma$:
 @f{align*}{
   (a,b)_\Omega & := \int_{\Omega} \overline{a} b \text{d}x \approx
   \sum_{K\in \Omega_h} \int_{K} \overline{a} b \text{d}x &  & \langle
@@ -154,7 +154,7 @@ elements $\partial K$.
 
 In the DPG literature, this weak formulation of the second-order equation is
 referred to as the primal formulation. While widely used, there are other
-ways to weaken the strong form of the problem. Notably one, there is one
+ways to weaken the strong form of the problem. Notably, there is one
 that is referred to as the ultraweak formulation. This alternative representation
 is obtained by using the first-order system presented above and relaxing both
 equations independently. This is the form that we will use and solve in this
@@ -313,7 +313,7 @@ energy space for the skeleton:
 <h4>Application to the acoustic Helmholtz equation</h4>
 
 Now if we apply the DPG method to the acoustic Helmholtz ultraweak formulation
-presented above, we get the following :
+presented above, we get the following:
 @f{align*}{
    \text{Find } & p^* \in L^2(\Omega_h), \mathbf{u} \in (L^2(\Omega_h))^d,
    \hat{p}^* \in H^{1/2}(\partial \Omega_h) \text{ and } \hat{u}_n \in
@@ -325,7 +325,7 @@ K), \\
     &(q, i\omega p^*)_{\Omega_h} - (\nabla q, \mathbf{u})_{\Omega_h} + \langle
     q, \hat{u}_n \rangle_{\partial \Omega_h} = 0, \quad \forall q \in H^1(K).
 @f}
-where we make explicit the difference between the the interior terms
+where we make explicit the difference between the interior terms
 $\mathbf{u}$ and $p^*$ and the mesh interface terms $\hat{u}_n$ and $\hat{p}^*$
 which lives on the skeleton ($\partial \Omega_h$). From this ultraweak
 formulation, we can identify the functional space of our problem:
@@ -353,7 +353,7 @@ boundary condition on the flux variable of our problem, here the fluid
 velocity. However, careful attention needs to be made with Robin boundary
 conditions because they tie together the two fields of interest and we do not
 want to overconstrain the system. To do so, here we will present the method
-proposed by J. Gopalakrishnan and J.  Schöberl @cite gopalakrishnan2014. We
+proposed by J. Gopalakrishnan and J. Schöberl @cite gopalakrishnan2014. We
 therefore add an approximate version of the $\mathbf{u} \cdot \mathbf{n}  -
 \frac{ k_n }{\omega} p^* = g_R$ into our system by adding the term:
 @f{align*}{
@@ -366,7 +366,7 @@ therefore add an approximate version of the $\mathbf{u} \cdot \mathbf{n}  -
     \in H^{-1/2}(\Gamma_1 \cup \Gamma_3)
 @f}
 on the appropriate boundaries. This extra relation adds new terms in
-the third equation of the DPG abstract formulation and change the overall
+the third equation of the DPG abstract formulation and changes the overall
 structure to the following:
 @f{equation*}{
     \begin{pmatrix}
@@ -439,7 +439,7 @@ in our case study for clarity.
 
 <h4>Final elementary system and condensation</h4>
 
-Finally, because the Gramm matrix is block-diagonal, where each block
+Finally, because the Gram matrix is block-diagonal, where each block
 corresponds to a cell, it is common to condense it in order to remove the
 residual unknowns. The resulting system is:
 @f{equation*}{

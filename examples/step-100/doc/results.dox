@@ -4,7 +4,7 @@ interior solution and the skeleton one. Each file contains four components,
 the real and imaginary part of the pressure and velocity field. With degree
 $p=2$ polynomial space, a difference of $\Delta p =1$ degree between the test
 and the trial space, a plane wave propagating in the direction $\theta = \pi/4$
-and an angular frequency $\omega =  20 \pi$, the program should output the
+and an angular frequency $\omega = 20 \pi$, the program should output the
 following table at the end:
 
 <table align="center" class="doxtable">
@@ -148,7 +148,7 @@ style="width:80%" alt="">
 To validate that the code falls back on the analytical solution of the plane
 wave with the expected order, we did a convergence plot for all the different
 fields which are presented below. As expected for degree $p=2$ polynomial
-DGQ element in the interior, all field converge to the order 3. On the
+DGQ element in the interior, all fields converge to order 3. On the
 faces, it is expected that we lose half an order compared to the interior
 and that is what we observe for the normal velocity component. However,
 for the pressure skeleton unknowns, they are associated to the trace of Q
@@ -163,7 +163,7 @@ style="width:80%" alt="">
 
 <h3>Linear solver iterations</h3>
 
-In time-harmonic problem, the number of iterations to solve the system
+In time-harmonic problems, the number of iterations to solve the system
 increases as the resolution of the wave increases (there are more dofs in
 the linear system). The DPG method is no exception to this. To show this,
 we recorded the number of iterations as we refined the mesh for 3 different
@@ -197,6 +197,6 @@ when the solutions on the faces and interior dofs are known and use it to
 build an error estimator that can be utilized for adaptive hp-refinement
 @cite petrides2017. Finally, if one is interested more specifically in
 time-harmonic problems, the implementation of an adequate preconditioner to
-improve the algorithm convergence of the linear solver would remedy to one
+improve the convergence of the linear solver would remedy one
 of the inherent difficulties for this type of problem as stated by O. Ernst
 and M. J. Gander @cite ernst2012.

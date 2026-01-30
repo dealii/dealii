@@ -278,7 +278,7 @@ namespace Step100
   // each one of these objects, we will store the relevant finite element space
   // in the same order as for the BoundaryValues function. The first component
   // will therefore always be related to the real part of the velocity, the
-  // second component to the its imaginary part, the third component to the real
+  // second component to its imaginary part, the third component to the real
   // part of the pressure and the fourth component to its imaginary part.
 
   // The constructor of the class takes four arguments that define the problem.
@@ -309,7 +309,7 @@ namespace Step100
   // unknowns. When <code>solve_interior = true</code>, the system is assembled
   // again and the previously computed skeleton solution is used to reconstruct
   // the interior solution variables. As mentioned in the introduction, this
-  // two-step approach is interesting to reduces the size of the global system
+  // two-step approach is interesting to reduce the size of the global system
   // that needs to be solve which helps for memory consumption and for the
   // iterative solver convergence, but this requires assembling the system
   // twice. The boolean flag introduced is interesting since it allows to reuse
@@ -400,7 +400,7 @@ namespace Step100
   // $\Im(\mathbf{v})$, $\Re(q)$, $\Im(q)$.
 
   // Note that the FE_Q and FE_TraceQ elements have a higher degree than the
-  // others because their numbering start at 1 instead of 0. This is to ensure
+  // others because their numbering starts at 1 instead of 0. This is to ensure
   // that the spaces chosen follow the exact sequence of energy spaces
   // $\text{Q}_{k+1} \rightarrow \text{Nédélec}_k \rightarrow
   // \text{Raviart-Thomas}_k \rightarrow \text{DGQ}_k$. We also initialize the
@@ -765,7 +765,7 @@ namespace Step100
     // At each quadrature point, we evaluate
     // and cache the values, gradients, and divergences of the test functions
     // ($\mathbf{v}$ and $q$), as well as the values of the trial functions
-    // ($\mathbf{u}$ and $p$) in the the relevant containers. These quantities
+    // ($\mathbf{u}$ and $p$) in the relevant containers. These quantities
     // are stored as complex-valued expressions, together with their complex
     // conjugates, in order to directly form the sesquilinear forms appearing in
     // the time-harmonic formulation. In addition, we check and store in the
@@ -1009,14 +1009,14 @@ namespace Step100
         // for Robin boundary conditions, which in the present plane wave
         // configuration are imposed on two boundaries of the domain
         // (<code>types::boundary_id(1)</code> and
-        // <code>types::boundary_id(3)</code>).The Robin terms involve the
+        // <code>types::boundary_id(3)</code>). The Robin terms involve the
         // factor
         // $\frac{k_n}{\omega}$, but in our configuration,
         // $\omega = k c_s$ with $c_s=1$, and the geometry of the domain implies
         // that $k_n =\mathbf{k} \cdot \mathbf{n}$ reduces to either
         // $k\cos{\theta}$ for the right boundary
         // (<code>types::boundary_id(1)</code>) or $k\sin{\theta}$ for the top
-        // boundary (<code>types::boundary_id(3)</code>). Consequently the
+        // boundary (<code>types::boundary_id(3)</code>). Consequently, the
         // wavenumber cancels out, and we are left with the cosine and sine of
         // the propagation direction as the factor in front of the pressure
         // term.
@@ -1253,7 +1253,7 @@ namespace Step100
                 // always aligned with the outward normal. Consequently, the
                 // flux orientation factor is set to +1. As for the other
                 // matrices, we loop over the relevant <code>dof_indices</code>,
-                // here the ones of the skeleton trial-space degrees.However,
+                // here the ones of the skeleton trial-space degrees. However,
                 // here we already have stored the terms involving the skeleton
                 // trial-space basis functions and the shape function types, so
                 // we can directly assemble the matrix $D$ and vector $g$.:
@@ -1612,7 +1612,7 @@ namespace Step100
     // An additional detail worth mentioning concerns the error computation for
     // the velocity trace variable. Indeed, for the normal flux trace variable
     // $\hat{u}_n$, the analytical velocity is projected onto the outward normal
-    // at each quadrature point, and the error is computed using the only the
+    // at each quadrature point, and the error is computed using only the
     // magnitude (absolute value) of both numerical and analytical quantities.
     // This choice removes spurious sign changes induced by face-normal
     // orientation conventions, which may differ between neighboring cells and
