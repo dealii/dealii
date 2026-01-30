@@ -1522,6 +1522,19 @@ namespace ReferenceCells
   template <int structdim>
   constexpr unsigned int
   max_n_faces();
+
+  /**
+   * Return the maximum number of children an object of dimension `structdim`
+   * can have.
+   *
+   * @note If a cell is refined anisotropically, the actual number of children
+   * may be less than the value given here.
+   *
+   * @see ReferenceCells::max_n_faces()
+   */
+  template <int structdim>
+  constexpr unsigned int
+  max_n_children();
 } // namespace ReferenceCells
 
 
@@ -3375,6 +3388,13 @@ namespace ReferenceCells
   max_n_faces()
   {
     return GeometryInfo<structdim>::faces_per_cell;
+  }
+
+  template <int structdim>
+  inline constexpr unsigned int
+  max_n_children()
+  {
+    return GeometryInfo<structdim>::max_children_per_cell;
   }
 } // namespace ReferenceCells
 
