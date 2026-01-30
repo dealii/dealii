@@ -151,7 +151,8 @@ ScalarLagrangePolynomialPyramid<dim>::compute_polynomial_space_derivative(
   const unsigned int k,
   const Point<dim>  &p) const
 {
-  AssertDimension(dim, 3);
+  static_assert(dim == 3,
+    "Pyramid elements only make sense for dim=3.");
 
   AssertThrow(std::abs(p[2] - 1.0) > 1e-14,
               ExcMessage("The derivative at the tip is not defined."));
