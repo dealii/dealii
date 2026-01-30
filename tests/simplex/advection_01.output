@@ -1,0 +1,14 @@
+
+DEAL::Cycle 0
+DEAL::  Number of active cells:       24
+DEAL::  Number of degrees of freedom: 288
+DEAL::Cycle: 0 L2 norm: 9.77457
+DEAL::Cycle 1
+DEAL::  Number of active cells:       42
+DEAL::  Number of degrees of freedom: 540
+DEAL::Cycle: 1 L2 norm: 16.2697
+DEAL::Cycle 2
+DEAL::  Number of active cells:       108
+DEAL::  Number of degrees of freedom: 1452
+DEAL::Cycle: 2 L2 norm: 24.0321
+DEAL::
