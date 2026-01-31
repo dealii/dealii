@@ -222,7 +222,4 @@ DEAL:1::Owned DoFs:
 DEAL:1::{[94,143]}
 DEAL:1::Ghost DoFs:
 DEAL:1::{[0,88], [94,143]}
-DEAL:1::Coordinates:
-DEAL:1::52@-20.0000 20.0000 -10.0000
-DEAL:1::16@-20.0000 -20.0000 -10.0000
 
