@@ -175,7 +175,8 @@ namespace internal
 
       /**
        * One integer for every consecutive pair of cells to store which index
-       * their parent has.
+       * their parent has. Information is only stored for the even (index 0, 2
+       * 4, ...) child.
        *
        * (We store this information once for each pair of cells since every
        * refinement, isotropic or anisotropic, and in any space dimension,

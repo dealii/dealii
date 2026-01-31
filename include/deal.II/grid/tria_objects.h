@@ -87,11 +87,11 @@ namespace internal
       get_bounding_object_indices(const unsigned int index);
 
       /**
-       * Index of the even children of an object. Since when objects are
-       * refined, all children are created at the same time, they are appended
-       * to the list at least in pairs after each other. We therefore only
-       * store the index of the even children, the uneven follow immediately
-       * afterwards.
+       * Index of the even children (index 0, 2, 4, ...) of an object. Since
+       * when objects are refined, all children are created at the same time,
+       * they are appended to the list at least in pairs after each other. We
+       * therefore only store the index of the even children, the uneven follow
+       * immediately afterwards.
        *
        * If an object has no children, -1 is stored in this list. An object is
        * called active if it has no children. The function
