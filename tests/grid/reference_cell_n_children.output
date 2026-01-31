@@ -1,0 +1,13 @@
+
+DEAL::Line    0 0   1 2   
+DEAL::Tri     0 0   1 0   2 0   3 4   
+DEAL::Quad    0 0   1 2   2 2   3 4   
+DEAL::Tet     0 0   1 8   2 8   3 8   4 0   5 0   6 0   7 8   
+DEAL::Pyramid 0 0   1 0   2 0   3 0   4 0   5 0   6 0   7 0   
+DEAL::Wedge   0 0   1 0   2 0   3 0   4 0   5 0   6 0   7 8   
+DEAL::Hex     0 0   1 2   2 2   3 4   4 2   5 4   6 4   7 8   
+DEAL::
+DEAL::
+DEAL::Special cases
+DEAL::
+DEAL::Tet     1 8   2 8   3 8   
