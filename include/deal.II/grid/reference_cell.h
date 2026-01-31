@@ -2460,8 +2460,57 @@ ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
   // Use GeometryInfo here to keep it the single source of truth
   if (this->is_hyper_cube())
     return GeometryInfo<dim>::n_children(ref_case);
+  // static cast required to prevent compiler error
+  else if (this->kind ==
+           static_cast<decltype(kind)>(ReferenceCells::Tetrahedron))
+    { // Tetrahedron needs special treatment because there are multiple
+      // isotropic refinement cases that aren't captured by
+      // `RefinementCase<dim>::isotropic_refinement` because they are
+      // implemented via 'overloading' other refinement cases.
+
+      // needed to prevent multiple case warnings, because isotropic refinement
+      // might be (is) defined as a value between [1, 2] for dim<3.
+      constexpr unsigned int tet_dim =
+        ReferenceCells::Tetrahedron.get_dimension();
+      switch (ref_case)
+        {
+          // WARNING!!! This clashes with
+          // IsotropicRefinementChoice::isotropic_refinement!!! both are 0.
+          case RefinementPossibilities<tet_dim>::no_refinement:
+            return 0;
+          // The `::isotropic_refinement` case might be unnecessary however
+          // there is a lot of trickery going on with the values returned by
+          // this function, so it probably is safest to just add it as well.
+          case RefinementPossibilities<tet_dim>::isotropic_refinement:
+          case static_cast<RefinementPossibilities<tet_dim>::Possibilities>(
+            IsotropicRefinementChoice::cut_tet_68):
+          case static_cast<RefinementPossibilities<tet_dim>::Possibilities>(
+            IsotropicRefinementChoice::cut_tet_57):
+          case static_cast<RefinementPossibilities<tet_dim>::Possibilities>(
+            IsotropicRefinementChoice::cut_tet_49):
+            return n_isotropic_children();
+          default:
+            // See below on why this is required
+            return 0;
+        }
+    }
   else
-    return this->n_isotropic_children();
+    switch (ref_case)
+      {
+        case RefinementPossibilities<dim>::no_refinement:
+          return 0;
+        case RefinementPossibilities<dim>::isotropic_refinement:
+          return n_isotropic_children();
+        default:
+          // DEAL_II_NOT_IMPLEMENTED();
+          // We must return some data. Many parts of the code aren't aware which
+          // refinement cases are actually supported, calling this function with
+          // impossible refinement cases and expecting some output. One example
+          // is the constructor of `FiniteElement`.
+          return 0;
+      }
+
+  return numbers::invalid_unsigned_int;
 }
 
 
