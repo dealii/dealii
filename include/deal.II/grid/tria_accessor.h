@@ -4460,11 +4460,8 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   , present_index(index)
   , tria(tria)
 {
-  // non-cells have no level, so a 0
-  // should have been passed, or a -1
-  // for an end-iterator, or -2 for
-  // an invalid (default constructed)
-  // iterator
+  // non-cells have no level, so a 0 should have been passed, or a -1 for an
+  // end-iterator, or -2 for an invalid (default constructed) iterator
   if (structdim != dim)
     {
       Assert((level == 0) || (level == -1) || (level == -2),
@@ -4736,11 +4733,8 @@ template <int structdim, int dim, int spacedim>
 void
 InvalidAccessor<structdim, dim, spacedim>::copy_from(const InvalidAccessor &)
 {
-  // nothing to do here. we could
-  // throw an exception but we can't
-  // get here without first creating
-  // an object which would have
-  // already thrown
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown.
 }
 
 
@@ -4750,11 +4744,8 @@ bool
 InvalidAccessor<structdim, dim, spacedim>::operator==(
   const InvalidAccessor &) const
 {
-  // nothing to do here. we could
-  // throw an exception but we can't
-  // get here without first creating
-  // an object which would have
-  // already thrown
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown.
   return false;
 }
 
@@ -4765,11 +4756,8 @@ bool
 InvalidAccessor<structdim, dim, spacedim>::operator!=(
   const InvalidAccessor &) const
 {
-  // nothing to do here. we could
-  // throw an exception but we can't
-  // get here without first creating
-  // an object which would have
-  // already thrown
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown.
   return true;
 }
 
@@ -4779,11 +4767,8 @@ template <int structdim, int dim, int spacedim>
 bool
 InvalidAccessor<structdim, dim, spacedim>::used() const
 {
-  // nothing to do here. we could
-  // throw an exception but we can't
-  // get here without first creating
-  // an object which would have
-  // already thrown
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown.
   return false;
 }
 
@@ -4793,11 +4778,8 @@ template <int structdim, int dim, int spacedim>
 bool
 InvalidAccessor<structdim, dim, spacedim>::has_children() const
 {
-  // nothing to do here. we could
-  // throw an exception but we can't
-  // get here without first creating
-  // an object which would have
-  // already thrown
+  // nothing to do here. we could throw an exception but we can't get here
+  // without first creating an object which would have already thrown.
   return false;
 }
 
@@ -4898,11 +4880,8 @@ namespace internal
 {
   namespace TriaAccessorImplementation
   {
-    // make sure that if in the following we
-    // write TriaAccessor
-    // we mean the *class*
-    // dealii::TriaAccessor, not the
-    // enclosing namespace
+    // make sure that if in the following we write TriaAccessor we mean the
+    // *class* dealii::TriaAccessor, not the enclosing namespace
     // dealii::internal::TriaAccessor
     using dealii::TriaAccessor;
 
@@ -5213,8 +5192,8 @@ namespace internal
               cell.quad(2)->line_orientation(my_indices[5]));
           }
         else
-          // For other shapes (wedges, pyramids), we do not currently
-          // implement an optimized function
+          // For other shapes (wedges, pyramids), we do not currently implement
+          // an optimized function
           for (unsigned int l = 0; l < std::min(12U, cell.n_lines()); ++l)
             line_orientations[l] = cell.line_orientation(l);
 
@@ -5740,16 +5719,9 @@ TriaAccessor<structdim, dim, spacedim>::refinement_case() const
       case 1:
         return (RefinementCase<structdim>(
           this->objects().children[this->present_index] != -1 ?
-            // cast the branches
-            // here first to uchar
-            // and then (above) to
-            // RefinementCase<structdim>
-            // so that the
-            // conversion is valid
-            // even for the case
-            // structdim>1 (for
-            // which this part of
-            // the code is dead
+            // cast the branches here first to uchar and then (above) to
+            // RefinementCase<structdim> so that the conversion is valid even
+            // for the case structdim>1 (for which this part of the code is dead
             // anyway)
             static_cast<std::uint8_t>(RefinementCase<1>::cut_x) :
             static_cast<std::uint8_t>(RefinementCase<1>::no_refinement)));
@@ -5807,8 +5779,7 @@ inline TriaIterator<TriaAccessor<structdim, dim, spacedim>>
 TriaAccessor<structdim, dim, spacedim>::isotropic_child(
   const unsigned int i) const
 {
-  // checking of 'i' happens in child() or
-  // child_index() called below
+  // checking of 'i' happens in child() or child_index() called below
   switch (structdim)
     {
       case 1:
@@ -5859,8 +5830,7 @@ TriaAccessor<structdim, dim, spacedim>::has_children() const
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
 
-  // each set of two children are stored
-  // consecutively, so we only have to find
+  // each set of two children are stored consecutively, so we only have to find
   // the location of the set of children
   const unsigned int n_sets_of_two =
     GeometryInfo<structdim>::max_children_per_cell / 2;
@@ -5930,8 +5900,7 @@ TriaAccessor<structdim, dim, spacedim>::set_children(const unsigned int i,
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert(i % 2 == 0, TriaAccessorExceptions::ExcSetOnlyEvenChildren(i));
 
-  // each set of two children are stored
-  // consecutively, so we only have to find
+  // each set of two children are stored consecutively, so we only have to find
   // the location of the set of children
   const unsigned int n_sets_of_two =
     GeometryInfo<structdim>::max_children_per_cell / 2;
@@ -5939,12 +5908,11 @@ TriaAccessor<structdim, dim, spacedim>::set_children(const unsigned int i,
   Assert(
     // clearing the child index for a cell
     (index == -1) ||
-      // if setting the child index for the i'th child (with i==0),
-      // then the index must be a non-negative number
+      // if setting the child index for the i'th child (with i==0), then the
+      // index must be a non-negative number
       (i == 0 && !this->has_children() && (index >= 0)) ||
-      // if setting the child index for the i'th child (with i>0),
-      // then the previously stored index must be the invalid
-      // index
+      // if setting the child index for the i'th child (with i>0), then the
+      // previously stored index must be the invalid index
       (i > 0 && this->has_children() && (index >= 0) &&
        this->objects().children[n_sets_of_two * this->present_index + i / 2] ==
          -1),
@@ -5959,8 +5927,7 @@ template <int structdim, int dim, int spacedim>
 void
 TriaAccessor<structdim, dim, spacedim>::clear_children() const
 {
-  // each set of two children are stored
-  // consecutively, so we only have to find
+  // each set of two children are stored consecutively, so we only have to find
   // the location of the set of children
   const unsigned int n_sets_of_two =
     GeometryInfo<structdim>::max_children_per_cell / 2;
@@ -6242,13 +6209,11 @@ TriaAccessor<structdim, dim, spacedim>::set_all_boundary_ids(
   switch (structdim)
     {
       case 1:
-        // 1d objects have no sub-objects
-        // where we have to do anything
+        // 1d objects have no sub-objects where we have to do anything
         break;
 
       case 2:
-        // for boundary quads also set
-        // boundary_id of bounding lines
+        // for boundary quads also set boundary_id of bounding lines
         for (unsigned int i = 0; i < this->n_lines(); ++i)
           this->line(i)->set_boundary_id(boundary_ind);
         break;
@@ -6264,8 +6229,7 @@ template <int structdim, int dim, int spacedim>
 bool
 TriaAccessor<structdim, dim, spacedim>::at_boundary() const
 {
-  // error checking is done
-  // in boundary_id()
+  // error checking is done in boundary_id()
   return (boundary_id() != numbers::internal_face_boundary_id);
 }
 
@@ -6375,20 +6339,19 @@ template <int structdim, int dim, int spacedim>
 std::pair<Point<spacedim>, double>
 TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
 {
-  // If the object is one dimensional,
-  // the enclosing ball is the initial iterate
-  // i.e., the ball's center and diameter are
-  // the center and the diameter of the object.
+  // If the object is one dimensional, the enclosing ball is the initial iterate
+  // i.e., the ball's center and diameter are the center and the diameter of the
+  // object.
   if (structdim == 1)
     return std::make_pair((this->vertex(1) + this->vertex(0)) * 0.5,
                           (this->vertex(1) - this->vertex(0)).norm() * 0.5);
 
-  // The list is_initial_guess_vertex contains bool values and has
-  // the same size as the number of vertices per object.
-  // The entries of is_initial_guess_vertex are set true only for those
-  // two vertices corresponding to the largest diagonal which is being used
-  // to construct the initial ball.
-  // We employ this mask to skip these two vertices while enlarging the ball.
+  // The list is_initial_guess_vertex contains bool values and has the same size
+  // as the number of vertices per object. The entries of
+  // is_initial_guess_vertex are set true only for those two vertices
+  // corresponding to the largest diagonal which is being used to construct the
+  // initial ball. We employ this mask to skip these two vertices while
+  // enlarging the ball.
   std::vector<bool> is_initial_guess_vertex(this->n_vertices());
 
   // First let all the vertices be outside
@@ -6475,15 +6438,14 @@ TriaAccessor<structdim, dim, spacedim>::enclosing_ball() const
         const double distance = center.distance(this->vertex(v));
         if (distance > radius)
           {
-            // we found a vertex which is outside of the ball
-            // extend it (move center and change radius)
+            // we found a vertex which is outside of the ball extend it (move
+            // center and change radius)
             const Point<spacedim> pCV(center - this->vertex(v));
             radius = (distance + radius) * 0.5;
             center = this->vertex(v) + pCV * (radius / distance);
 
-            // Now the new ball constructed in this block
-            // encloses the vertex (v) that was found to be geometrically
-            // outside the old ball.
+            // Now the new ball constructed in this block encloses the vertex
+            // (v) that was found to be geometrically outside the old ball.
           }
       }
   if constexpr (running_in_debug_mode())
@@ -6537,21 +6499,14 @@ bool
 TriaAccessor<structdim, dim, spacedim>::is_translation_of(
   const TriaIterator<TriaAccessor<structdim, dim, spacedim>> &o) const
 {
-  // go through the vertices and check... The
-  // cell is a translation of the previous
-  // one in case the distance between the
-  // individual vertices in the two cell is
-  // the same for all the vertices. So do the
-  // check by first getting the distance on
-  // the first vertex, and then checking
-  // whether all others have the same down to
-  // rounding errors (we have to be careful
-  // here because the calculation of the
-  // displacement between one cell and the
-  // next can already result in the loss of
-  // one or two digits), so we choose 1e-12
-  // times the distance between the zeroth
-  // vertices here.
+  // go through the vertices and check... The cell is a translation of the
+  // previous one in case the distance between the individual vertices in the
+  // two cell is the same for all the vertices. So do the check by first getting
+  // the distance on the first vertex, and then checking whether all others have
+  // the same down to rounding errors (we have to be careful here because the
+  // calculation of the displacement between one cell and the next can already
+  // result in the loss of one or two digits), so we choose 1e-12 times the
+  // distance between the zeroth vertices here.
   bool                      is_translation = true;
   const Tensor<1, spacedim> dist           = o->vertex(0) - this->vertex(0);
   const double              tol_square     = 1e-24 * dist.norm_square();
@@ -7192,9 +7147,7 @@ TriaAccessor<0, 1, spacedim>::operator==(const TriaAccessor &t) const
 {
   const bool result =
     ((tria == t.tria) && (global_vertex_index == t.global_vertex_index));
-  // if we point to the same vertex,
-  // make sure we know the same about
-  // it
+  // if we point to the same vertex, make sure we know the same about it
   if (result == true)
     Assert(vertex_kind == t.vertex_kind, ExcInternalError());
 
@@ -7756,11 +7709,9 @@ inline RefinementCase<dim>
 CellAccessor<dim, spacedim>::refine_flag_set() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  // cells flagged for refinement must be active
-  // (the @p set_refine_flag function checks this,
-  // but activity may change when refinement is
-  // executed and for some reason the refine
-  // flag is not cleared).
+  // cells flagged for refinement must be active (the @p set_refine_flag
+  // function checks this, but activity may change when refinement is executed
+  // and for some reason the refine flag is not cleared).
   Assert(this->is_active() || !this->tria->levels[this->present_level]
                                  ->refine_flags[this->present_index],
          ExcRefineCellNotActive());
@@ -7841,10 +7792,8 @@ CellAccessor<dim, spacedim>::flag_for_face_refinement(
   AssertIndexRange(face_refinement_case,
                    RefinementCase<dim>::isotropic_refinement + 1);
 
-  // the new refinement case is a combination
-  // of the minimum required one for the given
-  // face refinement and the already existing
-  // flagged refinement case
+  // the new refinement case is a combination of the minimum required one for
+  // the given face refinement and the already existing flagged refinement case
   RefinementCase<dim> old_ref_case = refine_flag_set();
   RefinementCase<dim> new_ref_case =
     (old_ref_case |
@@ -7855,8 +7804,7 @@ CellAccessor<dim, spacedim>::flag_for_face_refinement(
        this->face_flip(face_no),
        this->face_rotation(face_no)));
   set_refine_flag(new_ref_case);
-  // return, whether we had to change the
-  // refinement flag
+  // return, whether we had to change the refinement flag
   return new_ref_case != old_ref_case;
 }
 
@@ -7870,18 +7818,15 @@ CellAccessor<dim, spacedim>::flag_for_line_refinement(
   Assert(dim > 1, ExcImpossibleInDim(dim));
   AssertIndexRange(line_no, this->n_lines());
 
-  // the new refinement case is a combination
-  // of the minimum required one for the given
-  // line refinement and the already existing
-  // flagged refinement case
+  // the new refinement case is a combination of the minimum required one for
+  // the given line refinement and the already existing flagged refinement case
   RefinementCase<dim>
     old_ref_case = refine_flag_set(),
     new_ref_case =
       old_ref_case |
       GeometryInfo<dim>::min_cell_refinement_case_for_line_refinement(line_no);
   set_refine_flag(new_ref_case);
-  // return, whether we had to change the
-  // refinement flag
+  // return, whether we had to change the refinement flag
   return new_ref_case != old_ref_case;
 }
 
@@ -7981,11 +7926,9 @@ inline bool
 CellAccessor<dim, spacedim>::coarsen_flag_set() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  // cells flagged for coarsening must be active
-  // (the @p set_refine_flag function checks this,
-  // but activity may change when refinement is
-  // executed and for some reason the refine
-  // flag is not cleared).
+  // cells flagged for coarsening must be active (the @p set_refine_flag
+  // function checks this, but activity may change when refinement is executed
+  // and for some reason the refine flag is not cleared).
   Assert(this->is_active() || !this->tria->levels[this->present_level]
                                  ->coarsen_flags[this->present_index],
          ExcRefineCellNotActive());
@@ -8208,8 +8151,7 @@ CellAccessor<dim, spacedim>::neighbor_face_no(const unsigned int neighbor) const
 {
   const unsigned int n2 = neighbor_of_neighbor_internal(neighbor);
   if (n2 != numbers::invalid_unsigned_int)
-    // return this value as the
-    // neighbor is not coarser
+    // return this value as the neighbor is not coarser
     return n2;
   else
     // the neighbor is coarser
