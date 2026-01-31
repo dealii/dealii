@@ -81,6 +81,64 @@ automatically computes convergence rates etc. In addition, we will compare
 different strategies for mesh refinement.
 
 
+<h3> Cost-accuracy diagrams </h3>
+
+Being able to evaluate the error of a computed solution also helps us
+evaluate how well a method actually works. Since pretty much the
+beginning of numerical analysis, people have assessed methods by
+showing *cost-accuracy plots* (or work-accuracy diagrams),
+i.e., figures that illustrate what
+level of error one can achieve with a given computational cost. These
+figures can come in different forms, some being more explicit, some
+requiring more experience to tie what's shown to the computational
+cost. The following are more common:
+
+- Plots that on the horizontal axis show the time it took to solve the
+  problem and on the vertical axis the error $E=\|u-u_h\|$ (using
+  whatever norm is convenient or appropriate for the problem at
+  hand). Here, one would then show data points for a variety of
+  meshes, some finer and some more refined. Of course, one would hope
+  that on a mesh that is finer (and for which consequently it is more
+  expensive to solve) the error is smaller. That is, in these plots,
+  points further to the right should also be lower.
+- Plots that on the horizontal axis show the "size" $N$ of the
+  problem, typically measured in terms of the number of mesh cells or
+  degrees of freedom. On the vertical axis again the error
+  $E$. Implied in this kind of plot is that the computational cost
+  grows with the size of the problem, i.e., we imply a linear or at
+  least monotonically growing relationship between size and cost of a
+  problem. While this kind of plot is perhaps not an accurate
+  representation of the actual cost in terms of CPU seconds (for
+  example if the computational cost is proportional to $N^2$ rather
+  than $N$), it has the advantage that the plot is independent of a
+  concrete implementation and hardware platform.
+- Plots in which the horizontal axis shows the mesh size $h$ and the
+  vertical axis again the error $E$. These plots match theoretical
+  statements such as that the error decreases with the mesh size like
+  @f[
+    E \le Ch^2 \|u\|_{H^2(\Omega)}
+  @f]
+  that you will have seen in courses or
+  text books on the finite element method. In a sense, these kinds of
+  plots also are cost-accuracy diagrams because the mesh size $h$ is a
+  measure of cost, even if this is perhaps not how we typically think
+  of it. This is because if you subdivide a two-dimensional domain
+  $(0,L)^2$ into a mesh with mesh size $h$, you will end up with
+  $N=\left(\frac{L}{h}\right)^2$ mesh cells. That is, $h \propto
+  \frac{1}{\sqrt{N}}$ in two space dimensions. In other words, as the
+  mesh size decreases, the cost goes up. For adaptively refined meshes,
+  the relationship may not be as simple, but in general the trend is still
+  true: Smaller $h$ means more cells required to mesh the domain, which
+  in turns means more degrees of freedom. In these plots, then, where one
+  shows $h$ decreasing on the horizontal axis from right to left, cost
+  therefore *increases* from right to left and we would hope that the
+  error decreases right to left (rather than left to right as in the
+  two previous ways of showing cost-accuracy information).
+
+We will show all three kinds of cost-accuracy plots in the results
+section below and interpret what we find for them.
+
+
 <h3>Non-homogeneous Neumann boundary conditions</h3>
 
 The second, totally
