@@ -1316,6 +1316,44 @@ class FEInterfaceValues
 {
 public:
   /**
+   * Collects the options for reinitialization of the @p FEInterfaceValues class.
+   * The parameters @p face_no and @p sub_face_no identify the face and subface
+   * of the first cell the inface is on.
+   * The parameters @p face_no_neighbor and @p sub_face_no_neighbor identify the
+   * face and subface of the second cell the inface is on.
+   * Optional are the @p fe_index, the @p q_index and the @p mapping_index, which
+   * identify the corresponding indices for the first cell on the interface and
+   * the  @p fe_index_neighbor, the @p q_index_neighbor and the @p mapping_index_neighbor,
+   * which identify the corresponding indices for the first cell on the
+   * interface.
+   */
+  struct InterfaceData
+  {
+    InterfaceData(const unsigned int face_no,
+                  const unsigned int sub_face_no,
+                  const unsigned int face_no_neighbor,
+                  const unsigned int sub_face_no_neighbor)
+      : face_no(face_no)
+      , sub_face_no(sub_face_no)
+      , face_no_neighbor(face_no_neighbor)
+      , sub_face_no_neighbor(sub_face_no_neighbor)
+    {}
+
+    // mandatory
+    unsigned int face_no;
+    unsigned int sub_face_no;
+    unsigned int face_no_neighbor;
+    unsigned int sub_face_no_neighbor;
+
+    // optional
+    unsigned int fe_index               = numbers::invalid_unsigned_int;
+    unsigned int q_index                = numbers::invalid_unsigned_int;
+    unsigned int mapping_index          = numbers::invalid_unsigned_int;
+    unsigned int fe_index_neighbor      = numbers::invalid_unsigned_int;
+    unsigned int q_index_neighbor       = numbers::invalid_unsigned_int;
+    unsigned int mapping_index_neighbor = numbers::invalid_unsigned_int;
+  };
+  /**
    * Number of quadrature points.
    */
   const unsigned int n_quadrature_points;
@@ -1495,6 +1533,26 @@ public:
          const unsigned int mapping_index     = numbers::invalid_unsigned_int,
          const unsigned int fe_index          = numbers::invalid_unsigned_int,
          const unsigned int fe_index_neighbor = numbers::invalid_unsigned_int);
+
+  /**
+   * Same as above, takes additional interface data to identify hp indices
+   * for the neighbour cell.
+   * @param[in] cell An iterator to the first cell adjacent to the interface.
+   * @param[in] cell_neighbor An iterator to the second cell adjacent to
+   *   the interface. The type of this iterator does not have to equal that
+   *   of `cell`, but must be convertible to it. This allows using an
+   *   active cell iterator for `cell`, and `cell->neighbor(f)` for
+   *   `cell_neighbor`, since the return type of `cell->neighbor(f)` is
+   *   simply a cell iterator (not necessarily an active cell iterator).
+   * @param[in] interface_data A struct taking face and subface number of the
+   *   cell and the neighbour cell and the hp indices for the fe index, the
+   *   quadrature index and the mapping index.
+   */
+  template <typename CellIteratorType, typename CellNeighborIteratorType>
+  void
+  reinit(const CellIteratorType         &cell,
+         const CellNeighborIteratorType &cell_neighbor,
+         const InterfaceData            &interface_data);
 
   /**
    * Re-initialize this object to be used on an interface given by a single face
@@ -2401,6 +2459,28 @@ FEInterfaceValues<dim, spacedim>::reinit(
   const unsigned int              fe_index_in,
   const unsigned int              fe_index_neighbor_in)
 {
+  InterfaceData data(face_no,
+                     sub_face_no,
+                     face_no_neighbor,
+                     sub_face_no_neighbor);
+  data.q_index           = q_index;
+  data.mapping_index     = mapping_index;
+  data.fe_index          = fe_index_in;
+  data.fe_index_neighbor = fe_index_neighbor_in;
+
+  reinit(cell, cell_neighbor, data);
+}
+
+
+
+template <int dim, int spacedim>
+template <typename CellIteratorType, typename CellNeighborIteratorType>
+void
+FEInterfaceValues<dim, spacedim>::reinit(
+  const CellIteratorType         &cell,
+  const CellNeighborIteratorType &cell_neighbor,
+  const InterfaceData            &interface_data)
+{
   Assert(internal_fe_face_values || internal_hp_fe_face_values,
          ExcNotInitialized());
 
@@ -2415,6 +2495,11 @@ FEInterfaceValues<dim, spacedim>::reinit(
                    typename CellNeighborIteratorType::AccessorType> ||
     std::is_same_v<DoFCellAccessor<dim, spacedim, false>,
                    typename CellNeighborIteratorType::AccessorType>;
+
+  const unsigned int face_no              = interface_data.face_no;
+  const unsigned int sub_face_no          = interface_data.sub_face_no;
+  const unsigned int face_no_neighbor     = interface_data.face_no_neighbor;
+  const unsigned int sub_face_no_neighbor = interface_data.sub_face_no_neighbor;
 
   unsigned int active_fe_index          = 0;
   unsigned int active_fe_index_neighbor = 0;
@@ -2453,11 +2538,11 @@ FEInterfaceValues<dim, spacedim>::reinit(
     }
   else if (internal_hp_fe_face_values)
     {
-      active_fe_index = fe_index_in;
+      active_fe_index = interface_data.fe_index;
       active_fe_index_neighbor =
-        (fe_index_neighbor_in != numbers::invalid_unsigned_int) ?
-          fe_index_neighbor_in :
-          fe_index_in;
+        (interface_data.fe_index_neighbor == numbers::invalid_unsigned_int) ?
+          interface_data.fe_index :
+          interface_data.fe_index_neighbor;
 
       if (active_fe_index == numbers::invalid_unsigned_int)
         {
@@ -2475,8 +2560,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
             active_fe_index_neighbor = 0;
         }
 
-      unsigned int used_q_index       = q_index;
-      unsigned int used_mapping_index = mapping_index;
+      unsigned int used_q_index       = interface_data.q_index;
+      unsigned int used_mapping_index = interface_data.mapping_index;
 
       // First check. If there is only one element in a collection, and if none
       // had been specified explicitly, then that's clearly the one to take:
@@ -2539,6 +2624,19 @@ FEInterfaceValues<dim, spacedim>::reinit(
             }
         }
 
+      // If q_index_neighbor is given use it, if not use the values determined
+      // before
+      const unsigned int used_q_index_neighbor =
+        (interface_data.q_index_neighbor == numbers::invalid_unsigned_int) ?
+          used_q_index :
+          interface_data.q_index_neighbor;
+      // Same as for q_index_neighbor
+      const unsigned int used_mapping_index_neighbor =
+        (interface_data.mapping_index_neighbor ==
+         numbers::invalid_unsigned_int) ?
+          used_mapping_index :
+          interface_data.mapping_index_neighbor;
+
       // Same as if above, but when hp is enabled.
       if (sub_face_no == numbers::invalid_unsigned_int)
         {
@@ -2561,11 +2659,12 @@ FEInterfaceValues<dim, spacedim>::reinit(
         }
       if (sub_face_no_neighbor == numbers::invalid_unsigned_int)
         {
-          internal_hp_fe_face_values_neighbor->reinit(cell_neighbor,
-                                                      face_no_neighbor,
-                                                      used_q_index,
-                                                      used_mapping_index,
-                                                      active_fe_index_neighbor);
+          internal_hp_fe_face_values_neighbor->reinit(
+            cell_neighbor,
+            face_no_neighbor,
+            used_q_index_neighbor,
+            used_mapping_index_neighbor,
+            active_fe_index_neighbor);
 
           fe_face_values_neighbor = &const_cast<FEFaceValues<dim, spacedim> &>(
             internal_hp_fe_face_values_neighbor->get_present_fe_values());
@@ -2576,8 +2675,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
             cell_neighbor,
             face_no_neighbor,
             sub_face_no_neighbor,
-            used_q_index,
-            used_mapping_index,
+            used_q_index_neighbor,
+            used_mapping_index_neighbor,
             active_fe_index_neighbor);
 
           fe_face_values_neighbor =
