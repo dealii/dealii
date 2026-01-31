@@ -5840,11 +5840,8 @@ TriaAccessor<structdim, dim, spacedim>::n_children() const
   Assert(this->state() == IteratorState::valid,
          TriaAccessorExceptions::ExcDereferenceInvalidObject<TriaAccessor>(
            *this));
-  if (reference_cell() == ReferenceCells::Tetrahedron)
-    return GeometryInfo<structdim>::n_children(
-      RefinementCase<structdim>::isotropic_refinement);
-  else
-    return GeometryInfo<structdim>::n_children(refinement_case());
+
+  return reference_cell().n_children(refinement_case());
 }
 
 
