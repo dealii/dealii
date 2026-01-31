@@ -52,6 +52,8 @@ if(DEAL_II_COMPONENT_EXAMPLES)
     PATTERN "sphere_r8.msh"                     # step-97
     PATTERN "sphere_r9.geo"                     # step-97
     PATTERN "sphere_r9.msh"                     # step-97
+    PATTERN "circle.geo"                        # step-98
+    PATTERN "circle.msh"                        # step-98
     )
 
   message(STATUS "Setting up examples - Done")
