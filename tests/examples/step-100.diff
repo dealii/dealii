@@ -1,0 +1,63 @@
+496,498d495
+<     std::cout << std::endl
+<               << "Number of dofs for the interior: "
+<               << dof_handler_trial_interior.n_dofs() << std::endl;
+501,502d497
+<     std::cout << "Number of dofs for the skeleton: "
+<               << dof_handler_trial_skeleton.n_dofs() << std::endl;
+505,506d499
+<     std::cout << "Number of dofs for the test space: "
+<               << dof_handler_test.n_dofs() << std::endl;
+1442,1444c1435
+<     std::cout << std::endl << "Solving the DPG system..." << std::endl;
+< 
+<     SolverControl solver_control(100000, 1e-10 * system_rhs.l2_norm());
+---
+>     SolverControl solver_control(100000, 1e-6 * system_rhs.l2_norm());
+1451,1456d1441
+< 
+<     std::cout << "   " << solver_control.last_step()
+<               << " CG iterations needed to obtain convergence. \n"
+<               << std::endl;
+< 
+<     error_table.add_value("n_iter", solver_control.last_step());
+1729,1745d1713
+<     std::cout << "Velocity real part L2 error is : "
+<               << std::sqrt(L2_error_u_real) << std::endl;
+<     std::cout << "Velocity imag part L2 error is : "
+<               << std::sqrt(L2_error_u_imag) << std::endl;
+<     std::cout << "Pressure real part L2 error is : "
+<               << std::sqrt(L2_error_p_real) << std::endl;
+<     std::cout << "Pressure imag part L2 error is : "
+<               << std::sqrt(L2_error_p_imag) << std::endl;
+<     std::cout << "Velocity skeleton real part L2 error is : "
+<               << std::sqrt(L2_error_u_hat_real) << std::endl;
+<     std::cout << "Velocity skeleton imag part L2 error is : "
+<               << std::sqrt(L2_error_u_hat_imag) << std::endl;
+<     std::cout << "Pressure skeleton real part L2 error is : "
+<               << std::sqrt(L2_error_p_hat_real) << std::endl;
+<     std::cout << "Pressure skeleton imag part L2 error is : "
+<               << std::sqrt(L2_error_p_hat_imag) << std::endl;
+< 
+1778,1780d1745
+<     std::cout << "Number of active cells: " << triangulation.n_active_cells()
+<               << std::endl;
+< 
+1794c1759
+<     for (unsigned int cycle = 0; cycle < 8; ++cycle)
+---
+>     for (unsigned int cycle = 0; cycle < 3; ++cycle)
+1796,1798d1760
+<         std::cout << "===========================================" << std::endl
+<                   << "Cycle " << cycle << ':' << std::endl;
+< 
+1805d1766
+<         output_results(cycle);
+1845c1806
+<       const int    degree       = 2;
+---
+>       const int    degree       = 1;
+1847c1808
+<       const double wavenumber   = 20 * pi;
+---
+>       const double wavenumber   = 2 * pi;
