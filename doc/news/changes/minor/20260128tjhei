@@ -1,0 +1,5 @@
+New: RemotePointEvaluation::CellData::get_data_view() now
+supports cases with more than one component via an optional
+third argument.
+<br>
+(Timo Heister, 2026/01/28)

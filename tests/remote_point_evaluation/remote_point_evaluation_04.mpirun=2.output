@@ -1,0 +1,27 @@
+
+DEAL:0::* n_components = 1
+DEAL:0::cell index = 0, center = 0.250000 0.250000:
+	point 0, coordinates = 0.00000 0.00000, data:
+	1 
+
+DEAL:0::cell index = 1, center = 0.750000 0.250000:
+	point 0, coordinates = 0.500000 0.00000, data:
+	2 
+
+DEAL:0::OK.
+DEAL:0::* n_components = 2
+DEAL:0::cell index = 0, center = 0.250000 0.250000:
+	point 0, coordinates = 0.00000 0.00000, data:
+	1 2 
+
+DEAL:0::cell index = 1, center = 0.750000 0.250000:
+	point 0, coordinates = 0.500000 0.00000, data:
+	3 4 
+
+DEAL:0::OK.
+
+DEAL:1::* n_components = 1
+DEAL:1::OK.
+DEAL:1::* n_components = 2
+DEAL:1::OK.
+
