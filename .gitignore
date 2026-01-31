@@ -58,3 +58,4 @@ examples/step-*/CMakeCache.txt
 examples/step-*/cmake_install.cmake
 examples/step-*/step-?
 examples/step-*/step-??
+install/
