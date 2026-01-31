@@ -74,12 +74,17 @@ test()
   Assert(v_one.ghost_elements() == v_one_from_vec.ghost_elements(),
          ExcInternalError());
 
-  // Test swap
+  // ---------- Test swap
   IndexSet local_active_2(numproc * 4);
   local_active_2.add_range(myid * 4, myid * 4 + 4);
+  IndexSet local_relevant_2(numproc * 4);
+  local_relevant_2.add_index((myid * 4 + 6) % (numproc * 4));
+
+  // Create a small vs1 without ghost entries, and a larger
+  // vs2 that has ghost entries, then swap them.
   PETScWrappers::MPI::Vector vs1(local_active, MPI_COMM_WORLD);
   PETScWrappers::MPI::Vector vs2(local_active_2,
-                                 local_relevant,
+                                 local_relevant_2,
                                  MPI_COMM_WORLD);
   vs1.swap(vs2);
   Assert(vs1.size() == numproc * 4, ExcInternalError());
@@ -88,7 +93,7 @@ test()
   Assert(vs2.locally_owned_size() == 2, ExcInternalError());
   Assert(vs1.has_ghost_elements() == true, ExcInternalError());
   Assert(vs2.has_ghost_elements() == false, ExcInternalError());
-  Assert(vs1.ghost_elements() == v_one.ghost_elements(), ExcInternalError());
+  Assert(vs1.ghost_elements() == local_relevant_2, ExcInternalError());
 
   // Now BlockVectors
   PETScWrappers::MPI::BlockVector vb, v;
