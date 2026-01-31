@@ -2547,10 +2547,16 @@ ReferenceCell::refinement_cases() const
               return make_array_view(possibilities);
             }
           case ReferenceCells::Pyramid:
+            {
+              // TODO: Pyramid
+              // Pyramids cannot yet be refined
+              return ArrayView<const RefinementCase<3>>();
+            }
           case ReferenceCells::Wedge:
             {
-              // Pyramids and Wedges cannot yet be refined
-              return ArrayView<const RefinementCase<3>>();
+              static constexpr std::array<RefinementCase<3>, 1> possibilities{
+                {RefinementPossibilities<3>::isotropic_refinement}};
+              return make_array_view(possibilities);
             }
           case ReferenceCells::Hexahedron:
             {
