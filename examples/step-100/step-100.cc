@@ -1432,7 +1432,7 @@ namespace Step100
   // quite high. For simplicity, we put a high upper limit on the number of
   // iterations, but in practice one would want to change this function to have
   // a more robust solver. The tolerance for the convergence here is defined
-  // proportional to the $L^2$ norm of the RHS vector so the stopping criterion
+  // proportional to the $L^2$ norm of the RHS vector so the stopping criterion is
   // independent of whatever scaling we apply to the equation. The chosen
   // tolerance is rather stiff, but it is required to reproduce the convergence
   // plots of the results section.
