@@ -1059,7 +1059,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::locally_owned_elements() const
     {
       IndexSet locally_owned_entries(vector->getMap());
-      locally_owned_entries.subtract_set(nonlocal_entries);
+      if (!nonlocal_vector.is_null())
+        locally_owned_entries.subtract_set(nonlocal_entries);
       return locally_owned_entries;
     }
 
