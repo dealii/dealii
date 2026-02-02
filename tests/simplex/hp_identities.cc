@@ -15,6 +15,7 @@
 
 
 // verify hp identity functions for mixed meshes
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_pyramid_p.h>
 #include <deal.II/fe/fe_q.h>
@@ -112,8 +113,10 @@ test()
   hp::FECollection<dim> fes;
   for (unsigned int i = 1; i <= 3; ++i)
     fes.push_back(FE_SimplexP<dim>(i));
-  for (unsigned int i = 1; i <= 5; ++i)
+  for (unsigned int i = 1; i <= 4; ++i)
     fes.push_back(FE_Q<dim>(i));
+  for (unsigned int i = 1; i <= 4; ++i)
+    fes.push_back(FE_Q<dim>(QIterated<1>(QTrapezoid<1>(), i)));
   if constexpr (dim == 3)
     {
       for (unsigned int i = 1; i <= 2; ++i)
