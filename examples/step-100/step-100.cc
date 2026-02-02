@@ -1432,8 +1432,8 @@ namespace Step100
   // quite high. For simplicity, we put a high upper limit on the number of
   // iterations, but in practice one would want to change this function to have
   // a more robust solver. The tolerance for the convergence here is defined
-  // proportional to the $L^2$ norm of the RHS vector so the stopping criterion is
-  // independent of whatever scaling we apply to the equation. The chosen
+  // proportional to the $L^2$ norm of the RHS vector so the stopping criterion
+  // is independent of whatever scaling we apply to the equation. The chosen
   // tolerance is rather stiff, but it is required to reproduce the convergence
   // plots of the results section.
   template <int dim>
@@ -1703,14 +1703,16 @@ namespace Step100
                 double u_hat_n_analytical_imag =
                   normal * analytical_solution_u_imag.value(position);
 
-                L2_error_u_hat_real += std::pow(abs(local_u_hat_real[q_index]) -
-                                                  abs(u_hat_n_analytical_real),
-                                                2) *
-                                       JxW;
-                L2_error_u_hat_imag += std::pow(abs(local_u_hat_imag[q_index]) -
-                                                  abs(u_hat_n_analytical_imag),
-                                                2) *
-                                       JxW;
+                L2_error_u_hat_real +=
+                  std::pow(std::abs(local_u_hat_real[q_index]) -
+                             std::abs(u_hat_n_analytical_real),
+                           2) *
+                  JxW;
+                L2_error_u_hat_imag +=
+                  std::pow(std::abs(local_u_hat_imag[q_index]) -
+                             std::abs(u_hat_n_analytical_imag),
+                           2) *
+                  JxW;
 
                 L2_error_p_hat_real +=
                   std::pow((local_p_hat_real[q_index] -
