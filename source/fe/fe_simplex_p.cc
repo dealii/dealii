@@ -1033,7 +1033,7 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
       const auto face_reference_cell_other =
         this->reference_cell().face_reference_cell(face_no_neighbor);
 
-      // DoFs are the same if they have the same positon on the face
+      // DoFs are the same if they have the same position on the face
       for (unsigned int i = 0; i < this->n_dofs_per_quad(0); ++i)
         for (unsigned int j = 0; j < fe_other.n_dofs_per_quad(face_no_neighbor);
              ++j)
