@@ -97,9 +97,12 @@ namespace LinearAlgebra
                                                              Teuchos::Copy))
     {
       if (!V.nonlocal_vector.is_null())
-        nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
-          TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
-                                                        Teuchos::Copy);
+        {
+          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
+                                                          Teuchos::Copy);
+          nonlocal_entries = V.nonlocal_entries;
+        }
     }
 
 
@@ -1059,7 +1062,8 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::locally_owned_elements() const
     {
       IndexSet locally_owned_entries(vector->getMap());
-      locally_owned_entries.subtract_set(nonlocal_entries);
+      if (!nonlocal_vector.is_null())
+        locally_owned_entries.subtract_set(nonlocal_entries);
       return locally_owned_entries;
     }
 

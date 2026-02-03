@@ -463,6 +463,9 @@ public:
    * Remove all elements contained in @p other from this set. In other words,
    * if $x$ is the current object and $o$ the argument, then we compute $x
    * \leftarrow x \backslash o$.
+   *
+   * @pre The sizes of the two index spaces need to be equal, i.e., the
+   *   condition `this->size() == other.size()` has to be true.
    */
   void
   subtract_set(const IndexSet &other);
