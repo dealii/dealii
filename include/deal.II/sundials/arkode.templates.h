@@ -44,14 +44,31 @@ namespace SUNDIALS
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
                              const MPI_Comm        mpi_comm)
+    : ARKode(std::make_shared<ARKStepper<VectorType>>(
+               typename ARKStepper<VectorType>::AdditionalData(
+                 data.maximum_non_linear_iterations,
+                 data.implicit_function_is_linear,
+                 data.implicit_function_is_time_independent,
+                 data.mass_is_time_independent,
+                 data.anderson_acceleration_subspace)),
+             data,
+             mpi_comm)
+  {}
+
+
+  template <typename VectorType>
+  ARKode<VectorType>::ARKode(std::shared_ptr<ARKodeStepper<VectorType>> stepper,
+                             const AdditionalData                      &data)
+    : ARKode(stepper, data, MPI_COMM_SELF)
+  {}
+
+
+  template <typename VectorType>
+  ARKode<VectorType>::ARKode(std::shared_ptr<ARKodeStepper<VectorType>> stepper,
+                             const AdditionalData                      &data,
+                             const MPI_Comm mpi_comm)
     : data(data)
-    , stepper(std::make_shared<ARKStepper<VectorType>>(
-        typename ARKStepper<VectorType>::AdditionalData(
-          data.maximum_non_linear_iterations,
-          data.implicit_function_is_linear,
-          data.implicit_function_is_time_independent,
-          data.mass_is_time_independent,
-          data.anderson_acceleration_subspace)))
+    , stepper(stepper)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     , arkode_ctx(nullptr)
 #  endif

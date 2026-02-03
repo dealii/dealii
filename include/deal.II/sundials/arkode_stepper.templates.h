@@ -77,8 +77,7 @@ namespace SUNDIALS
                                          void              *user_data) -> int {
       Assert(user_data != nullptr, ExcInternalError());
       auto &callback_ctx =
-        *static_cast<internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-          user_data);
+        *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(user_data);
 
       auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
       auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
@@ -97,8 +96,7 @@ namespace SUNDIALS
                                          void              *user_data) -> int {
       Assert(user_data != nullptr, ExcInternalError());
       auto &callback_ctx =
-        *static_cast<internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-          user_data);
+        *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(user_data);
 
       auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
       auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
@@ -213,8 +211,9 @@ namespace SUNDIALS
                                                  void              *user_data,
                                                  N_Vector) -> int {
           Assert(user_data != nullptr, ExcInternalError());
-          auto &callback_ctx = *static_cast<
-            internal::ARKCallbackContext<ARKStepper<VectorType>> *>(user_data);
+          auto &callback_ctx =
+            *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+              user_data);
 
           auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
           auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
@@ -237,8 +236,9 @@ namespace SUNDIALS
                                                        N_Vector           fy,
                                                        void *user_data) -> int {
           Assert(user_data != nullptr, ExcInternalError());
-          auto &callback_ctx = *static_cast<
-            internal::ARKCallbackContext<ARKStepper<VectorType>> *>(user_data);
+          auto &callback_ctx =
+            *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+              user_data);
 
           auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
           auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
@@ -268,9 +268,9 @@ namespace SUNDIALS
                                                    int                lr,
                                                    void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
-              auto &callback_ctx = *static_cast<
-                internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-                user_data);
+              auto &callback_ctx =
+                *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+                  user_data);
 
               auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
               auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
@@ -300,9 +300,9 @@ namespace SUNDIALS
                  SUNDIALS::realtype  gamma,
                  void               *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
-              auto &callback_ctx = *static_cast<
-                internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-                user_data);
+              auto &callback_ctx =
+                *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+                  user_data);
 
               auto *src_y  = internal::unwrap_nvector_const<VectorType>(y);
               auto *src_fy = internal::unwrap_nvector_const<VectorType>(fy);
@@ -420,9 +420,9 @@ namespace SUNDIALS
         auto mass_matrix_times_vector_setup_callback =
           [](SUNDIALS::realtype t, void *mtimes_data) -> int {
           Assert(mtimes_data != nullptr, ExcInternalError());
-          auto &callback_ctx = *static_cast<
-            internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-            mtimes_data);
+          auto &callback_ctx =
+            *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+              mtimes_data);
 
           return Utilities::call_and_possibly_capture_exception(
             callback_ctx.stepper->mass_times_setup,
@@ -435,9 +435,9 @@ namespace SUNDIALS
                                                     SUNDIALS::realtype t,
                                                     void *mtimes_data) -> int {
           Assert(mtimes_data != nullptr, ExcInternalError());
-          auto &callback_ctx = *static_cast<
-            internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-            mtimes_data);
+          auto &callback_ctx =
+            *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+              mtimes_data);
 
           auto *src_v  = internal::unwrap_nvector_const<VectorType>(v);
           auto *dst_Mv = internal::unwrap_nvector<VectorType>(Mv);
@@ -463,9 +463,9 @@ namespace SUNDIALS
             auto mass_matrix_solver_setup_callback =
               [](SUNDIALS::realtype t, void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
-              auto &callback_ctx = *static_cast<
-                internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-                user_data);
+              auto &callback_ctx =
+                *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+                  user_data);
 
               return Utilities::call_and_possibly_capture_exception(
                 callback_ctx.stepper->mass_preconditioner_setup,
@@ -480,9 +480,9 @@ namespace SUNDIALS
                                                       int                lr,
                                                       void *user_data) -> int {
               Assert(user_data != nullptr, ExcInternalError());
-              auto &callback_ctx = *static_cast<
-                internal::ARKCallbackContext<ARKStepper<VectorType>> *>(
-                user_data);
+              auto &callback_ctx =
+                *static_cast<ARKCallbackContext<ARKStepper<VectorType>> *>(
+                  user_data);
 
               auto *src_r = internal::unwrap_nvector_const<VectorType>(r);
               auto *dst_z = internal::unwrap_nvector<VectorType>(z);
