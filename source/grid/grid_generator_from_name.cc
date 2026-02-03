@@ -133,7 +133,7 @@ namespace GridGenerator
       else if (name == "uniform_channel_with_sphere")
         parse_and_create<dim,
                          dim,
-                         const std::vector<double> &,
+                         const std::vector<unsigned int> &,
                          const double,
                          const double,
                          const bool,

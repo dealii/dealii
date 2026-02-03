@@ -9786,12 +9786,12 @@ namespace GridGenerator
 
   template <>
   void
-  uniform_channel_with_sphere(Triangulation<3>          &tria,
-                              const std::vector<double> &lengths_heights_widths,
-                              const double               inner_radius,
-                              const double               outer_radius,
-                              const bool                 use_transfinite_region,
-                              const bool                 colorize)
+  uniform_channel_with_sphere(Triangulation<3>                &tria,
+                              const std::vector<unsigned int> &lengths_heights_widths,
+                              const double                     inner_radius,
+                              const double                     outer_radius,
+                              const bool                       use_transfinite_region,
+                              const bool                       colorize)
   {
     AssertThrow(inner_radius > 0, ExcMessage("inner_radius must be positive."));
     AssertThrow(inner_radius < outer_radius,
@@ -9881,8 +9881,8 @@ namespace GridGenerator
             bool face_spherical = true;
             for (const auto v : face->vertex_indices())
               {
-                if (std::abs(face->vertex(v).norm_square() >
-                             std::sqrt(inner_radius)))
+                if (face->vertex(v).norm_square() >
+                             std::sqrt(inner_radius))
                   face_spherical = false;
               }
             if (face_spherical)
@@ -9949,7 +9949,7 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<1> &,
-                              const std::vector<double> &,
+                              const std::vector<unsigned int> &,
                               const double,
                               const double,
                               const bool,
@@ -9963,7 +9963,7 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<2> &,
-                              const std::vector<double> &,
+                              const std::vector<unsigned int> &,
                               const double,
                               const double,
                               const bool,

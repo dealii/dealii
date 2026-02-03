@@ -685,11 +685,9 @@ namespace GridGenerator
    * @param lengths_heights_widths A vector containing the distances of the domain to the
    * cube that contains the sphere, and are expressed as units
    * of the reference distance $2 \times \texttt{outer\_radius}$.
-   * The vector must contain 6 double variables which consist resp. in the
+   * The vector must contain 6 integer variables which consist resp. in the
    * length before the sphere, after the sphere, below the sphere, above the
-   * sphere, in front of the sphere, and behind the sphere. All these lengths
-   * must divide $2 \times \texttt{outer\_radius}$.
-   *
+   * sphere, in front of the sphere, and behind the sphere.
    *
    * @param inner_radius  Radius of the sphere.
    *
@@ -713,10 +711,10 @@ namespace GridGenerator
    */
   template <int dim>
   void
-  uniform_channel_with_sphere(Triangulation<dim>        &tria,
-                              const std::vector<double> &lengths_heights_widths,
-                              const double               inner_radius,
-                              const double               outer_radius,
+  uniform_channel_with_sphere(Triangulation<dim>              &tria,
+                              const std::vector<unsigned int> &lengths_heights_widths,
+                              const double                     inner_radius,
+                              const double                     outer_radius,
                               const bool use_transfinite_region = false,
                               const bool colorize               = false);
 
@@ -3246,7 +3244,7 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<1> &,
-                              const std::vector<double> &,
+                              const std::vector<unsigned int> &,
                               const double,
                               const double,
                               const bool,
@@ -3255,7 +3253,7 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<2> &,
-                              const std::vector<double> &,
+                              const std::vector<unsigned int> &,
                               const double,
                               const double,
                               const bool,
@@ -3264,7 +3262,7 @@ namespace GridGenerator
   template <>
   void
   uniform_channel_with_sphere(Triangulation<3> &,
-                              const std::vector<double> &,
+                              const std::vector<unsigned int> &,
                               const double,
                               const double,
                               const bool,
