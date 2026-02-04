@@ -711,12 +711,13 @@ namespace GridGenerator
    */
   template <int dim>
   void
-  uniform_channel_with_sphere(Triangulation<dim>              &tria,
-                              const std::vector<unsigned int> &lengths_heights_widths,
-                              const double                     inner_radius,
-                              const double                     outer_radius,
-                              const bool use_transfinite_region = false,
-                              const bool colorize               = false);
+  uniform_channel_with_sphere(
+    Triangulation<dim>              &tria,
+    const std::vector<unsigned int> &lengths_heights_widths,
+    const double                     inner_radius,
+    const double                     outer_radius,
+    const bool                       use_transfinite_region = false,
+    const bool                       colorize               = false);
 
   /**
    * This function produces a cube with a spherical hole in the middle.
