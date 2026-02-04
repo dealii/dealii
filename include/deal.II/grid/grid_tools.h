@@ -1647,9 +1647,9 @@ namespace GridTools
    *  bounding boxes max_boxes can't be reached by merging neighbors
    *  an exception is thrown.
    *
-   * The following image describes an example of the algorithm with @p
-   * refinement_level = 2, @p allow_merge = true and @p max_boxes =
-   * 1. The cells with the property predicate are in red, the area of
+   * The following image describes an example of the algorithm with
+   * @p refinement_level = 2, @p allow_merge = true and @p max_boxes = 1.
+   * The cells with the property predicate are in red, the area of
    * a bounding box is slightly orange.
    * @image html bounding_box_predicate.png
    *
