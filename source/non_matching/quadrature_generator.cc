@@ -38,6 +38,7 @@
 #include <boost/math/special_functions/relative_difference.hpp>
 #include <boost/math/special_functions/sign.hpp>
 #include <boost/math/tools/roots.hpp>
+#include <boost/math/tools/toms748_solve.hpp>
 
 #include <algorithm>
 #include <vector>
