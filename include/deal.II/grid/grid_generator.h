@@ -645,6 +645,111 @@ namespace GridGenerator
     const bool                       colorize               = false);
 
   /**
+   * Generate a grid (in 3D) consisting of a channel with a sphere where the
+   * length, the height and the width of the channel can be defined by the user.
+   * This generator can be used for benchmarking Navier-Stokes solvers
+   * for various flows around a sphere cases in 3D.
+   * The sphere is centered at $(0, 0, 0)$, has diameter which is equal to two
+   * times the inner_radius and lies at the center of a cube of length which is
+   * two times the outer_radius. The geometry consists of a channel of size
+   * $[-outer_radius - L_{pre}, outer_radius + L_{post}] \times
+   * [-outer_radius - H_{below}, outer_radius + H_{above}] \times [-outer_radius
+   * - W_{front}, outer_radius + W_{back}] $ with the sphere inside. The channel
+   * has three distinct regions: <ol>
+   *   <li>The sphere,</li>
+   *   <li>a blending region between the sphere and the cube that contains it, and</li>
+   *   <li>a bulk region consisting of Cartesian cells.</li>
+   * </ol>
+   * Here is an example of a grid cut in the middle along the z direction,
+   * with global refinement $3$,
+   * where the arguments were resp.:
+   * {1,6,1,1,1,1}, 0.5, 0.6, true, true:
+   *
+   * @image html custom_channel_with_sphere.png
+   *
+   * The resulting Triangulation uses two manifolds:
+   * a SphericalManifold with manifold id $1$, and
+   * either a TransfiniteInterpolationManifold or a FlatManifold, with manifold
+   * id $0$. For more information on this topic see
+   * @ref GlossManifoldIndicator "the glossary entry on manifold indicators".
+   * The cell faces on the sphere have manifold ids of $1$,
+   * while the other cell volumes have a manifold id of $0$. Put another way:
+   * this grid uses TransfiniteInterpolationManifold to smoothly transition from
+   * the sphere to the cube and the bulk region. All cell volumes and faces
+   * in the bulk region are rectangular prisms aligned with the
+   * coordinate axes.
+   *
+   * @param tria Triangulation to be created. Must be empty upon calling this
+   * function.
+   *
+   * @param lengths_heights_widths A vector containing the distances of the domain to the
+   * cube that contains the sphere, and are expressed as units
+   * of the reference distance $2 \times \texttt{outer\_radius}$.
+   * The vector must contain 6 integer variables which consist resp. in the
+   * length before the sphere, after the sphere, below the sphere, above the
+   * sphere, in front of the sphere, and behind the sphere.
+   *
+   * @param inner_radius  Radius of the sphere.
+   *
+   * @param outer_radius Half of the edge length of the cube that contains the sphere.
+   *
+   * @param use_transfinite_region If `true`, then a tranfinite manifold is used
+   * in the intermediary region in the channel outside the sphere, and if
+   * `false`, a flat manifold is used instead.
+   *
+   * @param colorize If `true`, then assign different boundary ids to
+   * different parts of the boundary. For more
+   * information on boundary indicators see
+   * @ref GlossBoundaryIndicator "this glossary entry".
+   * The left boundary (at $x = -outer_radius - L_{pre}$) is assigned an id of
+   * $0$, the right boundary (at $x = outer_radius + L_{post}$) is assigned an
+   * id of $1$; the boundary of the sphere is assigned an id of $2$, the bottom
+   * wall (at $y=-outer_radius - H_{below}$) is assigned and id of $3$, the top
+   * wall (at $y=outer_radius + H_{above}$) is assigned an id of $4$, the front
+   * wall (at $y=-outer_radius - W_{front}$) is assigned an id of $5$, and the
+   * back wall (at $y=outer_radius + W_{back}$) is assigned an id of $6$.
+   */
+  template <int dim>
+  void
+  uniform_channel_with_sphere(
+    Triangulation<dim>              &tria,
+    const std::vector<unsigned int> &lengths_heights_widths,
+    const double                     inner_radius,
+    const double                     outer_radius,
+    const bool                       use_transfinite_region = false,
+    const bool                       colorize               = false);
+
+  /**
+   * This function produces a cube with a spherical hole in the middle.
+   * The cube and the sphere are centered at the origin.
+   * The inner boundary has a manifold id of $0$ and a boundary id of
+   * $6$. This function attaches a SphericalManifold to the interior boundary,
+   * and the other faces have boundary ids of $0$, $1$, $2$, $3$, $4$ and $5$
+   * given in the standard order of faces in 3d.
+   *
+   * @image html cube_spherical_hole.png
+   *
+   * It is implemented in 3d, and takes the following arguments:
+   *
+   * @param tria The triangulation to be filled.
+   * @param inner_radius  Radius of the internal sphere.
+   * @param outer_radius Half of the edge length of the cube.
+   * @param colorize Whether to assign different boundary indicators to
+   * different faces (see
+   * @ref GlossColorization "the glossary entry on colorization").
+   * The colors are given in lexicographic ordering for the
+   * flat faces (0 to 3 in 2d, 0 to 5 in 3d) plus the curved hole (4 in 2d,
+   * and 6 in 3d). If @p colorize is set to false, then flat faces get the
+   * number 0 and the hole gets number 1.
+   */
+  template <int dim>
+  void
+  hyper_cube_with_spherical_hole(Triangulation<dim> &tria,
+                                 const double        inner_radius = 0.25,
+                                 const double        outer_radius = 0.5,
+                                 const bool          colorize     = false);
+
+  /**
    * A general @p dim -dimensional cell (a segment if dim is 1, a quadrilateral
    * if @p dim is 2, or a hexahedron if @p dim is 3) immersed in a
    * @p spacedim -dimensional space. It is the responsibility of the user to
@@ -3136,6 +3241,54 @@ namespace GridGenerator
                         const unsigned int,
                         const double,
                         const bool);
+
+  template <>
+  void
+  uniform_channel_with_sphere(Triangulation<1> &,
+                              const std::vector<unsigned int> &,
+                              const double,
+                              const double,
+                              const bool,
+                              const bool);
+
+  template <>
+  void
+  uniform_channel_with_sphere(Triangulation<2> &,
+                              const std::vector<unsigned int> &,
+                              const double,
+                              const double,
+                              const bool,
+                              const bool);
+
+  template <>
+  void
+  uniform_channel_with_sphere(Triangulation<3> &,
+                              const std::vector<unsigned int> &,
+                              const double,
+                              const double,
+                              const bool,
+                              const bool);
+
+  template <>
+  void
+  hyper_cube_with_spherical_hole(Triangulation<1> &,
+                                 const double,
+                                 const double,
+                                 const bool);
+
+  template <>
+  void
+  hyper_cube_with_spherical_hole(Triangulation<2> &,
+                                 const double,
+                                 const double,
+                                 const bool);
+
+  template <>
+  void
+  hyper_cube_with_spherical_hole(Triangulation<3> &,
+                                 const double,
+                                 const double,
+                                 const bool);
 
 
 
