@@ -206,7 +206,8 @@ test(const unsigned numRefinementLevels = 2)
   locally_relevant_dofs.print(deallog);
   // we have issues with constraints for u_52 = ....
   const unsigned int i = 52;
-  if (locally_relevant_dofs.is_element(i) && constraints.is_constrained(i))
+  if (dof_handler.locally_owned_dofs().is_element(i) &&
+      constraints.is_constrained(i))
     {
       deallog << "Coordinates:" << std::endl;
       deallog << i << '@' << supportPoints[i] << std::endl;
