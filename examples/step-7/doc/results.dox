@@ -276,6 +276,241 @@ particular in 3d, one needs *far* more effort to solve problems to
 this level of accuracy.
 
 
+<h3> Cost-accuracy diagrams for this program </h3>
+
+As mentioned in the introduction, we assess numerical algorithms by
+figures that show cost vs. accuracy. The information for this is
+mostly available from the data tables produced by this program and
+shown above already. Specifically, the program above outputs four
+tables (for uniform and adaptive mesh refinement, and $Q_1$ and $Q_2$
+finite elements) that already have data points for cost (e.g., the
+number of degrees of freedom $N_\text{dofs}$) and accuracy (the error
+in one of several different norms). From the number of cells
+$N_\text{cells}$ in the table, we can also compute the mesh size at
+least in the case of uniformly refined meshes via
+$h=\frac{2}{\sqrt{N_\text{cells}}}$ given that we are in 2d and that
+the domain has width and height equal to 2. What we don't have is a
+measure of run time from the program. This turns out not to be too
+difficult to add using the Timer class you will first see in step-28
+and that I won't show here so as not too complicate the situation more
+than necessary. In any case, adding this information to the tables
+above, and running a few more refinement cycles, we can then convert
+the resulting data into this little Python program to create figures:
+
+@code{.py}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+...# Q1, adaptive refinement
+...#cycle  cells   dofs         L2         H1     Linfty  time (exclusive)  time (inclusive)
+data_q1_adaptive = [
+    [  0,     64,     81, 1.840e+00, 2.858e+00, 1.835e+00,           0.0010,           0.0010],
+    [  1,    121,    154, 5.336e-02, 1.200e+00, 1.354e-01,           0.0009,           0.0020],
+    [  2,    280,    341, 1.439e-02, 7.892e-01, 7.554e-02,           0.0031,           0.0050],
+    [  3,    565,    678, 8.696e-03, 5.086e-01, 2.843e-02,           0.0062,           0.0112],
+    [  4,   1075,   1240, 3.245e-03, 3.059e-01, 1.072e-02,           0.0116,           0.0228],
+    [  5,   2041,   2306, 2.407e-03, 2.147e-01, 5.156e-03,           0.0221,           0.0449],
+    [  6,   3913,   4216, 8.501e-04, 1.503e-01, 2.033e-03,           0.0174,           0.0623],
+    [  7,   7432,   7909, 7.113e-04, 1.086e-01, 1.808e-03,           0.0315,           0.0938],
+    [  8,  14203,  14870, 3.140e-04, 7.671e-02, 7.181e-04,           0.0708,           0.1645],
+    [  9,  26983,  27974, 2.442e-04, 5.605e-02, 4.535e-04,           0.3129,           0.4775],
+    [ 10,  51373,  52648, 7.752e-05, 3.973e-02, 1.753e-04,           0.5939,           1.0714],
+    [ 11,  97606,  99481, 6.101e-05, 2.926e-02, 1.051e-04,           1.2738,           2.3452],
+    [ 12, 184801, 187576, 3.219e-05, 2.098e-02, 8.162e-05,           2.8018,           5.1470],
+    [ 13, 350581, 355204, 1.964e-05, 1.543e-02, 3.971e-05,           6.8079,          11.9549]]
+
+...# Q1, global refinement
+...#cycle  cells   dofs         L2         H1     Linfty  time (exclusive)  time (inclusive)
+data_q1_global = [
+    [  0,     64,     81, 1.840e+00, 2.858e+00, 1.835e+00,           0.0010,           0.0010],
+    [  1,    256,    289, 3.570e-02, 1.199e+00, 1.307e-01,           0.0027,           0.0037],
+    [  2,   1024,   1089, 1.192e-02, 7.565e-01, 7.168e-02,           0.0049,           0.0086],
+    [  3,   4096,   4225, 3.047e-03, 3.823e-01, 2.128e-02,           0.0286,           0.0372],
+    [  4,  16384,  16641, 7.660e-04, 1.917e-01, 5.554e-03,           0.1024,           0.1396],
+    [  5,  65536,  66049, 1.918e-04, 9.591e-02, 1.403e-03,           0.5169,           0.6565],
+    [  6, 262144, 263169, 4.796e-05, 4.797e-02, 3.518e-04,           3.2094,           3.8660]]
+
+...# Q2, adaptive refinement
+...#cycle  cells   dofs         L2         H1     Linfty  time (exclusive)  time (inclusive)
+data_q2_adaptive = [
+    [  0,     64,     289, 1.606e-01, 1.278e+00, 3.029e-01,           0.0023,           0.0023],
+    [  1,    121,     569, 7.916e-03, 5.257e-01, 4.857e-02,           0.0029,           0.0052],
+    [  2,    280,    1317, 1.092e-03, 1.165e-01, 4.832e-03,           0.0062,           0.0115],
+    [  3,    529,    2459, 5.999e-04, 5.177e-02, 1.873e-03,           0.0245,           0.0359],
+    [  4,   1015,    4719, 2.100e-04, 3.245e-02, 7.938e-04,           0.0556,           0.0915],
+    [  5,   1963,    9039, 7.821e-05, 1.990e-02, 7.261e-04,           0.0606,           0.1521],
+    [  6,   3727,   17143, 2.868e-05, 8.498e-03, 1.462e-04,           0.3220,           0.4741],
+    [  7,   7081,   32343, 1.146e-05, 4.360e-03, 8.576e-05,           0.6608,           1.1349],
+    [  8,  13525,   60895, 3.747e-06, 2.123e-03, 2.174e-05,           1.2863,           2.4212],
+    [  9,  25675,  119149, 1.770e-06, 1.419e-03, 1.685e-05,           3.1596,           5.5808],
+    [ 10,  48649,  223813, 7.563e-07, 7.145e-04, 8.908e-06,           7.6294,          13.2102],
+    [ 11,  92152,  420625, 3.207e-07, 3.726e-04, 2.413e-06,          17.2886,          30.4988],
+    [ 12, 174361,  801241, 1.394e-07, 2.344e-04, 1.503e-06,          42.8784,          73.3773],
+    [ 13, 329440, 1525936, 6.378e-08, 1.203e-04, 7.240e-07,         103.9731,         177.3504]]
+
+...# Q2, global refinement
+...#cycle  cells   dofs         L2         H1     Linfty  time (exclusive)  time (inclusive)
+data_q2_global = [
+    [  0,     64,     289, 1.606e-01, 1.278e+00, 3.029e-01,           0.0018,           0.0018],
+    [  1,    256,    1089, 7.638e-03, 5.248e-01, 4.816e-02,           0.0044,           0.0061],
+    [  2,   1024,    4225, 8.601e-04, 1.086e-01, 4.827e-03,           0.0277,           0.0339],
+    [  3,   4096,   16641, 1.107e-04, 2.756e-02, 7.804e-04,           0.1383,           0.1721],
+    [  4,  16384,   66049, 1.394e-05, 6.915e-03, 9.991e-05,           0.9730,           1.1451],
+    [  5,  65536,  263169, 1.761e-06, 1.730e-03, 1.245e-05,           6.6831,           7.8282],
+    [  6, 262144, 1050625, 2.563e-07, 4.327e-04, 1.636e-06,          44.0744,          51.9026]]
+
+
+...# Plot error as a function of the number of DoFs
+plt.title("Error as a function of the number of unknowns")
+plt.plot([d[2] for d in data_q1_adaptive],            # third column (counted from zero)
+         [d[3]/0.27135 for d in data_q1_adaptive],    # fourth column, divided by ||u||
+         "-*", label="Q1 element, adaptive mesh refinement")
+plt.plot([d[2] for d in data_q1_global],              # third column (counted from zero)
+         [d[3]/0.27135 for d in data_q1_global],      # fourth column, divided by ||u||
+         "-*", label="Q1 element, uniform mesh refinement")
+plt.plot([d[2] for d in data_q2_adaptive],            # third column (counted from zero)
+         [d[3]/0.27135 for d in data_q2_adaptive],    # fourth column, divided by ||u||
+         "-*", label="Q2 element, adaptive mesh refinement")
+plt.plot([d[2] for d in data_q2_global],              # third column (counted from zero)
+         [d[3]/0.27135 for d in data_q2_global],      # fourth column, divided by ||u||
+         "-*", label="Q2 element, uniform mesh refinement")
+
+plt.xlabel("Number of degrees of freedom")
+plt.ylabel("Relative L2 error ||u-uh||/||u||")
+plt.xscale("log")
+plt.yscale("log")
+plt.legend()
+
+plt.show()
+
+
+...# Plot error as a function of the mesh size
+plt.title("Error as a function of the mesh size")
+plt.plot([1/math.sqrt(d[1]) for d in data_q1_global],  # 1/sqrt(second column)
+         [d[3]/0.27135 for d in data_q1_global],
+         "-*", label="Q1 element, uniform mesh refinement")
+plt.plot([1/math.sqrt(d[1]) for d in data_q2_global],
+         [d[3]/0.27135 for d in data_q2_global],
+         "-*", label="Q2 element, uniform mesh refinement")
+
+plt.xlabel("Mesh size h")
+plt.ylabel("Relative L2 error ||u-uh||/||u||")
+plt.xscale("log")
+plt.yscale("log")
+plt.legend()
+
+plt.show()
+
+
+# Plot error as a function of the run time
+plt.title("Error as a function of run time")
+plt.plot([d[7] for d in data_q1_adaptive],            # inclusive time column
+         [d[3]/0.27135 for d in data_q1_adaptive],    # fourth column (counted from zero)
+         "-*", label="Q1 element, adaptive mesh refinement")
+plt.plot([d[6] for d in data_q1_global],              # exclusive time column
+         [d[3]/0.27135 for d in data_q1_global],      # fourth column (counted from zero)
+         "-*", label="Q1 element, uniform mesh refinement")
+plt.plot([d[7] for d in data_q2_adaptive],            # inclusive time column
+         [d[3]/0.27135 for d in data_q2_adaptive],    # fourth column (counted from zero)
+         "-*", label="Q2 element, adaptive mesh refinement")
+plt.plot([d[6] for d in data_q2_global],              # exclusive time column
+         [d[3]/0.27135 for d in data_q2_global],      # fourth column (counted from zero)
+         "-*", label="Q2 element, uniform mesh refinement")
+
+plt.xlabel("Run time")
+plt.ylabel("Relative L2 error ||u-uh||/||u||")
+plt.xscale("log")
+plt.yscale("log")
+plt.legend()
+
+plt.show()
+@endcode
+
+@note When showing run time in the figures below, it is useful to be
+clear about what that actually encompasses to fairly represent how
+long it takes to compute a data point. The way I've measured this is
+as follows: For uniform meshes, we could have just globally refined
+the mesh to a specific refinement level and then solve on it; as a
+consequence, the run time shown really only shows the time to set up,
+assemble, and solve the system *on the mesh for which the time is
+reported*. (The table captions in the Python program call this "time
+(exclusive)".) On the other hand, for adaptive meshes, one needs to
+first go through the coarser meshes, solve on them, refine the mesh,
+until one arrives at a specific adaptive mesh; thus, the run times
+shown for a specific mesh refinement level correspond to the time to
+solve on this mesh *and all previous meshes* (labeled "time
+(inclusive)"). Second, when we evaluate the run time of methods, we
+should think of these as "production runs" done once a program has
+been completely debugged. That is, we should run the program in
+"release mode", not the default "debug mode" -- see step-8 for more
+details. Finally, when discussing run times, it is useful to state
+what kind of machine these results were obtained on; here, it is a 2024
+laptop running a 13th generation Intel Core i9-13900H processor.
+
+With this program, we get the three figures, all representing
+cost-accuracy diagrams. First, a plot of the error as a function of
+the number of unknowns:
+
+<img src="https://dealii.org/images/steps/developer/step-7.cost-accuracy-dofs.png" alt="">
+
+The figure shows that (when measuring the cost in terms of
+$N_\text{dofs}$!) $Q_2$ elements are substantially better than $Q_1$
+elements because for the same number of unknowns, the error is much
+smaller for $Q_2$ elements than for $Q_1$ elements. For example, for the
+last $Q_1$ data point, the error for $Q_2$ is smaller by about a
+factor of 100x at that number of unknowns. Similarly, one can say that
+for a relative error of $10^{-3}$, one needs perhaps a factor of 20x fewer
+unknowns with $Q_2$ than with $Q_1$ elements. Similarly, adaptively
+refined meshes are always better than uniformly refined meshes.
+
+The second figure created by the program above shows the error as a
+function of mesh size. This is only useful for uniformly refined
+meshes because the mesh size is of course not the same for all cells
+of the adaptively refined meshes:
+
+<img src="https://dealii.org/images/steps/developer/step-7.cost-accuracy-h.png" alt="">
+
+Here, again, we see the superiority of the $Q_2$ element. The two
+lines represent the theoretical estimates that for $Q_1$, the $L_2$
+error should behave as $\|u-u_h\|_{L_2(\Omega)} \le C h^2$, and for
+the $Q_2$ element $\|u-u_h\|_{L_2(\Omega)} \le C h^3$. Indeed, we see can
+that a reduction of $h$ by a factor of 10 in the figure corresponds to
+reductions of the error by factors of around 100 and 1000,
+respectively, as predicted by theory.
+
+The final figure shows the error as a function of run time:
+
+<img src="https://dealii.org/images/steps/developer/step-7.cost-accuracy-run-time.png" alt="">
+
+This figure is more difficult to interpret. First, again, $Q_2$ is
+better than $Q_1$: For the same run time, we get substantially lower
+errors; or, equivalently, we can reach the same error in substantially
+less compute time. The surprise is perhaps that the adaptively refined
+meshes are not better than the uniform meshes as far as run time is
+concerned. (Though they are better in terms of memory consumption,
+because memory is proportional to the number of degrees of freedom
+shown above.) This is because (i) to compute on an adaptively refined
+mesh, you have to first solve on all previous meshes, and as explained
+above this time is included in the figure for the adaptively refined
+meshes; (ii) from a theoretical perspective, one can show that
+adaptive meshes are only *qualitatively* better than uniform meshes
+for solutions that are not smooth, whereas the solution we have chosen
+for the program here is $C^\infty$. The solutions of partial
+differential equations for *real* situations are not smooth, however,
+and so what you will see in other tutorial programs is that adaptive
+mesh refinement really *is* better in terms of run time as well.
+
+The cost-accuracy diagrams shown above allow us to compare the four
+methods in a quantitative way. But they also allow us to draw one
+other conclusion: The figures all credibly convey through their
+straight lines that with sufficient effort (measured in any of the
+three ways), we can make the error as small as we want (or need, based
+on engineering requirements). In other words, they illustrate that our
+method *converges* to the exact solution.
+
+
+
 <h3> Possibilities for extensions </h3>
 
 <h4> Higher order elements </h4>
@@ -285,39 +520,14 @@ will notice that assertions in several parts of the code will trigger (for
 example in the generation of the filename for the data output). You might have to address these,
 but it should not be very hard to get the program to work!
 
-<h4> Convergence comparison </h4>
+<h4> Better linear solvers </h4>
 
-Is $Q_1$ or $Q_2$ better? What about adaptive versus global refinement? A (somewhat
-unfair but typical) metric to compare them, is to look at the error as a
-function of the number of unknowns.
-
-To see this, create a plot in log-log style with the number of unknowns on the
-$x$ axis and the $L_2$ error on the $y$ axis. You can add reference lines for
-$h^2=N^{-1}$ and $h^3=N^{-3/2}$ and check that global and adaptive refinement
-follow those. If one makes the (not completely unreasonable)
-assumption that with a good linear solver, the computational effort is
-proportional to the number of unknowns $N$, then it is clear that an
-error reduction of ${\cal O}(N^{-3/2})$ is substantially better than a
-reduction of the form ${\cal O}(N^{-1})$: That is, that adaptive
-refinement gives us the desired error level with less computational
-work than if we used global refinement. This is not a particularly
-surprising conclusion, but it's worth checking these sorts of
-assumptions in practice.
-
-Of course, a fairer comparison would be to plot runtime (switch to
-release mode first!) instead of number of unknowns on the $x$ axis. If
-you plotted run time (check out the Timer class!) against the number
-of unknowns by timing each refinement step, you will notice that the
+If you carefully looked at the run time tables shown in the Python
+program above, you will have noticed that the
 linear system solver we use in this program is not perfect -- its run
 time grows faster than proportional to the linear system size -- and
 picking a better linear solver might be appropriate for this kind of
 comparison.
-
-To see how a comparison of this kind could work, take a look at
-@cite KronbichlerWall2018 , and specifically Figure 5
-that illustrates the error as a function of compute time for
-a number of polynomial degrees (as well as a number of different ways
-to discretize the equation used there).
 
 
 @anchor step_7-ResultsSection-bad-sign
