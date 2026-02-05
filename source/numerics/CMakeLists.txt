@@ -15,6 +15,7 @@
 set(_unity_include_src
   data_out.cc
   data_out_faces.cc
+  data_out_points.cc
   data_out_rotation.cc
   data_out_stack.cc
   data_postprocessor.cc
@@ -75,6 +76,7 @@ set(_inst
   data_out_dof_data_codim.inst.in
   data_out_faces.inst.in
   data_out.inst.in
+  data_out_points.inst.in
   data_out_resample.inst.in
   data_out_rotation.inst.in
   data_out_stack.inst.in

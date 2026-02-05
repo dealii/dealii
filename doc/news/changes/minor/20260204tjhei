@@ -1,0 +1,4 @@
+New: A new class DataOutPoints to produce graphical
+output in a set of points specified by the user.
+<br>
+(Timo Heister, 2026/02/04)
