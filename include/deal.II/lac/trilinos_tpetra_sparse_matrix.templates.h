@@ -218,9 +218,11 @@ namespace LinearAlgebra
         const size_type first_row = row_space_map->getMinGlobalIndex();
         const size_type last_row  = row_space_map->getMaxGlobalIndex() + 1;
 
-        Teuchos::Array<size_t> n_entries_per_row(last_row - first_row);
-        for (size_type row = first_row; row < last_row; ++row)
-          n_entries_per_row[row - first_row] = sparsity_pattern.row_length(row);
+        const auto row_global_indices = row_space_map->getMyGlobalIndices();
+        Teuchos::Array<size_t> n_entries_per_row(row_global_indices.size());
+        for (size_type row = 0; row < n_entries_per_row.size(); ++row)
+          n_entries_per_row[row] =
+            sparsity_pattern.row_length(row_global_indices[row]);
 
         // The deal.II notion of a 'sparsity pattern' corresponds to the
         // Tpetra concept of a 'graph'. Hence, we generate a graph by copying
@@ -852,7 +854,7 @@ namespace LinearAlgebra
     {
       Assert(d == 0, ExcScalarAssignmentOnlyForZeroValue());
 
-      if (compressed)
+      if (this->is_compressed())
         {
           matrix->resumeFill();
           compressed = false;
@@ -873,7 +875,7 @@ namespace LinearAlgebra
     SparseMatrix<Number, MemorySpace> &
     SparseMatrix<Number, MemorySpace>::operator*=(const Number a)
     {
-      if (compressed)
+      if (this->is_compressed())
         {
           matrix->resumeFill();
           compressed = false;
@@ -895,7 +897,7 @@ namespace LinearAlgebra
     {
       Assert(a != 0, ExcDivideByZero());
 
-      if (compressed)
+      if (this->is_compressed())
         {
           matrix->resumeFill();
           compressed = false;
@@ -1023,7 +1025,7 @@ namespace LinearAlgebra
 
       // If the matrix is marked as compressed, we need to
       // call resumeFill() first.
-      if (compressed || matrix->isFillComplete())
+      if (this->is_compressed() || matrix->isFillComplete())
         {
           matrix->resumeFill();
           compressed = false;
@@ -1123,7 +1125,7 @@ namespace LinearAlgebra
 
       // If the matrix is marked as compressed, we need to
       // call resumeFill() first.
-      if (compressed || matrix->isFillComplete())
+      if (this->is_compressed() || matrix->isFillComplete())
         {
           matrix->resumeFill();
           compressed = false;
@@ -1232,7 +1234,7 @@ namespace LinearAlgebra
     {
       // If the matrix is marked as compressed, we need to
       // call resumeFill() first.
-      if (compressed || matrix->isFillComplete())
+      if (this->is_compressed() || matrix->isFillComplete())
         {
           matrix->resumeFill();
           compressed = false;
@@ -1440,7 +1442,10 @@ namespace LinearAlgebra
     void
     SparseMatrix<Number, MemorySpace>::compress(VectorOperation::values)
     {
-      if (!compressed)
+      // We can't use fillComplete multiple times in a row, so we need to know
+      // if any process has changed matrix entries
+      if (!dealii::Utilities::MPI::logical_or(compressed,
+                                              this->get_mpi_communicator()))
         {
           matrix->fillComplete(column_space_map, matrix->getRowMap());
           compressed = true;
@@ -1453,7 +1458,7 @@ namespace LinearAlgebra
     void
     SparseMatrix<Number, MemorySpace>::resume_fill()
     {
-      if (compressed)
+      if (this->is_compressed())
         {
           matrix->resumeFill();
           compressed = false;
