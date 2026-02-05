@@ -5806,6 +5806,11 @@ namespace internal
             subcells[i]->set_manifold_id(cell->manifold_id());
             subcells[i]->set_subdomain_id(subdomainid);
 
+            // We only store the parent for every second cell. That's because
+            // cells are created during refinement in multiples of two, and so
+            // two successive cells always share the same parent. As a
+            // consequence, we can save a bit of work by skipping setting parent
+            // indices for the odd children.
             if (i % 2 == 0)
               subcells[i]->set_parent(cell->index());
           }
@@ -6231,6 +6236,11 @@ namespace internal
                 subcells[i]->set_combined_face_orientation(
                   face_no, inherited_orientations[child_lines[i][face_no]]);
 
+              // We only store the parent for every second cell. That's because
+              // cells are created during refinement in multiples of two, and so
+              // two successive cells always share the same parent. As a
+              // consequence, we can save a bit of work by skipping setting
+              // parent indices for the odd children.
               if (i % 2 == 0)
                 subcells[i]->set_parent(cell->index());
             }
@@ -6430,6 +6440,11 @@ namespace internal
                   if (dim == spacedim - 1)
                     first_child->set_direction_flag(cell->direction_flag());
 
+                  // We only store the parent for every second cell. That's
+                  // because cells are created during refinement in multiples of
+                  // two, and so two successive cells always share the same
+                  // parent. As a consequence, we can save a bit of work by
+                  // skipping setting parent indices for the second child.
                   first_child->set_parent(cell->index());
 
                   // Set manifold id of the right face. Only do this
@@ -7595,9 +7610,13 @@ namespace internal
                       new_cell->set_manifold_id(cell->manifold_id());
                       new_cell->set_subdomain_id(cell->subdomain_id());
 
-                      // Why every other? See
-                      // TriangulationImplementation::TriaLevel::parents
-                      if (i % 2)
+                      // We only store the parent for every second cell. That's
+                      // because cells are created during refinement in
+                      // multiples of two, and so two successive cells always
+                      // share the same parent. As a consequence, we can save a
+                      // bit of work by skipping setting parent indices for the
+                      // odd children.
+                      if (i % 2 == 0)
                         new_cell->set_parent(cell->index());
 
                       // set the orientation flag to its default state for all
@@ -9813,8 +9832,13 @@ namespace internal
                       new_hexes[i]->set_manifold_id(hex->manifold_id());
                       new_hexes[i]->set_subdomain_id(subdomainid);
 
-                      if (i % 2)
+                      // We only store the parent for every second cell. That's
+                      // because cells are created during refinement in
+                      // multiples of two, and so two successive cells always
+                      // share the same parent.
+                      if (i % 2 == 0)
                         new_hexes[i]->set_parent(hex->index());
+
                       // set the face_orientation flag to true for all
                       // faces initially, as this is the default value
                       // which is true for all faces interior to the
