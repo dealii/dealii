@@ -267,11 +267,19 @@ namespace Utilities
 
         /**
          * Return local view of the processed cell @p cell for the vector @p values.
+         *
+         * The number of components @p n_components needs to match the template argument
+         * of the same name supplied to process_and_evaluate().
+         *
+         * For more than one component, the returned ArrayView has one entry for
+         * each component for each data point and all components for each point
+         * are stored consecutively.
          */
         template <typename DataType>
         ArrayView<DataType>
         get_data_view(const unsigned int         cell,
-                      const ArrayView<DataType> &values) const;
+                      const ArrayView<DataType> &values,
+                      const unsigned int         n_components = 1) const;
 
         /**
          * Level and index of processed cells.
@@ -731,11 +739,21 @@ namespace Utilities
     ArrayView<DataType>
     RemotePointEvaluation<dim, spacedim>::CellData::get_data_view(
       const unsigned int         cell,
-      const ArrayView<DataType> &values) const
+      const ArrayView<DataType> &values,
+      const unsigned int         n_components) const
     {
       AssertIndexRange(cell, cells.size());
-      return {values.data() + reference_point_ptrs[cell],
-              reference_point_ptrs[cell + 1] - reference_point_ptrs[cell]};
+      Assert(n_components > 0,
+             ExcMessage("The number of components needs to be positive!"));
+
+      Assert(
+        values.size() == n_components * reference_point_ptrs[cells.size()],
+        ExcMessage(
+          "The size of values is incorrect. One value per component needs to be provided!"));
+
+      return {values.data() + n_components * reference_point_ptrs[cell],
+              n_components *
+                (reference_point_ptrs[cell + 1] - reference_point_ptrs[cell])};
     }
 
 
