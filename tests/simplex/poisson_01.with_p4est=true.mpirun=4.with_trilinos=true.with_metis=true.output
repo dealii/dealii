@@ -21,5 +21,5 @@ DEAL::Solver stopped within 194 - 198 iterations
 DEAL::
 DEAL::Solve problem on PYRAMID mesh:
 DEAL::   on parallel::fullydistributed::Triangulation
-DEAL::Solver stopped within 81 - 85 iterations
+DEAL::Solver stopped within 241 - 243 iterations
 DEAL::

@@ -83,7 +83,7 @@ test(const unsigned int v, const unsigned int degree)
       GridGenerator::subdivided_hyper_cube_with_pyramids(tria,
                                                          dim == 2 ? 16 : 8);
       fe         = std::make_shared<FE_PyramidP<dim>>(degree);
-      quad       = std::make_shared<QGaussPyramid<dim>>(degree + 1);
+      quad       = std::make_shared<QGaussPyramid<dim>>(2);
       fe_mapping = std::make_shared<FE_PyramidP<dim>>(1);
       face_quad  = hp::QCollection<dim - 1>{QGauss<dim - 1>(degree + 1),
                                             QGaussSimplex<dim - 1>(degree + 1),
@@ -227,9 +227,7 @@ main(int argc, char **argv)
         }
 
       test<3>(i, /*degree=*/1);
-
-      if (i != 2) // for pyramids: no quadratic elements implemented
-        test<3>(i, /*degree=*/2);
+      test<3>(i, /*degree=*/2);
 
       deallog.pop();
     }
