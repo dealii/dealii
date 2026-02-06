@@ -179,7 +179,7 @@ The ghost penalty acts on these faces and reads
 @f}
 where $g_F$ is the face-wise ghost penalty:
 @f{equation*}{
-  g_F(u_h, v_h) = \gamma_A \sum_{k=0}^p \left(\frac{h_F^{2k-1}}{k!^2}[\partial_n^k u_h], [\partial_n^k v_h] \right)_F.
+  g_F(u_h, v_h) = \gamma_A \sum_{k=1}^p \left(\frac{h_F^{2k-1}}{k!^2}[\partial_n^k u_h], [\partial_n^k v_h] \right)_F.
 @f}
 Here, $\gamma_A$ is a penalty parameter and $h_F$ is some measure of the face size.
 We see that $g_F$ penalizes the jumps in the face-normal derivatives, $\partial_n^k$,
