@@ -62,9 +62,9 @@ DEAL_II_NAMESPACE_OPEN
  * std::vector<Point<dim>> points;
  * // [Fill points with data on each rank]
  * DataOutPoints<dim> data_out;
- * const auto offset_pair =
+ * const std::pair<std::size_t,std::size_t> offset_and_total =
  * Utilities::MPI::partial_and_total_sum(locations.size(), MPI_COMM_WORLD);
- * data_out.build_patches(points, offset_pair.first);
+ * data_out.build_patches(points, offset_and_total.first);
  * data_out.write_vtu_in_parallel("output.vtu", MPI_COMM_WORLD);
  * @endcode
  *
@@ -73,17 +73,6 @@ template <int dim, int spacedim = dim>
 class DataOutPoints : public dealii::DataOutInterface<0, spacedim>
 {
 public:
-  /**
-   * Default constructor.
-   */
-  DataOutPoints() = default;
-
-  /**
-   * Default destructor.
-   */
-  ~DataOutPoints() = default;
-
-
   /**
    * Build the patches for a given set of points and optionally data in each
    * point.
