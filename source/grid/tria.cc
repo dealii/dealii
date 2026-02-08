@@ -3282,8 +3282,9 @@ namespace internal
               connectivity.entity_to_entities(1, 0);
             const unsigned int n_lines = lines_to_vertices.size();
 
-            // allocate memory
-            reserve_space_(lines_0, n_lines);
+            lines_0.allocate(n_lines,
+                             ReferenceCells::max_n_children<1>(),
+                             ReferenceCells::max_n_faces<1>());
 
             // loop over lines
             for (unsigned int line = 0; line < n_lines; ++line)
@@ -3305,8 +3306,9 @@ namespace internal
             const auto &quads_to_lines = connectivity.entity_to_entities(2, 1);
             const unsigned int n_quads = quads_to_lines.size();
 
-            // allocate memory
-            reserve_space_(quads_0, n_quads);
+            quads_0.allocate(n_quads,
+                             ReferenceCells::max_n_children<2>(),
+                             ReferenceCells::max_n_faces<2>());
             reserve_space_(faces, 2 /*structdim*/, n_quads);
 
             // loop over all quads -> entity type, line indices/orientations
@@ -3375,8 +3377,9 @@ namespace internal
                   }
             }
 
-          // allocate memory
-          reserve_space_(cells_0, n_cell);
+          cells_0.allocate(n_cell,
+                           ReferenceCells::max_n_children<dim>(),
+                           ReferenceCells::max_n_faces<dim>());
           reserve_space_(level, spacedim, n_cell, orientation_needed);
 
           // loop over all cells
@@ -3669,44 +3672,6 @@ namespace internal
         level.global_level_cell_indices.assign(size,
                                                numbers::invalid_dof_index);
       }
-
-
-
-      static void
-      reserve_space_(TriaObjects &obj, const unsigned int size)
-      {
-        const unsigned int structdim = obj.structdim;
-
-        const unsigned int max_children_per_cell = 1 << structdim;
-
-        obj.used.assign(size, true);
-        obj.boundary_or_material_id.assign(
-          size,
-          internal::TriangulationImplementation::TriaObjects::
-            BoundaryOrMaterialId());
-        obj.manifold_id.assign(size, -1);
-        obj.user_flags.assign(size, false);
-        obj.user_data.resize(size);
-
-        if (structdim > 1) // TODO: why?
-          obj.refinement_cases.assign(size, 0);
-
-        obj.children.assign(max_children_per_cell / 2 * size, -1);
-
-        obj.cells.assign(size * max_n_faces(structdim), -1);
-
-        if (structdim <= 2)
-          {
-            obj.next_free_single               = size - 1;
-            obj.next_free_pair                 = 0;
-            obj.reverse_order_next_free_single = true;
-          }
-        else
-          {
-            obj.next_free_single = obj.next_free_pair = 0;
-          }
-      }
-
 
       /**
        * Actually delete a cell, or rather all

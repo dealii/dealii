@@ -61,6 +61,42 @@ namespace internal
     }
 
 
+
+    void
+    TriaObjects::allocate(const std::size_t  n_objects,
+                          const unsigned int children_per_object,
+                          const unsigned int faces_per_object)
+    {
+      used.assign(n_objects, true);
+      boundary_or_material_id.assign(n_objects, BoundaryOrMaterialId());
+      manifold_id.assign(n_objects, -1);
+      user_flags.assign(n_objects, false);
+      user_data.resize(n_objects);
+
+      // Lines can only be refined in one way so, in that case, we don't need to
+      // store a field indicating which type of refinement to use per object
+      if (structdim > 1)
+        refinement_cases.assign(n_objects, 0);
+
+      Assert(children_per_object % 2 == 0, ExcNotImplemented());
+      children.assign(children_per_object / 2 * n_objects, -1);
+
+      cells.assign(n_objects * faces_per_object, -1);
+
+      if (structdim <= 2)
+        {
+          next_free_single               = n_objects - 1;
+          next_free_pair                 = 0;
+          reverse_order_next_free_single = true;
+        }
+      else
+        {
+          next_free_single = next_free_pair = 0;
+        }
+    }
+
+
+
     std::size_t
     TriaObjects::memory_consumption() const
     {

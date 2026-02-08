@@ -62,11 +62,32 @@ namespace internal
        */
       TriaObjects(const unsigned int structdim);
 
+      /**
+       * Resize all internal arrays and populate with default values.
+       *
+       * @param[in] n_objects Total number of objects this object
+       *            should store.
+       *
+       * @param[in] children_per_object Number of children to store for each
+       *            object.
+       *
+       * @param[in] faces_per_object Number of faces (i.e., neighbors) to store
+       *            for each object.
+       */
+      void
+      allocate(const std::size_t  n_objects,
+               const unsigned int children_per_object,
+               const unsigned int faces_per_object);
+
       unsigned int structdim;
 
       /**
        * Vector of the objects belonging to this level. The index of the
        * object equals the index in this container.
+       *
+       * @note In this context, "cells" means "geometric entities bounded by
+       * other geometric entities": for example, TriaFaces::quads stores quads
+       * (structdim 2 objects) which are bounded by lines.
        */
       std::vector<int> cells;
 
