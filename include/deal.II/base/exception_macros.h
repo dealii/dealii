@@ -68,13 +68,16 @@
  *
  * @ingroup Exceptions
  */
+// We explicitly assign msg to arg (instead of using the member initializer list
+// syntax) to work around a bug in nvcc 13.1 and earlier when using C++20.
 #  define DeclExceptionMsg(Exception, defaulttext)    \
     class Exception : public dealii::ExceptionBase    \
     {                                                 \
     public:                                           \
       Exception(const std::string &msg = defaulttext) \
-        : arg(msg)                                    \
-      {}                                              \
+      {                                               \
+        arg = msg;                                    \
+      }                                               \
       virtual ~Exception() noexcept                   \
       {}                                              \
       virtual void                                    \
@@ -84,7 +87,7 @@
       }                                               \
                                                       \
     private:                                          \
-      const std::string arg;                          \
+      std::string arg;                                \
     }
 
 /**
