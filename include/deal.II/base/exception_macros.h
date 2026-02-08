@@ -68,8 +68,8 @@
  *
  * @ingroup Exceptions
  */
-// We explicit assign msg to arg to workaround a bug in nvcc 13.1 and earlier
-// when using C++20.
+// We explicitly assign msg to arg (instead of using the member initializer list
+// syntax) to work around a bug in nvcc 13.1 and earlier when using C++20.
 #  define DeclExceptionMsg(Exception, defaulttext)    \
     class Exception : public dealii::ExceptionBase    \
     {                                                 \
