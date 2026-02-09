@@ -15,15 +15,16 @@
 // tests DataOut with more MPI ranks than cells / patches and writing
 // a TrilinosWrappers::Vector
 
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/distributed/tria.h>
 
-#include <deal.II/fe/fe_system.h>
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
+
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/distributed/tria.h>
 
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 
@@ -68,9 +69,9 @@ test()
   stokes_relevant_partitioning.push_back(
     stokes_locally_relevant_set.get_view(0, n_u));
 
-  TrilinosWrappers::MPI::Vector v(stokes_partitioning[0], 
-    stokes_relevant_partitioning[0],
-    tria.get_mpi_communicator());
+  TrilinosWrappers::MPI::Vector v(stokes_partitioning[0],
+                                  stokes_relevant_partitioning[0],
+                                  tria.get_mpi_communicator());
 
   DataOut<dim> data_out;
   data_out.add_data_vector(dof_handler, v, "linear");
