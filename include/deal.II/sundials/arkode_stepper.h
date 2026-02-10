@@ -80,9 +80,9 @@ namespace SUNDIALS
      *
      * @param t0 Time instance that serves as starting time
      * @param y0 Initial state vector whose layout is used for initialization of
-     * the internal ARKODE vectors
+     *   the internal ARKODE vectors
      * @param inv_ctx Invocation context that provides access to the SUNContext
-     * object and the exception pointer managed by the caller
+     *   object and the exception pointer managed by the caller
      */
     virtual void
     reinit(double                      t0,
@@ -861,18 +861,25 @@ namespace SUNDIALS
     /**
      * Set up the (non)linear solver and preconditioners in the ARKODE memory
      * object based on the user-specified functions.
+     *
      * @param solution The solution vector which is used as a template to create
      *   new vectors.
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
      */
     void
     setup_system_solver(const VectorType           &solution,
                         internal::InvocationContext inv_ctx);
 
     /**
-     * Set up the solver and preconditioner for a non-identity @ref GlossMassMatrix "mass matrix" in
-     * the ARKODE memory object based on the user-specified functions.
+     * Set up the solver and preconditioner for a non-identity @ref GlossMassMatrix
+     * "mass matrix" in the ARKODE memory object based on the user-specified
+     * functions.
+     *
      * @param solution The solution vector which is used as a template to create
      *   new vectors.
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
      */
     void
     setup_mass_solver(const VectorType           &solution,

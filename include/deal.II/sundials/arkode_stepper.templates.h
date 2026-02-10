@@ -31,8 +31,6 @@
 #  include <deal.II/sundials/utilities.h>
 
 #  include <arkode/arkode_arkstep.h>
-#  include <arkode/arkode_erkstep.h>
-#  include <arkode/arkode_lsrkstep.h>
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
 

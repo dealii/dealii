@@ -99,7 +99,7 @@ namespace SUNDIALS
     AssertARKode(status);
 #  endif
 
-    // Set up the proxy objects to provide backwards compatibiltiy with the old
+    // Set up the proxy objects to provide backwards compatibility with the old
     // interface
     auto ark_stepper =
       std::dynamic_pointer_cast<ARKStepper<VectorType>>(stepper);
