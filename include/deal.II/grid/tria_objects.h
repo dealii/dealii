@@ -79,6 +79,30 @@ namespace internal
                const unsigned int children_per_object,
                const unsigned int faces_per_object);
 
+      /**
+       * Allocate space at the end of each array for new objects and populate
+       * the new values with default values.
+       *
+       * @param[in] new_objects_in_pairs Number of new objects which should
+       *            be added as pairs.
+       *
+       * @param[in] new_objects_single Number of new objects which should be
+       *            added alone (i.e., not in pairs). For example, in 2d refined
+       *            lines have to be stored in pairs, whereas new lines in the
+       *            interior of refined cells can be stored as single lines.
+       *
+       * @param[in] children_per_object Number of children to store for each
+       *            object.
+       *
+       * @param[in] faces_per_object Number of faces (i.e., neighbors) to store
+       *            for each object.
+       */
+      void
+      allocate_end(const unsigned int new_objects_in_pairs,
+                   const unsigned int new_objects_single,
+                   const unsigned int children_per_object,
+                   const unsigned int faces_per_object);
+
       unsigned int structdim;
 
       /**

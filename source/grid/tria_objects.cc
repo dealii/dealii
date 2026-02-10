@@ -97,6 +97,166 @@ namespace internal
 
 
 
+    void
+    TriaObjects::allocate_end(const unsigned int new_objects_in_pairs,
+                              const unsigned int new_objects_single,
+                              const unsigned int children_per_object,
+                              const unsigned int faces_per_object)
+    {
+      if (structdim <= 2)
+        {
+          Assert(new_objects_in_pairs % 2 == 0, ExcInternalError());
+
+          next_free_single               = 0;
+          next_free_pair                 = 0;
+          reverse_order_next_free_single = false;
+
+          // count the number of objects, of unused single objects and of
+          // unused pairs of objects
+          unsigned int n_objects        = 0;
+          unsigned int n_unused_pairs   = 0;
+          unsigned int n_unused_singles = 0;
+          for (unsigned int i = 0; i < used.size(); ++i)
+            {
+              if (used[i])
+                ++n_objects;
+              else if (i + 1 < used.size())
+                {
+                  if (used[i + 1])
+                    {
+                      ++n_unused_singles;
+                      if (next_free_single == 0)
+                        next_free_single = i;
+                    }
+                  else
+                    {
+                      ++n_unused_pairs;
+                      if (next_free_pair == 0)
+                        next_free_pair = i;
+                      ++i;
+                    }
+                }
+              else
+                ++n_unused_singles;
+            }
+          Assert(n_objects + 2 * n_unused_pairs + n_unused_singles ==
+                   used.size(),
+                 ExcInternalError());
+
+          // how many single objects are needed in addition to
+          // n_unused_objects?
+          const int additional_single_objects =
+            new_objects_single - n_unused_singles;
+
+          unsigned int new_size =
+            used.size() + new_objects_in_pairs - 2 * n_unused_pairs;
+          if (additional_single_objects > 0)
+            new_size += additional_single_objects;
+
+          // only allocate space if necessary
+          if (new_size > this->n_objects())
+            {
+              cells.reserve(new_size * faces_per_object);
+              cells.insert(cells.end(),
+                           (new_size - this->n_objects()) * faces_per_object,
+                           -1);
+
+              used.reserve(new_size);
+              used.insert(used.end(), new_size - used.size(), false);
+
+              user_flags.reserve(new_size);
+              user_flags.insert(user_flags.end(),
+                                new_size - user_flags.size(),
+                                false);
+
+              const unsigned int factor = children_per_object / 2;
+              children.reserve(factor * new_size);
+              children.insert(children.end(),
+                              factor * new_size - children.size(),
+                              -1);
+
+              if (structdim > 1)
+                {
+                  refinement_cases.reserve(new_size);
+                  refinement_cases.insert(refinement_cases.end(),
+                                          new_size - refinement_cases.size(),
+                                          /*RefinementCase::no_refinement=*/0);
+                }
+
+              // first reserve, then resize. Otherwise the std library can
+              // decide to allocate more entries.
+              boundary_or_material_id.reserve(new_size);
+              boundary_or_material_id.resize(new_size);
+
+              user_data.reserve(new_size);
+              user_data.resize(new_size);
+
+              manifold_id.reserve(new_size);
+              manifold_id.insert(manifold_id.end(),
+                                 new_size - manifold_id.size(),
+                                 numbers::flat_manifold_id);
+            }
+
+          if (n_unused_singles == 0)
+            {
+              next_free_single               = new_size - 1;
+              reverse_order_next_free_single = true;
+            }
+        }
+      else
+        {
+          const unsigned int new_hexes = new_objects_in_pairs;
+
+          const unsigned int new_size =
+            new_hexes + std::count(used.begin(), used.end(), true);
+
+          // see above...
+          if (new_size > this->n_objects())
+            {
+              cells.reserve(new_size * faces_per_object);
+              cells.insert(cells.end(),
+                           (new_size - this->n_objects()) * faces_per_object,
+                           -1);
+
+              used.reserve(new_size);
+              used.insert(used.end(), new_size - used.size(), false);
+
+              user_flags.reserve(new_size);
+              user_flags.insert(user_flags.end(),
+                                new_size - user_flags.size(),
+                                false);
+
+              children.reserve(4 * new_size);
+              children.insert(children.end(),
+                              4 * new_size - children.size(),
+                              -1);
+
+              // for the following fields, we know exactly how many elements
+              // we need, so first reserve then resize (resize itself, at least
+              // with some compiler libraries, appears to round up the size it
+              // actually reserves)
+              boundary_or_material_id.reserve(new_size);
+              boundary_or_material_id.resize(new_size);
+
+              manifold_id.reserve(new_size);
+              manifold_id.insert(manifold_id.end(),
+                                 new_size - manifold_id.size(),
+                                 numbers::flat_manifold_id);
+
+              user_data.reserve(new_size);
+              user_data.resize(new_size);
+
+              refinement_cases.reserve(new_size);
+              refinement_cases.insert(refinement_cases.end(),
+                                      new_size - refinement_cases.size(),
+                                      /*RefinementCase::no_refinement=*/0);
+            }
+          next_free_single = next_free_pair = 0;
+        }
+    }
+
+
+
     std::size_t
     TriaObjects::memory_consumption() const
     {
