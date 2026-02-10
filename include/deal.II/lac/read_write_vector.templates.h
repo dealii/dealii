@@ -229,9 +229,6 @@ namespace LinearAlgebra
           // block-local numbering
           const IndexSet block_local = stored.get_view(b0, b1);
 
-          if (block_local.n_elements() == 0)
-            continue;
-
           ReadWriteVector<Number> tmp(block_local);
 
           // Per-block import: relies on existing import_elements() overloads
