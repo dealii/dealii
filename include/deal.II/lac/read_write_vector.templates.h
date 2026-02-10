@@ -101,10 +101,16 @@ namespace LinearAlgebra
         const VectorOperation::values /*operation*/,
         ::dealii::LinearAlgebra::ReadWriteVector<Number> & /*rw_vector*/)
       {
+        // We should only get into this general template if neither
+        // of the specializations below triggers (namely, if the
+        // MemorySpace argument is not either Host or Default).
+        // If that's the case, just prevent compilation.
         static_assert(
           std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
             std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
-          "MemorySpace should be Host or Default");
+          "MemorySpace should be Host or Default, which then reaches "
+          "specializations of this function.");
+        DEAL_II_ASSERT_UNREACHABLE();
       }
     };
 
