@@ -90,123 +90,97 @@ namespace LinearAlgebra
 
 
 
-    template <typename Number, typename MemorySpace>
-    struct read_write_vector_functions
-    {
-      static void
-      import_elements(
-        const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-          & /*communication_pattern*/,
-        const Number * /*values*/,
-        const VectorOperation::values /*operation*/,
-        ::dealii::LinearAlgebra::ReadWriteVector<Number> & /*rw_vector*/)
-      {
-        // We should only get into this general template if neither
-        // of the specializations below triggers (namely, if the
-        // MemorySpace argument is not either Host or Default).
-        // If that's the case, just prevent compilation.
-        static_assert(
-          std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
-            std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
-          "MemorySpace should be Host or Default, which then reaches "
-          "specializations of this function.");
-        DEAL_II_ASSERT_UNREACHABLE();
-      }
-    };
-
-
-
-    template <typename Number>
-    struct read_write_vector_functions<Number, ::dealii::MemorySpace::Host>
+    template <typename MemorySpace, typename Number>
+    void
+    import_elements(
+      const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
+                                                       &communication_pattern,
+      const Number                                     *values,
+      const VectorOperation::values                     operation,
+      ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
     {
       using size_type = types::global_dof_index;
 
+      if constexpr (std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host>)
+        {
+          distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
+            communication_pattern);
 
-      static void
-      import_elements(
-        const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-                                                         &communication_pattern,
-        const Number                                     *values,
-        const VectorOperation::values                     operation,
-        ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
-      {
-        distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
-          communication_pattern);
+          const unsigned int n_elements =
+            communication_pattern->locally_owned_size();
+          std::copy(values, values + n_elements, tmp_vector.begin());
+          tmp_vector.update_ghost_values();
 
-        const unsigned int n_elements =
-          communication_pattern->locally_owned_size();
-        std::copy(values, values + n_elements, tmp_vector.begin());
-        tmp_vector.update_ghost_values();
+          const IndexSet &stored = rw_vector.get_stored_elements();
+          if (operation == VectorOperation::add)
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) +=
+                tmp_vector(stored.nth_index_in_set(i));
+          else if (operation == VectorOperation::min)
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) =
+                get_min(tmp_vector(stored.nth_index_in_set(i)),
+                        rw_vector.local_element(i));
+          else if (operation == VectorOperation::max)
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) =
+                get_max(tmp_vector(stored.nth_index_in_set(i)),
+                        rw_vector.local_element(i));
+          else
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) =
+                tmp_vector(stored.nth_index_in_set(i));
+        }
+      else if constexpr (std::is_same_v<MemorySpace,
+                                        ::dealii::MemorySpace::Default>)
+        {
+          distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
+            communication_pattern);
 
-        const IndexSet &stored = rw_vector.get_stored_elements();
-        if (operation == VectorOperation::add)
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) +=
-              tmp_vector(stored.nth_index_in_set(i));
-        else if (operation == VectorOperation::min)
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) =
-              get_min(tmp_vector(stored.nth_index_in_set(i)),
-                      rw_vector.local_element(i));
-        else if (operation == VectorOperation::max)
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) =
-              get_max(tmp_vector(stored.nth_index_in_set(i)),
-                      rw_vector.local_element(i));
-        else
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
-      }
-    };
+          const unsigned int n_elements =
+            communication_pattern->locally_owned_size();
+          Kokkos::deep_copy(
+            Kokkos::View<Number *, Kokkos::HostSpace>(tmp_vector.begin(),
+                                                      n_elements),
+            Kokkos::View<const Number *,
+                         ::dealii::MemorySpace::Default::kokkos_space>(
+              values, n_elements));
+          tmp_vector.update_ghost_values();
 
-
-
-    template <typename Number>
-    struct read_write_vector_functions<Number, ::dealii::MemorySpace::Default>
-    {
-      using size_type = types::global_dof_index;
-
-      static void
-      import_elements(
-        const std::shared_ptr<const ::dealii::Utilities::MPI::Partitioner>
-                                                         &communication_pattern,
-        const Number                                     *values,
-        const VectorOperation::values                     operation,
-        ::dealii::LinearAlgebra::ReadWriteVector<Number> &rw_vector)
-      {
-        distributed::Vector<Number, ::dealii::MemorySpace::Host> tmp_vector(
-          communication_pattern);
-
-        const unsigned int n_elements =
-          communication_pattern->locally_owned_size();
-        Kokkos::deep_copy(
-          Kokkos::View<Number *, Kokkos::HostSpace>(tmp_vector.begin(),
-                                                    n_elements),
-          Kokkos::View<const Number *,
-                       ::dealii::MemorySpace::Default::kokkos_space>(
-            values, n_elements));
-        tmp_vector.update_ghost_values();
-
-        const IndexSet &stored = rw_vector.get_stored_elements();
-        if (operation == VectorOperation::add)
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) +=
-              tmp_vector(stored.nth_index_in_set(i));
-        else if (operation == VectorOperation::min)
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) =
-              get_min(tmp_vector(stored.nth_index_in_set(i)),
-                      rw_vector.local_element(i));
-        else if (operation == VectorOperation::max)
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) =
-              get_max(tmp_vector(stored.nth_index_in_set(i)),
-                      rw_vector.local_element(i));
-        else
-          for (size_type i = 0; i < stored.n_elements(); ++i)
-            rw_vector.local_element(i) = tmp_vector(stored.nth_index_in_set(i));
-      }
-    };
+          const IndexSet &stored = rw_vector.get_stored_elements();
+          if (operation == VectorOperation::add)
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) +=
+                tmp_vector(stored.nth_index_in_set(i));
+          else if (operation == VectorOperation::min)
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) =
+                get_min(tmp_vector(stored.nth_index_in_set(i)),
+                        rw_vector.local_element(i));
+          else if (operation == VectorOperation::max)
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) =
+                get_max(tmp_vector(stored.nth_index_in_set(i)),
+                        rw_vector.local_element(i));
+          else
+            for (size_type i = 0; i < stored.n_elements(); ++i)
+              rw_vector.local_element(i) =
+                tmp_vector(stored.nth_index_in_set(i));
+        }
+      else
+        {
+          // We should only get into this general 'else' case if neither
+          // of the special cases above triggers (namely, if the
+          // MemorySpace argument is not either Host or Default).
+          // If that's the case, just prevent compilation.
+          static_assert(
+            std::is_same_v<MemorySpace, ::dealii::MemorySpace::Host> ||
+              std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default>,
+            "MemorySpace should be Host or Default, which then reaches "
+            "specializations of this function.");
+          DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
 
 
 
@@ -482,8 +456,10 @@ namespace LinearAlgebra
       }
 
 
-    internal::read_write_vector_functions<Number, MemorySpace>::import_elements(
-      comm_pattern, vec.begin(), operation, *this);
+    internal::import_elements<MemorySpace>(comm_pattern,
+                                           vec.begin(),
+                                           operation,
+                                           *this);
   }
 
 
@@ -576,8 +552,10 @@ namespace LinearAlgebra
     AssertThrow(ierr == 0, ExcPETScError(ierr));
 
     // Do the actual MPI exchange + apply operation into *this*
-    internal::read_write_vector_functions<Number, ::dealii::MemorySpace::Host>::
-      import_elements(comm_pattern, owned_values.data(), operation, *this);
+    internal::import_elements<::dealii::MemorySpace::Host>(comm_pattern,
+                                                           owned_values.data(),
+                                                           operation,
+                                                           *this);
   }
 
   template <typename Number>
