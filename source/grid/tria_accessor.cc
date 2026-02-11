@@ -2262,6 +2262,10 @@ CellAccessor<dim, spacedim>::set_parent(const unsigned int parent_index)
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
+
+  // We only store the parent for every second cell. That's because cells are
+  // created during refinement in multiples of two, and so two successive
+  // cells always share the same parent.
   this->tria->levels[this->present_level]->parents[this->present_index / 2] =
     parent_index;
 }
@@ -2274,9 +2278,9 @@ CellAccessor<dim, spacedim>::parent_index() const
 {
   Assert(this->present_level > 0, TriaAccessorExceptions::ExcCellHasNoParent());
 
-  // the parent of two consecutive cells
-  // is stored only once, since it is
-  // the same
+  // We only store the parent for every second cell. That's because cells are
+  // created during refinement in multiples of two, and so two successive
+  // cells always share the same parent.
   return this->tria->levels[this->present_level]
     ->parents[this->present_index / 2];
 }
