@@ -1,0 +1,14 @@
+427d426
+<     data_out.write_vtu_in_parallel("example_1.vtu", MPI_COMM_WORLD);
+657d655
+<     data_out.write_vtu_in_parallel("example_2.vtu", MPI_COMM_WORLD);
+1031,1034d1028
+<             data_out_background.write_vtu_in_parallel("example_3_background_" +
+<                                                         std::to_string(it) +
+<                                                         ".vtu",
+<                                                       MPI_COMM_WORLD);
+1040,1043d1033
+<             data_out_immersed.write_vtu_in_parallel("example_3_immersed_" +
+<                                                       std::to_string(it) +
+<                                                       ".vtu",
+<                                                     MPI_COMM_WORLD);
