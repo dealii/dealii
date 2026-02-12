@@ -101,8 +101,8 @@ namespace LinearAlgebra
           nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
                                                           Teuchos::Copy);
-          nonlocal_entries = V.nonlocal_entries;
         }
+      nonlocal_entries = V.nonlocal_entries;
     }
 
 
@@ -126,6 +126,7 @@ namespace LinearAlgebra
                TpetraTypes::VectorType<Number, MemorySpace>>(
           parallel_partitioner.make_tpetra_map_rcp<
             TpetraTypes::NodeType<MemorySpace>>(communicator, true)))
+      , nonlocal_entries(IndexSet(parallel_partitioner.size()))
     {}
 
 
@@ -218,6 +219,7 @@ namespace LinearAlgebra
         parallel_partitioner
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
             communicator, true));
+      nonlocal_entries = IndexSet(parallel_partitioner.size());
     }
 
 
@@ -1062,8 +1064,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::locally_owned_elements() const
     {
       IndexSet locally_owned_entries(vector->getMap());
-      if (!nonlocal_vector.is_null())
-        locally_owned_entries.subtract_set(nonlocal_entries);
+      locally_owned_entries.subtract_set(nonlocal_entries);
       return locally_owned_entries;
     }
 
