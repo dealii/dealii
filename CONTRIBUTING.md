@@ -49,6 +49,12 @@ else. If you are new to the project then we will work with you to ensure
 your contributions are formatted with this style, so please do not think of
 it as a road block if you would like to contribute some code.
 
+A good rule-of-thumb is to limit patches to no more than about 1000 new or
+changed lines of code. The work required to review a patch scales nonlinearly
+with the amount of changes, and a series of smaller patches will make it through
+the system faster than one big patch. If you are not sure how to break up your
+work feel free to open an issue where we can discuss the changeset.
+
 As a contributor to this project, you agree that all of your contributions
 to deal.II (a) be governed by the <b>Developer Certificate of Origin
 version 1.1</b> and (b) be made available to the project under the terms of
@@ -58,3 +64,17 @@ later</b>; see [LICENSE.md](./LICENSE.md) for details. The deal.II project
 does not require copyright assignments for contributions. This means that
 the copyright for code contributions in the deal.II project is held by its
 respective contributors.
+
+## AI Contributions
+
+Only human beings can legally certify the <b>Developer Certificate of Origin</b>
+listed above. Hence, at the present time, we are not accepting contributions
+from autonomous AI agents. Patches may include source code created in part by an
+AI tool as long as they satisfy the DCO and
+1. The submitting author has personally read, reviewed, and understood the patch
+   in its entirety.
+2. The submitting author takes full responsibility for the contribution.
+
+This is a rapidly evolving legal and technical field and these restrictions will
+evolve over time. For more information, see [The Linux kernel's policy on AI
+Coding Assistants](https://docs.kernel.org/next/process/coding-assistants.html)
