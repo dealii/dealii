@@ -474,8 +474,7 @@ namespace internal
                               {
                                 unsigned int i = 0;
                                 for (; i < dofs_per_line; ++i)
-                                  if ((identities[i].first != i) &&
-                                      (identities[i].second != i))
+                                  if (identities[i] != std::pair{i, i})
                                     // not an identity
                                     break;
 
