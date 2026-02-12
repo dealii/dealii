@@ -1225,11 +1225,12 @@ namespace Step7
   // for this program:
 } // namespace Step7
 
+
 // @sect3{Main function}
 
 // The main function is mostly as before. The only difference is that we solve
-// three times, once for Q1 and adaptive refinement, once for Q1 elements and
-// global refinement, and once for Q2 elements and global refinement.
+// four times, once for Q1 and adaptive refinement, once for Q1 elements and
+// global refinement, and then the same again for Q2 elements.
 //
 // Since we instantiate several template classes below for two space
 // dimensions, we make this more generic by declaring a constant at the
@@ -1245,12 +1246,12 @@ int main()
       using namespace dealii;
       using namespace Step7;
 
-      // Now for the three calls to the main class. Each call is blocked into
+      // Now for the four calls to the main class. Each call is blocked into
       // curly braces in order to destroy the respective objects (i.e. the
       // finite element and the HelmholtzProblem object) at the end of the
       // block and before we go to the next run. This avoids conflicts with
       // variable names, and also makes sure that memory is released
-      // immediately after one of the three runs has finished, and not only at
+      // immediately after each one of the runs has finished, and not only at
       // the end of the <code>try</code> block.
       {
         std::cout << "Solving with Q1 elements, adaptive refinement"
@@ -1283,19 +1284,6 @@ int main()
       }
 
       {
-        std::cout << "Solving with Q2 elements, global refinement" << std::endl
-                  << "===========================================" << std::endl
-                  << std::endl;
-
-        const FE_Q<dim>       fe(2);
-        HelmholtzProblem<dim> helmholtz_problem_2d(
-          fe, HelmholtzProblem<dim>::global_refinement);
-
-        helmholtz_problem_2d.run();
-
-        std::cout << std::endl;
-      }
-      {
         std::cout << "Solving with Q2 elements, adaptive refinement"
                   << std::endl
                   << "===========================================" << std::endl
@@ -1304,6 +1292,20 @@ int main()
         const FE_Q<dim>       fe(2);
         HelmholtzProblem<dim> helmholtz_problem_2d(
           fe, HelmholtzProblem<dim>::adaptive_refinement);
+
+        helmholtz_problem_2d.run();
+
+        std::cout << std::endl;
+      }
+
+      {
+        std::cout << "Solving with Q2 elements, global refinement" << std::endl
+                  << "===========================================" << std::endl
+                  << std::endl;
+
+        const FE_Q<dim>       fe(2);
+        HelmholtzProblem<dim> helmholtz_problem_2d(
+          fe, HelmholtzProblem<dim>::global_refinement);
 
         helmholtz_problem_2d.run();
 
