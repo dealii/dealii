@@ -1,0 +1,789 @@
+
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_SimplexP<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(4) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_SimplexP<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_SimplexP<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_SimplexP<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(3): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(4): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(1): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(2): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:2d::hp vertex dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:2d::
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_SimplexP<2>(2): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(4): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),4)): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_SimplexP<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(4): 0 1, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_SimplexP<2>(2): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_SimplexP<2>(3): 0 0, 1 1, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(4): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0, 1 1, 
+DEAL:2d::hp line dof identities between FE_SimplexP<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),4)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_SimplexP<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(4): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),4)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_SimplexP<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(4): 0 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_SimplexP<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(3): 0 0, 1 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(4): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(3) and FE_Q<2>(QIterated(QTrapezoid(),4)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_SimplexP<2>(2): 1 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(2): 1 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(4): 0 0, 1 1, 2 2, 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(2): 1 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(4) and FE_Q<2>(QIterated(QTrapezoid(),4)): 1 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_SimplexP<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(4): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(1) and FE_Q<2>(QIterated(QTrapezoid(),4)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_SimplexP<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(4): 0 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(2): 0 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(2) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_SimplexP<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_SimplexP<2>(3): 0 0, 1 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(4): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(2): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(QIterated(QTrapezoid(),3)): 0 0, 1 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),3)) and FE_Q<2>(QIterated(QTrapezoid(),4)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_SimplexP<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_SimplexP<2>(2): 1 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_SimplexP<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(2): 1 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(3): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(4): 1 1, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(1): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(2): 1 0, 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(QIterated(QTrapezoid(),3)): 
+DEAL:2d::hp line dof identities between FE_Q<2>(QIterated(QTrapezoid(),4)) and FE_Q<2>(QIterated(QTrapezoid(),4)): 0 0, 1 1, 2 2, 
+DEAL:2d::
+DEAL:2d::
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(1) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(2) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_SimplexP<3>(3) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(3) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(4) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(1) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(2) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(1) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_WedgeP<3>(2) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(3): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(4): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_WedgeP<3>(1): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_WedgeP<3>(2): 0 0
+DEAL:3d::hp vertex dof identities between FE_PyramidP<3>(1) and FE_PyramidP<3>(1): 0 0
+DEAL:3d::
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(4): 0 1, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(3): 0 0, 1 1, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0, 1 1, 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_SimplexP<3>(3) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_SimplexP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(4): 0 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(3): 0 0, 1 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(3) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_SimplexP<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(4): 0 0, 1 1, 2 2, 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_Q<3>(QIterated(QTrapezoid(),4)): 1 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_WedgeP<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(4) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_SimplexP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(4): 0 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_SimplexP<3>(3): 0 0, 1 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0, 1 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_SimplexP<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(4): 1 1, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0, 1 1, 2 2, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_WedgeP<3>(2): 1 0, 
+DEAL:3d::hp line dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(4): 0 1, 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 1, 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp line dof identities between FE_WedgeP<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp line dof identities between FE_PyramidP<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(2) and FE_SimplexP<3>(3): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(2) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(3) and FE_SimplexP<3>(3): 0 0, 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(3) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(3) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_SimplexP<3>(3) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(4): 0 4, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 4, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(3): 0 0, 1 1, 2 2, 3 3, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(4): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(3) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(2): 4 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(4): 0 0, 1 1, 2 2, 3 3, 4 4, 5 5, 6 6, 7 7, 8 8, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(2): 4 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_Q<3>(QIterated(QTrapezoid(),4)): 4 4, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_WedgeP<3>(2): 4 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(4) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(4): 0 4, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 4, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(4): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(QIterated(QTrapezoid(),3)): 0 0, 1 1, 2 2, 3 3, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),3)) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(2): 4 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(4): 4 4, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(2): 4 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 0, 1 1, 2 2, 3 3, 4 4, 5 5, 6 6, 7 7, 8 8, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_WedgeP<3>(2): 4 0, 
+DEAL:3d::hp quad dof identities between FE_Q<3>(QIterated(QTrapezoid(),4)) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_SimplexP<3>(3): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(4): 0 4, 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_Q<3>(QIterated(QTrapezoid(),4)): 0 4, 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_WedgeP<3>(2): 0 0, 
+DEAL:3d::hp quad dof identities between FE_WedgeP<3>(2) and FE_PyramidP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_SimplexP<3>(3): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(3): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(4): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(1): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(2): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),3)): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_Q<3>(QIterated(QTrapezoid(),4)): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_WedgeP<3>(1): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_WedgeP<3>(2): 
+DEAL:3d::hp quad dof identities between FE_PyramidP<3>(1) and FE_PyramidP<3>(1): 
+DEAL:3d::
