@@ -342,22 +342,22 @@ namespace hp
      * equivalent to a `std::set` of pairs, but in practice is easier to query.
      */
     std::vector<std::map<unsigned int, unsigned int>>
-    hp_vertex_dof_identities(const std::set<unsigned int> &fes) const;
+    hp_vertex_dof_identities(const std::vector<unsigned int> &fes) const;
 
     /**
      * Same as hp_vertex_dof_indices(), except that the function treats degrees
      * of freedom on lines.
      */
     std::vector<std::map<unsigned int, unsigned int>>
-    hp_line_dof_identities(const std::set<unsigned int> &fes) const;
+    hp_line_dof_identities(const std::vector<unsigned int> &fes) const;
 
     /**
      * Same as hp_vertex_dof_indices(), except that the function treats degrees
      * of freedom on quads.
      */
     std::vector<std::map<unsigned int, unsigned int>>
-    hp_quad_dof_identities(const std::set<unsigned int> &fes,
-                           const unsigned int            face_no = 0) const;
+    hp_quad_dof_identities(const std::vector<unsigned int> &fes,
+                           const unsigned int               face_no = 0) const;
 
 
     /**

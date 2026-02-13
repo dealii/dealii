@@ -102,7 +102,7 @@ namespace internal
                     {
                       // TODO: Change set to types::fe_index
                       complete_identities = fes.hp_vertex_dof_identities(
-                        std::set<unsigned int>{fe_index_1, fe_index_2});
+                        std::vector<unsigned int>{fe_index_1, fe_index_2});
                       break;
                     }
 
@@ -110,7 +110,7 @@ namespace internal
                     {
                       // TODO: Change set to types::fe_index
                       complete_identities = fes.hp_line_dof_identities(
-                        std::set<unsigned int>{fe_index_1, fe_index_2});
+                        std::vector<unsigned int>{fe_index_1, fe_index_2});
                       break;
                     }
 
@@ -118,7 +118,7 @@ namespace internal
                     {
                       // TODO: Change set to types::fe_index
                       complete_identities = fes.hp_quad_dof_identities(
-                        std::set<unsigned int>{fe_index_1, fe_index_2},
+                        std::vector<unsigned int>{fe_index_1, fe_index_2},
                         face_no);
                       break;
                     }

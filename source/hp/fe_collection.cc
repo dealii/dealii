@@ -338,24 +338,32 @@ namespace hp
      */
     std::vector<std::map<unsigned int, unsigned int>>
     compute_hp_dof_identities(
-      const std::set<unsigned int> &fes,
+      const std::vector<unsigned int> &fes,
       const std::function<std::vector<std::pair<unsigned int, unsigned int>>(
         const unsigned int,
-        const unsigned int)>       &query_identities)
+        const unsigned int)>          &query_identities)
     {
+      // Get a unique set of indices.
+      const std::set<unsigned int> fes_unique(fes.begin(), fes.end());
+
       // Let's deal with the easy cases first. If the set of fe indices is empty
       // or has only one entry, then there are no identities:
-      if (fes.size() <= 1)
+      if (fes_unique.size() <= 1)
         return {};
 
       // If the set has two entries, then the
       // FiniteElement::hp_*_dof_identities() function directly returns what we
       // need. We just need to prefix its output with the respective fe indices:
-      if (fes.size() == 2)
+      if (fes_unique.size() == 2)
         {
-          const unsigned int fe_index_1 = *fes.begin();
-          const unsigned int fe_index_2 = *(++fes.begin());
-          const auto         reduced_identities =
+          // check if the vector has two entries, then use the information from
+          // the vector, else use the set
+          const unsigned int fe_index_1 =
+            fes.size() == 2 ? fes[0] : *fes_unique.begin();
+          const unsigned int fe_index_2 =
+            fes.size() == 2 ? fes[1] : *(++fes_unique.begin());
+
+          const auto reduced_identities =
             query_identities(fe_index_1, fe_index_2);
 
           std::vector<std::map<unsigned int, unsigned int>> complete_identities;
@@ -387,8 +395,8 @@ namespace hp
       using Graph = std::set<Edge>;
 
       Graph identities_graph;
-      for (const unsigned int fe_index_1 : fes)
-        for (const unsigned int fe_index_2 : fes)
+      for (const unsigned int fe_index_1 : fes_unique)
+        for (const unsigned int fe_index_2 : fes_unique)
           if (fe_index_1 != fe_index_2)
             for (const auto &identity :
                  query_identities(fe_index_1, fe_index_2))
@@ -534,7 +542,7 @@ namespace hp
   template <int dim, int spacedim>
   std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_vertex_dof_identities(
-    const std::set<unsigned int> &fes) const
+    const std::vector<unsigned int> &fes) const
   {
     auto query_vertex_dof_identities = [this](const unsigned int fe_index_1,
                                               const unsigned int fe_index_2) {
@@ -548,7 +556,7 @@ namespace hp
   template <int dim, int spacedim>
   std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_line_dof_identities(
-    const std::set<unsigned int> &fes) const
+    const std::vector<unsigned int> &fes) const
   {
     auto query_line_dof_identities = [this](const unsigned int fe_index_1,
                                             const unsigned int fe_index_2) {
@@ -562,8 +570,8 @@ namespace hp
   template <int dim, int spacedim>
   std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_quad_dof_identities(
-    const std::set<unsigned int> &fes,
-    const unsigned int            face_no) const
+    const std::vector<unsigned int> &fes,
+    const unsigned int               face_no) const
   {
     auto query_quad_dof_identities = [this,
                                       face_no](const unsigned int fe_index_1,
