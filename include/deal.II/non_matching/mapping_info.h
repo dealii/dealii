@@ -63,8 +63,7 @@ namespace NonMatching
         const ObserverPointer<const Mapping<dim, spacedim>> &mapping,
         const UpdateFlags &update_flags_mapping,
         const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        CellSimilarity::Similarity &cell_similarity,
-        const Quadrature<dim>      &quadrature,
+        const Quadrature<dim>                                      &quadrature,
         std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
                     &internal_mapping_data,
         MappingData &mapping_data)
@@ -72,11 +71,14 @@ namespace NonMatching
         mapping_data.initialize(quadrature.size(), update_flags_mapping);
         internal_mapping_data->reinit(update_flags_mapping, quadrature);
 
-        cell_similarity = mapping->fill_fe_values(cell,
-                                                  cell_similarity,
-                                                  quadrature,
-                                                  *internal_mapping_data,
-                                                  mapping_data);
+        // Since the points passed to the function will in general vary from
+        // one call to the next, do not detect any cell similarity that aims
+        // to avoid some computations of metric terms.
+        mapping->fill_fe_values(cell,
+                                CellSimilarity::none,
+                                quadrature,
+                                *internal_mapping_data,
+                                mapping_data);
       }
 
 
@@ -880,27 +882,18 @@ namespace NonMatching
                       quadrature.get_points());
 
     // compute mapping data
-    CellSimilarity::Similarity cell_similarity = CellSimilarity::none;
     internal::ComputeMappingDataHelper<dim, spacedim>::
       compute_mapping_data_for_quadrature(mapping,
                                           update_flags_mapping,
                                           cell,
-                                          cell_similarity,
                                           quadrature,
                                           internal_mapping_data,
                                           mapping_data);
 
-    // check for cartesian/affine cell
-    if (!quadrature.empty() &&
-        update_flags_mapping & UpdateFlags::update_inverse_jacobians)
-      {
-        cell_type.push_back(
-          internal::compute_geometry_type(cell->diameter(),
-                                          mapping_data.inverse_jacobians));
-      }
-    else
-      cell_type.push_back(
-        dealii::internal::MatrixFreeFunctions::GeometryType::general);
+    // Since with this reinit() function there is no storage of the mapping
+    // data beyond the present call, do not try to check for cell types (as
+    // that would be costly) but simply assume the cell to be of general type.
+    cell_type = {dealii::internal::MatrixFreeFunctions::GeometryType::general};
 
     // store mapping data
     store_mapping_data(
@@ -1154,13 +1147,10 @@ namespace NonMatching
       [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell,
           const Quadrature<dim> &quadrature,
           MappingData           &mapping_data) {
-        CellSimilarity::Similarity cell_similarity =
-          CellSimilarity::Similarity::none;
         internal::ComputeMappingDataHelper<dim, spacedim>::
           compute_mapping_data_for_quadrature(mapping,
                                               update_flags_mapping,
                                               cell,
-                                              cell_similarity,
                                               quadrature,
                                               internal_mapping_data,
                                               mapping_data);
@@ -1762,6 +1752,7 @@ namespace NonMatching
   MappingInfo<dim, spacedim, Number>::get_cell_type(
     const unsigned int geometry_index) const
   {
+    AssertIndexRange(geometry_index, cell_type.size());
     return cell_type[geometry_index];
   }
 
