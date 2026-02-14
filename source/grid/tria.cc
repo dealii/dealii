@@ -3934,11 +3934,17 @@ namespace internal
         tria.levels.clear();
         tria.levels.push_back(
           std::make_unique<
-            dealii::internal::TriangulationImplementation::TriaLevel>(dim));
+            dealii::internal::TriangulationImplementation::TriaLevel>(
+            dim,
+            ReferenceCells::max_n_children<dim>(),
+            ReferenceCells::max_n_faces<dim>()));
 
         if (dim > 1)
           tria.faces = std::make_unique<
-            dealii::internal::TriangulationImplementation::TriaFaces>(dim);
+            dealii::internal::TriangulationImplementation::TriaFaces>(
+            dim,
+            ReferenceCells::max_n_children<2>(),
+            ReferenceCells::max_n_lines<2>());
 
         // copy vertices
         tria.vertices = vertices;
@@ -3958,10 +3964,7 @@ namespace internal
               connectivity.entity_to_entities(1, 0);
             const unsigned int n_lines = lines_to_vertices.size();
 
-            lines_0.allocate(n_lines,
-                             ReferenceCells::max_n_children<1>(),
-                             ReferenceCells::max_n_faces<1>());
-
+            lines_0.allocate(n_lines);
             // loop over lines
             for (unsigned int line = 0; line < n_lines; ++line)
               {
@@ -3982,9 +3985,7 @@ namespace internal
             const auto &quads_to_lines = connectivity.entity_to_entities(2, 1);
             const unsigned int n_quads = quads_to_lines.size();
 
-            quads_0.allocate(n_quads,
-                             ReferenceCells::max_n_children<2>(),
-                             ReferenceCells::max_n_faces<2>());
+            quads_0.allocate(n_quads);
             reserve_space_(faces, 2 /*structdim*/, n_quads);
 
             // loop over all quads -> entity type, line indices/orientations
@@ -4053,9 +4054,7 @@ namespace internal
                   }
             }
 
-          cells_0.allocate(n_cell,
-                           ReferenceCells::max_n_children<dim>(),
-                           ReferenceCells::max_n_faces<dim>());
+          cells_0.allocate(n_cell);
           reserve_space_(level, spacedim, n_cell, orientation_needed);
 
           // loop over all cells
@@ -5623,7 +5622,10 @@ namespace internal
             {
               triangulation.levels.push_back(
                 std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(dim));
+                  internal::TriangulationImplementation::TriaLevel>(
+                  dim,
+                  ReferenceCells::max_n_children<dim>(),
+                  ReferenceCells::max_n_faces<dim>()));
               break;
             }
 
@@ -5687,11 +5689,8 @@ namespace internal
                           used_cells + needed_cells,
                           spacedim);
 
-            triangulation.levels[level + 1]->cells.allocate_end(
-              needed_cells,
-              0,
-              ReferenceCells::max_n_children<dim>(),
-              ReferenceCells::max_n_faces<dim>());
+            triangulation.levels[level + 1]->cells.allocate_end(needed_cells,
+                                                                0);
           }
 
         for (auto line = triangulation.begin_line();
@@ -5704,11 +5703,7 @@ namespace internal
               needed_vertices += 1;
             }
 
-        triangulation.faces->lines.allocate_end(
-          n_lines_in_pairs,
-          0,
-          ReferenceCells::max_n_children<1>(),
-          ReferenceCells::max_n_faces<1>());
+        triangulation.faces->lines.allocate_end(n_lines_in_pairs, 0);
 
         needed_vertices += std::count(triangulation.vertices_used.begin(),
                                       triangulation.vertices_used.end(),
@@ -5786,11 +5781,7 @@ namespace internal
               }
         }
 
-        triangulation.faces->lines.allocate_end(
-          0,
-          n_single_lines,
-          ReferenceCells::max_n_children<1>(),
-          ReferenceCells::max_n_faces<1>());
+        triangulation.faces->lines.allocate_end(0, n_single_lines);
 
 
         typename Triangulation<dim, spacedim>::DistortedCellList
@@ -6097,7 +6088,10 @@ namespace internal
             {
               triangulation.levels.push_back(
                 std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(dim));
+                  internal::TriangulationImplementation::TriaLevel>(
+                  dim,
+                  ReferenceCells::max_n_children<dim>(),
+                  ReferenceCells::max_n_faces<dim>()));
               break;
             }
 
@@ -6135,10 +6129,7 @@ namespace internal
             // reserve space for 2*flagged_cells new lines on the next
             // higher level
             triangulation.levels[level + 1]->cells.allocate_end(
-              ReferenceCells::max_n_children<dim>() * flagged_cells,
-              0,
-              ReferenceCells::max_n_children<dim>(),
-              ReferenceCells::max_n_faces<dim>());
+              ReferenceCells::max_n_children<dim>() * flagged_cells, 0);
             needed_vertices += flagged_cells;
           }
 
@@ -6355,7 +6346,10 @@ namespace internal
             {
               triangulation.levels.push_back(
                 std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(dim));
+                  internal::TriangulationImplementation::TriaLevel>(
+                  dim,
+                  ReferenceCells::max_n_children<dim>(),
+                  ReferenceCells::max_n_faces<dim>()));
               break;
             }
 
@@ -6454,11 +6448,8 @@ namespace internal
 
             // reserve space for needed_cells new quads on the next
             // higher level
-            triangulation.levels[level + 1]->cells.allocate_end(
-              needed_cells,
-              0,
-              ReferenceCells::max_n_children<dim>(),
-              ReferenceCells::max_n_faces<dim>());
+            triangulation.levels[level + 1]->cells.allocate_end(needed_cells,
+                                                                0);
           }
 
         // now count the lines which were flagged for refinement
@@ -6479,11 +6470,7 @@ namespace internal
         // to store all lines. memory reservation for n_single_lines
         // can only be done AFTER we refined the lines of the current
         // cells
-        triangulation.faces->lines.allocate_end(
-          n_lines_in_pairs,
-          0,
-          ReferenceCells::max_n_children<1>(),
-          ReferenceCells::max_n_faces<1>());
+        triangulation.faces->lines.allocate_end(n_lines_in_pairs, 0);
 
         // add to needed vertices how many vertices are already in use
         needed_vertices += std::count(triangulation.vertices_used.begin(),
@@ -6593,11 +6580,7 @@ namespace internal
 
         // reserve space for inner lines (can be stored as single
         // lines)
-        triangulation.faces->lines.allocate_end(
-          0,
-          n_single_lines,
-          ReferenceCells::max_n_children<1>(),
-          ReferenceCells::max_n_faces<1>());
+        triangulation.faces->lines.allocate_end(0, n_single_lines);
 
         typename Triangulation<2, spacedim>::DistortedCellList
           cells_with_distorted_children;
@@ -6665,7 +6648,10 @@ namespace internal
             {
               triangulation.levels.push_back(
                 std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(dim));
+                  internal::TriangulationImplementation::TriaLevel>(
+                  dim,
+                  ReferenceCells::max_n_children<dim>(),
+                  ReferenceCells::max_n_faces<dim>()));
               break;
             }
 
@@ -6791,11 +6777,7 @@ namespace internal
                               spacedim,
                               true);
 
-              triangulation.levels[level + 1]->cells.allocate_end(
-                new_cells,
-                0,
-                ReferenceCells::max_n_children<dim>(),
-                ReferenceCells::max_n_faces<dim>());
+              triangulation.levels[level + 1]->cells.allocate_end(new_cells, 0);
             }
 
           // now count the faces and lines which were flagged for
@@ -6840,16 +6822,10 @@ namespace internal
           reserve_space(*triangulation.faces,
                         needed_faces_pair,
                         needed_faces_single);
-          triangulation.faces->lines.allocate_end(
-            needed_lines_pair,
-            needed_lines_single,
-            ReferenceCells::max_n_children<1>(),
-            ReferenceCells::max_n_faces<1>());
-          triangulation.faces->quads.allocate_end(
-            needed_faces_pair,
-            needed_faces_single,
-            ReferenceCells::max_n_children<2>(),
-            ReferenceCells::max_n_faces<2>());
+          triangulation.faces->lines.allocate_end(needed_lines_pair,
+                                                  needed_lines_single);
+          triangulation.faces->quads.allocate_end(needed_faces_pair,
+                                                  needed_faces_single);
 
           // add to needed vertices how many vertices are already in use
           needed_vertices += std::count(triangulation.vertices_used.begin(),
@@ -8215,7 +8191,10 @@ namespace internal
             {
               triangulation.levels.push_back(
                 std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(dim));
+                  internal::TriangulationImplementation::TriaLevel>(
+                  dim,
+                  ReferenceCells::max_n_children<dim>(),
+                  ReferenceCells::max_n_faces<dim>()));
               break;
             }
 
@@ -8385,11 +8364,7 @@ namespace internal
                           spacedim);
             // reserve space for 8*flagged_cells new hexes on the next
             // higher level
-            triangulation.levels[level + 1]->cells.allocate_end(
-              new_cells,
-              0,
-              ReferenceCells::max_n_children<dim>(),
-              ReferenceCells::max_n_faces<dim>());
+            triangulation.levels[level + 1]->cells.allocate_end(new_cells, 0);
           } // for all levels
         // now count the quads and lines which were flagged for
         // refinement
@@ -8455,21 +8430,15 @@ namespace internal
             }
 
         // reserve space for needed_lines new lines stored in pairs
-        triangulation.faces->lines.allocate_end(
-          needed_lines_pair,
-          needed_lines_single,
-          ReferenceCells::max_n_children<1>(),
-          ReferenceCells::max_n_faces<1>());
+        triangulation.faces->lines.allocate_end(needed_lines_pair,
+                                                needed_lines_single);
 
         // reserve space for needed_quads new quads stored in pairs
         reserve_space(*triangulation.faces,
                       needed_quads_pair,
                       needed_quads_single);
-        triangulation.faces->quads.allocate_end(
-          needed_quads_pair,
-          needed_quads_single,
-          ReferenceCells::max_n_children<2>(),
-          ReferenceCells::max_n_faces<2>());
+        triangulation.faces->quads.allocate_end(needed_quads_pair,
+                                                needed_quads_single);
 
         // add to needed vertices how many vertices are already in use
         needed_vertices += std::count(triangulation.vertices_used.begin(),

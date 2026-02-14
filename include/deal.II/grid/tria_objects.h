@@ -53,20 +53,15 @@ namespace internal
     {
     public:
       /**
-       * Constructor resetting some data.
+       * Default constructor. Needed for serialization.
        */
       TriaObjects();
 
       /**
        * Constructor for a specific dimension.
-       */
-      TriaObjects(const unsigned int structdim);
-
-      /**
-       * Resize all internal arrays and populate with default values.
        *
-       * @param[in] n_objects Total number of objects this object
-       *            should store.
+       * @param[in] structdim The dimension of the structures which this object
+       *            stores: e.g., TriaFaces::lines has `structdim == 1`.
        *
        * @param[in] children_per_object Number of children to store for each
        *            object.
@@ -74,10 +69,18 @@ namespace internal
        * @param[in] faces_per_object Number of faces (i.e., neighbors) to store
        *            for each object.
        */
+      TriaObjects(const unsigned int structdim,
+                  const unsigned int children_per_object,
+                  const unsigned int faces_per_object);
+
+      /**
+       * Resize all internal arrays and populate with default values.
+       *
+       * @param[in] n_objects Total number of objects this object
+       *            should store.
+       */
       void
-      allocate(const std::size_t  n_objects,
-               const unsigned int children_per_object,
-               const unsigned int faces_per_object);
+      allocate(const std::size_t n_objects);
 
       /**
        * Allocate space at the end of each array for new objects and populate
@@ -90,20 +93,29 @@ namespace internal
        *            added alone (i.e., not in pairs). For example, in 2d refined
        *            lines have to be stored in pairs, whereas new lines in the
        *            interior of refined cells can be stored as single lines.
-       *
-       * @param[in] children_per_object Number of children to store for each
-       *            object.
-       *
-       * @param[in] faces_per_object Number of faces (i.e., neighbors) to store
-       *            for each object.
        */
       void
       allocate_end(const unsigned int new_objects_in_pairs,
-                   const unsigned int new_objects_single,
-                   const unsigned int children_per_object,
-                   const unsigned int faces_per_object);
+                   const unsigned int new_objects_single);
 
+      /**
+       * The dimension of the structures which this object stores.
+       */
       unsigned int structdim;
+
+      /**
+       * The number of children stored per object. In practice, to support mixed
+       * meshes, this is the maximum number of children per ReferenceCell across
+       * all relevant ReferenceCell types used by the Triangulation.
+       */
+      unsigned int children_per_object;
+
+      /**
+       * The number of faces (i.e., neighbors) stored per object. Like
+       * children_per_object, this is typically the maximum value across all
+       * relevant ReferenceCell types.
+       */
+      unsigned int faces_per_object;
 
       /**
        * Vector of the objects belonging to this level. The index of the
@@ -518,6 +530,8 @@ namespace internal
 
     inline TriaObjects::TriaObjects()
       : structdim(numbers::invalid_unsigned_int)
+      , children_per_object(numbers::invalid_unsigned_int)
+      , faces_per_object(numbers::invalid_unsigned_int)
       , next_free_single(numbers::invalid_unsigned_int)
       , next_free_pair(numbers::invalid_unsigned_int)
       , reverse_order_next_free_single(false)
@@ -525,8 +539,12 @@ namespace internal
     {}
 
 
-    inline TriaObjects::TriaObjects(const unsigned int structdim)
+    inline TriaObjects::TriaObjects(const unsigned int structdim,
+                                    const unsigned int children_per_object,
+                                    const unsigned int faces_per_object)
       : structdim(structdim)
+      , children_per_object(children_per_object)
+      , faces_per_object(faces_per_object)
       , next_free_single(numbers::invalid_unsigned_int)
       , next_free_pair(numbers::invalid_unsigned_int)
       , reverse_order_next_free_single(false)
@@ -577,6 +595,8 @@ namespace internal
     TriaObjects::serialize(Archive &ar, const unsigned int)
     {
       ar                                   &structdim;
+      ar                                   &children_per_object;
+      ar                                   &faces_per_object;
       ar &cells                            &children;
       ar                                   &refinement_cases;
       ar                                   &used;

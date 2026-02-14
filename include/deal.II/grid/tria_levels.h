@@ -59,10 +59,20 @@ namespace internal
        * Constructor.
        *
        * @param dim Dimension of the Triangulation.
+       *
+       * @param[in] max_children_per_cell Maximum number of children (across all
+       *            relevant ReferenceCell types) a cell in the present
+       *            Triangulation may have.
+       *
+       * @param[in] max_faces_per_cell Maximum number of faces (i.e., neighbors)
+       *            per cell. Like @p max_children_per_cell, this is the maximum
+       *            over all relevant ReferenceCell types.
        */
-      TriaLevel(const unsigned int dim)
+      TriaLevel(const unsigned int dim,
+                const unsigned int max_children_per_cell,
+                const unsigned int max_faces_per_cell)
         : dim(dim)
-        , cells(dim)
+        , cells(dim, max_children_per_cell, max_faces_per_cell)
       {}
 
       /**
@@ -70,7 +80,6 @@ namespace internal
        */
       TriaLevel()
         : dim(numbers::invalid_unsigned_int)
-        , cells(numbers::invalid_unsigned_int)
       {}
 
       /**
