@@ -5269,8 +5269,9 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
       // This branch needs to be first (and not combined with the structdim ==
       // dim branch) so that we can get line vertex indices when setting up the
       // cell vertex index cache
-      return this->objects()
-        .cells[this->present_index * ReferenceCells::max_n_faces<1>() + corner];
+      const auto &objects = this->objects();
+      return objects
+        .cells[this->present_index * objects.faces_per_object + corner];
     }
   else if constexpr (structdim == dim)
     {
@@ -5340,8 +5341,8 @@ TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
 
   if constexpr (structdim == 2)
     {
-      return this->objects()
-        .cells[this->present_index * ReferenceCells::max_n_faces<2>() + i];
+      const auto &objects = this->objects();
+      return objects.cells[this->present_index * objects.faces_per_object + i];
     }
   else if constexpr (structdim == 3)
     {
@@ -5653,10 +5654,9 @@ TriaAccessor<structdim, dim, spacedim>::child_index(const unsigned int i) const
   // each set of two children are stored
   // consecutively, so we only have to find
   // the location of the set of children
-  const unsigned int n_sets_of_two =
-    GeometryInfo<structdim>::max_children_per_cell / 2;
-  return this->objects().children[n_sets_of_two * this->present_index + i / 2] +
-         i % 2;
+  const auto        &objects       = this->objects();
+  const unsigned int n_sets_of_two = objects.children_per_object / 2;
+  return objects.children[n_sets_of_two * this->present_index + i / 2] + i % 2;
 }
 
 
@@ -5666,7 +5666,7 @@ int
 TriaAccessor<structdim, dim, spacedim>::isotropic_child_index(
   const unsigned int i) const
 {
-  AssertIndexRange(i, GeometryInfo<structdim>::max_children_per_cell);
+  AssertIndexRange(i, this->objects().children_per_object);
 
   switch (structdim)
     {
@@ -5832,9 +5832,9 @@ TriaAccessor<structdim, dim, spacedim>::has_children() const
 
   // each set of two children are stored consecutively, so we only have to find
   // the location of the set of children
-  const unsigned int n_sets_of_two =
-    GeometryInfo<structdim>::max_children_per_cell / 2;
-  return (this->objects().children[n_sets_of_two * this->present_index] != -1);
+  const auto        &objects       = this->objects();
+  const unsigned int n_sets_of_two = objects.children_per_object / 2;
+  return (objects.children[n_sets_of_two * this->present_index] != -1);
 }
 
 
@@ -5902,9 +5902,8 @@ TriaAccessor<structdim, dim, spacedim>::set_children(const unsigned int i,
 
   // each set of two children are stored consecutively, so we only have to find
   // the location of the set of children
-  const unsigned int n_sets_of_two =
-    GeometryInfo<structdim>::max_children_per_cell / 2;
-
+  auto              &objects       = this->objects();
+  const unsigned int n_sets_of_two = objects.children_per_object / 2;
   Assert(
     // clearing the child index for a cell
     (index == -1) ||
@@ -5914,11 +5913,10 @@ TriaAccessor<structdim, dim, spacedim>::set_children(const unsigned int i,
       // if setting the child index for the i'th child (with i>0), then the
       // previously stored index must be the invalid index
       (i > 0 && this->has_children() && (index >= 0) &&
-       this->objects().children[n_sets_of_two * this->present_index + i / 2] ==
-         -1),
+       objects.children[n_sets_of_two * this->present_index + i / 2] == -1),
     TriaAccessorExceptions::ExcCantSetChildren(index));
 
-  this->objects().children[n_sets_of_two * this->present_index + i / 2] = index;
+  objects.children[n_sets_of_two * this->present_index + i / 2] = index;
 }
 
 
@@ -5929,9 +5927,8 @@ TriaAccessor<structdim, dim, spacedim>::clear_children() const
 {
   // each set of two children are stored consecutively, so we only have to find
   // the location of the set of children
-  const unsigned int n_sets_of_two =
-    GeometryInfo<structdim>::max_children_per_cell / 2;
-
+  const auto        &objects       = this->objects();
+  const unsigned int n_sets_of_two = objects.children_per_object / 2;
   for (unsigned int i = 0; i < n_sets_of_two; ++i)
     set_children(2 * i, -1);
 }
