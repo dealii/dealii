@@ -24,10 +24,14 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    TriaFaces::TriaFaces(const unsigned int dim)
+    TriaFaces::TriaFaces(const unsigned int dim,
+                         const unsigned int max_children_per_quad,
+                         const unsigned int max_lines_per_quad)
       : dim(dim)
-      , quads(2)
-      , lines(1)
+      , quads(2, max_children_per_quad, max_lines_per_quad)
+      , lines(1,
+              ReferenceCells::max_n_children<1>(),
+              ReferenceCells::max_n_faces<1>())
     {}
 
     std::size_t

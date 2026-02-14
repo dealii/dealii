@@ -63,9 +63,7 @@ namespace internal
 
 
     void
-    TriaObjects::allocate(const std::size_t  n_objects,
-                          const unsigned int children_per_object,
-                          const unsigned int faces_per_object)
+    TriaObjects::allocate(const std::size_t n_objects)
     {
       used.assign(n_objects, true);
       boundary_or_material_id.assign(n_objects, BoundaryOrMaterialId());
@@ -99,9 +97,7 @@ namespace internal
 
     void
     TriaObjects::allocate_end(const unsigned int new_objects_in_pairs,
-                              const unsigned int new_objects_single,
-                              const unsigned int children_per_object,
-                              const unsigned int faces_per_object)
+                              const unsigned int new_objects_single)
     {
       if (structdim <= 2)
         {

@@ -44,8 +44,22 @@ namespace internal
     public:
       /**
        * Constructor.
+       *
+       * @param[in] dim Dimension of the relevant Triangulation.
+       *
+       * @param[in] max_children_per_quad Maximum number of children (across all
+       *            relevant ReferenceCell types) a quad (i.e., a face of a cell
+       *            in 3d) in the present Triangulation may have. Only used in
+       *            3d.
+       *
+       * @param[in] max_lines_per_quad Maximum number of faces (i.e., neighbors)
+       *            per cell. Like @p max_children_per_quad, this is the maximum
+       *            over all relevant ReferenceCell types and is only used in 2d
+       *            and 3d.
        */
-      TriaFaces(const unsigned int dim);
+      TriaFaces(const unsigned int dim,
+                const unsigned int max_children_per_quad,
+                const unsigned int max_lines_per_quad);
 
       /**
        * Default constructor for Boost::serialization.
