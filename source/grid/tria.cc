@@ -2206,8 +2206,7 @@ namespace internal
 
           if (dim == 2 || dim == 3)
             {
-              tria_level.face_orientations.resize(total_cells *
-                                                  max_n_faces(dim));
+              tria_level.face_orientations.resize(total_cells);
 
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
@@ -4085,7 +4084,8 @@ namespace internal
                   if (orientation_needed)
                     {
                       level.face_orientations.set_combined_orientation(
-                        cell * ReferenceCells::max_n_faces<dim>() + f,
+                        cell,
+                        f,
                         connectivity.entity_orientations(dim -
                                                          1)[global_face_index]);
                     }
@@ -4335,7 +4335,7 @@ namespace internal
         level.reference_cell.assign(size, ReferenceCells::Invalid);
 
         if (orientation_needed)
-          level.face_orientations.reinit(size * max_n_faces(dim));
+          level.face_orientations.reinit(size, max_n_faces(dim));
 
 
         level.global_active_cell_indices.assign(size,
@@ -17041,7 +17041,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
                 const auto combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
-                    cell->index() * ReferenceCells::max_n_faces<dim>() + face);
+                    cell->index(), face);
                 const std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,

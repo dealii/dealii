@@ -73,6 +73,7 @@ namespace internal
                 const unsigned int max_faces_per_cell)
         : dim(dim)
         , cells(dim, max_children_per_cell, max_faces_per_cell)
+        , face_orientations(0, max_faces_per_cell)
       {}
 
       /**

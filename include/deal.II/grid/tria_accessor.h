@@ -4912,10 +4912,9 @@ namespace internal
         // face_orientations is not set up in 1d
         if (dim != 1)
           accessor.tria->levels[accessor.present_level]
-            ->face_orientations.set_combined_orientation(
-              accessor.present_index * ReferenceCells::max_n_faces<dim>() +
-                face_no,
-              combined_orientation);
+            ->face_orientations.set_combined_orientation(accessor.present_index,
+                                                         face_no,
+                                                         combined_orientation);
       }
 
 
@@ -4964,8 +4963,8 @@ namespace internal
                 const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
+                    ->face_orientations.get_combined_orientation(cell.index(),
+                                                                 f);
 
                 // It might seem superfluous to spell out the four indices
                 // that get later consumed by a for loop over these four
@@ -4988,8 +4987,8 @@ namespace internal
                 const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
+                    ->face_orientations.get_combined_orientation(cell.index(),
+                                                                 f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
@@ -5082,8 +5081,8 @@ namespace internal
                 const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCells::max_n_faces<dim>() + f);
+                    ->face_orientations.get_combined_orientation(cell.index(),
+                                                                 f);
 
                 // It might seem superfluous to spell out the four indices and
                 // orientations that get later consumed by a for loop over
@@ -5126,8 +5125,8 @@ namespace internal
                 const auto orientation =
                   cell.get_triangulation()
                     .levels[cell.level()]
-                    ->face_orientations.get_combined_orientation(
-                      cell.index() * ReferenceCells::max_n_faces<3>() + f);
+                    ->face_orientations.get_combined_orientation(cell.index(),
+                                                                 f);
                 const std::array<unsigned int, 2> my_indices{
                   {ref_cell.standard_to_real_face_line(0, f, orientation),
                    ref_cell.standard_to_real_face_line(1, f, orientation)}};
@@ -5421,13 +5420,12 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
         return numbers::default_geometric_orientation;
       else
         return this->tria->levels[this->present_level]
-          ->face_orientations.get_combined_orientation(
-            this->present_index * ReferenceCells::max_n_faces<dim>() + face);
+          ->face_orientations.get_combined_orientation(this->present_index,
+                                                       face);
     }
   else
     return this->tria->levels[this->present_level]
-      ->face_orientations.get_combined_orientation(
-        this->present_index * ReferenceCells::max_n_faces<dim>() + face);
+      ->face_orientations.get_combined_orientation(this->present_index, face);
 }
 
 
@@ -5454,8 +5452,7 @@ TriaAccessor<structdim, dim, spacedim>::face_orientation(
            numbers::default_geometric_orientation;
   else
     return this->tria->levels[this->present_level]
-      ->face_orientations.get_orientation(
-        this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
+      ->face_orientations.get_orientation(this->present_index, face);
 }
 
 
@@ -5475,7 +5472,7 @@ TriaAccessor<structdim, dim, spacedim>::face_flip(const unsigned int face) const
 
   if constexpr (structdim == 3)
     return this->tria->levels[this->present_level]->face_orientations.get_flip(
-      this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
+      this->present_index, face);
   else
     // In 1d and 2d, face_flip is always false as faces can only be
     // 'flipped' in 3d.
@@ -5499,8 +5496,7 @@ TriaAccessor<structdim, dim, spacedim>::face_rotation(
 
   if constexpr (structdim == 3)
     return this->tria->levels[this->present_level]
-      ->face_orientations.get_rotation(
-        this->present_index * ReferenceCells::max_n_faces<structdim>() + face);
+      ->face_orientations.get_rotation(this->present_index, face);
   else
     // In 1d and 2d, face_rotation is always false as faces can only be
     // 'rotated' in 3d.

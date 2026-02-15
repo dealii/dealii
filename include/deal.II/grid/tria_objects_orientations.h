@@ -49,7 +49,8 @@ namespace internal
        * Constructor. Sets up objects in the default orientation (orientation
        * = `true`).
        */
-      TriaObjectsOrientations(const unsigned int n_objects);
+      TriaObjectsOrientations(const unsigned int n_objects,
+                              const unsigned int n_faces_per_object);
 
       /**
        * Return number of geometric objects stored by this class.
@@ -61,7 +62,8 @@ namespace internal
        * Reset the object to a default state.
        */
       void
-      reinit(const unsigned int n_objects);
+      reinit(const unsigned int n_objects,
+             const unsigned int n_faces_per_object);
 
       /**
        * Change the number of stored objects. New objects are constructed in
@@ -81,32 +83,36 @@ namespace internal
        * documentation.
        */
       types::geometric_orientation
-      get_combined_orientation(const unsigned int object) const;
+      get_combined_orientation(const unsigned int object_no,
+                               const unsigned int face_no) const;
 
       /**
        * Get the orientation bit of the object.
        */
       bool
-      get_orientation(const unsigned int object) const;
+      get_orientation(const unsigned int object_no,
+                      const unsigned int face_no) const;
 
       /**
        * Get the rotation bit of the object.
        */
       bool
-      get_rotation(const unsigned int object) const;
+      get_rotation(const unsigned int object_no,
+                   const unsigned int face_no) const;
 
       /**
        * Get the flip bit of the object.
        */
       bool
-      get_flip(const unsigned int object) const;
+      get_flip(const unsigned int object_no, const unsigned int face_no) const;
 
       /**
        * Set the combined orientation of the object, as described in the class
        * documentation.
        */
       void
-      set_combined_orientation(const unsigned int                 object,
+      set_combined_orientation(const unsigned int                 object_no,
+                               const unsigned int                 face_no,
                                const types::geometric_orientation value);
 
       /**
@@ -120,39 +126,41 @@ namespace internal
 
     private:
       /**
-       * Number of objects.
+       * Number of faces per object.
        */
-      unsigned int n_stored_objects;
+      unsigned int faces_per_object;
 
       /**
        * Orientations.
        */
-      std::vector<types::geometric_orientation> object_orientations;
+      std::vector<types::geometric_orientation> face_orientations;
     };
 
     //----------------------------------------------------------------------//
 
     inline TriaObjectsOrientations::TriaObjectsOrientations()
     {
-      reinit(0);
+      reinit(0, numbers::invalid_unsigned_int);
     }
 
 
 
     inline TriaObjectsOrientations::TriaObjectsOrientations(
-      const unsigned int n_objects)
+      const unsigned int n_objects,
+      const unsigned int n_faces_per_object)
     {
-      reinit(n_objects);
+      reinit(n_objects, n_faces_per_object);
     }
 
 
 
     inline void
-    TriaObjectsOrientations::reinit(const unsigned int n_objects)
+    TriaObjectsOrientations::reinit(const unsigned int n_objects,
+                                    const unsigned int n_faces_per_object)
     {
-      n_stored_objects = n_objects;
-      object_orientations.assign(n_objects,
-                                 numbers::default_geometric_orientation);
+      faces_per_object = n_faces_per_object;
+      face_orientations.assign(n_objects * faces_per_object,
+                               numbers::default_geometric_orientation);
     }
 
 
@@ -160,9 +168,8 @@ namespace internal
     inline void
     TriaObjectsOrientations::resize(const unsigned int n_objects)
     {
-      object_orientations.resize(n_objects,
-                                 numbers::default_geometric_orientation);
-      n_stored_objects = n_objects;
+      face_orientations.resize(n_objects * faces_per_object,
+                               numbers::default_geometric_orientation);
     }
 
 
@@ -170,8 +177,8 @@ namespace internal
     inline std::size_t
     TriaObjectsOrientations::memory_consumption() const
     {
-      return MemoryConsumption::memory_consumption(n_stored_objects) +
-             MemoryConsumption::memory_consumption(object_orientations);
+      return MemoryConsumption::memory_consumption(faces_per_object) +
+             MemoryConsumption::memory_consumption(face_orientations);
     }
 
 
@@ -179,55 +186,63 @@ namespace internal
     inline unsigned int
     TriaObjectsOrientations::n_objects() const
     {
-      return n_stored_objects;
+      return face_orientations.size() / faces_per_object;
     }
 
 
 
     inline types::geometric_orientation
     TriaObjectsOrientations::get_combined_orientation(
-      const unsigned int object) const
+      const unsigned int object_no,
+      const unsigned int face_no) const
     {
-      AssertIndexRange(object, n_stored_objects);
-      return object_orientations[object];
+      AssertIndexRange(face_no, faces_per_object);
+      const auto index = object_no * faces_per_object + face_no;
+      AssertIndexRange(index, face_orientations.size());
+      return face_orientations[index];
     }
 
 
 
     inline bool
-    TriaObjectsOrientations::get_orientation(const unsigned int object) const
+    TriaObjectsOrientations::get_orientation(const unsigned int object_no,
+                                             const unsigned int face_no) const
     {
-      AssertIndexRange(object, n_stored_objects);
-      return !Utilities::get_bit(object_orientations[object], 0);
+      return !Utilities::get_bit(get_combined_orientation(object_no, face_no),
+                                 0);
     }
 
 
 
     inline bool
-    TriaObjectsOrientations::get_rotation(const unsigned int object) const
+    TriaObjectsOrientations::get_rotation(const unsigned int object_no,
+                                          const unsigned int face_no) const
     {
-      AssertIndexRange(object, n_stored_objects);
-      return Utilities::get_bit(object_orientations[object], 1);
+      return Utilities::get_bit(get_combined_orientation(object_no, face_no),
+                                1);
     }
 
 
 
     inline bool
-    TriaObjectsOrientations::get_flip(const unsigned int object) const
+    TriaObjectsOrientations::get_flip(const unsigned int object_no,
+                                      const unsigned int face_no) const
     {
-      AssertIndexRange(object, n_stored_objects);
-      return Utilities::get_bit(object_orientations[object], 2);
+      return Utilities::get_bit(get_combined_orientation(object_no, face_no),
+                                2);
     }
 
 
 
     inline void
     TriaObjectsOrientations::set_combined_orientation(
-      const unsigned int                 object,
+      const unsigned int                 object_no,
+      const unsigned int                 face_no,
       const types::geometric_orientation value)
     {
-      AssertIndexRange(object, n_stored_objects);
-      object_orientations[object] = value;
+      const auto index = object_no * faces_per_object + face_no;
+      AssertIndexRange(index, face_orientations.size());
+      face_orientations[index] = value;
     }
 
 
@@ -236,7 +251,7 @@ namespace internal
     void
     TriaObjectsOrientations::serialize(Archive &ar, const unsigned int)
     {
-      ar &n_stored_objects &object_orientations;
+      ar &faces_per_object &face_orientations;
     }
   } // namespace TriangulationImplementation
 } // namespace internal
