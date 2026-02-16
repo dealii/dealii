@@ -1,22 +1,20 @@
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// SPDX-License-Identifier: LGPL-2.1-or-later
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
 // Copyright (C) 2004 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// Part of the source code is dual licensed under Apache-2.0 WITH
-// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
-// governing the source code and code contributions can be found in
-// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #ifndef dealii_tests_h
 #define dealii_tests_h
 
 
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 // Common includes for tests.
 //
@@ -54,7 +52,7 @@
 #endif
 
 
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -77,7 +75,7 @@ DEAL_II_NAMESPACE_CLOSE
 using namespace dealii;
 
 
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 // Utility functions used in tests.
 //
@@ -446,7 +444,7 @@ operator<<(LogStream &out, const std::vector<T> &v)
 }
 
 
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 // Functions and classes used when initializing (library) subsystems and
 // modifying global state for the testing environment.
@@ -818,7 +816,7 @@ struct SetTBBAssertionHandler
 #endif /*TBB_DO_ASSERT*/
 
 
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 // Modify global state for the test environment.
 //
