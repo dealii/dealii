@@ -1,0 +1,6 @@
+Fixed: FEPointEvaluation::get_gradient() would return wrong results if a mesh
+consisted of both non-affine and affine elements and several points were
+evaluated on the cells of affine shape. This also affected the step-19
+tutorial program. This is now fixed.
+<br>
+(Martin Kronbichler, Zdeněk Bonaventura, 2026/02/13)
