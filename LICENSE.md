@@ -7,12 +7,17 @@ The deal.II library is copyrighted by the deal.II authors. This term refers
 to the people listed in the file `AUTHORS` and in the [authors
 list](https://dealii.org/authors.html) on the webpage.
 
-The deal.II library is free software; it is licensed under the <b>GNU
-Lesser General Public License v2.1 or later</b>. The deal.II authors are in
-the process of relicensing the library to be dual-licensed under the
-<b>Apache License 2.0</b> with <b>LLVM Exception</b> and the <b>GNU Lesser
-General Public License v2.1 or later</b>. As such we require all new code
-contributions to the library to be dual licensed as outlined below.
+This project is licensed under the terms of the [<b>Apache License
+2.0</b>](https://spdx.org/licenses/Apache-2.0.html) with [<b>LLVM
+Exception</b>](https://spdx.org/licenses/LLVM-exception.html), and
+separately under the terms of the [<b>GNU Lesser General Public License
+v2.1 or later</b>](https://spdx.org/licenses/LGPL-2.1-or-later.html) (dual
+licensed).
+
+Separate licenses apply to a small number of source files, notably under
+`bundled/`, `examples/`, and `tests/`. The open source license that applies
+to a source file is annotated in the header with an [SPDX
+identifier](https://spdx.dev/ids/).
 
 
 Contributions
