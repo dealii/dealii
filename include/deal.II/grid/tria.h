@@ -3383,11 +3383,18 @@ public:
   has_hanging_nodes() const;
 
   /**
-   * Return the total number of vertices.  Some of them may not be used, which
-   * usually happens upon coarsening of a triangulation when some vertices are
-   * discarded, but we do not want to renumber the remaining ones, leading to
-   * holes in the numbers of used vertices.  You can get the number of used
-   * vertices using @p n_used_vertices function.
+   * Return the total number of vertices.
+   *
+   * When refining a mesh, the Triangulation class creates new vertices that
+   * are then enumerated. When a mesh is coarsened again, some of these
+   * vertices become unused, but the class does not re-enumerate the remaining
+   * ones. As a consequence, what this function returns is the *total* number
+   * of vertices, used or unused. That is, not all vertex indices between zero
+   * and what this function returns may be used.
+   *
+   * If you want to know how many *used* vertices this triangulation have, call
+   * the n_used_vertices() function. If you want to know which specific indices
+   * are used, call vertex_used() or get_used_vertices().
    */
   unsigned int
   n_vertices() const;
@@ -3405,20 +3412,27 @@ public:
 
   /**
    * Return the number of vertices that are presently in use, i.e. belong to
-   * at least one used element.
+   * at least one cell. See the discussion in the documentation of the
+   * n_vertices() function about the distinction between used and unused
+   * vertex indices.
    */
   unsigned int
   n_used_vertices() const;
 
   /**
    * Return @p true if the vertex with this @p index is used.
+   * See the discussion in the documentation of the
+   * n_vertices() function about the distinction between used and unused
+   * vertex indices.
    */
   bool
   vertex_used(const unsigned int index) const;
 
   /**
    * Return a constant reference to the array of @p bools indicating whether
-   * an entry in the vertex array is used or not.
+   * a specific vertex index is used or not. See the discussion in the
+   * documentation of the n_vertices() function about the distinction between
+   * used and unused vertex indices.
    */
   const std::vector<bool> &
   get_used_vertices() const;
