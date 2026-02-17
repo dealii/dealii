@@ -82,9 +82,15 @@ namespace internal
           const types::fe_index                          fe_index_1,
           const types::fe_index                          fe_index_2,
           std::unique_ptr<DoFIdentities>                &identities,
-          const unsigned int face_no = numbers::invalid_unsigned_int)
+          const unsigned int face_no          = numbers::invalid_unsigned_int,
+          const unsigned int face_no_neighbor = numbers::invalid_unsigned_int)
         {
           Assert(structdim == 2 || face_no == numbers::invalid_unsigned_int,
+                 ExcInternalError());
+          Assert((face_no == numbers::invalid_unsigned_int &&
+                  face_no_neighbor == numbers::invalid_unsigned_int) ||
+                   (face_no != numbers::invalid_unsigned_int &&
+                    face_no_neighbor != numbers::invalid_unsigned_int),
                  ExcInternalError());
 
           // see if we need to fill this entry, or whether it already
@@ -180,7 +186,7 @@ namespace internal
                       Assert(
                         identity.second <
                           fes[fe_index_2].template n_dofs_per_object<structdim>(
-                            face_no),
+                            face_no_neighbor),
                         ExcInternalError());
                     }
                 }
@@ -789,10 +795,16 @@ namespace internal
                       {fe_indices.begin(), fe_indices.end()},
                       /*codim=*/dim - 2);
 
+                  // check if this cell is the dominating one and get the face
+                  // indices
+                  const bool this_cell_is_dominating =
+                    cell->active_fe_index() == most_dominating_fe_index;
+
                   const unsigned int most_dominating_fe_index_face_no =
-                    cell->active_fe_index() == most_dominating_fe_index ?
-                      q :
-                      cell->neighbor_face_no(q);
+                    this_cell_is_dominating ? q : cell->neighbor_face_no(q);
+
+                  const unsigned int other_fe_index_face_no =
+                    this_cell_is_dominating ? cell->neighbor_face_no(q) : q;
 
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
@@ -818,7 +830,8 @@ namespace internal
                                   [most_dominating_fe_index][other_fe_index]
                                   [cell->quad(q)->reference_cell() ==
                                    ReferenceCells::Quadrilateral],
-                                most_dominating_fe_index_face_no);
+                                most_dominating_fe_index_face_no,
+                                other_fe_index_face_no);
 
                             for (const auto &identity : identities)
                               {
@@ -1526,11 +1539,16 @@ namespace internal
                       {fe_indices.begin(), fe_indices.end()},
                       /*codim=*/dim - 2);
 
-                  const types::fe_index most_dominating_fe_index_face_no =
-                    cell->active_fe_index() == most_dominating_fe_index ?
-                      q :
-                      cell->neighbor_face_no(q);
+                  // check if this cell is the dominating one and get the face
+                  // indices
+                  const bool this_cell_is_dominating =
+                    cell->active_fe_index() == most_dominating_fe_index;
 
+                  const unsigned int most_dominating_fe_index_face_no =
+                    this_cell_is_dominating ? q : cell->neighbor_face_no(q);
+
+                  const unsigned int other_fe_index_face_no =
+                    this_cell_is_dominating ? cell->neighbor_face_no(q) : q;
                   // if we found the most dominating element, then use
                   // this to eliminate some of the degrees of freedom
                   // by identification. otherwise, the code that
@@ -1555,7 +1573,8 @@ namespace internal
                                   [most_dominating_fe_index][other_fe_index]
                                   [cell->quad(q)->reference_cell() ==
                                    ReferenceCells::Quadrilateral],
-                                most_dominating_fe_index_face_no);
+                                most_dominating_fe_index_face_no,
+                                other_fe_index_face_no);
 
                             for (const auto &identity : identities)
                               {
@@ -2269,9 +2288,15 @@ namespace internal
                           const types::fe_index fe_index =
                             quad->nth_active_fe_index(f);
 
+                          // figure out on which side of the face we are on
+                          const unsigned int face_no =
+                            cell->active_fe_index() == fe_index ?
+                              q :
+                              cell->neighbor_face_no(q);
+
                           for (unsigned int d = 0;
-                               d <
-                               dof_handler.get_fe(fe_index).n_dofs_per_quad(q);
+                               d < dof_handler.get_fe(fe_index).n_dofs_per_quad(
+                                     face_no);
                                ++d)
                             {
                               const types::global_dof_index old_dof_index =
