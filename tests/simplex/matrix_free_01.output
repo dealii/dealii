@@ -13,3 +13,5 @@ DEAL:WEDGE  ::dim=3 degree=2 Type=Possion   : Convergence step 20 value 0.000133
 DEAL:WEDGE  ::dim=3 degree=2 Type=Helmholtz : Convergence step 20 value 0.000125844.
 DEAL:PYRAMID::dim=3 degree=1 Type=Possion   : Convergence step 10 value 0.000197898.
 DEAL:PYRAMID::dim=3 degree=1 Type=Helmholtz : Convergence step 10 value 0.000186534.
+DEAL:PYRAMID::dim=3 degree=2 Type=Possion   : Convergence step 30 value 0.000129965.
+DEAL:PYRAMID::dim=3 degree=2 Type=Helmholtz : Convergence step 30 value 0.000120027.

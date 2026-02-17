@@ -158,7 +158,7 @@ test(const unsigned int v, const unsigned int degree, const bool do_helmholtz)
       GridGenerator::subdivided_hyper_cube_with_pyramids(tria,
                                                          dim == 2 ? 16 : 8);
       fe         = std::make_shared<FE_PyramidP<dim>>(degree);
-      quad       = std::make_shared<QGaussPyramid<dim>>(degree + 1);
+      quad       = std::make_shared<QGaussPyramid<dim>>(2);
       fe_mapping = std::make_shared<FE_PyramidP<dim>>(1);
     }
   else
@@ -337,13 +337,9 @@ main(int argc, char **argv)
 
       test<3>(i, /*degree=*/1, /*do_helmholtz*/ false);
       test<3>(i, /*degree=*/1, /*do_helmholtz*/ true);
+      test<3>(i, /*degree=*/2, /*do_helmholtz*/ false);
+      test<3>(i, /*degree=*/2, /*do_helmholtz*/ true);
 
-      if (i !=
-          2) // for pyramids no quadratic elements have been implemented yet
-        {
-          test<3>(i, /*degree=*/2, /*do_helmholtz*/ false);
-          test<3>(i, /*degree=*/2, /*do_helmholtz*/ true);
-        }
 
       deallog.pop();
     }

@@ -282,8 +282,8 @@ test(const Triangulation<dim, spacedim> &tria,
     }
   else if (reference_cells[0] == ReferenceCells::Pyramid)
     {
-      lower = 81;
-      upper = 85;
+      lower = 241;
+      upper = 243;
     }
   else
     Assert(false, ExcInternalError());
@@ -631,7 +631,7 @@ test_pyramid(const MPI_Comm comm, const Parameters<dim> &params)
   // 3) Select components
   FE_PyramidP<dim> fe(params.degree);
 
-  QGaussPyramid<dim> quad(params.degree + 1);
+  QGaussPyramid<dim> quad(2);
 
   hp::QCollection<dim - 1> face_quad{QGauss<dim - 1>(params.degree + 1),
                                      QGaussSimplex<dim - 1>(params.degree + 1),
@@ -725,9 +725,6 @@ main(int argc, char **argv)
       params.repetitions   = std::vector<unsigned int>{10, 10, 10};
       params.p1            = Point<3>(3.3, 0, 0);
       params.p2            = Point<3>(4.3, 1, 1);
-
-      params.degree = 1;
-
       test_pyramid(comm, params);
     }
   }

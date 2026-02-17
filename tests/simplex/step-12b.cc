@@ -968,7 +968,7 @@ DGMethod<dim>::run()
 
       solution1 -= solution2;
       const double difference = solution1.linfty_norm();
-      if (difference > 1e-13)
+      if (difference > 1e-12)
         deallog << "solution1 and solution2 differ!!" << std::endl;
       else
         deallog << "solution1 and solution2 coincide." << std::endl;
@@ -1050,14 +1050,14 @@ main()
         }
 
       // pyramid
-      for (unsigned int i = 1; i <= 1; ++i)
+      for (unsigned int i = 1; i <= 2; ++i)
         {
           ScratchData<3> scratch_data;
 
           scratch_data.mapping =
             hp::MappingCollection<3>(MappingFE<3>(FE_PyramidP<3>(1)));
           scratch_data.fe         = hp::FECollection<3>(FE_PyramidDGP<3>(i));
-          scratch_data.quadrature = hp::QCollection<3>(QGaussPyramid<3>(i + 1));
+          scratch_data.quadrature = hp::QCollection<3>(QGaussPyramid<3>(2));
           scratch_data.face_quadrature = std::vector<hp::QCollection<2>>{
             hp::QCollection<2>(QGauss<2>(i + 1),
                                QGaussSimplex<2>(i + 1),

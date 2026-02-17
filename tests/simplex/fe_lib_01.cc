@@ -74,6 +74,10 @@ main()
   test(FE_WedgeDGP<3>(2));
 
   test(FE_PyramidP<3>(1));
+  test(FE_PyramidP<3>(2));
+  test(FE_PyramidP<3>(3));
 
   test(FE_PyramidDGP<3>(1));
+  test(FE_PyramidDGP<3>(2));
+  test(FE_PyramidDGP<3>(3));
 }
