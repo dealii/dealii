@@ -172,11 +172,11 @@ an unknown vector:
 \left(\begin{array}{cc}
  M         &       -k\theta M \\
 c_0^2\,k\,\theta\,A+c_0\,B  &  M   \\
-               \end{array} \right)\\
+               \end{array} \right)
 \left(\begin{array}{c}
  \bar{p}^{n}    \\
  \bar{v}^{n}
-              \end{array}\right)=\\
+              \end{array}\right)=
 \left(\begin{array}{l}
  G_1  \\
  G_2 -(\theta F^{n}+(1-\theta)F ^{n-1})c_{0}^{2}k \\
@@ -188,7 +188,7 @@ where
 \left(\begin{array}{c}
 G_1 \\
 G_2 \\
-   \end{array} \right)=\\
+   \end{array} \right)=
 \left(\begin{array}{l}
  M\bar{p}^{n-1}+k(1-\theta)Mv^{n-1}\\
  (-c_{0}^{2}k (1-\theta)A+c_0 B)\bar{p}^{n-1} +Mv^{n-1}
@@ -211,7 +211,7 @@ Compared to step-23, this programs adds the treatment of a
 simple absorbing boundary conditions. In addition, it deals with data obtained
 from actual experimental measurements. To this end, we need to evaluate the
 solution at points at which the experiment also evaluates a real pressure
-field. We will see how to do that using the VectorTools::point_value function
+field. We will see how to do that using the VectorTools::point_value() function
 further down below.
 
 
