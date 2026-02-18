@@ -322,11 +322,11 @@ namespace GridGenerator
     // pipe segment. Each skeleton vector points from the associated opening to
     // the common bifurcation point. For convenience, we also compute length and
     // unit vector of every skeleton vector here.
-    std::array<vector3d, n_pipes> skeleton;
+    std::array<vector3d, n_pipes> skeleton{};
     for (unsigned int p = 0; p < n_pipes; ++p)
       skeleton[p] = bifurcation.first - openings[p].first;
 
-    std::array<double, n_pipes> skeleton_length;
+    std::array<double, n_pipes> skeleton_length{};
     for (unsigned int p = 0; p < n_pipes; ++p)
       skeleton_length[p] = skeleton[p].norm();
 
@@ -338,7 +338,7 @@ namespace GridGenerator
       tolerance *
       *std::max_element(skeleton_length.begin(), skeleton_length.end());
 
-    std::array<vector3d, n_pipes> skeleton_unit;
+    std::array<vector3d, n_pipes> skeleton_unit{};
     for (unsigned int p = 0; p < n_pipes; ++p)
       {
         Assert(skeleton_length[p] > tolerance_length,
@@ -364,7 +364,7 @@ namespace GridGenerator
 
     // Projections of all skeleton vectors perpendicular to the normal vector,
     // or in other words, onto the plane described above.
-    std::array<vector3d, n_pipes> skeleton_plane;
+    std::array<vector3d, n_pipes> skeleton_plane{};
     for (unsigned int p = 0; p < n_pipes; ++p)
       {
         skeleton_plane[p] = skeleton[p] - (skeleton[p] * normal) * normal;
