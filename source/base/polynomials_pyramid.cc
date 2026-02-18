@@ -186,16 +186,61 @@ ScalarLagrangePolynomialPyramid<dim>::
   AssertIndexRange(j, this->degree() + 1);
   AssertIndexRange(k, this->degree() + 1 - std::max(i, j));
 
-  AssertThrow(std::abs(p[2] - 1.0) > 1e-14,
-              ExcMessage("The derivative at the tip is not defined."));
-  // e.g. for i,j,k=1,1,0 the gradient is [y/(1-z),x/(1-z),xy/(1-z)**2] which is
-  // not defined at [0,0,1]
+  Tensor<1, dim> grad;
 
   const double x = p[0];
   const double y = p[1];
   const double z = p[2];
 
-  Tensor<1, dim> grad;
+  // handle the special cases where 1/(1-z) cancels and the tip
+  if (i == 0 && j == 0)
+    {
+      // assume (1-z)^0 = 1 even when z = 1
+      grad[0] = 0.;
+      if constexpr (dim > 1)
+        grad[1] = 0.;
+      if constexpr (dim > 2)
+        grad[2] =
+          Polynomials::jacobi_polynomial_derivative<double>(k, 2, 0, z, true);
+
+      return grad;
+    }
+  else if (i == 0 && j == 1)
+    {
+      grad[0] = 0.;
+      if constexpr (dim > 1)
+        grad[1] =
+          Polynomials::jacobi_polynomial_value<double>(k, 4, 0, z, true);
+      if constexpr (dim > 2)
+        grad[2] =
+          y *
+          Polynomials::jacobi_polynomial_derivative<double>(k, 4, 0, z, true);
+
+      return grad;
+    }
+  else if (i == 1 && j == 0)
+    {
+      grad[0] = Polynomials::jacobi_polynomial_value<double>(k, 4, 0, z, true);
+      if constexpr (dim > 1)
+        grad[1] = 0.0;
+      if constexpr (dim > 2)
+        grad[2] =
+          x *
+          Polynomials::jacobi_polynomial_derivative<double>(k, 4, 0, z, true);
+
+      return grad;
+    }
+  else if (std::abs(p[2] - 1.0) < 1e-14)
+    {
+      grad = 0.;
+      if (i == 1 && j == 1)
+        // assume x/(1-z)-> 1 and y/(1-z)-> 1 at the tip
+        for (unsigned int d = 0; d < dim; ++d)
+          grad[d] =
+            Polynomials::jacobi_polynomial_value<double>(k, 4, 0, z, true);
+
+      return grad;
+    }
 
   const unsigned int max_ij = std::max(i, j);
   const double       ratio  = 1.0 / (1.0 - z);
