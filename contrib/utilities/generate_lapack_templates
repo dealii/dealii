@@ -638,12 +638,15 @@ def main():
     #
     with open(args["output_file"], "w") as output:
         print(
-            "// ------------------------------------------------------------------------",
+            "// -----------------------------------------------------------------------------",
             file=output,
         )
         print("//", file=output)
         year = time.ctime().split(" ")[-1]
-        print("// SPDX-License-Identifier: LGPL-2.1-or-later", file=output)
+        print(
+            "// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later",
+            file=output,
+        )
         print(
             "// Copyright (C) 2005 - {} by the deal.II authors".format(year),
             file=output,
@@ -652,24 +655,16 @@ def main():
         print("// This file is part of the deal.II library.", file=output)
         print("//", file=output)
         print(
-            "// Part of the source code is dual licensed under Apache-2.0 WITH",
+            "// Detailed license information governing the source code and contributions",
             file=output,
         )
         print(
-            "// LLVM-exception OR LGPL-2.1-or-later. Detailed license information",
-            file=output,
-        )
-        print(
-            "// governing the source code and code contributions can be found in",
-            file=output,
-        )
-        print(
-            "// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.",
+            "// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.",
             file=output,
         )
         print("//", file=output)
         print(
-            "// ------------------------------------------------------------------------------",
+            "// -----------------------------------------------------------------------------",
             file=output,
         )
 

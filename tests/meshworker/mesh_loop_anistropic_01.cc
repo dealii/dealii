@@ -1,15 +1,13 @@
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
 // Copyright (C) 2020 - 2021 by the deal.II Authors
 //
 // This file is part of the deal.II library.
 //
-// Part of the source code is dual licensed under Apache-2.0 WITH
-// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
-// governing the source code and code contributions can be found in
-// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Test mesh_loop with anisotropic grids in 2 and 3 dimensions
 

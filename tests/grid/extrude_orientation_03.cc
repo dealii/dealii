@@ -1,16 +1,14 @@
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// SPDX-License-Identifier: LGPL-2.1-or-later
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
 // Copyright (C) 2015 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// Part of the source code is dual licensed under Apache-2.0 WITH
-// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
-// governing the source code and code contributions can be found in
-// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Test GridGenerator::extrude_triangulation taking slice z-coordinate values.
 // This test is just a replicate of the one in extrude_orientation_02.cc except
