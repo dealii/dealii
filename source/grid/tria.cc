@@ -2204,8 +2204,7 @@ namespace internal
 
           if (dim == 2 || dim == 3)
             {
-              tria_level.face_orientations.resize(total_cells *
-                                                  max_n_faces(dim));
+              tria_level.face_orientations.resize(total_cells);
 
               tria_level.reference_cell.reserve(total_cells);
               tria_level.reference_cell.insert(
@@ -2551,7 +2550,7 @@ namespace internal
         , cell_types(cell_types)
       {}
 
-      inline TriaObjectsOrientations &
+      inline std::vector<types::geometric_orientation> &
       entity_orientations(const unsigned int structdim)
       {
         if (structdim == 1)
@@ -2562,7 +2561,7 @@ namespace internal
         return quad_orientation;
       }
 
-      inline const TriaObjectsOrientations &
+      inline const std::vector<types::geometric_orientation> &
       entity_orientations(const unsigned int structdim) const
       {
         if (structdim == 1)
@@ -2643,12 +2642,12 @@ namespace internal
 
       ArrayOfArrays line_vertices;
 
-      TriaObjectsOrientations line_orientation;
+      std::vector<types::geometric_orientation> line_orientation;
 
       ArrayOfArrays quad_vertices;
       ArrayOfArrays quad_lines;
 
-      TriaObjectsOrientations quad_orientation;
+      std::vector<types::geometric_orientation> quad_orientation;
 
       ArrayOfArrays cell_entities;
       ArrayOfArrays neighbors;
@@ -2741,13 +2740,13 @@ namespace internal
     template <int max_n_vertices, typename FU>
     void
     build_face_entities_templated(
-      const unsigned int                face_dimensionality,
-      const std::vector<ReferenceCell> &cell_types,
-      const ArrayOfArrays              &cells_to_vertices,
-      ArrayOfArrays                    &cells_to_faces, // result
-      ArrayOfArrays                    &crs_0,          // result
-      TriaObjectsOrientations          &orientations,   // result
-      const FU                         &second_key_function)
+      const unsigned int                         face_dimensionality,
+      const std::vector<ReferenceCell>          &cell_types,
+      const ArrayOfArrays                       &cells_to_vertices,
+      ArrayOfArrays                             &cells_to_faces, // result
+      ArrayOfArrays                             &crs_0,          // result
+      std::vector<types::geometric_orientation> &orientations,   // result
+      const FU                                  &second_key_function)
     {
       const bool compatibility_mode = true;
 
@@ -2874,12 +2873,11 @@ namespace internal
         }
 
       std::vector<unsigned int> cells_to_faces_indices(keys.size());
-      orientations.reinit(keys.size());
+      orientations.assign(keys.size(), numbers::default_geometric_orientation);
 
       // step 2: sort according to key so that entities with same key can be
       // merged
       std::sort(keys.begin(), keys.end());
-
 
       if (compatibility_mode)
         {
@@ -2938,8 +2936,7 @@ namespace internal
             {
               // previously seen key: set orientation relative to the first
               // occurrence
-              orientations.set_combined_orientation(
-                offset_i,
+              orientations[offset_i] =
                 ad_entity_types[offset_i]
                   .template get_combined_orientation<unsigned int>(
                     make_array_view(ad_entity_vertices[offset_i].begin(),
@@ -2947,7 +2944,7 @@ namespace internal
                                       ad_entity_types[offset_i].n_vertices()),
                     make_array_view(ref_indices.begin(),
                                     ref_indices.begin() +
-                                      ad_entity_types[offset_i].n_vertices())));
+                                      ad_entity_types[offset_i].n_vertices()));
             }
           cells_to_faces_indices[offset_i] = counter;
         }
@@ -2972,8 +2969,8 @@ namespace internal
                         const ArrayOfArrays              &cells_to_vertices,
                         ArrayOfArrays                    &cells_to_faces,
                         ArrayOfArrays                    &crs_0,
-                        TriaObjectsOrientations          &orientations,
-                        const FU                         &second_key_function)
+                        std::vector<types::geometric_orientation> &orientations,
+                        const FU &second_key_function)
     {
       unsigned int max_n_vertices = 0;
 
@@ -3030,16 +3027,17 @@ namespace internal
      * Furthermore, the type of the quad is determined.
      */
     inline void
-    build_intersection(const std::vector<ReferenceCell> &cell_types,
-                       const ArrayOfArrays              &cells_to_vertices,
-                       const ArrayOfArrays              &cells_to_lines,
-                       const ArrayOfArrays              &lines_to_vertices,
-                       const ArrayOfArrays              &cells_to_quads,
-                       const ArrayOfArrays              &quads_to_vertices,
-                       const TriaObjectsOrientations    &ori_cq,
-                       ArrayOfArrays              &quads_to_lines, // result
-                       TriaObjectsOrientations    &ori_ql,         // result
-                       std::vector<ReferenceCell> &quad_t_id       // result
+    build_intersection(
+      const std::vector<ReferenceCell>                &cell_types,
+      const ArrayOfArrays                             &cells_to_vertices,
+      const ArrayOfArrays                             &cells_to_lines,
+      const ArrayOfArrays                             &lines_to_vertices,
+      const ArrayOfArrays                             &cells_to_quads,
+      const ArrayOfArrays                             &quads_to_vertices,
+      const std::vector<types::geometric_orientation> &ori_cq,
+      ArrayOfArrays                                   &quads_to_lines, // result
+      std::vector<types::geometric_orientation>       &ori_ql,         // result
+      std::vector<ReferenceCell>                      &quad_t_id       // result
     )
     {
       quad_t_id.resize(quads_to_vertices.size());
@@ -3070,7 +3068,8 @@ namespace internal
       // Now that we have the offsets, allocate memory for the indices:
       std::vector<unsigned int> quads_to_lines_indices(
         quads_to_lines_offsets.back());
-      ori_ql.reinit(quads_to_lines_offsets.back());
+      ori_ql.assign(quads_to_lines_offsets.back(),
+                    numbers::default_geometric_orientation);
 
       // loop over cells
       unsigned int global_face_index = 0;
@@ -3086,7 +3085,7 @@ namespace internal
               const unsigned int f = faces[f_index];
 
               // only faces with default orientation have to do something
-              if (ori_cq.get_combined_orientation(global_face_index) !=
+              if (ori_cq[global_face_index] !=
                   numbers::default_geometric_orientation)
                 continue;
 
@@ -3119,10 +3118,9 @@ namespace internal
                       }
 
                   // ... comparison gives orientation
-                  ori_ql.set_combined_orientation(
-                    quads_to_lines_offsets[f] + l,
+                  ori_ql[quads_to_lines_offsets[f] + l] =
                     same ? numbers::default_geometric_orientation :
-                           numbers::reverse_line_orientation);
+                           numbers::reverse_line_orientation;
                 }
             }
         }
@@ -3156,7 +3154,7 @@ namespace internal
 
       if (dim == 2 || dim == 3) // build lines
         {
-          TriaObjectsOrientations dummy;
+          std::vector<types::geometric_orientation> dummy;
 
           build_face_entities(
             1,
@@ -4004,8 +4002,7 @@ namespace internal
 
                     // set line orientations
                     const auto combined_orientation =
-                      connectivity.entity_orientations(1)
-                        .get_combined_orientation(k);
+                      connectivity.entity_orientations(1)[k];
                     // it doesn't make sense to set any flags except
                     // orientation for a line
                     Assert(combined_orientation ==
@@ -4043,13 +4040,10 @@ namespace internal
           else if (dim == 2)
             {
               const auto &orientations = connectivity.entity_orientations(1);
-              for (unsigned int i = 0; i < orientations.n_objects(); ++i)
-                if (orientations.get_combined_orientation(i) !=
-                    numbers::default_geometric_orientation)
-                  {
-                    orientation_needed = true;
-                    break;
-                  }
+              orientation_needed       = std::any_of(
+                orientations.begin(), orientations.end(), [](const auto &a) {
+                  return a != numbers::default_geometric_orientation;
+                });
             }
 
           cells_0.allocate(n_cell);
@@ -4088,9 +4082,10 @@ namespace internal
                   if (orientation_needed)
                     {
                       level.face_orientations.set_combined_orientation(
-                        cell * ReferenceCells::max_n_faces<dim>() + f,
-                        connectivity.entity_orientations(dim - 1)
-                          .get_combined_orientation(global_face_index));
+                        cell,
+                        f,
+                        connectivity.entity_orientations(dim -
+                                                         1)[global_face_index]);
                     }
                 }
             }
@@ -4338,7 +4333,7 @@ namespace internal
         level.reference_cell.assign(size, ReferenceCells::Invalid);
 
         if (orientation_needed)
-          level.face_orientations.reinit(size * max_n_faces(dim));
+          level.face_orientations.reinit(size, max_n_faces(dim));
 
 
         level.global_active_cell_indices.assign(size,
@@ -17044,7 +17039,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 
                 const auto combined_orientation =
                   levels[l]->face_orientations.get_combined_orientation(
-                    cell->index() * ReferenceCells::max_n_faces<dim>() + face);
+                    cell->index(), face);
                 const std::array<unsigned int, 4> vertex_order{
                   {ref_cell.standard_to_real_face_vertex(0,
                                                          face,
