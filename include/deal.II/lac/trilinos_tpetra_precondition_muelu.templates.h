@@ -68,21 +68,24 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     PreconditionAMGMueLu<Number, MemorySpace>::initialize(
-      SparseMatrix<Number, MemorySpace> &A,
-      Teuchos::ParameterList            &parameters)
+      const SparseMatrix<Number, MemorySpace> &A,
+      const Teuchos::ParameterList            &parameters)
     {
       this->parameter_list.setParameters(parameters);
-      Teuchos::RCP<Tpetra::Operator<Number,
-                                    TpetraTypes::LO,
-                                    TpetraTypes::GO,
-                                    TpetraTypes::NodeType<MemorySpace>>>
+      Teuchos::RCP<const Tpetra::Operator<Number,
+                                          TpetraTypes::LO,
+                                          TpetraTypes::GO,
+                                          TpetraTypes::NodeType<MemorySpace>>>
+
         op = A.trilinos_rcp();
-      Teuchos::RCP<MueLu::TpetraOperator<Number,
-                                         TpetraTypes::LO,
-                                         TpetraTypes::GO,
-                                         TpetraTypes::NodeType<MemorySpace>>>
-        precon             = MueLu::CreateTpetraPreconditioner(op, parameters);
-      this->preconditioner = precon;
+
+      this->preconditioner = MueLu::CreateTpetraPreconditioner(
+        Teuchos::rcp_const_cast<
+          Tpetra::Operator<Number,
+                           TpetraTypes::LO,
+                           TpetraTypes::GO,
+                           TpetraTypes::NodeType<MemorySpace>>>(op),
+        this->parameter_list);
     }
 
 
@@ -90,8 +93,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     PreconditionAMGMueLu<Number, MemorySpace>::initialize(
-      SparseMatrix<Number, MemorySpace> &A,
-      const AdditionalData              &ad)
+      const SparseMatrix<Number, MemorySpace> &A,
+      const AdditionalData                    &ad)
     {
       Teuchos::ParameterList parameter_list;
 
