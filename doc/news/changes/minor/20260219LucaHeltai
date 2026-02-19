@@ -1,0 +1,5 @@
+New: VTKWrappers::unstructured_grid_to_dealii_triangulation() and
+VTKWrappers::dealii_triangulation_to_unstructured_grid() allow translations of
+a Triangulation from and to vtkUnstructuredGrid.
+<br>
+(Luca Heltai, 2026/02/19)
