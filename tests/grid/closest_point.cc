@@ -29,7 +29,7 @@ test(const ReferenceCell &reference_cell,
                 ExcInternalError());
 
   // Also generate a lot of points in the unit cell - we should be closer than
-  // any generated point
+  // any generated point up to a roundoff error
   const unsigned int n_points_1d = 100;
   if (dim == 2)
     {
@@ -39,7 +39,8 @@ test(const ReferenceCell &reference_cell,
             const Point<dim> grid_point(i / double(n_points_1d),
                                         j / double(n_points_1d));
             if (reference_cell.contains_point(grid_point))
-              AssertThrow(distance_square <= grid_point.distance_square(p),
+              AssertThrow(distance_square <=
+                            (1 + 1e-15) * grid_point.distance_square(p),
                           ExcInternalError());
           }
     }
@@ -55,7 +56,8 @@ test(const ReferenceCell &reference_cell,
                                           -1.0 + 2.0 * j / double(n_points_1d),
                                           k / double(n_points_1d));
               if (reference_cell.contains_point(grid_point))
-                AssertThrow(distance_square <= grid_point.distance_square(p),
+                AssertThrow(distance_square <=
+                              (1 + 1e-15) * grid_point.distance_square(p),
                             ExcInternalError());
             }
     }
