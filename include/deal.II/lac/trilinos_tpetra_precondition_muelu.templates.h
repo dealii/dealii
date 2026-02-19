@@ -79,6 +79,9 @@ namespace LinearAlgebra
 
         op = A.trilinos_rcp();
 
+      // FIXME We shouldn't need to use const_cast here but up to at least
+      // Trilinos 17.0.0 MueLu::CreateTpetraPreconditioner only works with
+      // non-const arguments
       this->preconditioner = MueLu::CreateTpetraPreconditioner(
         Teuchos::rcp_const_cast<
           Tpetra::Operator<Number,
