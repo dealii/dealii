@@ -274,8 +274,11 @@ test_convergence(
       error.sadd(1.0, -1.0, solution);
       double error_norm = error.l2_norm();
       errors.push_back(error_norm);
-      if (cycle > 1)
-        deallog << std::log(std::fabs(errors[cycle - 1] / errors[cycle])) /
+      if (error_norm > 1e-13 && cycle > 1)
+        deallog << std::setprecision(4) << "dt " << std::setw(10) << time_step
+                << " error " << std::setw(10) << errors[cycle] << " rate "
+                << std::setw(10)
+                << std::log(std::fabs(errors[cycle - 1] / errors[cycle])) /
                      std::log(2.)
                 << std::endl;
     }
