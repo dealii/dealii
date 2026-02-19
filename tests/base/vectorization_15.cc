@@ -11,9 +11,9 @@
 // -----------------------------------------------------------------------------
 
 
-// test transpose operations of vectorized array using the array+offset method
-// for the set of all supported vectorization widths (otherwise the same as
-// vectorization_10)
+// test transpose operations of vectorized array using the 'multiple-pointer'
+// method for the set of all supported vectorization widths (otherwise the
+// same as vectorization_10)
 
 #include <deal.II/base/vectorization.h>
 
