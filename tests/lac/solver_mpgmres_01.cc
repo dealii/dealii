@@ -137,5 +137,5 @@ main()
     solver_mpgmres.solve(matrix, sol, rhs, wrapper_a, wrapper_b, wrapper_c),
     control.last_step(),
     20 - 12,
-    20 + 12);
+    20 + 20);
 }
