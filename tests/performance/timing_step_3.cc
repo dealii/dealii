@@ -229,6 +229,15 @@ Step3::run()
   assemble_system();
   timer["assemble_system"].stop();
 
+  timer["vmult"].start();
+  {
+    for (int i = 0; i < 1000; ++i)
+      system_matrix.vmult(solution, system_rhs);
+  }
+  timer["vmult"].stop();
+  solution = 0.;
+
+
   timer["solve"].start();
   solve();
   timer["solve"].stop();
@@ -240,6 +249,7 @@ Step3::run()
   return {timer["make_grid"].wall_time(),
           timer["setup_system"].wall_time(),
           timer["assemble_system"].wall_time(),
+          timer["vmult"].wall_time(),
           timer["solve"].wall_time(),
           timer["output_results"].wall_time()};
 }
@@ -253,6 +263,7 @@ describe_measurements()
           {"make_grid",
            "setup_system",
            "assemble_system",
+           "vmult",
            "solve",
            "output_results"}};
 }
