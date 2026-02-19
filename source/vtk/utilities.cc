@@ -633,62 +633,19 @@ namespace VTKWrappers
     AssertDimension(dof_handler.get_fe().n_blocks(), data_names_from_fe.size());
     data_names = data_names_from_fe;
   }
-#else
-DEAL_II_NAMESPACE_OPEN
 
-namespace VTKWrappers
-{
-  template <int dim, int spacedim>
-  void
-  read_tria(const std::string &,
-            Triangulation<dim, spacedim> &,
-            const bool,
-            const double)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  void
-  read_cell_data(const std::string &, const std::string &, Vector<double> &)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  void
-  read_vertex_data(const std::string &, const std::string &, Vector<double> &)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  void
-  read_all_data(const std::string &, Vector<double> &, const bool, const double)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  template <int dim, int spacedim>
-  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-            std::vector<std::string>>
-  vtk_to_finite_element(const std::string &)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  template <int dim, int spacedim>
-  void
-  read_vtk(const std::string &,
-           DoFHandler<dim, spacedim> &,
-           Vector<double> &,
-           std::vector<std::string> &,
-           const bool,
-           const double)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-#endif
-
-#include "vtk/utilities.inst"
+#  include "vtk/utilities.inst"
 
 } // namespace VTKWrappers
 
 DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+#endif
