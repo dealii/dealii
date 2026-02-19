@@ -36,8 +36,10 @@ public:
   /**
    * Constructor.
    */
-  FE_PyramidPoly(const unsigned int                                degree,
-                 const internal::GenericDoFsPerObject             &dpos,
+  FE_PyramidPoly(const unsigned int                   degree,
+                 const internal::GenericDoFsPerObject dpos,
+                 const std::vector<Point<dim>>        support_points,
+                 const bool                           prolongation_is_additive,
                  const typename FiniteElementData<dim>::Conformity conformity);
 
   /**
@@ -56,8 +58,8 @@ public:
  * cells is FE_SimplexP, on hypercube cells it is FE_Q, and
  * on wedges it is FE_WedgeP.
  *
- * @note Currently, only linear polynomials (degree=1) are implemented. See
- * also the documentation of ScalarLagrangePolynomialPyramid.
+ * The elements are based on @cite Bergot2010, yet use equidistant support
+ * points. For continuous elements the degree is currently limited to 3.
  *
  * Also see
  * @ref simplex "Simplex support".
@@ -119,8 +121,8 @@ public:
  * the finite element space of discontinuous, piecewise polynomials of
  * degree $k$.
  *
- * @note Currently, only linear polynomials (degree=1) are implemented. See
- * also the documentation of ScalarLagrangePolynomialPyramid.
+ * The elements are based on @cite Bergot2010, yet use equidistant support
+ * points.
  *
  * Also see
  * @ref simplex "Simplex support".

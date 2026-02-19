@@ -20,11 +20,18 @@
 #include <deal.II/base/scalar_polynomials_base.h>
 #include <deal.II/base/tensor.h>
 
+#include <deal.II/lac/full_matrix.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 /**
  * Polynomials defined on pyramid entities. This class is basis of
  * FE_PyramidP.
+ * The polynomials are based on @cite Bergot2010. We first use the
+ * Jacobi polynomials to construct a modal basis (Proposition 1.10). With the
+ * modal basis a Vandermonde matrix is calculated which leads to a nodal basis.
+ * For computing the values of the nodal basis the Vandermonde matrix is
+ * multiplied with the modal basis vector evaluated at the evaluation point.
  */
 template <int dim>
 class ScalarLagrangePolynomialPyramid : public ScalarPolynomialsBase<dim>
@@ -37,10 +44,18 @@ public:
 
   /*
    * Constructor taking the polynomial @p degree as input.
-   *
-   * @note Currently, only linear polynomials (degree=1) are implemented.
+   * This constructor only works for linear elements.
    */
   ScalarLagrangePolynomialPyramid(const unsigned int degree);
+
+  /*
+   * Constructor taking the polynomial @p degree, the number of polynomials
+   * @p n_dofs and the support points as input.
+   */
+  ScalarLagrangePolynomialPyramid(
+    const unsigned int             degree,
+    const unsigned int             n_dofs,
+    const std::vector<Point<dim>> &support_points);
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
@@ -55,6 +70,9 @@ public:
            std::vector<Tensor<3, dim>> &third_derivatives,
            std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
 
+  /**
+   * @copydoc ScalarPolynomialsBase::compute_value()
+   */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
 
@@ -114,6 +132,55 @@ public:
 
   virtual std::unique_ptr<ScalarPolynomialsBase<dim>>
   clone() const override;
+
+private:
+  /**
+   * The Vandermonde matrix evaluates each modal basis function at the chosen
+   * nodal points.
+   * Applying the inverse of the Vandermonde matrix transforms from the modal
+   * basis to the nodal basis.
+   */
+  FullMatrix<double> vandermonde_matrix_inverse;
+
+  /**
+   * Evaluate the orthogonal basis at point @p p. The indices @p i, @p j
+   * and @p k corresponde to the polynomial degrees of the Jacobi polynomials,
+   * see @cite Bergot2010 proposition 1.10.
+   */
+  double
+  evaluate_orthogonal_basis_function_by_degree(const unsigned int i,
+                                               const unsigned int j,
+                                               const unsigned int k,
+                                               const Point<dim>  &p) const;
+
+  /**
+   * Evaluate the orthogonal basis function @p i at point @p p.
+   * This function determines the corresponding indices for the Jacobi
+   * polynomials and calls the function taking all indices as arguments.
+   */
+  double
+  evaluate_orthogonal_basis_function(const unsigned int i,
+                                     const Point<dim>  &p) const;
+
+  /**
+   * Evaluate the derivative of the orthogonal basis at point @p p.
+   * The indices @p i, @p j and @p k corresponde to the polynomial degrees of
+   * the Jacobi polynomials, see @cite Bergot2010 proposition 1.10.
+   */
+  Tensor<1, dim>
+  evaluate_orthogonal_basis_derivative_by_degree(const unsigned int i,
+                                                 const unsigned int j,
+                                                 const unsigned int k,
+                                                 const Point<dim>  &p) const;
+
+  /**
+   * Evaluate the derivative of the orthogonal basis function @p i at point
+   * @p p. This function determines the corresponding indices for the Jacobi
+   * polynomials and calls the function taking all indices as arguments.
+   */
+  Tensor<1, dim>
+  evaluate_orthogonal_basis_derivative(const unsigned int i,
+                                       const Point<dim>  &p) const;
 };
 
 

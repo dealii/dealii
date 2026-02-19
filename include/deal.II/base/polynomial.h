@@ -760,15 +760,38 @@ namespace Polynomials
    *
    * @note The Jacobi polynomials are not orthonormal and are defined on the
    * unit interval $[0, 1]$ as usual for deal.II, rather than $[-1, +1]$ often
-   * used in literature. @p x is the point of evaluation.
+   * used in literature. @p x is the point of evaluation. If instead the point
+   * @p x is given on the interval $[-1, +1]$ set
+   * @p rescale_to_dealii_unit_interval to false.
    */
   template <typename Number>
   Number
   jacobi_polynomial_value(const unsigned int degree,
                           const int          alpha,
                           const int          beta,
-                          const Number       x);
+                          const Number       x,
+                          const bool rescale_to_dealii_unit_interval = true);
 
+  /*
+   * Evaluate the derivative of the Jacobi polynomial $ d P_n^{\alpha, \beta}(x)
+   * / dx $ specified by the
+   * parameters @p alpha, @p beta, @p n, where @p n is the degree of the
+   * Jacobi polynomial.
+   *
+   * @note The Jacobi polynomials are not orthonormal and are defined on the
+   * unit interval $[0, 1]$ as usual for deal.II, rather than $[-1, +1]$ often
+   * used in literature. @p x is the point of evaluation. If instead the point @p
+   * x is given on the interval $[-1, +1]$ set @p rescale_to_dealii_unit_interval
+   * to false.
+   */
+  template <typename Number>
+  Number
+  jacobi_polynomial_derivative(
+    const unsigned int degree,
+    const int          alpha,
+    const int          beta,
+    const Number       x,
+    const bool         rescale_to_dealii_unit_interval = true);
 
   /**
    * Compute the roots of the Jacobi polynomials on the unit interval $[0, 1]$
@@ -1045,7 +1068,8 @@ namespace Polynomials
   jacobi_polynomial_value(const unsigned int degree,
                           const int          alpha,
                           const int          beta,
-                          const Number       x)
+                          const Number       x,
+                          const bool         rescale_to_dealii_unit_interval)
   {
     Assert(alpha >= 0 && beta >= 0,
            ExcNotImplemented("Negative alpha/beta coefficients not supported"));
@@ -1054,7 +1078,8 @@ namespace Polynomials
 
     // The recursion formula is defined for the interval [-1, 1], so rescale
     // to that interval here
-    const Number xeval = Number(-1) + 2. * x;
+    const Number xeval =
+      rescale_to_dealii_unit_interval ? Number(-1) + 2. * x : x;
 
     // initial values P_0(x), P_1(x):
     p0 = 1.0;
@@ -1077,6 +1102,30 @@ namespace Polynomials
         p1              = pn;
       }
     return p1;
+  }
+
+
+  template <typename Number>
+  Number
+  jacobi_polynomial_derivative(const unsigned int degree,
+                               const int          alpha,
+                               const int          beta,
+                               const Number       x,
+                               const bool rescale_to_dealii_unit_interval)
+  {
+    Assert(alpha >= 0 && beta >= 0,
+           ExcNotImplemented("Negative alpha/beta coefficients not supported"));
+
+    // The derivative of the Jacobi polynomial is evaluated using the recurrence
+    // relations
+    if (degree == 0)
+      return 0.0;
+    if (rescale_to_dealii_unit_interval)
+      return (1 + alpha + beta + degree) *
+             jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, true);
+
+    return 0.5 * (1 + alpha + beta + degree) *
+           jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, false);
   }
 
 
