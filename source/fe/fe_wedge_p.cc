@@ -83,6 +83,7 @@ template <int dim, int spacedim>
 FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   const unsigned int                                degree,
   const internal::GenericDoFsPerObject             &dpos,
+  const bool                                        prolongation_is_additive,
   const typename FiniteElementData<dim>::Conformity conformity)
   : dealii::FE_Poly<dim, spacedim>(
       ScalarLagrangePolynomialWedge<dim>(degree),
@@ -94,7 +95,7 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
       std::vector<bool>(
         FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
           .dofs_per_cell,
-        true),
+        prolongation_is_additive),
       std::vector<ComponentMask>(
         FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
           .dofs_per_cell,
@@ -162,6 +163,7 @@ template <int dim, int spacedim>
 FE_WedgeP<dim, spacedim>::FE_WedgeP(const unsigned int degree)
   : FE_WedgePoly<dim, spacedim>(degree,
                                 get_dpo_vector_fe_wedge_p(degree),
+                                false,
                                 FiniteElementData<dim>::H1)
 {}
 
@@ -334,6 +336,7 @@ template <int dim, int spacedim>
 FE_WedgeDGP<dim, spacedim>::FE_WedgeDGP(const unsigned int degree)
   : FE_WedgePoly<dim, spacedim>(degree,
                                 get_dpo_vector_fe_wedge_dgp(degree),
+                                true,
                                 FiniteElementData<dim>::L2)
 {}
 
