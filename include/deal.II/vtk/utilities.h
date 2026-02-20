@@ -20,6 +20,7 @@
 
 #include <deal.II/fe/fe.h>
 
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria.h>
 
 #ifdef DEAL_II_WITH_VTK
@@ -210,6 +211,69 @@ namespace VTKWrappers
             std::vector<std::string>>
   vtk_to_finite_element(const std::string &vtk_filename);
 
+  /**
+   * Translate a vtk data file (obtained through read_all_data() above) to a
+   * dealii vector type, associated with the given DoFHandler object.
+   *
+   * Prerequisites:
+   * - The input triangulation must be a serial triangulation, obtained through
+   *   read_tria() above.
+   * - The DoFHandler must have been initialized with the finite element
+   *   obtained through the vtk_to_finite_element() method, and degrees of
+   *   freedom must have been already distributed.
+   * - The triangulation associated with the DoFHandler doest not need to be
+   *   same as the input triangulation, but it must be obtained from it. It may
+   *   be, for example, a parallel::fullydistributed::Triangulation obtained by
+   *   distributing the serial triangulation.
+   * - The input data must refer to the serial triangulation (obtained through
+   *   the read_vtk() method), and must have been obtained by calling the
+   *   read_all_data() method above.
+   *
+   * The DoFHandler object may be serial or parallel, and you may renumber it to
+   * your liking before calling this method. An example usage is the following:
+   * @code
+   * // Read serial triangulation from VTK file Triangulation<dim, spacedim>
+   * serial_tria; VTKWrappers::read_tria(vtk_filename, serial_tria);
+   *
+   * // Read all data from VTK file Vector<double> serial_data;
+   * VTKWrappers::read_all_data(vtk_filename, serial_data);
+   *
+   * // Read finite element from VTK file auto [fe, data_names] =
+   * VTKWrappers::vtk_to_finite_element<dim, spacedim>(vtk_filename);
+   *
+   * // Split serial triangulation into a parallel one
+   * parallel::fullydistributed::Triangulation<dim, spacedim> parallel_tria;
+   * parallel_tria.copy_triangulation(serial_tria); // use default partitioner
+   *
+   * // Setup DoFHandler on parallel triangulation DoFHandler<dim, spacedim>
+   * dof_handler(parallel_tria); dof_handler.distribute_dofs(*fe); // Optionally
+   * renumber dofs here
+   * ...
+   * // Map serial data to distributed vector
+   * LinearAlgebra::distributed::Vector<double> distributed_data;
+   * VTKWrappers::data_to_dealii_vector( serial_tria, serial_data, dof_handler,
+   * distributed_data);
+   * @endcode
+   *
+   * This function exists to allow manipulation of the DoFHandler (e.g., through
+   * block wise renumbering) before mapping the (serial) data to (a possibly
+   * distributed) vector.
+   *
+   * @tparam dim
+   * @tparam spacedim
+   * @tparam VectorType
+   * @param serial_tria
+   * @param data
+   * @param dh
+   * @param output_vector
+   */
+  template <int dim, int spacedim, typename VectorType>
+  void
+  data_to_dealii_vector(const Triangulation<dim, spacedim> &serial_tria,
+                        const Vector<double>               &data,
+                        const DoFHandler<dim, spacedim>    &dh,
+                        VectorType                         &output_vector);
+
 #  ifndef DOXYGEN
   // Template implementations
 
@@ -229,6 +293,91 @@ namespace VTKWrappers
     return p_vtk;
   }
 
+
+
+  template <int dim, int spacedim, typename VectorType>
+  void
+  data_to_dealii_vector(const Triangulation<dim, spacedim> &serial_tria,
+                        const Vector<double>               &data,
+                        const DoFHandler<dim, spacedim>    &dh,
+                        VectorType                         &output_vector)
+  {
+    AssertDimension(dh.n_dofs(), output_vector.size());
+    const auto &fe = dh.get_fe();
+
+    const auto dist_to_serial_vertices =
+      GridTools::parallel_to_serial_vertex_indices(serial_tria,
+                                                   dh.get_triangulation());
+
+    const auto &locally_owned_dofs = dh.locally_owned_dofs();
+
+    types::global_dof_index dofs_offset        = 0;
+    unsigned int            vertex_comp_offset = 0;
+    unsigned int            cell_comp_offset   = 0;
+    for (unsigned int field = 0; field < fe.n_blocks(); ++field)
+      {
+        const auto        &field_fe = fe.base_element(field);
+        const unsigned int n_comps  = field_fe.n_components();
+        if (field_fe.n_dofs_per_vertex() > 0)
+          {
+            // This is a vertex data field
+            const types::global_dof_index n_local_dofs =
+              n_comps * serial_tria.n_vertices();
+            for (const auto &cell : dh.active_cell_iterators())
+              if (cell->is_locally_owned())
+                for (const auto v : cell->vertex_indices())
+                  {
+                    const types::global_dof_index serial_vertex_index =
+                      dist_to_serial_vertices[cell->vertex_index(v)];
+                    if (serial_vertex_index != numbers::invalid_unsigned_int)
+                      for (unsigned int c = 0; c < n_comps; ++c)
+                        {
+                          const types::global_dof_index dof_index =
+                            cell->vertex_dof_index(v, vertex_comp_offset + c);
+                          Assert(locally_owned_dofs.is_element(dof_index),
+                                 ExcInternalError());
+                          output_vector[dof_index] =
+                            data[dofs_offset + n_comps * serial_vertex_index +
+                                 c];
+                        }
+                  }
+            dofs_offset += n_local_dofs;
+            vertex_comp_offset += n_comps;
+          }
+        else if (field_fe.template n_dofs_per_object<dim>() > 0)
+          {
+            // this is a cell data field
+            const types::global_dof_index n_local_dofs =
+              n_comps * serial_tria.n_global_active_cells();
+
+            // Assumption: serial and parallel meshes have the same ordering of
+            // cells.
+            auto serial_cell   = serial_tria.begin_active();
+            auto parallel_cell = dh.begin_active();
+            for (; parallel_cell != dh.end(); ++parallel_cell)
+              if (parallel_cell->is_locally_owned())
+                {
+                  // Advance serial cell until we reach the same cell index of
+                  // the parallel cell
+                  while (serial_cell->id() < parallel_cell->id())
+                    ++serial_cell;
+                  const auto serial_cell_index =
+                    serial_cell->global_active_cell_index();
+                  for (unsigned int c = 0; c < n_comps; ++c)
+                    {
+                      const types::global_dof_index dof_index =
+                        parallel_cell->dof_index(cell_comp_offset + c);
+                      Assert(locally_owned_dofs.is_element(dof_index),
+                             ExcInternalError());
+                      output_vector[dof_index] =
+                        data[dofs_offset + n_comps * serial_cell_index + c];
+                    }
+                }
+            dofs_offset += n_local_dofs;
+            cell_comp_offset += n_comps;
+          }
+      }
+  }
 #  endif
 
 } // namespace VTKWrappers

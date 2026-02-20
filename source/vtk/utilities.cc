@@ -175,6 +175,7 @@ namespace VTKWrappers
                 CellData<2> cell_data(4);
                 for (unsigned int j = 0; j < 4; ++j)
                   cell_data.vertices[j] = cell->GetPointId(j);
+                std::swap(cell_data.vertices[2], cell_data.vertices[3]);
                 cell_data.material_id = 0;
                 cells.push_back(cell_data);
               }
