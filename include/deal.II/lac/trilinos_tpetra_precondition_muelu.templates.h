@@ -71,7 +71,7 @@ namespace LinearAlgebra
       const SparseMatrix<Number, MemorySpace> &A,
       const Teuchos::ParameterList            &parameters)
     {
-      this->parameter_list.setParameters(parameters);
+      this->parameter_list = parameters;
       Teuchos::RCP<const Tpetra::Operator<Number,
                                           TpetraTypes::LO,
                                           TpetraTypes::GO,
