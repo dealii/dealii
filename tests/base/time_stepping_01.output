@@ -43,129 +43,125 @@ DEAL::Cash-Karp
 DEAL::0
 DEAL::Forward Euler first order
 DEAL::convergence rate
-DEAL::0.634657
-DEAL::0.763742
-DEAL::0.862050
-DEAL::0.924783
-DEAL::0.960617
-DEAL::0.979834
+DEAL::dt 0.2500     error 0.07847    rate 0.6347    
+DEAL::dt 0.1250     error 0.04622    rate 0.7637    
+DEAL::dt 0.06250    error 0.02543    rate 0.8621    
+DEAL::dt 0.03125    error 0.01339    rate 0.9248    
+DEAL::dt 0.01562    error 0.006882   rate 0.9606    
+DEAL::dt 0.007812   error 0.003490   rate 0.9798    
 DEAL::Runge-Kutta third order
 DEAL::convergence rate
-DEAL::0.0523936
-DEAL::2.00049
-DEAL::2.55207
-DEAL::2.78347
-DEAL::2.89332
-DEAL::2.94704
+DEAL::dt 0.2500     error 3.856e-05  rate 0.05239   
+DEAL::dt 0.1250     error 9.637e-06  rate 2.000     
+DEAL::dt 0.06250    error 1.643e-06  rate 2.552     
+DEAL::dt 0.03125    error 2.387e-07  rate 2.783     
+DEAL::dt 0.01562    error 3.212e-08  rate 2.893     
+DEAL::dt 0.007812   error 4.166e-09  rate 2.947     
 DEAL::Strong Stability Preserving Runge-Kutta third order
 DEAL::convergence rate
-DEAL::2.72007
-DEAL::2.86894
-DEAL::2.93941
-DEAL::2.97135
-DEAL::2.98614
-DEAL::2.99319
+DEAL::dt 0.2500     error 0.001073   rate 2.720     
+DEAL::dt 0.1250     error 0.0001469  rate 2.869     
+DEAL::dt 0.06250    error 1.915e-05  rate 2.939     
+DEAL::dt 0.03125    error 2.442e-06  rate 2.971     
+DEAL::dt 0.01562    error 3.082e-07  rate 2.986     
+DEAL::dt 0.007812   error 3.870e-08  rate 2.993     
 DEAL::Runge-Kutta fourth order
 DEAL::convergence rate
-DEAL::3.64708
-DEAL::3.86926
-DEAL::3.95478
-DEAL::3.98399
-DEAL::3.99389
-DEAL::3.99746
+DEAL::dt 0.2500     error 4.100e-05  rate 3.647     
+DEAL::dt 0.1250     error 2.806e-06  rate 3.869     
+DEAL::dt 0.06250    error 1.809e-07  rate 3.955     
+DEAL::dt 0.03125    error 1.144e-08  rate 3.984     
+DEAL::dt 0.01562    error 7.177e-10  rate 3.994     
+DEAL::dt 0.007812   error 4.494e-11  rate 3.997     
 DEAL::Runge-Kutta fifth order
 DEAL::convergence rate
-DEAL::6.86518
-DEAL::4.45602
-DEAL::3.95502
-DEAL::4.64075
-DEAL::4.84314
-DEAL::4.88753
+DEAL::dt 0.2500     error 1.041e-07  rate 6.865     
+DEAL::dt 0.1250     error 4.744e-09  rate 4.456     
+DEAL::dt 0.06250    error 3.059e-10  rate 3.955     
+DEAL::dt 0.03125    error 1.226e-11  rate 4.641     
+DEAL::dt 0.01562    error 4.272e-13  rate 4.843     
 DEAL::Runge-Kutta sixth order
 DEAL::convergence rate
-DEAL::5.18177
-DEAL::5.68249
-DEAL::5.87473
-DEAL::5.94764
-DEAL::5.97758
-DEAL::5.44730
+DEAL::dt 0.2500     error 5.393e-07  rate 5.182     
+DEAL::dt 0.1250     error 1.050e-08  rate 5.682     
+DEAL::dt 0.06250    error 1.790e-10  rate 5.875     
+DEAL::dt 0.03125    error 2.900e-12  rate 5.948     
 DEAL::Low-storage Runge-Kutta stage 1 order 1
 DEAL::convergence rate
-DEAL::0.634657
-DEAL::0.763742
-DEAL::0.862050
-DEAL::0.924783
-DEAL::0.960617
-DEAL::0.979834
+DEAL::dt 0.2500     error 0.07847    rate 0.6347    
+DEAL::dt 0.1250     error 0.04622    rate 0.7637    
+DEAL::dt 0.06250    error 0.02543    rate 0.8621    
+DEAL::dt 0.03125    error 0.01339    rate 0.9248    
+DEAL::dt 0.01562    error 0.006882   rate 0.9606    
+DEAL::dt 0.007812   error 0.003490   rate 0.9798    
 DEAL::Low-storage Runge-Kutta stage 2 order 2
 DEAL::convergence rate
-DEAL::1.92699
-DEAL::1.99168
-DEAL::2.00801
-DEAL::2.00821
-DEAL::2.00536
-DEAL::2.00302
+DEAL::dt 0.2500     error 0.005740   rate 1.927     
+DEAL::dt 0.1250     error 0.001443   rate 1.992     
+DEAL::dt 0.06250    error 0.0003588  rate 2.008     
+DEAL::dt 0.03125    error 8.920e-05  rate 2.008     
+DEAL::dt 0.01562    error 2.222e-05  rate 2.005     
+DEAL::dt 0.007812   error 5.543e-06  rate 2.003     
 DEAL::Low-storage Runge-Kutta stage 3 order 3
 DEAL::convergence rate
-DEAL::2.65986
-DEAL::2.82914
-DEAL::2.91745
-DEAL::2.95989
-DEAL::2.98029
-DEAL::2.99024
+DEAL::dt 0.2500     error 0.0008828  rate 2.660     
+DEAL::dt 0.1250     error 0.0001242  rate 2.829     
+DEAL::dt 0.06250    error 1.644e-05  rate 2.917     
+DEAL::dt 0.03125    error 2.113e-06  rate 2.960     
+DEAL::dt 0.01562    error 2.678e-07  rate 2.980     
+DEAL::dt 0.007812   error 3.370e-08  rate 2.990     
 DEAL::Low-storage Runge-Kutta stage 5 order 4
 DEAL::convergence rate
-DEAL::3.52474
-DEAL::3.77867
-DEAL::3.89561
-DEAL::3.94964
-DEAL::3.97531
-DEAL::3.98778
+DEAL::dt 0.2500     error 4.908e-05  rate 3.525     
+DEAL::dt 0.1250     error 3.576e-06  rate 3.779     
+DEAL::dt 0.06250    error 2.403e-07  rate 3.896     
+DEAL::dt 0.03125    error 1.555e-08  rate 3.950     
+DEAL::dt 0.01562    error 9.888e-10  rate 3.975     
+DEAL::dt 0.007812   error 6.232e-11  rate 3.988     
 DEAL::Low-storage Runge-Kutta stage 7 order 4
 DEAL::convergence rate
-DEAL::-0.579086
-DEAL::3.29557
-DEAL::3.71647
-DEAL::3.87052
-DEAL::3.93798
-DEAL::3.96951
+DEAL::dt 0.2500     error 2.243e-06  rate -0.5791   
+DEAL::dt 0.1250     error 2.284e-07  rate 3.296     
+DEAL::dt 0.06250    error 1.738e-08  rate 3.716     
+DEAL::dt 0.03125    error 1.188e-09  rate 3.871     
+DEAL::dt 0.01562    error 7.751e-11  rate 3.938     
+DEAL::dt 0.007812   error 4.948e-12  rate 3.970     
 DEAL::Low-storage Runge-Kutta stage 9 order 5
 DEAL::convergence rate
-DEAL::4.66916
-DEAL::4.85354
-DEAL::4.93262
-DEAL::4.96796
-DEAL::4.98436
-DEAL::4.99866
+DEAL::dt 0.2500     error 2.606e-06  rate 4.669     
+DEAL::dt 0.1250     error 9.016e-08  rate 4.854     
+DEAL::dt 0.06250    error 2.952e-09  rate 4.933     
+DEAL::dt 0.03125    error 9.432e-11  rate 4.968     
+DEAL::dt 0.01562    error 2.980e-12  rate 4.984     
 DEAL::Backward Euler first order
 DEAL::convergence rate
-DEAL::6.54345
-DEAL::1.54696
-DEAL::1.20585
-DEAL::1.09170
-DEAL::1.04350
-DEAL::1.02129
+DEAL::dt 0.2500     error 0.2158     rate 6.543     
+DEAL::dt 0.1250     error 0.07385    rate 1.547     
+DEAL::dt 0.06250    error 0.03201    rate 1.206     
+DEAL::dt 0.03125    error 0.01502    rate 1.092     
+DEAL::dt 0.01562    error 0.007288   rate 1.044     
+DEAL::dt 0.007812   error 0.003590   rate 1.021     
 DEAL::Implicit midpoint second order
 DEAL::convergence rate
-DEAL::1.96525
-DEAL::1.99777
-DEAL::2.00269
-DEAL::2.00884
-DEAL::2.04892
-DEAL::2.05461
+DEAL::dt 0.2500     error 0.002824   rate 1.965     
+DEAL::dt 0.1250     error 0.0007071  rate 1.998     
+DEAL::dt 0.06250    error 0.0001764  rate 2.003     
+DEAL::dt 0.03125    error 4.384e-05  rate 2.009     
+DEAL::dt 0.01562    error 1.060e-05  rate 2.049     
+DEAL::dt 0.007812   error 2.550e-06  rate 2.055     
 DEAL::Crank-Nicolson second order
 DEAL::convergence rate
-DEAL::2.34241
-DEAL::2.07476
-DEAL::2.01846
-DEAL::2.00559
-DEAL::2.00652
-DEAL::2.00632
+DEAL::dt 0.2500     error 0.01213    rate 2.342     
+DEAL::dt 0.1250     error 0.002879   rate 2.075     
+DEAL::dt 0.06250    error 0.0007105  rate 2.018     
+DEAL::dt 0.03125    error 0.0001769  rate 2.006     
+DEAL::dt 0.01562    error 4.404e-05  rate 2.007     
+DEAL::dt 0.007812   error 1.096e-05  rate 2.006     
 DEAL::SDIRK second order
 DEAL::convergence rate
-DEAL::2.11605
-DEAL::2.02959
-DEAL::2.00992
-DEAL::2.01080
-DEAL::2.01420
-DEAL::2.11290
+DEAL::dt 0.2500     error 0.003533   rate 2.116     
+DEAL::dt 0.1250     error 0.0008653  rate 2.030     
+DEAL::dt 0.06250    error 0.0002149  rate 2.010     
+DEAL::dt 0.03125    error 5.331e-05  rate 2.011     
+DEAL::dt 0.01562    error 1.320e-05  rate 2.014     
+DEAL::dt 0.007812   error 3.051e-06  rate 2.113     
