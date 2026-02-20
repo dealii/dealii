@@ -1415,8 +1415,8 @@ namespace LinearAlgebra
        * the MueLu User Guide and Tutorial are highly recommended.
        */
       void
-      initialize(SparseMatrix<Number, MemorySpace> &A,
-                 Teuchos::ParameterList            &parameters);
+      initialize(const SparseMatrix<Number, MemorySpace> &A,
+                 const Teuchos::ParameterList            &parameters);
 
       /**
        * @brief Simplified interface for constructing a MueLu preconditioner
@@ -1429,7 +1429,7 @@ namespace LinearAlgebra
        * you should use the other initialize function.
        */
       void
-      initialize(SparseMatrix<Number, MemorySpace> &A,
+      initialize(const SparseMatrix<Number, MemorySpace> &A,
                  const AdditionalData &additional_data = AdditionalData());
     };
 #    endif
