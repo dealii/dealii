@@ -31,4 +31,4 @@ Applying preconditioner C
 Applying preconditioner A
 Applying preconditioner B
 Applying preconditioner C
-DEAL::Solver stopped within 8 - 32 iterations
+DEAL::Solver stopped within 8 - 40 iterations
