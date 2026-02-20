@@ -102,10 +102,10 @@ protected:
 };
 
 /**
- * Inverse iteration (Wieland) for eigenvalue computations.
+ * Inverse iteration (Wielandt) for eigenvalue computations.
  *
  * This class implements an adaptive version of the inverse iteration by
- * Wieland.
+ * Wielandt.
  *
  * There are two choices for the stopping criterion: by default, the norm of
  * the residual $A x - l x$ is computed. Since this might not converge to zero

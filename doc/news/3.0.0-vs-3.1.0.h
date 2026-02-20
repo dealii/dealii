@@ -545,7 +545,7 @@ All entries are signed with the names of the author.
 
   <li> <p>
        New: <code>EigenInverse</code> implements inverse
-       iteration by Wieland.
+       iteration by Wielandt.
        <br>
        (GK 2000/04/20)
        </p>

@@ -76,21 +76,21 @@ main()
 
   u      = 1.;
   lambda = 0.;
-  EigenInverse<> wieland(control, mem);
-  wieland.solve(lambda, A, u);
+  EigenInverse<> wielandt(control, mem);
+  wielandt.solve(lambda, A, u);
   deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_min
           << std::endl;
 
   u      = 1.;
   lambda = 10.;
-  wieland.solve(lambda, A, u);
+  wielandt.solve(lambda, A, u);
   deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max
           << std::endl;
 
   u      = 1.;
   lambda = 10.;
-  EigenInverse<> wieland2(control, mem, .2);
-  wieland2.solve(lambda, A, u);
+  EigenInverse<> wielandt2(control, mem, .2);
+  wielandt2.solve(lambda, A, u);
   deallog << "Eigenvalue " << lambda << " Error " << lambda - lambda_max
           << std::endl;
 }
