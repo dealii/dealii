@@ -4487,11 +4487,7 @@ TriaAccessorBase<structdim, dim, spacedim>::copy_from(
   tria          = a.tria;
 
   if (structdim != dim)
-    {
-      Assert((present_level == 0) || (present_level == -1) ||
-               (present_level == -2),
-             ExcInternalError());
-    }
+    Assert(level() == 0, ExcInternalError());
 }
 
 
@@ -4506,11 +4502,7 @@ TriaAccessorBase<structdim, dim, spacedim>::operator=(
   tria          = a.tria;
 
   if (structdim != dim)
-    {
-      Assert((present_level == 0) || (present_level == -1) ||
-               (present_level == -2),
-             ExcInternalError());
-    }
+    Assert(level() == 0, ExcInternalError());
   return *this;
 }
 
