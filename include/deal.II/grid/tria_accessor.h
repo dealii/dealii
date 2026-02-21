@@ -86,61 +86,72 @@ namespace internal
     struct Implementation;
 
     /**
-     * Implementation of a type with which to store the level of an accessor
-     * object. We only need it for the case that <tt>structdim == dim</tt>.
-     * Otherwise, an empty object is sufficient.
+     * Store either the level on which an object is defined or nothing.
+     *
+     * Only cells (i.e., accessors with dim == structdim) have levels. This
+     * class either stores an integer or nothing.
+     *
+     * @tparam access Whether or not the present class stores an integer for the
+     * level.
+     *
+     * @note Since this class stores nothing in the dim != structdim case, it
+     * ultimately requires no additional space when used with TriaAccessor due
+     * to the empty base class optimization.
      */
-    template <int structdim, int dim>
-    struct PresentLevelType
-    {
-      struct type
-      {
-        /**
-         * Default constructor.
-         */
-        type() = default;
-
-        /**
-         * Dummy constructor. Only level zero is allowed.
-         */
-        type(const int level)
-        {
-          Assert(level == 0, ExcInternalError());
-          (void)level; // removes -Wunused-parameter warning in optimized mode
-        }
-
-        /**
-         * Dummy conversion operator. Returns level zero.
-         */
-        operator int() const
-        {
-          return 0;
-        }
-
-        void
-        operator++() const
-        {
-          DEAL_II_ASSERT_UNREACHABLE();
-        }
-
-        void
-        operator--() const
-        {
-          DEAL_II_ASSERT_UNREACHABLE();
-        }
-      };
-    };
-
+    template <bool level_access>
+    class LevelAccessor
+    {};
 
     /**
-     * Implementation of a type with which to store the level of an accessor
-     * object. We only need it for the case that <tt>structdim == dim</tt>.
-     * Otherwise, an empty object is sufficient.
+     * Specialization of LevelAccessor which stores the level.
      */
-    template <int dim>
-    struct PresentLevelType<dim, dim>
+    template <>
+    class LevelAccessor<true>
     {
-      using type = int;
+    public:
+      LevelAccessor(const int level)
+        : present_level(level)
+      {}
+
+      void
+      set_level(const int level)
+      {
+        present_level = level;
+      }
+
+      int
+      get_level() const
+      {
+        return present_level;
+      }
+
+    private:
+      int present_level;
+    };
+
+    /**
+     * Specialization of LevelAccessor which does not store the level.
+     */
+    template <>
+    class LevelAccessor<false>
+    {
+    public:
+      LevelAccessor(const int level)
+      {
+        Assert(level == 0, ExcInternalError());
+      }
+
+      static void
+      set_level(const int level)
+      {
+        Assert(level == 0, ExcInternalError());
+      }
+
+      static int
+      get_level()
+      {
+        return 0;
+      }
     };
   } // namespace TriaAccessorImplementation
 } // namespace internal
@@ -287,7 +298,7 @@ namespace TriaAccessorExceptions
  *
  * In the implementation, the behavior of this class differs between the cases
  * where <tt>structdim==dim</tt> (cells of a mesh) and
- * <tt>structdim&lt;dim</tt> (faces and edges). For the latter, #present_level
+ * <tt>structdim&lt;dim</tt> (faces and edges). For the latter, level()
  * is always equal to zero and the constructors may not receive a positive
  * value there. For cells, any level is possible, but only those within the
  * range of the levels of the Triangulation are reasonable. Furthermore, the
@@ -303,6 +314,8 @@ namespace TriaAccessorExceptions
  */
 template <int structdim, int dim, int spacedim = dim>
 class TriaAccessorBase
+  : private internal::TriaAccessorImplementation::LevelAccessor<structdim ==
+                                                                dim>
 {
 public:
   /**
@@ -518,13 +531,6 @@ public:
    * @}
    */
 protected:
-  /**
-   * The level if this is a cell (<tt>structdim==dim</tt>). Else, contains
-   * zero.
-   */
-  typename dealii::internal::TriaAccessorImplementation::
-    PresentLevelType<structdim, dim>::type present_level;
-
   /**
    * Used to store the index of the element presently pointed to on the level
    * presently used.
@@ -4454,24 +4460,23 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   const int                           level,
   const int                           index,
   const AccessorData *)
-  : present_level((structdim == dim) ? level : 0)
+  : internal::TriaAccessorImplementation::LevelAccessor<dim == structdim>(
+      (structdim == dim) ? level : 0)
   , present_index(index)
   , tria(tria)
 {
   // non-cells have no level, so a 0 should have been passed, or a -1 for an
   // end-iterator, or -2 for an invalid (default constructed) iterator
   if (structdim != dim)
-    {
-      Assert((level == 0) || (level == -1) || (level == -2),
-             ExcInternalError());
-    }
+    Assert((level == 0) || (level == -1) || (level == -2), ExcInternalError());
 }
 
 
 template <int structdim, int dim, int spacedim>
 inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   const TriaAccessorBase<structdim, dim, spacedim> &a)
-  : present_level(a.present_level)
+  : internal::TriaAccessorImplementation::LevelAccessor<dim == structdim>(
+      a.level())
   , present_index(a.present_index)
   , tria(a.tria)
 {}
@@ -4482,7 +4487,7 @@ inline void
 TriaAccessorBase<structdim, dim, spacedim>::copy_from(
   const TriaAccessorBase<structdim, dim, spacedim> &a)
 {
-  present_level = a.present_level;
+  this->set_level(a.level());
   present_index = a.present_index;
   tria          = a.tria;
 
@@ -4497,7 +4502,7 @@ inline TriaAccessorBase<structdim, dim, spacedim> &
 TriaAccessorBase<structdim, dim, spacedim>::operator=(
   const TriaAccessorBase<structdim, dim, spacedim> &a)
 {
-  present_level = a.present_level;
+  this->set_level(a.level());
   present_index = a.present_index;
   tria          = a.tria;
 
@@ -4515,7 +4520,7 @@ TriaAccessorBase<structdim, dim, spacedim>::operator==(
 {
   Assert(tria == a.tria || tria == nullptr || a.tria == nullptr,
          TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((tria == a.tria) && (present_level == a.present_level) &&
+  return ((tria == a.tria) && (level() == a.level()) &&
           (present_index == a.present_index));
 }
 
@@ -4528,7 +4533,7 @@ TriaAccessorBase<structdim, dim, spacedim>::operator!=(
 {
   Assert(tria == a.tria || tria == nullptr || a.tria == nullptr,
          TriaAccessorExceptions::ExcCantCompareIterators());
-  return ((tria != a.tria) || (present_level != a.present_level) ||
+  return ((tria != a.tria) || (level() != a.level()) ||
           (present_index != a.present_index));
 }
 
@@ -4541,8 +4546,8 @@ TriaAccessorBase<structdim, dim, spacedim>::operator<(
 {
   Assert(tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
 
-  if (present_level != other.present_level)
-    return (present_level < other.present_level);
+  if (level() != other.level())
+    return (level() < other.level());
 
   return (present_index < other.present_index);
 }
@@ -4555,7 +4560,7 @@ TriaAccessorBase<structdim, dim, spacedim>::level() const
 {
   // This is always zero or invalid
   // if the object is not a cell
-  return present_level;
+  return this->get_level();
 }
 
 
@@ -4573,7 +4578,7 @@ template <int structdim, int dim, int spacedim>
 inline IteratorState::IteratorStates
 TriaAccessorBase<structdim, dim, spacedim>::state() const
 {
-  if ((present_level >= 0) && (present_index >= 0))
+  if ((level() >= 0) && (present_index >= 0))
     return IteratorState::valid;
   else if (present_index == -1)
     return IteratorState::past_the_end;
@@ -4613,19 +4618,18 @@ TriaAccessorBase<structdim, dim, spacedim>::operator++()
   else
     {
       while (this->present_index >=
-             static_cast<int>(
-               this->tria->levels[this->present_level]->cells.n_objects()))
+             static_cast<int>(this->tria->levels[level()]->cells.n_objects()))
         {
           // no -> go one level up until we find
           // one with more than zero cells
-          ++this->present_level;
+          this->set_level(level() + 1);
           this->present_index = 0;
           // highest level reached?
-          if (this->present_level >=
-              static_cast<int>(this->tria->levels.size()))
+          if (level() >= static_cast<int>(this->tria->levels.size()))
             {
               // return with past the end pointer
-              this->present_level = this->present_index = -1;
+              this->set_level(-1);
+              this->present_index = -1;
               return;
             }
         }
@@ -4650,17 +4654,18 @@ TriaAccessorBase<structdim, dim, spacedim>::operator--()
       while (this->present_index < 0)
         {
           // no -> go one level down
-          --this->present_level;
+          this->set_level(level() - 1);
           // lowest level reached?
-          if (this->present_level == -1)
+          if (level() == -1)
             {
               // return with past the end pointer
-              this->present_level = this->present_index = -1;
+              this->set_level(-1);
+              this->present_index = -1;
               return;
             }
           // else
           this->present_index =
-            this->tria->levels[this->present_level]->cells.n_objects() - 1;
+            this->tria->levels[level()]->cells.n_objects() - 1;
         }
     }
 }
@@ -4672,7 +4677,7 @@ inline dealii::internal::TriangulationImplementation::TriaObjects &
 TriaAccessorBase<structdim, dim, spacedim>::objects() const
 {
   if (structdim == dim)
-    return this->tria->levels[this->present_level]->cells;
+    return this->tria->levels[level()]->cells;
 
   if (structdim == 1 && dim > 1)
     return this->tria->faces->lines;
@@ -4682,7 +4687,7 @@ TriaAccessorBase<structdim, dim, spacedim>::objects() const
 
   DEAL_II_ASSERT_UNREACHABLE();
 
-  return this->tria->levels[this->present_level]->cells;
+  return this->tria->levels[level()]->cells;
 }
 
 
@@ -4901,7 +4906,7 @@ namespace internal
 
         // face_orientations is not set up in 1d
         if (dim != 1)
-          accessor.tria->levels[accessor.present_level]
+          accessor.tria->levels[accessor.level()]
             ->face_orientations.set_combined_orientation(accessor.present_index,
                                                          face_no,
                                                          combined_orientation);
@@ -5238,7 +5243,7 @@ TriaAccessor<structdim, dim, spacedim>::reference_cell() const
   else if (structdim == 1)
     return ReferenceCells::Line;
   else if (structdim == dim)
-    return this->tria->levels[this->present_level]
+    return this->tria->levels[this->level()]
       ->reference_cell[this->present_index];
   else
     return this->tria->faces->get_quad_type(this->present_index);
@@ -5268,11 +5273,11 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
       // set up
       const auto my_index = static_cast<std::size_t>(this->present_index) *
                             ReferenceCells::max_n_vertices<dim>();
-      AssertIndexRange(my_index + corner,
-                       this->tria->levels[this->present_level]
-                         ->cell_vertex_indices_cache.size());
+      AssertIndexRange(
+        my_index + corner,
+        this->tria->levels[this->level()]->cell_vertex_indices_cache.size());
       const unsigned int vertex_index =
-        this->tria->levels[this->present_level]
+        this->tria->levels[this->level()]
           ->cell_vertex_indices_cache[my_index + corner];
       Assert(vertex_index != numbers::invalid_unsigned_int, ExcInternalError());
       return vertex_index;
@@ -5375,7 +5380,7 @@ TriaAccessor<structdim, dim, spacedim>::quad_index(const unsigned int i) const
   if constexpr (structdim == 3)
     {
       AssertIndexRange(i, n_faces());
-      return this->tria->levels[this->present_level]
+      return this->tria->levels[this->level()]
         ->cells
         .cells[this->present_index * ReferenceCells::max_n_faces<3>() + i];
     }
@@ -5405,16 +5410,15 @@ TriaAccessor<structdim, dim, spacedim>::combined_face_orientation(
     {
       // if all elements are quads (or if we have a very special consistently
       // oriented triangular mesh) then we do not store this array
-      if (this->tria->levels[this->present_level]
-            ->face_orientations.n_objects() == 0)
+      if (this->tria->levels[this->level()]->face_orientations.n_objects() == 0)
         return numbers::default_geometric_orientation;
       else
-        return this->tria->levels[this->present_level]
+        return this->tria->levels[this->level()]
           ->face_orientations.get_combined_orientation(this->present_index,
                                                        face);
     }
   else
-    return this->tria->levels[this->present_level]
+    return this->tria->levels[this->level()]
       ->face_orientations.get_combined_orientation(this->present_index, face);
 }
 
@@ -5441,8 +5445,8 @@ TriaAccessor<structdim, dim, spacedim>::face_orientation(
     return this->line_orientation(face) ==
            numbers::default_geometric_orientation;
   else
-    return this->tria->levels[this->present_level]
-      ->face_orientations.get_orientation(this->present_index, face);
+    return this->tria->levels[this->level()]->face_orientations.get_orientation(
+      this->present_index, face);
 }
 
 
@@ -5461,7 +5465,7 @@ TriaAccessor<structdim, dim, spacedim>::face_flip(const unsigned int face) const
   (void)face;
 
   if constexpr (structdim == 3)
-    return this->tria->levels[this->present_level]->face_orientations.get_flip(
+    return this->tria->levels[this->level()]->face_orientations.get_flip(
       this->present_index, face);
   else
     // In 1d and 2d, face_flip is always false as faces can only be
@@ -5485,8 +5489,8 @@ TriaAccessor<structdim, dim, spacedim>::face_rotation(
   (void)face;
 
   if constexpr (structdim == 3)
-    return this->tria->levels[this->present_level]
-      ->face_orientations.get_rotation(this->present_index, face);
+    return this->tria->levels[this->level()]->face_orientations.get_rotation(
+      this->present_index, face);
   else
     // In 1d and 2d, face_rotation is always false as faces can only be
     // 'rotated' in 3d.
@@ -7535,7 +7539,7 @@ inline TriaIterator<CellAccessor<dim, spacedim>>
 CellAccessor<dim, spacedim>::child(const unsigned int i) const
 {
   TriaIterator<CellAccessor<dim, spacedim>> q(this->tria,
-                                              this->present_level + 1,
+                                              this->level() + 1,
                                               this->child_index(i));
 
   Assert((q.state() == IteratorState::past_the_end) || q->used(),
@@ -7666,7 +7670,7 @@ inline int
 CellAccessor<dim, spacedim>::neighbor_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
                 face_no]
     .second;
@@ -7679,7 +7683,7 @@ inline int
 CellAccessor<dim, spacedim>::neighbor_level(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
                 face_no]
     .first;
@@ -7695,11 +7699,12 @@ CellAccessor<dim, spacedim>::refine_flag_set() const
   // cells flagged for refinement must be active (the @p set_refine_flag
   // function checks this, but activity may change when refinement is executed
   // and for some reason the refine flag is not cleared).
-  Assert(this->is_active() || !this->tria->levels[this->present_level]
-                                 ->refine_flags[this->present_index],
-         ExcRefineCellNotActive());
+  Assert(
+    this->is_active() ||
+      !this->tria->levels[this->level()]->refine_flags[this->present_index],
+    ExcRefineCellNotActive());
   return RefinementCase<dim>(
-    this->tria->levels[this->present_level]->refine_flags[this->present_index]);
+    this->tria->levels[this->level()]->refine_flags[this->present_index]);
 }
 
 
@@ -7712,7 +7717,7 @@ CellAccessor<dim, spacedim>::set_refine_flag(
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   Assert(!coarsen_flag_set(), ExcCellFlaggedForCoarsening());
 
-  this->tria->levels[this->present_level]->refine_flags[this->present_index] =
+  this->tria->levels[this->level()]->refine_flags[this->present_index] =
     refinement_case;
 }
 
@@ -7723,7 +7728,7 @@ inline void
 CellAccessor<dim, spacedim>::clear_refine_flag() const
 {
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
-  this->tria->levels[this->present_level]->refine_flags[this->present_index] =
+  this->tria->levels[this->level()]->refine_flags[this->present_index] =
     RefinementCase<dim>::no_refinement;
 }
 
@@ -7733,10 +7738,9 @@ inline std::uint8_t
 CellAccessor<dim, spacedim>::refine_choice() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  if (this->tria->levels[this->present_level]->refine_choice.size() == 0)
+  if (this->tria->levels[this->level()]->refine_choice.size() == 0)
     return 0U;
-  return this->tria->levels[this->present_level]
-    ->refine_choice[this->present_index];
+  return this->tria->levels[this->level()]->refine_choice[this->present_index];
 }
 
 
@@ -7746,9 +7750,9 @@ CellAccessor<dim, spacedim>::set_refine_choice(
   const std::uint8_t refinement_choice) const
 {
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
-  if (this->tria->levels[this->present_level]->refine_choice.size() != 0)
-    this->tria->levels[this->present_level]
-      ->refine_choice[this->present_index] = refinement_choice;
+  if (this->tria->levels[this->level()]->refine_choice.size() != 0)
+    this->tria->levels[this->level()]->refine_choice[this->present_index] =
+      refinement_choice;
 }
 
 
@@ -7757,9 +7761,8 @@ inline void
 CellAccessor<dim, spacedim>::clear_refine_choice() const
 {
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
-  if (this->tria->levels[this->present_level]->refine_choice.size() != 0)
-    this->tria->levels[this->present_level]
-      ->refine_choice[this->present_index] =
+  if (this->tria->levels[this->level()]->refine_choice.size() != 0)
+    this->tria->levels[this->level()]->refine_choice[this->present_index] =
       static_cast<char>(IsotropicRefinementChoice::isotropic_refinement);
 }
 
@@ -7912,11 +7915,11 @@ CellAccessor<dim, spacedim>::coarsen_flag_set() const
   // cells flagged for coarsening must be active (the @p set_refine_flag
   // function checks this, but activity may change when refinement is executed
   // and for some reason the refine flag is not cleared).
-  Assert(this->is_active() || !this->tria->levels[this->present_level]
-                                 ->coarsen_flags[this->present_index],
-         ExcRefineCellNotActive());
-  return this->tria->levels[this->present_level]
-    ->coarsen_flags[this->present_index];
+  Assert(
+    this->is_active() ||
+      !this->tria->levels[this->level()]->coarsen_flags[this->present_index],
+    ExcRefineCellNotActive());
+  return this->tria->levels[this->level()]->coarsen_flags[this->present_index];
 }
 
 
@@ -7928,8 +7931,7 @@ CellAccessor<dim, spacedim>::set_coarsen_flag() const
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   Assert(!refine_flag_set(), ExcCellFlaggedForRefinement());
 
-  this->tria->levels[this->present_level]->coarsen_flags[this->present_index] =
-    true;
+  this->tria->levels[this->level()]->coarsen_flags[this->present_index] = true;
 }
 
 
@@ -7939,8 +7941,7 @@ inline void
 CellAccessor<dim, spacedim>::clear_coarsen_flag() const
 {
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
-  this->tria->levels[this->present_level]->coarsen_flags[this->present_index] =
-    false;
+  this->tria->levels[this->level()]->coarsen_flags[this->present_index] = false;
 }
 
 
@@ -8111,8 +8112,7 @@ CellAccessor<dim, spacedim>::subdomain_id() const
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   Assert(this->is_active(),
          ExcMessage("subdomain_id() can only be called on active cells!"));
-  return this->tria->levels[this->present_level]
-    ->subdomain_ids[this->present_index];
+  return this->tria->levels[this->level()]->subdomain_ids[this->present_index];
 }
 
 
@@ -8122,7 +8122,7 @@ inline types::subdomain_id
 CellAccessor<dim, spacedim>::level_subdomain_id() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->level_subdomain_ids[this->present_index];
 }
 
@@ -8157,7 +8157,7 @@ inline unsigned int
 CellAccessor<dim, spacedim>::active_cell_index() const
 {
   Assert(this->is_active(), TriaAccessorExceptions::ExcCellNotActive());
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->active_cell_indices[this->present_index];
 }
 
@@ -8172,7 +8172,7 @@ CellAccessor<dim, spacedim>::global_active_cell_index() const
          ExcMessage(
            "global_active_cell_index() can only be called on active cells!"));
 
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->global_active_cell_indices[this->present_index];
 }
 
@@ -8182,7 +8182,7 @@ template <int dim, int spacedim>
 inline types::global_cell_index
 CellAccessor<dim, spacedim>::global_level_cell_index() const
 {
-  return this->tria->levels[this->present_level]
+  return this->tria->levels[this->level()]
     ->global_level_cell_indices[this->present_index];
 }
 
