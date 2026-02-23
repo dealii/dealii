@@ -1,0 +1,4 @@
+Improved: `CellAccessor::child_iterators()` return vector size now depends on
+the `constexpr` function `ReferenceCells::max_n_children<dim>()`.
+<br>
+(Andreas Steger, 2026/02/23)
