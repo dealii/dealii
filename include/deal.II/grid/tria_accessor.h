@@ -264,8 +264,9 @@ namespace TriaAccessorExceptions
    * @ingroup Exceptions
    */
   DeclException0(ExcNoPeriodicNeighbor);
-  // TODO: Write documentation!
   /**
+   * Children are always stored in pairs, you must only provide the index of the
+   * even numbered children.
    * @ingroup Exceptions
    */
   DeclException1(
@@ -3230,7 +3231,7 @@ public:
    * Return an array of iterators to all children of this cell.
    */
   boost::container::small_vector<TriaIterator<CellAccessor<dim, spacedim>>,
-                                 GeometryInfo<dim>::max_children_per_cell>
+                                 ReferenceCells::max_n_children<dim>()>
   child_iterators() const;
 
   /**
@@ -7556,11 +7557,11 @@ CellAccessor<dim, spacedim>::child(const unsigned int i) const
 
 template <int dim, int spacedim>
 inline boost::container::small_vector<TriaIterator<CellAccessor<dim, spacedim>>,
-                                      GeometryInfo<dim>::max_children_per_cell>
+                                      ReferenceCells::max_n_children<dim>()>
 CellAccessor<dim, spacedim>::child_iterators() const
 {
   boost::container::small_vector<TriaIterator<CellAccessor<dim, spacedim>>,
-                                 GeometryInfo<dim>::max_children_per_cell>
+                                 ReferenceCells::max_n_children<dim>()>
     child_iterators(this->n_children());
 
   for (unsigned int i = 0; i < this->n_children(); ++i)
