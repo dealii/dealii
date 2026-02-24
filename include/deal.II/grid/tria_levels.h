@@ -50,13 +50,12 @@ namespace internal
      * need to know how to refine a line if the two adjacent faces have
      * different boundary indicators), and material data for cells.
      */
+    template <int dim, int spacedim = dim>
     class TriaLevel
     {
     public:
       /**
        * Constructor.
-       *
-       * @param dim Dimension of the Triangulation.
        *
        * @param[in] max_children_per_cell Maximum number of children (across all
        *            relevant ReferenceCell types) a cell in the present
@@ -66,25 +65,16 @@ namespace internal
        *            per cell. Like @p max_children_per_cell, this is the maximum
        *            over all relevant ReferenceCell types.
        */
-      TriaLevel(const unsigned int dim,
-                const unsigned int max_children_per_cell,
+      TriaLevel(const unsigned int max_children_per_cell,
                 const unsigned int max_faces_per_cell)
-        : dim(dim)
-        , cells(dim, max_children_per_cell, max_faces_per_cell)
+        : cells(dim, max_children_per_cell, max_faces_per_cell)
         , face_orientations(0, max_faces_per_cell)
       {}
 
       /**
        * Default constructor (needed by Boost).
        */
-      TriaLevel()
-        : dim(numbers::invalid_unsigned_int)
-      {}
-
-      /**
-       * Dimension of the Triangulation.
-       */
-      unsigned int dim;
+      TriaLevel() = default;
 
       /**
        * @p RefinementCase<dim>::Type flags for the cells to be refined with
@@ -108,7 +98,6 @@ namespace internal
        * coarsened.
        */
       std::vector<bool> coarsen_flags;
-
 
       /**
        * An integer that, for every active cell, stores the how many-th active
@@ -267,12 +256,11 @@ namespace internal
     };
 
 
+    template <int dim, int spacedim>
     template <class Archive>
     void
-    TriaLevel::serialize(Archive &ar, const unsigned int)
+    TriaLevel<dim, spacedim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &dim;
-
       ar &refine_flags &coarsen_flags;
 
       // do not serialize `active_cell_indices` and `vertex_indices_cache`

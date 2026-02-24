@@ -2111,14 +2111,13 @@ namespace internal
      * functions, with <tt>N>0</tt>.
      */
 
+    template <int dim, int spacedim>
     void
-    reserve_space(TriaLevel         &tria_level,
-                  const unsigned int total_cells,
-                  const unsigned int space_dimension,
-                  const bool         tetraheder_in_mesh = false)
+    reserve_space(TriaLevel<dim, spacedim> &tria_level,
+                  const unsigned int        total_cells,
+                  const unsigned int        space_dimension,
+                  const bool                tetraheder_in_mesh = false)
     {
-      const unsigned int dim = tria_level.dim;
-
       // we need space for total_cells cells. Maybe we have more already
       // with those cells which are unused, so only allocate new space if
       // needed.
@@ -2232,9 +2231,10 @@ namespace internal
      * be called with the preprocessor flag @p DEBUG set. The function
      * should be called from the functions of the higher TriaLevel classes.
      */
+    template <int dim, int spacedim>
     void
-    monitor_memory(const TriaLevel   &tria_level,
-                   const unsigned int true_dimension)
+    monitor_memory(const TriaLevel<dim, spacedim> &tria_level,
+                   const unsigned int              true_dimension)
     {
       Assert(2 * true_dimension * tria_level.refine_flags.size() ==
                tria_level.neighbors.size(),
@@ -3930,8 +3930,7 @@ namespace internal
         tria.levels.clear();
         tria.levels.push_back(
           std::make_unique<
-            dealii::internal::TriangulationImplementation::TriaLevel>(
-            dim,
+            internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
             ReferenceCells::max_n_children<dim>(),
             ReferenceCells::max_n_faces<dim>()));
 
@@ -4047,7 +4046,7 @@ namespace internal
             }
 
           cells_0.allocate(n_cell);
-          reserve_space_(level, spacedim, n_cell, orientation_needed);
+          reserve_space_(level, n_cell, orientation_needed);
 
           // loop over all cells
           unsigned int global_face_index = 0;
@@ -4307,14 +4306,12 @@ namespace internal
 
 
 
+      template <int dim, int spacedim>
       static void
-      reserve_space_(TriaLevel         &level,
-                     const unsigned int spacedim,
-                     const unsigned int size,
-                     const bool         orientation_needed)
+      reserve_space_(TriaLevel<dim, spacedim> &level,
+                     const unsigned int        size,
+                     const bool                orientation_needed)
       {
-        const unsigned int dim = level.dim;
-
         level.active_cell_indices.assign(size, numbers::invalid_unsigned_int);
         level.subdomain_ids.assign(size, 0);
         level.level_subdomain_ids.assign(size, 0);
@@ -5614,9 +5611,8 @@ namespace internal
           if (cell->refine_flag_set())
             {
               triangulation.levels.push_back(
-                std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(
-                  dim,
+                std::make_unique<internal::TriangulationImplementation::
+                                   TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
                   ReferenceCells::max_n_faces<dim>()));
               break;
@@ -6080,9 +6076,8 @@ namespace internal
           if (cell->refine_flag_set())
             {
               triangulation.levels.push_back(
-                std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(
-                  dim,
+                std::make_unique<internal::TriangulationImplementation::
+                                   TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
                   ReferenceCells::max_n_faces<dim>()));
               break;
@@ -6220,7 +6215,7 @@ namespace internal
                   first_child->face(1)->set_manifold_id(cell->manifold_id());
 
                   // reset neighborship info (refer to
-                  // internal::TriangulationImplementation::TriaLevel<0> for
+                  // internal::TriangulationImplementation::TriaLevel for
                   // details)
                   first_child->set_neighbor(1, second_child);
                   if (cell->neighbor(0).state() != IteratorState::valid)
@@ -6338,9 +6333,8 @@ namespace internal
           if (cell->refine_flag_set())
             {
               triangulation.levels.push_back(
-                std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(
-                  dim,
+                std::make_unique<internal::TriangulationImplementation::
+                                   TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
                   ReferenceCells::max_n_faces<dim>()));
               break;
@@ -6640,9 +6634,8 @@ namespace internal
           if (cell->refine_flag_set())
             {
               triangulation.levels.push_back(
-                std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(
-                  dim,
+                std::make_unique<internal::TriangulationImplementation::
+                                   TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
                   ReferenceCells::max_n_faces<dim>()));
               break;
@@ -8183,9 +8176,8 @@ namespace internal
           if (cell->refine_flag_set())
             {
               triangulation.levels.push_back(
-                std::make_unique<
-                  internal::TriangulationImplementation::TriaLevel>(
-                  dim,
+                std::make_unique<internal::TriangulationImplementation::
+                                   TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
                   ReferenceCells::max_n_faces<dim>()));
               break;
@@ -13466,7 +13458,8 @@ void Triangulation<dim, spacedim>::copy_triangulation(
   levels.reserve(other_tria.levels.size());
   for (const auto &level : other_tria.levels)
     levels.push_back(
-      std::make_unique<internal::TriangulationImplementation::TriaLevel>(
+      std::make_unique<
+        internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
         *level));
 
   number_cache = other_tria.number_cache;
@@ -14092,10 +14085,12 @@ namespace internal
 {
   namespace
   {
+    template <int dim, int spacedim>
     std::vector<std::vector<bool>>
     extract_raw_coarsen_flags(
-      const std::vector<std::unique_ptr<
-        dealii::internal::TriangulationImplementation::TriaLevel>> &levels)
+      const std::vector<
+        std::unique_ptr<dealii::internal::TriangulationImplementation::
+                          TriaLevel<dim, spacedim>>> &levels)
     {
       std::vector<std::vector<bool>> coarsen_flags(levels.size());
       for (unsigned int level = 0; level < levels.size(); ++level)
@@ -14103,10 +14098,12 @@ namespace internal
       return coarsen_flags;
     }
 
+    template <int dim, int spacedim>
     std::vector<std::vector<std::uint8_t>>
     extract_raw_refine_flags(
-      const std::vector<std::unique_ptr<
-        dealii::internal::TriangulationImplementation::TriaLevel>> &levels)
+      const std::vector<
+        std::unique_ptr<dealii::internal::TriangulationImplementation::
+                          TriaLevel<dim, spacedim>>> &levels)
     {
       std::vector<std::vector<std::uint8_t>> refine_flags(levels.size());
       for (unsigned int level = 0; level < levels.size(); ++level)
@@ -14123,9 +14120,11 @@ namespace internal
 namespace
 {
   // clear user data of cells
+  template <int dim, int spacedim>
   void
-  clear_user_data(std::vector<std::unique_ptr<
-                    internal::TriangulationImplementation::TriaLevel>> &levels)
+  clear_user_data(
+    std::vector<std::unique_ptr<
+      internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels)
   {
     for (auto &level : levels)
       level->cells.clear_user_data();
@@ -14166,13 +14165,12 @@ void Triangulation<dim, spacedim>::clear_user_data()
 
 namespace
 {
+  template <int dim, int spacedim>
   void
   clear_user_flags_line(
-    unsigned int dim,
-    std::vector<
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel>>
-                                                     &levels,
-    internal::TriangulationImplementation::TriaFaces *faces)
+    std::vector<std::unique_ptr<
+      internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels,
+    internal::TriangulationImplementation::TriaFaces                    *faces)
   {
     if (dim == 1)
       {
@@ -14195,20 +14193,19 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::clear_user_flags_line()
 {
-  dealii::clear_user_flags_line(dim, levels, faces.get());
+  dealii::clear_user_flags_line(levels, faces.get());
 }
 
 
 
 namespace
 {
+  template <int dim, int spacedim>
   void
   clear_user_flags_quad(
-    unsigned int dim,
-    std::vector<
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel>>
-                                                     &levels,
-    internal::TriangulationImplementation::TriaFaces *faces)
+    std::vector<std::unique_ptr<
+      internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels,
+    internal::TriangulationImplementation::TriaFaces                    *faces)
   {
     if (dim == 1)
       {
@@ -14235,19 +14232,18 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::clear_user_flags_quad()
 {
-  dealii::clear_user_flags_quad(dim, levels, faces.get());
+  dealii::clear_user_flags_quad(levels, faces.get());
 }
 
 
 
 namespace
 {
+  template <int dim, int spacedim>
   void
   clear_user_flags_hex(
-    unsigned int dim,
-    std::vector<
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel>>
-      &levels,
+    std::vector<std::unique_ptr<
+      internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels,
     internal::TriangulationImplementation::TriaFaces *)
   {
     if (dim == 1)
@@ -14275,7 +14271,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::clear_user_flags_hex()
 {
-  dealii::clear_user_flags_hex(dim, levels, faces.get());
+  dealii::clear_user_flags_hex(levels, faces.get());
 }
 
 

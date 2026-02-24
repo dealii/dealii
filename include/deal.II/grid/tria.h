@@ -4491,8 +4491,8 @@ private:
    * Array of pointers pointing to the objects storing the cell data on the
    * different levels.
    */
-  std::vector<
-    std::unique_ptr<dealii::internal::TriangulationImplementation::TriaLevel>>
+  std::vector<std::unique_ptr<
+    dealii::internal::TriangulationImplementation::TriaLevel<dim, spacedim>>>
     levels;
 
   /**
@@ -4753,8 +4753,10 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   levels.resize(size);
   for (auto &level_ : levels)
     {
-      std::unique_ptr<internal::TriangulationImplementation::TriaLevel> level;
-      ar                                                               &level;
+      std::unique_ptr<
+        internal::TriangulationImplementation::TriaLevel<dim, spacedim>>
+          level;
+      ar &level;
       level_ = std::move(level);
     }
 

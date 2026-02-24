@@ -21,8 +21,9 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
+    template <int dim, int spacedim>
     std::size_t
-    TriaLevel::memory_consumption() const
+    TriaLevel<dim, spacedim>::memory_consumption() const
     {
       return (
         MemoryConsumption::memory_consumption(refine_flags) +
@@ -41,6 +42,15 @@ namespace internal
         MemoryConsumption::memory_consumption(reference_cell) +
         MemoryConsumption::memory_consumption(cell_vertex_indices_cache));
     }
+
+    // explicit instantiations; note: we need them all for all dimensions
+
+    template class TriaLevel<1, 1>;
+    template class TriaLevel<1, 2>;
+    template class TriaLevel<1, 3>;
+    template class TriaLevel<2, 2>;
+    template class TriaLevel<2, 3>;
+    template class TriaLevel<3, 3>;
   } // namespace TriangulationImplementation
 } // namespace internal
 
