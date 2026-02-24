@@ -12,6 +12,6 @@ Cycle 1:
       1024+1024+1024+1024+
    Number of degrees of freedom: 16641
       4225+4160+4160+4096+
-DEAL:mpi::Solver stopped within 11 - 11 iterations
-   Solved in 11 iterations.
+DEAL:mpi::Solver stopped after 10 iterations
+   Solved in 10 iterations.
 
