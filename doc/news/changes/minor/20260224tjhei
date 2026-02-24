@@ -1,0 +1,3 @@
+Fixed: NonMatching::MappingInfo::reinit() would leak a small amount of memory in each call. This is now fixed. This indirectly affects the usage of FEPointEvaluation.
+<br>
+(Timo Heister, 2026/02/24)
