@@ -2293,7 +2293,7 @@ inline TriaIterator<DoFAccessor<structdim, dim, spacedim, level_dof_access>>
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::child(
   const unsigned int i) const
 {
-  Assert(static_cast<unsigned int>(this->present_level) <
+  Assert(static_cast<unsigned int>(this->level()) <
            this->dof_handler->object_dof_indices.size(),
          ExcMessage("DoFHandler not initialized"));
 
