@@ -64,6 +64,7 @@
 #  endif
 #  include <vtkDataArray.h>
 #  include <vtkPointData.h>
+#  include <vtkPoints.h>
 #  include <vtkSmartPointer.h>
 #  include <vtkUnstructuredGrid.h>
 #  include <vtkUnstructuredGridReader.h>
@@ -120,16 +121,14 @@ namespace VTKWrappers
 
   template <int dim, int spacedim>
   void
-  read_tria(const std::string            &vtk_filename,
-            Triangulation<dim, spacedim> &tria,
-            const bool                    cleanup,
-            const double                  relative_tolerance)
+  unstructured_grid_to_dealii_triangulation(
+    const vtkUnstructuredGrid    &unstructured_grid,
+    Triangulation<dim, spacedim> &tria)
   {
-    vtkSmartPointer<vtkUnstructuredGrid> grid =
-      internal::load_vtk_file(vtk_filename, cleanup, relative_tolerance);
+    auto &grid = const_cast<vtkUnstructuredGrid &>(unstructured_grid);
 
     // Read points
-    vtkPoints                   *vtk_points = grid->GetPoints();
+    vtkPoints                   *vtk_points = grid.GetPoints();
     const vtkIdType              n_points   = vtk_points->GetNumberOfPoints();
     std::vector<Point<spacedim>> points(n_points);
     for (vtkIdType i = 0; i < n_points; ++i)
@@ -142,15 +141,15 @@ namespace VTKWrappers
           AssertThrow(
             coords[d] == 0.0,
             ExcMessage(
-              "VTK file has non-zero coordinate in unused dimension."));
+              "VTK grid has non-zero coordinate in unused dimension."));
       }
 
     // Read cells
     std::vector<CellData<dim>> cells;
-    const vtkIdType            n_cells = grid->GetNumberOfCells();
+    const vtkIdType            n_cells = grid.GetNumberOfCells();
     for (vtkIdType i = 0; i < n_cells; ++i)
       {
-        vtkCell *cell = grid->GetCell(i);
+        vtkCell *cell = grid.GetCell(i);
         if constexpr (dim == 1)
           {
             if (cell->GetCellType() != VTK_LINE)
@@ -266,6 +265,97 @@ namespace VTKWrappers
 
     // Create triangulation
     tria.create_triangulation(points, cells, SubCellData());
+  }
+
+
+
+  template <int dim, int spacedim>
+  vtkSmartPointer<vtkUnstructuredGrid>
+  dealii_triangulation_to_unstructured_grid(
+    const Triangulation<dim, spacedim> &tria)
+  {
+    auto grid   = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    auto points = vtkSmartPointer<vtkPoints>::New();
+
+    points->SetNumberOfPoints(tria.n_vertices());
+    for (unsigned int i = 0; i < tria.n_vertices(); ++i)
+      {
+        std::array<double, 3> coords = {{0.0, 0.0, 0.0}};
+        for (unsigned int d = 0; d < spacedim; ++d)
+          coords[d] = tria.get_vertices()[i][d];
+        points->SetPoint(i, coords.data());
+      }
+    grid->SetPoints(points);
+
+    for (const auto &cell : tria.active_cell_iterators())
+      {
+        const unsigned int     n_vertices = cell->n_vertices();
+        std::vector<vtkIdType> point_ids(n_vertices);
+        for (unsigned int i = 0; i < n_vertices; ++i)
+          point_ids[i] = static_cast<vtkIdType>(cell->vertex_index(i));
+
+        int vtk_cell_type = -1;
+        if constexpr (dim == 1)
+          {
+            AssertThrow(n_vertices == 2,
+                        ExcMessage("Unsupported 1D cell with != 2 vertices."));
+            vtk_cell_type = VTK_LINE;
+          }
+        else if constexpr (dim == 2)
+          {
+            if (n_vertices == 4)
+              {
+                vtk_cell_type = VTK_QUAD;
+                std::swap(point_ids[2], point_ids[3]);
+              }
+            else if (n_vertices == 3)
+              vtk_cell_type = VTK_TRIANGLE;
+            else
+              AssertThrow(false,
+                          ExcMessage("Unsupported 2D cell type: only "
+                                     "quads and triangles are supported."));
+          }
+        else if constexpr (dim == 3)
+          {
+            if (n_vertices == 8)
+              {
+                vtk_cell_type = VTK_HEXAHEDRON;
+                std::swap(point_ids[2], point_ids[3]);
+                std::swap(point_ids[6], point_ids[7]);
+              }
+            else if (n_vertices == 4)
+              vtk_cell_type = VTK_TETRA;
+            else if (n_vertices == 6)
+              vtk_cell_type = VTK_WEDGE;
+            else if (n_vertices == 5)
+              vtk_cell_type = VTK_PYRAMID;
+            else
+              AssertThrow(false,
+                          ExcMessage("Unsupported 3D cell type: only "
+                                     "hexes, tets, wedges and pyramids are "
+                                     "supported."));
+          }
+        else
+          AssertThrow(false, ExcMessage("Unsupported dimension."));
+
+        grid->InsertNextCell(vtk_cell_type, n_vertices, point_ids.data());
+      }
+
+    return grid;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  read_tria(const std::string            &vtk_filename,
+            Triangulation<dim, spacedim> &tria,
+            const bool                    cleanup,
+            const double                  relative_tolerance)
+  {
+    vtkSmartPointer<vtkUnstructuredGrid> grid =
+      internal::load_vtk_file(vtk_filename, cleanup, relative_tolerance);
+    unstructured_grid_to_dealii_triangulation(*grid, tria);
   }
 
 
@@ -543,62 +633,19 @@ namespace VTKWrappers
     AssertDimension(dof_handler.get_fe().n_blocks(), data_names_from_fe.size());
     data_names = data_names_from_fe;
   }
-#else
-DEAL_II_NAMESPACE_OPEN
 
-namespace VTKWrappers
-{
-  template <int dim, int spacedim>
-  void
-  read_tria(const std::string &,
-            Triangulation<dim, spacedim> &,
-            const bool,
-            const double)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  void
-  read_cell_data(const std::string &, const std::string &, Vector<double> &)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  void
-  read_vertex_data(const std::string &, const std::string &, Vector<double> &)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  void
-  read_all_data(const std::string &, Vector<double> &, const bool, const double)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  template <int dim, int spacedim>
-  std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>,
-            std::vector<std::string>>
-  vtk_to_finite_element(const std::string &)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-
-  template <int dim, int spacedim>
-  void
-  read_vtk(const std::string &,
-           DoFHandler<dim, spacedim> &,
-           Vector<double> &,
-           std::vector<std::string> &,
-           const bool,
-           const double)
-  {
-    AssertThrow(false, ExcMessage("deal.II is not built with VTK support."));
-  }
-#endif
-
-#include "vtk/utilities.inst"
+#  include "vtk/utilities.inst"
 
 } // namespace VTKWrappers
 
 DEAL_II_NAMESPACE_CLOSE
+
+#else
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+#endif

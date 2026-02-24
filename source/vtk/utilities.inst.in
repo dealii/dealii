@@ -13,6 +13,17 @@
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
+    template void
+    unstructured_grid_to_dealii_triangulation<deal_II_dimension,
+                                              deal_II_space_dimension>(
+      const vtkUnstructuredGrid &,
+      Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
+    template vtkSmartPointer<vtkUnstructuredGrid>
+    dealii_triangulation_to_unstructured_grid<deal_II_dimension,
+                                              deal_II_space_dimension>(
+      const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+
     template void read_tria<deal_II_dimension, deal_II_space_dimension>(
       const std::string &,
       Triangulation<deal_II_dimension, deal_II_space_dimension> &,

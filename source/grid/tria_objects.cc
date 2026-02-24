@@ -220,9 +220,10 @@ namespace internal
                                 new_size - user_flags.size(),
                                 false);
 
-              children.reserve(4 * new_size);
+              const unsigned int factor = children_per_object / 2;
+              children.reserve(factor * new_size);
               children.insert(children.end(),
-                              4 * new_size - children.size(),
+                              factor * new_size - children.size(),
                               -1);
 
               // for the following fields, we know exactly how many elements
