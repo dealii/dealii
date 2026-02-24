@@ -1,0 +1,4 @@
+
+DEAL::Round-trip OK for Triangulation<1, 1>: 2 cells, 3 vertices
+DEAL::Round-trip OK for Triangulation<2, 2>: 4 cells, 9 vertices
+DEAL::Round-trip OK for Triangulation<3, 3>: 8 cells, 27 vertices

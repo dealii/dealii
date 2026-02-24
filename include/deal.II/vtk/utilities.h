@@ -86,7 +86,30 @@ namespace VTKWrappers
   dealii_point_to_vtk_array(const dealii::Point<dim> &p);
 
   /**
-   * @brief Read a VTK mesh file and populate a deal.II Triangulation.
+   * Convert a VTK unstructured grid to a deal.II triangulation.
+   *
+   * This function translates the points and cells in @p unstructured_grid into
+   * a serial deal.II Triangulation.
+   */
+  template <int dim, int spacedim>
+  void
+  unstructured_grid_to_dealii_triangulation(
+    const vtkUnstructuredGrid    &unstructured_grid,
+    Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Convert a serial deal.II triangulation to a VTK unstructured grid.
+   *
+   * This function exports the active cells of @p tria to a newly allocated
+   * VTK unstructured grid and returns it.
+   */
+  template <int dim, int spacedim>
+  vtkSmartPointer<vtkUnstructuredGrid>
+  dealii_triangulation_to_unstructured_grid(
+    const Triangulation<dim, spacedim> &tria);
+
+  /**
+   * Read a VTK mesh file and populate a deal.II Triangulation.
    *
    * This function reads the mesh from the specified VTK file and fills the
    * given Triangulation object. If cleanup is true, overlapping points in the
