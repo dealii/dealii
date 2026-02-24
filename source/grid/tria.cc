@@ -2273,21 +2273,11 @@ namespace internal
              ExcMemoryInexact(tria_object.n_objects(),
                               tria_object.user_data.size()));
 
-      if (tria_object.structdim == 1)
+      if (tria_object.structdim > 0)
         {
-          Assert(1 * tria_object.n_objects() == tria_object.children.size(),
-                 ExcMemoryInexact(tria_object.n_objects(),
-                                  tria_object.children.size()));
-        }
-      else if (tria_object.structdim == 2)
-        {
-          Assert(2 * tria_object.n_objects() == tria_object.children.size(),
-                 ExcMemoryInexact(tria_object.n_objects(),
-                                  tria_object.children.size()));
-        }
-      else if (tria_object.structdim == 3)
-        {
-          Assert(4 * tria_object.n_objects() == tria_object.children.size(),
+          const unsigned int factor = tria_object.children_per_object / 2;
+          Assert(factor * tria_object.n_objects() ==
+                   tria_object.children.size(),
                  ExcMemoryInexact(tria_object.n_objects(),
                                   tria_object.children.size()));
         }
@@ -5927,7 +5917,7 @@ namespace internal
             }
 
           typename Triangulation<dim, spacedim>::raw_cell_iterator
-            subcells[GeometryInfo<dim>::max_children_per_cell];
+            subcells[ReferenceCells::max_n_children<dim>()];
           while (next_unused_cell->used() == true)
             ++next_unused_cell;
 
@@ -6111,8 +6101,8 @@ namespace internal
             // on the next higher level as well as for the
             // 2*flagged_cells that will be created on that level
             reserve_space(*triangulation.levels[level + 1],
-                          used_cells + GeometryInfo<1>::max_children_per_cell *
-                                         flagged_cells,
+                          used_cells +
+                            ReferenceCells::max_n_children<1>() * flagged_cells,
                           spacedim);
             // reserve space for 2*flagged_cells new lines on the next
             // higher level
