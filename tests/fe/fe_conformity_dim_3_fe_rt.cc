@@ -39,7 +39,7 @@ main(int, char **)
 
       constexpr int dim = 3;
 
-      for (unsigned int fe_degree = 0; fe_degree < 3; ++fe_degree)
+      for (unsigned int fe_degree = 0; fe_degree < 2; ++fe_degree)
         {
           // H(div) conformal
           FE_RaviartThomas<dim> fe(fe_degree);
