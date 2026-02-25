@@ -3316,6 +3316,83 @@ namespace internal
         }
     }
 
+    // vector updates for device vectors and DiagonalMatrix as preconditioner
+    template <typename Number>
+    inline void
+    vector_updates(
+      const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &rhs,
+      const dealii::DiagonalMatrix<
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
+                        &preconditioner,
+      const unsigned int iteration_index,
+      const double       factor1_,
+      const double       factor2_,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &solution_old,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &temp_vector1,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
+        &solution)
+    {
+      const Number factor1        = factor1_;
+      const Number factor1_plus_1 = 1. + factor1_;
+      const Number factor2        = factor2_;
+
+      auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
+        execution_space{};
+      Number       *sol_data     = solution.begin();
+      const Number *rhs_data     = rhs.begin();
+      const Number *prec_data    = preconditioner.get_vector().begin();
+      Number       *sol_old_data = solution_old.begin();
+      Number       *tmp_data     = temp_vector1.begin();
+      using size_type            = typename LinearAlgebra::distributed::
+        Vector<Number, MemorySpace::Default>::size_type;
+      const size_type size = solution.locally_owned_size();
+      if (iteration_index == 0)
+        {
+          Kokkos::parallel_for(
+            "dealii::ChebyshevIt0",
+            Kokkos::RangePolicy<
+              ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+              exec, 0, size),
+            KOKKOS_LAMBDA(size_type i) {
+              sol_old_data[i] = prec_data[i] * factor2 * rhs_data[i];
+            });
+        }
+      else if (iteration_index == 1)
+        {
+          Kokkos::parallel_for(
+            "dealii::ChebyshevIt1",
+            Kokkos::RangePolicy<
+              ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+              exec, 0, size),
+            KOKKOS_LAMBDA(size_type i) {
+              const Number residual = rhs_data[i] - tmp_data[i];
+              sol_old_data[i]       = factor2 * prec_data[i] * residual +
+                                factor1_plus_1 * sol_data[i];
+            });
+        }
+      else
+        {
+          Kokkos::parallel_for(
+            "dealii::ChebyshevItk",
+            Kokkos::RangePolicy<
+              ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+              exec, 0, size),
+            KOKKOS_LAMBDA(size_type i) {
+              const Number residual = rhs_data[i] - tmp_data[i];
+              sol_old_data[i]       = factor2 * prec_data[i] * residual -
+                                factor1 * sol_old_data[i] +
+                                factor1_plus_1 * sol_data[i];
+            });
+        }
+      exec.fence();
+
+      solution.swap(solution_old);
+    }
+
     // worker routine for deal.II vectors. Because of vectorization, we need
     // to put the loop into an extra structure because the virtual function of
     // VectorUpdatesRange prevents the compiler from applying vectorization.
