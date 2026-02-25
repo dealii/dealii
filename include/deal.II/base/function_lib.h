@@ -1692,6 +1692,12 @@ namespace Functions
      * The data that is to be interpolated.
      */
     const Table<dim, double> data_values;
+
+
+    /**
+     * An array to store the spacing of the grid in each direction.
+     */
+    std::array<double, dim> delta_x;
   };
 
 

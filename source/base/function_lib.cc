@@ -2660,6 +2660,11 @@ namespace Functions
                           "to have positive size"));
         Assert(data_values.size()[d] == n_subintervals[d] + 1,
                ExcMessage("The data table does not have the correct size."));
+
+        // Precompute the grid spacing since the grid doesn't change
+        this->delta_x[d] =
+          (interval_endpoints[d].second - interval_endpoints[d].first) /
+          n_subintervals[d];
       }
   }
 
@@ -2685,6 +2690,11 @@ namespace Functions
                           "to have positive size"));
         Assert(this->data_values.size()[d] == this->n_subintervals[d] + 1,
                ExcMessage("The data table does not have the correct size."));
+
+        // Precompute the grid spacing since the grid doesn't change
+        this->delta_x[d] = (this->interval_endpoints[d].second -
+                            this->interval_endpoints[d].first) /
+                           this->n_subintervals[d];
       }
   }
 
@@ -2705,9 +2715,8 @@ namespace Functions
     TableIndices<dim> ix;
     for (unsigned int d = 0; d < dim; ++d)
       {
-        const double delta_x =
-          ((interval_endpoints[d].second - interval_endpoints[d].first) /
-           n_subintervals[d]);
+        // using precomputed delta_x from constructor
+        const double delta_x = this->delta_x[d];
         if (p[d] <= interval_endpoints[d].first)
           ix[d] = 0;
         else if (p[d] >= interval_endpoints[d].second - delta_x)
@@ -2723,9 +2732,8 @@ namespace Functions
     Point<dim> p_unit;
     for (unsigned int d = 0; d < dim; ++d)
       {
-        const double delta_x =
-          ((interval_endpoints[d].second - interval_endpoints[d].first) /
-           n_subintervals[d]);
+        // using precomputed delta_x from constructor
+        const double delta_x = this->delta_x[d];
 
         p_unit[d] =
           std::clamp((p[d] - interval_endpoints[d].first - ix[d] * delta_x) /
@@ -2754,9 +2762,7 @@ namespace Functions
     TableIndices<dim> ix;
     for (unsigned int d = 0; d < dim; ++d)
       {
-        const double delta_x = ((this->interval_endpoints[d].second -
-                                 this->interval_endpoints[d].first) /
-                                this->n_subintervals[d]);
+        const double delta_x = this->delta_x[d];
         if (p[d] <= this->interval_endpoints[d].first)
           ix[d] = 0;
         else if (p[d] >= this->interval_endpoints[d].second - delta_x)
@@ -2773,9 +2779,7 @@ namespace Functions
     Point<dim> delta_x;
     for (unsigned int d = 0; d < dim; ++d)
       {
-        delta_x[d] = ((this->interval_endpoints[d].second -
-                       this->interval_endpoints[d].first) /
-                      this->n_subintervals[d]);
+        delta_x[d] = this->delta_x[d];
         p_unit[d]  = std::clamp((p[d] - this->interval_endpoints[d].first -
                                 ix[d] * delta_x[d]) /
                                  delta_x[d],
