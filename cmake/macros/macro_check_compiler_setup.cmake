@@ -25,7 +25,7 @@
 #
 
 macro(check_compiler_setup _compiler_flags _linker_flags _var)
-  message(STATUS "Performing Test ${_var}")
+  message(STATUS "Performing test ${_var}")
 
   #
   # We used to do some fancy caching here, but for now simply rerun this
@@ -91,9 +91,9 @@ macro(check_compiler_setup _compiler_flags _linker_flags _var)
     )
 
   if(${_var})
-    message(STATUS "Performing Test ${_var} - Success")
+    message(STATUS "Performing test ${_var} - Success")
   else()
-    message(STATUS "Performing Test ${_var} - Failed")
+    message(STATUS "Performing test ${_var} - Failed")
     message(STATUS "Compiler output:\n\n${_output}")
   endif()
 endmacro()
