@@ -204,21 +204,35 @@ IndexSet::do_compress() const
 
   if constexpr (running_in_debug_mode())
     {
-      // A consistency check: We should only ever have added indices
-      // that are within the range of the index set. Instead of doing
-      // this in every one of the many functions that add indices,
-      // do this in the current, central location
+      // Avoid code duplication by doing consistency checks here instead of in
+      // calling functions:
+      //
+      // 1. Verify that we only added indices that are within the range of the
+      //    index set.
+      //
+      // 2. Verify that we calculated the size in a consistent way.
+      size_type n_owned_elements = 0;
       for (const auto &range : ranges)
-        Assert((range.begin < index_space_size) &&
-                 (range.end <= index_space_size),
-               ExcMessage(
-                 "In the process of creating the current IndexSet "
-                 "object, you added indices beyond the size of the index "
-                 "space. Specifically, you added elements that form the "
-                 "range [" +
-                 std::to_string(range.begin) + "," + std::to_string(range.end) +
-                 "), but the size of the index space is only " +
-                 std::to_string(index_space_size) + "."));
+        {
+          Assert(
+            (range.begin < index_space_size) && (range.end <= index_space_size),
+            ExcMessage("In the process of creating the current IndexSet "
+                       "object, you added indices beyond the size of the index "
+                       "space. Specifically, you added elements that form the "
+                       "range [" +
+                       std::to_string(range.begin) + "," +
+                       std::to_string(range.end) +
+                       "), but the size of the index space is only " +
+                       std::to_string(index_space_size) + "."));
+          n_owned_elements += (range.end - range.begin);
+        }
+
+      if (!ranges.empty())
+        {
+          const Range &r = ranges.back();
+          Assert(r.nth_index_in_set + r.end - r.begin == n_owned_elements,
+                 ExcInternalError());
+        }
     }
 }
 
