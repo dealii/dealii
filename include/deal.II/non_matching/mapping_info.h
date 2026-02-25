@@ -904,9 +904,9 @@ namespace NonMatching
       cell_type.back() <=
         dealii::internal::MatrixFreeFunctions::GeometryType::affine);
 
-    unit_points_index.push_back(0);
-    data_index_offsets.push_back(0);
-    compressed_data_index_offsets.push_back(0);
+    unit_points_index             = {0};
+    data_index_offsets            = {0};
+    compressed_data_index_offsets = {0};
 
     state = State::single_cell;
   }
