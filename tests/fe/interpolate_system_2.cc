@@ -23,7 +23,7 @@
 
 
 //
-// Check convert_generalized_support_opint_values_to_dof_values for systems
+// Check convert_generalized_support_point_values_to_dof_values for systems
 // of non-Lagrangian elements.
 //
 
@@ -31,9 +31,9 @@ template <int dim, typename T>
 void
 check(T function, const unsigned int degree)
 {
-  FESystem<dim> fe(FE_RaviartThomas<dim>(degree),
+  FESystem<dim> fe(FE_RaviartThomasNodal<dim>(degree),
                    2,
-                   FESystem<dim>(FE_RaviartThomas<dim>(degree), 2),
+                   FESystem<dim>(FE_RaviartThomasNodal<dim>(degree), 2),
                    1);
   deallog << fe.get_name() << std::endl;
 

@@ -31,8 +31,8 @@ template <int dim, typename T>
 void
 check(T function, const unsigned int degree)
 {
-  FESystem<dim> fe = {FE_RaviartThomas<dim>(degree) ^ 2,
-                      FESystem<dim>(FE_RaviartThomas<dim>(degree), 2) ^ 1};
+  FESystem<dim> fe = {FE_RaviartThomasNodal<dim>(degree) ^ 2,
+                      FESystem<dim>(FE_RaviartThomasNodal<dim>(degree), 2) ^ 1};
   deallog << fe.get_name() << std::endl;
 
   std::vector<double> dofs(fe.dofs_per_cell);
