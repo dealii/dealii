@@ -2201,6 +2201,10 @@ namespace Utilities
               const unsigned int root,
               const MPI_Comm     comm)
     {
+      static_assert(is_mpi_type<T>,
+                    "This function is currently only implemented for "
+                    "MPI-supported data types.");
+
 #  ifndef DEAL_II_WITH_MPI
       (void)buffer;
       (void)count;
@@ -2250,8 +2254,8 @@ namespace Utilities
 
       if constexpr (is_mpi_type<T>)
         {
-          T   object = object_to_send;
-          int ierr =
+          T         object = object_to_send;
+          const int ierr =
             MPI_Bcast(&object, 1, mpi_type_id_for_type<T>, root_process, comm);
           AssertThrowMPI(ierr);
 
