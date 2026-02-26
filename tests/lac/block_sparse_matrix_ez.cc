@@ -191,8 +191,8 @@ namespace
 
     // Also check that scaling affects vmult consistently:
     BlockVector<double> x, result;
-    x.reinit({3, 2});      // col blocks
-    result.reinit({2, 3}); // row blocks
+    x.reinit(std::vector<size_type>{3, 2});      // col blocks
+    result.reinit(std::vector<size_type>{2, 3}); // row blocks
     fill_linear(x);
 
     bsm_ez.vmult(result, x);
@@ -211,8 +211,8 @@ namespace
     fill_two_entries_per_row(bsm_ez);
 
     BlockVector<double> x, result;
-    x.reinit({3, 2});      // columns
-    result.reinit({2, 3}); // rows
+    x.reinit(std::vector<size_type>{3, 2});      // columns
+    result.reinit(std::vector<size_type>{2, 3}); // rows
     fill_linear(x);
 
     bsm_ez.vmult(result, x);
@@ -230,8 +230,8 @@ namespace
 
     // Tvmult (block-block)
     BlockVector<double> xt, result_T;
-    xt.reinit({2, 3});       // rows
-    result_T.reinit({3, 2}); // cols
+    xt.reinit(std::vector<size_type>{2, 3});       // rows
+    result_T.reinit(std::vector<size_type>{3, 2}); // cols
     fill_linear(xt);
 
     bsm_ez.Tvmult(result_T, xt);
@@ -264,7 +264,7 @@ namespace
     fill_linear(x);
 
     BlockVector<double> result;
-    result.reinit({2, 3});
+    result.reinit(std::vector<size_type>{2, 3});
 
     bsm_ez.vmult(result, x);
 
@@ -276,7 +276,7 @@ namespace
 
     // Tvmult(Vector&, BlockVector&) valid because: one block column
     BlockVector<double> xt;
-    xt.reinit({2, 3});
+    xt.reinit(std::vector<size_type>{2, 3});
     fill_linear(xt);
 
     Vector<double> result_T(bsm_ez.n());
@@ -306,7 +306,7 @@ namespace
     fill_two_entries_per_row(bsm_ez);
 
     BlockVector<double> x;
-    x.reinit({2, 3});
+    x.reinit(std::vector<size_type>{2, 3});
     fill_linear(x);
 
     Vector<double> result(bsm_ez.m());
@@ -327,7 +327,7 @@ namespace
     fill_linear(xt);
 
     BlockVector<double> result_T;
-    result_T.reinit({2, 3});
+    result_T.reinit(std::vector<size_type>{2, 3});
     bsm_ez.Tvmult(result_T, xt);
 
     const Vector<double> ref_result_T = reference_Tvmult(bsm_ez, xt);
