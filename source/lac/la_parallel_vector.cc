@@ -101,6 +101,14 @@ namespace LinearAlgebra
     Vector<double, ::dealii::MemorySpace::Default>::
       copy_locally_owned_data_from<double>(
         const Vector<double, ::dealii::MemorySpace::Default> &);
+
+    template void
+    Vector<double, ::dealii::MemorySpace::Default>::
+      copy_locally_owned_data_from<float>(
+        const Vector<float, ::dealii::MemorySpace::Default> &);
+    template void
+    Vector<float, ::dealii::MemorySpace::Default>::copy_locally_owned_data_from<
+      double>(const Vector<double, ::dealii::MemorySpace::Default> &);
 #endif
   } // namespace distributed
 } // namespace LinearAlgebra

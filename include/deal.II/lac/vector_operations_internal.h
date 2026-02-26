@@ -1464,18 +1464,21 @@ namespace internal
     struct functions
     {
       static void
-      copy(
-        const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
-        /*thread_loop_partitioner*/,
-        const size_type /*size*/,
-        const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
-          & /*v_data*/,
-        ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> & /*data*/)
+      copy(const std::shared_ptr<::dealii::parallel::internal::TBBPartitioner> &
+           /*thread_loop_partitioner*/,
+           const size_type size,
+           const ::dealii::MemorySpace::MemorySpaceData<Number2, MemorySpace>
+                                                                       &v_data,
+           ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &data)
       {
-        static_assert(
-          std::is_same_v<MemorySpace, ::dealii::MemorySpace::Default> &&
-            std::is_same_v<Number, Number2>,
-          "For the Default MemorySpace Number and Number2 should be the same type");
+        typename MemorySpace::kokkos_space::execution_space exec;
+        Kokkos::deep_copy(
+          exec,
+          Kokkos::subview(data.values,
+                          Kokkos::pair<size_type, size_type>(0, size)),
+          Kokkos::subview(v_data.values,
+                          Kokkos::pair<size_type, size_type>(0, size)));
+        exec.fence();
       }
 
       static void
@@ -2137,11 +2140,15 @@ namespace internal
                                                ::dealii::MemorySpace::Default>
           &data)
       {
+        typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
+          exec;
         Kokkos::deep_copy(
+          exec,
           Kokkos::subview(data.values,
                           Kokkos::pair<size_type, size_type>(0, size)),
           Kokkos::subview(v_data.values,
                           Kokkos::pair<size_type, size_type>(0, size)));
+        exec.fence();
       }
 
       static void
@@ -2152,10 +2159,14 @@ namespace internal
                                                  ::dealii::MemorySpace::Default>
             &data)
       {
+        typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
+          exec;
         Kokkos::deep_copy(
+          exec,
           Kokkos::subview(data.values,
                           Kokkos::pair<size_type, size_type>(0, size)),
           s);
+        exec.fence();
       }
 
       static void
