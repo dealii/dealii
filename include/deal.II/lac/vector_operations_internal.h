@@ -1471,11 +1471,14 @@ namespace internal
                                                                        &v_data,
            ::dealii::MemorySpace::MemorySpaceData<Number, MemorySpace> &data)
       {
+        typename MemorySpace::kokkos_space::execution_space exec;
         Kokkos::deep_copy(
+          exec,
           Kokkos::subview(data.values,
                           Kokkos::pair<size_type, size_type>(0, size)),
           Kokkos::subview(v_data.values,
                           Kokkos::pair<size_type, size_type>(0, size)));
+        exec.fence();
       }
 
       static void
@@ -2137,11 +2140,15 @@ namespace internal
                                                ::dealii::MemorySpace::Default>
           &data)
       {
+        typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
+          exec;
         Kokkos::deep_copy(
+          exec,
           Kokkos::subview(data.values,
                           Kokkos::pair<size_type, size_type>(0, size)),
           Kokkos::subview(v_data.values,
                           Kokkos::pair<size_type, size_type>(0, size)));
+        exec.fence();
       }
 
       static void
@@ -2152,10 +2159,14 @@ namespace internal
                                                  ::dealii::MemorySpace::Default>
             &data)
       {
+        typename ::dealii::MemorySpace::Default::kokkos_space::execution_space
+          exec;
         Kokkos::deep_copy(
+          exec,
           Kokkos::subview(data.values,
                           Kokkos::pair<size_type, size_type>(0, size)),
           s);
+        exec.fence();
       }
 
       static void
