@@ -231,10 +231,10 @@ void SolverRichardson<VectorType>::solve(
   // Main loop
   while (conv == SolverControl::iterate)
     {
-      // Do not use residual,
-      // but do it in 2 steps
+      // Do not use the residual() function, but do it in 2 steps
       A.vmult(r, x);
       r.sadd(-1., 1., b);
+
       preconditioner.vmult(d, r);
 
       // get the required norm of the (possibly preconditioned)
@@ -244,7 +244,11 @@ void SolverRichardson<VectorType>::solve(
       if (conv != SolverControl::iterate)
         break;
 
-      x.add(additional_data.omega, d);
+      if (additional_data.omega != 1.0)
+        x.add(additional_data.omega, d);
+      else
+        x += d;
+
       print_vectors(iter, x, r, d);
 
       ++iter;
