@@ -1103,7 +1103,7 @@ namespace PETScWrappers
                                    const PetscScalar *values,
                                    const bool         add_values)
   {
-    VectorOperation::values action =
+    const VectorOperation::values action =
       (add_values ? VectorOperation::add : VectorOperation::insert);
     Assert((last_action == action) || (last_action == VectorOperation::unknown),
            internal::VectorReference::ExcWrongMode(action, last_action));
