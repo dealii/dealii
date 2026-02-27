@@ -65,7 +65,7 @@ namespace Portable
    * The transfer is built from the underlying DoFHandler and AffineConstraints
    * objects on the coarse and fine side, collecting an explicit copy of all
    * indices on both sides. For the moment, this works with FE_Q and a single
-   * DoFHandler. The intergration of other types of finite elements as well as
+   * DoFHandler. The integration of other types of finite elements as well as
    * polynomial transfer is underway.
    */
   template <int dim, typename VectorType>

@@ -713,7 +713,7 @@ namespace Portable
           {
             scheme.weights =
               Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
-                Kokkos::view_alloc("weights_h_transer_scheme_" +
+                Kokkos::view_alloc("weights_h_transfer_scheme_" +
                                      std::to_string(scheme_index),
                                    Kokkos::WithoutInitializing),
                 scheme.n_dofs_per_cell_fine,
@@ -1246,10 +1246,10 @@ namespace Portable
               auto dof_indices_fine_host =
                 Kokkos::create_mirror_view(scheme.dof_indices_fine);
 
-              const unsigned int firts_cell = cell_counter;
+              const unsigned int first_cell = cell_counter;
               for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
                 {
-                  const unsigned int cell_index = firts_cell + cell;
+                  const unsigned int cell_index = first_cell + cell;
 
                   // fill coarse indices
                   {
