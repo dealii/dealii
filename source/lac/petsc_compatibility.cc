@@ -68,7 +68,12 @@ namespace PETScWrappers
 #  if DEAL_II_PETSC_VERSION_GTE(3, 11, 0)
     snes->jacobiandomainerror = PETSC_FALSE;
 #  endif
+#  if DEAL_II_PETSC_VERSION_GTE(3, 25, 0)
+    snes->functiondomainerror  = PETSC_FALSE;
+    snes->objectivedomainerror = PETSC_FALSE;
+#  else
     snes->domainerror = PETSC_FALSE;
+#  endif
   }
 
   void
