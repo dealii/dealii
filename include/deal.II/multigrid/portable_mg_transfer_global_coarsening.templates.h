@@ -30,6 +30,7 @@
 #include <deal.II/matrix_free/portable_matrix_free.h>
 
 #include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
+#include <deal.II/multigrid/portable_mg_transfer_global_coarsening.h>
 
 
 DEAL_II_NAMESPACE_OPEN

@@ -29,7 +29,6 @@
 
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
-#include <deal.II/multigrid/portable_mg_transfer_global_coarsening.h>
 
 DEAL_II_NAMESPACE_OPEN
 
