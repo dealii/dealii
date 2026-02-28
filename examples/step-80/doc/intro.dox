@@ -1,0 +1,113 @@
+<i>This program was contributed by Luca Heltai (University of Pisa), Marco Feder (University of Pisa) and Bruno Blais (Polytechnique Montreal).</i>
+
+<a name="step_80-Intro"></a>
+<h1>Introduction</h1>
+
+<h3>Distributed Lagrange multipliers for FSI problems</h3>
+
+This tutorial implements the finite element immersed boundary method (FEIBM)
+with <b>distributed Lagrange multipliers</b> to couple an incompressible fluid
+with a compressible, possibly viscous, hyper-elastic solid. The formulation is
+based on a simplified version of the works by Heltai, Costanzo, and Roy
+\cite{HeltaiCostanzo-2018, RoyHeltaiCostanzo-2015-a}, and on their
+distributed-Lagrange multiplier formulation presented in
+\cite{BoffiGastaldiHeltai-2018-a}, and retains the clean variational splitting
+between the two media while enforcing velocity continuity through an additional
+field $\lambda$.
+
+Compared with step-60, where distributed Lagrange multipliers are introduced on
+non-matching manifolds for a scalar problem, and step-70, where immersed
+Dirichlet conditions are imposed via Nitsche penalties on parallel grids, the
+present program targets a <b>fully coupled fluid-structure interaction
+problem</b> with an independent volumetric discretization of both fluid and
+solid, without penalization. We reuse particles and mapping ideas from step-19
+(to transport quadrature data), nonmatching coupling from step-60, and the
+parallel machinery of step-70, but the governing equations and unknowns now
+reflect a mixed compressible solid / incompressible fluid setting.
+
+<h3>Model problem</h3>
+
+Let $\Omega=\Omega^f_t \cup \Omega^s_t \subset \mathbb{R}^{\text{spacedim}}$ be
+filled with an incompressible fluid of density $\rho_f$ and viscosity $\nu_f$,
+with a solid occupying the reference domain $B$ and current position
+$\Omega^s_t=X(B,t)$. The fluid satisfies the Navier-Stokes equations, while the
+solid is described by a compressible, viscous linear-elastic model with
+displacement $w$, deformation gradient $F=I+\nabla_s w$, Jacobian $J=\det F$,
+and first Piola-Kirchhoff stress
+$P = \partial W/\partial F + \nu_s D u_s F^{-1}$.
+
+Following the distributed Lagrange multiplier approach, we extend the velocity
+field in the entire domain, and introduce a common velocity $u$ and pressure $p$
+on $\Omega$, the solid displacement $w$ on $B$, and a multiplier $\lambda$ in a
+space $\Lambda$ such that @f{align*}{ c(\lambda, v\!\circ\!X) &= \int_B
+ \big[(\rho_{s0}-\rho_f J)\ddot w + \nu_s D u_s F^{-1} + \partial W/\partial F +
+    J\,p\,F^{-T}\big] : \nabla_s v(X) \, ds,\\ c(\mu, u\!\circ\!X - \dot w) &= 0
+    \quad \forall \mu\in\Lambda, @f} with $c(\cdot,\cdot)$ a continuous pairing.
+The remaining weak equations are the momentum balance for $u$, the
+incompressibility constraint in the fluid, and the momentum balance for $w$. The
+multiplier acts as an intermediary: it enforces $u=\dot w$ on the moving
+interface without embedding the constraint directly into the finite element
+spaces, leading to an energy estimate of the form @f[ \tfrac12 \tfrac{d}{dt}\|
+\rho^{1/2} u\|^2_{0,\Omega} + \|\nu^{1/2} D u\|^2_{0,\Omega} +
+\tfrac{d}{dt}\int_B W(F)\,ds \lesssim \|f\|_{0,\Omega}^2 +
+\|\tau_g\|^2_{-1/2,\partial\Omega_N}. @f]
+
+<h3>Semi-discrete scheme</h3>
+
+Backward differentiation in time yields, at each step, a saddle-point system for
+$(u^{n+1},p^{n+1},w^{n+1},\lambda^{n+1})$ with the block structure sketched in
+the paper:
+@f[
+\begin{pmatrix}
+  M_f/\Delta t + A_f & B_f^T & 0          & C_f^T\\
+  B_f                & M_p   & B_s        & 0\\
+  0                  & B_s^T/\Delta t & M_s/\Delta t^2 + A_s & -C_s^T\\
+  C_f                & 0      & -C_s/\Delta t  & 0
+\end{pmatrix}
+\begin{pmatrix}
+  u^{n+1}\\ p^{n+1}\\ w^{n+1}\\ \lambda^{n+1}
+\end{pmatrix}
+= \text{rhs}(u^n,w^n,\dot w^n).
+@f]
+The blocks mirror the coupling between the incompressible Navier-Stokes part
+and the compressible solid, while $C_f$ and $C_s$ come from the bilinear form
+$c(\cdot,\cdot)$. The formulation supports arbitrary hyper-elastic models via
+$W(F)$ and keeps the pressure physically meaningful only in the fluid region
+($p=0$ in $\Omega^s_t$).
+
+
+<h3>What this tutorial covers</h3>
+
+- Independent, distributed meshes for fluid and solid, updated through a
+  `MappingFEField` driven by the solid displacement.
+- Particle-based transfer of interface quadrature data (as in step-19) to
+  evaluate the $c(\cdot,\cdot)$ terms on non-matching meshes while keeping the
+  full solid mesh available for deformation.
+- Dimension-independent assembly of the coupled Navier-Stokes / compressible
+  elasticity system, together with a Schur-complement based solver.
+- Time stepping that mirrors the semi-implicit scheme described above, in 2D or
+  3D, with configurable material parameters and loading.
+
+For background on the Stokes/Navier-Stokes formulation and saddle-point solvers
+see step-22; for non-matching interface coupling with Lagrange multipliers see
+step-60; for immersed penalization in parallel see step-70; for particle
+infrastructure see step-19.
+
+
+<h3>Validation problems</h3>
+
+The accompanying paper validates the formulation with two tests that can be
+reproduced by adapting the parameter files:
+
+- <b>Recovery and rise of a compressed disk.</b> A compressible neo-Hookean
+  disk initially squeezed to $\lambda_0 R$ is released in a quiescent fluid.
+  Volume expansion, buoyancy-driven rise, and the flux leaving the box are
+  compared to assess momentum and mass conservation.
+- <b>Annulus deformation under a point source.</b> A hollow compressible ring
+  immersed in a box is inflated by a point mass source. The mismatch between
+  injected volume and solid compression tracks the discretization error and
+  highlights mesh refinement effects.
+
+These scenarios showcase the ability of the distributed Lagrange multiplier
+FEIBM to handle compressible solids, non-conforming grids, and moving
+interfaces without resorting to interface-fitted meshes or penalty terms.
