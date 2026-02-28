@@ -1,0 +1,8 @@
+1256c1256
+<     gridin.read_msh("circle.msh");
+---
+>     gridin.read_msh("../../../source/step-98/circle.msh");
+1703c1703
+<     for (unsigned int r = 1; r < 5; r++) // Mesh refinement parameter.
+---
+>     for (unsigned int r = 1; r < 2; r++) // Mesh refinement parameter.
