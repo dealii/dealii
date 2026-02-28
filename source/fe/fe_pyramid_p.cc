@@ -512,6 +512,16 @@ FE_PyramidP<dim, spacedim>::compare_for_domination(
       else
         return FiniteElementDomination::other_element_dominates;
     }
+  else if (const FE_WedgeP<dim, spacedim> *fe_pp_other =
+             dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_pp_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_pp_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
   else if (const FE_Nothing<dim, spacedim> *fe_nothing =
              dynamic_cast<const FE_Nothing<dim, spacedim> *>(&fe_other))
     {
@@ -538,7 +548,9 @@ FE_PyramidP<dim, spacedim>::hp_vertex_dof_identities(
   (void)fe_other;
 
   Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
-           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
          ExcNotImplemented());
 
   return {{0, 0}};
@@ -551,19 +563,40 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_PyramidP<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  (void)fe_other;
-
   Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
-           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
          ExcNotImplemented());
 
-  std::vector<std::pair<unsigned int, unsigned int>> result;
+  std::vector<std::pair<unsigned int, unsigned int>> identities;
+  // check if the support points are the same location on the line
+  // the pyramid base is defined by the vertices [-1,-1,0], [1,-1,0],
+  // [-1,1,0], [1,1,0], to avoid rescaling use the support points on the faces
+  const auto face_support_points = this->get_unit_face_support_points(0);
+  const auto face_support_points_other =
+    fe_other.get_unit_face_support_points(0);
 
-  result.reserve(this->degree - 1);
+  // for FE_Q and FE_PyramidP the first line runs in y-direction
+  // for FE_SimplexP and FE_WedgeP in x-direction
+  const unsigned int direction_of_first_line =
+    ((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+     (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))) ?
+      1 :
+      0;
+
   for (unsigned int i = 0; i < this->degree - 1; ++i)
-    result.emplace_back(i, i);
+    for (unsigned int j = 0; j < fe_other.degree - 1; ++j)
+      if (std::fabs(face_support_points[i + this->reference_cell()
+                                              .face_reference_cell(0)
+                                              .n_vertices()][1] -
+                    face_support_points_other[j + fe_other.reference_cell()
+                                                    .face_reference_cell(0)
+                                                    .n_vertices()]
+                                             [direction_of_first_line]) < 1e-14)
+        identities.emplace_back(i, j);
 
-  return result;
+  return identities;
 }
 
 
@@ -574,29 +607,61 @@ FE_PyramidP<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
   const unsigned int                  face_no) const
 {
-  (void)fe_other;
-
-
   AssertIndexRange(face_no, 5);
+  std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+  unsigned int face_no_neighbor;
 
   if (face_no == 0)
     {
-      Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+      // on a quad, neighbor can be a hex, a pyramid or a wedge
+      Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
              ExcNotImplemented());
+      // for the wedge the first quad face is face no. 2
+      if (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other))
+        face_no_neighbor = 2;
+      else
+        face_no_neighbor = 0;
     }
   else
     {
-      Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)),
+      Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
              ExcNotImplemented());
+      // on tri, neighbor can be a tet, a pyramid or a wedge
+      if (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+        face_no_neighbor = 1;
+      else
+        face_no_neighbor = 0;
     }
 
-  std::vector<std::pair<unsigned int, unsigned int>> result;
+  // compare the face support points
+  const auto face_support_points = this->get_unit_face_support_points(face_no);
+  const auto face_support_points_other =
+    fe_other.get_unit_face_support_points(face_no_neighbor);
 
-  result.reserve(this->n_dofs_per_quad(face_no));
+  const auto face_reference_cell =
+    this->reference_cell().face_reference_cell(face_no);
+  const auto face_reference_cell_other =
+    fe_other.reference_cell().face_reference_cell(face_no_neighbor);
+
   for (unsigned int i = 0; i < this->n_dofs_per_quad(face_no); ++i)
-    result.emplace_back(i, i);
+    for (unsigned int j = 0; j < fe_other.n_dofs_per_quad(face_no_neighbor);
+         ++j)
+      if (face_support_points[i + face_reference_cell.n_vertices() +
+                              face_reference_cell.n_lines() *
+                                this->n_dofs_per_line()]
+            .distance(
+              face_support_points_other[j +
+                                        face_reference_cell_other.n_vertices() +
+                                        face_reference_cell_other.n_lines() *
+                                          fe_other.n_dofs_per_line()]) < 1e-14)
+        identities.emplace_back(i, j);
 
-  return result;
+  return identities;
 }
 
 

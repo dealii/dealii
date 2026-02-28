@@ -741,8 +741,12 @@ FE_Q_Base<dim, spacedim>::hp_vertex_dof_identities(
       // should have identical value
       return {{0U, 0U}};
     }
-  else if (dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other) !=
-           nullptr)
+  else if ((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other) !=
+            nullptr) ||
+           (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other) !=
+            nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other) !=
+            nullptr))
     {
       // there should be exactly one single DoF of each FE at a vertex, and they
       // should have identical value
@@ -821,8 +825,8 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
 
       return identities;
     }
-  else if (const FE_SimplexP<dim, spacedim> *fe_p_other =
-             dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other))
+  else if ((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)))
     {
       // DoFs are located along lines, so two dofs are identical if they are
       // located at identical positions. If we had only equidistant points, we
@@ -832,22 +836,45 @@ FE_Q_Base<dim, spacedim>::hp_line_dof_identities(
       // first coordinate direction. For FE_Q, we take the lexicographic
       // ordering of the line support points in the first direction (i.e.,
       // x-direction), which we access between index 1 and p-1 (index 0 and p
-      // are vertex dofs). For FE_SimplexP, they are currently hard-coded and we
-      // iterate over points on the first line which begin after the 3 vertex
-      // points in the complete list of unit support points
-
-      Assert(fe_p_other->degree <= 2, ExcNotImplemented());
-
+      // are vertex dofs).
+      // The same applies to FE_WedgeP, so iterate over all combinations
       const std::vector<unsigned int> &index_map_inverse_q =
         this->get_poly_space_numbering_inverse();
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 
       for (unsigned int i = 0; i < this->degree - 1; ++i)
-        for (unsigned int j = 0; j < fe_p_other->degree - 1; ++j)
+        for (unsigned int j = 0; j < fe_other.degree - 1; ++j)
           if (std::fabs(
                 this->unit_support_points[index_map_inverse_q[i + 1]][0] -
-                fe_p_other->get_unit_support_points()[j + 3][0]) < 1e-14)
+                fe_other.get_unit_support_points()[j + fe_other.reference_cell()
+                                                         .n_vertices()][0]) <
+              1e-14)
+            identities.emplace_back(i, j);
+
+      return identities;
+    }
+  else if (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+    {
+      // in contrast to FE_SimplexP and FE_WedgeP the support points have to be
+      // scaled
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+      const double scale =
+        fe_other.reference_cell().template vertex<dim>(1)[0] -
+        fe_other.reference_cell().template vertex<dim>(0)[0];
+      const double offset =
+        fe_other.reference_cell().template vertex<dim>(0)[0];
+
+      for (unsigned int i = 0; i < this->degree - 1; ++i)
+        for (unsigned int j = 0; j < fe_other.degree - 1; ++j)
+          if (std::fabs(
+                (scale * this->unit_support_points[i + this->reference_cell()
+                                                         .n_vertices()][1] +
+                 offset) -
+                fe_other.get_unit_support_points()[j + fe_other.reference_cell()
+                                                         .n_vertices()][1]) <
+              1e-14)
             identities.emplace_back(i, j);
 
       return identities;
@@ -919,6 +946,30 @@ FE_Q_Base<dim, spacedim>::hp_quad_dof_identities(
                        ->unit_support_points[index_map_inverse_other[j2 + 1]]
                                             [0]) < 1e-14))
                 identities.emplace_back(i1 * (p - 1) + i2, j1 * (q - 1) + j2);
+
+      return identities;
+    }
+  else if ((dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ||
+           (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr))
+    {
+      const unsigned int face_no_neighbor =
+        (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ? 0 : 2;
+
+      std::vector<std::pair<unsigned int, unsigned int>> identities;
+
+      // compare the face support points
+      const auto face_support_points = this->get_unit_face_support_points(0);
+      const auto face_support_points_other =
+        fe_other.get_unit_face_support_points(face_no_neighbor);
+
+      for (unsigned int i = 0; i < this->n_dofs_per_quad(); ++i)
+        for (unsigned int j = 0; j < fe_other.n_dofs_per_quad(face_no_neighbor);
+             ++j)
+          if (face_support_points[i + 4 + 4 * this->n_dofs_per_line()].distance(
+                face_support_points_other[j + 4 +
+                                          4 * fe_other.n_dofs_per_line()]) <
+              1e-14)
+            identities.emplace_back(i, j);
 
       return identities;
     }
