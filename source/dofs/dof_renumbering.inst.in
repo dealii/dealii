@@ -45,6 +45,17 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const std::vector<unsigned int> &);
 
       template void
+      component_wise<deal_II_dimension, deal_II_space_dimension>(
+        DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<FEValuesExtractors::AnyExtractor> &);
+
+      template void
+      component_wise<deal_II_dimension, deal_II_space_dimension>(
+        DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const unsigned int,
+        const std::vector<FEValuesExtractors::AnyExtractor> &);
+
+      template void
       block_wise<deal_II_dimension, deal_II_space_dimension>(
         DoFHandler<deal_II_dimension, deal_II_space_dimension> &);
 
