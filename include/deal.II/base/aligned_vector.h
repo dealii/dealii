@@ -1775,11 +1775,14 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   // has all of the data.
   if (is_shmem_root)
     {
-      if (std::is_trivially_copyable_v<T> == true)
+      if constexpr (Utilities::MPI::is_mpi_type<T>)
         {
-          // The data is trivially copyable, i.e., we can copy things directly
-          // without having to go through the serialization/deserialization
-          // machinery of Utilities::MPI::broadcast.
+          // The data is an MPI type, so it can be sent as an array
+          // without having to go through the
+          // serialization/deserialization machinery. We want to use
+          // Utilities::MPI::broadcast() over MPI_Bcast() because the
+          // former can deal with more elements than just a signed int
+          // can hold. That's useful for very large tables.
           //
           // In that case, first tell all of the other shmem roots how many
           // elements we will have to deal with, and let them resize their
@@ -1792,12 +1795,11 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
             resize(new_size);
 
           // Then directly copy from the root process into these buffers
-          int ierr = MPI_Bcast(elements.get(),
-                               sizeof(T) * new_size,
-                               MPI_CHAR,
-                               shmem_roots_root_rank,
-                               shmem_roots_communicator);
-          AssertThrowMPI(ierr);
+
+          Utilities::MPI::broadcast(elements.get(),
+                                    new_size,
+                                    shmem_roots_root_rank,
+                                    shmem_roots_communicator);
         }
       else
         {
