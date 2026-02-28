@@ -172,6 +172,19 @@ namespace PETScWrappers
              const BlockDynamicSparsityPattern &bdsp,
              const MPI_Comm                     com);
 
+      /**
+       * Same as above, but needed in case a BDDC preconditioner must be
+       * initialized.
+       */
+      void
+      reinit(const std::vector<IndexSet>       &local_rows,
+             const std::vector<IndexSet>       &active_rows,
+             const std::vector<IndexSet>       &local_cols,
+             const std::vector<IndexSet>       &active_cols,
+             const BlockDynamicSparsityPattern &bdsp,
+             const MPI_Comm                     com);
+
+
 
       /**
        * Same as above but for a symmetric structure only.

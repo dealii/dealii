@@ -149,6 +149,68 @@ namespace PETScWrappers
       this->collect_sizes();
     }
 
+    // BDDC
+    void
+    BlockSparseMatrix::reinit(const std::vector<IndexSet>       &rows,
+                              const std::vector<IndexSet>       &active_rows,
+                              const std::vector<IndexSet>       &cols,
+                              const std::vector<IndexSet>       &active_cols,
+                              const BlockDynamicSparsityPattern &bdsp,
+                              const MPI_Comm                     com)
+    {
+      Assert(rows.size() == bdsp.n_block_rows(), ExcMessage("invalid size"));
+      Assert(cols.size() == bdsp.n_block_cols(), ExcMessage("invalid size"));
+
+#  if DEAL_II_PETSC_VERSION_GTE(3, 10, 0)
+      clear();
+      this->sub_objects.reinit(bdsp.n_block_rows(), bdsp.n_block_cols());
+
+      std::vector<types::global_dof_index> row_sizes;
+      for (unsigned int r = 0; r < bdsp.n_block_rows(); ++r)
+        row_sizes.push_back(bdsp.block(r, 0).n_rows());
+      this->row_block_indices.reinit(row_sizes);
+
+      std::vector<types::global_dof_index> col_sizes;
+      for (unsigned int c = 0; c < bdsp.n_block_cols(); ++c)
+        col_sizes.push_back(bdsp.block(0, c).n_cols());
+      this->column_block_indices.reinit(col_sizes);
+
+      for (unsigned int r = 0; r < this->n_block_rows(); ++r)
+        for (unsigned int c = 0; c < this->n_block_cols(); ++c)
+          {
+            Assert(rows[r].size() == bdsp.block(r, c).n_rows(),
+                   ExcMessage("invalid size"));
+            Assert(cols[c].size() == bdsp.block(r, c).n_cols(),
+                   ExcMessage("invalid size"));
+
+            BlockType *p = new BlockType();
+            // We need to call the reinit() that takes four IndexSet(s) so that
+            // MATIS objects from PETSc are created on each block.
+            p->reinit(rows[r],
+                      active_rows[r],
+                      cols[c],
+                      active_cols[c],
+                      bdsp.block(r, c),
+                      com);
+            this->sub_objects[r][c] = p;
+          }
+
+      this->collect_sizes();
+#  else
+
+      // Use this to avoid unused variables warning
+      (void)communicator;
+      (void)rows;
+      (void)local_active_rows;
+      (void)columns;
+      (void)local_active_columns;
+      (void)bdsp;
+      AssertThrow(false,
+                  ExcMessage(
+                    "BDDC preconditioner requires PETSc 3.10.0 or newer"));
+#  endif
+    }
+
     void
     BlockSparseMatrix::reinit(const std::vector<IndexSet>       &sizes,
                               const BlockDynamicSparsityPattern &bdsp,
