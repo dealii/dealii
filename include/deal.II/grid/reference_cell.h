@@ -2497,8 +2497,67 @@ ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
   // Use GeometryInfo here to keep it the single source of truth
   if (this->is_hyper_cube())
     return GeometryInfo<dim>::n_children(ref_case);
+
+  // TODO: Rewrite once refinement cases are cleaned up
+  // For all other cells, we assume that only isotropic refinement is
+  // implemented. This is a strong assumption that should be removed as soon as
+  // the issue regarding the uniqueness of refinement cases is resolved.
+  //
+  // This is a short outline of the issue: Different refinement options are
+  // stored as an enum, primarily focusing on hypercubes. They therefore are (to
+  // some extent) unsuitable for other cell types. For example, there are
+  // multiple ways to isotropically refine a tetrahedron. Distinguishing between
+  // these required the introduction of the additional
+  // `IsotropicRefinementChoice` enum. However, this leads to a conflict where
+  // the same integer value is assigned to multiple different refinement options
+  // across the existing refinement cases. The most critical conflict is likely
+  // `IsotropicRefinementChoice::isotropic_refinement` shadowing
+  // `RefinementPossibilities<~>::no_refinement`.
+  // The following code attempts to circumvent this mess by predicting whether
+  // the given refinement case is isotropic and then returning either the number
+  // of isotropic children or `0` (see below for why `0` is used).
+
+  // Detect isotropic refinement.
+  // Only in 3D and only for Tetrahedrons we have ambiguity.
+  bool is_isotropic = false;
+
+  // all other cells
+  if (this->kind != static_cast<decltype(kind)>(ReferenceCells::Tetrahedron))
+    is_isotropic =
+      ref_case == RefinementPossibilities<dim>::isotropic_refinement;
+  else // tets
+    {
+      constexpr unsigned int tet_dim =
+        ReferenceCells::Tetrahedron.get_dimension(); // no magic numbers
+      is_isotropic =
+        (ref_case ==
+           RefinementPossibilities<tet_dim>::isotropic_refinement || //
+         // We must not check `IsotropicRefinementChoice::isotropic_refinement`
+         // because it coincides with
+         // `RefinementPossibilities<tet_dim>::no_refinement` (both are 0).
+         ref_case ==
+           static_cast<RefinementPossibilities<tet_dim>::Possibilities>(
+             IsotropicRefinementChoice::cut_tet_68) || //
+         ref_case ==
+           static_cast<RefinementPossibilities<tet_dim>::Possibilities>(
+             IsotropicRefinementChoice::cut_tet_57) || //
+         ref_case ==
+           static_cast<RefinementPossibilities<tet_dim>::Possibilities>(
+             IsotropicRefinementChoice::cut_tet_49));
+    }
+
+  // return the according value
+  if (is_isotropic)
+    return n_isotropic_children();
   else
-    return this->n_isotropic_children();
+    // DEAL_II_NOT_IMPLEMENTED();
+    // We must return some data. Many parts of the code aren't aware
+    // which refinement cases are actually supported, calling this
+    // function with impossible refinement cases and expecting some
+    // output. One example is the constructor of `FiniteElement`.
+    return 0;
+
+  return numbers::invalid_unsigned_int;
 }
 
 
