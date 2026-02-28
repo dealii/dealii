@@ -146,9 +146,16 @@ namespace TrilinosWrappers
        *
        * In order to make copying of iterators/accessor of acceptable
        * performance, we keep a shared pointer to these entries so that more
-       * than one accessor can access this data if necessary.
+       * than one accessor can access this data if necessary. Each operator
+       * never modifies the pointed to vector when it moves on to a different
+       * row of the matrix, but instead resets the shared pointer to a newly
+       * allocated vector, thereby ensuring that other accessors who may still
+       * hold a pointer to the original vector continue to see the same values.
+       * The exception is that if there is only a single accessor object
+       * pointing to the array (very likely), then we can change the underlying
+       * vector.
        */
-      std::shared_ptr<const std::vector<size_type>> colnum_cache;
+      std::shared_ptr<std::vector<size_type>> colnum_cache;
 
       /**
        * Discard the old row caches (they may still be used by other
