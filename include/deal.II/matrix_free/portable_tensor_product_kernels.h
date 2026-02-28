@@ -80,6 +80,7 @@ namespace Portable
               int n_columns,
               int direction,
               typename Number,
+              typename ShapeDataMemorySpace,
               bool contract_over_rows,
               bool add,
               typename ViewTypeIn,
@@ -87,11 +88,10 @@ namespace Portable
     DEAL_II_HOST_DEVICE void
     apply_1d(const Kokkos::TeamPolicy<
                MemorySpace::Default::kokkos_space::execution_space>::member_type
-               &team_member,
-             const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                              shape_data,
-             const ViewTypeIn in,
-             ViewTypeOut      out)
+                                                               &team_member,
+             const Kokkos::View<Number *, ShapeDataMemorySpace> shape_data,
+             const ViewTypeIn                                   in,
+             ViewTypeOut                                        out)
     {
       constexpr int Nk = (contract_over_rows ? n_rows : n_columns),
                     Nq = (contract_over_rows ? n_columns : n_rows);
@@ -129,6 +129,7 @@ namespace Portable
               int n_columns,
               int direction,
               typename Number,
+              typename ShapeDataMemorySpace,
               bool contract_over_rows,
               bool add,
               typename ViewTypeIn,
@@ -136,11 +137,10 @@ namespace Portable
     DEAL_II_HOST_DEVICE void
     apply_2d(const Kokkos::TeamPolicy<
                MemorySpace::Default::kokkos_space::execution_space>::member_type
-               &team_member,
-             const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                              shape_data,
-             const ViewTypeIn in,
-             ViewTypeOut      out)
+                                                               &team_member,
+             const Kokkos::View<Number *, ShapeDataMemorySpace> shape_data,
+             const ViewTypeIn                                   in,
+             ViewTypeOut                                        out)
     {
       using TeamType = Kokkos::TeamPolicy<
         MemorySpace::Default::kokkos_space::execution_space>::member_type;
@@ -206,6 +206,7 @@ namespace Portable
               int n_columns,
               int direction,
               typename Number,
+              typename ShapeDataMemorySpace,
               bool contract_over_rows,
               bool add,
               typename ViewTypeIn,
@@ -213,11 +214,10 @@ namespace Portable
     DEAL_II_HOST_DEVICE void
     apply_3d(const Kokkos::TeamPolicy<
                MemorySpace::Default::kokkos_space::execution_space>::member_type
-               &team_member,
-             const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                              shape_data,
-             const ViewTypeIn in,
-             ViewTypeOut      out)
+                                                               &team_member,
+             const Kokkos::View<Number *, ShapeDataMemorySpace> shape_data,
+             const ViewTypeIn                                   in,
+             ViewTypeOut                                        out)
     {
       using TeamType = Kokkos::TeamPolicy<
         MemorySpace::Default::kokkos_space::execution_space>::member_type;
@@ -290,6 +290,7 @@ namespace Portable
               int n_rows,
               int n_columns,
               typename Number,
+              typename ShapeDataMemorySpace,
               int  direction,
               bool contract_over_rows,
               bool add,
@@ -298,22 +299,36 @@ namespace Portable
     DEAL_II_HOST_DEVICE void
     apply(const Kokkos::TeamPolicy<
             MemorySpace::Default::kokkos_space::execution_space>::member_type
-            &team_member,
-          const Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                           shape_data,
-          const ViewTypeIn in,
-          ViewTypeOut      out)
+                                                            &team_member,
+          const Kokkos::View<Number *, ShapeDataMemorySpace> shape_data,
+          const ViewTypeIn                                   in,
+          ViewTypeOut                                        out)
     {
 #if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
       if constexpr (dim == 1)
-        apply_1d<n_rows, n_columns, direction, Number, contract_over_rows, add>(
-          team_member, shape_data, in, out);
+        apply_1d<n_rows,
+                 n_columns,
+                 direction,
+                 Number,
+                 ShapeDataMemorySpace,
+                 contract_over_rows,
+                 add>(team_member, shape_data, in, out);
       if constexpr (dim == 2)
-        apply_2d<n_rows, n_columns, direction, Number, contract_over_rows, add>(
-          team_member, shape_data, in, out);
+        apply_2d<n_rows,
+                 n_columns,
+                 direction,
+                 Number,
+                 ShapeDataMemorySpace,
+                 contract_over_rows,
+                 add>(team_member, shape_data, in, out);
       if constexpr (dim == 3)
-        apply_3d<n_rows, n_columns, direction, Number, contract_over_rows, add>(
-          team_member, shape_data, in, out);
+        apply_3d<n_rows,
+                 n_columns,
+                 direction,
+                 Number,
+                 ShapeDataMemorySpace,
+                 contract_over_rows,
+                 add>(team_member, shape_data, in, out);
 #else
       // I: [0, m^{dim - direction - 1})
       // J: [0, n^direction)
@@ -368,7 +383,9 @@ namespace Portable
               int              dim,
               int              n_rows,
               int              n_columns,
-              typename Number>
+              typename Number,
+              typename ShapeDataMemorySpace =
+                MemorySpace::Default::kokkos_space>
     struct EvaluatorTensorProduct
     {};
 
@@ -378,12 +395,17 @@ namespace Portable
      * Internal evaluator for 1d-3d shape function using the tensor product form
      * of the basis functions.
      */
-    template <int dim, int n_rows, int n_columns, typename Number>
+    template <int dim,
+              int n_rows,
+              int n_columns,
+              typename Number,
+              typename ShapeDataMemorySpace>
     struct EvaluatorTensorProduct<evaluate_general,
                                   dim,
                                   n_rows,
                                   n_columns,
-                                  Number>
+                                  Number,
+                                  ShapeDataMemorySpace>
     {
     public:
       using TeamHandle = Kokkos::TeamPolicy<
@@ -396,13 +418,11 @@ namespace Portable
 
       DEAL_II_HOST_DEVICE
       EvaluatorTensorProduct(
-        const TeamHandle                                          &team_member,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-          shape_gradients,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                   co_shape_gradients,
-        SharedView temp);
+        const TeamHandle                            &team_member,
+        Kokkos::View<Number *, ShapeDataMemorySpace> shape_values,
+        Kokkos::View<Number *, ShapeDataMemorySpace> shape_gradients,
+        Kokkos::View<Number *, ShapeDataMemorySpace> co_shape_gradients,
+        SharedView                                   temp);
 
       /**
        * Evaluate/integrate the values of a finite element function at the
@@ -451,19 +471,17 @@ namespace Portable
       /**
        * Values of the shape functions.
        */
-      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values;
+      Kokkos::View<Number *, ShapeDataMemorySpace> shape_values;
 
       /**
        * Values of the shape function gradients.
        */
-      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-        shape_gradients;
+      Kokkos::View<Number *, ShapeDataMemorySpace> shape_gradients;
 
       /**
        * Values of the shape function gradients for collocation methods.
        */
-      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-        co_shape_gradients;
+      Kokkos::View<Number *, ShapeDataMemorySpace> co_shape_gradients;
 
       /**
        * Temporary storage for in-place evaluations.
@@ -473,17 +491,24 @@ namespace Portable
 
 
 
-    template <int dim, int n_rows, int n_columns, typename Number>
+    template <int dim,
+              int n_rows,
+              int n_columns,
+              typename Number,
+              typename ShapeDataMemorySpace>
     DEAL_II_HOST_DEVICE
-    EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           n_rows,
+                           n_columns,
+                           Number,
+                           ShapeDataMemorySpace>::
       EvaluatorTensorProduct(
-        const TeamHandle                                          &team_member,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space> shape_values,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-          shape_gradients,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                   co_shape_gradients,
-        SharedView temp)
+        const TeamHandle                            &team_member,
+        Kokkos::View<Number *, ShapeDataMemorySpace> shape_values,
+        Kokkos::View<Number *, ShapeDataMemorySpace> shape_gradients,
+        Kokkos::View<Number *, ShapeDataMemorySpace> co_shape_gradients,
+        SharedView                                   temp)
       : team_member(team_member)
       , shape_values(shape_values)
       , shape_gradients(shape_gradients)
@@ -493,7 +518,11 @@ namespace Portable
 
 
 
-    template <int dim, int n_rows, int n_columns, typename Number>
+    template <int dim,
+              int n_rows,
+              int n_columns,
+              typename Number,
+              typename ShapeDataMemorySpace>
     template <int  direction,
               bool dof_to_quad,
               bool add,
@@ -501,24 +530,45 @@ namespace Portable
               typename ViewTypeIn,
               typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
-    EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
-      values(const ViewTypeIn in, ViewTypeOut out) const
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           n_rows,
+                           n_columns,
+                           Number,
+                           ShapeDataMemorySpace>::values(const ViewTypeIn in,
+                                                         ViewTypeOut out) const
     {
       if constexpr (in_place)
         {
-          apply<dim, n_rows, n_columns, Number, direction, dof_to_quad, false>(
-            team_member, shape_values, in, temp);
+          apply<dim,
+                n_rows,
+                n_columns,
+                Number,
+                ShapeDataMemorySpace,
+                direction,
+                dof_to_quad,
+                false>(team_member, shape_values, in, temp);
 
           populate_view<add>(team_member, out, temp, out.extent(0));
         }
       else
-        apply<dim, n_rows, n_columns, Number, direction, dof_to_quad, add>(
-          team_member, shape_values, in, out);
+        apply<dim,
+              n_rows,
+              n_columns,
+              Number,
+              ShapeDataMemorySpace,
+              direction,
+              dof_to_quad,
+              add>(team_member, shape_values, in, out);
     }
 
 
 
-    template <int dim, int n_rows, int n_columns, typename Number>
+    template <int dim,
+              int n_rows,
+              int n_columns,
+              typename Number,
+              typename ShapeDataMemorySpace>
     template <int  direction,
               bool dof_to_quad,
               bool add,
@@ -526,24 +576,46 @@ namespace Portable
               typename ViewTypeIn,
               typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
-    EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
-      gradients(const ViewTypeIn in, ViewTypeOut out) const
+    EvaluatorTensorProduct<evaluate_general,
+                           dim,
+                           n_rows,
+                           n_columns,
+                           Number,
+                           ShapeDataMemorySpace>::gradients(const ViewTypeIn in,
+                                                            ViewTypeOut out)
+      const
     {
       if constexpr (in_place)
         {
-          apply<dim, n_rows, n_columns, Number, direction, dof_to_quad, false>(
-            team_member, shape_gradients, in, temp);
+          apply<dim,
+                n_rows,
+                n_columns,
+                Number,
+                ShapeDataMemorySpace,
+                direction,
+                dof_to_quad,
+                false>(team_member, shape_gradients, in, temp);
 
           populate_view<add>(team_member, out, temp, out.extent(0));
         }
       else
-        apply<dim, n_rows, n_columns, Number, direction, dof_to_quad, add>(
-          team_member, shape_gradients, in, out);
+        apply<dim,
+              n_rows,
+              n_columns,
+              Number,
+              ShapeDataMemorySpace,
+              direction,
+              dof_to_quad,
+              add>(team_member, shape_gradients, in, out);
     }
 
 
 
-    template <int dim, int n_rows, int n_columns, typename Number>
+    template <int dim,
+              int n_rows,
+              int n_columns,
+              typename Number,
+              typename ShapeDataMemorySpace>
     template <int  direction,
               bool dof_to_quad,
               bool add,
@@ -551,8 +623,14 @@ namespace Portable
               typename ViewTypeIn,
               typename ViewTypeOut>
     DEAL_II_HOST_DEVICE void
-    EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
-      co_gradients(const ViewTypeIn in, ViewTypeOut out) const
+    EvaluatorTensorProduct<
+      evaluate_general,
+      dim,
+      n_rows,
+      n_columns,
+      Number,
+      ShapeDataMemorySpace>::co_gradients(const ViewTypeIn in,
+                                          ViewTypeOut      out) const
     {
       if constexpr (in_place)
         {
@@ -560,6 +638,7 @@ namespace Portable
                 n_columns,
                 n_columns,
                 Number,
+                ShapeDataMemorySpace,
                 direction,
                 dof_to_quad,
                 false>(team_member, co_shape_gradients, in, temp);
@@ -567,8 +646,14 @@ namespace Portable
           populate_view<add>(team_member, out, temp, out.extent(0));
         }
       else
-        apply<dim, n_columns, n_columns, Number, direction, dof_to_quad, add>(
-          team_member, co_shape_gradients, in, out);
+        apply<dim,
+              n_columns,
+              n_columns,
+              Number,
+              ShapeDataMemorySpace,
+              direction,
+              dof_to_quad,
+              add>(team_member, co_shape_gradients, in, out);
     }
   } // namespace internal
 } // namespace Portable
