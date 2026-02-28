@@ -1,0 +1,422 @@
+
+<i>This tutorial was contributed by Stephan Voss. Special Thank You to Jean-Paul Pelteret and Marc Fehling for review, discussions and support.</i>
+
+<a name="step-92-Intro"></a>
+
+@f[
+\newcommand{\myint}{\int\limits}
+%\newcommand{\myint}{\int}
+\newcommand{\nvec}[1]{{\vec{\bf{#1}}}}
+\newcommand{\nmatrix}[1]{{\bf{#1}}}
+\newcommand{\mIdentity}{{\nmatrix{I}}}
+%\newcommand{\nvec}[1]{{\bf{#1}}}
+\newcommand{\speedvec}{\nvec{v}}
+\def\imj{\mathrm{j}}
+\def\cskinconst{\underline\alpha^2}
+\def\cwaveconst{\underline\beta^2}
+\def\cwavenumber{\underline\gamma^2}
+\newcommand{\cptr}[1]{{\underline{#1}}}
+%\newcommand{\cptr}[1]{{#1}}
+\newcommand{\cconj}[1]{\bar{#1}}
+\newcommand{\conductivity}{\kappa}
+\newcommand{\permeability}{\mu}
+\newcommand{\permittivity}{\varepsilon}
+\def\timesym{t}
+\def\frequency{\text{f}}
+\def\chargesym{\rho}
+\def\Jsym{j}
+\def\Esym{E}
+\def\Dsym{D}
+\def\Hsym{H}
+\def\Bsym{B}
+\def\potsym{\varphi}
+\def\vecpotsym{A}
+\def\energysym{W}
+\newcommand{\energy}[1][]{\energysym_{#1}}
+\newcommand{\elcharge}[1][]{\chargesym_{e #1}}
+\newcommand{\celcharge}[1][]{\cptr{\chargesym}_{e #1}}
+\newcommand{\magcharge}[1][]{\chargesym_\mathrm{m #1}}
+\newcommand{\cmagcharge}[1][]{\cptr{\chargesym}_{m #1}}
+\newcommand{\Epot}{{\potsym\!}_{e}}
+\newcommand{\cEpot}{\cptr{\potsym\!}_{e}}
+\newcommand{\cMpot}{\cptr{\potsym\!}_{m}}
+\newcommand{\Mvecpot}{\vecpotsym_e}
+\newcommand{\cMvecpot}{\cptr\Mvecpot}
+\newcommand{\vMvecpot}{\nvec{\vecpotsym}_e}
+\newcommand{\cvMvecpot}{\cptr{\nvec{\vecpotsym}}_e}
+\newcommand{\Evecpot}{\vecpotsym_m}
+\newcommand{\cEvecpot}{\cptr{\Evecpot}}
+\newcommand{\vEvecpot}{\nvec{\vecpotsym}_m}
+\newcommand{\cvEvecpot}{\cptr{\nvec{\vecpotsym}}_m}
+\newcommand{\Efield}{\Esym}
+\newcommand{\cEfield}{\cptr{\Esym}}
+\newcommand{\vEfield}{\nvec\Efield}
+\newcommand{\cvEfield}{\nvec\cEfield}
+\newcommand{\movingcvEfield}{\tilde\cvEfield}
+\newcommand{\Dfield}{\Dsym}
+\newcommand{\cDfield}{\cptr{\Dfield}}
+\newcommand{\vDfield}{\nvec\Dfield}
+\newcommand{\cvDfield}{\nvec\cDfield}
+\newcommand{\Jelfield}[1][]{\Jsym_{e #1}}
+\newcommand{\cJelfield}[1][]{\cptr{\Jsym}_{e #1}}
+\newcommand{\vJelfield}[1][]{\nvec{\Jsym}_{e #1}}
+\newcommand{\cvJelfield}[1][]{\cptr{\nvec{\Jsym}}_{e #1}}
+\newcommand{\Jmagfield}[1][]{\Jsym_{m #1}}
+\newcommand{\cJmagfield}[1][]{\cptr{\Jsym}_{m #1}}
+\newcommand{\vJmagfield}[1][]{\nvec{\Jsym}_{m #1}}
+\newcommand{\cvJmagfield}[1][]{\cptr{\nvec{\Jsym}}_{m #1}}
+\newcommand{\Hfield}{\Hsym}
+\newcommand{\cHfield}{\cptr{\Hfield}}
+\newcommand{\vHfield}{\nvec\Hfield}
+\newcommand{\cvHfield}{\nvec\cHfield}
+\newcommand{\Bfield}{\Bsym}
+\newcommand{\cBfield}{\cptr{\Bfield}}
+\newcommand{\vBfield}{\nvec\Bfield}
+\newcommand{\cvBfield}{\nvec\cBfield}
+\newcommand{\div}{\nvec\nabla\cdot}
+\newcommand{\grad}{\nvec\nabla}
+\newcommand{\curl}{\nvec\nabla\times}
+\newcommand{\laplace}{\Delta}
+\newcommand{\scalednabla}{\nvec{\hat{\nabla}}}
+\newcommand{\scaleddiv}{\scalednabla\cdot}
+\newcommand{\scaledgrad}{\scalednabla}
+\newcommand{\scaledcurl}{\scalednabla\times}
+\newcommand{\posvec}{\nvec{r}}
+\def\partialt{{{\partial}\over{\partial \timesym}}}
+%\def\partialt{{\partial_\timesym}}
+\def\scalekr{k_r}
+\def\scalekE{k_E}
+\def\scalekA{k_A}
+\def\domain{\Omega}
+\def\domainboundary{\partial\Omega}
+\def\domain{\Omega}
+\def\ddomainV{\domain}
+\def\ddomainS{\partial\domain}
+\def\ddomainvS{\vec\partial_n\domain}
+\newcommand{\scaledsym}[1]{\hat{#1}}
+\newcommand{\scalek}[1]{\mathrm{k}_{#1}}
+\newcommand{\scaledcEpot}{\cptr{\scaledsym{\potsym}\!}_e}
+\newcommand{\scaledcMpot}{\cptr{\scaledsym{\potsym}\!}_m}
+\newcommand{\scaledcvJelfield}[1][]{{\cptr{\nvec{\scaledsym{\Jsym}}}_{e #1}}}
+\newcommand{\scaledcvMvecpot}{\cptr{\nvec{\scaledsym{\vecpotsym}}}_e}
+\def\pottestsym{\phi}
+\def\vecpottestsym{\Psi}
+\def\cvAeTestfnconj{\cconj{\cptr{\nvec{\vecpottestsym}\!}}_e}
+\def\cvAmTestfnconj{\cconj{\cptr{\nvec{\vecpottestsym}\!}}_m}
+\def\csPhiETestfnconj{{\cconj{\cptr{\boldsymbol{\pottestsym}\!}}}_e}
+\def\csPhiMTestfnconj{{\cconj{\cptr{\boldsymbol{\pottestsym}\!}}}_m}
+\def\scaledcvAeTestfnconj{\cconj{\cptr{\nvec{\scaledsym{\vecpottestsym}}}\!}_e}
+\def\scaledcvAmTestfnconj{\cconj{\cptr{\nvec{\scaledsym{\vecpottestsym}}}\!}_m}
+\def\scaledcsPhiETestfnconj{{\cconj{\cptr{\scaledsym{\boldsymbol{\pottestsym}}\!}}}_e}
+\def\scaledcsPhiMTestfnconj{{\cconj{\cptr{\scaledsym{\boldsymbol{\pottestsym}}\!}}}_m}
+@f]
+
+
+<h1> Introduction </h1>
+
+
+<h3> Abstract </h3>
+
+The idea of this tutorial is to show a few aspects of electrical
+engineering of high voltage components in the energy industry.
+
+A parallelized direct solver (based on MUMPS) for Laplace-equation
+and a DataPostprocessor on cell-data is implemented
+to derive and export electrical field
+distributions for visualization or further evaluation.
+Visualizations in this tutorial have been prepared using
+<a href="https://www.paraview.org/">ParaView</a>,
+but this choice is not binding to any reader.
+
+Two simple and abstrahized examples are provided for generating
+hexahedral meshes using <a href="https://gmsh.info/">Gmsh</a>.
+
+Performance of the mesh-import and the solver can be tested
+by generating finer meshes.
+
+
+<h3> References </h3>
+
+<ol>
+    <li>
+	    wikipedia authors,
+		Electric power transmission,
+		Web-Link: <a href="https://en.wikipedia.org/wiki/Electric_power_transmission">
+        https://en.wikipedia.org/wiki/Electric_power_transmission</a>
+    </li>
+    <li>
+	    wikipedia authors,
+		High voltage,
+		Web-Link: <a href="https://en.wikipedia.org/wiki/High_voltage">
+        https://en.wikipedia.org/wiki/High_voltage</a>
+    </li>
+    <li>
+	    wikipedia authors,
+		Maxwell's equations,
+		Web-Link: <a href="https://en.wikipedia.org/wiki/Maxwell%27s_equations">
+        https://en.wikipedia.org/wiki/Maxwell%27s_equations</a>
+    </li>
+    <li>
+	    Christophe Geuzaine and Jean-François Remacle (2000),
+		A three-dimensional finite element mesh generator with built-in pre- and post-processing facilities,
+		Web-Link: <a href="https://gmsh.info/">
+        https://gmsh.info/</a>
+    </li>
+</ol>
+
+
+<h3>High voltage - key to efficient electrical power systems</h3>
+
+Electric power transmission systems shall be as efficient as possible
+in transmitting power from generators to consumers.
+The electrical power is calculated as a product of voltage and current:
+@f{align*}{
+    P = U I
+@f}
+
+Fig. 1 shows a rough simplification of a power transmission line
+only represented by an ohmic resistance $R$ of the cable and neglecting
+any capacitive or inductive components.
+
+<table width="50%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/power_transmission.jpg" alt="power transmission example"/>
+      <p> Fig 1: simplified power transmission example </p>
+      </td>
+  </tr>
+</table>
+
+
+Assume a consumer on the right hand side receiving power $P_2 = U_2 I$.
+On the other (left hand) side of the transmission line, a generator
+is providing power $P_1 = U_1 I$.
+
+Due to Ohm's law, the transmission line itself will have a voltage drop
+$U_R = R I$ and hence the voltage $U_2$ on consumer side is lower
+than the generator voltage $U_1 = U_2 + U_R > U_2$ and the generator
+has to provide more power than the consumer receives $P_1 > P_2$.
+
+The power $P_L = U_R I = R I^2$ is converted into Joule's heating
+along the ohmic resistance of the transmission line cable.
+
+The efficiency of the shown system is $\eta = \frac{P_2}{P_1} < 1.0$.
+When designing this unrealistically simplified transmission line
+for a combination of maximum efficiency and reasonable invest,
+two major options may be considered:
+<ol>
+    <li>
+    Reduce the resistance $R$, which will increase use of material and
+    hence also increase investment cost.
+    </li>
+    <li>
+    Reduce the current $I$. If same power shall be provided to a consumer,
+    the voltages $U_1 \approx U_2$ have to be increased.
+    </li>
+</ol>
+
+In large (national or international) power transmission systems,
+this optimization usually leads to systems with high and ultra-high voltages
+and many more aspects have to be considered, i.e. reactive power,
+failure modes, or dc vs. ac transmission.
+Hence, real generation, transmission and distribution systems are
+much more complex and even interconnected. Much more equipment
+has to be installed i.e. for connecting, disconnecting,
+interconnecting and for protection.
+
+But the discussed simplification on reducing ohmic losses by increasing
+system voltages leads to the fact that all connected equipment
+has to be designed for safe and economic operation at those voltages.
+
+In design of high voltage equipment, it is common
+practice to utilize numerical software for electrical field computation.
+A high voltage component manufacturer has reasonable interest in
+continuously improving and developing smart arrangements,
+efficient materials and engineering know-how.
+
+The two provided examples show abstrahized arrangenements for
+showing two simple aspects of high voltage engineering.
+
+<table>
+<tr style="vertical-align:top">
+    <td>
+    <b>example-1</b>
+    </td>
+    <td>
+      <img src="../../../examples/step-92/doc/example-1_model_key.jpg" width="50%" alt="example-1, 3D model"/>
+      <p> example-1, 3D model: ohmic conductors (green), terminals (light blue), barrier (blue)</p>
+      <p>
+          Two ohmic conductors, each connected with two terminals.
+          Current flow inside the conductors can be enforced by defining
+          different electric potential at each terminal.
+          Dirichlet boundary conditions will be used later in this example.
+      </p>
+      <p>
+          Even though the example is not a realistic component, it shows an
+          aspect of high voltage engineering:
+          A barrier is placed in between those conductors.
+          Placing such barrier(s) is common practice in designing insulation
+          systems of oil-immersed high-voltage components as it reduces the
+          overall dimension of a component in comparison to a design without
+          such barrier(s).
+          For real products, arrangement, material and safety margins
+          are manufacturer know-how.
+      </p>
+    </td>
+</tr>
+<tr style="vertical-align:top">
+    <td>
+    <b>example-2</b>
+    </td>
+    <td>
+      <img src="../../../examples/step-92/doc/example-2_model_key.jpg" width="50%" alt="example-2, 3D model"/>
+      <p> example-2, 3D model: two simple windings (green), terminals (light blue), core (grey)</p>
+      <p>
+        This example already looks like a single-phase power transformer
+        with two very simple windings with connecting terminals.
+        Similar as in first example, current flow inside the windings
+        can be enforced by defining different electric potential at
+        each terminal.
+      </p>
+      <p>
+        In practice, barrier(s) should be located at least in between
+        those two windings.
+        They have not been placed in this model for keeping the visibility
+        of the two windings. The reader may think in expanding the model
+        by some barriers and bring the model closer to a real design.
+      </p>
+      <p>
+        Instead of the barrier(s), a realistic iron core is considered
+        in this example.
+        Such core in practice shall be grounded (to $0\,\text{V}$).
+        Once again, a Dirichlet boundary condition will serve this purpose
+        in the model as the core volume will be removed from the
+        simulation domain and only its surface will be part of the model
+        as a boundary.
+      </p>
+    </td>
+</tr>
+</table>
+
+In both cases, a high voltage engineer will have to calculate
+electrical field strength $\vEfield$, which can be determined from
+electric potential $\Epot$
+@f{align*}{
+    \vEfield = -\grad \Epot .
+@f}
+
+The current density may be of interest in some cases and can be calculated
+under terms of Ohm's law
+@f{align*}{
+    \vJelfield = \conductivity \vEfield .
+@f}
+
+Usually the field strength is evaluated according to design rules
+considering some safety margin and the engineer may adopt the design
+iteratively until a safe and economic variant can be approved.
+
+
+<h3> Mathematical formulation </h3>
+
+Transmission systems are usually operated at 50 Hz or 60 Hz and hence
+some simplifications are common practice in most high voltage engineering applications:
+<ul>
+  <li>
+  Dielectric material properties show linear behaviour.
+  (In this tutorial, dielectric permittivity is assumed to be lossless $\permittivity\in\mathbb{R}$.)
+  </li>
+  <li>
+  Thus, a time-harmonic analysis can be performed in frequency-domain
+  using pointers (further indicated by an underscore below the symbol
+  until even this will become obsolete for this tutorial in a few steps.).
+  </li>
+</ul>
+
+The corresponding field equation of interest for the high voltage engineer in frequency domain is a Laplace equation
+@f{align*}{
+  \div \left[ \left( \conductivity +\imj \omega \permittivity \right) \grad {\cEpot} \right] &= 0 \qquad\qquad & \text{in}\ \Omega,
+  \\
+  \cEpot &= \cptr{g} \qquad\qquad & \text{on}\ \partial\Omega
+@f}
+
+
+For practical high voltage engineering of above mentioned transmission grid components,
+some practical assumptions are significant:
+<ol>
+    <li>
+        Inside conductors, current density is much higher than dielectric displacement current:
+        $ \left\| \cvJelfield \right\| \gg \omega\permittivity || \cvEfield || $
+
+        Example for copper conductivity
+                $\conductivity_\text{Cu} \approx 56 \cdot 10^{6} \frac{\text{A}}{\text{V m}}$
+                and cellulose/oil insulation with dielectric permittivity
+                $ \permittivity_\text{insulation} < 6 \permittivity_0 $
+                at $\frequency = 60 \text{Hz}$:
+                @f{align*}{
+                  \conductivity_\text{Cu} \approx 56 \cdot 10^{6} \frac{\text{A}}{\text{V m}}
+                  \gg
+                  \omega \permittivity_\text{insulation} \approx 2 \cdot 10^{-8} \frac{\text{A}}{\text{V m}}
+                @f}
+
+        Even the conductivity of oil-impregnated cellulose insulation barriers is still much higher
+        than $\omega\permittivity_\text{insulation}$.
+
+        This assumption is a neglection of the phase-angle of
+        the electric potentials frequency-domain pointer
+        @f{align*}{
+          \text{Arg}\left(\cEpot\right) \to 0
+          \,\,\,\, \Rightarrow \,\,\,\,
+          \cEpot \approx \Epot
+        @f}
+        However, the interpretation of the solution $\Epot$ is still not an electrostatic potential
+        but the real-valued electric potential for very low frequencies (LF).
+    </li>
+    <li>
+        For higher frequencies, Laplace equation will not serve to solve the problem anyhow as
+        induction and wave-propagation are completely neglected when not solving the full Maxwell's equations.
+    </li>
+</ol>
+
+With this assumption, it is feasible to even reduce the above mentioned complex-valued PDE
+into a real-valued (LF but not necessarily static) problem
+@f{align*}{
+  \div \left( a \grad \Epot \right) &= 0 \qquad\qquad & \text{in}\ \Omega,
+  \\
+  \Epot &= g \qquad\qquad & \text{on}\ \partial\Omega
+@f}
+with a real-valued parameter $a$ for consideration of material properties (either conductor or insulator).
+
+Furthermore, the domain is a union
+$\Omega=\bigcup \left\{\Omega_{\conductivity},\Omega_{\permittivity}\right\}$
+of purely ohmic sub-domains
+$\Omega_\conductivity=\bigcup\left\{\Omega_{\conductivity m} | m \in \left\{1,\dots,M\right\} \right\}$ with $\conductivity_m>0$
+and purely dielectric sub-domains
+$\Omega_\permittivity=\bigcup\left\{\Omega_{\permittivity n} | n \in \left\{1,\dots,N\right\} \right\}$
+with permittivity $\permittivity_n$:
+@f{align*}{
+    a = \left\{
+        \begin{array}{cc}
+            \conductivity_m \qquad\qquad & \text{in any ohmic sub-domain}\ \Omega_{\conductivity m}
+            \\
+            \permittivity_n \qquad\qquad & \text{in any dielectric sub-domain}\ \Omega_{\permittivity n}
+        \end{array}
+        \right.
+@f}
+
+The domain boundary is a union
+$\partial\Omega=\bigcup \left\{\Gamma_k | k \in \left\{1,\dots,K\right\} \right\}$ of boundaries where different electric potentials can be defined
+@f{align*}{
+    g = {\Epot}_k \qquad\qquad & \text{on}\ \Gamma_{k}
+@f}
+
+Such definitions will be used for two purposes:
+<ol>
+    <li>
+        On a reference shell $\Gamma_{k_0}$ surrounding the entire arrangement $\Omega$,
+        a reference potential will be set, e.g. ${{\Epot}_{k_0}} = 0\,\text{V}$.
+    </li>
+    <li>
+        Terminals will be modeled as cavities and on its surfaces $\Gamma_{k}$
+        Dirichlet boundary conditions will be used for assigning electric potential values ${\Epot}_{k}$.
+    </li>
+</ol>

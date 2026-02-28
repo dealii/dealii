@@ -698,6 +698,14 @@
  *       <td> Solving the Laplace-Beltrami equation on a surface using the trace finite element method.
  *       <br/> Keywords: MeshWorker::mesh_loop(), NonMatching::FEImmersedSurfaceValues
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-92</td>
+ *       <td> An example from high-voltage engineering solving Laplace-equation; 
+ *            mesh-generation using Gmsh; mesh-import using GridIn class; 
+ *            using a DataPostprocessor for exporting solution and electrical field distribution
+ *       <br/> Keywords: ParameterAcceptor, GridIn, DataOut, DataPostprocessor, PETScWrappers::SparseDirectMUMPS
+ *       </td></tr>
  * 
  *   <tr valign="top">
  *       <td>step-93</td>
@@ -860,7 +868,8 @@
  *     <td> Parallelization via MUMPS and MPI
  *     </td>
  *     <td>
- *       step-62
+ *       step-62,
+ *       step-92
  *     </td>
  *   </tr>
  *
