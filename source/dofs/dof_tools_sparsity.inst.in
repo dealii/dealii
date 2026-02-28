@@ -41,6 +41,18 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
       const bool,
       const types::subdomain_id);
 
+    template void DoFTools::make_block_sparsity_pattern_block<
+      deal_II_dimension,
+      deal_II_space_dimension,
+      scalar>(const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+              const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+              SparsityPatternBase &,
+              const AffineConstraints<scalar> &,
+              const AffineConstraints<scalar> &,
+              const bool,
+              const types::subdomain_id subdomain_id);
+
+
     template void DoFTools::make_flux_sparsity_pattern<deal_II_dimension,
                                                        deal_II_space_dimension>(
       const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
