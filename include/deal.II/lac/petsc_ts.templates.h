@@ -320,6 +320,14 @@ namespace PETScWrappers
     if (data.ts_type.size())
       AssertPETSc(TSSetType(ts, data.ts_type.c_str()));
 
+    // Problem type
+    if (data.problem_type == "linear")
+      AssertPETSc(TSSetProblemType(ts, TS_LINEAR));
+    else if (data.problem_type == "nonlinear")
+      AssertPETSc(TSSetProblemType(ts, TS_NONLINEAR));
+    else
+      AssertThrow(false, ExcInternalError());
+
     // Options prefix
     if (data.options_prefix.size())
       AssertPETSc(TSSetOptionsPrefix(ts, data.options_prefix.c_str()));

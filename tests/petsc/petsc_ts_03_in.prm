@@ -2,6 +2,7 @@ subsection Running parameters
   set initial time      = 0
   set final time        = 2.0
   set solver type       = bdf
+  set problem type      = nonlinear
   set initial step size = 0.2
 end
 
