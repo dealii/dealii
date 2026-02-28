@@ -846,6 +846,30 @@ public:
   get_cell_data() const;
 
   /**
+   * Return a map containing point data associated with the elements of an
+   * external vtk format mesh imported using read_vtk().
+   * The format of the returned map is as
+   * follows:
+   * - std::string stores the name of the point data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each vertex.
+   * To access the value, use point_data[name_field][global_vertex_index].
+   *
+   * For example, if the vtk mesh contains point data "Pressure" defined on
+   * vertices, then `point_data["Pressure"][0]` provides the pressure defined at
+   * vertex ID '0', which corresponds to index 0 of the vector. The length of
+   * the vector in `point_data["Pressure"]` equals the number of vertices in the
+   * coarse mesh.
+   * The length of the returned vector equals the number of vertices in the
+   * coarse mesh also in case of vector data. For example, if the vtk mesh
+   * contains point data "Velocity", defined at vertices, then
+   * `point_data["Velocity"][0]`provides the three components of the velocity
+   * field at vertex ID '0'.
+   */
+  const std::map<std::string, Vector<double>> &
+  get_point_data() const;
+
+  /**
    * Exception
    */
   DeclException1(ExcUnknownSectionType,
@@ -1037,6 +1061,17 @@ private:
    * To access the value use cell_data[name_field][cell->active_cell_index()].
    */
   std::map<std::string, Vector<double>> cell_data;
+
+  /**
+   * Data member that stores field data defined at the vertices of the mesh.
+   * The format is as follows:
+   * - std::string stores the name of the field data (identifier) as specified
+   * in the external mesh
+   * - Vector<double> stores value for the given identifier in each vertex id.
+   *
+   * To access the value use cell_data[name_field][global_vertex_index].
+   */
+  std::map<std::string, Vector<double>> point_data;
 };
 
 /* -------------- declaration of explicit specializations ------------- */
