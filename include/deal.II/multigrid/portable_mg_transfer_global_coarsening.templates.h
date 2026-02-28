@@ -149,7 +149,7 @@ namespace Portable
                        scratch_memory_space,
                      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
-      CellProlongationKernel();
+      CellProlongationKernel() = default;
 
 
       DEAL_II_HOST_DEVICE void
@@ -159,11 +159,6 @@ namespace Portable
         const DeviceVector<Number> &src,
         const DeviceVector<Number> &dst) const;
     };
-
-    template <int dim, typename VectorType>
-    CellProlongationKernel<dim, VectorType>::CellProlongationKernel()
-    {}
-
 
     template <int dim, typename VectorType>
     DEAL_II_HOST_DEVICE void
@@ -415,7 +410,7 @@ namespace Portable
                                         execution_space::scratch_memory_space,
                                       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
-      CellRestrictionKernel();
+      CellRestrictionKernel() = default;
 
       DEAL_II_HOST_DEVICE void
       operator()(
@@ -424,11 +419,6 @@ namespace Portable
         const DeviceVector<Number> &src,
         const DeviceVector<Number> &dst) const;
     };
-
-
-    template <int dim, typename VectorType>
-    CellRestrictionKernel<dim, VectorType>::CellRestrictionKernel()
-    {}
 
     template <int dim, typename VectorType>
     DEAL_II_HOST_DEVICE void
