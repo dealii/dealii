@@ -39,6 +39,7 @@
 
 #include <deal.II/hp/fe_values.h>
 
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/precondition_block.h>
 #include <deal.II/lac/solver_richardson.h>
@@ -204,37 +205,27 @@ DGTransportEquation<dim>::DGTransportEquation()
 
 template <int dim>
 void
-DGTransportEquation<dim>::assemble_cell_term(const hp::FEValues<dim> &fe_v,
+DGTransportEquation<dim>::assemble_cell_term(const hp::FEValues<dim> &fe_v_hp,
                                              FullMatrix<double> &ui_vi_matrix,
                                              Vector<double> &cell_vector) const
 {
-  const std::vector<double> &JxW =
-    fe_v.get_present_fe_values().get_JxW_values();
+  const FEValues<dim>       &fe_v = fe_v_hp.get_present_fe_values();
+  const std::vector<double> &JxW  = fe_v.get_JxW_values();
 
-  std::vector<Point<dim>> beta(
-    fe_v.get_present_fe_values().n_quadrature_points);
-  std::vector<double> rhs(fe_v.get_present_fe_values().n_quadrature_points);
+  std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
+  std::vector<double>     rhs(fe_v.n_quadrature_points);
 
-  beta_function.value_list(fe_v.get_present_fe_values().get_quadrature_points(),
-                           beta);
-  rhs_function.value_list(fe_v.get_present_fe_values().get_quadrature_points(),
-                          rhs);
+  beta_function.value_list(fe_v.get_quadrature_points(), beta);
+  rhs_function.value_list(fe_v.get_quadrature_points(), rhs);
 
-  for (unsigned int point = 0;
-       point < fe_v.get_present_fe_values().n_quadrature_points;
-       ++point)
-    for (unsigned int i = 0; i < fe_v.get_present_fe_values().dofs_per_cell;
-         ++i)
+  for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
+    for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
       {
-        for (unsigned int j = 0; j < fe_v.get_present_fe_values().dofs_per_cell;
-             ++j)
-          ui_vi_matrix(i, j) -=
-            beta[point] * fe_v.get_present_fe_values().shape_grad(i, point) *
-            fe_v.get_present_fe_values().shape_value(j, point) * JxW[point];
+        for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
+          ui_vi_matrix(i, j) -= beta[point] * fe_v.shape_grad(i, point) *
+                                fe_v.shape_value(j, point) * JxW[point];
 
-        cell_vector(i) += rhs[point] *
-                          fe_v.get_present_fe_values().shape_value(i, point) *
-                          JxW[point];
+        cell_vector(i) += rhs[point] * fe_v.shape_value(i, point) * JxW[point];
       }
 }
 
@@ -242,44 +233,32 @@ DGTransportEquation<dim>::assemble_cell_term(const hp::FEValues<dim> &fe_v,
 template <int dim>
 void
 DGTransportEquation<dim>::assemble_boundary_term(
-  const hp::FEFaceValues<dim> &fe_v,
+  const hp::FEFaceValues<dim> &fe_v_hp,
   FullMatrix<double>          &ui_vi_matrix,
   Vector<double>              &cell_vector) const
 {
-  const std::vector<double> &JxW =
-    fe_v.get_present_fe_values().get_JxW_values();
-  const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_normal_vectors();
+  const FEFaceValues<dim>           &fe_v    = fe_v_hp.get_present_fe_values();
+  const std::vector<double>         &JxW     = fe_v.get_JxW_values();
+  const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
-  std::vector<Point<dim>> beta(
-    fe_v.get_present_fe_values().n_quadrature_points);
-  std::vector<double> g(fe_v.get_present_fe_values().n_quadrature_points);
+  std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
+  std::vector<double>     g(fe_v.n_quadrature_points);
 
-  beta_function.value_list(fe_v.get_present_fe_values().get_quadrature_points(),
-                           beta);
-  boundary_function.value_list(
-    fe_v.get_present_fe_values().get_quadrature_points(), g);
+  beta_function.value_list(fe_v.get_quadrature_points(), beta);
+  boundary_function.value_list(fe_v.get_quadrature_points(), g);
 
-  for (unsigned int point = 0;
-       point < fe_v.get_present_fe_values().n_quadrature_points;
-       ++point)
+  for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
     {
       const double beta_n = beta[point] * normals[point];
       if (beta_n > 0)
-        for (unsigned int i = 0; i < fe_v.get_present_fe_values().dofs_per_cell;
-             ++i)
-          for (unsigned int j = 0;
-               j < fe_v.get_present_fe_values().dofs_per_cell;
-               ++j)
-            ui_vi_matrix(i, j) +=
-              beta_n * fe_v.get_present_fe_values().shape_value(j, point) *
-              fe_v.get_present_fe_values().shape_value(i, point) * JxW[point];
+        for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
+            ui_vi_matrix(i, j) += beta_n * fe_v.shape_value(j, point) *
+                                  fe_v.shape_value(i, point) * JxW[point];
       else
-        for (unsigned int i = 0; i < fe_v.get_present_fe_values().dofs_per_cell;
-             ++i)
-          cell_vector(i) -= beta_n * g[point] *
-                            fe_v.get_present_fe_values().shape_value(i, point) *
-                            JxW[point];
+        for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
+          cell_vector(i) -=
+            beta_n * g[point] * fe_v.shape_value(i, point) * JxW[point];
     }
 }
 
@@ -288,45 +267,32 @@ template <int dim>
 template <class X, class Y>
 void
 DGTransportEquation<dim>::assemble_face_term1(
-  const X            &fe_v,
-  const Y            &fe_v_neighbor,
+  const X            &fe_v_hp,
+  const Y            &fe_v_neighbor_hp,
   FullMatrix<double> &ui_vi_matrix,
   FullMatrix<double> &ue_vi_matrix) const
 {
-  const std::vector<double> &JxW =
-    fe_v.get_present_fe_values().get_JxW_values();
-  const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_normal_vectors();
+  const auto &fe_v          = fe_v_hp.get_present_fe_values();
+  const auto &fe_v_neighbor = fe_v_neighbor_hp.get_present_fe_values();
+  const std::vector<double>         &JxW     = fe_v.get_JxW_values();
+  const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
-  std::vector<Point<dim>> beta(
-    fe_v.get_present_fe_values().n_quadrature_points);
-  beta_function.value_list(fe_v.get_present_fe_values().get_quadrature_points(),
-                           beta);
+  std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
+  beta_function.value_list(fe_v.get_quadrature_points(), beta);
 
-  for (unsigned int point = 0;
-       point < fe_v.get_present_fe_values().n_quadrature_points;
-       ++point)
+  for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
     {
       const double beta_n = beta[point] * normals[point];
       if (beta_n > 0)
-        for (unsigned int i = 0; i < fe_v.get_present_fe_values().dofs_per_cell;
-             ++i)
-          for (unsigned int j = 0;
-               j < fe_v.get_present_fe_values().dofs_per_cell;
-               ++j)
-            ui_vi_matrix(i, j) +=
-              beta_n * fe_v.get_present_fe_values().shape_value(j, point) *
-              fe_v.get_present_fe_values().shape_value(i, point) * JxW[point];
+        for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
+          for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
+            ui_vi_matrix(i, j) += beta_n * fe_v.shape_value(j, point) *
+                                  fe_v.shape_value(i, point) * JxW[point];
       else
-        for (unsigned int i = 0; i < fe_v.get_present_fe_values().dofs_per_cell;
-             ++i)
-          for (unsigned int k = 0;
-               k < fe_v_neighbor.get_present_fe_values().dofs_per_cell;
-               ++k)
-            ue_vi_matrix(i, k) +=
-              beta_n *
-              fe_v_neighbor.get_present_fe_values().shape_value(k, point) *
-              fe_v.get_present_fe_values().shape_value(i, point) * JxW[point];
+        for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
+          for (unsigned int k = 0; k < fe_v_neighbor.dofs_per_cell; ++k)
+            ue_vi_matrix(i, k) += beta_n * fe_v_neighbor.shape_value(k, point) *
+                                  fe_v.shape_value(i, point) * JxW[point];
     }
 }
 
@@ -335,76 +301,51 @@ template <int dim>
 template <class X, class Y>
 void
 DGTransportEquation<dim>::assemble_face_term2(
-  const X            &fe_v,
-  const Y            &fe_v_neighbor,
+  const X            &fe_v_hp,
+  const Y            &fe_v_neighbor_hp,
   FullMatrix<double> &ui_vi_matrix,
   FullMatrix<double> &ue_vi_matrix,
   FullMatrix<double> &ui_ve_matrix,
   FullMatrix<double> &ue_ve_matrix) const
 {
-  const std::vector<double> &JxW =
-    fe_v.get_present_fe_values().get_JxW_values();
-  const std::vector<Tensor<1, dim>> &normals =
-    fe_v.get_present_fe_values().get_normal_vectors();
+  const auto &fe_v          = fe_v_hp.get_present_fe_values();
+  const auto &fe_v_neighbor = fe_v_neighbor_hp.get_present_fe_values();
+  const std::vector<double>         &JxW     = fe_v.get_JxW_values();
+  const std::vector<Tensor<1, dim>> &normals = fe_v.get_normal_vectors();
 
-  std::vector<Point<dim>> beta(
-    fe_v.get_present_fe_values().n_quadrature_points);
+  std::vector<Point<dim>> beta(fe_v.n_quadrature_points);
 
-  beta_function.value_list(fe_v.get_present_fe_values().get_quadrature_points(),
-                           beta);
+  beta_function.value_list(fe_v.get_quadrature_points(), beta);
 
-  for (unsigned int point = 0;
-       point < fe_v.get_present_fe_values().n_quadrature_points;
-       ++point)
+  for (unsigned int point = 0; point < fe_v.n_quadrature_points; ++point)
     {
       const double beta_n = beta[point] * normals[point];
       if (beta_n > 0)
         {
-          for (unsigned int i = 0;
-               i < fe_v.get_present_fe_values().dofs_per_cell;
-               ++i)
-            for (unsigned int j = 0;
-                 j < fe_v.get_present_fe_values().dofs_per_cell;
-                 ++j)
-              ui_vi_matrix(i, j) +=
-                beta_n * fe_v.get_present_fe_values().shape_value(j, point) *
-                fe_v.get_present_fe_values().shape_value(i, point) * JxW[point];
+          for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
+            for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
+              ui_vi_matrix(i, j) += beta_n * fe_v.shape_value(j, point) *
+                                    fe_v.shape_value(i, point) * JxW[point];
 
-          for (unsigned int k = 0;
-               k < fe_v_neighbor.get_present_fe_values().dofs_per_cell;
-               ++k)
-            for (unsigned int j = 0;
-                 j < fe_v.get_present_fe_values().dofs_per_cell;
-                 ++j)
-              ui_ve_matrix(k, j) -=
-                beta_n * fe_v.get_present_fe_values().shape_value(j, point) *
-                fe_v_neighbor.get_present_fe_values().shape_value(k, point) *
-                JxW[point];
+          for (unsigned int k = 0; k < fe_v_neighbor.dofs_per_cell; ++k)
+            for (unsigned int j = 0; j < fe_v.dofs_per_cell; ++j)
+              ui_ve_matrix(k, j) -= beta_n * fe_v.shape_value(j, point) *
+                                    fe_v_neighbor.shape_value(k, point) *
+                                    JxW[point];
         }
       else
         {
-          for (unsigned int i = 0;
-               i < fe_v.get_present_fe_values().dofs_per_cell;
-               ++i)
-            for (unsigned int l = 0;
-                 l < fe_v_neighbor.get_present_fe_values().dofs_per_cell;
-                 ++l)
-              ue_vi_matrix(i, l) +=
-                beta_n *
-                fe_v_neighbor.get_present_fe_values().shape_value(l, point) *
-                fe_v.get_present_fe_values().shape_value(i, point) * JxW[point];
+          for (unsigned int i = 0; i < fe_v.dofs_per_cell; ++i)
+            for (unsigned int l = 0; l < fe_v_neighbor.dofs_per_cell; ++l)
+              ue_vi_matrix(i, l) += beta_n *
+                                    fe_v_neighbor.shape_value(l, point) *
+                                    fe_v.shape_value(i, point) * JxW[point];
 
-          for (unsigned int k = 0;
-               k < fe_v_neighbor.get_present_fe_values().dofs_per_cell;
-               ++k)
-            for (unsigned int l = 0;
-                 l < fe_v_neighbor.get_present_fe_values().dofs_per_cell;
-                 ++l)
+          for (unsigned int k = 0; k < fe_v_neighbor.dofs_per_cell; ++k)
+            for (unsigned int l = 0; l < fe_v_neighbor.dofs_per_cell; ++l)
               ue_ve_matrix(k, l) -=
-                beta_n *
-                fe_v_neighbor.get_present_fe_values().shape_value(l, point) *
-                fe_v_neighbor.get_present_fe_values().shape_value(k, point) *
-                JxW[point];
+                beta_n * fe_v_neighbor.shape_value(l, point) *
+                fe_v_neighbor.shape_value(k, point) * JxW[point];
         }
     }
 }
@@ -482,16 +423,11 @@ DGMethod<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          (GeometryInfo<dim>::faces_per_cell *
-                             GeometryInfo<dim>::max_children_per_face +
-                           1) *
-                            fe[0].dofs_per_cell);
+  DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
 
-  DoFTools::make_flux_sparsity_pattern(dof_handler, sparsity_pattern);
+  DoFTools::make_flux_sparsity_pattern(dof_handler, dsp);
 
-  sparsity_pattern.compress();
+  sparsity_pattern.copy_from(dsp);
 
   system_matrix.reinit(sparsity_pattern);
 
@@ -1040,7 +976,7 @@ main()
           scratch_data.mesh_generator =
             [](Triangulation<3> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube_with_simplices(triangulation,
-                                                                8);
+                                                                5);
           };
 
           DGMethod<3> dgmethod(scratch_data);
@@ -1063,9 +999,9 @@ main()
                                QGaussSimplex<2>(i + 1),
                                QGaussSimplex<2>(i + 1))};
           scratch_data.mesh_generator =
-            [](Triangulation<3> &triangulation) -> void {
+            [i](Triangulation<3> &triangulation) -> void {
             GridGenerator::subdivided_hyper_cube_with_pyramids(triangulation,
-                                                               8);
+                                                               5 - i);
           };
 
           DGMethod<3> dgmethod(scratch_data);
@@ -1088,8 +1024,9 @@ main()
                                QGauss<2>(i + 1),
                                QGauss<2>(i + 1))};
           scratch_data.mesh_generator =
-            [](Triangulation<3> &triangulation) -> void {
-            GridGenerator::subdivided_hyper_cube_with_wedges(triangulation, 8);
+            [i](Triangulation<3> &triangulation) -> void {
+            GridGenerator::subdivided_hyper_cube_with_wedges(triangulation,
+                                                             6 - i);
           };
 
           DGMethod<3> dgmethod(scratch_data);
@@ -1107,8 +1044,8 @@ main()
           scratch_data.face_quadrature = std::vector<hp::QCollection<2>>{
             hp::QCollection<2>(QGauss<2>(i + 1))};
           scratch_data.mesh_generator =
-            [](Triangulation<3> &triangulation) -> void {
-            GridGenerator::subdivided_hyper_cube(triangulation, 8);
+            [i](Triangulation<3> &triangulation) -> void {
+            GridGenerator::subdivided_hyper_cube(triangulation, 6 - i);
           };
 
           DGMethod<3> dgmethod(scratch_data);
