@@ -193,7 +193,8 @@ namespace internal
           initialize_cells(tria, cells, active_fe_index, *mapping);
           initialize_faces(
             tria, cells, face_info.faces, active_fe_index, *mapping);
-          initialize_faces_by_cells(tria, cells, face_info, *mapping);
+          initialize_faces_by_cells(
+            tria, cells, active_fe_index, face_info, *mapping);
         }
     }
 
@@ -231,7 +232,8 @@ namespace internal
           initialize_cells(tria, cells, active_fe_index, *mapping);
           initialize_faces(
             tria, cells, face_info.faces, active_fe_index, *mapping);
-          initialize_faces_by_cells(tria, cells, face_info, *mapping);
+          initialize_faces_by_cells(
+            tria, cells, active_fe_index, face_info, *mapping);
         }
     }
 
@@ -1649,25 +1651,23 @@ namespace internal
             *std::max_element(active_fe_index.begin(), active_fe_index.end()) :
             0;
 
-        std::vector<std::vector<std::shared_ptr<FEFaceValues<dim>>>>
-          fe_face_values_container(mapping_info.face_data.size());
-        for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
-             ++my_q)
-          fe_face_values_container[my_q].resize(max_active_fe_index + 1);
+        Table<4, std::shared_ptr<FEFaceValues<dim>>> fe_face_values_container(
+          mapping_info.face_data.size(),
+          max_active_fe_index + 1,
+          max_active_fe_index + 1,
+          GeometryInfo<dim>::faces_per_cell);
 
-        std::vector<std::vector<std::shared_ptr<FEFaceValues<dim>>>>
-          fe_boundary_face_values_container(mapping_info.face_data.size());
-        for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
-             ++my_q)
-          fe_boundary_face_values_container[my_q].resize(max_active_fe_index +
-                                                         1);
+        Table<4, std::shared_ptr<FEFaceValues<dim>>>
+          fe_boundary_face_values_container(mapping_info.face_data.size(),
+                                            max_active_fe_index + 1,
+                                            max_active_fe_index + 1,
+                                            GeometryInfo<dim>::faces_per_cell);
 
-        std::vector<std::vector<std::shared_ptr<FESubfaceValues<dim>>>>
-          fe_subface_values_container(mapping_info.face_data.size());
-        for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
-             ++my_q)
-          fe_subface_values_container[my_q].resize(
-            mapping_info.face_data[my_q].descriptor.size());
+        Table<4, std::shared_ptr<FESubfaceValues<dim>>>
+          fe_subface_values_container(mapping_info.face_data.size(),
+                                      max_active_fe_index + 1,
+                                      max_active_fe_index + 1,
+                                      GeometryInfo<dim>::faces_per_cell);
 
         ExtractCellHelper::LocalData<dim, Number, VectorizedArrayType>
           face_data(ExtractCellHelper::get_jacobian_size(tria));
@@ -1678,6 +1678,9 @@ namespace internal
           for (unsigned int my_q = 0; my_q < mapping_info.face_data.size();
                ++my_q)
             {
+              const bool is_boundary_face =
+                faces[face].cells_exterior[0] == numbers::invalid_unsigned_int;
+
               // We assume that we have the faces sorted by the active FE
               // indices so that the active FE index of the interior side of the
               // face batch is the same as the FE index of the interior side of
@@ -1687,39 +1690,87 @@ namespace internal
                   active_fe_index[faces[face].cells_interior[0] /
                                   VectorizedArrayType::size()] :
                   0;
-              const unsigned int hp_quad_index =
+
+              // select quadrature
+              unsigned int hp_quad_index =
                 mapping_info.cell_data[my_q].descriptor.size() == 1 ? 0 :
                                                                       fe_index;
+              unsigned int hp_quad_face_no = mapping_info.face_data[my_q]
+                                                   .q_collection[hp_quad_index]
+                                                   .size() == 1 ?
+                                               0 :
+                                               faces[face].interior_face_no;
+
+              if (!is_boundary_face)
+                {
+                  const unsigned int ext_fe_index =
+                    active_fe_index.size() > 0 ?
+                      active_fe_index[faces[face].cells_exterior[0] /
+                                      VectorizedArrayType::size()] :
+                      0;
+
+                  const unsigned int ext_hp_quad_index =
+                    mapping_info.cell_data[my_q].descriptor.size() == 1 ?
+                      0 :
+                      ext_fe_index;
+                  const unsigned int ext_hp_quad_face_no =
+                    mapping_info.face_data[my_q]
+                          .q_collection[ext_hp_quad_index]
+                          .size() == 1 ?
+                      0 :
+                      faces[face].exterior_face_no;
+
+                  if (mapping_info.face_data[my_q]
+                        .q_collection[ext_hp_quad_index][ext_hp_quad_face_no]
+                        .size() >
+                      mapping_info.face_data[my_q]
+                        .q_collection[hp_quad_index][hp_quad_face_no]
+                        .size())
+                    {
+                      hp_quad_index   = ext_hp_quad_index;
+                      hp_quad_face_no = ext_hp_quad_face_no;
+                    }
+                }
+
+              const auto &quadrature =
+                mapping_info.face_data[my_q]
+                  .q_collection[hp_quad_index][hp_quad_face_no];
+
+              // select mapping
               const unsigned int hp_mapping_index =
                 mapping_in.size() == 1 ? 0 : fe_index;
 
               const auto &mapping = mapping_in[hp_mapping_index];
-              const auto &quadrature =
-                mapping_info.face_data[my_q].q_collection[hp_quad_index];
-
-              const bool is_boundary_face =
-                faces[face].cells_exterior[0] == numbers::invalid_unsigned_int;
 
               if (is_boundary_face &&
-                  fe_boundary_face_values_container[my_q][fe_index] == nullptr)
-                fe_boundary_face_values_container[my_q][fe_index] =
-                  std::make_shared<FEFaceValues<dim>>(
-                    mapping,
-                    *dummy_fe[my_q][hp_quad_index],
-                    quadrature,
-                    mapping_info.update_flags_boundary_faces);
-              else if (fe_face_values_container[my_q][fe_index] == nullptr)
-                fe_face_values_container[my_q][fe_index] =
-                  std::make_shared<FEFaceValues<dim>>(
-                    mapping,
-                    *dummy_fe[my_q][hp_quad_index],
-                    quadrature,
-                    mapping_info.update_flags_inner_faces);
+                  fe_boundary_face_values_container[my_q][fe_index]
+                                                   [hp_quad_index]
+                                                   [hp_quad_face_no] == nullptr)
+                fe_boundary_face_values_container
+                  [my_q][fe_index][hp_quad_index][hp_quad_face_no] =
+                    std::make_shared<FEFaceValues<dim>>(
+                      mapping,
+                      *dummy_fe[my_q][hp_quad_index],
+                      quadrature,
+                      mapping_info.update_flags_boundary_faces);
+              else if (fe_face_values_container[my_q][fe_index][hp_quad_index]
+                                               [hp_quad_face_no] == nullptr)
+                fe_face_values_container[my_q][fe_index][hp_quad_index]
+                                        [hp_quad_face_no] =
+                                          std::make_shared<FEFaceValues<dim>>(
+                                            mapping,
+                                            *dummy_fe[my_q][hp_quad_index],
+                                            quadrature,
+                                            mapping_info
+                                              .update_flags_inner_faces);
 
               FEFaceValues<dim> &fe_face_values =
                 is_boundary_face ?
-                  *fe_boundary_face_values_container[my_q][fe_index] :
-                  *fe_face_values_container[my_q][fe_index];
+                  *fe_boundary_face_values_container[my_q][fe_index]
+                                                    [hp_quad_index]
+                                                    [hp_quad_face_no] :
+                  *fe_face_values_container[my_q][fe_index][hp_quad_index]
+                                           [hp_quad_face_no];
 
               unsigned int n_q_points = 0; // will be override once FEFaceValues
                                            // is set up
@@ -1747,6 +1798,9 @@ namespace internal
                           n_q_points = fe_face_values.n_quadrature_points;
                           face_data.resize(n_q_points);
                         }
+                      else
+                        AssertDimension(fe_face_values.n_quadrature_points,
+                                        n_q_points);
 
                       for (unsigned int q = 0; q < n_q_points; ++q)
                         {
@@ -1874,49 +1928,56 @@ namespace internal
                               active_fe_index[faces[face].cells_exterior[0] /
                                               VectorizedArrayType::size()] :
                               0;
-                          const unsigned int hp_quad_index =
-                            mapping_info.cell_data[my_q].descriptor.size() ==
-                                1 ?
-                              0 :
-                              fe_index;
+
                           const unsigned int hp_mapping_index =
                             mapping_in.size() == 1 ? 0 : fe_index;
 
                           const auto &mapping = mapping_in[hp_mapping_index];
-                          const auto &quadrature =
-                            mapping_info.face_data[my_q]
-                              .q_collection[hp_quad_index];
 
-                          if (fe_face_values_container[my_q][fe_index] ==
+                          if (fe_face_values_container[my_q][fe_index]
+                                                      [hp_quad_index]
+                                                      [hp_quad_face_no] ==
                               nullptr)
-                            fe_face_values_container[my_q][fe_index] =
-                              std::make_shared<FEFaceValues<dim>>(
-                                mapping,
-                                *dummy_fe[my_q][hp_quad_index],
-                                quadrature,
-                                mapping_info.update_flags_boundary_faces);
+                            fe_face_values_container
+                              [my_q][fe_index][hp_quad_index][hp_quad_face_no] =
+                                std::make_shared<FEFaceValues<dim>>(
+                                  mapping,
+                                  *dummy_fe[my_q][hp_quad_index],
+                                  quadrature,
+                                  mapping_info.update_flags_boundary_faces);
 
-                          fe_face_values_container[my_q][fe_index]->reinit(
-                            cell_it, faces[face].exterior_face_no);
+                          fe_face_values_container
+                            [my_q][fe_index][hp_quad_index][hp_quad_face_no]
+                              ->reinit(cell_it, faces[face].exterior_face_no);
 
                           actual_fe_face_values =
-                            fe_face_values_container[my_q][fe_index].get();
+                            fe_face_values_container[my_q][fe_index]
+                                                    [hp_quad_index]
+                                                    [hp_quad_face_no]
+                                                      .get();
                         }
                       else
                         {
-                          if (fe_subface_values_container[my_q][0] == nullptr)
-                            fe_subface_values_container[my_q][0] =
-                              std::make_shared<FESubfaceValues<dim>>(
-                                mapping,
-                                *dummy_fe[my_q][hp_quad_index],
-                                quadrature,
-                                mapping_info.update_flags_inner_faces);
-                          fe_subface_values_container[my_q][0]->reinit(
-                            cell_it,
-                            faces[face].exterior_face_no,
-                            faces[face].subface_index);
+                          if (fe_subface_values_container[my_q][0]
+                                                         [hp_quad_index]
+                                                         [hp_quad_face_no] ==
+                              nullptr)
+                            fe_subface_values_container
+                              [my_q][0][hp_quad_index][hp_quad_face_no] =
+                                std::make_shared<FESubfaceValues<dim>>(
+                                  mapping,
+                                  *dummy_fe[my_q][hp_quad_index],
+                                  quadrature,
+                                  mapping_info.update_flags_inner_faces);
+                          fe_subface_values_container
+                            [my_q][0][hp_quad_index][hp_quad_face_no]
+                              ->reinit(cell_it,
+                                       faces[face].exterior_face_no,
+                                       faces[face].subface_index);
                           actual_fe_face_values =
-                            fe_subface_values_container[my_q][0].get();
+                            fe_subface_values_container[my_q][0][hp_quad_index]
+                                                       [hp_quad_face_no]
+                                                         .get();
                         }
                       for (unsigned int q = 0; q < n_q_points; ++q)
                         {
@@ -2086,15 +2147,58 @@ namespace internal
         const std::vector<GeometryType> &face_type,
         const std::vector<FaceToCellTopology<VectorizedArrayType::size()>>
                                                               &faces,
+        const std::vector<unsigned int>                       &active_fe_index,
         MappingInfoStorage<dim - 1, dim, VectorizedArrayType> &data_faces)
       {
         for (unsigned int face = first_face; face < last_face; ++face)
           {
             const bool is_boundary_face =
               faces[face].cells_exterior[0] == numbers::invalid_unsigned_int;
+
+
+            const unsigned int fe_index =
+              active_fe_index.size() > 0 ?
+                active_fe_index[faces[face].cells_interior[0] /
+                                VectorizedArrayType::size()] :
+                0;
+
+            unsigned int hp_quad_index =
+              data_faces.q_collection.size() == 1 ? 0 : fe_index;
+            unsigned int hp_quad_face_no =
+              data_faces.q_collection[hp_quad_index].size() == 1 ?
+                0 :
+                faces[face].interior_face_no;
+
+            if (!is_boundary_face)
+              {
+                const unsigned int ext_fe_index =
+                  active_fe_index.size() > 0 ?
+                    active_fe_index[faces[face].cells_exterior[0] /
+                                    VectorizedArrayType::size()] :
+                    0;
+
+                const unsigned int ext_hp_quad_index =
+                  data_faces.descriptor.size() == 1 ? 0 : ext_fe_index;
+                const unsigned int ext_hp_quad_face_no =
+                  data_faces.q_collection[ext_hp_quad_index].size() == 1 ?
+                    0 :
+                    faces[face].exterior_face_no;
+
+                if (data_faces
+                      .q_collection[ext_hp_quad_index][ext_hp_quad_face_no]
+                      .size() >
+                    data_faces.q_collection[hp_quad_index][hp_quad_face_no]
+                      .size())
+                  {
+                    hp_quad_index   = ext_hp_quad_index;
+                    hp_quad_face_no = ext_hp_quad_face_no;
+                  }
+              }
+
             const unsigned int n_q_points_work =
-              face_type[face] > affine ? data_faces.descriptor[0].n_q_points :
-                                         1;
+              face_type[face] > affine ?
+                data_faces.q_collection[hp_quad_index][hp_quad_face_no].size() :
+                1;
             const unsigned int offset = data_faces.data_index_offsets[face];
 
             for (unsigned int q = 0; q < n_q_points_work; ++q)
@@ -2655,6 +2759,7 @@ namespace internal
               std::min<unsigned int>(work_per_chunk * (i + 1), faces.size()),
               face_type,
               faces,
+              active_fe_index,
               face_data[my_q]);
           tasks.join_all();
         }
@@ -3028,10 +3133,8 @@ namespace internal
       // transitioned to extracting the information from cell quadrature
       // points but we need to figure out the correct indices of neighbors
       // within the list of arrays still
-      initialize_faces_by_cells(tria,
-                                cell_array,
-                                face_info,
-                                *this->mapping_collection);
+      initialize_faces_by_cells(
+        tria, cell_array, {}, face_info, *this->mapping_collection);
     }
 
 
@@ -3041,15 +3144,12 @@ namespace internal
     MappingInfo<dim, Number, VectorizedArrayType>::initialize_faces_by_cells(
       const dealii::Triangulation<dim>                         &tria,
       const std::vector<std::pair<unsigned int, unsigned int>> &cells,
+      const std::vector<unsigned int>                          &active_fe_index,
       const FaceInfo<VectorizedArrayType::size()>              &face_info,
       const dealii::hp::MappingCollection<dim>                 &mapping_in)
     {
       if (update_flags_faces_by_cells == update_default)
         return;
-
-
-      AssertDimension(mapping_in.size(), 1);
-      const auto &mapping = mapping_in[0];
 
       const unsigned int     n_quads = face_data_by_cells.size();
       constexpr unsigned int n_lanes = VectorizedArrayType::size();
@@ -3105,10 +3205,57 @@ namespace internal
           if (update_flags & update_quadrature_points)
             face_data_by_cells[my_q].quadrature_point_offsets.resize(
               cell_type.size() * ReferenceCells::max_n_faces<dim>());
-          std::size_t storage_length = 0;
+          std::size_t storage_length   = 0;
+          std::size_t storage_length_q = 0;
           for (unsigned int i = 0; i < cell_type.size(); ++i)
             for (const unsigned int face : GeometryInfo<dim>::face_indices())
               {
+                unsigned int n_q_points =
+                  face_data_by_cells[my_q].descriptor[0].n_q_points;
+
+                if (face_data[my_q].q_collection.size() > 1)
+                  {
+                    const unsigned int fe_index =
+                      active_fe_index.size() > 0 ? active_fe_index[i] : 0;
+
+                    // select quadrature
+                    unsigned int hp_quad_index =
+                      cell_data[my_q].descriptor.size() == 1 ? 0 : fe_index;
+
+                    for (unsigned int v = 0; v < n_lanes; ++v)
+                      {
+                        const auto cell_neighbor =
+                          compute_neighbor_index(i, face, v);
+
+                        if (cell_neighbor != numbers::invalid_unsigned_int)
+                          {
+                            const unsigned int ext_fe_index =
+                              active_fe_index.size() > 0 ?
+                                active_fe_index[cell_neighbor /
+                                                VectorizedArrayType::size()] :
+                                0;
+
+                            unsigned int ext_hp_quad_index =
+                              cell_data[my_q].descriptor.size() == 1 ?
+                                0 :
+                                ext_fe_index;
+
+                            if (face_data[my_q]
+                                  .q_collection[ext_hp_quad_index]
+                                               [0 /*ext_hp_quad_face_no*/]
+                                  .size() >
+                                face_data[my_q]
+                                  .q_collection[hp_quad_index]
+                                               [0 /*hp_quad_face_no*/]
+                                  .size())
+                              hp_quad_index = ext_hp_quad_index;
+                          }
+                      }
+
+                    n_q_points =
+                      face_data[my_q].q_collection[hp_quad_index][0].size();
+                  }
+
                 if (faces_by_cells_type[i][face] <= affine)
                   {
                     face_data_by_cells[my_q].data_index_offsets
@@ -3121,82 +3268,118 @@ namespace internal
                     face_data_by_cells[my_q].data_index_offsets
                       [i * ReferenceCells::max_n_faces<dim>() + face] =
                       storage_length;
-                    storage_length +=
-                      face_data_by_cells[my_q].descriptor[0].n_q_points;
+                    storage_length += n_q_points;
                   }
                 if (update_flags & update_quadrature_points)
-                  face_data_by_cells[my_q].quadrature_point_offsets
-                    [i * ReferenceCells::max_n_faces<dim>() + face] =
-                    (i * ReferenceCells::max_n_faces<dim>() + face) *
-                    face_data_by_cells[my_q].descriptor[0].n_q_points;
+                  {
+                    face_data_by_cells[my_q].quadrature_point_offsets
+                      [i * ReferenceCells::max_n_faces<dim>() + face] =
+                      storage_length_q;
+                    storage_length_q += n_q_points;
+                  }
               }
-          face_data_by_cells[my_q].JxW_values.resize_fast(
-            storage_length * ReferenceCells::max_n_faces<dim>());
-          face_data_by_cells[my_q].jacobians[0].resize_fast(
-            storage_length * ReferenceCells::max_n_faces<dim>());
-          face_data_by_cells[my_q].jacobians[1].resize_fast(
-            storage_length * ReferenceCells::max_n_faces<dim>());
+          face_data_by_cells[my_q].JxW_values.resize_fast(storage_length);
+          face_data_by_cells[my_q].jacobians[0].resize_fast(storage_length);
+          face_data_by_cells[my_q].jacobians[1].resize_fast(storage_length);
           if (update_flags & update_normal_vectors)
-            face_data_by_cells[my_q].normal_vectors.resize_fast(
-              storage_length * ReferenceCells::max_n_faces<dim>());
+            face_data_by_cells[my_q].normal_vectors.resize_fast(storage_length);
           if (update_flags & update_normal_vectors &&
               update_flags & update_jacobians)
             face_data_by_cells[my_q].normals_times_jacobians[0].resize_fast(
-              storage_length * ReferenceCells::max_n_faces<dim>());
+              storage_length);
           if (update_flags & update_normal_vectors &&
               update_flags & update_jacobians)
             face_data_by_cells[my_q].normals_times_jacobians[1].resize_fast(
-              storage_length * ReferenceCells::max_n_faces<dim>());
+              storage_length);
           if (update_flags & update_jacobian_grads)
             {
               face_data_by_cells[my_q].jacobian_gradients[0].resize_fast(
-                storage_length * ReferenceCells::max_n_faces<dim>());
+                storage_length);
               face_data_by_cells[my_q]
                 .jacobian_gradients_non_inverse[0]
-                .resize_fast(storage_length *
-                             ReferenceCells::max_n_faces<dim>());
+                .resize_fast(storage_length);
             }
 
           if (update_flags & update_quadrature_points)
             face_data_by_cells[my_q].quadrature_points.resize_fast(
-              cell_type.size() * ReferenceCells::max_n_faces<dim>() *
-              face_data_by_cells[my_q].descriptor[0].n_q_points);
+              storage_length_q);
         }
 
       FE_Nothing<dim> dummy_fe;
-      // currently no hp-indices implemented
-      const unsigned int fe_index = 0;
-      std::vector<std::vector<std::shared_ptr<dealii::FEFaceValues<dim>>>>
-        fe_face_values(face_data_by_cells.size());
-      for (unsigned int i = 0; i < fe_face_values.size(); ++i)
-        fe_face_values[i].resize(face_data_by_cells[i].descriptor.size());
-      std::vector<std::vector<std::shared_ptr<dealii::FEFaceValues<dim>>>>
-        fe_face_values_neigh(face_data_by_cells.size());
-      for (unsigned int i = 0; i < fe_face_values_neigh.size(); ++i)
-        fe_face_values_neigh[i].resize(face_data_by_cells[i].descriptor.size());
+
+      const unsigned int max_active_fe_index =
+        active_fe_index.size() > 0 ?
+          *std::max_element(active_fe_index.begin(), active_fe_index.end()) :
+          0;
+
+      Table<3, std::shared_ptr<FEFaceValues<dim>>> fe_face_values(
+        face_data_by_cells.size(),
+        max_active_fe_index + 1,
+        max_active_fe_index + 1);
+      Table<3, std::shared_ptr<FEFaceValues<dim>>> fe_face_values_neigh(
+        face_data_by_cells.size(),
+        max_active_fe_index + 1,
+        max_active_fe_index + 1);
+
       for (unsigned int cell = 0; cell < cell_type.size(); ++cell)
         for (unsigned int my_q = 0; my_q < face_data_by_cells.size(); ++my_q)
           for (const unsigned int face : GeometryInfo<dim>::face_indices())
             {
-              if (fe_face_values[my_q][fe_index].get() == nullptr)
-                fe_face_values[my_q][fe_index] =
-                  std::make_shared<dealii::FEFaceValues<dim>>(
-                    mapping,
+              const unsigned int fe_index =
+                active_fe_index.size() > 0 ? active_fe_index[cell] : 0;
+
+              // select quadrature
+              unsigned int hp_quad_index =
+                cell_data[my_q].descriptor.size() == 1 ? 0 : fe_index;
+
+              for (unsigned int v = 0; v < n_lanes; ++v)
+                {
+                  const auto cell_neighbor =
+                    compute_neighbor_index(cell, face, v);
+
+                  if (cell_neighbor != numbers::invalid_unsigned_int)
+                    {
+                      const unsigned int ext_fe_index =
+                        active_fe_index.size() > 0 ?
+                          active_fe_index[cell_neighbor /
+                                          VectorizedArrayType::size()] :
+                          0;
+
+                      unsigned int ext_hp_quad_index =
+                        cell_data[my_q].descriptor.size() == 1 ? 0 :
+                                                                 ext_fe_index;
+
+                      if (face_data[my_q]
+                            .q_collection[ext_hp_quad_index]
+                                         [0 /*ext_hp_quad_face_no*/]
+                            .size() >
+                          face_data[my_q]
+                            .q_collection[hp_quad_index][0 /*hp_quad_face_no*/]
+                            .size())
+                        hp_quad_index = ext_hp_quad_index;
+                    }
+                }
+              const auto &quadrature =
+                face_data[my_q]
+                  .q_collection[hp_quad_index][0 /*hp_quad_face_no*/];
+
+              // select mapping
+              const unsigned int hp_mapping_index =
+                mapping_in.size() == 1 ? 0 : fe_index;
+
+              if (fe_face_values[my_q][fe_index][hp_quad_index].get() ==
+                  nullptr)
+                fe_face_values[my_q][fe_index][hp_quad_index] =
+                  std::make_shared<FEFaceValues<dim>>(
+                    mapping_in[hp_mapping_index],
                     dummy_fe,
-                    face_data[my_q].q_collection[fe_index],
+                    quadrature,
                     update_flags);
-              if (fe_face_values_neigh[my_q][fe_index].get() == nullptr)
-                fe_face_values_neigh[my_q][fe_index] =
-                  std::make_shared<dealii::FEFaceValues<dim>>(
-                    mapping,
-                    dummy_fe,
-                    face_data[my_q].q_collection[fe_index],
-                    update_flags);
-              dealii::FEFaceValues<dim> &fe_val =
-                *fe_face_values[my_q][fe_index];
-              dealii::FEFaceValues<dim> &fe_val_neigh =
-                *fe_face_values_neigh[my_q][fe_index];
-              const unsigned int offset =
+
+              FEFaceValues<dim> &fe_val =
+                *fe_face_values[my_q][fe_index][hp_quad_index];
+              std::shared_ptr<FEFaceValues<dim>> fe_val_neigh;
+              const unsigned int                 offset =
                 face_data_by_cells[my_q].data_index_offsets
                   [cell * ReferenceCells::max_n_faces<dim>() + face];
 
@@ -3204,27 +3387,50 @@ namespace internal
 
               for (unsigned int v = 0; v < n_lanes; ++v)
                 {
-                  typename dealii::Triangulation<dim>::cell_iterator cell_it(
+                  typename Triangulation<dim>::cell_iterator cell_it(
                     &tria,
                     cells[cell * n_lanes + v].first,
                     cells[cell * n_lanes + v].second);
                   fe_val.reinit(cell_it, face);
 
-                  const unsigned int cell_neighbor =
+                  const auto cell_neighbor =
                     compute_neighbor_index(cell, face, v);
 
                   if (cell_neighbor != numbers::invalid_unsigned_int)
                     {
-                      typename dealii::Triangulation<dim>::cell_iterator
-                        cell_it_neigh(&tria,
-                                      cells[cell_neighbor].first,
-                                      cells[cell_neighbor].second);
-                      fe_val_neigh.reinit(cell_it_neigh,
-                                          cell_it->at_boundary(face) ?
-                                            cell_it->periodic_neighbor_face_no(
-                                              face) :
-                                            cell_it->neighbor_face_no(face));
+                      const unsigned int fe_index =
+                        active_fe_index.size() > 0 ?
+                          active_fe_index[cell_neighbor /
+                                          VectorizedArrayType::size()] :
+                          0;
+
+                      const unsigned int hp_mapping_index =
+                        mapping_in.size() == 1 ? 0 : fe_index;
+
+                      if (fe_face_values_neigh[my_q][fe_index][hp_quad_index]
+                            .get() == nullptr)
+                        fe_face_values_neigh[my_q][fe_index][hp_quad_index] =
+                          std::make_shared<FEFaceValues<dim>>(
+                            mapping_in[hp_mapping_index],
+                            dummy_fe,
+                            quadrature,
+                            update_flags);
+
+                      fe_val_neigh =
+                        fe_face_values_neigh[my_q][fe_index][hp_quad_index];
+
+                      typename Triangulation<dim>::cell_iterator cell_it_neigh(
+                        &tria,
+                        cells[cell_neighbor].first,
+                        cells[cell_neighbor].second);
+                      fe_val_neigh->reinit(cell_it_neigh,
+                                           cell_it->at_boundary(face) ?
+                                             cell_it->periodic_neighbor_face_no(
+                                               face) :
+                                             cell_it->neighbor_face_no(face));
                     }
+                  else
+                    fe_val_neigh = {};
 
                   // copy data for affine data type
                   if (my_cell_type <= affine)
@@ -3252,13 +3458,13 @@ namespace internal
                              ++q)
                           {
                             DerivativeForm<1, dim, dim> inv_jac =
-                              fe_val_neigh.jacobian(q).covariant_form();
+                              fe_val_neigh->jacobian(q).covariant_form();
                             for (unsigned int d = 0; d < dim; ++d)
                               for (unsigned int e = 0; e < dim; ++e)
                                 {
                                   const unsigned int ee = ExtractFaceHelper::
                                     reorder_face_derivative_indices<dim>(
-                                      fe_val_neigh.get_face_number(), e);
+                                      fe_val_neigh->get_face_number(), e);
                                   face_data_by_cells[my_q]
                                     .jacobians[1][offset][d][e][v] =
                                     inv_jac[d][ee];
@@ -3305,13 +3511,13 @@ namespace internal
                              ++q)
                           {
                             DerivativeForm<1, dim, dim> inv_jac =
-                              fe_val_neigh.jacobian(q).covariant_form();
+                              fe_val_neigh->jacobian(q).covariant_form();
                             for (unsigned int d = 0; d < dim; ++d)
                               for (unsigned int e = 0; e < dim; ++e)
                                 {
                                   const unsigned int ee = ExtractFaceHelper::
                                     reorder_face_derivative_indices<dim>(
-                                      fe_val_neigh.get_face_number(), e);
+                                      fe_val_neigh->get_face_number(), e);
                                   face_data_by_cells[my_q]
                                     .jacobians[1][offset + q][d][e][v] =
                                     inv_jac[d][ee];

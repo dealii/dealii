@@ -1,0 +1,10 @@
+Improved: The hp adaptivity features for DG of MatrixFree have
+been extended. For face-centric loops, neighboring cells can have
+quadrature rules with different number of quadrature points. On
+shared face, the quadrature rule is used that has the most quadrature
+points. For element-centric loops, p-adaptivity is enabled. It is
+experimental, since categorization and hp-enabled DoFHandler are not
+supported at the same time by MatrixFree, limiting, in most cases, the
+usablity to VectorizedArray<double, 1>.
+<br>
+(Peter Munch, 2025/10/21)
