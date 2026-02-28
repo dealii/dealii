@@ -123,7 +123,8 @@ namespace internal
                       // TODO: Change set to types::fe_index
                       complete_identities = fes.hp_quad_dof_identities(
                         std::set<unsigned int>{fe_index_1, fe_index_2},
-                        face_no);
+                        face_no,
+                        fe_index_1 < fe_index_2);
                       break;
                     }
 
