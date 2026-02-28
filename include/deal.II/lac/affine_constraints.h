@@ -2794,21 +2794,11 @@ namespace internal
     {
     private:
       /**
-       * Overload returning true if the class is derived from BlockMatrixBase,
-       * which is what block matrices do (with the exception of
-       * BlockSparseMatrixEZ).
+       * Overload returning true if the class is derived from BlockMatrixBase.
        */
       template <typename T>
       static std::true_type
       check(const BlockMatrixBase<T> *);
-
-      /**
-       * Overload for BlockSparseMatrixEZ, which is the only block matrix not
-       * derived from BlockMatrixBase at the time of writing this class.
-       */
-      template <typename T>
-      static std::true_type
-      check(const BlockSparseMatrixEZ<T> *);
 
       /**
        * Catch all for all other potential types that are then apparently not
