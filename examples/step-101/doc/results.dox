@@ -1,0 +1,341 @@
+<h1>Results</h1>
+
+When you run the program, it prints a few global statistics about the mesh
+and the finite element space. In the run shown above, the mesh has 168 active
+cells and 390 degrees of freedom, and the area check reports a total area of 4,
+as expected for the chosen geometry.
+
+@code
+Mesh check: sum(cell areas) = 4 (expected ~ 4)
+Step-101 (CMS) (CMS timestep targeting)
+Active cells: 168
+DoFs: 390
+@endcode
+
+The main output of the program is a detailed per-cell table that shows the output
+of CMS for every cell/element. Each row corresponds to one active element and
+contains:
+
+- the element area <code>area</code>,
+- the element's four edge lengths <code>e0</code>-<code>e3</code>,
+- the characteristic element length <code>h_char</code>, which for <code>FE_Q(1)</code> in 2D is the minimum of the edge lengths,
+- the element's critical time step <code>dt_cell</code>, computed with the CFL condition,
+- whether the element is affected by mass scaling <code>scaling</code>,
+- and the density scaling factor <code>factor</code> applied to that element, where <code>1</code> means no scaling.
+
+@code
+--- Per-cell debug for a target critical step = 0.0181865 ---
+idx   area       e0        e1        e2        e3        h_char      dt_cell     scaled   factor
+------------------------------------------------------------------------------------------------
+   0   0.090000  0.300000  0.300000  0.300000  0.300000    0.300000  0.173205  NO       1.0000
+   1   0.090000  0.300000  0.300000  0.300000  0.300000    0.300000  0.173205  NO       1.0000
+   2   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+   3   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+   4   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+   5   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+   6   0.036000  0.300000  0.300000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+   7   0.018000  0.300000  0.300000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+   8   0.012000  0.300000  0.300000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+   9   0.054000  0.300000  0.300000  0.180000  0.180000    0.180000  0.103923  NO       1.0000
+  10   0.030000  0.300000  0.300000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  11   0.030000  0.300000  0.300000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  12   0.090000  0.300000  0.300000  0.300000  0.300000    0.300000  0.173205  NO       1.0000
+  13   0.090000  0.300000  0.300000  0.300000  0.300000    0.300000  0.173205  NO       1.0000
+  14   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  15   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  16   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  17   0.060000  0.300000  0.300000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  18   0.036000  0.300000  0.300000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+  19   0.018000  0.300000  0.300000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  20   0.012000  0.300000  0.300000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  21   0.054000  0.300000  0.300000  0.180000  0.180000    0.180000  0.103923  NO       1.0000
+  22   0.030000  0.300000  0.300000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  23   0.030000  0.300000  0.300000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  24   0.060000  0.200000  0.200000  0.300000  0.300000    0.200000  0.115470  NO       1.0000
+  25   0.060000  0.200000  0.200000  0.300000  0.300000    0.200000  0.115470  NO       1.0000
+  26   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  27   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  28   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  29   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  30   0.024000  0.200000  0.200000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+  31   0.012000  0.200000  0.200000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  32   0.008000  0.200000  0.200000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  33   0.036000  0.200000  0.200000  0.180000  0.180000    0.180000  0.103923  NO       1.0000
+  34   0.020000  0.200000  0.200000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  35   0.020000  0.200000  0.200000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  36   0.060000  0.200000  0.200000  0.300000  0.300000    0.200000  0.115470  NO       1.0000
+  37   0.060000  0.200000  0.200000  0.300000  0.300000    0.200000  0.115470  NO       1.0000
+  38   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  39   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  40   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  41   0.040000  0.200000  0.200000  0.200000  0.200000    0.200000  0.115470  NO       1.0000
+  42   0.024000  0.200000  0.200000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+  43   0.012000  0.200000  0.200000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  44   0.008000  0.200000  0.200000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  45   0.036000  0.200000  0.200000  0.180000  0.180000    0.180000  0.103923  NO       1.0000
+  46   0.020000  0.200000  0.200000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  47   0.020000  0.200000  0.200000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  48   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+  49   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+  50   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  51   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  52   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  53   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  54   0.018000  0.150000  0.150000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+  55   0.009000  0.150000  0.150000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  56   0.006000  0.150000  0.150000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  57   0.027000  0.150000  0.150000  0.180000  0.180000    0.150000  0.086603  NO       1.0000
+  58   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  59   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  60   0.021000  0.070000  0.070000  0.300000  0.300000    0.070000  0.040415  NO       1.0000
+  61   0.021000  0.070000  0.070000  0.300000  0.300000    0.070000  0.040415  NO       1.0000
+  62   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+  63   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+  64   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+  65   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+  66   0.008400  0.070000  0.070000  0.120000  0.120000    0.070000  0.040415  NO       1.0000
+  67   0.004200  0.070000  0.070000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  68   0.002800  0.070000  0.070000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  69   0.012600  0.070000  0.070000  0.180000  0.180000    0.070000  0.040415  NO       1.0000
+  70   0.007000  0.070000  0.070000  0.100000  0.100000    0.070000  0.040415  NO       1.0000
+  71   0.007000  0.070000  0.070000  0.100000  0.100000    0.070000  0.040415  NO       1.0000
+  72   0.024000  0.080000  0.080000  0.300000  0.300000    0.080000  0.046188  NO       1.0000
+  73   0.024000  0.080000  0.080000  0.300000  0.300000    0.080000  0.046188  NO       1.0000
+  74   0.016000  0.080000  0.080000  0.200000  0.200000    0.080000  0.046188  NO       1.0000
+  75   0.016000  0.080000  0.080000  0.200000  0.200000    0.080000  0.046188  NO       1.0000
+  76   0.016000  0.080000  0.080000  0.200000  0.200000    0.080000  0.046188  NO       1.0000
+  77   0.016000  0.080000  0.080000  0.200000  0.200000    0.080000  0.046188  NO       1.0000
+  78   0.009600  0.080000  0.080000  0.120000  0.120000    0.080000  0.046188  NO       1.0000
+  79   0.004800  0.080000  0.080000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  80   0.003200  0.080000  0.080000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  81   0.014400  0.080000  0.080000  0.180000  0.180000    0.080000  0.046188  NO       1.0000
+  82   0.008000  0.080000  0.080000  0.100000  0.100000    0.080000  0.046188  NO       1.0000
+  83   0.008000  0.080000  0.080000  0.100000  0.100000    0.080000  0.046188  NO       1.0000
+  84   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+  85   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+  86   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  87   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  88   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  89   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+  90   0.018000  0.150000  0.150000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+  91   0.009000  0.150000  0.150000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+  92   0.006000  0.150000  0.150000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+  93   0.027000  0.150000  0.150000  0.180000  0.180000    0.150000  0.086603  NO       1.0000
+  94   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  95   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+  96   0.030000  0.100000  0.100000  0.300000  0.300000    0.100000  0.057735  NO       1.0000
+  97   0.030000  0.100000  0.100000  0.300000  0.300000    0.100000  0.057735  NO       1.0000
+  98   0.020000  0.100000  0.100000  0.200000  0.200000    0.100000  0.057735  NO       1.0000
+  99   0.020000  0.100000  0.100000  0.200000  0.200000    0.100000  0.057735  NO       1.0000
+ 100   0.020000  0.100000  0.100000  0.200000  0.200000    0.100000  0.057735  NO       1.0000
+ 101   0.020000  0.100000  0.100000  0.200000  0.200000    0.100000  0.057735  NO       1.0000
+ 102   0.012000  0.100000  0.100000  0.120000  0.120000    0.100000  0.057735  NO       1.0000
+ 103   0.006000  0.100000  0.100000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+ 104   0.004000  0.100000  0.100000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+ 105   0.018000  0.100000  0.100000  0.180000  0.180000    0.100000  0.057735  NO       1.0000
+ 106   0.010000  0.100000  0.100000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+ 107   0.010000  0.100000  0.100000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+ 108   0.015000  0.050000  0.050000  0.300000  0.300000    0.050000  0.028868  NO       1.0000
+ 109   0.015000  0.050000  0.050000  0.300000  0.300000    0.050000  0.028868  NO       1.0000
+ 110   0.010000  0.050000  0.050000  0.200000  0.200000    0.050000  0.028868  NO       1.0000
+ 111   0.010000  0.050000  0.050000  0.200000  0.200000    0.050000  0.028868  NO       1.0000
+ 112   0.010000  0.050000  0.050000  0.200000  0.200000    0.050000  0.028868  NO       1.0000
+ 113   0.010000  0.050000  0.050000  0.200000  0.200000    0.050000  0.028868  NO       1.0000
+ 114   0.006000  0.050000  0.050000  0.120000  0.120000    0.050000  0.028868  NO       1.0000
+ 115   0.003000  0.050000  0.050000  0.060000  0.060000    0.050000  0.028868  NO       1.0000
+ 116   0.002000  0.050000  0.050000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+ 117   0.009000  0.050000  0.050000  0.180000  0.180000    0.050000  0.028868  NO       1.0000
+ 118   0.005000  0.050000  0.050000  0.100000  0.100000    0.050000  0.028868  NO       1.0000
+ 119   0.005000  0.050000  0.050000  0.100000  0.100000    0.050000  0.028868  NO       1.0000
+ 120   0.009000  0.030000  0.030000  0.300000  0.300000    0.030000  0.017321  YES      1.1025
+ 121   0.009000  0.030000  0.030000  0.300000  0.300000    0.030000  0.017321  YES      1.1025
+ 122   0.006000  0.030000  0.030000  0.200000  0.200000    0.030000  0.017321  YES      1.1025
+ 123   0.006000  0.030000  0.030000  0.200000  0.200000    0.030000  0.017321  YES      1.1025
+ 124   0.006000  0.030000  0.030000  0.200000  0.200000    0.030000  0.017321  YES      1.1025
+ 125   0.006000  0.030000  0.030000  0.200000  0.200000    0.030000  0.017321  YES      1.1025
+ 126   0.003600  0.030000  0.030000  0.120000  0.120000    0.030000  0.017321  YES      1.1025
+ 127   0.001800  0.030000  0.030000  0.060000  0.060000    0.030000  0.017321  YES      1.1025
+ 128   0.001200  0.030000  0.030000  0.040000  0.040000    0.030000  0.017321  YES      1.1025
+ 129   0.005400  0.030000  0.030000  0.180000  0.180000    0.030000  0.017321  YES      1.1025
+ 130   0.003000  0.030000  0.030000  0.100000  0.100000    0.030000  0.017321  YES      1.1025
+ 131   0.003000  0.030000  0.030000  0.100000  0.100000    0.030000  0.017321  YES      1.1025
+ 132   0.021000  0.070000  0.070000  0.300000  0.300000    0.070000  0.040415  NO       1.0000
+ 133   0.021000  0.070000  0.070000  0.300000  0.300000    0.070000  0.040415  NO       1.0000
+ 134   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+ 135   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+ 136   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+ 137   0.014000  0.070000  0.070000  0.200000  0.200000    0.070000  0.040415  NO       1.0000
+ 138   0.008400  0.070000  0.070000  0.120000  0.120000    0.070000  0.040415  NO       1.0000
+ 139   0.004200  0.070000  0.070000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+ 140   0.002800  0.070000  0.070000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+ 141   0.012600  0.070000  0.070000  0.180000  0.180000    0.070000  0.040415  NO       1.0000
+ 142   0.007000  0.070000  0.070000  0.100000  0.100000    0.070000  0.040415  NO       1.0000
+ 143   0.007000  0.070000  0.070000  0.100000  0.100000    0.070000  0.040415  NO       1.0000
+ 144   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+ 145   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+ 146   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 147   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 148   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 149   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 150   0.018000  0.150000  0.150000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+ 151   0.009000  0.150000  0.150000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+ 152   0.006000  0.150000  0.150000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+ 153   0.027000  0.150000  0.150000  0.180000  0.180000    0.150000  0.086603  NO       1.0000
+ 154   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+ 155   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+ 156   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+ 157   0.045000  0.150000  0.150000  0.300000  0.300000    0.150000  0.086603  NO       1.0000
+ 158   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 159   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 160   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 161   0.030000  0.150000  0.150000  0.200000  0.200000    0.150000  0.086603  NO       1.0000
+ 162   0.018000  0.150000  0.150000  0.120000  0.120000    0.120000  0.069282  NO       1.0000
+ 163   0.009000  0.150000  0.150000  0.060000  0.060000    0.060000  0.034641  NO       1.0000
+ 164   0.006000  0.150000  0.150000  0.040000  0.040000    0.040000  0.023094  NO       1.0000
+ 165   0.027000  0.150000  0.150000  0.180000  0.180000    0.150000  0.086603  NO       1.0000
+ 166   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+ 167   0.015000  0.150000  0.150000  0.100000  0.100000    0.100000  0.057735  NO       1.0000
+--- End per-cell debug ---
+@endcode
+
+The table makes the CFL mechanism explicit. Small elements lead to small 
+characteristic element lengths, which then lead directly to small critical time 
+steps. In the example run above, the smallest characteristic length is <code>0.03</code>,
+which yields the smalles per-cell time step <code>0.017321</code>. Because explicit
+time integration requires using a time step that is stable for every cell, this smallest
+value sets the global critical time before mass scaling.
+
+The program then requires an improved time step, which in this run corresponds
+to a 5% increase. CMS is then applied only to those cells whosse local critical
+time step is below the requested target. For these cells, the density is increased
+so that their updated local critical time step matches the target. This is why, in
+the run shown above, all cells with a characteristic element length of <code>0.03</code>
+are marked as scaled and receive the same scaling factor. They all have the same
+characteristic length and hence require the same density increase to reach the same
+target time step.
+
+The summary printed after the table confirms the intended effect of CMS:
+
+@code
+Summary:
+Target improvement factor = 1.05 (5%)
+Global critical time step before CMS = 0.0173205
+Target critical time step = 0.0181865
+Global critical time step after CMS = 0.0181865
+Real improvement factor = 1.05 (5%)
+
+CMS impact:
+Added mass ratio: 0.15375%
+Scaled cells: 12 / 168 (7.14286%)
+@endcode
+
+The program successfully increases the global critical time step by the requested
+factor, and it does so by modifying only a small part of the mesh and by adding
+a small amount of artificial mass.
+
+Finally, the program writes the file <code>>cms_rho_scaling.vtk</code>, which stores
+the per-cell field of the density scaling. 
+
+@code
+Wrote: cms_rho_scaling.vtk (cell data: rho_scaling)
+@endcode
+
+Visualizing this output for example with ParaView highlights where density scaling was
+applied. Most of the mesh has a density scaling of 1, while the smalll, stability-limiting
+elements show values larger than one. This proves an immediate sanity check that CMS is
+localized to the intended region of the mesh and helps assess whether the added mass is
+in parts of the domain where it is acceptable.
+
+<a name="step-101-extensions"></a>
+<h3>Possibilities for extensions</h3>
+
+The goal of this tutorial is to introduce the idea and implementation of CMS.
+However, this can be extended in a number of ways. Some of these possibilities
+are briefly discussed below.
+
+
+<h4>Implementation of CMS into explicit FEM solvers and parallelization</h4>
+
+This tutorial presents the technique of CMS including the definition and calculation
+of the characteristic element length, the material wave speed, the critical
+time step, the required additional density to achieve a desired critical time
+step, and the physical impact of the additional density on the model. Therefore,
+a possible extension would be the solution of a full finite element simulation
+using explicit time integration, augmented with CMS to relax the critical
+time step constraint.
+
+Additionally, a big advantage of explicit time integration schemes is that their calculations
+can be easily parallelized because their time steps primarily consist of local
+operations and sparse matrix-vector products. Therefore, combining this tutorial
+with solving a simulation through explicit time integration and parallelization
+would allow CMS to be applied to significantly larger and more complex problems.
+
+
+<h4>3D problems</h4>
+
+This tutorial is restricted to a 2D setting in order to keep the focus on CMS,
+therefore, a possible extension would be to compute everything in 3D. Most
+components of the program are already dimension-independent and only require
+instantiating the main class with <code>dim = 3</code>. This extension would significantly
+increase the computational cost and memory requirements, but it would also
+provide a more realistic setting for more complex applications.
+
+
+<h4>Selective Mass Scaling (SMS)</h4>
+
+CMS as used in this tutorial increases the critical time step by increasing
+the density of selected finite elements uniformly, which affects all eigenmodes
+equally much. In particular rigid body and low frequency modes are affected.
+However, structures tend to deform in low frequency modes. In some applications
+modifying the density of the elements uniformly can lead to an undesired
+influence on the physically relevant low-frequency response.
+
+In contrast, high frequency modes are relatively unimportant for the global
+structural response, are often highly localized, and they only limit the time
+step. Hence, the idea of Selective Mass Scaling (SMS) is to suppress high
+frequency content and leave the low frequency modes unaffected by modifying
+the structure of the added mass matrix to select only the affected modes. This
+generally requires additional analysis steps, and is therefore more complex
+than CMS.
+
+
+<h4>Adaptive mesh refinement</h4>
+
+The critical time step in explicit time integration methods is dictated by the
+smallest element in the mesh. Therefore, a possible extension of this tutorial
+would be to avoid unnecessarily small elements whenever possible through adaptive
+mesh refinement. This could significantly reduce the number of elements that
+impose a restriction on the critical time step. Combining adaptive mesh refinement
+with CMS could help solve more complex simulations in advanced applications.
+
+
+<h4>Higher-order finite elements</h4>
+
+In this tutorial, we restrict ourselves to <code>FE_Q(1)</code> elements in
+order to keep the discussion of stability limits and characteristic element
+lengths the focus. A possible extension would therefore be to consider higher-order
+finite elements. They could improve accuracy for smooth solutions, but they also
+introduce additional stability constraints in explicit time integration.
+Therefore, this would require extending the definition of characteristic
+element lengths and therefore the CFL condition, but the concept of the tutorial
+would remain the same.
+
+
+<h4>Nonlinear materials</h4>
+
+This tutorial is based on small-strain linear elasticity to focus the explanation
+on CMS. However, in many practical applications, nonlinear material behavior plays
+a major role. Thus, this material could be extended to work with nonlinear
+constitutive laws, such as plasticity and damage models, which would possibly
+require to re-evaluate stability limits dynamically and potentially adapt mass
+scaling factors during the simulation.
+
+
+<h4>Contact</h4>
+
+As already mentioned in the introduction, common applications of explicit
+integration methods are crash and impact simulations. However, these kinds of
+simulations involve contact, which involves contact stiffness and penalty
+parameteres. Extending the prersent tutorial to include contact formulations would
+provide additional insight into the practical use of mass scaling in realistic
+engineering simulations.
