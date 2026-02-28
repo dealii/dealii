@@ -77,6 +77,70 @@ SubCellData::check_consistency(const unsigned int dim) const
 
 namespace TriangulationDescription
 {
+  template <int dim, int spacedim>
+  Description<dim, spacedim>::Description()
+    : comm(MPI_COMM_NULL)
+    , settings(Settings::default_setting)
+    , smoothing(Triangulation<dim, spacedim>::MeshSmoothing::none)
+  {}
+
+
+
+  template <int dim, int spacedim>
+  void
+  Description<dim, spacedim>::reorder_coarse_grid()
+  {
+    const unsigned int n_cells = coarse_cells.size();
+
+    DynamicSparsityPattern cell_connectivity(n_cells, n_cells);
+
+    {
+      // copy of GridTools::get_vertex_connectivity_of_cells()
+
+      std::vector<boost::container::small_vector<unsigned int, 16>>
+        vertex_to_cell(coarse_cell_vertices.size());
+      for (unsigned int cell = 0; cell < n_cells; ++cell)
+        {
+          for (const auto v : coarse_cells[cell].vertices)
+            vertex_to_cell[v].push_back(cell);
+        }
+
+      std::vector<types::global_dof_index> neighbors;
+      for (unsigned int cell = 0; cell < n_cells; ++cell)
+        {
+          neighbors.clear();
+          for (const auto v : coarse_cells[cell].vertices)
+            neighbors.insert(neighbors.end(),
+                             vertex_to_cell[v].begin(),
+                             vertex_to_cell[v].end());
+          std::sort(neighbors.begin(), neighbors.end());
+          cell_connectivity.add_entries(cell,
+                                        neighbors.begin(),
+                                        std::unique(neighbors.begin(),
+                                                    neighbors.end()),
+                                        true);
+        }
+    }
+
+    std::vector<unsigned int> new_order(n_cells);
+    SparsityTools::reorder_hierarchical(cell_connectivity, new_order);
+
+    std::vector<dealii::CellData<dim>> coarse_cells_new(n_cells);
+    std::vector<types::coarse_cell_id> coarse_cell_index_to_coarse_cell_id_new(
+      n_cells);
+
+    for (unsigned int cell = 0; cell < n_cells; ++cell)
+      {
+        coarse_cells_new[new_order[cell]] = coarse_cells[cell];
+        coarse_cell_index_to_coarse_cell_id_new[new_order[cell]] =
+          coarse_cell_index_to_coarse_cell_id[cell];
+      }
+
+    std::swap(coarse_cells_new, coarse_cells);
+    std::swap(coarse_cell_index_to_coarse_cell_id_new,
+              coarse_cell_index_to_coarse_cell_id);
+  }
+
   namespace Utilities
   {
     namespace
