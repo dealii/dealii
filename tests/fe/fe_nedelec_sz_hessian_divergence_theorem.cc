@@ -71,6 +71,9 @@ test(const Triangulation<dim> &tr,
                                    update_gradients | update_quadrature_points |
                                      update_normal_vectors | update_JxW_values);
 
+  Table<2, Tensor<2, dim>> boundary_integrals(fe.n_components(),
+                                              fe.dofs_per_cell);
+
   for (const auto &cell : dof.active_cell_iterators())
     {
       fe_values.reinit(cell);
@@ -79,6 +82,27 @@ test(const Triangulation<dim> &tr,
       for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
         deallog << i << ": ( " << cell->vertex(i) << " )" << std::endl;
 
+      // Precompute boundary integrals to avoid frequent
+      // fe_face_values.reinit() calls
+      boundary_integrals.fill(Tensor<2, dim>());
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        {
+          fe_face_values.reinit(cell, face);
+          for (unsigned int c = 0; c < fe.n_components(); ++c)
+            {
+              const FEValuesExtractors::Scalar single_component(c);
+              for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
+                for (const auto q : fe_face_values.quadrature_point_indices())
+                  {
+                    Tensor<1, dim> gradient =
+                      fe_face_values[single_component].gradient(i, q);
+                    Tensor<2, dim> gradient_normal_outer_prod =
+                      outer_product(gradient, fe_face_values.normal_vector(q));
+                    boundary_integrals(c, i) +=
+                      gradient_normal_outer_prod * fe_face_values.JxW(q);
+                  }
+            }
+        }
       bool cell_ok = true;
 
       for (unsigned int c = 0; c < fe.n_components(); ++c)
@@ -96,21 +120,7 @@ test(const Triangulation<dim> &tr,
                                    fe_values.JxW(q);
                 }
 
-              Tensor<2, dim> boundary_integral;
-              for (const unsigned int face : GeometryInfo<dim>::face_indices())
-                {
-                  fe_face_values.reinit(cell, face);
-                  for (const auto q : fe_face_values.quadrature_point_indices())
-                    {
-                      Tensor<1, dim> gradient =
-                        fe_face_values[single_component].gradient(i, q);
-                      Tensor<2, dim> gradient_normal_outer_prod =
-                        outer_product(gradient,
-                                      fe_face_values.normal_vector(q));
-                      boundary_integral +=
-                        gradient_normal_outer_prod * fe_face_values.JxW(q);
-                    }
-                }
+              const Tensor<2, dim> boundary_integral = boundary_integrals(c, i);
 
               if ((bulk_integral - boundary_integral).norm_square() >
                   tolerance * (bulk_integral.norm() + boundary_integral.norm()))
