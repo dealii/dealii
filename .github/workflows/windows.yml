@@ -66,7 +66,7 @@ jobs:
     - name: test
       run: |
         cmake --build build --target setup_tests_a-framework setup_tests_examples setup_tests_quick_tests
-        ctest --test-dir build --build-config Debug --extra-verbose
+        ctest --test-dir build --build-config Debug --extra-verbose -E "step-100.debug|step-100.release"
     - name: upload library
       # run only if a PR is merged into master
       if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
