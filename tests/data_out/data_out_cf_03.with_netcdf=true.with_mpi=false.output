@@ -1,0 +1,24 @@
+
+DEAL::ok
+DEAL::global:Conventions = CF-1.12
+DEAL::global:comment = Created by the deal.II finite element library (https://dealii.org).
+DEAL::mesh()
+DEAL::mesh:cf_role = mesh_topology
+DEAL::mesh:long_name = Topology of a 2-d unstructured mesh
+DEAL::mesh:topology_dimension = 2
+DEAL::mesh:node_coordinates = mesh_node_x mesh_node_y
+DEAL::mesh:face_node_connectivity = mesh_face_nodes
+DEAL::mesh:face_dimension = face
+DEAL::mesh_face_nodes(8, 3)
+DEAL::mesh_face_nodes:cf_role = face_node_connectivity
+DEAL::mesh_face_nodes:long_name = Corner nodes that make up each face.
+DEAL::mesh_face_nodes:start_index = 0
+DEAL::mesh_face_nodes:_FillValue = -1
+DEAL::mesh_node_x(9)
+DEAL::mesh_node_x:axis = X
+DEAL::mesh_node_y(9)
+DEAL::mesh_node_y:axis = Y
+DEAL::linear(9)
+DEAL::linear:mesh = mesh
+DEAL::linear:location = node
+DEAL::linear:_FillValue = nan

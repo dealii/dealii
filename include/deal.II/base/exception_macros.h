@@ -1053,4 +1053,27 @@
     Assert(code >= 0, ::dealii::SUNDIALS::ExcIDAError(code))
 #endif
 
+#ifdef DEAL_II_WITH_NETCDF
+/**
+ * Assertion that checks the error code produced by calling a NetCDF API
+ * function. Throws ExcIO with an error message provided by NetCDF if the
+ * error code is anything other than NC_NOERR.
+ *
+ * @note This and similar macro names are examples of preprocessor definitions
+ * in the deal.II library that are not prefixed by a string that likely makes
+ * them unique to deal.II. As a consequence, it is possible that other
+ * libraries your code interfaces with define the same name, and the result
+ * will be name collisions (see
+ * https://en.wikipedia.org/wiki/Name_collision). One can <code>\#undef</code>
+ * this macro, as well as all other macros defined by deal.II that are not
+ * prefixed with either <code>DEAL</code> or <code>deal</code>, by including
+ * the header <code>deal.II/base/undefine_macros.h</code> after all other
+ * deal.II headers have been included.
+ *
+ * @ingroup Exceptions
+ */
+#  define AssertThrowNC(code) \
+    AssertThrow(code == NC_NOERR, ExcIO(nc_strerror(code)))
+#endif
+
 #endif
