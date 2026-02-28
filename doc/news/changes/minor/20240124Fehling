@@ -1,0 +1,5 @@
+New: parallel::CellWeights can now work with pre-computed weights.
+This requires that the weights are determined only by information
+about finite elements.
+<br>
+(Marc Fehling, 2024/01/24)
