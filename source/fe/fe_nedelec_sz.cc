@@ -1769,61 +1769,20 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // Define an edge numbering so that each edge, E_{m} = [e^{m}_{1},
               // e^{m}_{2}] e1 = higher global numbering of the two local
               // vertices e2 = lower global numbering of the two local vertices
-              std::vector<int> edge_sign(lines_per_cell);
-              for (unsigned int m = 0; m < lines_per_cell; ++m)
-                {
-                  unsigned int v0_loc =
-                    GeometryInfo<dim>::line_to_cell_vertices(m, 0);
-                  unsigned int v1_loc =
-                    GeometryInfo<dim>::line_to_cell_vertices(m, 1);
-                  unsigned int v0_glob = cell->vertex_index(v0_loc);
-                  unsigned int v1_glob = cell->vertex_index(v1_loc);
-
-                  if (v0_glob > v1_glob)
-                    {
-                      // Opposite to global numbering on our reference element
-                      edge_sign[m] = -1.0;
-                    }
-                  else
-                    {
-                      // Aligns with global numbering on our reference element.
-                      edge_sign[m] = 1.0;
-                    }
-                }
+              std::vector<int>  edge_sign(lines_per_cell);
+              std::vector<bool> line_neighbor_is_coarser(
+                GeometryInfo<dim>::lines_per_cell, false);
 
               // Check for hanging faces. If we encounter hanging faces,
               // we use the vertex indices from the parent.
-              for (unsigned int f = 0; f < 6; ++f)
-                if (cell->face(f)->at_boundary() == false)
+              for (unsigned int f : cell->face_indices())
+                if (!cell->face(f)->at_boundary())
                   if (cell->neighbor_is_coarser(f))
-                    for (unsigned int m = 0; m < 4; ++m)
-                      {
-                        unsigned int parent_m =
-                          GeometryInfo<dim>::face_to_cell_lines(f, m);
-
-                        unsigned int v0_loc =
-                          GeometryInfo<dim>::line_to_cell_vertices(parent_m, 0);
-                        unsigned int v1_loc =
-                          GeometryInfo<dim>::line_to_cell_vertices(parent_m, 1);
-
-                        unsigned int v0_glob =
-                          cell->parent()->vertex_index(v0_loc);
-                        unsigned int v1_glob =
-                          cell->parent()->vertex_index(v1_loc);
-
-                        if (v0_glob > v1_glob)
-                          {
-                            // Opposite to global numbering on our reference
-                            // element
-                            edge_sign[parent_m] = -1.0;
-                          }
-                        else
-                          {
-                            // Aligns with global numbering on our reference
-                            // element.
-                            edge_sign[parent_m] = 1.0;
-                          }
-                      }
+                    for (unsigned int m = 0;
+                         m < GeometryInfo<dim>::vertices_per_face;
+                         ++m)
+                      line_neighbor_is_coarser
+                        [GeometryInfo<dim>::face_to_cell_lines(f, m)] = true;
 
               // Next, we cover the case where we encounter a hanging edge but
               // not a hanging face. This is always the case if the cell
@@ -1849,82 +1808,64 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
               // In that case, we determine the direction of the hanging edge
               // based on the vertex indices from the parent cell.
               //
-              // Note: We assume here that at most eight cells are adjacent to
-              // a single vertex.
-              std::vector<unsigned int> adjacent_faces = {2, 2, 4, 4, 0, 0};
-              for (unsigned int f = 0; f < 6; ++f)
+              // Note:
+              // This also covers cases where five or more cells are adjacent
+              // to one edge.
+              for (unsigned int line : cell->line_indices())
                 {
-                  if (!cell->face(f)->at_boundary() &&
-                      !cell->face(adjacent_faces[f])->at_boundary())
-                    if (!cell->neighbor_is_coarser(f) &&
-                        !cell->neighbor_is_coarser(adjacent_faces[f]))
-                      if (!cell->neighbor(f)
-                             ->face(adjacent_faces[f])
-                             ->at_boundary())
-                        if (cell->neighbor(f)->neighbor_is_coarser(
-                              adjacent_faces[f]))
-                          {
-                            unsigned int parent_m =
-                              GeometryInfo<dim>::face_to_cell_lines(f, 0);
-                            unsigned int v0_loc =
-                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
-                                                                       0);
-                            unsigned int v1_loc =
-                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
-                                                                       1);
-                            unsigned int v0_glob =
-                              cell->parent()->vertex_index(v0_loc);
-                            unsigned int v1_glob =
-                              cell->parent()->vertex_index(v1_loc);
-                            if (v0_glob > v1_glob)
-                              {
-                                // Opposite to global numbering on our reference
-                                // element
-                                edge_sign[parent_m] = -1.0;
-                              }
-                            else
-                              {
-                                // Aligns with global numbering on our reference
-                                // element.
-                                edge_sign[parent_m] = 1.0;
-                              }
-                          }
+                  // If we already know this is a hanging edge, we do not need
+                  // to run further checks to confirm whether it is indeed a
+                  // hanging edge.
+                  if (line_neighbor_is_coarser[line])
+                    continue;
 
-                  if (!cell->face(f)->at_boundary() &&
-                      !cell->face(adjacent_faces[f] + 1)->at_boundary())
-                    if (!cell->neighbor_is_coarser(f) &&
-                        !cell->neighbor_is_coarser(adjacent_faces[f] + 1))
-                      if (!cell->neighbor(f)
-                             ->face(adjacent_faces[f] + 1)
-                             ->at_boundary())
-                        if (cell->neighbor(f)->neighbor_is_coarser(
-                              adjacent_faces[f] + 1))
-                          {
-                            unsigned int parent_m =
-                              GeometryInfo<dim>::face_to_cell_lines(f, 1);
-                            unsigned int v0_loc =
-                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
-                                                                       0);
-                            unsigned int v1_loc =
-                              GeometryInfo<dim>::line_to_cell_vertices(parent_m,
-                                                                       1);
-                            unsigned int v0_glob =
-                              cell->parent()->vertex_index(v0_loc);
-                            unsigned int v1_glob =
-                              cell->parent()->vertex_index(v1_loc);
-                            if (v0_glob > v1_glob)
-                              {
-                                // Opposite to global numbering on our reference
-                                // element
-                                edge_sign[parent_m] = -1.0;
-                              }
-                            else
-                              {
-                                // Aligns with global numbering on our reference
-                                // element.
-                                edge_sign[parent_m] = 1.0;
-                              }
-                          }
+                  if (!cell->is_active())
+                    continue;
+
+                  int cell_level = cell->level();
+                  for (auto &neighbor_cell :
+                       cell->get_cells_adjacent_to_line(line))
+                    if (neighbor_cell->level() != cell_level)
+                      {
+                        line_neighbor_is_coarser[line] = true;
+                        break;
+                      }
+                }
+
+              for (unsigned int line : cell->line_indices())
+                {
+                  unsigned int v0_loc =
+                    GeometryInfo<dim>::line_to_cell_vertices(line, 0);
+                  unsigned int v1_loc =
+                    GeometryInfo<dim>::line_to_cell_vertices(line, 1);
+
+                  // get the global vertexc indices
+                  unsigned int v0_glob;
+                  unsigned int v1_glob;
+                  if (line_neighbor_is_coarser[line])
+                    {
+                      // hanging edge case
+                      v0_glob = cell->parent()->vertex_index(v0_loc);
+                      v1_glob = cell->parent()->vertex_index(v1_loc);
+                    }
+                  else
+                    {
+                      // normal case
+                      v0_glob = cell->vertex_index(v0_loc);
+                      v1_glob = cell->vertex_index(v1_loc);
+                    }
+
+                  // get the direction in comparison to the reference element
+                  if (v0_glob > v1_glob)
+                    {
+                      // Opposite to global numbering on our reference element
+                      edge_sign[line] = -1.0;
+                    }
+                  else
+                    {
+                      // Aligns with global numbering on our reference element.
+                      edge_sign[line] = 1.0;
+                    }
                 }
 
               // Define \sigma_{m} = sigma_{e^{m}_{1}} - sigma_{e^{m}_{2}}

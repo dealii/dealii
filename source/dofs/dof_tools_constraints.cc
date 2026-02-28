@@ -1191,6 +1191,15 @@ namespace DoFTools
 
       const unsigned int dim = 3;
 
+      // In order to find all hanging edges in a reasonable
+      // computing time, even when five or more cells share
+      // one edge, we pre-compute the edge-to-cell map.
+      // Unfortunately, we need to get rid of a 'const'...
+      Triangulation<dim, spacedim> &tria =
+        const_cast<Triangulation<dim, spacedim> &>(
+          dof_handler.get_triangulation());
+      tria.prepare_line_to_adjacent_cells_map();
+
       std::vector<types::global_dof_index> dofs_on_mother;
       std::vector<types::global_dof_index> dofs_on_children;
 
