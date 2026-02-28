@@ -1355,6 +1355,38 @@ private:
     }};
 
   /**
+   * The number of orientations this type of reference cell can have in case it
+   * is used as a codimensional object of a cell (only then there is a
+   * meaningful interpretation of orientation).
+   */
+  unsigned int
+  n_orientations() const;
+
+  /**
+   * Get the index of vertex @p vertex for this reference cell while accounting
+   * for an arbitrary orientation @p face_orientation. The name
+   * `face_orientation` is chosen deliberately because, for an orientation to be
+   * present, this reference cell must be used as a codimensional object
+   * (e.g., as a face) of another cell.
+   */
+  unsigned int
+  standard_to_real_vertex(
+    const unsigned int                 vertex,
+    const types::geometric_orientation face_orientation) const;
+
+  /**
+   * Get the index of line @p line for this reference cell while accounting for
+   * an arbitrary orientation @p face_orientation. The name`face_orientation` is
+   * chosen deliberately because, for an orientation to be present, this
+   * reference cell must be used as a codimensional object
+   * (e.g., as a face) of another cell.
+   */
+  unsigned int
+  standard_to_real_line(
+    const unsigned int                 line,
+    const types::geometric_orientation face_orientation) const;
+
+  /**
    * A kind of constructor -- not quite private because it can be
    * called by anyone, but at least hidden in an internal namespace.
    */
@@ -3264,48 +3296,79 @@ ReferenceCell::face_vertex_location(const unsigned int face,
 
 
 inline unsigned int
+ReferenceCell::standard_to_real_vertex(
+  const unsigned int                 vertex,
+  const types::geometric_orientation face_orientation) const
+{
+  Assert(get_dimension() < 3, ExcImpossibleInDim(3));
+  AssertIndexRange(vertex, n_vertices());
+  AssertIndexRange(face_orientation, n_orientations());
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        // test to ensure that face_orientation is default_geometric_orientation
+        // already done with AssertIndexRange(face_orientation, ...) above.
+        return vertex;
+      case ReferenceCells::Line:
+        return line_vertex_permutations[face_orientation][vertex];
+      case ReferenceCells::Triangle:
+        return triangle_vertex_permutations[face_orientation][vertex];
+      case ReferenceCells::Quadrilateral:
+        return quadrilateral_vertex_permutations[face_orientation][vertex];
+      case ReferenceCells::Invalid:
+        // might be reached in case standard_to_real_face_vertex is called on a
+        // vertex
+        DEAL_II_ASSERT_UNREACHABLE();
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+  return numbers::invalid_unsigned_int;
+
+  return 0;
+}
+
+
+
+inline unsigned int
 ReferenceCell::standard_to_real_face_vertex(
   const unsigned int                 vertex,
   const unsigned int                 face,
   const types::geometric_orientation face_orientation) const
 {
   AssertIndexRange(face, n_faces());
-  AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
+
+  return face_reference_cell(face).standard_to_real_vertex(vertex,
+                                                           face_orientation);
+}
+
+
+
+inline unsigned int
+ReferenceCell::standard_to_real_line(
+  const unsigned int                 line,
+  const types::geometric_orientation face_orientation) const
+{
+  Assert(get_dimension() < 3, ExcImpossibleInDim(3));
+  AssertIndexRange(line, n_lines());
+  AssertIndexRange(face_orientation, n_orientations());
 
   switch (this->kind)
     {
-      case ReferenceCells::Vertex:
-        DEAL_II_NOT_IMPLEMENTED();
-        break;
-      case ReferenceCells::Line:
-        Assert(face_orientation == numbers::default_geometric_orientation,
-               ExcMessage(
-                 "In 1D, all faces must have the default orientation."));
-        return vertex;
       case ReferenceCells::Triangle:
+        return triangle_line_permutations[face_orientation][line];
       case ReferenceCells::Quadrilateral:
-        return line_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Tetrahedron:
-        return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Pyramid:
-        // face 0 is a quadrilateral
-        if (face == 0)
-          return quadrilateral_vertex_permutations[face_orientation][vertex];
-        else
-          return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Wedge:
-        // faces 0 and 1 are triangles
-        if (face > 1)
-          return quadrilateral_vertex_permutations[face_orientation][vertex];
-        else
-          return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Hexahedron:
-        return quadrilateral_vertex_permutations[face_orientation][vertex];
+        return quadrilateral_line_permutations[face_orientation][line];
+      case ReferenceCells::Invalid:
+        // might be reached in case standard_to_real_face_line is called on a
+        // vertex.
+        DEAL_II_ASSERT_UNREACHABLE();
+      // case ReferenceCells::Vertex:
+      // case ReferenceCells::Line:
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
 
-  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -3315,49 +3378,12 @@ inline unsigned int
 ReferenceCell::standard_to_real_face_line(
   const unsigned int                 line,
   const unsigned int                 face,
-  const types::geometric_orientation combined_face_orientation) const
+  const types::geometric_orientation face_orientation) const
 {
   AssertIndexRange(face, n_faces());
-  AssertIndexRange(line, face_reference_cell(face).n_lines());
 
-  switch (this->kind)
-    {
-      case ReferenceCells::Vertex:
-      case ReferenceCells::Line:
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
-        DEAL_II_NOT_IMPLEMENTED();
-        break;
-      case ReferenceCells::Tetrahedron:
-        return triangle_line_permutations[combined_face_orientation][line];
-      case ReferenceCells::Pyramid:
-        if (face == 0) // The quadrilateral face
-          {
-            return quadrilateral_line_permutations[combined_face_orientation]
-                                                  [line];
-          }
-        else // One of the triangular faces
-          {
-            return triangle_line_permutations[combined_face_orientation][line];
-          }
-      case ReferenceCells::Wedge:
-        if (face > 1) // One of the quadrilateral faces
-          {
-            return quadrilateral_line_permutations[combined_face_orientation]
-                                                  [line];
-          }
-        else // One of the triangular faces
-          return triangle_line_permutations[combined_face_orientation][line];
-      case ReferenceCells::Hexahedron:
-        {
-          return quadrilateral_line_permutations[combined_face_orientation]
-                                                [line];
-        }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
-
-  return numbers::invalid_unsigned_int;
+  return face_reference_cell(face).standard_to_real_line(line,
+                                                         face_orientation);
 }
 
 
@@ -3991,20 +4017,38 @@ ReferenceCell::face_normal_vector(const unsigned int face_no) const
 
 
 inline unsigned int
+ReferenceCell::n_orientations() const
+{
+  // 3D cells never are faces (because no 4D cells exist)
+  Assert(get_dimension() < 3, ExcImpossibleInDim(3));
+
+  switch (this->kind)
+    {
+      case ReferenceCells::Vertex:
+        return 1;
+      case ReferenceCells::Line:
+        return 2;
+      case ReferenceCells::Triangle:
+        return 6;
+      case ReferenceCells::Quadrilateral:
+        return 8;
+      case ReferenceCells::Invalid:
+        // might be reached in case n_face_orientations is called on a vertex
+        DEAL_II_ASSERT_UNREACHABLE();
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+inline unsigned int
 ReferenceCell::n_face_orientations(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
-  if (get_dimension() == 1)
-    return 1;
-  if (get_dimension() == 2)
-    return 2;
-  else if (face_reference_cell(face_no) == ReferenceCells::Quadrilateral)
-    return 8;
-  else if (face_reference_cell(face_no) == ReferenceCells::Triangle)
-    return 6;
 
-  DEAL_II_ASSERT_UNREACHABLE();
-  return numbers::invalid_unsigned_int;
+  return face_reference_cell(face_no).n_orientations();
 }
 
 
