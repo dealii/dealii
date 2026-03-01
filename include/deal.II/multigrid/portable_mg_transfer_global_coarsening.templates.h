@@ -200,6 +200,8 @@ namespace Portable
 
       team_member.team_barrier();
 
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+
       // apply kernel in each direction
       if constexpr (dim == 2)
         {
@@ -375,7 +377,12 @@ namespace Portable
           }
           team_member.team_barrier();
         }
-
+#else
+      AssertThrow(
+        false,
+        ExcMessage(
+          "This feature requires Kokkos version 4.0.0 or newer. The support for older versions of Kokkos is underway and will be added shortly."));
+#endif
       // apply weights
       Kokkos::parallel_for(Kokkos::TeamThreadRange(
                              team_member, transfer_data.n_dofs_per_cell_fine),
@@ -463,6 +470,8 @@ namespace Portable
                                transfer_data.weights(i, cell_index);
                            });
       team_member.team_barrier();
+
+#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
 
       // apply kernel in each direction
       if constexpr (dim == 2)
@@ -641,6 +650,13 @@ namespace Portable
 
           team_member.team_barrier();
         }
+
+#else
+      AssertThrow(
+        false,
+        ExcMessage(
+          "This feature requires Kokkos version 4.0.0 or newer. The support for older versions of Kokkos is underway and will be added shortly."));
+#endif
 
       // distribute coarse dofs values
       Kokkos::parallel_for(
