@@ -38,6 +38,15 @@ namespace LinearAlgebra
     TEMPL_COPY_CONSTRUCTOR(float, double);
 
 #  undef TEMPL_COPY_CONSTRUCTOR
+
+    template void
+    BlockVector<float, ::dealii::MemorySpace::Default>::reinit<float>(
+      const BlockVector<float, ::dealii::MemorySpace::Default> &,
+      const bool);
+    template void
+    BlockVector<double, ::dealii::MemorySpace::Default>::reinit<double>(
+      const BlockVector<double, ::dealii::MemorySpace::Default> &,
+      const bool);
 #endif
   } // namespace distributed
 } // namespace LinearAlgebra
