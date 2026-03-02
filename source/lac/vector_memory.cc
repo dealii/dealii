@@ -35,6 +35,14 @@ template class GrowingVectorMemory<
   LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>;
 template class GrowingVectorMemory<
   LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>;
+template class VectorMemory<
+  LinearAlgebra::distributed::BlockVector<float, MemorySpace::Default>>;
+template class VectorMemory<
+  LinearAlgebra::distributed::BlockVector<double, MemorySpace::Default>>;
+template class GrowingVectorMemory<
+  LinearAlgebra::distributed::BlockVector<float, MemorySpace::Default>>;
+template class GrowingVectorMemory<
+  LinearAlgebra::distributed::BlockVector<double, MemorySpace::Default>>;
 
 namespace internal
 {
@@ -50,6 +58,13 @@ namespace internal
       dealii::GrowingVectorMemory<dealii::LinearAlgebra::distributed::Vector<
         double,
         MemorySpace::Default>>::release_unused_memory();
+
+      dealii::GrowingVectorMemory<
+        dealii::LinearAlgebra::distributed::
+          BlockVector<float, MemorySpace::Default>>::release_unused_memory();
+      dealii::GrowingVectorMemory<
+        dealii::LinearAlgebra::distributed::
+          BlockVector<double, MemorySpace::Default>>::release_unused_memory();
     }
   } // namespace GrowingVectorMemoryImplementation
 } // namespace internal
