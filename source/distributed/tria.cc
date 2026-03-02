@@ -16,7 +16,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/distributed/p4est_wrappers.h>
+#include <deal.II/distributed/amr.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/grid/grid_tools.h>
@@ -33,14 +33,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-namespace amr
-{
-#if defined(DEAL_II_WITH_P4EST)
-  using namespace dealii::internal::p4est;
-#else
-#  error DEAL_II_WITH_P4EST required
-#endif
-} // namespace amr
 
 
 namespace internal

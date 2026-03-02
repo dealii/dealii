@@ -21,7 +21,7 @@
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/template_constraints.h>
 
-#include <deal.II/distributed/p4est_wrappers.h>
+#include <deal.II/distributed/amr.h>
 #include <deal.II/distributed/tria_base.h>
 
 #include <deal.II/grid/tria.h>
@@ -462,9 +462,9 @@ namespace parallel
        */
       void
       execute_transfer(
-        const typename dealii::internal::p4est::types<dim>::forest
+        const typename amr::types<dim>::forest
           *parallel_forest,
-        const typename dealii::internal::p4est::types<dim>::gloidx
+        const typename amr::types<dim>::gloidx
           *previous_global_first_quadrant);
 
       /**
@@ -702,7 +702,7 @@ namespace parallel
        * parallel::distributed::Triangulation::get_p4est().
        */
       void
-      load(const typename dealii::internal::p4est::types<dim>::forest *forest);
+      load(const typename amr::types<dim>::forest *forest);
 
       /**
        * Return a permutation vector for the order the coarse cells are handed
@@ -728,7 +728,7 @@ namespace parallel
        * @warning If you modify the p4est object, internal data structures
        * can become inconsistent.
        */
-      const typename dealii::internal::p4est::types<dim>::forest *
+      const typename amr::types<dim>::forest *
       get_p4est() const;
 
       /**
@@ -772,19 +772,19 @@ namespace parallel
        * each tree is rooted in a coarse grid cell, this data structure holds
        * the connectivity between the cells of the coarse grid.
        */
-      typename dealii::internal::p4est::types<dim>::connectivity *connectivity;
+      typename amr::types<dim>::connectivity *connectivity;
 
       /**
        * A data structure that holds the local part of the global
        * triangulation.
        */
-      typename dealii::internal::p4est::types<dim>::forest *parallel_forest;
+      typename amr::types<dim>::forest *parallel_forest;
 
       /**
        * A data structure that holds some information about the ghost cells of
        * the triangulation.
        */
-      typename dealii::internal::p4est::types<dim>::ghost *parallel_ghost;
+      typename amr::types<dim>::ghost *parallel_ghost;
 
       /**
        * Go through all p4est trees and record the relations between locally
@@ -832,7 +832,7 @@ namespace parallel
        * Return a pointer to the p4est tree that belongs to the given
        * dealii_coarse_cell_index()
        */
-      typename dealii::internal::p4est::types<dim>::tree *
+      typename amr::types<dim>::tree *
       init_tree(const int dealii_coarse_cell_index) const;
 
       /**
