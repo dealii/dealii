@@ -94,7 +94,7 @@ jobs:
         sed -i '/^$/d' doxygen.log
         # Check if remaining log is zero size
         ! [ -s doxygen.log ] || exit 1
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       with:
         name: doxygen_documentation
         path: build/doc/doxygen
