@@ -27,22 +27,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 #include "lac/vector_memory.inst"
-template class VectorMemory<
-  LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>;
-template class VectorMemory<
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>;
-template class GrowingVectorMemory<
-  LinearAlgebra::distributed::Vector<float, MemorySpace::Default>>;
-template class GrowingVectorMemory<
-  LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>;
-template class VectorMemory<
-  LinearAlgebra::distributed::BlockVector<float, MemorySpace::Default>>;
-template class VectorMemory<
-  LinearAlgebra::distributed::BlockVector<double, MemorySpace::Default>>;
-template class GrowingVectorMemory<
-  LinearAlgebra::distributed::BlockVector<float, MemorySpace::Default>>;
-template class GrowingVectorMemory<
-  LinearAlgebra::distributed::BlockVector<double, MemorySpace::Default>>;
 
 namespace internal
 {
