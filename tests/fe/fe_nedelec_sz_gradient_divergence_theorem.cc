@@ -27,7 +27,7 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_q1.h>
+#include <deal.II/fe/mapping_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/manifold_lib.h>
@@ -73,6 +73,9 @@ test(const Triangulation<dim> &tr,
                                    update_values | update_quadrature_points |
                                      update_normal_vectors | update_JxW_values);
 
+  Table<2, Tensor<1, dim>> boundary_integrals(fe.n_components(),
+                                              fe.dofs_per_cell);
+
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();
        ++cell)
@@ -86,6 +89,23 @@ test(const Triangulation<dim> &tr,
           for (unsigned int d = 0; d < dim; ++d)
             deallog << cell->vertex(i)[d] << ' ';
           deallog << ')' << std::endl;
+        }
+
+      // Precompute boundary integrals to avoid frequent
+      // fe_face_values.reinit() calls
+      boundary_integrals.fill(Tensor<1, dim>());
+      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        {
+          fe_face_values.reinit(cell, face);
+          for (unsigned int c = 0; c < fe.n_components(); ++c)
+            {
+              const FEValuesExtractors::Scalar single_component(c);
+              for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
+                for (const auto q : fe_face_values.quadrature_point_indices())
+                  boundary_integrals(c, i) +=
+                    fe_face_values[single_component].value(i, q) *
+                    fe_face_values.normal_vector(q) * fe_face_values.JxW(q);
+            }
         }
 
       bool cell_ok = true;
@@ -105,17 +125,7 @@ test(const Triangulation<dim> &tr,
                                    fe_values.JxW(q);
                 }
 
-              Tensor<1, dim> boundary_integral;
-              for (const unsigned int face : GeometryInfo<dim>::face_indices())
-                {
-                  fe_face_values.reinit(cell, face);
-                  for (const auto q : fe_face_values.quadrature_point_indices())
-                    {
-                      boundary_integral +=
-                        fe_face_values[single_component].value(i, q) *
-                        fe_face_values.normal_vector(q) * fe_face_values.JxW(q);
-                    }
-                }
+              const Tensor<1, dim> boundary_integral = boundary_integrals(c, i);
 
               if ((bulk_integral - boundary_integral).norm_square() >
                   tolerance * (bulk_integral.norm() + boundary_integral.norm()))
@@ -150,11 +160,6 @@ test_hyper_ball(const double tolerance)
 {
   Triangulation<dim> tr;
   GridGenerator::hyper_ball(tr);
-
-  static const SphericalManifold<dim> boundary;
-  tr.set_manifold(0, boundary);
-
-  //  tr.refine_global(1); // taking too long,
 
   FE_NedelecSZ<dim> fe(1);
   test(tr, fe, tolerance);
