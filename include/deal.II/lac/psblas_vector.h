@@ -911,8 +911,7 @@ namespace PSCToolkitWrappers
      */
     VectorOperation::values last_action;
 
-    // TODO[MF]: uncomment when the matrix class will be introduced
-    // friend class SparseMatrix;
+    friend class SparseMatrix;
   };
 
 

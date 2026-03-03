@@ -275,3 +275,6 @@ OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
 // CGAL Kernels
 CGAL_KERNELS := {CGAL::Simple_cartesian<double>; CGAL::Exact_predicates_exact_constructions_kernel; 
                 CGAL::Exact_predicates_inexact_constructions_kernel }
+
+// PSCToolkit matrix
+PSCTOOLKIT_MATRICES := {PSCToolkitWrappers::SparseMatrix}
