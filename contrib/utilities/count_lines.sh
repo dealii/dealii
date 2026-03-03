@@ -57,7 +57,7 @@
 #
 #  set xdata time
 #  set timefmt "%Y-%m-%d"
-#  set xrange ["1997-11-01":"2023-12-31"]
+#  set xrange ["1997-11-01":"2026-12-31"]
 #  set yrange [0:1000000]
 #  set format x "%Y"
 #  set style data lines
@@ -66,6 +66,12 @@
 #  unset arrow
 #  unset label
 #  
+#  set arrow from "2025-07-22",600000 to "2025-07-22",900000 head
+#  set label "9.7" at "2025-07-22",575000
+#
+#  set arrow from "2024-08-11",550000 to "2024-08-11",850000 head
+#  set label "9.6" at "2024-08-11",525000
+#
 #  set arrow from "2023-07-07",500000 to "2023-07-07",800000 head
 #  set label "9.5" at "2023-07-07",475000
 #  
@@ -96,7 +102,7 @@
 #      
 #  plot "< cat line-count.dat | sort" using 1:2 title "Lines of code in source files", \
 #       "" using 1:3 title "Lines of code in tests", \
-#       "< echo 2018-01-01 700000 ; echo 2023-12-31 1000000" using 1:2 title "50,000 lines per year"
+#       "< echo 2008-01-01 290000 ; echo 2026-12-31 1050000" using 1:2 title "40,000 lines per year"
 #
 #
 
