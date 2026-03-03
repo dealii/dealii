@@ -25,10 +25,18 @@ set(T8CODE_DIR "" CACHE PATH
   "An optional hint to a t8code installation/directory"
   )
 set_if_empty(T8CODE_DIR "$ENV{T8CODE_DIR}")
-set_if_empty(SC_DIR "$ENV{SC_DIR}")
 
-find_package(T8CODE CONFIG)
 
+
+## add additional hints for different ways to install t8code/p4est/sc
+find_package(SC CONFIG
+             HINTS ${T8CODE_DIR}/cmake ${T8CODE_DIR}/install/cmake)
+
+find_package(P4EST CONFIG
+             HINTS ${T8CODE_DIR}/cmake ${T8CODE_DIR}/install/cmake)
+
+find_package(T8CODE CONFIG
+             HINTS ${T8CODE_DIR}/cmake ${T8CODE_DIR}/install/cmake)
 
   if(${T8CODE_ENABLE_MPI})
     message(STATUS "Found MPI")
@@ -37,15 +45,9 @@ find_package(T8CODE CONFIG)
     message(STATUS "NOT Found MPI")
   endif()
 
-  
-  if(${T8_CMAKE_BUILD})
-    message(STATUS "Found CMAKE BUILD")
-  else()
-    message(STATUS "Did not find CMAKE BUILD")
-  endif()    
-  
+ 
   deal_ii_find_path(T8CODE_INCLUDE_DIR t8.h
-  HINTS ${T8CODE_DIR}/.. 
+  HINTS ${T8CODE_DIR}/.. ${T8CODE_DIR}
   PATH_SUFFIXES include
   )
 
