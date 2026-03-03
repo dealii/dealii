@@ -24,7 +24,6 @@
 #include "deal.II/lac/psblas_common.h"
 #include <deal.II/lac/psblas_sparse_matrix.h>
 
-#include <muParserDef.h>
 #include <psb_types.h>
 
 #include <utility>

@@ -409,9 +409,6 @@ namespace PSCToolkitWrappers
 
 
 } // namespace PSCToolkitWrappers
-
-
-DEAL_II_NAMESPACE_CLOSE
 #endif // DEAL_II_WITH_PSBLAS
 DEAL_II_NAMESPACE_CLOSE
 
