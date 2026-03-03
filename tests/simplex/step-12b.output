@@ -32,66 +32,66 @@ DEAL::  0.176777
 DEAL::  10.4560
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       2560
-DEAL::   Number of degrees of freedom: 10240
-DEAL::  0.0360844
-DEAL::  45.1833
-DEAL::  0.0360844
-DEAL::  45.1833
+DEAL::   Number of active cells:       625
+DEAL::   Number of degrees of freedom: 2500
+DEAL::  0.0556543
+DEAL::  23.2688
+DEAL::  0.0556543
+DEAL::  23.2688
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       2560
-DEAL::   Number of degrees of freedom: 25600
-DEAL::  0.0360844
-DEAL::  69.8864
-DEAL::  0.0360844
-DEAL::  69.8864
+DEAL::   Number of active cells:       625
+DEAL::   Number of degrees of freedom: 6250
+DEAL::  0.0569772
+DEAL::  37.3269
+DEAL::  0.0569772
+DEAL::  37.3269
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       3072
-DEAL::   Number of degrees of freedom: 15360
-DEAL::  0.0441942
-DEAL::  54.8271
-DEAL::  0.0441942
-DEAL::  54.8271
+DEAL::   Number of active cells:       384
+DEAL::   Number of degrees of freedom: 1920
+DEAL::  0.0883883
+DEAL::  19.7309
+DEAL::  0.0883883
+DEAL::  19.7309
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       3072
-DEAL::   Number of degrees of freedom: 43008
-DEAL::  0.0441942
-DEAL::  92.3281
-DEAL::  0.0441942
-DEAL::  92.3281
+DEAL::   Number of active cells:       162
+DEAL::   Number of degrees of freedom: 2268
+DEAL::  0.125143
+DEAL::  26.4046
+DEAL::  0.125143
+DEAL::  26.4046
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       1024
-DEAL::   Number of degrees of freedom: 6144
-DEAL::  0.0441942
-DEAL::  34.7035
-DEAL::  0.0441942
-DEAL::  34.7035
+DEAL::   Number of active cells:       250
+DEAL::   Number of degrees of freedom: 1500
+DEAL::  0.0683130
+DEAL::  18.0917
+DEAL::  0.0683130
+DEAL::  18.0917
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       1024
-DEAL::   Number of degrees of freedom: 18432
-DEAL::  0.0441942
-DEAL::  59.5766
-DEAL::  0.0441942
-DEAL::  59.5766
+DEAL::   Number of active cells:       128
+DEAL::   Number of degrees of freedom: 2304
+DEAL::  0.0883883
+DEAL::  20.0584
+DEAL::  0.0883883
+DEAL::  20.0584
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       512
-DEAL::   Number of degrees of freedom: 4096
-DEAL::  0.0441942
-DEAL::  28.1989
-DEAL::  0.0441942
-DEAL::  28.1989
+DEAL::   Number of active cells:       125
+DEAL::   Number of degrees of freedom: 1000
+DEAL::  0.0683130
+DEAL::  14.7843
+DEAL::  0.0683130
+DEAL::  14.7843
 DEAL::solution1 and solution2 coincide.
 DEAL::Cycle 0:
-DEAL::   Number of active cells:       512
-DEAL::   Number of degrees of freedom: 13824
-DEAL::  0.0441942
-DEAL::  51.2235
-DEAL::  0.0441942
-DEAL::  51.2235
+DEAL::   Number of active cells:       64
+DEAL::   Number of degrees of freedom: 1728
+DEAL::  0.0883883
+DEAL::  17.8322
+DEAL::  0.0883883
+DEAL::  17.8322
 DEAL::solution1 and solution2 coincide.
