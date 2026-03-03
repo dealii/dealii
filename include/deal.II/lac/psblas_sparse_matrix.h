@@ -405,6 +405,8 @@ namespace PSCToolkitWrappers
      * either default, building or assembled).
      */
     internal::State state;
+
+    friend class PreconditionAMG;
   };
 
 

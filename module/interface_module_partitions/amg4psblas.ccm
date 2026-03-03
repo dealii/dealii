@@ -1,0 +1,50 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from AMG4PSBLAS into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_AMG4PSBLAS
+#  include <amg_cbind.h>
+#endif
+
+
+export module dealii.external.amg4psblas;
+
+#ifdef DEAL_II_WITH_AMG4PSBLAS
+
+export
+{
+  using ::amg_c_dprec;
+  using ::amg_c_dprecbld;
+  using ::amg_c_dprecfree;
+  using ::amg_c_dprecinit;
+  using ::amg_c_dprecset;
+  using ::amg_c_dprecsol;
+}
+
+#endif
