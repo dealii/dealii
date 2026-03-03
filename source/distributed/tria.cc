@@ -153,7 +153,7 @@ namespace
     const std::vector<types::global_dof_index>
               &coarse_cell_to_p4est_tree_permutation,
     const bool set_vertex_info,
-    typename amr::types<dim>::connectivity *connectivity)
+    typename dealii::internal::amr::types<dim>::connectivity *connectivity)
   {
     // copy the vertices into the connectivity structure. the triangulation
     // exports the array of vertices, but some of the entries are sometimes
@@ -312,8 +312,10 @@ namespace
                      vertex_touch_count.end(),
                      &connectivity->ctt_offset[1]);
 
-    [[maybe_unused]] const typename amr::types<dim>::locidx num_vtt =
-      std::accumulate(vertex_touch_count.begin(), vertex_touch_count.end(), 0u);
+    [[maybe_unused]] const typename dealii::internal::amr::types<dim>::locidx
+      num_vtt = std::accumulate(vertex_touch_count.begin(),
+                                vertex_touch_count.end(),
+                                0u);
     Assert(connectivity->ctt_offset[triangulation.n_vertices()] == num_vtt,
            ExcInternalError());
 
@@ -340,8 +342,9 @@ namespace
 
   template <int dim, int spacedim>
   bool
-  tree_exists_locally(const typename amr::types<dim>::forest *parallel_forest,
-                      const typename amr::types<dim>::topidx  coarse_grid_cell)
+  tree_exists_locally(
+    const typename dealii::internal::amr::types<dim>::forest *parallel_forest,
+    const typename dealii::internal::amr::types<dim>::topidx  coarse_grid_cell)
   {
     Assert(coarse_grid_cell < parallel_forest->connectivity->num_trees,
            ExcInternalError());
@@ -378,11 +381,11 @@ namespace
   template <int dim, int spacedim>
   void
   determine_level_subdomain_id_recursively(
-    const typename amr::types<dim>::tree                       &tree,
-    const typename amr::types<dim>::locidx                     &tree_index,
+    const typename dealii::internal::amr::types<dim>::tree     &tree,
+    const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename amr::types<dim>::quadrant                   &p4est_cell,
-    typename amr::types<dim>::forest                           &forest,
+    const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+    typename dealii::internal::amr::types<dim>::forest         &forest,
     const types::subdomain_id                                   my_subdomain,
     const std::vector<std::vector<bool>>                       &marked_vertices)
   {
@@ -445,10 +448,8 @@ namespace
 
         if (used)
           {
-            int owner = amr::functions<dim>::comm_find_owner(&forest,
-                                                             tree_index,
-                                                             &p4est_cell,
-                                                             my_subdomain);
+            int owner = dealii::internal::amr::functions<dim>::comm_find_owner(
+              &forest, tree_index, &p4est_cell, my_subdomain);
             Assert((owner != -2) && (owner != -1),
                    ExcMessage("p4est should know the owner."));
             dealii_cell->set_level_subdomain_id(owner);
@@ -457,14 +458,15 @@ namespace
 
     if (dealii_cell->has_children())
       {
-        typename amr::types<dim>::quadrant
+        typename dealii::internal::amr::types<dim>::quadrant
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          amr::functions<dim>::quadrant_init(p4est_child[c]);
+          dealii::internal::amr::functions<dim>::quadrant_init(p4est_child[c]);
 
 
-        amr::functions<dim>::quadrant_childrenv(&p4est_cell, p4est_child);
+        dealii::internal::amr::functions<dim>::quadrant_childrenv(&p4est_cell,
+                                                                  p4est_child);
 
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
@@ -485,16 +487,17 @@ namespace
   template <int dim, int spacedim>
   void
   match_tree_recursively(
-    const typename amr::types<dim>::tree                       &tree,
+    const typename dealii::internal::amr::types<dim>::tree     &tree,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename amr::types<dim>::quadrant                   &p4est_cell,
-    const typename amr::types<dim>::forest                     &forest,
+    const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+    const typename dealii::internal::amr::types<dim>::forest   &forest,
     const types::subdomain_id                                   my_subdomain)
   {
     // check if this cell exists in the local p4est cell
-    if (sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                         &p4est_cell,
-                         amr::functions<dim>::quadrant_compare) != -1)
+    if (sc_array_bsearch(
+          const_cast<sc_array_t *>(&tree.quadrants),
+          &p4est_cell,
+          dealii::internal::amr::functions<dim>::quadrant_compare) != -1)
       {
         // yes, cell found in local part of p4est
         delete_all_children<dim, spacedim>(dealii_cell);
@@ -512,20 +515,23 @@ namespace
           dealii_cell->set_refine_flag();
         else
           {
-            typename amr::types<dim>::quadrant
+            typename dealii::internal::amr::types<dim>::quadrant
               p4est_child[GeometryInfo<dim>::max_children_per_cell];
             for (unsigned int c = 0;
                  c < GeometryInfo<dim>::max_children_per_cell;
                  ++c)
-              amr::functions<dim>::quadrant_init(p4est_child[c]);
+              dealii::internal::amr::functions<dim>::quadrant_init(
+                p4est_child[c]);
 
-            amr::functions<dim>::quadrant_childrenv(&p4est_cell, p4est_child);
+            dealii::internal::amr::functions<dim>::quadrant_childrenv(
+              &p4est_cell, p4est_child);
 
             for (unsigned int c = 0;
                  c < GeometryInfo<dim>::max_children_per_cell;
                  ++c)
-              if (amr::functions<dim>::quadrant_overlaps_tree(
-                    const_cast<typename amr::types<dim>::tree *>(&tree),
+              if (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+                    const_cast<typename dealii::internal::amr::types<dim>::tree
+                                 *>(&tree),
                     &p4est_child[c]) == false)
                 {
                   // no, this child is locally not available in the p4est.
@@ -553,10 +559,11 @@ namespace
 
   template <int dim, int spacedim>
   void
-  match_quadrant(const dealii::Triangulation<dim, spacedim> *tria,
-                 unsigned int                                dealii_index,
-                 const typename amr::types<dim>::quadrant   &ghost_quadrant,
-                 types::subdomain_id                         ghost_owner)
+  match_quadrant(
+    const dealii::Triangulation<dim, spacedim>                 *tria,
+    unsigned int                                                dealii_index,
+    const typename dealii::internal::amr::types<dim>::quadrant &ghost_quadrant,
+    types::subdomain_id                                         ghost_owner)
   {
     const int l = ghost_quadrant.level;
 
@@ -573,7 +580,8 @@ namespace
           }
 
         const int child_id =
-          amr::functions<dim>::quadrant_ancestor_id(&ghost_quadrant, i + 1);
+          dealii::internal::amr::functions<dim>::quadrant_ancestor_id(
+            &ghost_quadrant, i + 1);
         dealii_index = cell->child_index(child_id);
       }
 
@@ -614,12 +622,13 @@ namespace
      * each point individually.
      */
     static int
-    local_quadrant_fn(typename amr::types<dim>::forest   *forest,
-                      typename amr::types<dim>::topidx    which_tree,
-                      typename amr::types<dim>::quadrant *quadrant,
-                      int                                 rank_begin,
-                      int                                 rank_end,
-                      void                               *point);
+    local_quadrant_fn(
+      typename dealii::internal::amr::types<dim>::forest   *forest,
+      typename dealii::internal::amr::types<dim>::topidx    which_tree,
+      typename dealii::internal::amr::types<dim>::quadrant *quadrant,
+      int                                                   rank_begin,
+      int                                                   rank_end,
+      void                                                 *point);
 
     /**
      * Callback for point function. Check whether a point is in a (physical)
@@ -634,12 +643,13 @@ namespace
      * does not belong to a quadrant.
      */
     static int
-    local_point_fn(typename amr::types<dim>::forest   *forest,
-                   typename amr::types<dim>::topidx    which_tree,
-                   typename amr::types<dim>::quadrant *quadrant,
-                   int                                 rank_begin,
-                   int                                 rank_end,
-                   void                               *point);
+    local_point_fn(
+      typename dealii::internal::amr::types<dim>::forest   *forest,
+      typename dealii::internal::amr::types<dim>::topidx    which_tree,
+      typename dealii::internal::amr::types<dim>::quadrant *quadrant,
+      int                                                   rank_begin,
+      int                                                   rank_end,
+      void                                                 *point);
 
   private:
     /**
@@ -653,10 +663,11 @@ namespace
 
       void
       set_cell_vertices(
-        typename amr::types<dim>::forest              *forest,
-        typename amr::types<dim>::topidx               which_tree,
-        typename amr::types<dim>::quadrant            *quadrant,
-        const typename amr::types<dim>::quadrant_coord quad_length_on_level);
+        typename dealii::internal::amr::types<dim>::forest   *forest,
+        typename dealii::internal::amr::types<dim>::topidx    which_tree,
+        typename dealii::internal::amr::types<dim>::quadrant *quadrant,
+        const typename dealii::internal::amr::types<dim>::quadrant_coord
+          quad_length_on_level);
 
       void
       initialize_mapping();
@@ -692,9 +703,9 @@ namespace
   template <int dim>
   int
   PartitionSearch<dim>::local_quadrant_fn(
-    typename amr::types<dim>::forest   *forest,
-    typename amr::types<dim>::topidx    which_tree,
-    typename amr::types<dim>::quadrant *quadrant,
+    typename dealii::internal::amr::types<dim>::forest   *forest,
+    typename dealii::internal::amr::types<dim>::topidx    which_tree,
+    typename dealii::internal::amr::types<dim>::quadrant *quadrant,
     int /* rank_begin */,
     int /* rank_end */,
     void * /* this is always nullptr */ point)
@@ -708,11 +719,14 @@ namespace
       reinterpret_cast<PartitionSearch<dim> *>(forest->user_pointer);
 
     // Avoid p4est macros, instead do bitshifts manually with fixed size types
-    const typename amr::types<dim>::quadrant_coord quad_length_on_level =
-      1 << (static_cast<typename amr::types<dim>::quadrant_coord>(
-              (dim == 2 ? P4EST_MAXLEVEL : P8EST_MAXLEVEL)) -
-            static_cast<typename amr::types<dim>::quadrant_coord>(
-              quadrant->level));
+    const typename dealii::internal::amr::types<dim>::quadrant_coord
+      quad_length_on_level =
+        1 << (static_cast<
+                typename dealii::internal::amr::types<dim>::quadrant_coord>(
+                (dim == 2 ? P4EST_MAXLEVEL : P8EST_MAXLEVEL)) -
+              static_cast<
+                typename dealii::internal::amr::types<dim>::quadrant_coord>(
+                quadrant->level));
 
     this_object->quadrant_data.set_cell_vertices(forest,
                                                  which_tree,
@@ -731,9 +745,9 @@ namespace
   template <int dim>
   int
   PartitionSearch<dim>::local_point_fn(
-    typename amr::types<dim>::forest *forest,
-    typename amr::types<dim>::topidx /* which_tree */,
-    typename amr::types<dim>::quadrant * /* quadrant */,
+    typename dealii::internal::amr::types<dim>::forest *forest,
+    typename dealii::internal::amr::types<dim>::topidx /* which_tree */,
+    typename dealii::internal::amr::types<dim>::quadrant * /* quadrant */,
     int   rank_begin,
     int   rank_end,
     void *point)
@@ -931,10 +945,11 @@ namespace
   template <>
   void
   PartitionSearch<2>::QuadrantData::set_cell_vertices(
-    typename amr::types<2>::forest              *forest,
-    typename amr::types<2>::topidx               which_tree,
-    typename amr::types<2>::quadrant            *quadrant,
-    const typename amr::types<2>::quadrant_coord quad_length_on_level)
+    typename dealii::internal::amr::types<2>::forest   *forest,
+    typename dealii::internal::amr::types<2>::topidx    which_tree,
+    typename dealii::internal::amr::types<2>::quadrant *quadrant,
+    const typename dealii::internal::amr::types<2>::quadrant_coord
+      quad_length_on_level)
   {
     constexpr unsigned int dim = 2;
 
@@ -958,7 +973,7 @@ namespace
      * Corner #0
      */
     unsigned int vertex_index = 0;
-    amr::functions<dim>::quadrant_coord_to_vertex(
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
       forest->connectivity, which_tree, quadrant->x, quadrant->y, corner_point);
 
     // copy into local struct
@@ -968,12 +983,12 @@ namespace
      * Corner #1
      */
     vertex_index = 1;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x +
-                                                    quad_length_on_level,
-                                                  quadrant->y,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x + quad_length_on_level,
+      quadrant->y,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -982,12 +997,12 @@ namespace
      * Corner #2
      */
     vertex_index = 2;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x,
-                                                  quadrant->y +
-                                                    quad_length_on_level,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x,
+      quadrant->y + quad_length_on_level,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -996,13 +1011,12 @@ namespace
      * Corner #3
      */
     vertex_index = 3;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x +
-                                                    quad_length_on_level,
-                                                  quadrant->y +
-                                                    quad_length_on_level,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x + quad_length_on_level,
+      quadrant->y + quad_length_on_level,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1015,10 +1029,11 @@ namespace
   template <>
   void
   PartitionSearch<3>::QuadrantData::set_cell_vertices(
-    typename amr::types<3>::forest              *forest,
-    typename amr::types<3>::topidx               which_tree,
-    typename amr::types<3>::quadrant            *quadrant,
-    const typename amr::types<3>::quadrant_coord quad_length_on_level)
+    typename dealii::internal::amr::types<3>::forest   *forest,
+    typename dealii::internal::amr::types<3>::topidx    which_tree,
+    typename dealii::internal::amr::types<3>::quadrant *quadrant,
+    const typename dealii::internal::amr::types<3>::quadrant_coord
+      quad_length_on_level)
   {
     constexpr unsigned int dim = 3;
 
@@ -1040,12 +1055,13 @@ namespace
      * Corner #0
      */
     unsigned int vertex_index = 0;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x,
-                                                  quadrant->y,
-                                                  quadrant->z,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x,
+      quadrant->y,
+      quadrant->z,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1055,13 +1071,13 @@ namespace
      * Corner #1
      */
     vertex_index = 1;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x +
-                                                    quad_length_on_level,
-                                                  quadrant->y,
-                                                  quadrant->z,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x + quad_length_on_level,
+      quadrant->y,
+      quadrant->z,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1070,13 +1086,13 @@ namespace
      * Corner #2
      */
     vertex_index = 2;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x,
-                                                  quadrant->y +
-                                                    quad_length_on_level,
-                                                  quadrant->z,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x,
+      quadrant->y + quad_length_on_level,
+      quadrant->z,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1085,14 +1101,13 @@ namespace
      * Corner #3
      */
     vertex_index = 3;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x +
-                                                    quad_length_on_level,
-                                                  quadrant->y +
-                                                    quad_length_on_level,
-                                                  quadrant->z,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x + quad_length_on_level,
+      quadrant->y + quad_length_on_level,
+      quadrant->z,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1101,13 +1116,13 @@ namespace
      * Corner #4
      */
     vertex_index = 4;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x,
-                                                  quadrant->y,
-                                                  quadrant->z +
-                                                    quad_length_on_level,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x,
+      quadrant->y,
+      quadrant->z + quad_length_on_level,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1116,14 +1131,13 @@ namespace
      * Corner #5
      */
     vertex_index = 5;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x +
-                                                    quad_length_on_level,
-                                                  quadrant->y,
-                                                  quadrant->z +
-                                                    quad_length_on_level,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x + quad_length_on_level,
+      quadrant->y,
+      quadrant->z + quad_length_on_level,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1132,14 +1146,13 @@ namespace
      * Corner #6
      */
     vertex_index = 6;
-    amr::functions<dim>::quadrant_coord_to_vertex(forest->connectivity,
-                                                  which_tree,
-                                                  quadrant->x,
-                                                  quadrant->y +
-                                                    quad_length_on_level,
-                                                  quadrant->z +
-                                                    quad_length_on_level,
-                                                  corner_point);
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
+      forest->connectivity,
+      which_tree,
+      quadrant->x,
+      quadrant->y + quad_length_on_level,
+      quadrant->z + quad_length_on_level,
+      corner_point);
 
     // copy into local struct
     copy_vertex(vertex_index);
@@ -1148,7 +1161,7 @@ namespace
      * Corner #7
      */
     vertex_index = 7;
-    amr::functions<dim>::quadrant_coord_to_vertex(
+    dealii::internal::amr::functions<dim>::quadrant_coord_to_vertex(
       forest->connectivity,
       which_tree,
       quadrant->x + quad_length_on_level,
@@ -1167,8 +1180,8 @@ namespace
 
   /**
    * A data structure that we use to store which cells (indicated by
-   * amr::types<dim>::quadrant objects) shall be refined and which
-   * shall be coarsened.
+   * dealii::internal::amr::types<dim>::quadrant objects) shall be refined and
+   * which shall be coarsened.
    */
   template <int dim, int spacedim>
   class RefineAndCoarsenList
@@ -1188,35 +1201,39 @@ namespace
      * triangulation has the refined flag set.
      */
     static int
-    refine_callback(typename amr::types<dim>::forest   *forest,
-                    typename amr::types<dim>::topidx    coarse_cell_index,
-                    typename amr::types<dim>::quadrant *quadrant);
+    refine_callback(
+      typename dealii::internal::amr::types<dim>::forest   *forest,
+      typename dealii::internal::amr::types<dim>::topidx    coarse_cell_index,
+      typename dealii::internal::amr::types<dim>::quadrant *quadrant);
 
     /**
      * Same as the refine_callback function, but return whether all four of
      * the given children of a non-terminal cell are to be coarsened away.
      */
     static int
-    coarsen_callback(typename amr::types<dim>::forest   *forest,
-                     typename amr::types<dim>::topidx    coarse_cell_index,
-                     typename amr::types<dim>::quadrant *children[]);
+    coarsen_callback(
+      typename dealii::internal::amr::types<dim>::forest   *forest,
+      typename dealii::internal::amr::types<dim>::topidx    coarse_cell_index,
+      typename dealii::internal::amr::types<dim>::quadrant *children[]);
 
     bool
     pointers_are_at_end() const;
 
   private:
-    std::vector<typename amr::types<dim>::quadrant> refine_list;
-    typename std::vector<typename amr::types<dim>::quadrant>::const_iterator
-      current_refine_pointer;
+    std::vector<typename dealii::internal::amr::types<dim>::quadrant>
+      refine_list;
+    typename std::vector<typename dealii::internal::amr::types<dim>::quadrant>::
+      const_iterator current_refine_pointer;
 
-    std::vector<typename amr::types<dim>::quadrant> coarsen_list;
-    typename std::vector<typename amr::types<dim>::quadrant>::const_iterator
-      current_coarsen_pointer;
+    std::vector<typename dealii::internal::amr::types<dim>::quadrant>
+      coarsen_list;
+    typename std::vector<typename dealii::internal::amr::types<dim>::quadrant>::
+      const_iterator current_coarsen_pointer;
 
     void
     build_lists(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      const typename amr::types<dim>::quadrant                   &p4est_cell,
+      const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
       const types::subdomain_id                                   myid);
   };
 
@@ -1272,10 +1289,10 @@ namespace
         const typename Triangulation<dim, spacedim>::cell_iterator cell(
           &triangulation, 0, coarse_cell_index);
 
-        typename amr::types<dim>::quadrant p4est_cell;
-        amr::functions<dim>::quadrant_set_morton(&p4est_cell,
-                                                 /*level=*/0,
-                                                 /*index=*/0);
+        typename dealii::internal::amr::types<dim>::quadrant p4est_cell;
+        dealii::internal::amr::functions<dim>::quadrant_set_morton(&p4est_cell,
+                                                                   /*level=*/0,
+                                                                   /*index=*/0);
         p4est_cell.p.which_tree = c;
         build_lists(cell, p4est_cell, my_subdomain);
       }
@@ -1302,7 +1319,7 @@ namespace
   void
   RefineAndCoarsenList<dim, spacedim>::build_lists(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    const typename amr::types<dim>::quadrant                   &p4est_cell,
+    const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
     const types::subdomain_id                                   my_subdomain)
   {
     if (cell->is_active())
@@ -1317,12 +1334,13 @@ namespace
       }
     else
       {
-        typename amr::types<dim>::quadrant
+        typename dealii::internal::amr::types<dim>::quadrant
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          amr::functions<dim>::quadrant_init(p4est_child[c]);
-        amr::functions<dim>::quadrant_childrenv(&p4est_cell, p4est_child);
+          dealii::internal::amr::functions<dim>::quadrant_init(p4est_child[c]);
+        dealii::internal::amr::functions<dim>::quadrant_childrenv(&p4est_cell,
+                                                                  p4est_child);
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
           {
@@ -1336,9 +1354,9 @@ namespace
   template <int dim, int spacedim>
   int
   RefineAndCoarsenList<dim, spacedim>::refine_callback(
-    typename amr::types<dim>::forest   *forest,
-    typename amr::types<dim>::topidx    coarse_cell_index,
-    typename amr::types<dim>::quadrant *quadrant)
+    typename dealii::internal::amr::types<dim>::forest   *forest,
+    typename dealii::internal::amr::types<dim>::topidx    coarse_cell_index,
+    typename dealii::internal::amr::types<dim>::quadrant *quadrant)
   {
     RefineAndCoarsenList<dim, spacedim> *this_object =
       reinterpret_cast<RefineAndCoarsenList<dim, spacedim> *>(
@@ -1365,12 +1383,12 @@ namespace
 
     // make sure that the p4est loop over cells hasn't gotten ahead of our own
     // pointer
-    Assert(amr::functions<dim>::quadrant_compare(
+    Assert(dealii::internal::amr::functions<dim>::quadrant_compare(
              quadrant, &*this_object->current_refine_pointer) <= 0,
            ExcInternalError());
 
     // now, if the p4est cell is one in the list, it is supposed to be refined
-    if (amr::functions<dim>::quadrant_is_equal(
+    if (dealii::internal::amr::functions<dim>::quadrant_is_equal(
           quadrant, &*this_object->current_refine_pointer))
       {
         ++this_object->current_refine_pointer;
@@ -1386,9 +1404,9 @@ namespace
   template <int dim, int spacedim>
   int
   RefineAndCoarsenList<dim, spacedim>::coarsen_callback(
-    typename amr::types<dim>::forest   *forest,
-    typename amr::types<dim>::topidx    coarse_cell_index,
-    typename amr::types<dim>::quadrant *children[])
+    typename dealii::internal::amr::types<dim>::forest   *forest,
+    typename dealii::internal::amr::types<dim>::topidx    coarse_cell_index,
+    typename dealii::internal::amr::types<dim>::quadrant *children[])
   {
     RefineAndCoarsenList<dim, spacedim> *this_object =
       reinterpret_cast<RefineAndCoarsenList<dim, spacedim> *>(
@@ -1415,13 +1433,13 @@ namespace
 
     // make sure that the p4est loop over cells hasn't gotten ahead of our own
     // pointer
-    Assert(amr::functions<dim>::quadrant_compare(
+    Assert(dealii::internal::amr::functions<dim>::quadrant_compare(
              children[0], &*this_object->current_coarsen_pointer) <= 0,
            ExcInternalError());
 
     // now, if the p4est cell is one in the list, it is supposed to be
     // coarsened
-    if (amr::functions<dim>::quadrant_is_equal(
+    if (dealii::internal::amr::functions<dim>::quadrant_is_equal(
           children[0], &*this_object->current_coarsen_pointer))
       {
         // move current pointer one up
@@ -1432,7 +1450,7 @@ namespace
         for (unsigned int c = 1; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
           {
-            Assert(amr::functions<dim>::quadrant_is_equal(
+            Assert(dealii::internal::amr::functions<dim>::quadrant_is_equal(
                      children[c], &*this_object->current_coarsen_pointer),
                    ExcInternalError());
             ++this_object->current_coarsen_pointer;
@@ -1472,9 +1490,10 @@ namespace
      * function returns the weight of the cell.
      */
     static int
-    cell_weight(typename amr::types<dim>::forest   *forest,
-                typename amr::types<dim>::topidx    coarse_cell_index,
-                typename amr::types<dim>::quadrant *quadrant);
+    cell_weight(
+      typename dealii::internal::amr::types<dim>::forest   *forest,
+      typename dealii::internal::amr::types<dim>::topidx    coarse_cell_index,
+      typename dealii::internal::amr::types<dim>::quadrant *quadrant);
 
   private:
     std::vector<unsigned int>                 cell_weights_list;
@@ -1496,9 +1515,9 @@ namespace
   template <int dim, int spacedim>
   int
   PartitionWeights<dim, spacedim>::cell_weight(
-    typename amr::types<dim>::forest *forest,
-    typename amr::types<dim>::topidx,
-    typename amr::types<dim>::quadrant *)
+    typename dealii::internal::amr::types<dim>::forest *forest,
+    typename dealii::internal::amr::types<dim>::topidx,
+    typename dealii::internal::amr::types<dim>::quadrant *)
   {
     // the function gets two additional arguments, but we don't need them
     // since we know in which order p4est will walk through the cells
@@ -1544,7 +1563,7 @@ namespace
   inline void
   add_single_cell_relation(
     std::vector<cell_relation_t<dim, spacedim>>                &cell_rel,
-    const typename amr::types<dim>::tree                       &tree,
+    const typename dealii::internal::amr::types<dim>::tree     &tree,
     const unsigned int                                          idx,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
     const CellStatus                                            status)
@@ -1573,17 +1592,20 @@ namespace
   void
   update_cell_relations_recursively(
     std::vector<cell_relation_t<dim, spacedim>>                &cell_rel,
-    const typename amr::types<dim>::tree                       &tree,
+    const typename dealii::internal::amr::types<dim>::tree     &tree,
     const typename Triangulation<dim, spacedim>::cell_iterator &dealii_cell,
-    const typename amr::types<dim>::quadrant                   &p4est_cell)
+    const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell)
   {
     // find index of p4est_cell in the quadrants array of the corresponding tree
-    const int idx = sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                                     &p4est_cell,
-                                     amr::functions<dim>::quadrant_compare);
-    if (idx == -1 && (amr::functions<dim>::quadrant_overlaps_tree(
-                        const_cast<typename amr::types<dim>::tree *>(&tree),
-                        &p4est_cell) == false))
+    const int idx =
+      sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
+                       &p4est_cell,
+                       dealii::internal::amr::functions<dim>::quadrant_compare);
+    if (idx == -1 &&
+        (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+           const_cast<typename dealii::internal::amr::types<dim>::tree *>(
+             &tree),
+           &p4est_cell) == false))
       // this quadrant and none of its children belong to us.
       return;
 
@@ -1592,14 +1614,15 @@ namespace
     if (p4est_has_children && dealii_cell->has_children())
       {
         // recurse further
-        typename amr::types<dim>::quadrant
+        typename dealii::internal::amr::types<dim>::quadrant
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          amr::functions<dim>::quadrant_init(p4est_child[c]);
+          dealii::internal::amr::functions<dim>::quadrant_init(p4est_child[c]);
 
-        amr::functions<dim>::quadrant_childrenv(&p4est_cell, p4est_child);
+        dealii::internal::amr::functions<dim>::quadrant_childrenv(&p4est_cell,
+                                                                  p4est_child);
 
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
@@ -1623,13 +1646,14 @@ namespace
 
         // this quadrant is not active
         // generate its children, and store information in those
-        typename amr::types<dim>::quadrant
+        typename dealii::internal::amr::types<dim>::quadrant
           p4est_child[GeometryInfo<dim>::max_children_per_cell];
         for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
              ++c)
-          amr::functions<dim>::quadrant_init(p4est_child[c]);
+          dealii::internal::amr::functions<dim>::quadrant_init(p4est_child[c]);
 
-        amr::functions<dim>::quadrant_childrenv(&p4est_cell, p4est_child);
+        dealii::internal::amr::functions<dim>::quadrant_childrenv(&p4est_cell,
+                                                                  p4est_child);
 
         // mark first child with CellStatus::cell_will_be_refined and the
         // remaining children with CellStatus::cell_invalid, but associate them
@@ -1640,10 +1664,10 @@ namespace
         for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
              ++i)
           {
-            child_idx =
-              sc_array_bsearch(const_cast<sc_array_t *>(&tree.quadrants),
-                               &p4est_child[i],
-                               amr::functions<dim>::quadrant_compare);
+            child_idx = sc_array_bsearch(
+              const_cast<sc_array_t *>(&tree.quadrants),
+              &p4est_child[i],
+              dealii::internal::amr::functions<dim>::quadrant_compare);
 
             cell_status = (i == 0) ? CellStatus::cell_will_be_refined :
                                      CellStatus::cell_invalid;
@@ -1797,19 +1821,20 @@ namespace parallel
 
       if (parallel_ghost != nullptr)
         {
-          amr::functions<dim>::ghost_destroy(parallel_ghost);
+          dealii::internal::amr::functions<dim>::ghost_destroy(parallel_ghost);
           parallel_ghost = nullptr;
         }
 
       if (parallel_forest != nullptr)
         {
-          amr::functions<dim>::destroy(parallel_forest);
+          dealii::internal::amr::functions<dim>::destroy(parallel_forest);
           parallel_forest = nullptr;
         }
 
       if (connectivity != nullptr)
         {
-          amr::functions<dim>::connectivity_destroy(connectivity);
+          dealii::internal::amr::functions<dim>::connectivity_destroy(
+            connectivity);
           connectivity = nullptr;
         }
 
@@ -1848,8 +1873,9 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::execute_transfer(
-      const typename amr::types<dim>::forest *parallel_forest,
-      const typename amr::types<dim>::gloidx *previous_global_first_quadrant)
+      const typename dealii::internal::amr::types<dim>::forest *parallel_forest,
+      const typename dealii::internal::amr::types<dim>::gloidx
+        *previous_global_first_quadrant)
     {
       Assert(this->data_serializer.sizes_fixed_cumulative.size() > 0,
              ExcMessage("No data has been packed!"));
@@ -1860,8 +1886,8 @@ namespace parallel
         this->data_serializer.sizes_fixed_cumulative.back());
 
       // Execute non-blocking fixed size transfer.
-      typename amr::types<dim>::transfer_context *tf_context;
-      tf_context = amr::functions<dim>::transfer_fixed_begin(
+      typename dealii::internal::amr::types<dim>::transfer_context *tf_context;
+      tf_context = dealii::internal::amr::functions<dim>::transfer_fixed_begin(
         parallel_forest->global_first_quadrant,
         previous_global_first_quadrant,
         parallel_forest->mpicomm,
@@ -1878,7 +1904,7 @@ namespace parallel
 
           // Execute fixed size transfer of data sizes for variable size
           // transfer.
-          amr::functions<dim>::transfer_fixed(
+          dealii::internal::amr::functions<dim>::transfer_fixed(
             parallel_forest->global_first_quadrant,
             previous_global_first_quadrant,
             parallel_forest->mpicomm,
@@ -1888,7 +1914,7 @@ namespace parallel
             sizeof(unsigned int));
         }
 
-      amr::functions<dim>::transfer_fixed_end(tf_context);
+      dealii::internal::amr::functions<dim>::transfer_fixed_end(tf_context);
 
       // Release memory of previously packed data.
       this->data_serializer.src_data_fixed.clear();
@@ -1903,7 +1929,7 @@ namespace parallel
                             std::vector<int>::size_type(0)));
 
           // Execute variable size transfer.
-          amr::functions<dim>::transfer_custom(
+          dealii::internal::amr::functions<dim>::transfer_custom(
             parallel_forest->global_first_quadrant,
             previous_global_first_quadrant,
             parallel_forest->mpicomm,
@@ -1954,9 +1980,8 @@ namespace parallel
                     "To use this function the triangulation's flag "
                     "Settings::communicate_vertices_to_p4est must be set."));
 
-      amr::functions<dim>::vtk_write_file(parallel_forest,
-                                          nullptr,
-                                          file_basename.c_str());
+      dealii::internal::amr::functions<dim>::vtk_write_file(
+        parallel_forest, nullptr, file_basename.c_str());
     }
 
 
@@ -2005,7 +2030,9 @@ namespace parallel
                                parallel_forest->global_num_quadrants,
                                file_basename);
 
-      amr::functions<dim>::save(file_basename.c_str(), parallel_forest, false);
+      dealii::internal::amr::functions<dim>::save(file_basename.c_str(),
+                                                  parallel_forest,
+                                                  false);
 
       // signal that serialization has finished
       this->signals.post_distributed_save();
@@ -2034,12 +2061,12 @@ namespace parallel
 
       if (parallel_ghost != nullptr)
         {
-          amr::functions<dim>::ghost_destroy(parallel_ghost);
+          dealii::internal::amr::functions<dim>::ghost_destroy(parallel_ghost);
           parallel_ghost = nullptr;
         }
-      amr::functions<dim>::destroy(parallel_forest);
+      dealii::internal::amr::functions<dim>::destroy(parallel_forest);
       parallel_forest = nullptr;
-      amr::functions<dim>::connectivity_destroy(connectivity);
+      dealii::internal::amr::functions<dim>::connectivity_destroy(connectivity);
       connectivity = nullptr;
 
       unsigned int version, numcpus, attached_count_fixed,
@@ -2065,21 +2092,23 @@ namespace parallel
       this->cell_attached_data.n_attached_deserialize =
         attached_count_fixed + attached_count_variable;
 
-      parallel_forest = amr::functions<dim>::load_ext(file_basename.c_str(),
-                                                      this->mpi_communicator,
-                                                      0,
-                                                      0,
-                                                      1,
-                                                      0,
-                                                      this,
-                                                      &connectivity);
+      parallel_forest =
+        dealii::internal::amr::functions<dim>::load_ext(file_basename.c_str(),
+                                                        this->mpi_communicator,
+                                                        0,
+                                                        0,
+                                                        1,
+                                                        0,
+                                                        this,
+                                                        &connectivity);
 
       // We partition the p4est mesh that it conforms to the requirements of the
       // deal.II mesh, i.e., partition for coarsening.
       // This function call is optional.
-      amr::functions<dim>::partition(parallel_forest,
-                                     /* prepare coarsening */ 1,
-                                     /* weight_callback */ nullptr);
+      dealii::internal::amr::functions<dim>::partition(
+        parallel_forest,
+        /* prepare coarsening */ 1,
+        /* weight_callback */ nullptr);
 
       try
         {
@@ -2112,7 +2141,7 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::load(
-      const typename amr::types<dim>::forest *forest)
+      const typename dealii::internal::amr::types<dim>::forest *forest)
     {
       Assert(this->n_cells() > 0,
              ExcMessage(
@@ -2126,19 +2155,21 @@ namespace parallel
       // clear the old forest
       if (parallel_ghost != nullptr)
         {
-          amr::functions<dim>::ghost_destroy(parallel_ghost);
+          dealii::internal::amr::functions<dim>::ghost_destroy(parallel_ghost);
           parallel_ghost = nullptr;
         }
-      amr::functions<dim>::destroy(parallel_forest);
+      dealii::internal::amr::functions<dim>::destroy(parallel_forest);
       parallel_forest = nullptr;
 
       // note: we can keep the connectivity, since the coarse grid does not
       // change
 
       // create deep copy of the new forest
-      typename amr::types<dim>::forest *temp =
-        const_cast<typename amr::types<dim>::forest *>(forest);
-      parallel_forest = amr::functions<dim>::copy_forest(temp, false);
+      typename dealii::internal::amr::types<dim>::forest *temp =
+        const_cast<typename dealii::internal::amr::types<dim>::forest *>(
+          forest);
+      parallel_forest =
+        dealii::internal::amr::functions<dim>::copy_forest(temp, false);
       parallel_forest->connectivity = connectivity;
       parallel_forest->user_pointer = this;
 
@@ -2167,7 +2198,8 @@ namespace parallel
              ExcMessage(
                "Can't produce a check sum when no forest is created yet."));
 
-      auto checksum = amr::functions<dim>::checksum(parallel_forest);
+      auto checksum =
+        dealii::internal::amr::functions<dim>::checksum(parallel_forest);
 
 #  if !DEAL_II_P4EST_VERSION_GTE(2, 8, 6, 0)
       /*
@@ -2187,7 +2219,7 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    const typename amr::types<dim>::forest
+    const typename dealii::internal::amr::types<dim>::forest
       *Triangulation<dim, spacedim>::get_p4est() const
     {
       Assert(parallel_forest != nullptr,
@@ -2199,13 +2231,14 @@ namespace parallel
 
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-    typename amr::types<dim>::tree *Triangulation<dim, spacedim>::init_tree(
-      const int dealii_coarse_cell_index) const
+    typename dealii::internal::amr::types<dim>::tree
+      *Triangulation<dim, spacedim>::init_tree(
+        const int dealii_coarse_cell_index) const
     {
       const unsigned int tree_index =
         coarse_cell_to_p4est_tree_permutation[dealii_coarse_cell_index];
-      typename amr::types<dim>::tree *tree =
-        static_cast<typename amr::types<dim>::tree *>(
+      typename dealii::internal::amr::types<dim>::tree *tree =
+        static_cast<typename dealii::internal::amr::types<dim>::tree *>(
           sc_array_index(parallel_forest->trees, tree_index));
 
       return tree;
@@ -2236,7 +2269,7 @@ namespace parallel
                             unsigned int>>>
         vertex_to_cell;
       get_vertex_to_cell_mappings(*this, vertex_touch_count, vertex_to_cell);
-      const amr::types<2>::locidx num_vtt =
+      const dealii::internal::amr::types<2>::locidx num_vtt =
         std::accumulate(vertex_touch_count.begin(),
                         vertex_touch_count.end(),
                         0u);
@@ -2246,7 +2279,7 @@ namespace parallel
       // in optimized mode)
       const bool set_vertex_info = this->are_vertices_communicated_to_p4est();
 
-      connectivity = amr::functions<2>::connectivity_new(
+      connectivity = dealii::internal::amr::functions<2>::connectivity_new(
         (set_vertex_info == true ? this->n_vertices() : 0),
         this->n_cells(0),
         this->n_vertices(),
@@ -2263,7 +2296,7 @@ namespace parallel
              ExcInternalError());
 
       // now create a forest out of the connectivity data structure
-      parallel_forest = amr::functions<2>::new_forest(
+      parallel_forest = dealii::internal::amr::functions<2>::new_forest(
         this->mpi_communicator,
         connectivity,
         /* minimum initial number of quadrants per tree */ 0,
@@ -2297,7 +2330,7 @@ namespace parallel
                             unsigned int>>>
         vertex_to_cell;
       get_vertex_to_cell_mappings(*this, vertex_touch_count, vertex_to_cell);
-      const amr::types<2>::locidx num_vtt =
+      const dealii::internal::amr::types<2>::locidx num_vtt =
         std::accumulate(vertex_touch_count.begin(),
                         vertex_touch_count.end(),
                         0u);
@@ -2307,7 +2340,7 @@ namespace parallel
       // in optimized mode)
       const bool set_vertex_info = this->are_vertices_communicated_to_p4est();
 
-      connectivity = amr::functions<2>::connectivity_new(
+      connectivity = dealii::internal::amr::functions<2>::connectivity_new(
         (set_vertex_info == true ? this->n_vertices() : 0),
         this->n_cells(0),
         this->n_vertices(),
@@ -2324,7 +2357,7 @@ namespace parallel
              ExcInternalError());
 
       // now create a forest out of the connectivity data structure
-      parallel_forest = amr::functions<2>::new_forest(
+      parallel_forest = dealii::internal::amr::functions<2>::new_forest(
         this->mpi_communicator,
         connectivity,
         /* minimum initial number of quadrants per tree */ 0,
@@ -2355,7 +2388,7 @@ namespace parallel
         std::pair<Triangulation<3>::active_cell_iterator, unsigned int>>>
         vertex_to_cell;
       get_vertex_to_cell_mappings(*this, vertex_touch_count, vertex_to_cell);
-      const amr::types<2>::locidx num_vtt =
+      const dealii::internal::amr::types<2>::locidx num_vtt =
         std::accumulate(vertex_touch_count.begin(),
                         vertex_touch_count.end(),
                         0u);
@@ -2365,13 +2398,13 @@ namespace parallel
         std::pair<Triangulation<3>::active_cell_iterator, unsigned int>>>
         edge_to_cell;
       get_edge_to_cell_mappings(*this, edge_touch_count, edge_to_cell);
-      const amr::types<2>::locidx num_ett =
+      const dealii::internal::amr::types<2>::locidx num_ett =
         std::accumulate(edge_touch_count.begin(), edge_touch_count.end(), 0u);
 
       // now create a connectivity object with the right sizes for all arrays
       const bool set_vertex_info = this->are_vertices_communicated_to_p4est();
 
-      connectivity = amr::functions<3>::connectivity_new(
+      connectivity = dealii::internal::amr::functions<3>::connectivity_new(
         (set_vertex_info == true ? this->n_vertices() : 0),
         this->n_cells(0),
         this->n_active_lines(),
@@ -2459,7 +2492,7 @@ namespace parallel
              ExcInternalError());
 
       // now create a forest out of the connectivity data structure
-      parallel_forest = amr::functions<3>::new_forest(
+      parallel_forest = dealii::internal::amr::functions<3>::new_forest(
         this->mpi_communicator,
         connectivity,
         /* minimum initial number of quadrants per tree */ 0,
@@ -2779,14 +2812,15 @@ namespace parallel
       // query p4est for the ghost cells
       if (parallel_ghost != nullptr)
         {
-          amr::functions<dim>::ghost_destroy(parallel_ghost);
+          dealii::internal::amr::functions<dim>::ghost_destroy(parallel_ghost);
           parallel_ghost = nullptr;
         }
-      parallel_ghost = amr::functions<dim>::ghost_new(
+      parallel_ghost = dealii::internal::amr::functions<dim>::ghost_new(
         parallel_forest,
-        (dim == 2 ?
-           typename amr::types<dim>::balance_type(P4EST_CONNECT_CORNER) :
-           typename amr::types<dim>::balance_type(P8EST_CONNECT_CORNER)));
+        (dim == 2 ? typename dealii::internal::amr::types<dim>::balance_type(
+                      P4EST_CONNECT_CORNER) :
+                    typename dealii::internal::amr::types<dim>::balance_type(
+                      P8EST_CONNECT_CORNER)));
 
       Assert(parallel_ghost, ExcInternalError());
 
@@ -2818,11 +2852,13 @@ namespace parallel
                   // this processor stores at least a part of the tree that
                   // comes out of this cell.
 
-                  typename amr::types<dim>::quadrant p4est_coarse_cell;
-                  typename amr::types<dim>::tree    *tree =
+                  typename dealii::internal::amr::types<dim>::quadrant
+                    p4est_coarse_cell;
+                  typename dealii::internal::amr::types<dim>::tree *tree =
                     init_tree(cell->index());
 
-                  amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
+                  dealii::internal::amr::init_coarse_quadrant<dim>(
+                    p4est_coarse_cell);
 
                   match_tree_recursively<dim, spacedim>(*tree,
                                                         cell,
@@ -2835,9 +2871,9 @@ namespace parallel
           // check mesh for ghost cells, refine as necessary. iterate over
           // every ghostquadrant, find corresponding deal coarsecell and
           // recurse.
-          typename amr::types<dim>::quadrant *quadr;
-          types::subdomain_id                 ghost_owner = 0;
-          typename amr::types<dim>::topidx    ghost_tree  = 0;
+          typename dealii::internal::amr::types<dim>::quadrant *quadr;
+          types::subdomain_id                                   ghost_owner = 0;
+          typename dealii::internal::amr::types<dim>::topidx    ghost_tree  = 0;
 
           for (unsigned int g_idx = 0;
                g_idx < parallel_ghost->ghosts.elem_count;
@@ -2850,7 +2886,8 @@ namespace parallel
                                 parallel_ghost->tree_offsets[ghost_tree + 1]))
                 ++ghost_tree;
 
-              quadr = static_cast<typename amr::types<dim>::quadrant *>(
+              quadr = static_cast<
+                typename dealii::internal::amr::types<dim>::quadrant *>(
                 sc_array_index(&parallel_ghost->ghosts, g_idx));
 
               unsigned int coarse_cell_index =
@@ -2985,12 +3022,15 @@ namespace parallel
 
           for (const auto &cell : this->cell_iterators_on_level(0))
             {
-              typename amr::types<dim>::quadrant p4est_coarse_cell;
-              const unsigned int                 tree_index =
+              typename dealii::internal::amr::types<dim>::quadrant
+                                 p4est_coarse_cell;
+              const unsigned int tree_index =
                 coarse_cell_to_p4est_tree_permutation[cell->index()];
-              typename amr::types<dim>::tree *tree = init_tree(cell->index());
+              typename dealii::internal::amr::types<dim>::tree *tree =
+                init_tree(cell->index());
 
-              amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
+              dealii::internal::amr::init_coarse_quadrant<dim>(
+                p4est_coarse_cell);
 
               determine_level_subdomain_id_recursively<dim, spacedim>(
                 *tree,
@@ -3156,7 +3196,7 @@ namespace parallel
           this_sc_point[dim] = -1.0; // owner rank
         }
 
-      amr::functions<dim>::search_partition(
+      dealii::internal::amr::functions<dim>::search_partition(
         parallel_forest,
         /* execute quadrant function when leaving quadrant */
         static_cast<int>(false),
@@ -3211,11 +3251,13 @@ namespace parallel
 
 
       // safety check: p4est has an upper limit on the level of a cell
-      if (this->n_levels() == amr::functions<dim>::max_level)
+      if (this->n_levels() == dealii::internal::amr::functions<dim>::max_level)
         {
           for (typename Triangulation<dim, spacedim>::active_cell_iterator
-                 cell = this->begin_active(amr::functions<dim>::max_level - 1);
-               cell != this->end(amr::functions<dim>::max_level - 1);
+                 cell = this->begin_active(
+                   dealii::internal::amr::functions<dim>::max_level - 1);
+               cell !=
+               this->end(dealii::internal::amr::functions<dim>::max_level - 1);
                ++cell)
             {
               AssertThrow(
@@ -3255,15 +3297,15 @@ namespace parallel
 
       if (parallel_ghost != nullptr)
         {
-          amr::functions<dim>::ghost_destroy(parallel_ghost);
+          dealii::internal::amr::functions<dim>::ghost_destroy(parallel_ghost);
           parallel_ghost = nullptr;
         }
-      amr::functions<dim>::refine(
+      dealii::internal::amr::functions<dim>::refine(
         parallel_forest,
         /* refine_recursive */ false,
         &RefineAndCoarsenList<dim, spacedim>::refine_callback,
         /*init_callback=*/nullptr);
-      amr::functions<dim>::coarsen(
+      dealii::internal::amr::functions<dim>::coarsen(
         parallel_forest,
         /* coarsen_recursive */ false,
         &RefineAndCoarsenList<dim, spacedim>::coarsen_callback,
@@ -3276,11 +3318,13 @@ namespace parallel
       parallel_forest->user_pointer = this;
 
       // enforce 2:1 hanging node condition
-      amr::functions<dim>::balance(
+      dealii::internal::amr::functions<dim>::balance(
         parallel_forest,
         /* face and corner balance */
-        (dim == 2 ? typename amr::types<dim>::balance_type(P4EST_CONNECT_FULL) :
-                    typename amr::types<dim>::balance_type(P8EST_CONNECT_FULL)),
+        (dim == 2 ? typename dealii::internal::amr::types<dim>::balance_type(
+                      P4EST_CONNECT_FULL) :
+                    typename dealii::internal::amr::types<dim>::balance_type(
+                      P8EST_CONNECT_FULL)),
         /*init_callback=*/nullptr);
 
       // since refinement and/or coarsening on the parallel forest
@@ -3293,7 +3337,7 @@ namespace parallel
 
       // before repartitioning the mesh, save a copy of the current positions
       // of quadrants only if data needs to be transferred later
-      std::vector<typename amr::types<dim>::gloidx>
+      std::vector<typename dealii::internal::amr::types<dim>::gloidx>
         previous_global_first_quadrant;
 
       if (this->cell_attached_data.n_attached_data_sets > 0)
@@ -3301,7 +3345,8 @@ namespace parallel
           previous_global_first_quadrant.resize(parallel_forest->mpisize + 1);
           std::memcpy(previous_global_first_quadrant.data(),
                       parallel_forest->global_first_quadrant,
-                      sizeof(typename amr::types<dim>::gloidx) *
+                      sizeof(
+                        typename dealii::internal::amr::types<dim>::gloidx) *
                         (parallel_forest->mpisize + 1));
         }
 
@@ -3310,9 +3355,10 @@ namespace parallel
           // partition the new mesh between all processors. If cell weights
           // have not been given balance the number of cells.
           if (this->signals.weight.empty())
-            amr::functions<dim>::partition(parallel_forest,
-                                           /* prepare coarsening */ 1,
-                                           /* weight_callback */ nullptr);
+            dealii::internal::amr::functions<dim>::partition(
+              parallel_forest,
+              /* prepare coarsening */ 1,
+              /* weight_callback */ nullptr);
           else
             {
               // get cell weights for a weighted repartitioning.
@@ -3334,17 +3380,17 @@ namespace parallel
               Assert(parallel_forest->user_pointer == this, ExcInternalError());
               parallel_forest->user_pointer = &partition_weights;
 
-              amr::functions<dim>::partition(
+              dealii::internal::amr::functions<dim>::partition(
                 parallel_forest,
                 /* prepare coarsening */ 1,
                 /* weight_callback */
                 &PartitionWeights<dim, spacedim>::cell_weight);
 
               // release data
-              amr::functions<dim>::reset_data(parallel_forest,
-                                              0,
-                                              nullptr,
-                                              nullptr);
+              dealii::internal::amr::functions<dim>::reset_data(parallel_forest,
+                                                                0,
+                                                                nullptr,
+                                                                nullptr);
               // reset the user pointer to its previous state
               parallel_forest->user_pointer = this;
             }
@@ -3476,7 +3522,7 @@ namespace parallel
 
       // before repartitioning the mesh, save a copy of the current positions
       // of quadrants only if data needs to be transferred later
-      std::vector<typename amr::types<dim>::gloidx>
+      std::vector<typename dealii::internal::amr::types<dim>::gloidx>
         previous_global_first_quadrant;
 
       if (this->cell_attached_data.n_attached_data_sets > 0)
@@ -3484,7 +3530,8 @@ namespace parallel
           previous_global_first_quadrant.resize(parallel_forest->mpisize + 1);
           std::memcpy(previous_global_first_quadrant.data(),
                       parallel_forest->global_first_quadrant,
-                      sizeof(typename amr::types<dim>::gloidx) *
+                      sizeof(
+                        typename dealii::internal::amr::types<dim>::gloidx) *
                         (parallel_forest->mpisize + 1));
         }
 
@@ -3492,9 +3539,10 @@ namespace parallel
         {
           // no cell weights given -- call p4est's 'partition' without a
           // callback for cell weights
-          amr::functions<dim>::partition(parallel_forest,
-                                         /* prepare coarsening */ 1,
-                                         /* weight_callback */ nullptr);
+          dealii::internal::amr::functions<dim>::partition(
+            parallel_forest,
+            /* prepare coarsening */ 1,
+            /* weight_callback */ nullptr);
         }
       else
         {
@@ -3517,7 +3565,7 @@ namespace parallel
           Assert(parallel_forest->user_pointer == this, ExcInternalError());
           parallel_forest->user_pointer = &partition_weights;
 
-          amr::functions<dim>::partition(
+          dealii::internal::amr::functions<dim>::partition(
             parallel_forest,
             /* prepare coarsening */ 1,
             /* weight_callback */
@@ -3790,21 +3838,23 @@ namespace parallel
               p4est_orientation = second_p4est_idx_on_face;
             }
 
-          amr::functions<dim>::connectivity_join_faces(connectivity,
-                                                       tree_left,
-                                                       tree_right,
-                                                       face_left,
-                                                       face_right,
-                                                       p4est_orientation);
+          dealii::internal::amr::functions<dim>::connectivity_join_faces(
+            connectivity,
+            tree_left,
+            tree_right,
+            face_left,
+            face_right,
+            p4est_orientation);
         }
 
 
-      Assert(amr::functions<dim>::connectivity_is_valid(connectivity) == 1,
+      Assert(dealii::internal::amr::functions<dim>::connectivity_is_valid(
+               connectivity) == 1,
              ExcInternalError());
 
       // now create a forest out of the connectivity data structure
-      amr::functions<dim>::destroy(parallel_forest);
-      parallel_forest = amr::functions<dim>::new_forest(
+      dealii::internal::amr::functions<dim>::destroy(parallel_forest);
+      parallel_forest = dealii::internal::amr::functions<dim>::new_forest(
         this->mpi_communicator,
         connectivity,
         /* minimum initial number of quadrants per tree */ 0,
@@ -3864,8 +3914,10 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     std::size_t Triangulation<dim, spacedim>::memory_consumption_p4est() const
     {
-      return amr::functions<dim>::forest_memory_used(parallel_forest) +
-             amr::functions<dim>::connectivity_memory_used(connectivity);
+      return dealii::internal::amr::functions<dim>::forest_memory_used(
+               parallel_forest) +
+             dealii::internal::amr::functions<dim>::connectivity_memory_used(
+               connectivity);
     }
 
 
@@ -3913,17 +3965,20 @@ namespace parallel
             other_distributed->p4est_tree_to_coarse_cell_permutation;
 
           // create deep copy of connectivity graph
-          typename amr::types<dim>::connectivity *temp_connectivity =
-            const_cast<typename amr::types<dim>::connectivity *>(
+          typename dealii::internal::amr::types<dim>::connectivity
+            *temp_connectivity = const_cast<
+              typename dealii::internal::amr::types<dim>::connectivity *>(
               other_distributed->connectivity);
-          connectivity = amr::copy_connectivity<dim>(temp_connectivity);
+          connectivity =
+            dealii::internal::amr::copy_connectivity<dim>(temp_connectivity);
 
           // create deep copy of parallel forest
-          typename amr::types<dim>::forest *temp_forest =
-            const_cast<typename amr::types<dim>::forest *>(
+          typename dealii::internal::amr::types<dim>::forest *temp_forest =
+            const_cast<typename dealii::internal::amr::types<dim>::forest *>(
               other_distributed->parallel_forest);
           parallel_forest =
-            amr::functions<dim>::copy_forest(temp_forest, false);
+            dealii::internal::amr::functions<dim>::copy_forest(temp_forest,
+                                                               false);
           parallel_forest->connectivity = connectivity;
           parallel_forest->user_pointer = this;
         }
@@ -3969,11 +4024,13 @@ namespace parallel
             continue;
 
           // initialize auxiliary top level p4est quadrant
-          typename amr::types<dim>::quadrant p4est_coarse_cell;
-          amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          typename dealii::internal::amr::types<dim>::quadrant
+            p4est_coarse_cell;
+          dealii::internal::amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
           // determine tree to start recursion on
-          typename amr::types<dim>::tree *tree = init_tree(cell->index());
+          typename dealii::internal::amr::types<dim>::tree *tree =
+            init_tree(cell->index());
 
           update_cell_relations_recursively<dim, spacedim>(
             this->local_cell_relations, *tree, cell, p4est_coarse_cell);

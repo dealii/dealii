@@ -10,21 +10,27 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef amr_h
-#define amr_h
+#ifndef dealii_distributed_amr_h
+#define dealii_distributed_amr_h
 
 #ifdef DEAL_II_WITH_P4EST
 #  include <deal.II/distributed/p4est_wrappers.h>
 #endif // DEAL_II_WITH_P4EST
 
-namespace amr
+namespace dealii
 {
+  namespace internal
+  {
+    namespace amr
+    {
 #if defined(DEAL_II_WITH_P4EST)
-  using namespace dealii::internal::p4est;
+      using namespace dealii::internal::p4est;
 #else
 #  error DEAL_II_WITH_P4EST required
 #endif
-} // namespace amr
+    } // namespace amr
+  }   // namespace internal
+} // namespace dealii
 
 
-#endif // amr_h
+#endif // dealii_distributed_amr_h
