@@ -1801,10 +1801,19 @@ namespace internal
                                                     ::dealii::MemorySpace::Host>
                &data)
       {
-        Vectorization_add_av<Number> vector_add(data.values.data(),
-                                                v_data.values.data(),
-                                                a);
-        parallel_for(vector_add, 0, size, thread_loop_partitioner);
+        if (a == Number(1.0))
+          {
+            Vectorization_add_v<Number> vector_add(data.values.data(),
+                                                   v_data.values.data());
+            parallel_for(vector_add, 0, size, thread_loop_partitioner);
+          }
+        else
+          {
+            Vectorization_add_av<Number> vector_add(data.values.data(),
+                                                    v_data.values.data(),
+                                                    a);
+            parallel_for(vector_add, 0, size, thread_loop_partitioner);
+          }
       }
 
       static void
@@ -2242,17 +2251,22 @@ namespace internal
                                                ::dealii::MemorySpace::Default>
           &data)
       {
-        auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
-          execution_space{};
-        Kokkos::parallel_for(
-          "dealii::add_av",
-          Kokkos::RangePolicy<
-            ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
-            exec, 0, size),
-          KOKKOS_LAMBDA(size_type i) {
-            data.values(i) += a * v_data.values(i);
-          });
-        exec.fence();
+        if (a == Number(1.0))
+          add_vector({}, size, v_data, data);
+        else
+          {
+            auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
+              execution_space{};
+            Kokkos::parallel_for(
+              "dealii::add_av",
+              Kokkos::RangePolicy<
+                ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
+                exec, 0, size),
+              KOKKOS_LAMBDA(size_type i) {
+                data.values(i) += a * v_data.values(i);
+              });
+            exec.fence();
+          }
       }
 
       static void
