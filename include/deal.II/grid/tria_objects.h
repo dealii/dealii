@@ -116,8 +116,8 @@ namespace internal
       unsigned int faces_per_object;
 
       /**
-       * Vector of the objects belonging to this level. The index of the
-       * object equals the index in this container.
+       * Vector of the objects bounding each cell in this level. This is
+       * typically accessed via get_bounding_object_indices().
        *
        * @note In this context, "cells" means "geometric entities bounded by
        * other geometric entities": for example, TriaFaces::quads stores quads
@@ -430,7 +430,7 @@ namespace internal
     {
       // ensure that sizes are consistent, and then return one that
       // corresponds to the number of objects
-      AssertDimension(cells.size(), manifold_id.size() * 2 * this->structdim);
+      AssertDimension(cells.size(), manifold_id.size() * faces_per_object);
       return manifold_id.size();
     }
 
@@ -439,10 +439,9 @@ namespace internal
     inline ArrayView<int>
     TriaObjects::get_bounding_object_indices(const unsigned int index)
     {
-      // assume that each cell has the same number of faces
-      const unsigned int faces_per_cell = 2 * this->structdim;
-      return ArrayView<int>(cells.data() + index * faces_per_cell,
-                            faces_per_cell);
+      // each cell has the same number of subcell objects
+      return ArrayView<int>(cells.data() + index * faces_per_object,
+                            faces_per_object);
     }
 
 
