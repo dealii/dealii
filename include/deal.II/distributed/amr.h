@@ -25,8 +25,6 @@ namespace dealii
     {
 #if defined(DEAL_II_WITH_P4EST)
       using namespace dealii::internal::p4est;
-#else
-#  error DEAL_II_WITH_P4EST required
 #endif
     } // namespace amr
   }   // namespace internal
