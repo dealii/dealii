@@ -80,7 +80,7 @@ namespace PSCToolkitWrappers
     operator=(const SparseMatrix &) = delete;
 
     /**
-     * Construtor using an IndexSet and a MPI communicator to describe the
+     * Constructor using an IndexSet and a MPI communicator to describe the
      * parallel partitioning of the matrix.
      */
     void
@@ -88,7 +88,7 @@ namespace PSCToolkitWrappers
            const MPI_Comm  communicator = MPI_COMM_WORLD);
 
     /**
-     * Construtor using an IndexSet and a MPI communicator to describe the
+     * Constructor using an IndexSet and a MPI communicator to describe the
      * parallel partitioning of the matrix.
      */
     void
