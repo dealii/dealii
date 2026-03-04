@@ -277,4 +277,7 @@ CGAL_KERNELS := {CGAL::Simple_cartesian<double>; CGAL::Exact_predicates_exact_co
                 CGAL::Exact_predicates_inexact_constructions_kernel }
 
 // PSCToolkit matrix
-PSCTOOLKIT_MATRICES := {PSCToolkitWrappers::SparseMatrix}
+PSCTOOLKIT_MATRICES := {@DEAL_II_EXPAND_PSBLAS_SPARSE_MATRICES@}
+
+// PSCToolkit vector
+PSCTOOLKIT_VECTORS := {@DEAL_II_EXPAND_PSBLAS_VECTOR@}

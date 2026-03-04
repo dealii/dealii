@@ -409,15 +409,15 @@ for (V : EXTERNAL_PARALLEL_VECTORS)
 // PSCToolkit
 for (M : PSCTOOLKIT_MATRICES)
   {
-    template void
-    AffineConstraints<double>::distribute_local_to_global<M, PSCToolkitWrappers::Vector>(
-      const FullMatrix<double> &,
-      const Vector<double> &,
-      const std::vector<AffineConstraints<double>::size_type> &,
-      M &,
-      PSCToolkitWrappers::Vector &,
-      bool,
-      std::bool_constant<false>) const;
+    template void AffineConstraints<double>::
+      distribute_local_to_global<M, PSCToolkitWrappers::Vector>(
+        const FullMatrix<double> &,
+        const Vector<double> &,
+        const std::vector<AffineConstraints<double>::size_type> &,
+        M &,
+        PSCToolkitWrappers::Vector &,
+        bool,
+        std::bool_constant<false>) const;
 
     template void AffineConstraints<double>::distribute_local_to_global<M>(
       const FullMatrix<double> &,
