@@ -17,9 +17,9 @@
 
 #include <deal.II/lac/sparsity_pattern_base.h>
 
-#include <memory.h>
-
 #ifdef DEAL_II_WITH_PSBLAS
+
+#  include <deal.II/lac/psblas_common.h>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -12,9 +12,12 @@
 //
 // ------------------------------------------------------------------------
 
+#include "deal.II/lac/exceptions.h"
 #include <deal.II/lac/psblas_sparse_matrix.h>
 
 #include <psb_types.h>
+
+#include <utility>
 
 #ifdef DEAL_II_WITH_PSBLAS
 
@@ -84,7 +87,9 @@ namespace PSCToolkitWrappers
     communicator = comm;
 
     // Create a new PSBLAS descriptor
-    psblas_descriptor.reset(psb_c_new_descriptor());
+    psblas_descriptor.reset(
+      psb_c_new_descriptor(),
+      PSCToolkitWrappers::internal::PSBLASDescriptorDeleter());
 
     // Use get_index_vector() from IndexSet to get the indexes
     const std::vector<types::global_dof_index> &indexes =
@@ -150,6 +155,30 @@ namespace PSCToolkitWrappers
   }
 
 
+  std::pair<SparseMatrix::size_type, SparseMatrix::size_type>
+  SparseMatrix::local_range() const
+  {
+    std::vector<psb_l_t> local_indices(local_size());
+    int                  err = psb_c_cd_get_global_indices(local_indices.data(),
+                                          local_size(),
+                                          true /*only owned indices*/,
+                                          psblas_descriptor.get());
+    Assert(err == 0,
+           ExcMessage("Error getting local range from PSBLAS descriptor."));
+
+    return {local_indices[0], local_indices.back() + 1};
+  }
+
+
+
+  bool
+  SparseMatrix::in_local_range(const size_type index) const
+  {
+    std::pair<size_type, size_type> local_range = this->local_range();
+    return index >= local_range.first && index < local_range.second;
+  }
+
+
 
   SparseMatrix::size_type
   SparseMatrix::m() const
@@ -198,6 +227,15 @@ namespace PSCToolkitWrappers
   {
     // Not implemented yet from PSBLAS.
     AssertThrow(false, ExcNotImplemented());
+  }
+
+
+
+  SparseMatrix::value_type
+  SparseMatrix::diag_element(const SparseMatrix::size_type i) const
+  {
+    Assert(m() == n(), ExcNotQuadratic());
+    return el(i, i);
   }
 
 
@@ -386,13 +424,35 @@ namespace PSCToolkitWrappers
            ExcMessage("PSBLAS matrix has not been initialized."));
     Assert(src.psblas_vector != nullptr,
            ExcMessage("Source PSBLAS vector has not been initialized."));
-    Assert(dst.psblas_vector != nullptr,
-           ExcMessage("Destination PSBLAS vector has not been initialized."));
+    Assert(&src != &dst, ExcSourceEqualsDestination());
+
 
     int err = psb_c_dspmm(1.0, // alpha
                           psblas_sparse_matrix,
                           src.psblas_vector,
                           0.0, // beta
+                          dst.psblas_vector,
+                          psblas_descriptor.get());
+    Assert(err == 0,
+           ExcMessage("Error in PSBLAS matrix-vector multiplication."));
+  }
+
+
+
+  void
+  SparseMatrix::vmult_add(Vector &dst, const Vector &src) const
+  {
+    Assert(psblas_sparse_matrix != nullptr,
+           ExcMessage("PSBLAS matrix has not been initialized."));
+    Assert(src.psblas_vector != nullptr,
+           ExcMessage("Source PSBLAS vector has not been initialized."));
+    Assert(&src != &dst, ExcSourceEqualsDestination());
+
+
+    int err = psb_c_dspmm(1.0, // alpha
+                          psblas_sparse_matrix,
+                          src.psblas_vector,
+                          1.0, // beta
                           dst.psblas_vector,
                           psblas_descriptor.get());
     Assert(err == 0,
@@ -408,14 +468,38 @@ namespace PSCToolkitWrappers
            ExcMessage("PSBLAS matrix has not been initialized."));
     Assert(src.psblas_vector != nullptr,
            ExcMessage("Source PSBLAS vector has not been initialized."));
-    Assert(dst.psblas_vector != nullptr,
-           ExcMessage("Destination PSBLAS vector has not been initialized."));
+    Assert(&src != &dst, ExcSourceEqualsDestination());
 
     char transpose = 'T';
     int  err       = psb_c_dspmm_opt(1.0, // alpha
                               psblas_sparse_matrix,
                               src.psblas_vector,
                               0.0, // beta
+                              dst.psblas_vector,
+                              psblas_descriptor.get(),
+                              &transpose,
+                              true);
+    Assert(err == 0,
+           ExcMessage(
+             "Error in PSBLAS transposed matrix-vector multiplication."));
+  }
+
+
+
+  void
+  SparseMatrix::Tvmult_add(Vector &dst, const Vector &src) const
+  {
+    Assert(psblas_sparse_matrix != nullptr,
+           ExcMessage("PSBLAS matrix has not been initialized."));
+    Assert(src.psblas_vector != nullptr,
+           ExcMessage("Source PSBLAS vector has not been initialized."));
+    Assert(&src != &dst, ExcSourceEqualsDestination());
+
+    char transpose = 'T';
+    int  err       = psb_c_dspmm_opt(1.0, // alpha
+                              psblas_sparse_matrix,
+                              src.psblas_vector,
+                              1.0, // beta
                               dst.psblas_vector,
                               psblas_descriptor.get(),
                               &transpose,

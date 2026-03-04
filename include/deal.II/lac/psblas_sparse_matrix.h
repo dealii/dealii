@@ -23,6 +23,8 @@
 #include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/vector.h>
 
+#include <utility>
+
 
 #ifdef DEAL_II_WITH_PSBLAS
 
@@ -63,6 +65,20 @@ namespace PSCToolkitWrappers
     SparseMatrix(const SparsityPattern &psblas_sparsity_pattern,
                  const MPI_Comm         communicator = MPI_COMM_WORLD);
 
+
+    /**
+     * Copy-constructor is deleted.
+     *
+     */
+    SparseMatrix(const SparseMatrix &) = delete;
+
+    /**
+     * Copy assignment is deleted.
+     *
+     */
+    SparseMatrix &
+    operator=(const SparseMatrix &) = delete;
+
     /**
      * Construtor using an IndexSet and a MPI communicator to describe the
      * parallel partitioning of the matrix.
@@ -88,11 +104,20 @@ namespace PSCToolkitWrappers
     size_type
     local_size() const;
 
+    std::pair<size_type, size_type>
+    local_range() const;
+
+    bool
+    in_local_range(const size_type index) const;
+
     size_type
     n_nonzero_elements() const;
 
     value_type
     el(const size_type i, const size_type j) const;
+
+    value_type
+    diag_element(const size_type i) const;
 
     /**
      * Set the element (i,j) to 'value'.
@@ -100,6 +125,15 @@ namespace PSCToolkitWrappers
     void
     set(const size_type i, const size_type j, const value_type value);
 
+    /**
+     * Set all elements given in a FullMatrix into the sparse matrix locations
+     * given by <tt>indices</tt>. In other words, this function writes the
+     * elements in <tt>full_matrix</tt> into the calling matrix, using the
+     * local-to-global indexing specified by <tt>indices</tt> for both the rows
+     * and the columns of the matrix. This function assumes a quadratic sparse
+     * matrix and a quadratic full_matrix, the usual situation in FE
+     * calculations.
+     */
     void
     set(const std::vector<size_type> &indices,
         const FullMatrix<double>     &matrix);
@@ -143,11 +177,43 @@ namespace PSCToolkitWrappers
     void
     compress();
 
+    /**
+     * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>
+     * being this matrix.
+     *
+     * Source and destination must not be the same vector.
+     */
     void
     vmult(Vector &dst, const Vector &src) const;
 
+    /**
+     * Adding matrix-vector multiplication: Add <i>M*src</i> to <i>dst</i> with
+     * <i>M</i> being this matrix.
+     *
+     * Source and destination must not be the same vector.
+     */
+    void
+    vmult_add(Vector &dst, const Vector &src) const;
+
+
+    /**
+     * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
+     * <i>M</i> being this matrix. This function does the same as vmult() but
+     * takes the transposed matrix.
+     *
+     * Source and destination must not be the same vector.
+     */
     void
     Tvmult(Vector &dst, const Vector &src) const;
+
+    /**
+     * Adding matrix-vector multiplication: Add <i>M^T*src</i> to <i>dst</i>
+     * with <i>M</i> being this matrix.
+     *
+     * Source and destination must not be the same vector.
+     */
+    void
+    Tvmult_add(Vector &dst, const Vector &src) const;
 
     /**
      * Get the underlying PSBLAS sparse matrix.
@@ -161,8 +227,20 @@ namespace PSCToolkitWrappers
     psb_c_descriptor *
     get_psblas_descriptor() const;
 
+    /**
+     * Return the underlying MPI communicator.
+     */
     MPI_Comm
     get_mpi_communicator() const;
+
+
+    /**
+     * Exception
+     */
+    DeclExceptionMsg(ExcSourceEqualsDestination,
+                     "You are attempting an operation on two vectors that "
+                     "are the same object, but the operation requires that the "
+                     "two objects are in fact different.");
 
   private:
     MPI_Comm communicator;
