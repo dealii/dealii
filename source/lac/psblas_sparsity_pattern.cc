@@ -80,6 +80,8 @@ namespace PSCToolkitWrappers
     ForwardIterator                                      end,
     const bool                                           indices_are_sorted)
   {
+    Assert(psblas_descriptor.get() != nullptr,
+           ExcMessage("PSBLAS descriptor is null."));
     if (begin == end)
       return;
 

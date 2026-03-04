@@ -31,8 +31,6 @@ namespace PSCToolkitWrappers
     , psblas_descriptor(nullptr)
   {}
 
-
-
   SparseMatrix::SparseMatrix(const SparsityPattern &psblas_sparsity_pattern,
                              const MPI_Comm         communicator)
   {
