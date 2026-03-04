@@ -1,25 +1,25 @@
 
-DEAL:0:0::N refinement: 1. Solver iterations: 5
-DEAL:0:0::velocity error: 0.191153 pressure error: 0.0924125
-DEAL:0:0::N refinement: 2. Solver iterations: 20
-DEAL:0:0::velocity error: 0.0387597 pressure error: 0.148860
-DEAL:0:0::N refinement: 3. Solver iterations: 82
-DEAL:0:0::velocity error: 0.00532010 pressure error: 0.0509138
-DEAL:0:0::N refinement: 4. Solver iterations: 242
-DEAL:0:0::velocity error: 0.00142583 pressure error: 0.0378769
-DEAL:0:0::N refinement: 5. Solver iterations: 920
-DEAL:0:0::velocity error: 0.00127712 pressure error: 0.0326658
+DEAL:0:0::N refinement: 1.
+DEAL:0:0::velocity error: 0.19 pressure error: 0.092
+DEAL:0:0::N refinement: 2.
+DEAL:0:0::velocity error: 0.039 pressure error: 0.15
+DEAL:0:0::N refinement: 3.
+DEAL:0:0::velocity error: 0.0053 pressure error: 0.051
+DEAL:0:0::N refinement: 4.
+DEAL:0:0::velocity error: 0.0014 pressure error: 0.038
+DEAL:0:0::N refinement: 5.
+DEAL:0:0::velocity error: 0.0013 pressure error: 0.033
 DEAL:0:0::OK
 
-DEAL:1:1::N refinement: 1. Solver iterations: 5
-DEAL:1:1::velocity error: 0.191153 pressure error: 0.0924125
-DEAL:1:1::N refinement: 2. Solver iterations: 20
-DEAL:1:1::velocity error: 0.0387597 pressure error: 0.148860
-DEAL:1:1::N refinement: 3. Solver iterations: 82
-DEAL:1:1::velocity error: 0.00532010 pressure error: 0.0509138
-DEAL:1:1::N refinement: 4. Solver iterations: 242
-DEAL:1:1::velocity error: 0.00142583 pressure error: 0.0378769
-DEAL:1:1::N refinement: 5. Solver iterations: 920
-DEAL:1:1::velocity error: 0.00127712 pressure error: 0.0326658
+DEAL:1:1::N refinement: 1.
+DEAL:1:1::velocity error: 0.19 pressure error: 0.092
+DEAL:1:1::N refinement: 2.
+DEAL:1:1::velocity error: 0.039 pressure error: 0.15
+DEAL:1:1::N refinement: 3.
+DEAL:1:1::velocity error: 0.0053 pressure error: 0.051
+DEAL:1:1::N refinement: 4.
+DEAL:1:1::velocity error: 0.0014 pressure error: 0.038
+DEAL:1:1::N refinement: 5.
+DEAL:1:1::velocity error: 0.0013 pressure error: 0.033
 DEAL:1:1::OK
 

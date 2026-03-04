@@ -187,9 +187,6 @@ template <
     LinearAlgebra::distributed::BlockVector<double, MemorySpace::Default>,
   int n_q_points_1d = degree_u + 1>
 class PortableMFStokesOperator
-  : MatrixFreeOperators::Base<dim,
-                              dealii::LinearAlgebra::distributed::
-                                BlockVector<double, MemorySpace::Default>>
 {
 public:
   PortableMFStokesOperator(const Portable::MatrixFree<dim, double> &data_in)
@@ -197,16 +194,6 @@ public:
   {}
 
   const Portable::MatrixFree<dim, Number> &data;
-
-  void
-  compute_diagonal()
-  {
-    // There is currently no need in the code for the diagonal of the entire
-    // Stokes block. If needed, one could easily construct based on the diagonal
-    // of the A block and append zeros to the end for the number of pressure
-    // DoFs.
-    Assert(false, ExcNotImplemented());
-  }
 
   void
   vmult(VectorType &dst, const VectorType &src) const
@@ -218,13 +205,6 @@ public:
 
     data.copy_constrained_values(src, dst);
   }
-
-private:
-  void
-  apply_add(VectorType &dst, const VectorType &src) const override
-  {
-    vmult(dst, src);
-  };
 };
 
 
@@ -291,32 +271,14 @@ test(unsigned int n_refinements)
     solution_host;
   mf_data.initialize_dof_vector(solution_host);
 
-  LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Host>
-    reference_solution_host;
-  mf_data.initialize_dof_vector(reference_solution_host);
-
   LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Host> rhs_host;
   mf_data.initialize_dof_vector(rhs_host);
-  rhs_host.block(0).reinit(mf_data.get_vector_partitioner(0));
-  rhs_host.block(1).reinit(mf_data.get_vector_partitioner(1));
 
   VectorTools::create_right_hand_side(dof_u,
                                       QGauss<dim>(degree_u + 2),
                                       VelocityRightHandSide<dim>(),
                                       rhs_host.block(0),
                                       constraints_u);
-
-  VectorTools::interpolate(dof_u,
-                           VelocitySolution<dim>(),
-                           reference_solution_host.block(0));
-  VectorTools::interpolate(dof_p,
-                           PressureSolution<dim>(),
-                           reference_solution_host.block(1));
-
-  solution.block(0).import_elements(solution_host.block(0),
-                                    VectorOperation::insert);
-  solution.block(1).import_elements(solution_host.block(1),
-                                    VectorOperation::insert);
 
   rhs.block(0).import_elements(rhs_host.block(0), VectorOperation::insert);
   rhs.block(1).import_elements(rhs_host.block(1), VectorOperation::insert);
@@ -361,10 +323,9 @@ test(unsigned int n_refinements)
                                                         cellwise_errors_pl2,
                                                         VectorTools::L2_norm);
 
-  deallog << "N refinement: " << n_refinements
-          << ". Solver iterations: " << solver_control.last_step() << std::endl;
-  deallog << "velocity error: " << u_l2 << " pressure error: " << p_l2
-          << std::endl;
+  deallog << "N refinement: " << n_refinements << "." << std::endl;
+  deallog << "velocity error: " << std::setprecision(2) << u_l2
+          << " pressure error: " << p_l2 << std::endl;
 }
 
 int
