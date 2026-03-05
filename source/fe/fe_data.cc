@@ -116,11 +116,7 @@ FiniteElementData<dim>::FiniteElementData(
   const Conformity                 conformity,
   const BlockIndices              &block_indices)
   : FiniteElementData(dofs_per_object,
-                      dim == 0 ?
-                        ReferenceCells::Vertex :
-                        (dim == 1 ? ReferenceCells::Line :
-                                    (dim == 2 ? ReferenceCells::Quadrilateral :
-                                                ReferenceCells::Hexahedron)),
+                      ReferenceCells::get_hypercube<dim>(),
                       n_components,
                       degree,
                       conformity,
