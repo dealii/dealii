@@ -4755,8 +4755,17 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::get_fe() const
   const auto &fe = this->dof_handler->get_fe(active_fe_index());
 
   Assert(this->reference_cell() == fe.reference_cell(),
-         internal::ExcNonMatchingReferenceCellTypes(this->reference_cell(),
-                                                    fe.reference_cell()));
+         ExcMessage(
+           "The reference-cell type used on this cell (" +
+           this->reference_cell().to_string() +
+           ") does not match the reference-cell type of the finite element "
+           "associated with this cell (" +
+           fe.reference_cell().to_string() +
+           "). "
+           "Did you accidentally use simplex elements on hypercube meshes "
+           "(or the other way around), or are you using a mixed mesh and "
+           "assigned a simplex element to a hypercube cell (or the other "
+           "way around) via the active_fe_index?"));
 
   return fe;
 }
