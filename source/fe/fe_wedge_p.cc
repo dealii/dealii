@@ -73,7 +73,7 @@ namespace
     else
       DEAL_II_NOT_IMPLEMENTED();
 
-    return internal::expand(3, {{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
+    return internal::expand<3>({{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
   }
 } // namespace
 

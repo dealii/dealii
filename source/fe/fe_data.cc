@@ -18,9 +18,9 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
+  template <int dim>
   internal::GenericDoFsPerObject
-  expand(const unsigned int               dim,
-         const std::vector<unsigned int> &dofs_per_object,
+  expand(const std::vector<unsigned int> &dofs_per_object,
          const ReferenceCell              cell_type)
   {
     internal::GenericDoFsPerObject result;
@@ -135,7 +135,7 @@ FiniteElementData<dim>::FiniteElementData(
   const unsigned int               degree,
   const Conformity                 conformity,
   const BlockIndices              &block_indices)
-  : FiniteElementData(internal::expand(dim, dofs_per_object, cell_type),
+  : FiniteElementData(internal::expand<dim>(dofs_per_object, cell_type),
                       cell_type,
                       n_components,
                       degree,
