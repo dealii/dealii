@@ -207,8 +207,7 @@ FE_Q_Hierarchical<dim>::get_prolongation_matrix(
     ExcMessage(
       "Prolongation matrices are only available for isotropic refinement!"));
 
-  AssertIndexRange(
-    child, this->reference_cell().template n_children<dim>(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   return this->prolongation[refinement_case - 1][child];
 }

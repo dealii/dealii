@@ -1062,7 +1062,7 @@ DataOut<dim, spacedim>::build_patches(const unsigned int n_subdivisions)
   AssertDimension(this->triangulation->get_reference_cells().size(), 1);
 
   build_patches(this->triangulation->get_reference_cells()[0]
-                  .template get_default_linear_mapping<dim, spacedim>(),
+                  .template get_default_linear_mapping<spacedim>(),
                 n_subdivisions,
                 no_curved_cells);
 }

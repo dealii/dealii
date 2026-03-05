@@ -206,7 +206,7 @@ namespace GridTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
@@ -319,16 +319,16 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   std::map<unsigned int, Point<spacedim>>
-  extract_used_vertices(
-    const Triangulation<dim, spacedim> &container,
-    const Mapping<dim, spacedim>       &mapping =
-      (ReferenceCells::get_hypercube<dim>()
+  extract_used_vertices(const Triangulation<dim, spacedim> &container,
+                        const Mapping<dim, spacedim>       &mapping =
+                          (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+                             .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+                             .ReferenceCell::
+                               get_default_linear_mapping<dim, spacedim>()
 #endif
-         ));
+                             ));
 
   /**
    * Return the adjacent cells of all the vertices. If a vertex is also a

@@ -317,7 +317,7 @@ namespace GridTools
            ExcNotImplemented());
     const auto reference_cell = ReferenceCells::get_hypercube<dim>();
     MatrixCreator::create_laplace_matrix(
-      reference_cell.template get_default_linear_mapping<dim, dim>(),
+      reference_cell.template get_default_linear_mapping<dim>(),
       dof_handler,
       quadrature,
       S,

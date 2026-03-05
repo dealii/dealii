@@ -40,6 +40,7 @@ class Mapping;
 template <int dim>
 class Quadrature;
 
+template <int dim>
 class ReferenceCell;
 #endif
 
@@ -58,7 +59,8 @@ namespace internal
    * one function in an internal namespace that is a friend of the class and can
    * be used to create the objects.
    */
-  constexpr ReferenceCell
+  template <int dim>
+  constexpr ReferenceCell<dim>
   make_reference_cell_from_int(const std::uint8_t kind);
 } // namespace internal
 
@@ -122,6 +124,7 @@ enum class IsotropicRefinementChoice : std::uint8_t
  *
  * @ingroup grid geomprimitives reordering
  */
+template <int dim>
 class ReferenceCell
 {
 public:
@@ -133,7 +136,7 @@ public:
    * ReferenceCells::Tetrahedron.
    */
   static ReferenceCell
-  n_vertices_to_type(const int dim, const unsigned int n_vertices);
+  n_vertices_to_type(const int dim_, const unsigned int n_vertices);
 
   /**
    * Default constructor. Initialize this object as an invalid object. The
@@ -166,7 +169,8 @@ public:
 
   /**
    * Return the dimension of the reference cell represented by the current
-   * object.
+   * object. This value, of course, simply equals the `dim` template
+   * argument of this class.
    */
   constexpr unsigned int
   get_dimension() const;
@@ -184,29 +188,19 @@ public:
    * Compute the value of the $i$-th linear shape function at location $\xi$
    * for the current reference-cell type.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * For ReferenceCells::Vertex, the reference cell is a zero-dimensional point
    * in a zero-dimensional space: i.e., asking about the value of a polynomial
    * doesn't make sense since there cannot be any independent variables. To
    * enable dimension-independent programming we define the zero-dimensional
    * value to be 1.
    */
-  template <int dim>
   double
   d_linear_shape_function(const Point<dim> &xi, const unsigned int i) const;
 
   /**
    * Compute the gradient of the $i$-th linear shape function at location
    * $\xi$ for the current reference-cell type.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Tensor<1, dim>
   d_linear_shape_function_gradient(const Point<dim>  &xi,
                                    const unsigned int i) const;
@@ -220,7 +214,7 @@ public:
    * cell is a pyramid), or with FE_WedgeP (if the reference cell is
    * a wedge).
    */
-  template <int dim, int spacedim = dim>
+  template <int spacedim = dim>
   std::unique_ptr<Mapping<dim, spacedim>>
   get_default_mapping(const unsigned int degree) const;
 
@@ -235,7 +229,7 @@ public:
    * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
    * coordinate directions.
    */
-  template <int dim, int spacedim = dim>
+  template <int spacedim = dim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping() const;
 
@@ -246,12 +240,7 @@ public:
    * @param[in] n_points_1d The number of quadrature points in each direction
    * (QGauss) or an indication of what polynomial degree needs to be
    * integrated exactly for the other types.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Quadrature<dim>
   get_gauss_type_quadrature(const unsigned n_points_1d) const;
 
@@ -263,12 +252,7 @@ public:
    *
    * The object returned by this function generalizes what the QMidpoint class
    * represents to other reference cells.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Quadrature<dim>
   get_midpoint_quadrature() const;
 
@@ -284,12 +268,7 @@ public:
    *   consequently the object cannot usefully be used for actually
    *   computing integrals. This is in contrast to, for example, the QTrapezoid
    *   class that correctly sets quadrature weights.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   const Quadrature<dim> &
   get_nodal_type_quadrature() const;
 
@@ -323,12 +302,7 @@ public:
    *
    * Because the ReferenceCell class does not have a `dim` argument,
    * it has to be explicitly specified in the call to this function.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Point<dim>
   vertex(const unsigned int v) const;
 
@@ -368,7 +342,7 @@ public:
    * form a continuous range that is empty in case no face of such type exists.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-  face_indices_by_type(const ReferenceCell &face_ref_type) const;
+  face_indices_by_type(const ReferenceCell<dim - 1> &face_ref_type) const;
 
   /**
    * Return the number of refinement directions of the cell.
@@ -399,12 +373,7 @@ public:
   /**
    * Return the number of cells one would get by refining the
    * current cell with the given refinement case.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   unsigned int
   n_children(const RefinementCase<dim> ref_case =
                RefinementCase<dim>::isotropic_refinement) const;
@@ -435,7 +404,6 @@ public:
    * @note In 3d, for backwards compatibility, we treat
    * internal::SubfaceCase::case_none as internal::SubfaceCase::case_isotropic.
    */
-  template <int dim>
   std::pair<unsigned int, RefinementCase<dim - 1>>
   equivalent_refinement_case(
     const types::geometric_orientation combined_face_orientation,
@@ -447,9 +415,8 @@ public:
    * `RefinementPossibilities<2>::cut_x`) of the current ReferenceCell. This
    * ArrayView will not include `RefinementPossibilities<dim>::no_refinement`:
    * instead, for elements which do not yet support refinement (e.g.,
-   * ReferenceCell::Pyramid) the ArrayView will be empty.
+   * ReferenceCell<dim>::Pyramid) the ArrayView will be empty.
    */
-  template <int dim>
   ArrayView<const RefinementCase<dim>>
   refinement_cases() const;
 
@@ -465,7 +432,7 @@ public:
    * returned object may be either ReferenceCells::Triangle or
    * ReferenceCells::Quadrilateral, depending on the given index.
    */
-  constexpr ReferenceCell
+  constexpr ReferenceCell<dim - 1>
   face_reference_cell(const unsigned int face_index) const;
 
   /**
@@ -491,7 +458,7 @@ public:
   /**
    * Return the reversed (non-default orientation) line orientation flag. As
    * lines only have two possible orientations, this function and
-   * ReferenceCell::default_combined_face_orientation() encode all of its
+   * ReferenceCell<dim>::default_combined_face_orientation() encode all of its
    * possible orientation states.
    *
    * @deprecated Use numbers::reverse_line_orientation instead.
@@ -681,17 +648,12 @@ public:
    * @return The location of the vertex so identified in `dim`-dimensional
    *   space.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * @post The output of calling `reference_cell.face_vertex_location<dim>(f,v)`
    *   is identical to calling
    *   `reference_cell.vertex<dim>(
    *       reference_cell.face_to_cell_vertices(
                    f, v, numbers::default_geometric_orientation))`.
    */
-  template <int dim>
   Point<dim>
   face_vertex_location(const unsigned int face,
                        const unsigned int vertex) const;
@@ -709,7 +671,6 @@ public:
    * @param[in] face_refinement_case The way in which the current face is
    * refined.
    */
-  template <int dim>
   Point<dim>
   subface_vertex_location(
     const unsigned int            face_no,
@@ -847,7 +808,7 @@ public:
    * $\sqrt{2}$, and $1$, respectively, whereas the measures of the sides of a
    * ReferenceCells::Quadrilateral are all $1$.
    *
-   * @note Like ReferenceCell::volume(), this function defines vertices to have
+   * @note Like ReferenceCell<dim>::volume(), this function defines vertices to have
    * a measure of $1$ to enable the definition of one-dimensional face
    * quadratures.
    */
@@ -865,12 +826,7 @@ public:
    * @f]
    * where $V$ is the volume of the reference cell (see also the volume()
    * function).
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Point<dim>
   barycenter() const;
 
@@ -892,24 +848,14 @@ public:
    *
    * The tolerance parameter may be less than zero, indicating that the point
    * should be safely inside the cell.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   bool
   contains_point(const Point<dim> &p, const double tolerance = 0) const;
 
   /**
    * Return the point on the surface of the reference cell closest (in the
    * Euclidean norm) to @p p.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Point<dim>
   closest_point(const Point<dim> &p) const;
 
@@ -919,12 +865,7 @@ public:
    * cross product between the two vectors returns the face normal vector.
    *
    * @pre $i$ must be between zero and `dim-1`.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Tensor<1, dim>
   face_tangent_vector(const unsigned int face_no, const unsigned int i) const;
 
@@ -935,40 +876,27 @@ public:
    *
    * @pre $i$ must be between zero and `dim-1`.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * @deprecated Use face_tangent_vector() instead.
    */
-  template <int dim>
   DEAL_II_DEPRECATED_WITH_COMMENT("Use face_tangent_vector() instead.")
-  Tensor<1, dim> unit_tangential_vectors(const unsigned int face_no,
-                                         const unsigned int i) const;
+  Tensor<1, dim>
+  unit_tangential_vectors(const unsigned int face_no,
+                          const unsigned int i) const;
 
   /**
    * Return the unit normal vector of a face of the reference cell.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Tensor<1, dim>
   face_normal_vector(const unsigned int face_no) const;
 
   /**
    * Return the unit normal vector of a face of the reference cell.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * @deprecated Use face_normal_vector() instead.
    */
-  template <int dim>
   DEAL_II_DEPRECATED_WITH_COMMENT("Use face_normal_vector() instead.")
-  Tensor<1, dim> unit_normal_vectors(const unsigned int face_no) const;
+  Tensor<1, dim>
+  unit_normal_vectors(const unsigned int face_no) const;
 
   /**
    * Return the number of orientations for a face in the ReferenceCell. For
@@ -1087,7 +1015,7 @@ public:
    * being set to numbers::invalid_unsigned_int.
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 13, 4>
@@ -1103,7 +1031,7 @@ public:
    * details).
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 13, 4, 2>
@@ -1118,7 +1046,7 @@ public:
    * numbers::invalid_unsigned_int.
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 10, 6>
@@ -1132,7 +1060,7 @@ public:
    * numbers::invalid_unsigned_int.
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 10, 8>
@@ -1196,12 +1124,7 @@ public:
    * The last argument, @p legacy_format, indicates whether to use the
    * old, VTK legacy format (when `true`) or the new, VTU format (when
    * `false`).
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   unsigned int
   vtk_lexicographic_to_node_index(
     const std::array<unsigned, dim> &node_indices,
@@ -1245,13 +1168,13 @@ public:
    * Operator for equality comparison.
    */
   constexpr bool
-  operator==(const ReferenceCell &type) const;
+  operator==(const ReferenceCell<dim> &type) const;
 
   /**
    * Operator for inequality comparison.
    */
   constexpr bool
-  operator!=(const ReferenceCell &type) const;
+  operator!=(const ReferenceCell<dim> &type) const;
 
   /**
    * Write and read the data of this object from a stream for the purpose
@@ -1359,14 +1282,17 @@ private:
    * A kind of constructor -- not quite private because it can be
    * called by anyone, but at least hidden in an internal namespace.
    */
-  friend constexpr ReferenceCell
+  template <int dim_>
+  friend constexpr ReferenceCell<dim_>
   internal::make_reference_cell_from_int(const std::uint8_t);
 
+  template <int dim_>
   friend std::ostream &
-  operator<<(std::ostream &out, const ReferenceCell &reference_cell);
+  operator<<(std::ostream &out, const ReferenceCell<dim_> &reference_cell);
 
+  template <int dim_>
   friend std::istream &
-  operator>>(std::istream &in, ReferenceCell &reference_cell);
+  operator>>(std::istream &in, ReferenceCell<dim_> &reference_cell);
 };
 
 
@@ -1375,10 +1301,12 @@ private:
  * in a text format in which the object is represented by an integer. The
  * details of which integer value represents each kind of reference cell
  * is unimportant and consequently not specified. If you want a string
- * representation of what a ReferenceCell is, use ReferenceCell::to_string().
+ * representation of what a ReferenceCell is, use
+ * ReferenceCell<dim>::to_string().
  */
+template <int dim>
 std::ostream &
-operator<<(std::ostream &out, const ReferenceCell &reference_cell);
+operator<<(std::ostream &out, const ReferenceCell<dim> &reference_cell);
 
 /**
  * Input operator that reads the @p reference_cell object from the stream
@@ -1387,33 +1315,39 @@ operator<<(std::ostream &out, const ReferenceCell &reference_cell);
  * but the function uses the same translation as the corresponding
  * output `operator<<`.
  */
+template <int dim>
 std::istream &
-operator>>(std::istream &in, ReferenceCell &reference_cell);
+operator>>(std::istream &in, ReferenceCell<dim> &reference_cell);
 
 
-inline constexpr ReferenceCell::ReferenceCell(const std::uint8_t kind)
+
+template <int dim>
+inline constexpr ReferenceCell<dim>::ReferenceCell(const std::uint8_t kind)
   : kind(kind)
 {}
 
 
 
-inline constexpr ReferenceCell::operator std::uint8_t() const
+template <int dim>
+inline constexpr ReferenceCell<dim>::operator std::uint8_t() const
 {
   return kind;
 }
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::operator==(const ReferenceCell &type) const
+ReferenceCell<dim>::operator==(const ReferenceCell<dim> &type) const
 {
   return kind == type.kind;
 }
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::operator!=(const ReferenceCell &type) const
+ReferenceCell<dim>::operator!=(const ReferenceCell<dim> &type) const
 {
   return kind != type.kind;
 }
@@ -1422,7 +1356,8 @@ ReferenceCell::operator!=(const ReferenceCell &type) const
 
 namespace internal
 {
-  inline constexpr ReferenceCell
+  template <int dim>
+  inline constexpr ReferenceCell<dim>
   make_reference_cell_from_int(const std::uint8_t kind)
   {
 #ifndef DEAL_II_CXX14_CONSTEXPR_BUG
@@ -1449,19 +1384,27 @@ namespace internal
  */
 namespace ReferenceCells
 {
-  constexpr ReferenceCell Vertex   = internal::make_reference_cell_from_int(0);
-  constexpr ReferenceCell Line     = internal::make_reference_cell_from_int(1);
-  constexpr ReferenceCell Triangle = internal::make_reference_cell_from_int(2);
-  constexpr ReferenceCell Quadrilateral =
-    internal::make_reference_cell_from_int(3);
-  constexpr ReferenceCell Tetrahedron =
-    internal::make_reference_cell_from_int(4);
-  constexpr ReferenceCell Pyramid = internal::make_reference_cell_from_int(5);
-  constexpr ReferenceCell Wedge   = internal::make_reference_cell_from_int(6);
-  constexpr ReferenceCell Hexahedron =
-    internal::make_reference_cell_from_int(7);
-  constexpr ReferenceCell Invalid = internal::make_reference_cell_from_int(
-    std::numeric_limits<std::uint8_t>::max());
+  constexpr ReferenceCell<0> Vertex =
+    internal::make_reference_cell_from_int<0>(0);
+  constexpr ReferenceCell<1> Line =
+    internal::make_reference_cell_from_int<1>(1);
+  constexpr ReferenceCell<2> Triangle =
+    internal::make_reference_cell_from_int<2>(2);
+  constexpr ReferenceCell<2> Quadrilateral =
+    internal::make_reference_cell_from_int<2>(3);
+  constexpr ReferenceCell<3> Tetrahedron =
+    internal::make_reference_cell_from_int<3>(4);
+  constexpr ReferenceCell<3> Pyramid =
+    internal::make_reference_cell_from_int<3>(5);
+  constexpr ReferenceCell<3> Wedge =
+    internal::make_reference_cell_from_int<3>(6);
+  constexpr ReferenceCell<3> Hexahedron =
+    internal::make_reference_cell_from_int<3>(7);
+
+  template <int dim>
+  constexpr ReferenceCell<dim> Invalid =
+    internal::make_reference_cell_from_int<dim>(
+      std::numeric_limits<std::uint8_t>::max());
 
   /**
    * Return the correct simplex reference cell type for the given dimension
@@ -1469,7 +1412,7 @@ namespace ReferenceCells
    * reference to either Vertex, Line, Triangle, or Tetrahedron.
    */
   template <int dim>
-  constexpr const ReferenceCell &
+  constexpr const ReferenceCell<dim> &
   get_simplex();
 
   /**
@@ -1478,7 +1421,7 @@ namespace ReferenceCells
    * reference to either Vertex, Quadrilateral, or Hexahedron.
    */
   template <int dim>
-  constexpr const ReferenceCell &
+  constexpr const ReferenceCell<dim> &
   get_hypercube();
 
   /**
@@ -1538,31 +1481,35 @@ namespace ReferenceCells
 
 
 
-inline constexpr ReferenceCell::ReferenceCell()
-  : ReferenceCell(ReferenceCells::Invalid)
+template <int dim>
+inline constexpr ReferenceCell<dim>::ReferenceCell()
+  : ReferenceCell(ReferenceCells::Invalid<dim>)
 {}
 
 
 
+template <int dim>
 template <class Archive>
 inline void
-ReferenceCell::serialize(Archive &archive, const unsigned int /*version*/)
+ReferenceCell<dim>::serialize(Archive &archive, const unsigned int /*version*/)
 {
   archive &kind;
 }
 
 
 
+template <int dim>
 inline constexpr std::size_t
-ReferenceCell::memory_consumption()
+ReferenceCell<dim>::memory_consumption()
 {
-  return sizeof(ReferenceCells::Invalid);
+  return sizeof(ReferenceCells::Invalid<dim>);
 }
 
 
 
+template <int dim>
 inline ArrayView<const unsigned int>
-ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
+ReferenceCell<dim>::faces_for_given_vertex(const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
   switch (this->kind)
@@ -1618,8 +1565,10 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
 }
 
 
+
+template <int dim>
 constexpr dealii::ndarray<unsigned int, 13, 4>
-ReferenceCell::new_isotropic_child_face_lines(
+ReferenceCell<dim>::new_isotropic_child_face_lines(
   const unsigned int refinement_choice) const
 {
   AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
@@ -1725,8 +1674,9 @@ ReferenceCell::new_isotropic_child_face_lines(
 
 
 
+template <int dim>
 constexpr dealii::ndarray<unsigned int, 13, 4, 2>
-ReferenceCell::new_isotropic_child_face_line_vertices(
+ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
   const unsigned int refinement_choice) const
 {
   AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
@@ -1837,8 +1787,9 @@ ReferenceCell::new_isotropic_child_face_line_vertices(
 
 
 
+template <int dim>
 constexpr dealii::ndarray<unsigned int, 10, 6>
-ReferenceCell::new_isotropic_child_cell_faces(
+ReferenceCell<dim>::new_isotropic_child_cell_faces(
   const unsigned int refinement_choice) const
 {
   AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
@@ -1941,8 +1892,9 @@ ReferenceCell::new_isotropic_child_cell_faces(
 
 
 
+template <int dim>
 constexpr dealii::ndarray<unsigned int, 10, 8>
-ReferenceCell::new_isotropic_child_cell_vertices(
+ReferenceCell<dim>::new_isotropic_child_cell_vertices(
   const unsigned int refinement_choice) const
 {
   AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
@@ -2042,8 +1994,9 @@ ReferenceCell::new_isotropic_child_cell_vertices(
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::is_hyper_cube() const
+ReferenceCell<dim>::is_hyper_cube() const
 {
   return (*this == ReferenceCells::Vertex || *this == ReferenceCells::Line ||
           *this == ReferenceCells::Quadrilateral ||
@@ -2052,8 +2005,9 @@ ReferenceCell::is_hyper_cube() const
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::is_simplex() const
+ReferenceCell<dim>::is_simplex() const
 {
   return (*this == ReferenceCells::Vertex || *this == ReferenceCells::Line ||
           *this == ReferenceCells::Triangle ||
@@ -2062,51 +2016,28 @@ ReferenceCell::is_simplex() const
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::get_dimension() const
+ReferenceCell<dim>::get_dimension() const
 {
-  switch (this->kind)
-    {
-      case ReferenceCells::Vertex:
-        return 0;
-      case ReferenceCells::Line:
-        return 1;
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
-        return 2;
-      case ReferenceCells::Tetrahedron:
-      case ReferenceCells::Pyramid:
-      case ReferenceCells::Wedge:
-      case ReferenceCells::Hexahedron:
-        return 3;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
-
-  return numbers::invalid_unsigned_int;
+  return dim;
 }
 
 
 
 template <int dim>
 Quadrature<dim>
-ReferenceCell::get_midpoint_quadrature() const
+ReferenceCell<dim>::get_midpoint_quadrature() const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
-  return Quadrature<dim>(std::vector<Point<dim>>({barycenter<dim>()}),
+  return Quadrature<dim>(std::vector<Point<dim>>({barycenter()}),
                          std::vector<double>({volume()}));
 }
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_vertices() const
+ReferenceCell<dim>::n_vertices() const
 {
   switch (this->kind)
     {
@@ -2135,8 +2066,9 @@ ReferenceCell::n_vertices() const
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_lines() const
+ReferenceCell<dim>::n_lines() const
 {
   switch (this->kind)
     {
@@ -2167,14 +2099,8 @@ ReferenceCell::n_lines() const
 
 template <int dim>
 Point<dim>
-ReferenceCell::vertex(const unsigned int v) const
+ReferenceCell<dim>::vertex(const unsigned int v) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(v, n_vertices());
 
   switch (dim)
@@ -2290,8 +2216,10 @@ ReferenceCell::vertex(const unsigned int v) const
 }
 
 
+
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_faces() const
+ReferenceCell<dim>::n_faces() const
 {
   switch (this->kind)
     {
@@ -2320,8 +2248,9 @@ ReferenceCell::n_faces() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices() const
+ReferenceCell<dim>::face_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_faces());
@@ -2329,8 +2258,10 @@ ReferenceCell::face_indices() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
+ReferenceCell<dim>::face_indices_by_type(
+  const ReferenceCell<dim - 1> &face_ref_type) const
 {
   switch (this->kind)
     {
@@ -2396,8 +2327,9 @@ ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_isotropic_refinement_choices() const
+ReferenceCell<dim>::n_isotropic_refinement_choices() const
 {
   switch (this->kind)
     {
@@ -2426,8 +2358,9 @@ ReferenceCell::n_isotropic_refinement_choices() const
 
 
 
+template <int dim>
 inline IsotropicRefinementChoice
-ReferenceCell::get_isotropic_refinement_choice(
+ReferenceCell<dim>::get_isotropic_refinement_choice(
   const unsigned int ref_choice) const
 {
   AssertIndexRange(ref_choice, n_isotropic_refinement_choices());
@@ -2452,8 +2385,9 @@ ReferenceCell::get_isotropic_refinement_choice(
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_isotropic_children() const
+ReferenceCell<dim>::n_isotropic_children() const
 {
   switch (this->kind)
     {
@@ -2486,15 +2420,8 @@ ReferenceCell::n_isotropic_children() const
 
 template <int dim>
 unsigned int
-ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
+ReferenceCell<dim>::n_children(const RefinementCase<dim> ref_case) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   // Use GeometryInfo here to keep it the single source of truth
   if (this->is_hyper_cube())
     return GeometryInfo<dim>::n_children(ref_case);
@@ -2504,8 +2431,9 @@ ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::isotropic_child_indices() const
+ReferenceCell<dim>::isotropic_child_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
     0U, n_isotropic_children());
@@ -2513,8 +2441,9 @@ ReferenceCell::isotropic_child_indices() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::vertex_indices() const
+ReferenceCell<dim>::vertex_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_vertices());
@@ -2522,8 +2451,9 @@ ReferenceCell::vertex_indices() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::line_indices() const
+ReferenceCell<dim>::line_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_lines());
@@ -2533,7 +2463,7 @@ ReferenceCell::line_indices() const
 
 template <int dim>
 inline ArrayView<const RefinementCase<dim>>
-ReferenceCell::refinement_cases() const
+ReferenceCell<dim>::refinement_cases() const
 {
   AssertDimension(dim, get_dimension());
 
@@ -2619,53 +2549,58 @@ ReferenceCell::refinement_cases() const
 
 
 
-inline constexpr ReferenceCell
-ReferenceCell::face_reference_cell(const unsigned int face_no) const
+template <int dim>
+inline constexpr ReferenceCell<dim - 1>
+ReferenceCell<dim>::face_reference_cell(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
 
-  switch (this->kind)
+  if constexpr (dim == 0)
+    return ReferenceCells::Invalid<dim - 1>;
+  else if constexpr (dim == 1)
+    return ReferenceCells::Vertex;
+  else if constexpr (dim == 1)
+    return ReferenceCells::Line;
+  else if constexpr (dim == 1)
     {
-      case ReferenceCells::Vertex:
-        return ReferenceCells::Invalid;
-      case ReferenceCells::Line:
-        return ReferenceCells::Vertex;
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
-        return ReferenceCells::Line;
-      case ReferenceCells::Tetrahedron:
-        return ReferenceCells::Triangle;
-      case ReferenceCells::Pyramid:
-        if (face_no == 0)
-          return ReferenceCells::Quadrilateral;
-        else
-          return ReferenceCells::Triangle;
-      case ReferenceCells::Wedge:
-        if (face_no > 1)
-          return ReferenceCells::Quadrilateral;
-        else
-          return ReferenceCells::Triangle;
-      case ReferenceCells::Hexahedron:
-        return ReferenceCells::Quadrilateral;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return ReferenceCells::Triangle;
+          case ReferenceCells::Pyramid:
+            if (face_no == 0)
+              return ReferenceCells::Quadrilateral;
+            else
+              return ReferenceCells::Triangle;
+          case ReferenceCells::Wedge:
+            if (face_no > 1)
+              return ReferenceCells::Quadrilateral;
+            else
+              return ReferenceCells::Triangle;
+          case ReferenceCells::Hexahedron:
+            return ReferenceCells::Quadrilateral;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
     }
-
-  return ReferenceCells::Invalid;
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
 
+template <int dim>
 inline constexpr types::geometric_orientation
-ReferenceCell::default_combined_face_orientation()
+ReferenceCell<dim>::default_combined_face_orientation()
 {
   return numbers::default_geometric_orientation;
 }
 
 
 
+template <int dim>
 inline constexpr types::geometric_orientation
-ReferenceCell::reversed_combined_line_orientation()
+ReferenceCell<dim>::reversed_combined_line_orientation()
 {
   // For a reversed line 'orientation' is false and neither flip nor rotate are
   // defined.
@@ -2674,9 +2609,10 @@ ReferenceCell::reversed_combined_line_orientation()
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::child_cell_on_face(const unsigned int face,
-                                  const unsigned int subface) const
+ReferenceCell<dim>::child_cell_on_face(const unsigned int face,
+                                       const unsigned int subface) const
 {
   return child_cell_on_face(face,
                             subface,
@@ -2685,8 +2621,9 @@ ReferenceCell::child_cell_on_face(const unsigned int face,
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::child_cell_on_face(
+ReferenceCell<dim>::child_cell_on_face(
   const unsigned int                 face,
   const unsigned int                 subface,
   const types::geometric_orientation combined_orientation) const
@@ -2758,8 +2695,9 @@ ReferenceCell::child_cell_on_face(
 
 
 
+template <int dim>
 inline std::array<unsigned int, 2>
-ReferenceCell::standard_vertex_to_face_and_vertex_index(
+ReferenceCell<dim>::standard_vertex_to_face_and_vertex_index(
   const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
@@ -2820,8 +2758,9 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
 
 
 
+template <int dim>
 inline std::array<unsigned int, 2>
-ReferenceCell::standard_line_to_face_and_line_index(
+ReferenceCell<dim>::standard_line_to_face_and_line_index(
   const unsigned int line) const
 {
   AssertIndexRange(line, n_lines());
@@ -2882,9 +2821,11 @@ ReferenceCell::standard_line_to_face_and_line_index(
 }
 
 
+
+template <int dim>
 inline unsigned int
-ReferenceCell::line_to_cell_vertices(const unsigned int line,
-                                     const unsigned int vertex) const
+ReferenceCell<dim>::line_to_cell_vertices(const unsigned int line,
+                                          const unsigned int vertex) const
 {
   AssertIndexRange(vertex, 2);
   AssertIndexRange(line, n_lines());
@@ -2964,8 +2905,10 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
 }
 
 
+
+template <int dim>
 inline unsigned int
-ReferenceCell::face_to_cell_lines(
+ReferenceCell<dim>::face_to_cell_lines(
   const unsigned int                 face,
   const unsigned int                 line,
   const types::geometric_orientation combined_face_orientation) const
@@ -3047,8 +2990,9 @@ ReferenceCell::face_to_cell_lines(
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::face_to_cell_vertices(
+ReferenceCell<dim>::face_to_cell_vertices(
   const unsigned int                 face,
   const unsigned int                 vertex,
   const types::geometric_orientation combined_face_orientation) const
@@ -3141,8 +3085,9 @@ ReferenceCell::face_to_cell_vertices(
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::face_and_line_to_cell_vertices(
+ReferenceCell<dim>::face_and_line_to_cell_vertices(
   const unsigned int                 face,
   const unsigned int                 line,
   const unsigned int                 vertex,
@@ -3249,23 +3194,18 @@ ReferenceCell::face_and_line_to_cell_vertices(
 
 template <int dim>
 Point<dim>
-ReferenceCell::face_vertex_location(const unsigned int face,
-                                    const unsigned int vertex) const
+ReferenceCell<dim>::face_vertex_location(const unsigned int face,
+                                         const unsigned int vertex) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-  return this->template vertex<dim>(face_to_cell_vertices(
+  return this->vertex(face_to_cell_vertices(
     face, vertex, numbers::default_geometric_orientation));
 }
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::standard_to_real_face_vertex(
+ReferenceCell<dim>::standard_to_real_face_vertex(
   const unsigned int                 vertex,
   const unsigned int                 face,
   const types::geometric_orientation face_orientation) const
@@ -3296,8 +3236,9 @@ ReferenceCell::standard_to_real_face_vertex(
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::standard_to_real_face_line(
+ReferenceCell<dim>::standard_to_real_face_line(
   const unsigned int                 line,
   const unsigned int                 face,
   const types::geometric_orientation face_orientation) const
@@ -3328,45 +3269,40 @@ ReferenceCell::standard_to_real_face_line(
 namespace ReferenceCells
 {
   template <int dim>
-  inline constexpr const ReferenceCell &
+  inline constexpr const ReferenceCell<dim> &
   get_simplex()
   {
-    switch (dim)
-      {
-        case 0:
-          return ReferenceCells::Vertex;
-        case 1:
-          return ReferenceCells::Line;
-        case 2:
-          return ReferenceCells::Triangle;
-        case 3:
-          return ReferenceCells::Tetrahedron;
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
-    return ReferenceCells::Invalid;
+    if constexpr (dim == 0)
+      return ReferenceCells::Vertex;
+    else if constexpr (dim == 1)
+      return ReferenceCells::Line;
+    else if constexpr (dim == 2)
+      return ReferenceCells::Triangle;
+    else if constexpr (dim == 3)
+      return ReferenceCells::Tetrahedron;
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+
+    return ReferenceCells::Invalid<dim>;
   }
 
 
 
   template <int dim>
-  inline constexpr const ReferenceCell &
+  inline constexpr const ReferenceCell<dim> &
   get_hypercube()
   {
-    switch (dim)
-      {
-        case 0:
-          return ReferenceCells::Vertex;
-        case 1:
-          return ReferenceCells::Line;
-        case 2:
-          return ReferenceCells::Quadrilateral;
-        case 3:
-          return ReferenceCells::Hexahedron;
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
-    return ReferenceCells::Invalid;
+    if constexpr (dim == 0)
+      return ReferenceCells::Vertex;
+    else if constexpr (dim == 1)
+      return ReferenceCells::Line;
+    else if constexpr (dim == 2)
+      return ReferenceCells::Quadrilateral;
+    else if constexpr (dim == 3)
+      return ReferenceCells::Hexahedron;
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+    return ReferenceCells::Invalid<dim>;
   }
 
 
@@ -3396,6 +3332,8 @@ namespace ReferenceCells
     return GeometryInfo<structdim>::faces_per_cell;
   }
 
+
+
   template <int structdim>
   inline constexpr unsigned int
   max_n_children()
@@ -3405,59 +3343,60 @@ namespace ReferenceCells
 } // namespace ReferenceCells
 
 
-inline ReferenceCell
-ReferenceCell::n_vertices_to_type(const int dim, const unsigned int n_vertices)
-{
-  AssertIndexRange(dim, 4);
-  AssertIndexRange(n_vertices, 9);
 
-  const auto                                X     = ReferenceCells::Invalid;
-  static const ndarray<ReferenceCell, 4, 9> table = {
-    {// dim 0
-     {{X, ReferenceCells::Vertex, X, X, X, X, X, X, X}},
-     // dim 1
-     {{X, X, ReferenceCells::Line, X, X, X, X, X, X}},
-     // dim 2
-     {{X,
-       X,
-       X,
-       ReferenceCells::Triangle,
-       ReferenceCells::Quadrilateral,
-       X,
-       X,
-       X,
-       X}},
-     // dim 3
-     {{X,
-       X,
-       X,
-       X,
-       ReferenceCells::Tetrahedron,
-       ReferenceCells::Pyramid,
-       ReferenceCells::Wedge,
-       X,
-       ReferenceCells::Hexahedron}}}};
-  Assert(table[dim][n_vertices] != ReferenceCells::Invalid,
+template <int dim>
+inline ReferenceCell<dim>
+ReferenceCell<dim>::n_vertices_to_type(const int          dim_,
+                                       const unsigned int n_vertices)
+{
+  AssertDimension(dim, dim_);
+
+  if constexpr (dim == 0)
+    if (n_vertices == 1)
+      return ReferenceCells::Vertex;
+
+  if constexpr (dim == 1)
+    {
+      if (n_vertices == 2)
+        return ReferenceCells::Line;
+    }
+
+  if constexpr (dim == 2)
+    {
+      if (n_vertices == 3)
+        return ReferenceCells::Triangle;
+      else if (n_vertices == 4)
+        return ReferenceCells::Quadrilateral;
+    }
+
+  if constexpr (dim == 3)
+    {
+      if (n_vertices == 4)
+        return ReferenceCells::Tetrahedron;
+      else if (n_vertices == 5)
+        return ReferenceCells::Pyramid;
+      if (n_vertices == 6)
+        return ReferenceCells::Wedge;
+      else if (n_vertices == 8)
+        return ReferenceCells::Hexahedron;
+    }
+
+  Assert(false,
          ExcMessage("The combination of dim = " + std::to_string(dim) +
                     " and n_vertices = " + std::to_string(n_vertices) +
                     " does not correspond to a known reference cell type."));
-  return table[dim][n_vertices];
+  return ReferenceCells::Invalid<dim>;
 }
 
 
 
 template <int dim>
 inline double
-ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
-                                       const unsigned int i) const
+ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
+                                            const unsigned int i) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(i, n_vertices());
+
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -3527,13 +3466,11 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
         }
       // see also ScalarLagrangePolynomialWedge::compute_value()
       case ReferenceCells::Wedge:
-        return ReferenceCell(ReferenceCells::Triangle)
-                 .d_linear_shape_function<2>(Point<2>(xi[std::min(0, dim - 1)],
-                                                      xi[std::min(1, dim - 1)]),
-                                             i % 3) *
-               ReferenceCell(ReferenceCells::Line)
-                 .d_linear_shape_function<1>(Point<1>(xi[std::min(2, dim - 1)]),
-                                             i / 3);
+        return ReferenceCells::Triangle.d_linear_shape_function(
+                 Point<2>(xi[std::min(0, dim - 1)], xi[std::min(1, dim - 1)]),
+                 i % 3) *
+               ReferenceCells::Line.d_linear_shape_function(
+                 Point<1>(xi[std::min(2, dim - 1)]), i / 3);
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
@@ -3546,15 +3483,9 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
-                                                const unsigned int i) const
+ReferenceCell<dim>::d_linear_shape_function_gradient(const Point<dim>  &xi,
+                                                     const unsigned int i) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -3584,8 +3515,9 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
 
 
 
+template <int dim>
 inline double
-ReferenceCell::volume() const
+ReferenceCell<dim>::volume() const
 {
   switch (this->kind)
     {
@@ -3614,8 +3546,9 @@ ReferenceCell::volume() const
 
 
 
+template <int dim>
 inline double
-ReferenceCell::face_measure(const unsigned int face_no) const
+ReferenceCell<dim>::face_measure(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
   constexpr double X = std::numeric_limits<double>::signaling_NaN();
@@ -3653,15 +3586,8 @@ ReferenceCell::face_measure(const unsigned int face_no) const
 
 template <int dim>
 inline Point<dim>
-ReferenceCell::barycenter() const
+ReferenceCell<dim>::barycenter() const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -3691,15 +3617,9 @@ ReferenceCell::barycenter() const
 
 template <int dim>
 inline bool
-ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
+ReferenceCell<dim>::contains_point(const Point<dim> &p,
+                                   const double      tolerance) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   // Introduce abbreviations to silence compiler warnings about invalid
   // array accesses (that can't happen, of course, but the compiler
   // doesn't know that).
@@ -3805,26 +3725,20 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
-                                       const unsigned int i) const
+ReferenceCell<dim>::unit_tangential_vectors(const unsigned int face_no,
+                                            const unsigned int i) const
 {
-  return face_tangent_vector<dim>(face_no, i);
+  return face_tangent_vector(face_no, i);
 }
 
 
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::face_tangent_vector(const unsigned int face_no,
-                                   const unsigned int i) const
+ReferenceCell<dim>::face_tangent_vector(const unsigned int face_no,
+                                        const unsigned int i) const
 {
   AssertIndexRange(face_no, n_faces());
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
 
   // Simplify the 1d case by setting tangents (which are used for boundary forms
   // and thus Jacobians) equal to the unit vector
@@ -3910,24 +3824,17 @@ ReferenceCell::face_tangent_vector(const unsigned int face_no,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
+ReferenceCell<dim>::unit_normal_vectors(const unsigned int face_no) const
 {
-  return face_normal_vector<dim>(face_no);
+  return face_normal_vector(face_no);
 }
 
 
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::face_normal_vector(const unsigned int face_no) const
+ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   if (is_hyper_cube())
     {
       AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
@@ -3938,12 +3845,12 @@ ReferenceCell::face_normal_vector(const unsigned int face_no) const
       Assert(*this == ReferenceCells::Triangle, ExcInternalError());
 
       // Return the rotated vector
-      return cross_product_2d(face_tangent_vector<dim>(face_no, 0));
+      return cross_product_2d(face_tangent_vector(face_no, 0));
     }
   else if (dim == 3)
     {
-      return cross_product_3d(face_tangent_vector<dim>(face_no, 0),
-                              face_tangent_vector<dim>(face_no, 1));
+      return cross_product_3d(face_tangent_vector(face_no, 0),
+                              face_tangent_vector(face_no, 1));
     }
 
   DEAL_II_NOT_IMPLEMENTED();
@@ -3953,8 +3860,9 @@ ReferenceCell::face_normal_vector(const unsigned int face_no) const
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::n_face_orientations(const unsigned int face_no) const
+ReferenceCell<dim>::n_face_orientations(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
 
@@ -3978,8 +3886,9 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 
 
 
+template <int dim>
 inline types::geometric_orientation
-ReferenceCell::standard_vs_true_line_orientation(
+ReferenceCell<dim>::standard_vs_true_line_orientation(
   const unsigned int                 line,
   const unsigned int                 face,
   const types::geometric_orientation combined_face_orientation,
@@ -3992,8 +3901,10 @@ ReferenceCell::standard_vs_true_line_orientation(
 }
 
 
+
+template <int dim>
 inline types::geometric_orientation
-ReferenceCell::face_to_cell_line_orientation(
+ReferenceCell<dim>::face_to_cell_line_orientation(
   const unsigned int                 face_line_no,
   const unsigned int                 face_no,
   const types::geometric_orientation combined_face_orientation,
@@ -4041,8 +3952,11 @@ ReferenceCell::face_to_cell_line_orientation(
     return numbers::default_geometric_orientation;
 }
 
+
+
+template <int dim>
 inline unsigned int
-ReferenceCell::opposite_face_index(const unsigned int face_no) const
+ReferenceCell<dim>::opposite_face_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
   switch (this->kind)
@@ -4107,14 +4021,14 @@ ReferenceCell::opposite_face_index(const unsigned int face_no) const
 
 namespace internal
 {
-  template <typename T>
+  template <int dim, typename T>
   class NoPermutation : public dealii::ExceptionBase
   {
   public:
     /**
      * Constructor.
      */
-    NoPermutation(const ReferenceCell      &entity_type,
+    NoPermutation(const ReferenceCell<dim> &entity_type,
                   const ArrayView<const T> &vertices_0,
                   const ArrayView<const T> &vertices_1)
       : entity_type(entity_type)
@@ -4162,7 +4076,7 @@ namespace internal
     /**
      * Entity type.
      */
-    const ReferenceCell entity_type;
+    const ReferenceCell<dim> entity_type;
 
     /**
      * First set of values.
@@ -4179,10 +4093,12 @@ namespace internal
 
 
 
+template <int dim>
 template <typename T, std::size_t N>
 inline types::geometric_orientation
-ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
-                                   const std::array<T, N> &vertices_1) const
+ReferenceCell<dim>::compute_orientation(
+  const std::array<T, N> &vertices_0,
+  const std::array<T, N> &vertices_1) const
 {
   Assert(N >= n_vertices(),
          ExcMessage("The number of array elements must be equal to or "
@@ -4200,9 +4116,10 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
 
 
 
+template <int dim>
 template <typename T>
 types::geometric_orientation
-ReferenceCell::get_combined_orientation(
+ReferenceCell<dim>::get_combined_orientation(
   const ArrayView<const T> &vertices_0,
   const ArrayView<const T> &vertices_1) const
 {
@@ -4232,7 +4149,7 @@ ReferenceCell::get_combined_orientation(
     // argument of unary '*' (have 'int')
     [[maybe_unused]] const auto &ref_cell = *this;
     Assert(false,
-           (internal::NoPermutation<T>(ref_cell, vertices_0, vertices_1)));
+           (internal::NoPermutation<dim, T>(ref_cell, vertices_0, vertices_1)));
     return std::numeric_limits<types::geometric_orientation>::max();
   };
 
@@ -4250,15 +4167,17 @@ ReferenceCell::get_combined_orientation(
         DEAL_II_NOT_IMPLEMENTED();
     }
 
-  Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
+  Assert(false,
+         (internal::NoPermutation<dim, T>(*this, vertices_0, vertices_1)));
   return std::numeric_limits<types::geometric_orientation>::max();
 }
 
 
 
+template <int dim>
 template <typename T, std::size_t N>
 inline std::array<T, N>
-ReferenceCell::permute_according_orientation(
+ReferenceCell<dim>::permute_according_orientation(
   const std::array<T, N> &vertices,
   const unsigned int      orientation) const
 {
@@ -4283,9 +4202,10 @@ ReferenceCell::permute_according_orientation(
 
 
 
+template <int dim>
 template <typename T>
 boost::container::small_vector<T, 8>
-ReferenceCell::permute_by_combined_orientation(
+ReferenceCell<dim>::permute_by_combined_orientation(
   const ArrayView<const T>          &vertices,
   const types::geometric_orientation orientation) const
 {
@@ -4321,8 +4241,9 @@ ReferenceCell::permute_by_combined_orientation(
 
 
 
+template <int dim>
 inline types::geometric_orientation
-ReferenceCell::get_inverse_combined_orientation(
+ReferenceCell<dim>::get_inverse_combined_orientation(
   const types::geometric_orientation orientation) const
 {
   switch (this->kind)
@@ -4359,33 +4280,40 @@ ReferenceCell::get_inverse_combined_orientation(
 
 
 
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<0>(
-  const std::array<unsigned, 0> &node_indices,
-  const std::array<unsigned, 0> &nodes_per_direction,
-  const bool                     legacy_format) const;
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<1>(
-  const std::array<unsigned, 1> &node_indices,
-  const std::array<unsigned, 1> &nodes_per_direction,
-  const bool                     legacy_format) const;
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<2>(
-  const std::array<unsigned, 2> &node_indices,
-  const std::array<unsigned, 2> &nodes_per_direction,
-  const bool                     legacy_format) const;
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<3>(
-  const std::array<unsigned, 3> &node_indices,
-  const std::array<unsigned, 3> &nodes_per_direction,
-  const bool                     legacy_format) const;
+// template <int dim>
+// template <>
+// unsigned int
+// ReferenceCell<dim>::vtk_lexicographic_to_node_index<0>(
+//   const std::array<unsigned, 0> &node_indices,
+//   const std::array<unsigned, 0> &nodes_per_direction,
+//   const bool                     legacy_format) const;
+//
+//
+// template <int dim>
+// template <>
+// unsigned int
+// ReferenceCell<dim>::vtk_lexicographic_to_node_index<1>(
+//   const std::array<unsigned, 1> &node_indices,
+//   const std::array<unsigned, 1> &nodes_per_direction,
+//   const bool                     legacy_format) const;
+//
+//
+// template <int dim>
+// template <>
+// unsigned int
+// ReferenceCell<dim>::vtk_lexicographic_to_node_index<2>(
+//   const std::array<unsigned, 2> &node_indices,
+//   const std::array<unsigned, 2> &nodes_per_direction,
+//   const bool                     legacy_format) const;
+//
+//
+// template <int dim>
+// template <>
+// unsigned int
+// ReferenceCell<dim>::vtk_lexicographic_to_node_index<3>(
+//   const std::array<unsigned, 3> &node_indices,
+//   const std::array<unsigned, 3> &nodes_per_direction,
+//   const bool                     legacy_format) const;
 
 DEAL_II_NAMESPACE_CLOSE
 

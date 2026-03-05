@@ -153,7 +153,7 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   reference_cell(Triangulation<dim, spacedim> &tria,
-                 const ReferenceCell          &reference_cell);
+                 const ReferenceCell<dim>     &reference_cell);
 
 
   /**

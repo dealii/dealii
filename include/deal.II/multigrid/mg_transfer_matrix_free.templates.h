@@ -1874,7 +1874,7 @@ namespace internal
         else
           {
             const auto dummy_quadrature =
-              reference_cell.template get_gauss_type_quadrature<dim>(1);
+              reference_cell.get_gauss_type_quadrature(1);
             internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
             shape_info.reinit(dummy_quadrature, fe_fine, 0);
             lexicographic_numbering_fine = shape_info.lexicographic_numbering;
@@ -2514,7 +2514,7 @@ namespace internal
             else
               {
                 const auto dummy_quadrature =
-                  reference_cell.template get_gauss_type_quadrature<dim>(1);
+                  reference_cell.get_gauss_type_quadrature(1);
 
                 internal::MatrixFreeFunctions::ShapeInfo<Number> shape_info;
                 shape_info.reinit(dummy_quadrature,

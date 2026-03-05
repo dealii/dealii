@@ -329,8 +329,7 @@ namespace internal
           else
             {
               const auto dummy_quadrature =
-                fes[i].reference_cell().template get_gauss_type_quadrature<dim>(
-                  1);
+                fes[i].reference_cell().get_gauss_type_quadrature(1);
               shape_infos[i].reinit(dummy_quadrature, fes[i], 0);
             }
 

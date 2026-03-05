@@ -192,7 +192,7 @@ FEValues<dim, spacedim>::FEValues(const FiniteElement<dim, spacedim> &fe,
       q.size(),
       fe.n_dofs_per_cell(),
       update_default,
-      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<spacedim>(),
       fe)
   , quadrature(q)
 {
@@ -495,7 +495,7 @@ FEFaceValues<dim, spacedim>::FEFaceValues(
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
       update_flags,
-      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<spacedim>(),
       fe,
       quadrature)
 {
@@ -721,7 +721,7 @@ FESubfaceValues<dim, spacedim>::FESubfaceValues(
   : FEFaceValuesBase<dim, spacedim>(
       fe.n_dofs_per_cell(),
       update_flags,
-      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<spacedim>(),
       fe,
       quadrature)
 {

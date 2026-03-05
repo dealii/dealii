@@ -39,7 +39,7 @@ namespace internal
      * are defined on each face.
      */
     template <int dim>
-    inline std::pair<ReferenceCell, dealii::hp::QCollection<dim - 1>>
+    inline std::pair<ReferenceCell<dim>, dealii::hp::QCollection<dim - 1>>
     get_face_quadrature_collection(const Quadrature<dim> &quad,
                                    const bool             do_assert = true)
     {
@@ -101,7 +101,7 @@ namespace internal
       if (do_assert)
         AssertThrow(false, ExcNotImplemented());
 
-      return {ReferenceCells::Invalid, dealii::hp::QCollection<dim - 1>()};
+      return {ReferenceCells::Invalid<dim>, dealii::hp::QCollection<dim - 1>()};
     }
 
 

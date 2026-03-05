@@ -70,7 +70,7 @@ namespace internal
 
       neighbors.assign(n_cells * cells.faces_per_object, {-1, -1});
 
-      reference_cell.assign(n_cells, ReferenceCells::Invalid);
+      reference_cell.assign(n_cells, ReferenceCells::Invalid<dim>);
 
       global_active_cell_indices.assign(n_cells, numbers::invalid_dof_index);
       global_level_cell_indices.assign(n_cells, numbers::invalid_dof_index);
