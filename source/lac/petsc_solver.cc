@@ -103,11 +103,11 @@ namespace PETScWrappers
          */
         AssertPETSc(KSPSetReusePreconditioner(ksp, PETSC_TRUE));
 
-        // By default, we use the unpreconditioned norm to check for convergence.
-        // This is consistent with the behavior of deal.II's own solvers,
-        // and is also more efficient to compute.
-        // However, users can override this default behavior with command-line options
-        // if they wish to use a different norm for convergence testing.
+        // By default, we use the unpreconditioned norm to check for
+        // convergence. This is consistent with the behavior of deal.II's own
+        // solvers, and is also more efficient to compute. However, users can
+        // override this default behavior with command-line options if they wish
+        // to use a different norm for convergence testing.
         AssertPETSc(KSPSetNormType(ksp, KSP_NORM_UNPRECONDITIONED));
       }
 

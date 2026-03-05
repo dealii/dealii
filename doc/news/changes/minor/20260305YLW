@@ -1,0 +1,6 @@
+Fixed: When using the PETSc solver through PETScWrappers,
+the original code will use the l2 norm of the preconditioned residual.
+This is not consistent with deal.II expectations and example usage.
+This PR fixes the issue by using the unpreconditioned residual norm.
+<br>
+(Yiliang Wang, 2026/03/05)
