@@ -633,11 +633,12 @@ namespace DataOutBase
 
 
 
+  template <int dim>
   void
-  DataOutFilter::write_cell_single(const unsigned int   index,
-                                   const unsigned int   start,
-                                   const unsigned int   n_points,
-                                   const ReferenceCell &reference_cell)
+  DataOutFilter::write_cell_single(const unsigned int        index,
+                                   const unsigned int        start,
+                                   const unsigned int        n_points,
+                                   const ReferenceCell<dim> &reference_cell)
   {
     ++num_cells;
 
@@ -926,7 +927,7 @@ namespace
     unsigned int n_cells = 0;
     for (const auto &patch : patches)
       {
-        Assert(patch.reference_cell != ReferenceCells::Invalid,
+        Assert(patch.reference_cell != ReferenceCells::Invalid<dim>,
                ExcMessage(
                  "The reference cell for this patch is set to 'Invalid', "
                  "but that is clearly not a valid choice. Did you forget "
@@ -1068,11 +1069,12 @@ namespace
      *
      * @note All inheriting classes should implement this function.
      */
+    template <int dim>
     void
-    write_cell_single(const unsigned int   index,
-                      const unsigned int   start,
-                      const unsigned int   n_points,
-                      const ReferenceCell &reference_cell)
+    write_cell_single(const unsigned int        index,
+                      const unsigned int        start,
+                      const unsigned int        n_points,
+                      const ReferenceCell<dim> &reference_cell)
     {
       (void)index;
       (void)start;
@@ -1287,11 +1289,12 @@ namespace
     /**
      * Print vertices [start, start+n_points[
      */
+    template <int dim>
     void
-    write_cell_single(const unsigned int   index,
-                      const unsigned int   start,
-                      const unsigned int   n_points,
-                      const ReferenceCell &reference_cell);
+    write_cell_single(const unsigned int        index,
+                      const unsigned int        start,
+                      const unsigned int        n_points,
+                      const ReferenceCell<dim> &reference_cell);
 
     /**
      * Write a high-order cell type, i.e., a Lagrange cell
@@ -1727,11 +1730,12 @@ namespace
 
 
 
+  template <int dim>
   void
-  VtkStream::write_cell_single(const unsigned int   index,
-                               const unsigned int   start,
-                               const unsigned int   n_points,
-                               const ReferenceCell &reference_cell)
+  VtkStream::write_cell_single(const unsigned int        index,
+                               const unsigned int        start,
+                               const unsigned int        n_points,
+                               const ReferenceCell<dim> &reference_cell)
   {
     (void)index;
 
@@ -1744,6 +1748,8 @@ namespace
                   (reference_cell == ReferenceCells::Pyramid ? table[i] : i);
     stream << '\n';
   }
+
+
 
   template <int dim>
   void
@@ -1777,7 +1783,7 @@ namespace DataOutBase
     : patch_index(no_neighbor)
     , n_subdivisions(1)
     , points_are_available(false)
-    , reference_cell(ReferenceCells::Invalid)
+    , reference_cell(ReferenceCells::Invalid<dim>)
   // all the other data has a constructor of its own, except for the "neighbors"
   // field, which we set to invalid values.
   {
@@ -1880,7 +1886,7 @@ namespace DataOutBase
   const unsigned int Patch<0, spacedim>::n_subdivisions = 1;
 
   template <int spacedim>
-  const ReferenceCell Patch<0, spacedim>::reference_cell =
+  const ReferenceCell<0> Patch<0, spacedim>::reference_cell =
     ReferenceCells::Vertex;
 
   template <int spacedim>
@@ -2768,9 +2774,8 @@ namespace DataOutBase
                   {
                     const unsigned int local_index = i1;
                     const unsigned int connectivity_index =
-                      patch.reference_cell
-                        .template vtk_lexicographic_to_node_index<1>(
-                          {{i1}}, {{n_subdivisions}}, legacy_format);
+                      patch.reference_cell.vtk_lexicographic_to_node_index(
+                        {{i1}}, {{n_subdivisions}}, legacy_format);
                     connectivity[connectivity_index] = local_index;
                   }
               }
@@ -2781,11 +2786,10 @@ namespace DataOutBase
                     {
                       const unsigned int local_index = i2 * n + i1;
                       const unsigned int connectivity_index =
-                        patch.reference_cell
-                          .template vtk_lexicographic_to_node_index<2>(
-                            {{i1, i2}},
-                            {{n_subdivisions, n_subdivisions}},
-                            legacy_format);
+                        patch.reference_cell.vtk_lexicographic_to_node_index(
+                          {{i1, i2}},
+                          {{n_subdivisions, n_subdivisions}},
+                          legacy_format);
                       connectivity[connectivity_index] = local_index;
                     }
               }
@@ -2798,13 +2802,10 @@ namespace DataOutBase
                         const unsigned int local_index =
                           i3 * n * n + i2 * n + i1;
                         const unsigned int connectivity_index =
-                          patch.reference_cell
-                            .template vtk_lexicographic_to_node_index<3>(
-                              {{i1, i2, i3}},
-                              {{n_subdivisions,
-                                n_subdivisions,
-                                n_subdivisions}},
-                              legacy_format);
+                          patch.reference_cell.vtk_lexicographic_to_node_index(
+                            {{i1, i2, i3}},
+                            {{n_subdivisions, n_subdivisions, n_subdivisions}},
+                            legacy_format);
                         connectivity[connectivity_index] = local_index;
                       }
               }
@@ -5657,7 +5658,7 @@ namespace DataOutBase
                           const unsigned int local_index = i1;
                           const unsigned int connectivity_index =
                             patch.reference_cell
-                              .template vtk_lexicographic_to_node_index<1>(
+                              .vtk_lexicographic_to_node_index(
                                 {{i1}},
                                 {{n_subdivisions}},
                                 /* use VTU, not VTK: */ false);
@@ -5674,7 +5675,7 @@ namespace DataOutBase
                               i2 * n_points_per_direction + i1;
                             const unsigned int connectivity_index =
                               patch.reference_cell
-                                .template vtk_lexicographic_to_node_index<2>(
+                                .vtk_lexicographic_to_node_index(
                                   {{i1, i2}},
                                   {{n_subdivisions, n_subdivisions}},
                                   /* use VTU, not VTK: */ false);
@@ -5696,7 +5697,7 @@ namespace DataOutBase
                                 i2 * n_points_per_direction + i1;
                               const unsigned int connectivity_index =
                                 patch.reference_cell
-                                  .template vtk_lexicographic_to_node_index<3>(
+                                  .vtk_lexicographic_to_node_index(
                                     {{i1, i2, i3}},
                                     {{n_subdivisions,
                                       n_subdivisions,
@@ -9415,38 +9416,45 @@ XDMFEntry::XDMFEntry()
   , num_cells(numbers::invalid_unsigned_int)
   , dimension(numbers::invalid_unsigned_int)
   , space_dimension(numbers::invalid_unsigned_int)
-  , cell_type()
+  , cell_type_name()
+  , n_vertices_per_cell(numbers::invalid_unsigned_int)
 {}
 
 
 
-XDMFEntry::XDMFEntry(const std::string   &filename,
-                     const double         time,
-                     const std::uint64_t  nodes,
-                     const std::uint64_t  cells,
-                     const unsigned int   dim,
-                     const ReferenceCell &cell_type)
-  : XDMFEntry(filename, filename, time, nodes, cells, dim, dim, cell_type)
-{}
+template <int dim>
+XDMFEntry::XDMFEntry(const std::string        &filename,
+                     const double              time,
+                     const std::uint64_t       nodes,
+                     const std::uint64_t       cells,
+                     const unsigned int        dim_,
+                     const ReferenceCell<dim> &cell_type)
+  : XDMFEntry(filename, filename, time, nodes, cells, dim_, dim, cell_type)
+{
+  AssertDimension(dim, dim_);
+}
 
 
 
-XDMFEntry::XDMFEntry(const std::string   &mesh_filename,
-                     const std::string   &solution_filename,
-                     const double         time,
-                     const std::uint64_t  nodes,
-                     const std::uint64_t  cells,
-                     const unsigned int   dim,
-                     const ReferenceCell &cell_type)
+template <int dim>
+XDMFEntry::XDMFEntry(const std::string        &mesh_filename,
+                     const std::string        &solution_filename,
+                     const double              time,
+                     const std::uint64_t       nodes,
+                     const std::uint64_t       cells,
+                     const unsigned int        dim_,
+                     const ReferenceCell<dim> &cell_type)
   : XDMFEntry(mesh_filename,
               solution_filename,
               time,
               nodes,
               cells,
-              dim,
-              dim,
+              dim_,
+              dim_,
               cell_type)
-{}
+{
+  AssertDimension(dim, dim_);
+}
 
 
 
@@ -9456,26 +9464,12 @@ namespace
    * Deprecated XDMFEntry constructors do not fill the cell_type, so we use this
    * little helper to convert it to the appropriate hex cell.
    */
-  ReferenceCell
-  cell_type_hex_if_invalid(const ReferenceCell &cell_type,
-                           const unsigned int   dimension)
+  template <int dim>
+  ReferenceCell<dim>
+  cell_type_hex_if_invalid(const ReferenceCell<dim> &cell_type)
   {
-    if (cell_type == ReferenceCells::Invalid)
-      {
-        switch (dimension)
-          {
-            case 0:
-              return ReferenceCells::get_hypercube<0>();
-            case 1:
-              return ReferenceCells::get_hypercube<1>();
-            case 2:
-              return ReferenceCells::get_hypercube<2>();
-            case 3:
-              return ReferenceCells::get_hypercube<3>();
-            default:
-              AssertThrow(false, ExcMessage("Invalid dimension"));
-          }
-      }
+    if (cell_type == ReferenceCells::Invalid<dim>)
+      return ReferenceCells::get_hypercube<dim>();
     else
       return cell_type;
   }
@@ -9483,24 +9477,71 @@ namespace
 
 
 
-XDMFEntry::XDMFEntry(const std::string   &mesh_filename,
-                     const std::string   &solution_filename,
-                     const double         time,
-                     const std::uint64_t  nodes,
-                     const std::uint64_t  cells,
-                     const unsigned int   dim,
-                     const unsigned int   spacedim,
-                     const ReferenceCell &cell_type_)
+template <int dim>
+XDMFEntry::XDMFEntry(const std::string        &mesh_filename,
+                     const std::string        &solution_filename,
+                     const double              time,
+                     const std::uint64_t       nodes,
+                     const std::uint64_t       cells,
+                     const unsigned int        dim_,
+                     const unsigned int        spacedim,
+                     const ReferenceCell<dim> &cell_type_)
   : valid(true)
   , h5_sol_filename(solution_filename)
   , h5_mesh_filename(mesh_filename)
   , entry_time(time)
   , num_nodes(nodes)
   , num_cells(cells)
-  , dimension(dim)
+  , dimension(dim_)
   , space_dimension(spacedim)
-  , cell_type(cell_type_hex_if_invalid(cell_type_, dim))
-{}
+{
+  AssertDimension(dim, dim_);
+
+  const ReferenceCell<dim> cell_type =
+    cell_type_hex_if_invalid<dim>(cell_type_);
+  n_vertices_per_cell = cell_type.n_vertices();
+
+  if constexpr (dim == 0)
+    {
+      cell_type_name = "Polyvertex";
+    }
+  else if constexpr (dim == 1)
+    {
+      cell_type_name = "Polyline";
+    }
+  else if constexpr (dim == 2)
+    {
+      Assert(cell_type == ReferenceCells::Quadrilateral ||
+               cell_type == ReferenceCells::Triangle,
+             ExcNotImplemented());
+
+      if (cell_type == ReferenceCells::Quadrilateral)
+        {
+          cell_type_name = "Quadrilateral";
+        }
+      else // if (cell_type == ReferenceCells::Triangle)
+        {
+          cell_type_name = "Triangle";
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      Assert(cell_type == ReferenceCells::Hexahedron ||
+               cell_type == ReferenceCells::Tetrahedron,
+             ExcNotImplemented());
+
+      if (cell_type == ReferenceCells::Hexahedron)
+        {
+          cell_type_name = "Hexahedron";
+        }
+      else // if (reference_cell == ReferenceCells::Tetrahedron)
+        {
+          cell_type_name = "Tetrahedron";
+        }
+    }
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
+}
 
 
 
@@ -9553,48 +9594,8 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
   // If we have cells defined, use the topology corresponding to the dimension
   if (num_cells > 0)
     {
-      ss << indent(indent_level + 1) << "<Topology TopologyType=\"";
-
-      if (dimension == 0)
-        {
-          ss << "Polyvertex";
-        }
-      else if (dimension == 1)
-        {
-          ss << "Polyline";
-        }
-      else if (dimension == 2)
-        {
-          Assert(cell_type == ReferenceCells::Quadrilateral ||
-                   cell_type == ReferenceCells::Triangle,
-                 ExcNotImplemented());
-
-          if (cell_type == ReferenceCells::Quadrilateral)
-            {
-              ss << "Quadrilateral";
-            }
-          else // if (cell_type == ReferenceCells::Triangle)
-            {
-              ss << "Triangle";
-            }
-        }
-      else if (dimension == 3)
-        {
-          Assert(cell_type == ReferenceCells::Hexahedron ||
-                   cell_type == ReferenceCells::Tetrahedron,
-                 ExcNotImplemented());
-
-          if (cell_type == ReferenceCells::Hexahedron)
-            {
-              ss << "Hexahedron";
-            }
-          else // if (reference_cell == ReferenceCells::Tetrahedron)
-            {
-              ss << "Tetrahedron";
-            }
-        }
-
-      ss << "\" NumberOfElements=\"" << num_cells;
+      ss << indent(indent_level + 1) << "<Topology TopologyType=\""
+         << cell_type_name << "\" NumberOfElements=\"" << num_cells;
       if (dimension == 0)
         ss << "\" NodesPerElement=\"1\">\n";
       else if (dimension == 1)
@@ -9604,15 +9605,15 @@ XDMFEntry::get_xdmf_content(const unsigned int indent_level) const
         ss << "\">\n";
 
       ss << indent(indent_level + 2) << "<DataItem Dimensions=\"" << num_cells
-         << " " << cell_type.n_vertices()
+         << " " << n_vertices_per_cell
          << "\" NumberType=\"UInt\" Format=\"HDF\">\n";
 
       ss << indent(indent_level + 3) << h5_mesh_filename << ":/cells\n";
       ss << indent(indent_level + 2) << "</DataItem>\n";
       ss << indent(indent_level + 1) << "</Topology>\n";
     }
-  // Otherwise, we assume the points are isolated in space and use a Polyvertex
-  // topology
+  // Otherwise, we assume the points are isolated in space and use a
+  // Polyvertex topology
   else
     {
       ss << indent(indent_level + 1)

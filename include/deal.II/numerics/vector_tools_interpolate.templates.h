@@ -697,8 +697,7 @@ namespace VectorTools
   {
     const FiniteElement<dim, spacedim> &fe = dh.get_fe();
     get_position_vector(
-      *fe.reference_cell().template get_default_mapping<dim, spacedim>(
-        fe.degree),
+      *fe.reference_cell().template get_default_mapping<spacedim>(fe.degree),
       dh,
       vector,
       mask);

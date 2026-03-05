@@ -1155,8 +1155,7 @@ FE_Q_Base<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, this->reference_cell().template n_children<dim>(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -1359,8 +1358,7 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, this->reference_cell().template n_children<dim>(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
@@ -1474,7 +1472,7 @@ FE_Q_Base<dim, spacedim>::get_restriction_matrix(
           if (q_dofs_per_cell < this->n_dofs_per_cell())
             my_restriction(this->n_dofs_per_cell() - 1,
                            this->n_dofs_per_cell() - 1) =
-              1. / this->reference_cell().template n_children<dim>(
+              1. / this->reference_cell().n_children(
                      RefinementCase<dim>(refinement_case));
         }
 

@@ -235,3 +235,36 @@ for (deal_II_dimension : OUTPUT_DIMENSIONS;
     DataOutInterface<deal_II_dimension, deal_II_space_dimension>::set_flags(
       const DataOutBase::flag_type &flags);
   }
+
+
+// Also instantiate the templated XDMFEntry constructors for the dimensions
+// we need:
+for (deal_II_dimension : OUTPUT_DIMENSIONS)
+  {
+    template XDMFEntry::XDMFEntry(
+      const std::string                      &filename,
+      const double                            time,
+      const std::uint64_t                     nodes,
+      const std::uint64_t                     cells,
+      const unsigned int                      dim_,
+      const ReferenceCell<deal_II_dimension> &cell_type);
+
+    template XDMFEntry::XDMFEntry(
+      const std::string                      &mesh_filename,
+      const std::string                      &solution_filename,
+      const double                            time,
+      const std::uint64_t                     nodes,
+      const std::uint64_t                     cells,
+      const unsigned int                      dim_,
+      const ReferenceCell<deal_II_dimension> &cell_type);
+
+    template XDMFEntry::XDMFEntry(
+      const std::string                      &mesh_filename,
+      const std::string                      &solution_filename,
+      const double                            time,
+      const std::uint64_t                     nodes,
+      const std::uint64_t                     cells,
+      const unsigned int                      dim_,
+      const unsigned int                      spacedim,
+      const ReferenceCell<deal_II_dimension> &cell_type);
+  }

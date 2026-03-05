@@ -1838,7 +1838,7 @@ namespace
   child_line_index(const unsigned int                 child_no,
                    const types::geometric_orientation line_orientation)
   {
-    AssertIndexRange(child_no, ReferenceCells::Line.template n_children<1>());
+    AssertIndexRange(child_no, ReferenceCells::Line.n_children());
     Assert(line_orientation == numbers::default_geometric_orientation ||
              line_orientation == numbers::reverse_line_orientation,
            ExcInternalError());
@@ -2202,7 +2202,7 @@ namespace internal
                                         tria_level.neighbors.size(),
                                       std::make_pair(-1, -1));
 
-          if (dim == 2 || dim == 3)
+          if constexpr (dim == 2 || dim == 3)
             {
               tria_level.face_orientations.resize(total_cells);
 
@@ -2210,8 +2210,7 @@ namespace internal
               tria_level.reference_cell.insert(
                 tria_level.reference_cell.end(),
                 total_cells - tria_level.reference_cell.size(),
-                dim == 2 ? ReferenceCells::Quadrilateral :
-                           ReferenceCells::Hexahedron);
+                ReferenceCells::get_hypercube<dim>());
             }
         }
     }
@@ -2533,12 +2532,11 @@ namespace internal
      * with markers highlighting the reason for the entry x:=bounding entities;
      * n:= neighboring entities; s:=sub-cell data
      */
+    template <int dim>
     struct Connectivity
     {
-      Connectivity(const unsigned int                dim,
-                   const std::vector<ReferenceCell> &cell_types)
-        : dim(dim)
-        , cell_types(cell_types)
+      Connectivity(const std::vector<ReferenceCell<dim>> &cell_types)
+        : cell_types(cell_types)
       {}
 
       inline std::vector<types::geometric_orientation> &
@@ -2563,30 +2561,36 @@ namespace internal
         return quad_orientation;
       }
 
-      inline std::vector<ReferenceCell> &
-      entity_types(const unsigned int structdim)
+      template <int structdim>
+      inline std::vector<ReferenceCell<structdim>> &
+      entity_types()
       {
-        if (structdim == dim)
+        if constexpr (structdim == dim)
           return cell_types;
-
-        // for vertices/lines the entity types are clear (0/1)
-        AssertDimension(structdim, 2);
-        AssertDimension(dim, 3);
-
-        return quad_types;
+        else if constexpr ((structdim == 2) && (dim == 3))
+          {
+            return quad_types;
+          }
+        else
+          // for vertices/lines the entity types are clear
+          // and we shouldn't need this function
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
-      inline const std::vector<ReferenceCell> &
-      entity_types(const unsigned int structdim) const
+      template <int structdim>
+      inline const std::vector<ReferenceCell<structdim>> &
+      entity_types() const
       {
-        if (structdim == dim)
+        if constexpr (structdim == dim)
           return cell_types;
-
-        // for vertices/lines the entity types are clear (0/1)
-        AssertDimension(structdim, 2);
-        AssertDimension(dim, 3);
-
-        return quad_types;
+        else if constexpr ((structdim == 2) && (dim == 3))
+          {
+            return quad_types;
+          }
+        else
+          // for vertices/lines the entity types are clear
+          // and we shouldn't need this function
+          DEAL_II_ASSERT_UNREACHABLE();
       }
 
       inline ArrayOfArrays &
@@ -2628,8 +2632,7 @@ namespace internal
       }
 
     private:
-      const unsigned int         dim;
-      std::vector<ReferenceCell> cell_types;
+      std::vector<ReferenceCell<dim>> cell_types;
 
       ArrayOfArrays line_vertices;
 
@@ -2643,7 +2646,7 @@ namespace internal
       ArrayOfArrays cell_entities;
       ArrayOfArrays neighbors;
 
-      std::vector<ReferenceCell> quad_types;
+      std::vector<ReferenceCell<2>> quad_types;
     };
 
 
@@ -2722,17 +2725,17 @@ namespace internal
 
 
     /**
-     * Build entities of dimension d (with 0<d<dim). Entities are described by
-     * a set of vertices.
+     * Build entities of dimension face_dim (with 0<face_dim<dim).
+     * Entities are described by a set of vertices.
      *
-     * Furthermore, the function determines for each cell of which d-dimensional
-     * entity it consists of and its orientation relative to the cell.
+     * Furthermore, the function determines for each cell of which
+     * face_dim-dimensional entity it consists of and its orientation
+     * relative to the cell.
      */
-    template <int max_n_vertices, typename FU>
+    template <int max_n_vertices, int face_dim, int dim, typename FU>
     void
     build_face_entities_templated(
-      const unsigned int                         face_dimensionality,
-      const std::vector<ReferenceCell>          &cell_types,
+      const std::vector<ReferenceCell<dim>>     &cell_types,
       const ArrayOfArrays                       &cells_to_vertices,
       ArrayOfArrays                             &cells_to_faces, // result
       ArrayOfArrays                             &crs_0,          // result
@@ -2751,13 +2754,10 @@ namespace internal
       for (const auto &c : cell_types)
         {
           // Make sure that there are only two possibilities for
-          // face_dimensionality that we can cover with the ?: statement below:
-          Assert((face_dimensionality == c.get_dimension() - 1) ||
-                   ((c.get_dimension() == 3) && (face_dimensionality == 1)),
+          // face_dim that we can cover with the ?: statement below:
+          Assert((face_dim == dim - 1) || ((dim == 3) && (face_dim == 1)),
                  ExcInternalError());
-          n_entities +=
-            (face_dimensionality == c.get_dimension() - 1 ? c.n_faces() :
-                                                            c.n_lines());
+          n_entities += (face_dim == dim - 1 ? c.n_faces() : c.n_lines());
         }
 
       // step 1: store each d-dimensional entity of a cell (described by their
@@ -2770,7 +2770,7 @@ namespace internal
         keys; // key (sorted vertices), cell-entity index
 
       std::vector<std::array<unsigned int, max_n_vertices>> ad_entity_vertices;
-      std::vector<ReferenceCell>                            ad_entity_types;
+      std::vector<ReferenceCell<face_dim>>                  ad_entity_types;
       std::vector<std::array<unsigned int, max_n_vertices>> ad_compatibility;
 
       keys.reserve(n_entities);
@@ -2790,14 +2790,10 @@ namespace internal
 
           // Make sure that there are only two possibilities for
           // face_dimensionality that we can cover with the ?: statement below:
-          Assert((face_dimensionality == cell_type.get_dimension() - 1) ||
-                   ((cell_type.get_dimension() == 3) &&
-                    (face_dimensionality == 1)),
+          Assert((face_dim == dim - 1) || ((dim == 3) && (face_dim == 1)),
                  ExcInternalError());
           const unsigned int n_face_entities =
-            (face_dimensionality == cell_type.get_dimension() - 1 ?
-               cell_type.n_faces() :
-               cell_type.n_lines());
+            (face_dim == dim - 1 ? cell_type.n_faces() : cell_type.n_lines());
           cells_to_faces_offsets[c + 1] =
             cells_to_faces_offsets[c] + n_face_entities;
 
@@ -2813,21 +2809,20 @@ namespace internal
               // Same as above, make sure that there are only two possibilities
               // for face_dimensionality that we can cover with the ?: statement
               // below:
-              Assert((face_dimensionality == cell_type.get_dimension() - 1) ||
-                       ((cell_type.get_dimension() == 3) &&
-                        (face_dimensionality == 1)),
+              Assert((face_dim == dim - 1) || ((dim == 3) && (face_dim == 1)),
                      ExcInternalError());
               for (unsigned int i = 0;
-                   i < (face_dimensionality == cell_type.get_dimension() - 1 ?
+                   i < (face_dim == dim - 1 ?
                           cell_type.face_reference_cell(e).n_vertices() :
                           ReferenceCells::Line.n_vertices());
                    ++i)
                 entity_vertices[i] =
-                  local_vertices
-                    [face_dimensionality == cell_type.get_dimension() - 1 ?
-                       cell_type.face_to_cell_vertices(
-                         e, i, numbers::default_geometric_orientation) :
-                       cell_type.line_to_cell_vertices(e, i)] +
+                  local_vertices[face_dim == dim - 1 ?
+                                   cell_type.face_to_cell_vertices(
+                                     e,
+                                     i,
+                                     numbers::default_geometric_orientation) :
+                                   cell_type.line_to_cell_vertices(e, i)] +
                   offset;
 
               // ... create key
@@ -2837,17 +2832,17 @@ namespace internal
 
               ad_entity_vertices.emplace_back(entity_vertices);
 
-              if (face_dimensionality == cell_type.get_dimension() - 1)
+              if constexpr (face_dim == dim - 1)
                 ad_entity_types.emplace_back(cell_type.face_reference_cell(e));
-              else if (face_dimensionality == cell_type.get_dimension() - 2)
+              else if constexpr (face_dim == dim - 2)
                 {
                   // Since we only deal with meshes up to dimension 3,
                   // something that has co-dimensionality -2 must either be
                   // a vertex or a line, regardless of what the object we are
                   // working on actually us:
-                  if (face_dimensionality == 0)
+                  if constexpr (face_dim == 0)
                     ad_entity_types.emplace_back(ReferenceCells::Vertex);
-                  else if (face_dimensionality == 1)
+                  else if constexpr (face_dim == 1)
                     ad_entity_types.emplace_back(ReferenceCells::Line);
                   else
                     // But it's probably useful to be conservative if someone
@@ -2953,13 +2948,12 @@ namespace internal
      * Call the right templated function to be able to use std::array instead
      * of std::vector.
      */
-    template <typename FU>
+    template <int face_dim, int dim, typename FU>
     void
-    build_face_entities(const unsigned int                face_dimensionality,
-                        const std::vector<ReferenceCell> &cell_types,
-                        const ArrayOfArrays              &cells_to_vertices,
-                        ArrayOfArrays                    &cells_to_faces,
-                        ArrayOfArrays                    &crs_0,
+    build_face_entities(const std::vector<ReferenceCell<dim>> &cell_types,
+                        const ArrayOfArrays &cells_to_vertices,
+                        ArrayOfArrays       &cells_to_faces,
+                        ArrayOfArrays       &crs_0,
                         std::vector<types::geometric_orientation> &orientations,
                         const FU &second_key_function)
     {
@@ -2969,41 +2963,38 @@ namespace internal
       // each face may have. Otherwise, we're in 3d and are dealing with
       // lines, for which we know the number of vertices:
       for (const auto &c : cell_types)
-        if (face_dimensionality == c.get_dimension() - 1)
+        if (face_dim == dim - 1)
           {
             for (unsigned int f = 0; f < c.n_faces(); ++f)
               max_n_vertices =
                 std::max(max_n_vertices, c.face_reference_cell(f).n_vertices());
           }
-        else if (face_dimensionality == 1)
+        else if (face_dim == 1)
           max_n_vertices = std::max(max_n_vertices, 2u);
         else
           DEAL_II_ASSERT_UNREACHABLE();
 
       if (max_n_vertices == 2)
-        build_face_entities_templated<2>(face_dimensionality,
-                                         cell_types,
-                                         cells_to_vertices,
-                                         cells_to_faces,
-                                         crs_0,
-                                         orientations,
-                                         second_key_function);
+        build_face_entities_templated<2, face_dim>(cell_types,
+                                                   cells_to_vertices,
+                                                   cells_to_faces,
+                                                   crs_0,
+                                                   orientations,
+                                                   second_key_function);
       else if (max_n_vertices == 3)
-        build_face_entities_templated<3>(face_dimensionality,
-                                         cell_types,
-                                         cells_to_vertices,
-                                         cells_to_faces,
-                                         crs_0,
-                                         orientations,
-                                         second_key_function);
+        build_face_entities_templated<3, face_dim>(cell_types,
+                                                   cells_to_vertices,
+                                                   cells_to_faces,
+                                                   crs_0,
+                                                   orientations,
+                                                   second_key_function);
       else if (max_n_vertices == 4)
-        build_face_entities_templated<4>(face_dimensionality,
-                                         cell_types,
-                                         cells_to_vertices,
-                                         cells_to_faces,
-                                         crs_0,
-                                         orientations,
-                                         second_key_function);
+        build_face_entities_templated<4, face_dim>(cell_types,
+                                                   cells_to_vertices,
+                                                   cells_to_faces,
+                                                   crs_0,
+                                                   orientations,
+                                                   second_key_function);
       else
         AssertThrow(false, dealii::StandardExceptions::ExcNotImplemented());
     }
@@ -3017,9 +3008,10 @@ namespace internal
      *
      * Furthermore, the type of the quad is determined.
      */
+    template <int dim>
     inline void
     build_intersection(
-      const std::vector<ReferenceCell>                &cell_types,
+      const std::vector<ReferenceCell<dim>>           &cell_types,
       const ArrayOfArrays                             &cells_to_vertices,
       const ArrayOfArrays                             &cells_to_lines,
       const ArrayOfArrays                             &lines_to_vertices,
@@ -3028,7 +3020,7 @@ namespace internal
       const std::vector<types::geometric_orientation> &ori_cq,
       ArrayOfArrays                                   &quads_to_lines, // result
       std::vector<types::geometric_orientation>       &ori_ql,         // result
-      std::vector<ReferenceCell>                      &quad_t_id       // result
+      std::vector<ReferenceCell<2>>                   &quad_t_id       // result
     )
     {
       quad_t_id.resize(quads_to_vertices.size());
@@ -3066,7 +3058,7 @@ namespace internal
       unsigned int global_face_index = 0;
       for (unsigned int c = 0; c < cells_to_quads.size(); ++c)
         {
-          const ReferenceCell cell_type = cell_types[c];
+          const ReferenceCell<dim> cell_type = cell_types[c];
 
           // loop over faces
           const ArrayView<const unsigned int> faces = cells_to_quads[c];
@@ -3131,25 +3123,24 @@ namespace internal
      * implementation. It has been strongly adjusted to efficiently solely meet
      * our connectivity needs while sacrificing some of the flexibility there.
      */
-    Connectivity
-    build_connectivity(const unsigned int                dim,
-                       const std::vector<ReferenceCell> &cell_types,
-                       const ArrayOfArrays              &cells_to_vertices)
+    template <int dim>
+    Connectivity<dim>
+    build_connectivity(const std::vector<ReferenceCell<dim>> &cell_types,
+                       const ArrayOfArrays                   &cells_to_vertices)
     {
-      Connectivity connectivity(dim, cell_types);
+      Connectivity<dim> connectivity(cell_types);
 
       ArrayOfArrays temp1; // needed for 3d
 
-      if (dim == 1)
+      if constexpr (dim == 1)
         connectivity.entity_to_entities(1, 0) = cells_to_vertices;
 
-      if (dim == 2 || dim == 3) // build lines
+      if constexpr (dim == 2 || dim == 3) // build lines
         {
           std::vector<types::geometric_orientation> dummy;
 
-          build_face_entities(
-            1,
-            connectivity.entity_types(dim),
+          build_face_entities<1>(
+            connectivity.template entity_types<dim>(),
             cells_to_vertices,
             dim == 2 ? connectivity.entity_to_entities(2, 1) : temp1,
             connectivity.entity_to_entities(1, 0),
@@ -3160,20 +3151,19 @@ namespace internal
             });
         }
 
-      if (dim == 3) // build quads
+      if constexpr (dim == 3) // build quads
         {
-          build_face_entities(
-            2,
-            connectivity.entity_types(3),
+          build_face_entities<2>(
+            connectivity.template entity_types<3>(),
             cells_to_vertices,
             connectivity.entity_to_entities(3, 2),
             connectivity.entity_to_entities(2, 0),
             connectivity.entity_orientations(2),
             [&](auto key, // of type std::array<unsigned int, max_n_vertices>
                           // but max_n_vertices is not known here
-                const ReferenceCell &cell_type,
-                const unsigned int  &c,
-                const unsigned int  &f) {
+                const ReferenceCell<dim> &cell_type,
+                const unsigned int       &c,
+                const unsigned int       &f) {
               //  to ensure same enumeration as in deal.II
               AssertIndexRange(cell_type.face_reference_cell(f).n_lines(),
                                key.size() + 1);
@@ -3195,7 +3185,7 @@ namespace internal
             });
 
           // create connectivity: quad -> line
-          build_intersection(connectivity.entity_types(3),
+          build_intersection(connectivity.template entity_types<3>(),
                              cells_to_vertices,
                              temp1,
                              connectivity.entity_to_entities(1, 0),
@@ -3204,7 +3194,7 @@ namespace internal
                              connectivity.entity_orientations(2),
                              connectivity.entity_to_entities(2, 1),
                              connectivity.entity_orientations(1),
-                             connectivity.entity_types(2));
+                             connectivity.template entity_types<2>());
         }
 
       // determine neighbors
@@ -3220,7 +3210,7 @@ namespace internal
      * Preprocessing step to remove the template argument dim.
      */
     template <int dim>
-    Connectivity
+    Connectivity<dim>
     build_connectivity(const std::vector<CellData<dim>> &cells)
     {
       AssertThrow(cells.size() > 0, ExcMessage("No cells have been provided!"));
@@ -3240,7 +3230,7 @@ namespace internal
       cell_vertices_offsets.reserve(cells.size() + 1);
       cell_vertices_offsets.push_back(0);
 
-      std::vector<ReferenceCell> cell_types;
+      std::vector<ReferenceCell<dim>> cell_types;
       cell_types.reserve(cells.size());
 
       // loop over cells and create CRS
@@ -3266,7 +3256,7 @@ namespace internal
             }
 
           cell_types.push_back(
-            ReferenceCell::n_vertices_to_type(dim, cell.vertices.size()));
+            ReferenceCell<dim>::n_vertices_to_type(dim, cell.vertices.size()));
 
           // create CRS of vertices (to remove template argument dim)
           cell_vertices.insert(cell_vertices.end(),
@@ -3276,8 +3266,7 @@ namespace internal
         }
 
       // do the actual work
-      return build_connectivity(dim,
-                                cell_types,
+      return build_connectivity(cell_types,
                                 {std::move(cell_vertices_offsets),
                                  std::move(cell_vertices)});
     }
@@ -3930,7 +3919,7 @@ namespace internal
           }
 
         // TriaObjects: quads
-        if (dim == 3)
+        if constexpr (dim == 3)
           {
             auto &faces = *tria.faces;
             // get connectivity between quads and lines
@@ -3939,14 +3928,15 @@ namespace internal
             for (unsigned int q = 0, k = 0; q < n_quads; ++q)
               {
                 // set entity type of quads
-                const auto reference_cell = connectivity.entity_types(2)[q];
-                faces.set_quad_type(q, reference_cell);
+                const auto face_reference_cell =
+                  connectivity.template entity_types<2>()[q];
+                faces.set_quad_type(q, face_reference_cell);
 
                 // loop over all its lines
                 const auto lines = quads_to_lines[q];
                 for (unsigned int l = 0; l < lines.size(); ++l, ++k)
                   {
-                    AssertIndexRange(l, reference_cell.n_lines());
+                    AssertIndexRange(l, face_reference_cell.n_lines());
                     // set line index
                     faces.quads.cells[q * faces.quads.children_per_object + l] =
                       lines[l];
@@ -4010,7 +4000,8 @@ namespace internal
               cells_0.manifold_id[cell] = cells[cell].manifold_id;
 
               // set entity types
-              level.reference_cell[cell] = connectivity.entity_types(dim)[cell];
+              level.reference_cell[cell] =
+                connectivity.template entity_types<dim>()[cell];
 
               // loop over faces
               const auto faces     = cells_to_faces[cell];
@@ -7517,7 +7508,7 @@ namespace internal
                   auto standard_to_real_quad_child_index =
                     [](const unsigned int                 child,
                        const types::geometric_orientation face_orientation,
-                       const ReferenceCell                face_ref_cell_type) {
+                       const ReferenceCell<dim - 1>       face_ref_cell_type) {
                       // The parent vertex indices correlate nicely with the
                       // child indices of a tri and quad, as shown in the
                       // drawing for 2D face refinement (see the curly brackets
@@ -12457,8 +12448,7 @@ namespace internal
                         // with a linear mapping
                         const Point<dim> new_unit =
                           cell->reference_cell()
-                            .template get_default_linear_mapping<dim,
-                                                                 spacedim>()
+                            .template get_default_linear_mapping<spacedim>()
                             .transform_real_to_unit_cell(cell, new_bound);
 
                         // Now, we have to calculate the distance from
@@ -16853,7 +16843,7 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
           // to reduce the cost of this function when passing down into quads,
           // then lines, then vertices, we use a more low-level access method
           // for hexahedral cells, where we can streamline most of the logic
-          const ReferenceCell ref_cell = cell->reference_cell();
+          const ReferenceCell<dim> ref_cell = cell->reference_cell();
           if (ref_cell == ReferenceCells::Hexahedron)
             for (unsigned int face = 4; face < 6; ++face)
               {
@@ -16998,21 +16988,21 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::update_reference_cells()
 {
-  std::set<ReferenceCell> reference_cells_set;
+  std::set<ReferenceCell<dim>> reference_cells_set;
   for (auto cell : active_cell_iterators())
     if (cell->is_locally_owned())
       reference_cells_set.insert(cell->reference_cell());
 
   this->reference_cells =
-    std::vector<ReferenceCell>(reference_cells_set.begin(),
-                               reference_cells_set.end());
+    std::vector<ReferenceCell<dim>>(reference_cells_set.begin(),
+                                    reference_cells_set.end());
 }
 
 
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-const std::vector<ReferenceCell>
+const std::vector<ReferenceCell<dim>>
   &Triangulation<dim, spacedim>::get_reference_cells() const
 {
   return this->reference_cells;

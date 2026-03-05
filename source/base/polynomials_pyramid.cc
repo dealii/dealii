@@ -35,11 +35,11 @@ namespace
   get_pyramid_vertices()
   {
     if constexpr (dim == 3)
-      return {ReferenceCells::Pyramid.vertex<3>(0),
-              ReferenceCells::Pyramid.vertex<3>(1),
-              ReferenceCells::Pyramid.vertex<3>(2),
-              ReferenceCells::Pyramid.vertex<3>(3),
-              ReferenceCells::Pyramid.vertex<3>(4)};
+      return {ReferenceCells::Pyramid.vertex(0),
+              ReferenceCells::Pyramid.vertex(1),
+              ReferenceCells::Pyramid.vertex(2),
+              ReferenceCells::Pyramid.vertex(3),
+              ReferenceCells::Pyramid.vertex(4)};
     else
       {
         DEAL_II_ASSERT_UNREACHABLE();

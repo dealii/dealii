@@ -102,7 +102,7 @@ namespace GridTools
     const ReferenceCell reference_cell = triangulation.get_reference_cells()[0];
     return volume(
       triangulation,
-      reference_cell.template get_default_linear_mapping<dim, spacedim>());
+      reference_cell.template get_default_linear_mapping<spacedim>());
   }
 
 
@@ -125,8 +125,7 @@ namespace GridTools
            ExcNotImplemented());
     const ReferenceCell reference_cell = triangulation.get_reference_cells()[0];
     const Quadrature<dim> quadrature_formula =
-      reference_cell.template get_gauss_type_quadrature<dim>(mapping_degree +
-                                                             1);
+      reference_cell.get_gauss_type_quadrature(mapping_degree + 1);
     const unsigned int n_q_points = quadrature_formula.size();
 
     // we really want the JxW values from the FEValues object, but it

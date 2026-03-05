@@ -112,7 +112,7 @@ DataOutFaces<dim, spacedim>::build_one_patch(
   for (const unsigned int vertex : cell->face(face_number)->vertex_indices())
     {
       const Point<dim> vertex_reference_coordinates =
-        cell->reference_cell().template vertex<dim>(
+        cell->reference_cell().vertex(
           cell->reference_cell().face_to_cell_vertices(
             face_number, vertex, cell->combined_face_orientation(face_number)));
 
@@ -327,7 +327,7 @@ DataOutFaces<dim, spacedim>::build_patches(const unsigned int n_subdivisions)
 {
   if (this->triangulation->get_reference_cells().size() == 1)
     build_patches(this->triangulation->get_reference_cells()[0]
-                    .template get_default_linear_mapping<dim, spacedim>(),
+                    .template get_default_linear_mapping<spacedim>(),
                   n_subdivisions);
   else
     Assert(false,

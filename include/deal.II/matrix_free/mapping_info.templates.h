@@ -1572,13 +1572,13 @@ namespace internal
       template <int dim>
       unsigned int
       reorder_face_derivative_indices(
-        const unsigned int  face_no,
-        const unsigned int  index,
-        const ReferenceCell reference_cell = ReferenceCells::Invalid)
+        const unsigned int       face_no,
+        const unsigned int       index,
+        const ReferenceCell<dim> reference_cell = ReferenceCells::Invalid<dim>)
       {
         Assert(index < dim, ExcInternalError());
 
-        if ((reference_cell == ReferenceCells::Invalid ||
+        if ((reference_cell == ReferenceCells::Invalid<dim> ||
              reference_cell == ReferenceCells::get_hypercube<dim>()) == false)
           {
             return index;

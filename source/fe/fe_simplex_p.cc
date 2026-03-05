@@ -47,7 +47,7 @@ namespace
         const auto vertex_no = reference_cell.face_to_cell_vertices(
           face_no, face_vertex_no, numbers::default_geometric_orientation);
 
-        midpoint += reference_cell.template vertex<dim>(vertex_no);
+        midpoint += reference_cell.vertex(vertex_no);
       }
 
     midpoint /= reference_cell.face_reference_cell(0).n_vertices();
@@ -124,7 +124,7 @@ namespace
     // centroid and only the centroid
     if (degree == 0)
       {
-        unit_points.emplace_back(reference_cell.template barycenter<dim>());
+        unit_points.emplace_back(reference_cell.barycenter());
         return unit_points;
       }
 
@@ -134,7 +134,7 @@ namespace
     Assert(dpo[0] == 1, ExcNotImplemented());
     // vertices:
     for (const unsigned int d : reference_cell.vertex_indices())
-      unit_points.push_back(reference_cell.template vertex<dim>(d));
+      unit_points.push_back(reference_cell.vertex(d));
     // lines:
     for (const unsigned int l : reference_cell.line_indices())
       {
@@ -151,7 +151,7 @@ namespace
       {
         Assert(dpo[2] == 1, ExcNotImplemented());
         if (dim == 2)
-          unit_points.push_back(reference_cell.template barycenter<dim>());
+          unit_points.push_back(reference_cell.barycenter());
         if (dim == 3)
           for (const unsigned int f : reference_cell.face_indices())
             unit_points.push_back(face_midpoint<dim>(f));
@@ -523,7 +523,7 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
                                        unit_support_points[i][1],
                                        unit_support_points[i][2])};
           this->reference_cell()
-            .template get_default_linear_mapping<dim, spacedim>()
+            .template get_default_linear_mapping<spacedim>()
             .transform_points_real_to_unit_cell(
               child_cell,
               make_array_view(unit_support_point),

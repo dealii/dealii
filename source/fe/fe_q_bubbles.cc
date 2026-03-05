@@ -96,8 +96,7 @@ namespace internal
              ++ref_case)
           {
             const unsigned int nc =
-              fe.reference_cell().template n_children<dim>(
-                RefinementCase<dim>(ref_case));
+              fe.reference_cell().n_children(RefinementCase<dim>(ref_case));
 
             for (unsigned int i = 0; i < nc; ++i)
               {
@@ -470,8 +469,7 @@ FE_Q_Bubbles<dim, spacedim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, this->reference_cell().template n_children<dim>(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   Assert(this->prolongation[refinement_case - 1][child].n() != 0,
          ExcMessage("This prolongation matrix has not been computed yet!"));
@@ -492,8 +490,7 @@ FE_Q_Bubbles<dim, spacedim>::get_restriction_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, this->reference_cell().template n_children<dim>(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   Assert(this->restriction[refinement_case - 1][child].n() != 0,
          ExcMessage("This restriction matrix has not been computed yet!"));

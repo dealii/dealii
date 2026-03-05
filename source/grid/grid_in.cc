@@ -3415,8 +3415,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                   if constexpr (dim > 0)
                     {
                       // Determine reference cell type from number of vertices
-                      const ReferenceCell ref_cell =
-                        ReferenceCell::n_vertices_to_type(dim, n_vertices);
+                      const ReferenceCell<dim> ref_cell =
+                        ReferenceCell<dim>::n_vertices_to_type(dim, n_vertices);
 
                       // Number of faces for this reference cell
                       const unsigned int n_faces = ref_cell.n_faces();

@@ -291,9 +291,9 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+         .ReferenceCell::get_default_linear_mapping<spacedim>()
 #endif
          ),
     const bool use_manifold_for_normal = true);
@@ -319,9 +319,9 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+         .ReferenceCell::get_default_linear_mapping<spacedim>()
 #endif
          ),
     const IndexSet    &refinement_edge_indices = IndexSet(),
@@ -354,9 +354,9 @@ namespace VectorTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+         .ReferenceCell::get_default_linear_mapping<spacedim>()
 #endif
          ),
     const bool use_manifold_for_normal = true);
@@ -387,9 +387,9 @@ namespace VectorTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+         .ReferenceCell::get_default_linear_mapping<spacedim>()
 #endif
          ),
     const IndexSet    &refinement_edge_indices = IndexSet(),
@@ -431,9 +431,9 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+         .ReferenceCell::get_default_linear_mapping<spacedim>()
 #endif
          ),
     const bool use_manifold_for_normal = true);
@@ -456,9 +456,9 @@ namespace VectorTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+         .ReferenceCell::get_default_linear_mapping<spacedim>()
 #endif
          ),
     const bool use_manifold_for_normal = true);

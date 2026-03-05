@@ -1796,7 +1796,7 @@ MappingQ<dim, spacedim>::get_bounding_box(
 template <int dim, int spacedim>
 bool
 MappingQ<dim, spacedim>::is_compatible_with(
-  const ReferenceCell &reference_cell) const
+  const ReferenceCell<dim> &reference_cell) const
 {
   Assert(dim == reference_cell.get_dimension(),
          ExcMessage("The dimension of your mapping (" +

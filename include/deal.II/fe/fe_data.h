@@ -302,7 +302,7 @@ private:
   /**
    * Reference cell type.
    */
-  const ReferenceCell reference_cell_kind;
+  const ReferenceCell<dim> reference_cell_kind;
 
   /**
    * Number of unique two-dimensional sub-objects. If all
@@ -510,7 +510,7 @@ public:
    * underlying geometric entity can be specified.
    */
   FiniteElementData(const std::vector<unsigned int> &dofs_per_object,
-                    const ReferenceCell              reference_cell,
+                    const ReferenceCell<dim>         reference_cell,
                     const unsigned int               n_components,
                     const unsigned int               degree,
                     const Conformity                 conformity = unknown,
@@ -523,7 +523,7 @@ public:
    * is particular useful for cells with triangles and quadrilaterals as faces.
    */
   FiniteElementData(const internal::GenericDoFsPerObject &data,
-                    const ReferenceCell                   reference_cell,
+                    const ReferenceCell<dim>              reference_cell,
                     const unsigned int                    n_components,
                     const unsigned int                    degree,
                     const Conformity                      conformity = unknown,
@@ -534,7 +534,7 @@ public:
    * example, whether the element's reference cell is a square or
    * triangle, or similar choices in higher dimensions.
    */
-  ReferenceCell
+  ReferenceCell<dim>
   reference_cell() const;
 
   /**
@@ -711,7 +711,7 @@ namespace internal
   template <int dim>
   internal::GenericDoFsPerObject
   expand(const std::vector<unsigned int> &dofs_per_object,
-         const ReferenceCell              reference_cell);
+         const ReferenceCell<dim>         reference_cell);
 } // namespace internal
 
 
@@ -771,7 +771,7 @@ namespace FiniteElementDomination
 
 
 template <int dim>
-inline ReferenceCell
+inline ReferenceCell<dim>
 FiniteElementData<dim>::reference_cell() const
 {
   return reference_cell_kind;
