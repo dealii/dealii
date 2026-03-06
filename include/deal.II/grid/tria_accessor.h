@@ -5239,11 +5239,11 @@ template <int structdim, int dim, int spacedim>
 inline ReferenceCell
 TriaAccessor<structdim, dim, spacedim>::reference_cell() const
 {
-  if (structdim == 0)
+  if constexpr (structdim == 0)
     return ReferenceCells::Vertex;
-  else if (structdim == 1)
+  else if constexpr (structdim == 1)
     return ReferenceCells::Line;
-  else if (structdim == dim)
+  else if constexpr (structdim == dim)
     return this->tria->levels[this->level()]
       ->reference_cell[this->present_index];
   else

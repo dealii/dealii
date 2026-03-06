@@ -288,12 +288,14 @@ namespace internal
 
           if (needs_simplex_setup)
             {
-              if (dim == 2)
+              if constexpr (dim == 2)
                 quadrature_simplex = std::make_unique<Quadrature<dim>>(
                   generate_simplex_evaluation_points<dim>(n_subdivisions));
-              else
+              else if constexpr (dim == 3)
                 quadrature_simplex = std::make_unique<Quadrature<dim>>(
                   FE_SimplexP<dim>(n_subdivisions).get_unit_support_points());
+              else
+                DEAL_II_ASSERT_UNREACHABLE();
             }
 
           if (needs_hypercube_setup)
@@ -303,21 +305,23 @@ namespace internal
                                                  n_subdivisions);
             }
 
-          if (needs_wedge_setup)
-            {
-              Assert(n_subdivisions == 1, ExcNotImplemented());
+          if constexpr (dim == 3)
+            if (needs_wedge_setup)
+              {
+                Assert(n_subdivisions == 1, ExcNotImplemented());
 
-              quadrature_wedge = std::make_unique<Quadrature<dim>>(
-                ReferenceCells::Wedge.get_nodal_type_quadrature<dim>());
-            }
+                quadrature_wedge = std::make_unique<Quadrature<dim>>(
+                  ReferenceCells::Wedge.get_nodal_type_quadrature<dim>());
+              }
 
-          if (needs_pyramid_setup)
-            {
-              Assert(n_subdivisions == 1, ExcNotImplemented());
+          if constexpr (dim == 3)
+            if (needs_pyramid_setup)
+              {
+                Assert(n_subdivisions == 1, ExcNotImplemented());
 
-              quadrature_pyramid = std::make_unique<Quadrature<dim>>(
-                ReferenceCells::Pyramid.get_nodal_type_quadrature<dim>());
-            }
+                quadrature_pyramid = std::make_unique<Quadrature<dim>>(
+                  ReferenceCells::Pyramid.get_nodal_type_quadrature<dim>());
+              }
 
           x_fe_values.resize(finite_elements.size());
           for (unsigned int i = 0; i < finite_elements.size(); ++i)

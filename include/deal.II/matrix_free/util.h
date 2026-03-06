@@ -67,7 +67,7 @@ namespace internal
             }
         }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int i = 1; i <= 3; ++i)
           if (quad == QGaussWedge<dim>(i))
             {
@@ -79,7 +79,7 @@ namespace internal
                 dealii::hp::QCollection<dim - 1>(tri, tri, quad, quad, quad)};
             }
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         for (unsigned int i = 1; i <= 2; ++i)
           if (quad == QGaussPyramid<dim>(i))
             {
