@@ -2376,36 +2376,37 @@ QGaussPyramid<dim>::QGaussPyramid(const unsigned int n_points_1D)
 {
   AssertDimension(dim, 3);
 
-  if (n_points_1D == 1)
-    {
-      const double Q14 = 1.0 / 4.0;
-      const double Q43 = 4.0 / 3.0;
+  // Gauss-Legendre in x and y direction and Gauss-Jacobi in z direction
+  QGauss<1> q_gauss(n_points_1D);
 
-      this->quadrature_points.emplace_back(0, 0, Q14);
-      this->weights.emplace_back(Q43);
-    }
-  else if (n_points_1D == 2)
-    {
-      // clang-format off
-        this->quadrature_points.emplace_back(-0.26318405556971, -0.26318405556971, 0.54415184401122);
-        this->quadrature_points.emplace_back(-0.50661630334979, -0.50661630334979, 0.12251482265544);
-        this->quadrature_points.emplace_back(-0.26318405556971, +0.26318405556971, 0.54415184401122);
-        this->quadrature_points.emplace_back(-0.50661630334979, +0.50661630334979, 0.12251482265544);
-        this->quadrature_points.emplace_back(+0.26318405556971, -0.26318405556971, 0.54415184401122);
-        this->quadrature_points.emplace_back(+0.50661630334979, -0.50661630334979, 0.12251482265544);
-        this->quadrature_points.emplace_back(+0.26318405556971, +0.26318405556971, 0.54415184401122);
-        this->quadrature_points.emplace_back(+0.50661630334979, +0.50661630334979, 0.12251482265544);
-      // clang-format on
+  std::vector<long double> points_z =
+    Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 2, 0);
 
-      this->weights.emplace_back(0.10078588207983);
-      this->weights.emplace_back(0.23254745125351);
-      this->weights.emplace_back(0.10078588207983);
-      this->weights.emplace_back(0.23254745125351);
-      this->weights.emplace_back(0.10078588207983);
-      this->weights.emplace_back(0.23254745125351);
-      this->weights.emplace_back(0.10078588207983);
-      this->weights.emplace_back(0.23254745125351);
-    }
+  const long double factor = 8.0; // with alpha = 2 and beta = 0 only pow(2,
+                                  // alpha + beta + 1) remains
+
+  for (unsigned int i = 0; i < n_points_1D; ++i)
+    for (unsigned int j = 0; j < n_points_1D; ++j)
+      for (unsigned int k = 0; k < n_points_1D; ++k)
+        {
+          // rescale x and y to pyramid
+          const double x =
+            (2.0 * q_gauss.point(i)[0] - 1.0) * (1.0 - points_z[k]);
+          const double y =
+            (2.0 * q_gauss.point(j)[0] - 1.0) * (1.0 - points_z[k]);
+
+          this->quadrature_points.emplace_back(x, y, points_z[k]);
+
+          const double w_k =
+            factor / ((1.0 - std::pow(2.0 * points_z[k] - 1.0, 2)) *
+                      std::pow(Polynomials::jacobi_polynomial_derivative(
+                                 n_points_1D, 2, 0, points_z[k]),
+                               2));
+          // rescaling x and y direction form [0,1] to [-1,1] and rescaling
+          // z direction from [-1,1] to [0,1] gives an overall factor of 2
+          this->weights.emplace_back(2.0 * w_k * q_gauss.weight(i) *
+                                     q_gauss.weight(j));
+        }
 
   AssertDimension(this->quadrature_points.size(), this->weights.size());
   Assert(this->quadrature_points.size() > 0,
