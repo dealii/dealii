@@ -2752,70 +2752,60 @@ namespace DataOutBase
 
             connectivity.resize(Utilities::fixed_power<dim>(n));
 
-            switch (dim)
+            if constexpr (dim == 0)
               {
-                case 0:
+                Assert(false,
+                       ExcMessage("Point-like cells should not be possible "
+                                  "when writing higher-order cells."));
+              }
+            else if constexpr (dim == 2)
+              {
+                for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
                   {
-                    Assert(false,
-                           ExcMessage("Point-like cells should not be possible "
-                                      "when writing higher-order cells."));
-                    break;
+                    const unsigned int local_index = i1;
+                    const unsigned int connectivity_index =
+                      patch.reference_cell
+                        .template vtk_lexicographic_to_node_index<1>(
+                          {{i1}}, {{n_subdivisions}}, legacy_format);
+                    connectivity[connectivity_index] = local_index;
                   }
-                case 1:
-                  {
+              }
+            else if constexpr (dim == 2)
+              {
+                for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                  for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                    {
+                      const unsigned int local_index = i2 * n + i1;
+                      const unsigned int connectivity_index =
+                        patch.reference_cell
+                          .template vtk_lexicographic_to_node_index<2>(
+                            {{i1, i2}},
+                            {{n_subdivisions, n_subdivisions}},
+                            legacy_format);
+                      connectivity[connectivity_index] = local_index;
+                    }
+              }
+            else if constexpr (dim == 3)
+              {
+                for (unsigned int i3 = 0; i3 < n_subdivisions + 1; ++i3)
+                  for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
                     for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
                       {
-                        const unsigned int local_index = i1;
+                        const unsigned int local_index =
+                          i3 * n * n + i2 * n + i1;
                         const unsigned int connectivity_index =
                           patch.reference_cell
-                            .template vtk_lexicographic_to_node_index<1>(
-                              {{i1}}, {{n_subdivisions}}, legacy_format);
+                            .template vtk_lexicographic_to_node_index<3>(
+                              {{i1, i2, i3}},
+                              {{n_subdivisions,
+                                n_subdivisions,
+                                n_subdivisions}},
+                              legacy_format);
                         connectivity[connectivity_index] = local_index;
                       }
-
-                    break;
-                  }
-                case 2:
-                  {
-                    for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
-                      for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
-                        {
-                          const unsigned int local_index = i2 * n + i1;
-                          const unsigned int connectivity_index =
-                            patch.reference_cell
-                              .template vtk_lexicographic_to_node_index<2>(
-                                {{i1, i2}},
-                                {{n_subdivisions, n_subdivisions}},
-                                legacy_format);
-                          connectivity[connectivity_index] = local_index;
-                        }
-
-                    break;
-                  }
-                case 3:
-                  {
-                    for (unsigned int i3 = 0; i3 < n_subdivisions + 1; ++i3)
-                      for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
-                        for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
-                          {
-                            const unsigned int local_index =
-                              i3 * n * n + i2 * n + i1;
-                            const unsigned int connectivity_index =
-                              patch.reference_cell
-                                .template vtk_lexicographic_to_node_index<3>(
-                                  {{i1, i2, i3}},
-                                  {{n_subdivisions,
-                                    n_subdivisions,
-                                    n_subdivisions}},
-                                  legacy_format);
-                            connectivity[connectivity_index] = local_index;
-                          }
-
-                    break;
-                  }
-                default:
-                  DEAL_II_NOT_IMPLEMENTED();
               }
+            else
+              DEAL_II_NOT_IMPLEMENTED();
 
             // Having so set up the 'connectivity' data structure,
             // output it:
@@ -5649,88 +5639,73 @@ namespace DataOutBase
                   local_vertex_order.resize(
                     Utilities::fixed_power<dim>(n_points_per_direction));
 
-                  switch (dim)
+                  if constexpr (dim == 0)
                     {
-                      case 0:
+                      Assert(false,
+                             ExcMessage(
+                               "Point-like cells should not be possible "
+                               "when writing higher-order cells."));
+                    }
+                  else if constexpr (dim == 1)
+                    {
+                      for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
                         {
-                          Assert(false,
-                                 ExcMessage(
-                                   "Point-like cells should not be possible "
-                                   "when writing higher-order cells."));
-                          break;
+                          const unsigned int local_index = i1;
+                          const unsigned int connectivity_index =
+                            patch.reference_cell
+                              .template vtk_lexicographic_to_node_index<1>(
+                                {{i1}},
+                                {{n_subdivisions}},
+                                /* use VTU, not VTK: */ false);
+                          local_vertex_order[connectivity_index] = local_index;
                         }
-                      case 1:
-                        {
+                      flush_current_cell();
+                    }
+                  else if constexpr (dim == 2)
+                    {
+                      for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
+                        for (unsigned int i1 = 0; i1 < n_subdivisions + 1; ++i1)
+                          {
+                            const unsigned int local_index =
+                              i2 * n_points_per_direction + i1;
+                            const unsigned int connectivity_index =
+                              patch.reference_cell
+                                .template vtk_lexicographic_to_node_index<2>(
+                                  {{i1, i2}},
+                                  {{n_subdivisions, n_subdivisions}},
+                                  /* use VTU, not VTK: */ false);
+                            local_vertex_order[connectivity_index] =
+                              local_index;
+                          }
+                      flush_current_cell();
+                    }
+                  else if constexpr (dim == 3)
+                    {
+                      for (unsigned int i3 = 0; i3 < n_subdivisions + 1; ++i3)
+                        for (unsigned int i2 = 0; i2 < n_subdivisions + 1; ++i2)
                           for (unsigned int i1 = 0; i1 < n_subdivisions + 1;
                                ++i1)
                             {
-                              const unsigned int local_index = i1;
+                              const unsigned int local_index =
+                                i3 * n_points_per_direction *
+                                  n_points_per_direction +
+                                i2 * n_points_per_direction + i1;
                               const unsigned int connectivity_index =
                                 patch.reference_cell
-                                  .template vtk_lexicographic_to_node_index<1>(
-                                    {{i1}},
-                                    {{n_subdivisions}},
+                                  .template vtk_lexicographic_to_node_index<3>(
+                                    {{i1, i2, i3}},
+                                    {{n_subdivisions,
+                                      n_subdivisions,
+                                      n_subdivisions}},
                                     /* use VTU, not VTK: */ false);
                               local_vertex_order[connectivity_index] =
                                 local_index;
                             }
-                          flush_current_cell();
 
-                          break;
-                        }
-                      case 2:
-                        {
-                          for (unsigned int i2 = 0; i2 < n_subdivisions + 1;
-                               ++i2)
-                            for (unsigned int i1 = 0; i1 < n_subdivisions + 1;
-                                 ++i1)
-                              {
-                                const unsigned int local_index =
-                                  i2 * n_points_per_direction + i1;
-                                const unsigned int connectivity_index =
-                                  patch.reference_cell
-                                    .template vtk_lexicographic_to_node_index<
-                                      2>({{i1, i2}},
-                                         {{n_subdivisions, n_subdivisions}},
-                                         /* use VTU, not VTK: */ false);
-                                local_vertex_order[connectivity_index] =
-                                  local_index;
-                              }
-                          flush_current_cell();
-
-                          break;
-                        }
-                      case 3:
-                        {
-                          for (unsigned int i3 = 0; i3 < n_subdivisions + 1;
-                               ++i3)
-                            for (unsigned int i2 = 0; i2 < n_subdivisions + 1;
-                                 ++i2)
-                              for (unsigned int i1 = 0; i1 < n_subdivisions + 1;
-                                   ++i1)
-                                {
-                                  const unsigned int local_index =
-                                    i3 * n_points_per_direction *
-                                      n_points_per_direction +
-                                    i2 * n_points_per_direction + i1;
-                                  const unsigned int connectivity_index =
-                                    patch.reference_cell
-                                      .template vtk_lexicographic_to_node_index<
-                                        3>({{i1, i2, i3}},
-                                           {{n_subdivisions,
-                                             n_subdivisions,
-                                             n_subdivisions}},
-                                           /* use VTU, not VTK: */ false);
-                                  local_vertex_order[connectivity_index] =
-                                    local_index;
-                                }
-
-                          flush_current_cell();
-                          break;
-                        }
-                      default:
-                        DEAL_II_NOT_IMPLEMENTED();
+                      flush_current_cell();
                     }
+                  else
+                    DEAL_II_NOT_IMPLEMENTED();
                 }
 
               // Finally update the number of the first vertex of this
