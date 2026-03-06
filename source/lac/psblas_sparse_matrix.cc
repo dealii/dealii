@@ -105,10 +105,9 @@ namespace PSCToolkitWrappers
       }
 
     // Insert the indexes into the descriptor
-    psblas_context = InitFinalize::get_psblas_context();
     psb_c_cdall_vl(number_of_local_indexes,
                    vl.data(),
-                   *psblas_context,
+                   *InitFinalize::get_psblas_context(),
                    psblas_descriptor.get());
 
     // Create a new PSBLAS sparse matrix

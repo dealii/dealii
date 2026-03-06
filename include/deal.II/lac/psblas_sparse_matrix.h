@@ -242,12 +242,31 @@ namespace PSCToolkitWrappers
                      "two objects are in fact different.");
 
   private:
+    /**
+     * The underlying MPI communicator.
+     *
+     */
     MPI_Comm communicator;
 
+    /**
+     * Returns a pointerto the underlying PSBLAS sparse matrix. Do not use
+     * this function unless you know what you are doing.
+     *
+     */
     psb_c_dspmat *psblas_sparse_matrix;
 
+    /**
+     * Returns a pointer to the underlying PSBLAS descriptor object. Do not use
+     * this function unless you know what you are doing.
+     *
+     */
     std::shared_ptr<psb_c_descriptor> psblas_descriptor;
 
+    /**
+     * Returns a pointer to the underlying PSBLAS context object. Do not use
+     * this function unless you know what you are doing.
+     *
+     */
     psb_c_ctxt *psblas_context;
   };
 

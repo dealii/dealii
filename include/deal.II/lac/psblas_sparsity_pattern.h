@@ -84,8 +84,6 @@ namespace PSCToolkitWrappers
   private:
     std::shared_ptr<psb_c_descriptor> psblas_descriptor;
 
-    psb_c_ctxt *psblas_context;
-
     friend class SparseMatrix;
   };
 
