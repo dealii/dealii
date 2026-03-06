@@ -1009,11 +1009,45 @@ FE_DGQArbitraryNodes<dim, spacedim>::clone() const
 
 
 
+// ------------------- FE_DGQArbitraryPolynomialSpace -------------------------
+
+
+
+template <int dim, int spacedim>
+FE_DGQArbitraryPolynomialSpace<dim, spacedim>::FE_DGQArbitraryPolynomialSpace(
+  const std::vector<Polynomials::Polynomial<double>> &poly_space_1D)
+  : FE_DGQ<dim, spacedim>(poly_space_1D)
+  , poly_space_1D(poly_space_1D)
+{}
+
+
+
+template <int dim, int spacedim>
+std::string
+FE_DGQArbitraryPolynomialSpace<dim, spacedim>::get_name() const
+{
+  return "FE_DGQArbitraryPolynomialSpace<" +
+         Utilities::dim_string(dim, spacedim) + ">(" +
+         Utilities::int_to_string(this->degree) + ")";
+}
+
+
+
+template <int dim, int spacedim>
+std::unique_ptr<FiniteElement<dim, spacedim>>
+FE_DGQArbitraryPolynomialSpace<dim, spacedim>::clone() const
+{
+  return std::make_unique<FE_DGQArbitraryPolynomialSpace<dim, spacedim>>(
+    poly_space_1D);
+}
+
+
+
 // ---------------------------------- FE_DGQLegendre -------------------------
 
 template <int dim, int spacedim>
 FE_DGQLegendre<dim, spacedim>::FE_DGQLegendre(const unsigned int degree)
-  : FE_DGQ<dim, spacedim>(
+  : FE_DGQArbitraryPolynomialSpace<dim, spacedim>(
       Polynomials::Legendre::generate_complete_basis(degree))
 {}
 
