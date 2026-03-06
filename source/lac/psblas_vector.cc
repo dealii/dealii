@@ -101,8 +101,8 @@ namespace PSCToolkitWrappers
     // been assembled
     if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
-        psblas_descriptor = std::shared_ptr<psb_c_descriptor>(
-          psb_c_new_descriptor(), internal::PSBLASDescriptorDeleter{});
+        psblas_descriptor.reset(psb_c_new_descriptor(),
+                                internal::PSBLASDescriptorDeleter());
 
         // Use get_index_vector() from IndexSet to get the indexes
         const std::vector<types::global_dof_index> &indexes =
@@ -133,7 +133,10 @@ namespace PSCToolkitWrappers
     // Create a new PSBLAS vector and allocate mem space for vector
     psblas_vector = psb_c_new_dvector();
 
-    ierr = psb_c_dgeall_remote(psblas_vector, psblas_descriptor.get());
+    ierr = psb_c_dgeall_remote_options(psblas_vector,
+                                       psblas_descriptor.get(),
+                                       PSB_MATBLD_REMOTE,
+                                       PSB_DUPL_DEF);
     Assert(ierr == 0, ExcInitializePSBLASVector(ierr));
 
     if (omit_zeroing_entries == false)
@@ -166,8 +169,8 @@ namespace PSCToolkitWrappers
     int ierr;
     if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
-        psblas_descriptor = std::shared_ptr<psb_c_descriptor>(
-          psb_c_new_descriptor(), internal::PSBLASDescriptorDeleter{});
+        psblas_descriptor.reset(psb_c_new_descriptor(),
+                                internal::PSBLASDescriptorDeleter());
 
         // Use get_index_vector() from IndexSet to get the indexes
         const std::vector<types::global_dof_index> &indexes =
@@ -231,11 +234,16 @@ namespace PSCToolkitWrappers
 
         Assert(ierr == 0, ExcCallingPSBLASFunction(ierr, "psb_c_cdins_lidx"));
       }
-    // ... create and finalize vector
-    psblas_vector = psb_c_new_dvector();
-    ierr          = psb_c_dgeall_remote(psblas_vector, psblas_descriptor.get());
 
-    // ...and descriptor
+    // Create a new PSBLAS vector and allocate mem space for it
+    psblas_vector = psb_c_new_dvector();
+
+    ierr = psb_c_dgeall_remote_options(psblas_vector,
+                                       psblas_descriptor.get(),
+                                       PSB_MATBLD_REMOTE,
+                                       PSB_DUPL_DEF);
+
+    // ... and assemble descriptor
     ierr = psb_c_cdasb(psblas_descriptor.get());
 
     Assert(ierr == 0, ExcInitializePSBLASVector(ierr));
@@ -294,9 +302,7 @@ namespace PSCToolkitWrappers
           reinit(v.owned_elements, v.get_mpi_communicator(), true);
       }
 
-    // copy local values using axpby routine
-    int ierr = psb_c_dgeaxpby(
-      1.0, v.psblas_vector, 0.0, psblas_vector, psblas_descriptor.get());
+    int ierr = psb_c_dvect_clone(v.psblas_vector, psblas_vector);
     AssertThrow(ierr == 0, ExcAXPBY(ierr));
 
     // If current vector has ghost elements, update them
@@ -677,7 +683,7 @@ namespace PSCToolkitWrappers
                       "elements and consequently is read-only. It does "
                       "not make sense to call compress() for such "
                       "vectors."));
-    AssertThrow(operation == VectorOperation::values::add, ExcNotImplemented());
+
     // We check the state of the vector...
     Assert(state != internal::State::Default, ExcInvalidDefault());
     // ... and if the last action was compatible with what we want to do
@@ -695,7 +701,16 @@ namespace PSCToolkitWrappers
       }
 
     // finally, we perform the assemble operation
-    ierr = psb_c_dgeasb(psblas_vector, psblas_descriptor.get());
+    if (operation == VectorOperation::add)
+      ierr = psb_c_dgeasb_options(psblas_vector,
+                                  psblas_descriptor.get(),
+                                  PSB_DUPL_ADD);
+    else if (operation == VectorOperation::insert)
+      ierr = psb_c_dgeasb_options(psblas_vector,
+                                  psblas_descriptor.get(),
+                                  PSB_DUPL_DEF);
+    else
+      DEAL_II_NOT_IMPLEMENTED();
 
     Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
     state       = internal::State::Assembled;

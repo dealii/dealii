@@ -29,57 +29,12 @@
 
 #ifdef DEAL_II_WITH_PSBLAS
 
-#  include <psb_base_cbind.h>
-#  include <psb_c_base.h>
-#  include <psb_c_dbase.h>
+#  include <deal.II/lac/psblas_common.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace PSCToolkitWrappers
 {
-
-  namespace internal
-  {
-    /*
-     * Custom deleter for PSBLAS descriptor.
-     */
-    struct PSBLASDescriptorDeleter
-    {
-      void
-      operator()(psb_c_descriptor *p) const
-      {
-        if (p)
-          psb_c_cdfree(p);
-      }
-    };
-
-    /**
-     * Enum to indicate the state of the vector (building or assembled).
-     * TODO[MF]: use the same also when I'll introduce the matrix class. Move to
-     * a common .h file?
-     */
-
-    enum State
-    {
-      /**
-       * State entered after the default constructor, before any allocation.
-       * In this state, no operations are possible.
-       */
-      Default,
-      /**
-       * State entered after the first allocation, and before the first
-       * assembly; in this state it is possible to add communication
-       * requirements among different processes.
-       */
-      Build,
-      /*
-       * State entered after the assembly; computations such as matrix-vector
-       * products, are only possible in this state.
-       */
-      Assembled
-    };
-
-  } // namespace internal
 
   class Vector : public ReadVector<double>
   {
@@ -911,8 +866,7 @@ namespace PSCToolkitWrappers
      */
     VectorOperation::values last_action;
 
-    // TODO[MF]: uncomment when the matrix class will be introduced
-    // friend class SparseMatrix;
+    friend class SparseMatrix;
   };
 
 
