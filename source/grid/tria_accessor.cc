@@ -1685,6 +1685,8 @@ Point<structdim>
 TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   const Point<spacedim> &point) const
 {
+  Assert(this->reference_cell().is_hyper_cube(), ExcNotImplemented());
+
   std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
     vertices;
   for (const unsigned int v : this->vertex_indices())
