@@ -10,7 +10,6 @@
 //
 // -----------------------------------------------------------------------------
 
-
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
@@ -27,6 +26,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <future>
 #include <iomanip>
@@ -35,6 +35,8 @@
 #include <numeric>
 #include <set>
 #include <sstream>
+#include <type_traits>
+#include <variant>
 #include <vector>
 
 #ifdef DEAL_II_WITH_ZLIB
@@ -43,6 +45,14 @@
 
 #ifdef DEAL_II_WITH_HDF5
 #  include <hdf5.h>
+#endif
+
+#ifdef DEAL_II_WITH_NETCDF
+#  include <netcdf.h>
+#  include <netcdf_meta.h>
+#  if NC_HAS_PARALLEL
+#    include <netcdf_par.h>
+#  endif
 #endif
 
 #include <boost/iostreams/copy.hpp>
@@ -2405,6 +2415,16 @@ namespace DataOutBase
       DEAL_II_ASSERT_UNREACHABLE();
   }
 
+  CFFlags::CFFlags(
+    const double time,
+    const bool   keep_existing_file,
+    const std::map<std::string,
+                   std::vector<std::pair<std::string, AttributeValue>>>
+      &attributes)
+    : time(time)
+    , keep_existing_file(keep_existing_file)
+    , attributes(attributes)
+  {}
 
   Hdf5Flags::Hdf5Flags(const CompressionLevel compression_level)
     : compression_level(compression_level)
@@ -8826,8 +8846,562 @@ DataOutBase::write_hdf5_parallel(
 
 #endif
 }
+#ifdef DEAL_II_WITH_NETCDF
+namespace
+{
+  /**
+   * Automatically close the netcdf file on scope exit.
+   */
+  struct ScopeNcClose
+  {
+    int ncid;
+    ~ScopeNcClose()
+    {
+      // Ignore the error code because nc_close can only fail
+      // if ncid is invalid, in which case nc_create/open or
+      // other functions already failed.
+      nc_close(ncid);
+    }
+  };
+
+  /**
+   * Helper function to create a NetCDF attribute for different data types.
+   */
+  int
+  nc_put_att_var(int                                         ncid,
+                 int                                         varid,
+                 const char                                 *name,
+                 const DataOutBase::CFFlags::AttributeValue &value)
+  {
+    return std::visit(
+      [&](const auto &v) {
+        using T = std::remove_cv_t<std::remove_reference_t<decltype(v)>>;
+        if constexpr (std::is_same_v<T, std::string>)
+          {
+            return nc_put_att_text(ncid, varid, name, v.size(), v.c_str());
+          }
+        else if constexpr (std::is_same_v<T, double>)
+          {
+            return nc_put_att_double(ncid, varid, name, NC_DOUBLE, 1, &v);
+          }
+        else if constexpr (std::is_same_v<T, int>)
+          {
+            return nc_put_att_int(ncid, varid, name, NC_INT, 1, &v);
+          }
+      },
+      value);
+  }
+
+  /**
+   * Helper function to write the mesh according to CF conventions.
+   */
+  template <int dim, int spacedim>
+  void
+  write_cf_mesh(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+                const DataOutBase::DataOutFilter &data_filter,
+                const DataOutBase::CFFlags       &flags,
+                const std::string                &filename,
+                const int                         global_node_cell_count[2],
+                const int                         global_node_cell_offsets[2],
+                const MPI_Comm                    comm)
+  {
+    (void)comm;
+    int ncid;
+    int ncerr;
+    // Create file, overwriting any existing file
+#  if NC_HAS_PARALLEL && defined(DEAL_II_WITH_MPI)
+    ncerr = nc_create_par(filename.c_str(),
+                          NC_WRITE | NC_CLOBBER | NC_NETCDF4,
+                          comm,
+                          MPI_INFO_NULL,
+                          &ncid);
+#  else
+    ncerr =
+      nc_create(filename.c_str(), NC_WRITE | NC_CLOBBER | NC_NETCDF4, &ncid);
+#  endif
+    AssertThrowNC(ncerr);
+    ScopeNcClose close{ncid};
+
+    // global attributes, may be overwritten by user defined attributes
+    ncerr = nc_put_att_var(ncid, NC_GLOBAL, "Conventions", "CF-1.12");
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(
+      ncid,
+      NC_GLOBAL,
+      "comment",
+      "Created by the deal.II finite element library (https://dealii.org).");
+    AssertThrowNC(ncerr);
+    // user defined global attributes
+    if (auto it_global_atts = flags.attributes.find("global");
+        it_global_atts != flags.attributes.end())
+      {
+        for (const auto &[att_name, att_value] : it_global_atts->second)
+          {
+            ncerr =
+              nc_put_att_var(ncid, NC_GLOBAL, att_name.c_str(), att_value);
+            AssertThrowNC(ncerr);
+          }
+      }
+
+    // create dimensions for the mesh topology
+    // assume no mixed mesh, fixed number of nodes per cell
+    int dim_node, dim_cell, dim_cell_node;
+    ncerr = nc_def_dim(ncid, "node", global_node_cell_count[0], &dim_node);
+    AssertThrowNC(ncerr);
+    ncerr = nc_def_dim(ncid, "face", global_node_cell_count[1], &dim_cell);
+    AssertThrowNC(ncerr);
+    int n_nodes_per_cell = patches[0].reference_cell.n_vertices();
+    // check for mixed mesh, may be expensive
+    // actually requires MPI communication to be certain
+    Assert(std::all_of(patches.begin(),
+                       patches.end(),
+                       [ref = patches[0].reference_cell](auto &&patch) {
+                         return patch.reference_cell == ref;
+                       }),
+           ExcNotImplemented(
+             "Mixed meshes are currently not supported in CF output."));
+    ncerr = nc_def_dim(ncid, "face_node", n_nodes_per_cell, &dim_cell_node);
+    AssertThrowNC(ncerr);
+
+    // create the mesh variable that holds the mesh meta data
+    // as attributes. Only include the required topology attributes,
+    // edges would require parsing of the vertices and filtering duplicates.
+    int var_mesh, var_cell, var_x, var_y;
+    ncerr = nc_def_var(ncid, "mesh", NC_INT, 0, nullptr, &var_mesh);
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid, var_mesh, "cf_role", "mesh_topology");
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid,
+                           var_mesh,
+                           "long_name",
+                           "Topology of a 2-d unstructured mesh");
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid, var_mesh, "topology_dimension", 2);
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid,
+                           var_mesh,
+                           "node_coordinates",
+                           "mesh_node_x mesh_node_y");
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid,
+                           var_mesh,
+                           "face_node_connectivity",
+                           "mesh_face_nodes");
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid, var_mesh, "face_dimension", "face");
+    AssertThrowNC(ncerr);
+    // not sure if the mesh variable is required to have a value,
+    // but to be safe:
+    int dummy_mesh_value = 0;
+    ncerr                = nc_put_var_int(ncid, var_mesh, &dummy_mesh_value);
+    AssertThrowNC(ncerr);
+
+    // create the variable that holds the node indices that define each cell
+    int dims_cells[] = {dim_cell, dim_cell_node};
+    ncerr =
+      nc_def_var(ncid, "mesh_face_nodes", NC_INT, 2, dims_cells, &var_cell);
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid, var_cell, "cf_role", "face_node_connectivity");
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid,
+                           var_cell,
+                           "long_name",
+                           "Corner nodes that make up each face.");
+    AssertThrowNC(ncerr);
+    // use 0-based indexing
+    ncerr = nc_put_att_var(ncid, var_cell, "start_index", 0);
+    AssertThrowNC(ncerr);
+    // fill if cells in a mixed mesh have less than the maximum number of nodes:
+    // (currently unused since mixed mesh not supported)
+    ncerr = nc_put_att_var(ncid, var_cell, "_FillValue", -1);
+    AssertThrowNC(ncerr);
+
+    // create the variables that hold the node coordinates
+    // variable names must be the same as listed in the mesh attributes above
+    ncerr = nc_def_var(ncid, "mesh_node_x", NC_DOUBLE, 1, &dim_node, &var_x);
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid, var_x, "axis", "X");
+    AssertThrowNC(ncerr);
+    ncerr = nc_def_var(ncid, "mesh_node_y", NC_DOUBLE, 1, &dim_node, &var_y);
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_att_var(ncid, var_y, "axis", "Y");
+    // user defined attributes for coordinates (e.g. "units")
+    AssertThrowNC(ncerr);
+    if (auto it_time_atts = flags.attributes.find("x");
+        it_time_atts != flags.attributes.end())
+      {
+        for (const auto &[att_name, att_value] : it_time_atts->second)
+          {
+            ncerr = nc_put_att_var(ncid, var_x, att_name.c_str(), att_value);
+            AssertThrowNC(ncerr);
+          }
+      }
+    if (auto it_time_atts = flags.attributes.find("y");
+        it_time_atts != flags.attributes.end())
+      {
+        for (const auto &[att_name, att_value] : it_time_atts->second)
+          {
+            ncerr = nc_put_att_var(ncid, var_y, att_name.c_str(), att_value);
+            AssertThrowNC(ncerr);
+          }
+      }
+
+    // Create the unlimited time dimension if requested
+    int dim_time, var_time;
+    if (flags.time > -std::numeric_limits<double>::infinity())
+      {
+        ncerr = nc_def_dim(ncid, "time", NC_UNLIMITED, &dim_time);
+        AssertThrowNC(ncerr);
+        ncerr = nc_def_var(ncid, "time", NC_DOUBLE, 1, &dim_time, &var_time);
+        AssertThrowNC(ncerr);
+        ncerr = nc_put_att_var(ncid, var_time, "standard_name", "time");
+        AssertThrowNC(ncerr);
+        ncerr = nc_put_att_var(ncid, var_time, "axis", "T");
+        AssertThrowNC(ncerr);
+        ncerr = nc_put_att_var(ncid, var_time, "long_name", "Time dimension");
+        AssertThrowNC(ncerr);
+        // user defined attributes for time variable (e.g. units)
+        if (auto it_time_atts = flags.attributes.find("time");
+            it_time_atts != flags.attributes.end())
+          {
+            for (const auto &[att_name, att_value] : it_time_atts->second)
+              {
+                ncerr =
+                  nc_put_att_var(ncid, var_time, att_name.c_str(), att_value);
+                AssertThrowNC(ncerr);
+              }
+          }
+      }
+
+    // write the coordinate values
+    std::vector<double> coords;
+    data_filter.fill_node_data(coords);
+    std::vector<double> x(data_filter.n_nodes());
+    std::vector<double> y(data_filter.n_nodes());
+    for (int i = 0; i < global_node_cell_count[0]; ++i)
+      {
+        x[i] = coords[i * spacedim];
+        y[i] = coords[i * spacedim + 1];
+      }
+    size_t coord_write_start[] = {(size_t)global_node_cell_offsets[0]};
+    size_t coord_write_count[] = {(size_t)data_filter.n_nodes()};
+    ncerr                      = nc_put_vara_double(
+      ncid, var_x, coord_write_start, coord_write_count, x.data());
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_vara_double(
+      ncid, var_y, coord_write_start, coord_write_count, y.data());
+    AssertThrowNC(ncerr);
+
+    // write the cell node indices
+    std::vector<unsigned int> ucells;
+    data_filter.fill_cell_data(global_node_cell_offsets[0], ucells);
+    size_t cell_write_start[] = {(size_t)global_node_cell_offsets[1],
+                                 size_t(0)};
+    size_t cell_write_count[] = {(size_t)data_filter.n_cells(),
+                                 (size_t)n_nodes_per_cell};
+    ncerr                     = nc_put_vara_uint(
+      ncid, var_cell, cell_write_start, cell_write_count, ucells.data());
+    AssertThrowNC(ncerr);
+  }
+
+  void
+  write_cf_data(const DataOutBase::DataOutFilter &data_filter,
+                const DataOutBase::CFFlags       &flags,
+                const std::string                &filename,
+                const int                         global_node_offset,
+                const MPI_Comm                    comm)
+  {
+    (void)comm; // unused if not parallel
+
+    int ncid;
+    int ncerr;
+
+    // open file
+#  if NC_HAS_PARALLEL && defined(DEAL_II_WITH_MPI)
+    ncerr = nc_open_par(
+      filename.c_str(), NC_WRITE | NC_NETCDF4, comm, MPI_INFO_NULL, &ncid);
+#  else
+    ncerr = nc_open(filename.c_str(), NC_WRITE | NC_NETCDF4, &ncid);
+#  endif
+    AssertThrowNC(ncerr);
+    ScopeNcClose close{ncid};
+
+    // find mesh dimensions for data sets
+    int dim_node;
+    ncerr = nc_inq_dimid(ncid, "node", &dim_node);
+    AssertThrowNC(ncerr);
+
+    // find time dimension if requested
+    int    dim_time = -1, var_time = -1;
+    size_t index_t  = 0;
+    bool   has_time = flags.time > -std::numeric_limits<double>::infinity();
+    if (has_time)
+      {
+        int inq_dim_time = nc_inq_dimid(ncid, "time", &dim_time);
+        int inq_var_time = nc_inq_varid(ncid, "time", &var_time);
+        if (inq_dim_time == NC_EBADDIM || inq_var_time == NC_ENOTVAR)
+          {
+            AssertThrow(
+              false,
+              ExcIO("You are trying to add a time point to an existing file "
+                    "that does not have a time dimension or variable. "
+                    "Check the options in DataOutBase::cf_flags."));
+          }
+        AssertThrowNC(inq_dim_time);
+        AssertThrowNC(inq_var_time);
+
+        // Write time point.
+        // Assume time points are strictly increasing to find the correct index
+        // to write at. This may not be the end of the time dimension
+        // if the simulation was interrupted and restarted at a checkpoint.
+        size_t n_time;
+        ncerr = nc_inq_dimlen(ncid, dim_time, &n_time);
+        AssertThrowNC(ncerr);
+        auto times = std::vector<double>(n_time);
+        ncerr      = nc_get_var_double(ncid, var_time, times.data());
+        AssertThrowNC(ncerr);
+        auto it_lb = std::lower_bound(times.begin(), times.end(), flags.time);
+        index_t    = std::distance(times.begin(), it_lb);
+        size_t count_t = 1;
+#  if NC_HAS_PARALLEL && defined(DEAL_II_WITH_MPI)
+        // variable with unlimited dimension must be written collectively
+        ncerr = nc_var_par_access(ncid, var_time, NC_COLLECTIVE);
+        AssertThrowNC(ncerr);
+#  endif
+        ncerr =
+          nc_put_vara_double(ncid, var_time, &index_t, &count_t, &flags.time);
+        AssertThrowNC(ncerr);
+#  if NC_HAS_PARALLEL && defined(DEAL_II_WITH_MPI)
+        ncerr = nc_var_par_access(ncid, var_time, NC_INDEPENDENT);
+        AssertThrowNC(ncerr);
+#  endif
+      }
 
 
+    // write data sets
+    for (auto dataset_index = 0u; dataset_index < data_filter.n_data_sets();
+         ++dataset_index)
+      {
+        AssertThrow(data_filter.get_data_set_dim(dataset_index) == 1,
+                    ExcIO("Can only write scalar data in CF files."));
+
+        const std::string &key = data_filter.get_data_set_name(dataset_index);
+        const double      *values = data_filter.get_data_set(dataset_index);
+
+        // find existing variable for dataset or create new
+        int varid;
+        int inq_var = nc_inq_varid(ncid, key.c_str(), &varid);
+        if (inq_var == NC_ENOTVAR)
+          {
+            int var_dims[] = {dim_time, dim_node};
+            ncerr          = nc_def_var(ncid,
+                               key.c_str(),
+                               NC_DOUBLE,
+                               has_time ? 2 : 1,
+                               &var_dims[has_time ? 0 : 1],
+                               &varid);
+            AssertThrowNC(ncerr);
+            ncerr = nc_put_att_var(ncid, varid, "mesh", "mesh");
+            AssertThrowNC(ncerr);
+            ncerr = nc_put_att_var(ncid,
+                                   varid,
+                                   "location",
+                                   "node"); // no cell data in DataOutFilter
+            AssertThrowNC(ncerr);
+            // fill value if this data set is not written at every time point:
+            ncerr = nc_put_att_var(ncid,
+                                   varid,
+                                   "_FillValue",
+                                   std::numeric_limits<double>::quiet_NaN());
+            AssertThrowNC(ncerr);
+            // user defined attributes for this variable:
+            if (auto it_atts = flags.attributes.find(key);
+                it_atts != flags.attributes.end())
+              {
+                for (const auto &[att_name, att_value] : it_atts->second)
+                  {
+                    ncerr =
+                      nc_put_att_var(ncid, varid, att_name.c_str(), att_value);
+                    AssertThrowNC(ncerr);
+                  }
+              }
+          }
+        else
+          {
+            AssertThrowNC(inq_var);
+          }
+
+#  if NC_HAS_PARALLEL && defined(DEAL_II_WITH_MPI)
+        // variable with unlimited dimension must be written collectively
+        ncerr = nc_var_par_access(ncid, varid, NC_COLLECTIVE);
+        AssertThrowNC(ncerr);
+#  endif
+        // write data
+        // skip time dimension if not available
+        size_t var_write_start[] = {index_t, (size_t)global_node_offset};
+        size_t var_write_count[] = {1, (size_t)data_filter.n_nodes()};
+        ncerr                    = nc_put_vara_double(ncid,
+                                   varid,
+                                   &var_write_start[has_time ? 0 : 1],
+                                   &var_write_count[has_time ? 0 : 1],
+                                   values);
+        AssertThrowNC(ncerr);
+#  if NC_HAS_PARALLEL && defined(DEAL_II_WITH_MPI)
+        ncerr = nc_var_par_access(ncid, varid, NC_INDEPENDENT);
+        AssertThrowNC(ncerr);
+#  endif
+      }
+  }
+} // namespace
+#endif // DEAL_II_WITH_NETCDF
+
+template <int dim, int spacedim>
+void
+DataOutInterface<dim, spacedim>::write_cf_parallel(
+  const DataOutBase::DataOutFilter &data_filter,
+  const std::string                &filename,
+  const MPI_Comm                    comm) const
+{
+  DataOutBase::write_cf_parallel(
+    get_patches(), data_filter, cf_flags, filename, comm);
+}
+
+template <int dim, int spacedim>
+void
+DataOutBase::write_cf_parallel(const std::vector<Patch<dim, spacedim>> &patches,
+                               const DataOutBase::DataOutFilter &data_filter,
+                               const DataOutBase::CFFlags       &flags,
+                               const std::string                &filename,
+                               const MPI_Comm                    comm)
+{
+  AssertThrow(spacedim == 2,
+              ExcMessage(
+                "DataOutBase can only write CF output in 2 dimensions."));
+  AssertThrow(dim == spacedim,
+              ExcMessage(
+                "Mesh must have codimension 0 for writing CF output."));
+
+#ifndef DEAL_II_WITH_NETCDF
+  // throw an exception, but first make sure the compiler does not warn about
+  // the now unused function arguments
+  (void)patches;
+  (void)data_filter;
+  (void)flags;
+  (void)filename;
+  (void)comm;
+  AssertThrow(false, ExcNeedsNetCDF());
+#else
+
+  const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
+  (void)n_ranks;
+
+  // If NetCDF is not parallel and we're using multiple processes, abort:
+#  if !NC_HAS_PARALLEL
+  AssertThrow(
+    n_ranks <= 1,
+    ExcNotImplemented(
+      "Serial NetCDF output on multiple processes is not yet supported."));
+#  endif
+
+  // Verify that there are indeed patches to be written out. most of
+  // the times, people just forget to call build_patches when there
+  // are no patches, so a warning is in order. That said, the
+  // assertion is disabled if we run with more than one MPI rank,
+  // since then it can happen that, on coarse meshes, a processor
+  // simply has no cells it actually owns, and in that case it is
+  // legit if there are no patches.
+  Assert((patches.size() > 0) || (n_ranks > 1), ExcNoPatches());
+
+  // The HDF5 routines perform a bunch of collective calls that expect all
+  // ranks to participate. One ranks without any patches we are missing
+  // critical information, so rather than broadcasting that information, just
+  // create a new communicator that only contains ranks with cells and
+  // use that to perform the write operations:
+  const bool have_patches = (patches.size() > 0);
+#  ifdef DEAL_II_WITH_MPI
+  MPI_Comm   split_comm;
+  {
+    const int key   = Utilities::MPI::this_mpi_process(comm);
+    const int color = (have_patches ? 1 : 0);
+    const int ierr  = MPI_Comm_split(comm, color, key, &split_comm);
+    AssertThrowMPI(ierr);
+  }
+#  else
+  MPI_Comm split_comm = comm;
+#  endif
+
+  if (have_patches)
+    {
+      int local_node_cell_count[] = {
+        (int)data_filter.n_nodes(),
+        (int)data_filter.n_cells(),
+      };
+      int global_node_cell_count[]   = {local_node_cell_count[0],
+                                        local_node_cell_count[1]};
+      int global_node_cell_offsets[] = {0, 0};
+
+#  ifdef DEAL_II_WITH_MPI
+      int ierr                       = MPI_Allreduce(local_node_cell_count,
+                               global_node_cell_count,
+                               2,
+                               Utilities::MPI::mpi_type_id_for_type<int>,
+                               MPI_SUM,
+                               split_comm);
+      AssertThrowMPI(ierr);
+      ierr = MPI_Exscan(local_node_cell_count,
+                        global_node_cell_offsets,
+                        2,
+                        Utilities::MPI::mpi_type_id_for_type<int>,
+                        MPI_SUM,
+                        split_comm);
+      AssertThrowMPI(ierr);
+#  endif
+
+      if (!flags.keep_existing_file)
+        {
+          // Create new file with mesh definition
+          write_cf_mesh(patches,
+                        data_filter,
+                        flags,
+                        filename,
+                        global_node_cell_count,
+                        global_node_cell_offsets,
+                        split_comm);
+        }
+      else
+        {
+          // Existing file with mesh definition will be reused.
+          // Explicitly checking that the mesh in the file is correct
+          // could be expensive. But NetCDF will complain if the dimensions
+          // don't match. So we only check that the file exists.
+          if (!std::filesystem::is_regular_file(filename))
+            {
+              AssertThrow(false,
+                          ExcIO(
+                            "You are trying to write data to an existing file "
+                            "but no file of the given name exists. "
+                            "Create the file with a mesh by setting "
+                            "CFFlags::keep_existing_file = false."));
+            }
+        }
+
+      // write the data sets to the file that contains the mesh definition
+      // (either just created or preexisting)
+      write_cf_data(
+        data_filter, flags, filename, global_node_cell_offsets[0], split_comm);
+    }
+
+#  ifdef DEAL_II_WITH_MPI
+  int ierr = MPI_Comm_free(&split_comm);
+  AssertThrowMPI(ierr);
+  // writing netcdf is collective, but maybe not all processes participated.
+  // Use explicit synchronization so the behavior of this function is always
+  // the same, all processes can use the file safely after this.
+  ierr = MPI_Barrier(comm);
+  AssertThrowMPI(ierr);
+#  endif
+#endif // DEAL_II_WITH_NETCDF
+}
 
 template <int dim, int spacedim>
 void
@@ -8921,6 +9495,8 @@ DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
     gmv_flags = flags;
   else if constexpr (std::is_same_v<FlagType, DataOutBase::Hdf5Flags>)
     hdf5_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::CFFlags>)
+    cf_flags = flags;
   else if constexpr (std::is_same_v<FlagType, DataOutBase::TecplotFlags>)
     tecplot_flags = flags;
   else if constexpr (std::is_same_v<FlagType, DataOutBase::VtkFlags>)
