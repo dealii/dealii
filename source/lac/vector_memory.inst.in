@@ -17,3 +17,16 @@ for (VECTOR : VECTOR_TYPES)
     template class VectorMemory<VECTOR>;
     template class GrowingVectorMemory<VECTOR>;
   }
+
+for (SCALAR : REAL_SCALARS)
+  {
+    template class VectorMemory<
+      LinearAlgebra::distributed::BlockVector<SCALAR, MemorySpace::Default>>;
+    template class GrowingVectorMemory<
+      LinearAlgebra::distributed::BlockVector<SCALAR, MemorySpace::Default>>;
+
+    template class VectorMemory<
+      LinearAlgebra::distributed::Vector<SCALAR, MemorySpace::Default>>;
+    template class GrowingVectorMemory<
+      LinearAlgebra::distributed::Vector<SCALAR, MemorySpace::Default>>;
+  }

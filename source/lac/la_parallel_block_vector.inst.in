@@ -130,3 +130,19 @@ for (S1, S2 : COMPLEX_SCALARS)
       \}
     \}
   }
+
+
+
+for (SCALAR : REAL_SCALARS)
+  {
+    namespace LinearAlgebra
+    \{
+      namespace distributed
+      \{
+        template void
+        BlockVector<SCALAR, ::dealii::MemorySpace::Default>::reinit<SCALAR>(
+          const BlockVector<SCALAR, ::dealii::MemorySpace::Default> &,
+          const bool);
+      \}
+    \}
+  }
