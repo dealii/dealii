@@ -24,18 +24,36 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+namespace
+{
+  /**
+   * Return the vertices of a pyramid in a way that can also be compiled
+   * for dim==1 and dim==2.
+   */
+  template <int dim>
+  std::vector<Point<dim>>
+  get_pyramid_vertices()
+  {
+    if constexpr (dim == 3)
+      return {ReferenceCells::Pyramid.vertex<3>(0),
+              ReferenceCells::Pyramid.vertex<3>(1),
+              ReferenceCells::Pyramid.vertex<3>(2),
+              ReferenceCells::Pyramid.vertex<3>(3),
+              ReferenceCells::Pyramid.vertex<3>(4)};
+    else
+      {
+        DEAL_II_ASSERT_UNREACHABLE();
+        return {};
+      }
+  }
+} // namespace
+
+
 
 template <int dim>
 ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
   const unsigned int degree)
-  : ScalarLagrangePolynomialPyramid<dim>(
-      1,
-      5,
-      {ReferenceCells::Pyramid.vertex<dim>(0),
-       ReferenceCells::Pyramid.vertex<dim>(1),
-       ReferenceCells::Pyramid.vertex<dim>(2),
-       ReferenceCells::Pyramid.vertex<dim>(3),
-       ReferenceCells::Pyramid.vertex<dim>(4)})
+  : ScalarLagrangePolynomialPyramid<dim>(1, 5, get_pyramid_vertices<dim>())
 {
   AssertThrow(degree == 1,
               ExcNotImplemented(
