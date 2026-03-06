@@ -708,9 +708,9 @@ namespace internal
    * Utility function to convert "dofs per object" information
    * of a @p dim dimensional reference cell @p reference_cell.
    */
+  template <int dim>
   internal::GenericDoFsPerObject
-  expand(const unsigned int               dim,
-         const std::vector<unsigned int> &dofs_per_object,
+  expand(const std::vector<unsigned int> &dofs_per_object,
          const ReferenceCell              reference_cell);
 } // namespace internal
 

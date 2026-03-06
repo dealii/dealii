@@ -189,9 +189,8 @@ namespace
 
     if (conformity == FiniteElementData<dim>::L2)
       {
-        dpo = internal::expand(3,
-                               {{0, 0, 0, compute_n_dofs(dim, degree)}},
-                               ReferenceCells::Pyramid);
+        dpo = internal::expand<3>({{0, 0, 0, compute_n_dofs(dim, degree)}},
+                                  ReferenceCells::Pyramid);
       }
     else if (conformity == FiniteElementData<dim>::H1)
       {
