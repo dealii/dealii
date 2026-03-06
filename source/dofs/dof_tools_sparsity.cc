@@ -357,6 +357,68 @@ namespace DoFTools
   }
 
 
+  template <int dim, int spacedim, typename number>
+  void
+  make_block_sparsity_pattern_block(
+    const DoFHandler<dim, spacedim> &dof_row,
+    const DoFHandler<dim, spacedim> &dof_col,
+    SparsityPatternBase             &sparsity_pattern,
+    const AffineConstraints<number> &constraints_row,
+    const AffineConstraints<number> &constraints_col,
+    const bool                       keep_constrained_dofs,
+    const types::subdomain_id        subdomain_id)
+  {
+    const types::global_dof_index n_dofs_row = dof_row.n_dofs();
+    const types::global_dof_index n_dofs_col = dof_col.n_dofs();
+    (void)n_dofs_row;
+    (void)n_dofs_col;
+    Assert(sparsity_pattern.n_rows() == n_dofs_row,
+           ExcDimensionMismatch(sparsity_pattern.n_rows(), n_dofs_row));
+    Assert(sparsity_pattern.n_cols() == n_dofs_col,
+           ExcDimensionMismatch(sparsity_pattern.n_cols(), n_dofs_col));
+    // See DoFTools::make_sparsity_pattern
+    if (const auto *triangulation =
+          dynamic_cast<const parallel::DistributedTriangulationBase<dim> *>(
+            &dof_row.get_triangulation()))
+      Assert((subdomain_id == numbers::invalid_subdomain_id) ||
+               (subdomain_id == triangulation->locally_owned_subdomain()),
+             ExcMessage(
+               "For distributed Triangulation objects and associated "
+               "DoFHandler objects, asking for any subdomain other than the "
+               "locally owned one does not make sense."));
+
+    std::vector<types::global_dof_index> dofs_row_on_this_cell;
+    dofs_row_on_this_cell.reserve(
+      dof_row.get_fe_collection().max_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs_col_on_this_cell;
+    dofs_col_on_this_cell.reserve(
+      dof_col.get_fe_collection().max_dofs_per_cell());
+
+    // See DoFTools::make_sparsity_pattern
+    for (const auto &cell_row : dof_row.active_cell_iterators())
+      if (((subdomain_id == numbers::invalid_subdomain_id) ||
+           (subdomain_id == cell_row->subdomain_id())) &&
+          cell_row->is_locally_owned())
+        {
+          typename DoFHandler<dim>::active_cell_iterator cell_col =
+            cell_row->as_dof_handler_iterator(dof_col);
+          const unsigned int dofs_per_cell_row =
+            cell_row->get_fe().n_dofs_per_cell();
+          dofs_row_on_this_cell.resize(dofs_per_cell_row);
+          cell_row->get_dof_indices(dofs_row_on_this_cell);
+          const unsigned int dofs_per_cell_col =
+            cell_col->get_fe().n_dofs_per_cell();
+          dofs_col_on_this_cell.resize(dofs_per_cell_col);
+          cell_col->get_dof_indices(dofs_col_on_this_cell);
+          // See DoFTools::make_sparsity_pattern
+          constraints_row.add_entries_local_to_global(dofs_row_on_this_cell,
+                                                      constraints_col,
+                                                      dofs_col_on_this_cell,
+                                                      sparsity_pattern,
+                                                      keep_constrained_dofs);
+        }
+  }
+
 
   template <int dim, int spacedim>
   void
