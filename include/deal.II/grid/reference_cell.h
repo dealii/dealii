@@ -4032,7 +4032,9 @@ ReferenceCell::face_to_cell_line_orientation(
 {
   constexpr auto D = numbers::default_geometric_orientation;
   constexpr auto R = numbers::reverse_line_orientation;
-  if (*this == ReferenceCells::Hexahedron)
+
+  if (*this == ReferenceCells::Hexahedron ||
+      (*this == ReferenceCells::Pyramid && face_no == 0))
     {
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
         table{{{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
@@ -4055,8 +4057,15 @@ ReferenceCell::face_to_cell_line_orientation(
       Assert(combined_line != X,
              ExcMessage(
                "This function can only be called for following face-line "
-               "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1),"));
+               "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1)"));
 
+      // if the line in the face and the line on the reference cell have the
+      // same orientation, then switching vertices 1 and 2 reverses the
+      // orientation (i.e. in the first array the 2nd, the 4th and the last
+      // entry) but rotating the triangle does not switch the orientation (the
+      // remaining entries)
+      // if the line in the face and the line on the reference cell do not have
+      // the same orientation, then it is the other way around
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
         table{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
 
@@ -4066,10 +4075,43 @@ ReferenceCell::face_to_cell_line_orientation(
       return match ? numbers::default_geometric_orientation :
                      numbers::reverse_line_orientation;
     }
+  else if (*this == ReferenceCells::Pyramid)
+    {
+      // face 0 is handled above, the lines in the face 3 and 4 already appear
+      // in faces 1 and 2
+      Assert((face_no == 1 || face_no == 2), ExcMessage("Invalid face number"));
+      // so lines 0 - 3 are done, which means the face_line_no cannot be 0
+      Assert(face_line_no == 1 || face_line_no == 2,
+             ExcMessage("Invalid face line number for the triangular faces"));
+
+      // lines 6 (face 1, face_line_no 1) and 5 (face 2, face_line_no 1) are
+      // oriented the same way in the cell and on the faces
+      // lines 4 (face 1, face_line 2) and 7 (face 2, face_line 2) are not
+      // oriented the same way in the cell and on the faces
+      static constexpr dealii::ndarray<unsigned int, 2, 2> combined_lines{
+        {{{0, 1}}, {{0, 1}}}};
+
+      const auto combined_line = combined_lines[face_no - 1][face_line_no - 1];
+
+      // so if the face_line_no is 1 and the combined_face_orientation is even
+      // (see also the table for Tetrahedrons) it is in the default orientation
+      // if the face_line_no is 2 and the combined_face_orientation is odd it is
+      // also in the default orientation
+      static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
+        table{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
+
+      // then just check if the given line is also in the default orientation
+      const bool match =
+        line_orientation == table[combined_line][combined_face_orientation];
+
+      return match ? numbers::default_geometric_orientation :
+                     numbers::reverse_line_orientation;
+    }
   else
-    // TODO: This might actually be wrong for some of the other
-    // kinds of objects. We should check this
-    return numbers::default_geometric_orientation;
+    DEAL_II_NOT_IMPLEMENTED();
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return numbers::default_geometric_orientation;
 }
 
 inline unsigned int
