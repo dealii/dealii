@@ -35,7 +35,7 @@ jobs:
     # simple serial release build using g++
 
     name: ${{ matrix.ubuntu_version }} release serial
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -48,11 +48,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy, noble]
-
-    container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
-      options: --user root
+        include:
+          - ubuntu_version: jammy
+            os: ubuntu-22.04
+          - ubuntu_version: noble
+            os: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v6
