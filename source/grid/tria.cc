@@ -3936,8 +3936,8 @@ namespace internal
         tria.vertices_used.assign(vertices.size(), true);
 
         // compute connectivity
-        const auto         connectivity = build_connectivity(cells);
-        const unsigned int n_cell       = cells.size();
+        const auto connectivity = build_connectivity(cells);
+        const auto n_cells      = cells.size();
 
         // TriaObjects: lines
         if (dim >= 2)
@@ -4035,12 +4035,10 @@ namespace internal
                 });
             }
 
-          cells_0.allocate(n_cell);
-          reserve_space_(level, n_cell, orientation_needed);
-
+          level.allocate(n_cells, orientation_needed);
           // loop over all cells
           unsigned int global_face_index = 0;
-          for (unsigned int cell = 0; cell < n_cell; ++cell)
+          for (unsigned int cell = 0; cell < n_cells; ++cell)
             {
               // set material ids
               cells_0.boundary_or_material_id[cell].material_id =
@@ -4292,41 +4290,6 @@ namespace internal
             faces.quads_line_orientations.assign(size * max_n_faces(structdim),
                                                  true);
           }
-      }
-
-
-
-      template <int dim, int spacedim>
-      static void
-      reserve_space_(TriaLevel<dim, spacedim> &level,
-                     const unsigned int        size,
-                     const bool                orientation_needed)
-      {
-        level.active_cell_indices.assign(size, numbers::invalid_unsigned_int);
-        level.subdomain_ids.assign(size, 0);
-        level.level_subdomain_ids.assign(size, 0);
-
-        level.refine_flags.assign(size, 0u);
-        level.refine_choice.assign(size, 0u);
-        level.coarsen_flags.assign(size, false);
-
-        level.parents.assign((size + 1) / 2, -1);
-
-        if (dim == spacedim - 1)
-          level.direction_flags.assign(size, true);
-
-        level.neighbors.assign(size * max_n_faces(dim), {-1, -1});
-
-        level.reference_cell.assign(size, ReferenceCells::Invalid);
-
-        if (orientation_needed)
-          level.face_orientations.reinit(size, max_n_faces(dim));
-
-
-        level.global_active_cell_indices.assign(size,
-                                                numbers::invalid_dof_index);
-        level.global_level_cell_indices.assign(size,
-                                               numbers::invalid_dof_index);
       }
 
       /**

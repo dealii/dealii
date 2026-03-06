@@ -77,6 +77,17 @@ namespace internal
       TriaLevel() = default;
 
       /**
+       * Resize all internal arrays and populate with default values.
+       *
+       * @param[in] n_cells Total number of cells this object should store.
+       *
+       * @param[in] orientation_needed Whether or not the level needs to store
+       *            orientation values.
+       */
+      void
+      allocate(const std::size_t n_cells, const bool orientation_needed);
+
+      /**
        * @p RefinementCase<dim>::Type flags for the cells to be refined with
        * or not (RefinementCase<dim>::no_refinement). The meaning what a cell
        * is, is dimension specific, therefore also the length of this vector

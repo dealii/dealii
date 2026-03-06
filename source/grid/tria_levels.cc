@@ -43,6 +43,39 @@ namespace internal
         MemoryConsumption::memory_consumption(cell_vertex_indices_cache));
     }
 
+
+
+    template <int dim, int spacedim>
+    void
+    TriaLevel<dim, spacedim>::allocate(const std::size_t n_cells,
+                                       const bool        orientation_needed)
+    {
+      active_cell_indices.assign(n_cells, numbers::invalid_unsigned_int);
+      subdomain_ids.assign(n_cells, 0);
+      level_subdomain_ids.assign(n_cells, 0);
+
+      refine_flags.assign(n_cells, 0u);
+      refine_choice.assign(n_cells, 0u);
+      coarsen_flags.assign(n_cells, false);
+
+      parents.assign((n_cells + 1) / 2, -1);
+
+      if (dim == spacedim - 1)
+        direction_flags.assign(n_cells, true);
+
+      cells.allocate(n_cells);
+
+      face_orientations.reinit(orientation_needed ? n_cells : 0u,
+                               cells.faces_per_object);
+
+      neighbors.assign(n_cells * cells.faces_per_object, {-1, -1});
+
+      reference_cell.assign(n_cells, ReferenceCells::Invalid);
+
+      global_active_cell_indices.assign(n_cells, numbers::invalid_dof_index);
+      global_level_cell_indices.assign(n_cells, numbers::invalid_dof_index);
+    }
+
     // explicit instantiations; note: we need them all for all dimensions
 
     template class TriaLevel<1, 1>;
