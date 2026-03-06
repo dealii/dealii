@@ -34,6 +34,10 @@ namespace PETScWrappers
     prm.add_parameter("solver type",
                       ts_type,
                       "The string indicating the PETSc TS type.");
+    prm.add_parameter("problem type",
+                      problem_type,
+                      "The string indicating the PETSc problem type.",
+                      Patterns::Selection("linear|nonlinear"));
     prm.add_parameter("initial time",
                       initial_time,
                       "The value for the initial time.");
