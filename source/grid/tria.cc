@@ -2034,12 +2034,13 @@ namespace internal
      *
      * @note Used only for dim=3.
      */
+    template <int dim>
     void
-    reserve_space(TriaFaces         &tria_faces,
+    reserve_space(TriaFaces<dim>    &tria_faces,
                   const unsigned int new_quads_in_pairs,
                   const unsigned int new_quads_single)
     {
-      AssertDimension(tria_faces.dim, 3);
+      AssertDimension(dim, 3);
 
       Assert(new_quads_in_pairs % 2 == 0, ExcInternalError());
 
@@ -3926,8 +3927,7 @@ namespace internal
 
         if (dim > 1)
           tria.faces = std::make_unique<
-            dealii::internal::TriangulationImplementation::TriaFaces>(
-            dim,
+            dealii::internal::TriangulationImplementation::TriaFaces<dim>>(
             ReferenceCells::max_n_children<2>(),
             ReferenceCells::max_n_lines<2>());
 
@@ -4274,13 +4274,12 @@ namespace internal
 
 
 
+      template <int dim>
       static void
-      reserve_space_(TriaFaces         &faces,
+      reserve_space_(TriaFaces<dim>    &faces,
                      const unsigned     structdim,
                      const unsigned int size)
       {
-        const unsigned int dim = faces.dim;
-
         if (dim == 3 && structdim == 2)
           {
             // quad entity types
@@ -13401,8 +13400,9 @@ void Triangulation<dim, spacedim>::copy_triangulation(
   reference_cells        = other_tria.reference_cells;
 
   if (dim > 1)
-    faces = std::make_unique<internal::TriangulationImplementation::TriaFaces>(
-      *other_tria.faces);
+    faces =
+      std::make_unique<internal::TriangulationImplementation::TriaFaces<dim>>(
+        *other_tria.faces);
 
   for (const auto &p : other_tria.manifolds)
     set_manifold(p.first, *p.second);
@@ -14085,16 +14085,17 @@ namespace
 
 
   // clear user data of faces
+  template <int dim>
   void
-  clear_user_data(internal::TriangulationImplementation::TriaFaces *faces)
+  clear_user_data(internal::TriangulationImplementation::TriaFaces<dim> *faces)
   {
-    if (faces->dim == 2)
+    if (dim == 2)
       {
         faces->lines.clear_user_data();
       }
 
 
-    if (faces->dim == 3)
+    if (dim == 3)
       {
         faces->lines.clear_user_data();
         faces->quads.clear_user_data();
@@ -14123,7 +14124,7 @@ namespace
   clear_user_flags_line(
     std::vector<std::unique_ptr<
       internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels,
-    internal::TriangulationImplementation::TriaFaces                    *faces)
+    internal::TriangulationImplementation::TriaFaces<dim>               *faces)
   {
     if (dim == 1)
       {
@@ -14158,7 +14159,7 @@ namespace
   clear_user_flags_quad(
     std::vector<std::unique_ptr<
       internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels,
-    internal::TriangulationImplementation::TriaFaces                    *faces)
+    internal::TriangulationImplementation::TriaFaces<dim>               *faces)
   {
     if (dim == 1)
       {
@@ -14197,7 +14198,7 @@ namespace
   clear_user_flags_hex(
     std::vector<std::unique_ptr<
       internal::TriangulationImplementation::TriaLevel<dim, spacedim>>> &levels,
-    internal::TriangulationImplementation::TriaFaces *)
+    internal::TriangulationImplementation::TriaFaces<dim> *)
   {
     if (dim == 1)
       {
