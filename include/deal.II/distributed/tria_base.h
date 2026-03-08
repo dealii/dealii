@@ -137,9 +137,29 @@ namespace parallel
     n_locally_owned_active_cells() const;
 
     /**
-     * Return the sum over all processors of the number of active cells owned
+     * Return the total number of active cells in the triangulation.
+     *
+     * For the serial ::Triangulation class, this function returns the same
+     * number as n_active_cells() because the mesh is stored entirely on one
+     * process. However, for derived classes that store meshes in parallel
+     * (e.g., in parallel::distributed::Triangulation or the intermediate
+     * class parallel::TriangulationBase), the function returns the
+     * sum over all processors of the number of active cells owned
      * by each processor. This equals the overall number of active cells in
-     * the triangulation.
+     * the triangulation if you think of it as one global object that just
+     * happened to be partitioned among a number of processes.
+     *
+     * (Note that in the parallel case, the returned value is *not* equal
+     * to the sum of active cells stored on each of the processes. This
+     * is because each process stores its own, locally owned, active cells,
+     * but there are also ghost and artificial cells it stores, both of
+     * which are also active cells -- see also
+     * @ref GlossArtificialCell
+     * and
+     * @ref GlossGhostCell.
+     * In other words, each process stores *more*
+     * active cells than just the locally owned active cells; what this function
+     * returns is only the sum over the latter.)
      */
     virtual types::global_cell_index
     n_global_active_cells() const override;
