@@ -2727,6 +2727,10 @@ namespace DataOutBase
                          StreamType                              &out,
                          const bool                               legacy_format)
   {
+    // Make sure the variable is used not just in one of the 'if
+    // constexpr' branches:
+    (void)legacy_format;
+
     unsigned int first_vertex_of_patch = 0;
     // Array to hold all the node numbers of a cell
     std::vector<unsigned> connectivity;
