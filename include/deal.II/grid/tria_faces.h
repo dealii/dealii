@@ -37,13 +37,12 @@ namespace internal
      * store the information belonging to the faces of a triangulation
      * separately from the TriaLevel classes.
      */
+    template <int dim>
     class TriaFaces
     {
     public:
       /**
        * Constructor.
-       *
-       * @param[in] dim Dimension of the relevant Triangulation.
        *
        * @param[in] max_children_per_quad Maximum number of children (across all
        *            relevant ReferenceCell types) a quad (i.e., a face of a cell
@@ -55,19 +54,13 @@ namespace internal
        *            over all relevant ReferenceCell types and is only used in 2d
        *            and 3d.
        */
-      TriaFaces(const unsigned int dim,
-                const unsigned int max_children_per_quad,
+      TriaFaces(const unsigned int max_children_per_quad,
                 const unsigned int max_lines_per_quad);
 
       /**
        * Default constructor for Boost::serialization.
        */
       TriaFaces() = default;
-
-      /**
-       * Dimension of the underlying triangulation.
-       */
-      unsigned int dim;
 
       /**
        * The TriaObject containing the data of quads.
@@ -131,8 +124,9 @@ namespace internal
 
 
 
+    template <int dim>
     inline ReferenceCell
-    TriaFaces::get_quad_type(const std::size_t index) const
+    TriaFaces<dim>::get_quad_type(const std::size_t index) const
     {
       AssertIndexRange(index, quad_is_quadrilateral.size());
       return quad_is_quadrilateral[index] ? ReferenceCells::Quadrilateral :
@@ -141,9 +135,10 @@ namespace internal
 
 
 
+    template <int dim>
     inline void
-    TriaFaces::set_quad_type(const std::size_t   index,
-                             const ReferenceCell face_type)
+    TriaFaces<dim>::set_quad_type(const std::size_t   index,
+                                  const ReferenceCell face_type)
     {
       AssertIndexRange(index, quad_is_quadrilateral.size());
       Assert(face_type == ReferenceCells::Quadrilateral ||
@@ -157,11 +152,11 @@ namespace internal
 
 
 
+    template <int dim>
     template <class Archive>
     void
-    TriaFaces::serialize(Archive &ar, const unsigned int)
+    TriaFaces<dim>::serialize(Archive &ar, const unsigned int)
     {
-      ar                                        &dim;
       ar &quads &lines &quads_line_orientations &quad_is_quadrilateral;
     }
   } // namespace TriangulationImplementation

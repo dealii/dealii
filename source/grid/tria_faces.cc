@@ -22,18 +22,20 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    TriaFaces::TriaFaces(const unsigned int dim,
-                         const unsigned int max_children_per_quad,
-                         const unsigned int max_lines_per_quad)
-      : dim(dim)
-      , quads(2, max_children_per_quad, max_lines_per_quad)
+    template <int dim>
+    TriaFaces<dim>::TriaFaces(const unsigned int max_children_per_quad,
+                              const unsigned int max_lines_per_quad)
+      : quads(2, max_children_per_quad, max_lines_per_quad)
       , lines(1,
               ReferenceCells::max_n_children<1>(),
               ReferenceCells::max_n_faces<1>())
     {}
 
+
+
+    template <int dim>
     std::size_t
-    TriaFaces::memory_consumption() const
+    TriaFaces<dim>::memory_consumption() const
     {
       if (dim == 2)
         return MemoryConsumption::memory_consumption(lines);
@@ -45,6 +47,11 @@ namespace internal
 
       return 0;
     }
+
+
+    template class TriaFaces<1>;
+    template class TriaFaces<2>;
+    template class TriaFaces<3>;
   } // namespace TriangulationImplementation
 } // namespace internal
 
