@@ -1297,19 +1297,20 @@ private:
   /**
    * Table containing all vertex permutations for a line.
    */
-  static constexpr ndarray<unsigned int, 2, 2> line_vertex_permutations = {
-    {{{0, 1}}, {{1, 0}}}};
+  static constexpr ndarray<unsigned int, 3, 4> line_vertex_permutations = {
+    {{{0, 1, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}}, //
+     {{1, 0, numbers::invalid_unsigned_int, numbers::invalid_unsigned_int}}}};
 
   /**
    * Table containing all vertex permutations for all rotations of a triangle.
    */
-  static constexpr ndarray<unsigned int, 6, 3> triangle_vertex_permutations = {
-    {{{0, 1, 2}},
-     {{0, 2, 1}},
-     {{2, 0, 1}},
-     {{2, 1, 0}},
-     {{1, 2, 0}},
-     {{1, 0, 2}}}};
+  static constexpr ndarray<unsigned int, 6, 4> triangle_vertex_permutations = {
+    {{{0, 1, 2, numbers::invalid_unsigned_int}},
+     {{0, 2, 1, numbers::invalid_unsigned_int}},
+     {{2, 0, 1, numbers::invalid_unsigned_int}},
+     {{2, 1, 0, numbers::invalid_unsigned_int}},
+     {{1, 2, 0, numbers::invalid_unsigned_int}},
+     {{1, 0, 2, numbers::invalid_unsigned_int}}}};
 
   /**
    * Table containing all vertex permutations for all rotations of a
@@ -3271,41 +3272,25 @@ ReferenceCell::standard_to_real_face_vertex(
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
+  AssertIndexRange(face_orientation, n_face_orientations(face));
 
-  switch (this->kind)
+  switch (face_reference_cell(face))
     {
       case ReferenceCells::Vertex:
-        DEAL_II_NOT_IMPLEMENTED();
-        break;
-      case ReferenceCells::Line:
-        Assert(face_orientation == numbers::default_geometric_orientation,
-               ExcMessage(
-                 "In 1D, all faces must have the default orientation."));
+        // test to ensure that face_orientation is default_geometric_orientation
+        // already done with AssertIndexRange(face_orientation, ...) above.
         return vertex;
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
+      case ReferenceCells::Line:
         return line_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Tetrahedron:
+      case ReferenceCells::Triangle:
         return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Pyramid:
-        // face 0 is a quadrilateral
-        if (face == 0)
-          return quadrilateral_vertex_permutations[face_orientation][vertex];
-        else
-          return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Wedge:
-        // faces 0 and 1 are triangles
-        if (face > 1)
-          return quadrilateral_vertex_permutations[face_orientation][vertex];
-        else
-          return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Hexahedron:
+      case ReferenceCells::Quadrilateral:
         return quadrilateral_vertex_permutations[face_orientation][vertex];
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
 
-  DEAL_II_NOT_IMPLEMENTED();
+  DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
 }
 
@@ -3315,48 +3300,26 @@ inline unsigned int
 ReferenceCell::standard_to_real_face_line(
   const unsigned int                 line,
   const unsigned int                 face,
-  const types::geometric_orientation combined_face_orientation) const
+  const types::geometric_orientation face_orientation) const
 {
   AssertIndexRange(face, n_faces());
   AssertIndexRange(line, face_reference_cell(face).n_lines());
+  AssertIndexRange(face_orientation, n_face_orientations(face));
 
-  switch (this->kind)
+  switch (face_reference_cell(face))
     {
-      case ReferenceCells::Vertex:
-      case ReferenceCells::Line:
       case ReferenceCells::Triangle:
+        return triangle_line_permutations[face_orientation][line];
       case ReferenceCells::Quadrilateral:
-        DEAL_II_NOT_IMPLEMENTED();
-        break;
-      case ReferenceCells::Tetrahedron:
-        return triangle_line_permutations[combined_face_orientation][line];
-      case ReferenceCells::Pyramid:
-        if (face == 0) // The quadrilateral face
-          {
-            return quadrilateral_line_permutations[combined_face_orientation]
-                                                  [line];
-          }
-        else // One of the triangular faces
-          {
-            return triangle_line_permutations[combined_face_orientation][line];
-          }
-      case ReferenceCells::Wedge:
-        if (face > 1) // One of the quadrilateral faces
-          {
-            return quadrilateral_line_permutations[combined_face_orientation]
-                                                  [line];
-          }
-        else // One of the triangular faces
-          return triangle_line_permutations[combined_face_orientation][line];
-      case ReferenceCells::Hexahedron:
-        {
-          return quadrilateral_line_permutations[combined_face_orientation]
-                                                [line];
-        }
+        return quadrilateral_line_permutations[face_orientation][line];
+      // case ReferenceCells::Vertex:
+      // case ReferenceCells::Line:
+      // case ReferenceCells::Invalid:
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
 
+  DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
 }
 
@@ -3994,14 +3957,20 @@ inline unsigned int
 ReferenceCell::n_face_orientations(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
-  if (get_dimension() == 1)
-    return 1;
-  if (get_dimension() == 2)
-    return 2;
-  else if (face_reference_cell(face_no) == ReferenceCells::Quadrilateral)
-    return 8;
-  else if (face_reference_cell(face_no) == ReferenceCells::Triangle)
-    return 6;
+
+  switch (face_reference_cell(face_no))
+    {
+      case ReferenceCells::Vertex:
+        return 1;
+      case ReferenceCells::Line:
+        return 2;
+      case ReferenceCells::Triangle:
+        return 6;
+      case ReferenceCells::Quadrilateral:
+        return 8;
+      default:
+        DEAL_II_NOT_IMPLEMENTED();
+    }
 
   DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
@@ -4246,11 +4215,12 @@ ReferenceCell::get_combined_orientation(
                     "the number of vertices of the cell "
                     "referenced by this object."));
 
-  auto compute_orientation = [&](const auto &table) {
+  auto compute_orientation = [&](const auto        &table,
+                                 const unsigned int n_vertices) {
     for (types::geometric_orientation o = 0; o < table.size(); ++o)
       {
         bool match = true;
-        for (unsigned int j = 0; j < table[o].size(); ++j)
+        for (unsigned int j = 0; j < n_vertices; ++j)
           match = (match && vertices_0[j] == vertices_1[table[o][j]]);
 
         if (match)
@@ -4269,13 +4239,13 @@ ReferenceCell::get_combined_orientation(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        return compute_orientation(vertex_vertex_permutations);
+        return compute_orientation(vertex_vertex_permutations, 1);
       case ReferenceCells::Line:
-        return compute_orientation(line_vertex_permutations);
+        return compute_orientation(line_vertex_permutations, 2);
       case ReferenceCells::Triangle:
-        return compute_orientation(triangle_vertex_permutations);
+        return compute_orientation(triangle_vertex_permutations, 3);
       case ReferenceCells::Quadrilateral:
-        return compute_orientation(quadrilateral_vertex_permutations);
+        return compute_orientation(quadrilateral_vertex_permutations, 4);
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
@@ -4322,25 +4292,25 @@ ReferenceCell::permute_by_combined_orientation(
   AssertDimension(vertices.size(), n_vertices());
   boost::container::small_vector<T, 8> result(n_vertices());
 
-  auto permute = [&](const auto &table) {
+  auto permute = [&](const auto &table, unsigned int n_vertices) {
     AssertIndexRange(orientation, table.size());
-    for (unsigned int j = 0; j < table[orientation].size(); ++j)
+    for (unsigned int j = 0; j < n_vertices; ++j)
       result[j] = vertices[table[orientation][j]];
   };
 
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-        permute(vertex_vertex_permutations);
+        permute(vertex_vertex_permutations, 1);
         break;
       case ReferenceCells::Line:
-        permute(line_vertex_permutations);
+        permute(line_vertex_permutations, 2);
         break;
       case ReferenceCells::Triangle:
-        permute(triangle_vertex_permutations);
+        permute(triangle_vertex_permutations, 3);
         break;
       case ReferenceCells::Quadrilateral:
-        permute(quadrilateral_vertex_permutations);
+        permute(quadrilateral_vertex_permutations, 4);
         break;
       default:
         DEAL_II_NOT_IMPLEMENTED();
