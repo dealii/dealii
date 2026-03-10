@@ -1,0 +1,46 @@
+
+DEAL::Collect periodic faces along x
+Collect periodic faces along y
+Applying periodicity
+----- Cell no = 0----- 
+	 Periodic neighbor cell = 2
+	 Periodic neighbor cell = 6
+----- Cell no = 1----- 
+	 Periodic neighbor cell = 7
+----- Cell no = 2----- 
+	 Periodic neighbor cell = 0
+	 Periodic neighbor cell = 8
+----- Cell no = 3----- 
+	 Periodic neighbor cell = 5
+----- Cell no = 4----- 
+----- Cell no = 5----- 
+	 Periodic neighbor cell = 3
+----- Cell no = 6----- 
+	 Periodic neighbor cell = 8
+	 Periodic neighbor cell = 0
+----- Cell no = 7----- 
+	 Periodic neighbor cell = 1
+----- Cell no = 8----- 
+	 Periodic neighbor cell = 6
+	 Periodic neighbor cell = 2
+No of boundary faces = 12
+Beginning of mesh_loop:
+
+Interior face: (cell,neigh) = (0,2)
+DEAL::Interior face: (cell,neigh) = (0,1)
+DEAL::Interior face: (cell,neigh) = (0,6)
+DEAL::Interior face: (cell,neigh) = (0,3)
+DEAL::Interior face: (cell,neigh) = (1,2)
+DEAL::Interior face: (cell,neigh) = (1,7)
+DEAL::Interior face: (cell,neigh) = (1,4)
+DEAL::Interior face: (cell,neigh) = (2,8)
+DEAL::Interior face: (cell,neigh) = (2,5)
+DEAL::Interior face: (cell,neigh) = (3,5)
+DEAL::Interior face: (cell,neigh) = (3,4)
+DEAL::Interior face: (cell,neigh) = (3,6)
+DEAL::Interior face: (cell,neigh) = (4,5)
+DEAL::Interior face: (cell,neigh) = (4,7)
+DEAL::Interior face: (cell,neigh) = (5,8)
+DEAL::Interior face: (cell,neigh) = (6,8)
+DEAL::Interior face: (cell,neigh) = (6,7)
+DEAL::Interior face: (cell,neigh) = (7,8)
