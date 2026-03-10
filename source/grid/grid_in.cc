@@ -1823,7 +1823,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       std::string object_name;
       whole_file >> object_name;
 
-      static const std::set<std::string> known_object_names = {
+      const std::set<std::string> known_object_names = {
         "vtx", "edg", "tri", "quad", "tet", "prism"
         // TODO: Add hexahedra and pyramids once we have a sample input file
         // that contains these
