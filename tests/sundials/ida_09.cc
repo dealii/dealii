@@ -20,11 +20,12 @@
 #include "../tests.h"
 
 
-// Like the _07 test, but we only provide correct initial conditions
-// for Y[0]', not for Y[1]' -- this is not uncommon in cases where we
-// have a first order DAE where at best we know initial conditions for
-// all variables (or could compute them), but definitely not initial
-// velocities Y'.
+// Like the _07 test and _08 test, but we only provide correct initial
+// conditions for Y[0], but not for Y[1], Y[0]', or Y[1]' -- this is
+// not uncommon in cases where we have a first order DAE where at best
+// we know initial conditions for all differential variables, but not
+// for the algebraic ones and definitely not for initial velocities
+// Y'.
 
 int
 main()
