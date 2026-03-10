@@ -1842,22 +1842,29 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       whole_file >> n_elements;
 
 
-      if (object_name == "vtx")
+      if ((dim >= 3) && (object_name == "tet"))
         {
-          AssertThrow(n_vertices_per_element == 1, ExcInternalError());
+          AssertThrow(dim >= 3,
+                      ExcMessage("Tetrahedra should not appear in input files "
+                                 "for 1d or 2d meshes."));
+          AssertThrow(n_vertices_per_element == 4, ExcInternalError());
         }
-      else if (object_name == "edg")
+      else if ((dim >= 3) && (object_name == "prism"))
         {
-          AssertThrow(n_vertices_per_element == 2, ExcInternalError());
+          AssertThrow(dim >= 3,
+                      ExcMessage(
+                        "Prisms (wedges) should not appear in input files "
+                        "for 1d or 2d meshes."));
+          AssertThrow(n_vertices_per_element == 6, ExcInternalError());
         }
-      else if ((dim>=2) && (object_name == "tri"))
+      else if ((dim >= 2) && (object_name == "tri"))
         {
           AssertThrow(dim >= 2,
                       ExcMessage("Triangles should not appear in input files "
                                  "for 1d meshes."));
           AssertThrow(n_vertices_per_element == 3, ExcInternalError());
         }
-      else if ((dim>=2) && (object_name == "quad"))
+      else if ((dim >= 2) && (object_name == "quad"))
         {
           AssertThrow(dim >= 2,
                       ExcMessage(
@@ -1865,20 +1872,13 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                         "for 1d meshes."));
           AssertThrow(n_vertices_per_element == 4, ExcInternalError());
         }
-      else if ((dim>=3) && (object_name == "tet"))
+      else if (object_name == "edg")
         {
-          AssertThrow(dim >= 3,
-                      ExcMessage("Tetrahedra should not appear in input files "
-                                 "for 1d or 2d meshes."));
-          AssertThrow(n_vertices_per_element == 4, ExcInternalError());
+          AssertThrow(n_vertices_per_element == 2, ExcInternalError());
         }
-      else if ((dim>=3) && (object_name == "prism"))
+      else if (object_name == "vtx")
         {
-          AssertThrow(dim >= 3,
-                      ExcMessage(
-                        "Prisms (wedges) should not appear in input files "
-                        "for 1d or 2d meshes."));
-          AssertThrow(n_vertices_per_element == 6, ExcInternalError());
+          AssertThrow(n_vertices_per_element == 1, ExcInternalError());
         }
       else
         AssertThrow(false, ExcNotImplemented());
@@ -1907,8 +1907,32 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               vertices_for_this_element[v] -= starting_vertex_index;
             }
 
-          if (object_name == "vtx")
-            ; // do nothing
+          if ((dim >= 3) &&
+              ((object_name == "tet") || (object_name == "prism")))
+            {
+              if (dim == 3)
+                {
+                  cells.emplace_back();
+                  cells.back().vertices = vertices_for_this_element;
+                }
+              else
+                DEAL_II_ASSERT_UNREACHABLE();
+            }
+          else if ((dim >= 2) &&
+                   ((object_name == "tri") || (object_name == "quad")))
+            {
+              if (dim == 2)
+                {
+                  cells.emplace_back();
+                  cells.back().vertices = vertices_for_this_element;
+                }
+              else
+                {
+                  subcelldata.boundary_quads.emplace_back();
+                  subcelldata.boundary_quads.back().vertices =
+                    vertices_for_this_element;
+                }
+            }
           else if (object_name == "edg")
             {
               if (dim == 1)
@@ -1923,30 +1947,9 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                     vertices_for_this_element;
                 }
             }
-          else if ((dim>=2) && ((object_name == "tri") || (object_name == "quad")))
-            {
-              if (dim == 2)
-                {
-                  cells.emplace_back();
-                  cells.back().vertices = vertices_for_this_element;
-                }
-              else
-                {
-                  subcelldata.boundary_quads.emplace_back();
-                  subcelldata.boundary_quads.back().vertices =
-                    vertices_for_this_element;
-                }
-            }
-          else if ((dim>=3) && ((object_name == "tet") || (object_name == "prism")))
-            {
-              if (dim == 3)
-                {
-                  cells.emplace_back();
-                  cells.back().vertices = vertices_for_this_element;
-                }
-              else
-                DEAL_II_ASSERT_UNREACHABLE();
-            }
+          else if (object_name == "vtx")
+            ; // do nothing
+
           else
             DEAL_II_NOT_IMPLEMENTED();
         }
@@ -1985,7 +1988,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                                       n_elements + e]
                       .boundary_id = geometric_entity_index;
                 }
-              else if ((dim>=2) && ((object_name == "tri") || (object_name == "quad")))
+              else if ((dim >= 2) &&
+                       ((object_name == "tri") || (object_name == "quad")))
                 {
                   if (dim == 2)
                     cells[cells.size() - n_elements + e].material_id =
@@ -1996,7 +2000,8 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                                       n_elements + e]
                       .boundary_id = geometric_entity_index;
                 }
-              else if ((dim>=3) && ((object_name == "tet") || (object_name == "prism")))
+              else if ((dim >= 3) &&
+                       ((object_name == "tet") || (object_name == "prism")))
                 {
                   if (dim == 3)
                     cells[cells.size() - n_elements + e].material_id =
