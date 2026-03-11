@@ -214,16 +214,16 @@ namespace SUNDIALS
        */
       AdditionalData(
         // Initial parameters
-        const double initial_time      = 0.0,
-        const double final_time        = 1.0,
-        const double initial_step_size = 1e-2,
-        const double output_period     = 1e-1,
+        const double initial_time,
+        const double final_time,
+        const double initial_step_size,
+        const double output_period,
         // Running parameters
-        const double       minimum_step_size = 1e-6,
-        const unsigned int maximum_order     = 5,
+        const double       minimum_step_size,
+        const unsigned int maximum_order,
         // Error parameters
-        const double absolute_tolerance = 1e-6,
-        const double relative_tolerance = 1e-5);
+        const double absolute_tolerance,
+        const double relative_tolerance);
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
