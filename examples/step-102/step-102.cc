@@ -36,6 +36,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/precondition.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -58,6 +59,8 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
+
+#include <deal.II/sundials/ida.h>
 
 #include <iostream>
 #include <fstream>
@@ -300,30 +303,42 @@ namespace Step102
   // must be greater or equal to zero, so we assert that as well to make sure
   // that our calculations to get at the formula for the derivative made
   // sense.
+  double bounded_saturation(const double S)
+  {
+    Assert(std::isfinite(S), ExcMessage("Saturation is not finite."));
+    return std::clamp(S, 0.0, 1.0);
+  }
+
+
   double mobility_inverse(const double S, const double viscosity)
   {
-    return 1.0 / (1.0 / viscosity * S * S + (1 - S) * (1 - S));
+    const double bounded_S = bounded_saturation(S);
+    return 1.0 / (1.0 / viscosity * bounded_S * bounded_S +
+                  (1 - bounded_S) * (1 - bounded_S));
   }
 
 
   double fractional_flow(const double S, const double viscosity)
   {
-    Assert((S >= 0) && (S <= 1),
-           ExcMessage("Saturation is outside its physically valid range."));
+    const double bounded_S = bounded_saturation(S);
 
-    return S * S / (S * S + viscosity * (1 - S) * (1 - S));
+    return bounded_S * bounded_S /
+           (bounded_S * bounded_S +
+            viscosity * (1 - bounded_S) * (1 - bounded_S));
   }
 
 
   double fractional_flow_derivative(const double S, const double viscosity)
   {
-    Assert((S >= 0) && (S <= 1),
-           ExcMessage("Saturation is outside its physically valid range."));
+    const double bounded_S = bounded_saturation(S);
 
-    const double temp = (S * S + viscosity * (1 - S) * (1 - S));
+    const double temp =
+      (bounded_S * bounded_S + viscosity * (1 - bounded_S) * (1 - bounded_S));
 
     const double numerator =
-      2.0 * S * temp - S * S * (2.0 * S - 2.0 * viscosity * (1 - S));
+      2.0 * bounded_S * temp -
+      bounded_S * bounded_S *
+        (2.0 * bounded_S - 2.0 * viscosity * (1 - bounded_S));
     const double denominator = Utilities::fixed_power<2>(temp);
 
     const double F_prime = numerator / denominator;
@@ -481,11 +496,14 @@ namespace Step102
     void run();
 
   private:
+    using TimeStepper = SUNDIALS::IDA<TrilinosWrappers::MPI::BlockVector>;
+
     static constexpr unsigned int velocity_block   = 0;
     static constexpr unsigned int pressure_block   = 1;
     static constexpr unsigned int saturation_block = 2;
 
     void setup_dofs();
+    void setup_time_stepper();
     void assemble_darcy_preconditioner();
     void build_darcy_preconditioner();
     void assemble_darcy_system();
@@ -506,6 +524,22 @@ namespace Step102
     void refine_mesh(const unsigned int min_grid_level,
                      const unsigned int max_grid_level);
     void output_results() const;
+    void ida_residual(const double                              t,
+                      const TrilinosWrappers::MPI::BlockVector &y,
+                      const TrilinosWrappers::MPI::BlockVector &y_dot,
+                      TrilinosWrappers::MPI::BlockVector       &residual);
+    void ida_setup_jacobian(const double                              t,
+                            const TrilinosWrappers::MPI::BlockVector &y,
+                            const TrilinosWrappers::MPI::BlockVector &y_dot,
+                            const double                              alpha);
+    void ida_solve_with_jacobian(const TrilinosWrappers::MPI::BlockVector &rhs,
+                                 TrilinosWrappers::MPI::BlockVector       &dst,
+                                 const double tolerance);
+    IndexSet ida_differential_components() const;
+    void     ida_output_step(const double                              t,
+                             const TrilinosWrappers::MPI::BlockVector &sol,
+                             const TrilinosWrappers::MPI::BlockVector &sol_dot,
+                             const unsigned int                        step_number);
 
     // We follow with a number of helper functions that are used in a variety
     // of places throughout the program:
@@ -556,6 +590,7 @@ namespace Step102
     TrilinosWrappers::BlockSparseMatrix darcy_preconditioner_matrix;
 
     TrilinosWrappers::MPI::BlockVector solution;
+    TrilinosWrappers::MPI::BlockVector solution_dot;
     TrilinosWrappers::MPI::BlockVector old_solution;
     TrilinosWrappers::MPI::BlockVector old_old_solution;
     TrilinosWrappers::MPI::BlockVector darcy_rhs;
@@ -587,6 +622,8 @@ namespace Step102
     std::shared_ptr<TrilinosWrappers::PreconditionIC> top_left_preconditioner;
     std::shared_ptr<TrilinosWrappers::PreconditionIC>
       bottom_right_preconditioner;
+
+    std::unique_ptr<TimeStepper> time_stepper;
 
     bool rebuild_saturation_matrix;
 
@@ -813,6 +850,7 @@ namespace Step102
                                                 complete_index_set(n_s)};
 
     solution.reinit(partitioning, MPI_COMM_WORLD);
+    solution_dot.reinit(partitioning, MPI_COMM_WORLD);
     old_solution.reinit(partitioning, MPI_COMM_WORLD);
     old_old_solution.reinit(partitioning, MPI_COMM_WORLD);
 
@@ -826,6 +864,60 @@ namespace Step102
                                                             MPI_COMM_WORLD);
 
     saturation_rhs.reinit(partitioning, MPI_COMM_WORLD);
+
+    setup_time_stepper();
+  }
+
+
+  template <int dim>
+  void TwoPhaseFlowProblem<dim>::setup_time_stepper()
+  {
+    typename TimeStepper::AdditionalData data;
+    data.initial_time      = 0.0;
+    data.final_time        = end_time;
+    data.initial_step_size = 1e-4;
+    data.output_period     = .01;
+    data.ic_type           = TimeStepper::AdditionalData::use_y_diff;
+    data.reset_type        = TimeStepper::AdditionalData::use_y_diff;
+
+    time_stepper = std::make_unique<TimeStepper>(data, MPI_COMM_WORLD);
+
+    time_stepper->reinit_vector = [&](TrilinosWrappers::MPI::BlockVector &v) {
+      v.reinit(solution);
+    };
+
+    time_stepper->residual =
+      [&](const double                              t,
+          const TrilinosWrappers::MPI::BlockVector &y,
+          const TrilinosWrappers::MPI::BlockVector &y_dot,
+          TrilinosWrappers::MPI::BlockVector       &residual) {
+        ida_residual(t, y, y_dot, residual);
+      };
+
+    time_stepper->setup_jacobian =
+      [&](const double                              t,
+          const TrilinosWrappers::MPI::BlockVector &y,
+          const TrilinosWrappers::MPI::BlockVector &y_dot,
+          const double alpha) { ida_setup_jacobian(t, y, y_dot, alpha); };
+
+    time_stepper->solve_with_jacobian =
+      [&](const TrilinosWrappers::MPI::BlockVector &rhs,
+          TrilinosWrappers::MPI::BlockVector       &dst,
+          const double                              tolerance) {
+        ida_solve_with_jacobian(rhs, dst, tolerance);
+      };
+
+    time_stepper->differential_components = [&]() {
+      return ida_differential_components();
+    };
+
+    time_stepper->output_step =
+      [&](const double                              t,
+          const TrilinosWrappers::MPI::BlockVector &sol,
+          const TrilinosWrappers::MPI::BlockVector &sol_dot,
+          const unsigned int                        step_number) {
+        ida_output_step(t, sol, sol_dot, step_number);
+      };
   }
 
 
@@ -1891,6 +1983,461 @@ namespace Step102
   }
 
 
+  template <int dim>
+  void TwoPhaseFlowProblem<dim>::ida_residual(
+    const double                              t,
+    const TrilinosWrappers::MPI::BlockVector &y,
+    const TrilinosWrappers::MPI::BlockVector &y_dot,
+    TrilinosWrappers::MPI::BlockVector       &residual)
+  {
+    static unsigned int residual_call = 0;
+    ++residual_call;
+    std::cout << "IDA residual call " << residual_call << ": t=" << t
+              << std::endl;
+
+    residual = 0;
+
+    TrilinosWrappers::MPI::BlockVector constrained_y(y);
+    TrilinosWrappers::MPI::BlockVector constrained_y_dot(y_dot);
+    constraints.distribute(constrained_y);
+    constraints.distribute(constrained_y_dot);
+
+    const auto saved_solution     = solution;
+    const auto saved_old_solution = old_solution;
+
+    solution     = constrained_y;
+    old_solution = constrained_y;
+
+    assemble_darcy_system();
+
+    TrilinosWrappers::MPI::BlockVector darcy_state;
+    darcy_state.reinit({complete_index_set(dofs_per_block[velocity_block]),
+                        complete_index_set(dofs_per_block[pressure_block])},
+                       MPI_COMM_WORLD);
+    darcy_state.block(0) = constrained_y.block(velocity_block);
+    darcy_state.block(1) = constrained_y.block(pressure_block);
+
+    TrilinosWrappers::MPI::BlockVector darcy_residual;
+    darcy_residual.reinit(darcy_rhs);
+    darcy_matrix.vmult(darcy_residual, darcy_state);
+    darcy_residual -= darcy_rhs;
+
+    residual.block(velocity_block) = darcy_residual.block(0);
+    residual.block(pressure_block) = darcy_residual.block(1);
+
+    const QGauss<dim>     quadrature_formula(saturation_degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
+
+    FEValues<dim>     fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(fe,
+                                     face_quadrature_formula,
+                                     update_values | update_normal_vectors |
+                                       update_quadrature_points |
+                                       update_JxW_values);
+
+    const FEValuesExtractors::Vector velocities(0);
+    const FEValuesExtractors::Scalar saturation(dim + 1);
+
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
+    const unsigned int n_q_points      = quadrature_formula.size();
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
+    Vector<double>     local_residual(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    std::vector<Tensor<1, dim>> velocity_values(n_q_points);
+    std::vector<double>         saturation_values(n_q_points);
+    std::vector<double>         saturation_dot_values(n_q_points);
+    std::vector<Tensor<1, dim>> saturation_gradients(n_q_points);
+
+    std::vector<Tensor<1, dim>> velocity_values_face(n_face_q_points);
+    std::vector<double>         saturation_values_face(n_face_q_points);
+    std::vector<double>         boundary_saturation(n_face_q_points);
+
+    SaturationBoundaryValues<dim> saturation_boundary_values;
+
+    double global_max_u_F_prime = 0.0;
+    double min_saturation       = std::numeric_limits<double>::max();
+    double max_saturation       = -std::numeric_limits<double>::max();
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      {
+        fe_values.reinit(cell);
+        fe_values[velocities].get_function_values(constrained_y,
+                                                  velocity_values);
+        fe_values[saturation].get_function_values(constrained_y,
+                                                  saturation_values);
+
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            const double bounded_s = bounded_saturation(saturation_values[q]);
+            min_saturation         = std::min(min_saturation, bounded_s);
+            max_saturation         = std::max(max_saturation, bounded_s);
+            global_max_u_F_prime =
+              std::max(global_max_u_F_prime,
+                       velocity_values[q].norm() *
+                         fractional_flow_derivative(bounded_s, viscosity));
+          }
+      }
+
+    const double global_S_variation =
+      std::max(max_saturation - min_saturation, 1e-12);
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      {
+        fe_values.reinit(cell);
+        local_residual = 0;
+
+        fe_values[velocities].get_function_values(constrained_y,
+                                                  velocity_values);
+        fe_values[saturation].get_function_values(constrained_y,
+                                                  saturation_values);
+        fe_values[saturation].get_function_values(constrained_y_dot,
+                                                  saturation_dot_values);
+        fe_values[saturation].get_function_gradients(constrained_y,
+                                                     saturation_gradients);
+
+        const double nu = compute_viscosity(saturation_values,
+                                            saturation_values,
+                                            saturation_gradients,
+                                            saturation_gradients,
+                                            velocity_values,
+                                            global_max_u_F_prime,
+                                            global_S_variation,
+                                            cell->diameter());
+
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            if (component_to_block(fe.system_to_component_index(i).first) ==
+                saturation_block)
+              {
+                const double phi_i_s = fe_values[saturation].value(i, q);
+                const Tensor<1, dim> grad_phi_i_s =
+                  fe_values[saturation].gradient(i, q);
+
+                local_residual(i) +=
+                  (porosity * saturation_dot_values[q] * phi_i_s -
+                   fractional_flow(saturation_values[q], viscosity) *
+                     velocity_values[q] * grad_phi_i_s +
+                   nu * saturation_gradients[q] * grad_phi_i_s) *
+                  fe_values.JxW(q);
+              }
+
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
+            {
+              fe_face_values.reinit(cell, face);
+
+              fe_face_values[velocities].get_function_values(
+                constrained_y, velocity_values_face);
+              fe_face_values[saturation].get_function_values(
+                constrained_y, saturation_values_face);
+              saturation_boundary_values.value_list(
+                fe_face_values.get_quadrature_points(), boundary_saturation);
+
+              for (unsigned int q = 0; q < n_face_q_points; ++q)
+                {
+                  const double normal_flux =
+                    velocity_values_face[q] * fe_face_values.normal_vector(q);
+                  const bool   is_outflow = (normal_flux >= 0.0);
+                  const double upwind_saturation =
+                    (is_outflow ? saturation_values_face[q] :
+                                  boundary_saturation[q]);
+
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    if (component_to_block(
+                          fe.system_to_component_index(i).first) ==
+                        saturation_block)
+                      local_residual(i) +=
+                        normal_flux *
+                        fractional_flow(upwind_saturation, viscosity) *
+                        fe_face_values[saturation].value(i, q) *
+                        fe_face_values.JxW(q);
+                }
+            }
+
+        cell->get_dof_indices(local_dof_indices);
+        constraints.distribute_local_to_global(local_residual,
+                                               local_dof_indices,
+                                               residual);
+      }
+
+    solution     = saved_solution;
+    old_solution = saved_old_solution;
+  }
+
+
+  template <int dim>
+  void TwoPhaseFlowProblem<dim>::ida_setup_jacobian(
+    const double                              t,
+    const TrilinosWrappers::MPI::BlockVector &y,
+    const TrilinosWrappers::MPI::BlockVector &y_dot,
+    const double                              alpha)
+  {
+    static unsigned int jacobian_call = 0;
+    ++jacobian_call;
+    std::cout << "IDA jacobian setup " << jacobian_call << ": t=" << t
+              << ", alpha=" << alpha << std::endl;
+
+    TrilinosWrappers::MPI::BlockVector constrained_y(y);
+    constraints.distribute(constrained_y);
+
+    const auto saved_solution         = solution;
+    const auto saved_old_solution     = old_solution;
+    const auto saved_rebuild_s_matrix = rebuild_saturation_matrix;
+
+    solution                  = constrained_y;
+    old_solution              = constrained_y;
+    rebuild_saturation_matrix = true;
+
+    assemble_darcy_system();
+    build_darcy_preconditioner();
+
+    saturation_matrix = 0;
+
+    const QGauss<dim>     quadrature_formula(saturation_degree + 2);
+    const QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
+
+    FEValues<dim>     fe_values(fe,
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(fe,
+                                     face_quadrature_formula,
+                                     update_values | update_normal_vectors |
+                                       update_quadrature_points |
+                                       update_JxW_values);
+
+    const FEValuesExtractors::Vector velocities(0);
+    const FEValuesExtractors::Scalar saturation(dim + 1);
+
+    const unsigned int dofs_per_cell   = fe.n_dofs_per_cell();
+    const unsigned int n_q_points      = quadrature_formula.size();
+    const unsigned int n_face_q_points = face_quadrature_formula.size();
+
+    FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    std::vector<Tensor<1, dim>> velocity_values(n_q_points);
+    std::vector<double>         saturation_values(n_q_points);
+    std::vector<Tensor<1, dim>> saturation_gradients(n_q_points);
+    std::vector<double>         saturation_dot_values(n_q_points);
+    std::vector<Tensor<1, dim>> velocity_values_face(n_face_q_points);
+    std::vector<double>         saturation_values_face(n_face_q_points);
+
+    double global_max_u_F_prime = 0.0;
+    double min_saturation       = std::numeric_limits<double>::max();
+    double max_saturation       = -std::numeric_limits<double>::max();
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      {
+        fe_values.reinit(cell);
+        fe_values[velocities].get_function_values(constrained_y,
+                                                  velocity_values);
+        fe_values[saturation].get_function_values(constrained_y,
+                                                  saturation_values);
+
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          {
+            const double bounded_s = bounded_saturation(saturation_values[q]);
+            min_saturation         = std::min(min_saturation, bounded_s);
+            max_saturation         = std::max(max_saturation, bounded_s);
+            global_max_u_F_prime =
+              std::max(global_max_u_F_prime,
+                       velocity_values[q].norm() *
+                         fractional_flow_derivative(bounded_s, viscosity));
+          }
+      }
+
+    const double global_S_variation =
+      std::max(max_saturation - min_saturation, 1e-12);
+
+    for (const auto &cell : dof_handler.active_cell_iterators())
+      {
+        fe_values.reinit(cell);
+        local_matrix = 0;
+
+        fe_values[velocities].get_function_values(constrained_y,
+                                                  velocity_values);
+        fe_values[saturation].get_function_values(constrained_y,
+                                                  saturation_values);
+        fe_values[saturation].get_function_gradients(constrained_y,
+                                                     saturation_gradients);
+        fe_values[saturation].get_function_values(y_dot, saturation_dot_values);
+
+        const double nu = compute_viscosity(saturation_values,
+                                            saturation_values,
+                                            saturation_gradients,
+                                            saturation_gradients,
+                                            velocity_values,
+                                            global_max_u_F_prime,
+                                            global_S_variation,
+                                            cell->diameter());
+
+        for (unsigned int q = 0; q < n_q_points; ++q)
+          for (unsigned int i = 0; i < dofs_per_cell; ++i)
+            if (component_to_block(fe.system_to_component_index(i).first) ==
+                saturation_block)
+              {
+                const double phi_i_s = fe_values[saturation].value(i, q);
+                const Tensor<1, dim> grad_phi_i_s =
+                  fe_values[saturation].gradient(i, q);
+
+                for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                  if (component_to_block(
+                        fe.system_to_component_index(j).first) ==
+                      saturation_block)
+                    {
+                      const double phi_j_s = fe_values[saturation].value(j, q);
+                      local_matrix(i, j) +=
+                        (alpha * porosity * phi_i_s * phi_j_s -
+                         fractional_flow_derivative(saturation_values[q],
+                                                    viscosity) *
+                           phi_j_s * velocity_values[q] * grad_phi_i_s +
+                         nu * fe_values[saturation].gradient(j, q) *
+                           grad_phi_i_s) *
+                        fe_values.JxW(q);
+                    }
+              }
+
+        for (const auto &face : cell->face_iterators())
+          if (face->at_boundary())
+            {
+              fe_face_values.reinit(cell, face);
+              fe_face_values[velocities].get_function_values(
+                constrained_y, velocity_values_face);
+              fe_face_values[saturation].get_function_values(
+                constrained_y, saturation_values_face);
+
+              for (unsigned int q = 0; q < n_face_q_points; ++q)
+                {
+                  const double normal_flux =
+                    velocity_values_face[q] * fe_face_values.normal_vector(q);
+
+                  if (normal_flux >= 0.0)
+                    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                      if (component_to_block(
+                            fe.system_to_component_index(i).first) ==
+                          saturation_block)
+                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                          if (component_to_block(
+                                fe.system_to_component_index(j).first) ==
+                              saturation_block)
+                            local_matrix(i, j) +=
+                              normal_flux *
+                              fractional_flow_derivative(
+                                saturation_values_face[q], viscosity) *
+                              fe_face_values[saturation].value(j, q) *
+                              fe_face_values[saturation].value(i, q) *
+                              fe_face_values.JxW(q);
+                }
+            }
+
+        cell->get_dof_indices(local_dof_indices);
+        constraints.distribute_local_to_global(local_matrix,
+                                               local_dof_indices,
+                                               saturation_matrix);
+      }
+
+    rebuild_saturation_matrix = saved_rebuild_s_matrix;
+    solution                  = saved_solution;
+    old_solution              = saved_old_solution;
+  }
+
+
+  template <int dim>
+  void TwoPhaseFlowProblem<dim>::ida_solve_with_jacobian(
+    const TrilinosWrappers::MPI::BlockVector &rhs,
+    TrilinosWrappers::MPI::BlockVector       &dst,
+    const double                              tolerance)
+  {
+    static unsigned int linear_solve_call = 0;
+    ++linear_solve_call;
+    std::cout << "IDA linear solve " << linear_solve_call
+              << ": tolerance=" << tolerance << ", |rhs|=" << rhs.l2_norm()
+              << std::endl;
+
+    dst = 0;
+
+    {
+      const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
+                                         TrilinosWrappers::PreconditionIC>
+        mp_inverse(darcy_preconditioner_matrix.block(1, 1),
+                   *bottom_right_preconditioner);
+
+      const LinearSolvers::BlockSchurPreconditioner<
+        TrilinosWrappers::PreconditionIC,
+        TrilinosWrappers::PreconditionIC>
+        preconditioner(darcy_matrix, mp_inverse, *top_left_preconditioner);
+
+      TrilinosWrappers::MPI::BlockVector darcy_dst;
+      darcy_dst.reinit({complete_index_set(dofs_per_block[velocity_block]),
+                        complete_index_set(dofs_per_block[pressure_block])},
+                       MPI_COMM_WORLD);
+
+      TrilinosWrappers::MPI::BlockVector darcy_rhs_view;
+      darcy_rhs_view.reinit(darcy_rhs);
+      darcy_rhs_view.block(0) = rhs.block(velocity_block);
+      darcy_rhs_view.block(1) = rhs.block(pressure_block);
+
+      SolverControl solver_control(darcy_matrix.m(),
+                                   std::max(tolerance,
+                                            1e-12 * darcy_rhs_view.l2_norm()));
+      SolverGMRES<TrilinosWrappers::MPI::BlockVector> gmres(
+        solver_control,
+        SolverGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(100));
+      gmres.solve(darcy_matrix, darcy_dst, darcy_rhs_view, preconditioner);
+
+      dst.block(velocity_block) = darcy_dst.block(0);
+      dst.block(pressure_block) = darcy_dst.block(1);
+    }
+
+    {
+      SolverControl solver_control(
+        saturation_matrix.block(saturation_block, saturation_block).m(),
+        std::max(tolerance, 1e-12 * rhs.block(saturation_block).l2_norm()));
+      SolverGMRES<TrilinosWrappers::MPI::Vector> gmres(solver_control);
+      gmres.solve(saturation_matrix.block(saturation_block, saturation_block),
+                  dst.block(saturation_block),
+                  rhs.block(saturation_block),
+                  PreconditionIdentity());
+    }
+  }
+
+
+  template <int dim>
+  IndexSet TwoPhaseFlowProblem<dim>::ida_differential_components() const
+  {
+    IndexSet differential_components(dof_handler.n_dofs());
+    differential_components.add_range(get_block_offset(saturation_block),
+                                      get_block_offset(saturation_block) +
+                                        dofs_per_block[saturation_block]);
+    return differential_components;
+  }
+
+
+  template <int dim>
+  void TwoPhaseFlowProblem<dim>::ida_output_step(
+    const double                              t,
+    const TrilinosWrappers::MPI::BlockVector &sol,
+    const TrilinosWrappers::MPI::BlockVector &sol_dot,
+    const unsigned int                        step_number)
+  {
+    std::cout << "IDA output step " << step_number << ": t=" << t
+              << ", |y|=" << sol.l2_norm() << ", |y_dot|=" << sol_dot.l2_norm()
+              << std::endl;
+
+    time            = t;
+    timestep_number = step_number;
+    solution        = sol;
+    solution_dot    = sol_dot;
+    constraints.distribute(solution);
+    output_results();
+  }
+
+
 
   // @sect3{Tool functions}
 
@@ -1989,8 +2536,8 @@ namespace Step102
   void TwoPhaseFlowProblem<dim>::project_back_saturation()
   {
     for (unsigned int i = 0; i < solution.block(saturation_block).size(); ++i)
-      if (solution.block(saturation_block)(i) < 0.2)
-        solution.block(saturation_block)(i) = 0.2;
+      if (solution.block(saturation_block)(i) < 0.0)
+        solution.block(saturation_block)(i) = 0.0;
       else if (solution.block(saturation_block)(i) > 1)
         solution.block(saturation_block)(i) = 1;
   }
@@ -2151,10 +2698,12 @@ namespace Step102
 
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
-        const Tensor<1, dim> u     = present_darcy_values[q];
-        const double         dS_dt = porosity *
-                             (old_saturation[q] - old_old_saturation[q]) /
-                             old_time_step;
+        const Tensor<1, dim> u = present_darcy_values[q];
+        const double         dS_dt =
+          (old_time_step > 0 ?
+             porosity * (old_saturation[q] - old_old_saturation[q]) /
+               old_time_step :
+             0.0);
 
         const double dF_dS = fractional_flow_derivative(
           (old_saturation[q] + old_old_saturation[q]) / 2.0, viscosity);
@@ -2200,8 +2749,7 @@ namespace Step102
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run()
   {
-    const unsigned int initial_refinement     = (dim == 2 ? 5 : 2);
-    const unsigned int n_pre_refinement_steps = (dim == 2 ? 3 : 2);
+    const unsigned int initial_refinement = (dim == 2 ? 5 : 2);
 
 
     GridGenerator::hyper_cube(triangulation, 0, 1);
@@ -2210,53 +2758,28 @@ namespace Step102
 
     setup_dofs();
 
-    unsigned int pre_refinement_step = 0;
-
-  start_time_iteration:
-
     VectorTools::project(dof_handler,
                          constraints,
                          QGauss<dim>(saturation_degree + 2),
                          InitialValues<dim>(),
                          old_solution);
-    solution         = old_solution;
-    old_old_solution = old_solution;
+    constraints.distribute(old_solution);
+
+    solution                                         = old_solution;
+    old_old_solution                                 = old_solution;
+    solution_dot                                     = 0;
+    last_computed_darcy_solution                     = 0;
+    second_last_computed_darcy_solution              = 0;
+    saturation_matching_last_computed_darcy_solution = solution;
 
     time_step = old_time_step = 0;
     current_macro_time_step = old_macro_time_step = 0;
 
-    time = 0;
+    time            = 0;
+    timestep_number = 0;
 
-    do
-      {
-        std::cout << "Timestep " << timestep_number << ":  t=" << time
-                  << ", dt=" << time_step << std::endl;
-
-        solve();
-
-        std::cout << std::endl;
-
-        if (timestep_number % 200 == 0)
-          output_results();
-
-        if (timestep_number % 25 == 0)
-          refine_mesh(initial_refinement,
-                      initial_refinement + n_pre_refinement_steps);
-
-        if ((timestep_number == 0) &&
-            (pre_refinement_step < n_pre_refinement_steps))
-          {
-            ++pre_refinement_step;
-            goto start_time_iteration;
-          }
-
-        time += time_step;
-        ++timestep_number;
-
-        old_old_solution = old_solution;
-        old_solution     = solution;
-      }
-    while (time <= end_time);
+    output_results();
+    time_stepper->solve_dae(solution, solution_dot);
   }
 } // namespace Step102
 
