@@ -368,8 +368,8 @@ namespace SUNDIALS
      * objects to only work on the present processor (i.e., results are only
      * communicated over MPI_COMM_SELF).
      */
-    ARKode(std::shared_ptr<ARKodeStepper<VectorType>> stepper,
-           const AdditionalData                      &data = AdditionalData());
+    ARKode(ARKodeStepper<VectorType> &stepper,
+           const AdditionalData      &data = AdditionalData());
 
     /**
      * Constructor receiving the stepper, additional data, and MPI communicator.
@@ -379,9 +379,9 @@ namespace SUNDIALS
      * @param mpi_comm MPI Communicator over which logging operations are
      * computed. Only used in SUNDIALS 6 and newer.
      */
-    ARKode(std::shared_ptr<ARKodeStepper<VectorType>> stepper,
-           const AdditionalData                      &data,
-           const MPI_Comm                             mpi_comm);
+    ARKode(ARKodeStepper<VectorType> &stepper,
+           const AdditionalData      &data,
+           const MPI_Comm             mpi_comm);
 
     /**
      * Destructor.
@@ -774,14 +774,28 @@ namespace SUNDIALS
     set_functions_to_trigger_an_assert();
 
     /**
+     * This function is executed at construction time to initialize the
+     * SUNContext object.
+     */
+    void
+    initialize_context();
+
+    /**
      * ARKode configuration data.
      */
     AdditionalData data;
 
     /**
+     * Internal stepper object if a constructor without a stepper was invoked.
+     * The need for this object arises due to interface backward compatibility
+     * requirement.
+     */
+    std::unique_ptr<ARKStepper<VectorType>> ark_stepper_storage{nullptr};
+
+    /**
      * Stepper object.
      */
-    std::shared_ptr<ARKodeStepper<VectorType>> stepper;
+    ARKodeStepper<VectorType> &stepper;
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**

@@ -44,29 +44,56 @@ namespace SUNDIALS
   template <typename VectorType>
   ARKode<VectorType>::ARKode(const AdditionalData &data,
                              const MPI_Comm        mpi_comm)
-    : ARKode(std::make_shared<ARKStepper<VectorType>>(
-               typename ARKStepper<VectorType>::AdditionalData(
-                 data.maximum_non_linear_iterations,
-                 data.implicit_function_is_linear,
-                 data.implicit_function_is_time_independent,
-                 data.mass_is_time_independent,
-                 data.anderson_acceleration_subspace)),
-             data,
-             mpi_comm)
-  {}
+    : data(data)
+    , ark_stepper_storage(std::make_unique<ARKStepper<VectorType>>(
+        typename ARKStepper<VectorType>::AdditionalData(
+          data.maximum_non_linear_iterations,
+          data.implicit_function_is_linear,
+          data.implicit_function_is_time_independent,
+          data.mass_is_time_independent,
+          data.anderson_acceleration_subspace)))
+    , stepper(*ark_stepper_storage)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    , arkode_ctx(nullptr)
+#  endif
+    , mpi_communicator(mpi_comm)
+    , last_end_time(data.initial_time)
+    , pending_exception(nullptr)
+  {
+    set_functions_to_trigger_an_assert();
+    initialize_context();
+
+    // Set up the proxy objects to provide backwards compatibility with the old
+    // interface
+    explicit_function     = &ark_stepper_storage->explicit_function;
+    implicit_function     = &ark_stepper_storage->implicit_function;
+    mass_times_vector     = &ark_stepper_storage->mass_times_vector;
+    mass_times_setup      = &ark_stepper_storage->mass_times_setup;
+    jacobian_times_vector = &ark_stepper_storage->jacobian_times_vector;
+    jacobian_times_setup  = &ark_stepper_storage->jacobian_times_setup;
+
+    solve_linearized_system = &ark_stepper_storage->solve_linearized_system;
+    solve_mass              = &ark_stepper_storage->solve_mass;
+    jacobian_preconditioner_solve =
+      &ark_stepper_storage->jacobian_preconditioner_solve;
+    jacobian_preconditioner_setup =
+      &ark_stepper_storage->jacobian_preconditioner_setup;
+    mass_preconditioner_solve = &ark_stepper_storage->mass_preconditioner_solve;
+    mass_preconditioner_setup = &ark_stepper_storage->mass_preconditioner_setup;
+  }
 
 
   template <typename VectorType>
-  ARKode<VectorType>::ARKode(std::shared_ptr<ARKodeStepper<VectorType>> stepper,
-                             const AdditionalData                      &data)
+  ARKode<VectorType>::ARKode(ARKodeStepper<VectorType> &stepper,
+                             const AdditionalData      &data)
     : ARKode(stepper, data, MPI_COMM_SELF)
   {}
 
 
   template <typename VectorType>
-  ARKode<VectorType>::ARKode(std::shared_ptr<ARKodeStepper<VectorType>> stepper,
-                             const AdditionalData                      &data,
-                             const MPI_Comm mpi_comm)
+  ARKode<VectorType>::ARKode(ARKodeStepper<VectorType> &stepper,
+                             const AdditionalData      &data,
+                             const MPI_Comm             mpi_comm)
     : data(data)
     , stepper(stepper)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
@@ -77,7 +104,27 @@ namespace SUNDIALS
     , pending_exception(nullptr)
   {
     set_functions_to_trigger_an_assert();
+    initialize_context();
+  }
 
+
+  template <typename VectorType>
+  ARKode<VectorType>::~ARKode()
+  {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    const int status = SUNContext_Free(&arkode_ctx);
+    (void)status;
+    AssertARKode(status);
+#  endif
+
+    Assert(pending_exception == nullptr, ExcInternalError());
+  }
+
+
+  template <typename VectorType>
+  void
+  ARKode<VectorType>::initialize_context()
+  {
     // SUNDIALS will always duplicate communicators if we provide them. This
     // can cause problems if SUNDIALS is configured with MPI and we pass along
     // MPI_COMM_SELF in a serial application as MPI won't be
@@ -98,45 +145,7 @@ namespace SUNDIALS
     (void)status;
     AssertARKode(status);
 #  endif
-
-    // Set up the proxy objects to provide backwards compatibility with the old
-    // interface
-    auto ark_stepper =
-      std::dynamic_pointer_cast<ARKStepper<VectorType>>(stepper);
-    if (ark_stepper)
-      {
-        explicit_function     = &ark_stepper->explicit_function;
-        implicit_function     = &ark_stepper->implicit_function;
-        mass_times_vector     = &ark_stepper->mass_times_vector;
-        mass_times_setup      = &ark_stepper->mass_times_setup;
-        jacobian_times_vector = &ark_stepper->jacobian_times_vector;
-        jacobian_times_setup  = &ark_stepper->jacobian_times_setup;
-
-        solve_linearized_system = &ark_stepper->solve_linearized_system;
-        solve_mass              = &ark_stepper->solve_mass;
-        jacobian_preconditioner_solve =
-          &ark_stepper->jacobian_preconditioner_solve;
-        jacobian_preconditioner_setup =
-          &ark_stepper->jacobian_preconditioner_setup;
-        mass_preconditioner_solve = &ark_stepper->mass_preconditioner_solve;
-        mass_preconditioner_setup = &ark_stepper->mass_preconditioner_setup;
-      }
   }
-
-
-
-  template <typename VectorType>
-  ARKode<VectorType>::~ARKode()
-  {
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    const int status = SUNContext_Free(&arkode_ctx);
-    (void)status;
-    AssertARKode(status);
-#  endif
-
-    Assert(pending_exception == nullptr, ExcInternalError());
-  }
-
 
 
   template <typename VectorType>
@@ -165,7 +174,7 @@ namespace SUNDIALS
         "intermediate time."));
 
     const bool do_reset =
-      reset_solver || stepper->get_arkode_memory() == nullptr;
+      reset_solver || stepper.get_arkode_memory() == nullptr;
     DiscreteTime time(last_end_time, intermediate_time, data.initial_step_size);
     return do_evolve_time(solution, time, do_reset);
   }
@@ -193,7 +202,7 @@ namespace SUNDIALS
         // current time is past the set end point (i.e., ARKStepEvolve will
         // return ARK_TSTOP_RETURN).
         const int status =
-          ARKStepSetStopTime(stepper->get_arkode_memory(), time.get_end_time());
+          ARKStepSetStopTime(stepper.get_arkode_memory(), time.get_end_time());
         (void)status;
         AssertARKode(status);
       }
@@ -218,7 +227,7 @@ namespace SUNDIALS
         // - If no exception, test that SUNDIALS really did successfully return
         Assert(pending_exception == nullptr, ExcInternalError());
         double     actual_next_time;
-        const auto status = ARKStepEvolve(stepper->get_arkode_memory(),
+        const auto status = ARKStepEvolve(stepper.get_arkode_memory(),
                                           time.get_next_time(),
                                           solution_nvector,
                                           &actual_next_time,
@@ -266,7 +275,7 @@ namespace SUNDIALS
 
     long int   n_steps;
     const auto status =
-      ARKStepGetNumSteps(stepper->get_arkode_memory(), &n_steps);
+      ARKStepGetNumSteps(stepper.get_arkode_memory(), &n_steps);
     (void)status;
     AssertARKode(status);
 
@@ -307,7 +316,7 @@ namespace SUNDIALS
     AssertARKode(status);
 #  endif
 
-    stepper->reinit(
+    stepper.reinit(
       current_time, solution, internal::InvocationContext {
         pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
@@ -316,7 +325,7 @@ namespace SUNDIALS
 #  endif
       });
 
-    auto *arkode_mem = stepper->get_arkode_memory();
+    auto *arkode_mem = stepper.get_arkode_memory();
 
     if (get_local_tolerances)
       {
@@ -367,7 +376,7 @@ namespace SUNDIALS
   void *
   ARKode<VectorType>::get_arkode_memory() const
   {
-    return stepper->get_arkode_memory();
+    return stepper.get_arkode_memory();
   }
 
 } // namespace SUNDIALS
