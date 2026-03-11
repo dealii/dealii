@@ -536,6 +536,9 @@ namespace Step102
                                  TrilinosWrappers::MPI::BlockVector       &dst,
                                  const double tolerance);
     IndexSet ida_differential_components() const;
+    bool     ida_solver_should_restart(const double                        t,
+                                       TrilinosWrappers::MPI::BlockVector &sol,
+                                       TrilinosWrappers::MPI::BlockVector &sol_dot);
     void     ida_output_step(const double                              t,
                              const TrilinosWrappers::MPI::BlockVector &sol,
                              const TrilinosWrappers::MPI::BlockVector &sol_dot,
@@ -585,6 +588,8 @@ namespace Step102
 
     AffineConstraints<double>            darcy_preconditioner_constraints;
     std::vector<types::global_dof_index> dofs_per_block;
+    std::vector<IndexSet>                state_partitioning;
+    std::vector<IndexSet>                darcy_partitioning;
 
     TrilinosWrappers::BlockSparseMatrix darcy_matrix;
     TrilinosWrappers::BlockSparseMatrix darcy_preconditioner_matrix;
@@ -615,9 +620,12 @@ namespace Step102
     double       old_time_step;
     unsigned int timestep_number;
 
-    const double viscosity;
-    const double porosity;
-    const double AOS_threshold;
+    const double       viscosity;
+    const double       porosity;
+    const double       AOS_threshold;
+    const double       refinement_interval;
+    const unsigned int initial_refinement;
+    const unsigned int max_refinement_level;
 
     std::shared_ptr<TrilinosWrappers::PreconditionIC> top_left_preconditioner;
     std::shared_ptr<TrilinosWrappers::PreconditionIC>
@@ -625,7 +633,8 @@ namespace Step102
 
     std::unique_ptr<TimeStepper> time_stepper;
 
-    bool rebuild_saturation_matrix;
+    bool   rebuild_saturation_matrix;
+    double next_refinement_time;
 
     // At the very end we declare a variable that denotes the material
     // model. Compared to step-21, we do this here as a member variable since
@@ -680,9 +689,13 @@ namespace Step102
     , viscosity(0.2)
     , porosity(1.0)
     , AOS_threshold(3.0)
+    , refinement_interval(0.02)
+    , initial_refinement(dim == 2 ? 5 : 2)
+    , max_refinement_level(initial_refinement + (dim == 2 ? 3 : 2))
     ,
 
     rebuild_saturation_matrix(true)
+    , next_refinement_time(refinement_interval)
   {}
 
 
@@ -845,27 +858,25 @@ namespace Step102
       saturation_matrix.reinit(dsp);
     }
 
-    const std::vector<IndexSet> partitioning = {complete_index_set(n_u),
-                                                complete_index_set(n_p),
-                                                complete_index_set(n_s)};
+    state_partitioning = {complete_index_set(n_u),
+                          complete_index_set(n_p),
+                          complete_index_set(n_s)};
 
-    solution.reinit(partitioning, MPI_COMM_WORLD);
-    solution_dot.reinit(partitioning, MPI_COMM_WORLD);
-    old_solution.reinit(partitioning, MPI_COMM_WORLD);
-    old_old_solution.reinit(partitioning, MPI_COMM_WORLD);
+    solution.reinit(state_partitioning, MPI_COMM_WORLD);
+    solution_dot.reinit(state_partitioning, MPI_COMM_WORLD);
+    old_solution.reinit(state_partitioning, MPI_COMM_WORLD);
+    old_old_solution.reinit(state_partitioning, MPI_COMM_WORLD);
 
-    const std::vector<IndexSet> darcy_partitioning = {complete_index_set(n_u),
-                                                      complete_index_set(n_p)};
-    last_computed_darcy_solution.reinit(partitioning, MPI_COMM_WORLD);
-    second_last_computed_darcy_solution.reinit(partitioning, MPI_COMM_WORLD);
+    darcy_partitioning = {complete_index_set(n_u), complete_index_set(n_p)};
+    last_computed_darcy_solution.reinit(state_partitioning, MPI_COMM_WORLD);
+    second_last_computed_darcy_solution.reinit(state_partitioning,
+                                               MPI_COMM_WORLD);
     darcy_rhs.reinit(darcy_partitioning, MPI_COMM_WORLD);
 
-    saturation_matching_last_computed_darcy_solution.reinit(partitioning,
+    saturation_matching_last_computed_darcy_solution.reinit(state_partitioning,
                                                             MPI_COMM_WORLD);
 
-    saturation_rhs.reinit(partitioning, MPI_COMM_WORLD);
-
-    setup_time_stepper();
+    saturation_rhs.reinit(state_partitioning, MPI_COMM_WORLD);
   }
 
 
@@ -878,12 +889,12 @@ namespace Step102
     data.initial_step_size = 1e-4;
     data.output_period     = .01;
     data.ic_type           = TimeStepper::AdditionalData::use_y_diff;
-    data.reset_type        = TimeStepper::AdditionalData::use_y_diff;
+    data.reset_type        = TimeStepper::AdditionalData::none;
 
     time_stepper = std::make_unique<TimeStepper>(data, MPI_COMM_WORLD);
 
     time_stepper->reinit_vector = [&](TrilinosWrappers::MPI::BlockVector &v) {
-      v.reinit(solution);
+      v.reinit(state_partitioning, MPI_COMM_WORLD);
     };
 
     time_stepper->residual =
@@ -910,6 +921,13 @@ namespace Step102
     time_stepper->differential_components = [&]() {
       return ida_differential_components();
     };
+
+    time_stepper->solver_should_restart =
+      [&](const double                        t,
+          TrilinosWrappers::MPI::BlockVector &sol,
+          TrilinosWrappers::MPI::BlockVector &sol_dot) {
+        return ida_solver_should_restart(t, sol, sol_dot);
+      };
 
     time_stepper->output_step =
       [&](const double                              t,
@@ -1837,13 +1855,12 @@ namespace Step102
 
   // The next function does the refinement and coarsening of the mesh. It does
   // its work in three blocks: (i) Compute refinement indicators by looking at
-  // the gradient of a solution vector extrapolated linearly from the previous
-  // two using the respective sizes of the time step (or taking the only
-  // solution we have if this is the first time step). (ii) Flagging those
+  // the gradient of the current saturation solution. (ii) Flagging those
   // cells for refinement and coarsening where the gradient is larger or
   // smaller than a certain threshold, preserving minimal and maximal levels
-  // of mesh refinement. (iii) Transferring the solution from the old to the
-  // new mesh. None of this is particularly difficult.
+  // of mesh refinement. (iii) Transferring the current IDA state and its time
+  // derivative from the old to the new mesh. None of this is particularly
+  // difficult.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::refine_mesh(const unsigned int min_grid_level,
                                              const unsigned int max_grid_level)
@@ -1855,18 +1872,11 @@ namespace Step102
       FEValues<dim>        fe_values(fe, quadrature_formula, update_gradients);
       std::vector<Tensor<1, dim>> grad_saturation(1);
 
-      TrilinosWrappers::MPI::BlockVector extrapolated_solution(solution);
-      if (timestep_number != 0)
-        extrapolated_solution.block(saturation_block)
-          .sadd((1. + time_step / old_time_step),
-                time_step / old_time_step,
-                old_solution.block(saturation_block));
-
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
           const unsigned int cell_no = cell->active_cell_index();
           fe_values.reinit(cell);
-          fe_values[saturation].get_function_gradients(extrapolated_solution,
+          fe_values[saturation].get_function_gradients(solution,
                                                        grad_saturation);
 
           refinement_indicators(cell_no) = grad_saturation[0].norm();
@@ -1895,13 +1905,9 @@ namespace Step102
     triangulation.prepare_coarsening_and_refinement();
 
     {
-      std::vector<TrilinosWrappers::MPI::BlockVector> x_solution(6);
+      std::vector<TrilinosWrappers::MPI::BlockVector> x_solution(2);
       x_solution[0] = solution;
-      x_solution[1] = old_solution;
-      x_solution[2] = old_old_solution;
-      x_solution[3] = saturation_matching_last_computed_darcy_solution;
-      x_solution[4] = last_computed_darcy_solution;
-      x_solution[5] = second_last_computed_darcy_solution;
+      x_solution[1] = solution_dot;
 
       SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector>
         solution_soltrans(dof_handler);
@@ -1913,28 +1919,16 @@ namespace Step102
       triangulation.execute_coarsening_and_refinement();
       setup_dofs();
 
-      std::vector<TrilinosWrappers::MPI::BlockVector> tmp_solution(6);
+      std::vector<TrilinosWrappers::MPI::BlockVector> tmp_solution(2);
       tmp_solution[0].reinit(solution);
       tmp_solution[1].reinit(solution);
-      tmp_solution[2].reinit(solution);
-      tmp_solution[3].reinit(solution);
-      tmp_solution[4].reinit(solution);
-      tmp_solution[5].reinit(solution);
       solution_soltrans.interpolate(tmp_solution);
 
-      solution                                         = tmp_solution[0];
-      old_solution                                     = tmp_solution[1];
-      old_old_solution                                 = tmp_solution[2];
-      saturation_matching_last_computed_darcy_solution = tmp_solution[3];
-      last_computed_darcy_solution                     = tmp_solution[4];
-      second_last_computed_darcy_solution              = tmp_solution[5];
+      solution     = tmp_solution[0];
+      solution_dot = tmp_solution[1];
 
       constraints.distribute(solution);
-      constraints.distribute(old_solution);
-      constraints.distribute(old_old_solution);
-      constraints.distribute(saturation_matching_last_computed_darcy_solution);
-      constraints.distribute(last_computed_darcy_solution);
-      constraints.distribute(second_last_computed_darcy_solution);
+      constraints.distribute(solution_dot);
 
       rebuild_saturation_matrix = true;
     }
@@ -2419,6 +2413,35 @@ namespace Step102
 
 
   template <int dim>
+  bool TwoPhaseFlowProblem<dim>::ida_solver_should_restart(
+    const double                        t,
+    TrilinosWrappers::MPI::BlockVector &sol,
+    TrilinosWrappers::MPI::BlockVector &sol_dot)
+  {
+    if (t + 1e-12 < next_refinement_time)
+      return false;
+
+    std::cout << "IDA restart for mesh refinement at t=" << t << std::endl;
+
+    time         = t;
+    solution     = sol;
+    solution_dot = sol_dot;
+    constraints.distribute(solution);
+    constraints.distribute(solution_dot);
+
+    refine_mesh(initial_refinement, max_refinement_level);
+
+    sol     = solution;
+    sol_dot = solution_dot;
+
+    while (next_refinement_time <= t + 1e-12)
+      next_refinement_time += refinement_interval;
+
+    return true;
+  }
+
+
+  template <int dim>
   void TwoPhaseFlowProblem<dim>::ida_output_step(
     const double                              t,
     const TrilinosWrappers::MPI::BlockVector &sol,
@@ -2749,14 +2772,12 @@ namespace Step102
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run()
   {
-    const unsigned int initial_refinement = (dim == 2 ? 5 : 2);
-
-
     GridGenerator::hyper_cube(triangulation, 0, 1);
     triangulation.refine_global(initial_refinement);
     global_Omega_diameter = GridTools::diameter(triangulation);
 
     setup_dofs();
+    setup_time_stepper();
 
     VectorTools::project(dof_handler,
                          constraints,
@@ -2775,8 +2796,9 @@ namespace Step102
     time_step = old_time_step = 0;
     current_macro_time_step = old_macro_time_step = 0;
 
-    time            = 0;
-    timestep_number = 0;
+    time                 = 0;
+    timestep_number      = 0;
+    next_refinement_time = refinement_interval;
 
     output_results();
     time_stepper->solve_dae(solution, solution_dot);
