@@ -70,6 +70,13 @@ namespace SUNDIALS
 
   /**
    * Interface that implements a given ARKODE time stepper.
+   *
+   * This object does not perform any actions during the time marching itself.
+   * It is responsible for setting up the internal data structures of the ARKODE
+   * via the ARKODE memoby block. This setup is very much stepper specific,
+   * whereas the time advance itself is generalized in ARKODE. This separation
+   * of responsibilities is reflected in the current design that distributes the
+   * functionality between ARKode and ARKodeStepper accordingly.
    */
   template <typename VectorType>
   class ARKodeStepper
@@ -82,7 +89,8 @@ namespace SUNDIALS
     friend class ARKode<VectorType>;
 
     /**
-     * Virtual destructor for proper inheritance.
+     * Destructor. Made `virtual` to allow this class to be used as an abstract
+     * base class.
      */
     virtual ~ARKodeStepper() = default;
 
@@ -463,8 +471,16 @@ namespace SUNDIALS
       int anderson_acceleration_subspace;
     };
 
+    /**
+     * Constructor, with class parameters set by the AdditionalData object.
+     *
+     * @param data ARKStep configuration data
+     */
     ARKStepper(const AdditionalData &data = AdditionalData());
 
+    /**
+     * Destructor. Cleans up the internal ARKODE memory block.
+     */
     ~ARKStepper();
 
     void *
@@ -844,13 +860,15 @@ namespace SUNDIALS
      * custom settings on the supplied @p arkode_mem object. Refer to the
      * SUNDIALS documentation for valid options.
      *
-     * For instance, the following code attaches two files for diagnostic and
-     * error output of the internal ARKODE implementation:
+     * For instance, the following code indicates to use specific built-in
+     * Butcher tables for the ERK, DIRK or ARK method of the ARKStep module:
      *
      * @code
-     *      ode.custom_setup = [&](void *arkode_mem) {
-     *        ARKStepSetErrFile(arkode_mem, errfile);
-     *        ARKStepSetDiagnostics(arkode_mem, diagnostics_file);
+     *      stepper.custom_setup = [&](void *arkode_mem) {
+              const int status = ARKStepSetTableName(
+                arkode_mem, implicit_method_name, explicit_method_name);
+
+              AssertARKode(status);
      *      };
      * @endcode
      *
