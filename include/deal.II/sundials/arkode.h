@@ -62,8 +62,45 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace SUNDIALS
 {
-  namespace internal
+  /**
+   * Interface to SUNDIALS additive Runge-Kutta methods (ARKode).
+   *
+   * The class ARKode is a wrapper to SUNDIALS adaptive-step time integration
+   * modules for stiff, nonstiff and mixed stiff/nonstiff systems of ordinary
+   * differential equations (ODEs). This class provides access to general
+   * underlying infrastructure of ARKODE, controls the main time marching loop,
+   * output, reinitializaiton, exception handling. The class ARKode does not
+   * implement any time integration strategies itself. Instead, it employs one
+   * of the available stepper classes, which are basically wrappers around the
+   * corresponding ARKODE steppers. Currently, only ARKStepper is available,
+   * which provides interfaces to ARKode's additive Runge-Kutta steppers.
+   * The documentation of the ARKStepper class also shows examples of how
+   * this class in conjunction with ARKStepper can be used.
+   * Users can also provide their own steppers or implement wrappers around,
+   * e.g., ERKStepper, SPRKStep, LSRKStepper, or MRIStep modules of ARKode.
+   *
+   * The integrator settings are primarily customized by setting up fields of
+   * ARKode::AdditionalData passed to the constructors. For most of the cases,
+   * it is advised to set at least the end time up to which the time integrator
+   * should run and the initial time step size. The ARKode behavior can be
+   * further tuned via function object custom_setup().
+   */
+  template <typename VectorType = Vector<double>>
+  class ARKode
   {
+  private:
+    /**
+     * This class is introduced in order to provide backward compatibility with
+     * the previous interface of ARKode class. As the steppers have been
+     * introduced, the function objects required for the ARKStep callbacks have
+     * been moved to the ARKStepper class. In order not to break the existing
+     * codes, the underlying type of the function objects relevant for the time
+     * stepping mechanism was changed from std::function to FunctionProxy. These
+     * proxy objects then provide indirect access from the ARKode interface to
+     * the underlying stepper function objects for the case the stepper is
+     * actually of type ARKStepper and one of the old constructors without a
+     * stepper parameter was used for instantiation of the ARKode object.
+     */
     template <class Fn>
     struct FunctionProxy
     {
@@ -94,29 +131,7 @@ namespace SUNDIALS
         return *this;
       }
     };
-  } // namespace internal
 
-  /**
-   * Interface to SUNDIALS additive Runge-Kutta methods (ARKode).
-   *
-   * The class ARKode is a wrapper to SUNDIALS adaptive-step time integration
-   * modules for stiff, nonstiff and mixed stiff/nonstiff systems of ordinary
-   * differential equations (ODEs). This class provides access to general
-   * underlying infrastructure of ARKODE, controls the main time marching loop,
-   * output, reinitializaiton, exception handling. The class ARKode does not
-   * implement any time integration strategies itself. Instead, it employs one
-   * of the available stepper classes, which are basically wrappers around the
-   * corresponding ARKODE steppers. Currently, only ARKStepper is available.
-   * A user can also provide his own steppers or implement wrappers around,
-   * e.g., ERKStepper, SPRKStep, LSRKStepper, or MRIStep modules of ARKode.
-   *
-   * In practice, you would of course at least want to set the end time up
-   * to which the time integrator should run. In the example code shown here,
-   * it is taken from the default value defined by ARKode::AdditionalData.
-   */
-  template <typename VectorType = Vector<double>>
-  class ARKode
-  {
   public:
     /**
      * Additional parameters that can be passed to the ARKode class.
@@ -126,8 +141,8 @@ namespace SUNDIALS
     public:
       /**
        * Initialization parameters for ARKode. Some parameters are provided for
-       * the interface backward compatibility and have been effective moved to
-       * the the AKRStepper additional parameters.
+       * interface backward compatibility and have been effectively moved to the
+       * AKRStepper additional parameters.
        *
        * Global parameters:
        *
@@ -136,7 +151,7 @@ namespace SUNDIALS
        * @param initial_step_size Initial step size
        * @param output_period Desired time interval between each output
        *
-       * Running parameters:
+       * Run-control parameters:
        *
        * @param minimum_step_size Minimum step size
        * @param maximum_order Maximum ARK order
@@ -272,42 +287,42 @@ namespace SUNDIALS
        * Maximum number of iterations for Newton or fixed point method during
        * time advancement.
        *
-       * @deprecated Specify ARKStepper::AdditionalData::maximum_non_linear_iterations instead.
+       * @deprecated Provide ARKStepper::AdditionalData::maximum_non_linear_iterations instead.
        */
       DEAL_II_DEPRECATED_WITH_COMMENT(
-        "Specify ARKStepper::AdditionalData::maximum_non_linear_iterations "
+        "Provide ARKStepper::AdditionalData::maximum_non_linear_iterations "
         "instead.")
       unsigned int maximum_non_linear_iterations;
 
       /**
-       * Specify whether the implicit portion of the problem is linear.
+       * Provide whether the implicit portion of the problem is linear.
        *
-       * @deprecated Specify ARKStepper::AdditionalData::implicit_function_is_linear instead.
+       * @deprecated Provide ARKStepper::AdditionalData::implicit_function_is_linear instead.
        */
       DEAL_II_DEPRECATED_WITH_COMMENT(
-        "Specify ARKStepper::AdditionalData::implicit_function_is_linear "
+        "Provide ARKStepper::AdditionalData::implicit_function_is_linear "
         "instead.")
       bool implicit_function_is_linear;
 
       /**
-       * Specify whether the implicit portion of the problem is linear and time
+       * Provide whether the implicit portion of the problem is linear and time
        * independent.
        *
-       * @deprecated Specify ARKStepper::AdditionalData::implicit_function_is_time_independent instead.
+       * @deprecated Provide ARKStepper::AdditionalData::implicit_function_is_time_independent instead.
        */
       DEAL_II_DEPRECATED_WITH_COMMENT(
-        "Specify ARKStepper::AdditionalData::implicit_function_is_time_independent "
+        "Provide ARKStepper::AdditionalData::implicit_function_is_time_independent "
         "instead.")
       bool implicit_function_is_time_independent;
 
       /**
-       * Specify whether the mass pre-factor is time independent. Has no effect
+       * Provide whether the mass pre-factor is time independent. Has no effect
        * if no mass is specified.
        *
-       * @deprecated Specify ARKStepper::AdditionalData::mass_is_time_independent instead.
+       * @deprecated Provide ARKStepper::AdditionalData::mass_is_time_independent instead.
        */
       DEAL_II_DEPRECATED_WITH_COMMENT(
-        "Specify ARKStepper::AdditionalData::mass_is_time_independent "
+        "Provide ARKStepper::AdditionalData::mass_is_time_independent "
         "instead.")
       bool mass_is_time_independent;
 
@@ -315,10 +330,10 @@ namespace SUNDIALS
        * Number of subspace vectors to use for Anderson acceleration. Only
        * meaningful if the packaged SUNDIALS fixed-point solver is used.
        *
-       * @deprecated Specify ARKStepper::AdditionalData::anderson_acceleration_subspace instead.
+       * @deprecated Provide ARKStepper::AdditionalData::anderson_acceleration_subspace instead.
        */
       DEAL_II_DEPRECATED_WITH_COMMENT(
-        "Specify ARKStepper::AdditionalData::anderson_acceleration_subspace "
+        "Provide ARKStepper::AdditionalData::anderson_acceleration_subspace "
         "instead.")
       int anderson_acceleration_subspace;
     };
@@ -357,7 +372,7 @@ namespace SUNDIALS
            const AdditionalData                      &data = AdditionalData());
 
     /**
-     * Constructor receiving the stepper, additional data and MPI communicator.
+     * Constructor receiving the stepper, additional data, and MPI communicator.
      *
      * @param stepper ARKodeStepper object
      * @param data ARKode configuration data
@@ -462,7 +477,7 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::explicit_function instead.
      */
-    internal::FunctionProxy<
+    FunctionProxy<
       void(const double t, const VectorType &y, VectorType &explicit_f)>
       explicit_function;
 
@@ -478,8 +493,7 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::implicit_function instead.
      */
-    internal::FunctionProxy<
-      void(const double t, const VectorType &y, VectorType &res)>
+    FunctionProxy<void(const double t, const VectorType &y, VectorType &res)>
       implicit_function;
 
     /**
@@ -496,8 +510,7 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::mass_times_vector instead.
      */
-    internal::FunctionProxy<
-      void(const double t, const VectorType &v, VectorType &Mv)>
+    FunctionProxy<void(const double t, const VectorType &v, VectorType &Mv)>
       mass_times_vector;
 
     /**
@@ -515,7 +528,7 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::mass_times_setup instead.
      */
-    internal::FunctionProxy<void(const double t)> mass_times_setup;
+    FunctionProxy<void(const double t)> mass_times_setup;
 
     /**
      * A function object that users may supply and that is intended to compute
@@ -530,11 +543,11 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::jacobian_times_vector instead.
      */
-    internal::FunctionProxy<void(const VectorType &v,
-                                 VectorType       &Jv,
-                                 const double      t,
-                                 const VectorType &y,
-                                 const VectorType &fy)>
+    FunctionProxy<void(const VectorType &v,
+                       VectorType       &Jv,
+                       const double      t,
+                       const VectorType &y,
+                       const VectorType &fy)>
       jacobian_times_vector;
 
     /**
@@ -548,7 +561,7 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::jacobian_times_setup instead.
      */
-    internal::FunctionProxy<
+    FunctionProxy<
       void(const double t, const VectorType &y, const VectorType &fy)>
       jacobian_times_setup;
 
@@ -564,11 +577,11 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::solve_linearized_system instead.
      */
-    internal::FunctionProxy<void(SundialsOperator<VectorType>       &op,
-                                 SundialsPreconditioner<VectorType> &prec,
-                                 VectorType                         &x,
-                                 const VectorType                   &b,
-                                 double                              tol)>
+    FunctionProxy<void(SundialsOperator<VectorType>       &op,
+                       SundialsPreconditioner<VectorType> &prec,
+                       VectorType                         &x,
+                       const VectorType                   &b,
+                       double                              tol)>
       solve_linearized_system;
 
     /**
@@ -582,11 +595,11 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::solve_mass instead.
      */
-    internal::FunctionProxy<void(SundialsOperator<VectorType>       &op,
-                                 SundialsPreconditioner<VectorType> &prec,
-                                 VectorType                         &x,
-                                 const VectorType                   &b,
-                                 double                              tol)>
+    FunctionProxy<void(SundialsOperator<VectorType>       &op,
+                       SundialsPreconditioner<VectorType> &prec,
+                       VectorType                         &x,
+                       const VectorType                   &b,
+                       double                              tol)>
       solve_mass;
 
     /**
@@ -601,14 +614,14 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::jacobian_preconditioner_solve instead.
      */
-    internal::FunctionProxy<void(const double      t,
-                                 const VectorType &y,
-                                 const VectorType &fy,
-                                 const VectorType &r,
-                                 VectorType       &z,
-                                 const double      gamma,
-                                 const double      tol,
-                                 const int         lr)>
+    FunctionProxy<void(const double      t,
+                       const VectorType &y,
+                       const VectorType &fy,
+                       const VectorType &r,
+                       VectorType       &z,
+                       const double      gamma,
+                       const double      tol,
+                       const int         lr)>
       jacobian_preconditioner_solve;
 
     /**
@@ -622,12 +635,12 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::jacobian_preconditioner_setup instead.
      */
-    internal::FunctionProxy<void(const double      t,
-                                 const VectorType &y,
-                                 const VectorType &fy,
-                                 const int         jok,
-                                 int              &jcur,
-                                 const double      gamma)>
+    FunctionProxy<void(const double      t,
+                       const VectorType &y,
+                       const VectorType &fy,
+                       const int         jok,
+                       int              &jcur,
+                       const double      gamma)>
       jacobian_preconditioner_setup;
 
     /**
@@ -642,11 +655,11 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::mass_preconditioner_solve instead.
      */
-    internal::FunctionProxy<void(const double      t,
-                                 const VectorType &r,
-                                 VectorType       &z,
-                                 const double      tol,
-                                 const int         lr)>
+    FunctionProxy<void(const double      t,
+                       const VectorType &r,
+                       VectorType       &z,
+                       const double      tol,
+                       const int         lr)>
       mass_preconditioner_solve;
 
     /**
@@ -660,7 +673,7 @@ namespace SUNDIALS
      *
      * @deprecated Specify @p ARKStepper::mass_preconditioner_solve instead.
      */
-    internal::FunctionProxy<void(const double t)> mass_preconditioner_setup;
+    FunctionProxy<void(const double t)> mass_preconditioner_setup;
 
     /**
      * A function object that users may supply and that is intended to

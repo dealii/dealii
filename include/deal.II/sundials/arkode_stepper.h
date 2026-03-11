@@ -63,31 +63,28 @@ DEAL_II_NAMESPACE_OPEN
 namespace SUNDIALS
 {
   /**
+   * Forward declare ARKode class.
+   */
+  template <typename VectorType>
+  class ARKode;
+
+  /**
    * Interface that implements a given ARKODE time stepper.
    */
   template <typename VectorType>
   class ARKodeStepper
   {
   public:
-    virtual ~ARKodeStepper() = default;
     /**
-     * Rebuild the stepper at a given time instance and for a given state vector
-     *
-     * To transport exceptions and maintain context across C boundaries, the
-     * code uses `internal::InvocationContext` (see `invocation_context.h`)
-     * which carries an `std::exception_ptr` that is inspected after a callback
-     * returns.
-     *
-     * @param t0 Time instance that serves as starting time
-     * @param y0 Initial state vector whose layout is used for initialization of
-     *   the internal ARKODE vectors
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
+     * Make ARKode class a friend such that the latter could access reinit()
+     * method.
      */
-    virtual void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) = 0;
+    friend class ARKode<VectorType>;
+
+    /**
+     * Virtual destructor for proper inheritance.
+     */
+    virtual ~ARKodeStepper() = default;
 
     /**
      * Provides user access to the internally used ARKODE memory.
@@ -107,6 +104,27 @@ namespace SUNDIALS
      */
     virtual void *
     get_arkode_memory() const = 0;
+
+  private:
+    /**
+     * Rebuild the stepper at a given time instance and for a given state
+     * vector.
+     *
+     * To transport exceptions and maintain context across C boundaries, the
+     * code uses `internal::InvocationContext` (see `invocation_context.h`)
+     * which carries an `std::exception_ptr` that is inspected after a callback
+     * returns.
+     *
+     * @param t0 Time instance that serves as starting time
+     * @param y0 Initial state vector whose layout is used for initialization of
+     *   the internal ARKODE vectors
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    virtual void
+    reinit(double                      t0,
+           const VectorType           &y0,
+           internal::InvocationContext inv_ctx) = 0;
 
   protected:
     /**
@@ -448,11 +466,6 @@ namespace SUNDIALS
     ARKStepper(const AdditionalData &data = AdditionalData());
 
     ~ARKStepper();
-
-    void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) override;
 
     void *
     get_arkode_memory() const override;
@@ -858,6 +871,21 @@ namespace SUNDIALS
       typename ARKodeStepper<VectorType>::ARKCallbackContext<Stepper>;
 
   private:
+    /**
+     * Rebuild the stepper at a given time instance and for a given state
+     * vector. Required by the ARKodeStepper interface.
+     *
+     * @param t0 Time instance that serves as starting time
+     * @param y0 Initial state vector whose layout is used for initialization of
+     *   the internal ARKODE vectors
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    void
+    reinit(double                      t0,
+           const VectorType           &y0,
+           internal::InvocationContext inv_ctx) override;
+
     /**
      * Set up the (non)linear solver and preconditioners in the ARKODE memory
      * object based on the user-specified functions.
