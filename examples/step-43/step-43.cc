@@ -1629,29 +1629,29 @@ namespace Step43
 
       for (const auto &cell : saturation_dof_handler.active_cell_iterators())
         {
-          const unsigned int cell_no = cell->active_cell_index();
           fe_values.reinit(cell);
           fe_values.get_function_gradients(extrapolated_saturation_solution,
                                            grad_saturation);
 
-          refinement_indicators(cell_no) = grad_saturation[0].norm();
+          refinement_indicators(cell->active_cell_index()) =
+            grad_saturation[0].norm();
         }
     }
 
     {
       for (const auto &cell : saturation_dof_handler.active_cell_iterators())
         {
-          const unsigned int cell_no = cell->active_cell_index();
           cell->clear_coarsen_flag();
           cell->clear_refine_flag();
 
           if ((static_cast<unsigned int>(cell->level()) < max_grid_level) &&
-              (std::fabs(refinement_indicators(cell_no)) >
+              (std::fabs(refinement_indicators(cell->active_cell_index())) >
                saturation_refinement_threshold))
             cell->set_refine_flag();
           else if ((static_cast<unsigned int>(cell->level()) >
                     min_grid_level) &&
-                   (std::fabs(refinement_indicators(cell_no)) <
+                   (std::fabs(
+                      refinement_indicators(cell->active_cell_index())) <
                     0.5 * saturation_refinement_threshold))
             cell->set_coarsen_flag();
         }
