@@ -504,26 +504,32 @@ namespace Step102
 
     void setup_dofs();
     void setup_time_stepper();
-    void assemble_darcy_preconditioner();
-    void build_darcy_preconditioner();
-    void assemble_darcy_system();
-    void assemble_saturation_system();
+    void assemble_darcy_preconditioner(
+      const TrilinosWrappers::MPI::BlockVector &state);
+    void
+    build_darcy_preconditioner(const TrilinosWrappers::MPI::BlockVector &state);
+    void assemble_darcy_system(const TrilinosWrappers::MPI::BlockVector &state);
+    void assemble_saturation_system(TrilinosWrappers::MPI::BlockVector &y);
     void assemble_saturation_matrix();
-    void assemble_saturation_rhs();
+    void assemble_saturation_rhs(const TrilinosWrappers::MPI::BlockVector &y);
     void assemble_saturation_rhs_cell_term(
       const FEValues<dim>                        &saturation_fe_values,
       const FEValues<dim>                        &darcy_fe_values,
       const double                                global_max_u_F_prime,
       const double                                global_S_variation,
-      const std::vector<types::global_dof_index> &local_dof_indices);
+      const std::vector<types::global_dof_index> &local_dof_indices,
+      const TrilinosWrappers::MPI::BlockVector   &y);
     void assemble_saturation_rhs_boundary_term(
       const FEFaceValues<dim>                    &saturation_fe_face_values,
       const FEFaceValues<dim>                    &darcy_fe_face_values,
-      const std::vector<types::global_dof_index> &local_dof_indices);
-    void solve();
-    void refine_mesh(const unsigned int min_grid_level,
-                     const unsigned int max_grid_level);
-    void output_results() const;
+      const std::vector<types::global_dof_index> &local_dof_indices,
+      const TrilinosWrappers::MPI::BlockVector   &y);
+    void solve(TrilinosWrappers::MPI::BlockVector &y);
+    void refine_mesh(const unsigned int                  min_grid_level,
+                     const unsigned int                  max_grid_level,
+                     TrilinosWrappers::MPI::BlockVector &y,
+                     TrilinosWrappers::MPI::BlockVector &y_dot);
+    void output_results(const TrilinosWrappers::MPI::BlockVector &state) const;
     void ida_residual(const double                              t,
                       const TrilinosWrappers::MPI::BlockVector &y,
                       const TrilinosWrappers::MPI::BlockVector &y_dot,
@@ -546,10 +552,12 @@ namespace Step102
 
     // We follow with a number of helper functions that are used in a variety
     // of places throughout the program:
-    double                    get_max_u_F_prime() const;
-    std::pair<double, double> get_extrapolated_saturation_range() const;
-    bool         determine_whether_to_solve_for_pressure_and_velocity() const;
-    void         project_back_saturation();
+    double get_max_u_F_prime(const TrilinosWrappers::MPI::BlockVector &y) const;
+    std::pair<double, double> get_extrapolated_saturation_range(
+      const TrilinosWrappers::MPI::BlockVector &y) const;
+    bool determine_whether_to_solve_for_pressure_and_velocity(
+      const TrilinosWrappers::MPI::BlockVector &y) const;
+    void         project_back_saturation(TrilinosWrappers::MPI::BlockVector &y);
     unsigned int component_to_block(const unsigned int component) const;
     unsigned int n_local_dofs_for_blocks(
       const std::vector<unsigned int> &selected_blocks) const;
@@ -570,8 +578,6 @@ namespace Step102
       const double                       global_max_u_F_prime,
       const double                       global_S_variation,
       const double                       cell_diameter) const;
-
-
     // This all is followed by the member variables, most of which are similar
     // to the ones in step-31, with the exception of the ones that pertain to
     // the macro time stepping for the velocity/pressure system:
@@ -594,10 +600,6 @@ namespace Step102
     TrilinosWrappers::BlockSparseMatrix darcy_matrix;
     TrilinosWrappers::BlockSparseMatrix darcy_preconditioner_matrix;
 
-    TrilinosWrappers::MPI::BlockVector solution;
-    TrilinosWrappers::MPI::BlockVector solution_dot;
-    TrilinosWrappers::MPI::BlockVector old_solution;
-    TrilinosWrappers::MPI::BlockVector old_old_solution;
     TrilinosWrappers::MPI::BlockVector darcy_rhs;
 
     TrilinosWrappers::MPI::BlockVector last_computed_darcy_solution;
@@ -862,11 +864,6 @@ namespace Step102
                           complete_index_set(n_p),
                           complete_index_set(n_s)};
 
-    solution.reinit(state_partitioning, MPI_COMM_WORLD);
-    solution_dot.reinit(state_partitioning, MPI_COMM_WORLD);
-    old_solution.reinit(state_partitioning, MPI_COMM_WORLD);
-    old_old_solution.reinit(state_partitioning, MPI_COMM_WORLD);
-
     darcy_partitioning = {complete_index_set(n_u), complete_index_set(n_p)};
     last_computed_darcy_solution.reinit(state_partitioning, MPI_COMM_WORLD);
     second_last_computed_darcy_solution.reinit(state_partitioning,
@@ -890,6 +887,9 @@ namespace Step102
     data.output_period     = .01;
     data.ic_type           = TimeStepper::AdditionalData::use_y_diff;
     data.reset_type        = TimeStepper::AdditionalData::none;
+
+    std::cout << "IDA configuration: ic_type=" << data.ic_type
+              << ", reset_type=" << data.reset_type << std::endl;
 
     time_stepper = std::make_unique<TimeStepper>(data, MPI_COMM_WORLD);
 
@@ -1058,7 +1058,8 @@ namespace Step102
   // Trilinos classes where we don't immediately have access to individual
   // memory locations.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner()
+  void TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner(
+    const TrilinosWrappers::MPI::BlockVector &state)
   {
     std::cout << "   Rebuilding darcy preconditioner..." << std::endl;
 
@@ -1097,8 +1098,7 @@ namespace Step102
 
         local_matrix = 0;
 
-        fe_values[saturation].get_function_values(old_solution,
-                                                  old_saturation_values);
+        fe_values[saturation].get_function_values(state, old_saturation_values);
 
         k_inverse.value_list(fe_values.get_quadrature_points(),
                              k_inverse_values);
@@ -1158,9 +1158,10 @@ namespace Step102
   // preconditioner which does not need any special knowledge of the matrix
   // structure and/or the operator that's behind it.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::build_darcy_preconditioner()
+  void TwoPhaseFlowProblem<dim>::build_darcy_preconditioner(
+    const TrilinosWrappers::MPI::BlockVector &state)
   {
-    assemble_darcy_preconditioner();
+    assemble_darcy_preconditioner(state);
 
     top_left_preconditioner =
       std::make_shared<TrilinosWrappers::PreconditionIC>();
@@ -1198,7 +1199,8 @@ namespace Step102
   // creation of the local matrix, right hand side as well as the vector for
   // the indices of the local dofs compared to the global system.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::assemble_darcy_system()
+  void TwoPhaseFlowProblem<dim>::assemble_darcy_system(
+    const TrilinosWrappers::MPI::BlockVector &state)
   {
     darcy_matrix = 0;
     darcy_rhs    = 0;
@@ -1300,8 +1302,7 @@ namespace Step102
         local_matrix = 0;
         local_rhs    = 0;
 
-        fe_values[saturation].get_function_values(old_solution,
-                                                  old_saturation_values);
+        fe_values[saturation].get_function_values(state, old_saturation_values);
 
         pressure_right_hand_side.value_list(fe_values.get_quadrature_points(),
                                             pressure_rhs_values);
@@ -1383,7 +1384,8 @@ namespace Step102
   // assembles the right hand side must be called at every saturation time
   // step.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::assemble_saturation_system()
+  void TwoPhaseFlowProblem<dim>::assemble_saturation_system(
+    TrilinosWrappers::MPI::BlockVector &y)
   {
     if (rebuild_saturation_matrix == true)
       {
@@ -1392,7 +1394,7 @@ namespace Step102
       }
 
     saturation_rhs = 0;
-    assemble_saturation_rhs();
+    assemble_saturation_rhs(y);
   }
 
 
@@ -1477,7 +1479,8 @@ namespace Step102
   // boundary contributions into the global vector in the two functions rather
   // than in this present function.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs()
+  void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs(
+    const TrilinosWrappers::MPI::BlockVector &y)
   {
     const QGauss<dim>     quadrature_formula(saturation_degree + 2);
     const QGauss<dim - 1> face_quadrature_formula(saturation_degree + 2);
@@ -1495,9 +1498,9 @@ namespace Step102
     std::vector<types::global_dof_index> local_dof_indices(
       fe.n_dofs_per_cell());
 
-    const double                    global_max_u_F_prime = get_max_u_F_prime();
+    const double                    global_max_u_F_prime = get_max_u_F_prime(y);
     const std::pair<double, double> global_S_range =
-      get_extrapolated_saturation_range();
+      get_extrapolated_saturation_range(y);
     const double global_S_variation =
       global_S_range.second - global_S_range.first;
 
@@ -1511,7 +1514,8 @@ namespace Step102
                                           fe_values,
                                           global_max_u_F_prime,
                                           global_S_variation,
-                                          local_dof_indices);
+                                          local_dof_indices,
+                                          y);
 
         for (const auto &face : cell->face_iterators())
           if (face->at_boundary())
@@ -1519,7 +1523,8 @@ namespace Step102
               fe_face_values.reinit(cell, face);
               assemble_saturation_rhs_boundary_term(fe_face_values,
                                                     fe_face_values,
-                                                    local_dof_indices);
+                                                    local_dof_indices,
+                                                    y);
             }
       }
   }
@@ -1543,7 +1548,8 @@ namespace Step102
     const FEValues<dim>                        &darcy_fe_values,
     const double                                global_max_u_F_prime,
     const double                                global_S_variation,
-    const std::vector<types::global_dof_index> &local_dof_indices)
+    const std::vector<types::global_dof_index> &local_dof_indices,
+    const TrilinosWrappers::MPI::BlockVector   &y)
   {
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = saturation_fe_values.n_quadrature_points;
@@ -1558,15 +1564,15 @@ namespace Step102
     std::vector<Tensor<1, dim>> present_darcy_solution_values(n_q_points);
 
     saturation_fe_values[saturation].get_function_values(
-      old_solution, old_saturation_solution_values);
+      y, old_saturation_solution_values);
     saturation_fe_values[saturation].get_function_values(
-      old_old_solution, old_old_saturation_solution_values);
+      y, old_old_saturation_solution_values);
     saturation_fe_values[saturation].get_function_gradients(
-      old_solution, old_grad_saturation_solution_values);
+      y, old_grad_saturation_solution_values);
     saturation_fe_values[saturation].get_function_gradients(
-      old_old_solution, old_old_grad_saturation_solution_values);
+      y, old_old_grad_saturation_solution_values);
     darcy_fe_values[velocities].get_function_values(
-      solution, present_darcy_solution_values);
+      y, present_darcy_solution_values);
 
     const double nu =
       compute_viscosity(old_saturation_solution_values,
@@ -1618,7 +1624,8 @@ namespace Step102
   void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_boundary_term(
     const FEFaceValues<dim>                    &saturation_fe_face_values,
     const FEFaceValues<dim>                    &darcy_fe_face_values,
-    const std::vector<types::global_dof_index> &local_dof_indices)
+    const std::vector<types::global_dof_index> &local_dof_indices,
+    const TrilinosWrappers::MPI::BlockVector   &y)
   {
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_face_q_points =
@@ -1634,9 +1641,9 @@ namespace Step102
     std::vector<double> neighbor_saturation(n_face_q_points);
 
     saturation_fe_face_values[saturation].get_function_values(
-      old_solution, old_saturation_solution_values_face);
+      y, old_saturation_solution_values_face);
     darcy_fe_face_values[velocities].get_function_values(
-      solution, present_darcy_solution_values_face);
+      y, present_darcy_solution_values_face);
 
     SaturationBoundaryValues<dim> saturation_boundary_values;
     saturation_boundary_values.value_list(
@@ -1684,18 +1691,18 @@ namespace Step102
   // part using the GMRES solver with the Schur complement block
   // preconditioner as is described in the introduction.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::solve()
+  void TwoPhaseFlowProblem<dim>::solve(TrilinosWrappers::MPI::BlockVector &y)
   {
     const bool solve_for_pressure_and_velocity =
-      determine_whether_to_solve_for_pressure_and_velocity();
+      determine_whether_to_solve_for_pressure_and_velocity(y);
 
     if (solve_for_pressure_and_velocity == true)
       {
         std::cout << "   Solving Darcy (pressure-velocity) system..."
                   << std::endl;
 
-        assemble_darcy_system();
-        build_darcy_preconditioner();
+        assemble_darcy_system(y);
+        build_darcy_preconditioner(y);
 
         {
           const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
@@ -1716,44 +1723,40 @@ namespace Step102
             SolverGMRES<TrilinosWrappers::MPI::BlockVector>::AdditionalData(
               100));
 
-          for (unsigned int i = 0; i < solution.block(velocity_block).size();
-               ++i)
+          for (unsigned int i = 0; i < y.block(velocity_block).size(); ++i)
             if (constraints.is_constrained(i))
-              solution.block(velocity_block)(i) = 0;
-          for (unsigned int i = 0; i < solution.block(pressure_block).size();
-               ++i)
+              y.block(velocity_block)(i) = 0;
+          for (unsigned int i = 0; i < y.block(pressure_block).size(); ++i)
             if (constraints.is_constrained(dofs_per_block[velocity_block] + i))
-              solution.block(pressure_block)(i) = 0;
+              y.block(pressure_block)(i) = 0;
 
           TrilinosWrappers::MPI::BlockVector darcy_solution_view;
           darcy_solution_view.reinit(
             {complete_index_set(dofs_per_block[velocity_block]),
              complete_index_set(dofs_per_block[pressure_block])},
             MPI_COMM_WORLD);
-          darcy_solution_view.block(0) = solution.block(velocity_block);
-          darcy_solution_view.block(1) = solution.block(pressure_block);
+          darcy_solution_view.block(0) = y.block(velocity_block);
+          darcy_solution_view.block(1) = y.block(pressure_block);
 
           gmres.solve(darcy_matrix,
                       darcy_solution_view,
                       darcy_rhs,
                       preconditioner);
 
-          solution.block(velocity_block) = darcy_solution_view.block(0);
-          solution.block(pressure_block) = darcy_solution_view.block(1);
-          constraints.distribute(solution);
+          y.block(velocity_block) = darcy_solution_view.block(0);
+          y.block(pressure_block) = darcy_solution_view.block(1);
+          constraints.distribute(y);
 
           std::cout << "        ..." << solver_control.last_step()
                     << " GMRES iterations." << std::endl;
         }
 
         {
-          second_last_computed_darcy_solution = last_computed_darcy_solution;
-          last_computed_darcy_solution.block(0) =
-            solution.block(velocity_block);
-          last_computed_darcy_solution.block(1) =
-            solution.block(pressure_block);
+          second_last_computed_darcy_solution   = last_computed_darcy_solution;
+          last_computed_darcy_solution.block(0) = y.block(velocity_block);
+          last_computed_darcy_solution.block(1) = y.block(pressure_block);
 
-          saturation_matching_last_computed_darcy_solution = solution;
+          saturation_matching_last_computed_darcy_solution = y;
         }
       }
     // On the other hand, if we have decided that we don't want to compute the
@@ -1774,13 +1777,13 @@ namespace Step102
     // the Darcy solution for the first 2 time steps.
     else
       {
-        solution.block(velocity_block) = last_computed_darcy_solution.block(0);
-        solution.block(pressure_block) = last_computed_darcy_solution.block(1);
-        solution.block(velocity_block)
+        y.block(velocity_block) = last_computed_darcy_solution.block(0);
+        y.block(pressure_block) = last_computed_darcy_solution.block(1);
+        y.block(velocity_block)
           .sadd(1 + current_macro_time_step / old_macro_time_step,
                 -current_macro_time_step / old_macro_time_step,
                 second_last_computed_darcy_solution.block(0));
-        solution.block(pressure_block)
+        y.block(pressure_block)
           .sadd(1 + current_macro_time_step / old_macro_time_step,
                 -current_macro_time_step / old_macro_time_step,
                 second_last_computed_darcy_solution.block(1));
@@ -1792,7 +1795,7 @@ namespace Step102
     {
       old_time_step = time_step;
 
-      const double max_u_F_prime = get_max_u_F_prime();
+      const double max_u_F_prime = get_max_u_F_prime(y);
       if (max_u_F_prime > 0)
         time_step = porosity * GridTools::minimal_cell_diameter(triangulation) /
                     saturation_degree / max_u_F_prime / 50;
@@ -1838,12 +1841,12 @@ namespace Step102
         saturation_matrix.block(saturation_block, saturation_block));
 
       cg.solve(saturation_matrix.block(saturation_block, saturation_block),
-               solution.block(saturation_block),
+               y.block(saturation_block),
                saturation_rhs.block(saturation_block),
                preconditioner);
 
-      constraints.distribute(solution);
-      project_back_saturation();
+      constraints.distribute(y);
+      project_back_saturation(y);
 
       std::cout << "        ..." << solver_control.last_step()
                 << " CG iterations." << std::endl;
@@ -1862,8 +1865,11 @@ namespace Step102
   // derivative from the old to the new mesh. None of this is particularly
   // difficult.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::refine_mesh(const unsigned int min_grid_level,
-                                             const unsigned int max_grid_level)
+  void TwoPhaseFlowProblem<dim>::refine_mesh(
+    const unsigned int                  min_grid_level,
+    const unsigned int                  max_grid_level,
+    TrilinosWrappers::MPI::BlockVector &y,
+    TrilinosWrappers::MPI::BlockVector &y_dot)
   {
     Vector<double> refinement_indicators(triangulation.n_active_cells());
     const FEValuesExtractors::Scalar saturation(dim + 1);
@@ -1876,8 +1882,7 @@ namespace Step102
         {
           const unsigned int cell_no = cell->active_cell_index();
           fe_values.reinit(cell);
-          fe_values[saturation].get_function_gradients(solution,
-                                                       grad_saturation);
+          fe_values[saturation].get_function_gradients(y, grad_saturation);
 
           refinement_indicators(cell_no) = grad_saturation[0].norm();
         }
@@ -1906,8 +1911,8 @@ namespace Step102
 
     {
       std::vector<TrilinosWrappers::MPI::BlockVector> x_solution(2);
-      x_solution[0] = solution;
-      x_solution[1] = solution_dot;
+      x_solution[0] = y;
+      x_solution[1] = y_dot;
 
       SolutionTransfer<dim, TrilinosWrappers::MPI::BlockVector>
         solution_soltrans(dof_handler);
@@ -1920,15 +1925,15 @@ namespace Step102
       setup_dofs();
 
       std::vector<TrilinosWrappers::MPI::BlockVector> tmp_solution(2);
-      tmp_solution[0].reinit(solution);
-      tmp_solution[1].reinit(solution);
+      tmp_solution[0].reinit(state_partitioning, MPI_COMM_WORLD);
+      tmp_solution[1].reinit(state_partitioning, MPI_COMM_WORLD);
       solution_soltrans.interpolate(tmp_solution);
 
-      solution     = tmp_solution[0];
-      solution_dot = tmp_solution[1];
+      y     = tmp_solution[0];
+      y_dot = tmp_solution[1];
 
-      constraints.distribute(solution);
-      constraints.distribute(solution_dot);
+      constraints.distribute(y);
+      constraints.distribute(y_dot);
 
       rebuild_saturation_matrix = true;
     }
@@ -1941,12 +1946,13 @@ namespace Step102
   // This function generates graphical output. It is in essence a copy of the
   // implementation in step-31.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::output_results() const
+  void TwoPhaseFlowProblem<dim>::output_results(
+    const TrilinosWrappers::MPI::BlockVector &state) const
   {
     Vector<double> joint_solution(dof_handler.n_dofs());
-    for (unsigned int block = 0; block < solution.n_blocks(); ++block)
-      for (unsigned int i = 0; i < solution.block(block).size(); ++i)
-        joint_solution(get_block_offset(block) + i) = solution.block(block)(i);
+    for (unsigned int block = 0; block < state.n_blocks(); ++block)
+      for (unsigned int i = 0; i < state.block(block).size(); ++i)
+        joint_solution(get_block_offset(block) + i) = state.block(block)(i);
 
     std::vector<std::string> joint_solution_names(dim, "velocity");
     joint_solution_names.emplace_back("pressure");
@@ -1996,13 +2002,7 @@ namespace Step102
     constraints.distribute(constrained_y);
     constraints.distribute(constrained_y_dot);
 
-    const auto saved_solution     = solution;
-    const auto saved_old_solution = old_solution;
-
-    solution     = constrained_y;
-    old_solution = constrained_y;
-
-    assemble_darcy_system();
+    assemble_darcy_system(constrained_y);
 
     TrilinosWrappers::MPI::BlockVector darcy_state;
     darcy_state.reinit({complete_index_set(dofs_per_block[velocity_block]),
@@ -2157,9 +2157,6 @@ namespace Step102
                                                local_dof_indices,
                                                residual);
       }
-
-    solution     = saved_solution;
-    old_solution = saved_old_solution;
   }
 
 
@@ -2178,16 +2175,12 @@ namespace Step102
     TrilinosWrappers::MPI::BlockVector constrained_y(y);
     constraints.distribute(constrained_y);
 
-    const auto saved_solution         = solution;
-    const auto saved_old_solution     = old_solution;
     const auto saved_rebuild_s_matrix = rebuild_saturation_matrix;
 
-    solution                  = constrained_y;
-    old_solution              = constrained_y;
     rebuild_saturation_matrix = true;
 
-    assemble_darcy_system();
-    build_darcy_preconditioner();
+    assemble_darcy_system(constrained_y);
+    build_darcy_preconditioner(constrained_y);
 
     saturation_matrix = 0;
 
@@ -2336,8 +2329,6 @@ namespace Step102
       }
 
     rebuild_saturation_matrix = saved_rebuild_s_matrix;
-    solution                  = saved_solution;
-    old_solution              = saved_old_solution;
   }
 
 
@@ -2422,17 +2413,17 @@ namespace Step102
       return false;
 
     std::cout << "IDA restart for mesh refinement at t=" << t << std::endl;
+    std::cout << "  restart input blocks: y=" << sol.n_blocks()
+              << ", y_dot=" << sol_dot.n_blocks() << std::endl;
 
-    time         = t;
-    solution     = sol;
-    solution_dot = sol_dot;
-    constraints.distribute(solution);
-    constraints.distribute(solution_dot);
+    time = t;
+    constraints.distribute(sol);
+    constraints.distribute(sol_dot);
 
-    refine_mesh(initial_refinement, max_refinement_level);
+    refine_mesh(initial_refinement, max_refinement_level, sol, sol_dot);
 
-    sol     = solution;
-    sol_dot = solution_dot;
+    std::cout << "  restart output blocks: y=" << sol.n_blocks()
+              << ", y_dot=" << sol_dot.n_blocks() << std::endl;
 
     while (next_refinement_time <= t + 1e-12)
       next_refinement_time += refinement_interval;
@@ -2454,10 +2445,10 @@ namespace Step102
 
     time            = t;
     timestep_number = step_number;
-    solution        = sol;
-    solution_dot    = sol_dot;
-    constraints.distribute(solution);
-    output_results();
+
+    TrilinosWrappers::MPI::BlockVector output_state(sol);
+    constraints.distribute(output_state);
+    output_results(output_state);
   }
 
 
@@ -2482,8 +2473,9 @@ namespace Step102
   // extrapolate the velocity from the last two solutions in
   // <code>solve()</code>.
   template <int dim>
-  bool TwoPhaseFlowProblem<
-    dim>::determine_whether_to_solve_for_pressure_and_velocity() const
+  bool TwoPhaseFlowProblem<dim>::
+    determine_whether_to_solve_for_pressure_and_velocity(
+      const TrilinosWrappers::MPI::BlockVector &y) const
   {
     if (timestep_number <= 2)
       return true;
@@ -2512,7 +2504,7 @@ namespace Step102
         fe_values[saturation].get_function_values(
           saturation_matching_last_computed_darcy_solution,
           old_saturation_after_solving_pressure);
-        fe_values[saturation].get_function_values(solution, present_saturation);
+        fe_values[saturation].get_function_values(y, present_saturation);
 
         k_inverse.value_list(fe_values.get_quadrature_points(),
                              k_inverse_values);
@@ -2556,13 +2548,14 @@ namespace Step102
   // fluid velocity)). Consequently, at the end of each time step, we simply
   // project the saturation field back into the physically reasonable region.
   template <int dim>
-  void TwoPhaseFlowProblem<dim>::project_back_saturation()
+  void TwoPhaseFlowProblem<dim>::project_back_saturation(
+    TrilinosWrappers::MPI::BlockVector &y)
   {
-    for (unsigned int i = 0; i < solution.block(saturation_block).size(); ++i)
-      if (solution.block(saturation_block)(i) < 0.0)
-        solution.block(saturation_block)(i) = 0.0;
-      else if (solution.block(saturation_block)(i) > 1)
-        solution.block(saturation_block)(i) = 1;
+    for (unsigned int i = 0; i < y.block(saturation_block).size(); ++i)
+      if (y.block(saturation_block)(i) < 0.0)
+        y.block(saturation_block)(i) = 0.0;
+      else if (y.block(saturation_block)(i) > 1)
+        y.block(saturation_block)(i) = 1;
   }
 
 
@@ -2575,7 +2568,8 @@ namespace Step102
   // both the computation of the time step as well as in normalizing the
   // entropy-residual term in the artificial viscosity.
   template <int dim>
-  double TwoPhaseFlowProblem<dim>::get_max_u_F_prime() const
+  double TwoPhaseFlowProblem<dim>::get_max_u_F_prime(
+    const TrilinosWrappers::MPI::BlockVector &y) const
   {
     const QGauss<dim>  quadrature_formula(darcy_degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
@@ -2593,10 +2587,8 @@ namespace Step102
       {
         fe_values.reinit(cell);
 
-        fe_values[velocities].get_function_values(solution,
-                                                  darcy_solution_values);
-        fe_values[saturation].get_function_values(old_solution,
-                                                  saturation_values);
+        fe_values[velocities].get_function_values(y, darcy_solution_values);
+        fe_values[saturation].get_function_values(y, saturation_values);
 
         for (unsigned int q = 0; q < n_q_points; ++q)
           {
@@ -2625,7 +2617,8 @@ namespace Step102
   // As before, the function is taken with minimal modifications from step-31.
   template <int dim>
   std::pair<double, double>
-  TwoPhaseFlowProblem<dim>::get_extrapolated_saturation_range() const
+  TwoPhaseFlowProblem<dim>::get_extrapolated_saturation_range(
+    const TrilinosWrappers::MPI::BlockVector &y) const
   {
     const QGauss<dim>  quadrature_formula(saturation_degree + 2);
     const unsigned int n_q_points = quadrature_formula.size();
@@ -2643,10 +2636,9 @@ namespace Step102
         for (const auto &cell : dof_handler.active_cell_iterators())
           {
             fe_values.reinit(cell);
-            fe_values[saturation].get_function_values(old_solution,
-                                                      old_saturation_values);
+            fe_values[saturation].get_function_values(y, old_saturation_values);
             fe_values[saturation].get_function_values(
-              old_old_solution, old_old_saturation_values);
+              y, old_old_saturation_values);
 
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
@@ -2669,8 +2661,7 @@ namespace Step102
         for (const auto &cell : dof_handler.active_cell_iterators())
           {
             fe_values.reinit(cell);
-            fe_values[saturation].get_function_values(old_solution,
-                                                      old_saturation_values);
+            fe_values[saturation].get_function_values(y, old_saturation_values);
 
             for (unsigned int q = 0; q < n_q_points; ++q)
               {
@@ -2772,26 +2763,29 @@ namespace Step102
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run()
   {
+    TrilinosWrappers::MPI::BlockVector y;
+    TrilinosWrappers::MPI::BlockVector y_dot;
+
     GridGenerator::hyper_cube(triangulation, 0, 1);
     triangulation.refine_global(initial_refinement);
     global_Omega_diameter = GridTools::diameter(triangulation);
 
     setup_dofs();
+    y.reinit(state_partitioning, MPI_COMM_WORLD);
+    y_dot.reinit(state_partitioning, MPI_COMM_WORLD);
     setup_time_stepper();
 
     VectorTools::project(dof_handler,
                          constraints,
                          QGauss<dim>(saturation_degree + 2),
                          InitialValues<dim>(),
-                         old_solution);
-    constraints.distribute(old_solution);
+                         y);
+    constraints.distribute(y);
 
-    solution                                         = old_solution;
-    old_old_solution                                 = old_solution;
-    solution_dot                                     = 0;
+    y_dot                                            = 0;
     last_computed_darcy_solution                     = 0;
     second_last_computed_darcy_solution              = 0;
-    saturation_matching_last_computed_darcy_solution = solution;
+    saturation_matching_last_computed_darcy_solution = y;
 
     time_step = old_time_step = 0;
     current_macro_time_step = old_macro_time_step = 0;
@@ -2800,8 +2794,8 @@ namespace Step102
     timestep_number      = 0;
     next_refinement_time = refinement_interval;
 
-    output_results();
-    time_stepper->solve_dae(solution, solution_dot);
+    output_results(y);
+    time_stepper->solve_dae(y, y_dot);
   }
 } // namespace Step102
 
