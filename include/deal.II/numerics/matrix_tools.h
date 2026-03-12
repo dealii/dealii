@@ -78,8 +78,7 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
-namespace TrilinosWrappers
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 {
   class SparseMatrix;
   class BlockSparseMatrix;
@@ -366,7 +365,7 @@ namespace MatrixTools
 
 #endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Apply Dirichlet boundary conditions to the system matrix and vectors as
    * described in the general documentation of this namespace. This function

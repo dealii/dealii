@@ -70,7 +70,7 @@ BlockVector<Number>::BlockVector(const BlockVector<OtherNumber> &v)
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 template <typename Number>
 BlockVector<Number>::BlockVector(const TrilinosWrappers::MPI::BlockVector &v)
@@ -142,7 +142,7 @@ BlockVector<Number>::reinit(const BlockVector<Number2> &v,
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 template <typename Number>
 inline BlockVector<Number> &
 BlockVector<Number>::operator=(const TrilinosWrappers::MPI::BlockVector &v)

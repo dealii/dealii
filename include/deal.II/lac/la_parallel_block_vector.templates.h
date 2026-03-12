@@ -394,7 +394,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
     template <typename Number, typename MemorySpace>
     BlockVector<Number, MemorySpace> &

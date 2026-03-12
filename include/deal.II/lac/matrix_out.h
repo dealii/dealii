@@ -265,7 +265,7 @@ namespace internal
     }
 
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Return the element with given indices of a Trilinos sparse matrix.
      */

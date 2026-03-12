@@ -25,23 +25,23 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-#        ifdef HAVE_TPETRA_INST_FLOAT
+#        ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
     template class PreconditionAMGMueLu<float, MemorySpace::Host>;
     template class PreconditionAMGMueLu<float, MemorySpace::Default>;
 #        endif
 
-#        ifdef HAVE_TPETRA_INST_DOUBLE
+#        ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
     template class PreconditionAMGMueLu<double, MemorySpace::Host>;
     template class PreconditionAMGMueLu<double, MemorySpace::Default>;
 #        endif
 
 #        ifdef DEAL_II_WITH_COMPLEX_VALUES
-#          ifdef HAVE_TPETRA_INST_COMPLEX_FLOAT
+#          ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
     template class PreconditionAMGMueLu<std::complex<float>, MemorySpace::Host>;
     template class PreconditionAMGMueLu<std::complex<float>,
                                         MemorySpace::Default>;
 #          endif
-#          ifdef HAVE_TPETRA_INST_COMPLEX_DOUBLE
+#          ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
     template class PreconditionAMGMueLu<std::complex<double>,
                                         MemorySpace::Host>;
     template class PreconditionAMGMueLu<std::complex<double>,

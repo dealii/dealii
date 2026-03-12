@@ -280,7 +280,7 @@ namespace LinearAlgebra
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <typename Number>
   void
   ReadWriteVector<Number>::reinit(
@@ -709,6 +709,7 @@ namespace LinearAlgebra
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
@@ -881,6 +882,7 @@ namespace LinearAlgebra
   {
     internal::import_elements_from_block_vector(*this, src, operation);
   }
+#  endif
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -905,6 +907,7 @@ namespace LinearAlgebra
 
 
 
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <typename Number>
   void
   ReadWriteVector<Number>::import_elements(
@@ -919,6 +922,7 @@ namespace LinearAlgebra
                     trilinos_vec.get_mpi_communicator(),
                     communication_pattern);
   }
+#  endif
 #endif
 
 
@@ -998,6 +1002,7 @@ namespace LinearAlgebra
 
 
 
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <typename Number>
   EpetraWrappers::CommunicationPattern
   ReadWriteVector<Number>::create_epetra_comm_pattern(
@@ -1012,6 +1017,7 @@ namespace LinearAlgebra
 
     return epetra_comm_pattern;
   }
+#  endif
 #endif
 } // end of namespace LinearAlgebra
 

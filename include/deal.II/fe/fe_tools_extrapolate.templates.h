@@ -1561,6 +1561,7 @@ namespace FETools
 #endif // DEAL_II_WITH_PETSC
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <int dim, int spacedim>
     void
     reinit_distributed(const DoFHandler<dim, spacedim> &dh,
@@ -1575,6 +1576,7 @@ namespace FETools
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
+#  endif
 
 
 
@@ -1597,6 +1599,7 @@ namespace FETools
     }
 #    endif
 
+#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <int dim, int spacedim>
     void
     reinit_distributed(const DoFHandler<dim, spacedim>       &dh,
@@ -1611,6 +1614,7 @@ namespace FETools
       const IndexSet &locally_owned_dofs = dh.locally_owned_dofs();
       vector.reinit(locally_owned_dofs, parallel_tria->get_mpi_communicator());
     }
+#    endif
 #  endif
 #endif // DEAL_II_WITH_TRILINOS
 
@@ -1658,7 +1662,7 @@ namespace FETools
     }
 #endif // DEAL_II_WITH_PETSC
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <int dim, int spacedim>
     void
     reinit_ghosted(const DoFHandler<dim, spacedim> &dh,

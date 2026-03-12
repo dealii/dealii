@@ -256,6 +256,7 @@ namespace VectorTools
 
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <int dim, int spacedim>
   void
   add_constant(LinearAlgebra::EpetraWrappers::Vector &,
@@ -266,6 +267,7 @@ namespace VectorTools
     // TODO: no vector access using operator()
     AssertThrow(false, ExcNotImplemented());
   }
+#  endif
 
 
 

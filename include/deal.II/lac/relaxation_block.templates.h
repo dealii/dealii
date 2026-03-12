@@ -188,7 +188,7 @@ namespace internal
     return prev;
   }
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Specialization for Trilinos. Use the ghosted vector.
    */

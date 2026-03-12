@@ -157,7 +157,7 @@ namespace LinearAlgebraPETSc
 } // namespace LinearAlgebraPETSc
 #endif // DEAL_II_WITH_PETSC
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 /**
  * A namespace in which the wrappers to the Trilinos linear algebra classes

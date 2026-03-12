@@ -52,7 +52,7 @@ namespace Utilities
 } // namespace Utilities
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -1016,7 +1016,7 @@ public:
   void
   copy_from(const FullMatrix<somenumber> &matrix);
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Copy the given Trilinos matrix to this one. The operation triggers an
    * assertion if the sparsity patterns of the current object does not contain
