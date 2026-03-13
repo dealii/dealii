@@ -2445,14 +2445,11 @@ namespace parallel
       const unsigned int deal_to_p4est_line_index[12] = {
         4, 5, 0, 1, 6, 7, 2, 3, 8, 9, 10, 11};
 
-      for (Triangulation<dim, spacedim>::active_cell_iterator cell =
-             this->begin_active();
-           cell != this->end();
-           ++cell)
+      for (const auto &cell : this->active_cell_iterators())
         {
           const unsigned int index =
             coarse_cell_to_p4est_tree_permutation[cell->index()];
-          for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_cell; ++e)
+          for (unsigned int e = 0; e < cell->n_lines(); ++e)
             connectivity->tree_to_edge[index * GeometryInfo<3>::lines_per_cell +
                                        deal_to_p4est_line_index[e]] =
               cell->line(e)->index();
