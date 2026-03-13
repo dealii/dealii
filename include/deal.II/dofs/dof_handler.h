@@ -1429,14 +1429,15 @@ private:
      * Container to temporarily store the iterator and future active FE index
      * of cells that persist.
      */
-    std::map<const cell_iterator, const types::fe_index>
+    std::vector<std::pair<const cell_iterator, const types::fe_index>>
       persisting_cells_fe_index;
 
     /**
      * Container to temporarily store the iterator and future active FE index
      * of cells that will be refined.
      */
-    std::map<const cell_iterator, const types::fe_index> refined_cells_fe_index;
+    std::vector<std::pair<const cell_iterator, const types::fe_index>>
+      refined_cells_fe_index;
 
     /**
      * Container to temporarily store the iterator and future active FE index
