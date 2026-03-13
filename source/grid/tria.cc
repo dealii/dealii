@@ -16897,18 +16897,18 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::reset_global_cell_indices()
 {
-  {
-    types::global_cell_index cell_index = 0;
-    for (const auto &cell : active_cell_iterators())
-      cell->set_global_active_cell_index(cell_index++);
-  }
-
+  types::global_cell_index active_cell_index = 0;
   for (unsigned int l = 0; l < levels.size(); ++l)
     {
-      types::global_cell_index cell_index = 0;
+      types::global_cell_index level_cell_index = 0;
       for (const auto &cell : cell_iterators_on_level(l))
-        cell->set_global_level_cell_index(cell_index++);
+        {
+          cell->set_global_level_cell_index(level_cell_index++);
+          if (cell->is_active())
+            cell->set_global_active_cell_index(active_cell_index++);
+        }
     }
+  AssertDimension(active_cell_index, this->n_active_cells());
 }
 
 
