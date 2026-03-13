@@ -1477,8 +1477,8 @@ namespace internal
                     // Store the active FE index of each cell that will be
                     // refined to and distribute it later on its children.
                     // Pick their future index if flagged for p-refinement.
-                    fe_transfer->refined_cells_fe_index.insert(
-                      {cell, cell->future_fe_index()});
+                    fe_transfer->refined_cells_fe_index.emplace_back(
+                      cell, cell->future_fe_index());
                   }
                 else if (cell->coarsen_flag_set())
                   {
@@ -1523,8 +1523,8 @@ namespace internal
                     // However, it may have p-refinement indicators, so we
                     // choose a new active FE index based on its flags.
                     if (cell->future_fe_index_set() == true)
-                      fe_transfer->persisting_cells_fe_index.insert(
-                        {cell, cell->future_fe_index()});
+                      fe_transfer->persisting_cells_fe_index.emplace_back(
+                        cell, cell->future_fe_index());
                   }
               }
         }
