@@ -462,6 +462,14 @@ namespace LinearAlgebra
       is_compressed() const;
 
       /**
+       * Determine an estimate for the memory consumption (in bytes) of this
+       * object. Note that only the memory reserved on the current processor is
+       * returned in case this is called in an MPI-based program.
+       */
+      size_type
+      memory_consumption() const;
+
+      /**
        * Return the underlying MPI communicator.
        */
       MPI_Comm
@@ -1752,6 +1760,19 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
       // must always take this from the additional column space map
       Assert(column_space_map.get() != nullptr, ExcInternalError());
       return column_space_map->getGlobalNumElements();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline typename SparseMatrix<Number, MemorySpace>::size_type
+    SparseMatrix<Number, MemorySpace>::memory_consumption() const
+    {
+      size_type static_memory =
+        sizeof(*this) + sizeof(*matrix) + sizeof(matrix->getGraph().get());
+      return ((sizeof(Number) + sizeof(TrilinosWrappers::types::int_type)) *
+                matrix->getLocalNumEntries() +
+              sizeof(int) * local_size() + static_memory);
     }
 
 

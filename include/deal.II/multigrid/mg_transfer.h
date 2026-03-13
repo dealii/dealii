@@ -29,6 +29,7 @@
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/multigrid/mg_base.h>
@@ -123,8 +124,11 @@ namespace internal
   struct MatrixSelector<
     dealii::LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>>
   {
-    using Sparsity = ::dealii::TrilinosWrappers::SparsityPattern;
-    using Matrix   = ::dealii::TrilinosWrappers::SparseMatrix;
+    using Sparsity =
+      ::dealii::LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace>;
+    using Matrix =
+      ::dealii::LinearAlgebra::TpetraWrappers::SparseMatrix<Number,
+                                                            MemorySpace>;
 
     static const bool requires_distributed_sparsity_pattern = false;
 
