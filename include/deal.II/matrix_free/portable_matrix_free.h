@@ -561,10 +561,11 @@ namespace Portable
 
     // clang-format off
     /**
-     * This method runs the loop over all cells and applies the local operation on
-     * each element in parallel. @p func is a functor which is applied on each color.
+     * This method performs a loop over all cells and applies the local operation on
+     * each element in parallel. @p func is a functor which is applied for each color
+     * and each cell.
      *
-     * @p func needs to define
+     * If VectorType is a LinearAlgebra::distributed::Vector, @p func needs to define
      * \code
      * DEAL_II_HOST_DEVICE void operator()(
      *   const typename Portable::MatrixFree<dim, Number>::Data *data,
@@ -572,6 +573,8 @@ namespace Portable
      *   DeviceVector<Number>                                   &dst) const;
      *   static const unsigned int n_q_points;
      * \endcode
+     * If VectorType is a LinearAlgebra::distributed::BlockVector, @p func uses
+     * BlockDeviceVector instead of DeviceVector for the `src` and `dst` arguments.
      */
     // clang-format on
     template <typename Functor, typename VectorType>
