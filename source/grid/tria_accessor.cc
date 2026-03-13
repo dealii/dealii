@@ -2212,25 +2212,6 @@ CellAccessor<dim, spacedim>::set_level_subdomain_id(
 }
 
 
-template <int dim, int spacedim>
-bool
-CellAccessor<dim, spacedim>::direction_flag() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  if constexpr (dim == spacedim)
-    return true;
-  else if constexpr (dim == spacedim - 1)
-    return this->tria->levels[this->level()]
-      ->direction_flags[this->present_index];
-  else
-    {
-      Assert(false,
-             ExcMessage("This function cannot be called if dim<spacedim-1."));
-      return true;
-    }
-}
-
-
 
 template <int dim, int spacedim>
 void

@@ -3918,25 +3918,6 @@ public:
   global_level_cell_index() const;
 
   /**
-   * @name Dealing with codim 1 cell orientation
-   */
-  /**
-   * @{
-   */
-
-  /**
-   * Return the orientation of this cell. This function always returns
-   * `true` if `dim==spacedim`. It can return `true` or `false` if
-   * `dim==spacedim-1`. The function cannot be called (and will abort
-   * with an error) if called for `dim<spacedim-1`.
-   *
-   * For the meaning of this flag, see
-   * @ref GlossDirectionFlag.
-   */
-  bool
-  direction_flag() const;
-
-  /**
    * Return the how many-th active cell the current cell is (assuming the
    * current cell is indeed active). This is useful, for example, if you are
    * accessing the elements of a vector with as many entries as there are
@@ -3981,6 +3962,25 @@ public:
    */
   TriaIterator<CellAccessor<dim, spacedim>>
   parent() const;
+
+  /**
+   * @name Dealing with codim 1 cell orientation
+   */
+  /**
+   * @{
+   */
+
+  /**
+   * Return the orientation of this cell. This function always returns
+   * `true` if `dim==spacedim`. It can return `true` or `false` if
+   * `dim==spacedim-1`. The function cannot be called (and will abort
+   * with an error) if called for `dim<spacedim-1`.
+   *
+   * For the meaning of this flag, see
+   * @ref GlossDirectionFlag.
+   */
+  bool
+  direction_flag() const;
 
   /**
    * @}
@@ -8185,6 +8185,26 @@ CellAccessor<dim, spacedim>::global_level_cell_index() const
 {
   return this->tria->levels[this->level()]
     ->global_level_cell_indices[this->present_index];
+}
+
+
+
+template <int dim, int spacedim>
+inline bool
+CellAccessor<dim, spacedim>::direction_flag() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  if constexpr (dim == spacedim)
+    return true;
+  else if constexpr (dim == spacedim - 1)
+    return this->tria->levels[this->level()]
+      ->direction_flags[this->present_index];
+  else
+    {
+      Assert(false,
+             ExcMessage("This function cannot be called if dim<spacedim-1."));
+      return true;
+    }
 }
 
 #endif // DOXYGEN
