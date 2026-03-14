@@ -22,6 +22,14 @@ namespace internal
   namespace TriangulationImplementation
   {
     template <int dim, int spacedim>
+    TriaLevel<dim, spacedim>::TriaLevel()
+      : children_per_object(numbers::invalid_unsigned_int)
+      , faces_per_object(numbers::invalid_unsigned_int)
+    {}
+
+
+
+    template <int dim, int spacedim>
     std::size_t
     TriaLevel<dim, spacedim>::memory_consumption() const
     {
@@ -50,6 +58,9 @@ namespace internal
     TriaLevel<dim, spacedim>::allocate(const std::size_t n_cells,
                                        const bool        orientation_needed)
     {
+      Assert(children_per_object == cells.children_per_object,
+             ExcInternalError());
+      Assert(faces_per_object == cells.faces_per_object, ExcInternalError());
       active_cell_indices.assign(n_cells, numbers::invalid_unsigned_int);
       subdomain_ids.assign(n_cells, 0);
       level_subdomain_ids.assign(n_cells, 0);
@@ -66,9 +77,9 @@ namespace internal
       cells.allocate(n_cells);
 
       face_orientations.reinit(orientation_needed ? n_cells : 0u,
-                               cells.faces_per_object);
+                               faces_per_object);
 
-      neighbors.assign(n_cells * cells.faces_per_object, {-1, -1});
+      neighbors.assign(n_cells * faces_per_object, {-1, -1});
 
       reference_cell.assign(n_cells, ReferenceCells::Invalid);
 
