@@ -34,6 +34,7 @@
 #include <string>
 #include <tuple>
 #include <typeinfo>
+#include <variant>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1083,6 +1084,107 @@ namespace DataOutBase
       const CompressionLevel compression_level = CompressionLevel::best_speed);
   };
 
+
+  /**
+   * Flags controlling the details of output in CF Conventions format.
+   *
+   * @ingroup output
+   */
+  struct CFFlags : public OutputFlagsBase<CFFlags>
+  {
+    using AttributeValue = std::variant<int, double, std::string>;
+
+    /**
+     * The time of the time step if this file is part of a time dependent
+     * simulation.
+     *
+     * If this field is set to a value other than the default value of
+     * negative infinity, the output file will contain an unlimited time
+     * dimension which is used as a dimension for all data vectors.
+     * With \ref keep_existing_file = true, consecutive
+     * time points are written to the same file. It is assumed that
+     * time is increasing.
+     */
+    double time;
+
+    /**
+     * If this field is set to true, instead of creating a new file with a
+     * mesh definition, data vectors are added to an existing file. This is
+     * mostly used to write multiple time points to the same file by setting
+     * CFFlags::time. For example:
+     *
+     * @code
+     * DataOut<dim> data_out;
+     * data_out.attach_dof_handler(dof);
+     * // output mesh and initial value
+     * data_out.add_vector("solution", solution);
+     * data_out.build_patches();
+     * data_out.cf_flags.time = t_0;
+     * DataOutBase::DataOutFilter data_filter({false, false});
+     * data_out.write_filtered_data(data_filter);
+     * data_out.write_cf_parallel(data_filter, "solution.nc", MPI_COMM_WORLD);
+     *
+     * double t = t_0;
+     * while (t < t_end) {
+     *   // update solution, e.g. ODE step
+     *
+     *   // output current time step by adding
+     *   // a time step to the same file.
+     *   data_out.clear_data_vectors();
+     *   data_out.add_vector("solution", solution);
+     *   data_out.build_patches();
+     *   data_out.cf_flags.keep_existing_file = true;
+     *   data_out.cf_flags.time = t;
+     *   DataOutBase::DataOutFilter data_filter({false, false});
+     *   data_out.write_filtered_data(data_filter);
+     *   data_out.write_cf_parallel(data_filter, "solution.nc", MPI_COMM_WORLD);
+     * }
+     * @endcode
+     *
+     * The current mesh must be the same as the one that was written to the
+     * existing file. When the mesh changes, e.g., when refining or coarsening,
+     * a new file must be created with the updated mesh.
+     */
+    bool keep_existing_file;
+
+    /**
+     * Additional attributes written for each data vector. Can be used to
+     * set attributes that are defined or required by CF Conventions but
+     * cannot be set by deal.II due to lack of information, e.g., units.
+     * deal.II does not use these attributes in any way except adding them
+     * to the output file, but they may be required by post processing tools.
+     * For example:
+     * @code
+     * attributes["solution"].push_back({"units", "m/s"});
+     * @endcode
+     * The map may include the special keys that do not correspond to
+     * data vectors (and should not be used as names for data vectors):
+     * - "global": define global attributes that describe the file content
+     * - "time", "x", "y": attributes for dimension variables, e.g., "units".
+     * Attributes are only written when the variable is first created, not
+     * on subsequent calls with \ref keep_existing_file = true;
+     * Common attributes in the CF Conventions include (see the CF
+     * documentation for full details):
+     * - units: required for all data that is not dimensionless.
+     * - long_name, standard_name: recommended for all data.
+     * - comment: e.g. methods, global or per variable
+     * - title, references, history, etc: global, description of file.
+     */
+    std::map<std::string, std::vector<std::pair<std::string, AttributeValue>>>
+      attributes;
+
+    /**
+     * Constructor. Initializes the member variables with names corresponding
+     * to the argument names of this function.
+     */
+    explicit CFFlags(
+      const double time = -std::numeric_limits<double>::infinity(),
+      const bool   keep_existing_file = false,
+      const std::map<std::string,
+                     std::vector<std::pair<std::string, AttributeValue>>>
+        &attributes = {});
+  };
+
   /**
    * Flags controlling the details of output in Tecplot format.
    *
@@ -1660,7 +1762,12 @@ namespace DataOutBase
     /**
      * Output in HDF5 format.
      */
-    hdf5
+    hdf5,
+
+    /**
+     * Output in NetCDF format according to CF Conventions.
+     */
+    cf,
   };
 
 
@@ -2396,6 +2503,18 @@ namespace DataOutBase
                       const MPI_Comm     comm);
 
   /**
+   * Write the data in @p data_filter to a NetCDF file according to
+   * CF Conventions. See DataOutInterface::write_cf_parallel.
+   */
+  template <int dim, int spacedim>
+  void
+  write_cf_parallel(const std::vector<Patch<dim, spacedim>> &patches,
+                    const DataOutFilter                     &data_filter,
+                    const DataOutBase::CFFlags              &flags,
+                    const std::string                       &filename,
+                    const MPI_Comm                           comm);
+
+  /**
    * DataOutFilter is an intermediate data format that reduces the amount of
    * data that will be written to files. The object filled by this function
    * can then later be used again to write data in a concrete file format;
@@ -2956,6 +3075,27 @@ public:
                       const MPI_Comm                    comm) const;
 
   /**
+   * Write the data in @p data_filter to a NetCDF file according to
+   * Climate and Forecast (CF) Conventions (https://cfconventions.org/).
+   * The format supports time series and user defined attributes, see
+   * DataOutBase::CFFlags for options to control the output. Below is an
+   * example of how to use this function with the DataOutFilter:
+   *
+   * @code
+   * // Filter the data and store it in data_filter
+   * DataOutBase::DataOutFilterFlags flags(true, true);
+   * DataOutBase::DataOutFilter data_filter(flags);
+   * data_out.write_filtered_data(data_filter);
+   * // Write the filtered data to NetCDF
+   * data_out.write_cf_parallel(data_filter, "solution.nc", MPI_COMM_WORLD);
+   * @endcode
+   */
+  void
+  write_cf_parallel(const DataOutBase::DataOutFilter &data_filter,
+                    const std::string                &filename,
+                    const MPI_Comm                    comm) const;
+
+  /**
    * DataOutFilter is an intermediate data format that reduces the amount of
    * data that will be written to files. The object filled by this function
    * can then later be used again to write data in a concrete file format;
@@ -3150,6 +3290,12 @@ private:
    * changed by using the <tt>set_flags</tt> function.
    */
   DataOutBase::Hdf5Flags hdf5_flags;
+
+  /**
+   * Flags to be used upon output of NetCDF data in CF Conventions. Can be
+   * changed by using the <tt>set_flags</tt> function.
+   */
+  DataOutBase::CFFlags cf_flags;
 
   /**
    * Flags to be used upon output of Tecplot data in one space dimension. Can
