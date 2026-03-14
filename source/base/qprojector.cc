@@ -668,12 +668,9 @@ QProjector<dim>::DataSetDescriptor::face(
   AssertDimension(reference_cell.get_dimension(), dim);
 
   unsigned int offset = 0;
-  if (quadrature.size() == 1)
-    offset =
-      reference_cell.n_face_orientations(0) * quadrature[0].size() * face_no;
-  else
-    for (unsigned int i = 0; i < face_no; ++i)
-      offset += reference_cell.n_face_orientations(i) * quadrature[i].size();
+  for (unsigned int i = 0; i < face_no; ++i)
+    offset += reference_cell.n_face_orientations(i) *
+              quadrature[quadrature.size() == 1 ? 0 : i].size();
 
   return {offset + combined_orientation *
                      quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
