@@ -1,0 +1,58 @@
+
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_SimplexP<3>(1)
+DEAL::5 compared to 5 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_SimplexP<3>(2)
+DEAL::11 compared to 11 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_SimplexP<3>(3)
+DEAL::21 compared to 21 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_SimplexP<3>(1)
+DEAL::11 compared to 11 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_SimplexP<3>(2)
+DEAL::14 compared to 14 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_SimplexP<3>(3)
+DEAL::27 compared to 27 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_SimplexP<3>(1)
+DEAL::21 compared to 21 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_SimplexP<3>(2)
+DEAL::27 compared to 27 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_SimplexP<3>(3)
+DEAL::30 compared to 30 dofs
+DEAL::
+DEAL::Testing number of dofs FE_PyramidP<3>(1) vs. FE_PyramidP<3>(1)
+DEAL::6 compared to 6 dofs
+DEAL::
+DEAL::Testing number of dofs FE_PyramidP<3>(1) vs. FE_PyramidP<3>(1)
+DEAL::7 compared to 7 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(1) vs. FE_WedgeP<3>(1)
+DEAL::8 compared to 8 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(2) vs. FE_WedgeP<3>(1)
+DEAL::20 compared to 20 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(1) vs. FE_WedgeP<3>(2)
+DEAL::20 compared to 20 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(2) vs. FE_WedgeP<3>(2)
+DEAL::27 compared to 27 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(1) vs. FE_WedgeP<3>(1)
+DEAL::9 compared to 9 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(1) vs. FE_WedgeP<3>(2)
+DEAL::21 compared to 21 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(2) vs. FE_WedgeP<3>(1)
+DEAL::21 compared to 21 dofs
+DEAL::
+DEAL::Testing number of dofs FE_WedgeP<3>(2) vs. FE_WedgeP<3>(2)
+DEAL::30 compared to 30 dofs
+DEAL::

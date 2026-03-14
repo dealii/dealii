@@ -1,0 +1,133 @@
+
+DEAL::Testing interpolation FE_SimplexP<3>(1) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_SimplexP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(2) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_SimplexP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(3) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(1) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_SimplexP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(1) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_SimplexP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(2) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_SimplexP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(2) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_SimplexP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(3) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_SimplexP<3>(3) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_Q<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(1) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_Q<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(2) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_Q<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(3) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_Q<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(1) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_Q<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(1) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_Q<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(2) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_Q<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(2) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_Q<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(3) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_Q<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_Q<3>(3) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_WedgeP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(1) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_PyramidP<3>(1) vs. FE_WedgeP<3>(2)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
+DEAL::Testing interpolation FE_WedgeP<3>(2) vs. FE_PyramidP<3>(1)
+DEAL::  Relative interpolation errors: ok ok ok ok
+DEAL::
