@@ -27,8 +27,8 @@
 #  include <deal.II/cgal/utilities.h>
 #endif
 
+#include <deal.II/distributed/amr.h>
 #include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/p4est_wrappers.h>
 #include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 
@@ -2184,13 +2184,13 @@ namespace GridTools
         for (const auto &cell_id : cell_ids)
           {
             // find descendent from coarse quadrant
-            typename dealii::internal::p4est::types<dim>::quadrant p4est_cell,
+            typename dealii::internal::amr::types<dim>::quadrant p4est_cell,
               p4est_children[GeometryInfo<dim>::max_children_per_cell];
 
-            dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_cell);
+            dealii::internal::amr::init_coarse_quadrant<dim>(p4est_cell);
             for (const auto &child_index : cell_id.get_child_indices())
               {
-                dealii::internal::p4est::init_quadrant_children<dim>(
+                dealii::internal::amr::init_quadrant_children<dim>(
                   p4est_cell, p4est_children);
                 p4est_cell =
                   p4est_children[static_cast<unsigned int>(child_index)];
@@ -2198,8 +2198,8 @@ namespace GridTools
 
             // find owning process, i.e., the subdomain id
             const int owner =
-              dealii::internal::p4est::functions<dim>::comm_find_owner(
-                const_cast<typename dealii::internal::p4est::types<dim>::forest
+              dealii::internal::amr::functions<dim>::comm_find_owner(
+                const_cast<typename dealii::internal::amr::types<dim>::forest
                              *>(triangulation.get_p4est()),
                 cell_id.get_coarse_cell_id(),
                 &p4est_cell,
