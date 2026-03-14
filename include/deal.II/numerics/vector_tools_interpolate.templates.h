@@ -1131,7 +1131,7 @@ namespace VectorTools
         DEAL_II_NOT_IMPLEMENTED();
     }
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <typename Number>
     void
     copy_locally_owned_data_from(

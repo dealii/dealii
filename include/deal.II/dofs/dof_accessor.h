@@ -2962,7 +2962,7 @@ namespace internal
 #  endif
 
 
-
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
       template <typename ForwardIterator>
       static void
       extract_subvector_to(const LinearAlgebra::EpetraWrappers::Vector &values,
@@ -2987,6 +2987,7 @@ namespace internal
         for (unsigned int i = 0; i < cache_size; ++i, ++local_values_begin)
           *local_values_begin = read_write_vector[sorted_indices_pos[i]];
       }
+#  endif
 #endif
 
       /**

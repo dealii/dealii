@@ -73,7 +73,7 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -212,7 +212,7 @@ namespace LinearAlgebra
            const bool      omit_zeroing_entries = false);
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Initialize this ReadWriteVector by supplying access to all locally
      * available entries in the given ghosted or non-ghosted vector.
@@ -339,7 +339,8 @@ namespace LinearAlgebra
                     const VectorOperation::values          operation);
 #endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#if defined(DEAL_II_WITH_TRILINOS)
+#  if defined(DEAL_II_TRILINOS_WITH_EPETRA)
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p trilinos_vec. VectorOperation::values @p operation is used to
@@ -360,6 +361,7 @@ namespace LinearAlgebra
     void
     import_elements(const TrilinosWrappers::MPI::BlockVector &src,
                     const VectorOperation::values             operation);
+#  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     /**
@@ -381,6 +383,7 @@ namespace LinearAlgebra
 
 #  endif
 
+#  if defined(DEAL_II_TRILINOS_WITH_EPETRA)
     /**
      * Imports all the elements present in the vector's IndexSet from the input
      * vector @p epetra_vec. VectorOperation::values @p operation is used to
@@ -395,7 +398,7 @@ namespace LinearAlgebra
       VectorOperation::values       operation,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
-
+#  endif
 #endif
 
     /**
@@ -654,6 +657,7 @@ namespace LinearAlgebra
         &communication_pattern);
 #  endif
 
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Import all the elements present in the vector's IndexSet from the input
      * vector @p multivector. This is an helper function and it should not be
@@ -667,6 +671,7 @@ namespace LinearAlgebra
       const MPI_Comm            mpi_comm,
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern);
+#  endif
 #endif
 
     /**
@@ -687,6 +692,7 @@ namespace LinearAlgebra
                                const MPI_Comm  mpi_comm);
 #  endif
 
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Return a EpetraWrappers::CommunicationPattern and store it for future
      * use.
@@ -694,6 +700,7 @@ namespace LinearAlgebra
     EpetraWrappers::CommunicationPattern
     create_epetra_comm_pattern(const IndexSet &source_index_set,
                                const MPI_Comm  mpi_comm);
+#  endif
 #endif
 
     /**

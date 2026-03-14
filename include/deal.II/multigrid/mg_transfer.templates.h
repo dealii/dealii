@@ -104,7 +104,7 @@ namespace internal
     }
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Adjust vectors on all levels to correct size.  Here, we just count the
      * numbers of degrees of freedom on each level and @p reinit each level

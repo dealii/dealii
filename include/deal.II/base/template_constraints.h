@@ -635,6 +635,7 @@ namespace PETScWrappers
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  if defined(DEAL_II_TRILINOS_WITH_EPETRA)
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -650,8 +651,12 @@ namespace LinearAlgebra
   {
     class Vector;
   }
+} // namespace LinearAlgebra
+#  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace LinearAlgebra
+{
   namespace TpetraWrappers
   {
     template <typename Number, typename MemorySpace>
@@ -666,8 +671,8 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     class BlockSparseMatrix;
   } // namespace TpetraWrappers
-#  endif
 } // namespace LinearAlgebra
+#  endif
 #endif
 
 
@@ -764,6 +769,7 @@ namespace concepts
 #  endif
 
 #  ifdef DEAL_II_WITH_TRILINOS
+#    if defined(DEAL_II_TRILINOS_WITH_EPETRA)
     template <>
     inline constexpr bool
       is_dealii_vector_type<dealii::TrilinosWrappers::MPI::Vector> = true;
@@ -776,6 +782,7 @@ namespace concepts
     inline constexpr bool
       is_dealii_vector_type<dealii::LinearAlgebra::EpetraWrappers::Vector> =
         true;
+#    endif
 
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <typename Number, typename MemorySpace>
@@ -957,7 +964,7 @@ namespace concepts
       dealii::LinearAlgebra::distributed::BlockVector<Number, MemorySpace>> =
       true;
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <>
     inline constexpr bool
       is_distributed_vector_type<dealii::TrilinosWrappers::MPI::Vector> = true;

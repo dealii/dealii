@@ -421,6 +421,7 @@ namespace FETools
 
     // special version for Trilinos
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -449,7 +450,6 @@ namespace FETools
       u2 = u2_out;
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
-
 
 
     template <int dim, int spacedim>
@@ -482,7 +482,6 @@ namespace FETools
     }
 
 
-
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -497,6 +496,7 @@ namespace FETools
     {
       AssertThrow(false, ExcNotImplemented());
     }
+#  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
     template <int dim, int spacedim, typename Number, typename MemorySpace>
@@ -727,7 +727,7 @@ namespace FETools
     }
 
     // special version for Trilinos
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     template <int dim, int spacedim>
     void
     interpolation_difference(

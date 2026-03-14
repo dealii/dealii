@@ -42,7 +42,7 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -250,7 +250,7 @@ namespace LinearAlgebra
       operator=(const PETScWrappers::MPI::BlockVector &petsc_vec);
 #endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
       /**
        * Copy the content of a Trilinos vector into the calling vector. This
        * function assumes that the vectors layouts have already been

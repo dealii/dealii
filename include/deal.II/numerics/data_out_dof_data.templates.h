@@ -810,7 +810,7 @@ namespace internal
       struct is_trilinos_vector : std::false_type
       {};
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
       template <>
       struct is_trilinos_vector<TrilinosWrappers::MPI::Vector> : std::true_type
       {};

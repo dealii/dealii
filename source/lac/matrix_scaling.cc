@@ -26,6 +26,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -35,6 +36,7 @@ namespace TrilinosWrappers
     class Vector;
   } // namespace MPI
 } // namespace TrilinosWrappers
+#endif
 namespace PETScWrappers
 {
   namespace MPI
@@ -155,8 +157,11 @@ MatrixScaling::find_scaling_and_scale_matrix(Matrix &matrix)
             DEAL_II_ASSERT_UNREACHABLE();
         }
     }
-  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
-                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+  else if constexpr (
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+#endif
+    std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
       locally_owned_rows = matrix.locally_owned_range_indices();
 
@@ -265,9 +270,11 @@ MatrixScaling::find_scaling_and_scale_linear_system(Matrix     &matrix,
       for (unsigned int i = 0; i < rhs.size(); ++i)
         rhs[i] *= row_scaling[i];
     }
-  else if constexpr (std::is_same_v<VectorType,
-                                    TrilinosWrappers::MPI::Vector> ||
-                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+  else if constexpr (
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector> ||
+#endif
+    std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
     {
       Assert(matrix.locally_owned_range_indices() ==
                rhs.locally_owned_elements(),
@@ -306,9 +313,11 @@ MatrixScaling::scale_system_solution(VectorType &sol) const
       for (unsigned int i = 0; i < sol.size(); ++i)
         sol[i] *= column_scaling[i];
     }
-  else if constexpr (std::is_same_v<VectorType,
-                                    TrilinosWrappers::MPI::Vector> ||
-                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
+  else if constexpr (
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector> ||
+#endif
+    std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
     {
       Assert(locally_owned_cols == sol.locally_owned_elements(),
              ExcMessage("Matrix and vector must have the same partitioning"));
@@ -627,8 +636,11 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
             }
         }
     }
-  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
-                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+  else if constexpr (
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+#endif
+    std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
@@ -744,8 +756,10 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
                                            PETScWrappers::MPI::SparseMatrix>)
                 matrix.compress(VectorOperation::insert);
             }
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
           if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
             matrix.compress(VectorOperation::insert);
+#endif
         }
     }
   return false;
@@ -803,8 +817,11 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
             }
         }
     }
-  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
-                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+  else if constexpr (
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+#endif
+    std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
@@ -924,8 +941,10 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
                                            PETScWrappers::MPI::SparseMatrix>)
                 matrix.compress(VectorOperation::insert);
             }
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
           if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
             matrix.compress(VectorOperation::insert);
+#endif
         }
     }
   return false;
@@ -1062,8 +1081,11 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
             DEAL_II_ASSERT_UNREACHABLE();
         }
     }
-  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
-                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+  else if constexpr (
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+#endif
+    std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
@@ -1115,9 +1137,11 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       row_scaling[local_row_idx] /=
                         local_row_norms[local_row_idx];
                     }
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
                   if constexpr (std::is_same_v<Matrix,
                                                TrilinosWrappers::SparseMatrix>)
                     matrix.compress(VectorOperation::insert);
+#endif
 
                   // Communicate partial column norms
                   std::map<
@@ -1219,9 +1243,11 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                                       PETScWrappers::MPI::SparseMatrix>)
                         matrix.compress(VectorOperation::insert);
                     }
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
                   if constexpr (std::is_same_v<Matrix,
                                                TrilinosWrappers::SparseMatrix>)
                     matrix.compress(VectorOperation::insert);
+#endif
                   for (unsigned int i = 0; i < local_col_norms.size(); ++i)
                     column_scaling[i] /= local_col_norms[i];
 
@@ -1280,9 +1306,11 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                       row_scaling[local_row_idx] /=
                         local_row_norms[local_row_idx];
                     }
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
                   if constexpr (std::is_same_v<Matrix,
                                                TrilinosWrappers::SparseMatrix>)
                     matrix.compress(VectorOperation::insert);
+#endif
 
                   // Communicate partial column norms
                   std::map<
@@ -1389,9 +1417,11 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                                       PETScWrappers::MPI::SparseMatrix>)
                         matrix.compress(VectorOperation::insert);
                     }
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
                   if constexpr (std::is_same_v<Matrix,
                                                TrilinosWrappers::SparseMatrix>)
                     matrix.compress(VectorOperation::insert);
+#endif
                   for (unsigned int i = 0; i < local_col_norms.size(); ++i)
                     column_scaling[i] /= local_col_norms[i];
 
@@ -1419,7 +1449,7 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                                                                     VECTOR &); \
   template void MatrixScaling::scale_system_solution(VECTOR &) const;
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 InstantiateMatrixScaling(TrilinosWrappers::SparseMatrix,
                          TrilinosWrappers::MPI::Vector)
 #endif

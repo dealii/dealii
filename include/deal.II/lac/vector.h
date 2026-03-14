@@ -44,7 +44,7 @@ namespace PETScWrappers
 }
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -222,7 +222,7 @@ public:
   explicit Vector(const PETScWrappers::VectorBase &v);
 #endif
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Another copy constructor: copy the values from a Trilinos wrapper vector.
    * This copy constructor is only available if Trilinos was detected during
@@ -453,7 +453,7 @@ public:
 #endif
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Another copy operator: copy the values from a (sequential or parallel,
    * depending on the underlying compiler) Trilinos wrapper vector class. This

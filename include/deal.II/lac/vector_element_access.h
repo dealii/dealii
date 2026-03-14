@@ -75,8 +75,7 @@ namespace internal
   }
 
 
-
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <>
   inline void
   ElementAccess<LinearAlgebra::EpetraWrappers::Vector>::add(

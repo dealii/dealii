@@ -526,7 +526,7 @@ BlockDynamicSparsityPattern::reinit(const BlockIndices &row_indices,
 }
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   BlockSparsityPattern::BlockSparsityPattern(const size_type n_rows,
@@ -660,7 +660,7 @@ namespace TrilinosWrappers
 
 template class BlockSparsityPatternBase<SparsityPattern>;
 template class BlockSparsityPatternBase<DynamicSparsityPattern>;
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 template class BlockSparsityPatternBase<TrilinosWrappers::SparsityPattern>;
 #endif
 

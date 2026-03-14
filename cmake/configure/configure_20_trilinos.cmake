@@ -20,7 +20,7 @@ set(FEATURE_TRILINOS_DEPENDS MPI)
 # A list of optional Trilinos modules we use:
 #
 set(_deal_ii_trilinos_optional_modules
-  Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan 
+  Amesos Epetra Ifpack AztecOO Teuchos ML Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan
 )
 
 #
@@ -51,18 +51,36 @@ macro(feature_trilinos_find_external var)
       "Checking whether the found trilinos package contains all required modules:"
     )
 
-    foreach(_module
-      Amesos Epetra Ifpack AztecOO Teuchos ML
-    )
-      item_matches(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
-      if(_module_found)
-        message(STATUS "  Found ${_module}")
-      else()
-        message(STATUS "  Module ${_module} not found!")
-        set(_modules_missing "${_modules_missing} ${_module}")
-        set(${var} FALSE)
-      endif()
-    endforeach()
+    item_matches(DEAL_II_TRILINOS_HAS_EPETRA Epetra ${Trilinos_PACKAGE_LIST})
+    if (DEAL_II_TRILINOS_HAS_EPETRA)
+      foreach(_module
+        Amesos Epetra Ifpack AztecOO Teuchos ML
+      )
+        item_matches(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
+        if(_module_found)
+          message(STATUS "  Found ${_module}")
+        else()
+          message(STATUS "  Module ${_module} not found!")
+          set(_modules_missing "${_modules_missing} ${_module}")
+          set(${var} FALSE)
+        endif()
+      endforeach()
+    endif()
+    item_matches(DEAL_II_TRILINOS_HAS_TPETRA Tpetra ${Trilinos_PACKAGE_LIST})
+    if (DEAL_II_TRILINOS_HAS_TPETRA)
+      foreach(_module
+        Amesos2 Belos Ifpack2 MueLu Tpetra
+      )
+        item_matches(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
+        if(_module_found)
+          message(STATUS "  Found ${_module}")
+        else()
+          message(STATUS "  Module ${_module} not found!")
+          set(_modules_missing "${_modules_missing} ${_module}")
+          set(${var} FALSE)
+        endif()
+      endforeach()
+    endif()
 
     if(NOT ${var})
       message(STATUS "Could not find a sufficient Trilinos installation: "
@@ -466,12 +484,14 @@ macro(feature_trilinos_configure_external)
   # Figure out all the possible instantiations we need:
   #
 
-  set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
-  set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
-  set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES "TrilinosWrappers::SparseMatrix" "TrilinosWrappers::BlockSparseMatrix")
-  set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
-  set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+  if(${DEAL_II_TRILINOS_WITH_EPETRA})
+    set(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
+    set(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
+    set(DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES "TrilinosWrappers::SparseMatrix" "TrilinosWrappers::BlockSparseMatrix")
+    set(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
+    set(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
+    set(DEAL_II_EXPAND_EPETRA_VECTOR "LinearAlgebra::EpetraWrappers::Vector")
+  endif()
 
   if(${DEAL_II_TRILINOS_WITH_TPETRA})
     if(DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)

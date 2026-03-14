@@ -389,7 +389,7 @@ InitFinalize::finalize()
         release_unused_memory();
 
       // Next with Trilinos:
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
       GrowingVectorMemory<
         TrilinosWrappers::MPI::Vector>::release_unused_memory();
       GrowingVectorMemory<

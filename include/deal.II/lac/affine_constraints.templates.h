@@ -2632,7 +2632,7 @@ namespace internal
   //
   // this is an operation that is different for all vector types and so we
   // need a few overloads
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   inline void
   import_vector_with_ghost_elements(
     const TrilinosWrappers::MPI::Vector &vec,
