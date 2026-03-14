@@ -19,7 +19,7 @@
 #include <deal.II/base/mpi_consensus_algorithms.h>
 #include <deal.II/base/types.h>
 
-#include <deal.II/distributed/p4est_wrappers.h>
+#include <deal.II/distributed/amr.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -101,11 +101,11 @@ namespace FETools
        */
       struct WorkPackage
       {
-        const typename dealii::internal::p4est::types<dim>::forest forest;
-        const typename dealii::internal::p4est::types<dim>::tree   tree;
-        const typename dealii::internal::p4est::types<dim>::locidx tree_index;
+        const typename dealii::internal::amr::types<dim>::forest   forest;
+        const typename dealii::internal::amr::types<dim>::tree     tree;
+        const typename dealii::internal::amr::types<dim>::locidx   tree_index;
         const typename DoFHandler<dim, spacedim>::cell_iterator    dealii_cell;
-        const typename dealii::internal::p4est::types<dim>::quadrant p4est_cell;
+        const typename dealii::internal::amr::types<dim>::quadrant p4est_cell;
       };
 
 
@@ -147,8 +147,8 @@ namespace FETools
          * The tree within the forest (i.e., the coarse cell) and which of its
          * descendents we are currently working on.
          */
-        unsigned int                                           tree_index;
-        typename dealii::internal::p4est::types<dim>::quadrant quadrant;
+        unsigned int                                         tree_index;
+        typename dealii::internal::amr::types<dim>::quadrant quadrant;
 
         types::subdomain_id receiver;
       };
@@ -213,14 +213,13 @@ namespace FETools
       template <class InVector>
       void
       interpolate_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                       &p4est_cell,
-        const InVector &u1,
-        OutVector      &u2);
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        const InVector                                             &u1,
+        OutVector                                                  &u2);
 
       // get dof values for this
       // cell by interpolation
@@ -230,13 +229,12 @@ namespace FETools
       template <class InVector>
       void
       get_interpolated_dof_values(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        const InVector        &u,
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        const InVector                                             &u,
         Vector<value_type>    &interpolated_values,
         std::vector<CellData> &new_needs);
 
@@ -244,9 +242,8 @@ namespace FETools
       // cell by interpolation
       void
       set_dof_values_by_interpolation(
-        const typename DoFHandler<dim, spacedim>::cell_iterator &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                                 &p4est_cell,
+        const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
         const Vector<value_type> &interpolated_values,
         OutVector                &u);
 
@@ -263,13 +260,12 @@ namespace FETools
       // process has to work on
       void
       traverse_tree_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        std::vector<CellData> &new_needs);
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        std::vector<CellData>                                      &new_needs);
 
       // traverse recursively
       // over a patch and look
@@ -277,13 +273,12 @@ namespace FETools
       // other processes for interpolation
       void
       traverse_patch_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        std::vector<CellData> &new_needs);
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        std::vector<CellData>                                      &new_needs);
 
       // compute dof values of all
       // cells collected in cells_to_compute
@@ -307,13 +302,12 @@ namespace FETools
       template <class InVector>
       void
       compute_cells_in_tree_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        const InVector        &u,
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        const InVector                                             &u,
         std::vector<CellData> &cells_to_compute,
         std::vector<CellData> &computed_cells,
         std::vector<CellData> &new_needs);
@@ -330,12 +324,11 @@ namespace FETools
       // uses cell_data_insert
       static void
       add_new_need(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        std::vector<CellData> &new_needs);
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        std::vector<CellData>                                      &new_needs);
 
       // binary search in cells_list
       // assume that cells_list
@@ -457,7 +450,7 @@ namespace FETools
     ExtrapolateImplementation<dim, spacedim, OutVector>::CellData::operator<(
       const CellData &rhs) const
     {
-      if (dealii::internal::p4est::functions<dim>::quadrant_compare(
+      if (dealii::internal::amr::functions<dim>::quadrant_compare(
             &quadrant, &rhs.quadrant) < 0)
         return true;
 
@@ -490,26 +483,25 @@ namespace FETools
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::
       interpolate_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                       &p4est_cell,
-        const InVector &u1,
-        OutVector      &u2)
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        const InVector                                             &u1,
+        OutVector                                                  &u2)
     {
       // check if this cell exists in the local p4est
       int idx = sc_array_bsearch(
         const_cast<sc_array_t *>(&tree.quadrants),
         &p4est_cell,
-        dealii::internal::p4est::functions<dim>::quadrant_compare);
+        dealii::internal::amr::functions<dim>::quadrant_compare);
 
       // if neither this cell nor one of it's children belongs to us, don't do
       // anything
       if (idx == -1 &&
-          (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
-             const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+          (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+             const_cast<typename dealii::internal::amr::types<dim>::tree *>(
                &tree),
              &p4est_cell) == false))
         return;
@@ -570,13 +562,12 @@ namespace FETools
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::
       get_interpolated_dof_values(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        const InVector        &u,
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        const InVector                                             &u,
         Vector<value_type>    &interpolated_values,
         std::vector<CellData> &new_needs)
     {
@@ -615,22 +606,20 @@ namespace FETools
           for (unsigned int i = 0; i < dofs_per_cell; ++i)
             restriction_is_additive[i] = fe.restriction_is_additive(i);
 
-          typename dealii::internal::p4est::types<dim>::quadrant
+          typename dealii::internal::amr::types<dim>::quadrant
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-          dealii::internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                               p4est_child);
+          dealii::internal::amr::init_quadrant_children<dim>(p4est_cell,
+                                                             p4est_child);
 
           bool found_child = true;
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
             {
-              if (dealii::internal::p4est::functions<dim>::
-                    quadrant_overlaps_tree(
-                      const_cast<
-                        typename dealii::internal::p4est::types<dim>::tree *>(
-                        &tree),
-                      &p4est_child[c]) == false)
+              if (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+                    const_cast<typename dealii::internal::amr::types<dim>::tree
+                                 *>(&tree),
+                    &p4est_child[c]) == false)
                 {
                   // this is a cell this process needs
                   // data from another process
@@ -720,9 +709,8 @@ namespace FETools
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::
       set_dof_values_by_interpolation(
-        const typename DoFHandler<dim, spacedim>::cell_iterator &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                                 &p4est_cell,
+        const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
         const Vector<value_type> &local_values,
         OutVector                &u)
     {
@@ -766,11 +754,11 @@ namespace FETools
 
           Vector<value_type> tmp(dofs_per_cell);
 
-          typename dealii::internal::p4est::types<dim>::quadrant
+          typename dealii::internal::amr::types<dim>::quadrant
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-          dealii::internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                               p4est_child);
+          dealii::internal::amr::init_quadrant_children<dim>(p4est_cell,
+                                                             p4est_child);
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
@@ -803,20 +791,20 @@ namespace FETools
 
       for (const auto &cell : dof2.cell_iterators_on_level(0))
         {
-          if (dealii::internal::p4est::tree_exists_locally<dim>(
+          if (dealii::internal::amr::tree_exists_locally<dim>(
                 tr->parallel_forest,
                 tr->coarse_cell_to_p4est_tree_permutation[cell->index()]) ==
               false)
             continue;
 
-          typename dealii::internal::p4est::types<dim>::quadrant
+          typename dealii::internal::amr::types<dim>::quadrant
                              p4est_coarse_cell;
           const unsigned int tree_index =
             tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
-          typename dealii::internal::p4est::types<dim>::tree *tree =
+          typename dealii::internal::amr::types<dim>::tree *tree =
             tr->init_tree(cell->index());
 
-          dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          dealii::internal::amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
           // make sure that each cell on the
           // coarsest level is at least once
@@ -827,7 +815,7 @@ namespace FETools
             int idx = sc_array_bsearch(
               const_cast<sc_array_t *>(&tree->quadrants),
               &p4est_coarse_cell,
-              dealii::internal::p4est::functions<dim>::quadrant_compare);
+              dealii::internal::amr::functions<dim>::quadrant_compare);
 
             AssertThrow(idx == -1, ExcGridNotRefinedAtLeastOnce());
           }
@@ -847,25 +835,24 @@ namespace FETools
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::
       traverse_tree_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        std::vector<CellData> &new_needs)
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        std::vector<CellData>                                      &new_needs)
     {
       // check if this cell exists in the local p4est
       int idx = sc_array_bsearch(
         const_cast<sc_array_t *>(&tree.quadrants),
         &p4est_cell,
-        dealii::internal::p4est::functions<dim>::quadrant_compare);
+        dealii::internal::amr::functions<dim>::quadrant_compare);
 
       // if neither this cell nor one of it's children belongs to us, don't do
       // anything
       if (idx == -1 &&
-          (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
-             const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+          (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+             const_cast<typename dealii::internal::amr::types<dim>::tree *>(
                &tree),
              &p4est_cell) == false))
         return;
@@ -903,11 +890,11 @@ namespace FETools
       // traverse recursively over this tree
       if (p4est_has_children)
         {
-          typename dealii::internal::p4est::types<dim>::quadrant
+          typename dealii::internal::amr::types<dim>::quadrant
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-          dealii::internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                               p4est_child);
+          dealii::internal::amr::init_quadrant_children<dim>(p4est_cell,
+                                                             p4est_child);
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
@@ -928,23 +915,22 @@ namespace FETools
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::
       traverse_patch_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        std::vector<CellData> &new_needs)
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        std::vector<CellData>                                      &new_needs)
     {
       if (dealii_cell->has_children())
         {
           Assert(dealii_cell->has_children(), ExcInternalError());
 
-          typename dealii::internal::p4est::types<dim>::quadrant
+          typename dealii::internal::amr::types<dim>::quadrant
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-          dealii::internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                               p4est_child);
+          dealii::internal::amr::init_quadrant_children<dim>(p4est_cell,
+                                                             p4est_child);
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
@@ -952,12 +938,10 @@ namespace FETools
               // check if this child
               // is locally available
               // in the p4est
-              if (dealii::internal::p4est::functions<dim>::
-                    quadrant_overlaps_tree(
-                      const_cast<
-                        typename dealii::internal::p4est::types<dim>::tree *>(
-                        &tree),
-                      &p4est_child[c]) == false)
+              if (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+                    const_cast<typename dealii::internal::amr::types<dim>::tree
+                                 *>(&tree),
+                    &p4est_child[c]) == false)
                 {
                   // this is a cell for which this process
                   // needs data from another process
@@ -1016,16 +1000,16 @@ namespace FETools
             tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
 
           if ((trees.find(tree_index) == trees.end()) ||
-              (dealii::internal::p4est::tree_exists_locally<dim>(
+              (dealii::internal::amr::tree_exists_locally<dim>(
                  tr->parallel_forest, tree_index) == false))
             continue;
 
-          typename dealii::internal::p4est::types<dim>::quadrant
-                                                              p4est_coarse_cell;
-          typename dealii::internal::p4est::types<dim>::tree *tree =
+          typename dealii::internal::amr::types<dim>::quadrant
+                                                            p4est_coarse_cell;
+          typename dealii::internal::amr::types<dim>::tree *tree =
             tr->init_tree(cell->index());
 
-          dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+          dealii::internal::amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
           compute_cells_in_tree_recursively(*tr->parallel_forest,
                                             *tree,
@@ -1046,13 +1030,12 @@ namespace FETools
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::
       compute_cells_in_tree_recursively(
-        const typename dealii::internal::p4est::types<dim>::forest &forest,
-        const typename dealii::internal::p4est::types<dim>::tree   &tree,
-        const typename dealii::internal::p4est::types<dim>::locidx &tree_index,
+        const typename dealii::internal::amr::types<dim>::forest   &forest,
+        const typename dealii::internal::amr::types<dim>::tree     &tree,
+        const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
         const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
-        const typename dealii::internal::p4est::types<dim>::quadrant
-                              &p4est_cell,
-        const InVector        &u,
+        const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+        const InVector                                             &u,
         std::vector<CellData> &cells_to_compute,
         std::vector<CellData> &computed_cells,
         std::vector<CellData> &new_needs)
@@ -1064,13 +1047,13 @@ namespace FETools
       int idx = sc_array_bsearch(
         const_cast<sc_array_t *>(&tree.quadrants),
         &p4est_cell,
-        dealii::internal::p4est::functions<dim>::quadrant_compare);
+        dealii::internal::amr::functions<dim>::quadrant_compare);
 
       // if neither this cell nor one of it's children belongs to us, don't do
       // anything
       if (idx == -1 &&
-          (dealii::internal::p4est::functions<dim>::quadrant_overlaps_tree(
-             const_cast<typename dealii::internal::p4est::types<dim>::tree *>(
+          (dealii::internal::amr::functions<dim>::quadrant_overlaps_tree(
+             const_cast<typename dealii::internal::amr::types<dim>::tree *>(
                &tree),
              &p4est_cell) == false))
         return;
@@ -1113,11 +1096,11 @@ namespace FETools
       // search recursively over this tree
       if (p4est_has_children)
         {
-          typename dealii::internal::p4est::types<dim>::quadrant
+          typename dealii::internal::amr::types<dim>::quadrant
             p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-          dealii::internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                               p4est_child);
+          dealii::internal::amr::init_quadrant_children<dim>(p4est_cell,
+                                                             p4est_child);
 
           for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
                ++c)
@@ -1195,11 +1178,11 @@ namespace FETools
     template <int dim, int spacedim, class OutVector>
     void
     ExtrapolateImplementation<dim, spacedim, OutVector>::add_new_need(
-      const typename dealii::internal::p4est::types<dim>::forest   &forest,
-      const typename dealii::internal::p4est::types<dim>::locidx   &tree_index,
-      const typename DoFHandler<dim, spacedim>::cell_iterator      &dealii_cell,
-      const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
-      std::vector<CellData>                                        &new_needs)
+      const typename dealii::internal::amr::types<dim>::forest   &forest,
+      const typename dealii::internal::amr::types<dim>::locidx   &tree_index,
+      const typename DoFHandler<dim, spacedim>::cell_iterator    &dealii_cell,
+      const typename dealii::internal::amr::types<dim>::quadrant &p4est_cell,
+      std::vector<CellData>                                      &new_needs)
     {
       const FiniteElement<dim, spacedim> &fe =
         dealii_cell->get_dof_handler().get_fe();
@@ -1209,8 +1192,8 @@ namespace FETools
       cell_data.quadrant   = p4est_cell;
       cell_data.tree_index = tree_index;
       cell_data.receiver =
-        dealii::internal::p4est::functions<dim>::comm_find_owner(
-          const_cast<typename dealii::internal::p4est::types<dim>::forest *>(
+        dealii::internal::amr::functions<dim>::comm_find_owner(
+          const_cast<typename dealii::internal::amr::types<dim>::forest *>(
             &forest),
           tree_index,
           &p4est_cell,
@@ -1311,7 +1294,7 @@ namespace FETools
                 received_needs.begin();
               while (recv != received_needs.end())
                 {
-                  if (dealii::internal::p4est::quadrant_is_equal<dim>(
+                  if (dealii::internal::amr::quadrant_is_equal<dim>(
                         recv->quadrant, comp.quadrant))
                     {
                       recv->dof_values = comp.dof_values;
@@ -1442,22 +1425,21 @@ namespace FETools
       {
         for (const auto &cell : dof2.cell_iterators_on_level(0))
           {
-            if (dealii::internal::p4est::tree_exists_locally<dim>(
+            if (dealii::internal::amr::tree_exists_locally<dim>(
                   tr->parallel_forest,
                   tr->coarse_cell_to_p4est_tree_permutation[cell->index()]) ==
                 false)
               continue;
 
-            typename dealii::internal::p4est::types<dim>::quadrant
+            typename dealii::internal::amr::types<dim>::quadrant
               p4est_coarse_cell;
-            const typename dealii::internal::p4est::types<dim>::locidx
+            const typename dealii::internal::amr::types<dim>::locidx
               tree_index =
                 tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
-            typename dealii::internal::p4est::types<dim>::tree *tree =
+            typename dealii::internal::amr::types<dim>::tree *tree =
               tr->init_tree(cell->index());
 
-            dealii::internal::p4est::init_coarse_quadrant<dim>(
-              p4est_coarse_cell);
+            dealii::internal::amr::init_coarse_quadrant<dim>(p4est_coarse_cell);
 
             queue.push({*tr->parallel_forest,
                         *tree,
@@ -1471,15 +1453,15 @@ namespace FETools
         {
           const WorkPackage &data = queue.front();
 
-          const typename dealii::internal::p4est::types<dim>::forest &forest =
+          const typename dealii::internal::amr::types<dim>::forest &forest =
             data.forest;
-          const typename dealii::internal::p4est::types<dim>::tree &tree =
+          const typename dealii::internal::amr::types<dim>::tree &tree =
             data.tree;
-          const typename dealii::internal::p4est::types<dim>::locidx
-            &tree_index = data.tree_index;
+          const typename dealii::internal::amr::types<dim>::locidx &tree_index =
+            data.tree_index;
           const typename DoFHandler<dim, spacedim>::cell_iterator &dealii_cell =
             data.dealii_cell;
-          const typename dealii::internal::p4est::types<dim>::quadrant
+          const typename dealii::internal::amr::types<dim>::quadrant
             &p4est_cell = data.p4est_cell;
 
           interpolate_recursively(
@@ -1489,11 +1471,11 @@ namespace FETools
           if (dealii_cell->has_children())
             {
               Assert(dealii_cell->has_children(), ExcInternalError());
-              typename dealii::internal::p4est::types<dim>::quadrant
+              typename dealii::internal::amr::types<dim>::quadrant
                 p4est_child[GeometryInfo<dim>::max_children_per_cell];
 
-              dealii::internal::p4est::init_quadrant_children<dim>(p4est_cell,
-                                                                   p4est_child);
+              dealii::internal::amr::init_quadrant_children<dim>(p4est_cell,
+                                                                 p4est_child);
 
               for (unsigned int c = 0;
                    c < GeometryInfo<dim>::max_children_per_cell;
