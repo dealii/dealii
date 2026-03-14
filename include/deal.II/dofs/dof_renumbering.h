@@ -687,6 +687,58 @@ namespace DoFRenumbering
                  const std::vector<unsigned int> &target_component =
                    std::vector<unsigned int>());
 
+
+
+  /**
+   * Sort the degrees of freedom by vector component. It does the same thing as
+   * above function except the ordering argument can be a braced initializer
+   * list containing FEValuesExtractors (or anything else that can be converted
+   * into the required `std::vector` type).
+   *
+   * The following two snippets are equivalent:
+   * @code{.cpp}
+   * std::vector<unsigned int> block_component(dim + 1, 0);
+   * block_component[dim] = 1;
+   * DoFRenumbering::component_wise(dof_handler, block_component);
+   * @endcode
+   *
+   * @code{.cpp}
+   * const FEValuesExtractors::Vector velocities(0);
+   * const FEValuesExtractors::Scalar pressure(dim);
+   * DoFRenumbering::component_wise(dof_handler, {velocities, pressure});
+   * @endcode
+   *
+   * Calling the function with `{velocities, pressure}` is equivalent to calling
+   * the above function with `std::vector<unsigned int>{0, 0, 1}` for dim=2,
+   * while calling with `{pressure, velocities}` would result in a call to above
+   * function with `std::vector<unsigned int>{1, 1, 0}` as the
+   * `target_component` argument. Components attributed to each of the
+   * extractors are blocked together.
+   *
+   *
+   * The initializer list of extractors must cover all finite-element
+   * components, and each component must be covered by exactly one extractor.
+   * Any missing or duplicate assignment to finite-element components will
+   * produce an error.
+   */
+  template <int dim, int spacedim>
+  void
+  component_wise(DoFHandler<dim, spacedim> &dof_handler,
+                 const std::vector<FEValuesExtractors::AnyExtractor> &order);
+
+  /**
+   * Sort the degrees of freedom by component. It does the same thing as the
+   * above function, only that it does this for one single level of a
+   * multilevel discretization. The non-multigrid part of the DoFHandler
+   * is not touched.
+   */
+  template <int dim, int spacedim>
+  void
+  component_wise(DoFHandler<dim, spacedim> &dof_handler,
+                 const unsigned int         level,
+                 const std::vector<FEValuesExtractors::AnyExtractor> &order);
+
+
   /**
    * Compute the renumbering vector needed by the component_wise() functions.
    * Does not perform the renumbering on the DoFHandler dofs but returns the
