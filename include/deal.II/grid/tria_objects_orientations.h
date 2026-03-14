@@ -124,6 +124,11 @@ namespace internal
 
     private:
       /**
+       * Number of objects.
+       */
+      std::size_t n_stored_objects;
+
+      /**
        * Number of faces per object.
        */
       unsigned int faces_per_object;
@@ -156,6 +161,7 @@ namespace internal
     TriaObjectsOrientations::reinit(const unsigned int n_objects,
                                     const unsigned int n_faces_per_object)
     {
+      n_stored_objects = n_objects;
       faces_per_object = n_faces_per_object;
       face_orientations.assign(n_objects * faces_per_object,
                                numbers::default_geometric_orientation);
@@ -166,6 +172,7 @@ namespace internal
     inline void
     TriaObjectsOrientations::resize(const unsigned int n_objects)
     {
+      n_stored_objects = n_objects;
       face_orientations.resize(n_objects * faces_per_object,
                                numbers::default_geometric_orientation);
     }
@@ -175,7 +182,8 @@ namespace internal
     inline std::size_t
     TriaObjectsOrientations::memory_consumption() const
     {
-      return MemoryConsumption::memory_consumption(faces_per_object) +
+      return MemoryConsumption::memory_consumption(n_stored_objects) +
+             MemoryConsumption::memory_consumption(faces_per_object) +
              MemoryConsumption::memory_consumption(face_orientations);
     }
 
@@ -184,7 +192,9 @@ namespace internal
     inline unsigned int
     TriaObjectsOrientations::n_objects() const
     {
-      return face_orientations.size() / faces_per_object;
+      AssertDimension(n_stored_objects,
+                      face_orientations.size() / faces_per_object);
+      return n_stored_objects;
     }
 
 
@@ -249,7 +259,7 @@ namespace internal
     void
     TriaObjectsOrientations::serialize(Archive &ar, const unsigned int)
     {
-      ar &faces_per_object &face_orientations;
+      ar &n_stored_objects &faces_per_object &face_orientations;
     }
   } // namespace TriangulationImplementation
 } // namespace internal
