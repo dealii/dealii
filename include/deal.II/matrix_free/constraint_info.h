@@ -138,7 +138,23 @@ namespace internal
                            const unsigned int first_cell,
                            const unsigned int n_cells,
                            const unsigned int n_dofs_per_cell,
-                           const bool         apply_constraints) const;
+                           const bool         apply_constraints,
+                           const unsigned int vectorization_offset = 0) const;
+      /**
+       * Extract the correct local vector entry from a cell and the local
+       * basis position. @p apply_constraints toggles which of the internal
+       * position vector is used to extract the correct entry if available
+       * (i.e. if constrained entries should be checked as well).
+       * If the entry is constrained the function returns
+       * numbers::invalid_dof_index.
+       */
+      unsigned int
+      extract_vec_entry_or_constrained(
+        const unsigned int cell,
+        const bool         apply_constraints,
+        const unsigned int local_basis_position,
+        const unsigned int vectorization_offset) const;
+
 
       void
       apply_hanging_node_constraints(
@@ -774,22 +790,25 @@ namespace internal
       const unsigned int first_cell,
       const unsigned int n_cells,
       const unsigned int n_dofs_per_cell,
-      const bool         apply_constraints) const
+      const bool         apply_constraints,
+      const unsigned int vectorization_offset) const
     {
       if ((row_starts_plain_indices.empty() == false) &&
           (apply_constraints == false))
         {
           for (unsigned int v = 0; v < n_cells; ++v)
             {
-              const unsigned int  cell_index = first_cell + v;
+              const unsigned int cell_index =
+                first_cell + v + vectorization_offset;
               const unsigned int *dof_indices =
                 this->plain_dof_indices.data() +
                 this->row_starts_plain_indices[cell_index];
 
               for (unsigned int i = 0; i < n_dofs_per_cell; ++dof_indices, ++i)
-                operation.process_dof(*dof_indices,
-                                      global_vector,
-                                      local_vector[i][v]);
+                operation.process_dof(
+                  *dof_indices,
+                  global_vector,
+                  local_vector[i][v + vectorization_offset]);
             }
 
           return;
@@ -797,7 +816,7 @@ namespace internal
 
       for (unsigned int v = 0; v < n_cells; ++v)
         {
-          const unsigned int  cell_index = first_cell + v;
+          const unsigned int cell_index = first_cell + v + vectorization_offset;
           const unsigned int *dof_indices =
             this->dof_indices.data() + this->row_starts[cell_index].first;
           unsigned int index_indicators = this->row_starts[cell_index].second;
@@ -812,9 +831,10 @@ namespace internal
 
               // run through values up to next constraint
               for (unsigned int j = 0; j < indicator.first; ++j)
-                operation.process_dof(dof_indices[j],
-                                      global_vector,
-                                      local_vector[ind_local + j][v]);
+                operation.process_dof(
+                  dof_indices[j],
+                  global_vector,
+                  local_vector[ind_local + j][v + vectorization_offset]);
 
               ind_local += indicator.first;
               dof_indices += indicator.first;
@@ -822,7 +842,8 @@ namespace internal
               // constrained case: build the local value as a linear
               // combination of the global value according to constraints
               typename Number::value_type value;
-              operation.pre_constraints(local_vector[ind_local][v], value);
+              operation.pre_constraints(
+                local_vector[ind_local][v + vectorization_offset], value);
 
               const typename Number::value_type *data_val =
                 this->constraint_pool_begin(indicator.second);
@@ -834,17 +855,78 @@ namespace internal
                                              global_vector,
                                              value);
 
-              operation.post_constraints(value, local_vector[ind_local][v]);
+              operation.post_constraints(
+                value, local_vector[ind_local][v + vectorization_offset]);
               ++ind_local;
             }
 
           AssertIndexRange(ind_local, n_dofs_per_cell + 1);
 
           for (; ind_local < n_dofs_per_cell; ++dof_indices, ++ind_local)
-            operation.process_dof(*dof_indices,
-                                  global_vector,
-                                  local_vector[ind_local][v]);
+            operation.process_dof(
+              *dof_indices,
+              global_vector,
+              local_vector[ind_local][v + vectorization_offset]);
         }
+    }
+    template <int dim, typename Number, typename IndexType>
+    inline unsigned int
+    ConstraintInfo<dim, Number, IndexType>::extract_vec_entry_or_constrained(
+      const unsigned int cell,
+      const bool         apply_constraints,
+      const unsigned int local_basis_position,
+      const unsigned int vectorization_offset) const
+    {
+      if ((row_starts_plain_indices.empty() == false) &&
+          (apply_constraints == false))
+        {
+          const unsigned int  cell_index = cell + vectorization_offset;
+          const unsigned int *dof_indices =
+            this->plain_dof_indices.data() +
+            this->row_starts_plain_indices[cell_index];
+          return dof_indices[local_basis_position];
+        }
+
+      // else
+      const unsigned int  cell_index = cell + vectorization_offset;
+      const unsigned int *dof_indices =
+        this->dof_indices.data() + this->row_starts[cell_index].first;
+      unsigned int index_indicators = this->row_starts[cell_index].second;
+      unsigned int next_index_indicators =
+        this->row_starts[cell_index + 1].second;
+
+      unsigned int ind_local = 0;
+      // loop over the possibly constrained entries of the cell
+      for (; index_indicators != next_index_indicators; ++index_indicators)
+        {
+          const std::pair<unsigned short, unsigned short> indicator =
+            this->constraint_indicator[index_indicators];
+
+          // run through unconstrained values up to next constraint
+          if (local_basis_position < ind_local + indicator.first)
+            // we found it in the unconstrained block (note that
+            // dof_indices is already incremented to the right position)
+            return dof_indices[local_basis_position - ind_local];
+
+          // otherwise skip unconstrained entries, and continue the search
+          ind_local += indicator.first;
+          dof_indices += indicator.first;
+
+          // constrained case:
+          // We assume for now that constrained entries never depend on
+          // themselves, i.e. that the corresponding row/col of the
+          // transfer matrix is eliminated
+          if (ind_local == local_basis_position)
+            return numbers::invalid_unsigned_int;
+
+          // if the constrained entry is not the one we are looking for,
+          // update the pointer and continue the search loop
+          dof_indices += this->constraint_pool_end(indicator.second) -
+                         this->constraint_pool_begin(indicator.second);
+          ++ind_local;
+        }
+      // if we didn't find it yet, it is in the last unconstrained block
+      return dof_indices[local_basis_position - ind_local];
     }
 
 

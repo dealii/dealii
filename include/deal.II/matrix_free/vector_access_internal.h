@@ -984,6 +984,125 @@ namespace internal
     process_empty(VectorizedArrayType &) const
     {}
   };
+
+
+
+  // A class to assemble matrix entries into a global
+  // matrix, similar to VectorDistributorLocalToGlobal.
+  // Here, we always fix one global row or column to
+  // write to (switchable via FixRow template parameter).
+  template <typename Number, bool FixRow = false>
+  struct MatrixAssembler
+  {
+    // the global row/column index to write to
+    // (depending on FixRow)
+    const types::global_dof_index global_fixed_index;
+    // the partitioner object to map local to global indices
+    // for the other index (the one not fixed)
+    const Utilities::MPI::Partitioner &partitioner;
+
+    template <typename MatrixType>
+    void
+    process_dof(const unsigned int index, MatrixType &matrix, Number &res) const
+    {
+      if constexpr (FixRow)
+        {
+          matrix.add(global_fixed_index,
+                     partitioner.local_to_global(index),
+                     res);
+        }
+      else
+        {
+          matrix.add(partitioner.local_to_global(index),
+                     global_fixed_index,
+                     res);
+        }
+    }
+
+
+
+    void
+    pre_constraints(const Number &input, Number &res) const
+    {
+      res = input;
+    }
+
+
+
+    template <typename MatrixType>
+    void
+    process_constraint(const unsigned int index,
+                       const Number       weight,
+                       MatrixType        &matrix,
+                       Number            &res) const
+    {
+      if constexpr (FixRow)
+        matrix.add(global_fixed_index,
+                   partitioner.local_to_global(index),
+                   weight * res);
+      else
+        matrix.add(partitioner.local_to_global(index),
+                   global_fixed_index,
+                   weight * res);
+    }
+
+
+
+    void
+    post_constraints(const Number &, Number &) const
+    {}
+  };
+
+
+
+  // A class mimicking the VectorReader, but instead of reading from an
+  // existing vector, we just mimic the situation that we have
+  // a unit vector with a single one at local_dof_index
+  // and zeros elsewhere.
+  template <typename Number>
+  struct ReadUnitBasisFixedIndex
+  {
+    const unsigned int local_dof_index;
+
+    template <typename VectorType>
+    void
+    process_dof(const unsigned int index, const VectorType &, Number &res) const
+    {
+      if (index == local_dof_index)
+        res = 1.;
+      else
+        res = 0.;
+    }
+
+
+    void
+    pre_constraints(const Number &, Number &res) const
+    {
+      res = Number();
+    }
+
+
+
+    template <typename VectorType>
+    void
+    process_constraint(const unsigned int index,
+                       const Number       weight,
+                       const VectorType &,
+                       Number &res) const
+    {
+      if (index == local_dof_index)
+        res += weight;
+    }
+
+
+
+    void
+    post_constraints(const Number &sum, Number &write_pos) const
+    {
+      write_pos = sum;
+    }
+  };
+
 } // namespace internal
 
 
