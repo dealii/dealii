@@ -2092,7 +2092,7 @@ namespace internal
         {
           // reserve the field of the derived class
           tria_faces.quads_line_orientations.resize(
-            new_size * ReferenceCells::max_n_lines<2>(), true);
+            new_size * tria_faces.quads.faces_per_object, true);
 
           auto &q_is_q = tria_faces.quad_is_quadrilateral;
           q_is_q.reserve(new_size);
@@ -3955,7 +3955,7 @@ namespace internal
               {
                 const auto vertices = lines_to_vertices[line];
                 for (unsigned int v = 0; v < vertices.size(); ++v)
-                  lines_0.cells[line * ReferenceCells::max_n_faces<1>() + v] =
+                  lines_0.cells[line * lines_0.children_per_object + v] =
                     vertices[v]; // set vertex indices
               }
           }
@@ -3986,7 +3986,7 @@ namespace internal
                   {
                     AssertIndexRange(l, reference_cell.n_lines());
                     // set line index
-                    quads_0.cells[q * ReferenceCells::max_n_lines<2>() + l] =
+                    quads_0.cells[q * quads_0.children_per_object + l] =
                       lines[l];
 
                     // set line orientations
@@ -4003,7 +4003,7 @@ namespace internal
                     // store true for the default orientation and false for
                     // reversed.
                     faces.quads_line_orientations
-                      [q * ReferenceCells::max_n_lines<2>() + l] =
+                      [q * faces.quads.children_per_object + l] =
                       combined_orientation ==
                       numbers::default_geometric_orientation;
                   }
@@ -4057,13 +4057,12 @@ namespace internal
                    ++f, ++global_face_index)
                 {
                   // set neighbor if not at boundary
+                  const auto index = cell * level.faces_per_object + f;
                   if (neighbors[f] != static_cast<unsigned int>(-1))
-                    level.neighbors[cell * ReferenceCells::max_n_faces<dim>() +
-                                    f] = {0, neighbors[f]};
+                    level.neighbors[index] = {0, neighbors[f]};
 
                   // set face indices
-                  cells_0.cells[cell * ReferenceCells::max_n_faces<dim>() + f] =
-                    faces[f];
+                  cells_0.cells[index] = faces[f];
 
                   // set face orientation if needed
                   if (orientation_needed)
@@ -6063,13 +6062,16 @@ namespace internal
             // on the next higher level as well as for the
             // 2*flagged_cells that will be created on that level
             reserve_space(*triangulation.levels[level + 1],
-                          used_cells +
-                            ReferenceCells::max_n_children<1>() * flagged_cells,
+                          used_cells + triangulation.levels[level + 1]
+                                           ->children_per_object *
+                                         flagged_cells,
                           spacedim);
             // reserve space for 2*flagged_cells new lines on the next
             // higher level
             triangulation.levels[level + 1]->cells.allocate_end(
-              ReferenceCells::max_n_children<dim>() * flagged_cells, 0);
+              triangulation.levels[level + 1]->cells.children_per_object *
+                flagged_cells,
+              0);
             needed_vertices += flagged_cells;
           }
 
