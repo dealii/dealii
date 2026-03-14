@@ -986,6 +986,10 @@ public:
 
 /**
  * Integration rule for pyramid entities.
+ * Taken from @cite Bergot2010, the integration rules generates @p (n_points_1d)^3
+ * integration points with all positive weights. The integration rule is the
+ * product of two QGauss objects in the first two coordinate directions and a
+ * Gauss-Jacobi integration in the third direction.
  */
 template <int dim>
 class QGaussPyramid : public Quadrature<dim>
