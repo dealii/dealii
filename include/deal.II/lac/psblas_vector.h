@@ -15,7 +15,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/exceptions.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/types.h>
 
@@ -29,57 +28,12 @@
 
 #ifdef DEAL_II_WITH_PSBLAS
 
-#  include <psb_base_cbind.h>
-#  include <psb_c_base.h>
-#  include <psb_c_dbase.h>
+#  include <deal.II/lac/psblas_common.h>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace PSCToolkitWrappers
 {
-
-  namespace internal
-  {
-    /*
-     * Custom deleter for PSBLAS descriptor.
-     */
-    struct PSBLASDescriptorDeleter
-    {
-      void
-      operator()(psb_c_descriptor *p) const
-      {
-        if (p)
-          psb_c_cdfree(p);
-      }
-    };
-
-    /**
-     * Enum to indicate the state of the vector (building or assembled).
-     * TODO[MF]: use the same also when I'll introduce the matrix class. Move to
-     * a common .h file?
-     */
-
-    enum State
-    {
-      /**
-       * State entered after the default constructor, before any allocation.
-       * In this state, no operations are possible.
-       */
-      Default,
-      /**
-       * State entered after the first allocation, and before the first
-       * assembly; in this state it is possible to add communication
-       * requirements among different processes.
-       */
-      Build,
-      /*
-       * State entered after the assembly; computations such as matrix-vector
-       * products, are only possible in this state.
-       */
-      Assembled
-    };
-
-  } // namespace internal
 
   class Vector : public ReadVector<double>
   {
@@ -259,145 +213,6 @@ namespace PSCToolkitWrappers
     using size_type = dealii::types::global_dof_index;
 
     using value_type = double;
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcInitializePSBLASVector,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while initializing a PSBLAS vector.");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcFreePSBLASVector,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while freeing a PSBLAS vector.");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcInitializePSBLASDescriptor,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while initializing a PSBLAS descriptor.");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcAssemblePSBLASVector,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while assembling a PSBLAS vector.");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcAssemblePSBLASDescriptor,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while assembling a PSBLAS descriptor.");
-
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcInvalidState,
-                   int,
-                   << "Vector's state is invalid. It is in "
-                   << (arg1 == 0 ? "Default" :
-                       arg1 == 1 ? "Build" :
-                                   "Assembled")
-                   << " state. Did you forget to call reinit() or compress()?");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcInvalidStateBuild,
-                   int,
-                   << "Vector's state is invalid. It should be in "
-                   << "Build state but it is in "
-                   << (arg1 == 0 ? "Default" : "Assembled")
-                   << " state. Did you forget to call reinit()?");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcInvalidStateAssembled,
-                   int,
-                   << "Vector's state is invalid. It should be in "
-                   << "Assembled state but it is in "
-                   << (arg1 == 0 ? "Default" : "Build")
-                   << " state. Did you forget to call compress()?");
-
-    /**
-     * Exception
-     */
-    DeclExceptionMsg(
-      ExcInvalidDefault,
-      "Vector's state is invalid. It should be in "
-      "Build or Assembled state but it is in Default state. Did you forget"
-      " to reinit it()?");
-
-    /**
-     * Exception
-     */
-    DeclException2(ExcCallingPSBLASFunction,
-                   int,
-                   std::string,
-                   << "An error with error number " << arg1
-                   << " occurred while calling a PSBLAS function: " << arg2
-                   << std::endl);
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcAXPBY,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while performing the AXPBY operation.");
-
-    /**
-     * Exception
-     */
-    DeclException1(ExcInsertionInPSBLASVector,
-                   int,
-                   << "An error with error number " << arg1
-                   << " occurred while inserting values into a PSBLAS vector.");
-
-    /**
-     * Exception
-     */
-    DeclException2(ExcWrongMode,
-                   int,
-                   int,
-                   << "You tried to do a "
-                   << (arg1 == 1 ? "'set'" : (arg1 == 2 ? "'add'" : "???"))
-                   << " operation but the vector is currently in "
-                   << (arg2 == 1 ? "'set'" : (arg2 == 2 ? "'add'" : "???"))
-                   << " mode. You first have to call 'compress()'.");
-
-    /**
-     * Exception
-     */
-    DeclException3(
-      ExcAccessToNonlocalElement,
-      int,
-      int,
-      int,
-      << "You tried to access element " << arg1
-      << " of a distributed vector, but only elements in range [" << arg2 << ','
-      << arg3 << "] are stored locally and can be accessed."
-      << "\n\n"
-      << "A common source for this kind of problem is that you "
-      << "are passing a 'fully distributed' vector into a function "
-      << "that needs read access to vector elements that correspond "
-      << "to degrees of freedom on ghost cells (or at least to "
-      << "'locally active' degrees of freedom that are not also "
-      << "'locally owned'). You need to pass a vector that has these "
-      << "elements as ghost entries.");
 
     /**
      *Default constructor. Generates an empty (zero-size) vector.
@@ -911,8 +726,7 @@ namespace PSCToolkitWrappers
      */
     VectorOperation::values last_action;
 
-    // TODO[MF]: uncomment when the matrix class will be introduced
-    // friend class SparseMatrix;
+    friend class SparseMatrix;
   };
 
 
