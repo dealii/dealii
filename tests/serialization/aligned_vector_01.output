@@ -1,0 +1,65 @@
+
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::~A()
+DEAL:A::A::operator=(const A&)
+DEAL:A::A::operator=(const A&)
+DEAL:A::A::operator=(const A&)
+DEAL:A::size = 58
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::ctors = 10 dtors = 10
+DEAL:int::size = 65
+DEAL:int::-11
+DEAL:int::-10
+DEAL:int::-9
+DEAL:int::-11
+DEAL:int::-10
+DEAL:int::-9
+DEAL:int::-11
+DEAL:int::-10
+DEAL:int::-9
+DEAL:int::-11
+DEAL:int::-10
+DEAL:int::-9
+DEAL:std::vector<int>::size = 101
+DEAL:std::vector<int>::1 1 2
+DEAL:std::vector<int>::42
+DEAL:std::vector<int>::3 5
+DEAL:std::vector<int>::1 1 2
+DEAL:std::vector<int>::42
+DEAL:std::vector<int>::3 5
+DEAL:std::vector<int>::1 1 2
+DEAL:std::vector<int>::42
+DEAL:std::vector<int>::3 5
+DEAL:std::vector<int>::1 1 2
+DEAL:std::vector<int>::42
+DEAL:std::vector<int>::3 5
+DEAL:std::string::size = 124
+DEAL:std::string::AAA
+DEAL:std::string::The quick brown fox jumped over the lazy dog
+DEAL:std::string::
+DEAL:std::string::AAA
+DEAL:std::string::The quick brown fox jumped over the lazy dog
+DEAL:std::string::
+DEAL:std::string::AAA
+DEAL:std::string::The quick brown fox jumped over the lazy dog
+DEAL:std::string::
+DEAL:std::string::AAA
+DEAL:std::string::The quick brown fox jumped over the lazy dog
+DEAL:std::string::
