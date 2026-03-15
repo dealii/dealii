@@ -727,6 +727,8 @@ namespace PSCToolkitWrappers
     VectorOperation::values last_action;
 
     friend class SparseMatrix;
+
+    friend class PreconditionAMG;
   };
 
 

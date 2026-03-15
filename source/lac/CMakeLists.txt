@@ -192,6 +192,14 @@ if(DEAL_II_WITH_PSBLAS)
   )
 endif()
 
+
+if(DEAL_II_WITH_AMG4PSBLAS)
+  set(_unity_include_src
+    ${_unity_include_src}
+    psblas_precondition.cc
+  )
+endif()
+
 # determined by profiling
 set(_n_includes_per_unity_file 20)
 
