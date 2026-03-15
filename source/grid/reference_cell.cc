@@ -1512,6 +1512,7 @@ operator>>(std::istream &in, ReferenceCell<dim> &reference_cell)
 
 #include "grid/reference_cell.inst"
 
+#ifndef DOXYGEN
 // Here also instantiate select members for dimension 0 (vertices) in addition
 // to the general class instantiation for dim=1,2,3 in the .inst file:
 template std::string
@@ -1530,7 +1531,6 @@ template unsigned int
 ReferenceCell<0>::vtk_vertex_to_deal_vertex(
   const unsigned int vertex_index) const;
 
-
 template Quadrature<0>
 ReferenceCell<0>::get_gauss_type_quadrature(const unsigned n_points_1d) const;
 
@@ -1542,6 +1542,6 @@ operator<<(std::ostream &out, const ReferenceCell<0> &reference_cell);
 
 template std::istream &
 operator>>(std::istream &in, ReferenceCell<0> &reference_cell);
-
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
