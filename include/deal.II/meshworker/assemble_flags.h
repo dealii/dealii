@@ -34,6 +34,12 @@ namespace MeshWorker
    *
    * You can select more than one flag by concatenation using the bitwise or
    * <code>operator|(AssembleFlags,AssembleFlags)</code>.
+   *
+   * Faces on periodic boundaries are treated as interior faces and the flags
+   * related to interior faces are applied to these faces. For example, if
+   * <code>assemble_own_interior_faces_once</code> is enabled, then among a
+   * periodic face pair, assembly is performed only on one of them, even though
+   * physically they are different faces.
    */
   enum AssembleFlags
   {
