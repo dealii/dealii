@@ -28,7 +28,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   Triangulation<dim> triangulation;
   GridGenerator::reference_cell(triangulation, reference_cell);
@@ -39,13 +39,14 @@ test(const ReferenceCell &reference_cell)
   // TODO: MappingQ asserts that face quadrature collections have exactly one
   // entry. For now just special-case those.
   if (reference_cell.is_hyper_cube())
-    quadratures.push_back(reference_cell.face_reference_cell(0)
-                            .template get_gauss_type_quadrature<dim - 1>(2));
+    quadratures.push_back(
+      reference_cell.face_reference_cell(0).get_gauss_type_quadrature(2));
   else
     for (unsigned int face_no = 0; face_no < reference_cell.n_faces();
          ++face_no)
-      quadratures.push_back(reference_cell.face_reference_cell(face_no)
-                              .template get_gauss_type_quadrature<dim - 1>(2));
+      quadratures.push_back(
+        reference_cell.face_reference_cell(face_no).get_gauss_type_quadrature(
+          2));
 
   // Set up the objects to compute an integral on the reference cell
   FEFaceValues<dim> fe_face_values(fe, quadratures, update_JxW_values);

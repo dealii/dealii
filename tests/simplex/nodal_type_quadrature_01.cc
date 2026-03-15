@@ -21,10 +21,9 @@
 
 template <int dim>
 void
-test(const ReferenceCell reference_cell)
+test(const ReferenceCell<dim> reference_cell)
 {
-  const Quadrature<dim> &quad =
-    reference_cell.template get_nodal_type_quadrature<dim>();
+  const Quadrature<dim> &quad = reference_cell.get_nodal_type_quadrature();
 
   for (unsigned int q = 0; q < quad.size(); ++q)
     {

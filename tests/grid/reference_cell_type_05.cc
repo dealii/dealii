@@ -24,7 +24,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   deallog << "ReferenceCell: " << reference_cell.to_string() << std::endl;
   for (unsigned int f = 0; f < reference_cell.n_faces(); ++f)
@@ -32,12 +32,12 @@ test(const ReferenceCell &reference_cell)
          v < reference_cell.face_reference_cell(f).n_vertices();
          ++v)
       {
-        deallog << "Face=" << f << ", vertex=" << v << ", location="
-                << reference_cell.face_vertex_location<dim>(f, v) << std::endl;
-        Assert(reference_cell.face_vertex_location<dim>(f, v) ==
-                 reference_cell.vertex<dim>(
-                   reference_cell.face_to_cell_vertices(
-                     f, v, numbers::default_geometric_orientation)),
+        deallog << "Face=" << f << ", vertex=" << v
+                << ", location=" << reference_cell.face_vertex_location(f, v)
+                << std::endl;
+        Assert(reference_cell.face_vertex_location(f, v) ==
+                 reference_cell.vertex(reference_cell.face_to_cell_vertices(
+                   f, v, numbers::default_geometric_orientation)),
                ExcInternalError());
       }
 }

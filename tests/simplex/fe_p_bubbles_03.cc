@@ -58,8 +58,7 @@ test_unit_support_points()
       FESystem<dim, spacedim> fe(FE_SimplexP_Bubbles<dim, spacedim>(degree),
                                  dim);
       deallog << "element tensor degree = " << fe.tensor_degree() << std::endl;
-      Quadrature<dim> quad(
-        fe.reference_cell().template get_midpoint_quadrature<dim>());
+      Quadrature<dim> quad(fe.reference_cell().get_midpoint_quadrature());
       test(fe, quad);
     }
 }

@@ -75,7 +75,7 @@ test_interpolate()
           deallog << "number of dofs = " << dh.n_dofs() << std::endl;
 
           const Mapping<dim, spacedim> &map =
-            type.template get_default_linear_mapping<dim, spacedim>();
+            type.template get_default_linear_mapping<spacedim>();
 
           Vector<double> solution(dh.n_dofs());
           VectorTools::interpolate(map, dh, func, solution);
@@ -147,7 +147,7 @@ test_lumped_project()
           Vector<double> consistent_rhs(dh.n_dofs());
 
           const Mapping<dim, spacedim> &map =
-            type.template get_default_linear_mapping<dim, spacedim>();
+            type.template get_default_linear_mapping<spacedim>();
 
           FEValues<dim> lumped_fev(map,
                                    fe,

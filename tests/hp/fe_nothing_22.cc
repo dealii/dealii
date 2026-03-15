@@ -34,7 +34,7 @@ test()
           << std::endl;
   deallog << (FE_Nothing<dim>(1, true) == FE_Nothing<dim>(2, true))
           << std::endl;
-  if (dim == 2)
+  if constexpr (dim == 2)
     {
       deallog << (FE_Nothing<dim>(ReferenceCells::Quadrilateral, 2, true) ==
                   FE_Nothing<dim>(2, true))
@@ -43,7 +43,7 @@ test()
                   FE_Nothing<dim>(2, true))
               << std::endl;
     }
-  if (dim == 3)
+  if constexpr (dim == 3)
     {
       deallog << (FE_Nothing<dim>(ReferenceCells::Hexahedron, 2, true) ==
                   FE_Nothing<dim>(2, true))

@@ -24,16 +24,14 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   for (const auto face_no : reference_cell.face_indices())
     {
-      deallog << reference_cell.template face_normal_vector<dim>(face_no)
-              << std::endl;
+      deallog << reference_cell.face_normal_vector(face_no) << std::endl;
 
       for (unsigned int i = 0; i < dim - 1; ++i)
-        deallog << reference_cell.template face_tangent_vector<dim>(face_no, i)
-                << std::endl;
+        deallog << reference_cell.face_tangent_vector(face_no, i) << std::endl;
     }
   deallog << std::endl;
 }

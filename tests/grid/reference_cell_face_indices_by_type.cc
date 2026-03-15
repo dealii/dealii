@@ -24,8 +24,8 @@
 // general test case
 template <int dim>
 void
-execute_test(const std::initializer_list<ReferenceCell> &cell_types,
-             const std::initializer_list<ReferenceCell> &face_types)
+execute_test(const std::initializer_list<ReferenceCell<dim>>     &cell_types,
+             const std::initializer_list<ReferenceCell<dim - 1>> &face_types)
 {
   Triangulation<dim> triangulation;
 
@@ -41,8 +41,8 @@ execute_test(const std::initializer_list<ReferenceCell> &cell_types,
       // Store the information of a face that we need for testing
       struct FaceInfo
       {
-        unsigned int  face_id;
-        ReferenceCell face_type;
+        unsigned int           face_id;
+        ReferenceCell<dim - 1> face_type;
       };
       std::list<FaceInfo> returned_face_indices;
 
@@ -119,15 +119,8 @@ test_1d()
 {
   // All known 1d cell types
   auto cell_types = {ReferenceCells::Line};
-  // All known face types
-  auto face_types = {ReferenceCells::Vertex,
-                     ReferenceCells::Line,
-                     ReferenceCells::Triangle,
-                     ReferenceCells::Quadrilateral,
-                     ReferenceCells::Tetrahedron,
-                     ReferenceCells::Pyramid,
-                     ReferenceCells::Wedge,
-                     ReferenceCells::Hexahedron};
+  // All known face types of 1d cells
+  auto face_types = {ReferenceCells::Vertex};
 
   execute_test<1>(cell_types, face_types);
 }
@@ -137,15 +130,8 @@ test_2d()
 {
   // All known 2d cell types
   auto cell_types = {ReferenceCells::Triangle, ReferenceCells::Quadrilateral};
-  // All known face types
-  auto face_types = {ReferenceCells::Vertex,
-                     ReferenceCells::Line,
-                     ReferenceCells::Triangle,
-                     ReferenceCells::Quadrilateral,
-                     ReferenceCells::Tetrahedron,
-                     ReferenceCells::Pyramid,
-                     ReferenceCells::Wedge,
-                     ReferenceCells::Hexahedron};
+  // All known face types of 2d cells
+  auto face_types = {ReferenceCells::Line};
 
   execute_test<2>(cell_types, face_types);
 }
@@ -158,15 +144,8 @@ test_3d()
                      ReferenceCells::Pyramid,
                      ReferenceCells::Wedge,
                      ReferenceCells::Hexahedron};
-  // All known face types
-  auto face_types = {ReferenceCells::Vertex,
-                     ReferenceCells::Line,
-                     ReferenceCells::Triangle,
-                     ReferenceCells::Quadrilateral,
-                     ReferenceCells::Tetrahedron,
-                     ReferenceCells::Pyramid,
-                     ReferenceCells::Wedge,
-                     ReferenceCells::Hexahedron};
+  // All known face types of 3d cells
+  auto face_types = {ReferenceCells::Triangle, ReferenceCells::Quadrilateral};
 
   execute_test<3>(cell_types, face_types);
 }

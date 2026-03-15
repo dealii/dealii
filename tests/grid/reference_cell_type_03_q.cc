@@ -27,12 +27,12 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   Triangulation<dim> triangulation;
   GridGenerator::reference_cell(triangulation, reference_cell);
 
-  const Quadrature<dim> q = reference_cell.get_gauss_type_quadrature<dim>(2);
+  const Quadrature<dim> q = reference_cell.get_gauss_type_quadrature(2);
   const FE_Nothing<dim> fe(reference_cell);
 
   // Set up the objects to compute an integral on the reference cell
@@ -50,10 +50,10 @@ test(const ReferenceCell &reference_cell)
 
   deallog << "ReferenceCell: " << reference_cell.to_string() << std::endl;
   deallog << "  computed barycenter = " << barycenter << std::endl;
-  deallog << "  self-reported barycenter = " << reference_cell.barycenter<dim>()
+  deallog << "  self-reported barycenter = " << reference_cell.barycenter()
           << std::endl;
 
-  Assert((barycenter - reference_cell.barycenter<dim>()).norm() <= 1e-12,
+  Assert((barycenter - reference_cell.barycenter()).norm() <= 1e-12,
          ExcInternalError());
 }
 
@@ -67,7 +67,7 @@ main()
     // It doesn't make sense to integrate in 0D, but make sure that
     // get_gauss_type_quadrature() still works
     deallog << "0D quadrature size: "
-            << ReferenceCells::Vertex.get_gauss_type_quadrature<0>(1).size()
+            << ReferenceCells::Vertex.get_gauss_type_quadrature(1).size()
             << std::endl;
     deallog.pop();
   }

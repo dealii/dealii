@@ -30,17 +30,17 @@ test_face(const std::vector<Point<3>>    &vertices_,
           const std::vector<CellData<3>> &cell_data_,
           const unsigned int              face_n)
 {
-  const ReferenceCell ref_cell  = ReferenceCells::Tetrahedron;
-  auto                vertices  = vertices_;
-  auto                cell_data = cell_data_;
+  const ReferenceCell<3> ref_cell  = ReferenceCells::Tetrahedron;
+  auto                   vertices  = vertices_;
+  auto                   cell_data = cell_data_;
 
   Point<3> extra_vertex;
   for (unsigned int i = 0; i < 3; ++i)
-    extra_vertex += ref_cell.template vertex<3>(ref_cell.face_to_cell_vertices(
+    extra_vertex += ref_cell.vertex(ref_cell.face_to_cell_vertices(
       face_n, i, numbers::default_geometric_orientation));
 
   extra_vertex /= 3.0;
-  extra_vertex += ref_cell.template face_normal_vector<3>(face_n);
+  extra_vertex += ref_cell.face_normal_vector(face_n);
 
   vertices.push_back(extra_vertex);
 

@@ -49,7 +49,7 @@ process(const std::vector<Point<spacedim>> &vertices,
     AssertThrow(false, ExcNotImplemented());
 
   const Quadrature<dim> quad =
-    reference_cells.front().template get_gauss_type_quadrature<dim>(2);
+    reference_cells.front().get_gauss_type_quadrature(2);
   FE_Nothing<dim, spacedim> fe(reference_cells.front());
   FEValues<dim, spacedim>   fe_values(*mapping, fe, quad, update_JxW_values);
 

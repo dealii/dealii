@@ -65,7 +65,7 @@ check()
                   data_filter.n_cells(),
                   dim,
                   spacedim,
-                  ReferenceCell());
+                  ReferenceCell<dim>());
   unsigned int n_data_sets = data_filter.n_data_sets();
 
   // The vector names generated here must match those generated in the HDF5 file

@@ -4,9 +4,9 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell,
-     const Point<dim>    &p,
-     const bool           print = true)
+test(const ReferenceCell<dim> &reference_cell,
+     const Point<dim>         &p,
+     const bool                print = true)
 {
   const Point<dim> projected       = reference_cell.closest_point(p);
   const double     distance_square = projected.distance_square(p);
@@ -23,8 +23,7 @@ test(const ReferenceCell &reference_cell,
   // nearest vertex
   for (const unsigned int vertex_no : reference_cell.vertex_indices())
     AssertThrow(distance_square <=
-                  p.distance_square(
-                    reference_cell.template vertex<dim>(vertex_no)) *
+                  p.distance_square(reference_cell.vertex(vertex_no)) *
                     (1. + 2. * std::numeric_limits<double>::epsilon()),
                 ExcInternalError());
 
