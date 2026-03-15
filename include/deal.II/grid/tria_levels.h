@@ -67,14 +67,16 @@ namespace internal
        */
       TriaLevel(const unsigned int max_children_per_cell,
                 const unsigned int max_faces_per_cell)
-        : cells(dim, max_children_per_cell, max_faces_per_cell)
+        : children_per_object(max_children_per_cell)
+        , faces_per_object(max_faces_per_cell)
+        , cells(dim, max_children_per_cell, max_faces_per_cell)
         , face_orientations(0, max_faces_per_cell)
       {}
 
       /**
        * Default constructor (needed by Boost).
        */
-      TriaLevel() = default;
+      TriaLevel();
 
       /**
        * Resize all internal arrays and populate with default values.
@@ -86,6 +88,20 @@ namespace internal
        */
       void
       allocate(const std::size_t n_cells, const bool orientation_needed);
+
+      /**
+       * The number of children stored per object. In practice, to support mixed
+       * meshes, this is the maximum number of children per ReferenceCell across
+       * all relevant ReferenceCell types used by the Triangulation.
+       */
+      unsigned int children_per_object;
+
+      /**
+       * The number of faces (i.e., neighbors) stored per object. Like
+       * children_per_object, this is typically the maximum value across all
+       * relevant ReferenceCell types.
+       */
+      unsigned int faces_per_object;
 
       /**
        * @p RefinementCase<dim>::Type flags for the cells to be refined with
