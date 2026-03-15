@@ -33,14 +33,15 @@ namespace PSCToolkitWrappers
   namespace internal
   {
     /*
-     * Custom deleter for PSBLAS descriptor.
+     * Custom deleter for PSBLAS descriptor. This will be invoked automatically
+     * by the shared pointer.
      */
-    struct PSBLASDescriptorDeleter
+    struct DescriptorDeleter
     {
       void
       operator()(psb_c_descriptor *p) const
       {
-        if (p)
+        if (p != nullptr)
           psb_c_cdfree(p);
       }
     };

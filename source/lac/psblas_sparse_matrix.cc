@@ -66,17 +66,12 @@ namespace PSCToolkitWrappers
 
   SparseMatrix::~SparseMatrix()
   {
-    Assert((psblas_sparse_matrix != nullptr &&
-            psblas_descriptor.get() != nullptr),
-           ExcMessage("PSBLAS sparse matrix or descriptor is null."));
-
-    // We first clear the sparse matrix
-    int err = psb_c_dspfree(psblas_sparse_matrix, psblas_descriptor.get());
-    Assert(err == 0, ExcCallingPSBLASFunction(err, "psb_c_dspfree"));
-
-    // ... and then the descriptor
-    err = psb_c_cdfree(psblas_descriptor.get());
-    Assert(err == 0, ExcCallingPSBLASFunction(err, "psb_c_cdfree"));
+    if (psblas_sparse_matrix != nullptr && psblas_descriptor.get() != nullptr)
+      {
+        // We clear the underlying PSBLAS sparse matrix
+        int err = psb_c_dspfree(psblas_sparse_matrix, psblas_descriptor.get());
+        Assert(err == 0, ExcCallingPSBLASFunction(err, "psb_c_dspfree"));
+      }
   }
 
 
@@ -101,10 +96,17 @@ namespace PSCToolkitWrappers
            ExcMessage("MPI_COMM_NULL passed to SparseMatrix::reinit()."));
     communicator = comm;
 
+    // Free old resources before reinitializing
+    if (psblas_sparse_matrix != nullptr && psblas_descriptor.get() != nullptr)
+      {
+        int err = psb_c_dspfree(psblas_sparse_matrix, psblas_descriptor.get());
+        Assert(err == 0, ExcCallingPSBLASFunction(err, "psb_c_dspfree"));
+        psblas_sparse_matrix = nullptr;
+      }
+
     // Create a new PSBLAS descriptor
-    psblas_descriptor.reset(
-      psb_c_new_descriptor(),
-      PSCToolkitWrappers::internal::PSBLASDescriptorDeleter());
+    psblas_descriptor.reset(psb_c_new_descriptor(),
+                            PSCToolkitWrappers::internal::DescriptorDeleter());
 
     // Use get_index_vector() from IndexSet to get the indexes
     const std::vector<types::global_dof_index> &indexes =
@@ -151,6 +153,14 @@ namespace PSCToolkitWrappers
     Assert(communicator != MPI_COMM_NULL,
            ExcMessage("MPI_COMM_NULL passed to SparseMatrix::reinit()."));
 
+    // Free old resources before reinitializing
+    if (psblas_sparse_matrix != nullptr && psblas_descriptor.get() != nullptr)
+      {
+        int err = psb_c_dspfree(psblas_sparse_matrix, psblas_descriptor.get());
+        Assert(err == 0, ExcCallingPSBLASFunction(err, "psb_c_dspfree"));
+        psblas_sparse_matrix = nullptr;
+      }
+
     psblas_descriptor = psblas_sparsity_pattern.psblas_descriptor;
 
     // Create a new PSBLAS sparse matrix
@@ -182,6 +192,15 @@ namespace PSCToolkitWrappers
     Assert(local_rows.is_ascending_and_one_to_one(communicator),
            ExcNotImplemented());
 
+    // Free old resources before reinitializing
+    if (psblas_sparse_matrix != nullptr && psblas_descriptor.get() != nullptr)
+      {
+        int err = psb_c_dspfree(psblas_sparse_matrix, psblas_descriptor.get());
+        Assert(err == 0, ExcCallingPSBLASFunction(err, "psb_c_dspfree"));
+        psblas_sparse_matrix = nullptr;
+      }
+
+
     if constexpr (running_in_debug_mode())
       {
         types::global_dof_index row_owners =
@@ -198,9 +217,8 @@ namespace PSCToolkitWrappers
     this->communicator = communicator;
 
     // Set up the PSBLAS descriptor from the local IndexSet
-    psblas_descriptor.reset(
-      psb_c_new_descriptor(),
-      PSCToolkitWrappers::internal::PSBLASDescriptorDeleter());
+    psblas_descriptor.reset(psb_c_new_descriptor(),
+                            PSCToolkitWrappers::internal::DescriptorDeleter());
 
     {
       const std::vector<types::global_dof_index> indexes =

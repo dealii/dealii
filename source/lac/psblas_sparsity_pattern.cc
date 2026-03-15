@@ -35,9 +35,8 @@ namespace PSCToolkitWrappers
     Assert(communicator != MPI_COMM_NULL,
            ExcMessage("MPI_COMM_NULL passed to SparseMatrix::reinit()."));
 
-    psblas_descriptor.reset(
-      psb_c_new_descriptor(),
-      PSCToolkitWrappers::internal::PSBLASDescriptorDeleter());
+    psblas_descriptor.reset(psb_c_new_descriptor(),
+                            PSCToolkitWrappers::internal::DescriptorDeleter());
 
     // Use get_index_vector() from IndexSet to get the indexes
     const std::vector<types::global_dof_index> &indexes =

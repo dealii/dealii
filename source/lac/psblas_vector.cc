@@ -102,7 +102,7 @@ namespace PSCToolkitWrappers
     if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
         psblas_descriptor.reset(psb_c_new_descriptor(),
-                                internal::PSBLASDescriptorDeleter());
+                                internal::DescriptorDeleter());
 
         // Use get_index_vector() from IndexSet to get the indexes
         const std::vector<types::global_dof_index> &indexes =
@@ -170,7 +170,7 @@ namespace PSCToolkitWrappers
     if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
       {
         psblas_descriptor.reset(psb_c_new_descriptor(),
-                                internal::PSBLASDescriptorDeleter());
+                                internal::DescriptorDeleter());
 
         // Use get_index_vector() from IndexSet to get the indexes
         const std::vector<types::global_dof_index> &indexes =
