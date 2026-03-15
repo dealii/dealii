@@ -1564,14 +1564,14 @@ namespace FETools
     GridGenerator::reference_cell(tr, reference_cell);
 
     const auto &mapping =
-      reference_cell.template get_default_linear_mapping<dim, spacedim>();
+      reference_cell.template get_default_linear_mapping<spacedim>();
 
     // Choose a Gauss quadrature rule that is exact up to degree 2n-1
     const unsigned int degree =
       std::max(fe1.tensor_degree(), fe2.tensor_degree());
     Assert(degree != numbers::invalid_unsigned_int, ExcNotImplemented());
     const auto quadrature =
-      reference_cell.get_gauss_type_quadrature<dim>(degree + 1);
+      reference_cell.get_gauss_type_quadrature(degree + 1);
 
     const unsigned int nq = quadrature.size();
 
@@ -1735,9 +1735,9 @@ namespace FETools
         const unsigned int degree = fe.degree;
 
         const auto &mapping =
-          reference_cell.template get_default_linear_mapping<dim, spacedim>();
+          reference_cell.template get_default_linear_mapping<spacedim>();
         const auto &q_fine =
-          reference_cell.get_gauss_type_quadrature<dim>(degree + 1);
+          reference_cell.get_gauss_type_quadrature(degree + 1);
         const unsigned int nq = q_fine.size();
 
         FEValues<dim, spacedim> fine(mapping,
@@ -2059,9 +2059,8 @@ namespace FETools
     const ReferenceCell reference_cell = fe.reference_cell();
 
     const auto &mapping =
-      reference_cell.template get_default_linear_mapping<dim, spacedim>();
-    const auto &q_fine =
-      reference_cell.get_gauss_type_quadrature<dim>(degree + 1);
+      reference_cell.template get_default_linear_mapping<spacedim>();
+    const auto &q_fine = reference_cell.get_gauss_type_quadrature(degree + 1);
 
     // prepare FEValues, quadrature etc on coarse cell
     const unsigned int nq = q_fine.size();
@@ -2180,7 +2179,7 @@ namespace FETools
             Quadrature<dim> q_coarse(q_points_coarse, fine.get_JxW_values());
             FEValues<dim, spacedim> coarse(
               coarse_cell->reference_cell()
-                .template get_default_linear_mapping<dim, spacedim>(),
+                .template get_default_linear_mapping<spacedim>(),
               fe,
               q_coarse,
               update_values);
@@ -2824,11 +2823,11 @@ namespace FETools
     const ReferenceCell type = fe.reference_cell();
 
     const Quadrature<dim> q_gauss =
-      type.get_gauss_type_quadrature<dim>(fe.tensor_degree() + 1);
+      type.get_gauss_type_quadrature(fe.tensor_degree() + 1);
     Triangulation<dim, spacedim> tria;
     GridGenerator::reference_cell(tria, type);
     const Mapping<dim, spacedim> &mapping =
-      type.template get_default_linear_mapping<dim, spacedim>();
+      type.template get_default_linear_mapping<spacedim>();
 
     auto                    cell = tria.begin_active();
     FEValues<dim, spacedim> fe_values(mapping,

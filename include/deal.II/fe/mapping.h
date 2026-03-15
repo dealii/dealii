@@ -443,7 +443,7 @@ public:
    * in @p reference_cell.
    */
   virtual bool
-  is_compatible_with(const ReferenceCell &reference_cell) const = 0;
+  is_compatible_with(const ReferenceCell<dim> &reference_cell) const = 0;
 
   /**
    * @name Mapping points between reference and real cells

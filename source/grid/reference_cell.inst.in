@@ -10,38 +10,21 @@
 //
 // -----------------------------------------------------------------------------
 
+for (deal_II_dimension : DIMENSIONS)
+  {
+    template class ReferenceCell<deal_II_dimension>;
+  }
+
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension
     template std::unique_ptr<
       Mapping<deal_II_dimension, deal_II_space_dimension>>
-    ReferenceCell::get_default_mapping(const unsigned int degree) const;
+    ReferenceCell<deal_II_dimension>::get_default_mapping<
+      deal_II_space_dimension>(const unsigned int degree) const;
 
     template const Mapping<deal_II_dimension, deal_II_space_dimension> &
-    ReferenceCell::get_default_linear_mapping() const;
+    ReferenceCell<deal_II_dimension>::get_default_linear_mapping<
+      deal_II_space_dimension>() const;
 #endif
-  }
-
-for (deal_II_dimension : DIMENSIONS)
-  {
-    template Point<deal_II_dimension> ReferenceCell::subface_vertex_location(
-      const unsigned int,
-      const unsigned int,
-      const unsigned int,
-      const RefinementCase<deal_II_dimension - 1>) const;
-
-    template Quadrature<deal_II_dimension>
-    ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
-
-    template const Quadrature<deal_II_dimension> &
-    ReferenceCell::get_nodal_type_quadrature() const;
-
-    template std::pair<unsigned int, RefinementCase<deal_II_dimension - 1>>
-    ReferenceCell::equivalent_refinement_case(
-      const types::geometric_orientation,
-      const internal::SubfaceCase<deal_II_dimension>,
-      const unsigned int) const;
-
-    template Point<deal_II_dimension> ReferenceCell::closest_point(
-      const Point<deal_II_dimension> &) const;
   }

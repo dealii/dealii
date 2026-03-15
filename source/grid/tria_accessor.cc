@@ -2031,7 +2031,7 @@ CellAccessor<3>::point_inside(const Point<3> &p) const
       const TriaRawIterator<CellAccessor<dim, spacedim>> cell_iterator(*this);
       return (GeometryInfo<dim>::is_inside_unit_cell(
         reference_cell()
-          .template get_default_linear_mapping<dim, spacedim>()
+          .template get_default_linear_mapping<spacedim>()
           .transform_real_to_unit_cell(cell_iterator, p)));
     }
   catch (const Mapping<dim, spacedim>::ExcTransformationFailed &)
@@ -2097,10 +2097,9 @@ CellAccessor<dim, spacedim>::point_inside_codim(const Point<spacedim_> &p) const
 
   const TriaRawIterator<CellAccessor<dim_, spacedim_>> cell_iterator(*this);
 
-  const Point<dim_> p_unit =
-    this->reference_cell()
-      .template get_default_linear_mapping<dim_, spacedim_>()
-      .transform_real_to_unit_cell(cell_iterator, p);
+  const Point<dim_> p_unit = this->reference_cell()
+                               .template get_default_linear_mapping<spacedim_>()
+                               .transform_real_to_unit_cell(cell_iterator, p);
 
   return GeometryInfo<dim_>::is_inside_unit_cell(p_unit);
 }

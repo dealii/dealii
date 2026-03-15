@@ -1725,7 +1725,7 @@ namespace GridGenerator
   template <int dim, int spacedim>
   void
   reference_cell(Triangulation<dim, spacedim> &tria,
-                 const ReferenceCell          &reference_cell)
+                 const ReferenceCell<dim>     &reference_cell)
   {
     AssertDimension(dim, reference_cell.get_dimension());
 
@@ -1741,7 +1741,7 @@ namespace GridGenerator
         std::vector<Point<spacedim>> vertices(reference_cell.n_vertices());
         for (const unsigned int v : reference_cell.vertex_indices())
           {
-            const Point<dim> this_vertex = reference_cell.vertex<dim>(v);
+            const Point<dim> this_vertex = reference_cell.vertex(v);
             for (unsigned int d = 0; d < dim; ++d)
               vertices[v][d] = this_vertex[d];
             // Point<spacedim> initializes everything to zero, so any remaining

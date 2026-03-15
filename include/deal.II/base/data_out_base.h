@@ -41,6 +41,8 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 class ParameterHandler;
+
+template <int dim>
 class XDMFEntry;
 #endif
 
@@ -342,7 +344,7 @@ namespace DataOutBase
     /**
      * Reference-cell type of the underlying cell of this patch.
      */
-    ReferenceCell reference_cell;
+    ReferenceCell<dim> reference_cell;
 
     /**
      * Default constructor. Sets #n_subdivisions to one, #points_are_available
@@ -494,7 +496,7 @@ namespace DataOutBase
      * zero-dimensional objects, a patch can only refer to a vertex, this
      * field is always equal to ReferenceCells::Vertex and can not be changed.
      */
-    static const ReferenceCell reference_cell;
+    static const ReferenceCell<0> reference_cell;
 
     /**
      * Default constructor. Sets #points_are_available
@@ -1412,11 +1414,12 @@ namespace DataOutBase
      * Record a single deal.II cell without subdivisions (e.g. simplex) in the
      * internal reordered format.
      */
+    template <int dim>
     void
-    write_cell_single(const unsigned int   index,
-                      const unsigned int   start,
-                      const unsigned int   n_points,
-                      const ReferenceCell &reference_cell);
+    write_cell_single(const unsigned int        index,
+                      const unsigned int        start,
+                      const unsigned int        n_points,
+                      const ReferenceCell<dim> &reference_cell);
 
     /**
      * Filter and record a data set. If there are multiple values at a given
@@ -2875,7 +2878,7 @@ public:
    * the mesh and solution data were written to a single file. See
    * write_xdmf_file() for an example of usage.
    */
-  XDMFEntry
+  XDMFEntry<dim>
   create_xdmf_entry(const DataOutBase::DataOutFilter &data_filter,
                     const std::string                &h5_filename,
                     const double                      cur_time,
@@ -2886,7 +2889,7 @@ public:
    * the mesh and solution data were written to separate files. See
    * write_xdmf_file() for an example of usage.
    */
-  XDMFEntry
+  XDMFEntry<dim>
   create_xdmf_entry(const DataOutBase::DataOutFilter &data_filter,
                     const std::string                &h5_mesh_filename,
                     const std::string                &h5_solution_filename,
@@ -2901,7 +2904,7 @@ public:
    * @code
    * DataOutBase::DataOutFilterFlags flags(true, true);
    * DataOutBase::DataOutFilter data_filter(flags);
-   * std::vector<XDMFEntry> xdmf_entries;
+   * std::vector<XDMFEntry<dim>> xdmf_entries;
    * // Filter the data and store it in data_filter
    * data_out.write_filtered_data(data_filter);
    * // Write the filtered data to HDF5
@@ -2918,9 +2921,9 @@ public:
    * @endcode
    */
   void
-  write_xdmf_file(const std::vector<XDMFEntry> &entries,
-                  const std::string            &filename,
-                  const MPI_Comm                comm) const;
+  write_xdmf_file(const std::vector<XDMFEntry<dim>> &entries,
+                  const std::string                 &filename,
+                  const MPI_Comm                     comm) const;
 
   /**
    * Write the data in @p data_filter to a single HDF5 file containing both the
@@ -3367,6 +3370,7 @@ private:
  * This allows flexibility in arranging the data, and also
  * allows the mesh to be separated from the point data.
  */
+template <int dim>
 class XDMFEntry
 {
 public:
@@ -3380,36 +3384,36 @@ public:
    * cases where <code>solution_filename == mesh_filename</code>, and
    * <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string   &filename,
-            const double         time,
-            const std::uint64_t  nodes,
-            const std::uint64_t  cells,
-            const unsigned int   dim,
-            const ReferenceCell &cell_type);
+  XDMFEntry(const std::string        &filename,
+            const double              time,
+            const std::uint64_t       nodes,
+            const std::uint64_t       cells,
+            const unsigned int        dim_,
+            const ReferenceCell<dim> &cell_type);
 
   /**
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string   &mesh_filename,
-            const std::string   &solution_filename,
-            const double         time,
-            const std::uint64_t  nodes,
-            const std::uint64_t  cells,
-            const unsigned int   dim,
-            const ReferenceCell &cell_type);
+  XDMFEntry(const std::string        &mesh_filename,
+            const std::string        &solution_filename,
+            const double              time,
+            const std::uint64_t       nodes,
+            const std::uint64_t       cells,
+            const unsigned int        dim_,
+            const ReferenceCell<dim> &cell_type);
 
   /**
    * Constructor that sets all members to provided parameters.
    */
-  XDMFEntry(const std::string   &mesh_filename,
-            const std::string   &solution_filename,
-            const double         time,
-            const std::uint64_t  nodes,
-            const std::uint64_t  cells,
-            const unsigned int   dim,
-            const unsigned int   spacedim,
-            const ReferenceCell &cell_type);
+  XDMFEntry(const std::string        &mesh_filename,
+            const std::string        &solution_filename,
+            const double              time,
+            const std::uint64_t       nodes,
+            const std::uint64_t       cells,
+            const unsigned int        dim_,
+            const unsigned int        spacedim,
+            const ReferenceCell<dim> &cell_type);
 
   /**
    * Record an attribute and associated dimensionality.
@@ -3483,7 +3487,7 @@ private:
    * The type of cell in deal.II language. We currently only support
    * xdmf entries where all cells have the same type.
    */
-  ReferenceCell cell_type;
+  ReferenceCell<dim> cell_type;
 
   /**
    * The attributes associated with this entry and their dimension.

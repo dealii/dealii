@@ -65,7 +65,7 @@ namespace FE_P_BubblesImplementation
     std::vector<Point<dim>> points = fe_p.get_unit_support_points();
 
     const auto       reference_cell = fe_p.reference_cell();
-    const Point<dim> centroid       = reference_cell.template barycenter<dim>();
+    const Point<dim> centroid       = reference_cell.barycenter();
 
     switch (dim)
       {
@@ -94,8 +94,7 @@ namespace FE_P_BubblesImplementation
                             face_vertex_no,
                             numbers::default_geometric_orientation);
 
-                        midpoint +=
-                          reference_cell.template vertex<dim>(vertex_no);
+                        midpoint += reference_cell.vertex(vertex_no);
                       }
 
                     midpoint /=
@@ -131,7 +130,7 @@ namespace FE_P_BubblesImplementation
   get_basis(const unsigned int degree)
   {
     const auto       reference_cell = ReferenceCells::get_simplex<dim>();
-    const Point<dim> centroid       = reference_cell.template barycenter<dim>();
+    const Point<dim> centroid       = reference_cell.barycenter();
 
     auto M = [](const unsigned int d) {
       return BarycentricPolynomial<dim, double>::monomial(d);

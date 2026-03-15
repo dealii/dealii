@@ -291,7 +291,7 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
@@ -319,7 +319,7 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
@@ -354,7 +354,7 @@ namespace VectorTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
@@ -387,7 +387,7 @@ namespace VectorTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
@@ -431,7 +431,7 @@ namespace VectorTools
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif
@@ -456,7 +456,7 @@ namespace VectorTools
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+         .template get_default_linear_mapping<spacedim>()
 #else
          .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
 #endif

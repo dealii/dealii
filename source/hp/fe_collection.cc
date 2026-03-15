@@ -102,7 +102,7 @@ namespace hp
         for (const auto &fe : *this)
           this_nc.reference_cell_default_linear_mapping->push_back(
             fe.reference_cell()
-              .template get_default_linear_mapping<dim, spacedim>());
+              .template get_default_linear_mapping<spacedim>());
       }
 
     return *reference_cell_default_linear_mapping;

@@ -134,7 +134,7 @@ MappingCartesian<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 bool
 MappingCartesian<dim, spacedim>::is_compatible_with(
-  const ReferenceCell &reference_cell) const
+  const ReferenceCell<dim> &reference_cell) const
 {
   Assert(dim == reference_cell.get_dimension(),
          ExcMessage("The dimension of your mapping (" +
@@ -381,8 +381,8 @@ MappingCartesian<dim, spacedim>::maybe_update_normal_vectors(
       Assert(face_no < GeometryInfo<dim>::faces_per_cell, ExcInternalError());
       std::fill(normal_vectors.begin(),
                 normal_vectors.end(),
-                ReferenceCells::get_hypercube<dim>()
-                  .template face_normal_vector<dim>(face_no));
+                ReferenceCells::get_hypercube<dim>().face_normal_vector(
+                  face_no));
     }
 }
 

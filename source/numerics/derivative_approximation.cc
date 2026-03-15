@@ -1035,7 +1035,7 @@ namespace DerivativeApproximation
     const auto reference_cell =
       dof_handler.get_triangulation().get_reference_cells()[0];
     internal::approximate_derivative<internal::Gradient<dim>, dim>(
-      reference_cell.template get_default_linear_mapping<dim, spacedim>(),
+      reference_cell.template get_default_linear_mapping<spacedim>(),
       dof_handler,
       solution,
       component,
@@ -1068,7 +1068,7 @@ namespace DerivativeApproximation
     const auto reference_cell =
       dof_handler.get_triangulation().get_reference_cells()[0];
     internal::approximate_derivative<internal::SecondDerivative<dim>, dim>(
-      reference_cell.template get_default_linear_mapping<dim, spacedim>(),
+      reference_cell.template get_default_linear_mapping<spacedim>(),
       dof_handler,
       solution,
       component,
@@ -1114,8 +1114,7 @@ namespace DerivativeApproximation
   {
     // just call the respective function with Q1 mapping
     approximate_derivative_tensor(
-      cell->reference_cell()
-        .template get_default_linear_mapping<dim, spacedim>(),
+      cell->reference_cell().template get_default_linear_mapping<spacedim>(),
       dof,
       solution,
       cell,

@@ -715,7 +715,7 @@ PointValueHistory<dim>::evaluate_field(
       const Point<dim> requested_location = point->requested_location;
       const typename DoFHandler<dim>::active_cell_iterator cell =
         GridTools::find_active_cell_around_point(
-          reference_cell.template get_default_linear_mapping<dim, dim>(),
+          reference_cell.template get_default_linear_mapping<dim>(),
           *dof_handler,
           requested_location)
           .first;
@@ -1282,7 +1282,7 @@ PointValueHistory<dim>::get_postprocessor_locations(
       Point<dim> requested_location = point->requested_location;
       typename DoFHandler<dim>::active_cell_iterator cell =
         GridTools::find_active_cell_around_point(
-          reference_cell.template get_default_linear_mapping<dim, dim>(),
+          reference_cell.template get_default_linear_mapping<dim>(),
           *dof_handler,
           requested_location)
           .first;

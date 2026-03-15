@@ -2293,7 +2293,7 @@ FEInterfaceValues<dim, spacedim>::FEInterfaceValues(
   const Quadrature<dim - 1>          &quadrature,
   const UpdateFlags                   update_flags)
   : FEInterfaceValues(
-      fe.reference_cell().template get_default_linear_mapping<dim, spacedim>(),
+      fe.reference_cell().template get_default_linear_mapping<spacedim>(),
       fe,
       quadrature,
       update_flags)
