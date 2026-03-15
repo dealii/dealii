@@ -45,6 +45,8 @@
 #include <deal.II/meshworker/mesh_loop.h>
 #include <deal.II/meshworker/scratch_data.h>
 
+#include <fstream>
+
 namespace Step74
 {
   using namespace dealii;
