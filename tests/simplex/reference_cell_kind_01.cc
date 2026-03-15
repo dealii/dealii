@@ -44,7 +44,7 @@ main()
 {
   initlog();
 
-  test<2>(ReferenceCells::Line);
+  test<1>(ReferenceCells::Line);
   test<2>(ReferenceCells::Triangle);
   test<2>(ReferenceCells::Quadrilateral);
   test<3>(ReferenceCells::Tetrahedron);
