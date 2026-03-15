@@ -452,6 +452,7 @@ namespace FETools
     }
 
 
+
     template <int dim, int spacedim>
     void
     back_interpolate(
@@ -480,6 +481,7 @@ namespace FETools
       u2 = u2_out;
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
+
 
 
     template <int dim, int spacedim>
