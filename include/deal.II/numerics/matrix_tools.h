@@ -79,6 +79,7 @@ namespace PETScWrappers
 #  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+namespace TrilinosWrappers
 {
   class SparseMatrix;
   class BlockSparseMatrix;
