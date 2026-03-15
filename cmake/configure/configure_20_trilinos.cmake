@@ -20,7 +20,14 @@ set(FEATURE_TRILINOS_DEPENDS MPI)
 # A list of optional Trilinos modules we use:
 #
 set(_deal_ii_trilinos_optional_modules
-  Amesos Epetra Ifpack AztecOO Teuchos ML Amesos2 Belos EpetraExt Ifpack2 Kokkos MueLu NOX ROL Sacado SEACAS Tpetra Zoltan
+  # Epetra-based:
+  Amesos Epetra EpetraExt Ifpack AztecOO ML
+
+  # Tpetra-based:
+  Amesos2 Ifpack2 MueLu Tpetra
+
+  # Independent:
+  Belos Kokkos NOX ROL Sacado SEACAS Teuchos Zoltan
 )
 
 #
@@ -80,6 +87,12 @@ macro(feature_trilinos_find_external var)
           set(${var} FALSE)
         endif()
       endforeach()
+    endif()
+
+    if (NOT DEAL_II_TRILINOS_HAS_EPETRA AND NOT DEAL_II_TRILINOS_HAS_TPETRA)
+      message(STATUS "  Modules Epetra and Tpetra not found!")
+      set(_modules_missing "Epetra Tpetra")
+      set(${var} FALSE)
     endif()
 
     if(NOT ${var})
