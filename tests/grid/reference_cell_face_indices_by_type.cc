@@ -117,7 +117,7 @@ execute_test(const std::initializer_list<ReferenceCell> &cell_types,
 void
 test_1d()
 {
-  // All known 3d cell types
+  // All known 1d cell types
   auto cell_types = {ReferenceCells::Line};
   // All known face types
   auto face_types = {ReferenceCells::Vertex,
@@ -135,7 +135,7 @@ test_1d()
 void
 test_2d()
 {
-  // All known 3d cell types
+  // All known 2d cell types
   auto cell_types = {ReferenceCells::Triangle, ReferenceCells::Quadrilateral};
   // All known face types
   auto face_types = {ReferenceCells::Vertex,
