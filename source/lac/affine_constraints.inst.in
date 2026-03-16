@@ -372,6 +372,42 @@ for (S : TRILINOS_SCALARS)
       const std::vector<AffineConstraints<S>::size_type> &,
       LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>
         &) const;
+
+    // These are unusual combinations that are required to create Vector dummy
+    // objects in the variants of the function without a provided vector type
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host>,
+      Vector<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Host> &,
+      Vector<S> &,
+      bool,
+      std::bool_constant<true>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>,
+      Vector<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::BlockSparseMatrix<S, MemorySpace::Default>
+        &,
+      Vector<S> &,
+      bool,
+      std::bool_constant<true>) const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default>,
+      Vector<S>>(
+      const FullMatrix<S> &,
+      const Vector<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default> &,
+      Vector<S> &,
+      bool,
+      std::bool_constant<false>) const;
   }
 
 
