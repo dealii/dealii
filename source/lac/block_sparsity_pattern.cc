@@ -658,10 +658,156 @@ namespace TrilinosWrappers
 
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+namespace LinearAlgebra
+{
+  namespace TpetraWrappers
+  {
+    BlockSparsityPattern::BlockSparsityPattern(const size_type n_rows,
+                                               const size_type n_columns)
+      : dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
+          n_rows,
+          n_columns)
+    {}
+
+
+
+    BlockSparsityPattern::BlockSparsityPattern(
+      const std::vector<size_type> &row_indices,
+      const std::vector<size_type> &col_indices)
+      : BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
+          row_indices.size(),
+          col_indices.size())
+    {
+      for (size_type i = 0; i < row_indices.size(); ++i)
+        for (size_type j = 0; j < col_indices.size(); ++j)
+          this->block(i, j).reinit(row_indices[i], col_indices[j]);
+      this->collect_sizes();
+    }
+
+
+
+    BlockSparsityPattern::BlockSparsityPattern(
+      const std::vector<IndexSet> &parallel_partitioning,
+      const MPI_Comm               communicator)
+      : BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
+          parallel_partitioning.size(),
+          parallel_partitioning.size())
+    {
+      for (size_type i = 0; i < parallel_partitioning.size(); ++i)
+        for (size_type j = 0; j < parallel_partitioning.size(); ++j)
+          this->block(i, j).reinit(parallel_partitioning[i],
+                                   parallel_partitioning[j],
+                                   communicator);
+      this->collect_sizes();
+    }
+
+
+
+    BlockSparsityPattern::BlockSparsityPattern(
+      const std::vector<IndexSet> &row_parallel_partitioning,
+      const std::vector<IndexSet> &col_parallel_partitioning,
+      const std::vector<IndexSet> &writable_rows,
+      const MPI_Comm               communicator)
+      : BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
+          row_parallel_partitioning.size(),
+          col_parallel_partitioning.size())
+    {
+      for (size_type i = 0; i < row_parallel_partitioning.size(); ++i)
+        for (size_type j = 0; j < col_parallel_partitioning.size(); ++j)
+          this->block(i, j).reinit(row_parallel_partitioning[i],
+                                   col_parallel_partitioning[j],
+                                   writable_rows[i],
+                                   communicator);
+      this->collect_sizes();
+    }
+
+
+
+    void
+    BlockSparsityPattern::reinit(const std::vector<size_type> &row_block_sizes,
+                                 const std::vector<size_type> &col_block_sizes)
+    {
+      dealii::BlockSparsityPatternBase<
+        SparsityPattern<MemorySpace::Host>>::reinit(row_block_sizes.size(),
+                                                    col_block_sizes.size());
+      for (size_type i = 0; i < row_block_sizes.size(); ++i)
+        for (size_type j = 0; j < col_block_sizes.size(); ++j)
+          this->block(i, j).reinit(row_block_sizes[i], col_block_sizes[j]);
+      this->collect_sizes();
+    }
+
+
+
+    void
+    BlockSparsityPattern::reinit(
+      const std::vector<IndexSet> &parallel_partitioning,
+      const MPI_Comm               communicator)
+    {
+      dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>::
+        reinit(parallel_partitioning.size(), parallel_partitioning.size());
+      for (size_type i = 0; i < parallel_partitioning.size(); ++i)
+        for (size_type j = 0; j < parallel_partitioning.size(); ++j)
+          this->block(i, j).reinit(parallel_partitioning[i],
+                                   parallel_partitioning[j],
+                                   communicator);
+      this->collect_sizes();
+    }
+
+
+
+    void
+    BlockSparsityPattern::reinit(
+      const std::vector<IndexSet> &row_parallel_partitioning,
+      const std::vector<IndexSet> &col_parallel_partitioning,
+      const MPI_Comm               communicator)
+    {
+      dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>::
+        reinit(row_parallel_partitioning.size(),
+               col_parallel_partitioning.size());
+      for (size_type i = 0; i < row_parallel_partitioning.size(); ++i)
+        for (size_type j = 0; j < col_parallel_partitioning.size(); ++j)
+          this->block(i, j).reinit(row_parallel_partitioning[i],
+                                   col_parallel_partitioning[j],
+                                   communicator);
+      this->collect_sizes();
+    }
+
+
+
+    void
+    BlockSparsityPattern::reinit(
+      const std::vector<IndexSet> &row_parallel_partitioning,
+      const std::vector<IndexSet> &col_parallel_partitioning,
+      const std::vector<IndexSet> &writable_rows,
+      const MPI_Comm               communicator)
+    {
+      AssertDimension(writable_rows.size(), row_parallel_partitioning.size());
+      dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>::
+        reinit(row_parallel_partitioning.size(),
+               col_parallel_partitioning.size());
+      for (size_type i = 0; i < row_parallel_partitioning.size(); ++i)
+        for (size_type j = 0; j < col_parallel_partitioning.size(); ++j)
+          this->block(i, j).reinit(row_parallel_partitioning[i],
+                                   col_parallel_partitioning[j],
+                                   writable_rows[i],
+                                   communicator);
+      this->collect_sizes();
+    }
+
+  } // namespace TpetraWrappers
+} // namespace LinearAlgebra
+
+#endif
+
 template class BlockSparsityPatternBase<SparsityPattern>;
 template class BlockSparsityPatternBase<DynamicSparsityPattern>;
 #ifdef DEAL_II_WITH_TRILINOS
 template class BlockSparsityPatternBase<TrilinosWrappers::SparsityPattern>;
+#endif
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+template class BlockSparsityPatternBase<
+  typename LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>>;
 #endif
 
 DEAL_II_NAMESPACE_CLOSE

@@ -26,6 +26,7 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparsity_pattern_base.h>
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -766,6 +767,152 @@ namespace TrilinosWrappers
   /** @} */
 
 } /* namespace TrilinosWrappers */
+
+#endif
+
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+
+
+namespace LinearAlgebra
+{
+  namespace TpetraWrappers
+  {
+    /**
+     * @addtogroup TpetraWrappers
+     * @{
+     */
+
+    /**
+     * This class extends the base class to implement an array of Tpetra
+     * sparsity patterns that can be used to initialize Tpetra block sparse
+     * matrices that can be distributed among different processors. It is used
+     * in the same way as the dealii::BlockSparsityPattern except that it builds
+     * upon the TpetraWrappers::SparsityPattern instead of the
+     * dealii::SparsityPattern.
+     *
+     * This class has properties of the "dynamic" type of
+     * @ref Sparsity
+     * (in the sense that it can extend the memory if too little elements were
+     * allocated), but otherwise is more like the basic deal.II SparsityPattern
+     * (in the sense that the method compress() needs to be called before the
+     * pattern can be used).
+     *
+     */
+    class BlockSparsityPattern
+      : public dealii::BlockSparsityPatternBase<
+          typename LinearAlgebra::TpetraWrappers::SparsityPattern<
+            MemorySpace::Host>>
+    {
+    public:
+      /**
+       * Initialize the pattern empty, that is with no memory allocated.
+       * This is useful if you want such objects as member variables in other
+       * classes. You can make the structure usable by calling the reinit()
+       * function.
+       */
+      BlockSparsityPattern() = default;
+
+      /**
+       * Initialize the pattern with the given number of block rows and columns.
+       * The blocks themselves are still empty, and you have to call
+       * collect_sizes() after you assign them sizes.
+       */
+      BlockSparsityPattern(const size_type n_rows, const size_type n_columns);
+
+      /**
+       * Initialize the pattern with two BlockIndices for the block structures
+       * of matrix rows and columns. This function is equivalent to calling the
+       * previous constructor with the length of the two index vectors and then
+       * entering the index values.
+       */
+      BlockSparsityPattern(const std::vector<size_type> &row_block_sizes,
+                           const std::vector<size_type> &col_block_sizes);
+
+      /**
+       * Initialize the pattern with an array of index sets that specifies both
+       * rows and columns of the matrix (so the final matrix will be a square
+       * matrix), where the size() of the IndexSets specifies the size of the
+       * blocks and the values in each IndexSet denotes the rows that are going
+       * to be saved in each block.
+       */
+      BlockSparsityPattern(const std::vector<IndexSet> &parallel_partitioning,
+                           const MPI_Comm communicator = MPI_COMM_WORLD);
+
+      /**
+       * Initialize the pattern with two arrays of index sets that specify rows
+       * and columns of the matrix, where the size() of the IndexSets specifies
+       * the size of the blocks and the values in each IndexSet denotes the rows
+       * that are going to be saved in each block. The additional index set
+       * writable_rows is used to set all rows that we allow to write locally.
+       * This constructor is used to create matrices that allow several threads
+       * to write simultaneously into the matrix (to different rows, of course),
+       * see the method TpetraWrappers::SparsityPattern::reinit method with
+       * three index set arguments for more details.
+       */
+      BlockSparsityPattern(
+        const std::vector<IndexSet> &row_parallel_partitioning,
+        const std::vector<IndexSet> &column_parallel_partitioning,
+        const std::vector<IndexSet> &writable_rows,
+        const MPI_Comm               communicator = MPI_COMM_WORLD);
+
+      /**
+       * Resize the matrix to a tensor product of matrices with dimensions
+       * defined by the arguments.
+       *
+       * The matrix will have as many block rows and columns as there are
+       * entries in the two arguments. The block at position (<i>i,j</i>) will
+       * have the dimensions <tt>row_block_sizes[i]</tt> times
+       * <tt>col_block_sizes[j]</tt>.
+       */
+      void
+      reinit(const std::vector<size_type> &row_block_sizes,
+             const std::vector<size_type> &col_block_sizes);
+
+      /**
+       * Resize the matrix to a square tensor product of matrices. See the
+       * constructor that takes a vector of IndexSets for details.
+       */
+      void
+      reinit(const std::vector<IndexSet> &parallel_partitioning,
+             const MPI_Comm               communicator = MPI_COMM_WORLD);
+
+      /**
+       * Resize the matrix to a rectangular block matrices. This method allows
+       * rows and columns to be different, both in the outer block structure and
+       * within the blocks.
+       */
+      void
+      reinit(const std::vector<IndexSet> &row_parallel_partitioning,
+             const std::vector<IndexSet> &column_parallel_partitioning,
+             const MPI_Comm               communicator = MPI_COMM_WORLD);
+
+      /**
+       * Resize the matrix to a rectangular block matrices that furthermore
+       * explicitly specify the writable rows in each of the blocks. This method
+       * is used to create matrices that allow several threads to write
+       * simultaneously into the matrix (to different rows, of course), see the
+       * method TpetraWrappers::SparsityPattern::reinit method with three
+       * index set arguments for more details.
+       */
+      void
+      reinit(const std::vector<IndexSet> &row_parallel_partitioning,
+             const std::vector<IndexSet> &column_parallel_partitioning,
+             const std::vector<IndexSet> &writable_rows,
+             const MPI_Comm               communicator = MPI_COMM_WORLD);
+
+      /**
+       * Allow the use of the reinit functions of the base class as well.
+       */
+      using BlockSparsityPatternBase<
+        typename LinearAlgebra::TpetraWrappers::SparsityPattern<
+          MemorySpace::Host>>::reinit;
+    };
+
+    /** @} */
+
+  } /* namespace TpetraWrappers */
+} /* namespace LinearAlgebra */
 
 #endif
 
