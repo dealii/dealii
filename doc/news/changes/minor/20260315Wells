@@ -1,0 +1,4 @@
+Fixed: Deserialization of an AlignedVector now works correctly with types
+which are not trivially copyable.
+<br>
+(David Wells, 2206/03/15)
