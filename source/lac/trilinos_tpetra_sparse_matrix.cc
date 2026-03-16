@@ -20,7 +20,7 @@ DEAL_II_NAMESPACE_OPEN
 
 #  ifndef DOXYGEN
 
-#    include "lac/trilinos_tpetra_sparse_matrix.cc"
+#    include "lac/trilinos_tpetra_sparse_matrix.inst"
 
 #  endif
 
