@@ -87,6 +87,86 @@ macro(feature_trilinos_find_external var)
           set(DEAL_II_TRILINOS_HAS_TPETRA FALSE)
         endif()
       endforeach()
+
+      if(DEAL_II_TRILINOS_HAS_TPETRA)
+        #
+        # Check if Tpetra is usable in fact.
+        #
+        list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+        list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+
+        list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+        list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
+
+        # For the case of Trilinos being compiled with openmp support the
+        # following Tpetra test needs -fopenmp to succeed. Make sure that we
+        # supply the correct compiler and linker flags:
+        add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
+
+        if(DEAL_II_WITH_64BIT_INDICES)
+          set(_global_index_type "long long")
+        else()
+          set(_global_index_type "int")
+        endif()
+
+        CHECK_CXX_SOURCE_COMPILES(
+          "
+          #include <cstdint>
+          #include <Tpetra_Vector.hpp>
+          int main()
+          {
+            using LO       = int;
+            using GO       = ${_global_index_type};
+            using map_type = Tpetra::Map<LO, GO>;
+            Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
+            Tpetra::Vector<double, LO, GO> dummy_vector(dummy_map);
+            (void)dummy_vector;
+            return 0;
+          }
+          "
+          TRILINOS_TPETRA_IS_FUNCTIONAL
+        )
+
+        if(TRILINOS_TPETRA_IS_FUNCTIONAL)
+          #
+          # We need to figure out what instantiations are used in Tpetra so
+          # that we can populate our DEAL_II_EXPAND_TPETRA correctly. We need
+          # to dof this here prior to the call to reset_cmake_required().
+          #
+          check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
+          check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
+          check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE)
+          check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT)
+        else()
+          message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
+          set(DEAL_II_TRILINOS_HAS_TPETRA OFF)
+
+          check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" _tpetra_int_int)
+          check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" _tpetra_int_long_long)
+
+          if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
+            message( STATUS
+              "  Tpetra was configured *without* support for 64-bit global indices"
+             " but deal.II is configured to use 64-bit global indices."
+             )
+            message(STATUS
+             "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF"
+             " or rebuild Trilinos with -DTpetra_INST_INT_LONG_LONG=ON"
+             )
+
+          elseif(NOT _tpetra_int_int AND NOT DEAL_II_WITH_64BIT_INDICES)
+            message( STATUS
+              "  Tpetra was configured *without* support for 32-bit global indices"
+              " but deal.II is configured to use 32-bit global indices."
+              )
+            message(STATUS
+              "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON"
+              " or rebuild Trilinos with -DTpetra_INST_INT_INT=ON"
+            )
+          endif()
+          reset_cmake_required()
+        endif()
+      endif()
     endif()
 
     if (NOT DEAL_II_TRILINOS_HAS_EPETRA AND NOT DEAL_II_TRILINOS_HAS_TPETRA)
@@ -232,87 +312,6 @@ macro(feature_trilinos_find_external var)
       # FindDEAL_II_TRILINOS.cmake...
       #
       set(TRILINOS_KOKKOS_DIR "${TRILINOS_CONFIG_DIR}/..")
-    endif()
-
-    if(TRILINOS_WITH_TPETRA)
-      #
-      # Check if Tpetra is usable in fact.
-      #
-      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
-      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-
-      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
-      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
-
-      # For the case of Trilinos being compiled with openmp support the
-      # following Tpetra test needs -fopenmp to succeed. Make sure that we
-      # supply the correct compiler and linker flags:
-      add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
-
-      if(DEAL_II_WITH_64BIT_INDICES)
-        set(_global_index_type "long long")
-      else()
-        set(_global_index_type "int")
-      endif()
-
-      CHECK_CXX_SOURCE_COMPILES(
-        "
-        #include <cstdint>
-        #include <Tpetra_Vector.hpp>
-        int main()
-        {
-          using LO       = int;
-          using GO       = ${_global_index_type};
-          using map_type = Tpetra::Map<LO, GO>;
-          Teuchos::RCP<const map_type>   dummy_map = Teuchos::rcp(new map_type());
-          Tpetra::Vector<double, LO, GO> dummy_vector(dummy_map);
-          (void)dummy_vector;
-          return 0;
-        }
-        "
-        TRILINOS_TPETRA_IS_FUNCTIONAL
-      )
-
-      if(TRILINOS_TPETRA_IS_FUNCTIONAL)
-        #
-        # We need to figure out what instantiations are used in Tpetra so
-        # that we can populate our DEAL_II_EXPAND_TPETRA correctly. We need
-        # to dof this here prior to the call to reset_cmake_required().
-        #
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_DOUBLE "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_DOUBLE "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE)
-        check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT)
-      else()
-        message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
-        set(TRILINOS_WITH_TPETRA OFF)
-
-        check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" _tpetra_int_int)
-        check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" _tpetra_int_long_long)
-
-        if(NOT _tpetra_int_long_long AND DEAL_II_WITH_64BIT_INDICES)
-          message( STATUS
-            "  Tpetra was configured *without* support for 64-bit global indices"
-            " but deal.II is configured to use 64-bit global indices."
-            )
-          message(STATUS
-            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=OFF"
-            " or rebuild Trilinos with -DTpetra_INST_INT_LONG_LONG=ON"
-            )
-
-        elseif(NOT _tpetra_int_int AND NOT DEAL_II_WITH_64BIT_INDICES)
-          message( STATUS
-            "  Tpetra was configured *without* support for 32-bit global indices"
-            " but deal.II is configured to use 32-bit global indices."
-            )
-          message(STATUS
-            "  Either reconfigure deal.II with -DDEAL_II_WITH_64BIT_INDICES=ON"
-            " or rebuild Trilinos with -DTpetra_INST_INT_INT=ON"
-            )
-        endif()
-
-        reset_cmake_required()
-      endif()
     endif()
 
     if(TRILINOS_WITH_MUELU AND TRILINOS_WITH_TPETRA)
