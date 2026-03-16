@@ -21,10 +21,10 @@ set(FEATURE_TRILINOS_DEPENDS MPI)
 #
 set(_deal_ii_trilinos_optional_modules
   # Epetra-based:
-  Amesos Epetra EpetraExt Ifpack AztecOO ML
+  Amesos EpetraExt Ifpack AztecOO ML
 
   # Tpetra-based:
-  Amesos2 Ifpack2 MueLu Tpetra
+  Amesos2 Ifpack2 MueLu
 
   # Independent:
   Belos Kokkos NOX ROL Sacado SEACAS Teuchos Zoltan
@@ -58,8 +58,8 @@ macro(feature_trilinos_find_external var)
       "Checking whether the found trilinos package contains all required modules:"
     )
 
-    item_matches(DEAL_II_TRILINOS_HAS_EPETRA Epetra ${Trilinos_PACKAGE_LIST})
-    if (DEAL_II_TRILINOS_HAS_EPETRA)
+    item_matches(DEAL_II_TRILINOS_WITH_EPETRA Epetra ${Trilinos_PACKAGE_LIST})
+    if (DEAL_II_TRILINOS_WITH_EPETRA)
       foreach(_module
         Amesos Epetra Ifpack AztecOO Teuchos ML
       )
@@ -69,12 +69,12 @@ macro(feature_trilinos_find_external var)
         else()
           message(STATUS "  Module ${_module} not found!")
           set(_modules_missing "${_modules_missing} ${_module}")
-          set(DEAL_II_TRILINOS_HAS_EPETRA FALSE)
+          set(DEAL_II_TRILINOS_WITH_EPETRA FALSE)
         endif()
       endforeach()
     endif()
-    item_matches(DEAL_II_TRILINOS_HAS_TPETRA Tpetra ${Trilinos_PACKAGE_LIST})
-    if (DEAL_II_TRILINOS_HAS_TPETRA)
+    item_matches(DEAL_II_TRILINOS_WITH_TPETRA Tpetra ${Trilinos_PACKAGE_LIST})
+    if (DEAL_II_TRILINOS_WITH_TPETRA)
       foreach(_module
         Amesos2 Belos Ifpack2 Tpetra
       )
@@ -84,11 +84,11 @@ macro(feature_trilinos_find_external var)
         else()
           message(STATUS "  Module ${_module} not found!")
           set(_modules_missing "${_modules_missing} ${_module}")
-          set(DEAL_II_TRILINOS_HAS_TPETRA FALSE)
+          set(DEAL_II_TRILINOS_WITH_TPETRA FALSE)
         endif()
       endforeach()
 
-      if(DEAL_II_TRILINOS_HAS_TPETRA)
+      if(DEAL_II_TRILINOS_WITH_TPETRA)
         #
         # Check if Tpetra is usable in fact.
         #
@@ -139,7 +139,7 @@ macro(feature_trilinos_find_external var)
           check_cxx_symbol_exists(HAVE_TPETRA_INST_COMPLEX_FLOAT "TpetraCore_config.h" DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT)
         else()
           message(STATUS "Tpetra was found but is not usable due to a mismatch in ordinal number types.")
-          set(DEAL_II_TRILINOS_HAS_TPETRA OFF)
+          set(DEAL_II_TRILINOS_WITH_TPETRA OFF)
 
           check_cxx_symbol_exists(HAVE_TPETRA_INT_INT "TpetraCore_config.h" _tpetra_int_int)
           check_cxx_symbol_exists(HAVE_TPETRA_INT_LONG_LONG "TpetraCore_config.h" _tpetra_int_long_long)
@@ -169,7 +169,7 @@ macro(feature_trilinos_find_external var)
       endif()
     endif()
 
-    if (NOT DEAL_II_TRILINOS_HAS_EPETRA AND NOT DEAL_II_TRILINOS_HAS_TPETRA)
+    if (NOT DEAL_II_TRILINOS_WITH_EPETRA AND NOT DEAL_II_TRILINOS_WITH_TPETRA)
       message(STATUS "  Modules Epetra and Tpetra not found!")
       set(_modules_missing "Epetra Tpetra")
       set(${var} FALSE)
