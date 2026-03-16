@@ -258,7 +258,7 @@ for (S : TRILINOS_SCALARS)
       LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Host> &,
       LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Host> &,
       bool,
-      std::integral_constant<bool, false>) const;
+      std::bool_constant<false>) const;
 
 
     template void AffineConstraints<S>::distribute_local_to_global<
@@ -327,7 +327,7 @@ for (S : TRILINOS_SCALARS)
       LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default> &,
       LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Default> &,
       bool,
-      std::integral_constant<bool, false>) const;
+      std::bool_constant<false>) const;
 
     // BlockSparseMatrix
     template void AffineConstraints<S>::distribute_local_to_global<
