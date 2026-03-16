@@ -3024,8 +3024,7 @@ AffineConstraints<number>::distribute_local_to_global(
     global_matrix,
     dummy,
     false,
-    std::integral_constant<
-      bool,
+    std::bool_constant<
       internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
 }
 
@@ -3051,8 +3050,7 @@ AffineConstraints<number>::distribute_local_to_global(
     global_matrix,
     global_vector,
     use_inhomogeneities_for_rhs,
-    std::integral_constant<
-      bool,
+    std::bool_constant<
       internal::AffineConstraints::IsBlockMatrix<MatrixType>::value>());
 }
 
