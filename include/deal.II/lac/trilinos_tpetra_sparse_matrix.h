@@ -1771,7 +1771,11 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
       size_type static_memory =
         sizeof(*this) + sizeof(*matrix) + sizeof(matrix->getGraph().get());
       return ((sizeof(Number) + sizeof(TrilinosWrappers::types::int_type)) *
+#  if DEAL_II_TRILINOS_VERSION_GTE(16, 2, 0)
                 matrix->getLocalNumEntries() +
+#  else
+                matrix->getNodeNumEntries() +
+#  endif
               sizeof(int) * local_size() + static_memory);
     }
 
