@@ -46,23 +46,23 @@ deal_ii_find_path(AMG4PSBLAS_INCLUDE_DIR amg_cbind.h
   message(STATUS "AMG4PSBLAS_INCLUDE_DIR: ${AMG4PSBLAS_INCLUDE_DIR}")
 
 
-set(AMG4PSBLAS_PSBLASVERSION_H "${AMG4PSBLAS_INCLUDE_DIR}/amg_const.h")
+set(AMG4PSBLAS_PSBLASVERSION_H "${AMG4PSBLAS_INCLUDE_DIR}/amg_config.h")
 if(EXISTS ${AMG4PSBLAS_PSBLASVERSION_H})
   file(STRINGS "${AMG4PSBLAS_PSBLASVERSION_H}" AMG4PSBLAS_VERSION_MAJOR_STRING
-    REGEX "^#[ \t]*define[ \t]+AMG_VERSION_MAJOR_[ \t]+\\([ \t]*[0-9]+[ \t]*\\)[ \t]*$")
-  string(REGEX REPLACE "^#[ \t]*define[ \t]+AMG_VERSION_MAJOR_[ \t]+\\([ \t]*([0-9]+)[ \t]*\\)[ \t]*$" "\\1"
-    AMG4PSBLAS_VERSION_MAJOR "${AMG4PSBLAS_VERSION_MAJOR_STRING}"
-    )
+    REGEX "^#[ \t]*define[ \t]+AMG_VERSION_MAJOR[ \t]+[0-9]+[ \t]*$")
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+AMG_VERSION_MAJOR[ \t]+([0-9]+)[ \t]*$" "\\1"
+    AMG4PSBLAS_VERSION_MAJOR "${AMG4PSBLAS_VERSION_MAJOR_STRING}")
+
   file(STRINGS "${AMG4PSBLAS_PSBLASVERSION_H}" AMG4PSBLAS_VERSION_MINOR_STRING
-    REGEX "^#[ \t]*define[ \t]+AMG_VERSION_MINOR_[ \t]+\\([ \t]*[0-9]+[ \t]*\\)[ \t]*$")
-  string(REGEX REPLACE "^#[ \t]*define[ \t]+AMG_VERSION_MINOR_[ \t]+\\([ \t]*([0-9]+)[ \t]*\\)[ \t]*$" "\\1"
-    AMG4PSBLAS_VERSION_MINOR "${AMG4PSBLAS_VERSION_MINOR_STRING}"
-    )
+    REGEX "^#[ \t]*define[ \t]+AMG_VERSION_MINOR[ \t]+[0-9]+[ \t]*$")
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+AMG_VERSION_MINOR[ \t]+([0-9]+)[ \t]*$" "\\1"
+    AMG4PSBLAS_VERSION_MINOR "${AMG4PSBLAS_VERSION_MINOR_STRING}")
+
   file(STRINGS "${AMG4PSBLAS_PSBLASVERSION_H}" AMG4PSBLAS_VERSION_PATCHLEVEL_STRING
-    REGEX "^#[ \t]*define[ \t]+AMG_PATCHLEVEL_[ \t]+\\([ \t]*[0-9]+[ \t]*\\)[ \t]*$")
-  string(REGEX REPLACE "^#[ \t]*define[ \t]+AMG_PATCHLEVEL_[ \t]+\\([ \t]*([0-9]+)[ \t]*\\)[ \t]*$" "\\1"
-    AMG4PSBLAS_VERSION_PATCHLEVEL "${AMG4PSBLAS_VERSION_PATCHLEVEL_STRING}"
-    )
+    REGEX "^#[ \t]*define[ \t]+AMG_VERSION_PATCHLEVEL[ \t]+[0-9]+[ \t]*$")
+  string(REGEX REPLACE "^#[ \t]*define[ \t]+AMG_VERSION_PATCHLEVEL[ \t]+([0-9]+)[ \t]*$" "\\1"
+    AMG4PSBLAS_VERSION_PATCHLEVEL "${AMG4PSBLAS_VERSION_PATCHLEVEL_STRING}")
+
   set(AMG4PSBLAS_VERSION
     "${AMG4PSBLAS_VERSION_MAJOR}.${AMG4PSBLAS_VERSION_MINOR}.${AMG4PSBLAS_VERSION_PATCHLEVEL}"
     )

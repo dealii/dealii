@@ -24,7 +24,7 @@ macro(feature_amg4psblas_find_external var)
     if(AMG4PSBLAS_FOUND)
         set(${var} TRUE)
 
-            set(_version_required 1.0.0)
+            set(_version_required 1.2.0)
             if(AMG4PSBLAS_VERSION VERSION_LESS ${_version_required})
                 message(STATUS "Insufficient AMG4PSBLAS installation found: "
                 "At least version ${_version_required} is required. "
