@@ -169,6 +169,7 @@ if(DEAL_II_WITH_TRILINOS)
     ${_inst}
     trilinos_sparse_matrix.inst.in
     trilinos_vector.inst.in
+    trilinos_tpetra_sparse_matrix.inst.in
   )
 endif()
 
