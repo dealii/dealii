@@ -649,7 +649,7 @@ namespace TrilinosWrappers
    * the TrilinosWrappers::SparsityPattern instead of the
    * dealii::SparsityPattern.
    *
-   * This class is has properties of the "dynamic" type of
+   * This class has properties of the "dynamic" type of
    * @ref Sparsity
    * (in the sense that it can extend the memory if too little elements were
    * allocated), but otherwise is more like the basic deal.II SparsityPattern
