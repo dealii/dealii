@@ -81,7 +81,7 @@
  * DoFTools::make_sparsity_pattern() function, only at most as many entries can
  * be allocated as previously stated. This is a problem because it is often
  * difficult to estimate the maximal number of entries per row. Consequently,
- * a common strategy is to first build and intermediate sparsity pattern that
+ * a common strategy is to first build an intermediate sparsity pattern that
  * uses a less efficient storage scheme during construction of the sparsity
  * pattern and later copy it directly into the static, compressed form. Most
  * tutorial programs do this, starting at step-2 (see also, for example the
