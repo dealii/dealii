@@ -44,18 +44,9 @@ test()
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, {{0}});
 
-  const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-  const IndexSet  locally_relevant_dofs =
-    DoFTools::extract_locally_relevant_dofs(dof_handler);
-
-  const std::vector<IndexSet> system_partitioning =
-    locally_owned_dofs.split_by_block(dofs_per_block);
-  const std::vector<IndexSet> system_relevant_partitioning =
-    locally_relevant_dofs.split_by_block(dofs_per_block);
-
   // create an empty sparsity pattern
   dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern sparsity(
-    system_relevant_partitioning, MPI_COMM_WORLD, 100);
+    dofs_per_block, dofs_per_block, 100);
 
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,

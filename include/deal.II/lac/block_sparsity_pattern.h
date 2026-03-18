@@ -909,6 +909,15 @@ namespace LinearAlgebra
              const size_type              n_entries_per_row);
 
       /**
+       * Copy data from an object of type BlockDynamicSparsityPattern, i.e.
+       * resize this object to the size of the given argument, and copy over the
+       * contents of each of the subobjects. Previous content of this object is
+       * lost.
+       */
+      void
+      copy_from(const BlockDynamicSparsityPattern &dsp);
+
+      /**
        * Allow the use of the reinit functions of the base class as well.
        */
       using BlockSparsityPatternBase<
