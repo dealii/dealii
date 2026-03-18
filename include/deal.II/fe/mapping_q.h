@@ -298,6 +298,8 @@ public:
      */
     InternalData(const unsigned int polynomial_degree);
 
+    ~InternalData();
+
     // Documentation see Mapping::InternalDataBase.
     virtual void
     reinit(const UpdateFlags      update_flags,
@@ -423,6 +425,15 @@ public:
      */
     mutable typename Triangulation<dim, spacedim>::cell_iterator
       cell_of_current_support_points;
+
+    /**
+     * A signal connection we use to ensure we get informed whenever the
+     * triangulation changes, such as refinement or mesh transformations. We
+     * need to know about that because it invalidates all cell iterators and,
+     * as part of that, the 'cell_of_current_support_points' iterator we keep
+     * around between subsequent calls to fill_fe_*values().
+     */
+    mutable boost::signals2::connection listener_tria_change;
 
     /**
      * The determinant of the Jacobian in each quadrature point. Filled if
