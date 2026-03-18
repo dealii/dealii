@@ -12,8 +12,7 @@
 
 
 
-// Use LinearAlgebra::TpetraWrappers::BlockSparsityPattern to
-// construct an empty (single-block) matrix
+// like n_nonzeros_03, but this time actually allocate some elements
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
@@ -40,7 +39,7 @@ test()
   dof_handler.distribute_dofs(fe);
 
   Table<2, DoFTools::Coupling> coupling(1, 1);
-  coupling.fill(DoFTools::none);
+  coupling.fill(DoFTools::always);
 
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, {{0}});
@@ -56,7 +55,7 @@ test()
 
   // create an empty sparsity pattern
   dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern sparsity(
-    system_relevant_partitioning, MPI_COMM_WORLD, 0);
+    system_relevant_partitioning, MPI_COMM_WORLD, 100);
 
   DoFTools::make_sparsity_pattern(dof_handler,
                                   coupling,
