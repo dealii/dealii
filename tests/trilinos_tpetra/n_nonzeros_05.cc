@@ -12,13 +12,14 @@
 
 
 
-// Use LinearAlgebra::TpetraWrappers::BlockSparsityPattern to
-// construct an empty (single-block) matrix
+// like n_nonzeros_03, but this time actually allocate some elements
+// in multiple matrix blocks
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -35,27 +36,36 @@ test()
   Triangulation<2> tria;
   GridGenerator::hyper_cube(tria);
 
-  FE_Q<2>       fe(1);
+  FESystem<2>   fe(FE_Q<2>(1), FE_Q<2>(2));
   DoFHandler<2> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  Table<2, DoFTools::Coupling> coupling(1, 1);
+  Table<2, DoFTools::Coupling> coupling(2, 2);
   coupling.fill(DoFTools::none);
+  coupling(0, 0) = DoFTools::none;
+  // coupling(1,1) = DoFTools::always;
+
+  const IndexSet &locally_owned_total = dof_handler.locally_owned_dofs();
+  const IndexSet  relevant_total =
+    DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   const std::vector<types::global_dof_index> dofs_per_block =
-    DoFTools::count_dofs_per_fe_block(dof_handler, {{0}});
+    DoFTools::count_dofs_per_fe_block(dof_handler, {{0, 1}});
+
+  std::vector<IndexSet> locally_owned(2), relevant_set(2);
+  locally_owned[0] = locally_owned_total.get_view(0, dofs_per_block[0]);
+  locally_owned[1] =
+    locally_owned_total.get_view(dofs_per_block[0], dof_handler.n_dofs());
+  relevant_set[0] = relevant_total.get_view(0, dofs_per_block[0]);
+  relevant_set[1] =
+    relevant_total.get_view(dofs_per_block[0], dof_handler.n_dofs());
 
   // create an empty sparsity pattern
-  dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern sparsity(
-    dofs_per_block, dofs_per_block, 100);
+  dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern sparsity(2, 2);
+  sparsity.reinit(locally_owned, locally_owned, MPI_COMM_WORLD, 1000);
 
-  DoFTools::make_sparsity_pattern(dof_handler,
-                                  coupling,
-                                  sparsity,
-                                  AffineConstraints<double>(),
-                                  false,
-                                  Utilities::MPI::this_mpi_process(
-                                    MPI_COMM_WORLD));
+  DoFTools::make_sparsity_pattern(dof_handler, sparsity);
+
   sparsity.compress();
 
   // attach a sparse matrix to it
