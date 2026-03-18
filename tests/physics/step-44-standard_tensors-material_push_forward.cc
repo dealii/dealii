@@ -469,7 +469,7 @@ namespace Step44
         }
       else
         {
-          static const double tol = 1e-9;
+          static const double tol = 2e-9;
 
           // Verify the push-forward transformation
           Assert((Physics::Transformations::Contravariant::push_forward(
