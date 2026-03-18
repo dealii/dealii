@@ -56,7 +56,12 @@ namespace Polynomials
    * with the respective constructor. To obtain this more stable evaluation
    * form, the constructor with the roots in form of a Lagrange polynomial
    * must be used. In case a manipulation is done that changes the roots, the
-   * representation is switched to the coefficient form.
+   * representation is switched to the coefficient form. The more stable
+   * Lagrange form inherits the stability properties from the related
+   * barycentric form, a popular form of polynomial interpolation
+   * formulas. However, deal.II does not have a dedicated class for an entire
+   * basis, so the overall O(n) efficiency characteristic for the barycentric
+   * form is not achieved.
    *
    * This class is a typical example of a possible template argument for the
    * TensorProductPolynomials class.
@@ -362,10 +367,14 @@ namespace Polynomials
 
   private:
     /**
-     * Needed by constructor.
+     * Create a vector of roots representing the monomial in the Lagrange
+     * form. Due to the simple nature of a monomial, it consists of <tt>n</tt>
+     * zeros and a single value of one, the latter used for complying with the
+     * setup of the base Polynomial class, which picks one of the given points
+     * as the 'pivot' point of the Lagrange polynomial.
      */
-    static std::vector<number>
-    make_vector(unsigned int n, const double coefficient);
+    static std::vector<Point<1>>
+    create_vector_of_roots(unsigned int n);
   };
 
 
