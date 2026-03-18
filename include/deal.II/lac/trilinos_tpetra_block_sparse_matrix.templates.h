@@ -147,10 +147,79 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    void
+    BlockSparseMatrix<Number, MemorySpace>::reinit(
+      const std::vector<IndexSet>    &parallel_partitioning,
+      const BlockSparsityPattern     &block_sparsity_pattern,
+      const MPI_Comm                  communicator,
+      const bool                      exchange_data)
+    {
+      if constexpr (running_in_debug_mode())
+        {
+          std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
+          for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
+            tpetra_maps.push_back(
+              parallel_partitioning[i]
+                .template make_tpetra_map<
+                  typename TpetraTypes::NodeType<MemorySpace>>(communicator,
+                                                               false));
+
+          Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_rows(),
+                 ExcDimensionMismatch(tpetra_maps.size(),
+                                      block_sparsity_pattern.n_block_rows()));
+          Assert(tpetra_maps.size() == block_sparsity_pattern.n_block_cols(),
+                 ExcDimensionMismatch(tpetra_maps.size(),
+                                      block_sparsity_pattern.n_block_cols()));
+
+          const size_type n_block_rows = tpetra_maps.size();
+          Assert(n_block_rows == block_sparsity_pattern.n_block_rows(),
+                 ExcDimensionMismatch(n_block_rows,
+                                      block_sparsity_pattern.n_block_rows()));
+          Assert(n_block_rows == block_sparsity_pattern.n_block_cols(),
+                 ExcDimensionMismatch(n_block_rows,
+                                      block_sparsity_pattern.n_block_cols()));
+        }
+
+
+      // Call the other basic reinit function, ...
+      reinit(block_sparsity_pattern.n_block_rows(),
+             block_sparsity_pattern.n_block_cols());
+
+      // ... set the correct sizes, ...
+      this->row_block_indices    = block_sparsity_pattern.get_row_indices();
+      this->column_block_indices = block_sparsity_pattern.get_column_indices();
+
+      // ... and then assign the correct
+      // data to the blocks.
+      for (size_type r = 0; r < this->n_block_rows(); ++r)
+        for (size_type c = 0; c < this->n_block_cols(); ++c)
+          {
+            this->sub_objects[r][c]->reinit(block_sparsity_pattern.block(r, c));
+          }
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     template <typename BlockSparsityPatternType>
     void
     BlockSparseMatrix<Number, MemorySpace>::reinit(
       const BlockSparsityPatternType &block_sparsity_pattern)
+    {
+      std::vector<IndexSet> parallel_partitioning;
+      for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
+        parallel_partitioning.emplace_back(
+          complete_index_set(block_sparsity_pattern.block(i, 0).n_rows()));
+
+      reinit(parallel_partitioning, block_sparsity_pattern);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    BlockSparseMatrix<Number, MemorySpace>::reinit(
+      const BlockSparsityPattern &block_sparsity_pattern)
     {
       std::vector<IndexSet> parallel_partitioning;
       for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
