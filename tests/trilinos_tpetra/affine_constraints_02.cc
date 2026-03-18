@@ -96,7 +96,7 @@ test()
       Triangulation<dim>::smoothing_on_refinement |
       Triangulation<dim>::smoothing_on_coarsening));
 
-  FESystem<dim>   fe(FE_Q<dim>(1), FE_Q<dim>(1));
+  FESystem<dim>   fe(FE_Q<dim>(1));
   DoFHandler<dim> dof_handler(triangulation);
 
   AffineConstraints<double> constraints;
@@ -109,7 +109,6 @@ test()
   dof_handler.distribute_dofs(fe);
 
   constraints.clear();
-  std::map<unsigned int, double> boundary_values;
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,
                                            BoundaryValues<dim>(),
@@ -120,27 +119,30 @@ test()
   const IndexSet  locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-  DynamicSparsityPattern dsp(locally_relevant_dofs);
+  // compute the various partitionings between processors and blocks
+  // of vectors and matrices
+  const std::vector<types::global_dof_index> dofs_per_block = DoFTools::count_dofs_per_fe_block (dof_handler,
+                                                                            {{0}});
+
+  const std::vector<IndexSet> system_partitioning = locally_owned_dofs.split_by_block(dofs_per_block);
+  const std::vector<IndexSet> system_relevant_partitioning = locally_relevant_dofs.split_by_block(dofs_per_block);
+
+  BlockDynamicSparsityPattern dsp(system_relevant_partitioning);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
+  
   SparsityTools::distribute_sparsity_pattern(dsp,
                                              locally_owned_dofs,
                                              MPI_COMM_WORLD,
                                              locally_relevant_dofs);
 
   MatrixType system_matrix;
-  system_matrix.block(0, 0).reinit(locally_owned_dofs,
-                                   locally_owned_dofs,
-                                   dsp,
-                                   MPI_COMM_WORLD);
+  system_matrix.reinit(dsp);
 
   VectorType solution;
-  solution.block(0).reinit(locally_relevant_dofs, MPI_COMM_WORLD);
+  solution.reinit(system_partitioning, system_relevant_partitioning, MPI_COMM_WORLD);
 
   VectorType system_rhs;
-  system_rhs.block(0).reinit(locally_owned_dofs,
-                             locally_relevant_dofs,
-                             MPI_COMM_WORLD,
-                             true);
+  system_rhs.reinit(system_partitioning, system_relevant_partitioning, MPI_COMM_WORLD);
 
   QGauss<dim> quadrature_formula(fe.degree + 1);
 
@@ -215,10 +217,10 @@ main(int argc, char **argv)
     LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Host>,
     LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>>();
 
-  // test<2,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
-  // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
-  // MemorySpace::Default>>();
-  // test<3,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
-  // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
-  // MemorySpace::Default>>();
+    // test<2,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
+    // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
+    // MemorySpace::Default>>();
+    // test<3,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
+    // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
+    // MemorySpace::Default>>();
 }

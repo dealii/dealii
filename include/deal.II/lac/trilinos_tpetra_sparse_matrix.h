@@ -319,7 +319,7 @@ namespace LinearAlgebra
                    const std::vector<unsigned int> &n_entries_per_row);
 
       /**
-       * This function is initializes the Trilinos Tpetra matrix according to
+       * This function initializes the Trilinos Tpetra matrix according to
        * the specified @p sparsity_pattern, and also reassigns the matrix rows to
        * different processes according to the user-supplied index set @p parallel_partitioning and
        * %parallel communicator. In programs following the style of the tutorial
@@ -348,7 +348,7 @@ namespace LinearAlgebra
       /**
        * This function is similar to the other initialization function above,
        * but now also reassigns the matrix rows and columns according to two
-       * user-supplied index sets.  To be used for rectangular matrices. The
+       * user-supplied index sets. To be used for rectangular matrices. The
        * optional argument @p exchange_data can be used for reinitialization
        * with a sparsity pattern that is not fully constructed. This feature is
        * only implemented for input sparsity patterns of type
