@@ -1,0 +1,6 @@
+Improved: Triangulation::pack_data_serial() previously had quadratic complexity
+in the preparation of cell relations, which had a negative impact on runtime
+when refining a serial Triangulation in combination with SolutionTransfer.
+This has been improved.
+<br>
+(Peter Munch, Martin Kronbichler, Lukáš Lejdar, 2026/03/17)
