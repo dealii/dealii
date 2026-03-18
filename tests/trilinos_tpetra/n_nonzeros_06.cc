@@ -40,25 +40,18 @@ test(const Table<2, DoFTools::Coupling> &coupling)
   DoFHandler<2> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  const IndexSet &locally_owned_total = dof_handler.locally_owned_dofs();
-  const IndexSet  relevant_total =
+  const IndexSet relevant_total =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, {{0, 1}});
 
-  std::vector<IndexSet> locally_owned(2), relevant_set(2);
-  locally_owned[0] = locally_owned_total.get_view(0, dofs_per_block[0]);
-  locally_owned[1] =
-    locally_owned_total.get_view(dofs_per_block[0], dof_handler.n_dofs());
-  relevant_set[0] = relevant_total.get_view(0, dofs_per_block[0]);
-  relevant_set[1] =
-    relevant_total.get_view(dofs_per_block[0], dof_handler.n_dofs());
+  std::vector<IndexSet> system_partitioning =
+    relevant_total.split_by_block(dofs_per_block);
 
   // create an empty sparsity pattern
-  dealii::BlockDynamicSparsityPattern dsp(relevant_set);
+  dealii::BlockDynamicSparsityPattern dsp(system_partitioning);
   DoFTools::make_sparsity_pattern(dof_handler, coupling, dsp);
-  dsp.compress();
 
   dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern sparsity;
   sparsity.copy_from(dsp);
