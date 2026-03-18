@@ -39,7 +39,10 @@ test()
   columns.compress();
 
   {
-    TrilinosWrappers::SparseMatrix m(rows, columns, MPI_COMM_WORLD);
+    TrilinosWrappers::SparseMatrix m(rows,
+                                     columns,
+                                     MPI_COMM_WORLD,
+                                     2 * n_procs);
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
         if ((i + 2 * j + 1) % 3 == 0)
@@ -51,7 +54,10 @@ test()
   }
 
   {
-    TrilinosWrappers::SparseMatrix m(rows, columns, MPI_COMM_WORLD);
+    TrilinosWrappers::SparseMatrix m(rows,
+                                     columns,
+                                     MPI_COMM_WORLD,
+                                     2 * n_procs);
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
         if ((i + 2 * j + 1) % 3 == 0)
@@ -68,7 +74,10 @@ test()
   }
 
   {
-    TrilinosWrappers::SparseMatrix m(rows, columns, MPI_COMM_WORLD);
+    TrilinosWrappers::SparseMatrix m(rows,
+                                     columns,
+                                     MPI_COMM_WORLD,
+                                     2 * n_procs);
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
         if ((i + 2 * j + 1) % 3 == 0)
@@ -83,7 +92,10 @@ test()
   }
 
   {
-    TrilinosWrappers::SparseMatrix m(rows, columns, MPI_COMM_WORLD);
+    TrilinosWrappers::SparseMatrix m(rows,
+                                     columns,
+                                     MPI_COMM_WORLD,
+                                     2 * n_procs);
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
         if ((i + 2 * j + 1) % 3 == 0)
@@ -97,7 +109,10 @@ test()
   }
 
   {
-    TrilinosWrappers::SparseMatrix m(rows, columns, MPI_COMM_WORLD);
+    TrilinosWrappers::SparseMatrix m(rows,
+                                     columns,
+                                     MPI_COMM_WORLD,
+                                     2 * n_procs);
     for (unsigned int i = 5 * myid; i < 5 * (myid + 1); ++i)
       for (unsigned int j = 0; j < m.n(); ++j)
         if ((i + 2 * j + 1) % 3 == 0)
