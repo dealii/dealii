@@ -873,12 +873,12 @@ MappingQ<dim, spacedim>::fill_fe_values(
     data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   data.cell_of_current_support_points = cell;
-  data.listener_tria_change.disconnect();
-  data.listener_tria_change =
-    cell->get_triangulation().signals.any_change.connect([&data]() {
-      data.listener_tria_change.disconnect();
-      data.mapping_support_points.clear();
-    });
+  if (!data.listener_tria_change.connected())
+    data.listener_tria_change =
+      cell->get_triangulation().signals.any_change.connect([&data]() {
+        data.listener_tria_change.disconnect();
+        data.mapping_support_points.clear();
+      });
 
   // if the order of the mapping is greater than 1, then do not reuse any cell
   // similarity information. This is necessary because the cell similarity
@@ -1109,12 +1109,12 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
           this->compute_mapping_support_points(cell);
 
       data.cell_of_current_support_points = cell;
-      data.listener_tria_change.disconnect();
-      data.listener_tria_change =
-        cell->get_triangulation().signals.any_change.connect([&data]() {
-          data.listener_tria_change.disconnect();
-          data.mapping_support_points.clear();
-        });
+      if (!data.listener_tria_change.connected())
+        data.listener_tria_change =
+          cell->get_triangulation().signals.any_change.connect([&data]() {
+            data.listener_tria_change.disconnect();
+            data.mapping_support_points.clear();
+          });
     }
 
   internal::MappingQImplementation::do_fill_fe_face_values(
@@ -1176,12 +1176,12 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
           this->compute_mapping_support_points(cell);
       data.cell_of_current_support_points = cell;
 
-      data.listener_tria_change.disconnect();
-      data.listener_tria_change =
-        cell->get_triangulation().signals.any_change.connect([&data]() {
-          data.listener_tria_change.disconnect();
-          data.mapping_support_points.clear();
-        });
+      if (!data.listener_tria_change.connected())
+        data.listener_tria_change =
+          cell->get_triangulation().signals.any_change.connect([&data]() {
+            data.listener_tria_change.disconnect();
+            data.mapping_support_points.clear();
+          });
     }
 
   internal::MappingQImplementation::do_fill_fe_face_values(
@@ -1235,12 +1235,12 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   data.cell_of_current_support_points = cell;
-  data.listener_tria_change.disconnect();
-  data.listener_tria_change =
-    cell->get_triangulation().signals.any_change.connect([&data]() {
-      data.listener_tria_change.disconnect();
-      data.mapping_support_points.clear();
-    });
+  if (!data.listener_tria_change.connected())
+    data.listener_tria_change =
+      cell->get_triangulation().signals.any_change.connect([&data]() {
+        data.listener_tria_change.disconnect();
+        data.mapping_support_points.clear();
+      });
 
   internal::MappingQImplementation::maybe_update_q_points_Jacobians_generic(
     CellSimilarity::none,
