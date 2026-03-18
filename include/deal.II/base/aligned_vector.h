@@ -2174,12 +2174,10 @@ AlignedVector<T>::load(Archive &ar, const unsigned int)
   size_type vec_size = 0;
   ar       &vec_size;
 
+  resize(vec_size);
+
   if (vec_size > 0)
-    {
-      resize(vec_size);
-      ar &boost::serialization::make_array(elements.get(), vec_size);
-      used_elements_end = elements.get() + vec_size;
-    }
+    ar &boost::serialization::make_array(elements.get(), vec_size);
 }
 
 
