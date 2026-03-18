@@ -282,6 +282,19 @@ namespace TrilinosWrappers
 
 
   SparseMatrix::SparseMatrix(const IndexSet &parallel_partitioning,
+                             const MPI_Comm  communicator)
+    : SparseMatrix(parallel_partitioning, communicator, 0)
+  {}
+
+
+
+  SparseMatrix::SparseMatrix(const IndexSet &parallel_partitioning)
+    : SparseMatrix(parallel_partitioning, MPI_COMM_WORLD, 0)
+  {}
+
+
+
+  SparseMatrix::SparseMatrix(const IndexSet &parallel_partitioning,
                              const MPI_Comm  communicator,
                              const std::vector<unsigned int> &n_entries_per_row)
     : column_space_map(new Epetra_Map(
@@ -311,6 +324,27 @@ namespace TrilinosWrappers
         false))
     , last_action(Zero)
     , compressed(false)
+  {}
+
+
+
+  SparseMatrix::SparseMatrix(const IndexSet &row_parallel_partitioning,
+                             const IndexSet &col_parallel_partitioning,
+                             const MPI_Comm  communicator)
+    : SparseMatrix(row_parallel_partitioning,
+                   col_parallel_partitioning,
+                   communicator,
+                   0)
+  {}
+
+
+
+  SparseMatrix::SparseMatrix(const IndexSet &row_parallel_partitioning,
+                             const IndexSet &col_parallel_partitioning)
+    : SparseMatrix(row_parallel_partitioning,
+                   col_parallel_partitioning,
+                   MPI_COMM_WORLD,
+                   0)
   {}
 
 
