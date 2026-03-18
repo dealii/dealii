@@ -827,7 +827,8 @@ namespace LinearAlgebra
        * entering the index values.
        */
       BlockSparsityPattern(const std::vector<size_type> &row_block_sizes,
-                           const std::vector<size_type> &col_block_sizes);
+                           const std::vector<size_type> &col_block_sizes,
+                           const size_type               n_entries_per_row);
 
       /**
        * Initialize the pattern with an array of index sets that specifies both
@@ -837,7 +838,8 @@ namespace LinearAlgebra
        * to be saved in each block.
        */
       BlockSparsityPattern(const std::vector<IndexSet> &parallel_partitioning,
-                           const MPI_Comm communicator = MPI_COMM_WORLD);
+                           const MPI_Comm               communicator,
+                           const size_type              n_entries_per_row);
 
       /**
        * Initialize the pattern with two arrays of index sets that specify rows
@@ -854,7 +856,8 @@ namespace LinearAlgebra
         const std::vector<IndexSet> &row_parallel_partitioning,
         const std::vector<IndexSet> &column_parallel_partitioning,
         const std::vector<IndexSet> &writable_rows,
-        const MPI_Comm               communicator = MPI_COMM_WORLD);
+        const MPI_Comm               communicator,
+        const size_type              n_entries_per_row);
 
       /**
        * Resize the matrix to a tensor product of matrices with dimensions
@@ -867,7 +870,8 @@ namespace LinearAlgebra
        */
       void
       reinit(const std::vector<size_type> &row_block_sizes,
-             const std::vector<size_type> &col_block_sizes);
+             const std::vector<size_type> &col_block_sizes,
+             const size_type               n_entries_per_row);
 
       /**
        * Resize the matrix to a square tensor product of matrices. See the
@@ -875,7 +879,8 @@ namespace LinearAlgebra
        */
       void
       reinit(const std::vector<IndexSet> &parallel_partitioning,
-             const MPI_Comm               communicator = MPI_COMM_WORLD);
+             const MPI_Comm               communicator,
+             const size_type              n_entries_per_row);
 
       /**
        * Resize the matrix to a rectangular block matrices. This method allows
@@ -885,7 +890,8 @@ namespace LinearAlgebra
       void
       reinit(const std::vector<IndexSet> &row_parallel_partitioning,
              const std::vector<IndexSet> &column_parallel_partitioning,
-             const MPI_Comm               communicator = MPI_COMM_WORLD);
+             const MPI_Comm               communicator,
+             const size_type              n_entries_per_row);
 
       /**
        * Resize the matrix to a rectangular block matrices that furthermore
@@ -899,7 +905,8 @@ namespace LinearAlgebra
       reinit(const std::vector<IndexSet> &row_parallel_partitioning,
              const std::vector<IndexSet> &column_parallel_partitioning,
              const std::vector<IndexSet> &writable_rows,
-             const MPI_Comm               communicator = MPI_COMM_WORLD);
+             const MPI_Comm               communicator,
+             const size_type              n_entries_per_row);
 
       /**
        * Allow the use of the reinit functions of the base class as well.

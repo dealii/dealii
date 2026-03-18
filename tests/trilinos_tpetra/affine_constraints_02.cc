@@ -121,15 +121,17 @@ test()
 
   // compute the various partitionings between processors and blocks
   // of vectors and matrices
-  const std::vector<types::global_dof_index> dofs_per_block = DoFTools::count_dofs_per_fe_block (dof_handler,
-                                                                            {{0}});
+  const std::vector<types::global_dof_index> dofs_per_block =
+    DoFTools::count_dofs_per_fe_block(dof_handler, {{0}});
 
-  const std::vector<IndexSet> system_partitioning = locally_owned_dofs.split_by_block(dofs_per_block);
-  const std::vector<IndexSet> system_relevant_partitioning = locally_relevant_dofs.split_by_block(dofs_per_block);
+  const std::vector<IndexSet> system_partitioning =
+    locally_owned_dofs.split_by_block(dofs_per_block);
+  const std::vector<IndexSet> system_relevant_partitioning =
+    locally_relevant_dofs.split_by_block(dofs_per_block);
 
   BlockDynamicSparsityPattern dsp(system_relevant_partitioning);
   DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
-  
+
   SparsityTools::distribute_sparsity_pattern(dsp,
                                              locally_owned_dofs,
                                              MPI_COMM_WORLD,
@@ -139,10 +141,14 @@ test()
   system_matrix.reinit(dsp);
 
   VectorType solution;
-  solution.reinit(system_partitioning, system_relevant_partitioning, MPI_COMM_WORLD);
+  solution.reinit(system_partitioning,
+                  system_relevant_partitioning,
+                  MPI_COMM_WORLD);
 
   VectorType system_rhs;
-  system_rhs.reinit(system_partitioning, system_relevant_partitioning, MPI_COMM_WORLD);
+  system_rhs.reinit(system_partitioning,
+                    system_relevant_partitioning,
+                    MPI_COMM_WORLD);
 
   QGauss<dim> quadrature_formula(fe.degree + 1);
 
@@ -217,10 +223,10 @@ main(int argc, char **argv)
     LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Host>,
     LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>>();
 
-    // test<2,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
-    // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
-    // MemorySpace::Default>>();
-    // test<3,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
-    // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
-    // MemorySpace::Default>>();
+  // test<2,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
+  // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
+  // MemorySpace::Default>>();
+  // test<3,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
+  // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
+  // MemorySpace::Default>>();
 }

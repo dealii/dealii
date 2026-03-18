@@ -674,14 +674,17 @@ namespace LinearAlgebra
 
     BlockSparsityPattern::BlockSparsityPattern(
       const std::vector<size_type> &row_indices,
-      const std::vector<size_type> &col_indices)
+      const std::vector<size_type> &col_indices,
+      const size_type               n_entries_per_row)
       : BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
           row_indices.size(),
           col_indices.size())
     {
       for (size_type i = 0; i < row_indices.size(); ++i)
         for (size_type j = 0; j < col_indices.size(); ++j)
-          this->block(i, j).reinit(row_indices[i], col_indices[j]);
+          this->block(i, j).reinit(row_indices[i],
+                                   col_indices[j],
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
@@ -689,7 +692,8 @@ namespace LinearAlgebra
 
     BlockSparsityPattern::BlockSparsityPattern(
       const std::vector<IndexSet> &parallel_partitioning,
-      const MPI_Comm               communicator)
+      const MPI_Comm               communicator,
+      const size_type              n_entries_per_row)
       : BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
           parallel_partitioning.size(),
           parallel_partitioning.size())
@@ -698,7 +702,8 @@ namespace LinearAlgebra
         for (size_type j = 0; j < parallel_partitioning.size(); ++j)
           this->block(i, j).reinit(parallel_partitioning[i],
                                    parallel_partitioning[j],
-                                   communicator);
+                                   communicator,
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
@@ -708,7 +713,8 @@ namespace LinearAlgebra
       const std::vector<IndexSet> &row_parallel_partitioning,
       const std::vector<IndexSet> &col_parallel_partitioning,
       const std::vector<IndexSet> &writable_rows,
-      const MPI_Comm               communicator)
+      const MPI_Comm               communicator,
+      const size_type              n_entries_per_row)
       : BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>(
           row_parallel_partitioning.size(),
           col_parallel_partitioning.size())
@@ -718,7 +724,8 @@ namespace LinearAlgebra
           this->block(i, j).reinit(row_parallel_partitioning[i],
                                    col_parallel_partitioning[j],
                                    writable_rows[i],
-                                   communicator);
+                                   communicator,
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
@@ -726,14 +733,17 @@ namespace LinearAlgebra
 
     void
     BlockSparsityPattern::reinit(const std::vector<size_type> &row_block_sizes,
-                                 const std::vector<size_type> &col_block_sizes)
+                                 const std::vector<size_type> &col_block_sizes,
+                                 const size_type n_entries_per_row)
     {
       dealii::BlockSparsityPatternBase<
         SparsityPattern<MemorySpace::Host>>::reinit(row_block_sizes.size(),
                                                     col_block_sizes.size());
       for (size_type i = 0; i < row_block_sizes.size(); ++i)
         for (size_type j = 0; j < col_block_sizes.size(); ++j)
-          this->block(i, j).reinit(row_block_sizes[i], col_block_sizes[j]);
+          this->block(i, j).reinit(row_block_sizes[i],
+                                   col_block_sizes[j],
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
@@ -742,7 +752,8 @@ namespace LinearAlgebra
     void
     BlockSparsityPattern::reinit(
       const std::vector<IndexSet> &parallel_partitioning,
-      const MPI_Comm               communicator)
+      const MPI_Comm               communicator,
+      const size_type              n_entries_per_row)
     {
       dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>::
         reinit(parallel_partitioning.size(), parallel_partitioning.size());
@@ -750,7 +761,8 @@ namespace LinearAlgebra
         for (size_type j = 0; j < parallel_partitioning.size(); ++j)
           this->block(i, j).reinit(parallel_partitioning[i],
                                    parallel_partitioning[j],
-                                   communicator);
+                                   communicator,
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
@@ -760,7 +772,8 @@ namespace LinearAlgebra
     BlockSparsityPattern::reinit(
       const std::vector<IndexSet> &row_parallel_partitioning,
       const std::vector<IndexSet> &col_parallel_partitioning,
-      const MPI_Comm               communicator)
+      const MPI_Comm               communicator,
+      const size_type              n_entries_per_row)
     {
       dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>::
         reinit(row_parallel_partitioning.size(),
@@ -769,7 +782,8 @@ namespace LinearAlgebra
         for (size_type j = 0; j < col_parallel_partitioning.size(); ++j)
           this->block(i, j).reinit(row_parallel_partitioning[i],
                                    col_parallel_partitioning[j],
-                                   communicator);
+                                   communicator,
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
@@ -780,7 +794,8 @@ namespace LinearAlgebra
       const std::vector<IndexSet> &row_parallel_partitioning,
       const std::vector<IndexSet> &col_parallel_partitioning,
       const std::vector<IndexSet> &writable_rows,
-      const MPI_Comm               communicator)
+      const MPI_Comm               communicator,
+      const size_type              n_entries_per_row)
     {
       AssertDimension(writable_rows.size(), row_parallel_partitioning.size());
       dealii::BlockSparsityPatternBase<SparsityPattern<MemorySpace::Host>>::
@@ -791,7 +806,8 @@ namespace LinearAlgebra
           this->block(i, j).reinit(row_parallel_partitioning[i],
                                    col_parallel_partitioning[j],
                                    writable_rows[i],
-                                   communicator);
+                                   communicator,
+                                   n_entries_per_row);
       this->collect_sizes();
     }
 
