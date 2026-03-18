@@ -42,8 +42,8 @@ test()
 
   Table<2, DoFTools::Coupling> coupling(2, 2);
   coupling.fill(DoFTools::none);
-  coupling(0, 0) = DoFTools::none;
-  // coupling(1,1) = DoFTools::always;
+  coupling(1, 1) = DoFTools::always;
+  coupling(0, 0) = DoFTools::always;
 
   const IndexSet &locally_owned_total = dof_handler.locally_owned_dofs();
   const IndexSet  relevant_total =
@@ -52,20 +52,20 @@ test()
   const std::vector<types::global_dof_index> dofs_per_block =
     DoFTools::count_dofs_per_fe_block(dof_handler, {{0, 1}});
 
-  std::vector<IndexSet> locally_owned(2), relevant_set(2);
-  locally_owned[0] = locally_owned_total.get_view(0, dofs_per_block[0]);
-  locally_owned[1] =
-    locally_owned_total.get_view(dofs_per_block[0], dof_handler.n_dofs());
-  relevant_set[0] = relevant_total.get_view(0, dofs_per_block[0]);
-  relevant_set[1] =
-    relevant_total.get_view(dofs_per_block[0], dof_handler.n_dofs());
+  std::vector<IndexSet> locally_owned_partitioning =
+    locally_owned_total.split_by_block(dofs_per_block);
+  std::vector<IndexSet> locally_relevant_partitioning =
+    relevant_total.split_by_block(dofs_per_block);
 
   // create an empty sparsity pattern
   dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern sparsity(2, 2);
-  sparsity.reinit(locally_owned, locally_owned, MPI_COMM_WORLD, 1000);
+  sparsity.reinit(locally_owned_partitioning,
+                  locally_owned_partitioning,
+                  locally_relevant_partitioning,
+                  MPI_COMM_WORLD,
+                  1000);
 
-  DoFTools::make_sparsity_pattern(dof_handler, sparsity);
-
+  DoFTools::make_sparsity_pattern(dof_handler, coupling, sparsity);
   sparsity.compress();
 
   // attach a sparse matrix to it
