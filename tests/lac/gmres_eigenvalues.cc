@@ -20,18 +20,6 @@
 
 #include "../tests.h"
 
-template <class NUMBER>
-void
-output_eigenvalues(const std::vector<NUMBER> &eigenvalues,
-                   const std::string         &text)
-{
-  deallog << text;
-  for (unsigned int j = 0; j < eigenvalues.size(); ++j)
-    {
-      deallog << ' ' << eigenvalues.at(j);
-    }
-  deallog << std::endl;
-}
 
 template <typename number>
 void
@@ -76,18 +64,25 @@ test(unsigned int variant)
 
   SolverGMRES<Vector<number>> solver(control);
   solver.connect_eigenvalues_slot(
-    std::bind(output_eigenvalues<std::complex<double>>,
-              std::placeholders::_1,
-              "Eigenvalue estimate: "));
+    [](const std::vector<std::complex<number>> &eigenvalues) {
+      deallog << "Eigenvalue estimate: ";
+      for (const auto &a : eigenvalues)
+        deallog << ' ' << a;
+      deallog << std::endl;
+    });
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
 
   if (variant < 2)
     {
       IterationNumberControl   cg_control(variant == 1 ? 6 : 21, 1e-40);
       SolverCG<Vector<number>> solver_cg(cg_control);
-      solver_cg.connect_eigenvalues_slot(std::bind(output_eigenvalues<double>,
-                                                   std::placeholders::_1,
-                                                   "Eigenvalue estimate: "));
+      solver_cg.connect_eigenvalues_slot(
+        [](const std::vector<number> &eigenvalues) {
+          deallog << "Eigenvalue estimate: ";
+          for (const auto &a : eigenvalues)
+            deallog << ' ' << a;
+          deallog << std::endl;
+        });
       sol = 0;
       solver_cg.solve(matrix, sol, rhs, PreconditionIdentity());
     }
