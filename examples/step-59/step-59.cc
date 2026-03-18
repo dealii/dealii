@@ -307,7 +307,7 @@ namespace Step59
   types::global_dof_index LaplaceOperator<dim, fe_degree, number>::m() const
   {
     Assert(data.get() != nullptr, ExcNotInitialized());
-    return data->get_dof_handler().n_dofs();
+    return data->get_dof_info().vector_partitioner->size();
   }
 
 
@@ -1207,7 +1207,7 @@ namespace Step59
           {
             smoother_data[0].smoothing_range = 2e-2;
             smoother_data[0].degree          = numbers::invalid_unsigned_int;
-            smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
+            smoother_data[0].eig_cg_n_iterations = 40;
           }
         smoother_data[level].preconditioner =
           std::make_shared<PreconditionBlockJacobi<dim, fe_degree, float>>();
