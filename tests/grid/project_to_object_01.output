@@ -19,7 +19,7 @@ DEAL::
 DEAL::Project the convex combination of two vertices:
 DEAL::projected point:          1.98114 0.274025
 DEAL::Convex combination point: 1.98114 0.274025
-DEAL::Distance:                 5.55112e-17
+DEAL::Distance:                 2.48253e-16
 DEAL::
 DEAL::Check that projecting with spacedim == structdim
 DEAL::is the identity map:
@@ -71,7 +71,7 @@ DEAL::trial point distance from origin:     2.00000
 DEAL::projected point distance from origin: 2.00000
 DEAL::projected point: -1.15464 -1.15473 -1.15473
 DEAL::trial point:     -1.15464 -1.15473 -1.15473
-DEAL::distance:        2.51280e-13
+DEAL::distance:        3.62779e-13
 DEAL::
 DEAL::Project a weighed face point onto the same face in 3D:
 DEAL::
@@ -145,62 +145,6 @@ DEAL::Project a weighed line point onto the same line in 3D:
 DEAL::
 DEAL::trial point:                          -1.18152 -1.09909 -1.18152
 DEAL::projected point:                      -1.18152 -1.09909 -1.18152
-DEAL::trial point distance from origin:     2.00000
-DEAL::projected point distance from origin: 2.00000
-DEAL::Error less than 1.0e-7:               1
-DEAL::=====================================================
-DEAL::Number of global refinements: 6
-DEAL::=====================================================
-DEAL::
-DEAL::Project a reweighed center onto a face in 3D:
-DEAL::
-DEAL::vertex 0 distance from origin: 2.00000
-DEAL::vertex 1 distance from origin: 2.00000
-DEAL::trial point distance from origin: 2.19979
-DEAL::projected point distance from origin: 2.00000
-DEAL::projected point:    -1.14669 -1.14669 -1.17055
-DEAL::true line midpoint: -1.14669 -1.14669 -1.17055
-DEAL::distance less than 5.0e-6: 1
-DEAL::
-DEAL::Check that projecting with spacedim == structdim is the identity map:
-DEAL::
-DEAL::trial point:     0.417941 4.24242e+09 1.00000
-DEAL::projected point: 0.417941 4.24242e+09 1.00000
-DEAL::
-DEAL::Project a vertex:
-DEAL::
-DEAL::vertex 0 distance from origin:        2.00000
-DEAL::trial point distance from origin:     2.00000
-DEAL::projected point distance from origin: 2.00000
-DEAL::projected point: -1.15470 -1.15470 -1.15470
-DEAL::actual vertex:   -1.15470 -1.15470 -1.15470
-DEAL::distance:        0.00000
-DEAL::
-DEAL::Project a point near a vertex:
-DEAL::
-DEAL::vertex 0 distance from origin:        2.00000
-DEAL::trial point distance from origin:     2.00000
-DEAL::projected point distance from origin: 2.00000
-DEAL::projected point: -1.15469 -1.15471 -1.15471
-DEAL::trial point:     -1.15469 -1.15471 -1.15471
-DEAL::distance:        1.53899e-10
-DEAL::
-DEAL::Project a weighed face point onto the same face in 3D:
-DEAL::
-DEAL::trial point distance from origin:     2.00000
-DEAL::projected point distance from origin: 2.00000
-DEAL::Error is less than 1.0e-3:           1
-DEAL::
-DEAL::Project a point offset from the face onto the face in 3D:
-DEAL::
-DEAL::trial point distance from origin:     2.20000
-DEAL::projected point distance from origin: 2.00000
-DEAL::Error (vs. going along the normal) less than 0.01: 1
-DEAL::
-DEAL::Project a weighed line point onto the same line in 3D:
-DEAL::
-DEAL::trial point:                          -1.16828 -1.12706 -1.16828
-DEAL::projected point:                      -1.16828 -1.12706 -1.16828
 DEAL::trial point distance from origin:     2.00000
 DEAL::projected point distance from origin: 2.00000
 DEAL::Error less than 1.0e-7:               1

@@ -27,7 +27,7 @@
 #include <deal.II/fe/fe_simplex_p.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_values.h>
-#include <deal.II/fe/mapping_fe.h>
+#include <deal.II/fe/mapping_p1.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_out.h>
@@ -349,7 +349,7 @@ namespace Step56
 #ifdef HEX
     MappingQ1<dim> mapping;
 #else
-    MappingFE<dim> mapping;
+    MappingP1<dim> mapping;
 #endif
 
     FESystem<dim>   velocity_fe;
@@ -377,7 +377,6 @@ namespace Step56
     , velocity_fe(FE_Q<dim>(pressure_degree + 1), dim)
     , fe(velocity_fe, 1, FE_Q<dim>(pressure_degree), 1)
 #else
-    , mapping(FE_SimplexP<dim>(1))
     , velocity_fe(FE_SimplexP<dim>(pressure_degree + 1), dim)
     , fe(velocity_fe, 1, FE_SimplexDGP<dim>(pressure_degree), 1)
 #endif
@@ -652,33 +651,6 @@ namespace Step56
 
   template <int dim>
   void
-  StokesProblem<dim>::output_results(const unsigned int refinement_cycle) const
-  {
-    std::vector<std::string> solution_names(dim, "velocity");
-    solution_names.emplace_back("pressure");
-
-    std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation(
-        dim, DataComponentInterpretation::component_is_part_of_vector);
-    data_component_interpretation.push_back(
-      DataComponentInterpretation::component_is_scalar);
-
-    DataOut<dim> data_out;
-    data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution,
-                             solution_names,
-                             DataOut<dim>::type_dof_data,
-                             data_component_interpretation);
-    data_out.build_patches();
-
-    std::ofstream output("solution-" +
-                         Utilities::int_to_string(refinement_cycle, 2) +
-                         "-dim-" + Utilities::int_to_string(dim, 2) + ".vtk");
-    data_out.write_vtk(output);
-  }
-
-  template <int dim>
-  void
   StokesProblem<dim>::run()
   {
     // For Scott-Vogelius elements in 3D, we must use a cubic velocity space and
@@ -692,7 +664,7 @@ namespace Step56
 
         Triangulation<dim> s_tria;
         GridGenerator::subdivided_hyper_cube_with_simplices<dim, dim>(
-          s_tria, std::pow(1 + refinement_cycle, 2));
+          s_tria, std::pow(2, refinement_cycle));
         triangulation.clear();
         GridGenerator::alfeld_split_of_simplex_mesh(s_tria, triangulation);
 
@@ -706,8 +678,6 @@ namespace Step56
         solve();
 
         compute_errors();
-
-        output_results(refinement_cycle);
       }
   }
 } // namespace Step56
