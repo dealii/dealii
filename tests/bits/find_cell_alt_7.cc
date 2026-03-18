@@ -33,13 +33,13 @@
 void
 check(Triangulation<2> &tria)
 {
-  MappingQ<2> map(5);
+  MappingQ<2> map(7);
 
   // Test for a number of points, every ten degrees
   for (unsigned int i = 0; i < 200; ++i)
     {
-      Point<2> p(std::sin((double)i / 100. * numbers::PI),
-                 std::cos((double)i / 100. * numbers::PI));
+      Point<2> p(std::sin((double)i / 100. * numbers::PI + 1e-8),
+                 std::cos((double)i / 100. * numbers::PI + 1e-8));
       p *= 1. - 1e-8;
 
       std::pair<Triangulation<2>::active_cell_iterator, Point<2>> cell =
@@ -69,8 +69,6 @@ main()
   {
     Triangulation<2> coarse_grid;
     GridGenerator::hyper_ball(coarse_grid);
-    static const SphericalManifold<2> boundary;
-    coarse_grid.set_manifold(0, boundary);
     coarse_grid.refine_global(2);
     check(coarse_grid);
   }
