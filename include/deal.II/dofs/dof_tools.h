@@ -2402,7 +2402,9 @@ namespace DoFTools
    * @todo This function should generate a multimap, rather than just a map,
    * since several dofs may be located at the same support point. Currently,
    * only the last value in the map returned by map_dofs_to_support_points() for
-   * each point will be returned.
+   * each point will be returned. In fact, because for dim>1 points cannot be
+   * sorted in a stable way, what the function should return is a
+   * std::unsorted_multimap.
    */
   template <int dim, int spacedim, class Comp>
   void
