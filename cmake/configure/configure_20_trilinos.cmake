@@ -464,6 +464,12 @@ macro(feature_trilinos_find_external var)
       endif()
 
     endif()
+
+    if(NOT ${var})
+      set(DEAL_II_TRILINOS_WITH_EPETRA FALSE)
+      set(DEAL_II_TRILINOS_WITH_TPETRA FALSE)
+    endif()
+
   endif()
 endmacro()
 
