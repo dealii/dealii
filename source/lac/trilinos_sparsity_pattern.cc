@@ -306,9 +306,14 @@ namespace TrilinosWrappers
       graph.reset();
       column_space_map = std::make_unique<Epetra_Map>(col_map);
 
-      AssertThrow((TrilinosWrappers::max_my_gid(row_map) -
-                   TrilinosWrappers::min_my_gid(row_map)) *
-                      std::uint64_t(n_entries_per_row) <
+      // for empty ranges the maximum index might be lower than the minimum
+      // index
+      auto max_local_elements =
+        std::max(TrilinosWrappers::max_my_gid(row_map) -
+                   TrilinosWrappers::min_my_gid(row_map),
+                 TrilinosWrappers::types::int_type(0)) *
+        std::uint64_t(n_entries_per_row);
+      AssertThrow(max_local_elements <
                     static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
                   ExcMessage("The TrilinosWrappers use Epetra internally which "
                              "uses 'signed int' to represent local indices. "
