@@ -90,6 +90,7 @@ module;
 #include <boost/range/iterator_range_core.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/array_wrapper.hpp>
+#include <boost/serialization/binary_object.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -353,6 +354,7 @@ export
       using boost::serialization::array_wrapper;
       using boost::serialization::base_object;
       using boost::serialization::make_array;
+      using boost::serialization::make_binary_object;
       using boost::serialization::split_member;
       using boost::serialization::tracking_type;
 
