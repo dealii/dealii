@@ -1,0 +1,5 @@
+Fixed: The function AlignedVector::load() function did not work
+correctly if the AlignedVector object on which it was called had
+non-zero size and the object being deserialized had zero size.
+<br>
+(Wolfgang Bangerth, 2026/03/18)
