@@ -1,0 +1,151 @@
+
+DEAL::dim = 1, mapping degree 1
+DEAL::Testing triangulation create of edge length 1.00000
+DEAL::Jacobian cell: 1.00000
+DEAL::Jacobian face: 1.00000
+DEAL::Testing triangulation create of edge length 0.500000
+DEAL::Jacobian cell: 0.500000
+DEAL::Jacobian face: 0.500000
+DEAL::Testing triangulation create of edge length 0.250000
+DEAL::Jacobian cell: 0.250000
+DEAL::Jacobian face: 0.250000
+DEAL::Testing triangulation via pointer of edge length 1.00000
+DEAL::Jacobian cell: 1.00000
+DEAL::Jacobian face: 1.00000
+DEAL::Testing triangulation via pointer of edge length 0.500000
+DEAL::Jacobian cell: 0.500000
+DEAL::Jacobian face: 0.500000
+DEAL::Testing triangulation via pointer of edge length 0.250000
+DEAL::Jacobian cell: 0.250000
+DEAL::Jacobian face: 0.250000
+DEAL::Testing two triangulations with edge length 0.5 and 0.25
+DEAL::Jacobian cell: 0.500000
+DEAL::Jacobian face: 0.500000
+DEAL::Jacobian cell: 0.250000
+DEAL::Jacobian face: 0.250000
+DEAL::
+DEAL::dim = 1, mapping degree 2
+DEAL::Testing triangulation create of edge length 1.00000
+DEAL::Jacobian cell: 1.00000
+DEAL::Jacobian face: 1.00000
+DEAL::Testing triangulation create of edge length 0.500000
+DEAL::Jacobian cell: 0.500000
+DEAL::Jacobian face: 0.500000
+DEAL::Testing triangulation create of edge length 0.250000
+DEAL::Jacobian cell: 0.250000
+DEAL::Jacobian face: 0.250000
+DEAL::Testing triangulation via pointer of edge length 1.00000
+DEAL::Jacobian cell: 1.00000
+DEAL::Jacobian face: 1.00000
+DEAL::Testing triangulation via pointer of edge length 0.500000
+DEAL::Jacobian cell: 0.500000
+DEAL::Jacobian face: 0.500000
+DEAL::Testing triangulation via pointer of edge length 0.250000
+DEAL::Jacobian cell: 0.250000
+DEAL::Jacobian face: 0.250000
+DEAL::Testing two triangulations with edge length 0.5 and 0.25
+DEAL::Jacobian cell: 0.500000
+DEAL::Jacobian face: 0.500000
+DEAL::Jacobian cell: 0.250000
+DEAL::Jacobian face: 0.250000
+DEAL::
+DEAL::dim = 2, mapping degree 1
+DEAL::Testing triangulation create of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000  0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000  0.00000 1.00000
+DEAL::Testing triangulation create of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000  0.00000 0.500000
+DEAL::Testing triangulation create of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000  0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000  0.00000 0.250000
+DEAL::Testing triangulation via pointer of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000  0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000  0.00000 1.00000
+DEAL::Testing triangulation via pointer of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000  0.00000 0.500000
+DEAL::Testing triangulation via pointer of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000  0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000  0.00000 0.250000
+DEAL::Testing two triangulations with edge length 0.5 and 0.25
+DEAL::Jacobian cell: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian cell: 0.250000 0.00000  0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000  0.00000 0.250000
+DEAL::
+DEAL::dim = 2, mapping degree 2
+DEAL::Testing triangulation create of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000  0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000  0.00000 1.00000
+DEAL::Testing triangulation create of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000  0.00000 0.500000
+DEAL::Testing triangulation create of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000  0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000  0.00000 0.250000
+DEAL::Testing triangulation via pointer of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000  0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000  0.00000 1.00000
+DEAL::Testing triangulation via pointer of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000  0.00000 0.500000
+DEAL::Testing triangulation via pointer of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000  0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000  0.00000 0.250000
+DEAL::Testing two triangulations with edge length 0.5 and 0.25
+DEAL::Jacobian cell: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000  0.00000 0.500000
+DEAL::Jacobian cell: 0.250000 0.00000  0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000  0.00000 0.250000
+DEAL::
+DEAL::dim = 3, mapping degree 1
+DEAL::Testing triangulation create of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Testing triangulation create of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Testing triangulation create of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Testing triangulation via pointer of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Testing triangulation via pointer of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Testing triangulation via pointer of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Testing two triangulations with edge length 0.5 and 0.25
+DEAL::Jacobian cell: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian cell: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::
+DEAL::dim = 3, mapping degree 2
+DEAL::Testing triangulation create of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Testing triangulation create of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Testing triangulation create of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Testing triangulation via pointer of edge length 1.00000
+DEAL::Jacobian cell: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Jacobian face: 1.00000 0.00000 0.00000  0.00000 1.00000 0.00000  0.00000 0.00000 1.00000
+DEAL::Testing triangulation via pointer of edge length 0.500000
+DEAL::Jacobian cell: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Testing triangulation via pointer of edge length 0.250000
+DEAL::Jacobian cell: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Testing two triangulations with edge length 0.5 and 0.25
+DEAL::Jacobian cell: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian face: 0.500000 0.00000 0.00000  0.00000 0.500000 0.00000  0.00000 0.00000 0.500000
+DEAL::Jacobian cell: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::Jacobian face: 0.250000 0.00000 0.00000  0.00000 0.250000 0.00000  0.00000 0.00000 0.250000
+DEAL::
