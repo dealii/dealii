@@ -51,7 +51,6 @@
 #include <deal.II/numerics/data_out.h>
 
 #include <string>
-#include <ostream>
 #include <fstream>
 
 using namespace dealii;
