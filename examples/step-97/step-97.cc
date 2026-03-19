@@ -52,6 +52,7 @@
 
 #include <string>
 #include <ostream>
+#include <fstream>
 
 using namespace dealii;
 
