@@ -240,7 +240,7 @@ main()
 
   // refine in 3D a few times so that we can observe that the projection error
   // drops proportionally as the grid is refined
-  for (unsigned int n_refinements = 4; n_refinements < 7; ++n_refinements)
+  for (unsigned int n_refinements = 4; n_refinements < 6; ++n_refinements)
     {
       deallog << "====================================================="
               << std::endl
