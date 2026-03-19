@@ -16,6 +16,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#  ifndef DOXYGEN
 namespace LinearAlgebra
 {
   namespace TpetraWrappers
@@ -28,13 +29,13 @@ namespace LinearAlgebra
     // any mistake in the vector class declaration would
     // show up in uses of this class later on as well.
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
-#    ifdef DEAL_II_HAVE_CXX20
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
+#      ifdef DEAL_II_HAVE_CXX20
     static_assert(
       concepts::is_vector_space_vector<Vector<float, MemorySpace::Host>>);
     static_assert(
       concepts::is_vector_space_vector<Vector<float, MemorySpace::Default>>);
-#    endif
+#      endif
     template class Vector<float, MemorySpace::Host>;
     template class Vector<float, MemorySpace::Default>;
     template Vector<float, MemorySpace::Host> &
@@ -48,15 +49,15 @@ namespace LinearAlgebra
       template class VectorReference<float, MemorySpace::Host>;
       template class VectorReference<float, MemorySpace::Default>;
     } // namespace internal
-#  endif
+#    endif
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
-#    ifdef DEAL_II_HAVE_CXX20
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_DOUBLE
+#      ifdef DEAL_II_HAVE_CXX20
     static_assert(
       concepts::is_vector_space_vector<Vector<double, MemorySpace::Host>>);
     static_assert(
       concepts::is_vector_space_vector<Vector<double, MemorySpace::Default>>);
-#    endif
+#      endif
     template class Vector<double, MemorySpace::Host>;
     template class Vector<double, MemorySpace::Default>;
     template Vector<double, MemorySpace::Host> &
@@ -70,16 +71,16 @@ namespace LinearAlgebra
       template class VectorReference<double, MemorySpace::Host>;
       template class VectorReference<double, MemorySpace::Default>;
     } // namespace internal
-#  endif
+#    endif
 
-#  ifdef DEAL_II_WITH_COMPLEX_VALUES
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
-#      ifdef DEAL_II_HAVE_CXX20
+#    ifdef DEAL_II_WITH_COMPLEX_VALUES
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT
+#        ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<
                   Vector<std::complex<float>, MemorySpace::Host>>);
     static_assert(concepts::is_vector_space_vector<
                   Vector<std::complex<float>, MemorySpace::Default>>);
-#      endif
+#        endif
     template class Vector<std::complex<float>, MemorySpace::Host>;
     template class Vector<std::complex<float>, MemorySpace::Default>;
     template Vector<std::complex<float>, MemorySpace::Host> &
@@ -93,15 +94,15 @@ namespace LinearAlgebra
       template class VectorReference<std::complex<float>, MemorySpace::Host>;
       template class VectorReference<std::complex<float>, MemorySpace::Default>;
     } // namespace internal
-#    endif
+#      endif
 
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
-#      ifdef DEAL_II_HAVE_CXX20
+#      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
+#        ifdef DEAL_II_HAVE_CXX20
     static_assert(concepts::is_vector_space_vector<
                   Vector<std::complex<double>, MemorySpace::Host>>);
     static_assert(concepts::is_vector_space_vector<
                   Vector<std::complex<double>, MemorySpace::Default>>);
-#      endif
+#        endif
     template class Vector<std::complex<double>, MemorySpace::Host>;
     template class Vector<std::complex<double>, MemorySpace::Default>;
     template Vector<std::complex<double>, MemorySpace::Host> &
@@ -116,10 +117,12 @@ namespace LinearAlgebra
       template class VectorReference<std::complex<double>,
                                      MemorySpace::Default>;
     } // namespace internal
+#      endif
 #    endif
-#  endif
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
+
+#  endif
 
 DEAL_II_NAMESPACE_CLOSE
 

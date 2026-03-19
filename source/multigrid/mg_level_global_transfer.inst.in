@@ -103,7 +103,7 @@ for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
     template void
     MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_to_mg(

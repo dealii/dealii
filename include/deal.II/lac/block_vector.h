@@ -31,7 +31,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
 #ifndef DOXYGEN
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -126,7 +126,7 @@ public:
   template <typename OtherNumber>
   explicit BlockVector(const BlockVector<OtherNumber> &v);
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * A copy constructor taking a (parallel) Trilinos block vector and copying
    * it into the deal.II own format.
@@ -224,7 +224,7 @@ public:
   BlockVector<Number> &
   operator=(const Vector<Number> &V);
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * A copy constructor from a Trilinos block vector to a deal.II block
    * vector.

@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Utilities
 {
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   namespace Trilinos
   {
     const Epetra_Comm &
@@ -43,22 +43,6 @@ namespace Utilities
 #  endif
 
       return *communicator;
-    }
-
-
-
-    const Teuchos::RCP<const Teuchos::Comm<int>> &
-    tpetra_comm_self()
-    {
-#  ifdef DEAL_II_WITH_MPI
-      static auto communicator = Teuchos::RCP<const Teuchos::Comm<int>>(
-        new Teuchos::MpiComm<int>(MPI_COMM_SELF));
-#  else
-      static auto communicator =
-        Teuchos::RCP<const Teuchos::Comm<int>>(new Teuchos::Comm<int>());
-#  endif
-
-      return communicator;
     }
 
 
@@ -173,6 +157,22 @@ namespace Utilities
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
   namespace Trilinos
   {
+    const Teuchos::RCP<const Teuchos::Comm<int>> &
+    tpetra_comm_self()
+    {
+#  ifdef DEAL_II_WITH_MPI
+      static auto communicator = Teuchos::RCP<const Teuchos::Comm<int>>(
+        new Teuchos::MpiComm<int>(MPI_COMM_SELF));
+#  else
+      static auto communicator =
+        Teuchos::RCP<const Teuchos::Comm<int>>(new Teuchos::Comm<int>());
+#  endif
+
+      return communicator;
+    }
+
+
+
     MPI_Comm
     teuchos_comm_to_mpi_comm(
       const Teuchos::RCP<const Teuchos::Comm<int>> &teuchos_comm)

@@ -79,7 +79,8 @@ IndexSet::IndexSet(
 // the 64-bit path uses a few different names, so put that into a separate
 // implementation
 
-#  ifdef DEAL_II_WITH_64BIT_INDICES
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#    ifdef DEAL_II_WITH_64BIT_INDICES
 
 IndexSet::IndexSet(const Epetra_BlockMap &map)
   : is_compressed(true)
@@ -104,7 +105,7 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
   compress();
 }
 
-#  else
+#    else
 
 // this is the standard 32-bit implementation
 
@@ -131,6 +132,7 @@ IndexSet::IndexSet(const Epetra_BlockMap &map)
   compress();
 }
 
+#    endif
 #  endif
 
 #endif // ifdef DEAL_II_WITH_TRILINOS
@@ -962,8 +964,7 @@ IndexSet::get_index_vector() const
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 template <typename NodeType>
 Tpetra::Map<int, types::signed_global_dof_index, NodeType>
@@ -1018,12 +1019,12 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
       size(),
       n_elements(),
       0,
-#    ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
       Utilities::Trilinos::internal::make_rcp<Teuchos::MpiComm<int>>(
         communicator)
-#    else
+#  else
       Utilities::Trilinos::internal::make_rcp<Teuchos::Comm<int>>()
-#    endif // DEAL_II_WITH_MPI
+#  endif // DEAL_II_WITH_MPI
     );
   else
     {
@@ -1038,19 +1039,20 @@ IndexSet::make_tpetra_map_rcp(const MPI_Comm communicator,
         size(),
         arr_view,
         0,
-#    ifdef DEAL_II_WITH_MPI
+#  ifdef DEAL_II_WITH_MPI
         Utilities::Trilinos::internal::make_rcp<Teuchos::MpiComm<int>>(
           communicator)
-#    else
+#  else
         Utilities::Trilinos::internal::make_rcp<Teuchos::Comm<int>>()
-#    endif // DEAL_II_WITH_MPI
+#  endif // DEAL_II_WITH_MPI
       );
     }
 }
-#  endif
+#endif
 
 
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 Epetra_Map
 IndexSet::make_trilinos_map(const MPI_Comm communicator,
                             const bool     overlapping) const

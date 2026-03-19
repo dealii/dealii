@@ -16,7 +16,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/partitioner.h>

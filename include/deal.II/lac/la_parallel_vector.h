@@ -67,7 +67,7 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 #  endif
 
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 namespace TrilinosWrappers
 {
   namespace MPI

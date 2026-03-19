@@ -50,7 +50,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 namespace Utilities
 {
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * This namespace provides some of the basic structures used in the
    * initialization of the Trilinos objects (e.g., matrices, vectors, and
@@ -81,17 +81,6 @@ namespace Utilities
      */
     const Epetra_Comm &
     comm_self();
-
-    /**
-     * Return a Teuchos::Comm object needed for creation of Tpetra::Maps.
-     *
-     * If deal.II has been configured to use a compiler that does not support
-     * MPI then the resulting communicator will be a serial one. Otherwise,
-     * the communicator will correspond to MPI_COMM_SELF, i.e. a communicator
-     * that comprises only this one processor.
-     */
-    const Teuchos::RCP<const Teuchos::Comm<int>> &
-    tpetra_comm_self();
 
     /**
      * Given a communicator, duplicate it. If the given communicator is
@@ -192,6 +181,17 @@ namespace Utilities
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
   namespace Trilinos
   {
+    /**
+     * Return a Teuchos::Comm object needed for creation of Tpetra::Maps.
+     *
+     * If deal.II has been configured to use a compiler that does not support
+     * MPI then the resulting communicator will be a serial one. Otherwise,
+     * the communicator will correspond to MPI_COMM_SELF, i.e. a communicator
+     * that comprises only this one processor.
+     */
+    const Teuchos::RCP<const Teuchos::Comm<int>> &
+    tpetra_comm_self();
+
     /**
      * Return the underlying MPI_Comm communicator from the
      * <a

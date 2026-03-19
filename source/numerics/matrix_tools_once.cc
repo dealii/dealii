@@ -230,7 +230,7 @@ namespace MatrixTools
 
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
   namespace internal
   {

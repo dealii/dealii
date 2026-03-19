@@ -139,7 +139,7 @@ Vector<Number>::Vector(const PETScWrappers::VectorBase &v)
 #endif
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 template <typename Number>
 Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
@@ -824,7 +824,7 @@ Vector<Number>::operator=(const PETScWrappers::VectorBase &v)
 #endif
 
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 template <typename Number>
 Vector<Number> &

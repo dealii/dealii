@@ -66,6 +66,7 @@ namespace internal
   };
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <typename Number>
   struct MatrixSelector<LinearAlgebra::distributed::Vector<Number>>
   {
@@ -117,6 +118,7 @@ namespace internal
                     true);
     }
   };
+#  endif
 
 #  ifdef DEAL_II_WITH_MPI
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -151,6 +153,7 @@ namespace internal
   };
 #    endif
 
+#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template <>
   struct MatrixSelector<dealii::LinearAlgebra::EpetraWrappers::Vector>
   {
@@ -176,6 +179,7 @@ namespace internal
                     true);
     }
   };
+#    endif
 #  endif
 
 #else
