@@ -58,19 +58,17 @@ template <int dim, int spacedim>
 std::size_t
 MappingFE<dim, spacedim>::InternalData::memory_consumption() const
 {
-  return (
-    Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
-    MemoryConsumption::memory_consumption(shape_values) +
-    MemoryConsumption::memory_consumption(shape_derivatives) +
-    MemoryConsumption::memory_consumption(covariant) +
-    MemoryConsumption::memory_consumption(contravariant) +
-    MemoryConsumption::memory_consumption(unit_tangentials) +
-    MemoryConsumption::memory_consumption(aux) +
-    MemoryConsumption::memory_consumption(mapping_support_points) +
-    MemoryConsumption::memory_consumption(cell_of_current_support_points) +
-    MemoryConsumption::memory_consumption(volume_elements) +
-    MemoryConsumption::memory_consumption(polynomial_degree) +
-    MemoryConsumption::memory_consumption(n_shape_functions));
+  return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
+          MemoryConsumption::memory_consumption(shape_values) +
+          MemoryConsumption::memory_consumption(shape_derivatives) +
+          MemoryConsumption::memory_consumption(covariant) +
+          MemoryConsumption::memory_consumption(contravariant) +
+          MemoryConsumption::memory_consumption(unit_tangentials) +
+          MemoryConsumption::memory_consumption(aux) +
+          MemoryConsumption::memory_consumption(mapping_support_points) +
+          MemoryConsumption::memory_consumption(volume_elements) +
+          MemoryConsumption::memory_consumption(polynomial_degree) +
+          MemoryConsumption::memory_consumption(n_shape_functions));
 }
 
 
@@ -1129,7 +1127,6 @@ MappingFE<dim, spacedim>::fill_fe_values(
   // etc. to reliably test that the "cell" we are on is, therefore,
   // not easily done
   data.mapping_support_points = this->compute_mapping_support_points(cell);
-  data.cell_of_current_support_points = cell;
 
   // if the order of the mapping is greater than 1, then do not reuse any cell
   // similarity information. This is necessary because the cell similarity
@@ -1594,18 +1591,7 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  // if necessary, recompute the support points of the transformation of this
-  // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the
-  // triangulations are not the same)
-  if ((data.mapping_support_points.empty()) ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation()) ||
-      (cell != data.cell_of_current_support_points))
-    {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
-    }
+  data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   internal::MappingFEImplementation::do_fill_fe_face_values(
     *this,
@@ -1640,18 +1626,7 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  // if necessary, recompute the support points of the transformation of this
-  // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the
-  // triangulations are not the same)
-  if ((data.mapping_support_points.empty()) ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation()) ||
-      (cell != data.cell_of_current_support_points))
-    {
-      data.mapping_support_points = this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
-    }
+  data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   internal::MappingFEImplementation::do_fill_fe_face_values(
     *this,

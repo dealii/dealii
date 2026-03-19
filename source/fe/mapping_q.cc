@@ -60,16 +60,14 @@ template <int dim, int spacedim>
 std::size_t
 MappingQ<dim, spacedim>::InternalData::memory_consumption() const
 {
-  return (
-    Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
-    MemoryConsumption::memory_consumption(quadrature_points) +
-    MemoryConsumption::memory_consumption(unit_tangentials) +
-    MemoryConsumption::memory_consumption(aux) +
-    MemoryConsumption::memory_consumption(mapping_support_points) +
-    MemoryConsumption::memory_consumption(cell_of_current_support_points) +
-    MemoryConsumption::memory_consumption(volume_elements) +
-    MemoryConsumption::memory_consumption(polynomial_degree) +
-    MemoryConsumption::memory_consumption(n_shape_functions));
+  return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
+          MemoryConsumption::memory_consumption(quadrature_points) +
+          MemoryConsumption::memory_consumption(unit_tangentials) +
+          MemoryConsumption::memory_consumption(aux) +
+          MemoryConsumption::memory_consumption(mapping_support_points) +
+          MemoryConsumption::memory_consumption(volume_elements) +
+          MemoryConsumption::memory_consumption(polynomial_degree) +
+          MemoryConsumption::memory_consumption(n_shape_functions));
 }
 
 
@@ -864,8 +862,6 @@ MappingQ<dim, spacedim>::fill_fe_values(
   else
     data.mapping_support_points = this->compute_mapping_support_points(cell);
 
-  data.cell_of_current_support_points = cell;
-
   // if the order of the mapping is greater than 1, then do not reuse any cell
   // similarity information. This is necessary because the cell similarity
   // value is computed with just cell vertices and does not take into account
@@ -1072,29 +1068,16 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
   const InternalData &data = static_cast<const InternalData &>(internal_data);
   data.output_data         = &output_data;
 
-  // if necessary, recompute the support points of the transformation of this
-  // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the
-  // triangulations are not the same)
-  if ((data.mapping_support_points.empty()) ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation()) ||
-      (cell != data.cell_of_current_support_points))
+  // compute the support points of the transformation of this cell
+  if (polynomial_degree == 1)
     {
-      if (polynomial_degree == 1)
-        {
-          data.mapping_support_points.resize(
-            GeometryInfo<dim>::vertices_per_cell);
-          const auto vertices = this->get_vertices(cell);
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
-            data.mapping_support_points[i] = vertices[i];
-        }
-      else
-        data.mapping_support_points =
-          this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
+      data.mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
+      const auto vertices = this->get_vertices(cell);
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        data.mapping_support_points[i] = vertices[i];
     }
+  else
+    data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   internal::MappingQImplementation::do_fill_fe_face_values(
     *this,
@@ -1132,29 +1115,16 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
   const InternalData &data = static_cast<const InternalData &>(internal_data);
   data.output_data         = &output_data;
 
-  // if necessary, recompute the support points of the transformation of this
-  // cell (note that we need to first check the triangulation pointer, since
-  // otherwise the second test might trigger an exception if the
-  // triangulations are not the same)
-  if ((data.mapping_support_points.empty()) ||
-      (&cell->get_triangulation() !=
-       &data.cell_of_current_support_points->get_triangulation()) ||
-      (cell != data.cell_of_current_support_points))
+  // compute the support points of the transformation of this cell
+  if (polynomial_degree == 1)
     {
-      if (polynomial_degree == 1)
-        {
-          data.mapping_support_points.resize(
-            GeometryInfo<dim>::vertices_per_cell);
-          const auto vertices = this->get_vertices(cell);
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell;
-               ++i)
-            data.mapping_support_points[i] = vertices[i];
-        }
-      else
-        data.mapping_support_points =
-          this->compute_mapping_support_points(cell);
-      data.cell_of_current_support_points = cell;
+      data.mapping_support_points.resize(GeometryInfo<dim>::vertices_per_cell);
+      const auto vertices = this->get_vertices(cell);
+      for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+        data.mapping_support_points[i] = vertices[i];
     }
+  else
+    data.mapping_support_points = this->compute_mapping_support_points(cell);
 
   internal::MappingQImplementation::do_fill_fe_face_values(
     *this,
@@ -1205,7 +1175,6 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
     }
   else
     data.mapping_support_points = this->compute_mapping_support_points(cell);
-  data.cell_of_current_support_points = cell;
 
   internal::MappingQImplementation::maybe_update_q_points_Jacobians_generic(
     CellSimilarity::none,
