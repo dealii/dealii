@@ -1,0 +1,6 @@
+Fixed: If FEFaceValues::reinit() and FESubfaceValues::reinit() were used on
+objects that remained valid after a change in the triangulation and used the
+same cell, they could sometimes produce wrong results for the metric
+terms. This is now fixed.
+<br>
+(Martin Kronbichler, 2026/03/19)
