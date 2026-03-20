@@ -413,16 +413,9 @@ public:
     mutable std::vector<AlignedVector<Tensor<1, spacedim>>> aux;
 
     /**
-     * Stores the support points of the mapping shape functions on the @p
-     * cell_of_current_support_points.
+     * Stores the support points of the mapping shape functions.
      */
     mutable std::vector<Point<spacedim>> mapping_support_points;
-
-    /**
-     * Stores the cell of which the @p mapping_support_points are stored.
-     */
-    mutable typename Triangulation<dim, spacedim>::cell_iterator
-      cell_of_current_support_points;
 
     /**
      * The determinant of the Jacobian in each quadrature point. Filled if
