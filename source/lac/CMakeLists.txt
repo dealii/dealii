@@ -141,7 +141,6 @@ if(DEAL_II_TRILINOS_WITH_EPETRA)
     ${_inst}
     trilinos_sparse_matrix.inst.in
     trilinos_vector.inst.in
-    trilinos_tpetra_sparse_matrix.inst.in
   )
 endif()
 
@@ -163,6 +162,11 @@ if(DEAL_II_TRILINOS_WITH_TPETRA)
     trilinos_tpetra_sparse_matrix.cc
     trilinos_tpetra_sparsity_pattern.cc
     trilinos_tpetra_vector.cc
+  )
+
+  set(_inst
+    ${_inst}
+    trilinos_tpetra_sparse_matrix.inst.in
   )
 
   if(DEAL_II_TRILINOS_WITH_TPETRA_MUELU)
