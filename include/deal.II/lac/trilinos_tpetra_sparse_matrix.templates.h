@@ -970,8 +970,7 @@ namespace LinearAlgebra
     {
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
       // Trilinos 16.2.0 implements getNorm1() but is buggy. The
-      // implementation
-      // below is copied from there after fixing the bug.
+      // implementation below is copied from there after fixing the bug.
 #  if DEAL_II_TRILINOS_VERSION_GTE(17, 0, 0)
       return matrix->getNorm1();
 #  else

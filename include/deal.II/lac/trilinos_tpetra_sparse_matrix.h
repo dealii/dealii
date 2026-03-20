@@ -30,7 +30,6 @@
 // Tpetra includes
 #  include <Tpetra_Core.hpp>
 #  include <Tpetra_CrsMatrix.hpp>
-#  include <Tpetra_computeRowAndColumnOneNorms.hpp>
 
 #  include <type_traits>
 
