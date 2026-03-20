@@ -1,6 +1,7 @@
 /*build*
 /examples/step*/*build*
 /code-gallery
+.ninja_log
 
 # eclipse
 /.cproject
@@ -14,8 +15,8 @@ qtcreator/
 CMakeLists.txt.user
 
 # clangd
-/.cache
-/.clangd
+.cache
+.clangd
 
 # Python compiled modules
 /contrib/utilities/__pycache__
