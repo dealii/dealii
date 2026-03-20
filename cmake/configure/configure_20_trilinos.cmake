@@ -73,6 +73,7 @@ macro(feature_trilinos_find_external var)
         endif()
       endforeach()
     endif()
+
     item_matches(DEAL_II_TRILINOS_WITH_TPETRA Tpetra ${Trilinos_PACKAGE_LIST})
     if (DEAL_II_TRILINOS_WITH_TPETRA)
       foreach(_module
@@ -314,7 +315,7 @@ macro(feature_trilinos_find_external var)
       set(TRILINOS_KOKKOS_DIR "${TRILINOS_CONFIG_DIR}/..")
     endif()
 
-    if(TRILINOS_WITH_MUELU AND TRILINOS_WITH_TPETRA)
+    if(TRILINOS_WITH_MUELU AND DEAL_II_TRILINOS_WITH_TPETRA)
       #
       # Check if MueLu is actually usable.
       #
