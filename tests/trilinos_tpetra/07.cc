@@ -57,7 +57,8 @@ main(int argc, char **argv)
   try
     {
       {
-        LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Host> m(5U, 5U, 3U);
+        LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Host>
+          m(5U, 5U, 3U);
         test(m);
       }
     }
