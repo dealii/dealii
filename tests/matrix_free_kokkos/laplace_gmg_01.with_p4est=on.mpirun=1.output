@@ -1,4 +1,10 @@
 
+DEAL::n_cells: 8 n_dofs: 125 FE: FESystem<3>[FE_Q<3>(2)]
 DEAL::Solver stopped within 1 - 10 iterations
+DEAL::n_cells: 64 n_dofs: 729 FE: FESystem<3>[FE_Q<3>(2)]
 DEAL::Solver stopped within 1 - 10 iterations
-DEAL::Completed
+DEAL::n_cells: 8 n_dofs: 375 FE: FESystem<3>[FE_Q<3>(2)^3]
+DEAL::Solver stopped within 1 - 10 iterations
+DEAL::n_cells: 64 n_dofs: 2187 FE: FESystem<3>[FE_Q<3>(2)^3]
+DEAL::Solver stopped within 1 - 10 iterations
+DEAL::OK
