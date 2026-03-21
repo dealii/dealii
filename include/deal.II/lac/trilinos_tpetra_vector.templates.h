@@ -458,23 +458,18 @@ namespace LinearAlgebra
     {
       if (s != Number(0))
         Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(s == Number(0.0),
-             ExcMessage("Only 0 can be assigned to a vector."));
+      AssertIsFinite(s);
 
       // First set the elements of the locally owned part of
-      // the vector to 's'.
-      // As checked above, we are only allowed to use s==0.0, so pass
-      // a constant zero (instead of a run-time value 's' that *happens* to
-      // have a zero value) to the underlying class in hopes that the compiler
-      // can optimize this somehow.
-      vector->putScalar(/*s=*/0.0);
+      // the vector to 's':
+      vector->putScalar(s);
 
       // If the vector has ghost elements, then the assertion
       // above checks that s==0. In that case, we're simply
       // zeroing out the entire vector and need to also do
       // that for the ghost entries of the vector.
       if (!nonlocal_vector.is_null())
-        nonlocal_vector->putScalar(/*s=*/0.0);
+        nonlocal_vector->putScalar(Number(0));
 
       return *this;
     }
