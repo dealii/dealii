@@ -933,6 +933,27 @@ namespace LinearAlgebra
       Number
       frobenius_norm() const;
 
+      /**
+       * Return the <i>l</i><sub>1</sub>-norm of the matrix, that is $|M|_1=
+       * \max_{\mathrm{all\ columns\ } j} \sum_{\mathrm{all\ rows\ } i}
+       * |M_{ij}|$, (max. sum of columns).  This is the natural matrix norm that
+       * is compatible to the l1-norm for vectors, i.e.  $|Mv|_1 \leq |M|_1
+       * |v|_1$.  (cf. Haemmerlin-Hoffmann: Numerische Mathematik)
+       */
+      Number
+      l1_norm() const;
+
+      /**
+       * Return the linfty-norm of the matrix, that is
+       * $|M|_\infty=\max_{\mathrm{all\ rows\ } i}\sum_{\mathrm{all\ columns\ }
+       * j} |M_{ij}|$, (max. sum of rows).  This is the natural matrix norm that
+       * is compatible to the linfty-norm of vectors, i.e.  $|Mv|_\infty \leq
+       * |M|_\infty |v|_\infty$.  (cf. Haemmerlin-Hoffmann: Numerische
+       * Mathematik)
+       */
+      Number
+      linfty_norm() const;
+
       /** @} */
 
       /**

@@ -26,6 +26,8 @@
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
+#  include <Tpetra_computeRowAndColumnOneNorms.hpp>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace LinearAlgebra
@@ -958,6 +960,72 @@ namespace LinearAlgebra
     {
       Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
       return matrix->getFrobeniusNorm();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::l1_norm() const
+    {
+      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
+      // Trilinos 16.2.0 implements getNorm1() but is buggy. The
+      // implementation below is copied from there after fixing the bug.
+#  if DEAL_II_TRILINOS_VERSION_GTE(17, 0, 0)
+      return matrix->getNorm1();
+#  else
+      auto   equalInfo = Tpetra::computeRowAndColumnOneNorms(*matrix, false);
+      Number myMax;
+      using range_type =
+        Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space,
+                            int>;
+      Kokkos::parallel_reduce(
+        "getNorm1",
+        range_type(0, equalInfo.colNorms.extent(0)),
+        KOKKOS_LAMBDA(int i, Number &max) {
+          max = Kokkos::max(max, equalInfo.colNorms(i));
+        },
+        Kokkos::Max<Number>(myMax));
+      Number totalMax = 0;
+      Teuchos::reduceAll<int, Number>(*(matrix->getComm()),
+                                      Teuchos::REDUCE_MAX,
+                                      myMax,
+                                      Teuchos::outArg(totalMax));
+      return totalMax;
+#  endif
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    SparseMatrix<Number, MemorySpace>::linfty_norm() const
+    {
+      Assert(matrix->isFillComplete(), ExcMatrixNotCompressed());
+      // Trilinos 16.2.0 implements getNormInf() but is buggy. The
+      // implementation below is copied from there after fixing the bug.
+#  if DEAL_II_TRILINOS_VERSION_GTE(17, 0, 0)
+      return matrix->getNormInf();
+#  else
+      auto   equalInfo = Tpetra::computeRowOneNorms(*matrix);
+      Number myMax;
+      using range_type =
+        Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space,
+                            int>;
+      Kokkos::parallel_reduce(
+        "getNormInf",
+        range_type(0, equalInfo.rowNorms.extent(0)),
+        KOKKOS_LAMBDA(int i, Number &max) {
+          max = Kokkos::max(max, equalInfo.rowNorms(i));
+        },
+        Kokkos::Max<Number>(myMax));
+      Number totalMax = 0;
+      Teuchos::reduceAll<int, Number>(*(matrix->getComm()),
+                                      Teuchos::REDUCE_MAX,
+                                      myMax,
+                                      Teuchos::outArg(totalMax));
+      return totalMax;
+#  endif
     }
 
 
