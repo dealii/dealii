@@ -11,7 +11,8 @@
 // -----------------------------------------------------------------------------
 
 /*
- * Solve a Laplace problem on a hypercube with h multigrid on device.
+ * Solve a Laplace / Vector Laplace problem on a hypercube with h multigrid on
+ * device.
  */
 
 #include <deal.II/base/convergence_table.h>
@@ -175,7 +176,7 @@ public:
     Number *diagonal_global_ptr = diagonal_global.get_values();
 
     Kokkos::parallel_for(
-      "lethe::invert_vector",
+      "invert_vector",
       Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
         0, diagonal_global.locally_owned_size()),
       KOKKOS_LAMBDA(int i) {
@@ -241,6 +242,10 @@ run(const unsigned int n_refinements)
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
+
+  deallog << "n_cells: " << tria.n_active_cells()
+          << " n_dofs: " << dof_handler.n_dofs() << " FE: " << fe.get_name()
+          << std::endl;
 
   AffineConstraints<Number> constraints;
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
@@ -405,6 +410,8 @@ main(int argc, char **argv)
 
   run<dim, fe_degree, 1, MemorySpace::Default>(1);
   run<dim, fe_degree, 1, MemorySpace::Default>(2);
+  run<dim, fe_degree, dim, MemorySpace::Default>(1);
+  run<dim, fe_degree, dim, MemorySpace::Default>(2);
 
-  deallog << "Completed" << std::endl;
+  deallog << "OK" << std::endl;
 }
