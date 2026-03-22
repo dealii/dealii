@@ -1,0 +1,49 @@
+
+DEAL:0::dim: 2, fe_degree: 1, n_points: 3, n_components: 2, dof_handler_index: 0, Number: double
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 386), global size: 386
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 2.800e+00 2.800e+00 2.489e+00 2.489e+00 4.800e+00 4.800e+00 3.911e+00 3.911e+00 1.000e+00 1.000e ...
+DEAL:0::dim: 2, fe_degree: 1, n_points: 3, n_components: 1, dof_handler_index: 1, Number: double
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 55), global size: 55
+Vector data:
+1.500e+00 1.333e+00 3.000e+00 2.667e+00 6.667e-01 1.333e+00 3.000e+00 2.667e+00 1.333e+00 3.000e+00 2.667e+00 1.333e+00 1.500e+00 1.333e+0 ...
+DEAL:0::dim: 2, fe_degree: 1, n_points: 3, n_components: 2, dof_handler_index: 0, Number: float
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 386), global size: 386
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 2.800e+00 2.800e+00 2.489e+00 2.489e+00 4.800e+00 4.800e+00 3.911e+00 3.911e+00 1.000e+00 1.000e ...
+DEAL:0::dim: 2, fe_degree: 1, n_points: 3, n_components: 1, dof_handler_index: 1, Number: float
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 55), global size: 55
+Vector data:
+1.500e+00 1.333e+00 3.000e+00 2.667e+00 6.667e-01 1.333e+00 3.000e+00 2.667e+00 1.333e+00 3.000e+00 2.667e+00 1.333e+00 1.500e+00 1.333e+0 ...
+DEAL:0::dim: 3, fe_degree: 1, n_points: 3, n_components: 3, dof_handler_index: 0, Number: double
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 8943), global size: 8943
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.00 ...
+DEAL:0::dim: 3, fe_degree: 1, n_points: 3, n_components: 1, dof_handler_index: 1, Number: double
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 455), global size: 455
+Vector data:
+5.236e-01 5.236e-01 1.047e+00 1.047e+00 1.047e+00 1.047e+00 2.094e+00 2.094e+00 2.618e-01 5.236e-01 5.236e-01 1.047e+00 1.047e+00 1.047e ...
+DEAL:0::dim: 3, fe_degree: 1, n_points: 3, n_components: 3, dof_handler_index: 0, Number: float
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 8943), global size: 8943
+Vector data:
+1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.000e+00 1.00 ...
+DEAL:0::dim: 3, fe_degree: 1, n_points: 3, n_components: 1, dof_handler_index: 1, Number: float
+DEAL:0::first couple of entries: 
+Process #0
+Local range: [0, 455), global size: 455
+Vector data:
+5.236e-01 5.236e-01 1.047e+00 1.047e+00 1.047e+00 1.047e+00 2.094e+00 2.094e+00 2.618e-01 5.236e-01 5.236e-01 1.047e+00 1.047e+00 1.047e ...

@@ -1542,12 +1542,11 @@ namespace MatrixFreeTools
     const unsigned int first_selected_component,
     const unsigned int first_vector_component)
   {
-    Assert(dof_handler_index == 0, ExcNotImplemented());
     Assert(quadrature_index == 0, ExcNotImplemented());
     Assert(first_selected_component == 0, ExcNotImplemented());
     Assert(first_vector_component == 0, ExcNotImplemented());
 
-    matrix_free.initialize_dof_vector(diagonal_global);
+    matrix_free.initialize_dof_vector(diagonal_global, dof_handler_index);
 
 
     internal::ComputeDiagonalCellAction<dim,
