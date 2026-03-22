@@ -575,6 +575,11 @@ namespace Portable
      * \endcode
      * If VectorType is a LinearAlgebra::distributed::BlockVector, @p func uses
      * BlockDeviceVector instead of DeviceVector for the `src` and `dst` arguments.
+     *
+     * While @p src can be left empty, @p dst must be provided and allocated with
+     * a partitioner of one of the DoFHandlers of this MatrixFree object (or a BlockVector
+     * with one block for each DoFHandler). If @p src is provided, it must have
+     * the same partitioner as @p dst.
      */
     // clang-format on
     template <typename Functor, typename VectorType>

@@ -1497,179 +1497,118 @@ namespace Portable
   {
     MemorySpace::Default::kokkos_space::execution_space exec;
 
-    // Find the correct DoFHandler based on the partitioner of the vector if
-    // possible. If we have only one DoFHandler we assume this is what the user
-    // wanted to do.
-    unsigned int dof_handler_index = 0;
-    if (dof_handler_data.size() > 1)
-      {
-        dof_handler_index = numbers::invalid_unsigned_int;
-
-        for (unsigned int i = 0; i < dof_handler_data.size(); ++i)
-          {
-            if (src.get_partitioner().get() ==
-                dof_handler_data[i].partitioner.get())
-              {
-                Assert(
-                  src.get_partitioner().get() == dst.get_partitioner().get(),
-                  ExcMessage(
-                    "distributed_cell_loop() requires partitioners of both vectors to be equal when using >1 DoFHandler."));
-                dof_handler_index = i;
-                break;
-              }
-          }
-      }
+    // Find the correct DoFHandler based on the partitioner of the dst vector.
+    unsigned int dof_handler_index = numbers::invalid_unsigned_int;
+    {
+      for (unsigned int i = 0; i < dof_handler_data.size(); ++i)
+        {
+          if (dst.get_partitioner().get() ==
+              dof_handler_data[i].partitioner.get())
+            {
+              dof_handler_index = i;
+              break;
+            }
+        }
+    }
 
     AssertThrow(
       dof_handler_index != numbers::invalid_unsigned_int,
       ExcMessage(
         "Could not identify a matching DoFHandler for the vector partitioner in distributed_cell_loop()."));
+    AssertThrow(
+      (src.size() == 0) ||
+        (src.get_partitioner().get() == dst.get_partitioner().get()),
+      ExcMessage(
+        "distributed_cell_loop() requires partitioners of src and dst vectors to be equal or src to be empty."));
 
+    {
+      Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
 
-    // in case we have compatible partitioners, we can simply use the provided
-    // vectors
-    if (src.get_partitioner().get() ==
-          dof_handler_data[dof_handler_index].partitioner.get() &&
-        dst.get_partitioner().get() ==
-          dof_handler_data[dof_handler_index].partitioner.get())
-      {
-        Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
+      // This code is inspired to the code in TaskInfo::loop.
+      if (overlap_communication_computation)
+        {
+          // helper to process one color
+          auto do_color = [&](const unsigned int color) {
+            using TeamPolicy = Kokkos::TeamPolicy<
+              MemorySpace::Default::kokkos_space::execution_space>;
+            auto team_policy =
+              (this->team_size == numbers::invalid_unsigned_int) ?
+                TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                TeamPolicy(exec, n_cells[color], this->team_size);
 
-        // This code is inspired to the code in TaskInfo::loop.
-        if (overlap_communication_computation)
-          {
-            // helper to process one color
-            auto do_color = [&](const unsigned int color) {
-              using TeamPolicy = Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>;
-              auto team_policy =
-                (this->team_size == numbers::invalid_unsigned_int) ?
-                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
-                  TeamPolicy(exec, n_cells[color], this->team_size);
+            for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+              colored_data[di] = get_data(color, di);
 
-              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                colored_data[di] = get_data(color, di);
+            internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+              func, dof_handler_data.size(), colored_data, src, dst);
 
-              internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                func, dof_handler_data.size(), colored_data, src, dst);
+            Kokkos::parallel_for(
+              "dealii::MatrixFree::distributed_cell_loop color " +
+                std::to_string(color),
+              team_policy,
+              apply_kernel);
+          };
 
-              Kokkos::parallel_for(
-                "dealii::MatrixFree::distributed_cell_loop color " +
-                  std::to_string(color),
-                team_policy,
-                apply_kernel);
-            };
+          src.update_ghost_values_start(0);
 
-            src.update_ghost_values_start(0);
+          // In parallel, it's possible that some processors do not own any
+          // cells.
+          if (n_cells[0] > 0)
+            do_color(0);
 
-            // In parallel, it's possible that some processors do not own any
-            // cells.
-            if (n_cells[0] > 0)
-              do_color(0);
+          src.update_ghost_values_finish();
 
-            src.update_ghost_values_finish();
-
-            // In serial this color does not exist because there are no ghost
-            // cells
-            if (n_cells[1] > 0)
-              {
-                do_color(1);
-
-                // We need a synchronization point because we don't want
-                // device-aware MPI to start the MPI communication until the
-                // kernel is done.
-                Kokkos::fence();
-              }
-
-            dst.compress_start(0, VectorOperation::add);
-            // When the mesh is coarse it is possible that some processors do
-            // not own any cells
-            if (n_cells[2] > 0)
-              do_color(2);
-            dst.compress_finish(VectorOperation::add);
-          }
-        else
-          {
-            src.update_ghost_values();
-
-            // Execute the loop on the cells
-            for (unsigned int color = 0; color < n_colors; ++color)
-              if (n_cells[color] > 0)
-                {
-                  using TeamPolicy = Kokkos::TeamPolicy<
-                    MemorySpace::Default::kokkos_space::execution_space>;
-                  auto team_policy =
-                    (this->team_size == numbers::invalid_unsigned_int) ?
-                      TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
-                      TeamPolicy(exec, n_cells[color], this->team_size);
-
-                  for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                    colored_data[di] = get_data(color, di);
-
-                  internal::ApplyKernel<dim, Number, Functor, false>
-                    apply_kernel(
-                      func, dof_handler_data.size(), colored_data, src, dst);
-
-                  Kokkos::parallel_for(
-                    "dealii::MatrixFree::distributed_cell_loop color " +
-                      std::to_string(color),
-                    team_policy,
-                    apply_kernel);
-                }
-            dst.compress(VectorOperation::add);
-          }
-
-        src.zero_out_ghost_values();
-      }
-    else
-      {
-        Assert(dof_handler_index == 0,
-               ExcInternalError(
-                 "creating vectors only works when we have 1 DoFHandler"));
-
-        // Create the ghosted source and the ghosted destination
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-          ghosted_src(dof_handler_data[dof_handler_index].partitioner);
-        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-          ghosted_dst(ghosted_src);
-        ghosted_src = src;
-        ghosted_dst = dst;
-        ghosted_dst.zero_out_ghost_values();
-
-        Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
-
-        // Execute the loop on the cells
-        for (unsigned int color = 0; color < n_colors; ++color)
-          if (n_cells[color] > 0)
+          // In serial this color does not exist because there are no ghost
+          // cells
+          if (n_cells[1] > 0)
             {
-              using TeamPolicy = Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>;
-              auto team_policy =
-                (this->team_size == numbers::invalid_unsigned_int) ?
-                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
-                  TeamPolicy(exec, n_cells[color], this->team_size);
+              do_color(1);
 
-              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                colored_data[di] = get_data(color, di);
-
-              internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
-                func,
-                dof_handler_data.size(),
-                colored_data,
-                ghosted_src,
-                ghosted_dst);
-
-              Kokkos::parallel_for(
-                "dealii::MatrixFree::distributed_cell_loop color " +
-                  std::to_string(color),
-                team_policy,
-                apply_kernel);
+              // We need a synchronization point because we don't want
+              // device-aware MPI to start the MPI communication until the
+              // kernel is done.
+              Kokkos::fence();
             }
 
-        // Add the ghosted values
-        ghosted_dst.compress(VectorOperation::add);
-        dst = ghosted_dst;
-      }
+          dst.compress_start(0, VectorOperation::add);
+          // When the mesh is coarse it is possible that some processors do
+          // not own any cells
+          if (n_cells[2] > 0)
+            do_color(2);
+          dst.compress_finish(VectorOperation::add);
+        }
+      else
+        {
+          src.update_ghost_values();
+
+          // Execute the loop on the cells
+          for (unsigned int color = 0; color < n_colors; ++color)
+            if (n_cells[color] > 0)
+              {
+                using TeamPolicy = Kokkos::TeamPolicy<
+                  MemorySpace::Default::kokkos_space::execution_space>;
+                auto team_policy =
+                  (this->team_size == numbers::invalid_unsigned_int) ?
+                    TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                    TeamPolicy(exec, n_cells[color], this->team_size);
+
+                for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+                  colored_data[di] = get_data(color, di);
+
+                internal::ApplyKernel<dim, Number, Functor, false> apply_kernel(
+                  func, dof_handler_data.size(), colored_data, src, dst);
+
+                Kokkos::parallel_for(
+                  "dealii::MatrixFree::distributed_cell_loop color " +
+                    std::to_string(color),
+                  team_policy,
+                  apply_kernel);
+              }
+          dst.compress(VectorOperation::add);
+        }
+
+      src.zero_out_ghost_values();
+    }
   }
 
 } // namespace Portable
