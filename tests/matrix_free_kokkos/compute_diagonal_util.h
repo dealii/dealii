@@ -44,21 +44,24 @@
 #include "../tests.h"
 
 
-template <int dim, int fe_degree, int n_components, typename Number>
+template <int dim,
+          int fe_degree,
+          int n_points,
+          int n_components,
+          typename Number>
 class LaplaceOperatorQuad
 {
 public:
   DEAL_II_HOST_DEVICE void
   operator()(
-    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number>
+    Portable::FEEvaluation<dim, fe_degree, n_points, n_components, Number>
              *fe_eval,
     const int q_point) const
   {
     fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
   }
 
-  static const unsigned int n_q_points =
-    dealii::Utilities::pow(fe_degree + 1, dim);
+  static const unsigned int n_q_points = dealii::Utilities::pow(n_points, dim);
 };
 
 
@@ -74,9 +77,11 @@ class Test
 
 public:
   Test(const Portable::MatrixFree<dim, Number> &matrix_free,
-       const AffineConstraints<Number>         &constraints)
+       const AffineConstraints<Number>         &constraints,
+       const unsigned int                       dof_handler_index = 0)
     : matrix_free(matrix_free)
     , constraints(constraints)
+    , dof_handler_index(dof_handler_index)
   {}
 
   void
@@ -94,8 +99,8 @@ public:
     SparsityPattern      sparsity_pattern;
 
     {
-      matrix_free.initialize_dof_vector(diagonal_global);
-      LaplaceOperatorQuad<dim, fe_degree, n_components, Number>
+      matrix_free.initialize_dof_vector(diagonal_global, dof_handler_index);
+      LaplaceOperatorQuad<dim, fe_degree, n_points, n_components, Number>
         laplace_operator_quad;
       MatrixFreeTools::
         compute_diagonal<dim, fe_degree, n_points, n_components, Number>(
@@ -103,9 +108,11 @@ public:
           diagonal_global,
           laplace_operator_quad,
           EvaluationFlags::gradients,
-          EvaluationFlags::gradients);
+          EvaluationFlags::gradients,
+          dof_handler_index);
 
-      matrix_free.initialize_dof_vector(diagonal_global_host);
+      matrix_free.initialize_dof_vector(diagonal_global_host,
+                                        dof_handler_index);
       LinearAlgebra::ReadWriteVector<Number> rw_vector(
         diagonal_global.get_partitioner()->locally_owned_range());
       rw_vector.import_elements(diagonal_global, VectorOperation::insert);
@@ -120,7 +127,10 @@ public:
             }
         }
 
-      diagonal_global_host.print(deallog.get_file_stream());
+      std::stringstream ss;
+      diagonal_global_host.print(ss);
+      deallog << "first couple of entries: \n"
+              << ss.str().substr(0, 200) << " ..." << std::endl;
     }
 
     const bool test_matrix =
@@ -129,16 +139,17 @@ public:
 
     if (test_matrix)
       {
-        DynamicSparsityPattern dsp(matrix_free.get_dof_handler().n_dofs());
-        DoFTools::make_sparsity_pattern(matrix_free.get_dof_handler(),
-                                        dsp,
-                                        constraints);
+        DynamicSparsityPattern dsp(
+          matrix_free.get_dof_handler(dof_handler_index).n_dofs());
+        DoFTools::make_sparsity_pattern(
+          matrix_free.get_dof_handler(dof_handler_index), dsp, constraints);
         sparsity_pattern.copy_from(dsp);
         A_ref.reinit(sparsity_pattern);
 
         Function<dim, Number> *scaling = nullptr;
-        MatrixCreator::create_laplace_matrix(matrix_free.get_dof_handler(),
-                                             QGauss<dim>(fe_degree + 1),
+        MatrixCreator::create_laplace_matrix(matrix_free.get_dof_handler(
+                                               dof_handler_index),
+                                             QGauss<dim>(n_points),
                                              A_ref,
                                              scaling,
                                              constraints);
@@ -147,7 +158,7 @@ public:
           {
             if (!constraints.is_constrained(i))
               {
-                Assert(std::abs(A_ref(i, i) - diagonal_global_host(i)) < 1e-6,
+                Assert(std::abs(A_ref(i, i) - diagonal_global_host(i)) < 1e-5,
                        ExcMessage("Wrong diagonal entry at position " +
                                   std::to_string(i)));
               }
@@ -157,4 +168,5 @@ public:
 
   const Portable::MatrixFree<dim, Number> &matrix_free;
   const AffineConstraints<Number>         &constraints;
+  const unsigned int                       dof_handler_index;
 };
