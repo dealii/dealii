@@ -25,11 +25,32 @@ namespace internal
     template <int dim>
     TriaFaces<dim>::TriaFaces(const unsigned int max_children_per_quad,
                               const unsigned int max_lines_per_quad)
-      : quads(2, max_children_per_quad, max_lines_per_quad)
+      : max_lines_per_quad(max_lines_per_quad)
+      , quads(2, max_children_per_quad, max_lines_per_quad)
       , lines(1,
               ReferenceCells::max_n_children<1>(),
               ReferenceCells::max_n_faces<1>())
     {}
+
+
+
+    template <int dim>
+    void
+    TriaFaces<dim>::allocate(const std::size_t n_lines,
+                             const std::size_t n_quads)
+    {
+      if (dim > 1)
+        {
+          lines.allocate(n_lines);
+        }
+
+      if (dim == 3)
+        {
+          quads.allocate(n_quads);
+          quad_is_quadrilateral.assign(n_quads, true);
+          quads_line_orientations.assign(n_quads * max_lines_per_quad, true);
+        }
+    }
 
 
 

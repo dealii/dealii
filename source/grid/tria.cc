@@ -3903,23 +3903,28 @@ namespace internal
         const auto connectivity = build_connectivity(cells);
         const auto n_cells      = cells.size();
 
+        const ArrayOfArrays  empty;
+        const ArrayOfArrays &lines_to_vertices =
+          dim > 1 ? connectivity.entity_to_entities(1, 0) : empty;
+        const ArrayOfArrays &quads_to_lines =
+          dim == 3 ? connectivity.entity_to_entities(2, 1) : empty;
+        const unsigned int n_lines = lines_to_vertices.size();
+        const unsigned int n_quads = quads_to_lines.size();
+
+        if (dim > 1)
+          tria.faces->allocate(n_lines, n_quads);
+
         // TriaObjects: lines
-        if (dim >= 2)
+        if (dim > 1)
           {
-            auto &lines_0 = tria.faces->lines; // data structure to be filled
-
-            // get connectivity between quads and lines
-            const ArrayOfArrays &lines_to_vertices =
-              connectivity.entity_to_entities(1, 0);
-            const unsigned int n_lines = lines_to_vertices.size();
-
-            lines_0.allocate(n_lines);
+            auto &faces = *tria.faces;
             // loop over lines
             for (unsigned int line = 0; line < n_lines; ++line)
               {
                 const auto vertices = lines_to_vertices[line];
                 for (unsigned int v = 0; v < vertices.size(); ++v)
-                  lines_0.cells[line * lines_0.children_per_object + v] =
+                  faces.lines
+                    .cells[line * faces.lines.children_per_object + v] =
                     vertices[v]; // set vertex indices
               }
           }
@@ -3927,15 +3932,8 @@ namespace internal
         // TriaObjects: quads
         if (dim == 3)
           {
-            auto &quads_0 = tria.faces->quads; // data structures to be filled
-            auto &faces   = *tria.faces;
-
+            auto &faces = *tria.faces;
             // get connectivity between quads and lines
-            const auto &quads_to_lines = connectivity.entity_to_entities(2, 1);
-            const unsigned int n_quads = quads_to_lines.size();
-
-            quads_0.allocate(n_quads);
-            reserve_space_(faces, 2 /*structdim*/, n_quads);
 
             // loop over all quads -> entity type, line indices/orientations
             for (unsigned int q = 0, k = 0; q < n_quads; ++q)
@@ -3950,7 +3948,7 @@ namespace internal
                   {
                     AssertIndexRange(l, reference_cell.n_lines());
                     // set line index
-                    quads_0.cells[q * quads_0.children_per_object + l] =
+                    faces.quads.cells[q * faces.quads.children_per_object + l] =
                       lines[l];
 
                     // set line orientations
@@ -4236,23 +4234,6 @@ namespace internal
       }
 
 
-
-      template <int dim>
-      static void
-      reserve_space_(TriaFaces<dim>    &faces,
-                     const unsigned     structdim,
-                     const unsigned int size)
-      {
-        if (dim == 3 && structdim == 2)
-          {
-            // quad entity types
-            faces.quad_is_quadrilateral.assign(size, true);
-
-            // quad line orientations
-            faces.quads_line_orientations.assign(size * max_n_faces(structdim),
-                                                 true);
-          }
-      }
 
       /**
        * Actually delete a cell, or rather all
