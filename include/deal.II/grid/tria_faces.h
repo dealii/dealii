@@ -63,6 +63,18 @@ namespace internal
       TriaFaces() = default;
 
       /**
+       * Resize all internal arrays and populate with default values.
+       */
+      void
+      allocate(const std::size_t n_lines, const std::size_t n_quads);
+
+      /**
+       * Maximum number of lines for each quad (i.e., face of a 3d cell).
+       * Only used for `dim == 3`.
+       */
+      unsigned int max_lines_per_quad;
+
+      /**
        * The TriaObject containing the data of quads.
        *
        * @note Used only for dim=3.
