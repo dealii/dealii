@@ -35,6 +35,35 @@ DEAL_II_NAMESPACE_OPEN
 namespace PSCToolkitWrappers
 {
 
+  /**
+   * Implementation of a distributed parallel vector class based on PSBLAS
+   * (Parallel Sparse BLAS), which is the computational kernel of the
+   * <a href="https://psctoolkit.github.io/">PSCToolkit</a> library.
+   *
+   * This class stores a contiguous block of vector entries on each MPI
+   * process according to an IndexSet partitioning, and optionally
+   * maintains read-only ghost elements for entries owned by other
+   * processes. It supports the standard algebraic operations (addition,
+   * scaling, inner products, norms) as well as element-wise access. The
+   * interface is designed to be as close as possible to that of
+   * PETScWrappers::MPI::Vector.
+   *
+   * A typical workflow for using this vector is as follows:
+   * -# Create the vector by providing an IndexSet that describes the
+   *    parallel partitioning (i.e., which global degrees of freedom are
+   *    owned by each MPI process) and the MPI communicator, either
+   *    through the constructor or a call to reinit().  At this point the
+   *    vector is in the <em>Build</em> state.
+   * -# Fill the vector by inserting or adding values through set(),
+   *    add(), or the element access operators.
+   * -# Call compress() to transition the vector to the
+   *    <em>Assembled</em> state, in which algebraic operations such as
+   *    norms, inner products, and matrix-vector products become
+   *    available.
+   *
+   * @ingroup PSCToolkitWrappers
+   * @ingroup Vectors
+   */
   class Vector : public ReadVector<double>
   {
   private:
@@ -446,7 +475,6 @@ namespace PSCToolkitWrappers
      * this->add(a, V);
      * return_value = *this * W;
      * @endcode
-     *
      */
     value_type
     add_and_dot(const value_type a, const Vector &v, const Vector &W);
@@ -688,7 +716,7 @@ namespace PSCToolkitWrappers
     psb_c_ctxt *psblas_context;
 
     /*
-     * Pointer to PSBLAS descriptor.
+     * Shared pointer to the PSBLAS descriptor.
      */
     std::shared_ptr<psb_c_descriptor> psblas_descriptor;
 

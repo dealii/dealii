@@ -34,6 +34,34 @@ DEAL_II_NAMESPACE_OPEN
 namespace PSCToolkitWrappers
 {
 
+  /**
+   * Implementation of a distributed parallel sparse matrix class based on
+   * PSBLAS (Parallel Sparse BLAS), which is the computational kernel of the
+   * <a href="https://psctoolkit.github.io/">PSCToolkit</a> library.
+   *
+   * Rows of the matrix are distributed across MPI processes according to
+   * an IndexSet partitioning (just as for the Vector class). The matrix
+   * supports element-wise set/add assembly as well as matrix-vector
+   * products (vmult(), Tvmult(), and their <code>_add</code> variants).
+   *
+   * A typical workflow for using this matrix is as follows:
+   * -# Create the matrix by providing a SparsityPattern (recommended) or
+   *    an IndexSet that describes the parallel row partitioning, together
+   *    with the MPI communicator, either through the constructor or a
+   *    call to reinit().  At this point the matrix is in the
+   *    <em>Build</em> state.
+   * -# Fill the matrix by inserting or adding entries through set() or
+   *    add().
+   * -# Call compress() to transition the matrix to the
+   *    <em>Assembled</em> state, in which matrix-vector products and
+   *    other algebraic operations become available.
+   *
+   * A SparsityPattern can optionally be provided at construction time to
+   * pre-allocate the non-zero structure, which is strongly recommended
+   * for performance.
+   *
+   * @ingroup PSCToolkitWrappers
+   */
   class SparseMatrix : public EnableObserverPointer
   {
   public:
@@ -65,13 +93,11 @@ namespace PSCToolkitWrappers
 
     /**
      * Copy-constructor is deleted.
-     *
      */
     SparseMatrix(const SparseMatrix &) = delete;
 
     /**
      * Copy assignment is deleted.
-     *
      */
     SparseMatrix &
     operator=(const SparseMatrix &) = delete;
@@ -164,14 +190,12 @@ namespace PSCToolkitWrappers
 
     /**
      * Return the value of the matrix entry (<i>i,j</i>).
-     *
      */
     value_type
     el(const size_type i, const size_type j) const;
 
     /**
      * Return the diagonal element of the matrix at row <i>i</i>.
-     *
      */
     value_type
     diag_element(const size_type i) const;
@@ -179,7 +203,6 @@ namespace PSCToolkitWrappers
     /**
      * Return the element (i,j) of the matrix. This function is equivalent to
      * the el() function.
-     *
      */
     value_type
     operator()(const size_type i, const size_type j) const;
@@ -235,8 +258,8 @@ namespace PSCToolkitWrappers
 
     /**
      * Same as above, but with a vector of values instead of a pointer to an
-     * array. The vector must have the same size as the number of columns
-     given by @p ncols and the size of @p col_indices.
+     * array. The vector must have the same size as the number of columns given
+     * by @p ncols and the size of @p col_indices.
      */
     void
     add(const size_type                row,
@@ -329,7 +352,6 @@ namespace PSCToolkitWrappers
 
     /**
      * Returns the trace of the matrix, i.e., the sum of the diagonal elements.
-     *
      */
     value_type
     trace() const;
@@ -359,25 +381,21 @@ namespace PSCToolkitWrappers
   private:
     /**
      * The underlying MPI communicator.
-     *
      */
     MPI_Comm communicator;
 
     /**
      * Pointer the underlying PSBLAS sparse matrix.
-     *
      */
     psb_c_dspmat *psblas_sparse_matrix;
 
     /**
      * Shared pointer to the underlying PSBLAS descriptor object.
-     *
      */
     std::shared_ptr<psb_c_descriptor> psblas_descriptor;
 
     /**
      * Pointer to the underlying PSBLAS context object.
-     *
      */
     psb_c_ctxt *psblas_context;
 

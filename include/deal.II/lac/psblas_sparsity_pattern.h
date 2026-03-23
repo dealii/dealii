@@ -27,7 +27,19 @@ namespace PSCToolkitWrappers
 {
 
   /**
-   * This class implements a sparsity pattern based on PSBLAS framework.
+   * Implementation of a distributed sparsity pattern based on PSBLAS
+   * (Parallel Sparse BLAS), which is the
+   * computational kernel of the
+   * <a href="https://psctoolkit.github.io/">PSCToolkit</a> library.
+   *
+   * This class describes the non-zero structure of a distributed sparse
+   * matrix.  Rows are partitioned across MPI processes according to an
+   * IndexSet.  After construction the pattern is in the <em>Build</em>
+   * state; calling compress() transitions it to the <em>Assembled</em>
+   * state so that it can be passed to a SparseMatrix for allocation.
+   *
+   * @ingroup PSCToolkitWrappers
+   * @ingroup Sparsity
    */
   class SparsityPattern : public SparsityPatternBase
   {
@@ -60,11 +72,19 @@ namespace PSCToolkitWrappers
                 ForwardIterator end,
                 const bool      indices_are_sorted = false);
 
+    /**
+     * Add new entries to a given row. It calls the add_entries() function using
+     * columns.begin() and columns.end() as begin and end iterators,
+     * respectively.
+     */
     virtual void
     add_row_entries(const size_type                  &row,
                     const ArrayView<const size_type> &columns,
                     const bool indices_are_sorted = false) override;
 
+    /**
+     * Add a single entry to the sparsity pattern.
+     */
     void
     add(const size_type i, const size_type j);
 
@@ -82,6 +102,9 @@ namespace PSCToolkitWrappers
     compress();
 
   private:
+    /**
+     * Shared pointer to the PSBLAS descriptor object.
+     */
     std::shared_ptr<psb_c_descriptor> psblas_descriptor;
 
     friend class SparseMatrix;

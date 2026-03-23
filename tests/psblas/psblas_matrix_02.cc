@@ -36,7 +36,7 @@
 
 #include <iostream>
 
-#include "../../tests/tests.h"
+#include "../tests.h"
 
 using namespace dealii;
 
