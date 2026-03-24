@@ -24,7 +24,6 @@
 import sys
 import re
 
-
 match_export = re.compile(r"^export module dealii *: *(.*);")
 
 

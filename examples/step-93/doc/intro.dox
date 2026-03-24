@@ -139,7 +139,7 @@ in such a form. Take $(\mathcal{M}_{i, j}) = \int_\Omega\varphi_i\varphi_j$, $(\
   \mathcal{F}\Lambda =& 0.
  @f}
 
-Moving known quantities to the right-hand-side and combinging the matrix equations gives us an
+Moving known quantities to the right-hand-side and combining the matrix equations gives us an
 idealized system to solve:
 
 @f{align*}{

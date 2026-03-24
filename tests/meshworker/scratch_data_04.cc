@@ -106,12 +106,12 @@ test()
       H1_norm += (u[q] * u[q] + grad_u[q] * grad_u[q]) * JxW[q];
   };
 
-  const auto empty_copyer = [](const CopyData &) {};
+  const auto empty_copier = [](const CopyData &) {};
 
   mesh_loop(cell,
             endc,
             cell_integrator,
-            empty_copyer,
+            empty_copier,
             scratch,
             copy,
             assemble_own_cells);

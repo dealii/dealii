@@ -157,20 +157,16 @@ def check_clang_format_version(clang_format_binary, compatible_version_list):
                 r"Version\s*([\d.]+)", clang_format_version, re.IGNORECASE
             ).group(1)
             if version_number not in compatible_version_list:
-                sys.exit(
-                    """
+                sys.exit("""
                     ***
                     ***   No compatible clang-format program found.
                     ***
                     ***   Install any of the following versions
-                    ***"""
-                    + ", ".join(compatible_version_list)
-                )
+                    ***""" + ", ".join(compatible_version_list))
         except subprocess.CalledProcessError as subprocess_error:
             raise SystemExit(subprocess_error)
     else:
-        sys.exit(
-            """
+        sys.exit("""
             ***
             ***   No clang-format program found.
             ***
@@ -180,8 +176,7 @@ def check_clang_format_version(clang_format_binary, compatible_version_list):
             ***       'contrib/utilities/compile_clang_format'
             ***   to install a compatible binary into 'contrib/utilities/programs'.
             ***
-            """
-        )
+            """)
 
 
 def format_file(parsed_arguments, task_queue, temp_dir):

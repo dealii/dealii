@@ -26,7 +26,6 @@ from glob import glob
 import networkx as nx
 import re
 
-
 match_imports = re.compile(r"import *: *(.*);")
 match_exports = re.compile(r"export module dealii *: *(.*);")
 

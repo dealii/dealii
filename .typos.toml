@@ -17,6 +17,8 @@ multline = "multline"
 Tro = "Tro"
 arange = "arange"
 iy = "iy"
+iz = "iz"
+IZ = "IZ"
 Strang = "Strang"
 SuperMUC = "SuperMUC"
 pn = "pn"
@@ -50,6 +52,7 @@ Ned = "Ned"
 BA = "BA"
 Fike = "Fike"
 clen = "clen"
+cpy = "cpy"
 
 # Don't check the following files
 [files]
