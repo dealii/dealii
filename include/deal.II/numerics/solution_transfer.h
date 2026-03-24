@@ -309,7 +309,7 @@ public:
    * happen. At the time when this constructor is called, the DoFHandler
    * still points to the Triangulation before the refinement in question
    *   happens.
-   * @param[in] average_values Average the contribututions to the same
+   * @param[in] average_values Average the contributions to the same
    *   DoF coming from different cells. Note: averaging requires an
    * additional communication step, since the valence of the DoF has to be
    * determined.

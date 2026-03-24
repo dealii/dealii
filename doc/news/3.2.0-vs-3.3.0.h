@@ -144,7 +144,7 @@ All entries are signed with the names of the author.
        class="class">Functions::CutOffFunctionLinfty</code>, <code
        class="class">Functions::CutOffFunctionW1</code>, and <code
        class="class">Functions::CutOffFunctionCinfty</code> can be
-       vector-valued now and optionally only a single componente can
+       vector-valued now and optionally only a single component can
        be selected.
        <br>
        (GK 2002/01/10)

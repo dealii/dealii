@@ -826,7 +826,7 @@ namespace hp
       //
       // establish hierarchy
       //
-      // - create bimap between hierarchy levels and FE indices
+      // - create bidirectional map between hierarchy levels and FE indices
 
       // there can be as many levels in the hierarchy as active FE indices are
       // possible

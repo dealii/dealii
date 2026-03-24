@@ -26,7 +26,6 @@ import re
 
 import convert_to_module_units_common as header_to_partition_maps
 
-
 header_file = sys.argv[1]
 interface_module_unit_file = sys.argv[2]
 

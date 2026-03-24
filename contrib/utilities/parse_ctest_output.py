@@ -140,8 +140,7 @@ allgroups = sorted(allgroups)
 
 f = open("tests.html", "w")
 f.write("<html><head></head>")
-f.write(
-    """<style type="text/css">
+f.write("""<style type="text/css">
 table {
 border-collapse:collapse;
 }
@@ -187,10 +186,8 @@ border: 2px solid;
 .onerow {background: #FFE}
 .otherrow {background: #EEE}
 
-</style>"""
-)
-f.write(
-    """<script>
+</style>""")
+f.write("""<script>
 function toggle_id(obj)
 {
 var e = document.getElementById(obj);
@@ -200,8 +197,7 @@ else
  e.style.display = '';
 }
 </script>
-<body>"""
-)
+<body>""")
 f.write("<table>")
 
 f.write('<colgroup span="1" class="colgroup""/>')
