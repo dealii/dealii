@@ -106,6 +106,12 @@ namespace TrilinosWrappers
 
 
 
+  SparsityPattern::SparsityPattern(const size_type m, const size_type n)
+    : SparsityPattern(m, n, 0)
+  {}
+
+
+
   SparsityPattern::SparsityPattern(
     const size_type               m,
     const size_type               n,
@@ -154,6 +160,19 @@ namespace TrilinosWrappers
 
 
 
+  SparsityPattern::SparsityPattern(const IndexSet &parallel_partitioning,
+                                   const MPI_Comm  communicator)
+    : SparsityPattern(parallel_partitioning, communicator, 0)
+  {}
+
+
+
+  SparsityPattern::SparsityPattern(const IndexSet &parallel_partitioning)
+    : SparsityPattern(parallel_partitioning, MPI_COMM_WORLD, 0)
+  {}
+
+
+
   SparsityPattern::SparsityPattern(
     const IndexSet               &parallel_partitioning,
     const MPI_Comm                communicator,
@@ -177,6 +196,27 @@ namespace TrilinosWrappers
            communicator,
            n_entries_per_row);
   }
+
+
+
+  SparsityPattern::SparsityPattern(const IndexSet &row_parallel_partitioning,
+                                   const IndexSet &col_parallel_partitioning,
+                                   const MPI_Comm  communicator)
+    : SparsityPattern(row_parallel_partitioning,
+                      col_parallel_partitioning,
+                      communicator,
+                      0)
+  {}
+
+
+
+  SparsityPattern::SparsityPattern(const IndexSet &row_parallel_partitioning,
+                                   const IndexSet &col_parallel_partitioning)
+    : SparsityPattern(row_parallel_partitioning,
+                      col_parallel_partitioning,
+                      MPI_COMM_WORLD,
+                      0)
+  {}
 
 
 
@@ -223,6 +263,14 @@ namespace TrilinosWrappers
 
 
   void
+  SparsityPattern::reinit(const size_type m, const size_type n)
+  {
+    reinit(m, n, 0);
+  }
+
+
+
+  void
   SparsityPattern::reinit(const size_type               m,
                           const size_type               n,
                           const std::vector<size_type> &n_entries_per_row)
@@ -258,9 +306,14 @@ namespace TrilinosWrappers
       graph.reset();
       column_space_map = std::make_unique<Epetra_Map>(col_map);
 
-      AssertThrow((TrilinosWrappers::max_my_gid(row_map) -
-                   TrilinosWrappers::min_my_gid(row_map)) *
-                      std::uint64_t(n_entries_per_row) <
+      // for empty ranges the maximum index might be lower than the minimum
+      // index
+      auto max_local_elements =
+        std::max(TrilinosWrappers::max_my_gid(row_map) -
+                   TrilinosWrappers::min_my_gid(row_map),
+                 TrilinosWrappers::types::int_type(0)) *
+        std::uint64_t(n_entries_per_row);
+      AssertThrow(max_local_elements <
                     static_cast<std::uint64_t>(std::numeric_limits<int>::max()),
                   ExcMessage("The TrilinosWrappers use Epetra internally which "
                              "uses 'signed int' to represent local indices. "
@@ -475,6 +528,23 @@ namespace TrilinosWrappers
 
 
   void
+  SparsityPattern::reinit(const IndexSet &parallel_partitioning,
+                          const MPI_Comm  communicator)
+  {
+    reinit(parallel_partitioning, communicator, 0);
+  }
+
+
+
+  void
+  SparsityPattern::reinit(const IndexSet &parallel_partitioning)
+  {
+    reinit(parallel_partitioning, MPI_COMM_WORLD, 0);
+  }
+
+
+
+  void
   SparsityPattern::reinit(const IndexSet               &parallel_partitioning,
                           const MPI_Comm                communicator,
                           const std::vector<size_type> &n_entries_per_row)
@@ -507,6 +577,31 @@ namespace TrilinosWrappers
               column_space_map,
               graph,
               nonlocal_graph);
+  }
+
+
+
+  void
+  SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
+                          const IndexSet &col_parallel_partitioning,
+                          const MPI_Comm  communicator)
+  {
+    reinit(row_parallel_partitioning,
+           col_parallel_partitioning,
+           communicator,
+           0);
+  }
+
+
+
+  void
+  SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
+                          const IndexSet &col_parallel_partitioning)
+  {
+    reinit(row_parallel_partitioning,
+           col_parallel_partitioning,
+           MPI_COMM_WORLD,
+           0);
   }
 
 
@@ -580,7 +675,36 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityPatternType>
+  void
+  SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
+                          const IndexSet &col_parallel_partitioning,
+                          const IndexSet &writable_rows,
+                          const MPI_Comm  communicator)
+  {
+    reinit(row_parallel_partitioning,
+           col_parallel_partitioning,
+           writable_rows,
+           communicator,
+           0);
+  }
+
+
+
+  void
+  SparsityPattern::reinit(const IndexSet &row_parallel_partitioning,
+                          const IndexSet &col_parallel_partitioning,
+                          const IndexSet &writable_rows)
+  {
+    reinit(row_parallel_partitioning,
+           col_parallel_partitioning,
+           writable_rows,
+           MPI_COMM_WORLD,
+           0);
+  }
+
+
+
+  template <typename SparsityPatternType, typename>
   void
   SparsityPattern::reinit(
     const IndexSet            &row_parallel_partitioning,
@@ -606,7 +730,7 @@ namespace TrilinosWrappers
 
 
 
-  template <typename SparsityPatternType>
+  template <typename SparsityPatternType, typename>
   void
   SparsityPattern::reinit(
     const IndexSet            &parallel_partitioning,
