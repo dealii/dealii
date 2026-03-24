@@ -570,11 +570,11 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
-  template <typename NodeType, typename Dummy>
-  std::enable_if_t<std::is_same_v<Dummy, Number> &&
-                   dealii::is_tpetra_type<Number>::value>
+  template <typename NodeType, typename OtherNumber>
+  std::enable_if_t<dealii::is_tpetra_type<OtherNumber>::value>
   ReadWriteVector<Number>::import_elements(
-    const Tpetra::Vector<Number, int, types::signed_global_dof_index, NodeType>
+    const Tpetra::
+      Vector<OtherNumber, int, types::signed_global_dof_index, NodeType>
                            &vector,
     const IndexSet         &source_elements,
     VectorOperation::values operation,
@@ -628,7 +628,7 @@ namespace LinearAlgebra
     Tpetra::Export<int, types::signed_global_dof_index, NodeType> tpetra_export(
       tpetra_comm_pattern->get_tpetra_export());
 
-    Tpetra::Vector<Number, int, types::signed_global_dof_index, NodeType>
+    Tpetra::Vector<OtherNumber, int, types::signed_global_dof_index, NodeType>
       target_vector(tpetra_export.getSourceMap());
 
     // Communicate the vector to the correct map.
@@ -887,11 +887,10 @@ namespace LinearAlgebra
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename Number>
-  template <typename MemorySpace, typename Dummy>
-  std::enable_if_t<std::is_same_v<Dummy, Number> &&
-                   dealii::is_tpetra_type<Number>::value>
+  template <typename MemorySpace, typename OtherNumber>
+  std::enable_if_t<dealii::is_tpetra_type<OtherNumber>::value>
   ReadWriteVector<Number>::import_elements(
-    const LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>
+    const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace>
                            &trilinos_vec,
     VectorOperation::values operation,
     const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
