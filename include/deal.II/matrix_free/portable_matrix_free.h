@@ -571,7 +571,8 @@ namespace Portable
      *   const typename Portable::MatrixFree<dim, Number>::Data *data,
      *   const DeviceVector<Number>                             &src,
      *   DeviceVector<Number>                                   &dst) const;
-     *   static const unsigned int n_q_points;
+     *
+     * static const unsigned int n_q_points;
      * \endcode
      * If VectorType is a LinearAlgebra::distributed::BlockVector, @p func uses
      * BlockDeviceVector instead of DeviceVector for the `src` and `dst` arguments.
@@ -593,10 +594,15 @@ namespace Portable
      * each element in parallel. This function is very similar to cell_loop()
      * but it uses a simpler functor.
      *
+     * A typical usage of this function is to fill a Kokkos::View or
+     * LinearAlgebra::distributed::Vector with data for every cell or
+     * quadrature point. See step-64 for an example.
+     *
      * @p func needs to define
      * \code
-     *  DEAL_II_HOST_DEVICE void operator()(
-     *    const typename Portable::MatrixFree<dim, Number>::Data *data);
+     * DEAL_II_HOST_DEVICE void operator()(
+     *   const typename Portable::MatrixFree<dim, Number>::Data *data);
+     *
      * static const unsigned int n_q_points;
      * \endcode
      */
