@@ -381,7 +381,7 @@ namespace Portable
       AssertThrow(
         false,
         ExcMessage(
-          "This feature requires Kokkos version 4.0.0 or newer. The support for older versions of Kokkos is underway and will be added shortly."));
+          "This feature requires Kokkos version 4.0.0 or newer. "));
 #endif
       // apply weights
       Kokkos::parallel_for(Kokkos::TeamThreadRange(
