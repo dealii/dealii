@@ -1,0 +1,16 @@
+
+DEAL:0::Start without renumbering
+DEAL:0::{[0,24]}
+DEAL:0::{[0,24]}
+DEAL:0::local_range: 0 - 25
+DEAL:0::Finished without renumbering
+DEAL:0::Start with renumbering
+DEAL:0::n_dofs = 25
+DEAL:0::before renumbering:
+DEAL:0::{[0,24]}
+DEAL:0::after renumbering:
+DEAL:0::{[0,24]}
+DEAL:0::{[0,24]}
+DEAL:0::{[0,24]}
+DEAL:0::local_range: 0 - 25
+DEAL:0::Finished with renumbering
