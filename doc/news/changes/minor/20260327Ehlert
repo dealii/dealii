@@ -1,0 +1,5 @@
+Extended: parallel::distributed::Triangulation::copy_triangulation() now allows to
+control whether to copy also the triangulation settings or to use a developer provided
+setting.
+This can be useful for multigrid computations.
+(Vivienne Ehlert, Martin Kronbichler, 2026/03/27)

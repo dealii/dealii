@@ -94,7 +94,27 @@ namespace MGTransferGlobalCoarseningTools
       {
         // copy triangulation
         auto new_tria = create_new_empty_triangulation();
+
+#ifdef DEAL_II_WITH_P4EST
+        if constexpr (dim > 1 && dim == spacedim)
+          {
+            if (auto new_distr_tria = dynamic_cast<
+                  parallel::distributed::Triangulation<dim, spacedim> *>(
+                  &*new_tria))
+              new_distr_tria->copy_triangulation(
+                *coarse_grid_triangulations[l],
+                parallel::distributed::Triangulation<dim>::default_setting);
+            else
+              new_tria->copy_triangulation(*coarse_grid_triangulations[l]);
+          }
+        else
+          {
+            new_tria->copy_triangulation(*coarse_grid_triangulations[l]);
+          }
+#else
         new_tria->copy_triangulation(*coarse_grid_triangulations[l]);
+#endif
+
         new_tria->set_mesh_smoothing(mesh_smoothing);
 
         // coarsen mesh
