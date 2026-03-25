@@ -4077,10 +4077,9 @@ ReferenceCell::face_to_cell_line_orientation(
                      numbers::reverse_line_orientation;
     }
   else
-    DEAL_II_NOT_IMPLEMENTED();
-
-  DEAL_II_ASSERT_UNREACHABLE();
-  return numbers::default_geometric_orientation;
+    // TODO: This might actually be wrong for some of the other
+    // kinds of objects. We should check this
+    return numbers::default_geometric_orientation;
 }
 
 inline unsigned int
