@@ -69,8 +69,29 @@ if(Trilinos_FOUND)
   endif()  
 
   #
-  # Look for Epetra_config.h - we'll query it to determine MPI and 64bit
-  # indices support:
+  # Look for Teuchos_config.h - we'll query it to determine MPI support:
+  #
+  deal_ii_find_file(TEUCHOS_CONFIG_H Teuchos_config.h
+    HINTS ${Trilinos_INCLUDE_DIRS}
+    NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH
+    NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
+    )
+
+  if(EXISTS ${TEUCHOS_CONFIG_H})
+    #
+    # Determine whether Trilinos was configured with MPI:
+    #
+    file(STRINGS "${TEUCHOS_CONFIG_H}" TEUCHOS_MPI_STRING
+      REGEX "^[ \t]*#[ \t]*define[ \t]+HAVE_MPI")
+    if("${TEUCHOS_MPI_STRING}" STREQUAL "")
+      set(TRILINOS_WITH_MPI FALSE)
+    else()
+      set(TRILINOS_WITH_MPI TRUE)
+    endif()
+  endif()
+
+  #
+  # Look for Epetra_config.h - we'll query it to determine 64bit indices support:
   #
   deal_ii_find_file(EPETRA_CONFIG_H Epetra_config.h
     HINTS ${Trilinos_INCLUDE_DIRS}
@@ -80,15 +101,8 @@ if(Trilinos_FOUND)
 
   if(EXISTS ${EPETRA_CONFIG_H})
     #
-    # Determine whether Trilinos was configured with MPI and 64bit indices:
+    # Determine whether Trilinos was configured with 64bit indices:
     #
-    file(STRINGS "${EPETRA_CONFIG_H}" EPETRA_MPI_STRING
-      REGEX "^[ \t]*#[ \t]*define[ \t]+HAVE_MPI")
-    if("${EPETRA_MPI_STRING}" STREQUAL "")
-      set(TRILINOS_WITH_MPI FALSE)
-    else()
-      set(TRILINOS_WITH_MPI TRUE)
-    endif()
     file(STRINGS "${EPETRA_CONFIG_H}" EPETRA_32BIT_STRING
       REGEX "^[ \t]*#[ \t]*define[ \t]+EPETRA_NO_32BIT_GLOBAL_INDICES")
     if("${EPETRA_64BIT_STRING}" STREQUAL "")
