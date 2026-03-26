@@ -66,12 +66,18 @@ namespace Polynomials
   {
   public:
     /**
-     * Constructor. The coefficients of the polynomial are passed as
-     * arguments, and denote the polynomial $\sum_i a[i] x^i$, i.e. the first
+     * Constructor creating a polynomial in monomial form, i.e. a polynomial
+     * that is represented in the form
+     * $p(x) = a_0 + a_1x + a_2 x^2 + \cdots + a_n x^n = \sum_{i=0}^n a_i x^i$.
+     *
+     * The coefficients $a_i$ of the polynomial are passed as argument to this
+     * constructor, i.e. the first
      * element of the array denotes the constant term, the second the linear
-     * one, and so on. The degree of the polynomial represented by this object
-     * is thus the number of elements in the <tt>coefficient</tt> array minus
-     * one.
+     * one, and so on. The degree $n$ of the polynomial represented by this
+     * object is thus the number of elements in the <tt>coefficient</tt> array
+     * minus one.
+     *
+     * @param coefficients The vector of coefficients $a_i$ in the formula above.
      */
     Polynomial(const std::vector<number> &coefficients);
 
@@ -81,14 +87,21 @@ namespace Polynomials
     Polynomial(const unsigned int n);
 
     /**
-     * Constructor for a Lagrange polynomial and its point of evaluation. The
-     * idea is to construct $\prod_{i\neq j} \frac{x-x_i}{x_j-x_i}$, where j
-     * is the evaluation point specified as argument and the support points
-     * contain all points (including x_j, which will internally not be
-     * stored).
+     * Constructor for a poynomial in Lagrange form.
+     *
+     * Lagrange polynomials are defined via their "support points" $x_i$ as
+     * passed via the first argument to this constructor. For a given
+     * set of support points, there is a complete basis of polynomials
+     * that all have the form
+     * @f[
+     *   p_j(x) = \prod_{i\neq j} \frac{x-x_i}{x_j-x_i}
+     * @f]
+     * where $j=0,\ldots,n-1$ where $n$ is the number of support points and the
+     * degree of the polynomials is $n-1$. The second argument of this
+     * constructor, $j$, then selects which of these polynomials you want.
      */
     Polynomial(const std::vector<Point<1>> &lagrange_support_points,
-               const unsigned int           evaluation_point);
+               const unsigned int           j);
 
     /**
      * Default constructor creating an illegal object.
