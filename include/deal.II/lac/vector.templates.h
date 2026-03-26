@@ -186,10 +186,6 @@ Vector<Number>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v)
   : values(v.size())
 {
-  static_assert(
-    std::is_same<Number, OtherNumber>::value,
-    "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
-
   if (size() != 0)
     {
       // Copy the distributed vector to
@@ -874,10 +870,6 @@ Vector<Number> &
 Vector<Number>::operator=(
   const LinearAlgebra::TpetraWrappers::Vector<OtherNumber, MemorySpace> &v)
 {
-  static_assert(
-    std::is_same<Number, OtherNumber>::value,
-    "TpetraWrappers::Vector and dealii::Vector must use the same number type here.");
-
   if (v.size() != size())
     reinit(v.size(), true);
 
