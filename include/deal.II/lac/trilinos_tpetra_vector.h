@@ -1104,6 +1104,24 @@ namespace LinearAlgebra
       dealii::IndexSet local_entries;
 
       /**
+       * Indices of the non-local elements that are cached and will
+       * be communicated to their owners upon calling compress().
+       * Note, that these indices are not the set of entries in
+       * nonlocal_vector. Rather it enables a cache for fully
+       * distributed vectors to allow writing into entries
+       * that are not locally owned (i.e. it supports cases where
+       * the size of the non-local vector is not known at the time
+       * this vector is constructed).
+       */
+      std::vector<types::global_dof_index> nonlocal_cached_indices;
+
+      /**
+       * Values of the non-local cached elements specified in
+       * nonlocal_cached_indices.
+       */
+      std::vector<Number> nonlocal_cached_values;
+
+      /**
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
@@ -1228,12 +1246,22 @@ namespace LinearAlgebra
               if (nonlocal_vector.get() != nullptr)
                 compressed = false;
             }
+          else if (nonlocal_vector.get() == nullptr)
+            {
+              // The element is not in the locally owned part, and
+              // there is no specified nonlocal_vector, i.e. this is
+              // a fully distributed vector with a nonlocal cache.
+              // Add the element to the cache.
+              nonlocal_cached_indices.push_back(row);
+              nonlocal_cached_values.push_back(values[i]);
+              compressed = false;
+            }
           else
             {
               // If the element was not in the locally owned part,
-              // we need to figure out whether it is in the nonlocal
+              // and we have a predetermined nonlocal buffer, we need
+              // to figure out whether it is in the nonlocal
               // part. It better be:
-              Assert(nonlocal_vector.get() != nullptr, ExcInternalError());
               TrilinosWrappers::types::int_type nonlocal_row =
                 nonlocal_vector->getMap()->getLocalElement(row);
 
@@ -1338,12 +1366,22 @@ namespace LinearAlgebra
               if (nonlocal_vector.get() != nullptr)
                 compressed = false;
             }
+          else if (nonlocal_vector.get() == nullptr)
+            {
+              // The element is not in the locally owned part, and
+              // there is no specified nonlocal_vector, i.e. this is
+              // a fully distributed vector with a nonlocal cache.
+              // Add the element to the cache.
+              nonlocal_cached_indices.push_back(row);
+              nonlocal_cached_values.push_back(values[i]);
+              compressed = false;
+            }
           else
             {
               // If the element was not in the locally owned part,
-              // we need to figure out whether it is in the nonlocal
+              // and we have a predetermined nonlocal buffer, we need
+              // to figure out whether it is in the nonlocal
               // part. It better be:
-              Assert(nonlocal_vector.get() != nullptr, ExcInternalError());
               TrilinosWrappers::types::int_type nonlocal_row =
                 nonlocal_vector->getMap()->getLocalElement(row);
 
