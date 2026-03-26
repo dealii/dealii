@@ -775,6 +775,16 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     Vector<Number, MemorySpace>::sadd(const Number                       s,
+                                      const Vector<Number, MemorySpace> &V)
+    {
+      sadd(s, 1., V);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    Vector<Number, MemorySpace>::sadd(const Number                       s,
                                       const Number                       a,
                                       const Vector<Number, MemorySpace> &V)
     {
@@ -1075,6 +1085,13 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     void
+    Vector<Number, MemorySpace>::update_ghost_values() const
+    {}
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
     Vector<Number, MemorySpace>::compress(
       const VectorOperation::values operation)
     {
@@ -1120,6 +1137,15 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::trilinos_vector()
     {
       return *vector;
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    const TpetraTypes::MapType<MemorySpace> &
+    Vector<Number, MemorySpace>::trilinos_partitioner()
+    {
+      return *vector->getMap();
     }
 
 
