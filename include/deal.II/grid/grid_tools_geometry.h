@@ -128,7 +128,7 @@ namespace GridTools
 #ifndef _MSC_VER
                              .template get_default_linear_mapping<spacedim>()
 #else
-                             .ReferenceCell::get_default_linear_mapping<
+                             .ReferenceCell<dim>::get_default_linear_mapping<
                                spacedim>()
 #endif
                              ));
@@ -151,7 +151,7 @@ namespace GridTools
 #ifndef _MSC_VER
                              .template get_default_linear_mapping<spacedim>()
 #else
-                             .ReferenceCell::get_default_linear_mapping<
+                             .ReferenceCell<dim>::get_default_linear_mapping<
                                spacedim>()
 #endif
                              ));

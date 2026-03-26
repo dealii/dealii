@@ -69,7 +69,7 @@ namespace Particles
 #ifndef _MSC_VER
            .template get_default_linear_mapping<spacedim>()
 #else
-           .ReferenceCell::get_default_linear_mapping<spacedim>()
+           .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
 #endif
            ));
 
@@ -113,7 +113,7 @@ namespace Particles
 #ifndef _MSC_VER
            .template get_default_linear_mapping<spacedim>()
 #else
-           .ReferenceCell::get_default_linear_mapping<spacedim>()
+           .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
 #endif
            ));
 
@@ -135,7 +135,7 @@ namespace Particles
 #ifndef _MSC_VER
            .template get_default_linear_mapping<spacedim>()
 #else
-           .ReferenceCell::get_default_linear_mapping<spacedim>()
+           .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
 #endif
            ));
 
@@ -196,7 +196,7 @@ namespace Particles
 #ifndef _MSC_VER
            .template get_default_linear_mapping<spacedim>()),
 #else
-           .ReferenceCell::get_default_linear_mapping<spacedim>()),
+           .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()),
 #endif
       const unsigned int random_number_seed = 5432);
 
@@ -246,7 +246,7 @@ namespace Particles
 #ifndef _MSC_VER
                             .template get_default_linear_mapping<spacedim>()),
 #else
-                            .ReferenceCell::get_default_linear_mapping<
+                            .ReferenceCell<dim>::get_default_linear_mapping<
                               spacedim>()),
 #endif
                        const ComponentMask                    &components = {},
