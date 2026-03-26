@@ -1,0 +1,5 @@
+Deprecated: Overloads for TrilinosWrappers classes allowing a default number of
+entries per row have been deprecated. The respective overloads for TpetraWrappers
+classes have been removed.
+<br>
+(Daniel Arndt, 2026/03/25)
