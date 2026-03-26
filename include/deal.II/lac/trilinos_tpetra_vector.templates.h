@@ -283,11 +283,30 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     Vector<Number, MemorySpace>::reinit(const Vector<Number, MemorySpace> &V,
-                                        const bool omit_zeroing_entries)
+                                        const bool omit_zeroing_entries,
+                                        const bool allow_different_maps)
     {
-      reinit(V.locally_owned_elements(),
-             V.get_mpi_communicator(),
-             omit_zeroing_entries);
+      if (allow_different_maps)
+        {
+          Assert(omit_zeroing_entries == false,
+                 ExcMessage(
+                   "It is not possible to exchange data with the "
+                   "option 'omit_zeroing_entries' set, which would not write "
+                   "elements."));
+
+          AssertThrow(size() == V.size(),
+                      ExcDimensionMismatch(size(), V.size()));
+
+          TpetraTypes::ImportType<MemorySpace> data_exchange(
+            vector->getMap(), V.vector->getMap());
+          vector->doImport(*V.vector, data_exchange, Tpetra::INSERT);
+        }
+      else
+        {
+          reinit(V.locally_owned_elements(),
+                 V.get_mpi_communicator(),
+                 omit_zeroing_entries);
+        }
     }
 
 

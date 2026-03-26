@@ -326,7 +326,7 @@ namespace LinearAlgebra
        * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm  communicator);
+                      const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * In addition to just specifying one index set as in all the other
@@ -391,7 +391,8 @@ namespace LinearAlgebra
        */
       void
       reinit(const Vector<Number, MemorySpace> &V,
-             const bool                         omit_zeroing_entries = false);
+             const bool                         omit_zeroing_entries = false,
+             const bool                         allow_different_maps = false);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could do
@@ -590,6 +591,14 @@ namespace LinearAlgebra
       void
       add(const Number a);
 
+      void
+      add(const Vector<Number, MemorySpace> &V,
+          bool                               allow_different_maps = false)
+      {
+        Assert(!allow_different_maps, ExcNotImplemented());
+        this->add(1, V);
+      }
+
       /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
        * a*V</tt>. The vectors need to have the same layout.
@@ -635,6 +644,13 @@ namespace LinearAlgebra
            const Number                       a,
            const Vector<Number, MemorySpace> &V);
 
+      void
+      sadd(const Number s, const Vector<Number, MemorySpace> &V)
+      {
+        sadd(s, 1., V);
+      }
+
+
       /**
        * A collective set operation: instead of setting individual elements of a
        * vector, this function allows to set a whole set of elements at once.
@@ -645,6 +661,14 @@ namespace LinearAlgebra
       set(const size_type  n_elements,
           const size_type *indices,
           const Number    *values);
+
+      void
+      set(const std::vector<size_type> &indices,
+          const std::vector<Number>    &values)
+      {
+        AssertDimension(indices.size(), values.size());
+        set(indices.size(), indices.data(), values.data());
+      }
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -879,6 +903,10 @@ namespace LinearAlgebra
       void
       compress(const VectorOperation::values operation);
 
+      void
+      update_ghost_values() const
+      {}
+
       /**
        * Return a const reference to the underlying Trilinos
        * Tpetra::Vector class.
@@ -892,6 +920,12 @@ namespace LinearAlgebra
        */
       TpetraTypes::VectorType<Number, MemorySpace> &
       trilinos_vector();
+
+      const TpetraTypes::MapType<MemorySpace> &
+      trilinos_partitioner()
+      {
+        return *vector->getMap();
+      }
 
       /**
        * Return a const Teuchos::RCP to the underlying Trilinos
