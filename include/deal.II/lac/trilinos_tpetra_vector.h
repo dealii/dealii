@@ -326,7 +326,7 @@ namespace LinearAlgebra
        * need to generate a %parallel vector.
        */
       explicit Vector(const IndexSet &parallel_partitioner,
-                      const MPI_Comm  communicator);
+                      const MPI_Comm  communicator = MPI_COMM_WORLD);
 
       /**
        * In addition to just specifying one index set as in all the other
@@ -391,7 +391,8 @@ namespace LinearAlgebra
        */
       void
       reinit(const Vector<Number, MemorySpace> &V,
-             const bool                         omit_zeroing_entries = false);
+             const bool                         omit_zeroing_entries = false,
+             const bool                         allow_different_maps = false);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could do
@@ -591,6 +592,22 @@ namespace LinearAlgebra
       add(const Number a);
 
       /**
+       * Simple vector addition, equal to the <tt>operator+=</tt>.
+       *
+       * Though, if the second argument <tt>allow_different_maps</tt> is set,
+       * then it is possible to add data from a vector that uses a different
+       * map, i.e., a vector whose elements are split across processors
+       * differently. This may include vectors with ghost elements, for example.
+       * In general, however, adding vectors with a different
+       * element-to-processor map requires communicating data among processors
+       * and, consequently, is a slower operation than when using vectors using
+       * the same map.
+       */
+      void
+      add(const Vector<Number, MemorySpace> &V,
+          const bool                         allow_different_maps = false);
+
+      /**
        * Simple addition of a multiple of a vector, i.e. <tt>*this +=
        * a*V</tt>. The vectors need to have the same layout.
        */
@@ -636,6 +653,13 @@ namespace LinearAlgebra
            const Vector<Number, MemorySpace> &V);
 
       /**
+       * Scaling and simple vector addition, i.e.  <tt>*this = s*(*this) +
+       * V</tt>.
+       */
+      void
+      sadd(const Number s, const Vector<Number, MemorySpace> &V);
+
+      /**
        * A collective set operation: instead of setting individual elements of a
        * vector, this function allows to set a whole set of elements at once.
        * It is assumed that the elements to be set are located in contiguous
@@ -645,6 +669,16 @@ namespace LinearAlgebra
       set(const size_type  n_elements,
           const size_type *indices,
           const Number    *values);
+
+      /**
+       * A collective set operation: instead of setting individual elements of a
+       * vector, this function allows to set a whole set of elements at once.
+       * The indices of the elements to be set are stated in the first argument,
+       * the corresponding values in the second.
+       */
+      void
+      set(const std::vector<size_type> &indices,
+          const std::vector<Number>    &values);
 
       /**
        * Scale each element of this vector by the corresponding element in the
@@ -880,6 +914,15 @@ namespace LinearAlgebra
       compress(const VectorOperation::values operation);
 
       /**
+       * This function only exists for compatibility with the @p
+       * LinearAlgebra::distributed::Vector class and does nothing: this class
+       * implements ghost value updates in a different way that is a better fit
+       * with the underlying Trilinos vector object.
+       */
+      void
+      update_ghost_values() const;
+
+      /**
        * Return a const reference to the underlying Trilinos
        * Tpetra::Vector class.
        */
@@ -892,6 +935,13 @@ namespace LinearAlgebra
        */
       TpetraTypes::VectorType<Number, MemorySpace> &
       trilinos_vector();
+
+      /**
+       * Return a const reference to the underlying Trilinos Tpetra::Map
+       * that sets the parallel partitioning of the vector.
+       */
+      const TpetraTypes::MapType<MemorySpace> &
+      trilinos_partitioner();
 
       /**
        * Return a const Teuchos::RCP to the underlying Trilinos
@@ -1093,6 +1143,18 @@ namespace LinearAlgebra
     }
 
 
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    Vector<Number, MemorySpace>::add(const Vector<Number, MemorySpace> &V,
+                                     const bool allow_different_maps)
+    {
+      Assert(!allow_different_maps, ExcNotImplemented());
+      this->add(1, V);
+    }
+
+
+
     template <typename Number, typename MemorySpace>
     inline void
     Vector<Number, MemorySpace>::add(const std::vector<size_type> &indices,
@@ -1221,6 +1283,17 @@ namespace LinearAlgebra
           typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
             device_type::memory_space>();
 #  endif
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    inline void
+    Vector<Number, MemorySpace>::set(const std::vector<size_type> &indices,
+                                     const std::vector<Number>    &values)
+    {
+      AssertDimension(indices.size(), values.size());
+      set(indices.size(), indices.data(), values.data());
     }
 
 
