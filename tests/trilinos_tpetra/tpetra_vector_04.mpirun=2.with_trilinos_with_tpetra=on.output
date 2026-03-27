@@ -1,5 +1,5 @@
 
-DEAL:0::Vector a:size:10 locally_owned_size:7 :
+DEAL:0::Vector a:size:10 locally_stored_size:7 :
 [0]: 0.000e+00
 [1]: 0.000e+00
 [2]: 0.000e+00
@@ -8,7 +8,7 @@ DEAL:0::Vector a:size:10 locally_owned_size:7 :
 [5]: 0.000e+00
 [6]: 0.000e+00
 
-DEAL:0::Vector b:size:10 locally_owned_size:7 :
+DEAL:0::Vector b:size:10 locally_stored_size:7 :
 [0]: 0.000e+00
 [1]: 0.000e+00
 [2]: 0.000e+00
@@ -19,7 +19,7 @@ DEAL:0::Vector b:size:10 locally_owned_size:7 :
 
 DEAL:0::OK
 
-DEAL:1::Vector a:size:10 locally_owned_size:7 :
+DEAL:1::Vector a:size:10 locally_stored_size:7 :
 [3]: 0.000e+00
 [4]: 0.000e+00
 [5]: 0.000e+00
@@ -28,7 +28,7 @@ DEAL:1::Vector a:size:10 locally_owned_size:7 :
 [8]: 0.000e+00
 [9]: 0.000e+00
 
-DEAL:1::Vector b:size:10 locally_owned_size:7 :
+DEAL:1::Vector b:size:10 locally_stored_size:7 :
 [3]: 0.000e+00
 [4]: 0.000e+00
 [5]: 0.000e+00

@@ -1238,7 +1238,7 @@ namespace LinearAlgebra
 
       if (size() != local_length)
         {
-          out << "size:" << size() << " locally_owned_size:" << local_length
+          out << "size:" << size() << " locally_stored_size:" << local_length
               << " :" << std::endl;
           for (size_type i = 0; i < local_length; ++i)
             {
