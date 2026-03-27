@@ -232,7 +232,7 @@ namespace internal
       // to test there if dim<3.
       static const auto has_fe_with_reference_cell =
         [](const dealii::hp::FECollection<dim, spacedim> &fe_collection,
-           const ReferenceCell                           &reference_cell) {
+           const ReferenceCell<dim>                      &reference_cell) {
           for (unsigned int i = 0; i < fe_collection.size(); ++i)
             if (fe_collection[i].reference_cell() == reference_cell)
               return true;
@@ -264,8 +264,10 @@ namespace internal
            finite_elements.end(),
            [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
                 &fe_collection) {
-             return has_fe_with_reference_cell(*fe_collection,
-                                               ReferenceCells::Wedge);
+             return has_fe_with_reference_cell(
+               *fe_collection,
+               reinterpret_cast<const ReferenceCell<dim> &>(
+                 ReferenceCells::Wedge));
            }));
       const bool needs_pyramid_setup =
         (dim == 3 &&
@@ -274,8 +276,10 @@ namespace internal
            finite_elements.end(),
            [](const std::shared_ptr<dealii::hp::FECollection<dim, spacedim>>
                 &fe_collection) {
-             return has_fe_with_reference_cell(*fe_collection,
-                                               ReferenceCells::Pyramid);
+             return has_fe_with_reference_cell(
+               *fe_collection,
+               reinterpret_cast<const ReferenceCell<dim> &>(
+                 ReferenceCells::Pyramid));
            }));
 
       // Decide whether we want to work on cell or face FE(Face)Values objects:
@@ -311,7 +315,7 @@ namespace internal
                 Assert(n_subdivisions == 1, ExcNotImplemented());
 
                 quadrature_wedge = std::make_unique<Quadrature<dim>>(
-                  ReferenceCells::Wedge.get_nodal_type_quadrature<dim>());
+                  ReferenceCells::Wedge.get_nodal_type_quadrature());
               }
 
           if constexpr (dim == 3)
@@ -320,7 +324,7 @@ namespace internal
                 Assert(n_subdivisions == 1, ExcNotImplemented());
 
                 quadrature_pyramid = std::make_unique<Quadrature<dim>>(
-                  ReferenceCells::Pyramid.get_nodal_type_quadrature<dim>());
+                  ReferenceCells::Pyramid.get_nodal_type_quadrature());
               }
 
           x_fe_values.resize(finite_elements.size());

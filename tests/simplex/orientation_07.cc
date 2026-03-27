@@ -64,13 +64,13 @@ create_triangulation(const std::vector<Point<3>>    &vertices_,
             auto vertices = vertices_;
 
             vertices.push_back(
-              ref_cell.vertex<3>(
+              ref_cell.vertex(
                 ref_cell.face_to_cell_vertices(face_index, 0, o)) +
-              ref_cell.template face_normal_vector<3>(face_index));
+              ref_cell.face_normal_vector(face_index));
             vertices.push_back(
-              ref_cell.vertex<3>(
+              ref_cell.vertex(
                 ref_cell.face_to_cell_vertices(face_index, 1, o)) +
-              ref_cell.template face_normal_vector<3>(face_index));
+              ref_cell.face_normal_vector(face_index));
 
             std::vector<unsigned int> vertices_index;
             vertices_index.emplace_back(

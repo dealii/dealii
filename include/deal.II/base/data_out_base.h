@@ -41,6 +41,7 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 #ifndef DOXYGEN
 class ParameterHandler;
+
 class XDMFEntry;
 #endif
 
@@ -342,7 +343,7 @@ namespace DataOutBase
     /**
      * Reference-cell type of the underlying cell of this patch.
      */
-    ReferenceCell reference_cell;
+    ReferenceCell<dim> reference_cell;
 
     /**
      * Default constructor. Sets #n_subdivisions to one, #points_are_available
@@ -494,7 +495,7 @@ namespace DataOutBase
      * zero-dimensional objects, a patch can only refer to a vertex, this
      * field is always equal to ReferenceCells::Vertex and can not be changed.
      */
-    static const ReferenceCell reference_cell;
+    static const ReferenceCell<0> reference_cell;
 
     /**
      * Default constructor. Sets #points_are_available
@@ -1412,11 +1413,12 @@ namespace DataOutBase
      * Record a single deal.II cell without subdivisions (e.g. simplex) in the
      * internal reordered format.
      */
+    template <int dim>
     void
-    write_cell_single(const unsigned int   index,
-                      const unsigned int   start,
-                      const unsigned int   n_points,
-                      const ReferenceCell &reference_cell);
+    write_cell_single(const unsigned int        index,
+                      const unsigned int        start,
+                      const unsigned int        n_points,
+                      const ReferenceCell<dim> &reference_cell);
 
     /**
      * Filter and record a data set. If there are multiple values at a given
@@ -3380,36 +3382,39 @@ public:
    * cases where <code>solution_filename == mesh_filename</code>, and
    * <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string   &filename,
-            const double         time,
-            const std::uint64_t  nodes,
-            const std::uint64_t  cells,
-            const unsigned int   dim,
-            const ReferenceCell &cell_type);
+  template <int dim>
+  XDMFEntry(const std::string        &filename,
+            const double              time,
+            const std::uint64_t       nodes,
+            const std::uint64_t       cells,
+            const unsigned int        dim_,
+            const ReferenceCell<dim> &cell_type);
 
   /**
    * Simplified constructor that calls the complete constructor for
    * cases where <code>dim==spacedim</code>.
    */
-  XDMFEntry(const std::string   &mesh_filename,
-            const std::string   &solution_filename,
-            const double         time,
-            const std::uint64_t  nodes,
-            const std::uint64_t  cells,
-            const unsigned int   dim,
-            const ReferenceCell &cell_type);
+  template <int dim>
+  XDMFEntry(const std::string        &mesh_filename,
+            const std::string        &solution_filename,
+            const double              time,
+            const std::uint64_t       nodes,
+            const std::uint64_t       cells,
+            const unsigned int        dim_,
+            const ReferenceCell<dim> &cell_type);
 
   /**
    * Constructor that sets all members to provided parameters.
    */
-  XDMFEntry(const std::string   &mesh_filename,
-            const std::string   &solution_filename,
-            const double         time,
-            const std::uint64_t  nodes,
-            const std::uint64_t  cells,
-            const unsigned int   dim,
-            const unsigned int   spacedim,
-            const ReferenceCell &cell_type);
+  template <int dim>
+  XDMFEntry(const std::string        &mesh_filename,
+            const std::string        &solution_filename,
+            const double              time,
+            const std::uint64_t       nodes,
+            const std::uint64_t       cells,
+            const unsigned int        dim_,
+            const unsigned int        spacedim,
+            const ReferenceCell<dim> &cell_type);
 
   /**
    * Record an attribute and associated dimensionality.
@@ -3427,7 +3432,8 @@ public:
   serialize(Archive &ar, const unsigned int /*version*/)
   {
     ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
-      &num_cells &dimension &space_dimension &cell_type &attribute_dims;
+      &num_cells &dimension &space_dimension &cell_type_name
+        &n_vertices_per_cell &attribute_dims;
   }
 
   /**
@@ -3480,10 +3486,24 @@ private:
   unsigned int space_dimension;
 
   /**
-   * The type of cell in deal.II language. We currently only support
+   * The type of cell in XDMF language. We currently only support
    * xdmf entries where all cells have the same type.
+   *
+   * XDMFEntry objects can reference meshes independent of their
+   * dimension -- the dimension and space dimension is stored as an
+   * explicit variable. But we do have to store the ReferenceCell
+   * type of the mesh so that we can output information about. In
+   * practice, we only need a symbol name for each type of reference
+   * cell, and its number of vertices, so store only that, instead of
+   * the ReferenceCell object.
    */
-  ReferenceCell cell_type;
+  std::string cell_type_name;
+
+  /**
+   * The only other property of the cell type we need is the number
+   * of vertices per cell. Store that explicitly as well.
+   */
+  unsigned int n_vertices_per_cell;
 
   /**
    * The attributes associated with this entry and their dimension.

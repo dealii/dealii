@@ -1729,7 +1729,7 @@ public:
   /**
    * Reference cell type of the current object.
    */
-  ReferenceCell
+  ReferenceCell<structdim>
   reference_cell() const;
 
   /**
@@ -3022,7 +3022,7 @@ public:
   /**
    * Reference cell type of the current object.
    */
-  ReferenceCell
+  ReferenceCell<0>
   reference_cell() const;
 
   /**
@@ -4386,8 +4386,8 @@ namespace internal
                                            GeometryInfo<dim>::vertices_per_cell>
         vertices)
     {
-      const ReferenceCell reference_cell =
-        ReferenceCell::n_vertices_to_type(dim, vertices.size());
+      const ReferenceCell<dim> reference_cell =
+        ReferenceCell<dim>::n_vertices_to_type(dim, vertices.size());
 
       if (reference_cell == ReferenceCells::Line)
         // Return the distance between the two vertices
@@ -5236,7 +5236,7 @@ TriaAccessor<structdim, dim, spacedim>::vertex_iterator(
 
 
 template <int structdim, int dim, int spacedim>
-inline ReferenceCell
+inline ReferenceCell<structdim>
 TriaAccessor<structdim, dim, spacedim>::reference_cell() const
 {
   if constexpr (structdim == 0)
@@ -7468,7 +7468,7 @@ TriaAccessor<0, 1, spacedim>::used() const
 
 
 template <int spacedim>
-inline ReferenceCell
+inline ReferenceCell<0>
 TriaAccessor<0, 1, spacedim>::reference_cell() const
 {
   return ReferenceCells::Vertex;

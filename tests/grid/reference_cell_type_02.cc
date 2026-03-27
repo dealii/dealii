@@ -26,7 +26,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   Triangulation<dim> triangulation;
   GridGenerator::reference_cell(triangulation, reference_cell);

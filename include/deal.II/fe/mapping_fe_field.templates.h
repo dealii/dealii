@@ -347,7 +347,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
                 true))
   , component_dofs(euler_dof_handler.get_fe(), fe_mask)
   , fe_values(this->euler_dof_handler->get_fe(),
-              reference_cell.template get_nodal_type_quadrature<dim>(),
+              reference_cell.get_nodal_type_quadrature(),
               update_values)
   , dof_indices(fe_values.dofs_per_cell)
 {
@@ -371,7 +371,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
                 true))
   , component_dofs(euler_dof_handler.get_fe(), fe_mask)
   , fe_values(this->euler_dof_handler->get_fe(),
-              reference_cell.template get_nodal_type_quadrature<dim>(),
+              reference_cell.get_nodal_type_quadrature(),
               update_values)
   , dof_indices(fe_values.dofs_per_cell)
 {
@@ -407,7 +407,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
                 true))
   , component_dofs(euler_dof_handler.get_fe(), fe_mask)
   , fe_values(this->euler_dof_handler->get_fe(),
-              reference_cell.template get_nodal_type_quadrature<dim>(),
+              reference_cell.get_nodal_type_quadrature(),
               update_values)
   , dof_indices(fe_values.dofs_per_cell)
 {
@@ -440,7 +440,7 @@ MappingFEField<dim, spacedim, VectorType>::MappingFEField(
   , fe_mask(mapping.fe_mask)
   , component_dofs(euler_dof_handler->get_fe(), fe_mask)
   , fe_values(mapping.euler_dof_handler->get_fe(),
-              reference_cell.template get_nodal_type_quadrature<dim>(),
+              reference_cell.get_nodal_type_quadrature(),
               update_values)
   , dof_indices(fe_values.dofs_per_cell)
 {}
@@ -471,7 +471,7 @@ MappingFEField<dim, spacedim, VectorType>::preserves_vertex_locations() const
 template <int dim, int spacedim, typename VectorType>
 bool
 MappingFEField<dim, spacedim, VectorType>::is_compatible_with(
-  const ReferenceCell &reference_cell) const
+  const ReferenceCell<dim> &reference_cell) const
 {
   Assert(dim == reference_cell.get_dimension(),
          ExcMessage("The dimension of your mapping (" +
@@ -637,15 +637,14 @@ MappingFEField<dim, spacedim, VectorType>::compute_face_data(
               data.unit_tangentials[i].resize(n_original_q_points);
               std::fill(data.unit_tangentials[i].begin(),
                         data.unit_tangentials[i].end(),
-                        reference_cell.template face_tangent_vector<dim>(i, 0));
+                        reference_cell.face_tangent_vector(i, 0));
               if (dim > 2)
                 {
                   data.unit_tangentials[n_faces + i].resize(
                     n_original_q_points);
-                  std::fill(
-                    data.unit_tangentials[n_faces + i].begin(),
-                    data.unit_tangentials[n_faces + i].end(),
-                    reference_cell.template face_tangent_vector<dim>(i, 1));
+                  std::fill(data.unit_tangentials[n_faces + i].begin(),
+                            data.unit_tangentials[n_faces + i].end(),
+                            reference_cell.face_tangent_vector(i, 1));
                 }
             }
         }

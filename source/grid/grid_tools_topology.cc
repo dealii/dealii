@@ -532,7 +532,7 @@ namespace GridTools
           {
             ++n_negative_cells;
             const auto reference_cell =
-              ReferenceCell::n_vertices_to_type(dim, vertices.size());
+              ReferenceCell<dim>::n_vertices_to_type(dim, vertices.size());
 
             if (reference_cell.is_hyper_cube())
               {

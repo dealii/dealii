@@ -88,16 +88,25 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   : dealii::FE_Poly<dim, spacedim>(
       ScalarLagrangePolynomialWedge<dim>(degree),
       FiniteElementData<dim>(dpos,
-                             ReferenceCells::Wedge,
+                             reinterpret_cast<const ReferenceCell<dim> &>(
+                               ReferenceCells::Wedge),
                              1,
                              degree,
                              conformity),
       std::vector<bool>(
-        FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
+        FiniteElementData<dim>(dpos,
+                               reinterpret_cast<const ReferenceCell<dim> &>(
+                                 ReferenceCells::Wedge),
+                               1,
+                               degree)
           .dofs_per_cell,
         prolongation_is_additive),
       std::vector<ComponentMask>(
-        FiniteElementData<dim>(dpos, ReferenceCells::Wedge, 1, degree)
+        FiniteElementData<dim>(dpos,
+                               reinterpret_cast<const ReferenceCell<dim> &>(
+                                 ReferenceCells::Wedge),
+                               1,
+                               degree)
           .dofs_per_cell,
         ComponentMask(std::vector<bool>(1, true))))
 {

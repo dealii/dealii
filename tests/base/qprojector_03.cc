@@ -24,7 +24,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell reference_cell)
+test(const ReferenceCell<dim> reference_cell)
 {
   deallog.push(reference_cell.to_string());
 
@@ -105,7 +105,7 @@ test(const ReferenceCell reference_cell)
                      reference_cell.face_reference_cell(face_no)
                        .vertex_indices())
                   subface_vertices.push_back(
-                    reference_cell.subface_vertex_location<dim>(
+                    reference_cell.subface_vertex_location(
                       face_no,
                       final_subface_no,
                       vertex_no,

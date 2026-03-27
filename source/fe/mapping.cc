@@ -103,8 +103,8 @@ Mapping<dim, spacedim>::get_center(
 {
   if (map_barycenter_of_reference_cell)
     {
-      return transform_unit_to_real_cell(
-        cell, cell->reference_cell().template barycenter<dim>());
+      return transform_unit_to_real_cell(cell,
+                                         cell->reference_cell().barycenter());
     }
   else
     {
@@ -324,7 +324,7 @@ get_default_linear_mapping(const Triangulation<dim, spacedim> &triangulation)
            "passing to this function uses multiple cell types."));
 
   return reference_cells.front()
-    .template get_default_linear_mapping<dim, spacedim>();
+    .template get_default_linear_mapping<spacedim>();
 }
 
 

@@ -23,7 +23,7 @@
 
 template <int dim, std::size_t N, typename F>
 void
-test(const ReferenceCell             reference_cell,
+test(const ReferenceCell<dim>        reference_cell,
      const hp::QCollection<dim - 1> &quadrature,
      const std::array<double, N>    &integrals,
      const F                        &integrand)

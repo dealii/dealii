@@ -21,7 +21,7 @@ namespace internal
   template <int dim>
   internal::GenericDoFsPerObject
   expand(const std::vector<unsigned int> &dofs_per_object,
-         const ReferenceCell              cell_type)
+         const ReferenceCell<dim>         cell_type)
   {
     internal::GenericDoFsPerObject result;
 
@@ -126,7 +126,7 @@ FiniteElementData<dim>::FiniteElementData(
 template <int dim>
 FiniteElementData<dim>::FiniteElementData(
   const std::vector<unsigned int> &dofs_per_object,
-  const ReferenceCell              cell_type,
+  const ReferenceCell<dim>         cell_type,
   const unsigned int               n_components,
   const unsigned int               degree,
   const Conformity                 conformity,
@@ -144,7 +144,7 @@ FiniteElementData<dim>::FiniteElementData(
 template <int dim>
 FiniteElementData<dim>::FiniteElementData(
   const internal::GenericDoFsPerObject &data,
-  const ReferenceCell                   reference_cell,
+  const ReferenceCell<dim>              reference_cell,
   const unsigned int                    n_components,
   const unsigned int                    degree,
   const Conformity                      conformity,

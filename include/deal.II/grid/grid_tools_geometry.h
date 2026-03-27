@@ -122,16 +122,16 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   double
-  minimal_cell_diameter(
-    const Triangulation<dim, spacedim> &triangulation,
-    const Mapping<dim, spacedim>       &mapping =
-      (ReferenceCells::get_hypercube<dim>()
+  minimal_cell_diameter(const Triangulation<dim, spacedim> &triangulation,
+                        const Mapping<dim, spacedim>       &mapping =
+                          (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+                             .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+                             .ReferenceCell<dim>::get_default_linear_mapping<
+                               spacedim>()
 #endif
-         ));
+                             ));
 
   /**
    * Return an approximation of the diameter of the largest active cell of a
@@ -145,16 +145,16 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   double
-  maximal_cell_diameter(
-    const Triangulation<dim, spacedim> &triangulation,
-    const Mapping<dim, spacedim>       &mapping =
-      (ReferenceCells::get_hypercube<dim>()
+  maximal_cell_diameter(const Triangulation<dim, spacedim> &triangulation,
+                        const Mapping<dim, spacedim>       &mapping =
+                          (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-         .template get_default_linear_mapping<dim, spacedim>()
+                             .template get_default_linear_mapping<spacedim>()
 #else
-         .ReferenceCell::get_default_linear_mapping<dim, spacedim>()
+                             .ReferenceCell<dim>::get_default_linear_mapping<
+                               spacedim>()
 #endif
-         ));
+                             ));
 
   /**
    * Given a list of vertices (typically obtained using

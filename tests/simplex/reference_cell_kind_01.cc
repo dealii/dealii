@@ -23,7 +23,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   const auto kind = ReferenceCell(reference_cell);
 

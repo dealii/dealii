@@ -28,12 +28,12 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   Triangulation<dim> triangulation;
   GridGenerator::reference_cell(triangulation, reference_cell);
 
-  const Quadrature<dim> q = reference_cell.get_gauss_type_quadrature<dim>(2);
+  const Quadrature<dim> q = reference_cell.get_gauss_type_quadrature(2);
   const FE_Nothing<dim> fe(reference_cell);
 
   // Set up the objects to compute an integral on the reference cell

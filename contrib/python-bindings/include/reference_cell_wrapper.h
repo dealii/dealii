@@ -19,6 +19,8 @@
 
 #include <boost/python.hpp>
 
+#include <variant>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace python
@@ -39,7 +41,8 @@ namespace python
     /**
      * Constructor. Takes a ReferenceCell object and creates a Type class.
      */
-    ReferenceCellWrapper(const ReferenceCell &cell_type_in);
+    template <int dim>
+    ReferenceCellWrapper(const ReferenceCell<dim> &cell_type_in);
 
     /**
      * Constructor for an empty object.
@@ -55,7 +58,15 @@ namespace python
     cell_kind() const;
 
   private:
-    ReferenceCell cell_type;
+    /**
+     * A variable that stores the reference cell this object was initialized
+     * with -- regardless of what dimension the object has.
+     */
+    std::variant<ReferenceCell<0>,
+                 ReferenceCell<1>,
+                 ReferenceCell<2>,
+                 ReferenceCell<3>>
+      cell_type;
   };
 
 } // namespace python

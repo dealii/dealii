@@ -252,7 +252,8 @@ test(const Triangulation<dim, spacedim> &tria,
   SolverControl        solver_control(1000, 1e-12);
   SolverCG<VectorType> solver(solver_control);
 
-  const std::vector<ReferenceCell> reference_cells = tria.get_reference_cells();
+  const std::vector<ReferenceCell<dim>> reference_cells =
+    tria.get_reference_cells();
   Assert(reference_cells.size() == 1, ExcNotImplemented());
   unsigned int lower = 0;
   unsigned int upper = 0;

@@ -27,12 +27,12 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   Triangulation<dim> triangulation;
   GridGenerator::reference_cell(triangulation, reference_cell);
 
-  const Quadrature<dim> q = reference_cell.get_midpoint_quadrature<dim>();
+  const Quadrature<dim> q = reference_cell.get_midpoint_quadrature();
   Assert(q.size() == 1, ExcInternalError());
 
   FE_Nothing<dim> fe(reference_cell);

@@ -21,7 +21,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell &reference_cell)
+test(const ReferenceCell<dim> &reference_cell)
 {
   deallog << "Reference cell is: " << reference_cell.to_string() << std::endl;
 
@@ -41,13 +41,13 @@ test(const ReferenceCell &reference_cell)
 
   // Make sure that all vertices are inside:
   for (unsigned int v = 0; v < reference_cell.n_vertices(); ++v)
-    Assert(reference_cell.contains_point(reference_cell.vertex<dim>(v)),
+    Assert(reference_cell.contains_point(reference_cell.vertex(v)),
            ExcInternalError());
 
   // Make sure that all vertices are outside with a negative tolerance:
   for (unsigned int v = 0; v < reference_cell.n_vertices(); ++v)
-    Assert(reference_cell.contains_point(reference_cell.vertex<dim>(v),
-                                         -1e-12) == false,
+    Assert(reference_cell.contains_point(reference_cell.vertex(v), -1e-12) ==
+             false,
            ExcInternalError());
 }
 

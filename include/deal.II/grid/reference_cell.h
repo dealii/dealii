@@ -40,6 +40,7 @@ class Mapping;
 template <int dim>
 class Quadrature;
 
+template <int dim>
 class ReferenceCell;
 #endif
 
@@ -58,7 +59,8 @@ namespace internal
    * one function in an internal namespace that is a friend of the class and can
    * be used to create the objects.
    */
-  constexpr ReferenceCell
+  template <int dim>
+  constexpr ReferenceCell<dim>
   make_reference_cell_from_int(const std::uint8_t kind);
 } // namespace internal
 
@@ -122,6 +124,7 @@ enum class IsotropicRefinementChoice : std::uint8_t
  *
  * @ingroup grid geomprimitives reordering
  */
+template <int dim>
 class ReferenceCell
 {
 public:
@@ -133,7 +136,7 @@ public:
    * ReferenceCells::Tetrahedron.
    */
   static ReferenceCell
-  n_vertices_to_type(const int dim, const unsigned int n_vertices);
+  n_vertices_to_type(const int dim_, const unsigned int n_vertices);
 
   /**
    * Default constructor. Initialize this object as an invalid object. The
@@ -166,7 +169,8 @@ public:
 
   /**
    * Return the dimension of the reference cell represented by the current
-   * object.
+   * object. This value, of course, simply equals the `dim` template
+   * argument of this class.
    */
   constexpr unsigned int
   get_dimension() const;
@@ -184,29 +188,19 @@ public:
    * Compute the value of the $i$-th linear shape function at location $\xi$
    * for the current reference-cell type.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * For ReferenceCells::Vertex, the reference cell is a zero-dimensional point
    * in a zero-dimensional space: i.e., asking about the value of a polynomial
    * doesn't make sense since there cannot be any independent variables. To
    * enable dimension-independent programming we define the zero-dimensional
    * value to be 1.
    */
-  template <int dim>
   double
   d_linear_shape_function(const Point<dim> &xi, const unsigned int i) const;
 
   /**
    * Compute the gradient of the $i$-th linear shape function at location
    * $\xi$ for the current reference-cell type.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Tensor<1, dim>
   d_linear_shape_function_gradient(const Point<dim>  &xi,
                                    const unsigned int i) const;
@@ -220,7 +214,7 @@ public:
    * cell is a pyramid), or with FE_WedgeP (if the reference cell is
    * a wedge).
    */
-  template <int dim, int spacedim = dim>
+  template <int spacedim = dim>
   std::unique_ptr<Mapping<dim, spacedim>>
   get_default_mapping(const unsigned int degree) const;
 
@@ -235,7 +229,7 @@ public:
    * understood as $d$-linear (i.e., bilinear or trilinear) for some of the
    * coordinate directions.
    */
-  template <int dim, int spacedim = dim>
+  template <int spacedim = dim>
   const Mapping<dim, spacedim> &
   get_default_linear_mapping() const;
 
@@ -246,12 +240,7 @@ public:
    * @param[in] n_points_1d The number of quadrature points in each direction
    * (QGauss) or an indication of what polynomial degree needs to be
    * integrated exactly for the other types.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Quadrature<dim>
   get_gauss_type_quadrature(const unsigned n_points_1d) const;
 
@@ -263,12 +252,7 @@ public:
    *
    * The object returned by this function generalizes what the QMidpoint class
    * represents to other reference cells.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Quadrature<dim>
   get_midpoint_quadrature() const;
 
@@ -284,12 +268,7 @@ public:
    *   consequently the object cannot usefully be used for actually
    *   computing integrals. This is in contrast to, for example, the QTrapezoid
    *   class that correctly sets quadrature weights.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   const Quadrature<dim> &
   get_nodal_type_quadrature() const;
 
@@ -323,12 +302,7 @@ public:
    *
    * Because the ReferenceCell class does not have a `dim` argument,
    * it has to be explicitly specified in the call to this function.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Point<dim>
   vertex(const unsigned int v) const;
 
@@ -368,7 +342,7 @@ public:
    * form a continuous range that is empty in case no face of such type exists.
    */
   std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-  face_indices_by_type(const ReferenceCell &face_ref_type) const;
+  face_indices_by_type(const ReferenceCell<dim - 1> &face_ref_type) const;
 
   /**
    * Return the number of refinement directions of the cell.
@@ -399,12 +373,7 @@ public:
   /**
    * Return the number of cells one would get by refining the
    * current cell with the given refinement case.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   unsigned int
   n_children(const RefinementCase<dim> ref_case =
                RefinementCase<dim>::isotropic_refinement) const;
@@ -435,7 +404,6 @@ public:
    * @note In 3d, for backwards compatibility, we treat
    * internal::SubfaceCase::case_none as internal::SubfaceCase::case_isotropic.
    */
-  template <int dim>
   std::pair<unsigned int, RefinementCase<dim - 1>>
   equivalent_refinement_case(
     const types::geometric_orientation combined_face_orientation,
@@ -447,9 +415,8 @@ public:
    * `RefinementPossibilities<2>::cut_x`) of the current ReferenceCell. This
    * ArrayView will not include `RefinementPossibilities<dim>::no_refinement`:
    * instead, for elements which do not yet support refinement (e.g.,
-   * ReferenceCell::Pyramid) the ArrayView will be empty.
+   * ReferenceCell<dim>::Pyramid) the ArrayView will be empty.
    */
-  template <int dim>
   ArrayView<const RefinementCase<dim>>
   refinement_cases() const;
 
@@ -465,7 +432,7 @@ public:
    * returned object may be either ReferenceCells::Triangle or
    * ReferenceCells::Quadrilateral, depending on the given index.
    */
-  constexpr ReferenceCell
+  constexpr ReferenceCell<dim - 1>
   face_reference_cell(const unsigned int face_index) const;
 
   /**
@@ -491,7 +458,7 @@ public:
   /**
    * Return the reversed (non-default orientation) line orientation flag. As
    * lines only have two possible orientations, this function and
-   * ReferenceCell::default_combined_face_orientation() encode all of its
+   * ReferenceCell<dim>::default_combined_face_orientation() encode all of its
    * possible orientation states.
    *
    * @deprecated Use numbers::reverse_line_orientation instead.
@@ -681,17 +648,12 @@ public:
    * @return The location of the vertex so identified in `dim`-dimensional
    *   space.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * @post The output of calling `reference_cell.face_vertex_location<dim>(f,v)`
    *   is identical to calling
    *   `reference_cell.vertex<dim>(
    *       reference_cell.face_to_cell_vertices(
                    f, v, numbers::default_geometric_orientation))`.
    */
-  template <int dim>
   Point<dim>
   face_vertex_location(const unsigned int face,
                        const unsigned int vertex) const;
@@ -709,7 +671,6 @@ public:
    * @param[in] face_refinement_case The way in which the current face is
    * refined.
    */
-  template <int dim>
   Point<dim>
   subface_vertex_location(
     const unsigned int            face_no,
@@ -847,7 +808,7 @@ public:
    * $\sqrt{2}$, and $1$, respectively, whereas the measures of the sides of a
    * ReferenceCells::Quadrilateral are all $1$.
    *
-   * @note Like ReferenceCell::volume(), this function defines vertices to have
+   * @note Like ReferenceCell<dim>::volume(), this function defines vertices to have
    * a measure of $1$ to enable the definition of one-dimensional face
    * quadratures.
    */
@@ -865,12 +826,7 @@ public:
    * @f]
    * where $V$ is the volume of the reference cell (see also the volume()
    * function).
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Point<dim>
   barycenter() const;
 
@@ -892,24 +848,14 @@ public:
    *
    * The tolerance parameter may be less than zero, indicating that the point
    * should be safely inside the cell.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   bool
   contains_point(const Point<dim> &p, const double tolerance = 0) const;
 
   /**
    * Return the point on the surface of the reference cell closest (in the
    * Euclidean norm) to @p p.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Point<dim>
   closest_point(const Point<dim> &p) const;
 
@@ -919,12 +865,7 @@ public:
    * cross product between the two vectors returns the face normal vector.
    *
    * @pre $i$ must be between zero and `dim-1`.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Tensor<1, dim>
   face_tangent_vector(const unsigned int face_no, const unsigned int i) const;
 
@@ -935,40 +876,27 @@ public:
    *
    * @pre $i$ must be between zero and `dim-1`.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * @deprecated Use face_tangent_vector() instead.
    */
-  template <int dim>
   DEAL_II_DEPRECATED_WITH_COMMENT("Use face_tangent_vector() instead.")
-  Tensor<1, dim> unit_tangential_vectors(const unsigned int face_no,
-                                         const unsigned int i) const;
+  Tensor<1, dim>
+  unit_tangential_vectors(const unsigned int face_no,
+                          const unsigned int i) const;
 
   /**
    * Return the unit normal vector of a face of the reference cell.
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   Tensor<1, dim>
   face_normal_vector(const unsigned int face_no) const;
 
   /**
    * Return the unit normal vector of a face of the reference cell.
    *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
-   *
    * @deprecated Use face_normal_vector() instead.
    */
-  template <int dim>
   DEAL_II_DEPRECATED_WITH_COMMENT("Use face_normal_vector() instead.")
-  Tensor<1, dim> unit_normal_vectors(const unsigned int face_no) const;
+  Tensor<1, dim>
+  unit_normal_vectors(const unsigned int face_no) const;
 
   /**
    * Return the number of orientations for a face in the ReferenceCell. For
@@ -1087,7 +1015,7 @@ public:
    * being set to numbers::invalid_unsigned_int.
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 13, 4>
@@ -1103,7 +1031,7 @@ public:
    * details).
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 13, 4, 2>
@@ -1118,7 +1046,7 @@ public:
    * numbers::invalid_unsigned_int.
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 10, 6>
@@ -1132,7 +1060,7 @@ public:
    * numbers::invalid_unsigned_int.
    *
    * The chosen isotropic refinement (see
-   * ReferenceCell::get_isotropic_refinement_choice) is provided by
+   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
    * @p refinement_choice .
    */
   constexpr dealii::ndarray<unsigned int, 10, 8>
@@ -1196,12 +1124,7 @@ public:
    * The last argument, @p legacy_format, indicates whether to use the
    * old, VTK legacy format (when `true`) or the new, VTU format (when
    * `false`).
-   *
-   * @pre The template argument `dim` must equal the dimension
-   *   of the space in which the reference cell you are querying
-   *   lives (i.e., it must equal the result of get_dimension()).
    */
-  template <int dim>
   unsigned int
   vtk_lexicographic_to_node_index(
     const std::array<unsigned, dim> &node_indices,
@@ -1245,13 +1168,13 @@ public:
    * Operator for equality comparison.
    */
   constexpr bool
-  operator==(const ReferenceCell &type) const;
+  operator==(const ReferenceCell<dim> &type) const;
 
   /**
    * Operator for inequality comparison.
    */
   constexpr bool
-  operator!=(const ReferenceCell &type) const;
+  operator!=(const ReferenceCell<dim> &type) const;
 
   /**
    * Write and read the data of this object from a stream for the purpose
@@ -1359,14 +1282,17 @@ private:
    * A kind of constructor -- not quite private because it can be
    * called by anyone, but at least hidden in an internal namespace.
    */
-  friend constexpr ReferenceCell
+  template <int dim_>
+  friend constexpr ReferenceCell<dim_>
   internal::make_reference_cell_from_int(const std::uint8_t);
 
+  template <int dim_>
   friend std::ostream &
-  operator<<(std::ostream &out, const ReferenceCell &reference_cell);
+  operator<<(std::ostream &out, const ReferenceCell<dim_> &reference_cell);
 
+  template <int dim_>
   friend std::istream &
-  operator>>(std::istream &in, ReferenceCell &reference_cell);
+  operator>>(std::istream &in, ReferenceCell<dim_> &reference_cell);
 };
 
 
@@ -1375,10 +1301,12 @@ private:
  * in a text format in which the object is represented by an integer. The
  * details of which integer value represents each kind of reference cell
  * is unimportant and consequently not specified. If you want a string
- * representation of what a ReferenceCell is, use ReferenceCell::to_string().
+ * representation of what a ReferenceCell is, use
+ * ReferenceCell<dim>::to_string().
  */
+template <int dim>
 std::ostream &
-operator<<(std::ostream &out, const ReferenceCell &reference_cell);
+operator<<(std::ostream &out, const ReferenceCell<dim> &reference_cell);
 
 /**
  * Input operator that reads the @p reference_cell object from the stream
@@ -1387,33 +1315,39 @@ operator<<(std::ostream &out, const ReferenceCell &reference_cell);
  * but the function uses the same translation as the corresponding
  * output `operator<<`.
  */
+template <int dim>
 std::istream &
-operator>>(std::istream &in, ReferenceCell &reference_cell);
+operator>>(std::istream &in, ReferenceCell<dim> &reference_cell);
 
 
-inline constexpr ReferenceCell::ReferenceCell(const std::uint8_t kind)
+
+template <int dim>
+inline constexpr ReferenceCell<dim>::ReferenceCell(const std::uint8_t kind)
   : kind(kind)
 {}
 
 
 
-inline constexpr ReferenceCell::operator std::uint8_t() const
+template <int dim>
+inline constexpr ReferenceCell<dim>::operator std::uint8_t() const
 {
   return kind;
 }
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::operator==(const ReferenceCell &type) const
+ReferenceCell<dim>::operator==(const ReferenceCell<dim> &type) const
 {
   return kind == type.kind;
 }
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::operator!=(const ReferenceCell &type) const
+ReferenceCell<dim>::operator!=(const ReferenceCell<dim> &type) const
 {
   return kind != type.kind;
 }
@@ -1422,7 +1356,8 @@ ReferenceCell::operator!=(const ReferenceCell &type) const
 
 namespace internal
 {
-  inline constexpr ReferenceCell
+  template <int dim>
+  inline constexpr ReferenceCell<dim>
   make_reference_cell_from_int(const std::uint8_t kind)
   {
 #ifndef DEAL_II_CXX14_CONSTEXPR_BUG
@@ -1449,19 +1384,27 @@ namespace internal
  */
 namespace ReferenceCells
 {
-  constexpr ReferenceCell Vertex   = internal::make_reference_cell_from_int(0);
-  constexpr ReferenceCell Line     = internal::make_reference_cell_from_int(1);
-  constexpr ReferenceCell Triangle = internal::make_reference_cell_from_int(2);
-  constexpr ReferenceCell Quadrilateral =
-    internal::make_reference_cell_from_int(3);
-  constexpr ReferenceCell Tetrahedron =
-    internal::make_reference_cell_from_int(4);
-  constexpr ReferenceCell Pyramid = internal::make_reference_cell_from_int(5);
-  constexpr ReferenceCell Wedge   = internal::make_reference_cell_from_int(6);
-  constexpr ReferenceCell Hexahedron =
-    internal::make_reference_cell_from_int(7);
-  constexpr ReferenceCell Invalid = internal::make_reference_cell_from_int(
-    std::numeric_limits<std::uint8_t>::max());
+  constexpr ReferenceCell<0> Vertex =
+    internal::make_reference_cell_from_int<0>(0);
+  constexpr ReferenceCell<1> Line =
+    internal::make_reference_cell_from_int<1>(1);
+  constexpr ReferenceCell<2> Triangle =
+    internal::make_reference_cell_from_int<2>(2);
+  constexpr ReferenceCell<2> Quadrilateral =
+    internal::make_reference_cell_from_int<2>(3);
+  constexpr ReferenceCell<3> Tetrahedron =
+    internal::make_reference_cell_from_int<3>(4);
+  constexpr ReferenceCell<3> Pyramid =
+    internal::make_reference_cell_from_int<3>(5);
+  constexpr ReferenceCell<3> Wedge =
+    internal::make_reference_cell_from_int<3>(6);
+  constexpr ReferenceCell<3> Hexahedron =
+    internal::make_reference_cell_from_int<3>(7);
+
+  template <int dim>
+  constexpr ReferenceCell<dim> Invalid =
+    internal::make_reference_cell_from_int<dim>(
+      std::numeric_limits<std::uint8_t>::max());
 
   /**
    * Return the correct simplex reference cell type for the given dimension
@@ -1469,7 +1412,7 @@ namespace ReferenceCells
    * reference to either Vertex, Line, Triangle, or Tetrahedron.
    */
   template <int dim>
-  constexpr const ReferenceCell &
+  constexpr const ReferenceCell<dim> &
   get_simplex();
 
   /**
@@ -1478,7 +1421,7 @@ namespace ReferenceCells
    * reference to either Vertex, Quadrilateral, or Hexahedron.
    */
   template <int dim>
-  constexpr const ReferenceCell &
+  constexpr const ReferenceCell<dim> &
   get_hypercube();
 
   /**
@@ -1538,31 +1481,35 @@ namespace ReferenceCells
 
 
 
-inline constexpr ReferenceCell::ReferenceCell()
-  : ReferenceCell(ReferenceCells::Invalid)
+template <int dim>
+inline constexpr ReferenceCell<dim>::ReferenceCell()
+  : ReferenceCell(ReferenceCells::Invalid<dim>)
 {}
 
 
 
+template <int dim>
 template <class Archive>
 inline void
-ReferenceCell::serialize(Archive &archive, const unsigned int /*version*/)
+ReferenceCell<dim>::serialize(Archive &archive, const unsigned int /*version*/)
 {
   archive &kind;
 }
 
 
 
+template <int dim>
 inline constexpr std::size_t
-ReferenceCell::memory_consumption()
+ReferenceCell<dim>::memory_consumption()
 {
-  return sizeof(ReferenceCells::Invalid);
+  return sizeof(ReferenceCells::Invalid<dim>);
 }
 
 
 
+template <int dim>
 inline ArrayView<const unsigned int>
-ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
+ReferenceCell<dim>::faces_for_given_vertex(const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
   switch (this->kind)
@@ -1618,432 +1565,490 @@ ReferenceCell::faces_for_given_vertex(const unsigned int vertex) const
 }
 
 
+
+template <int dim>
 constexpr dealii::ndarray<unsigned int, 13, 4>
-ReferenceCell::new_isotropic_child_face_lines(
+ReferenceCell<dim>::new_isotropic_child_face_lines(
   const unsigned int refinement_choice) const
 {
   AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
 
-  const unsigned int X = numbers::invalid_unsigned_int;
-  switch (this->kind)
+  if constexpr (dim == 3)
     {
-      case ReferenceCells::Tetrahedron:
+      const unsigned int X = numbers::invalid_unsigned_int;
+
+      switch (this->kind)
         {
-          constexpr dealii::ndarray<unsigned int, 3, 13, 4> new_quad_lines_tet =
-            {{// new line is (6,8)
-              {{{{2, 3, 8, X}},
-                {{0, 9, 5, X}},
-                {{1, 6, 11, X}},
-                {{4, 10, 7, X}},
-                {{2, 12, 5, X}},
-                {{1, 9, 12, X}},
-                {{4, 8, 12, X}},
-                {{6, 12, 10, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}}}},
-              // new line is (5,7)
-              {{{{2, 3, 8, X}},
-                {{0, 9, 5, X}},
-                {{1, 6, 11, X}},
-                {{4, 10, 7, X}},
-                {{0, 3, 12, X}},
-                {{1, 12, 8, X}},
-                {{4, 12, 9, X}},
-                {{7, 11, 12, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}}}},
-              // new line is (4,9)
-              {{{{2, 3, 8, X}},
-                {{0, 9, 5, X}},
-                {{1, 6, 11, X}},
-                {{4, 10, 7, X}},
-                {{0, 12, 11, X}},
-                {{2, 6, 12, X}},
-                {{3, 12, 7, X}},
-                {{5, 10, 12, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}}}}}};
-          return new_quad_lines_tet[refinement_choice];
-        }
-
-      case ReferenceCells::Pyramid:
-        DEAL_II_NOT_IMPLEMENTED();
-
-      case ReferenceCells::Wedge:
-        {
-          constexpr dealii::ndarray<unsigned int, 13, 4> new_quad_lines_wedge =
-            {{{{2, 20, 11, X}}, // mid tri
-              {{3, 6, 18, X}},
-              {{19, 7, 10, X}},
-              {{18, 19, 20, X}},
-              {{4, 0, 14, 18}}, // lower
-              {{0, 8, 12, 20}},
-              {{8, 4, 13, 19}},
-              {{5, 1, 18, 15}}, // upper
-              {{1, 9, 20, 17}},
-              {{9, 5, 19, 16}},
-              {{X, X, X, X}},
-              {{X, X, X, X}},
-              {{X, X, X, X}}}};
-          return new_quad_lines_wedge;
-        }
-
-      case ReferenceCells::Hexahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 13, 4> new_quad_lines_hex = {
-            {{{10, 28, 16, 24}},
-             {{28, 14, 17, 25}},
-             {{11, 29, 24, 20}},
-             {{29, 15, 25, 21}},
-             {{18, 26, 0, 28}},
-             {{26, 22, 1, 29}},
-             {{19, 27, 28, 4}},
-             {{27, 23, 29, 5}},
-             {{2, 24, 8, 26}},
-             {{24, 6, 9, 27}},
-             {{3, 25, 26, 12}},
-             {{25, 7, 27, 13}},
-             {{X, X, X, X}}}};
-          return new_quad_lines_hex;
-        }
-
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
-    }
-
-  return {};
-}
-
-
-
-constexpr dealii::ndarray<unsigned int, 13, 4, 2>
-ReferenceCell::new_isotropic_child_face_line_vertices(
-  const unsigned int refinement_choice) const
-{
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
-
-  const unsigned int X = numbers::invalid_unsigned_int;
-  switch (this->kind)
-    {
-      case ReferenceCells::Tetrahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 3, 13, 4, 2>
-            quad_lines_vertices_tet = {
-              {// new line is (6, 8)
-               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                 {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
-                 {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
-                 {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
-                 {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-               // new line is (5, 7)
-               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                 {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
-                 {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
-                 {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
-                 {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}},
-               // new line is (4, 9)
-               {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                 {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                 {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                 {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                 {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
-                 {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
-                 {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
-                 {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}}}};
-          return quad_lines_vertices_tet[refinement_choice];
-        }
-
-      case ReferenceCells::Pyramid:
-        DEAL_II_NOT_IMPLEMENTED();
-
-      case ReferenceCells::Wedge:
-        {
-          constexpr dealii::ndarray<unsigned int, 13, 4, 2>
-            quad_lines_vertices_wedge = {
-              {// mid tri
-               {{{{12, 15}}, {{15, 17}}, {{17, 12}}, {{X, X}}}},
-               {{{{15, 13}}, {{13, 16}}, {{16, 15}}, {{X, X}}}},
-               {{{{17, 16}}, {{16, 14}}, {{14, 17}}, {{X, X}}}},
-               {{{{15, 16}}, {{16, 17}}, {{17, 15}}, {{X, X}}}},
-               // lower
-               {{{{7, 16}}, {{6, 15}}, {{7, 6}}, {{16, 15}}}},
-               {{{{6, 15}}, {{8, 17}}, {{6, 8}}, {{15, 17}}}},
-               {{{{8, 17}}, {{7, 16}}, {{8, 7}}, {{17, 16}}}},
-               // upper
-               {{{{16, 10}}, {{15, 9}}, {{16, 15}}, {{10, 9}}}},
-               {{{{15, 9}}, {{17, 11}}, {{15, 17}}, {{9, 11}}}},
-               {{{{17, 11}}, {{16, 10}}, {{17, 16}}, {{11, 10}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-          return quad_lines_vertices_wedge;
-        }
-
-      case ReferenceCells::Hexahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 13, 4, 2>
-            quad_lines_vertices_hex = {
-              {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
-               {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
-               {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
-               {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
-               {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
-               {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
-               {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
-               {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
-               {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
-               {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
-               {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
-               {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}},
-               {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-          return quad_lines_vertices_hex;
-        }
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
-    }
-
-  return {};
-}
-
-
-
-constexpr dealii::ndarray<unsigned int, 10, 6>
-ReferenceCell::new_isotropic_child_cell_faces(
-  const unsigned int refinement_choice) const
-{
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
-
-  const unsigned int X = numbers::invalid_unsigned_int;
-
-  switch (this->kind)
-    {
-      case ReferenceCells::Tetrahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 3, 10, 6> cell_quads_tet = {
-            {// new line is (6, 8)
-             {{
-               {{8, 13, 16, 0, X, X}},
-               {{9, 12, 1, 21, X, X}},
-               {{10, 2, 17, 20, X, X}},
-               {{3, 14, 18, 22, X, X}},
-               {{11, 1, 4, 5, X, X}},
-               {{15, 0, 4, 6, X, X}},
-               {{19, 7, 6, 3, X, X}},
-               {{23, 5, 2, 7, X, X}},
-               {{X, X, X, X, X, X}},
-               {{X, X, X, X, X, X}},
-             }},
-             // new line is (5, 7)
-             {{
-               {{8, 13, 16, 0, X, X}},
-               {{9, 12, 1, 21, X, X}},
-               {{10, 2, 17, 20, X, X}},
-               {{3, 14, 18, 22, X, X}},
-               {{11, 4, 0, 5, X, X}},
-               {{15, 4, 1, 6, X, X}},
-               {{19, 2, 5, 7, X, X}},
-               {{23, 6, 7, 3, X, X}},
-               {{X, X, X, X, X, X}},
-               {{X, X, X, X, X, X}},
-             }},
-             // new line is (4, 9)
-             {{
-               {{8, 13, 16, 0, X, X}},
-               {{9, 12, 1, 21, X, X}},
-               {{10, 2, 17, 20, X, X}},
-               {{3, 14, 18, 22, X, X}},
-               {{11, 4, 5, 2, X, X}},
-               {{15, 6, 7, 3, X, X}},
-               {{19, 5, 0, 6, X, X}},
-               {{23, 1, 4, 7, X, X}},
-               {{X, X, X, X, X, X}},
-               {{X, X, X, X, X, X}},
-             }}}};
-          return cell_quads_tet[refinement_choice];
-        }
-      case ReferenceCells::Pyramid:
-        DEAL_II_NOT_IMPLEMENTED();
-
-      case ReferenceCells::Wedge:
-        {
-          // Considerations that went into creating this table
-          // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
-          //   centre wedge is rotated by 180° compared to the parent)
-          // - Order of children is similar to the order of a reference triangle
-          //   in the x-y-plane (i.e. like the top triangle of the parent)
-          dealii::ndarray<unsigned int, 10, 6> cell_quads_wedge = {{
-            {{23, 0, 10, 5, 19, X}}, // bottom children
-            {{22, 1, 11, 14, 4, X}}, //
-            {{24, 2, 6, 15, 18, X}}, //
-            {{25, 3, 6, 5, 4, X}},   //
-            {{0, 26, 12, 8, 21, X}}, // top children
-            {{1, 27, 13, 16, 7, X}}, //
-            {{2, 28, 9, 17, 20, X}}, //
-            {{3, 29, 9, 8, 7, X}},   //
-            {{X, X, X, X, X, X}},
-            {{X, X, X, X, X, X}},
-          }};
-          return cell_quads_wedge;
-        }
-
-      case ReferenceCells::Hexahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 10, 6> cell_quads_hex = {{
-            {{12, 0, 20, 4, 28, 8}},  // bottom children
-            {{0, 16, 22, 6, 29, 9}},  //
-            {{13, 1, 4, 24, 30, 10}}, //
-            {{1, 17, 6, 26, 31, 11}}, //
-            {{14, 2, 21, 5, 8, 32}},  // top children
-            {{2, 18, 23, 7, 9, 33}},  //
-            {{15, 3, 5, 25, 10, 34}}, //
-            {{3, 19, 7, 27, 11, 35}}, //
-            {{X, X, X, X, X, X}},
-            {{X, X, X, X, X, X}},
-          }};
-          return cell_quads_hex;
-        }
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
-    }
-
-  return {};
-}
-
-
-
-constexpr dealii::ndarray<unsigned int, 10, 8>
-ReferenceCell::new_isotropic_child_cell_vertices(
-  const unsigned int refinement_choice) const
-{
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
-
-  constexpr unsigned int X = numbers::invalid_unsigned_int;
-
-  switch (this->kind)
-    {
-      case ReferenceCells::Tetrahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 3, 10, 8> cell_vertices_tet =
-            {{// new line is (6,8)
-              {{
-                {{0, 4, 6, 7, X, X, X, X}},
-                {{4, 1, 5, 8, X, X, X, X}},
-                {{6, 5, 2, 9, X, X, X, X}},
-                {{7, 8, 9, 3, X, X, X, X}},
-                {{4, 5, 6, 8, X, X, X, X}},
-                {{4, 7, 8, 6, X, X, X, X}},
-                {{6, 9, 7, 8, X, X, X, X}},
-                {{5, 8, 9, 6, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-              }},
-              // new line is (5,7)
-              {{
-                {{0, 4, 6, 7, X, X, X, X}},
-                {{4, 1, 5, 8, X, X, X, X}},
-                {{6, 5, 2, 9, X, X, X, X}},
-                {{7, 8, 9, 3, X, X, X, X}},
-                {{4, 5, 6, 7, X, X, X, X}},
-                {{4, 7, 8, 5, X, X, X, X}},
-                {{6, 9, 7, 5, X, X, X, X}},
-                {{5, 8, 9, 7, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-              }},
-              // new line is (4,9)
-              {{
-                {{0, 4, 6, 7, X, X, X, X}},
-                {{4, 1, 5, 8, X, X, X, X}},
-                {{6, 5, 2, 9, X, X, X, X}},
-                {{7, 8, 9, 3, X, X, X, X}},
-                {{4, 5, 6, 9, X, X, X, X}},
-                {{4, 7, 8, 9, X, X, X, X}},
-                {{6, 9, 7, 4, X, X, X, X}},
-                {{5, 8, 9, 4, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-              }}}};
-          return cell_vertices_tet[refinement_choice];
-        }
-      case ReferenceCells::Pyramid:
-        DEAL_II_NOT_IMPLEMENTED();
-
-      case ReferenceCells::Wedge:
-        {
-          constexpr dealii::ndarray<unsigned int, 10, 8> cell_vertices_wedge = {
+          case ReferenceCells::Tetrahedron:
             {
-              {{0, 6, 8, 12, 15, 17, X, X}},   // bottom children
-              {{6, 1, 7, 15, 13, 16, X, X}},   //
-              {{8, 7, 2, 17, 16, 14, X, X}},   //
-              {{7, 8, 6, 16, 17, 15, X, X}},   //
-              {{12, 15, 17, 3, 9, 11, X, X}},  // top children
-              {{15, 13, 16, 9, 4, 10, X, X}},  //
-              {{17, 16, 14, 11, 10, 5, X, X}}, //
-              {{16, 17, 15, 10, 11, 9, X, X}}, //
-              {{X, X, X, X, X, X, X, X}},
-              {{X, X, X, X, X, X, X, X}},
-            }};
-          return cell_vertices_wedge;
-        }
+              switch (refinement_choice)
+                {
+                  case 0:
+                    // new line is (6,8)
+                    return {{{{2, 3, 8, X}},
+                             {{0, 9, 5, X}},
+                             {{1, 6, 11, X}},
+                             {{4, 10, 7, X}},
+                             {{2, 12, 5, X}},
+                             {{1, 9, 12, X}},
+                             {{4, 8, 12, X}},
+                             {{6, 12, 10, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}}}};
+                  case 1:
+                    // new line is (5,7)
+                    return {{{{2, 3, 8, X}},
+                             {{0, 9, 5, X}},
+                             {{1, 6, 11, X}},
+                             {{4, 10, 7, X}},
+                             {{0, 3, 12, X}},
+                             {{1, 12, 8, X}},
+                             {{4, 12, 9, X}},
+                             {{7, 11, 12, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}}}};
+                  case 2:
+                    // new line is (4,9)
+                    return {{{{2, 3, 8, X}},
+                             {{0, 9, 5, X}},
+                             {{1, 6, 11, X}},
+                             {{4, 10, 7, X}},
+                             {{0, 12, 11, X}},
+                             {{2, 6, 12, X}},
+                             {{3, 12, 7, X}},
+                             {{5, 10, 12, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}},
+                             {{X, X, X, X}}}};
+                  default:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                }
+            }
 
-      case ReferenceCells::Hexahedron:
-        {
-          constexpr dealii::ndarray<unsigned int, 10, 8> cell_vertices_hex = {{
-            {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
-            {{10, 1, 24, 9, 22, 17, 26, 21}},  //
-            {{8, 24, 2, 11, 20, 26, 18, 23}},  //
-            {{24, 9, 11, 3, 26, 21, 23, 19}},  //
-            {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
-            {{22, 17, 26, 21, 14, 5, 25, 13}}, //
-            {{20, 26, 18, 23, 12, 25, 6, 15}}, //
-            {{26, 21, 23, 19, 25, 13, 15, 7}}, //
-            {{X, X, X, X, X, X, X, X}},
-            {{X, X, X, X, X, X, X, X}},
-          }};
-          return cell_vertices_hex;
-        }
+          case ReferenceCells::Pyramid:
+            DEAL_II_NOT_IMPLEMENTED();
 
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
+          case ReferenceCells::Wedge:
+            {
+              constexpr dealii::ndarray<unsigned int, 13, 4>
+                new_quad_lines_wedge = {{{{2, 20, 11, X}}, // mid tri
+                                         {{3, 6, 18, X}},
+                                         {{19, 7, 10, X}},
+                                         {{18, 19, 20, X}},
+                                         {{4, 0, 14, 18}}, // lower
+                                         {{0, 8, 12, 20}},
+                                         {{8, 4, 13, 19}},
+                                         {{5, 1, 18, 15}}, // upper
+                                         {{1, 9, 20, 17}},
+                                         {{9, 5, 19, 16}},
+                                         {{X, X, X, X}},
+                                         {{X, X, X, X}},
+                                         {{X, X, X, X}}}};
+              return new_quad_lines_wedge;
+            }
+
+          case ReferenceCells::Hexahedron:
+            {
+              constexpr dealii::ndarray<unsigned int, 13, 4>
+                new_quad_lines_hex = {{{{10, 28, 16, 24}},
+                                       {{28, 14, 17, 25}},
+                                       {{11, 29, 24, 20}},
+                                       {{29, 15, 25, 21}},
+                                       {{18, 26, 0, 28}},
+                                       {{26, 22, 1, 29}},
+                                       {{19, 27, 28, 4}},
+                                       {{27, 23, 29, 5}},
+                                       {{2, 24, 8, 26}},
+                                       {{24, 6, 9, 27}},
+                                       {{3, 25, 26, 12}},
+                                       {{25, 7, 27, 13}},
+                                       {{X, X, X, X}}}};
+              return new_quad_lines_hex;
+            }
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
     }
+  else
+    // We should never get here except in the 3d case.
+    DEAL_II_ASSERT_UNREACHABLE();
 
   return {};
 }
 
 
 
+template <int dim>
+constexpr dealii::ndarray<unsigned int, 13, 4, 2>
+ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
+  const unsigned int refinement_choice) const
+{
+  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+
+  if constexpr (dim == 3)
+    {
+      const unsigned int X = numbers::invalid_unsigned_int;
+
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              switch (refinement_choice)
+                {
+                  case 0:
+                    // new line is (6, 8)
+                    return {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                             {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                             {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                             {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                             {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
+                             {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
+                             {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
+                             {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+                  case 1:
+                    // new line is (5, 7)
+                    return {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                             {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                             {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                             {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                             {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
+                             {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
+                             {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
+                             {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+                  case 2:
+                    // new line is (4, 9)
+                    return {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                             {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                             {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                             {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                             {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
+                             {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
+                             {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
+                             {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                             {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+                  default:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                }
+            }
+
+          case ReferenceCells::Pyramid:
+            DEAL_II_NOT_IMPLEMENTED();
+
+          case ReferenceCells::Wedge:
+            {
+              constexpr dealii::ndarray<unsigned int, 13, 4, 2>
+                quad_lines_vertices_wedge = {
+                  {// mid tri
+                   {{{{12, 15}}, {{15, 17}}, {{17, 12}}, {{X, X}}}},
+                   {{{{15, 13}}, {{13, 16}}, {{16, 15}}, {{X, X}}}},
+                   {{{{17, 16}}, {{16, 14}}, {{14, 17}}, {{X, X}}}},
+                   {{{{15, 16}}, {{16, 17}}, {{17, 15}}, {{X, X}}}},
+                   // lower
+                   {{{{7, 16}}, {{6, 15}}, {{7, 6}}, {{16, 15}}}},
+                   {{{{6, 15}}, {{8, 17}}, {{6, 8}}, {{15, 17}}}},
+                   {{{{8, 17}}, {{7, 16}}, {{8, 7}}, {{17, 16}}}},
+                   // upper
+                   {{{{16, 10}}, {{15, 9}}, {{16, 15}}, {{10, 9}}}},
+                   {{{{15, 9}}, {{17, 11}}, {{15, 17}}, {{9, 11}}}},
+                   {{{{17, 11}}, {{16, 10}}, {{17, 16}}, {{11, 10}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+              return quad_lines_vertices_wedge;
+            }
+
+          case ReferenceCells::Hexahedron:
+            {
+              constexpr dealii::ndarray<unsigned int, 13, 4, 2>
+                quad_lines_vertices_hex = {
+                  {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
+                   {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
+                   {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
+                   {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
+                   {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
+                   {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
+                   {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
+                   {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
+                   {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
+                   {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
+                   {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
+                   {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+              return quad_lines_vertices_hex;
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+  else
+    // We should never get here except in the 3d case.
+    DEAL_II_ASSERT_UNREACHABLE();
+
+  return {};
+}
+
+
+
+template <int dim>
+constexpr dealii::ndarray<unsigned int, 10, 6>
+ReferenceCell<dim>::new_isotropic_child_cell_faces(
+  const unsigned int refinement_choice) const
+{
+  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+
+  if constexpr (dim == 3)
+    {
+      const unsigned int X = numbers::invalid_unsigned_int;
+
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              switch (refinement_choice)
+                {
+                  case 0:
+                    // new line is (6, 8)
+                    return {{
+                      {{8, 13, 16, 0, X, X}},
+                      {{9, 12, 1, 21, X, X}},
+                      {{10, 2, 17, 20, X, X}},
+                      {{3, 14, 18, 22, X, X}},
+                      {{11, 1, 4, 5, X, X}},
+                      {{15, 0, 4, 6, X, X}},
+                      {{19, 7, 6, 3, X, X}},
+                      {{23, 5, 2, 7, X, X}},
+                      {{X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X}},
+                    }};
+                  case 1:
+                    // new line is (5, 7)
+                    return {{
+                      {{8, 13, 16, 0, X, X}},
+                      {{9, 12, 1, 21, X, X}},
+                      {{10, 2, 17, 20, X, X}},
+                      {{3, 14, 18, 22, X, X}},
+                      {{11, 4, 0, 5, X, X}},
+                      {{15, 4, 1, 6, X, X}},
+                      {{19, 2, 5, 7, X, X}},
+                      {{23, 6, 7, 3, X, X}},
+                      {{X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X}},
+                    }};
+                  case 2:
+                    // new line is (4, 9)
+                    return {{
+                      {{8, 13, 16, 0, X, X}},
+                      {{9, 12, 1, 21, X, X}},
+                      {{10, 2, 17, 20, X, X}},
+                      {{3, 14, 18, 22, X, X}},
+                      {{11, 4, 5, 2, X, X}},
+                      {{15, 6, 7, 3, X, X}},
+                      {{19, 5, 0, 6, X, X}},
+                      {{23, 1, 4, 7, X, X}},
+                      {{X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X}},
+                    }};
+                  default:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                }
+            }
+          case ReferenceCells::Pyramid:
+            DEAL_II_NOT_IMPLEMENTED();
+
+          case ReferenceCells::Wedge:
+            {
+              // Considerations that went into creating this table
+              // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
+              //   centre wedge is rotated by 180° compared to the parent)
+              // - Order of children is similar to the order of a reference
+              // triangle
+              //   in the x-y-plane (i.e. like the top triangle of the parent)
+              dealii::ndarray<unsigned int, 10, 6> cell_quads_wedge = {{
+                {{23, 0, 10, 5, 19, X}}, // bottom children
+                {{22, 1, 11, 14, 4, X}}, //
+                {{24, 2, 6, 15, 18, X}}, //
+                {{25, 3, 6, 5, 4, X}},   //
+                {{0, 26, 12, 8, 21, X}}, // top children
+                {{1, 27, 13, 16, 7, X}}, //
+                {{2, 28, 9, 17, 20, X}}, //
+                {{3, 29, 9, 8, 7, X}},   //
+                {{X, X, X, X, X, X}},
+                {{X, X, X, X, X, X}},
+              }};
+              return cell_quads_wedge;
+            }
+
+          case ReferenceCells::Hexahedron:
+            {
+              constexpr dealii::ndarray<unsigned int, 10, 6> cell_quads_hex = {{
+                {{12, 0, 20, 4, 28, 8}},  // bottom children
+                {{0, 16, 22, 6, 29, 9}},  //
+                {{13, 1, 4, 24, 30, 10}}, //
+                {{1, 17, 6, 26, 31, 11}}, //
+                {{14, 2, 21, 5, 8, 32}},  // top children
+                {{2, 18, 23, 7, 9, 33}},  //
+                {{15, 3, 5, 25, 10, 34}}, //
+                {{3, 19, 7, 27, 11, 35}}, //
+                {{X, X, X, X, X, X}},
+                {{X, X, X, X, X, X}},
+              }};
+              return cell_quads_hex;
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+  else
+    // We should never get here except in the 3d case.
+    DEAL_II_ASSERT_UNREACHABLE();
+
+  return {};
+}
+
+
+
+template <int dim>
+constexpr dealii::ndarray<unsigned int, 10, 8>
+ReferenceCell<dim>::new_isotropic_child_cell_vertices(
+  const unsigned int refinement_choice) const
+{
+  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+
+  if constexpr (dim == 3)
+    {
+      constexpr unsigned int X = numbers::invalid_unsigned_int;
+
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              switch (refinement_choice)
+                {
+                  case 0:
+                    // new line is (6,8)
+                    return {{
+                      {{0, 4, 6, 7, X, X, X, X}},
+                      {{4, 1, 5, 8, X, X, X, X}},
+                      {{6, 5, 2, 9, X, X, X, X}},
+                      {{7, 8, 9, 3, X, X, X, X}},
+                      {{4, 5, 6, 8, X, X, X, X}},
+                      {{4, 7, 8, 6, X, X, X, X}},
+                      {{6, 9, 7, 8, X, X, X, X}},
+                      {{5, 8, 9, 6, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                    }};
+                  case 1:
+                    // new line is (5,7)
+                    return {{
+                      {{0, 4, 6, 7, X, X, X, X}},
+                      {{4, 1, 5, 8, X, X, X, X}},
+                      {{6, 5, 2, 9, X, X, X, X}},
+                      {{7, 8, 9, 3, X, X, X, X}},
+                      {{4, 5, 6, 7, X, X, X, X}},
+                      {{4, 7, 8, 5, X, X, X, X}},
+                      {{6, 9, 7, 5, X, X, X, X}},
+                      {{5, 8, 9, 7, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                    }};
+                  case 2:
+                    // new line is (4,9)
+                    return {{
+                      {{0, 4, 6, 7, X, X, X, X}},
+                      {{4, 1, 5, 8, X, X, X, X}},
+                      {{6, 5, 2, 9, X, X, X, X}},
+                      {{7, 8, 9, 3, X, X, X, X}},
+                      {{4, 5, 6, 9, X, X, X, X}},
+                      {{4, 7, 8, 9, X, X, X, X}},
+                      {{6, 9, 7, 4, X, X, X, X}},
+                      {{5, 8, 9, 4, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                    }};
+
+                  default:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                }
+            }
+          case ReferenceCells::Pyramid:
+            DEAL_II_NOT_IMPLEMENTED();
+
+          case ReferenceCells::Wedge:
+            {
+              constexpr dealii::ndarray<unsigned int, 10, 8>
+                cell_vertices_wedge = {{
+                  {{0, 6, 8, 12, 15, 17, X, X}},   // bottom children
+                  {{6, 1, 7, 15, 13, 16, X, X}},   //
+                  {{8, 7, 2, 17, 16, 14, X, X}},   //
+                  {{7, 8, 6, 16, 17, 15, X, X}},   //
+                  {{12, 15, 17, 3, 9, 11, X, X}},  // top children
+                  {{15, 13, 16, 9, 4, 10, X, X}},  //
+                  {{17, 16, 14, 11, 10, 5, X, X}}, //
+                  {{16, 17, 15, 10, 11, 9, X, X}}, //
+                  {{X, X, X, X, X, X, X, X}},
+                  {{X, X, X, X, X, X, X, X}},
+                }};
+              return cell_vertices_wedge;
+            }
+
+          case ReferenceCells::Hexahedron:
+            {
+              constexpr dealii::ndarray<unsigned int, 10, 8> cell_vertices_hex =
+                {{
+                  {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
+                  {{10, 1, 24, 9, 22, 17, 26, 21}},  //
+                  {{8, 24, 2, 11, 20, 26, 18, 23}},  //
+                  {{24, 9, 11, 3, 26, 21, 23, 19}},  //
+                  {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
+                  {{22, 17, 26, 21, 14, 5, 25, 13}}, //
+                  {{20, 26, 18, 23, 12, 25, 6, 15}}, //
+                  {{26, 21, 23, 19, 25, 13, 15, 7}}, //
+                  {{X, X, X, X, X, X, X, X}},
+                  {{X, X, X, X, X, X, X, X}},
+                }};
+              return cell_vertices_hex;
+            }
+
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
+  else
+    // We should never get here except in the 3d case.
+    DEAL_II_ASSERT_UNREACHABLE();
+
+  return {};
+}
+
+
+
+template <int dim>
 inline constexpr bool
-ReferenceCell::is_hyper_cube() const
+ReferenceCell<dim>::is_hyper_cube() const
 {
   return (*this == ReferenceCells::Vertex || *this == ReferenceCells::Line ||
           *this == ReferenceCells::Quadrilateral ||
@@ -2052,8 +2057,9 @@ ReferenceCell::is_hyper_cube() const
 
 
 
+template <int dim>
 inline constexpr bool
-ReferenceCell::is_simplex() const
+ReferenceCell<dim>::is_simplex() const
 {
   return (*this == ReferenceCells::Vertex || *this == ReferenceCells::Line ||
           *this == ReferenceCells::Triangle ||
@@ -2062,51 +2068,28 @@ ReferenceCell::is_simplex() const
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::get_dimension() const
+ReferenceCell<dim>::get_dimension() const
 {
-  switch (this->kind)
-    {
-      case ReferenceCells::Vertex:
-        return 0;
-      case ReferenceCells::Line:
-        return 1;
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
-        return 2;
-      case ReferenceCells::Tetrahedron:
-      case ReferenceCells::Pyramid:
-      case ReferenceCells::Wedge:
-      case ReferenceCells::Hexahedron:
-        return 3;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
-
-  return numbers::invalid_unsigned_int;
+  return dim;
 }
 
 
 
 template <int dim>
 Quadrature<dim>
-ReferenceCell::get_midpoint_quadrature() const
+ReferenceCell<dim>::get_midpoint_quadrature() const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
-  return Quadrature<dim>(std::vector<Point<dim>>({barycenter<dim>()}),
+  return Quadrature<dim>(std::vector<Point<dim>>({barycenter()}),
                          std::vector<double>({volume()}));
 }
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_vertices() const
+ReferenceCell<dim>::n_vertices() const
 {
   switch (this->kind)
     {
@@ -2135,8 +2118,9 @@ ReferenceCell::n_vertices() const
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_lines() const
+ReferenceCell<dim>::n_lines() const
 {
   switch (this->kind)
     {
@@ -2167,14 +2151,8 @@ ReferenceCell::n_lines() const
 
 template <int dim>
 Point<dim>
-ReferenceCell::vertex(const unsigned int v) const
+ReferenceCell<dim>::vertex(const unsigned int v) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(v, n_vertices());
 
   switch (dim)
@@ -2290,8 +2268,10 @@ ReferenceCell::vertex(const unsigned int v) const
 }
 
 
+
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_faces() const
+ReferenceCell<dim>::n_faces() const
 {
   switch (this->kind)
     {
@@ -2320,8 +2300,9 @@ ReferenceCell::n_faces() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices() const
+ReferenceCell<dim>::face_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_faces());
@@ -2329,8 +2310,10 @@ ReferenceCell::face_indices() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
+ReferenceCell<dim>::face_indices_by_type(
+  const ReferenceCell<dim - 1> &face_ref_type) const
 {
   switch (this->kind)
     {
@@ -2396,8 +2379,9 @@ ReferenceCell::face_indices_by_type(const ReferenceCell &face_ref_type) const
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_isotropic_refinement_choices() const
+ReferenceCell<dim>::n_isotropic_refinement_choices() const
 {
   switch (this->kind)
     {
@@ -2426,8 +2410,9 @@ ReferenceCell::n_isotropic_refinement_choices() const
 
 
 
+template <int dim>
 inline IsotropicRefinementChoice
-ReferenceCell::get_isotropic_refinement_choice(
+ReferenceCell<dim>::get_isotropic_refinement_choice(
   const unsigned int ref_choice) const
 {
   AssertIndexRange(ref_choice, n_isotropic_refinement_choices());
@@ -2452,8 +2437,9 @@ ReferenceCell::get_isotropic_refinement_choice(
 
 
 
+template <int dim>
 inline constexpr unsigned int
-ReferenceCell::n_isotropic_children() const
+ReferenceCell<dim>::n_isotropic_children() const
 {
   switch (this->kind)
     {
@@ -2486,15 +2472,8 @@ ReferenceCell::n_isotropic_children() const
 
 template <int dim>
 unsigned int
-ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
+ReferenceCell<dim>::n_children(const RefinementCase<dim> ref_case) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   // Use GeometryInfo here to keep it the single source of truth
   if (this->is_hyper_cube())
     return GeometryInfo<dim>::n_children(ref_case);
@@ -2504,8 +2483,9 @@ ReferenceCell::n_children(const RefinementCase<dim> ref_case) const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::isotropic_child_indices() const
+ReferenceCell<dim>::isotropic_child_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
     0U, n_isotropic_children());
@@ -2513,8 +2493,9 @@ ReferenceCell::isotropic_child_indices() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::vertex_indices() const
+ReferenceCell<dim>::vertex_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_vertices());
@@ -2522,8 +2503,9 @@ ReferenceCell::vertex_indices() const
 
 
 
+template <int dim>
 inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
-ReferenceCell::line_indices() const
+ReferenceCell<dim>::line_indices() const
 {
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
                                                                   n_lines());
@@ -2533,7 +2515,7 @@ ReferenceCell::line_indices() const
 
 template <int dim>
 inline ArrayView<const RefinementCase<dim>>
-ReferenceCell::refinement_cases() const
+ReferenceCell<dim>::refinement_cases() const
 {
   AssertDimension(dim, get_dimension());
 
@@ -2619,64 +2601,70 @@ ReferenceCell::refinement_cases() const
 
 
 
-inline constexpr ReferenceCell
-ReferenceCell::face_reference_cell(const unsigned int face_no) const
+template <int dim>
+inline constexpr ReferenceCell<dim - 1>
+ReferenceCell<dim>::face_reference_cell(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
 
-  switch (this->kind)
+  if constexpr (dim == 0)
+    return ReferenceCells::Invalid<dim - 1>;
+  else if constexpr (dim == 1)
+    return ReferenceCells::Vertex;
+  else if constexpr (dim == 2)
+    return ReferenceCells::Line;
+  else if constexpr (dim == 3)
     {
-      case ReferenceCells::Vertex:
-        return ReferenceCells::Invalid;
-      case ReferenceCells::Line:
-        return ReferenceCells::Vertex;
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
-        return ReferenceCells::Line;
-      case ReferenceCells::Tetrahedron:
-        return ReferenceCells::Triangle;
-      case ReferenceCells::Pyramid:
-        if (face_no == 0)
-          return ReferenceCells::Quadrilateral;
-        else
-          return ReferenceCells::Triangle;
-      case ReferenceCells::Wedge:
-        if (face_no > 1)
-          return ReferenceCells::Quadrilateral;
-        else
-          return ReferenceCells::Triangle;
-      case ReferenceCells::Hexahedron:
-        return ReferenceCells::Quadrilateral;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return ReferenceCells::Triangle;
+          case ReferenceCells::Pyramid:
+            if (face_no == 0)
+              return ReferenceCells::Quadrilateral;
+            else
+              return ReferenceCells::Triangle;
+          case ReferenceCells::Wedge:
+            if (face_no > 1)
+              return ReferenceCells::Quadrilateral;
+            else
+              return ReferenceCells::Triangle;
+          case ReferenceCells::Hexahedron:
+            return ReferenceCells::Quadrilateral;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
     }
-
-  return ReferenceCells::Invalid;
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 }
 
 
 
+template <int dim>
 inline constexpr types::geometric_orientation
-ReferenceCell::default_combined_face_orientation()
+ReferenceCell<dim>::default_combined_face_orientation()
 {
   return numbers::default_geometric_orientation;
 }
 
 
 
+template <int dim>
 inline constexpr types::geometric_orientation
-ReferenceCell::reversed_combined_line_orientation()
+ReferenceCell<dim>::reversed_combined_line_orientation()
 {
-  // For a reversed line 'orientation' is false and neither flip nor rotate are
-  // defined.
+  // For a reversed line 'orientation' is false and neither flip nor rotate
+  // are defined.
   return numbers::reverse_line_orientation;
 }
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::child_cell_on_face(const unsigned int face,
-                                  const unsigned int subface) const
+ReferenceCell<dim>::child_cell_on_face(const unsigned int face,
+                                       const unsigned int subface) const
 {
   return child_cell_on_face(face,
                             subface,
@@ -2685,8 +2673,9 @@ ReferenceCell::child_cell_on_face(const unsigned int face,
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::child_cell_on_face(
+ReferenceCell<dim>::child_cell_on_face(
   const unsigned int                 face,
   const unsigned int                 subface,
   const types::geometric_orientation combined_orientation) const
@@ -2758,8 +2747,9 @@ ReferenceCell::child_cell_on_face(
 
 
 
+template <int dim>
 inline std::array<unsigned int, 2>
-ReferenceCell::standard_vertex_to_face_and_vertex_index(
+ReferenceCell<dim>::standard_vertex_to_face_and_vertex_index(
   const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
@@ -2820,8 +2810,9 @@ ReferenceCell::standard_vertex_to_face_and_vertex_index(
 
 
 
+template <int dim>
 inline std::array<unsigned int, 2>
-ReferenceCell::standard_line_to_face_and_line_index(
+ReferenceCell<dim>::standard_line_to_face_and_line_index(
   const unsigned int line) const
 {
   AssertIndexRange(line, n_lines());
@@ -2882,9 +2873,11 @@ ReferenceCell::standard_line_to_face_and_line_index(
 }
 
 
+
+template <int dim>
 inline unsigned int
-ReferenceCell::line_to_cell_vertices(const unsigned int line,
-                                     const unsigned int vertex) const
+ReferenceCell<dim>::line_to_cell_vertices(const unsigned int line,
+                                          const unsigned int vertex) const
 {
   AssertIndexRange(vertex, 2);
   AssertIndexRange(line, n_lines());
@@ -2964,8 +2957,10 @@ ReferenceCell::line_to_cell_vertices(const unsigned int line,
 }
 
 
+
+template <int dim>
 inline unsigned int
-ReferenceCell::face_to_cell_lines(
+ReferenceCell<dim>::face_to_cell_lines(
   const unsigned int                 face,
   const unsigned int                 line,
   const types::geometric_orientation combined_face_orientation) const
@@ -3047,8 +3042,9 @@ ReferenceCell::face_to_cell_lines(
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::face_to_cell_vertices(
+ReferenceCell<dim>::face_to_cell_vertices(
   const unsigned int                 face,
   const unsigned int                 vertex,
   const types::geometric_orientation combined_face_orientation) const
@@ -3141,8 +3137,9 @@ ReferenceCell::face_to_cell_vertices(
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::face_and_line_to_cell_vertices(
+ReferenceCell<dim>::face_and_line_to_cell_vertices(
   const unsigned int                 face,
   const unsigned int                 line,
   const unsigned int                 vertex,
@@ -3249,23 +3246,18 @@ ReferenceCell::face_and_line_to_cell_vertices(
 
 template <int dim>
 Point<dim>
-ReferenceCell::face_vertex_location(const unsigned int face,
-                                    const unsigned int vertex) const
+ReferenceCell<dim>::face_vertex_location(const unsigned int face,
+                                         const unsigned int vertex) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-  return this->template vertex<dim>(face_to_cell_vertices(
+  return this->vertex(face_to_cell_vertices(
     face, vertex, numbers::default_geometric_orientation));
 }
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::standard_to_real_face_vertex(
+ReferenceCell<dim>::standard_to_real_face_vertex(
   const unsigned int                 vertex,
   const unsigned int                 face,
   const types::geometric_orientation face_orientation) const
@@ -3277,8 +3269,9 @@ ReferenceCell::standard_to_real_face_vertex(
   switch (face_reference_cell(face))
     {
       case ReferenceCells::Vertex:
-        // test to ensure that face_orientation is default_geometric_orientation
-        // already done with AssertIndexRange(face_orientation, ...) above.
+        // test to ensure that face_orientation is
+        // default_geometric_orientation already done with
+        // AssertIndexRange(face_orientation, ...) above.
         return vertex;
       case ReferenceCells::Line:
         return line_vertex_permutations[face_orientation][vertex];
@@ -3296,8 +3289,9 @@ ReferenceCell::standard_to_real_face_vertex(
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::standard_to_real_face_line(
+ReferenceCell<dim>::standard_to_real_face_line(
   const unsigned int                 line,
   const unsigned int                 face,
   const types::geometric_orientation face_orientation) const
@@ -3328,45 +3322,40 @@ ReferenceCell::standard_to_real_face_line(
 namespace ReferenceCells
 {
   template <int dim>
-  inline constexpr const ReferenceCell &
+  inline constexpr const ReferenceCell<dim> &
   get_simplex()
   {
-    switch (dim)
-      {
-        case 0:
-          return ReferenceCells::Vertex;
-        case 1:
-          return ReferenceCells::Line;
-        case 2:
-          return ReferenceCells::Triangle;
-        case 3:
-          return ReferenceCells::Tetrahedron;
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
-    return ReferenceCells::Invalid;
+    if constexpr (dim == 0)
+      return ReferenceCells::Vertex;
+    else if constexpr (dim == 1)
+      return ReferenceCells::Line;
+    else if constexpr (dim == 2)
+      return ReferenceCells::Triangle;
+    else if constexpr (dim == 3)
+      return ReferenceCells::Tetrahedron;
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+
+    return ReferenceCells::Invalid<dim>;
   }
 
 
 
   template <int dim>
-  inline constexpr const ReferenceCell &
+  inline constexpr const ReferenceCell<dim> &
   get_hypercube()
   {
-    switch (dim)
-      {
-        case 0:
-          return ReferenceCells::Vertex;
-        case 1:
-          return ReferenceCells::Line;
-        case 2:
-          return ReferenceCells::Quadrilateral;
-        case 3:
-          return ReferenceCells::Hexahedron;
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
-    return ReferenceCells::Invalid;
+    if constexpr (dim == 0)
+      return ReferenceCells::Vertex;
+    else if constexpr (dim == 1)
+      return ReferenceCells::Line;
+    else if constexpr (dim == 2)
+      return ReferenceCells::Quadrilateral;
+    else if constexpr (dim == 3)
+      return ReferenceCells::Hexahedron;
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+    return ReferenceCells::Invalid<dim>;
   }
 
 
@@ -3396,6 +3385,8 @@ namespace ReferenceCells
     return GeometryInfo<structdim>::faces_per_cell;
   }
 
+
+
   template <int structdim>
   inline constexpr unsigned int
   max_n_children()
@@ -3405,59 +3396,60 @@ namespace ReferenceCells
 } // namespace ReferenceCells
 
 
-inline ReferenceCell
-ReferenceCell::n_vertices_to_type(const int dim, const unsigned int n_vertices)
-{
-  AssertIndexRange(dim, 4);
-  AssertIndexRange(n_vertices, 9);
 
-  const auto                                X     = ReferenceCells::Invalid;
-  static const ndarray<ReferenceCell, 4, 9> table = {
-    {// dim 0
-     {{X, ReferenceCells::Vertex, X, X, X, X, X, X, X}},
-     // dim 1
-     {{X, X, ReferenceCells::Line, X, X, X, X, X, X}},
-     // dim 2
-     {{X,
-       X,
-       X,
-       ReferenceCells::Triangle,
-       ReferenceCells::Quadrilateral,
-       X,
-       X,
-       X,
-       X}},
-     // dim 3
-     {{X,
-       X,
-       X,
-       X,
-       ReferenceCells::Tetrahedron,
-       ReferenceCells::Pyramid,
-       ReferenceCells::Wedge,
-       X,
-       ReferenceCells::Hexahedron}}}};
-  Assert(table[dim][n_vertices] != ReferenceCells::Invalid,
+template <int dim>
+inline ReferenceCell<dim>
+ReferenceCell<dim>::n_vertices_to_type(const int          dim_,
+                                       const unsigned int n_vertices)
+{
+  AssertDimension(dim, dim_);
+
+  if constexpr (dim == 0)
+    if (n_vertices == 1)
+      return ReferenceCells::Vertex;
+
+  if constexpr (dim == 1)
+    {
+      if (n_vertices == 2)
+        return ReferenceCells::Line;
+    }
+
+  if constexpr (dim == 2)
+    {
+      if (n_vertices == 3)
+        return ReferenceCells::Triangle;
+      else if (n_vertices == 4)
+        return ReferenceCells::Quadrilateral;
+    }
+
+  if constexpr (dim == 3)
+    {
+      if (n_vertices == 4)
+        return ReferenceCells::Tetrahedron;
+      else if (n_vertices == 5)
+        return ReferenceCells::Pyramid;
+      if (n_vertices == 6)
+        return ReferenceCells::Wedge;
+      else if (n_vertices == 8)
+        return ReferenceCells::Hexahedron;
+    }
+
+  Assert(false,
          ExcMessage("The combination of dim = " + std::to_string(dim) +
                     " and n_vertices = " + std::to_string(n_vertices) +
                     " does not correspond to a known reference cell type."));
-  return table[dim][n_vertices];
+  return ReferenceCells::Invalid<dim>;
 }
 
 
 
 template <int dim>
 inline double
-ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
-                                       const unsigned int i) const
+ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
+                                            const unsigned int i) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
   AssertIndexRange(i, n_vertices());
+
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -3527,13 +3519,11 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
         }
       // see also ScalarLagrangePolynomialWedge::compute_value()
       case ReferenceCells::Wedge:
-        return ReferenceCell(ReferenceCells::Triangle)
-                 .d_linear_shape_function<2>(Point<2>(xi[std::min(0, dim - 1)],
-                                                      xi[std::min(1, dim - 1)]),
-                                             i % 3) *
-               ReferenceCell(ReferenceCells::Line)
-                 .d_linear_shape_function<1>(Point<1>(xi[std::min(2, dim - 1)]),
-                                             i / 3);
+        return ReferenceCells::Triangle.d_linear_shape_function(
+                 Point<2>(xi[std::min(0, dim - 1)], xi[std::min(1, dim - 1)]),
+                 i % 3) *
+               ReferenceCells::Line.d_linear_shape_function(
+                 Point<1>(xi[std::min(2, dim - 1)]), i / 3);
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
@@ -3546,15 +3536,9 @@ ReferenceCell::d_linear_shape_function(const Point<dim>  &xi,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
-                                                const unsigned int i) const
+ReferenceCell<dim>::d_linear_shape_function_gradient(const Point<dim>  &xi,
+                                                     const unsigned int i) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -3584,8 +3568,9 @@ ReferenceCell::d_linear_shape_function_gradient(const Point<dim>  &xi,
 
 
 
+template <int dim>
 inline double
-ReferenceCell::volume() const
+ReferenceCell<dim>::volume() const
 {
   switch (this->kind)
     {
@@ -3614,8 +3599,9 @@ ReferenceCell::volume() const
 
 
 
+template <int dim>
 inline double
-ReferenceCell::face_measure(const unsigned int face_no) const
+ReferenceCell<dim>::face_measure(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
   constexpr double X = std::numeric_limits<double>::signaling_NaN();
@@ -3653,15 +3639,8 @@ ReferenceCell::face_measure(const unsigned int face_no) const
 
 template <int dim>
 inline Point<dim>
-ReferenceCell::barycenter() const
+ReferenceCell<dim>::barycenter() const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
@@ -3691,15 +3670,9 @@ ReferenceCell::barycenter() const
 
 template <int dim>
 inline bool
-ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
+ReferenceCell<dim>::contains_point(const Point<dim> &p,
+                                   const double      tolerance) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   // Introduce abbreviations to silence compiler warnings about invalid
   // array accesses (that can't happen, of course, but the compiler
   // doesn't know that).
@@ -3805,29 +3778,23 @@ ReferenceCell::contains_point(const Point<dim> &p, const double tolerance) const
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::unit_tangential_vectors(const unsigned int face_no,
-                                       const unsigned int i) const
+ReferenceCell<dim>::unit_tangential_vectors(const unsigned int face_no,
+                                            const unsigned int i) const
 {
-  return face_tangent_vector<dim>(face_no, i);
+  return face_tangent_vector(face_no, i);
 }
 
 
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::face_tangent_vector(const unsigned int face_no,
-                                   const unsigned int i) const
+ReferenceCell<dim>::face_tangent_vector(const unsigned int face_no,
+                                        const unsigned int i) const
 {
   AssertIndexRange(face_no, n_faces());
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
 
-  // Simplify the 1d case by setting tangents (which are used for boundary forms
-  // and thus Jacobians) equal to the unit vector
+  // Simplify the 1d case by setting tangents (which are used for boundary
+  // forms and thus Jacobians) equal to the unit vector
   if constexpr (dim == 1)
     {
       return Tensor<1, dim>{{1.0}};
@@ -3910,24 +3877,17 @@ ReferenceCell::face_tangent_vector(const unsigned int face_no,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::unit_normal_vectors(const unsigned int face_no) const
+ReferenceCell<dim>::unit_normal_vectors(const unsigned int face_no) const
 {
-  return face_normal_vector<dim>(face_no);
+  return face_normal_vector(face_no);
 }
 
 
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell::face_normal_vector(const unsigned int face_no) const
+ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
 {
-  Assert(dim == get_dimension(),
-         ExcMessage("You can only call this function with arguments for "
-                    "which 'dim' equals the dimension of the space in which "
-                    "the current reference cell lives. You have dim=" +
-                    std::to_string(dim) + " but the reference cell is " +
-                    std::to_string(get_dimension()) + " dimensional."));
-
   if (is_hyper_cube())
     {
       AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
@@ -3938,12 +3898,12 @@ ReferenceCell::face_normal_vector(const unsigned int face_no) const
       Assert(*this == ReferenceCells::Triangle, ExcInternalError());
 
       // Return the rotated vector
-      return cross_product_2d(face_tangent_vector<dim>(face_no, 0));
+      return cross_product_2d(face_tangent_vector(face_no, 0));
     }
   else if (dim == 3)
     {
-      return cross_product_3d(face_tangent_vector<dim>(face_no, 0),
-                              face_tangent_vector<dim>(face_no, 1));
+      return cross_product_3d(face_tangent_vector(face_no, 0),
+                              face_tangent_vector(face_no, 1));
     }
 
   DEAL_II_NOT_IMPLEMENTED();
@@ -3953,8 +3913,9 @@ ReferenceCell::face_normal_vector(const unsigned int face_no) const
 
 
 
+template <int dim>
 inline unsigned int
-ReferenceCell::n_face_orientations(const unsigned int face_no) const
+ReferenceCell<dim>::n_face_orientations(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
 
@@ -3978,8 +3939,9 @@ ReferenceCell::n_face_orientations(const unsigned int face_no) const
 
 
 
+template <int dim>
 inline types::geometric_orientation
-ReferenceCell::standard_vs_true_line_orientation(
+ReferenceCell<dim>::standard_vs_true_line_orientation(
   const unsigned int                 line,
   const unsigned int                 face,
   const types::geometric_orientation combined_face_orientation,
@@ -3992,8 +3954,10 @@ ReferenceCell::standard_vs_true_line_orientation(
 }
 
 
+
+template <int dim>
 inline types::geometric_orientation
-ReferenceCell::face_to_cell_line_orientation(
+ReferenceCell<dim>::face_to_cell_line_orientation(
   const unsigned int                 face_line_no,
   const unsigned int                 face_no,
   const types::geometric_orientation combined_face_orientation,
@@ -4007,8 +3971,8 @@ ReferenceCell::face_to_cell_line_orientation(
     {
       static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
         table{{{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
-      // We use face_line_no / 2 here since lines i and i + 1 are parallel and,
-      // on a given face, have the same relative orientations.
+      // We use face_line_no / 2 here since lines i and i + 1 are parallel
+      // and, on a given face, have the same relative orientations.
       const bool match =
         line_orientation == table[face_line_no / 2][combined_face_orientation];
 
@@ -4082,8 +4046,11 @@ ReferenceCell::face_to_cell_line_orientation(
     return numbers::default_geometric_orientation;
 }
 
+
+
+template <int dim>
 inline unsigned int
-ReferenceCell::opposite_face_index(const unsigned int face_no) const
+ReferenceCell<dim>::opposite_face_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
   switch (this->kind)
@@ -4148,14 +4115,14 @@ ReferenceCell::opposite_face_index(const unsigned int face_no) const
 
 namespace internal
 {
-  template <typename T>
+  template <int dim, typename T>
   class NoPermutation : public dealii::ExceptionBase
   {
   public:
     /**
      * Constructor.
      */
-    NoPermutation(const ReferenceCell      &entity_type,
+    NoPermutation(const ReferenceCell<dim> &entity_type,
                   const ArrayView<const T> &vertices_0,
                   const ArrayView<const T> &vertices_1)
       : entity_type(entity_type)
@@ -4203,7 +4170,7 @@ namespace internal
     /**
      * Entity type.
      */
-    const ReferenceCell entity_type;
+    const ReferenceCell<dim> entity_type;
 
     /**
      * First set of values.
@@ -4220,10 +4187,12 @@ namespace internal
 
 
 
+template <int dim>
 template <typename T, std::size_t N>
 inline types::geometric_orientation
-ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
-                                   const std::array<T, N> &vertices_1) const
+ReferenceCell<dim>::compute_orientation(
+  const std::array<T, N> &vertices_0,
+  const std::array<T, N> &vertices_1) const
 {
   Assert(N >= n_vertices(),
          ExcMessage("The number of array elements must be equal to or "
@@ -4241,9 +4210,10 @@ ReferenceCell::compute_orientation(const std::array<T, N> &vertices_0,
 
 
 
+template <int dim>
 template <typename T>
 types::geometric_orientation
-ReferenceCell::get_combined_orientation(
+ReferenceCell<dim>::get_combined_orientation(
   const ArrayView<const T> &vertices_0,
   const ArrayView<const T> &vertices_1) const
 {
@@ -4273,7 +4243,7 @@ ReferenceCell::get_combined_orientation(
     // argument of unary '*' (have 'int')
     [[maybe_unused]] const auto &ref_cell = *this;
     Assert(false,
-           (internal::NoPermutation<T>(ref_cell, vertices_0, vertices_1)));
+           (internal::NoPermutation<dim, T>(ref_cell, vertices_0, vertices_1)));
     return std::numeric_limits<types::geometric_orientation>::max();
   };
 
@@ -4291,15 +4261,17 @@ ReferenceCell::get_combined_orientation(
         DEAL_II_NOT_IMPLEMENTED();
     }
 
-  Assert(false, (internal::NoPermutation<T>(*this, vertices_0, vertices_1)));
+  Assert(false,
+         (internal::NoPermutation<dim, T>(*this, vertices_0, vertices_1)));
   return std::numeric_limits<types::geometric_orientation>::max();
 }
 
 
 
+template <int dim>
 template <typename T, std::size_t N>
 inline std::array<T, N>
-ReferenceCell::permute_according_orientation(
+ReferenceCell<dim>::permute_according_orientation(
   const std::array<T, N> &vertices,
   const unsigned int      orientation) const
 {
@@ -4324,9 +4296,10 @@ ReferenceCell::permute_according_orientation(
 
 
 
+template <int dim>
 template <typename T>
 boost::container::small_vector<T, 8>
-ReferenceCell::permute_by_combined_orientation(
+ReferenceCell<dim>::permute_by_combined_orientation(
   const ArrayView<const T>          &vertices,
   const types::geometric_orientation orientation) const
 {
@@ -4362,8 +4335,9 @@ ReferenceCell::permute_by_combined_orientation(
 
 
 
+template <int dim>
 inline types::geometric_orientation
-ReferenceCell::get_inverse_combined_orientation(
+ReferenceCell<dim>::get_inverse_combined_orientation(
   const types::geometric_orientation orientation) const
 {
   switch (this->kind)
@@ -4398,35 +4372,6 @@ ReferenceCell::get_inverse_combined_orientation(
   return std::numeric_limits<types::geometric_orientation>::max();
 }
 
-
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<0>(
-  const std::array<unsigned, 0> &node_indices,
-  const std::array<unsigned, 0> &nodes_per_direction,
-  const bool                     legacy_format) const;
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<1>(
-  const std::array<unsigned, 1> &node_indices,
-  const std::array<unsigned, 1> &nodes_per_direction,
-  const bool                     legacy_format) const;
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<2>(
-  const std::array<unsigned, 2> &node_indices,
-  const std::array<unsigned, 2> &nodes_per_direction,
-  const bool                     legacy_format) const;
-
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<3>(
-  const std::array<unsigned, 3> &node_indices,
-  const std::array<unsigned, 3> &nodes_per_direction,
-  const bool                     legacy_format) const;
 
 DEAL_II_NAMESPACE_CLOSE
 

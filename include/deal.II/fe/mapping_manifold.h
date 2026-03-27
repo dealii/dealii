@@ -74,7 +74,7 @@ public:
   preserves_vertex_locations() const override;
 
   virtual bool
-  is_compatible_with(const ReferenceCell &cell_type) const override;
+  is_compatible_with(const ReferenceCell<dim> &cell_type) const override;
 
   /**
    * @name Mapping points between reference and real cells
@@ -390,7 +390,7 @@ MappingManifold<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 bool
 MappingManifold<dim, spacedim>::is_compatible_with(
-  const ReferenceCell &cell_type) const
+  const ReferenceCell<dim> &cell_type) const
 {
   if (cell_type.get_dimension() != dim)
     return false; // TODO: or is this an error?

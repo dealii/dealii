@@ -75,8 +75,11 @@ namespace
 
 } // namespace
 
+
+
+template <int dim>
 std::string
-ReferenceCell::to_string() const
+ReferenceCell<dim>::to_string() const
 {
   switch (this->kind)
     {
@@ -96,7 +99,7 @@ ReferenceCell::to_string() const
         return "Wedge";
       case ReferenceCells::Hexahedron:
         return "Hex";
-      case ReferenceCells::Invalid:
+      case ReferenceCells::Invalid<dim>:
         return "Invalid";
       default:
         DEAL_II_NOT_IMPLEMENTED();
@@ -104,6 +107,8 @@ ReferenceCell::to_string() const
 
   return "Invalid";
 }
+
+
 
 namespace
 {
@@ -113,12 +118,11 @@ namespace
   // faces of cells.
   template <int dim>
   Point<dim>
-  child_vertex(const ReferenceCell       reference_cell,
+  child_vertex(const ReferenceCell<dim>  reference_cell,
                const unsigned int        child_no,
                const unsigned int        vertex_no,
                const RefinementCase<dim> refinement_case)
   {
-    AssertDimension(dim, reference_cell.get_dimension());
     if (dim > 1)
       AssertIndexRange(child_no, reference_cell.n_children(refinement_case));
     AssertIndexRange(vertex_no, reference_cell.n_vertices());
@@ -225,13 +229,12 @@ namespace
 
 template <int dim>
 Point<dim>
-ReferenceCell::subface_vertex_location(
+ReferenceCell<dim>::subface_vertex_location(
   const unsigned int            face_no,
   const unsigned int            subface_no,
   const unsigned int            subface_vertex_no,
   const RefinementCase<dim - 1> face_refinement_case) const
 {
-  AssertDimension(dim, get_dimension());
   AssertIndexRange(face_no, n_faces());
   if (dim > 1)
     {
@@ -247,7 +250,7 @@ ReferenceCell::subface_vertex_location(
   Point<dim> p;
   for (const unsigned int vertex_no :
        face_reference_cell(face_no).vertex_indices())
-    p += face_vertex_location<dim>(face_no, vertex_no) *
+    p += face_vertex_location(face_no, vertex_no) *
          face_reference_cell(face_no).d_linear_shape_function(
            child_vertex(face_reference_cell(face_no),
                         subface_no,
@@ -262,12 +265,11 @@ ReferenceCell::subface_vertex_location(
 
 template <int dim>
 std::pair<unsigned int, RefinementCase<dim - 1>>
-ReferenceCell::equivalent_refinement_case(
+ReferenceCell<dim>::equivalent_refinement_case(
   const types::geometric_orientation combined_face_orientation,
   const internal::SubfaceCase<dim>   subface_case,
   const unsigned int                 subface_no) const
 {
-  AssertDimension(dim, get_dimension());
   // 1. in 1d subfaces don't exist, but we still support some subface code
   //    (such as QProjector's functions) to enable dimension-independent
   //    programming. To match the convention used by 3d this will always return
@@ -434,12 +436,11 @@ ReferenceCell::equivalent_refinement_case(
 
 
 
-template <int dim, int spacedim>
+template <int dim>
+template <int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
-ReferenceCell::get_default_mapping(const unsigned int degree) const
+ReferenceCell<dim>::get_default_mapping(const unsigned int degree) const
 {
-  AssertDimension(dim, get_dimension());
-
   if (is_hyper_cube())
     return std::make_unique<MappingQ<dim, spacedim>>(degree);
   else if (is_simplex())
@@ -464,12 +465,11 @@ ReferenceCell::get_default_mapping(const unsigned int degree) const
 
 
 
-template <int dim, int spacedim>
+template <int dim>
+template <int spacedim>
 const Mapping<dim, spacedim> &
-ReferenceCell::get_default_linear_mapping() const
+ReferenceCell<dim>::get_default_linear_mapping() const
 {
-  AssertDimension(dim, get_dimension());
-
   if (is_hyper_cube())
     {
       return StaticMappingQ1<dim, spacedim>::mapping;
@@ -503,10 +503,8 @@ ReferenceCell::get_default_linear_mapping() const
 
 template <int dim>
 Quadrature<dim>
-ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1d) const
+ReferenceCell<dim>::get_gauss_type_quadrature(const unsigned n_points_1d) const
 {
-  AssertDimension(dim, get_dimension());
-
   if (is_hyper_cube())
     return QGauss<dim>(n_points_1d);
   else if (is_simplex())
@@ -525,17 +523,15 @@ ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1d) const
 
 template <int dim>
 const Quadrature<dim> &
-ReferenceCell::get_nodal_type_quadrature() const
+ReferenceCell<dim>::get_nodal_type_quadrature() const
 {
-  AssertDimension(dim, get_dimension());
-
   // A function that is used to fill a quadrature object of the
   // desired type the first time we encounter a particular
   // reference cell
-  const auto create_quadrature = [](const ReferenceCell &reference_cell) {
+  const auto create_quadrature = [](const ReferenceCell<dim> &reference_cell) {
     std::vector<Point<dim>> vertices(reference_cell.n_vertices());
     for (const unsigned int v : reference_cell.vertex_indices())
-      vertices[v] = reference_cell.vertex<dim>(v);
+      vertices[v] = reference_cell.vertex(v);
 
     return Quadrature<dim>(vertices);
   };
@@ -569,8 +565,10 @@ ReferenceCell::get_nodal_type_quadrature() const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const
+ReferenceCell<dim>::exodusii_vertex_to_deal_vertex(
+  const unsigned int vertex_n) const
 {
   AssertIndexRange(vertex_n, n_vertices());
 
@@ -612,8 +610,9 @@ ReferenceCell::exodusii_vertex_to_deal_vertex(const unsigned int vertex_n) const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
+ReferenceCell<dim>::exodusii_face_to_deal_face(const unsigned int face_n) const
 {
   AssertIndexRange(face_n, n_faces());
 
@@ -659,8 +658,9 @@ ReferenceCell::exodusii_face_to_deal_face(const unsigned int face_n) const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
+ReferenceCell<dim>::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
 {
   AssertIndexRange(vertex_n, n_vertices());
   // Information on this file format isn't easy to find - the documents here
@@ -695,8 +695,9 @@ ReferenceCell::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::vtk_linear_type() const
+ReferenceCell<dim>::vtk_linear_type() const
 {
   switch (this->kind)
     {
@@ -716,7 +717,7 @@ ReferenceCell::vtk_linear_type() const
         return VTKCellType::VTK_WEDGE;
       case ReferenceCells::Hexahedron:
         return VTKCellType::VTK_HEXAHEDRON;
-      case ReferenceCells::Invalid:
+      case ReferenceCells::Invalid<dim>:
         return VTKCellType::VTK_INVALID;
       default:
         DEAL_II_NOT_IMPLEMENTED();
@@ -727,8 +728,9 @@ ReferenceCell::vtk_linear_type() const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::vtk_quadratic_type() const
+ReferenceCell<dim>::vtk_quadratic_type() const
 {
   switch (this->kind)
     {
@@ -748,7 +750,7 @@ ReferenceCell::vtk_quadratic_type() const
         return VTKCellType::VTK_QUADRATIC_WEDGE;
       case ReferenceCells::Hexahedron:
         return VTKCellType::VTK_QUADRATIC_HEXAHEDRON;
-      case ReferenceCells::Invalid:
+      case ReferenceCells::Invalid<dim>:
         return VTKCellType::VTK_INVALID;
       default:
         DEAL_II_NOT_IMPLEMENTED();
@@ -759,8 +761,9 @@ ReferenceCell::vtk_quadratic_type() const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::vtk_lagrange_type() const
+ReferenceCell<dim>::vtk_lagrange_type() const
 {
   switch (this->kind)
     {
@@ -780,7 +783,7 @@ ReferenceCell::vtk_lagrange_type() const
         return VTKCellType::VTK_LAGRANGE_WEDGE;
       case ReferenceCells::Hexahedron:
         return VTKCellType::VTK_LAGRANGE_HEXAHEDRON;
-      case ReferenceCells::Invalid:
+      case ReferenceCells::Invalid<dim>:
         return VTKCellType::VTK_INVALID;
       default:
         DEAL_II_NOT_IMPLEMENTED();
@@ -791,220 +794,210 @@ ReferenceCell::vtk_lagrange_type() const
 
 
 
-template <>
+template <int dim>
 unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<0>(
-  const std::array<unsigned, 0> &,
-  const std::array<unsigned, 0> &,
-  const bool) const
+ReferenceCell<dim>::vtk_lexicographic_to_node_index(
+  const std::array<unsigned, dim> &node_indices,
+  const std::array<unsigned, dim> &nodes_per_direction,
+  const bool                       legacy_format) const
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0;
-}
+  (void)legacy_format;
 
-
-
-/**
- * Modified from
- * https://github.com/Kitware/VTK/blob/265ca48a79a36538c95622c237da11133608bbe5/Common/DataModel/vtkLagrangeCurve.cxx#L478
- */
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<1>(
-  const std::array<unsigned, 1> &node_indices,
-  const std::array<unsigned, 1> &nodes_per_direction,
-  const bool) const
-{
-  const unsigned int i = node_indices[0];
-
-  const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
-  // How many boundaries do we lie on at once?
-  const int nbdy = (ibdy ? 1 : 0);
-
-  if (nbdy == 1) // Vertex DOF
-    { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
-      return i ? 1 : 0;
-    }
-
-  const int offset = 2;
-  return (i - 1) + offset;
-}
-
-
-
-/**
- * Modified from
- * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
- */
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<2>(
-  const std::array<unsigned, 2> &node_indices,
-  const std::array<unsigned, 2> &nodes_per_direction,
-  const bool) const
-{
-  Assert(*this == ReferenceCells::Quadrilateral, ExcNotImplemented());
-
-  const unsigned int i = node_indices[0];
-  const unsigned int j = node_indices[1];
-
-  const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
-  const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
-  // How many boundaries do we lie on at once?
-  const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
-
-  if (nbdy == 2) // Vertex DOF
-    { // ijk is a corner node. Return the proper index (somewhere in [0,3]):
-      return (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0));
-    }
-
-  int offset = 4;
-  if (nbdy == 1) // Edge DOF
+  if constexpr (dim == 0)
     {
-      if (!ibdy)
-        { // On i axis
-          return (i - 1) +
-                 (j != 0u ?
-                    nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 :
-                    0) +
-                 offset;
+      DEAL_II_NOT_IMPLEMENTED();
+      return 0;
+    }
+  else if constexpr (dim == 1)
+    {
+      /**
+       * Modified from
+       * https://github.com/Kitware/VTK/blob/265ca48a79a36538c95622c237da11133608bbe5/Common/DataModel/vtkLagrangeCurve.cxx#L478
+       */
+      const unsigned int i = node_indices[0];
+
+      const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+      // How many boundaries do we lie on at once?
+      const int nbdy = (ibdy ? 1 : 0);
+
+      if (nbdy == 1) // Vertex DOF
+        { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
+          return i ? 1 : 0;
         }
 
-      if (!jbdy)
-        { // On j axis
-          return (j - 1) +
-                 (i != 0u ? nodes_per_direction[0] - 1 :
-                            2 * (nodes_per_direction[0] - 1) +
-                              nodes_per_direction[1] - 1) +
-                 offset;
-        }
+      const int offset = 2;
+      return (i - 1) + offset;
     }
-
-  offset += 2 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1);
-  // nbdy == 0: Face DOF
-  return offset + (i - 1) + (nodes_per_direction[0] - 1) * ((j - 1));
-}
-
-
-
-/**
- * Modified from
- * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
- * (legacy_format=true) and from
- * https://github.com/Kitware/VTK/blob/256fe70de00e3441f126276ca4a8c5477d0bcb86/Common/DataModel/vtkHigherOrderHexahedron.cxx#L593
- * (legacy_format=false). The two versions differ regarding the ordering of
- * lines 10 and 11 (clockwise vs. anti-clockwise). See also:
- * https://github.com/Kitware/VTK/blob/7a0b92864c96680b1f42ee84920df556fc6ebaa3/Documentation/release/dev/node-numbering-change-for-VTK_LAGRANGE_HEXAHEDRON.md
- *
- */
-template <>
-unsigned int
-ReferenceCell::vtk_lexicographic_to_node_index<3>(
-  const std::array<unsigned, 3> &node_indices,
-  const std::array<unsigned, 3> &nodes_per_direction,
-  const bool                     legacy_format) const
-{
-  Assert(*this == ReferenceCells::Hexahedron, ExcNotImplemented());
-
-  const unsigned int i = node_indices[0];
-  const unsigned int j = node_indices[1];
-  const unsigned int k = node_indices[2];
-
-  const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
-  const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
-  const bool kbdy = (k == 0 || k == nodes_per_direction[2]);
-  // How many boundaries do we lie on at once?
-  const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
-
-  if (nbdy == 3) // Vertex DOF
-    { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
-      return (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
-             (k != 0u ? 4 : 0);
-    }
-
-  int offset = 8;
-  if (nbdy == 2) // Edge DOF
+  else if constexpr (dim == 2)
     {
-      if (!ibdy)
-        { // On i axis
-          return (i - 1) +
-                 (j != 0u ?
-                    nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 :
-                    0) +
-                 (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
-                                 nodes_per_direction[1] - 1) :
+      /**
+       * Modified from
+       * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeQuadrilateral.cxx#L558
+       */
+      Assert(*this == ReferenceCells::Quadrilateral, ExcNotImplemented());
+
+      const unsigned int i = node_indices[0];
+      const unsigned int j = node_indices[1];
+
+      const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+      const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
+      // How many boundaries do we lie on at once?
+      const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0);
+
+      if (nbdy == 2) // Vertex DOF
+        { // ijk is a corner node. Return the proper index (somewhere in [0,3]):
+          return (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0));
+        }
+
+      int offset = 4;
+      if (nbdy == 1) // Edge DOF
+        {
+          if (!ibdy)
+            { // On i axis
+              return (i - 1) +
+                     (j != 0u ? nodes_per_direction[0] - 1 +
+                                  nodes_per_direction[1] - 1 :
+                                0) +
+                     offset;
+            }
+
+          if (!jbdy)
+            { // On j axis
+              return (j - 1) +
+                     (i != 0u ? nodes_per_direction[0] - 1 :
+                                2 * (nodes_per_direction[0] - 1) +
+                                  nodes_per_direction[1] - 1) +
+                     offset;
+            }
+        }
+
+      offset += 2 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1);
+      // nbdy == 0: Face DOF
+      return offset + (i - 1) + (nodes_per_direction[0] - 1) * ((j - 1));
+    }
+  else if constexpr (dim == 3)
+    {
+      /**
+       * Modified from
+       * https://github.com/Kitware/VTK/blob/265ca48a/Common/DataModel/vtkLagrangeHexahedron.cxx#L734
+       * (legacy_format=true) and from
+       * https://github.com/Kitware/VTK/blob/256fe70de00e3441f126276ca4a8c5477d0bcb86/Common/DataModel/vtkHigherOrderHexahedron.cxx#L593
+       * (legacy_format=false). The two versions differ regarding the ordering
+       * of lines 10 and 11 (clockwise vs. anti-clockwise). See also:
+       * https://github.com/Kitware/VTK/blob/7a0b92864c96680b1f42ee84920df556fc6ebaa3/Documentation/release/dev/node-numbering-change-for-VTK_LAGRANGE_HEXAHEDRON.md
+       *
+       */
+      Assert(*this == ReferenceCells::Hexahedron, ExcNotImplemented());
+
+      const unsigned int i = node_indices[0];
+      const unsigned int j = node_indices[1];
+      const unsigned int k = node_indices[2];
+
+      const bool ibdy = (i == 0 || i == nodes_per_direction[0]);
+      const bool jbdy = (j == 0 || j == nodes_per_direction[1]);
+      const bool kbdy = (k == 0 || k == nodes_per_direction[2]);
+      // How many boundaries do we lie on at once?
+      const int nbdy = (ibdy ? 1 : 0) + (jbdy ? 1 : 0) + (kbdy ? 1 : 0);
+
+      if (nbdy == 3) // Vertex DOF
+        { // ijk is a corner node. Return the proper index (somewhere in [0,7]):
+          return (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
+                 (k != 0u ? 4 : 0);
+        }
+
+      int offset = 8;
+      if (nbdy == 2) // Edge DOF
+        {
+          if (!ibdy)
+            { // On i axis
+              return (i - 1) +
+                     (j != 0u ? nodes_per_direction[0] - 1 +
+                                  nodes_per_direction[1] - 1 :
+                                0) +
+                     (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
+                                     nodes_per_direction[1] - 1) :
+                                0) +
+                     offset;
+            }
+          if (!jbdy)
+            { // On j axis
+              return (j - 1) +
+                     (i != 0u ? nodes_per_direction[0] - 1 :
+                                2 * (nodes_per_direction[0] - 1) +
+                                  nodes_per_direction[1] - 1) +
+                     (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
+                                     nodes_per_direction[1] - 1) :
+                                0) +
+                     offset;
+            }
+          // !kbdy, On k axis
+          offset +=
+            4 * (nodes_per_direction[0] - 1) + 4 * (nodes_per_direction[1] - 1);
+          if (legacy_format)
+            return (k - 1) +
+                   (nodes_per_direction[2] - 1) *
+                     (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
+                   offset;
+          else
+            return (k - 1) +
+                   (nodes_per_direction[2] - 1) *
+                     (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
+                   offset;
+        }
+
+      offset += 4 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 +
+                     nodes_per_direction[2] - 1);
+      if (nbdy == 1) // Face DOF
+        {
+          if (ibdy) // On i-normal face
+            {
+              return (j - 1) + ((nodes_per_direction[1] - 1) * (k - 1)) +
+                     (i != 0u ? (nodes_per_direction[1] - 1) *
+                                  (nodes_per_direction[2] - 1) :
+                                0) +
+                     offset;
+            }
+          offset +=
+            2 * (nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1);
+          if (jbdy) // On j-normal face
+            {
+              return (i - 1) + ((nodes_per_direction[0] - 1) * (k - 1)) +
+                     (j != 0u ? (nodes_per_direction[2] - 1) *
+                                  (nodes_per_direction[0] - 1) :
+                                0) +
+                     offset;
+            }
+          offset +=
+            2 * (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1);
+          // kbdy, On k-normal face
+          return (i - 1) + ((nodes_per_direction[0] - 1) * (j - 1)) +
+                 (k != 0u ? (nodes_per_direction[0] - 1) *
+                              (nodes_per_direction[1] - 1) :
                             0) +
                  offset;
         }
-      if (!jbdy)
-        { // On j axis
-          return (j - 1) +
-                 (i != 0u ? nodes_per_direction[0] - 1 :
-                            2 * (nodes_per_direction[0] - 1) +
-                              nodes_per_direction[1] - 1) +
-                 (k != 0u ? 2 * (nodes_per_direction[0] - 1 +
-                                 nodes_per_direction[1] - 1) :
-                            0) +
-                 offset;
-        }
-      // !kbdy, On k axis
+
+      // nbdy == 0: Body DOF
       offset +=
-        4 * (nodes_per_direction[0] - 1) + 4 * (nodes_per_direction[1] - 1);
-      if (legacy_format)
-        return (k - 1) +
-               (nodes_per_direction[2] - 1) *
-                 (i != 0u ? (j != 0u ? 3 : 1) : (j != 0u ? 2 : 0)) +
-               offset;
-      else
-        return (k - 1) +
-               (nodes_per_direction[2] - 1) *
-                 (i != 0u ? (j != 0u ? 2 : 1) : (j != 0u ? 3 : 0)) +
-               offset;
+        2 * ((nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1) +
+             (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1) +
+             (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1));
+      return offset + (i - 1) +
+             (nodes_per_direction[0] - 1) *
+               ((j - 1) + (nodes_per_direction[1] - 1) * ((k - 1)));
     }
-
-  offset += 4 * (nodes_per_direction[0] - 1 + nodes_per_direction[1] - 1 +
-                 nodes_per_direction[2] - 1);
-  if (nbdy == 1) // Face DOF
+  else
     {
-      if (ibdy) // On i-normal face
-        {
-          return (j - 1) + ((nodes_per_direction[1] - 1) * (k - 1)) +
-                 (i != 0u ? (nodes_per_direction[1] - 1) *
-                              (nodes_per_direction[2] - 1) :
-                            0) +
-                 offset;
-        }
-      offset += 2 * (nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1);
-      if (jbdy) // On j-normal face
-        {
-          return (i - 1) + ((nodes_per_direction[0] - 1) * (k - 1)) +
-                 (j != 0u ? (nodes_per_direction[2] - 1) *
-                              (nodes_per_direction[0] - 1) :
-                            0) +
-                 offset;
-        }
-      offset += 2 * (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1);
-      // kbdy, On k-normal face
-      return (i - 1) + ((nodes_per_direction[0] - 1) * (j - 1)) +
-             (k != 0u ?
-                (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1) :
-                0) +
-             offset;
+      DEAL_II_NOT_IMPLEMENTED();
+      return 0;
     }
-
-  // nbdy == 0: Body DOF
-  offset += 2 * ((nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1) +
-                 (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1) +
-                 (nodes_per_direction[0] - 1) * (nodes_per_direction[1] - 1));
-  return offset + (i - 1) +
-         (nodes_per_direction[0] - 1) *
-           ((j - 1) + (nodes_per_direction[1] - 1) * ((k - 1)));
 }
 
 
-
+template <int dim>
 unsigned int
-ReferenceCell::vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const
+ReferenceCell<dim>::vtk_vertex_to_deal_vertex(
+  const unsigned int vertex_index) const
 {
   AssertIndexRange(vertex_index, n_vertices());
 
@@ -1044,7 +1037,7 @@ ReferenceCell::vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const
             {{0, 1, 3, 2, 4, 5, 7, 6}};
           return index_translation_table[vertex_index];
         }
-      case ReferenceCells::Invalid:
+      case ReferenceCells::Invalid<dim>:
         {
           DEAL_II_NOT_IMPLEMENTED();
           return numbers::invalid_unsigned_int;
@@ -1058,8 +1051,9 @@ ReferenceCell::vtk_vertex_to_deal_vertex(const unsigned int vertex_index) const
 
 
 
+template <int dim>
 unsigned int
-ReferenceCell::gmsh_element_type() const
+ReferenceCell<dim>::gmsh_element_type() const
 {
   /*
     From the GMSH documentation:
@@ -1132,7 +1126,7 @@ ReferenceCell::gmsh_element_type() const
         return 6;
       case ReferenceCells::Hexahedron:
         return 5;
-      case ReferenceCells::Invalid:
+      case ReferenceCells::Invalid<dim>:
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
@@ -1172,12 +1166,14 @@ namespace
       return std::make_pair(x1, x1.distance_square(p));
   }
 
+
+
   // template base-case
   template <int dim>
   std::pair<Point<dim>, double>
   project_to_quad(const std::array<Point<dim>, 3> & /*vertices*/,
                   const Point<dim> & /*p*/,
-                  const ReferenceCell /*reference_cell*/)
+                  const ReferenceCell<dim - 1> /*face_reference_cell*/)
   {
     DEAL_II_ASSERT_UNREACHABLE();
     return std::make_pair(Point<dim>(),
@@ -1205,7 +1201,7 @@ namespace
   std::pair<Point<3>, double>
   project_to_quad(const std::array<Point<3>, 3> &vertices,
                   const Point<3>                &p,
-                  const ReferenceCell            face_reference_cell)
+                  const ReferenceCell<2>         face_reference_cell)
   {
     Assert(face_reference_cell == ReferenceCells::Triangle ||
              face_reference_cell == ReferenceCells::Quadrilateral,
@@ -1282,100 +1278,43 @@ namespace
 
 template <int dim>
 Point<dim>
-ReferenceCell::closest_point(const Point<dim> &p) const
+ReferenceCell<dim>::closest_point(const Point<dim> &p) const
 {
-  AssertDimension(dim, get_dimension());
-
   // Handle simple cases first:
-  if (dim == 0)
+  if constexpr (dim == 0)
     return p;
   if (contains_point(p, 0.0))
     return p;
-  if (dim == 1)
-    return project_to_line(vertex<dim>(0), vertex<dim>(1), p).first;
 
-  // Find the closest vertex so that we only need to check adjacent faces and
-  // lines.
-  Point<dim>   result;
-  unsigned int closest_vertex_no        = 0;
-  double closest_vertex_distance_square = vertex<dim>(0).distance_square(p);
-  for (unsigned int i = 1; i < n_vertices(); ++i)
-    {
-      const double new_vertex_distance_square =
-        vertex<dim>(i).distance_square(p);
-      if (new_vertex_distance_square < closest_vertex_distance_square)
-        {
-          closest_vertex_no              = i;
-          closest_vertex_distance_square = new_vertex_distance_square;
-        }
-    }
-
-  double min_distance_square = std::numeric_limits<double>::max();
-  if (dim == 2)
-    {
-      for (const unsigned int face_no :
-           faces_for_given_vertex(closest_vertex_no))
-        {
-          const Point<dim> v0 = vertex<dim>(line_to_cell_vertices(face_no, 0));
-          const Point<dim> v1 = vertex<dim>(line_to_cell_vertices(face_no, 1));
-
-          auto pair = project_to_line(v0, v1, p);
-          if (pair.second < min_distance_square)
-            {
-              result              = pair.first;
-              min_distance_square = pair.second;
-            }
-        }
-    }
+  if constexpr (dim == 1)
+    return project_to_line(vertex(0), vertex(1), p).first;
   else
     {
-      // Check faces and then lines.
-      //
-      // For reference cells with sloped faces (i.e., all 3D shapes except
-      // Hexahedra), we might be able to do a valid normal projection to a face
-      // with a different slope which is on the 'other side' of the reference
-      // cell. To catch that case we have to unconditionally check lines after
-      // checking faces.
-      //
-      // For pyramids the closest vertex might not be on the closest face: for
-      // example, the origin is closest to vertex 4 which is not on the bottom
-      // plane. Get around that by just checking all faces for pyramids.
-      const std::array<unsigned int, 5> all_pyramid_faces{{0, 1, 2, 3, 4}};
-      const auto &faces = *this == ReferenceCells::Pyramid ?
-                            ArrayView<const unsigned int>(all_pyramid_faces) :
-                            faces_for_given_vertex(closest_vertex_no);
-      for (const unsigned int face_no : faces)
+      // Find the closest vertex so that we only need to check adjacent faces
+      // and lines.
+      Point<dim>   result;
+      unsigned int closest_vertex_no        = 0;
+      double closest_vertex_distance_square = vertex(0).distance_square(p);
+      for (unsigned int i = 1; i < n_vertices(); ++i)
         {
-          auto face_cell = face_reference_cell(face_no);
-          // We only need the first three points since for quads the last point
-          // is redundant
-          std::array<Point<dim>, 3> vertices;
-          for (unsigned int vertex_no = 0; vertex_no < 3; ++vertex_no)
-            vertices[vertex_no] = vertex<dim>(face_to_cell_vertices(
-              face_no, vertex_no, numbers::default_geometric_orientation));
-
-          auto pair = project_to_quad(vertices, p, face_cell);
-          if (pair.second < min_distance_square)
+          const double new_vertex_distance_square =
+            vertex(i).distance_square(p);
+          if (new_vertex_distance_square < closest_vertex_distance_square)
             {
-              result              = pair.first;
-              min_distance_square = pair.second;
+              closest_vertex_no              = i;
+              closest_vertex_distance_square = new_vertex_distance_square;
             }
         }
 
-      for (const unsigned int face_no :
-           faces_for_given_vertex(closest_vertex_no))
+      double min_distance_square = std::numeric_limits<double>::max();
+      if constexpr (dim == 2)
         {
-          auto face_cell = face_reference_cell(face_no);
-          for (const unsigned int face_line_no : face_cell.line_indices())
+          for (const unsigned int face_no :
+               faces_for_given_vertex(closest_vertex_no))
             {
-              const auto cell_line_no =
-                face_to_cell_lines(face_no,
-                                   face_line_no,
-                                   numbers::default_geometric_orientation);
-              const auto v0 =
-                vertex<dim>(line_to_cell_vertices(cell_line_no, 0));
-              const auto v1 =
-                vertex<dim>(line_to_cell_vertices(cell_line_no, 1));
+              const Point<dim> v0 = vertex(line_to_cell_vertices(face_no, 0));
+              const Point<dim> v1 = vertex(line_to_cell_vertices(face_no, 1));
+
               auto pair = project_to_line(v0, v1, p);
               if (pair.second < min_distance_square)
                 {
@@ -1384,87 +1323,152 @@ ReferenceCell::closest_point(const Point<dim> &p) const
                 }
             }
         }
-    }
-
-  Assert(min_distance_square < std::numeric_limits<double>::max(),
-         ExcInternalError());
-
-  // If necessary, slightly adjust the computed point so that it is closer to
-  // being on the surface of the reference cell. Due to roundoff it is difficult
-  // to place points on sloped surfaces (e.g., for Pyramids) so this check isn't
-  // perfect but does improve the accuracy of the projected point.
-  if (!contains_point(result, 0.0))
-    {
-      constexpr unsigned int x_index = 0;
-      constexpr unsigned int y_index = (dim >= 2 ? 1 : 0);
-      constexpr unsigned int z_index = (dim >= 3 ? 2 : 0);
-      switch (this->kind)
+      else
         {
-          case ReferenceCells::Vertex:
-            DEAL_II_ASSERT_UNREACHABLE();
-            break;
-            // the bounds for each dimension of a hypercube are mutually
-            // independent:
-          case ReferenceCells::Line:
-          case ReferenceCells::Quadrilateral:
-          case ReferenceCells::Hexahedron:
-            for (unsigned int d = 0; d < dim; ++d)
-              result[d] = std::clamp(result[d], 0.0, 1.0);
-            // simplices can use the standard definition of a simplex:
-            break;
-          case ReferenceCells::Triangle:
-            result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-            result[y_index] =
-              std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-            break;
-          case ReferenceCells::Tetrahedron:
-            result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-            result[y_index] =
-              std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-            result[z_index] =
-              std::clamp(result[z_index],
-                         0.0,
-                         1.0 - result[x_index] - result[y_index]);
-            break;
-          // wedges and pyramids are more ad-hoc:
-          case ReferenceCells::Wedge:
-            result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-            result[y_index] =
-              std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-            result[z_index] = std::clamp(result[z_index], 0.0, 1.0);
-            break;
-          case ReferenceCells::Pyramid:
+          // Check faces and then lines.
+          //
+          // For reference cells with sloped faces (i.e., all 3D shapes except
+          // Hexahedra), we might be able to do a valid normal projection to a
+          // face with a different slope which is on the 'other side' of the
+          // reference cell. To catch that case we have to unconditionally check
+          // lines after checking faces.
+          //
+          // For pyramids the closest vertex might not be on the closest face:
+          // for example, the origin is closest to vertex 4 which is not on the
+          // bottom plane. Get around that by just checking all faces for
+          // pyramids.
+          const std::array<unsigned int, 5> all_pyramid_faces{{0, 1, 2, 3, 4}};
+          const auto                       &faces =
+            *this == ReferenceCells::Pyramid ?
+                                    ArrayView<const unsigned int>(all_pyramid_faces) :
+                                    faces_for_given_vertex(closest_vertex_no);
+          for (const unsigned int face_no : faces)
             {
-              result[x_index] = std::clamp(result[x_index], -1.0, 1.0);
-              result[y_index] = std::clamp(result[y_index], -1.0, 1.0);
-              // It suffices to transform everything to the first quadrant to
-              // adjust z:
-              const auto x_abs = std::abs(result[x_index]);
-              const auto y_abs = std::abs(result[y_index]);
+              auto face_cell = face_reference_cell(face_no);
+              // We only need the first three points since for quads the last
+              // point is redundant
+              std::array<Point<dim>, 3> vertices;
+              for (unsigned int vertex_no = 0; vertex_no < 3; ++vertex_no)
+                vertices[vertex_no] = vertex(face_to_cell_vertices(
+                  face_no, vertex_no, numbers::default_geometric_orientation));
 
-              if (y_abs <= x_abs)
-                result[z_index] = std::clamp(result[z_index], 0.0, 1.0 - x_abs);
-              else
-                result[z_index] = std::clamp(result[z_index], 0.0, 1.0 - y_abs);
+              auto pair = project_to_quad(vertices, p, face_cell);
+              if (pair.second < min_distance_square)
+                {
+                  result              = pair.first;
+                  min_distance_square = pair.second;
+                }
             }
-            break;
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
-        }
-    }
-  // We should be within 4 * eps of the cell by this point. The roundoff error
-  // comes from, e.g., computing (1 - x) + x when moving points onto the top of
-  // a Pyramid.
-  Assert(contains_point(result, 4.0 * std::numeric_limits<double>::epsilon()),
-         ExcInternalError());
 
-  return result;
+          for (const unsigned int face_no :
+               faces_for_given_vertex(closest_vertex_no))
+            {
+              auto face_cell = face_reference_cell(face_no);
+              for (const unsigned int face_line_no : face_cell.line_indices())
+                {
+                  const auto cell_line_no =
+                    face_to_cell_lines(face_no,
+                                       face_line_no,
+                                       numbers::default_geometric_orientation);
+                  const auto v0 =
+                    vertex(line_to_cell_vertices(cell_line_no, 0));
+                  const auto v1 =
+                    vertex(line_to_cell_vertices(cell_line_no, 1));
+                  auto pair = project_to_line(v0, v1, p);
+                  if (pair.second < min_distance_square)
+                    {
+                      result              = pair.first;
+                      min_distance_square = pair.second;
+                    }
+                }
+            }
+        }
+
+      Assert(min_distance_square < std::numeric_limits<double>::max(),
+             ExcInternalError());
+
+      // If necessary, slightly adjust the computed point so that it is closer
+      // to being on the surface of the reference cell. Due to roundoff it is
+      // difficult to place points on sloped surfaces (e.g., for Pyramids) so
+      // this check isn't perfect but does improve the accuracy of the projected
+      // point.
+      if (!contains_point(result, 0.0))
+        {
+          constexpr unsigned int x_index = 0;
+          constexpr unsigned int y_index = (dim >= 2 ? 1 : 0);
+          constexpr unsigned int z_index = (dim >= 3 ? 2 : 0);
+          switch (this->kind)
+            {
+              case ReferenceCells::Vertex:
+                DEAL_II_ASSERT_UNREACHABLE();
+                break;
+                // the bounds for each dimension of a hypercube are mutually
+                // independent:
+              case ReferenceCells::Line:
+              case ReferenceCells::Quadrilateral:
+              case ReferenceCells::Hexahedron:
+                for (unsigned int d = 0; d < dim; ++d)
+                  result[d] = std::clamp(result[d], 0.0, 1.0);
+                // simplices can use the standard definition of a simplex:
+                break;
+              case ReferenceCells::Triangle:
+                result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
+                result[y_index] =
+                  std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                break;
+              case ReferenceCells::Tetrahedron:
+                result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
+                result[y_index] =
+                  std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                result[z_index] =
+                  std::clamp(result[z_index],
+                             0.0,
+                             1.0 - result[x_index] - result[y_index]);
+                break;
+              // wedges and pyramids are more ad-hoc:
+              case ReferenceCells::Wedge:
+                result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
+                result[y_index] =
+                  std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                result[z_index] = std::clamp(result[z_index], 0.0, 1.0);
+                break;
+              case ReferenceCells::Pyramid:
+                {
+                  result[x_index] = std::clamp(result[x_index], -1.0, 1.0);
+                  result[y_index] = std::clamp(result[y_index], -1.0, 1.0);
+                  // It suffices to transform everything to the first quadrant
+                  // to adjust z:
+                  const auto x_abs = std::abs(result[x_index]);
+                  const auto y_abs = std::abs(result[y_index]);
+
+                  if (y_abs <= x_abs)
+                    result[z_index] =
+                      std::clamp(result[z_index], 0.0, 1.0 - x_abs);
+                  else
+                    result[z_index] =
+                      std::clamp(result[z_index], 0.0, 1.0 - y_abs);
+                }
+                break;
+              default:
+                DEAL_II_NOT_IMPLEMENTED();
+            }
+        }
+      // We should be within 4 * eps of the cell by this point. The roundoff
+      // error comes from, e.g., computing (1 - x) + x when moving points onto
+      // the top of a Pyramid.
+      Assert(contains_point(result,
+                            4.0 * std::numeric_limits<double>::epsilon()),
+             ExcInternalError());
+
+      return result;
+    }
 }
 
 
 
+template <int dim>
 std::ostream &
-operator<<(std::ostream &out, const ReferenceCell &reference_cell)
+operator<<(std::ostream &out, const ReferenceCell<dim> &reference_cell)
 {
   AssertThrow(out.fail() == false, ExcIO());
 
@@ -1476,8 +1480,9 @@ operator<<(std::ostream &out, const ReferenceCell &reference_cell)
 
 
 
+template <int dim>
 std::istream &
-operator>>(std::istream &in, ReferenceCell &reference_cell)
+operator>>(std::istream &in, ReferenceCell<dim> &reference_cell)
 {
   AssertThrow(in.fail() == false, ExcIO());
 
@@ -1496,7 +1501,7 @@ operator>>(std::istream &in, ReferenceCell &reference_cell)
       (reference_cell == ReferenceCells::Hexahedron) ||
       (reference_cell == ReferenceCells::Wedge) ||
       (reference_cell == ReferenceCells::Pyramid) ||
-      (reference_cell == ReferenceCells::Invalid),
+      (reference_cell == ReferenceCells::Invalid<dim>),
     ExcMessage(
       "The reference cell kind just read does not correspond to one of the "
       "valid choices. There must be an error."));
@@ -1504,13 +1509,39 @@ operator>>(std::istream &in, ReferenceCell &reference_cell)
   return in;
 }
 
-// explicitly instantiate dimension 0 quadrature in addition to the standard
-// dimensions
-template Quadrature<0>
-ReferenceCell::get_gauss_type_quadrature(const unsigned n_points_1D) const;
-template const Quadrature<0> &
-ReferenceCell::get_nodal_type_quadrature() const;
 
 #include "grid/reference_cell.inst"
+
+#ifndef DOXYGEN
+// Here also instantiate select members for dimension 0 (vertices) in addition
+// to the general class instantiation for dim=1,2,3 in the .inst file:
+template std::string
+ReferenceCell<0>::to_string() const;
+
+template unsigned int
+ReferenceCell<0>::vtk_linear_type() const;
+
+template unsigned int
+ReferenceCell<0>::vtk_quadratic_type() const;
+
+template unsigned int
+ReferenceCell<0>::vtk_lagrange_type() const;
+
+template unsigned int
+ReferenceCell<0>::vtk_vertex_to_deal_vertex(
+  const unsigned int vertex_index) const;
+
+template Quadrature<0>
+ReferenceCell<0>::get_gauss_type_quadrature(const unsigned n_points_1d) const;
+
+template const Quadrature<0> &
+ReferenceCell<0>::get_nodal_type_quadrature() const;
+
+template std::ostream &
+operator<<(std::ostream &out, const ReferenceCell<0> &reference_cell);
+
+template std::istream &
+operator>>(std::istream &in, ReferenceCell<0> &reference_cell);
+#endif
 
 DEAL_II_NAMESPACE_CLOSE

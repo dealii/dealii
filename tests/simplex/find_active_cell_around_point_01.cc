@@ -58,7 +58,7 @@ test(unsigned int n_ref, unsigned int n_points)
 
   auto &mapping = tria.get_reference_cells()
                     .front()
-                    .template get_default_linear_mapping<dim, spacedim>();
+                    .template get_default_linear_mapping<spacedim>();
   auto cell = tria.begin_active();
   for (auto &p : points)
     {

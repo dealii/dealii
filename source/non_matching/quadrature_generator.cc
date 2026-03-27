@@ -152,7 +152,7 @@ namespace NonMatching
                                const BoundingBox<dim>    &box,
                                std::pair<double, double> &value_bounds)
       {
-        const ReferenceCell &cube = ReferenceCells::get_hypercube<dim>();
+        const ReferenceCell<dim> &cube = ReferenceCells::get_hypercube<dim>();
         for (unsigned int i = 0; i < cube.n_vertices(); ++i)
           {
             const double vertex_value = function.value(box.vertex(i));

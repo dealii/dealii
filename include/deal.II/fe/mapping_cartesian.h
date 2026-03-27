@@ -88,7 +88,7 @@ public:
   preserves_vertex_locations() const override;
 
   virtual bool
-  is_compatible_with(const ReferenceCell &reference_cell) const override;
+  is_compatible_with(const ReferenceCell<dim> &reference_cell) const override;
 
   /**
    * @name Mapping points between reference and real cells

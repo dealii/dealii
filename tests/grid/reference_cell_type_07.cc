@@ -22,7 +22,7 @@
 
 template <int dim>
 void
-test(const ReferenceCell       reference_cell,
+test(const ReferenceCell<dim>  reference_cell,
      const RefinementCase<dim> refinement_case =
        RefinementCase<dim>::isotropic_refinement)
 {
@@ -54,9 +54,8 @@ test(const ReferenceCell       reference_cell,
           std::vector<Point<dim>> subface_vertices;
           for (const unsigned int subface_vertex_no :
                reference_cell.face_reference_cell(face_no).vertex_indices())
-            subface_vertices.push_back(
-              reference_cell.subface_vertex_location<dim>(
-                face_no, subface_no, subface_vertex_no, face_refinement_case));
+            subface_vertices.push_back(reference_cell.subface_vertex_location(
+              face_no, subface_no, subface_vertex_no, face_refinement_case));
 
           for (const auto &vertex : subface_vertices)
             deallog << "    " << vertex << std::endl;

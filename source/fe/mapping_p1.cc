@@ -101,7 +101,7 @@ MappingP1<dim, spacedim>::preserves_vertex_locations() const
 template <int dim, int spacedim>
 bool
 MappingP1<dim, spacedim>::is_compatible_with(
-  const ReferenceCell &reference_cell) const
+  const ReferenceCell<dim> &reference_cell) const
 {
   return reference_cell.is_simplex();
 }
@@ -233,8 +233,7 @@ MappingP1<dim, spacedim>::maybe_update_normal_vectors(
   std::vector<Tensor<1, spacedim>> &normal_vectors) const
 {
   const Tensor<1, dim> ref_normal_vector =
-    ReferenceCells::get_simplex<dim>().template unit_normal_vectors<dim>(
-      face_no);
+    ReferenceCells::get_simplex<dim>().unit_normal_vectors(face_no);
   Tensor<1, spacedim> normal_vector =
     apply_transformation(data.covariant, ref_normal_vector);
   normal_vector /= normal_vector.norm();

@@ -19,8 +19,9 @@
 #include "../tests.h"
 
 
+template <int dim>
 void
-test(const ReferenceCell reference_cell)
+test(const ReferenceCell<dim> reference_cell)
 {
   for (const auto &face_no : reference_cell.face_indices())
     for (const auto &face_line_no :

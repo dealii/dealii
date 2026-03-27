@@ -51,14 +51,14 @@ namespace GridTools
           Assert(tria.get_reference_cells().size() > 0, ExcInternalError());
           Assert(tria.get_reference_cells().size() == 1, ExcNotImplemented());
           mapping = &tria.get_reference_cells()[0]
-                       .template get_default_linear_mapping<dim, spacedim>();
+                       .template get_default_linear_mapping<spacedim>();
         });
       }
     else
       {
         Assert(tria.get_reference_cells().size() == 1, ExcNotImplemented());
         mapping = &tria.get_reference_cells()[0]
-                     .template get_default_linear_mapping<dim, spacedim>();
+                     .template get_default_linear_mapping<spacedim>();
       }
   }
 

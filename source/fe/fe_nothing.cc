@@ -19,9 +19,9 @@ DEAL_II_NAMESPACE_OPEN
 
 
 template <int dim, int spacedim>
-FE_Nothing<dim, spacedim>::FE_Nothing(const ReferenceCell &type,
-                                      const unsigned int   n_components,
-                                      const bool           dominate)
+FE_Nothing<dim, spacedim>::FE_Nothing(const ReferenceCell<dim> &type,
+                                      const unsigned int        n_components,
+                                      const bool                dominate)
   : FiniteElement<dim, spacedim>(
       FiniteElementData<dim>(std::vector<unsigned>(dim + 1, 0),
                              type,

@@ -238,10 +238,10 @@ namespace CGALWrappers
     const BooleanOperation        &bool_op,
     const Mapping<dim0, spacedim> &mapping0 =
       (ReferenceCells::get_hypercube<dim0>()
-         .template get_default_linear_mapping<dim0, spacedim>()),
+         .template get_default_linear_mapping<spacedim>()),
     const Mapping<dim1, spacedim> &mapping1 =
       (ReferenceCells::get_hypercube<dim1>()
-         .template get_default_linear_mapping<dim1, spacedim>()));
+         .template get_default_linear_mapping<spacedim>()));
 
   /**
    * A specialization of the function above when the BooleanOperation is an
@@ -618,8 +618,9 @@ namespace CGALWrappers
     (void)vertices;
 
     if constexpr (spacedim == 2)
-      if (ReferenceCell::n_vertices_to_type(structdim, vertices.size()) ==
-          ReferenceCells::Quadrilateral)
+      if ((structdim == 2) &&
+          (ReferenceCell<2>::n_vertices_to_type(structdim, vertices.size()) ==
+           ReferenceCells::Quadrilateral))
         std::swap(vertices[2], vertices[3]);
   }
 

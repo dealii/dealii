@@ -19,9 +19,9 @@
 
 #include "../tests.h"
 
-template <unsigned int n_points>
+template <unsigned int n_points, int dim>
 void
-test(const ReferenceCell type, const unsigned int n_orientations)
+test(const ReferenceCell<dim> type, const unsigned int n_orientations)
 {
   for (unsigned int o = 0; o < n_orientations; ++o)
     {

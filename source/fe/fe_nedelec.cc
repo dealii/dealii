@@ -3351,8 +3351,7 @@ FE_Nedelec<dim>::get_prolongation_matrix(
   Assert(refinement_case != RefinementCase<dim>::no_refinement,
          ExcMessage(
            "Prolongation matrices are only available for refined cells!"));
-  AssertIndexRange(
-    child, this->reference_cell().template n_children<dim>(refinement_case));
+  AssertIndexRange(child, this->reference_cell().n_children(refinement_case));
 
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
@@ -3408,7 +3407,7 @@ FE_Nedelec<dim>::get_restriction_matrix(
          ExcMessage(
            "Restriction matrices are only available for refined cells!"));
   AssertIndexRange(child,
-                   this->reference_cell().template n_children<dim>(
+                   this->reference_cell().n_children(
                      RefinementCase<dim>(refinement_case)));
 
   // initialization upon first request
