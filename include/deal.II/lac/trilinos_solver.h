@@ -16,13 +16,14 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/template_constraints.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/solver_control.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #  include <deal.II/lac/vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
@@ -54,11 +55,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  // forward declarations
-#  ifndef DOXYGEN
-  class SparseMatrix;
-  class PreconditionBase;
-#  endif
 
 
   /**

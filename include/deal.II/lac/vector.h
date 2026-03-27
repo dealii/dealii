@@ -22,6 +22,7 @@
 #include <deal.II/base/numbers.h>
 
 #include <deal.II/lac/read_vector.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -42,27 +43,6 @@ namespace PETScWrappers
 {
   class VectorBase;
 }
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-} // namespace TrilinosWrappers
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-namespace LinearAlgebra
-{
-  namespace TpetraWrappers
-  {
-    template <typename Number, typename MemorySpace>
-    class Vector;
-  }
-} // namespace LinearAlgebra
 #  endif
 
 template <typename number>
