@@ -14,7 +14,7 @@
 
 // check
 
-#include <deal.II/lac/trilinos_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
 #include "../tests.h"
 
@@ -25,7 +25,7 @@ const unsigned int N = 15;
 
 // reinitialize sparsity patterns for 5-point star
 void
-do_reinit(TrilinosWrappers::SparsityPattern &sp)
+do_reinit(LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host> &sp)
 {
   sp.reinit((N - 1) * (N - 1), (N - 1) * (N - 1), 5);
 }
@@ -33,7 +33,8 @@ do_reinit(TrilinosWrappers::SparsityPattern &sp)
 
 
 void
-build_sparsity(TrilinosWrappers::SparsityPattern &sparsity_pattern)
+build_sparsity(LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>
+                 &sparsity_pattern)
 {
   // generate usual 5-point sparsity pattern
   do_reinit(sparsity_pattern);
@@ -50,7 +51,8 @@ build_sparsity(TrilinosWrappers::SparsityPattern &sparsity_pattern)
 void
 row_length()
 {
-  TrilinosWrappers::SparsityPattern sparsity_pattern;
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>
+    sparsity_pattern;
   build_sparsity(sparsity_pattern);
 
   for (unsigned int i = 0; i < sparsity_pattern.n_rows(); ++i)
@@ -64,7 +66,8 @@ row_length()
 void
 print_gnuplot()
 {
-  TrilinosWrappers::SparsityPattern sparsity_pattern;
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>
+    sparsity_pattern;
   build_sparsity(sparsity_pattern);
 
   sparsity_pattern.print_gnuplot(deallog.get_file_stream());
@@ -77,7 +80,8 @@ print_gnuplot()
 void
 print()
 {
-  TrilinosWrappers::SparsityPattern sparsity_pattern;
+  LinearAlgebra::TpetraWrappers::SparsityPattern<MemorySpace::Host>
+    sparsity_pattern;
   build_sparsity(sparsity_pattern);
 
   sparsity_pattern.print(deallog.get_file_stream());

@@ -22,6 +22,23 @@ DEAL_II_NAMESPACE_OPEN
 
 #    include "lac/trilinos_tpetra_sparse_matrix.inst"
 
+namespace LinearAlgebra::TpetraWrappers
+{
+  template void
+  SparseMatrix<double, MemorySpace::Host>::set(const size_type,
+                                               const size_type,
+                                               const size_type *,
+                                               const float *,
+                                               bool);
+
+  template void
+  SparseMatrix<double, MemorySpace::Default>::set(const size_type,
+                                                  const size_type,
+                                                  const size_type *,
+                                                  const float *,
+                                                  bool);
+} // namespace LinearAlgebra::TpetraWrappers
+
 #  endif
 
 DEAL_II_NAMESPACE_CLOSE

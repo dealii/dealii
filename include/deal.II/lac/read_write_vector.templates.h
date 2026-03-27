@@ -35,7 +35,9 @@
 #  include <deal.II/lac/trilinos_vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <Epetra_Import.h>
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#    include <Epetra_Import.h>
+#  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 

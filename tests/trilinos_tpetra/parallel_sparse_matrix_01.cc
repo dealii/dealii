@@ -38,15 +38,12 @@ test()
   // create a parallel matrix where the first
   // process has 10 rows, the second one 20,
   // the third one 30, and so on
-  unsigned int              N = 0;
-  std::vector<unsigned int> local_rows_per_process(
-    Utilities::Trilinos::get_n_mpi_processes(
-      Utilities::Trilinos::comm_world()));
-  std::vector<unsigned int> start_row(Utilities::Trilinos::get_n_mpi_processes(
-    Utilities::Trilinos::comm_world()));
-  for (unsigned int i = 0; i < Utilities::Trilinos::get_n_mpi_processes(
-                                 Utilities::Trilinos::comm_world());
-       ++i)
+  unsigned int       N = 0;
+  const unsigned int n_mpi_processes =
+    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  std::vector<unsigned int> local_rows_per_process(n_mpi_processes);
+  std::vector<unsigned int> start_row(n_mpi_processes);
+  for (unsigned int i = 0; i < n_mpi_processes; ++i)
     {
       N += (i + 1) * 10;
       local_rows_per_process[i] = (i + 1) * 10;

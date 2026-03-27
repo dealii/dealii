@@ -16,7 +16,7 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/block_sparsity_pattern.h>
-#include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
 
 #include "../tests.h"
 
@@ -48,7 +48,8 @@ test()
           << std::endl;
 
   // create block sparse matrix
-  TrilinosWrappers::BlockSparseMatrix tbsm;
+  LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Host>
+    tbsm;
   tbsm.reinit(bdsp);
   deallog << "nonzeros BlockSparseMatrix: " << tbsm.n_nonzero_elements()
           << std::endl;
@@ -67,7 +68,8 @@ test()
     set.compress();
 
   // create block sparse matrix using another reinit() function
-  TrilinosWrappers::BlockSparseMatrix tbsm2;
+  LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Host>
+    tbsm2;
   tbsm2.reinit(partitioning, bdsp, MPI_COMM_SELF, false);
 
   deallog << "nonzeros BlockSparseMatrix: " << tbsm.n_nonzero_elements()

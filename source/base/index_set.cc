@@ -23,11 +23,13 @@
 
 #ifdef DEAL_II_WITH_TRILINOS
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  ifdef DEAL_II_WITH_MPI
-#    include <Epetra_MpiComm.h>
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#    ifdef DEAL_II_WITH_MPI
+#      include <Epetra_MpiComm.h>
+#    endif
+#    include <Epetra_Map.h>
+#    include <Epetra_SerialComm.h>
 #  endif
-#  include <Epetra_Map.h>
-#  include <Epetra_SerialComm.h>
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif

@@ -20,9 +20,6 @@
 #include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
-#include <Epetra_Comm.h>
-#include <Epetra_Map.h>
-
 #include <iostream>
 #include <vector>
 
