@@ -1,6 +1,6 @@
 
 DEAL:0::Tpetra first import add:
-size:4 locally_owned_size:2 :
+size:4 locally_stored_size:2 :
 [0]: 2.000e+00
 [1]: 1.000e+02
 IndexSet: {[0,2]}
@@ -9,7 +9,7 @@ IndexSet: {[0,2]}
 [1]: 1.000e+02
 [2]: 1.000e+01
 DEAL:0::Tpetra second import add:
-size:4 locally_owned_size:2 :
+size:4 locally_stored_size:2 :
 [0]: 4.000e+00
 [1]: 2.000e+02
 IndexSet: {[0,2]}
@@ -37,7 +37,7 @@ IndexSet: {[0,2]}
 [2]: 1.000e+02
 
 DEAL:1::Tpetra first import add:
-size:4 locally_owned_size:2 :
+size:4 locally_stored_size:2 :
 [2]: 1.000e+01
 [3]: 1.010e+02
 IndexSet: {0, 3}
@@ -45,7 +45,7 @@ IndexSet: {0, 3}
 [0]: 1.000e+00
 [3]: 1.010e+02
 DEAL:1::Tpetra second import add:
-size:4 locally_owned_size:2 :
+size:4 locally_stored_size:2 :
 [2]: 3.000e+01
 [3]: 2.010e+02
 IndexSet: {0, 3}

@@ -824,8 +824,8 @@ namespace TrilinosWrappers
             return gid(vector->Map(), index);
           };
           out << "size:" << size()
-              << " locally_owned_size:" << vector->Map().NumMyElements() << " :"
-              << std::endl;
+              << " locally_stored_size:" << vector->Map().NumMyElements()
+              << " :" << std::endl;
           for (size_type i = 0; i < vector_size; ++i)
             out << "[" << global_id(i) << "]: " << (*(vector))[0][i]
                 << std::endl;
