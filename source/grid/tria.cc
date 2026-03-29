@@ -5970,7 +5970,6 @@ namespace internal
               break;
             }
 
-
         // check how much space is needed on every level. We need not
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
@@ -5994,20 +5993,15 @@ namespace internal
                          triangulation.levels[level + 1]->cells.used.end(),
                          true);
 
-            // reserve space for the used_cells cells already existing
-            // on the next higher level as well as for the
-            // 2*flagged_cells that will be created on that level
-            reserve_space(*triangulation.levels[level + 1],
-                          used_cells + triangulation.levels[level + 1]
-                                           ->children_per_object *
-                                         flagged_cells,
-                          spacedim);
-            // reserve space for 2*flagged_cells new lines on the next
+            // reserve space for all children of flagged cells on the next
             // higher level
+            const auto children_per_cell =
+              triangulation.levels[level]->children_per_object;
+            reserve_space(*triangulation.levels[level + 1],
+                          used_cells + children_per_cell * flagged_cells,
+                          spacedim);
             triangulation.levels[level + 1]->cells.allocate_end(
-              triangulation.levels[level + 1]->cells.children_per_object *
-                flagged_cells,
-              0);
+              children_per_cell * flagged_cells, 0);
             needed_vertices += flagged_cells;
           }
 
