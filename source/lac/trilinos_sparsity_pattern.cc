@@ -237,6 +237,19 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern(const IndexSet &row_parallel_partitioning,
                                    const IndexSet &col_parallel_partitioning,
                                    const IndexSet &writable_rows,
+                                   const MPI_Comm  communicator)
+    : SparsityPattern(row_parallel_partitioning,
+                      col_parallel_partitioning,
+                      writable_rows,
+                      communicator,
+                      0)
+  {}
+
+
+
+  SparsityPattern::SparsityPattern(const IndexSet &row_parallel_partitioning,
+                                   const IndexSet &col_parallel_partitioning,
+                                   const IndexSet &writable_rows,
                                    const MPI_Comm  communicator,
                                    const size_type n_max_entries_per_row)
   {
