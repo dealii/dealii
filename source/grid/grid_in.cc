@@ -4336,9 +4336,11 @@ GridIn<dim, spacedim>::read_ugrid(std::istream &in)
 // Namespace containing some extra functions for reading ExodusII files
 namespace
 {
-  // Convert ExodusII strings to cell types. Use the number of nodes per
-  // element to disambiguate some cases.
-  ReferenceCell
+  // Convert ExodusII strings to cell types. Use the number of nodes per element
+  // to disambiguate some cases. If the conversion fails then a
+  // ReferenceCells::Invalid<dim> is returned.
+  template <int dim>
+  ReferenceCell<dim>
   exodusii_name_to_type(const std::string &type_name,
                         const int          n_nodes_per_element)
   {
@@ -4359,32 +4361,40 @@ namespace
                       type_name_2.end());
 
     // The manual specifies BAR, BEAM, and TRUSS: in practice people use EDGE
-    if (type_name_2 == "BAR" || type_name_2 == "BEAM" ||
-        type_name_2 == "EDGE" || type_name_2 == "TRUSS")
-      return ReferenceCells::Line;
-    else if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
-      return ReferenceCells::Triangle;
-    else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
-      return ReferenceCells::Quadrilateral;
-    else if (type_name_2 == "SHELL")
+    if constexpr (dim == 1)
       {
-        if (n_nodes_per_element == 3)
-          return ReferenceCells::Triangle;
-        else
-          return ReferenceCells::Quadrilateral;
+        if (type_name_2 == "BAR" || type_name_2 == "BEAM" ||
+            type_name_2 == "EDGE" || type_name_2 == "TRUSS")
+          return ReferenceCells::Line;
       }
-    else if (type_name_2 == "TET" || type_name_2 == "TETRA" ||
-             type_name_2 == "TETRAHEDRON")
-      return ReferenceCells::Tetrahedron;
-    else if (type_name_2 == "PYRA" || type_name_2 == "PYRAMID")
-      return ReferenceCells::Pyramid;
-    else if (type_name_2 == "WEDGE")
-      return ReferenceCells::Wedge;
-    else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
-      return ReferenceCells::Hexahedron;
+    else if constexpr (dim == 2)
+      {
+        if (type_name_2 == "TRI" || type_name_2 == "TRIANGLE")
+          return ReferenceCells::Triangle;
+        else if (type_name_2 == "QUAD" || type_name_2 == "QUADRILATERAL")
+          return ReferenceCells::Quadrilateral;
+        else if (type_name_2 == "SHELL")
+          {
+            if (n_nodes_per_element == 3)
+              return ReferenceCells::Triangle;
+            else
+              return ReferenceCells::Quadrilateral;
+          }
+      }
+    else if constexpr (dim == 3)
+      {
+        if (type_name_2 == "TET" || type_name_2 == "TETRA" ||
+            type_name_2 == "TETRAHEDRON")
+          return ReferenceCells::Tetrahedron;
+        else if (type_name_2 == "PYRA" || type_name_2 == "PYRAMID")
+          return ReferenceCells::Pyramid;
+        else if (type_name_2 == "WEDGE")
+          return ReferenceCells::Wedge;
+        else if (type_name_2 == "HEX" || type_name_2 == "HEXAHEDRON")
+          return ReferenceCells::Hexahedron;
+      }
 
-    DEAL_II_NOT_IMPLEMENTED();
-    return ReferenceCells::Invalid;
+    return ReferenceCells::Invalid<dim>;
   }
 
   // Associate deal.II boundary ids with sidesets (a face can be in multiple
@@ -4502,7 +4512,7 @@ namespace
             const CellData<dim> &cell =
               cells[face_id / ReferenceCells::max_n_faces<dim>()];
             const ReferenceCell cell_type =
-              ReferenceCell::n_vertices_to_type(dim, cell.vertices.size());
+              ReferenceCell<dim>::n_vertices_to_type(dim, cell.vertices.size());
             const unsigned int deal_face_n =
               cell_type.exodusii_face_to_deal_face(local_face_n);
             const ReferenceCell face_reference_cell =
@@ -4657,14 +4667,14 @@ GridIn<dim, spacedim>::read_exodusii(
                           &n_faces_per_element,
                           &n_attributes_per_element);
       AssertThrowExodusII(ierr);
-      const ReferenceCell type =
-        exodusii_name_to_type(string_temp.data(), n_nodes_per_element);
-      AssertThrow(type.get_dimension() == dim,
+      const auto type =
+        exodusii_name_to_type<dim>(string_temp.data(), n_nodes_per_element);
+      AssertThrow(type != ReferenceCells::Invalid<dim>,
                   ExcMessage(
                     "The ExodusII block " + std::to_string(element_block_id) +
                     " with element type " + std::string(string_temp.data()) +
-                    " has dimension " + std::to_string(type.get_dimension()) +
-                    ", which does not match the topological mesh dimension " +
+                    " does not have a corresponding ReferenceCell<dim> with a"
+                    " dimension matching the topological mesh dimension " +
                     std::to_string(dim) + "."));
 
       // The number of nodes per element may be larger than what we want to
