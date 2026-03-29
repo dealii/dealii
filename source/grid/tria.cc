@@ -5522,7 +5522,7 @@ namespace internal
           {
             // count number of flagged cells on this level and compute
             // how many new vertices and new lines will be needed
-            unsigned int needed_cells = 0;
+            std::size_t needed_cells = 0;
 
             for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
@@ -5974,21 +5974,21 @@ namespace internal
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
-        unsigned int needed_vertices = 0;
+        std::size_t needed_vertices = 0;
         for (int level = triangulation.levels.size() - 2; level >= 0; --level)
           {
             // count number of flagged
             // cells on this level
-            unsigned int flagged_cells = 0;
+            std::size_t flagged_cells = 0;
 
-            for (const auto &acell :
+            for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
-              if (acell->refine_flag_set())
+              if (cell->refine_flag_set())
                 ++flagged_cells;
 
             // count number of used cells
             // on the next higher level
-            const unsigned int used_cells =
+            const auto used_cells =
               std::count(triangulation.levels[level + 1]->cells.used.begin(),
                          triangulation.levels[level + 1]->cells.used.end(),
                          true);
@@ -6252,7 +6252,7 @@ namespace internal
           {
             // count number of flagged cells on this level and compute
             // how many new vertices and new lines will be needed
-            unsigned int needed_cells = 0;
+            std::size_t needed_cells = 0;
 
             for (const auto &cell :
                  triangulation.active_cell_iterators_on_level(level))
@@ -6551,7 +6551,7 @@ namespace internal
           unsigned int needed_faces_pair   = 0;
           for (int level = triangulation.levels.size() - 2; level >= 0; --level)
             {
-              unsigned int new_cells = 0;
+              std::size_t new_cells = 0;
 
               for (const auto &cell :
                    triangulation.active_cell_iterators_on_level(level))
@@ -8113,7 +8113,7 @@ namespace internal
           {
             // count number of flagged cells on this level and compute
             // how many new vertices and new lines will be needed
-            unsigned int new_cells = 0;
+            std::size_t new_cells = 0;
 
             for (const auto &acell :
                  triangulation.active_cell_iterators_on_level(level))
