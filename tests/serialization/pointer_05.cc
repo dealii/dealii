@@ -108,7 +108,7 @@ test()
     // that the two components of the
     // re-created pair point to
     AssertThrow(pair_2.first.c == pair_2.second.c, ExcInternalError());
-    AssertThrow(object_number == 3, ExcInternalError());
+    AssertThrow(object_number == 4, ExcInternalError());
 
     // destroy the newly created object. this
     // must succeed and would likely throw
