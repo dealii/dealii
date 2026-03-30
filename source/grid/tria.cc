@@ -1848,28 +1848,6 @@ namespace
     else
       return line_orientation == D ? 1 : 0;
   }
-
-  // Several parts of Triangulation (e.g., TriaLevel) are not templated on the
-  // dimension and thus require de-templated versions of some ReferenceCell
-  // functions.
-  unsigned int
-  max_n_faces(const unsigned int structdim)
-  {
-    switch (structdim)
-      {
-        case 0:
-          return ReferenceCells::max_n_faces<0>();
-        case 1:
-          return ReferenceCells::max_n_faces<1>();
-        case 2:
-          return ReferenceCells::max_n_faces<2>();
-        case 3:
-          return ReferenceCells::max_n_faces<3>();
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-          return numbers::invalid_unsigned_int;
-      }
-  }
 } // end of anonymous namespace
 
 
@@ -2111,111 +2089,6 @@ namespace internal
      * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
      * functions, with <tt>N>0</tt>.
      */
-
-    template <int dim, int spacedim>
-    void
-    reserve_space(TriaLevel<dim, spacedim> &tria_level,
-                  const unsigned int        total_cells,
-                  const unsigned int        space_dimension,
-                  const bool                tetraheder_in_mesh = false)
-    {
-      // we need space for total_cells cells. Maybe we have more already
-      // with those cells which are unused, so only allocate new space if
-      // needed.
-      //
-      // note that all arrays should have equal sizes (checked by
-      // @p{monitor_memory}
-      if (total_cells > tria_level.refine_flags.size())
-        {
-          tria_level.refine_flags.reserve(total_cells);
-          tria_level.refine_flags.insert(tria_level.refine_flags.end(),
-                                         total_cells -
-                                           tria_level.refine_flags.size(),
-                                         /*RefinementCase::no_refinement=*/0);
-
-          if (tetraheder_in_mesh)
-            {
-              tria_level.refine_choice.reserve(total_cells);
-              tria_level.refine_choice.insert(
-                tria_level.refine_choice.end(),
-                total_cells - tria_level.refine_choice.size(),
-                static_cast<char>(
-                  IsotropicRefinementChoice::isotropic_refinement));
-            }
-
-          tria_level.coarsen_flags.reserve(total_cells);
-          tria_level.coarsen_flags.insert(tria_level.coarsen_flags.end(),
-                                          total_cells -
-                                            tria_level.coarsen_flags.size(),
-                                          false);
-
-          tria_level.active_cell_indices.reserve(total_cells);
-          tria_level.active_cell_indices.insert(
-            tria_level.active_cell_indices.end(),
-            total_cells - tria_level.active_cell_indices.size(),
-            numbers::invalid_unsigned_int);
-
-          tria_level.subdomain_ids.reserve(total_cells);
-          tria_level.subdomain_ids.insert(tria_level.subdomain_ids.end(),
-                                          total_cells -
-                                            tria_level.subdomain_ids.size(),
-                                          0);
-
-          tria_level.level_subdomain_ids.reserve(total_cells);
-          tria_level.level_subdomain_ids.insert(
-            tria_level.level_subdomain_ids.end(),
-            total_cells - tria_level.level_subdomain_ids.size(),
-            0);
-
-          tria_level.global_active_cell_indices.reserve(total_cells);
-          tria_level.global_active_cell_indices.insert(
-            tria_level.global_active_cell_indices.end(),
-            total_cells - tria_level.global_active_cell_indices.size(),
-            numbers::invalid_dof_index);
-
-          tria_level.global_level_cell_indices.reserve(total_cells);
-          tria_level.global_level_cell_indices.insert(
-            tria_level.global_level_cell_indices.end(),
-            total_cells - tria_level.global_level_cell_indices.size(),
-            numbers::invalid_dof_index);
-
-          if (dim == space_dimension - 1)
-            {
-              tria_level.direction_flags.reserve(total_cells);
-              tria_level.direction_flags.insert(
-                tria_level.direction_flags.end(),
-                total_cells - tria_level.direction_flags.size(),
-                true);
-            }
-          else
-            tria_level.direction_flags.clear();
-
-          tria_level.parents.reserve((total_cells + 1) / 2);
-          tria_level.parents.insert(tria_level.parents.end(),
-                                    (total_cells + 1) / 2 -
-                                      tria_level.parents.size(),
-                                    -1);
-
-          tria_level.neighbors.reserve(total_cells * max_n_faces(dim));
-          tria_level.neighbors.insert(tria_level.neighbors.end(),
-                                      total_cells * max_n_faces(dim) -
-                                        tria_level.neighbors.size(),
-                                      std::make_pair(-1, -1));
-
-          if constexpr (dim == 2 || dim == 3)
-            {
-              tria_level.face_orientations.resize(total_cells);
-
-              tria_level.reference_cell.reserve(total_cells);
-              tria_level.reference_cell.insert(
-                tria_level.reference_cell.end(),
-                total_cells - tria_level.reference_cell.size(),
-                ReferenceCells::get_hypercube<dim>());
-            }
-        }
-    }
-
-
 
     /**
      * Exception
@@ -5518,14 +5391,18 @@ namespace internal
         unsigned int n_lines_in_pairs = 0;
         unsigned int needed_vertices  = 0;
 
-        for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+        const bool orientation_needed =
+          !triangulation.all_reference_cells_are_hyper_cube();
+
+        for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
+             --level_no)
           {
             // count number of flagged cells on this level and compute
             // how many new vertices and new lines will be needed
-            unsigned int needed_cells = 0;
+            std::size_t needed_cells = 0;
 
             for (const auto &cell :
-                 triangulation.active_cell_iterators_on_level(level))
+                 triangulation.active_cell_iterators_on_level(level_no))
               if (cell->refine_flag_set())
                 {
                   if (cell->reference_cell() == ReferenceCells::Triangle)
@@ -5554,19 +5431,21 @@ namespace internal
                     }
                 }
 
+            // count number of used cells on the next higher level
+            auto      &next_level = *triangulation.levels[level_no + 1];
+            const auto used_cells = std::count(next_level.cells.used.begin(),
+                                               next_level.cells.used.end(),
+                                               true);
 
-            const unsigned int used_cells =
-              std::count(triangulation.levels[level + 1]->cells.used.begin(),
-                         triangulation.levels[level + 1]->cells.used.end(),
-                         true);
+            if (used_cells + needed_cells > next_level.size())
+              next_level.allocate_end((used_cells + needed_cells) -
+                                        next_level.size(),
+                                      orientation_needed,
+                                      // We are in 2d so there are no tetrahedra
+                                      false);
 
-
-            reserve_space(*triangulation.levels[level + 1],
-                          used_cells + needed_cells,
-                          spacedim);
-
-            triangulation.levels[level + 1]->cells.allocate_end(needed_cells,
-                                                                0);
+            // TODO: perhaps we can merge this with TriaLevel::allocate_end()
+            next_level.cells.allocate_end(needed_cells, 0);
           }
 
         for (auto line = triangulation.begin_line();
@@ -5882,10 +5761,19 @@ namespace internal
                 ->reference_cell[subcells[i]->index()] = cell->reference_cell();
 
               // Finally, now that children are marked as used, we can set
-              // orientation flags:
-              for (unsigned int face_no : cell->face_indices())
-                subcells[i]->set_combined_face_orientation(
-                  face_no, inherited_orientations[child_lines[i][face_no]]);
+              // orientation flags (if needed):
+              if (triangulation.levels[subcells[i]->level()]
+                    ->face_orientations.n_objects() > 0)
+                for (unsigned int face_no : cell->face_indices())
+                  subcells[i]->set_combined_face_orientation(
+                    face_no, inherited_orientations[child_lines[i][face_no]]);
+              else
+                // It should not be possible to inherit a nonstandard
+                // orientation when orientations are not set up
+                for (unsigned int face_no : cell->face_indices())
+                  Assert(inherited_orientations[child_lines[i][face_no]] ==
+                           numbers::default_geometric_orientation,
+                         ExcInternalError());
 
               // We only store the parent for every second cell. That's because
               // cells are created during refinement in multiples of two, and so
@@ -5970,45 +5858,38 @@ namespace internal
               break;
             }
 
-
         // check how much space is needed on every level. We need not
         // check the highest level since either - on the highest level
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
-        unsigned int needed_vertices = 0;
-        for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+        std::size_t needed_vertices = 0;
+        for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
+             --level_no)
           {
-            // count number of flagged
-            // cells on this level
-            unsigned int flagged_cells = 0;
+            std::size_t needed_cells = 0;
 
-            for (const auto &acell :
-                 triangulation.active_cell_iterators_on_level(level))
-              if (acell->refine_flag_set())
-                ++flagged_cells;
+            for (const auto &cell :
+                 triangulation.active_cell_iterators_on_level(level_no))
+              if (cell->refine_flag_set())
+                needed_cells += ReferenceCells::Line.n_isotropic_children();
 
-            // count number of used cells
-            // on the next higher level
-            const unsigned int used_cells =
-              std::count(triangulation.levels[level + 1]->cells.used.begin(),
-                         triangulation.levels[level + 1]->cells.used.end(),
-                         true);
+            // count number of used cells on the next higher level
+            auto      &next_level = *triangulation.levels[level_no + 1];
+            const auto used_cells = std::count(next_level.cells.used.begin(),
+                                               next_level.cells.used.end(),
+                                               true);
 
-            // reserve space for the used_cells cells already existing
-            // on the next higher level as well as for the
-            // 2*flagged_cells that will be created on that level
-            reserve_space(*triangulation.levels[level + 1],
-                          used_cells + triangulation.levels[level + 1]
-                                           ->children_per_object *
-                                         flagged_cells,
-                          spacedim);
-            // reserve space for 2*flagged_cells new lines on the next
-            // higher level
-            triangulation.levels[level + 1]->cells.allocate_end(
-              triangulation.levels[level + 1]->cells.children_per_object *
-                flagged_cells,
-              0);
-            needed_vertices += flagged_cells;
+            if (used_cells + needed_cells > next_level.size())
+              next_level.allocate_end((used_cells + needed_cells) -
+                                        next_level.size(),
+                                      // We are in 1d so there are no tetrahedra
+                                      // and we do not need the orientation
+                                      false,
+                                      false);
+
+            // TODO: perhaps we can merge this with TriaLevel::allocate_end()
+            next_level.cells.allocate_end(needed_cells, 0);
+            needed_vertices += needed_cells / 2;
           }
 
         // add to needed vertices how many
@@ -6240,6 +6121,7 @@ namespace internal
             line->clear_user_flag();
             line->clear_user_data();
           }
+
         // running over all cells and lines count the number
         // n_single_lines of lines which can be stored as single
         // lines, e.g. inner lines
@@ -6254,16 +6136,23 @@ namespace internal
         // no cells are flagged for refinement - there are, but
         // prepare_refinement added another empty level
         unsigned int needed_vertices = 0;
-        for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+
+        const bool orientation_needed =
+          !triangulation.all_reference_cells_are_hyper_cube();
+
+        for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
+             --level_no)
           {
             // count number of flagged cells on this level and compute
             // how many new vertices and new lines will be needed
-            unsigned int needed_cells = 0;
+            std::size_t needed_cells = 0;
 
             for (const auto &cell :
-                 triangulation.active_cell_iterators_on_level(level))
+                 triangulation.active_cell_iterators_on_level(level_no))
               if (cell->refine_flag_set())
                 {
+                  Assert(cell->reference_cell().is_hyper_cube(),
+                         ExcNotImplemented());
                   if (cell->refine_flag_set() == RefinementCase<dim>::cut_xy)
                     {
                       needed_cells += 4;
@@ -6308,25 +6197,19 @@ namespace internal
                     }
                 }
 
+            auto      &next_level = *triangulation.levels[level_no + 1];
+            const auto used_cells = std::count(next_level.cells.used.begin(),
+                                               next_level.cells.used.end(),
+                                               true);
+            if (used_cells + needed_cells > next_level.size())
+              next_level.allocate_end((used_cells + needed_cells) -
+                                        next_level.size(),
+                                      orientation_needed,
+                                      // We are in 2d so there are no tetrahedra
+                                      false);
 
-            // count number of used cells on the next higher level
-            const unsigned int used_cells =
-              std::count(triangulation.levels[level + 1]->cells.used.begin(),
-                         triangulation.levels[level + 1]->cells.used.end(),
-                         true);
-
-
-            // reserve space for the used_cells cells already existing
-            // on the next higher level as well as for the
-            // needed_cells that will be created on that level
-            reserve_space(*triangulation.levels[level + 1],
-                          used_cells + needed_cells,
-                          spacedim);
-
-            // reserve space for needed_cells new quads on the next
-            // higher level
-            triangulation.levels[level + 1]->cells.allocate_end(needed_cells,
-                                                                0);
+            // TODO: perhaps we can merge this with TriaLevel::allocate_end()
+            next_level.cells.allocate_end(needed_cells, 0);
           }
 
         // now count the lines which were flagged for refinement
@@ -6555,12 +6438,13 @@ namespace internal
           unsigned int needed_faces_single = 0;
           unsigned int needed_lines_pair   = 0;
           unsigned int needed_faces_pair   = 0;
-          for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+          for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
+               --level_no)
             {
-              unsigned int new_cells = 0;
+              std::size_t needed_cells = 0;
 
               for (const auto &cell :
-                   triangulation.active_cell_iterators_on_level(level))
+                   triangulation.active_cell_iterators_on_level(level_no))
                 if (cell->refine_flag_set())
                   {
                     // Only support isotropic refinement
@@ -6573,7 +6457,7 @@ namespace internal
 
                     // Now count up how many new cells, faces, edges, and
                     // vertices we will need to allocate to do this refinement.
-                    new_cells += cell_reference_cell.n_isotropic_children();
+                    needed_cells += cell_reference_cell.n_isotropic_children();
 
                     switch (cell_reference_cell)
                       {
@@ -6637,23 +6521,23 @@ namespace internal
                                ExcInternalError());
                   }
 
-              const unsigned int used_cells =
-                std::count(triangulation.levels[level + 1]->cells.used.begin(),
-                           triangulation.levels[level + 1]->cells.used.end(),
-                           true);
+              auto      &next_level = *triangulation.levels[level_no + 1];
+              const auto used_cells = std::count(next_level.cells.used.begin(),
+                                                 next_level.cells.used.end(),
+                                                 true);
+              if (used_cells + needed_cells > next_level.size())
+                next_level.allocate_end(
+                  (used_cells + needed_cells) - next_level.size(),
+                  // We unconditionally store the orientation in 3d
+                  true,
+                  // TODO: we can get rid of this check (i.e., we don't need to
+                  // store this value for purely wedge meshes). This will be
+                  // simpler to do once we merge IsotropicRefinementChoice and
+                  // RefinementCase.
+                  !triangulation.all_reference_cells_are_hyper_cube());
 
-              if (triangulation.all_reference_cells_are_hyper_cube())
-                reserve_space(*triangulation.levels[level + 1],
-                              used_cells + new_cells,
-                              spacedim,
-                              false);
-              else
-                reserve_space(*triangulation.levels[level + 1],
-                              used_cells + new_cells,
-                              spacedim,
-                              true);
-
-              triangulation.levels[level + 1]->cells.allocate_end(new_cells, 0);
+              // TODO: perhaps we can merge this with TriaLevel::allocate_end()
+              next_level.cells.allocate_end(needed_cells, 0);
             }
 
           // now count the faces and lines which were flagged for
@@ -8115,14 +7999,15 @@ namespace internal
         unsigned int needed_quads_single = 0;
         unsigned int needed_lines_pair   = 0;
         unsigned int needed_quads_pair   = 0;
-        for (int level = triangulation.levels.size() - 2; level >= 0; --level)
+        for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
+             --level_no)
           {
             // count number of flagged cells on this level and compute
             // how many new vertices and new lines will be needed
-            unsigned int new_cells = 0;
+            std::size_t needed_cells = 0;
 
             for (const auto &acell :
-                 triangulation.active_cell_iterators_on_level(level))
+                 triangulation.active_cell_iterators_on_level(level_no))
               if (acell->refine_flag_set())
                 {
                   RefinementCase<dim> ref_case = acell->refine_flag_set();
@@ -8134,7 +8019,7 @@ namespace internal
                       ref_case == RefinementCase<dim>::cut_z)
                     {
                       ++needed_quads_single;
-                      new_cells += 2;
+                      needed_cells += 2;
                       triangulation.anisotropic_refinement = true;
                     }
                   else if (ref_case == RefinementCase<dim>::cut_xy ||
@@ -8143,7 +8028,7 @@ namespace internal
                     {
                       ++needed_lines_single;
                       needed_quads_single += 4;
-                      new_cells += 4;
+                      needed_cells += 4;
                       triangulation.anisotropic_refinement = true;
                     }
                   else if (ref_case == RefinementCase<dim>::cut_xyz)
@@ -8151,7 +8036,7 @@ namespace internal
                       ++needed_vertices;
                       needed_lines_single += 6;
                       needed_quads_single += 12;
-                      new_cells += 8;
+                      needed_cells += 8;
                     }
                   else
                     {
@@ -8223,23 +8108,24 @@ namespace internal
 
                 } // if refine_flag set and for all cells on this level
 
-
             // count number of used cells on the next higher level
-            const unsigned int used_cells =
-              std::count(triangulation.levels[level + 1]->cells.used.begin(),
-                         triangulation.levels[level + 1]->cells.used.end(),
-                         true);
+            auto      &next_level = *triangulation.levels[level_no + 1];
+            const auto used_cells = std::count(next_level.cells.used.begin(),
+                                               next_level.cells.used.end(),
+                                               true);
+            if (used_cells + needed_cells > next_level.size())
+              next_level.allocate_end(
+                (used_cells + needed_cells) - next_level.size(),
+                // We unconditionally store the orientation in 3d
+                true,
+                // TODO: we can get rid of this check (i.e., we don't need to
+                // store this value for purely wedge meshes). This will be
+                // simpler to do once we merge IsotropicRefinementChoice and
+                // RefinementCase.
+                !triangulation.all_reference_cells_are_hyper_cube());
 
-
-            // reserve space for the used_cells cells already existing
-            // on the next higher level as well as for the
-            // 8*flagged_cells that will be created on that level
-            reserve_space(*triangulation.levels[level + 1],
-                          used_cells + new_cells,
-                          spacedim);
-            // reserve space for 8*flagged_cells new hexes on the next
-            // higher level
-            triangulation.levels[level + 1]->cells.allocate_end(new_cells, 0);
+            // TODO: perhaps we can merge this with TriaLevel::allocate_end()
+            next_level.cells.allocate_end(needed_cells, 0);
           } // for all levels
         // now count the quads and lines which were flagged for
         // refinement

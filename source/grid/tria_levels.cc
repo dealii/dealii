@@ -87,6 +87,101 @@ namespace internal
       global_level_cell_indices.assign(n_cells, numbers::invalid_dof_index);
     }
 
+
+
+    template <int dim, int spacedim>
+    void
+    TriaLevel<dim, spacedim>::allocate_end(const std::size_t n_new_cells,
+                                           const bool        orientation_needed,
+                                           const bool        has_tetrahedra)
+    {
+      Assert(children_per_object == cells.children_per_object,
+             ExcInternalError());
+      Assert(faces_per_object == cells.faces_per_object, ExcInternalError());
+      if (n_new_cells == 0)
+        return;
+      const auto total_cells = size() + n_new_cells;
+
+      // note that all arrays should have equal sizes (checked by
+      // @p{monitor_memory}
+      refine_flags.reserve(total_cells);
+      refine_flags.insert(refine_flags.end(),
+                          total_cells - refine_flags.size(),
+                          /*RefinementCase::no_refinement=*/0);
+
+      if (has_tetrahedra)
+        {
+          refine_choice.reserve(total_cells);
+          refine_choice.insert(
+            refine_choice.end(),
+            total_cells - refine_choice.size(),
+            static_cast<std::uint8_t>(
+              IsotropicRefinementChoice::isotropic_refinement));
+        }
+
+      coarsen_flags.reserve(total_cells);
+      coarsen_flags.insert(coarsen_flags.end(),
+                           total_cells - coarsen_flags.size(),
+                           false);
+
+      active_cell_indices.reserve(total_cells);
+      active_cell_indices.insert(active_cell_indices.end(),
+                                 total_cells - active_cell_indices.size(),
+                                 numbers::invalid_unsigned_int);
+
+      subdomain_ids.reserve(total_cells);
+      subdomain_ids.insert(subdomain_ids.end(),
+                           total_cells - subdomain_ids.size(),
+                           0);
+
+      level_subdomain_ids.reserve(total_cells);
+      level_subdomain_ids.insert(level_subdomain_ids.end(),
+                                 total_cells - level_subdomain_ids.size(),
+                                 0);
+
+      global_active_cell_indices.reserve(total_cells);
+      global_active_cell_indices.insert(global_active_cell_indices.end(),
+                                        total_cells -
+                                          global_active_cell_indices.size(),
+                                        numbers::invalid_dof_index);
+
+      global_level_cell_indices.reserve(total_cells);
+      global_level_cell_indices.insert(global_level_cell_indices.end(),
+                                       total_cells -
+                                         global_level_cell_indices.size(),
+                                       numbers::invalid_dof_index);
+
+      if (dim == spacedim - 1)
+        {
+          direction_flags.reserve(total_cells);
+          direction_flags.insert(direction_flags.end(),
+                                 total_cells - direction_flags.size(),
+                                 true);
+        }
+      else
+        direction_flags.clear();
+
+      parents.reserve((total_cells + 1) / 2);
+      parents.insert(parents.end(), (total_cells + 1) / 2 - parents.size(), -1);
+
+      neighbors.reserve(total_cells * faces_per_object);
+      neighbors.insert(neighbors.end(),
+                       total_cells * faces_per_object - neighbors.size(),
+                       std::make_pair(-1, -1));
+
+      if (dim > 1)
+        {
+          face_orientations.resize(orientation_needed ? total_cells : 0);
+
+          reference_cell.reserve(total_cells);
+          reference_cell.insert(reference_cell.end(),
+                                total_cells - reference_cell.size(),
+                                ReferenceCells::get_hypercube<dim>());
+        }
+    }
+
+
+
     // explicit instantiations; note: we need them all for all dimensions
 
     template class TriaLevel<1, 1>;

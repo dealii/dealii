@@ -90,6 +90,28 @@ namespace internal
       allocate(const std::size_t n_cells, const bool orientation_needed);
 
       /**
+       * Resize all internal arrays and populate with default values.
+       *
+       * @param[in] n_new_cells Number of new cells to add to the end of each
+       *            array.
+       *
+       * @param[in] orientation_needed Whether or not the level needs to store
+       *            orientation values.
+       *
+       * @param[in] has_tetrahedra Whether or not the level contains tetrahedra.
+       */
+      void
+      allocate_end(const std::size_t n_new_cells,
+                   const bool        orientation_needed,
+                   const bool        has_tetrahedra);
+
+      /**
+       * Return the number of cells in the level.
+       */
+      std::size_t
+      size() const;
+
+      /**
        * The number of children stored per object. In practice, to support mixed
        * meshes, this is the maximum number of children per ReferenceCell across
        * all relevant ReferenceCell types used by the Triangulation.
@@ -281,6 +303,28 @@ namespace internal
       void
       serialize(Archive &ar, const unsigned int version);
     };
+
+
+
+    template <int dim, int spacedim>
+    std::size_t
+    TriaLevel<dim, spacedim>::size() const
+    {
+      Assert(refine_flags.size() == coarsen_flags.size() &&
+               refine_flags.size() == active_cell_indices.size() &&
+               refine_flags.size() == global_active_cell_indices.size() &&
+               refine_flags.size() == global_level_cell_indices.size() &&
+               refine_flags.size() == subdomain_ids.size() &&
+               refine_flags.size() == level_subdomain_ids.size() &&
+               refine_flags.size() == cells.n_objects(),
+             ExcInternalError());
+      if constexpr (dim > 1)
+        Assert(refine_flags.size() == reference_cell.size(),
+               ExcInternalError());
+
+      return refine_flags.size();
+    }
+
 
 
     template <int dim, int spacedim>
