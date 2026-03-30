@@ -63,9 +63,9 @@ DEAL::derive
 DEAL::derive
 240.000 x^0
 DEAL::derive
-0.00000 x^0
+0.00000
 DEAL::derive
-0.00000 x^0
+0.00000
 DEAL::Legendre
 DEAL::P0 * P0 = 1.00000
 DEAL::P1 * P0 = 0.00000

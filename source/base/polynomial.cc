@@ -526,20 +526,28 @@ namespace Polynomials
   // ------------------ class Monomial -------------------------- //
 
   template <typename number>
-  std::vector<number>
-  Monomial<number>::make_vector(unsigned int n, double coefficient)
+  std::vector<Point<1>>
+  Monomial<number>::create_vector_of_roots(unsigned int n)
   {
-    std::vector<number> result(n + 1, 0.);
-    result[n] = coefficient;
-    return result;
+    // Create vector of support points in 0 for representing the monomial as
+    // Lagrange polynomial, augmented by an additional 'node' point at 1. The
+    // latter point is added because of the way polynomials in Lagrange form
+    // are defined, taking one index 'i' among the given points as pivot (in
+    // our case, 0) to define a product (x - x[k]) / (x[i] - x[k]) for k
+    // running through the indices of the vector, excluding 'i'.
+    std::vector<Point<1>> vector(n + 1);
+    vector[0] = Point<1>(1.0);
+    return vector;
   }
 
 
 
   template <typename number>
   Monomial<number>::Monomial(unsigned int n, double coefficient)
-    : Polynomial<number>(make_vector(n, coefficient))
-  {}
+    : Polynomial<number>(create_vector_of_roots(n), 0)
+  {
+    this->operator*=(coefficient);
+  }
 
 
 
