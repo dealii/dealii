@@ -21,20 +21,18 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <Epetra_Comm.h>
-#  include <Epetra_Map.h>
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#    include <Epetra_Comm.h>
+#    include <Epetra_Map.h>
+
+#    ifdef DEAL_II_WITH_MPI
+#      include <Epetra_MpiComm.h>
+#    else
+#      include <Epetra_SerialComm.h>
+#    endif
+#  endif
 #  include <Teuchos_Comm.hpp>
 #  include <Teuchos_RCP.hpp>
-
-#  ifdef DEAL_II_WITH_MPI
-#    include <Epetra_MpiComm.h>
-#  else
-#    include <Epetra_SerialComm.h>
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
-#    include <Teuchos_RCPDecl.hpp>
-#  endif // DEAL_II_TRILINOS_WITH_TPETRA
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #endif
 

@@ -33,7 +33,9 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <Epetra_Map.h>
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#    include <Epetra_Map.h>
+#  endif
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #    include <Tpetra_Map.hpp>
 #  endif

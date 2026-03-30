@@ -79,6 +79,13 @@ for (S : TRILINOS_SCALARS)
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
 
+        template void
+        SparseMatrix<S, MemorySpace::Host>::set(const size_type,
+                                                const size_type,
+                                                const size_type *,
+                                                const S *,
+                                                bool);
+
         template class SparseMatrix<S, MemorySpace::Default>;
 
         template void
@@ -139,6 +146,13 @@ for (S : TRILINOS_SCALARS)
         SparseMatrix<S, MemorySpace::Default>::Tvmult_add(
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
+
+        template void
+        SparseMatrix<S, MemorySpace::Default>::set(const size_type,
+                                                   const size_type,
+                                                   const size_type *,
+                                                   const S *,
+                                                   bool);
       \}
     \}
   }
