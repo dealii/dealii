@@ -1,0 +1,7 @@
+Removed: The function TrilinosWrappers::Vector::reinit with the option to copy values
+from a differently partitioned vector has been removed due to inconsistent behavior
+with the other reinit functions. If you require this functionality, use the
+copy-constructor specifying the parallel partitioning, or the equivalent
+assignment operator.
+<br>
+(Rene Gassmoeller, 2026/03/30)

@@ -286,75 +286,55 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     Vector<Number, MemorySpace>::reinit(const Vector<Number, MemorySpace> &V,
-                                        const bool omit_zeroing_entries,
-                                        const bool allow_different_maps)
+                                        const bool omit_zeroing_entries)
     {
-      if (allow_different_maps)
+      // Preserve the source vector's storage layout, including ghosted
+      // read-only vectors and writable vectors with a separate nonlocal
+      // accumulation buffer.
+      const bool same_vector_map =
+        vector.get() != nullptr && V.vector.get() != nullptr &&
+        vector->getMap()->isSameAs(*V.vector->getMap());
+
+      // If V has a different distribution, construct a new vector,
+      // otherwise just zero out this vector if so requested.
+      if (!same_vector_map)
+        vector = Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::VectorType<Number, MemorySpace>>(V.vector->getMap());
+      else if (vector.get() != nullptr && omit_zeroing_entries == false)
+        vector->putScalar(Number(0));
+
+      const bool same_nonlocal_map =
+        (nonlocal_vector.get() == nullptr &&
+         V.nonlocal_vector.get() == nullptr) ||
+        (nonlocal_vector.get() != nullptr &&
+         V.nonlocal_vector.get() != nullptr &&
+         nonlocal_vector->getMap()->isSameAs(*V.nonlocal_vector->getMap()));
+
+      // If V has a different distribution of nonlocal entries,
+      // modify our nonlocal entries to be identical. Otherwise,
+      // just zero out our nonlocal vector if so requested.
+      if (!same_nonlocal_map)
         {
-          Assert(omit_zeroing_entries == false,
-                 ExcMessage(
-                   "It is not possible to exchange data with the "
-                   "option 'omit_zeroing_entries' set, which would not write "
-                   "elements."));
-
-          AssertThrow(size() == V.size(),
-                      ExcDimensionMismatch(size(), V.size()));
-
-          TpetraTypes::ImportType<MemorySpace> data_exchange(
-            vector->getMap(), V.vector->getMap());
-          vector->doImport(*V.vector, data_exchange, Tpetra::INSERT);
+          if (V.nonlocal_vector.get() != nullptr)
+            nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+              TpetraTypes::VectorType<Number, MemorySpace>>(
+              V.nonlocal_vector->getMap());
+          else
+            nonlocal_vector.reset();
         }
-      else
-        {
-          // Preserve the source vector's storage layout, including ghosted
-          // read-only vectors and writable vectors with a separate nonlocal
-          // accumulation buffer.
-          const bool same_vector_map =
-            vector.get() != nullptr && V.vector.get() != nullptr &&
-            vector->getMap()->isSameAs(*V.vector->getMap());
+      else if (nonlocal_vector.get() != nullptr &&
+               omit_zeroing_entries == false)
+        nonlocal_vector->putScalar(Number(0));
 
-          // If V has a different distribution, construct a new vector,
-          // otherwise just zero out this vector if so requested.
-          if (!same_vector_map)
-            vector = Utilities::Trilinos::internal::make_rcp<
-              TpetraTypes::VectorType<Number, MemorySpace>>(V.vector->getMap());
-          else if (vector.get() != nullptr && omit_zeroing_entries == false)
-            vector->putScalar(Number(0));
+      has_ghost     = V.has_ghost;
+      local_entries = V.local_entries;
+      compressed    = true;
+      last_action   = VectorOperation::unknown;
 
-          const bool same_nonlocal_map =
-            (nonlocal_vector.get() == nullptr &&
-             V.nonlocal_vector.get() == nullptr) ||
-            (nonlocal_vector.get() != nullptr &&
-             V.nonlocal_vector.get() != nullptr &&
-             nonlocal_vector->getMap()->isSameAs(*V.nonlocal_vector->getMap()));
-
-          // If V has a different distribution of nonlocal entries,
-          // modify our nonlocal entries to be identical. Otherwise,
-          // just zero out our nonlocal vector if so requested.
-          if (!same_nonlocal_map)
-            {
-              if (V.nonlocal_vector.get() != nullptr)
-                nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
-                  TpetraTypes::VectorType<Number, MemorySpace>>(
-                  V.nonlocal_vector->getMap());
-              else
-                nonlocal_vector.reset();
-            }
-          else if (nonlocal_vector.get() != nullptr &&
-                   omit_zeroing_entries == false)
-            nonlocal_vector->putScalar(Number(0));
-
-          has_ghost     = V.has_ghost;
-          local_entries = V.local_entries;
-          compressed    = true;
-
-          // Cached import state depends on previous source layouts and should
-          // not survive reinitialization.
-          source_stored_elements.clear();
-          tpetra_comm_pattern = Teuchos::null;
-        }
-
-      last_action = VectorOperation::unknown;
+      // Cached import state depends on previous source layouts and should
+      // not survive reinitialization.
+      source_stored_elements.clear();
+      tpetra_comm_pattern = Teuchos::null;
     }
 
 

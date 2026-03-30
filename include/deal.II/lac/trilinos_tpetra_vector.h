@@ -391,8 +391,7 @@ namespace LinearAlgebra
        */
       void
       reinit(const Vector<Number, MemorySpace> &V,
-             const bool                         omit_zeroing_entries = false,
-             const bool                         allow_different_maps = false);
+             const bool                         omit_zeroing_entries = false);
 
       /**
        * Swap the contents of this vector and the other vector @p v. One could do

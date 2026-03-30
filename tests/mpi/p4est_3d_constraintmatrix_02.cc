@@ -85,14 +85,16 @@ test()
   cm.distribute(x);
   x_rel = x;
 
-  TrilinosWrappers::MPI::Vector x_dub;
-  x_dub.reinit(complete_index_set(dof_set.size()));
-  x_dub.reinit(x_rel, false, true);
+  // Copy into a purely local vector that owns all entries
+  // on every process
+  TrilinosWrappers::MPI::Vector x_output(complete_index_set(dof_set.size()),
+                                         MPI_COMM_SELF);
+  x_output = x_rel;
 
   {
     std::stringstream out;
     out << "**** proc " << myid << std::endl;
-    x_dub.print(out);
+    x_output.print(out);
 
     if (myid == 0)
       deallog << out.str() << std::endl;
