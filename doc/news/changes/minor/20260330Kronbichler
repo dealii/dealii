@@ -1,0 +1,5 @@
+Fixed: Initializing FEEvaluation with a Mapping, FiniteElement, and Quadrature
+object would leave some data pointers unset, leading to problems e.g. when
+evaluating elements of type FE_RaviartThomasNodal. This is now fixed.
+<br>
+(Martin Kronbichler, 2026/03/30)
