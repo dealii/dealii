@@ -1125,23 +1125,26 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   const unsigned int first_selected_component)
   : data(nullptr)
   , dof_info(nullptr)
-  , mapping_data(nullptr)
+  , mapping_data(&mapped_geometry->get_data_storage())
   , quadrature_index(numbers::invalid_unsigned_int)
   , n_fe_components(n_fe_components)
   , first_selected_component(first_selected_component)
   , active_fe_index(numbers::invalid_unsigned_int)
   , active_quad_index(numbers::invalid_unsigned_int)
-  , descriptor(nullptr)
-  , n_quadrature_points(
-      mapped_geometry->get_data_storage().descriptor[0].n_q_points)
-  , quadrature_points(nullptr)
-  , jacobian(nullptr)
-  , jacobian_gradients(nullptr)
-  , jacobian_gradients_non_inverse(nullptr)
-  , J_value(nullptr)
+  , descriptor(&mapped_geometry->get_data_storage().descriptor[0])
+  , n_quadrature_points(descriptor->n_q_points)
+  , quadrature_points(
+      mapped_geometry->get_data_storage().quadrature_points.begin())
+  , jacobian(mapped_geometry->get_data_storage().jacobians[0].begin())
+  , jacobian_gradients(
+      mapped_geometry->get_data_storage().jacobian_gradients[0].begin())
+  , jacobian_gradients_non_inverse(mapped_geometry->get_data_storage()
+                                     .jacobian_gradients_non_inverse[0]
+                                     .begin())
+  , J_value(mapped_geometry->get_data_storage().JxW_values.begin())
   , normal_vectors(nullptr)
   , normal_x_jacobian(nullptr)
-  , quadrature_weights(nullptr)
+  , quadrature_weights(descriptor->quadrature_weights.begin())
   , cell(0)
   , cell_type(internal::MatrixFreeFunctions::general)
   , interior_face(true)
@@ -1149,18 +1152,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , mapped_geometry(mapped_geometry)
   , is_reinitialized(false)
   , divergence_is_requested(false)
-{
-  mapping_data = &mapped_geometry->get_data_storage();
-  jacobian     = mapped_geometry->get_data_storage().jacobians[0].begin();
-  J_value      = mapped_geometry->get_data_storage().JxW_values.begin();
-  jacobian_gradients =
-    mapped_geometry->get_data_storage().jacobian_gradients[0].begin();
-  jacobian_gradients_non_inverse = mapped_geometry->get_data_storage()
-                                     .jacobian_gradients_non_inverse[0]
-                                     .begin();
-  quadrature_points =
-    mapped_geometry->get_data_storage().quadrature_points.begin();
-}
+{}
 
 
 

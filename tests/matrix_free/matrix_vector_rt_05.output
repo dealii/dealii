@@ -1,0 +1,10 @@
+
+DEAL:2d::Testing RT element of degree 2
+DEAL:2d::Norm of difference: 3.78683e-16
+DEAL:2d::
+DEAL:2d::Testing RT element of degree 3
+DEAL:2d::Norm of difference: 8.51187e-16
+DEAL:2d::
+DEAL:3d::Testing RT element of degree 2
+DEAL:3d::Norm of difference: 5.88715e-16
+DEAL:3d::
