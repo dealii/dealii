@@ -1,4 +1,4 @@
-Changed: If Trilinos was build with Tpetra support but without Epetra support,
+Changed: If Trilinos was built with Tpetra support but without Epetra support,
 the TrilinosWrappers classes are aliases for the respective TpetraWrappers classes
 with NumberType=double and MemorySpace=Host.
 <br>
