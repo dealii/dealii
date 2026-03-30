@@ -94,8 +94,8 @@ namespace internal
 
 
     void
-    TriaObjects::allocate_end(const unsigned int new_objects_in_pairs,
-                              const unsigned int new_objects_single)
+    TriaObjects::allocate_end(const std::size_t new_objects_in_pairs,
+                              const std::size_t new_objects_single)
     {
       if (structdim <= 2)
         {
@@ -107,10 +107,10 @@ namespace internal
 
           // count the number of objects, of unused single objects and of
           // unused pairs of objects
-          unsigned int n_objects        = 0;
-          unsigned int n_unused_pairs   = 0;
-          unsigned int n_unused_singles = 0;
-          for (unsigned int i = 0; i < used.size(); ++i)
+          std::size_t n_objects        = 0;
+          std::size_t n_unused_pairs   = 0;
+          std::size_t n_unused_singles = 0;
+          for (std::size_t i = 0; i < used.size(); ++i)
             {
               if (used[i])
                 ++n_objects;
@@ -139,10 +139,12 @@ namespace internal
 
           // how many single objects are needed in addition to
           // n_unused_objects?
-          const int additional_single_objects =
+          const std::ptrdiff_t additional_single_objects =
             new_objects_single - n_unused_singles;
 
-          unsigned int new_size =
+          Assert(used.size() + new_objects_in_pairs >= 2 * n_unused_pairs,
+                 ExcInternalError());
+          std::size_t new_size =
             used.size() + new_objects_in_pairs - 2 * n_unused_pairs;
           if (additional_single_objects > 0)
             new_size += additional_single_objects;
@@ -163,7 +165,7 @@ namespace internal
                                 new_size - user_flags.size(),
                                 false);
 
-              const unsigned int factor = children_per_object / 2;
+              const auto factor = children_per_object / 2;
               children.reserve(factor * new_size);
               children.insert(children.end(),
                               factor * new_size - children.size(),
@@ -199,9 +201,9 @@ namespace internal
         }
       else
         {
-          const unsigned int new_hexes = new_objects_in_pairs;
+          const auto new_hexes = new_objects_in_pairs;
 
-          const unsigned int new_size =
+          const auto new_size =
             new_hexes + std::count(used.begin(), used.end(), true);
 
           // see above...
@@ -220,7 +222,7 @@ namespace internal
                                 new_size - user_flags.size(),
                                 false);
 
-              const unsigned int factor = children_per_object / 2;
+              const auto factor = children_per_object / 2;
               children.reserve(factor * new_size);
               children.insert(children.end(),
                               factor * new_size - children.size(),

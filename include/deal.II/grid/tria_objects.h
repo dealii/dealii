@@ -93,8 +93,8 @@ namespace internal
        *            interior of refined cells can be stored as single lines.
        */
       void
-      allocate_end(const unsigned int new_objects_in_pairs,
-                   const unsigned int new_objects_single);
+      allocate_end(const std::size_t new_objects_in_pairs,
+                   const std::size_t new_objects_single);
 
       /**
        * The dimension of the structures which this object stores.
@@ -128,7 +128,7 @@ namespace internal
       /**
        * Return number of geometric objects stored by this class.
        */
-      unsigned int
+      std::size_t
       n_objects() const;
 
       /**
@@ -425,7 +425,7 @@ namespace internal
 
     //----------------------------------------------------------------------//
 
-    inline unsigned int
+    inline std::size_t
     TriaObjects::n_objects() const
     {
       // ensure that sizes are consistent, and then return one that
