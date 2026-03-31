@@ -1831,7 +1831,7 @@ private:
    */
   void
   set_combined_face_orientation(
-    const unsigned int                 face,
+    const unsigned int                 face_no,
     const types::geometric_orientation combined_orientation) const;
 
   /**
@@ -4887,34 +4887,6 @@ namespace internal
      */
     struct Implementation
     {
-      /**
-       * Implementation of the function of some name in the parent class.
-       */
-      template <int structdim, int dim, int spacedim>
-      inline static void
-      set_combined_face_orientation(
-        const TriaAccessor<structdim, dim, spacedim> &accessor,
-        const unsigned int                            face_no,
-        const types::geometric_orientation            combined_orientation)
-      {
-        Assert(structdim == dim,
-               ExcMessage("This function can only be used on objects that are "
-                          "cells and not on objects which bound cells."));
-        AssertIndexRange(face_no, accessor.n_faces());
-        AssertIndexRange(combined_orientation,
-                         accessor.reference_cell().n_face_orientations(
-                           face_no));
-
-        // face_orientations is not set up in 1d
-        if (dim != 1)
-          accessor.tria->levels[accessor.level()]
-            ->face_orientations.set_combined_orientation(accessor.present_index,
-                                                         face_no,
-                                                         combined_orientation);
-      }
-
-
-
       template <int dim, int spacedim>
       static std::array<unsigned int, 1>
       get_line_indices_of_cell(const TriaAccessor<1, dim, spacedim> &)
@@ -4956,11 +4928,7 @@ namespace internal
           {
             for (unsigned int f = 4; f < 6; ++f)
               {
-                const auto orientation =
-                  cell.get_triangulation()
-                    .levels[cell.level()]
-                    ->face_orientations.get_combined_orientation(cell.index(),
-                                                                 f);
+                const auto orientation = cell.combined_face_orientation(f);
 
                 // It might seem superfluous to spell out the four indices
                 // that get later consumed by a for loop over these four
@@ -5600,14 +5568,23 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
 template <int structdim, int dim, int spacedim>
 inline void
 TriaAccessor<structdim, dim, spacedim>::set_combined_face_orientation(
-  const unsigned int                 face,
+  const unsigned int                 face_no,
   const types::geometric_orientation combined_orientation) const
 {
   Assert(used(), TriaAccessorExceptions::ExcCellNotUsed());
-  AssertIndexRange(face, this->n_faces());
+  AssertIndexRange(face_no, this->n_faces());
+  Assert(structdim == dim,
+         ExcMessage("This function can only be used on objects that are cells "
+                    "and not on objects which bound cells."));
+  AssertIndexRange(combined_orientation,
+                   reference_cell().n_face_orientations(face_no));
 
-  dealii::internal::TriaAccessorImplementation::Implementation::
-    set_combined_face_orientation(*this, face, combined_orientation);
+  // face_orientations is not set up in 1d
+  if (dim > 1)
+    this->tria->levels[this->level()]
+      ->face_orientations.set_combined_orientation(this->present_index,
+                                                   face_no,
+                                                   combined_orientation);
 }
 
 
