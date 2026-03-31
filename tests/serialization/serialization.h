@@ -14,6 +14,8 @@
 
 #include <deal.II/base/logstream.h>
 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 
@@ -45,25 +47,50 @@ template <typename T>
 void
 verify(const T &t1, T &t2)
 {
-  // save data to archive
-  std::ostringstream oss;
+  // First test serialization to a text archive. This one we can actually
+  // output into the log file and use as a reference for future tests.
   {
-    boost::archive::text_oarchive oa(oss, boost::archive::no_header);
-    oa << t1;
-    // archive and stream closed when
-    // destructors are called
+    // save data to archive
+    std::ostringstream oss;
+    {
+      boost::archive::text_oarchive oa(oss, boost::archive::no_header);
+      oa << t1;
+      // archive and stream closed when
+      // destructors are called
+    }
+    deallog << oss.str() << std::endl;
+
+    // verify correctness of the
+    // serialization
+    {
+      std::istringstream            iss(oss.str());
+      boost::archive::text_iarchive ia(iss, boost::archive::no_header);
+
+      ia >> t2;
+
+      AssertThrow(compare(t1, t2), ExcInternalError());
+    }
   }
-  deallog << oss.str() << std::endl;
 
-  // verify correctness of the
-  // serialization
+  // Now do the same thing again, but with a binary archive. This one we
+  // can't output into the log, but we can at least verify that it works
+  // correctly. (In practice, one might then also want to compress
+  // the binary archive, but that is immaterial to us here. The point
+  // is just to verify that serialization to a binary archive works
+  // correctly.)
   {
-    std::istringstream            iss(oss.str());
-    boost::archive::text_iarchive ia(iss, boost::archive::no_header);
+    std::ostringstream oss;
+    {
+      boost::archive::binary_oarchive oa(oss, boost::archive::no_header);
+      oa << t1;
+    }
+    {
+      std::istringstream              iss(oss.str());
+      boost::archive::binary_iarchive ia(iss, boost::archive::no_header);
 
+      ia >> t2;
 
-    ia >> t2;
-
-    AssertThrow(compare(t1, t2), ExcInternalError());
+      AssertThrow(compare(t1, t2), ExcInternalError());
+    }
   }
 }

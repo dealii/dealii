@@ -5,4 +5,6 @@ DEAL::Serializing object number 1 via N5boost7archive13text_oarchiveE
 DEAL::0 0
 
 DEAL::Serializing object number 2 via N5boost7archive13text_iarchiveE
+DEAL::Serializing object number 1 via N5boost7archive15binary_oarchiveE
+DEAL::Serializing object number 2 via N5boost7archive15binary_iarchiveE
 DEAL::OK
