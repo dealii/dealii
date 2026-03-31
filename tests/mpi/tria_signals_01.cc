@@ -131,8 +131,8 @@ test()
 
   // Test signal on copying
   {
-    TriaType tria_cpoier(MPI_COMM_WORLD);
-    tria_cpoier.copy_triangulation(tria);
+    TriaType tria_copier(MPI_COMM_WORLD);
+    tria_copier.copy_triangulation(tria);
   }
 
   tria.refine_global(2);
