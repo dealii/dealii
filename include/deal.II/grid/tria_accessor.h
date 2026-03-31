@@ -4928,11 +4928,7 @@ namespace internal
           {
             for (unsigned int f = 4; f < 6; ++f)
               {
-                const auto orientation =
-                  cell.get_triangulation()
-                    .levels[cell.level()]
-                    ->face_orientations.get_combined_orientation(cell.index(),
-                                                                 f);
+                const auto orientation = cell.combined_face_orientation(f);
 
                 // It might seem superfluous to spell out the four indices
                 // that get later consumed by a for loop over these four
