@@ -7070,7 +7070,16 @@ namespace internal
                       DEAL_II_ASSERT_UNREACHABLE();
                   }
 
-                std::array<raw_line_iterator, 6> new_lines;
+                // the following numbers should be the max numbers of the above.
+                // They are used for sizing of arrays.
+                constexpr unsigned int max_n_new_lines       = 6;
+                constexpr unsigned int max_n_new_faces       = 13;
+                constexpr unsigned int max_n_new_children    = 10;
+                constexpr unsigned int max_relevant_vertices = 27;
+                constexpr unsigned int max_relevant_lines    = 30;
+                constexpr unsigned int max_face_indices      = 36;
+
+                std::array<raw_line_iterator, max_n_new_lines> new_lines;
                 for (unsigned int i = 0; i < n_new_lines; ++i)
                   {
                     new_lines[i] =
@@ -7087,7 +7096,7 @@ namespace internal
                     new_lines[i]->set_manifold_id(cell->manifold_id());
                   }
 
-                std::array<raw_quad_iterator, 12> new_faces;
+                std::array<raw_quad_iterator, max_n_new_faces> new_faces;
                 for (unsigned int i = 0; i < n_new_faces; ++i)
                   {
                     new_faces[i] =
@@ -7109,66 +7118,6 @@ namespace internal
                         j, numbers::default_geometric_orientation);
                   }
 
-                // We always get 8 children per refined cell, whether from
-                // refinement of a hex or a tet:
-                std::array<
-                  typename Triangulation<dim, spacedim>::raw_cell_iterator,
-                  8>
-                  new_cells;
-                { // SETUP_CELLS
-                  for (unsigned int i = 0; i < n_new_cells; ++i)
-                    {
-                      // Since we search for pairs of hexes (next_free_hex
-                      // returns a pair) we need to search only every other
-                      // time.
-                      if (i % 2 == 0)
-                        next_unused_cell =
-                          triangulation.levels[level + 1]->cells.next_free_hex(
-                            triangulation, level + 1);
-                      else
-                        ++next_unused_cell;
-
-                      new_cells[i] = next_unused_cell;
-
-                      auto &new_cell = new_cells[i];
-
-                      // children have the same type as the parent
-                      triangulation.levels[new_cell->level()]
-                        ->reference_cell[new_cell->index()] =
-                        cell_reference_cell;
-
-                      // Copy parent data to child.
-                      AssertIsNotUsed(new_cell);
-                      new_cell->set_used_flag();
-                      new_cell->clear_user_flag();
-                      new_cell->clear_user_data();
-                      new_cell->clear_children();
-                      new_cell->set_material_id(cell->material_id());
-                      new_cell->set_manifold_id(cell->manifold_id());
-                      new_cell->set_subdomain_id(cell->subdomain_id());
-
-                      // We only store the parent for every second cell. That's
-                      // because cells are created during refinement in
-                      // multiples of two, and so two successive cells always
-                      // share the same parent. As a consequence, we can save a
-                      // bit of work by skipping setting parent indices for the
-                      // odd children.
-                      if (i % 2 == 0)
-                        new_cell->set_parent(cell->index());
-
-                      // set the orientation flag to its default state for all
-                      // faces initially. later on go the other way round and
-                      // reset faces that are at the boundary of the mother cube
-                      // TODO: This might only be necessary for Hexes. For all
-                      // other cells the orientation is calculated for all faces
-                      // one by one. (Only a guess though).
-                      for (const auto f : new_cell->face_indices())
-                        new_cell->set_combined_face_orientation(
-                          f, numbers::default_geometric_orientation);
-                    }
-                  for (unsigned int i = 0; i < n_new_cells / 2; ++i)
-                    cell->set_children(2 * i, new_cells[2 * i]->index());
-                } // SETUP_CELLS
 
                 { // CREATE_CELLS
                   // Build a list of all relevant vertices required for
@@ -7178,7 +7127,10 @@ namespace internal
                   //
                   // Number of meaningful entries in this list is
                   //   10  Tetrahedron    18 Wedge
-                  //    ?  Pyramid        27 Hexahedron
+                  //   14  Pyramid        27 Hexahedron
+                  // In case the maximum changes, edit `max_relevant_vertices` a
+                  // few lines above (or in case it was moved to ReferenceCell,
+                  // update it there).
                   //
                   // The following algorithm is used to get the vertices.
                   //  1. Get vertices of the parent as provided.
@@ -7215,7 +7167,8 @@ namespace internal
                   //     |/   :   /
                   //     .-------.
 
-                  std::array<unsigned int, 27> vertex_indices = {};
+                  std::array<unsigned int, max_relevant_vertices>
+                    vertex_indices = {};
 
                   { // GET_VERTICES
                     // continuous counter variable
@@ -7451,9 +7404,18 @@ namespace internal
                     //
                     //  3. Newly created lines (see above)
                     //  4. Load indices for the extracted lines
+                    //
+                    // Number of meaningful entries in this list is
+                    //   13  Tetrahedron    21 Wedge
+                    //   20  Pyramid        30 Hexahedron
+                    // In case the maximum changes, edit `max_relevant_lines` a
+                    // few lines above (or in case it was moved to
+                    // ReferenceCell, update it there).
 
-                    std::array<raw_line_iterator, 30> relevant_lines;
-                    std::array<unsigned int, 30>      relevant_line_indices;
+                    std::array<raw_line_iterator, max_relevant_lines>
+                      relevant_lines;
+                    std::array<unsigned int, max_relevant_lines>
+                      relevant_line_indices;
 
                     unsigned int relevant_lines_counter = 0;
 
@@ -7483,14 +7445,14 @@ namespace internal
                                                                {{3, 0}}, //
                                                                {{0, 3}}, //
                                                                {{3, 2}}}};
-                        for (unsigned int c = 0; c < 4;
-                             ++c, ++relevant_lines_counter)
+                        for (unsigned int l = 0; l < 4;
+                             ++l, ++relevant_lines_counter)
                           {
                             // Use previously defined helper function to find
                             // children in an orientation-corrected way.
                             const unsigned int relevant_child =
                               standard_to_real_quad_child_index(
-                                quad_relevant_children_and_lines[c][0],
+                                quad_relevant_children_and_lines[l][0],
                                 cell->combined_face_orientation(f),
                                 ReferenceCells::Quadrilateral);
 
@@ -7500,7 +7462,7 @@ namespace internal
                             const unsigned int relevant_child_line =
                               ReferenceCells::Hexahedron
                                 .standard_to_real_face_line(
-                                  quad_relevant_children_and_lines[c][1],
+                                  quad_relevant_children_and_lines[l][1],
                                   // face irrelevant -> function doesn't use it.
                                   0,
                                   cell->combined_face_orientation(f));
@@ -7553,15 +7515,13 @@ namespace internal
                       }
 
                     // 3. Fill end of `relevant_lines` with `new_lines`.
-                    for (unsigned int i = 0, k = relevant_lines_counter;
-                         i < n_new_lines;
-                         ++i, ++k)
-                      relevant_lines[k] = new_lines[i];
+                    for (unsigned int i = 0; i < n_new_lines;
+                         ++i, ++relevant_lines_counter)
+                      relevant_lines[relevant_lines_counter] = new_lines[i];
 
 
                     // 4. Extract and store indices of the relevant lines.
-                    for (unsigned int i = 0; i < relevant_line_indices.size();
-                         ++i)
+                    for (unsigned int i = 0; i < relevant_lines_counter; ++i)
                       relevant_line_indices[i] = relevant_lines[i]->index();
 
 
@@ -7575,7 +7535,7 @@ namespace internal
                       cell_reference_cell.new_isotropic_child_face_lines(
                         chosen_line_tetrahedron);
 
-                    // The created lines might be oriented according to the
+                    // The created lines might not be oriented according to the
                     // expectation of the face's reference cell. Consequently,
                     // an additional lookup table is necessary to define the
                     // correct line connectivity desired by the reference cell.
@@ -7679,8 +7639,15 @@ namespace internal
                     //     for numbering see {} // FACE.
                     //  3. Get children of refined tri faces.
                     //     for numbering see {} // FACE.
+                    //
+                    // Number of meaningful entries in this list is
+                    //   24  Tetrahedron    30 Wedge
+                    //   33  Pyramid        36 Hexahedron
+                    // In case the maximum changes, edit `max_face_indices` a
+                    // few lines above (or in case it was moved to
+                    // ReferenceCell, update it there).
 
-                    std::array<int, 36> face_indices;
+                    std::array<int, max_face_indices> face_indices;
 
                     unsigned int face_indices_counter = 0;
 
@@ -7746,18 +7713,70 @@ namespace internal
                       cell_reference_cell.new_isotropic_child_cell_vertices(
                         chosen_line_tetrahedron);
 
-                    for (unsigned int c = 0;
-                         c < cell_reference_cell.n_isotropic_children();
-                         ++c)
-                      {
-                        auto      &new_cell = new_cells[c];
-                        const auto child_reference_cell =
-                          new_cell->reference_cell();
+                    // 1. Preserve data that can only be extracted from active
+                    //    cells.
+                    //    Parent becomes inactive after setting the first child!
+                    const dealii::types::subdomain_id cell_subdomain_id =
+                      cell->subdomain_id();
 
-                        // Set the bounding faces of the new cells
-                        // This seems to be the only option since
-                        // set_bounding_object_indices() takes an
-                        // std::initializer_list as argument
+                    // Create the new cells
+                    std::array<
+                      typename Triangulation<dim, spacedim>::raw_cell_iterator,
+                      max_n_new_children>
+                      new_cells;
+                    for (unsigned int c = 0; c < n_new_cells; ++c)
+                      {
+                        // Since we search for pairs of hexes (next_free_hex
+                        // returns a pair) we need to search only every other
+                        // time.
+                        if (c % 2 == 0)
+                          next_unused_cell =
+                            triangulation.levels[level + 1]
+                              ->cells.next_free_hex(triangulation, level + 1);
+                        else
+                          ++next_unused_cell;
+
+                        new_cells[c] = next_unused_cell;
+
+                        auto &new_cell = new_cells[c];
+
+                        AssertIsNotUsed(new_cell);
+
+                        // 2. Copy parent data to child.
+                        new_cell->set_used_flag();
+                        new_cell->clear_user_flag();
+                        new_cell->clear_user_data();
+                        new_cell->clear_children();
+                        new_cell->set_material_id(cell->material_id());
+                        new_cell->set_manifold_id(cell->manifold_id());
+                        new_cell->set_subdomain_id(cell_subdomain_id);
+
+                        // 3. Setup child parent relation (can only happen after
+                        //    call to `set_used_flag()`)
+                        if (c % 2 == 0)
+                          {
+                            new_cell->set_parent(cell->index());
+                            cell->set_children(c, new_cell->index());
+                          }
+
+                        // 4.a Determine the cell reference cell using the
+                        //     number of vertices it has according to
+                        //     `new_cells_vertices`.
+                        const ReferenceCell child_reference_cell =
+                            (new_cells_vertices[c][4] == X) ? ReferenceCells::Tetrahedron : // Tet
+                            (new_cells_vertices[c][5] == X) ? ReferenceCells::Pyramid :     // Pyramid
+                            (new_cells_vertices[c][6] == X) ? ReferenceCells::Wedge :       // Wedge
+                            ReferenceCells::Hexahedron; // Hex
+
+                        // 4.b Set the reference cell
+                        triangulation.levels[new_cell->level()]
+                          ->reference_cell[new_cell->index()] =
+                          child_reference_cell;
+
+                        // 5. Set the bounding faces of the new cells
+                        //    This seems to be the only option since
+                        //    set_bounding_object_indices() takes an
+                        //    std::initializer_list as argument
                         switch (child_reference_cell)
                           {
                             case ReferenceCells::Tetrahedron:
@@ -7795,10 +7814,22 @@ namespace internal
                               DEAL_II_ASSERT_UNREACHABLE();
                           }
 
-                        // Fix orientation of faces.
+                        // 6. Fix orientation of faces.
                         // For all reference cells except for Hexes, we need to
                         // go through the faces and figure the orientation out
                         // the hard way
+
+                        // Set the orientation flag to its default state for
+                        // all faces initially. later on go the other way
+                        // round and reset faces that are at the boundary of
+                        // the mother cube.
+                        // TODO: This might only be necessary for Hexes. For
+                        // all other cells the orientation is calculated for
+                        // all faces one by one. (Only a guess though).
+                        for (const auto f : new_cell->face_indices())
+                          new_cell->set_combined_face_orientation(
+                            f, numbers::default_geometric_orientation);
+
                         if (child_reference_cell != ReferenceCells::Hexahedron)
                           {
                             for (const auto f : new_cell->face_indices())
