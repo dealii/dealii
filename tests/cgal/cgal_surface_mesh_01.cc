@@ -38,18 +38,19 @@ test()
 {
   deallog << "dim= " << dim << ",\t spacedim= " << spacedim << std::endl;
   using namespace ReferenceCells;
-  std::vector<std::vector<ReferenceCell>> ref_cells = {
-    {},
-    {Line},
-    {Triangle, Quadrilateral},
-    {Tetrahedron, Pyramid, Wedge, Hexahedron}};
-  for (const auto &r_cell : ref_cells[dim])
+  std::vector<ReferenceCell<dim>> ref_cells;
+  if constexpr (dim == 1)
+    ref_cells = {Line};
+  else if constexpr (dim == 2)
+    ref_cells = {Triangle, Quadrilateral};
+  else if constexpr (dim == 3)
+    ref_cells = {Tetrahedron, Pyramid, Wedge, Hexahedron};
+  for (const auto &r_cell : ref_cells)
     {
       Triangulation<dim, spacedim>  tria;
       CGAL::Surface_mesh<CGALPoint> mesh;
 
-      const auto mapping =
-        r_cell.template get_default_mapping<dim, spacedim>(1);
+      const auto mapping = r_cell.template get_default_mapping<spacedim>(1);
       GridGenerator::reference_cell(tria, r_cell);
 
       const auto cell = tria.begin_active();
@@ -57,14 +58,14 @@ test()
 
       Assert(mesh.is_valid(), ExcMessage("The CGAL mesh is not valid"));
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         {
           // is closed/oriented only for 3 dimensional objects important
           Assert(CGAL::is_closed(mesh),
                  ExcMessage("The CGAL mesh is not closed"));
 
           // orientation not supported for wedges, this needs special treatment
-          if (r_cell != ref_cells[3][2])
+          if (r_cell != ref_cells[2])
             {
               Assert(
                 CGAL::Polygon_mesh_processing::is_outward_oriented(mesh),
