@@ -61,6 +61,7 @@ main(int argc, char *argv[])
         TrilinosWrappers::MPI::Vector v1(local_range, MPI_COMM_WORLD);
         test(v1);
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
         LinearAlgebra::ReadWriteVector<double> v_tmp(local_range);
         LinearAlgebra::EpetraWrappers::Vector  v2(local_range, MPI_COMM_WORLD);
         v_tmp.import_elements(v1, VectorOperation::insert);
@@ -68,6 +69,7 @@ main(int argc, char *argv[])
         VectorTools::subtract_mean_value(v2);
         AssertThrow(std::fabs(v2.mean_value()) < 1e-10 * v2.l2_norm(),
                     ExcInternalError());
+#endif
         deallog << "OK" << std::endl;
       }
       {
