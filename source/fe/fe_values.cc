@@ -805,20 +805,26 @@ FESubfaceValues<dim, spacedim>::reinit(
              cell->get_dof_handler().get_fe(cell->active_fe_index())),
          (typename FEValuesBase<dim, spacedim>::ExcFEDontMatch()));
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  // We would like to check for subface_no < cell->face(face_no)->n_children(),
-  // but unfortunately the current function is also called for
-  // faces without children (see tests/fe/mapping.cc). Therefore,
-  // we must use following workaround of two separate assertions
-  Assert(cell->face(face_no)->has_children() ||
-           subface_no < GeometryInfo<dim>::max_children_per_face,
-         ExcIndexRange(subface_no,
-                       0,
-                       GeometryInfo<dim>::max_children_per_face));
-  Assert(!cell->face(face_no)->has_children() ||
-           subface_no < cell->face(face_no)->n_active_descendants(),
-         ExcIndexRange(subface_no,
-                       0,
-                       cell->face(face_no)->n_active_descendants()));
+  Assert(cell->has_periodic_neighbor(face_no) ?
+           cell->periodic_neighbor(face_no)
+             ->face(cell->periodic_neighbor_face_no(face_no))
+             ->has_children() :
+           cell->face(face_no)->has_children(),
+         ExcMessage("You can only reinit() an FESubfaceValues object in case "
+                    "the neighboring cell is more refined than the one this "
+                    "object is initialized on."));
+
+  // in the following check, we need to compare the subface index against the
+  // number of descendants rather than the number of children because in
+  // anisotropic refinement, there might be more subfaces than the face has
+  // immediate children
+  AssertIndexRange(subface_no,
+                   (cell->has_periodic_neighbor(face_no) ?
+                      cell->periodic_neighbor(face_no)
+                        ->face(cell->periodic_neighbor_face_no(face_no))
+                        ->n_active_descendants() :
+                      cell->face(face_no)->n_active_descendants()));
+
   Assert(cell->has_children() == false,
          ExcMessage("You can't use subface data for cells that are "
                     "already refined. Iterate over their children "
@@ -858,16 +864,30 @@ FESubfaceValues<dim, spacedim>::reinit(
   const unsigned int                                          subface_no)
 {
   AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  // We would like to check for subface_no < cell->face(face_no)->n_children(),
-  // but unfortunately the current function is also called for
-  // faces without children for periodic faces, which have hanging nodes on
-  // the other side (see include/deal.II/matrix_free/mapping_info.templates.h).
+  Assert(cell->has_periodic_neighbor(face_no) ?
+           cell->periodic_neighbor(face_no)
+             ->face(cell->periodic_neighbor_face_no(face_no))
+             ->has_children() :
+           cell->face(face_no)->has_children(),
+         ExcMessage("You can only reinit() an FESubfaceValues object in case "
+                    "the neighboring cell is more refined than the one this "
+                    "object is initialized on."));
+
+  // in the following check, we need to compare the subface index against the
+  // number of descendants rather than the number of children because in
+  // anisotropic refinement, there might be more subfaces than the face has
+  // immediate children
   AssertIndexRange(subface_no,
                    (cell->has_periodic_neighbor(face_no) ?
                       cell->periodic_neighbor(face_no)
                         ->face(cell->periodic_neighbor_face_no(face_no))
-                        ->n_children() :
-                      cell->face(face_no)->n_children()));
+                        ->n_active_descendants() :
+                      cell->face(face_no)->n_active_descendants()));
+
+  Assert(cell->has_children() == false,
+         ExcMessage("You can't use subface data for cells that are "
+                    "already refined. Iterate over their children "
+                    "instead in these cases."));
 
   this->maybe_invalidate_previous_present_cell(cell);
   this->present_cell = {cell};
