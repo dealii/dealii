@@ -38,7 +38,7 @@ void
 test()
 {
   using namespace ReferenceCells;
-  std::vector<std::pair<ReferenceCell, ReferenceCell>> ref_pairs = {
+  std::vector<std::pair<ReferenceCell<3>, ReferenceCell<3>>> ref_pairs = {
     {Hexahedron, Pyramid},
     {Hexahedron, Tetrahedron},
     {Tetrahedron, Pyramid},

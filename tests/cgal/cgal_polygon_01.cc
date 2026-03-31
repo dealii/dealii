@@ -33,7 +33,7 @@ test_quadrilateral()
   ReferenceCell       r_cell = Quadrilateral;
   Triangulation<2, 2> tria;
 
-  const auto mapping = r_cell.template get_default_mapping<2, 2>(1);
+  const auto mapping = r_cell.template get_default_mapping<2>(1);
 
   GridGenerator::reference_cell(tria, r_cell);
 
@@ -66,7 +66,7 @@ test_triangle()
   ReferenceCell       r_cell = Triangle;
   Triangulation<2, 2> tria;
 
-  const auto mapping = r_cell.template get_default_mapping<2, 2>(1);
+  const auto mapping = r_cell.template get_default_mapping<2>(1);
 
   GridGenerator::reference_cell(tria, r_cell);
 
