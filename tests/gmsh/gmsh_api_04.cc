@@ -28,8 +28,8 @@ test(const std::uint8_t kind, const std::string out = "")
           << ',' << spacedim << '>' << std::endl;
 
   Triangulation<dim, spacedim> tria;
-  GridGenerator::reference_cell(tria,
-                                internal::make_reference_cell_from_int(kind));
+  GridGenerator::reference_cell(
+    tria, internal::make_reference_cell_from_int<dim>(kind));
 
   GridOut go;
   go.write_msh(tria, "output.msh");
