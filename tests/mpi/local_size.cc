@@ -124,7 +124,7 @@ check_ghosted_parallel_block()
 
   std::vector<IndexSet> local_blocks{local_indices, local_indices};
   // for variety do not ghost the second component
-  std::vector<IndexSet> ghost_blocks{ghost_indices, IndexSet()};
+  std::vector<IndexSet> ghost_blocks{ghost_indices, IndexSet(n_dofs)};
 
   VEC vec(local_blocks, ghost_blocks, MPI_COMM_WORLD);
   AssertDimension(vec.locally_owned_size(), dofs_per_proc * 2);
