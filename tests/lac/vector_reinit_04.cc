@@ -19,9 +19,7 @@
 #include <deal.II/base/mpi.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
-#include <deal.II/lac/la_parallel_vector.templates.h>
 #include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/vector_memory.templates.h>
 
 #include "../tests.h"
 

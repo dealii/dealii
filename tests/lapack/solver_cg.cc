@@ -17,7 +17,6 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_control.h>
 #include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparse_matrix.templates.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_memory.h>
 

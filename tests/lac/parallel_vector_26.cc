@@ -17,7 +17,7 @@
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
 
-#include <deal.II/lac/la_parallel_vector.templates.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include "../tests.h"
 
