@@ -278,9 +278,9 @@ namespace Portable
     };
 
     /**
-     * Structure which is passed to the kernel. It is used to pass all the
-     * necessary information from the CPU to the GPU and is precomputed
-     * on the CPU. This data is read-only once we run on the GPU.
+     * Structure which is passed to the kernel for a single DoFHandler. It is
+     * used to pass all the necessary information from the CPU to the GPU and is
+     * precomputed on the CPU. This data is read-only once we run on the GPU.
      */
     struct PrecomputedData
     {
@@ -890,21 +890,6 @@ namespace Portable
         local_to_global;
 
       /**
-       * Vector of Kokkos::View of the inverse Jacobian associated to the cells
-       * of each color.
-       */
-      std::vector<
-        Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
-        inv_jacobian;
-
-      /**
-       * Vector of Kokkos::View to the Jacobian times the weights associated to
-       * the cells of each color.
-       */
-      std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
-        JxW;
-
-      /**
        * Kokkos::View to the constrained degrees of freedom.
        */
       Kokkos::View<types::global_dof_index *,
@@ -980,6 +965,21 @@ namespace Portable
      */
     std::vector<Kokkos::View<point_type **, MemorySpace::Default::kokkos_space>>
       q_points;
+
+    /**
+     * Vector of Kokkos::View of the inverse Jacobian associated to the cells
+     * of each color.
+     */
+    std::vector<
+      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
+      inv_jacobian;
+
+    /**
+     * Vector of Kokkos::View to the Jacobian times the weights associated to
+     * the cells of each color.
+     */
+    std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
+      JxW;
 
     /**
      * Length of the padding (closest power of two larger than or equal to

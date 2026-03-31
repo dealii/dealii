@@ -138,12 +138,6 @@ namespace Portable
 
       dof_data.local_to_global.resize(n_colors);
       dof_data.constraint_mask.resize(n_colors);
-
-      if (update_flags & update_JxW_values)
-        dof_data.JxW.resize(n_colors);
-
-      if (update_flags & update_gradients)
-        dof_data.inv_jacobian.resize(n_colors);
     }
 
 
@@ -172,7 +166,7 @@ namespace Portable
           dofs_per_cell,
           n_cells);
 
-      if (update_flags & update_quadrature_points && dof_handler_index == 0)
+      if ((update_flags & update_quadrature_points) && dof_handler_index == 0)
         data->q_points[color] =
           Kokkos::View<Point<dim, Number> **,
                        MemorySpace::Default::kokkos_space>(
@@ -181,16 +175,16 @@ namespace Portable
             q_points_per_cell,
             n_cells);
 
-      if (update_flags & update_JxW_values)
-        dof_data.JxW[color] =
+      if ((update_flags & update_JxW_values) && dof_handler_index == 0)
+        data->JxW[color] =
           Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("JxW_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
             q_points_per_cell,
             n_cells);
 
-      if (update_flags & update_gradients)
-        dof_data.inv_jacobian[color] =
+      if ((update_flags & update_gradients) && dof_handler_index == 0)
+        data->inv_jacobian[color] =
           Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
@@ -210,8 +204,8 @@ namespace Portable
       typename std::remove_reference_t<
         decltype(data->q_points[color])>::host_mirror_type q_points_host;
       typename std::remove_reference_t<
-        decltype(dof_data.JxW[color])>::host_mirror_type JxW_host;
-      typename std::remove_reference_t<decltype(dof_data.inv_jacobian[color])>::
+        decltype(data->JxW[color])>::host_mirror_type JxW_host;
+      typename std::remove_reference_t<decltype(data->inv_jacobian[color])>::
         host_mirror_type inv_jacobian_host;
 #if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       auto local_to_global_host =
@@ -220,23 +214,23 @@ namespace Portable
       if (update_flags & update_quadrature_points && dof_handler_index == 0)
         q_points_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                                    data->q_points[color]);
-      if (update_flags & update_JxW_values)
+      if ((update_flags & update_JxW_values) && dof_handler_index == 0)
         JxW_host = Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                              dof_data.JxW[color]);
-      if (update_flags & update_gradients)
+                                              data->JxW[color]);
+      if ((update_flags & update_gradients) && dof_handler_index == 0)
         inv_jacobian_host =
           Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
-                                     dof_data.inv_jacobian[color]);
+                                     data->inv_jacobian[color]);
 #else
       auto local_to_global_host =
         Kokkos::create_mirror_view(dof_data.local_to_global[color]);
       if (update_flags & update_quadrature_points && dof_handler_index == 0)
         q_points_host = Kokkos::create_mirror_view(data->q_points[color]);
-      if (update_flags & update_JxW_values)
-        JxW_host = Kokkos::create_mirror_view(dof_data.JxW[color]);
-      if (update_flags & update_gradients)
+      if ((update_flags & update_JxW_values) && dof_handler_index == 0)
+        JxW_host = Kokkos::create_mirror_view(data->JxW[color]);
+      if ((update_flags & update_gradients) && dof_handler_index == 0)
         inv_jacobian_host =
-          Kokkos::create_mirror_view(dof_data.inv_jacobian[color]);
+          Kokkos::create_mirror_view(data->inv_jacobian[color]);
 #endif
       struct ScratchData
       {
@@ -321,13 +315,13 @@ namespace Portable
               q_points_host(i, cell_id) = fe_values.quadrature_point(i);
           }
 
-        if (update_flags & update_JxW_values)
+        if ((update_flags & update_JxW_values) && dof_handler_index == 0)
           {
             for (unsigned int i = 0; i < q_points_per_cell; ++i)
               JxW_host(i, cell_id) = fe_values.JxW(i);
           }
 
-        if (update_flags & update_gradients)
+        if ((update_flags & update_gradients) && dof_handler_index == 0)
           {
             for (unsigned int i = 0; i < q_points_per_cell; ++i)
               for (unsigned int d = 0; d < dim; ++d)
@@ -352,14 +346,13 @@ namespace Portable
       Kokkos::deep_copy(exec_space,
                         dof_data.local_to_global[color],
                         local_to_global_host);
-      if (update_flags & update_quadrature_points && dof_handler_index == 0)
+      if ((update_flags & update_quadrature_points) && dof_handler_index == 0)
         Kokkos::deep_copy(exec_space, data->q_points[color], q_points_host);
-
-      if (update_flags & update_JxW_values)
-        Kokkos::deep_copy(exec_space, dof_data.JxW[color], JxW_host);
-      if (update_flags & update_gradients)
+      if ((update_flags & update_JxW_values) && dof_handler_index == 0)
+        Kokkos::deep_copy(exec_space, data->JxW[color], JxW_host);
+      if ((update_flags & update_gradients) && dof_handler_index == 0)
         Kokkos::deep_copy(exec_space,
-                          dof_data.inv_jacobian[color],
+                          data->inv_jacobian[color],
                           inv_jacobian_host);
     }
 
@@ -665,11 +658,11 @@ namespace Portable
     PrecomputedData data_copy;
     if (q_points.size() > 0)
       data_copy.q_points = q_points[color];
+    if (inv_jacobian.size() > 0)
+      data_copy.inv_jacobian = inv_jacobian[color];
+    if (JxW.size() > 0)
+      data_copy.JxW = JxW[color];
 
-    if (data.inv_jacobian.size() > 0)
-      data_copy.inv_jacobian = data.inv_jacobian[color];
-    if (data.JxW.size() > 0)
-      data_copy.JxW = data.JxW[color];
     data_copy.local_to_global    = data.local_to_global[color];
     data_copy.constraint_mask    = data.constraint_mask[color];
     data_copy.shape_values       = data.shape_values;
@@ -920,7 +913,8 @@ namespace Portable
                         MemoryConsumption::memory_consumption(level_graph);
 
     for (unsigned int color = 0; color < n_colors; ++color)
-      bytes += mem(q_points[color]);
+      bytes +=
+        mem(q_points[color]) + mem(inv_jacobian[color]) + mem(JxW[color]);
 
     for (const PerDoFHandlerData &pdhd : dof_handler_data)
       {
@@ -932,9 +926,8 @@ namespace Portable
           bytes += pdhd.partitioner->memory_consumption();
 
         for (unsigned int color = 0; color < n_colors; ++color)
-          bytes += mem(pdhd.local_to_global[color]) +
-                   mem(pdhd.inv_jacobian[color]) + mem(pdhd.JxW[color]) +
-                   mem(pdhd.constraint_mask[color]);
+          bytes +=
+            mem(pdhd.local_to_global[color]) + mem(pdhd.constraint_mask[color]);
       }
 
     return bytes;
@@ -1163,6 +1156,10 @@ namespace Portable
 
       if (update_flags & update_quadrature_points)
         q_points.resize(n_colors);
+      if (update_flags & update_JxW_values)
+        JxW.resize(n_colors);
+      if (update_flags & update_gradients)
+        inv_jacobian.resize(n_colors);
     }
 
 
