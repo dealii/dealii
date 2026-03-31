@@ -21,7 +21,6 @@
 #include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
-#include <deal.II/lac/sparse_matrix_ez.templates.h>
 #include <deal.II/lac/sparse_vanka.h>
 #include <deal.II/lac/vector.h>
 

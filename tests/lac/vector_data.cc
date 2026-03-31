@@ -14,7 +14,6 @@
 // test Vector::data
 
 #include <deal.II/lac/vector.h>
-#include <deal.II/lac/vector.templates.h>
 
 #include "../tests.h"
 

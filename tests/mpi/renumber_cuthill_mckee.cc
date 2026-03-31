@@ -17,7 +17,6 @@
 
 
 #include <deal.II/base/mpi.h>
-#include <deal.II/base/mpi.templates.h>
 
 #include <deal.II/distributed/tria.h>
 
