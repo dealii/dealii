@@ -428,7 +428,7 @@ main()
 
   const unsigned int refinements  = 1;
   const unsigned int poly_degree  = 2;
-  const unsigned int n_iterations = (running_in_debug_mode ? 2 : 3);
+  const unsigned int n_iterations = (running_in_debug_mode() ? 2 : 3);
 
   MaxwellProblem<2> maxwell_2d(refinements, poly_degree, n_iterations);
   maxwell_2d.run();
