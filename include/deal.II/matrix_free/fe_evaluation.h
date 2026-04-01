@@ -24,6 +24,8 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/vectorization.h>
 
+#include <deal.II/fe/fe_values_views.h>
+
 #include <deal.II/lac/vector_operation.h>
 
 #include <deal.II/matrix_free/evaluation_flags.h>
@@ -104,6 +106,7 @@ public:
       n_components_ == dim,
       Tensor<2, dim, VectorizedArrayType>,
       Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>>>>;
+  using curl_type = typename internal::CurlType<dim, VectorizedArrayType>::type;
   using hessian_type = std::conditional_t<
     n_components_ == 1,
     Tensor<2, dim, VectorizedArrayType>,
@@ -593,7 +596,7 @@ public:
    */
   template <int dim_ = dim,
             typename = std::enable_if_t<n_components_ == dim_ && dim_ != 1>>
-  Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
+  curl_type
   get_curl(const unsigned int q_point) const;
 
   /**
@@ -612,8 +615,7 @@ public:
   template <int dim_ = dim,
             typename = std::enable_if_t<n_components_ == dim_ && dim != 1>>
   void
-  submit_curl(const Tensor<1, dim == 2 ? 1 : dim, VectorizedArrayType> curl_in,
-              const unsigned int                                       q_point);
+  submit_curl(const curl_type curl_in, const unsigned int q_point);
 
   /**
    * Take values collected at quadrature points via the submit_value() function,
@@ -5942,7 +5944,11 @@ template <int dim,
           typename VectorizedArrayType>
 template <int, typename>
 inline DEAL_II_ALWAYS_INLINE
-  Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType>
+  typename FEEvaluationBase<dim,
+                            n_components_,
+                            Number,
+                            is_face,
+                            VectorizedArrayType>::curl_type
   FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
     get_curl(const unsigned int q_point) const
 {
@@ -6262,8 +6268,13 @@ template <int dim,
 template <int, typename>
 inline DEAL_II_ALWAYS_INLINE void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
-  submit_curl(const Tensor<1, dim == 2 ? 1 : dim, VectorizedArrayType> curl,
-              const unsigned int                                       q_point)
+  submit_curl(
+    const typename FEEvaluationBase<dim,
+                                    n_components_,
+                                    Number,
+                                    is_face,
+                                    VectorizedArrayType>::curl_type curl,
+    const unsigned int                                              q_point)
 {
   static_assert(n_components == dim,
                 "Do not try to modify the default template parameters used for"
