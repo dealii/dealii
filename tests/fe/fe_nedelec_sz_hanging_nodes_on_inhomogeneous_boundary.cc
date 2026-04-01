@@ -236,8 +236,6 @@ namespace ConvergenceTest
     system_matrix = 0;
     system_rhs    = 0;
 
-    const unsigned int curl_dim = (dim == 2) ? 1 : 3;
-
     // choose the quadrature formulas
     QGauss<dim> quadrature_formula(fe.degree + 2);
 
@@ -273,8 +271,9 @@ namespace ConvergenceTest
         for (const unsigned int i : fe_values.dof_indices())
           {
             // only compute this once
-            std::vector<Tensor<1, dim>>      phi_i(n_q_points);
-            std::vector<Tensor<1, curl_dim>> curl_phi_i(n_q_points);
+            std::vector<Tensor<1, dim>> phi_i(n_q_points);
+            std::vector<typename FEValuesViews::Vector<dim>::curl_type>
+              curl_phi_i(n_q_points);
             for (unsigned int q_point = 0; q_point < n_q_points; q_point++)
               {
                 phi_i[q_point]      = fe_values[E_re].value(i, q_point);
@@ -289,9 +288,10 @@ namespace ConvergenceTest
 
                 for (unsigned int q_point = 0; q_point < n_q_points; q_point++)
                   {
-                    Tensor<1, dim> phi_j = fe_values[E_re].value(j, q_point);
-                    Tensor<1, curl_dim> curl_phi_j =
-                      fe_values[E_re].curl(j, q_point);
+                    const Tensor<1, dim> phi_j =
+                      fe_values[E_re].value(j, q_point);
+                    const typename FEValuesViews::Vector<dim>::curl_type
+                      curl_phi_j = fe_values[E_re].curl(j, q_point);
 
                     curl_part +=
                       curl_phi_i[q_point] * curl_phi_j * fe_values.JxW(q_point);
