@@ -76,6 +76,7 @@ namespace internal
         n_components == spacedim,
         Tensor<2, spacedim, Number>,
         Tensor<1, n_components, Tensor<1, spacedim, Number>>>;
+      using curl_type = typename internal::CurlType<dim, Number>::type;
       using scalar_unit_gradient_type =
         Tensor<1, n_components, Tensor<1, dim, ScalarNumber>>;
       using vectorized_unit_gradient_type =
@@ -256,11 +257,12 @@ namespace internal
       using VectorizedArrayType =
         typename dealii::internal::VectorizedArrayTrait<
           Number>::vectorized_value_type;
-      using value_type                    = Number;
-      using scalar_value_type             = ScalarNumber;
-      using vectorized_value_type         = VectorizedArrayType;
-      using unit_gradient_type            = Tensor<1, dim, Number>;
-      using real_gradient_type            = Tensor<1, spacedim, Number>;
+      using value_type            = Number;
+      using scalar_value_type     = ScalarNumber;
+      using vectorized_value_type = VectorizedArrayType;
+      using unit_gradient_type    = Tensor<1, dim, Number>;
+      using real_gradient_type    = Tensor<1, spacedim, Number>;
+      using curl_type = typename internal::CurlType<dim, Number>::type;
       using scalar_unit_gradient_type     = Tensor<1, dim, ScalarNumber>;
       using vectorized_unit_gradient_type = Tensor<1, dim, VectorizedArrayType>;
       using interface_vectorized_unit_gradient_type =
@@ -434,6 +436,7 @@ namespace internal
       using real_gradient_type            = unit_gradient_type;
       using scalar_unit_gradient_type     = Tensor<2, dim, ScalarNumber>;
       using vectorized_unit_gradient_type = Tensor<2, dim, VectorizedArrayType>;
+      using curl_type = typename internal::CurlType<dim, Number>::type;
       using interface_vectorized_unit_gradient_type =
         Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>>;
 
@@ -636,6 +639,7 @@ public:
   using scalar_value_type     = typename ETT::scalar_value_type;
   using vectorized_value_type = typename ETT::vectorized_value_type;
   using gradient_type         = typename ETT::real_gradient_type;
+  using curl_type             = typename ETT::curl_type;
   using interface_vectorized_unit_gradient_type =
     typename ETT::interface_vectorized_unit_gradient_type;
 
@@ -777,7 +781,8 @@ public:
    * EvaluationFlags::gradients set. This functions only makes sense for a
    * vector field with dim components and dim > 1.
    */
-  Tensor<1, (dim == 2 ? 1 : dim), Number>
+
+  curl_type
   get_curl(const unsigned int point_index) const;
 
   /**
@@ -2255,7 +2260,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::submit_divergence(
 
 
 template <int n_components_, int dim, int spacedim, typename Number>
-Tensor<1, (dim == 2 ? 1 : dim), Number>
+typename FEPointEvaluationBase<n_components_, dim, spacedim, Number>::curl_type
 FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_curl(
   const unsigned int point_index) const
 {
@@ -2263,22 +2268,20 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_curl(
     dim > 1 && n_components == dim,
     "Only makes sense for a vector field with dim components and dim > 1");
 
-  const Tensor<2, dim, Number>            grad = get_gradient(point_index);
-  Tensor<1, (dim == 2 ? 1 : dim), Number> curl;
-  switch (dim)
+  const Tensor<2, dim, Number> grad = get_gradient(point_index);
+  if constexpr (dim == 2)
+    return curl_type({grad[1][0] - grad[0][1]});
+  else if constexpr (dim == 3)
     {
-      case 2:
-        curl[0] = grad[1][0] - grad[0][1];
-        break;
-      case 3:
-        curl[0] = grad[2][1] - grad[1][2];
-        curl[1] = grad[0][2] - grad[2][0];
-        curl[2] = grad[1][0] - grad[0][1];
-        break;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      curl_type curl;
+      curl[0] = grad[2][1] - grad[1][2];
+      curl[1] = grad[0][2] - grad[2][0];
+      curl[2] = grad[1][0] - grad[0][1];
+      return curl;
     }
-  return curl;
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+  return {};
 }
 
 
