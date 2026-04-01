@@ -1,0 +1,7 @@
+Fixed: The function FEValuesViews::Vector::curl() computed the wrong
+value for `dim==2` and `spacedim==3`, i.e., for the case of a two-dimensional
+manifold embedded in 3d. In that case, it assumed that we are dealing with
+a two-dimensional vector field, for which the curl is a scalar, when what is
+meant is the curl of a three-dimensional vector field defined on a surface.
+<br>
+(Wolfgang Bangerth, 2026/03/18)
