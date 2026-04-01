@@ -479,6 +479,19 @@ namespace parallel
         const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
       /**
+       * Implementation of the same function as in the base class but instead
+       * of copying the settings of the other triangulation use the provided
+       * parameter as settings for the copy.
+       *
+       * @note This function can be used to copy a serial Triangulation to a
+       * parallel::distributed::Triangulation but only if the serial
+       * Triangulation has never been refined.
+       */
+      void
+      copy_triangulation(const dealii::Triangulation<dim, spacedim> &other_tria,
+                         const Settings                              settings);
+
+      /**
        * Create a triangulation as documented in the base class.
        *
        * This function also sets up the various data structures necessary to

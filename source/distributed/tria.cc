@@ -3924,6 +3924,23 @@ namespace parallel
     void Triangulation<dim, spacedim>::copy_triangulation(
       const dealii::Triangulation<dim, spacedim> &other_tria)
     {
+      if (const dealii::parallel::distributed::Triangulation<dim, spacedim>
+            *other_distributed =
+              dynamic_cast<const dealii::parallel::distributed::
+                             Triangulation<dim, spacedim> *>(&other_tria))
+        copy_triangulation(other_tria, other_distributed->settings);
+      else
+        copy_triangulation(other_tria, default_setting);
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::copy_triangulation(
+      const dealii::Triangulation<dim, spacedim> &other_tria,
+      const Settings                              settings)
+    {
       Assert(
         (dynamic_cast<
           const dealii::parallel::distributed::Triangulation<dim, spacedim> *>(
@@ -3952,8 +3969,9 @@ namespace parallel
               dynamic_cast<const dealii::parallel::distributed::
                              Triangulation<dim, spacedim> *>(&other_tria))
         {
+          // use settings from the provided parameter instead of copying them
+          this->settings = settings;
           // copy parallel distributed specifics
-          settings = other_distributed->settings;
           triangulation_has_content =
             other_distributed->triangulation_has_content;
           coarse_cell_to_p4est_tree_permutation =
