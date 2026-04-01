@@ -5971,24 +5971,22 @@ inline DEAL_II_ALWAYS_INLINE
       Assert(this->jacobian != nullptr,
              internal::ExcMatrixFreeAccessToUninitializedMappingField(
                "update_gradients"));
-      Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType> curl;
+      curl_type                  curl;
       const std::size_t          nqp   = this->n_quadrature_points;
       const std::size_t          nqp_d = nqp * dim;
       const VectorizedArrayType *gradients =
         this->gradients_quad + q_point * dim;
-      switch (dim)
+      if constexpr (dim == 2)
+        curl = curl_type({gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1]});
+      else if constexpr (dim == 3)
         {
-          case 2:
-            curl[0] = gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1];
-            break;
-          case 3:
-            curl[0] = gradients[2 * nqp_d + 1] - gradients[1 * nqp_d + 2];
-            curl[1] = gradients[0 * nqp_d + 2] - gradients[2 * nqp_d + 0];
-            curl[2] = gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1];
-            break;
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
+          curl[0] = gradients[2 * nqp_d + 1] - gradients[1 * nqp_d + 2];
+          curl[1] = gradients[0 * nqp_d + 2] - gradients[2 * nqp_d + 0];
+          curl[2] = gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1];
         }
+      else
+        DEAL_II_NOT_IMPLEMENTED();
+
       if (!is_face &&
           this->cell_type == internal::MatrixFreeFunctions::cartesian)
         {
@@ -6000,13 +5998,11 @@ inline DEAL_II_ALWAYS_INLINE
           const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[1];
 
           // J * curl * det(J^-1)
-          for (unsigned int d = 0; d < (dim == 2 ? 1 : dim); ++d)
-            {
-              if (dim == 2)
-                curl[d] *= inv_det;
-              else
-                curl[d] *= jac[d][d] * inv_det;
-            }
+          if constexpr (dim == 2)
+            curl *= inv_det;
+          else
+            for (unsigned int d = 0; d < (dim == 2 ? 1 : dim); ++d)
+              curl[d] *= jac[d][d] * inv_det;
         }
       else
         {
@@ -6030,7 +6026,7 @@ inline DEAL_II_ALWAYS_INLINE
           // J * curl * det(J^-1)
           // In case of 2D its just a scaling with det(J^-1)
           if constexpr (dim == 2)
-            curl[0] *= inv_det;
+            curl *= inv_det;
           else
             {
               Tensor<1, dim, VectorizedArrayType> curl_temp;
@@ -6049,20 +6045,18 @@ inline DEAL_II_ALWAYS_INLINE
 
   // copy from generic function into dim-specialization function
   const Tensor<2, dim, VectorizedArrayType> grad = get_gradient(q_point);
-  Tensor<1, (dim == 2 ? 1 : dim), VectorizedArrayType> curl;
-  switch (dim)
+  curl_type                                 curl;
+  if constexpr (dim == 2)
+    curl = curl_type({grad[1][0] - grad[0][1]});
+  else if constexpr (dim == 3)
     {
-      case 2:
-        curl[0] = grad[1][0] - grad[0][1];
-        break;
-      case 3:
-        curl[0] = grad[2][1] - grad[1][2];
-        curl[1] = grad[0][2] - grad[2][0];
-        curl[2] = grad[1][0] - grad[0][1];
-        break;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      curl[0] = grad[2][1] - grad[1][2];
+      curl[1] = grad[0][2] - grad[2][0];
+      curl[2] = grad[1][0] - grad[0][1];
     }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+
   return curl;
 }
 
@@ -6285,7 +6279,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   if (this->data->element_type ==
       internal::MatrixFreeFunctions::ElementType::tensor_nedelec)
     {
-      Tensor<1, (dim == 2) ? 1 : dim, VectorizedArrayType> curl_temp;
+      curl_type curl_temp;
 
       // Piola transform is required
       AssertIndexRange(q_point, this->n_quadrature_points);
