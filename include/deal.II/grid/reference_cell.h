@@ -1884,20 +1884,21 @@ ReferenceCell<dim>::new_isotropic_child_cell_faces(
               // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
               //   centre wedge is rotated by 180° compared to the parent)
               // - Order of children is similar to the order of a reference
-              // triangle
-              //   in the x-y-plane (i.e. like the top triangle of the parent)
-              dealii::ndarray<unsigned int, 10, 6> cell_quads_wedge = {{
-                {{23, 0, 10, 5, 19, X}}, // bottom children
-                {{22, 1, 11, 14, 4, X}}, //
-                {{24, 2, 6, 15, 18, X}}, //
-                {{25, 3, 6, 5, 4, X}},   //
-                {{0, 26, 12, 8, 21, X}}, // top children
-                {{1, 27, 13, 16, 7, X}}, //
-                {{2, 28, 9, 17, 20, X}}, //
-                {{3, 29, 9, 8, 7, X}},   //
-                {{X, X, X, X, X, X}},
-                {{X, X, X, X, X, X}},
-              }};
+              //   triangle in the x-y-plane (i.e. like the top triangle of the
+              //   parent)
+              constexpr dealii::ndarray<unsigned int, 10, 6> cell_quads_wedge =
+                {{
+                  {{23, 0, 10, 5, 19, X}}, // bottom children
+                  {{22, 1, 11, 14, 4, X}}, //
+                  {{24, 2, 6, 15, 18, X}}, //
+                  {{25, 3, 6, 5, 4, X}},   //
+                  {{0, 26, 12, 8, 21, X}}, // top children
+                  {{1, 27, 13, 16, 7, X}}, //
+                  {{2, 28, 9, 17, 20, X}}, //
+                  {{3, 29, 9, 8, 7, X}},   //
+                  {{X, X, X, X, X, X}},
+                  {{X, X, X, X, X, X}},
+                }};
               return cell_quads_wedge;
             }
 
