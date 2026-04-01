@@ -5977,7 +5977,7 @@ inline DEAL_II_ALWAYS_INLINE
       const VectorizedArrayType *gradients =
         this->gradients_quad + q_point * dim;
       if constexpr (dim == 2)
-        curl = curl_type({gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1]});
+        curl = gradients[1 * nqp_d + 0] - gradients[0 * nqp_d + 1];
       else if constexpr (dim == 3)
         {
           curl[0] = gradients[2 * nqp_d + 1] - gradients[1 * nqp_d + 2];
@@ -6047,7 +6047,7 @@ inline DEAL_II_ALWAYS_INLINE
   const Tensor<2, dim, VectorizedArrayType> grad = get_gradient(q_point);
   curl_type                                 curl;
   if constexpr (dim == 2)
-    curl = curl_type({grad[1][0] - grad[0][1]});
+    curl = grad[1][0] - grad[0][1];
   else if constexpr (dim == 3)
     {
       curl[0] = grad[2][1] - grad[1][2];
@@ -6302,7 +6302,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
           if constexpr (dim == 2)
             {
-              curl_temp[0] = curl[0] * weight;
+              curl_temp = curl * weight;
             }
           else if constexpr (dim == 3)
             {
@@ -6340,7 +6340,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
           if constexpr (dim == 2)
             {
-              curl_temp[0] = curl[0] * fac;
+              curl_temp = curl * fac;
             }
           else if constexpr (dim == 3)
             {
@@ -6386,23 +6386,23 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       return;
     }
 
-  switch (dim)
+  if constexpr (dim == 2)
     {
-      case 2:
-        grad[1][0] = curl[0];
-        grad[0][1] = -curl[0];
-        break;
-      case 3:
-        grad[2][1] = curl[0];
-        grad[1][2] = -curl[0];
-        grad[0][2] = curl[1];
-        grad[2][0] = -curl[1];
-        grad[1][0] = curl[2];
-        grad[0][1] = -curl[2];
-        break;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      grad[1][0] = curl;
+      grad[0][1] = -curl;
     }
+  else if constexpr (dim == 3)
+    {
+      grad[2][1] = curl[0];
+      grad[1][2] = -curl[0];
+      grad[0][2] = curl[1];
+      grad[2][0] = -curl[1];
+      grad[1][0] = curl[2];
+      grad[0][1] = -curl[2];
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+
   submit_gradient(grad, q_point);
 }
 

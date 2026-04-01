@@ -370,10 +370,10 @@ MaxwellProblem<dim>::assemble_system()
                       value_j[2] =
                         fe_values.shape_value_component(j, q_point, 2);
                     }
-                  cell_matrix(i, j) += (fe_views.curl(i, q_point)[0] *
-                                          fe_views.curl(j, q_point)[0] +
-                                        dotprod(value_i, value_j)) *
-                                       fe_values.JxW(q_point);
+                  cell_matrix(i, j) +=
+                    (fe_views.curl(i, q_point) * fe_views.curl(j, q_point) +
+                     dotprod(value_i, value_j)) *
+                    fe_values.JxW(q_point);
                 }
               cell_rhs(i) +=
                 dotprod(value_i, rhs_values[q_point]) * fe_values.JxW(q_point);

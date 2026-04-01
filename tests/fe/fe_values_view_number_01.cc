@@ -24,11 +24,9 @@ template <typename Number>
 void
 test()
 {
-  if (typeid(typename internal::CurlType<1, Number>::type) !=
-      typeid(Tensor<1, 1, Number>))
+  if (typeid(typename internal::CurlType<1, Number>::type) != typeid(Number))
     deallog << "NOT OK!" << std::endl;
-  if (typeid(typename internal::CurlType<2, Number>::type) !=
-      typeid(Tensor<1, 1, Number>))
+  if (typeid(typename internal::CurlType<2, Number>::type) != typeid(Number))
     deallog << "NOT OK!" << std::endl;
   if (typeid(typename internal::CurlType<3, Number>::type) !=
       typeid(Tensor<1, 3, Number>))
