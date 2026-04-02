@@ -15987,76 +15987,11 @@ unsigned int Triangulation<dim, spacedim>::n_active_lines(
 
   return number_cache.n_active_lines_level[level];
 }
-#endif
-
-template <>
-unsigned int
-Triangulation<1, 1>::n_quads() const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 1>::n_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 1>::n_raw_quads(const unsigned int) const
-{
-  return 0;
-}
 
 
 template <>
 unsigned int
 Triangulation<1, 1>::n_raw_hexs(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 1>::n_active_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 1>::n_active_quads() const
-{
-  return 0;
-}
-
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_quads() const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_raw_quads(const unsigned int) const
 {
   return 0;
 }
@@ -16072,74 +16007,21 @@ Triangulation<1, 2>::n_raw_hexs(const unsigned int) const
 
 template <>
 unsigned int
-Triangulation<1, 2>::n_active_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_active_quads() const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_quads() const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
 Triangulation<1, 3>::n_raw_hexs(const unsigned int) const
 {
   return 0;
 }
 
 
-template <>
-unsigned int
-Triangulation<1, 3>::n_active_quads(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_active_quads() const
-{
-  return 0;
-}
-
-#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_quads() const
 {
-  return number_cache.n_quads;
+  if constexpr (dim == 1)
+    return 0;
+  else
+    return number_cache.n_quads;
 }
 
 
@@ -16148,67 +16030,75 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_quads(
   const unsigned int level) const
 {
-  Assert(dim == 2, ExcFacesHaveNoLevel());
-  AssertIndexRange(level, number_cache.n_quads_level.size());
-  return number_cache.n_quads_level[level];
-}
+  (void)level;
+  if constexpr (dim == 1)
+    return 0;
+  else if constexpr (dim == 2)
+    {
+      AssertIndexRange(level, number_cache.n_quads_level.size());
+      return number_cache.n_quads_level[level];
+    }
+  else if constexpr (dim == 3)
+    Assert(dim < 3, ExcFacesHaveNoLevel());
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
-#endif
-
-template <>
-unsigned int
-Triangulation<2, 2>::n_raw_quads(const unsigned int level) const
-{
-  AssertIndexRange(level, n_levels());
-  return levels[level]->cells.n_objects();
-}
-
-
-
-template <>
-unsigned int
-Triangulation<2, 3>::n_raw_quads(const unsigned int level) const
-{
-  AssertIndexRange(level, n_levels());
-  return levels[level]->cells.n_objects();
+  return numbers::invalid_unsigned_int;
 }
 
 
-template <>
-unsigned int
-Triangulation<3, 3>::n_raw_quads(const unsigned int) const
-{
-  Assert(false, ExcFacesHaveNoLevel());
-  return 0;
-}
-
-#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_raw_quads() const
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  return 0;
+  if constexpr (dim == 1)
+    return 0;
+  else if constexpr (dim == 2)
+    DEAL_II_NOT_IMPLEMENTED();
+  else if constexpr (dim == 3)
+    return faces->quads.n_objects();
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+
+  return numbers::invalid_unsigned_int;
 }
 
-#endif
 
-template <>
-unsigned int
-Triangulation<3, 3>::n_raw_quads() const
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_quads(
+  const unsigned int level) const
 {
-  return faces->quads.n_objects();
+  (void)level;
+  if constexpr (dim == 1)
+    return 0;
+  else if constexpr (dim == 2)
+    {
+      AssertIndexRange(level, n_levels());
+      return levels[level]->cells.n_objects();
+    }
+  else if constexpr (dim == 3)
+    Assert(dim < 3, ExcFacesHaveNoLevel());
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+
+  return numbers::invalid_unsigned_int;
 }
 
-#ifndef DOXYGEN
+
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_active_quads() const
 {
-  return number_cache.n_active_quads;
+  if constexpr (dim == 1)
+    return 0;
+  else
+    return number_cache.n_active_quads;
 }
+
 
 
 template <int dim, int spacedim>
@@ -16216,11 +16106,22 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_active_quads(
   const unsigned int level) const
 {
-  AssertIndexRange(level, number_cache.n_quads_level.size());
-  Assert(dim == 2, ExcFacesHaveNoLevel());
+  (void)level;
+  if constexpr (dim == 1)
+    return 0;
+  else if constexpr (dim == 2)
+    {
+      AssertIndexRange(level, number_cache.n_quads_level.size());
+      return number_cache.n_active_quads_level[level];
+    }
+  else if constexpr (dim == 3)
+    Assert(dim < 3, ExcFacesHaveNoLevel());
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
-  return number_cache.n_active_quads_level[level];
+  return numbers::invalid_unsigned_int;
 }
+
 
 
 template <int dim, int spacedim>
@@ -16229,7 +16130,6 @@ unsigned int Triangulation<dim, spacedim>::n_hexs() const
 {
   return 0;
 }
-
 
 
 template <int dim, int spacedim>
