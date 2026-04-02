@@ -1065,7 +1065,7 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::locally_owned_size() const
     {
-      return vector->getLocalLength();
+      return local_entries.n_elements();
     }
 
 

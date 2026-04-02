@@ -34,9 +34,8 @@ check_serial()
 {
   const auto dofs_per_proc = 4;
   VEC        vec(dofs_per_proc);
-  deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
-  deallog << "local size: " << vec.locally_owned_size() << std::endl;
-  deallog << "size: " << vec.size() << std::endl;
+  AssertDimension(vec.locally_owned_size(), dofs_per_proc);
+  AssertDimension(vec.size(), dofs_per_proc);
 }
 
 
@@ -58,10 +57,8 @@ check_unghosted_parallel()
   local_indices.compress();
 
   VEC vec(local_indices, MPI_COMM_WORLD);
-  deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
-  deallog << "index set size: " << local_indices.n_elements() << std::endl;
-  deallog << "local size: " << vec.locally_owned_size() << std::endl;
-  deallog << "size: " << vec.size() << std::endl;
+  AssertDimension(vec.locally_owned_size(), dofs_per_proc);
+  AssertDimension(vec.size(), n_dofs);
 }
 
 
@@ -93,10 +90,8 @@ check_ghosted_parallel()
     }
 
   VEC vec(local_indices, ghost_indices, MPI_COMM_WORLD);
-  deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
-  deallog << "index set size: " << local_indices.n_elements() << std::endl;
-  deallog << "local size: " << vec.locally_owned_size() << std::endl;
-  deallog << "size: " << vec.size() << std::endl;
+  AssertDimension(vec.locally_owned_size(), dofs_per_proc);
+  AssertDimension(vec.size(), n_dofs);
 }
 
 
@@ -129,12 +124,11 @@ check_ghosted_parallel_block()
 
   std::vector<IndexSet> local_blocks{local_indices, local_indices};
   // for variety do not ghost the second component
-  std::vector<IndexSet> ghost_blocks{ghost_indices, IndexSet()};
+  std::vector<IndexSet> ghost_blocks{ghost_indices, IndexSet(n_dofs)};
 
   VEC vec(local_blocks, ghost_blocks, MPI_COMM_WORLD);
-  deallog << "type: " << Utilities::type_to_string(vec) << std::endl;
-  deallog << "local size: " << vec.locally_owned_size() << std::endl;
-  deallog << "size: " << vec.size() << std::endl;
+  AssertDimension(vec.locally_owned_size(), dofs_per_proc * 2);
+  AssertDimension(vec.size(), n_dofs * 2);
 }
 
 
@@ -148,16 +142,29 @@ main(int argc, char *argv[])
   // non-block vectors:
   check_serial<Vector<double>>();
 
+#ifdef DEAL_TRILINOS_WITH_EPETRA
   check_unghosted_parallel<LinearAlgebra::EpetraWrappers::Vector>();
+#endif
+#ifdef DEAL_TRILINOS_WITH_TPETRA
   check_unghosted_parallel<LinearAlgebra::TpetraWrappers::Vector<double>>();
+#endif
 
   check_ghosted_parallel<LinearAlgebra::distributed::Vector<double>>();
+#ifdef DEAL_II_WITH_PETSC
   check_ghosted_parallel<PETScWrappers::MPI::Vector>();
+#endif
+#ifdef DEAL_II_WITH_TRILINOS
   check_ghosted_parallel<TrilinosWrappers::MPI::Vector>();
+#endif
 
   // block vectors:
   check_ghosted_parallel_block<
     LinearAlgebra::distributed::BlockVector<double>>();
+#ifdef DEAL_II_WITH_PETSC
   check_ghosted_parallel_block<PETScWrappers::MPI::BlockVector>();
+#endif
+#ifdef DEAL_II_WITH_TRILINOS
   check_ghosted_parallel_block<TrilinosWrappers::MPI::BlockVector>();
+#endif
+  deallog << "OK" << std::endl;
 }
