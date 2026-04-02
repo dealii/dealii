@@ -16020,30 +16020,6 @@ unsigned int Triangulation<dim, spacedim>::n_active_lines(
 }
 
 
-template <>
-unsigned int
-Triangulation<1, 1>::n_raw_hexs(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_raw_hexs(const unsigned int) const
-{
-  return 0;
-}
-
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_hexs(const unsigned int) const
-{
-  return 0;
-}
-
-
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
@@ -16054,6 +16030,7 @@ unsigned int Triangulation<dim, spacedim>::n_quads() const
   else
     return number_cache.n_quads;
 }
+
 
 
 template <int dim, int spacedim>
@@ -16159,24 +16136,44 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_hexs() const
 {
-  return 0;
-}
-
-
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-unsigned int Triangulation<dim, spacedim>::n_hexs(const unsigned int) const
-{
-  return 0;
+  if constexpr (dim == 3)
+    return number_cache.n_hexes;
+  else
+    return 0;
 }
 
 
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-unsigned int Triangulation<dim, spacedim>::n_raw_hexs(const unsigned int) const
+unsigned int Triangulation<dim, spacedim>::n_hexs(
+  const unsigned int level) const
 {
-  return 0;
+  (void)level;
+  if constexpr (dim == 3)
+    {
+      AssertIndexRange(level, number_cache.n_hexes_level.size());
+      return number_cache.n_hexes_level[level];
+    }
+  else
+    return 0;
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_raw_hexs(
+  const unsigned int level) const
+{
+  (void)level;
+  if constexpr (dim == 3)
+    {
+      AssertIndexRange(level, n_levels());
+      return levels[level]->cells.n_objects();
+    }
+  else
+    return 0;
 }
 
 
@@ -16184,7 +16181,10 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_active_hexs() const
 {
-  return 0;
+  if constexpr (dim == 3)
+    return number_cache.n_active_hexes;
+  else
+    return 0;
 }
 
 
@@ -16192,61 +16192,19 @@ unsigned int Triangulation<dim, spacedim>::n_active_hexs() const
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 unsigned int Triangulation<dim, spacedim>::n_active_hexs(
-  const unsigned int) const
+  const unsigned int level) const
 {
-  return 0;
-}
-
-#endif
-
-template <>
-unsigned int
-Triangulation<3, 3>::n_hexs() const
-{
-  return number_cache.n_hexes;
-}
-
-
-
-template <>
-unsigned int
-Triangulation<3, 3>::n_hexs(const unsigned int level) const
-{
-  AssertIndexRange(level, number_cache.n_hexes_level.size());
-
-  return number_cache.n_hexes_level[level];
+  (void)level;
+  if constexpr (dim == 3)
+    {
+      AssertIndexRange(level, number_cache.n_hexes_level.size());
+      return number_cache.n_active_hexes_level[level];
+    }
+  else
+    return 0;
 }
 
 
-
-template <>
-unsigned int
-Triangulation<3, 3>::n_raw_hexs(const unsigned int level) const
-{
-  AssertIndexRange(level, n_levels());
-  return levels[level]->cells.n_objects();
-}
-
-
-template <>
-unsigned int
-Triangulation<3, 3>::n_active_hexs() const
-{
-  return number_cache.n_active_hexes;
-}
-
-
-
-template <>
-unsigned int
-Triangulation<3, 3>::n_active_hexs(const unsigned int level) const
-{
-  AssertIndexRange(level, number_cache.n_hexes_level.size());
-
-  return number_cache.n_active_hexes_level[level];
-}
-
-#ifndef DOXYGEN
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
