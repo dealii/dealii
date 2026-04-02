@@ -52,6 +52,7 @@
 
 #  include <exception>
 #  include <memory>
+#  include <string>
 
 #endif // DEAL_II_WITH_SUNDIALS
 
@@ -408,7 +409,9 @@ namespace SUNDIALS
        * Initialization parameters for ARKStepper.
        *
        * @param order Desired order of accuracy for the time integration.
-       *   If set to 0 the default order for the chosen method is used.
+       *   If set to 0 the default order for the chosen method is used. This
+       *   parameter is mutually exclusive with @p implicit_butcher_table and
+       *   @p explicit_butcher_table.
        * @param maximum_non_linear_iterations Maximum number of nonlinear
        *   iterations
        * @param implicit_function_is_linear Specifies that the implicit portion
@@ -419,6 +422,14 @@ namespace SUNDIALS
        *   independent of time
        * @param anderson_acceleration_subspace The number of vectors to use for
        *   Anderson acceleration within the packaged SUNDIALS solver.
+       * @param implicit_butcher_table Name of the implicit (DIRK) Butcher
+       *   table. An empty string means no implicit table is selected, which
+       *   is equivalent to passing `"ARKODE_DIRK_NONE"` to SUNDIALS. This
+       *   parameter is mutually exclusive with @p order.
+       * @param explicit_butcher_table Name of the explicit (ERK) Butcher
+       *   table. An empty string means no explicit table is selected, which
+       *   is equivalent to passing `"ARKODE_ERK_NONE"` to SUNDIALS. This
+       *   parameter is mutually exclusive with @p order.
        */
       explicit AdditionalData(
         const unsigned int order                                 = 0,
@@ -426,7 +437,9 @@ namespace SUNDIALS
         const bool         implicit_function_is_linear           = false,
         const bool         implicit_function_is_time_independent = false,
         const bool         mass_is_time_independent              = false,
-        const int          anderson_acceleration_subspace        = 3);
+        const int          anderson_acceleration_subspace        = 3,
+        const std::string &implicit_butcher_table                = "",
+        const std::string &explicit_butcher_table                = "");
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
@@ -448,6 +461,10 @@ namespace SUNDIALS
       /**
        * Desired order of accuracy for the time integration. If set to 0
        * the default order for the chosen method is used.
+       *
+       * This option is mutually exclusive with implicit_butcher_table and
+       * explicit_butcher_table: either the order is specified, or specific
+       * Butcher tables are chosen, but not both.
        */
       unsigned int order;
 
@@ -479,6 +496,28 @@ namespace SUNDIALS
        * meaningful if the packaged SUNDIALS fixed-point solver is used.
        */
       int anderson_acceleration_subspace;
+
+      /**
+       * Name of the implicit (DIRK) Butcher table to use. An empty string
+       * leaves the implicit table unset, equivalent to passing
+       * `"ARKODE_DIRK_NONE"` to SUNDIALS (i.e., no implicit component).
+       *
+       * Must be a name recognised by ARKStep (e.g.,
+       * `"ARKODE_SDIRK_2_1_2"`, `"ARKODE_ARK324L2SA_DIRK_4_2_3"`). This
+       * option is mutually exclusive with order.
+       */
+      std::string implicit_butcher_table;
+
+      /**
+       * Name of the explicit (ERK) Butcher table to use. An empty string
+       * leaves the explicit table unset, equivalent to passing
+       * `"ARKODE_ERK_NONE"` to SUNDIALS (i.e., no explicit component).
+       *
+       * Must be a name recognised by ARKStep (e.g.,
+       * `"ARKODE_BOGACKI_SHAMPINE_4_2_3"`, `"ARKODE_FEHLBERG_13_7_8"`). This
+       * option is mutually exclusive with order.
+       */
+      std::string explicit_butcher_table;
     };
 
     /**
@@ -968,7 +1007,9 @@ namespace SUNDIALS
     const bool         implicit_function_is_linear,
     const bool         implicit_function_is_time_independent,
     const bool         mass_is_time_independent,
-    const int          anderson_acceleration_subspace)
+    const int          anderson_acceleration_subspace,
+    const std::string &implicit_butcher_table,
+    const std::string &explicit_butcher_table)
     : order(order)
     , maximum_non_linear_iterations(maximum_non_linear_iterations)
     , implicit_function_is_linear(implicit_function_is_linear)
@@ -976,6 +1017,8 @@ namespace SUNDIALS
         implicit_function_is_time_independent)
     , mass_is_time_independent(mass_is_time_independent)
     , anderson_acceleration_subspace(anderson_acceleration_subspace)
+    , implicit_butcher_table(implicit_butcher_table)
+    , explicit_butcher_table(explicit_butcher_table)
   {}
 
 
@@ -994,6 +1037,8 @@ namespace SUNDIALS
     prm.add_parameter("Mass is time independent", mass_is_time_independent);
     prm.add_parameter("Anderson-acceleration subspace",
                       anderson_acceleration_subspace);
+    prm.add_parameter("Implicit Butcher table", implicit_butcher_table);
+    prm.add_parameter("Explicit Butcher table", explicit_butcher_table);
   }
 
 } // namespace SUNDIALS
