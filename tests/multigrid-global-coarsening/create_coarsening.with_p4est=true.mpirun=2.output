@@ -1,0 +1,13 @@
+
+DEAL::Test in 2d
+DEAL::Active cells in level triangulation: 1
+DEAL::Active cells in level triangulation: 4
+DEAL::Active cells in level triangulation: 16
+DEAL::Active cells in level triangulation: 64
+DEAL::
+DEAL::Test in 3d
+DEAL::Active cells in level triangulation: 1
+DEAL::Active cells in level triangulation: 8
+DEAL::Active cells in level triangulation: 64
+DEAL::Active cells in level triangulation: 512
+DEAL::
