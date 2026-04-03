@@ -4856,45 +4856,10 @@ inline types::coarse_cell_id
 
 template <>
 unsigned int
-Triangulation<1, 1>::n_raw_hexs(const unsigned int level) const;
-template <>
-unsigned int
-Triangulation<3, 3>::n_raw_hexs(const unsigned int level) const;
-template <>
-unsigned int
-Triangulation<3, 3>::n_hexs() const;
-template <>
-unsigned int
-Triangulation<3, 3>::n_active_hexs() const;
-template <>
-unsigned int
-Triangulation<3, 3>::n_active_hexs(const unsigned int) const;
-template <>
-unsigned int
-Triangulation<3, 3>::n_hexs(const unsigned int level) const;
-
-template <>
-unsigned int
 Triangulation<1, 1>::max_adjacent_cells() const;
-
-
-// -------------------------------------------------------------------
-// -- Explicit specializations for codimension one grids
-
-
-template <>
-unsigned int
-Triangulation<1, 2>::n_raw_hexs(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 2>::max_adjacent_cells() const;
-
-// -------------------------------------------------------------------
-// -- Explicit specializations for codimension two grids
-
-template <>
-unsigned int
-Triangulation<1, 3>::n_raw_hexs(const unsigned int level) const;
 template <>
 unsigned int
 Triangulation<1, 3>::max_adjacent_cells() const;
