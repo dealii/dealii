@@ -615,6 +615,28 @@ namespace SUNDIALS
     int status   = ERKStepSetUserData(arkode_mem, &callback_ctx);
     AssertARKode(status);
 
+    AssertThrow(
+      data.order == 0 || data.explicit_butcher_table.empty(),
+      ExcMessage(
+        "Either the order of accuracy or the Butcher table name may be "
+        "specified, but not both."));
+
+    if (data.order != 0)
+      {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 1, 0)
+        status = ARKodeSetOrder(arkode_mem, data.order);
+#  else
+        status = ERKStepSetOrder(arkode_mem, data.order);
+#  endif
+        AssertARKode(status);
+      }
+    else if (!data.explicit_butcher_table.empty())
+      {
+        status =
+          ERKStepSetTableName(arkode_mem, data.explicit_butcher_table.c_str());
+        AssertARKode(status);
+      }
+
     if (custom_setup)
       custom_setup(arkode_mem);
   }

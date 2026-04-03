@@ -1157,27 +1157,62 @@ namespace SUNDIALS
      *
      * ERKStep uses purely explicit Runge-Kutta methods and therefore does not
      * require any parameters related to implicit solvers, nonlinear iterations,
-     * or mass matrices. This class exists for consistency with ARKStepper and
-     * to allow future extensions.
+     * or mass matrices.
      */
     class AdditionalData
     {
     public:
       /**
-       * Default constructor.
+       * Initialization parameters for ERKStepper.
+       *
+       * @param order Desired order of accuracy for the time integration.
+       *   If set to 0 the default order for the chosen method is used. This
+       *   parameter is mutually exclusive with @p explicit_butcher_table.
+       * @param explicit_butcher_table Name of the explicit (ERK) Butcher
+       *   table. An empty string leaves the table unset (SUNDIALS default).
+       *   Must be a name recognised by ERKStep (e.g.,
+       *   `"ARKODE_BOGACKI_SHAMPINE_4_2_3"`, `"ARKODE_FEHLBERG_13_7_8"`).
+       *   This parameter is mutually exclusive with @p order.
        */
-      AdditionalData() = default;
+      AdditionalData(const unsigned int order                  = 0,
+                     const std::string &explicit_butcher_table = "");
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
        * object. When the parameters are parsed from a file, the internal
        * parameters are automatically updated.
        *
-       * This function currently does nothing since ERKStepper has no
-       * configurable parameters.
+       * The options you pass at construction time are set as default values in
+       * the ParameterHandler object `prm`. You can later modify them by parsing
+       * a parameter file using `prm`. The values of the parameter will be
+       * updated whenever the content of `prm` is updated.
+       *
+       * Make sure that this class lives longer than `prm`. Undefined behavior
+       * will occur if you destroy this class, and then parse a parameter file
+       * using `prm`.
        */
       void
       add_parameters(ParameterHandler &prm);
+
+      /**
+       * Desired order of accuracy for the time integration. If set to 0
+       * the default order for the chosen method is used.
+       *
+       * This option is mutually exclusive with explicit_butcher_table: either
+       * the order is specified, or a specific Butcher table is chosen, but
+       * not both.
+       */
+      unsigned int order;
+
+      /**
+       * Name of the explicit (ERK) Butcher table to use. An empty string
+       * leaves the table unset (SUNDIALS default).
+       *
+       * Must be a name recognised by ERKStep (e.g.,
+       * `"ARKODE_BOGACKI_SHAMPINE_4_2_3"`, `"ARKODE_FEHLBERG_13_7_8"`). This
+       * option is mutually exclusive with order.
+       */
+      std::string explicit_butcher_table;
     };
 
     /**
@@ -1276,10 +1311,21 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
+  ERKStepper<VectorType>::AdditionalData::AdditionalData(
+    const unsigned int order,
+    const std::string &explicit_butcher_table)
+    : order(order)
+    , explicit_butcher_table(explicit_butcher_table)
+  {}
+
+
+
+  template <typename VectorType>
   void
   ERKStepper<VectorType>::AdditionalData::add_parameters(ParameterHandler &prm)
   {
-    (void)prm;
+    prm.add_parameter("Integration accuracy order", order);
+    prm.add_parameter("Explicit Butcher table", explicit_butcher_table);
   }
 
 } // namespace SUNDIALS
