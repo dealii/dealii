@@ -20,6 +20,7 @@
 #include <deal.II/base/function.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
 #include <deal.II/numerics/matrix_creator.h>
 
@@ -76,19 +77,6 @@ namespace PETScWrappers
     class BlockVector;
   } // namespace MPI
 } // namespace PETScWrappers
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
-namespace TrilinosWrappers
-{
-  class SparseMatrix;
-  class BlockSparseMatrix;
-  namespace MPI
-  {
-    class Vector;
-    class BlockVector;
-  } // namespace MPI
-} // namespace TrilinosWrappers
 #  endif
 #endif
 

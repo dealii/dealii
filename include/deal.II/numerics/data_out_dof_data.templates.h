@@ -825,6 +825,20 @@ namespace internal
       {};
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+      template <typename Scalar, typename MemorySpace>
+      struct is_trilinos_vector<
+        LinearAlgebra::TpetraWrappers::Vector<Scalar, MemorySpace>>
+        : std::true_type
+      {};
+
+      template <typename Scalar, typename MemorySpace>
+      struct is_trilinos_vector<
+        LinearAlgebra::TpetraWrappers::BlockVector<Scalar, MemorySpace>>
+        : std::true_type
+      {};
+#endif
+
       template <class T>
       inline constexpr bool is_trilinos_vector_v =
         is_trilinos_vector<std::decay_t<T>>::value;

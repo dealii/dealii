@@ -75,16 +75,6 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 #  endif
 
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-} // namespace TrilinosWrappers
-#  endif
-
 #endif
 
 namespace LinearAlgebra

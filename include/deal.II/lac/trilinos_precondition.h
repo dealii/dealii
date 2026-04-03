@@ -16,7 +16,18 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifndef DEAL_II_TRILINOS_WITH_EPETRA
+
+#  include <deal.II/lac/trilinos_tpetra_precondition.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+
+#else
 
 #  include <deal.II/base/enable_observer_pointer.h>
 
@@ -2187,14 +2198,5 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
-#endif // DEAL_II_WITH_TRILINOS
-
+#endif
 #endif

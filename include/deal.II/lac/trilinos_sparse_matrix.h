@@ -16,7 +16,16 @@
 
 #  include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#  ifndef DEAL_II_TRILINOS_WITH_EPETRA
+#    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
+
+// Make sure the scripts that create the C++20 module input files have
+// something to latch on if the preprocessor #ifdef above would
+// otherwise lead to an empty content of the file.
+DEAL_II_NAMESPACE_OPEN
+DEAL_II_NAMESPACE_CLOSE
+#  else
 
 #    include <deal.II/base/enable_observer_pointer.h>
 #    include <deal.II/base/index_set.h>
@@ -26,7 +35,6 @@
 #    include <deal.II/lac/full_matrix.h>
 #    include <deal.II/lac/trilinos_epetra_vector.h>
 #    include <deal.II/lac/trilinos_index_access.h>
-#    include <deal.II/lac/trilinos_tpetra_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/vector_operation.h>
@@ -3322,18 +3330,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 DEAL_II_NAMESPACE_CLOSE
 
 
-#  else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #  endif // DEAL_II_WITH_TRILINOS
-
-
-/*-----------------------   trilinos_sparse_matrix.h     --------------------*/
 
 #endif
 /*-----------------------   trilinos_sparse_matrix.h     --------------------*/

@@ -25,6 +25,7 @@
 #include <deal.II/base/partitioner.h>
 
 #include <deal.II/lac/read_vector.h>
+#include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
@@ -65,16 +66,6 @@ namespace PETScWrappers
     class Vector;
   }
 } // namespace PETScWrappers
-#  endif
-
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
-namespace TrilinosWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-} // namespace TrilinosWrappers
 #  endif
 #endif
 
