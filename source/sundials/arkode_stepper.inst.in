@@ -16,12 +16,14 @@
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<V<S>>;
+    template class SUNDIALS::ERKStepper<V<S>>;
   }
 
 // parallel Vector and BlockVector
 for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<LinearAlgebra::distributed::V<S>>;
+    template class SUNDIALS::ERKStepper<LinearAlgebra::distributed::V<S>>;
   }
 
 #if defined(DEAL_II_WITH_MPI) && defined(DEAL_II_WITH_TRILINOS)
@@ -29,6 +31,7 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
 for (V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<TrilinosWrappers::MPI::V>;
+    template class SUNDIALS::ERKStepper<TrilinosWrappers::MPI::V>;
   }
 #endif
 
@@ -38,6 +41,7 @@ for (V : DEAL_II_VEC_TEMPLATES)
 for (V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<PETScWrappers::MPI::V>;
+    template class SUNDIALS::ERKStepper<PETScWrappers::MPI::V>;
   }
 #  endif
 #endif

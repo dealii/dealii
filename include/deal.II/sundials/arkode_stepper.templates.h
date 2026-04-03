@@ -31,6 +31,7 @@
 #  include <deal.II/sundials/utilities.h>
 
 #  include <arkode/arkode_arkstep.h>
+#  include <arkode/arkode_erkstep.h>
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
 
@@ -539,6 +540,91 @@ namespace SUNDIALS
   ARKStepper<VectorType>::get_arkode_memory() const
   {
     return arkode_mem.get();
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // ERKStepper implementation
+  // ---------------------------------------------------------------------------
+
+  template <typename VectorType>
+  ERKStepper<VectorType>::ERKStepper(const AdditionalData &data)
+    : arkode_mem(nullptr)
+    , data(data)
+  {}
+
+
+  template <typename VectorType>
+  ERKStepper<VectorType>::~ERKStepper()
+  {
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    ERKStepFree(&arkode_mem);
+  }
+
+
+  template <typename VectorType>
+  void
+  ERKStepper<VectorType>::reinit(double                      t0,
+                                 const VectorType           &y0,
+                                 internal::InvocationContext inv_ctx)
+  {
+    if (arkode_mem)
+      ERKStepFree(&arkode_mem);
+
+    Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
+
+    auto explicit_function_callback = [](SUNDIALS::realtype tt,
+                                         N_Vector           yy,
+                                         N_Vector           yp,
+                                         void              *user_data) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      auto &callback_ctx =
+        *static_cast<ARKCallbackContext<ERKStepper<VectorType>> *>(user_data);
+
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
+
+      return Utilities::call_and_possibly_capture_exception(
+        callback_ctx.stepper->explicit_function,
+        *callback_ctx.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
+    };
+
+    auto initial_condition_nvector =
+      internal::make_nvector_view(y0
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                  ,
+                                  inv_ctx.arkode_ctx
+#  endif
+      );
+
+    arkode_mem = ERKStepCreate(explicit_function_callback,
+                               t0,
+                               initial_condition_nvector
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                               ,
+                               inv_ctx.arkode_ctx
+#  endif
+    );
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    callback_ctx = {this, &inv_ctx.pending_exception};
+    int status   = ERKStepSetUserData(arkode_mem, &callback_ctx);
+    AssertARKode(status);
+
+    if (custom_setup)
+      custom_setup(arkode_mem);
+  }
+
+
+  template <typename VectorType>
+  void *
+  ERKStepper<VectorType>::get_arkode_memory() const
+  {
+    return arkode_mem;
   }
 
 } // namespace SUNDIALS
