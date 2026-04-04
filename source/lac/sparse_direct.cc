@@ -1000,8 +1000,11 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
           id.a   = a.get();
         }
     }
-  else if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
-                     std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
+  else if constexpr (
+#  ifdef DEAL_II_WITH_TRILINOS
+    std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix> ||
+#  endif
+    std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
     {
       int result;
       MPI_Comm_compare(mpi_communicator,
@@ -1021,9 +1024,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
       locally_owned_rows        = matrix.locally_owned_range_indices();
       size_type local_non_zeros = 0;
 
+#  ifdef DEAL_II_WITH_TRILINOS
       if constexpr (std::is_same_v<Matrix, TrilinosWrappers::SparseMatrix>)
         {
-#  ifdef DEAL_II_WITH_TRILINOS
           const auto &trilinos_matrix = matrix.trilinos_matrix();
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
           local_non_zeros = trilinos_matrix.NumMyNonzeros();
@@ -1034,10 +1037,10 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
           local_non_zeros = trilinos_matrix.getNodeNumEntries();
 #      endif
 #    endif
-#  endif
         }
-      else if constexpr (std::is_same_v<Matrix,
-                                        PETScWrappers::MPI::SparseMatrix>)
+      else
+#  endif
+        if constexpr (std::is_same_v<Matrix, PETScWrappers::MPI::SparseMatrix>)
         {
 #  ifdef DEAL_II_WITH_PETSC
           Mat &petsc_matrix =
@@ -1099,27 +1102,30 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
               id.a_loc = a.get();
 #  endif
             }
+#  ifdef DEAL_II_WITH_TRILINOS
           else if constexpr (std::is_same_v<Matrix,
                                             TrilinosWrappers::SparseMatrix>)
             {
-#  ifdef DEAL_II_WITH_TRILINOS
               const auto &trilinos_matrix = matrix.trilinos_matrix();
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
-              const auto n_local_rows = trilinos_matrix.NumMyRows();
+              const unsigned int n_local_rows = trilinos_matrix.NumMyRows();
 #    else
 #      if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
-              const auto n_local_rows = trilinos_matrix.getLocalNumRows();
+              const unsigned int n_local_rows =
+                trilinos_matrix.getLocalNumRows();
 #      else
-              const auto n_local_rows = trilinos_matrix.getNodeNumRows();
+              const unsigned int n_local_rows =
+                trilinos_matrix.getNodeNumRows();
 #      endif
 #    endif
-              for (int local_row = 0; local_row < n_local_rows; ++local_row)
+              for (unsigned int local_row = 0; local_row < n_local_rows;
+                   ++local_row)
                 {
-                  int     num_entries;
+                  int num_entries;
+#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
                   double *values;
                   int    *local_cols;
-#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
-                  int ierr = trilinos_matrix.ExtractMyRowView(local_row,
+                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
                                                               num_entries,
                                                               values,
                                                               local_cols);
@@ -1132,15 +1138,15 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 
                   int global_row = trilinos_matrix.GRID(local_row);
 #    else
-                  Kokkos::View<int *, Kokkos::HostSpace>    indices_view;
-                  Kokkos::View<double *, Kokkos::HostSpace> values_view;
+                  typename std::decay_t<decltype(trilinos_matrix)>::
+                    local_inds_host_view_type local_cols;
+                  typename std::decay_t<
+                    decltype(trilinos_matrix)>::values_host_view_type values;
 
                   trilinos_matrix.getLocalRowView(local_row,
-                                                  indices_view,
-                                                  values_view);
-                  num_entries = indices_view.size();
-                  values      = values_view.data();
-                  local_cols  = indices_view.size();
+                                                  local_cols,
+                                                  values);
+                  num_entries = local_cols.size();
 
                   int global_row =
                     trilinos_matrix.getRowMap()->getGlobalElement(local_row);
@@ -1162,13 +1168,13 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
                           jcn[n_non_zero_local] =
                             trilinos_matrix.GCID(local_cols[j]) + 1;
-                          a[n_non_zero_local] = values[j];
 #    else
                           jcn[n_non_zero_local] =
                             trilinos_matrix.getColMap()->getGlobalElement(
                               local_cols[j]) +
                             1;
 #    endif
+                          a[n_non_zero_local] = values[j];
 
                           // Count local non-zeros
                           n_non_zero_local++;
@@ -1179,8 +1185,8 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                   irhs_loc[local_row] = global_row + 1;
                 }
               id.a_loc = a.get();
-#  endif
             }
+#  endif
           else
             {
               DEAL_II_NOT_IMPLEMENTED();
@@ -1226,27 +1232,30 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
               id.a_loc = a.get();
 #  endif
             }
+#  ifdef DEAL_II_WITH_TRILINOS
           else if constexpr (std::is_same_v<Matrix,
                                             TrilinosWrappers::SparseMatrix>)
             {
-#  ifdef DEAL_II_WITH_TRILINOS
               const auto &trilinos_matrix = matrix.trilinos_matrix();
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
-              const auto n_local_rows = trilinos_matrix.NumMyRows();
+              const unsigned int n_local_rows = trilinos_matrix.NumMyRows();
 #    else
 #      if DEAL_II_TRILINOS_VERSION_GTE(13, 4, 0)
-              const auto n_local_rows = trilinos_matrix.getLocalNumRows();
+              const unsigned int n_local_rows =
+                trilinos_matrix.getLocalNumRows();
 #      else
-              const auto n_local_rows = trilinos_matrix.getNodeNumRows();
+              const unsigned int n_local_rows =
+                trilinos_matrix.getNodeNumRows();
 #      endif
 #    endif
-              for (int local_row = 0; local_row < n_local_rows; ++local_row)
+              for (unsigned int local_row = 0; local_row < n_local_rows;
+                   ++local_row)
                 {
-                  int     num_entries;
+                  int num_entries;
+#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
                   double *values;
                   int    *local_cols;
-#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
-                  int ierr = trilinos_matrix.ExtractMyRowView(local_row,
+                  int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
                                                               num_entries,
                                                               values,
                                                               local_cols);
@@ -1257,15 +1266,15 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                       "Error extracting global row view from Trilinos matrix. Error code " +
                       std::to_string(ierr) + "."));
 #    else
-                  Kokkos::View<int *, Kokkos::HostSpace>    indices_view;
-                  Kokkos::View<double *, Kokkos::HostSpace> values_view;
+                  typename std::decay_t<decltype(trilinos_matrix)>::
+                    local_inds_host_view_type local_cols;
+                  typename std::decay_t<
+                    decltype(trilinos_matrix)>::values_host_view_type values;
 
                   trilinos_matrix.getLocalRowView(local_row,
-                                                  indices_view,
-                                                  values_view);
-                  num_entries = indices_view.size();
-                  values      = values_view.data();
-                  local_cols  = indices_view.size();
+                                                  local_cols,
+                                                  values);
+                  num_entries = local_cols.size();
 #    endif
 
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
@@ -1296,8 +1305,8 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                   irhs_loc[local_row] = global_row + 1;
                 }
               id.a_loc = a.get();
-#  endif
             }
+#  endif
           else
             {
               DEAL_II_NOT_IMPLEMENTED();
@@ -1400,25 +1409,27 @@ SparseDirectMUMPS::vmult(VectorType &dst, const VectorType &src) const
       dmumps_c(&id);
       copy_solution(dst);
     }
-  else if constexpr (std::is_same_v<VectorType,
-                                    TrilinosWrappers::MPI::Vector> ||
-                     std::is_same_v<VectorType, PETScWrappers::MPI::Vector> ||
-                     std::is_same_v<VectorType,
-                                    LinearAlgebra::distributed::Vector<double>>)
+  else if constexpr (
+#  ifdef DEAL_II_WITH_TRILINOS
+    std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector> ||
+#  endif
+    std::is_same_v<VectorType, PETScWrappers::MPI::Vector> ||
+    std::is_same_v<VectorType, LinearAlgebra::distributed::Vector<double>>)
     {
+#  ifdef DEAL_II_WITH_TRILINOS
       if constexpr (std::is_same_v<VectorType, TrilinosWrappers::MPI::Vector>)
         {
-#  ifdef DEAL_II_WITH_TRILINOS
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
           id.rhs_loc = const_cast<double *>(src.begin());
 #    else
           Assert(false, ExcNotImplemented());
 #    endif
-#  endif
         }
-      else if constexpr (std::is_same_v<
-                           VectorType,
-                           LinearAlgebra::distributed::Vector<double>>)
+      else
+#  endif
+        if constexpr (std::is_same_v<
+                        VectorType,
+                        LinearAlgebra::distributed::Vector<double>>)
         id.rhs_loc = const_cast<double *>(src.begin());
       else if constexpr (std::is_same_v<VectorType, PETScWrappers::MPI::Vector>)
         {
