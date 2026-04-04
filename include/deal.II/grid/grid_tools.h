@@ -3448,10 +3448,10 @@ namespace GridTools
                                            cell->index(),
                                            &mesh);
 
-              const std::optional<DataType> data = pack(mesh_it);
+              std::optional<DataType> data = pack(mesh_it);
               if (data)
                 {
-                  data_to_send.emplace_back(*data);
+                  data_to_send.emplace_back(std::move(*data));
                   cell_carries_data[c] = true;
                 }
             }
