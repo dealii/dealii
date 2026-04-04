@@ -3349,10 +3349,8 @@ namespace GridTools
         }
 
       // build list of cells to request for each neighbor
-      std::set<dealii::types::subdomain_id> ghost_owners =
-        compute_ghost_owners(*tria);
-      std::map<dealii::types::subdomain_id,
-               std::vector<typename CellId::binary_type>>
+      std::set<types::subdomain_id> ghost_owners = compute_ghost_owners(*tria);
+      std::map<types::subdomain_id, std::vector<CellId::binary_type>>
         neighbor_cell_list;
 
       for (const auto ghost_owner : ghost_owners)
@@ -3361,7 +3359,6 @@ namespace GridTools
       process_cells([&](const auto &cell, const auto key) -> void {
         if (cell_filter(cell))
           {
-            constexpr int spacedim = MeshType::space_dimension;
             neighbor_cell_list[key].emplace_back(
               cell->id().template to_binary<spacedim>());
           }
@@ -3420,11 +3417,9 @@ namespace GridTools
           Assert(len % sizeof(typename CellId::binary_type) == 0,
                  ExcInternalError());
 
-          const unsigned int n_cells =
-            len / sizeof(typename CellId::binary_type);
-          std::vector<typename CellId::binary_type> cells_with_requests(
-            n_cells);
-          std::vector<DataType> data_to_send;
+          const unsigned int n_cells = len / sizeof(CellId::binary_type);
+          std::vector<CellId::binary_type> cells_with_requests(n_cells);
+          std::vector<DataType>            data_to_send;
           data_to_send.reserve(n_cells);
           std::vector<bool> cell_carries_data(n_cells, false);
 
@@ -3438,7 +3433,7 @@ namespace GridTools
           AssertThrowMPI(ierr);
 
           // store data for each cell
-          for (unsigned int c = 0; c < static_cast<unsigned int>(n_cells); ++c)
+          for (unsigned int c = 0; c < n_cells; ++c)
             {
               const auto cell =
                 tria->create_cell_iterator(CellId(cells_with_requests[c]));
@@ -3535,7 +3530,7 @@ namespace GridTools
           // (c) check if the received data contained fewer entries than the
           // number of cells we identified in the beginning, in which case we
           // need to extract the boolean vector with the relevant information
-          const std::vector<typename CellId::binary_type> &this_cell_list =
+          const std::vector<CellId::binary_type> &this_cell_list =
             neighbor_cell_list[status.MPI_SOURCE];
           AssertIndexRange(received_data.size(), this_cell_list.size() + 1);
           std::vector<bool> cells_with_data;
