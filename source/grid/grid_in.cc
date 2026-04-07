@@ -4403,7 +4403,7 @@ namespace
   template <int dim, int spacedim = dim>
   std::pair<SubCellData, std::vector<std::vector<int>>>
   read_exodusii_sidesets(const int                         ex_id,
-                         const int                         n_side_sets,
+                         const int                         n_sidesets,
                          const std::vector<CellData<dim>> &cells,
                          const bool apply_all_indicators_to_manifolds)
   {
@@ -4416,10 +4416,10 @@ namespace
     //
     // Exodus prints warnings if we try to get empty sets so always check
     // first
-    if (dim == spacedim && n_side_sets > 0)
+    if (dim == spacedim && n_sidesets > 0)
       {
-        std::vector<int> side_set_ids(n_side_sets);
-        int ierr = ex_get_ids(ex_id, EX_SIDE_SET, side_set_ids.data());
+        std::vector<int> sideset_ids(n_sidesets);
+        int ierr = ex_get_ids(ex_id, EX_SIDE_SET, sideset_ids.data());
         AssertThrowExodusII(ierr);
 
         // First collect all side sets on all boundary faces (indexed here as
@@ -4427,15 +4427,15 @@ namespace
         // the side sets so that we can convert a set of side set indices into
         // a single deal.II boundary or manifold id (and save the
         // correspondence).
-        std::map<std::size_t, std::vector<int>> face_side_sets;
-        for (const int side_set_id : side_set_ids)
+        std::map<std::size_t, std::vector<int>> face_sidesets;
+        for (const int sideset_id : sideset_ids)
           {
             int n_sides                = -1;
             int n_distribution_factors = -1;
 
             ierr = ex_get_set_param(ex_id,
                                     EX_SIDE_SET,
-                                    side_set_id,
+                                    sideset_id,
                                     &n_sides,
                                     &n_distribution_factors);
             AssertThrowExodusII(ierr);
@@ -4445,7 +4445,7 @@ namespace
                 std::vector<int> faces(n_sides);
                 ierr = ex_get_set(ex_id,
                                   EX_SIDE_SET,
-                                  side_set_id,
+                                  sideset_id,
                                   elements.data(),
                                   faces.data());
                 AssertThrowExodusII(ierr);
@@ -4462,24 +4462,24 @@ namespace
                     const long        face_n    = faces[side_n] - 1;
                     const std::size_t face_id =
                       element_n * ReferenceCells::max_n_faces<dim>() + face_n;
-                    face_side_sets[face_id].push_back(side_set_id);
+                    face_sidesets[face_id].push_back(sideset_id);
                   }
               }
           }
 
         // Collect into a sortable data structure:
         std::vector<std::pair<std::size_t, std::vector<int>>>
-          face_id_to_side_sets;
-        face_id_to_side_sets.reserve(face_side_sets.size());
-        for (auto &pair : face_side_sets)
+          face_id_to_sidesets;
+        face_id_to_sidesets.reserve(face_sidesets.size());
+        for (auto &pair : face_sidesets)
           {
             Assert(pair.second.size() > 0, ExcInternalError());
-            face_id_to_side_sets.emplace_back(std::move(pair));
+            face_id_to_sidesets.emplace_back(std::move(pair));
           }
 
         // sort by side sets:
-        std::sort(face_id_to_side_sets.begin(),
-                  face_id_to_side_sets.end(),
+        std::sort(face_id_to_sidesets.begin(),
+                  face_id_to_sidesets.end(),
                   [](const auto &a, const auto &b) {
                     return std::lexicographical_compare(a.second.begin(),
                                                         a.second.end(),
@@ -4488,11 +4488,11 @@ namespace
                   });
 
         if (dim == 2)
-          subcelldata.boundary_lines.reserve(face_id_to_side_sets.size());
+          subcelldata.boundary_lines.reserve(face_id_to_sidesets.size());
         else if (dim == 3)
-          subcelldata.boundary_quads.reserve(face_id_to_side_sets.size());
+          subcelldata.boundary_quads.reserve(face_id_to_sidesets.size());
         types::boundary_id current_b_or_m_id = 0;
-        for (const auto &pair : face_id_to_side_sets)
+        for (const auto &pair : face_id_to_sidesets)
           {
             const std::size_t       face_id          = pair.first;
             const std::vector<int> &face_sideset_ids = pair.second;
@@ -4587,8 +4587,8 @@ GridIn<dim, spacedim>::read_exodusii(
   int               n_nodes          = 0;
   int               n_elements       = 0;
   int               n_element_blocks = 0;
-  int               n_node_sets      = 0;
-  int               n_side_sets      = 0;
+  int               n_nodesets       = 0;
+  int               n_sidesets       = 0;
 
   int ierr = ex_get_init(ex_id,
                          string_temp.data(),
@@ -4596,8 +4596,8 @@ GridIn<dim, spacedim>::read_exodusii(
                          &n_nodes,
                          &n_elements,
                          &n_element_blocks,
-                         &n_node_sets,
-                         &n_side_sets);
+                         &n_nodesets,
+                         &n_sidesets);
   AssertThrowExodusII(ierr);
   AssertDimension(mesh_dimension, spacedim);
 
@@ -4707,7 +4707,7 @@ GridIn<dim, spacedim>::read_exodusii(
 
   // Extract boundary data.
   auto pair = read_exodusii_sidesets<dim, spacedim>(
-    ex_id, n_side_sets, cells, apply_all_indicators_to_manifolds);
+    ex_id, n_sidesets, cells, apply_all_indicators_to_manifolds);
   ierr = ex_close(ex_id);
   AssertThrowExodusII(ierr);
 
