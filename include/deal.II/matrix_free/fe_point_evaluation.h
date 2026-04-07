@@ -2270,7 +2270,7 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::get_curl(
 
   const Tensor<2, dim, Number> grad = get_gradient(point_index);
   if constexpr (dim == 2)
-    return curl_type({grad[1][0] - grad[0][1]});
+    return grad[1][0] - grad[0][1];
   else if constexpr (dim == 3)
     {
       curl_type curl;
