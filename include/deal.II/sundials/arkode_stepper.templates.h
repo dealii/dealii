@@ -32,6 +32,9 @@
 
 #  include <arkode/arkode_arkstep.h>
 #  include <arkode/arkode_erkstep.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+#    include <arkode/arkode_lsrkstep.h>
+#  endif
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
 
@@ -653,6 +656,209 @@ namespace SUNDIALS
   {
     return arkode_mem.get();
   }
+
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+
+  // --------------------------------------------------------------------------
+  // LSRKStepperSTS
+  // --------------------------------------------------------------------------
+
+  template <typename VectorType>
+  LSRKStepperSTS<VectorType>::LSRKStepperSTS(const AdditionalData &data)
+    : data(data)
+    , arkode_mem(nullptr, [](void *mem) {
+      if (mem)
+        ARKodeFree(&mem);
+    })
+  {}
+
+
+  template <typename VectorType>
+  void
+  LSRKStepperSTS<VectorType>::reinit(double                      t0,
+                                     const VectorType           &y0,
+                                     internal::InvocationContext inv_ctx)
+  {
+    arkode_mem.reset();
+
+    Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
+    Assert(dominant_eigenvalue_function,
+           ExcFunctionNotProvided("dominant_eigenvalue_function"));
+
+    auto explicit_function_callback = [](SUNDIALS::realtype tt,
+                                         N_Vector           yy,
+                                         N_Vector           yp,
+                                         void              *user_data) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      auto &ctx    = *static_cast<CallbackContext *>(user_data);
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
+      return Utilities::call_and_possibly_capture_exception(
+        ctx.stepper->explicit_function,
+        *ctx.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
+    };
+
+    auto dom_eig_callback = [](SUNDIALS::realtype  tt,
+                               N_Vector            yy,
+                               N_Vector            fn,
+                               SUNDIALS::realtype *lambdaR,
+                               SUNDIALS::realtype *lambdaI,
+                               void               *user_data,
+                               N_Vector /*temp1*/,
+                               N_Vector /*temp2*/,
+                               N_Vector /*temp3*/) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      auto     &ctx    = *static_cast<CallbackContext *>(user_data);
+      auto     *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto     *src_fn = internal::unwrap_nvector_const<VectorType>(fn);
+      double    lR = 0.0, lI = 0.0;
+      const int ret = Utilities::call_and_possibly_capture_exception(
+        ctx.stepper->dominant_eigenvalue_function,
+        *ctx.pending_exception,
+        tt,
+        *src_yy,
+        *src_fn,
+        lR,
+        lI);
+      *lambdaR = static_cast<SUNDIALS::realtype>(lR);
+      *lambdaI = static_cast<SUNDIALS::realtype>(lI);
+      return ret;
+    };
+
+    auto initial_condition_nvector =
+      internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
+
+    arkode_mem.reset(LSRKStepCreateSTS(explicit_function_callback,
+                                       t0,
+                                       initial_condition_nvector,
+                                       inv_ctx.arkode_ctx));
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    callback_ctx = {this, &inv_ctx.pending_exception};
+    int status   = ARKodeSetUserData(arkode_mem.get(), &callback_ctx);
+    AssertARKode(status);
+
+    status = LSRKStepSetDomEigFn(arkode_mem.get(), dom_eig_callback);
+    AssertARKode(status);
+
+    if (data.dom_eig_frequency >= 0)
+      {
+        status =
+          LSRKStepSetDomEigFrequency(arkode_mem.get(), data.dom_eig_frequency);
+        AssertARKode(status);
+      }
+
+    if (data.max_num_stages > 0)
+      {
+        status = LSRKStepSetMaxNumStages(arkode_mem.get(),
+                                         static_cast<int>(data.max_num_stages));
+        AssertARKode(status);
+      }
+
+    if (!data.method_name.empty())
+      {
+        status = LSRKStepSetSTSMethodByName(arkode_mem.get(),
+                                            data.method_name.c_str());
+        AssertARKode(status);
+      }
+
+    if (custom_setup)
+      custom_setup(arkode_mem.get());
+  }
+
+
+  template <typename VectorType>
+  void *
+  LSRKStepperSTS<VectorType>::get_arkode_memory() const
+  {
+    return arkode_mem.get();
+  }
+
+
+  // --------------------------------------------------------------------------
+  // LSRKStepperSSP
+  // --------------------------------------------------------------------------
+
+  template <typename VectorType>
+  LSRKStepperSSP<VectorType>::LSRKStepperSSP(const AdditionalData &data)
+    : data(data)
+    , arkode_mem(nullptr, [](void *mem) {
+      if (mem)
+        ARKodeFree(&mem);
+    })
+  {}
+
+
+  template <typename VectorType>
+  void
+  LSRKStepperSSP<VectorType>::reinit(double                      t0,
+                                     const VectorType           &y0,
+                                     internal::InvocationContext inv_ctx)
+  {
+    arkode_mem.reset();
+
+    Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
+
+    auto explicit_function_callback = [](SUNDIALS::realtype tt,
+                                         N_Vector           yy,
+                                         N_Vector           yp,
+                                         void              *user_data) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      auto &ctx    = *static_cast<CallbackContext *>(user_data);
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
+      return Utilities::call_and_possibly_capture_exception(
+        ctx.stepper->explicit_function,
+        *ctx.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
+    };
+
+    auto initial_condition_nvector =
+      internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
+
+    arkode_mem.reset(LSRKStepCreateSSP(explicit_function_callback,
+                                       t0,
+                                       initial_condition_nvector,
+                                       inv_ctx.arkode_ctx));
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    callback_ctx = {this, &inv_ctx.pending_exception};
+    int status   = ARKodeSetUserData(arkode_mem.get(), &callback_ctx);
+    AssertARKode(status);
+
+    if (!data.method_name.empty())
+      {
+        status = LSRKStepSetSSPMethodByName(arkode_mem.get(),
+                                            data.method_name.c_str());
+        AssertARKode(status);
+      }
+
+    if (data.num_stages > 0)
+      {
+        status = LSRKStepSetNumSSPStages(arkode_mem.get(),
+                                         static_cast<int>(data.num_stages));
+        AssertARKode(status);
+      }
+
+    if (custom_setup)
+      custom_setup(arkode_mem.get());
+  }
+
+
+  template <typename VectorType>
+  void *
+  LSRKStepperSSP<VectorType>::get_arkode_memory() const
+  {
+    return arkode_mem.get();
+  }
+
+#  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 
 } // namespace SUNDIALS
 

@@ -31,6 +31,9 @@ module;
 #  include <arkode/arkode_arkstep.h>
 #  include <arkode/arkode_erkstep.h>
 #  include <arkode/arkode_ls.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+#    include <arkode/arkode_lsrkstep.h>
+#  endif
 #  include <ida/ida.h>
 #  include <idas/idas.h>
 #  include <idas/idas_ls.h>
@@ -73,7 +76,9 @@ export
   using ::ARKLsMassTimesSetupFn;
   using ::ARKLsPrecSetupFn;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
+  using ::ARKodeFree;
   using ::ARKodeSetOrder;
+  using ::ARKodeSetUserData;
 #  else
   using ::ARKStepSetOrder;
   using ::ERKStepSetOrder;
@@ -147,6 +152,16 @@ export
   using ::KINSetScaledStepTol;
   using ::KINSetUserData;
   using ::KINSol;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+  using ::LSRKStepCreateSSP;
+  using ::LSRKStepCreateSTS;
+  using ::LSRKStepSetDomEigFn;
+  using ::LSRKStepSetDomEigFrequency;
+  using ::LSRKStepSetMaxNumStages;
+  using ::LSRKStepSetNumSSPStages;
+  using ::LSRKStepSetSSPMethodByName;
+  using ::LSRKStepSetSTSMethodByName;
+#  endif
   using ::N_VCopyOps;
   using ::N_VDestroy;
   using ::N_Vector;
