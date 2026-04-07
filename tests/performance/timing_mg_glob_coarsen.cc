@@ -401,8 +401,8 @@ private:
   mg::SmootherRelaxation<SmootherType, VectorTypeMG> mg_smoother;
 
   MGLevelObject<std::unique_ptr<MGTwoLevelTransferBase<dim, VectorTypeMG>>>
-                                                                 mg_transfers;
-  std::unique_ptr<MGTransferGlobalCoarsening<dim, VectorTypeMG>> mg_transfer;
+                                                    mg_transfers;
+  std::unique_ptr<MGTransferMatrixFree<dim, float>> mg_transfer;
 };
 
 
@@ -635,7 +635,7 @@ LaplaceProblem<dim>::setup_transfer()
       mg_transfers[level] = std::move(transfer);
     }
 
-  mg_transfer = std::make_unique<MGTransferGlobalCoarsening<dim, VectorTypeMG>>(
+  mg_transfer = std::make_unique<MGTransferMatrixFree<dim, float>>(
     mg_transfers, [&](const unsigned level, VectorTypeMG &vec) {
       level_matrices[level].initialize_dof_vector(vec);
     });
@@ -693,9 +693,7 @@ LaplaceProblem<dim>::solve()
 
   Multigrid<VectorTypeMG> mg(
     mg_matrix, mg_coarse, *mg_transfer, mg_smoother, mg_smoother);
-  PreconditionMG<dim,
-                 VectorTypeMG,
-                 MGTransferGlobalCoarsening<dim, VectorTypeMG>>
+  PreconditionMG<dim, VectorTypeMG, MGTransferMatrixFree<dim, float>>
     preconditioner(dof_handlers.back(), mg, *mg_transfer);
 
   SolverControl control(20, 1e-10 * rhs.l2_norm());
