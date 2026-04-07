@@ -1061,14 +1061,14 @@ private:
  * implement a global-coarsening multigrid algorithm. The
  * sequence of functions calls for setup is:
  * @code
- * MGTransferGlobalCoarsening mg_transfer;
+ * MGTransferMatrixFree<dim, Number> mg_transfer;
  * mg_transfer.initialize_two_level_transfers(two_level_transfers);
  * mg_transfer.build(partitioners);
  * @endcode
  *
  * Alternatively, this class can also be set up with:
  * @code
- * MGTransferGlobalCoarsening mg_transfer;
+ * MGTransferMatrixFree<dim, Number> mg_transfer;
  * mg_transfer.initialize_constraints(mg_constrained_dofs);
  * mg_transfer.build(dof_handler, partitioners);
  * @endcode
