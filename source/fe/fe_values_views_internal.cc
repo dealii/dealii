@@ -468,190 +468,115 @@ namespace FEValuesViews
                   Number,
                   typename dealii::internal::CurlType<spacedim>::type>::type());
 
-      switch (spacedim)
+      if constexpr (spacedim == 1)
         {
-          case 1:
+          Assert(false,
+                 ExcMessage(
+                   "Computing the curl in 1d is not a useful operation"));
+        }
+      else if constexpr (spacedim == 2)
+        {
+          for (unsigned int shape_function = 0; shape_function < dofs_per_cell;
+               ++shape_function)
             {
-              Assert(false,
-                     ExcMessage(
-                       "Computing the curl in 1d is not a useful operation"));
-              break;
-            }
+              const int snc =
+                shape_function_data[shape_function].single_nonzero_component;
 
-          case 2:
-            {
-              for (unsigned int shape_function = 0;
-                   shape_function < dofs_per_cell;
-                   ++shape_function)
+              if (snc == -2)
+                // shape function is zero for the selected components
+                continue;
+
+              const Number &value = dof_values[shape_function];
+              // For auto-differentiable numbers, the fact that a DoF value
+              // is zero does not imply that its derivatives are zero as
+              // well. So we can't filter by value for these number types.
+              if (CheckForZero<Number>::value(value) == true)
+                continue;
+
+              if (snc != -1)
                 {
-                  const int snc = shape_function_data[shape_function]
-                                    .single_nonzero_component;
+                  const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
+                    &shape_gradients[snc][0];
 
-                  if (snc == -2)
-                    // shape function is zero for the selected components
-                    continue;
-
-                  const Number &value = dof_values[shape_function];
-                  // For auto-differentiable numbers, the fact that a DoF value
-                  // is zero does not imply that its derivatives are zero as
-                  // well. So we can't filter by value for these number types.
-                  if (CheckForZero<Number>::value(value) == true)
-                    continue;
-
-                  if (snc != -1)
+                  Assert(shape_function_data[shape_function]
+                             .single_nonzero_component >= 0,
+                         ExcInternalError());
+                  // we're in 2d, so the formula for the curl is simple:
+                  if (shape_function_data[shape_function]
+                        .single_nonzero_component_index == 0)
+                    for (unsigned int q_point = 0;
+                         q_point < n_quadrature_points;
+                         ++q_point)
+                      curls[q_point] -= value * (*shape_gradient_ptr++)[1];
+                  else
+                    for (unsigned int q_point = 0;
+                         q_point < n_quadrature_points;
+                         ++q_point)
+                      curls[q_point] += value * (*shape_gradient_ptr++)[0];
+                }
+              else
+                // we have multiple non-zero components in the shape
+                // functions. not all of them must necessarily be within the
+                // 2-component window this FEValuesViews::Vector object
+                // considers, however.
+                {
+                  if (shape_function_data[shape_function]
+                        .is_nonzero_shape_function_component[0])
                     {
                       const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
-                        &shape_gradients[snc][0];
+                        &shape_gradients[shape_function_data[shape_function]
+                                           .row_index[0]][0];
 
-                      Assert(shape_function_data[shape_function]
-                                 .single_nonzero_component >= 0,
-                             ExcInternalError());
-                      // we're in 2d, so the formula for the curl is simple:
-                      if (shape_function_data[shape_function]
-                            .single_nonzero_component_index == 0)
-                        for (unsigned int q_point = 0;
-                             q_point < n_quadrature_points;
-                             ++q_point)
-                          curls[q_point][0] -=
-                            value * (*shape_gradient_ptr++)[1];
-                      else
-                        for (unsigned int q_point = 0;
-                             q_point < n_quadrature_points;
-                             ++q_point)
-                          curls[q_point][0] +=
-                            value * (*shape_gradient_ptr++)[0];
+                      for (unsigned int q_point = 0;
+                           q_point < n_quadrature_points;
+                           ++q_point)
+                        curls[q_point] -= value * (*shape_gradient_ptr++)[1];
                     }
-                  else
-                    // we have multiple non-zero components in the shape
-                    // functions. not all of them must necessarily be within the
-                    // 2-component window this FEValuesViews::Vector object
-                    // considers, however.
+
+                  if (shape_function_data[shape_function]
+                        .is_nonzero_shape_function_component[1])
                     {
-                      if (shape_function_data[shape_function]
-                            .is_nonzero_shape_function_component[0])
-                        {
-                          const dealii::Tensor<1,
-                                               spacedim> *shape_gradient_ptr =
-                            &shape_gradients[shape_function_data[shape_function]
-                                               .row_index[0]][0];
+                      const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
+                        &shape_gradients[shape_function_data[shape_function]
+                                           .row_index[1]][0];
 
-                          for (unsigned int q_point = 0;
-                               q_point < n_quadrature_points;
-                               ++q_point)
-                            curls[q_point][0] -=
-                              value * (*shape_gradient_ptr++)[1];
-                        }
-
-                      if (shape_function_data[shape_function]
-                            .is_nonzero_shape_function_component[1])
-                        {
-                          const dealii::Tensor<1,
-                                               spacedim> *shape_gradient_ptr =
-                            &shape_gradients[shape_function_data[shape_function]
-                                               .row_index[1]][0];
-
-                          for (unsigned int q_point = 0;
-                               q_point < n_quadrature_points;
-                               ++q_point)
-                            curls[q_point][0] +=
-                              value * (*shape_gradient_ptr++)[0];
-                        }
+                      for (unsigned int q_point = 0;
+                           q_point < n_quadrature_points;
+                           ++q_point)
+                        curls[q_point] += value * (*shape_gradient_ptr++)[0];
                     }
                 }
-              break;
             }
-
-          case 3:
+        }
+      else if constexpr (spacedim == 3)
+        {
+          for (unsigned int shape_function = 0; shape_function < dofs_per_cell;
+               ++shape_function)
             {
-              for (unsigned int shape_function = 0;
-                   shape_function < dofs_per_cell;
-                   ++shape_function)
+              const int snc =
+                shape_function_data[shape_function].single_nonzero_component;
+
+              if (snc == -2)
+                // shape function is zero for the selected components
+                continue;
+
+              const Number &value = dof_values[shape_function];
+              // For auto-differentiable numbers, the fact that a DoF value
+              // is zero does not imply that its derivatives are zero as
+              // well. So we can't filter by value for these number types.
+              if (CheckForZero<Number>::value(value) == true)
+                continue;
+
+              if (snc != -1)
                 {
-                  const int snc = shape_function_data[shape_function]
-                                    .single_nonzero_component;
+                  const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
+                    &shape_gradients[snc][0];
 
-                  if (snc == -2)
-                    // shape function is zero for the selected components
-                    continue;
-
-                  const Number &value = dof_values[shape_function];
-                  // For auto-differentiable numbers, the fact that a DoF value
-                  // is zero does not imply that its derivatives are zero as
-                  // well. So we can't filter by value for these number types.
-                  if (CheckForZero<Number>::value(value) == true)
-                    continue;
-
-                  if (snc != -1)
+                  switch (shape_function_data[shape_function]
+                            .single_nonzero_component_index)
                     {
-                      const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
-                        &shape_gradients[snc][0];
-
-                      switch (shape_function_data[shape_function]
-                                .single_nonzero_component_index)
+                      case 0:
                         {
-                          case 0:
-                            {
-                              for (unsigned int q_point = 0;
-                                   q_point < n_quadrature_points;
-                                   ++q_point)
-                                {
-                                  curls[q_point][1] +=
-                                    value * (*shape_gradient_ptr)[2];
-                                  curls[q_point][2] -=
-                                    value * (*shape_gradient_ptr++)[1];
-                                }
-
-                              break;
-                            }
-
-                          case 1:
-                            {
-                              for (unsigned int q_point = 0;
-                                   q_point < n_quadrature_points;
-                                   ++q_point)
-                                {
-                                  curls[q_point][0] -=
-                                    value * (*shape_gradient_ptr)[2];
-                                  curls[q_point][2] +=
-                                    value * (*shape_gradient_ptr++)[0];
-                                }
-
-                              break;
-                            }
-
-                          case 2:
-                            {
-                              for (unsigned int q_point = 0;
-                                   q_point < n_quadrature_points;
-                                   ++q_point)
-                                {
-                                  curls[q_point][0] +=
-                                    value * (*shape_gradient_ptr)[1];
-                                  curls[q_point][1] -=
-                                    value * (*shape_gradient_ptr++)[0];
-                                }
-                              break;
-                            }
-
-                          default:
-                            DEAL_II_ASSERT_UNREACHABLE();
-                        }
-                    }
-
-                  else
-                    // we have multiple non-zero components in the shape
-                    // functions. not all of them must necessarily be within the
-                    // 3-component window this FEValuesViews::Vector object
-                    // considers, however.
-                    {
-                      if (shape_function_data[shape_function]
-                            .is_nonzero_shape_function_component[0])
-                        {
-                          const dealii::Tensor<1,
-                                               spacedim> *shape_gradient_ptr =
-                            &shape_gradients[shape_function_data[shape_function]
-                                               .row_index[0]][0];
-
                           for (unsigned int q_point = 0;
                                q_point < n_quadrature_points;
                                ++q_point)
@@ -661,16 +586,12 @@ namespace FEValuesViews
                               curls[q_point][2] -=
                                 value * (*shape_gradient_ptr++)[1];
                             }
+
+                          break;
                         }
 
-                      if (shape_function_data[shape_function]
-                            .is_nonzero_shape_function_component[1])
+                      case 1:
                         {
-                          const dealii::Tensor<1,
-                                               spacedim> *shape_gradient_ptr =
-                            &shape_gradients[shape_function_data[shape_function]
-                                               .row_index[1]][0];
-
                           for (unsigned int q_point = 0;
                                q_point < n_quadrature_points;
                                ++q_point)
@@ -680,16 +601,12 @@ namespace FEValuesViews
                               curls[q_point][2] +=
                                 value * (*shape_gradient_ptr++)[0];
                             }
+
+                          break;
                         }
 
-                      if (shape_function_data[shape_function]
-                            .is_nonzero_shape_function_component[2])
+                      case 2:
                         {
-                          const dealii::Tensor<1,
-                                               spacedim> *shape_gradient_ptr =
-                            &shape_gradients[shape_function_data[shape_function]
-                                               .row_index[2]][0];
-
                           for (unsigned int q_point = 0;
                                q_point < n_quadrature_points;
                                ++q_point)
@@ -699,11 +616,74 @@ namespace FEValuesViews
                               curls[q_point][1] -=
                                 value * (*shape_gradient_ptr++)[0];
                             }
+                          break;
+                        }
+
+                      default:
+                        DEAL_II_ASSERT_UNREACHABLE();
+                    }
+                }
+              else
+                // we have multiple non-zero components in the shape
+                // functions. not all of them must necessarily be within the
+                // 3-component window this FEValuesViews::Vector object
+                // considers, however.
+                {
+                  if (shape_function_data[shape_function]
+                        .is_nonzero_shape_function_component[0])
+                    {
+                      const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
+                        &shape_gradients[shape_function_data[shape_function]
+                                           .row_index[0]][0];
+
+                      for (unsigned int q_point = 0;
+                           q_point < n_quadrature_points;
+                           ++q_point)
+                        {
+                          curls[q_point][1] += value * (*shape_gradient_ptr)[2];
+                          curls[q_point][2] -=
+                            value * (*shape_gradient_ptr++)[1];
+                        }
+                    }
+
+                  if (shape_function_data[shape_function]
+                        .is_nonzero_shape_function_component[1])
+                    {
+                      const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
+                        &shape_gradients[shape_function_data[shape_function]
+                                           .row_index[1]][0];
+
+                      for (unsigned int q_point = 0;
+                           q_point < n_quadrature_points;
+                           ++q_point)
+                        {
+                          curls[q_point][0] -= value * (*shape_gradient_ptr)[2];
+                          curls[q_point][2] +=
+                            value * (*shape_gradient_ptr++)[0];
+                        }
+                    }
+
+                  if (shape_function_data[shape_function]
+                        .is_nonzero_shape_function_component[2])
+                    {
+                      const dealii::Tensor<1, spacedim> *shape_gradient_ptr =
+                        &shape_gradients[shape_function_data[shape_function]
+                                           .row_index[2]][0];
+
+                      for (unsigned int q_point = 0;
+                           q_point < n_quadrature_points;
+                           ++q_point)
+                        {
+                          curls[q_point][0] += value * (*shape_gradient_ptr)[1];
+                          curls[q_point][1] -=
+                            value * (*shape_gradient_ptr++)[0];
                         }
                     }
                 }
             }
         }
+      else
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
 

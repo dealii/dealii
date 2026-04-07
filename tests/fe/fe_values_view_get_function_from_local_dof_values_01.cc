@@ -260,8 +260,8 @@ test_view(const Vector<double>             &solution,
       // Note: FE_Q's are curl free: Should always be zero'd
       // So we are just checking that we don't hit an internal assert
       // when doing the above calls, rather than testing the values
-      if ((qp_curls_local[q] - qp_curls_global[q]).norm() >
-          tolerance * qp_curls_global[q].norm())
+      if (std::fabs(qp_curls_local[q] - qp_curls_global[q]) >
+          tolerance * std::fabs(qp_curls_global[q]))
         deallog << "NOT OK: Curl @ " << q << std::endl;
 
       if ((qp_hess_local[q] - qp_hess_global[q]).norm() >

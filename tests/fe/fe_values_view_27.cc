@@ -34,10 +34,10 @@
 
 
 
-Tensor<1, 1>
+double
 curl(const Tensor<2, 2> &grads)
 {
-  return Point<1>(grads[1][0] - grads[0][1]);
+  return (grads[1][0] - grads[0][1]);
 }
 
 
@@ -85,7 +85,11 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
     {
       deallog << "  curls[q]= " << curls[q] << std::endl
               << "  grads[q]= " << grads[q] << std::endl;
-      Assert((curl(grads[q]) - curls[q]).norm() <= 1e-10, ExcInternalError());
+      if constexpr (dim == 2)
+        Assert(std::fabs(curl(grads[q]) - curls[q]) <= 1e-10,
+               ExcInternalError());
+      else
+        Assert((curl(grads[q]) - curls[q]).norm() <= 1e-10, ExcInternalError());
     }
 }
 

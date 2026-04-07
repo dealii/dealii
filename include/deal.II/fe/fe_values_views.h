@@ -55,7 +55,7 @@ namespace internal
   template <typename NumberType>
   struct CurlType<1, NumberType>
   {
-    using type = Tensor<1, 1, NumberType>;
+    using type = NumberType;
   };
 
   /**
@@ -67,7 +67,7 @@ namespace internal
   template <typename NumberType>
   struct CurlType<2, NumberType>
   {
-    using type = Tensor<1, 1, NumberType>;
+    using type = NumberType;
   };
 
   /**
@@ -2308,153 +2308,148 @@ namespace FEValuesViews
       return curl_type();
 
     else
-      switch (dim)
-        {
-          case 1:
-            {
-              Assert(false,
-                     ExcMessage(
-                       "Computing the curl in 1d is not a useful operation"));
-              return curl_type();
-            }
+      {
+        if constexpr (spacedim == 1)
+          {
+            (void)q_point;
+            Assert(false,
+                   ExcMessage(
+                     "Computing the curl in 1d is not a useful operation"));
+            return curl_type();
+          }
+        else if constexpr (spacedim == 2)
+          {
+            if (snc != -1)
+              {
+                curl_type return_value;
 
-          case 2:
-            {
-              if (snc != -1)
-                {
-                  curl_type return_value;
+                // the single nonzero component can only be zero or one in 2d
+                if (shape_function_data[shape_function]
+                      .single_nonzero_component_index == 0)
+                  return_value = -1.0 * fe_values->finite_element_output
+                                          .shape_gradients[snc][q_point][1];
+                else
+                  return_value = fe_values->finite_element_output
+                                   .shape_gradients[snc][q_point][0];
 
-                  // the single nonzero component can only be zero or one in 2d
-                  if (shape_function_data[shape_function]
-                        .single_nonzero_component_index == 0)
-                    return_value[0] =
-                      -1.0 * fe_values->finite_element_output
-                               .shape_gradients[snc][q_point][1];
-                  else
-                    return_value[0] = fe_values->finite_element_output
-                                        .shape_gradients[snc][q_point][0];
+                return return_value;
+              }
+            else
+              {
+                curl_type return_value;
 
-                  return return_value;
-                }
+                return_value = 0.0;
 
-              else
-                {
-                  curl_type return_value;
+                if (shape_function_data[shape_function]
+                      .is_nonzero_shape_function_component[0])
+                  return_value -=
+                    fe_values->finite_element_output
+                      .shape_gradients[shape_function_data[shape_function]
+                                         .row_index[0]][q_point][1];
 
-                  return_value[0] = 0.0;
+                if (shape_function_data[shape_function]
+                      .is_nonzero_shape_function_component[1])
+                  return_value +=
+                    fe_values->finite_element_output
+                      .shape_gradients[shape_function_data[shape_function]
+                                         .row_index[1]][q_point][0];
 
-                  if (shape_function_data[shape_function]
-                        .is_nonzero_shape_function_component[0])
-                    return_value[0] -=
+                return return_value;
+              }
+          }
+        else if constexpr (spacedim == 3)
+          {
+            if (snc != -1)
+              {
+                curl_type return_value;
+
+                switch (shape_function_data[shape_function]
+                          .single_nonzero_component_index)
+                  {
+                    case 0:
+                      {
+                        return_value[0] = 0;
+                        return_value[1] = fe_values->finite_element_output
+                                            .shape_gradients[snc][q_point][2];
+                        return_value[2] =
+                          -1.0 * fe_values->finite_element_output
+                                   .shape_gradients[snc][q_point][1];
+                        return return_value;
+                      }
+
+                    case 1:
+                      {
+                        return_value[0] =
+                          -1.0 * fe_values->finite_element_output
+                                   .shape_gradients[snc][q_point][2];
+                        return_value[1] = 0;
+                        return_value[2] = fe_values->finite_element_output
+                                            .shape_gradients[snc][q_point][0];
+                        return return_value;
+                      }
+
+                    default:
+                      {
+                        return_value[0] = fe_values->finite_element_output
+                                            .shape_gradients[snc][q_point][1];
+                        return_value[1] =
+                          -1.0 * fe_values->finite_element_output
+                                   .shape_gradients[snc][q_point][0];
+                        return_value[2] = 0;
+                        return return_value;
+                      }
+                  }
+              }
+            else
+              {
+                curl_type return_value;
+
+                for (unsigned int i = 0; i < dim; ++i)
+                  return_value[i] = 0.0;
+
+                if (shape_function_data[shape_function]
+                      .is_nonzero_shape_function_component[0])
+                  {
+                    return_value[1] +=
+                      fe_values->finite_element_output
+                        .shape_gradients[shape_function_data[shape_function]
+                                           .row_index[0]][q_point][2];
+                    return_value[2] -=
                       fe_values->finite_element_output
                         .shape_gradients[shape_function_data[shape_function]
                                            .row_index[0]][q_point][1];
+                  }
 
-                  if (shape_function_data[shape_function]
-                        .is_nonzero_shape_function_component[1])
-                    return_value[0] +=
+                if (shape_function_data[shape_function]
+                      .is_nonzero_shape_function_component[1])
+                  {
+                    return_value[0] -=
+                      fe_values->finite_element_output
+                        .shape_gradients[shape_function_data[shape_function]
+                                           .row_index[1]][q_point][2];
+                    return_value[2] +=
                       fe_values->finite_element_output
                         .shape_gradients[shape_function_data[shape_function]
                                            .row_index[1]][q_point][0];
+                  }
 
-                  return return_value;
-                }
-            }
+                if (shape_function_data[shape_function]
+                      .is_nonzero_shape_function_component[2])
+                  {
+                    return_value[0] +=
+                      fe_values->finite_element_output
+                        .shape_gradients[shape_function_data[shape_function]
+                                           .row_index[2]][q_point][1];
+                    return_value[1] -=
+                      fe_values->finite_element_output
+                        .shape_gradients[shape_function_data[shape_function]
+                                           .row_index[2]][q_point][0];
+                  }
 
-          case 3:
-            {
-              if (snc != -1)
-                {
-                  curl_type return_value;
-
-                  switch (shape_function_data[shape_function]
-                            .single_nonzero_component_index)
-                    {
-                      case 0:
-                        {
-                          return_value[0] = 0;
-                          return_value[1] = fe_values->finite_element_output
-                                              .shape_gradients[snc][q_point][2];
-                          return_value[2] =
-                            -1.0 * fe_values->finite_element_output
-                                     .shape_gradients[snc][q_point][1];
-                          return return_value;
-                        }
-
-                      case 1:
-                        {
-                          return_value[0] =
-                            -1.0 * fe_values->finite_element_output
-                                     .shape_gradients[snc][q_point][2];
-                          return_value[1] = 0;
-                          return_value[2] = fe_values->finite_element_output
-                                              .shape_gradients[snc][q_point][0];
-                          return return_value;
-                        }
-
-                      default:
-                        {
-                          return_value[0] = fe_values->finite_element_output
-                                              .shape_gradients[snc][q_point][1];
-                          return_value[1] =
-                            -1.0 * fe_values->finite_element_output
-                                     .shape_gradients[snc][q_point][0];
-                          return_value[2] = 0;
-                          return return_value;
-                        }
-                    }
-                }
-
-              else
-                {
-                  curl_type return_value;
-
-                  for (unsigned int i = 0; i < dim; ++i)
-                    return_value[i] = 0.0;
-
-                  if (shape_function_data[shape_function]
-                        .is_nonzero_shape_function_component[0])
-                    {
-                      return_value[1] +=
-                        fe_values->finite_element_output
-                          .shape_gradients[shape_function_data[shape_function]
-                                             .row_index[0]][q_point][2];
-                      return_value[2] -=
-                        fe_values->finite_element_output
-                          .shape_gradients[shape_function_data[shape_function]
-                                             .row_index[0]][q_point][1];
-                    }
-
-                  if (shape_function_data[shape_function]
-                        .is_nonzero_shape_function_component[1])
-                    {
-                      return_value[0] -=
-                        fe_values->finite_element_output
-                          .shape_gradients[shape_function_data[shape_function]
-                                             .row_index[1]][q_point][2];
-                      return_value[2] +=
-                        fe_values->finite_element_output
-                          .shape_gradients[shape_function_data[shape_function]
-                                             .row_index[1]][q_point][0];
-                    }
-
-                  if (shape_function_data[shape_function]
-                        .is_nonzero_shape_function_component[2])
-                    {
-                      return_value[0] +=
-                        fe_values->finite_element_output
-                          .shape_gradients[shape_function_data[shape_function]
-                                             .row_index[2]][q_point][1];
-                      return_value[1] -=
-                        fe_values->finite_element_output
-                          .shape_gradients[shape_function_data[shape_function]
-                                             .row_index[2]][q_point][0];
-                    }
-
-                  return return_value;
-                }
-            }
-        }
+                return return_value;
+              }
+          }
+      }
     // should not end up here
     DEAL_II_ASSERT_UNREACHABLE();
     return curl_type();

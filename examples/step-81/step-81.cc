@@ -680,7 +680,7 @@ namespace Step81
                   imag * fe_values[imag_part].curl(i, q_point);
 
                 const auto rhs_value =
-                  (imag * scalar_product(J_a, phi_i)) * fe_values.JxW(q_point);
+                  (imag * (J_a * phi_i)) * fe_values.JxW(q_point);
                 cell_rhs(i) += rhs_value.real();
 
                 for (const auto j : fe_values.dof_indices())
@@ -692,10 +692,9 @@ namespace Step81
                       fe_values[real_part].curl(j, q_point) +
                       imag * fe_values[imag_part].curl(j, q_point);
 
-                    const auto temp =
-                      (scalar_product(mu_inv * curl_phi_j, curl_phi_i) -
-                       scalar_product(epsilon * phi_j, phi_i)) *
-                      fe_values.JxW(q_point);
+                    const auto temp = (((mu_inv * curl_phi_j) * curl_phi_i) -
+                                       ((epsilon * phi_j) * phi_i)) *
+                                      fe_values.JxW(q_point);
                     cell_matrix(i, j) += temp.real();
                   }
               }
@@ -771,8 +770,7 @@ namespace Step81
                                 const auto sqrt_prod = prod;
 
                                 const auto temp =
-                                  -imag * scalar_product((sqrt_prod * phi_j_T),
-                                                         phi_i_T);
+                                  -imag * ((sqrt_prod * phi_j_T) * phi_i_T);
                                 cell_matrix(i, j) += temp.real();
                               } /* j */
                           }     /* i */
@@ -822,10 +820,9 @@ namespace Step81
                                 fe_face_values[imag_part].value(j, q_point);
                             const auto phi_j_T = tangential_part(phi_j, normal);
 
-                            const auto temp =
-                              -imag *
-                              scalar_product((sigma * phi_j_T), phi_i_T) *
-                              fe_face_values.JxW(q_point);
+                            const auto temp = -imag *
+                                              ((sigma * phi_j_T) * phi_i_T) *
+                                              fe_face_values.JxW(q_point);
                             cell_matrix(i, j) += temp.real();
                           } /* j */
                       }     /* i */

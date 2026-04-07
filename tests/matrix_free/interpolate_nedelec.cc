@@ -196,10 +196,16 @@ public:
                     std::abs(fe_eval.get_value(q)[d][j] - function.value(p, d));
                 }
 
-              for (unsigned int d = 0; d < (dim == 2 ? 1 : dim); d++)
+              if constexpr (dim == 3)
+                for (unsigned int d = 0; d < dim; d++)
+                  {
+                    cell_errors[1][d] +=
+                      std::abs(fe_eval.get_curl(q)[d][j] - function.curl(p)[d]);
+                  }
+              else
                 {
-                  cell_errors[1][d] +=
-                    std::abs(fe_eval.get_curl(q)[d][j] - function.curl(p)[d]);
+                  cell_errors[1][0] +=
+                    std::abs(fe_eval.get_curl(q)[j] - function.curl(p)[0]);
                 }
             }
       }
