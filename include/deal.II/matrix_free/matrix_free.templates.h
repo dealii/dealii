@@ -1224,7 +1224,10 @@ namespace internal
 
         if (fes.size() > 1)
           {
-            Assert(cell_vectorization_category.empty(), ExcNotImplemented());
+            Assert(cell_vectorization_category.empty(),
+                   ExcNotImplemented("When setting up MatrixFree in hp mode, "
+                                     "it is not yet possible to also set the "
+                                     "vectorization categories."));
             dof_info[no].cell_active_fe_index.resize(
               n_active_cells, numbers::invalid_unsigned_int);
           }
