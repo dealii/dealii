@@ -1,0 +1,10 @@
+Improved: The order by which a MatrixFree object passes through cells is now
+using the order implied by the categorization specified by
+MatrixFree::AdditionalData::cell_vectorization_category, if the number of
+categories equals the number of locally owned active cells in case the flag
+MatrixFree::AdditionalData::cell_vectorization_categories_strict is set to
+false, or if at least a quarter of cells is given for the flag set to true. By
+setting a one-to-one numbering of cells, one can now inject a fixed ordering
+of cells.
+<br>
+(Martin Kronbichler, 2026/04/07)
