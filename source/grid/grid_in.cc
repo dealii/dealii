@@ -4421,14 +4421,32 @@ namespace
         std::vector<int> sideset_ids(n_sidesets);
         int ierr = ex_get_ids(ex_id, EX_SIDE_SET, sideset_ids.data());
         AssertThrowExodusII(ierr);
+        std::sort(sideset_ids.begin(), sideset_ids.end());
 
         // First collect all side sets on all boundary faces (indexed here as
-        // max_faces_per_cell * cell_n + face_n). We then sort and uniquify
-        // the side sets so that we can convert a set of side set indices into
-        // a single deal.II boundary or manifold id (and save the
+        // ReferenceCells::max_n_faces<dim>() * cell_n + face_n). We then sort
+        // and uniquify the side sets so that we can convert a set of side set
+        // indices into a single deal.II boundary or manifold id (and save the
         // correspondence).
-        std::map<std::size_t, std::vector<int>> face_sidesets;
-        for (const int sideset_id : sideset_ids)
+        std::size_t n_total_sides = 0;
+        for (const int &sideset_id : sideset_ids)
+          {
+            int n_sides                = -1;
+            int n_distribution_factors = -1;
+
+            ierr = ex_get_set_param(ex_id,
+                                    EX_SIDE_SET,
+                                    sideset_id,
+                                    &n_sides,
+                                    &n_distribution_factors);
+            AssertThrowExodusII(ierr);
+            Assert(n_sides > 0, ExcInternalError());
+            n_total_sides += std::size_t(n_sides);
+          }
+        std::vector<std::pair<std::size_t, int>> face_sidesets;
+        face_sidesets.reserve(n_total_sides);
+
+        for (const int &sideset_id : sideset_ids)
           {
             int n_sides                = -1;
             int n_distribution_factors = -1;
@@ -4458,51 +4476,90 @@ namespace
                 // entry i - 1 in the cells array.
                 for (int side_n = 0; side_n < n_sides; ++side_n)
                   {
-                    const long        element_n = elements[side_n] - 1;
-                    const long        face_n    = faces[side_n] - 1;
+                    const long cell_n = elements[side_n] - 1;
+                    Assert(cell_n >= 0, ExcInternalError());
+                    const long face_n = faces[side_n] - 1;
+                    Assert(face_n >= 0, ExcInternalError());
                     const std::size_t face_id =
-                      element_n * ReferenceCells::max_n_faces<dim>() + face_n;
-                    face_sidesets[face_id].push_back(sideset_id);
+                      cell_n * ReferenceCells::max_n_faces<dim>() + face_n;
+                    face_sidesets.emplace_back(face_id, sideset_id);
                   }
               }
           }
+        // Do a full sort so we get consistent order of (face, sideset) pairs:
+        std::sort(face_sidesets.begin(), face_sidesets.end());
 
-        // Collect into a sortable data structure:
-        std::vector<std::pair<std::size_t, std::vector<int>>>
-          face_id_to_sidesets;
-        face_id_to_sidesets.reserve(face_sidesets.size());
-        for (auto &pair : face_sidesets)
+        // Collect into something we can sort by sideset ids (but avoid
+        // copying any actual data, since we typically have multiple sidesets
+        // per face):
+        std::deque<ArrayView<std::pair<std::size_t, int>>>
+                    face_id_to_sideset_ids;
+        std::size_t n_faces = 0;
+        if (face_sidesets.size() > 0)
           {
-            Assert(pair.second.size() > 0, ExcInternalError());
-            face_id_to_sidesets.emplace_back(std::move(pair));
+            auto start = face_sidesets.begin();
+            for (auto it = face_sidesets.begin() + 1; it < face_sidesets.end();
+                 ++it)
+              if (start->first != it->first)
+                {
+                  face_id_to_sideset_ids.emplace_back(
+                    make_array_view(start, it));
+                  start = it;
+                  ++n_faces;
+                }
+            face_id_to_sideset_ids.emplace_back(
+              make_array_view(start, face_sidesets.end()));
+            ++n_faces;
           }
 
-        // sort by side sets:
-        std::sort(face_id_to_sidesets.begin(),
-                  face_id_to_sidesets.end(),
-                  [](const auto &a, const auto &b) {
-                    return std::lexicographical_compare(a.second.begin(),
-                                                        a.second.end(),
-                                                        b.second.begin(),
-                                                        b.second.end());
-                  });
+        // Sort by sideset ids per face, so that faces with the same sidesets
+        // are consecutive. Use a stable sort so we get consistent output (since
+        // this step ignores face ids)
+        std::stable_sort(face_id_to_sideset_ids.begin(),
+                         face_id_to_sideset_ids.end(),
+                         [](const auto &a, const auto &b) {
+                           return std::lexicographical_compare(
+                             a.begin(),
+                             a.end(),
+                             b.begin(),
+                             b.end(),
+                             [](const auto &c, const auto &d) {
+                               return c.second < d.second;
+                             });
+                         });
 
         if (dim == 2)
-          subcelldata.boundary_lines.reserve(face_id_to_sidesets.size());
+          subcelldata.boundary_lines.reserve(face_id_to_sideset_ids.size());
         else if (dim == 3)
-          subcelldata.boundary_quads.reserve(face_id_to_sidesets.size());
+          subcelldata.boundary_quads.reserve(face_id_to_sideset_ids.size());
         types::boundary_id current_b_or_m_id = 0;
-        for (const auto &pair : face_id_to_sidesets)
+        std::vector<int>   face_sideset_ids;
+        for (const auto &pairs : face_id_to_sideset_ids)
           {
-            const std::size_t       face_id          = pair.first;
-            const std::vector<int> &face_sideset_ids = pair.second;
+            const std::size_t face_id = pairs[0].first;
+            Assert(std::all_of(pairs.begin(),
+                               pairs.end(),
+                               [&](const auto &a) {
+                                 return a.first == face_id;
+                               }),
+                   ExcInternalError());
+            face_sideset_ids.resize(pairs.size());
+            for (std::size_t i = 0; i < pairs.size(); ++i)
+              face_sideset_ids[i] = pairs[i].second;
+
             if (face_sideset_ids != b_or_m_id_to_sideset_ids.back())
               {
                 // Since we sorted by sideset ids we are guaranteed that if
                 // this doesn't match the last set then it has not yet been
-                // seen
+                // seen (but check that via assertion)
+                Assert(std::find(b_or_m_id_to_sideset_ids.begin(),
+                                 b_or_m_id_to_sideset_ids.end(),
+                                 face_sideset_ids) ==
+                         b_or_m_id_to_sideset_ids.end(),
+                       ExcInternalError());
                 ++current_b_or_m_id;
-                b_or_m_id_to_sideset_ids.push_back(face_sideset_ids);
+                b_or_m_id_to_sideset_ids.emplace_back(face_sideset_ids.begin(),
+                                                      face_sideset_ids.end());
                 Assert(current_b_or_m_id == b_or_m_id_to_sideset_ids.size() - 1,
                        ExcInternalError());
               }
@@ -4511,12 +4568,12 @@ namespace
               face_id % ReferenceCells::max_n_faces<dim>();
             const CellData<dim> &cell =
               cells[face_id / ReferenceCells::max_n_faces<dim>()];
-            const ReferenceCell cell_type =
+            const auto reference_cell =
               ReferenceCell<dim>::n_vertices_to_type(dim, cell.vertices.size());
             const unsigned int deal_face_n =
-              cell_type.exodusii_face_to_deal_face(local_face_n);
-            const ReferenceCell face_reference_cell =
-              cell_type.face_reference_cell(deal_face_n);
+              reference_cell.exodusii_face_to_deal_face(local_face_n);
+            const auto face_reference_cell =
+              reference_cell.face_reference_cell(deal_face_n);
 
             // The orientation we pick doesn't matter here since when we
             // create the Triangulation we will sort the vertices for each
@@ -4531,8 +4588,8 @@ namespace
                 for (unsigned int j = 0; j < face_reference_cell.n_vertices();
                      ++j)
                   boundary_line.vertices[j] =
-                    cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, numbers::default_geometric_orientation)];
+                    cell.vertices[reference_cell.face_to_cell_vertices(
+                      deal_face_n, j, 0)];
 
                 subcelldata.boundary_lines.push_back(std::move(boundary_line));
               }
@@ -4546,8 +4603,8 @@ namespace
                 for (unsigned int j = 0; j < face_reference_cell.n_vertices();
                      ++j)
                   boundary_quad.vertices[j] =
-                    cell.vertices[cell_type.face_to_cell_vertices(
-                      deal_face_n, j, numbers::default_geometric_orientation)];
+                    cell.vertices[reference_cell.face_to_cell_vertices(
+                      deal_face_n, j, 0)];
 
                 subcelldata.boundary_quads.push_back(std::move(boundary_quad));
               }
