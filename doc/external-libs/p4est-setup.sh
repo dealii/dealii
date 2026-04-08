@@ -120,6 +120,7 @@ cd "$BUILD_FAST"
         --disable-vtk-binary --without-blas \
         --prefix="$INSTALL_FAST" CFLAGS="$CFLAGS_FAST" \
         CPPFLAGS="-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL" \
+        LIBS="-lm" \
         "$@" > config.output || bdie "Error in configure"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
@@ -138,6 +139,7 @@ cd "$BUILD_DEBUG"
         --disable-vtk-binary --without-blas \
         --prefix="$INSTALL_DEBUG" CFLAGS="$CFLAGS_DEBUG" \
         CPPFLAGS="-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL" \
+        LIBS="-lm" \
         "$@" > config.output || bdie "Error in configure"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
