@@ -610,6 +610,10 @@ namespace Utilities
        * corresponding entries described by the ghost relations according to
        * @p vector_operation.
        *
+       * @param locally_owned_storage The array of data where the resulting data
+       * sent by remote processes to the calling process will be accumulated
+       * into.
+       *
        * @param ghost_array The array of ghost data that is sent to a remote
        * owner of the respective index in a vector. Its size must either be
        * n_ghost_indices() or equal the number of ghost indices in the larger
@@ -617,10 +621,6 @@ namespace Utilities
        * set_ghost_indices(). This function will set all data entries behind
        * @p ghost_array to zero for the implementation-dependent cases when it
        * was not already done in the import_from_ghosted_array_start() call.
-       *
-       * @param locally_owned_storage The array of data where the resulting data
-       * sent by remote processes to the calling process will be accumulated
-       * into.
        *
        * @param requests The list of MPI requests for the ongoing non-blocking
        * communication that have been initiated in the
