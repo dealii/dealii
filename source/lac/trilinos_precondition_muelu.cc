@@ -18,8 +18,10 @@
 #    include <deal.II/lac/sparse_matrix.h>
 #    include <deal.II/lac/trilinos_sparse_matrix.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <MueLu_CreateEpetraPreconditioner.hpp>
 #    include <ml_MultiLevelPreconditioner.h>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
