@@ -136,6 +136,8 @@ namespace LinearAlgebra
                                         const bool      vector_writable)
     {
       local_entries = locally_owned_entries;
+      compressed    = true;
+
       if (!vector_writable)
         {
           IndexSet parallel_partitioner = locally_owned_entries;
@@ -146,8 +148,6 @@ namespace LinearAlgebra
             parallel_partitioner
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-
-          compressed = true;
         }
       else
         {
@@ -165,8 +165,6 @@ namespace LinearAlgebra
             nonlocal_entries
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-
-          compressed = false;
         }
 
       has_ghost = (vector->getMap()->isOneToOne() == false);
@@ -244,8 +242,6 @@ namespace LinearAlgebra
             parallel_partitioner
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-
-          compressed = true;
         }
       else
         {
@@ -271,11 +267,10 @@ namespace LinearAlgebra
             nonlocal_entries
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-
-          compressed = false;
         }
 
-      has_ghost = (vector->getMap()->isOneToOne() == false);
+      has_ghost  = (vector->getMap()->isOneToOne() == false);
+      compressed = true;
     }
 
 
@@ -343,10 +338,7 @@ namespace LinearAlgebra
 
           has_ghost     = V.has_ghost;
           local_entries = V.local_entries;
-
-          // Writable vectors with a separate nonlocal accumulation buffer begin
-          // life uncompressed; all other layouts are compressed after reinit().
-          compressed = (nonlocal_vector.get() == nullptr);
+          compressed    = true;
 
           // Cached import state depends on previous source layouts and should
           // not survive reinitialization.
@@ -1149,7 +1141,7 @@ namespace LinearAlgebra
                "not make sense to call compress() for such "
                "vectors."));
 
-      if (!compressed)
+      if (!nonlocal_vector.is_null())
         {
           Tpetra::CombineMode tpetra_operation = Tpetra::ZERO;
           if (operation == VectorOperation::insert)
@@ -1163,8 +1155,16 @@ namespace LinearAlgebra
             Tpetra::createExport(nonlocal_vector->getMap(), vector->getMap());
           vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
 
-          compressed = true;
+          // Reset the nonlocal_vector. It may be surprising to only do this if
+          // we add to the vector, but repeated calls to compress should not
+          // lead to a change of the vector contents, which implies that for
+          // 'insert' operations nonlocal_vector should remain unchanged, while
+          // for 'add' operations it should be reset to 0.
+          if (operation == VectorOperation::add)
+            nonlocal_vector->putScalar(0.);
         }
+
+      compressed = true;
     }
 
 
