@@ -1673,13 +1673,13 @@ namespace python
       ExcMessage(
         "This function is only implemented for dim equal to spacedim."));
     if (dim == 2)
-      internal::generate_subdivided_cylinder<2>(radius,
-                                                x_subdivisions,
+      internal::generate_subdivided_cylinder<2>(x_subdivisions,
+                                                radius,
                                                 half_length,
                                                 triangulation);
     else
-      internal::generate_subdivided_cylinder<3>(radius,
-                                                x_subdivisions,
+      internal::generate_subdivided_cylinder<3>(x_subdivisions,
+                                                radius,
                                                 half_length,
                                                 triangulation);
   }
