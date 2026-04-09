@@ -78,6 +78,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::Vector()
       : compressed(true)
       , has_ghost(false)
+      , last_action(VectorOperation::unknown)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(
           Utilities::Trilinos::internal::make_rcp<TpetraTypes::MapType<
@@ -90,6 +91,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::Vector(const Vector<Number, MemorySpace> &V)
       : compressed(V.compressed)
       , has_ghost(V.has_ghost)
+      , last_action(VectorOperation::unknown)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
                                                              Teuchos::Copy))
@@ -110,6 +112,7 @@ namespace LinearAlgebra
       const Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> V)
       : compressed(true)
       , has_ghost(V->getMap()->isOneToOne() == false)
+      , last_action(VectorOperation::unknown)
       , vector(V)
     {}
 
@@ -120,6 +123,7 @@ namespace LinearAlgebra
                                         const MPI_Comm  communicator)
       : compressed(true)
       , has_ghost(false)
+      , last_action(VectorOperation::unknown)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(
           parallel_partitioner.make_tpetra_map_rcp<
@@ -134,6 +138,7 @@ namespace LinearAlgebra
                                         const IndexSet &ghost_entries,
                                         const MPI_Comm  communicator,
                                         const bool      vector_writable)
+      : last_action(VectorOperation::unknown)
     {
       local_entries = locally_owned_entries;
       compressed    = true;
@@ -190,8 +195,9 @@ namespace LinearAlgebra
         Utilities::Trilinos::internal::make_rcp<
           TpetraTypes::MapType<MemorySpace>>(
           0, 0, Utilities::Trilinos::tpetra_comm_self()));
-      has_ghost  = false;
-      compressed = true;
+      has_ghost   = false;
+      compressed  = true;
+      last_action = VectorOperation::unknown;
       nonlocal_vector.reset();
     }
 
@@ -206,9 +212,10 @@ namespace LinearAlgebra
       vector.reset();
       nonlocal_vector.reset();
 
-      compressed = true;
-      has_ghost  = false;
-      vector     = Utilities::Trilinos::internal::make_rcp<
+      compressed  = true;
+      has_ghost   = false;
+      last_action = VectorOperation::unknown;
+      vector      = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::VectorType<Number, MemorySpace>>(
         parallel_partitioner
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
@@ -269,8 +276,9 @@ namespace LinearAlgebra
                 communicator, true));
         }
 
-      has_ghost  = (vector->getMap()->isOneToOne() == false);
-      compressed = true;
+      has_ghost   = (vector->getMap()->isOneToOne() == false);
+      compressed  = true;
+      last_action = VectorOperation::unknown;
     }
 
 
@@ -345,6 +353,8 @@ namespace LinearAlgebra
           source_stored_elements.clear();
           tpetra_comm_pattern = Teuchos::null;
         }
+
+      last_action = VectorOperation::unknown;
     }
 
 
@@ -477,6 +487,8 @@ namespace LinearAlgebra
           tpetra_comm_pattern    = V.tpetra_comm_pattern;
         }
 
+      last_action = VectorOperation::unknown;
+
       return *this;
     }
 
@@ -497,8 +509,9 @@ namespace LinearAlgebra
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(),
         vector_data);
 
-      has_ghost  = false;
-      compressed = true;
+      has_ghost   = false;
+      compressed  = true;
+      last_action = VectorOperation::unknown;
 
       return *this;
     }
@@ -523,6 +536,8 @@ namespace LinearAlgebra
       // that for the ghost entries of the vector.
       if (!nonlocal_vector.is_null())
         nonlocal_vector->putScalar(Number(0));
+
+      last_action = VectorOperation::unknown;
 
       return *this;
     }
@@ -1141,6 +1156,43 @@ namespace LinearAlgebra
                "not make sense to call compress() for such "
                "vectors."));
 
+      Assert(
+        (operation == VectorOperation::insert) ||
+          (operation == VectorOperation::add),
+        ExcMessage(
+          "Only VectorOperation::add and VectorOperation::insert are allowed."));
+
+      // If there were no local operations, assume the input argument is
+      // the correct operation to perform globally.
+      if (last_action == VectorOperation::unknown)
+        last_action = operation;
+
+      Assert(last_action == operation,
+             ExcMessage(
+               "The last operation on the vector and the given operation in "
+               "compress() do not agree."));
+
+      if constexpr (running_in_debug_mode())
+        {
+          // Check that all processors agree that last_action is the same
+          int my_int_last_action = last_action;
+          int all_int_last_action;
+
+          const int ierr = MPI_Allreduce(&my_int_last_action,
+                                         &all_int_last_action,
+                                         1,
+                                         MPI_INT,
+                                         MPI_BOR,
+                                         get_mpi_communicator());
+          AssertThrowMPI(ierr);
+
+          AssertThrow(all_int_last_action !=
+                        (VectorOperation::add | VectorOperation::insert),
+                      ExcMessage(
+                        "Not all processors agree on the last "
+                        "VectorOperation before this compress() call."));
+        }
+
       if (!nonlocal_vector.is_null())
         {
           Tpetra::CombineMode tpetra_operation = Tpetra::ZERO;
@@ -1163,7 +1215,8 @@ namespace LinearAlgebra
           nonlocal_vector->putScalar(Number(0));
         }
 
-      compressed = true;
+      compressed  = true;
+      last_action = VectorOperation::unknown;
     }
 
 
