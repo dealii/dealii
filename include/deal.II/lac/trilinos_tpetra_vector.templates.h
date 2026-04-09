@@ -1155,13 +1155,7 @@ namespace LinearAlgebra
             Tpetra::createExport(nonlocal_vector->getMap(), vector->getMap());
           vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
 
-          // Reset the nonlocal_vector. It may be surprising to only do this if
-          // we add to the vector, but repeated calls to compress should not
-          // lead to a change of the vector contents, which implies that for
-          // 'insert' operations nonlocal_vector should remain unchanged, while
-          // for 'add' operations it should be reset to 0.
-          if (operation == VectorOperation::add)
-            nonlocal_vector->putScalar(0.);
+          nonlocal_vector->putScalar(0.);
         }
 
       compressed = true;
