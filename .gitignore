@@ -60,3 +60,10 @@ examples/step-*/cmake_install.cmake
 examples/step-*/step-?
 examples/step-*/step-??
 install/
+
+# direnv
+.env
+.envrc
+
+# CMake presets
+CMakeUserPresets.json
