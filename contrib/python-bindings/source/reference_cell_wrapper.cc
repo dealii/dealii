@@ -101,14 +101,10 @@ namespace python
   }
 
 
-  template ReferenceCellWrapper::ReferenceCellWrapper<0>(
-    const ReferenceCell<0> &);
-  template ReferenceCellWrapper::ReferenceCellWrapper<1>(
-    const ReferenceCell<1> &);
-  template ReferenceCellWrapper::ReferenceCellWrapper<2>(
-    const ReferenceCell<2> &);
-  template ReferenceCellWrapper::ReferenceCellWrapper<3>(
-    const ReferenceCell<3> &);
+  template ReferenceCellWrapper::ReferenceCellWrapper(const ReferenceCell<0> &);
+  template ReferenceCellWrapper::ReferenceCellWrapper(const ReferenceCell<1> &);
+  template ReferenceCellWrapper::ReferenceCellWrapper(const ReferenceCell<2> &);
+  template ReferenceCellWrapper::ReferenceCellWrapper(const ReferenceCell<3> &);
 
 
 } // namespace python

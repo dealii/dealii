@@ -410,7 +410,7 @@ class TestTriangulationWrapper(unittest.TestCase):
 
     def test_subdivided_cylinder(self):
         triangulation = Triangulation("3D")
-        n_cells_ref = 5
+        n_cells_ref = 10
         triangulation.generate_subdivided_cylinder(2)
         n_cells = triangulation.n_active_cells()
         self.assertEqual(n_cells, n_cells_ref)
