@@ -92,6 +92,49 @@ namespace TrilinosWrappers
      */
     struct AdditionalData
     {
+      /**
+       * Type of residual norm used for absolute and relative convergence
+       * checks.
+       *
+       * These correspond to the options described in:
+       * https://trilinos.github.io/docs/nox/class_n_o_x_1_1_status_test_1_1_norm_f.html
+       */
+      enum class NormType
+      {
+        /**
+         * L1 norm of the residual.
+         */
+        L1,
+        /**
+         * L2 norm of the residual.
+         */
+        L2,
+        /**
+         * Infinity norm of the residual.
+         */
+        Linfty,
+      };
+
+      /**
+       * Scaling of the absolute residual norm used for convergence checks.
+       *
+       * These correspond to the options described in:
+       * https://trilinos.github.io/docs/nox/class_n_o_x_1_1_status_test_1_1_norm_f.html
+       */
+      enum class NormScaling
+      {
+        /**
+         * Do not scale the residual norm by the problem size.
+         */
+        Unscaled,
+        /**
+         * Scale the residual norm by the problem size.
+         * For L1 and Linfty norms, the computed norm is multiplied by 1/n.
+         * For the L2 norm, the scaling factor is sqrt(1/n).
+         */
+        Scaled
+      };
+
     public:
       /**
        * Constructor.
@@ -101,7 +144,9 @@ namespace TrilinosWrappers
                      const double       rel_tol                        = 1.e-5,
                      const unsigned int threshold_nonlinear_iterations = 1,
                      const unsigned int threshold_n_linear_iterations  = 0,
-                     const bool         reuse_solver                   = false);
+                     const bool         reuse_solver                   = false,
+                     const NormType     norm_type    = NormType::L2,
+                     const NormScaling  norm_scaling = NormScaling::Scaled);
 
       /**
        * Max number of nonlinear iterations.
@@ -109,12 +154,25 @@ namespace TrilinosWrappers
       unsigned int max_iter;
 
       /**
-       * Absolute l2 tolerance of the residual to be reached.
+       * Absolute tolerance of the residual to be reached.
+       *
+       * The residual norm is computed using the selected `norm_type` and
+       * optionally scaled depending on `norm_scaling`.
        *
        * @note Solver terminates successfully if either the absolute or
        * the relative tolerance has been reached.
        */
       double abs_tol;
+
+      /**
+       * Norm type for measuring the absolute and relative tolerance.
+       */
+      NormType norm_type;
+
+      /**
+       * Norm scaling of the absolute residual norm.
+       */
+      NormScaling norm_scaling;
 
       /**
        * Relative l2 tolerance of the residual to be reached.

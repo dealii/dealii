@@ -15,6 +15,8 @@
 
 #include <deal.II/base/config.h>
 
+#include "deal.II/base/exception_macros.h"
+
 #ifdef DEAL_II_TRILINOS_WITH_NOX
 
 #  include <deal.II/trilinos/nox.h>
@@ -84,7 +86,7 @@ namespace TrilinosWrappers
        * Implementation of the abstract interface
        * NOX::Abstract::Vector for deal.II vectors. For details,
        * see
-       * https://docs.trilinos.org/dev/packages/nox/doc/html/classNOX_1_1Abstract_1_1Vector.html.
+       * https://trilinos.github.io/docs/nox/class_n_o_x_1_1_abstract_1_1_vector.html
        */
       template <typename VectorType>
       class Vector : public NOX::Abstract::Vector
@@ -341,7 +343,7 @@ namespace TrilinosWrappers
        * Implementation of the abstract interface
        * NOX::Abstract::Group for deal.II vectors and deal.II solvers. For
        * details, see
-       * https://docs.trilinos.org/dev/packages/nox/doc/html/classNOX_1_1Abstract_1_1Group.html.
+       * https://trilinos.github.io/docs/nox/class_n_o_x_1_1_abstract_1_1_group.html
        */
       template <typename VectorType>
       class Group : public NOX::Abstract::Group
@@ -913,9 +915,13 @@ namespace TrilinosWrappers
     const double       rel_tol,
     const unsigned int threshold_nonlinear_iterations,
     const unsigned int threshold_n_linear_iterations,
-    const bool         reuse_solver)
+    const bool         reuse_solver,
+    const NormType     norm_type,
+    const NormScaling  norm_scaling)
     : max_iter(max_iter)
     , abs_tol(abs_tol)
+    , norm_type(norm_type)
+    , norm_scaling(norm_scaling)
     , rel_tol(rel_tol)
     , threshold_nonlinear_iterations(threshold_nonlinear_iterations)
     , threshold_n_linear_iterations(threshold_n_linear_iterations)
@@ -1143,17 +1149,51 @@ namespace TrilinosWrappers
         check->addStatusTest(info);
       }
 
+    const auto to_nox_norm_type =
+      [](typename NOXSolver<VectorType>::AdditionalData::NormType norm_type) {
+        switch (norm_type)
+          {
+            case NOXSolver<VectorType>::AdditionalData::NormType::L1:
+              return NOX::Abstract::Vector::NormType::OneNorm;
+            case NOXSolver<VectorType>::AdditionalData::NormType::L2:
+              return NOX::Abstract::Vector::NormType::TwoNorm;
+            case NOXSolver<VectorType>::AdditionalData::NormType::Linfty:
+              return NOX::Abstract::Vector::NormType::MaxNorm;
+            default:
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+      };
+
+    const auto to_nox_norm_scaling =
+      [](typename NOXSolver<VectorType>::AdditionalData::NormScaling
+           norm_scaling) {
+        switch (norm_scaling)
+          {
+            case NOXSolver<VectorType>::AdditionalData::NormScaling::Unscaled:
+              return NOX::StatusTest::NormF::ScaleType::Unscaled;
+            case NOXSolver<VectorType>::AdditionalData::NormScaling::Scaled:
+              return NOX::StatusTest::NormF::ScaleType::Scaled;
+            default:
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
+      };
+
     if (additional_data.abs_tol > 0.0)
       {
         const auto additional_data_norm_f_abs =
-          Teuchos::rcp(new NOX::StatusTest::NormF(additional_data.abs_tol));
+          Teuchos::rcp(new NOX::StatusTest::NormF(
+            additional_data.abs_tol,
+            to_nox_norm_type(additional_data.norm_type),
+            to_nox_norm_scaling(additional_data.norm_scaling)));
         check->addStatusTest(additional_data_norm_f_abs);
       }
 
     if (additional_data.rel_tol > 0.0)
       {
         const auto additional_data_norm_f_rel = Teuchos::rcp(
-          new NOX::StatusTest::RelativeNormF(additional_data.rel_tol));
+          new NOX::StatusTest::RelativeNormF(additional_data.rel_tol,
+                                             to_nox_norm_type(
+                                               additional_data.norm_type)));
         check->addStatusTest(additional_data_norm_f_rel);
       }
 
