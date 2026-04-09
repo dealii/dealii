@@ -30,6 +30,7 @@
 #else
 #  include <boost/serialization/array.hpp>
 #endif
+#include <boost/serialization/binary_object.hpp>
 #include <boost/serialization/split_member.hpp>
 
 #include <cstring>
@@ -2161,7 +2162,13 @@ AlignedVector<T>::save(Archive &ar, const unsigned int) const
   size_type vec_size = size();
   ar       &vec_size;
   if (vec_size > 0)
-    ar &boost::serialization::make_array(elements.get(), vec_size);
+    {
+      if constexpr (std::is_trivially_copyable_v<T>)
+        ar &boost::serialization::make_binary_object(elements.get(),
+                                                     vec_size * sizeof(T));
+      else
+        ar &boost::serialization::make_array(elements.get(), vec_size);
+    }
 }
 
 
@@ -2177,7 +2184,13 @@ AlignedVector<T>::load(Archive &ar, const unsigned int)
   resize(vec_size);
 
   if (vec_size > 0)
-    ar &boost::serialization::make_array(elements.get(), vec_size);
+    {
+      if constexpr (std::is_trivially_copyable_v<T>)
+        ar &boost::serialization::make_binary_object(elements.get(),
+                                                     vec_size * sizeof(T));
+      else
+        ar &boost::serialization::make_array(elements.get(), vec_size);
+    }
 }
 
 

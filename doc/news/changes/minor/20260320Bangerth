@@ -1,0 +1,8 @@
+Changed: Serialization of Table and AlignedVector objects storing
+"trivial" data types (things such as `double` or `int`) now do this by
+serializing a binary blob of bits, rather than individual array
+members. This has no effect for binary archives (as one should use for
+checkpointing, for example), but makes text-based archives
+substantially smaller.
+<br>
+(Wolfgang Bangerth, 2026/03/20)
