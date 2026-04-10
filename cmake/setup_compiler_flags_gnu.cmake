@@ -25,8 +25,8 @@ if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
     )
 endif()
 
-if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
-    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0" )
+if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.0" )
   message(FATAL_ERROR "\n"
     "deal.II requires support for features of C++17 that are not present in\n"
     "versions of Clang prior to 10.0."
@@ -34,9 +34,9 @@ if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
 endif()
 
 # Correspondence between AppleClang version and upstream Clang version:
-# https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development)
-if (POLICY CMP0025)
-  if( CMAKE_CXX_COMPILER_ID MATCHES "AppleClang" AND
+# https://en.wikipedia.org/wiki/Xcode#Xcode_11.0_-_14.x_(since_SwiftUI_framework)_2
+if(POLICY CMP0025)
+  if( CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
       CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0" )
     message(FATAL_ERROR "\n"
       "deal.II requires support for features of C++17 that are not present in\n"
@@ -138,27 +138,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel
   # (and consequently removing access control altogether)
   #
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-unsupported-friend")
-
-  #
-  # Clang versions prior to 3.6 emit a lot of false positives wrt
-  # "-Wunused-function". Also suppress warnings for Xcode older than 6.3
-  # (which is equivalent to clang < 3.6).
-  # Policy CMP0025 allows to differentiate between Clang and AppleClang
-  # which admits a more fine-grained control. Otherwise, we are left
-  # with just disabling this feature for all versions between 4.0 and 6.3.
-  #
-  if (POLICY CMP0025)
-    if( (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"
-         AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6")
-        OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"
-         AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3"))
-      enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-unused-function")
-    endif()
-  elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "3.6" OR
-      ( NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0" AND
-        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.3") )
-    enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-unused-function")
-  endif()
 
   #
   # Clang-14.0.5 complains loudly about not being able to vectorize some

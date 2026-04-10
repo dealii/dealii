@@ -106,13 +106,13 @@ if( CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
   #
-  # Setup for ICC compiler (version >= 10):
+  # Setup for ICC compiler:
   #
   verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_intel.cmake)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   #
-  # Setup for MSVC compiler (version >= 2012):
+  # Setup for MSVC compiler:
   #
   verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_compiler_flags_msvc.cmake)
 
