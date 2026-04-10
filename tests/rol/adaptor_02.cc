@@ -90,7 +90,6 @@ test(const double x, const double y)
 
   ROL::ParameterList parlist;
 
-#if DEAL_II_TRILINOS_VERSION_GTE(12, 18, 0)
   // Define algorithm in three intuitive and easy steps.
   //
   // For the future developer: if this ever fails again, copy the relevant
@@ -102,10 +101,6 @@ test(const double x, const double y)
   ROL::Ptr<ROL::StatusTest<RealT>> status =
     ROL::makePtr<ROL::StatusTest<RealT>>(parlist);
   ROL::Algorithm<RealT> algo(step, status, false);
-#else
-  // Define algorithm.
-  ROL::Algorithm<RealT> algo("Line Search", parlist);
-#endif
 
   // Set parameters.
   parlist.sublist("Secant").set("Use as Preconditioner", false);

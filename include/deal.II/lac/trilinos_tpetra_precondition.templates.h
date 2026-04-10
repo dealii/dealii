@@ -269,13 +269,11 @@ namespace LinearAlgebra
       const std::string &preconditioner_type)
       : preconditioner_type(preconditioner_type)
     {
-#    if DEAL_II_TRILINOS_VERSION_GTE(13, 0, 0)
       Ifpack2::Factory factory;
       AssertThrow(
         (factory.isSupported<TpetraTypes::MatrixType<Number, MemorySpace>>(
           preconditioner_type)),
         ExcTrilinosIpack2PreconditionerUnsupported(preconditioner_type));
-#    endif
     }
 
 
