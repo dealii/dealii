@@ -228,7 +228,7 @@ namespace Portable
       /**
        * Coarse cell index.
        */
-      const int cell_index;
+      const int coarse_cell_index;
 
       /**
        * Transfer scheme information.

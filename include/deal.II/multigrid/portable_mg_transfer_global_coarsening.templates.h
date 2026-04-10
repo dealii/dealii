@@ -92,7 +92,7 @@ namespace Portable
       void
       operator()(const TeamHandle &team_member) const
       {
-        const int cell_index = team_member.league_rank();
+        const int coarse_cell_index = team_member.league_rank();
 
         SharedViewValues values_coarse(team_member.team_shmem(),
                                        transfer_scheme.n_dofs_per_cell_coarse);
@@ -120,7 +120,7 @@ namespace Portable
 
         typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData data{
           team_member,
-          cell_index,
+          coarse_cell_index,
           transfer_scheme,
           prolongation_matrix_device,
           values_coarse,
@@ -164,8 +164,8 @@ namespace Portable
       const DeviceVector<Number> &src,
       const DeviceVector<Number> &dst) const
     {
-      const int   cell_index  = cell_data->cell_index;
-      const auto &team_member = cell_data->team_member;
+      const int   coarse_cell_index = cell_data->coarse_cell_index;
+      const auto &team_member       = cell_data->team_member;
 
       const auto &prolongation_matrix_scratch =
         cell_data->prolongation_matrix_device;
@@ -187,7 +187,7 @@ namespace Portable
                              team_member, transfer_data.n_dofs_per_cell_coarse),
                            [&](const int &i) {
                              const unsigned int dof_index =
-                               dof_indices_coarse(i, cell_index);
+                               dof_indices_coarse(i, coarse_cell_index);
                              if (dof_index != numbers::invalid_unsigned_int)
                                values_coarse(i) = src[dof_index];
                              else
@@ -383,7 +383,7 @@ namespace Portable
                              team_member, transfer_data.n_dofs_per_cell_fine),
                            [&](const int &i) {
                              values_fine(i) *=
-                               transfer_data.weights(i, cell_index);
+                               transfer_data.weights(i, coarse_cell_index);
                            });
       team_member.team_barrier();
 
@@ -391,7 +391,7 @@ namespace Portable
         Kokkos::TeamThreadRange(team_member,
                                 transfer_data.n_dofs_per_cell_fine),
         [&](const int &i) {
-          const unsigned int dof_index = dof_indices_fine(i, cell_index);
+          const unsigned int dof_index = dof_indices_fine(i, coarse_cell_index);
           Kokkos::atomic_add(&dst[dof_index], values_fine(i));
         });
       team_member.team_barrier();
@@ -429,8 +429,8 @@ namespace Portable
       const DeviceVector<Number> &src,
       const DeviceVector<Number> &dst) const
     {
-      const int   cell_index  = cell_data->cell_index;
-      const auto &team_member = cell_data->team_member;
+      const int   coarse_cell_index = cell_data->coarse_cell_index;
+      const auto &team_member       = cell_data->team_member;
 
       const auto &prolongation_matrix_scratch =
         cell_data->prolongation_matrix_device;
@@ -452,7 +452,7 @@ namespace Portable
                              team_member, transfer_data.n_dofs_per_cell_fine),
                            [&](const int &i) {
                              values_fine(i) =
-                               src[dof_indices_fine(i, cell_index)];
+                               src[dof_indices_fine(i, coarse_cell_index)];
                            });
       team_member.team_barrier();
 
@@ -461,7 +461,7 @@ namespace Portable
                              team_member, transfer_data.n_dofs_per_cell_fine),
                            [&](const int &i) {
                              values_fine(i) *=
-                               transfer_data.weights(i, cell_index);
+                               transfer_data.weights(i, coarse_cell_index);
                            });
       team_member.team_barrier();
 
@@ -652,14 +652,15 @@ namespace Portable
 #endif
 
       // distribute coarse dofs values
-      Kokkos::parallel_for(
-        Kokkos::TeamThreadRange(team_member,
-                                transfer_data.n_dofs_per_cell_coarse),
-        [&](const int &i) {
-          const unsigned int dof_index = dof_indices_coarse(i, cell_index);
-          if (dof_index != numbers::invalid_unsigned_int)
-            Kokkos::atomic_add(&dst[dof_index], values_coarse(i));
-        });
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(
+                             team_member, transfer_data.n_dofs_per_cell_coarse),
+                           [&](const int &i) {
+                             const unsigned int dof_index =
+                               dof_indices_coarse(i, coarse_cell_index);
+                             if (dof_index != numbers::invalid_unsigned_int)
+                               Kokkos::atomic_add(&dst[dof_index],
+                                                  values_coarse(i));
+                           });
       team_member.team_barrier();
     }
 
@@ -724,12 +725,12 @@ namespace Portable
             const unsigned int first_cell = cell_counter;
             for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
               {
-                const unsigned int  cell_index = first_cell + cell;
+                const unsigned int  coarse_cell_index = first_cell + cell;
                 const unsigned int *dof_indices_fine =
                   transfer.transfer_cpu.constraint_info_fine.dof_indices
                     .data() +
                   transfer.transfer_cpu.constraint_info_fine
-                    .row_starts[cell_index]
+                    .row_starts[coarse_cell_index]
                     .first;
 
                 for (unsigned int i = 0; i < scheme.n_dofs_per_cell_fine;
@@ -904,20 +905,22 @@ namespace Portable
               const unsigned int first_cell = cell_counter;
               for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
                 {
-                  const unsigned int cell_index = first_cell + cell;
+                  const unsigned int coarse_cell_index = first_cell + cell;
 
                   // fill coarse indices
                   {
                     const unsigned int *dof_indices_coarse =
                       transfer_cpu.constraint_info_coarse.dof_indices.data() +
-                      transfer_cpu.constraint_info_coarse.row_starts[cell_index]
+                      transfer_cpu.constraint_info_coarse
+                        .row_starts[coarse_cell_index]
                         .first;
                     unsigned int index_indicators =
-                      transfer_cpu.constraint_info_coarse.row_starts[cell_index]
+                      transfer_cpu.constraint_info_coarse
+                        .row_starts[coarse_cell_index]
                         .second;
                     unsigned int next_index_indicators =
                       transfer_cpu.constraint_info_coarse
-                        .row_starts[cell_index + 1]
+                        .row_starts[coarse_cell_index + 1]
                         .second;
 
                     unsigned int ind_local = 0;
@@ -952,7 +955,8 @@ namespace Portable
                   {
                     const unsigned int *dof_indices_fine =
                       transfer_cpu.constraint_info_fine.dof_indices.data() +
-                      transfer_cpu.constraint_info_fine.row_starts[cell_index]
+                      transfer_cpu.constraint_info_fine
+                        .row_starts[coarse_cell_index]
                         .first;
 
                     for (unsigned int j = 0; j < scheme.n_dofs_per_cell_fine;
