@@ -1,0 +1,12 @@
+
+DEAL:0::After operation:
+size:3 locally_stored_size:2 :
+[0]: 1.000e+00
+[1]: 1.000e+00
+DEAL:0::OK
+
+DEAL:1::After operation:
+size:3 locally_stored_size:1 :
+[2]: 2.000e+00
+DEAL:1::OK
+
