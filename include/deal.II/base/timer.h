@@ -942,8 +942,9 @@ private:
 
   /**
    * A list of all the sections and their information.
+   * Mutable to let 'sync_sections' add zero-timed sections.
    */
-  std::map<std::string, Timer> sections;
+  mutable std::map<std::string, Timer> sections;
 
   /**
    * The stream object to which we are to output.
@@ -973,7 +974,15 @@ private:
    * A lock that makes sure that this class gives reasonable results even when
    * used with several threads.
    */
-  Threads::Mutex mutex;
+  mutable Threads::Mutex mutex;
+
+  /**
+   * Synchronize the sections map across all MPI ranks of the given communicator
+   * mpi_comm so that all ranks have the same set of section keys. For sections
+   * that a rank did not visit, a Timer with zero time is inserted.
+   */
+  void
+  sync_sections(const MPI_Comm mpi_comm) const;
 };
 
 

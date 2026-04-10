@@ -23,6 +23,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -940,8 +941,7 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
 
-  AssertDimension(sections.size(),
-                  Utilities::MPI::max(sections.size(), mpi_comm));
+  sync_sections(mpi_comm);
   Assert(quantile >= 0. && quantile <= 0.5,
          ExcMessage("The quantile must be between 0 and 0.5"));
 
@@ -1135,6 +1135,57 @@ TimerOutput::reset()
   sections.clear();
   active_sections.clear();
   timer_all.restart();
+}
+
+
+
+void
+TimerOutput::sync_sections(const MPI_Comm mpi_comm) const
+{
+  // No sync required
+  if (Utilities::MPI::n_mpi_processes(mpi_comm) == 1)
+    return;
+
+  // If timers are running in sync mode (i.e., the MPI communicator is not
+  // MPI_COMM_SELF), we require all ranks in mpi_comm to have visited the same
+  // number of sections.
+  if (mpi_communicator != MPI_COMM_SELF)
+    {
+      AssertDimension(sections.size(),
+                      Utilities::MPI::max(sections.size(), mpi_comm));
+      return;
+    }
+
+  // Now we know that timers are running in non-syncing mode and not all ranks
+  // may agree on which sections they visited.
+  std::vector<std::string> my_section_names;
+  my_section_names.reserve(sections.size());
+  for (const auto &[section, timer] : sections)
+    my_section_names.push_back(section);
+
+  const std::vector<std::vector<std::string>> all_section_names =
+    Utilities::MPI::all_gather(mpi_comm, my_section_names);
+
+  std::set<std::string> global_section_names;
+  for (const auto &rank_sections : all_section_names)
+    for (const auto &section_name : rank_sections)
+      global_section_names.insert(section_name);
+
+  std::lock_guard<std::mutex> lock(mutex);
+  for (const auto &section_name : global_section_names)
+    {
+      if (sections.find(section_name) == sections.end())
+        {
+          // If we arrive here the current rank did not visit the section
+          // 'section_name'. This can only happen when the current TimerOutput
+          // object is not forcing a sync of lap times -> construct the
+          // zero duration timer with MPI_COMM_SELF and sync_lap_times_=false.
+          Timer timer(MPI_COMM_SELF, /*sync_lap_times=*/false);
+          timer.stop();
+          timer.reset();
+          sections[section_name] = timer;
+        }
+    }
 }
 
 
