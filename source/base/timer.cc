@@ -10,8 +10,9 @@
 //
 // -----------------------------------------------------------------------------
 
+#include "deal.II/base/mpi.h"
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
@@ -23,6 +24,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -936,19 +938,47 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
          ExcMessage(
            "Cannot print data from TimerOutput while inside a timed section."));
 
+  Assert(quantile >= 0. && quantile <= 0.5,
+         ExcMessage("The quantile must be between 0 and 0.5"));
+
+#ifdef DEAL_II_WITH_MPI
+  // calling wall_time() below requires global communication over
+  // mpi_communicator, if timers are constructed with an MPI
+  // communicator
+  // -> make sure the two communicators mpi_communicator and
+  // mpi_comm contain the same ranks
+  if (mpi_communicator != MPI_COMM_SELF)
+    {
+      int       result;
+      const int ierr = MPI_Comm_compare(mpi_comm, mpi_communicator, &result);
+      AssertThrowMPI(ierr);
+
+      Assert(result == MPI_IDENT || result == MPI_CONGRUENT ||
+               result == MPI_SIMILAR,
+             ExcMessage(
+               "The passed MPI communicator must contain the same processes as "
+               "the one used to construct the TimerOutput."));
+    }
+#endif
+
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
 
-  AssertDimension(sections.size(),
-                  Utilities::MPI::max(sections.size(), mpi_comm));
-  Assert(quantile >= 0. && quantile <= 0.5,
-         ExcMessage("The quantile must be between 0 and 0.5"));
+  // Obtain the global list of all sections entered by the ranks within
+  // mpi_comm
+  std::vector<std::string> my_section_names;
+  my_section_names.reserve(sections.size());
+  for (const auto &[section, timer] : sections)
+    my_section_names.push_back(section);
+
+  const std::vector<std::string> global_section_names =
+    Utilities::MPI::compute_set_union(my_section_names, mpi_comm);
 
   // get the maximum width among all sections
   unsigned int max_width = 0;
-  for (const auto &i : sections)
-    max_width = std::max(max_width, static_cast<unsigned int>(i.first.size()));
+  for (const auto &i : global_section_names)
+    max_width = std::max(max_width, static_cast<unsigned int>(i.size()));
 
   // 17 is the default width until | character
   max_width = std::max(max_width + 1, static_cast<unsigned int>(17));
@@ -1084,9 +1114,11 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                << "------------+"
                << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
                << time_rank_column << '\n';
-    for (const auto &i : sections)
+
+    for (const auto &global_section_name : global_section_names)
       {
-        std::string name_out = i.first;
+        std::string name_out   = global_section_name;
+        const auto  section_it = sections.find(global_section_name);
 
         // resize the array so that it is always of the same size
         unsigned int pos_non_space = name_out.find_first_not_of(' ');
@@ -1095,9 +1127,14 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
         out_stream << "| " << name_out;
         out_stream << "| ";
         out_stream << std::setw(9);
-        out_stream << i.second.n_laps() << " |";
+        const unsigned n_laps =
+          section_it == sections.end() ? 0 : section_it->second.n_laps();
 
-        print_statistics(i.second.wall_time());
+        out_stream << n_laps << " |";
+
+        const double wall_time =
+          section_it == sections.end() ? 0.0 : section_it->second.wall_time();
+        print_statistics(wall_time);
       }
     out_stream << "+------------------------------" << extra_dash << "+"
                << time_rank_column
