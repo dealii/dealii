@@ -27,8 +27,6 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
-#include <deal.II/matrix_free/portable_matrix_free.h>
-
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
 #include <deal.II/multigrid/portable_mg_transfer_global_coarsening.h>
@@ -994,40 +992,32 @@ namespace Portable
     VectorType       &dst,
     const VectorType &src) const
   {
-    if (matrix_free_data.get() != nullptr)
+    using TeamPolicy =
+      Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>;
+
+    using Functor = internal::CellProlongationKernel<dim, VectorType>;
+
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
+    unsigned int scheme_index = 0;
+    for (auto &scheme : schemes)
       {
-        // p-transfer with MatrixFree cell loop will be added soon
-        Assert(false, ExcNotImplemented());
-      }
-    else
-      {
-        using TeamPolicy = Kokkos::TeamPolicy<
-          MemorySpace::Default::kokkos_space::execution_space>;
+        if (scheme.n_coarse_cells == 0)
+          continue;
 
-        using Functor = internal::CellProlongationKernel<dim, VectorType>;
+        Functor prolongator;
 
-        MemorySpace::Default::kokkos_space::execution_space exec;
+        auto team_policy =
+          TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
 
-        unsigned int scheme_index = 0;
-        for (auto &scheme : schemes)
-          {
-            if (scheme.n_coarse_cells == 0)
-              continue;
+        internal::ApplyCellKernel<dim, VectorType, Functor> apply_prolongation(
+          prolongator, scheme, src, dst);
 
-            Functor prolongator;
-
-            auto team_policy =
-              TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
-
-            internal::ApplyCellKernel<dim, VectorType, Functor>
-              apply_prolongation(prolongator, scheme, src, dst);
-
-            Kokkos::parallel_for("prolongate_and_add_h_transfer_scheme_" +
-                                   std::to_string(scheme_index),
-                                 team_policy,
-                                 apply_prolongation);
-            ++scheme_index;
-          }
+        Kokkos::parallel_for("prolongate_and_add_h_transfer_scheme_" +
+                               std::to_string(scheme_index),
+                             team_policy,
+                             apply_prolongation);
+        ++scheme_index;
       }
   }
 
@@ -1037,40 +1027,32 @@ namespace Portable
     VectorType       &dst,
     const VectorType &src) const
   {
-    if (matrix_free_data.get() != nullptr)
+    using TeamPolicy =
+      Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>;
+
+    using Functor = internal::CellRestrictionKernel<dim, VectorType>;
+
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
+    unsigned int scheme_index = 0;
+    for (auto &scheme : schemes)
       {
-        // p-transfer with MatrixFree cell loop will be added soon
-        Assert(false, ExcNotImplemented());
-      }
-    else
-      {
-        using TeamPolicy = Kokkos::TeamPolicy<
-          MemorySpace::Default::kokkos_space::execution_space>;
+        if (scheme.n_coarse_cells == 0)
+          continue;
 
-        using Functor = internal::CellRestrictionKernel<dim, VectorType>;
+        Functor restrictor;
 
-        MemorySpace::Default::kokkos_space::execution_space exec;
+        auto team_policy =
+          TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
 
-        unsigned int scheme_index = 0;
-        for (auto &scheme : schemes)
-          {
-            if (scheme.n_coarse_cells == 0)
-              continue;
+        internal::ApplyCellKernel<dim, VectorType, Functor> apply_restriction(
+          restrictor, scheme, src, dst);
 
-            Functor restrictor;
-
-            auto team_policy =
-              TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
-
-            internal::ApplyCellKernel<dim, VectorType, Functor>
-              apply_restriction(restrictor, scheme, src, dst);
-
-            Kokkos::parallel_for("prolongate_and_add_h_transfer_scheme_" +
-                                   std::to_string(scheme_index),
-                                 team_policy,
-                                 apply_restriction);
-            ++scheme_index;
-          }
+        Kokkos::parallel_for("prolongate_and_add_h_transfer_scheme_" +
+                               std::to_string(scheme_index),
+                             team_policy,
+                             apply_restriction);
+        ++scheme_index;
       }
   }
 
@@ -1108,15 +1090,12 @@ namespace Portable
     const std::shared_ptr<const Utilities::MPI::Partitioner>
       &external_partitioner_fine)
   {
-    if (matrix_free_data.get() != nullptr)
-      return std::make_pair(true, true);
-    else
-      return this->internal_enable_inplace_operations_if_possible(
-        external_partitioner_coarse,
-        external_partitioner_fine,
-        this->vec_fine_needs_ghost_update,
-        transfer_cpu.constraint_info_coarse,
-        transfer_cpu.constraint_info_fine.dof_indices);
+    return this->internal_enable_inplace_operations_if_possible(
+      external_partitioner_coarse,
+      external_partitioner_fine,
+      this->vec_fine_needs_ghost_update,
+      transfer_cpu.constraint_info_coarse,
+      transfer_cpu.constraint_info_fine.dof_indices);
   }
 
   template <int dim, typename VectorType>
@@ -1129,7 +1108,6 @@ namespace Portable
     const unsigned int               mg_level_fine,
     const unsigned int               mg_level_coarse)
   {
-    matrix_free_data.reset();
     internal::MGTwoLevelTransferImplementation::reinit_geometric_transfer(
       dof_handler_fine,
       dof_handler_coarse,
@@ -1139,23 +1117,6 @@ namespace Portable
       mg_level_coarse,
       *this);
   }
-
-  template <int dim, typename VectorType>
-  void
-  MGTwoLevelTransfer<dim, VectorType>::reinit_polynomial_transfer(
-    const MatrixFree<dim, Number> &matrix_free_fine,
-    const unsigned int             dof_handler_index_fine,
-    const MatrixFree<dim, Number> &matrix_free_coarse,
-    const unsigned int             dof_handler_index_coarse)
-  {
-    (void)matrix_free_fine;
-    (void)dof_handler_index_fine;
-    (void)matrix_free_coarse;
-    (void)dof_handler_index_coarse;
-
-    Assert(false, ExcNotImplemented());
-  }
-
 } // namespace Portable
 
 DEAL_II_NAMESPACE_CLOSE

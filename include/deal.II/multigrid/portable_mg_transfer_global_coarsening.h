@@ -100,21 +100,6 @@ namespace Portable
       const unsigned int mg_level_fine   = numbers::invalid_unsigned_int,
       const unsigned int mg_level_coarse = numbers::invalid_unsigned_int);
 
-    /**
-     * Set up polynomial coarsening between the DoFHandler objects underlying
-     * two MatrixFree objects and the respective numbers for the DoFHandler
-     * objects within MatrixFree. This reinit() function allows for a more
-     * efficient setup of the transfer operator and reduces the overall memory
-     * consumption of a multigrid cycle in case the same MatrixFree objects are
-     * also used for smoothers and residual evaluation on the two involved
-     * levels.
-     */
-    void
-    reinit_polynomial_transfer(
-      const MatrixFree<dim, Number> &matrix_free_fine,
-      const unsigned int             dof_handler_index_fine,
-      const MatrixFree<dim, Number> &matrix_free_coarse,
-      const unsigned int             dof_handler_index_coarse);
 
     /**
      * @copydoc MGTwoLevelTransferBase::interpolate
@@ -285,43 +270,6 @@ namespace Portable
      * Transfer schemes.
      */
     std::vector<MGTransferScheme> schemes;
-
-    /**
-     * Helper class for reading from and writing to global coarse vectors and
-     * for applying constraints.
-     */
-
-    struct MatrixFreeRelatedData
-    {
-      /**
-       * Matrix-free object on the fine side.
-       */
-      ObserverPointer<const MatrixFree<dim, Number>> matrix_free_fine;
-
-      /**
-       * Index within the list of DoFHandler objects in the matrix_free_fine
-       * object.
-       */
-      unsigned int dof_handler_index_fine;
-
-      /**
-       * Matrix-free object on the coarse side.
-       */
-      ObserverPointer<const MatrixFree<dim, Number>> matrix_free_coarse;
-
-      /**
-       * Index within the list of DoFHandler objects in the matrix_free_coarse
-       * object.
-       */
-      unsigned int dof_handler_index_coarse;
-    };
-
-    /**
-     * In case this class is built with MatrixFree objects (see the respective
-     * reinit() function), we set up this data structure and skip the other
-     * fields of the class.
-     */
-    std::unique_ptr<MatrixFreeRelatedData> matrix_free_data;
 
     /**
      * Number of components.
