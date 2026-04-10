@@ -106,7 +106,7 @@ public:
       n_components_ == dim,
       Tensor<2, dim, VectorizedArrayType>,
       Tensor<1, n_components_, Tensor<1, dim, VectorizedArrayType>>>>;
-  using curl_type = typename internal::CurlType<dim, VectorizedArrayType>::type;
+  using curl_type    = internal::CurlType<dim, VectorizedArrayType>;
   using hessian_type = std::conditional_t<
     n_components_ == 1,
     Tensor<2, dim, VectorizedArrayType>,

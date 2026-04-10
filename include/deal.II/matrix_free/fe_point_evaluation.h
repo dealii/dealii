@@ -76,7 +76,7 @@ namespace internal
         n_components == spacedim,
         Tensor<2, spacedim, Number>,
         Tensor<1, n_components, Tensor<1, spacedim, Number>>>;
-      using curl_type = typename internal::CurlType<dim, Number>::type;
+      using curl_type = internal::CurlType<dim, Number>;
       using scalar_unit_gradient_type =
         Tensor<1, n_components, Tensor<1, dim, ScalarNumber>>;
       using vectorized_unit_gradient_type =
@@ -257,12 +257,12 @@ namespace internal
       using VectorizedArrayType =
         typename dealii::internal::VectorizedArrayTrait<
           Number>::vectorized_value_type;
-      using value_type            = Number;
-      using scalar_value_type     = ScalarNumber;
-      using vectorized_value_type = VectorizedArrayType;
-      using unit_gradient_type    = Tensor<1, dim, Number>;
-      using real_gradient_type    = Tensor<1, spacedim, Number>;
-      using curl_type = typename internal::CurlType<dim, Number>::type;
+      using value_type                    = Number;
+      using scalar_value_type             = ScalarNumber;
+      using vectorized_value_type         = VectorizedArrayType;
+      using unit_gradient_type            = Tensor<1, dim, Number>;
+      using real_gradient_type            = Tensor<1, spacedim, Number>;
+      using curl_type                     = internal::CurlType<dim, Number>;
       using scalar_unit_gradient_type     = Tensor<1, dim, ScalarNumber>;
       using vectorized_unit_gradient_type = Tensor<1, dim, VectorizedArrayType>;
       using interface_vectorized_unit_gradient_type =
@@ -436,7 +436,7 @@ namespace internal
       using real_gradient_type            = unit_gradient_type;
       using scalar_unit_gradient_type     = Tensor<2, dim, ScalarNumber>;
       using vectorized_unit_gradient_type = Tensor<2, dim, VectorizedArrayType>;
-      using curl_type = typename internal::CurlType<dim, Number>::type;
+      using curl_type                     = internal::CurlType<dim, Number>;
       using interface_vectorized_unit_gradient_type =
         Tensor<1, dim, Tensor<1, dim, VectorizedArrayType>>;
 

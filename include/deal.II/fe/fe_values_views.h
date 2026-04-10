@@ -40,47 +40,24 @@ class FEValuesBase;
 namespace internal
 {
   /**
-   * A class whose specialization is used to define what type the curl of a
-   * vector valued function corresponds to.
+   * A type that represents the curl of a vector field in `dim` space
+   * dimensions. For 3d, the curl of a vector field is a vector
+   * itself, so if `dim==3`, then `CurlType = Tensor<1,3>`. In 2d,
+   * i.e., for vector fields that are confined to a two-dimensional
+   * manifold (which could be the two-dimensional plane, or a curved
+   * two-dimensional manifold embedded in higher-dimensional space),
+   * the curl is a vector that's perpendicular to the manifold; that
+   * is, it's a vector whose direction is fixed, and so the only thing
+   * that matters is the vector's magnitude and the curl of such a
+   * field is described by a scalar. For 1d or higher dimensions, the
+   * curl is not defined, and so we use a scalar type as a placeholder.
+   *
+   * The second argument denotes the scalar over which the vector
+   * field (and correspondingly the curl) is defined.
    */
   template <int dim, typename NumberType = double>
-  struct CurlType;
-
-  /**
-   * A class whose specialization is used to define what type the curl of a
-   * vector valued function corresponds to.
-   *
-   * In 1d, the curl is a scalar.
-   */
-  template <typename NumberType>
-  struct CurlType<1, NumberType>
-  {
-    using type = NumberType;
-  };
-
-  /**
-   * A class whose specialization is used to define what type the curl of a
-   * vector valued function corresponds to.
-   *
-   * In 2d, the curl is a scalar.
-   */
-  template <typename NumberType>
-  struct CurlType<2, NumberType>
-  {
-    using type = NumberType;
-  };
-
-  /**
-   * A class whose specialization is used to define what type the curl of a
-   * vector valued function corresponds to.
-   *
-   * In 3d, the curl is a vector.
-   */
-  template <typename NumberType>
-  struct CurlType<3, NumberType>
-  {
-    using type = Tensor<1, 3, NumberType>;
-  };
+  using CurlType =
+    std::conditional_t<dim == 3, Tensor<1, 3, NumberType>, NumberType>;
 } // namespace internal
 
 
@@ -634,10 +611,10 @@ namespace FEValuesViews
     /**
      * An alias for the type of the curl of the view this class represents.
      * Here, for a set of <code>spacedim=2</code> components of the finite
-     * element, the curl is a <code>Tensor@<1, 1@></code>. For
+     * element, the curl is a scalar. For
      * <code>spacedim=3</code> it is a <code>Tensor@<1, dim@></code>.
      */
-    using curl_type = typename dealii::internal::CurlType<spacedim>::type;
+    using curl_type = typename dealii::internal::CurlType<spacedim>;
 
     /**
      * An alias for the type of second derivatives of the view this class
