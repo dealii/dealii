@@ -129,10 +129,12 @@ for (S : REAL_AND_COMPLEX_SCALARS; deal_II_dimension : DIMENSIONS;
         std::vector<ProductType<
           S,
           dealii::SymmetricTensor<2, deal_II_space_dimension>>::type> &) const;
+#    if deal_II_space_dimension >= 2
     template void FEValuesViews::
       Vector<deal_II_dimension, deal_II_space_dimension>::get_function_curls<S>(
         const dealii::ReadVector<S> &,
         std::vector<ProductType<S, curl_type>::type> &) const;
+#    endif
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_divergences<S>(
@@ -235,10 +237,12 @@ for (VEC : GENERAL_CONTAINER_TYPES; Number : ALL_SCALAR_TYPES;
         const VEC<Number> &, std::vector<solution_divergence_type<Number>> &)
         const;
 
+#    if deal_II_space_dimension >= 2
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
       get_function_curls_from_local_dof_values<VEC<Number>>(
         const VEC<Number> &, std::vector<solution_curl_type<Number>> &) const;
+#    endif
 
     template void
     FEValuesViews::Vector<deal_II_dimension, deal_II_space_dimension>::
