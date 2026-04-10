@@ -235,12 +235,24 @@ namespace Portable
                        scratch_memory_space,
                      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
+      /**
+       * TeamPolicy handle.
+       */
       TeamHandle team_member;
 
+      /**
+       * Coarse cell index.
+       */
       const int cell_index;
 
+      /**
+       * Transfer scheme information.
+       */
       const MGTransferScheme &transfer_data;
 
+      /**
+       * Prolongation matrix in the scratch device memory.
+       */
       const SharedViewValues &prolongation_matrix_device;
 
       /**
