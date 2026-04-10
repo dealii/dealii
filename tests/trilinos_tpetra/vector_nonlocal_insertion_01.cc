@@ -15,7 +15,8 @@
 // Test distributed vector operations across multiple processes with non-local
 // entries to verify correct handling and compression states.
 // This test is like vector_nonlocal_addition_02, but checks the corresponding
-// insertion operation.
+// insertion operation. It shows that during insertion operations locally
+// owned entries are written, while non-locally owned entries are ignored.
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
@@ -85,7 +86,7 @@ test()
 
   if (my_rank == 0)
     {
-      // Add to both local and non-local parts
+      // Set both local and non-local parts
       vector_with_nonlocal_entries[0] = 1.0;
       vector_with_nonlocal_entries[1] = 1.0;
       vector_with_nonlocal_entries[2] = 1.0;
@@ -93,7 +94,7 @@ test()
     }
   if (my_rank == 1)
     {
-      // Add to both local and non-local parts
+      // Set both local and non-local parts
       vector_with_nonlocal_entries[2] = 2.0;
       vector_with_nonlocal_entries[3] = 2.0;
       vector_with_nonlocal_entries[4] = 2.0;
@@ -101,7 +102,7 @@ test()
     }
   if (my_rank == 2)
     {
-      // Add to only local part, there's no nonlocal part on rank 2
+      // Set only local part, there's no nonlocal part on rank 2
       vector_with_nonlocal_entries[5] = 3.0;
       vector_with_nonlocal_entries[6] = 3.0;
       vector_with_nonlocal_entries[7] = 3.0;
@@ -116,24 +117,25 @@ test()
   // deadlock, because other ranks would not participate in compress()
   if (my_rank == 1)
     {
-      // Add to both local and non-local parts
+      // Set both local and non-local parts
       vector_with_nonlocal_entries[2] = 0.5;
+      vector_with_nonlocal_entries[3] = 0.5;
     }
   vector_with_nonlocal_entries.compress(VectorOperation::insert);
 
   // Expected Results:
   // Entry Index  |  Insertions    |  Result
   // ------------ | -------------- | -------
-  //  0           |   +1           |   1.0
-  //  1           |   +1           |   1.0
-  //  2           |   +1, +2, +.5  |   0.5
-  //  3           |   +1, +2       |   2.0
-  //  4           |       +2       |   2.0
-  //  5           |       +2, +3   |   3.0
-  //  6           |           +3   |   3.0
-  //  7           |           +3   |   3.0
+  //  0           |   =1           |   1.0
+  //  1           |   =1           |   1.0
+  //  2           |   =1,          |   1.0
+  //  3           |      =2,=0.5   |   0.5
+  //  4           |      =2        |   2.0
+  //  5           |           =3   |   3.0
+  //  6           |           =3   |   3.0
+  //  7           |           =3   |   3.0
 
-  // Print the result after both additions on each process
+  // Print the result after both insertions on each process
   deallog << "After second operation:" << std::endl;
   vector_with_nonlocal_entries.print(deallog.get_file_stream());
 

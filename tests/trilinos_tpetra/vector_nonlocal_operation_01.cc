@@ -90,15 +90,15 @@ test()
       vector_with_nonlocal_entries[0] = 1.0;
       vector_with_nonlocal_entries[1] = 1.0;
       vector_with_nonlocal_entries[2] = 1.0;
-      vector_with_nonlocal_entries[3] = 2.0;
+      vector_with_nonlocal_entries[3] = 1.0;
     }
   if (my_rank == 1)
     {
       // Set both local and non-local parts
-      vector_with_nonlocal_entries[2] = 1.0;
+      vector_with_nonlocal_entries[2] = 2.0;
       vector_with_nonlocal_entries[3] = 2.0;
       vector_with_nonlocal_entries[4] = 2.0;
-      vector_with_nonlocal_entries[5] = 3.0;
+      vector_with_nonlocal_entries[5] = 2.0;
     }
   if (my_rank == 2)
     {
@@ -113,7 +113,7 @@ test()
   deallog << "After first operation:" << std::endl;
   vector_with_nonlocal_entries.print(deallog.get_file_stream());
 
-  // Continue with addition on some entries
+  // Continue with addition
   if (my_rank == 0)
     {
       // Add to both local and non-local parts
@@ -143,22 +143,22 @@ test()
   deallog << "After second operation:" << std::endl;
   vector_with_nonlocal_entries.print(deallog.get_file_stream());
 
-  // Finalize with another insertion, but only for some entries
+  // Finalize with another insertion
   if (my_rank == 0)
     {
       // Set both local and non-local parts
       vector_with_nonlocal_entries[0] = 1.0;
       vector_with_nonlocal_entries[1] = 1.0;
       vector_with_nonlocal_entries[2] = 1.0;
-      vector_with_nonlocal_entries[3] = 2.0;
+      vector_with_nonlocal_entries[3] = 1.0;
     }
   if (my_rank == 1)
     {
       // Set both local and non-local parts
-      vector_with_nonlocal_entries[2] = 1.0;
+      vector_with_nonlocal_entries[2] = 2.0;
       vector_with_nonlocal_entries[3] = 2.0;
       vector_with_nonlocal_entries[4] = 2.0;
-      vector_with_nonlocal_entries[5] = 3.0;
+      vector_with_nonlocal_entries[5] = 2.0;
     }
   if (my_rank == 2)
     {
@@ -181,7 +181,7 @@ test()
   //  6           |   =3,+3,=3     |   3.0,6.0,3.0
   //  7           |   =3,+3,=3     |   3.0,6.0,3.0
 
-  // Print the result afterinsertions on each process
+  // Print the result after insertions on each process
   deallog << "After third operation:" << std::endl;
   vector_with_nonlocal_entries.print(deallog.get_file_stream());
 

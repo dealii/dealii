@@ -7,13 +7,13 @@ size:8 locally_stored_size:3 :
 DEAL:0::After second operation:
 size:8 locally_stored_size:3 :
 [0]: 2.000e+00
-[1]: 2.000e+00
+[1]: 1.000e+00
 [2]: 2.000e+00
 DEAL:0::After third operation:
 size:8 locally_stored_size:3 :
-[0]: 1.000e+00
+[0]: 2.000e+00
 [1]: 1.000e+00
-[2]: 0.000e+00
+[2]: 1.000e+00
 DEAL:0::OK
 
 DEAL:1::After first operation:
@@ -43,7 +43,7 @@ size:8 locally_stored_size:3 :
 [7]: 6.000e+00
 DEAL:2::After third operation:
 size:8 locally_stored_size:3 :
-[5]: 0.000e+00
+[5]: 3.000e+00
 [6]: 3.000e+00
 [7]: 3.000e+00
 DEAL:2::OK

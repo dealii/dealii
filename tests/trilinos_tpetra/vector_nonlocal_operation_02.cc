@@ -15,8 +15,9 @@
 // Test distributed vector operations across multiple processes with non-local
 // entries to verify correct handling and compression states.
 // This test is like vector_nonlocal_operation_01, but when performing the
-// additions and insertions into non-local elements leaves out some elements
-// to check if the compression happens as one would expect.
+// additions and insertions into non-local elements it leaves out some elements
+// that are not locally owned. This checks that compression happens as one
+// would expect if some buffer entries remain empty.
 
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/utilities.h>
@@ -91,15 +92,15 @@ test()
       vector_with_nonlocal_entries[0] = 1.0;
       vector_with_nonlocal_entries[1] = 1.0;
       vector_with_nonlocal_entries[2] = 1.0;
-      vector_with_nonlocal_entries[3] = 2.0;
+      vector_with_nonlocal_entries[3] = 1.0;
     }
   if (my_rank == 1)
     {
       // Set both local and non-local parts
-      vector_with_nonlocal_entries[2] = 1.0;
+      vector_with_nonlocal_entries[2] = 2.0;
       vector_with_nonlocal_entries[3] = 2.0;
       vector_with_nonlocal_entries[4] = 2.0;
-      vector_with_nonlocal_entries[5] = 3.0;
+      vector_with_nonlocal_entries[5] = 2.0;
     }
   if (my_rank == 2)
     {
@@ -114,12 +115,12 @@ test()
   deallog << "After first operation:" << std::endl;
   vector_with_nonlocal_entries.print(deallog.get_file_stream());
 
-  // Continue with addition on some entries
+  // Continue with addition, but only on some entries
   if (my_rank == 0)
     {
       // Add to both local and non-local parts
       vector_with_nonlocal_entries[0] += 1.0;
-      vector_with_nonlocal_entries[1] += 1.0;
+      // vector_with_nonlocal_entries[1] += 1.0;
       vector_with_nonlocal_entries[2] += 1.0;
       vector_with_nonlocal_entries[3] += 1.0;
     }
@@ -148,18 +149,18 @@ test()
   if (my_rank == 0)
     {
       // Set both local and non-local parts
-      vector_with_nonlocal_entries[0] = 1.0;
+      // vector_with_nonlocal_entries[0] = 1.0;
       vector_with_nonlocal_entries[1] = 1.0;
       vector_with_nonlocal_entries[2] = 1.0;
-      vector_with_nonlocal_entries[3] = 2.0;
+      vector_with_nonlocal_entries[3] = 1.0;
     }
   if (my_rank == 1)
     {
       // Set only local part
-      // vector_with_nonlocal_entries[2] = 1.0;
+      // vector_with_nonlocal_entries[2] = 2.0;
       vector_with_nonlocal_entries[3] = 2.0;
       vector_with_nonlocal_entries[4] = 2.0;
-      // vector_with_nonlocal_entries[5] = 3.0;
+      // vector_with_nonlocal_entries[5] = 2.0;
     }
   if (my_rank == 2)
     {
@@ -173,12 +174,12 @@ test()
   // Expected Results across three operations:
   // Entry Index  |  Operations    |  Result
   // ------------ | -------------- | -------
-  //  0           |   =1,+1,=1     |   1.0,2.0,1.0
-  //  1           |   =1,+1,=1     |   1.0,2.0,1.0
-  //  2           |   =1,+1,=1     |   1.0,4.0,1.0
+  //  0           |   =1,+1        |   1.0,2.0,2.0
+  //  1           |   =1,=1        |   1.0,1.0,1.0
+  //  2           |   =1,+1,=1     |   1.0,2.0,1.0
   //  3           |   =2,+1,+2,=2  |   2.0,5.0,2.0
   //  4           |   =2,+2,=2     |   2.0,4.0,2.0
-  //  5           |   =3,+3=3      |   3.0,6.0,3.0
+  //  5           |   =3,+3,=3     |   3.0,6.0,3.0
   //  6           |   =3,+3,=3     |   3.0,6.0,3.0
   //  7           |   =3,+3,=3     |   3.0,6.0,3.0
 

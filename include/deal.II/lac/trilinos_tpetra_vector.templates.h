@@ -1151,11 +1151,16 @@ namespace LinearAlgebra
           else
             DEAL_II_NOT_IMPLEMENTED();
 
-          Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>> exporter =
-            Tpetra::createExport(nonlocal_vector->getMap(), vector->getMap());
-          vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
+          // Handle vector additions
+          if (operation == VectorOperation::add)
+            {
+              Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>>
+                exporter = Tpetra::createExport(nonlocal_vector->getMap(),
+                                                vector->getMap());
+              vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
+            }
 
-          nonlocal_vector->putScalar(0.);
+          nonlocal_vector->putScalar(Number(0));
         }
 
       compressed = true;

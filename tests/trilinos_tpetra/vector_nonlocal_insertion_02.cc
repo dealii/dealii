@@ -77,13 +77,13 @@ test()
       // Set all entries, assume all are locally active
       vector_with_nonlocal_entries[0] = 1.0;
       vector_with_nonlocal_entries[1] = 1.0;
-      vector_with_nonlocal_entries[2] = 2.0;
+      vector_with_nonlocal_entries[2] = 1.0;
     }
   if (my_rank == 1)
     {
-      // we dont set index 0, maybe it is locally relevant, but not locally
-      // active
-      vector_with_nonlocal_entries[1] = 1.0;
+      // we dont set index 0, this used to lead to
+      // overwriting index 0 on rank 0.
+      vector_with_nonlocal_entries[1] = 2.0;
       vector_with_nonlocal_entries[2] = 2.0;
     }
 

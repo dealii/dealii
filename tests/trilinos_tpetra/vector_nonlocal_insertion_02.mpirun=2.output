@@ -1,36 +1,12 @@
 
-DEAL:0::After first operation:
-size:8 locally_stored_size:3 :
+DEAL:0::After operation:
+size:3 locally_stored_size:2 :
 [0]: 1.000e+00
 [1]: 1.000e+00
-[2]: 2.000e+00
-DEAL:0::After second operation:
-size:8 locally_stored_size:3 :
-[0]: 1.000e+00
-[1]: 1.000e+00
-[2]: 5.000e-01
 DEAL:0::OK
 
-DEAL:1::After first operation:
-size:8 locally_stored_size:2 :
-[3]: 1.000e+00
-[4]: 2.000e+00
-DEAL:1::After second operation:
-size:8 locally_stored_size:2 :
-[3]: 1.000e+00
-[4]: 2.000e+00
+DEAL:1::After operation:
+size:3 locally_stored_size:1 :
+[2]: 2.000e+00
 DEAL:1::OK
-
-
-DEAL:2::After first operation:
-size:8 locally_stored_size:3 :
-[5]: 2.000e+00
-[6]: 3.000e+00
-[7]: 3.000e+00
-DEAL:2::After second operation:
-size:8 locally_stored_size:3 :
-[5]: 2.000e+00
-[6]: 3.000e+00
-[7]: 3.000e+00
-DEAL:2::OK
 
