@@ -39,12 +39,11 @@ namespace Portable
 #ifndef DOXYGEN
   namespace internal
   {
-    class MGTwoLevelTransferImplementation;
-
     template <typename Number>
     struct MGTransferSharedData;
 
   } // namespace internal
+
 #endif
 
   /**
@@ -220,7 +219,6 @@ namespace Portable
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> weights;
     };
 
-
     /**
      * Struct used for copying the data to the execution kernel handled by
      * internal::ApplyCellKernel. This is similar to MatrixFree<dim,
@@ -261,8 +259,6 @@ namespace Portable
       SharedViewValues &scratch_pad;
     };
 
-
-
   protected:
     void
     prolongate_and_add_internal(VectorType       &dst,
@@ -282,16 +278,6 @@ namespace Portable
      * Helper class for reading from and writing to global coarse vectors and
      * for applying constraints.
      */
-    dealii::internal::MatrixFreeFunctions::
-      ConstraintInfo<dim, VectorizedArray<Number, 1>, types::global_dof_index>
-        constraint_info_coarse;
-
-    /**
-     * Helper class for reading from and writing to global fine vectors.
-     */
-    dealii::internal::MatrixFreeFunctions::
-      ConstraintInfo<dim, VectorizedArray<Number, 1>, types::global_dof_index>
-        constraint_info_fine;
 
     struct MatrixFreeRelatedData
     {
@@ -339,6 +325,11 @@ namespace Portable
      * Multigrid level used during initialization.
      */
     unsigned int mg_level_fine;
+
+    dealii::MGTwoLevelTransfer<
+      dim,
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>
+      transfer_cpu;
 
     friend class internal::MGTwoLevelTransferImplementation;
   };
