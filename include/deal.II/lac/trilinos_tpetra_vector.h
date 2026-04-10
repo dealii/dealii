@@ -1192,12 +1192,6 @@ namespace LinearAlgebra
       using ViewType1d     = decltype(vector_1d_local);
       std::optional<ViewType1d> vector_1d_nonlocal;
 
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      // Mark vector as to-be-modified. We may do the same with
-      // the nonlocal part too if we end up writing into it.
-      vector->template modify<Kokkos::HostSpace>();
-#  endif
-
       for (size_type i = 0; i < n_elements; ++i)
         {
           const size_type row = indices[i];
@@ -1249,40 +1243,17 @@ namespace LinearAlgebra
               // deferred creating this view previously:
               if (!vector_1d_nonlocal)
                 {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
                   auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
                       Tpetra::Access::ReadWriteStruct{});
-#  else
-                  auto vector_2d_nonlocal =
-                    nonlocal_vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
 
                   vector_1d_nonlocal =
                     Kokkos::subview(vector_2d_nonlocal, Kokkos::ALL(), 0);
-
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-                  // Mark the nonlocal vector as to-be-modified as well.
-                  nonlocal_vector->template modify<Kokkos::HostSpace>();
-#  endif
                 }
               (*vector_1d_nonlocal)(nonlocal_row) += values[i];
               compressed = false;
             }
         }
-
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      vector->template sync<
-        typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
-          device_type::memory_space>();
-
-      // If we have created a view to the nonlocal part, then we have also
-      // written into it. Flush these modifications.
-      if (vector_1d_nonlocal)
-        nonlocal_vector->template sync<
-          typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
-            device_type::memory_space>();
-#  endif
     }
 
 
@@ -1308,14 +1279,8 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWriteStruct{});
-#  else
-      vector->template sync<Kokkos::HostSpace>();
-
-      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
 
       // Having extracted a view into the multivectors above, now also
       // extract a view into the one vector we actually store. We can
@@ -1326,12 +1291,6 @@ namespace LinearAlgebra
       auto vector_1d_local = Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
       using ViewType1d     = decltype(vector_1d_local);
       std::optional<ViewType1d> vector_1d_nonlocal;
-
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      // Mark vector as to-be-modified. We may do the same with
-      // the nonlocal part too if we end up writing into it.
-      vector->template modify<Kokkos::HostSpace>();
-#  endif
 
       for (size_type i = 0; i < n_elements; ++i)
         {
@@ -1384,40 +1343,17 @@ namespace LinearAlgebra
               // deferred creating this view previously:
               if (!vector_1d_nonlocal)
                 {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
                   auto vector_2d_nonlocal =
                     nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
                       Tpetra::Access::ReadWriteStruct{});
-#  else
-                  auto vector_2d_nonlocal =
-                    nonlocal_vector->template getLocalView<Kokkos::HostSpace>();
-#  endif
 
                   vector_1d_nonlocal =
                     Kokkos::subview(vector_2d_nonlocal, Kokkos::ALL(), 0);
-
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-                  // Mark the nonlocal vector as to-be-modified as well.
-                  nonlocal_vector->template modify<Kokkos::HostSpace>();
-#  endif
                 }
               (*vector_1d_nonlocal)(nonlocal_row) = values[i];
               compressed                          = false;
             }
         }
-
-#  if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-      vector->template sync<
-        typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
-          device_type::memory_space>();
-
-      // If we have created a view to the nonlocal part, then we have also
-      // written into it. Flush these modifications.
-      if (vector_1d_nonlocal)
-        nonlocal_vector->template sync<
-          typename Tpetra::Vector<Number, int, types::signed_global_dof_index>::
-            device_type::memory_space>();
-#  endif
     }
 
 

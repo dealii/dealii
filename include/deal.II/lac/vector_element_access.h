@@ -163,24 +163,10 @@ namespace internal
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
 
-#      if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
     auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>(
       Tpetra::Access::ReadWriteStruct{});
-#      else
-    vector.template sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
-#      endif
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-#      if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-    // We're going to modify the data on host.
-    vector.template modify<Kokkos::HostSpace>();
-#      endif
     vector_1d(trilinos_i) += value;
-#      if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-    vector.template sync<
-      typename Tpetra::Vector<NumberType, int, types::signed_global_dof_index>::
-        device_type::memory_space>();
-#      endif
   }
 
 
@@ -199,24 +185,11 @@ namespace internal
       vector.getMap()->getLocalElement(
         static_cast<TrilinosWrappers::types::int_type>(i));
 
-#      if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
     auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>(
       Tpetra::Access::ReadWriteStruct{});
-#      else
-    vector.template sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
-#      endif
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     // We're going to modify the data on host.
-#      if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-    vector.template modify<Kokkos::HostSpace>();
-#      endif
     vector_1d(trilinos_i) = value;
-#      if !DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
-    vector.template sync<
-      typename Tpetra::Vector<NumberType, int, types::signed_global_dof_index>::
-        device_type::memory_space>();
-#      endif
   }
 
 
@@ -230,15 +203,9 @@ namespace internal
         const types::global_dof_index                                         i)
   {
     // Extract local indices in the vector.
-#      if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
     const auto &vector    = V.trilinos_vector();
     auto        vector_2d = vector.template getLocalView<Kokkos::HostSpace>(
       Tpetra::Access::ReadOnlyStruct{});
-#      else
-    auto vector    = V.trilinos_vector();
-    vector.template sync<Kokkos::HostSpace>();
-    auto vector_2d = vector.template getLocalView<Kokkos::HostSpace>();
-#      endif
     auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     TrilinosWrappers::types::int_type trilinos_i =
       vector.getMap()->getLocalElement(

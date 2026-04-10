@@ -847,12 +847,8 @@ namespace LinearAlgebra
       size_type local_b = 0;
       for (int i = 0; i < static_cast<int>(local_size()); ++i)
         {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename TpetraTypes::GraphType<
             MemorySpace>::local_inds_host_view_type indices;
-#  else
-          Teuchos::ArrayView<const int> indices;
-#  endif
 
           graph->getLocalRowView(i, indices);
           const auto num_entries = indices.size();
@@ -1014,12 +1010,8 @@ namespace LinearAlgebra
           for (unsigned int i = 0; i < graph->getNodeNumRows(); ++i)
 #  endif
             {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
               typename TpetraTypes::GraphType<
                 MemorySpace>::local_inds_host_view_type indices;
-#  else
-              Teuchos::ArrayView<const int> indices;
-#  endif
               graph->getLocalRowView(i, indices);
               int num_entries = indices.size();
               for (int j = 0; j < num_entries; ++j)
@@ -1042,12 +1034,9 @@ namespace LinearAlgebra
 
       for (unsigned int row = 0; row < local_size(); ++row)
         {
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
           typename TpetraTypes::GraphType<
             MemorySpace>::local_inds_host_view_type indices;
-#  else
-          Teuchos::ArrayView<const int> indices;
-#  endif
+
           graph->getLocalRowView(row, indices);
           int num_entries = indices.size();
 

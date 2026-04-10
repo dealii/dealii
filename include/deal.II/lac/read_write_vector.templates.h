@@ -639,13 +639,8 @@ namespace LinearAlgebra
     //         backward.
     target_vector.doImport(vector, tpetra_export, Tpetra::INSERT);
 
-#  if DEAL_II_TRILINOS_VERSION_GTE(13, 2, 0)
     auto vector_2d = target_vector.template getLocalView<Kokkos::HostSpace>(
       Tpetra::Access::ReadOnlyStruct{});
-#  else
-    target_vector.template sync<Kokkos::HostSpace>();
-    auto vector_2d = target_vector.template getLocalView<Kokkos::HostSpace>();
-#  endif
     auto new_values = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     auto size       = target_vector.getLocalLength();
 
