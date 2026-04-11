@@ -1074,6 +1074,14 @@ namespace LinearAlgebra
       bool has_ghost;
 
       /**
+       * The operation that was last performed on the elements of the vector.
+       * The reset state is represented by VectorOperation::unknown, which means
+       * no element-wise modification has been done locally since creation or
+       * the last call to compress().
+       */
+      VectorOperation::values last_action;
+
+      /**
        * Teuchos::RCP to the actual Tpetra vector object.
        */
       Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>> vector;
@@ -1179,6 +1187,16 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      Assert(
+        nonlocal_vector.is_null() ||
+          (last_action == VectorOperation::unknown) ||
+          (last_action == VectorOperation::add),
+        ExcMessage(
+          "Cannot mix add and insert operations on a Tpetra vector "
+          "with non-locally owned entries without calling compress() in between."));
+
+      last_action = VectorOperation::add;
+
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWriteStruct{});
 
@@ -1278,6 +1296,16 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      Assert(
+        nonlocal_vector.is_null() ||
+          (last_action == VectorOperation::unknown) ||
+          (last_action == VectorOperation::insert),
+        ExcMessage(
+          "Cannot mix add and insert operations on a Tpetra vector "
+          "with non-locally owned entries without calling compress() in between."));
+
+      last_action = VectorOperation::insert;
 
       auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadWriteStruct{});
