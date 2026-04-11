@@ -154,10 +154,9 @@ Vector<Number>::Vector(const TrilinosWrappers::MPI::Vector &v)
       // be a better solution than
       // this, but it has not yet been
       // found.
-      TrilinosWrappers::MPI::Vector localized_vector;
-      localized_vector.reinit(complete_index_set(size()),
-                              v.get_mpi_communicator());
-      localized_vector.reinit(v, false, true);
+      TrilinosWrappers::MPI::Vector localized_vector(complete_index_set(size()),
+                                                     v,
+                                                     v.get_mpi_communicator());
 
       Assert(localized_vector.size() == size(),
              ExcDimensionMismatch(localized_vector.size(), size()));
@@ -831,10 +830,9 @@ Vector<Number>::operator=(const TrilinosWrappers::MPI::Vector &v)
       // be a better solution than
       // this, but it has not yet been
       // found.
-      TrilinosWrappers::MPI::Vector localized_vector;
-      localized_vector.reinit(complete_index_set(size()),
-                              v.get_mpi_communicator());
-      localized_vector.reinit(v, false, true);
+      TrilinosWrappers::MPI::Vector localized_vector(complete_index_set(size()),
+                                                     v,
+                                                     v.get_mpi_communicator());
 
       Assert(localized_vector.size() == size(),
              ExcDimensionMismatch(localized_vector.size(), size()));

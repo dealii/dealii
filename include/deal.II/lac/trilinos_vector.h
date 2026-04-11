@@ -546,22 +546,9 @@ namespace TrilinosWrappers
        * in case the vector layout is unchanged from before, otherwise entries
        * are set to zero.  Note that this behavior might change between
        * releases without notification.
-       *
-       * This function has a third argument, <tt>allow_different_maps</tt>,
-       * that allows for an exchange of data between two equal-sized vectors
-       * (but being distributed differently among the processors). A trivial
-       * application of this function is to generate a replication of a whole
-       * vector on each machine, when the calling vector is built with a map
-       * consisting of all indices on each process, and <tt>v</tt>
-       * is a distributed vector. In this case, the variable
-       * <tt>omit_zeroing_entries</tt> needs to be set to <tt>false</tt>,
-       * since it does not make sense to exchange data between differently
-       * parallelized vectors without touching the elements.
        */
       void
-      reinit(const Vector &v,
-             const bool    omit_zeroing_entries = false,
-             const bool    allow_different_maps = false);
+      reinit(const Vector &v, const bool omit_zeroing_entries = false);
 
       /**
        * Reinit functionality. This function destroys the old vector content

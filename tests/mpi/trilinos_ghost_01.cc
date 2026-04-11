@@ -63,7 +63,7 @@ test()
   Assert(v(myid * 2) == myid * 4.0, ExcInternalError());
   Assert(v(myid * 2 + 1) == myid * 4.0 + 2.0, ExcInternalError());
 
-  v_tmp.reinit(v, false, true);
+  v_tmp = v;
 
   // check ghost values
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

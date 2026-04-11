@@ -130,7 +130,15 @@ namespace TrilinosWrappers
 
       vector = std::make_unique<Epetra_FEVector>(
         parallel_partitioner.make_trilinos_map(communicator, true));
-      reinit(v, false, true);
+
+      AssertThrow(size() == v.size(), ExcDimensionMismatch(size(), v.size()));
+
+      Epetra_Import data_exchange(vector->Map(), v.vector->Map());
+
+      const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+      AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+
+      last_action = Insert;
     }
 
 
@@ -202,72 +210,40 @@ namespace TrilinosWrappers
 
 
     void
-    Vector::reinit(const Vector &v,
-                   const bool    omit_zeroing_entries,
-                   const bool    allow_different_maps)
+    Vector::reinit(const Vector &v, const bool omit_zeroing_entries)
     {
       nonlocal_vector.reset();
 
-      // In case we do not allow to have different maps, this call means that
-      // we have to reset the vector. So clear the vector, initialize our map
-      // with the map in v, and generate the vector.
-      if (allow_different_maps == false)
+      // check equality for MPI communicators: We can only choose the fast
+      // version in case the underlying Epetra_MpiComm object is the same,
+      // otherwise we might access an MPI_Comm object that has been
+      // deleted
+      const Epetra_MpiComm *my_comm =
+        dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
+      const Epetra_MpiComm *v_comm =
+        dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
+      const bool same_communicators = my_comm != nullptr && v_comm != nullptr &&
+                                      my_comm->DataPtr() == v_comm->DataPtr();
+      if (!same_communicators || vector->Map().SameAs(v.vector->Map()) == false)
         {
-          // check equality for MPI communicators: We can only choose the fast
-          // version in case the underlying Epetra_MpiComm object is the same,
-          // otherwise we might access an MPI_Comm object that has been
-          // deleted
-          const Epetra_MpiComm *my_comm =
-            dynamic_cast<const Epetra_MpiComm *>(&vector->Comm());
-          const Epetra_MpiComm *v_comm =
-            dynamic_cast<const Epetra_MpiComm *>(&v.vector->Comm());
-          const bool same_communicators =
-            my_comm != nullptr && v_comm != nullptr &&
-            my_comm->DataPtr() == v_comm->DataPtr();
-          if (!same_communicators ||
-              vector->Map().SameAs(v.vector->Map()) == false)
-            {
-              vector      = std::make_unique<Epetra_FEVector>(v.vector->Map());
-              has_ghosts  = v.has_ghosts;
-              last_action = Zero;
-              owned_elements = v.owned_elements;
-            }
-          else if (omit_zeroing_entries == false)
-            {
-              // old and new vectors have exactly the same map, i.e. size and
-              // parallel distribution
-              int ierr = vector->GlobalAssemble(last_action);
-              Assert(ierr == 0, ExcTrilinosError(ierr));
+          vector         = std::make_unique<Epetra_FEVector>(v.vector->Map());
+          has_ghosts     = v.has_ghosts;
+          last_action    = Zero;
+          owned_elements = v.owned_elements;
+        }
+      else if (omit_zeroing_entries == false)
+        {
+          // old and new vectors have exactly the same map, i.e. size and
+          // parallel distribution
+          int ierr = vector->GlobalAssemble(last_action);
+          Assert(ierr == 0, ExcTrilinosError(ierr));
 
-              ierr = vector->PutScalar(0.0);
-              Assert(ierr == 0, ExcTrilinosError(ierr));
+          ierr = vector->PutScalar(0.0);
+          Assert(ierr == 0, ExcTrilinosError(ierr));
 
-              last_action = Zero;
-            }
+          last_action = Zero;
         }
 
-      // Otherwise, we have to check that the two vectors are already of the
-      // same size, create an object for the data exchange and then insert all
-      // the data. The first assertion is only a check whether the user knows
-      // what they are doing.
-      else
-        {
-          Assert(omit_zeroing_entries == false,
-                 ExcMessage(
-                   "It is not possible to exchange data with the "
-                   "option 'omit_zeroing_entries' set, which would not write "
-                   "elements."));
-
-          AssertThrow(size() == v.size(),
-                      ExcDimensionMismatch(size(), v.size()));
-
-          Epetra_Import data_exchange(vector->Map(), v.vector->Map());
-
-          const int ierr = vector->Import(*v.vector, data_exchange, Insert);
-          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
-
-          last_action = Insert;
-        }
       if constexpr (running_in_debug_mode())
         {
           const Epetra_MpiComm *comm_ptr =
@@ -499,7 +475,12 @@ namespace TrilinosWrappers
       else if (size() == v.size() &&
                (v.vector->Map().UniqueGIDs() || vector->Map().UniqueGIDs()))
         {
-          reinit(v, false, true);
+          Epetra_Import data_exchange(vector->Map(), v.vector->Map());
+
+          const int ierr = vector->Import(*v.vector, data_exchange, Insert);
+          AssertThrow(ierr == 0, ExcTrilinosError(ierr));
+
+          last_action = Insert;
         }
       // Third case: Vectors do not have the same
       // size.

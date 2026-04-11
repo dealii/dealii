@@ -54,7 +54,7 @@ test()
 
   v.compress(VectorOperation::insert);
 
-  v_tmp.reinit(v, false, true);
+  v_tmp = v;
 
   bool   exc = false;
   double norm;
