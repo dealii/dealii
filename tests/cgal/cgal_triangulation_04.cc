@@ -12,7 +12,6 @@
 
 // Convert a cgal Triangulation_3 to a dealii::Triangulation<dim, spacedim>
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/triangulation.h>
 

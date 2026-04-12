@@ -14,7 +14,6 @@
 // the whole triangulation is a 2D surface mesh. In 3D, the surface mesh
 // describes the boundary of the deal.II Triangulation.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
 

@@ -13,7 +13,6 @@
 #ifndef dealii_performance_test_driver_h
 #define dealii_performance_test_driver_h
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/exceptions.h>

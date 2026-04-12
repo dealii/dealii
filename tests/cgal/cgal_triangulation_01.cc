@@ -12,7 +12,6 @@
 
 // Convert a vector of deal.II points to a cgal Triangulation
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/triangulation.h>
 

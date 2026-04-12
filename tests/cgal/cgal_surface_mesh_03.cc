@@ -12,7 +12,6 @@
 
 // Perform corefinement and boolean operations between surface_meshes.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/utilities.h>
 

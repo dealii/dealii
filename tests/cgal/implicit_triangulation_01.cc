@@ -12,7 +12,6 @@
 
 // Create a Triangulation<3,3> from an implicit function
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/function.h>
 

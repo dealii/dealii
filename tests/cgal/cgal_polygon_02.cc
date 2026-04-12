@@ -11,7 +11,6 @@
 // -----------------------------------------------------------------------------
 
 // Convert a deal.II triangulation to a CGAL polygon_2.
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/polygon.h>
 

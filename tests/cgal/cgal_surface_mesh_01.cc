@@ -12,7 +12,6 @@
 
 // Convert a deal.II cell to a cgal Surface_mesh.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
 

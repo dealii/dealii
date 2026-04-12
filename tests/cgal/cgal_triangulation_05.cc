@@ -16,7 +16,6 @@
 // kernel here, since Simple_cartesian will throw an exception when trying to
 // add some almost coplanar points.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/triangulation.h>
 

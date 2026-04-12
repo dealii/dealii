@@ -13,7 +13,6 @@
 
 // check that Tensor and SymmetricTensor work on device
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/symmetric_tensor.h>
