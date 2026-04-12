@@ -1,9 +1,9 @@
 - [x] Make output directory if it does not exist
-- [ ] Read second argument and make sure to save used parameter file there
+- [ ] Read second argument from CLI and make sure to save used parameter file there
 - [x] Functions should be initialized correctly
 - [ ] Default parameter should work
 - [ ] Check default tolerances
-- [ ] Move initialization of AMG preconditioners to the assembly functions
+- [x] Move initialization of AMG preconditioners to the assembly functions
 - [ ] Assemble the augmented system directly, and use AMG on it
 - [ ] Make sure that the names of the tolerances are meaningful
 - [ ] Explain very well the choicse of the reference configuration
