@@ -37,6 +37,9 @@
 #include <boost/algorithm/string.hpp>
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
+#include <filesystem>
+
+
 #define FORCE_USE_OF_TRILINOS
 
 namespace LA
@@ -586,7 +589,11 @@ namespace Step80
     , pressure(spacedim)
     , displacement(0)
     , lagrange_multiplier(spacedim)
-  {}
+  {
+    // Verify that the output folder exists, if it does not, create it
+    if (!std::filesystem::exists(par.output_directory))
+      std::filesystem::create_directory(par.output_directory);
+  }
 
 
   template <int dim, int spacedim>
@@ -1917,6 +1924,10 @@ namespace Step80
           << Utilities::dim_string(dim, spacedim) << "> using Trilinos."
           << std::endl;
 #endif
+    // Verify that the output folder exists, if it does not, create it
+    if (!std::filesystem::exists(par.output_directory))
+      std::filesystem::create_directory(par.output_directory);
+
     par.prm.print_parameters(par.output_directory + "/" + "used_parameters_" +
                                std::to_string(dim) + std::to_string(spacedim) +
                                ".prm",
