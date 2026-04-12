@@ -481,6 +481,8 @@ namespace Step80
     double compute_time_step() const;
 
     void setup_solid_particles();
+    void setup_tracer_particles();
+    void euler_step_tracer_particles(const double dt);
 
     void initial_setup();
     void setup_dofs();
@@ -760,6 +762,90 @@ namespace Step80
 
     AssertDimension(solid_particle_handler.n_global_particles() * spacedim,
                     solid_solution.block(0).size());
+  }
+
+
+
+  // @sect4{Tracer particle generation}
+  // This function generates tracer particles on the fluid triangulation.
+  // Following the approach from step-68, a separate triangulation is created
+  // to define the region where particles are seeded, and one particle is
+  // placed at the centroid of each cell of this seeding mesh.
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::setup_tracer_particles()
+  {
+    tracer_particle_handler.initialize(fluid_tria,
+                                       StaticMappingQ1<spacedim>::mapping);
+
+    parallel::distributed::Triangulation<spacedim> particle_triangulation(
+      mpi_communicator);
+
+    GridGenerator::generate_from_name_and_arguments(
+      particle_triangulation,
+      par.name_of_tracer_particle_grid,
+      par.arguments_for_tracer_particle_grid);
+
+
+    particle_triangulation.refine_global(par.particle_insertion_refinement);
+
+    Particles::Generators::quadrature_points(
+      particle_triangulation,
+      QMidpoint<spacedim>(),
+      global_fluid_bounding_boxes,
+      tracer_particle_handler,
+      StaticMappingQ1<spacedim>::mapping);
+
+    pcout << "   Number of tracer particles inserted: "
+          << tracer_particle_handler.n_global_particles() << std::endl;
+  }
+
+
+
+  // @sect4{Tracer particle advection}
+  // This function advects the tracer particles using the fluid velocity field,
+  // following the interpolated Euler step approach from step-68. The velocity
+  // is evaluated at each particle position using FEPointEvaluation and
+  // an explicit Euler step is used to update the particle locations.
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::euler_step_tracer_particles(
+    const double dt)
+  {
+    const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
+    Vector<double>     local_dof_values(dofs_per_cell);
+
+    FEPointEvaluation<spacedim, spacedim> evaluator(
+      StaticMappingQ1<spacedim>::mapping, *fluid_fe, update_values);
+    std::vector<Point<spacedim>> particle_positions;
+
+    auto particle = tracer_particle_handler.begin();
+    while (particle != tracer_particle_handler.end())
+      {
+        const auto cell = particle->get_surrounding_cell();
+        const auto dh_cell =
+          typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
+
+        dh_cell->get_dof_values(fluid_locally_relevant_solution,
+                                local_dof_values);
+
+        const auto pic = tracer_particle_handler.particles_in_cell(cell);
+        Assert(pic.begin() == particle, ExcInternalError());
+        particle_positions.clear();
+        for (auto &p : pic)
+          particle_positions.push_back(p.get_reference_location());
+
+        evaluator.reinit(cell, particle_positions);
+        evaluator.evaluate(make_array_view(local_dof_values),
+                           EvaluationFlags::values);
+
+        for (unsigned int particle_index = 0; particle != pic.end();
+             ++particle, ++particle_index)
+          {
+            const Tensor<1, spacedim> &particle_velocity =
+              evaluator.get_value(particle_index);
+            Point<spacedim> &particle_location = particle->get_location();
+            particle_location += particle_velocity * dt;
+          }
+      }
   }
 
 
@@ -1881,6 +1967,8 @@ namespace Step80
                      "solution-solid-particles",
                      cycle,
                      time);
+
+    output_particles(tracer_particle_handler, "tracer-particles", cycle, time);
   }
 
 
@@ -1982,6 +2070,7 @@ namespace Step80
             setup_dofs();
             interpolate_initial_conditions();
             setup_solid_particles();
+            setup_tracer_particles();
             output_results(output_cycle, time);
 
             assemble_navier_stokes_system(time_step);
@@ -2002,6 +2091,9 @@ namespace Step80
         solve(time_step);
 
         update_particle_positions();
+
+        euler_step_tracer_particles(time_step);
+        tracer_particle_handler.sort_particles_into_subdomains_and_cells();
 
         if (cycle % par.output_frequency == 0)
           {
