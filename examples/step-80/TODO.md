@@ -8,7 +8,7 @@
 - [ ] Make sure that the names of the tolerances are meaningful
 - [ ] Explain very well the choicse of the reference configuration
 - [ ] Make sure we use the same format for the parameters that is used as input
-- [ ] Reinsert tracers as in step-70
+- [x] Reinsert tracers as in step-70
 - [ ] Add output with only changed parameters w.r.t. default
 - [ ] Make sure we output the correct initial condition
 - [ ] Make it robust w.r.t. going out of the domain
