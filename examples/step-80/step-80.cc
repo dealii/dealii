@@ -540,12 +540,16 @@ namespace Step80
     AffineConstraints<double> fluid_constraints;
     AffineConstraints<double> solid_constraints;
 
-    LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
-    LA::MPI::BlockSparseMatrix fluid_mass_matrix;
-    LA::MPI::BlockSparseMatrix fluid_preconditioner;
+    LA::MPI::BlockSparseMatrix        fluid_matrix; // velocity and pressure
+    LA::MPI::BlockSparseMatrix        fluid_mass_matrix;
+    LA::MPI::BlockSparseMatrix        fluid_preconditioner;
+    TrilinosWrappers::PreconditionAMG fluid_velocity_preconditioner;
+    TrilinosWrappers::PreconditionAMG fluid_pressure_preconditioner;
 
     LA::MPI::BlockSparseMatrix
       solid_matrix; // displacement and Lagrange multiplier
+    TrilinosWrappers::PreconditionAMG solid_displacement_preconditioner;
+    TrilinosWrappers::PreconditionAMG solid_lagrange_preconditioner;
     LA::MPI::BlockSparseMatrix
       coupling_interpolation_matrix; // between displacement and velocity
 
@@ -1148,6 +1152,9 @@ namespace Step80
     fluid_matrix.compress(VectorOperation::add);
     fluid_preconditioner.compress(VectorOperation::add);
     fluid_mass_matrix.compress(VectorOperation::add);
+
+    fluid_velocity_preconditioner.initialize(fluid_matrix.block(0, 0));
+    fluid_pressure_preconditioner.initialize(fluid_preconditioner.block(1, 1));
   }
 
 
@@ -1318,6 +1325,9 @@ namespace Step80
                                                        solid_matrix);
         }
     solid_matrix.compress(VectorOperation::add);
+
+    solid_displacement_preconditioner.initialize(solid_matrix.block(0, 0));
+    solid_lagrange_preconditioner.initialize(solid_matrix.block(1, 1));
   }
 
 
@@ -1595,16 +1605,8 @@ namespace Step80
                                        false);
     SolverCG<TrilinosWrappers::MPI::Vector> cg_solver(inner_solver_control);
 
-    TrilinosWrappers::PreconditionILU Mp_inv_ilu;
-    Mp_inv_ilu.initialize(fluid_preconditioner.block(1, 1));
-    auto invMp = inverse_operator(Mp, cg_solver, Mp_inv_ilu);
-
-    TrilinosWrappers::PreconditionILU M_inv_ilu;
-    M_inv_ilu.initialize(solid_matrix.block(1, 1));
-    auto         invM = inverse_operator(M, cg_solver, M_inv_ilu);
-    const double h    = GridTools::maximal_cell_diameter(solid_tria);
-    //  const auto   invW = invM;
-    const auto invW = linear_operator(M, M_inv_ilu);
+    auto invMp = inverse_operator(Mp, cg_solver, fluid_pressure_preconditioner);
+    const auto invW = linear_operator(M, solid_lagrange_preconditioner);
 
     const auto gamma1 = par.gamma_AL_background;
     const auto gamma2 = par.gamma_AL_immersed * time_step;
@@ -1621,19 +1623,17 @@ namespace Step80
       false);
     SolverCG<Vec> cg_solver_lagrangian(inner_solver_control_lagrangian);
 
-    TrilinosWrappers::PreconditionAMG amg_A;
-    amg_A.initialize(fluid_matrix.block(0, 0));
     auto A11_aug_inv =
       inverse_operator(A11_aug,
                        cg_solver_lagrangian,
-                       amg_A); // inverse of fluid velocity block
+                       fluid_velocity_preconditioner); // inverse of fluid
+                                                       // velocity block
 
-    TrilinosWrappers::PreconditionAMG amg_K;
-    amg_K.initialize(solid_matrix.block(0, 0));
     auto A22_aug_inv =
       inverse_operator(A22_aug,
                        cg_solver_lagrangian,
-                       amg_K); // inverse of solid displacement block
+                       solid_displacement_preconditioner); // inverse of solid
+                                                           // displacement block
 
 
     // std::array<std::array<LinOp, 4>, 4> system_array = {
