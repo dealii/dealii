@@ -233,7 +233,7 @@ namespace Step80
     unsigned int outer_max_iterations            = 1000;
     double       outer_tolerance                 = 1e-5;
     unsigned int inner_lagrangian_max_iterations = 1000;
-    double       inner_lagrangian_tolerance      = 1e-2;
+    double       inner_lagrangian_tolerance      = 1e-4;
 
     using PrmFunction =
       ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
