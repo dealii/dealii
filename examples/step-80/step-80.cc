@@ -387,6 +387,8 @@ namespace Step80
       this->enter_my_subsection(this->prm);
     });
 
+
+
     // And make sure we check that the dimension and space dimension in the file
     // match the ones of the application
     parse_parameters_call_back.connect([&]() {
@@ -401,6 +403,35 @@ namespace Step80
       this->enter_my_subsection(this->prm);
       initialize_finite_elements_from_names();
     });
+
+    // We need to provide adequate default parameters for all of the functions
+    // of problem that have different number of components, but also potentially
+    // non-zero default values.
+    auto reset_function = [this](const std::string &expression) {
+      const unsigned int n_components =
+        Utilities::split_string_list(expression, ";").size();
+      this->prm.declare_entry(
+        "Function expression",
+        expression,
+        Patterns::List(Patterns::Anything(), n_components, n_components, ";"));
+    };
+
+    auto helper = [&](auto &function, const std::string expression) {
+      function.declare_parameters_call_back.connect(
+        [&]() { reset_function(expression); });
+    };
+
+    // We now use these two functions to set the correct default values for all
+    // of the functions used in this step.
+    helper(solid_initial_displacement,
+           spacedim == 2 ? "0; 0; 0; 0" : "0; 0; 0; 0; 0; 0");
+    helper(solid_reference_configuration,
+           spacedim == 2 ? "x; y; 0; 0" : "x; y; z; 0; 0; 0");
+    helper(solid_rhs, spacedim == 2 ? "0; 0; 0; 0 " : "0; 0; 0; 0; 0; 0");
+    helper(navier_stokes_initial_conditions,
+           spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
+    helper(navier_stokes_rhs, spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
+    helper(navier_stokes_bc, spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
   }
 
 
