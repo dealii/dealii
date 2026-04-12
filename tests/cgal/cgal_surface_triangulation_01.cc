@@ -13,7 +13,6 @@
 // Convert a closed CGAL::Surface_mesh or a closed CGAL::Polyhedron_3 to a
 // deal.II triangulation. The input mesh is a quad torus.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/triangulation.h>
 

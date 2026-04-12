@@ -13,7 +13,6 @@
 
 // check NumberTraits::abs() on device
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/numbers.h>

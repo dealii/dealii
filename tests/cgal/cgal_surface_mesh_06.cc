@@ -14,7 +14,6 @@
 // orientation issues that may arise in Hexaedrons with non-standard face
 // orientations.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/surface_mesh.h>
 #include <deal.II/cgal/utilities.h>

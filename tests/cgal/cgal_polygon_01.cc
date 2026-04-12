@@ -11,7 +11,6 @@
 // -----------------------------------------------------------------------------
 
 // Convert a deal.II reference cell to a cgal polygon_2.
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/polygon.h>
 

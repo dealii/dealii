@@ -12,7 +12,6 @@
 
 // Convert a cgal Triangulation_2 to a dealii::Triangulation<2, ...>
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/triangulation.h>
 

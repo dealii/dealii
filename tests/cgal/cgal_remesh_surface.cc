@@ -13,7 +13,6 @@
 // Remesh the union of two deal.II hyper_spheres in order to avoid bad
 // triangles.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
 

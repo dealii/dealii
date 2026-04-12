@@ -13,7 +13,6 @@
 // Performs the following: deal.II Triangulations -> CGAL::Surface_mesh(es) ->
 // Perform boolean operation -> deal.II tria.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/base/point.h>
 

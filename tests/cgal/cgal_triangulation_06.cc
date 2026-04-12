@@ -13,7 +13,6 @@
 // Read a surface mesh, make a coarse CGAL triangulation out of it, and
 // translate the result into a deal.II Triangulation.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/surface_mesh.h>
 #include <deal.II/cgal/triangulation.h>

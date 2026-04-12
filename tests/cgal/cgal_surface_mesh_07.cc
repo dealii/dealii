@@ -15,7 +15,6 @@
 // orientations. Make sure this works also when transforming the grid to
 // a simplex one.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/surface_mesh.h>
 #include <deal.II/cgal/utilities.h>

@@ -13,7 +13,6 @@
 // Read a Surface_mesh from an .off file, then create a coarse mesh filled with
 // tets
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/utilities.h>
 

@@ -12,7 +12,6 @@
 
 // Create a Tria<3> out of a Tria<2,3>.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/triangulation.h>
 

@@ -12,7 +12,6 @@
 
 // Check that different `cell_size` parameter gives different number of cells.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/utilities.h>
 

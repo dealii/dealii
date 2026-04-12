@@ -1,5 +1,4 @@
 
-#include <deal.II/base/config.h>
 
 #include <Kokkos_Core.hpp>
 

@@ -11,7 +11,6 @@
 // -----------------------------------------------------------------------------
 
 // Boolean operations on polygons
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/polygon.h>
 

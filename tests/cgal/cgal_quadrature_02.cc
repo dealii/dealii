@@ -13,7 +13,6 @@
 // Intersect reference cells and compute the volume of the intersection by
 // integration.
 
-#include <deal.II/base/config.h>
 
 #include <deal.II/cgal/utilities.h>
 
