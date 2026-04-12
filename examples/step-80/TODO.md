@@ -1,0 +1,13 @@
+- [x] Make output directory if it does not exist
+- [ ] Read second argument and make sure to save used parameter file there
+- [x] Functions should be initialized correctly
+- [ ] Default parameter should work
+- [ ] Check default tolerances
+- [ ] Move initialization of AMG preconditioners to the assembly functions
+- [ ] Assemble the augmented system directly, and use AMG on it
+- [ ] Make sure that the names of the tolerances are meaningful
+- [ ] Explain very well the choicse of the reference configuration
+- [ ] Make sure we use the same format for the parameters that is used as input
+- [ ] Reinsert tracers as in step-70
+- [ ] Add output with only changed parameters w.r.t. default
+- [ ] Make sure we output the correct initial condition
