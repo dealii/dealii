@@ -75,7 +75,7 @@ namespace Step101
 
     // We use the parameter thickness to compute the mass for the assessment of
     // the impact of the artificially added mass to the model. We still have a
-    // 2D problem, this is a non-existing thickness only used for the
+    // 2D problem, this is a nonexistent thickness only used for the
     // assessment, therefore, we set it to 1.0.
     double thickness;
 
@@ -154,7 +154,7 @@ namespace Step101
     // at any cost. If increasing the critical time step to our selected time
     // step means that we will violate our acceptability criteria, we will
     // reduce the target critical time step until the acceptability criteria are
-    // not longer violated.
+    // no longer violated.
     bool auto_reduce_dt_target;
 
     // Therefore, if the acceptability criteria are violated, we will reduce
@@ -165,7 +165,7 @@ namespace Step101
     // In this tutorial we have also set a maximum number of iterations in the
     // loop that reduces the target critical step. You may need to remesh your
     // model if you want to achieve a specific time step and after the maximum
-    // number of iteratively reducing the target critical step, the CMS still
+    // number of iterations of reducing the target critical step, the CMS still
     // violates the acceptability criteria.
     unsigned int max_dt_adjustment_steps;
 
@@ -866,7 +866,7 @@ namespace Step101
         AssertThrow(
           std::abs(h_char[idx] - h_char_i) < 1e-14,
           ExcMessage(
-            "h_char mismatch: stored h_char != recomputed min edge length"));
+            "h_char mismatch: stored h_char != recomputed minimum edge length"));
 
         ++idx;
       }

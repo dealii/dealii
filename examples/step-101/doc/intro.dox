@@ -8,12 +8,12 @@ This program was contributed by Lucía Agulló Martí in 2026.
 
 This tutorial focuses on Classical Mass Scaling (CMS), a method to
 artificially increase the critical time step in explicit time integration
-schemes. Therefore, this tutorial is conceptually based on step-8, which 
+schemes. Therefore, this tutorial is conceptually based on step-8, which
 already introduced linear elasticity using <code>FE_Q(1)</code> elements.
 However, unlike step-8, the present tutorial does not solve a boundary
 value problem. Instead, it reuses the elastic material model and finite
 element setting solely to demonstrate how the critical time step is computed
-and modified when applying CMS. 
+and modified when applying CMS.
 
 Broadly speaking, two classes of time integration schemes are commonly used
 in finite element (FE) simulations: implicit and explicit methods. Implicit
@@ -23,7 +23,7 @@ are typically unconditionally stable with respect to the time step size. However
 their major disadvantage is that they require the solution of one or more
 systems of equations at each step, which can be computationally expensive.
 
-Conversely, explicit integration methods are widely used for highly-dynamic
+Conversely, explicit integration methods are widely used for highly dynamic
 applications, such as impact and crash simulations, where inertia effects
 dominate the response. Their main appeal lies in the fact that explicit time
 integration schemes usually have less computationally expensive time steps
@@ -36,7 +36,7 @@ disadvantage lies in the stability since explicit time integration schemes are
 conditionally stable. Their stability depends on the size of the time step.
 If the time step is too big, the solution becomes rapidly unstable, leading to
 growing, non-physical oscillations. However, if the time step is too small,
-the overall computation time grows rapidly; computing only a few-seconds long
+the overall computation time grows rapidly; computing only a few-second-long
 crash could take hours and maybe even days. The restriction on the size of the
 time step is called the Courant-Friedrichs-Lewy (CFL) condition.
 
@@ -44,8 +44,8 @@ time step is called the Courant-Friedrichs-Lewy (CFL) condition.
 <h3>Courant-Friedrichs-Lewy (CFL) condition</h3>
 
 The CFL condition restricts the numerical stability of explicit integration
-schemes through the critical step time. If the explicit integration scheme uses
-a time step larger than the critical step time, the solution will become
+schemes through the critical time step. If the explicit integration scheme uses
+a time step larger than the critical time step, the solution will become
 numerically unstable, which manifests as rapidly growing, non-physical
 oscillations in the solution.
 
@@ -63,7 +63,7 @@ $c_{\text{max}}$ is the maximum wave propagation speed in the material.
 
 We see now that the CFL condition depends on the characteristic element
 length and on the maximum wave propagation speed in the material, which
-depends on the material stiffness. Therefore, very fine meshes and/or 
+depends on the material stiffness. Therefore, very fine meshes and/or
 very stiff materials result in very small critical time steps. However,
 sometimes the model needs such fine meshes to get plausible solutions, and
 the material cannot always be changed. This is exactly where Classical
@@ -159,7 +159,7 @@ transversal wave speed. This is an intrinsic physical property of
 elastic materials. However, if we are looking at numerics, we care about
 the fastest wave speed, the longitudinal wave speed. This speed dictates
 the smallest time scale that we are allowed to have in explicit time
-integration methods so that the mechanical perturbances have enough
+integration methods so that the mechanical perturbations have enough
 time to propagate from one mesh element to another. Thus, we formulate
 the CFL condition with the help of the longitudinal wave speed, which
 in the following, will be called material wave speed or only wave speed.
@@ -181,7 +181,7 @@ had already been used in step-8, the base for this tutorial.
 
 CMS is a numerical technique used in explicit finite element simulations
 to artificially increase the critical time step without modifying the
-spatial discretization. 
+spatial discretization.
 
 Let's look at the 1-dimensional CFL condition, for example for a rod:
 @f[
@@ -242,13 +242,13 @@ results in small acceptable changes in its behavior.
 
 In this tutorial, we assess the impact of CMS through two safety caps. We
 accept CMS if the total added mass remains below a prescribed maximum mass ratio,
-and if only a small portion of the mesh requires density scaling. For this 
+and if only a small portion of the mesh requires density scaling. For this
 tutorial, both values of these ratios have been set to certain numbers that would
 be appropriate for this specific model. When applying CMS to any model, one
 should ask themselves what specific acceptance criteria they should set.
 Nevertheless, this is not a trivial question. When dealing with CMS, you often
 have to conduct convergence studies until you find out what criteria are both
-acceptable and computationally efficient for your specific case. 
+acceptable and computationally efficient for your specific case.
 
 
 <h3>Limitations and scope of the tutorial</h3>

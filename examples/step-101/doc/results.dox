@@ -198,15 +198,15 @@ idx   area       e0        e1        e2        e3        h_char      dt_cell    
 --- End per-cell debug ---
 @endcode
 
-The table makes the CFL mechanism explicit. Small elements lead to small 
-characteristic element lengths, which then lead directly to small critical time 
+The table makes the CFL mechanism explicit. Small elements lead to small
+characteristic element lengths, which then lead directly to small critical time
 steps. In the example run above, the smallest characteristic length is <code>0.03</code>,
-which yields the smalles per-cell time step <code>0.017321</code>. Because explicit
+which yields the smallest per-cell time step <code>0.017321</code>. Because explicit
 time integration requires using a time step that is stable for every cell, this smallest
 value sets the global critical time before mass scaling.
 
 The program then requires an improved time step, which in this run corresponds
-to a 5% increase. CMS is then applied only to those cells whosse local critical
+to a 5% increase. CMS is then applied only to those cells whose local critical
 time step is below the requested target. For these cells, the density is increased
 so that their updated local critical time step matches the target. This is why, in
 the run shown above, all cells with a characteristic element length of <code>0.03</code>
@@ -233,15 +233,15 @@ The program successfully increases the global critical time step by the requeste
 factor, and it does so by modifying only a small part of the mesh and by adding
 a small amount of artificial mass.
 
-Finally, the program writes the file <code>>cms_rho_scaling.vtk</code>, which stores
-the per-cell field of the density scaling. 
+Finally, the program writes the file <code>cms_rho_scaling.vtk</code>, which stores
+the per-cell field of the density scaling.
 
 @code
 Wrote: cms_rho_scaling.vtk (cell data: rho_scaling)
 @endcode
 
 Visualizing this output for example with ParaView highlights where density scaling was
-applied. Most of the mesh has a density scaling of 1, while the smalll, stability-limiting
+applied. Most of the mesh has a density scaling of 1, while the small, stability-limiting
 elements show values larger than one. This proves an immediate sanity check that CMS is
 localized to the intended region of the mesh and helps assess whether the added mass is
 in parts of the domain where it is acceptable.
@@ -336,6 +336,6 @@ scaling factors during the simulation.
 As already mentioned in the introduction, common applications of explicit
 integration methods are crash and impact simulations. However, these kinds of
 simulations involve contact, which involves contact stiffness and penalty
-parameteres. Extending the prersent tutorial to include contact formulations would
+parameters. Extending the present tutorial to include contact formulations would
 provide additional insight into the practical use of mass scaling in realistic
 engineering simulations.
