@@ -25,9 +25,11 @@
 #  include <deal.II/lac/trilinos_tpetra_precondition.templates.h>
 #  include <deal.II/lac/trilinos_tpetra_types.h>
 
+DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <MueLu_CreateTpetraPreconditioner.hpp>
 #  include <MueLu_TpetraOperator_decl.hpp>
 #  include <Teuchos_ParameterList.hpp>
+DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #  include <string>
 
