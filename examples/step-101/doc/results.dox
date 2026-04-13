@@ -11,6 +11,23 @@ However, this can be extended in a number of ways. Some of these possibilities
 are briefly discussed below.
 
 
+<h4>Implementation into explicit FEM solvers and parallelization</h4>
+
+This tutorial presents the technique of CMS including the definition and calculation
+of the characteristic element length, the material wave speed, the critical
+time step, the required additional density to achieve a desired critical time
+step, and the physical impact of the additional density on the model. Therefore,
+a possible extension would be the solution of a full finite element simulation
+using explicit time integration, augmented with CMS to relax the critical
+time step constraint.
+
+Additionally, a big advantage of explicit time integration schemes is that their calculations
+can be easily parallelized because their time steps primarily consist of local
+operations and sparse matrix-vector products. Therefore, combining this tutorial
+with solving a simulation through explicit time integration and parallelization
+would allow CMS to be applied to significantly larger and more complex problems.
+
+
 <h4>3D problems</h4>
 
 This tutorial is restricted to a 2D setting in order to keep the focus on CMS,
@@ -79,12 +96,3 @@ simulations involve contact, which involves contact stiffness and penalty
 parameteres. Extending the prersent tutorial to include contact formulations would
 provide additional insight into the practical use of mass scaling in realistic
 engineering simulations.
-
-
-<h4>Parallelization</h4>
-
-A big advantage of explicit time integration schemes is that their calculations
-can be easily parallelized because their time steps primarily consist of local
-operations and sparse matrix-vector products. Therefore, combining this tutorial
-with parallelization would allow CMS to be applied to significantly larger and
-more complex problems.
