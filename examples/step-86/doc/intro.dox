@@ -241,7 +241,7 @@ differential equation, this is not actually true for those components
 of $U$ that correspond to boundary nodes; rather, their values are
 prescribed and will in general not satisfy the equation. On second
 thought, you will also find that the same sort of issue happens as
-well with handing nodes: These, too, are not really "free" but
+well with hanging nodes: These, too, are not really "free" but
 constrained to values that are derived from the values of neighboring
 nodes.
 
