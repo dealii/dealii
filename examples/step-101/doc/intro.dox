@@ -88,7 +88,7 @@ such as the bilinear quadrilateral elements used in this tutorial,
 $h_{\text{char}}$ is the smallest edge length of an element $l_{\text{min}}$:
 @f[
   h_{\text{char}} = l_{\text{min}}
-]
+@f]
 
 It is important to note that this definition is only valid for the finite
 elements that we use in this tutorial, <code>FE_Q(1)</code> elements in
@@ -112,7 +112,7 @@ due to increased inertia. Therefore, in linear elasticity, the material wave
 speed usually has the form of:
 @f[
   \text{wave speed} \sim \sqrt{\frac{\text{stiffness}}{\text{density}}}
-]
+@f]
 
 In elastic solids, mechanical disturbances do not propagate in a single way.
 Instead we have two different types of waves as a consequence of the constitutive
@@ -130,12 +130,12 @@ is why longitudinal waves typically propagate at the highest speed. The
 formula for longitudinal wave speed in linear elastic materials is:
 @f[
   c_p = \sqrt{\frac{\lambda + 2 \mu}{\rho}}
-]
+@f]
 expressed with the Lamé parameters $\lambda$ and $\mu$. Expressed with
 the elastic modulus $E$ and the Poisson's ratio $\nu$, the formula becomes:
 @f[
   c_p = \sqrt{\frac{E\,(1- \nu)}{(1+ \nu) \, (1-2 \nu) \, \rho}}
-]
+@f]
 
 The second type of waves are transversal waves, also known as shear
 waves. In these waves, the particle motion is perpendicular to the
@@ -148,11 +148,11 @@ slowly than longitudinal waves. The formula for transversal wave
 speed in linear elastic materials expressed with the Lamé parameters is:
 @f[
   c_s = \sqrt{\frac{\mu}{\rho}}
-]
+@f]
 and expressed with the elastic modulus and the Poisson's ratio:
 @f[
   c_s = \sqrt{\frac{E}{2 \, (1 + \nu) \, \rho}}
-]
+@f]
 
 There exist multiple wave speeds, the longitudinal wave speed and the
 transversal wave speed. This is an intrinsic physical property of
@@ -172,7 +172,7 @@ elements and the longitudinal wave speed in linear elastic materials
 we derive the CFL condition:
 @f[
   \Delta t \le h_{\text{char}} \, \sqrt{\frac{\rho}{\lambda + 2 \, \mu}}
-]
+@f]
 expressed with the Lamé parameters $\lambda$ and $\mu$, since these parameters
 had already been used in step-8, the base for this tutorial.
 
@@ -186,7 +186,7 @@ spatial discretization.
 Let's look at the 1-dimensional CFL condition, for example for a rod:
 @f[
   \Delta t_{\text{ele,1D}} \le h_{\text{char}} \, \sqrt{\frac{\rho}{E}}
-]
+@f]
 
 The critical time step of an element of a 1-dimensional rod depends on the
 characteristic element length $h_{\text{char}}$, density $\rho$ and
@@ -219,7 +219,7 @@ of the smallest elements of the model to increase the critical time step.
 The formula for the required density increase of an element is then:
 @f[
   \rho_{\text{add}} = E \, \left( \frac{\Delta t_{desired}}{h_{\text{char}}} \right)^{2} - \rho_{old}
-]
+@f]
 
 We now take a look at the physical meaning of CMS. When we artificially
 increase the density of an element, we decrease the material wave speed

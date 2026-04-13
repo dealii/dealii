@@ -478,7 +478,7 @@ namespace Step101
   // We first compute the critical step time per cell with the formula:
   // @f[
   // \Delta t \le h_{\text{char}} \, \sqrt{\frac{\rho}{\lambda + 2 \, \mu}}
-  // ]
+  // @f]
   template <int dim>
   double ElasticProblem<dim>::compute_dt_cell(
     const double h,
