@@ -239,6 +239,15 @@ results in small acceptable changes in its behavior.
 TODO: Add how to assess the impact.
 
 
+<h3>Limitations and scope of the tutorial</h3>
+
+Although CMS is used in explicit time integration schemes, this tutorial focuses
+on the computation and modification of the critical time step rather than on the
+full time integration. No explicit time integration is performed. The techniques
+discussed and presented here are intended as building blocks that can later be
+incorporated into explicit finite element solvers.
+
+
 <h3>References and further reading</h3>
 
 - K.-J. Bathe, "Finite Element Procedures", Prentice Hall, 1996.
