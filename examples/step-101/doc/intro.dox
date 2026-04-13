@@ -1,0 +1,403 @@
+<a name="step_8-Intro"></a>
+<h1>Introduction</h1>
+
+
+In real life, most partial differential equations are really systems
+of equations. Accordingly, the solutions are usually
+vector-valued. The deal.II library supports such problems (see the
+extensive documentation in the @ref vector_valued topic), and we will show
+that that is mostly rather simple. The only more complicated problems
+are in assembling matrix and right hand side, but these are easily
+understood as well.
+
+@dealiiVideoLecture{19}
+
+In this tutorial program we will want to solve the
+<a href="https://en.wikipedia.org/wiki/Linear_elasticity">elastic equations</a>.
+They are an extension to Laplace's equation with a vector-valued solution that
+describes the displacement in each space direction of a rigid body
+which is subject to a force. Of course, the force is also
+vector-valued, meaning that in each point it has a direction and an
+absolute value.
+
+One can write the elasticity equations in a number of ways. The one that shows
+the symmetry with the Laplace equation in the most obvious way is to write it
+as
+@f[
+  -
+  \text{div}\,
+  ({\mathbf C} \nabla \mathbf{u})
+  =
+  \mathbf f,
+@f]
+where $\mathbf u$ is the vector-valued displacement at each point,
+$\mathbf f$ the force, and ${\mathbf C}$ is a rank-4 tensor (i.e., it has four
+indices) that encodes the stress-strain relationship -- in essence,
+it represents the
+<a href="https://en.wikipedia.org/wiki/Hooke%27s_law">"spring constant"</a> in
+Hookes law that relates the displacement to the forces. ${\mathbf C}$ will, in many
+cases, depend on $\mathbf x$ if the body whose deformation we want to
+simulate is composed of different materials.
+
+While the form of the equations above is correct, it is not the way
+they are usually derived. In truth, the gradient of the displacement
+$\nabla\mathbf u$ (a matrix) has no physical meaning whereas its
+symmetrized version,
+@f[
+\varepsilon(\mathbf u)_{kl} =\frac{1}{2}(\partial_k u_l + \partial_l u_k),
+@f]
+does and is typically called the "strain". (Here and in the following,
+$\partial_k=\frac{\partial}{\partial x_k}$. We will also use the
+<a href="https://en.wikipedia.org/wiki/Einstein_notation">Einstein summation
+convention</a> that whenever the same index appears twice in an equation,
+summation over this index is implied; we will, however, not distinguish
+between upper and lower indices.)
+With this definition of the strain, the elasticity equations
+then read as
+@f[
+  -
+  \text{div}\,
+  ({\mathbf C} \varepsilon(\mathbf u))
+  =
+  \mathbf f,
+@f]
+which you can think of as the more natural generalization of the Laplace
+equation to vector-valued problems. (The form shown first is equivalent to
+this form because the tensor ${\mathbf C}$ has certain symmetries, namely that
+$C_{ijkl}=C_{ijlk}$, and consequently ${\mathbf C} \varepsilon(\mathbf u)_{kl}
+= {\mathbf C} \nabla\mathbf u$.)
+
+One can of course alternatively write these equations in component form:
+@f[
+  -
+  \partial_j (c_{ijkl} \varepsilon_{kl})
+  =
+  f_i,
+  \qquad
+  i=1\ldots d.
+@f]
+
+In many cases, one knows that the material under consideration is
+isotropic, in which case by introduction of the two coefficients
+$\lambda$ and $\mu$ the coefficient tensor reduces to
+@f[
+  c_{ijkl}
+  =
+  \lambda \delta_{ij} \delta_{kl} +
+  \mu (\delta_{ik} \delta_{jl} + \delta_{il} \delta_{jk}).
+@f]
+
+The elastic equations can then be rewritten in much simpler a form:
+@f[
+   -
+   \nabla \lambda (\nabla\cdot {\mathbf u})
+   -
+   (\nabla \cdot \mu \nabla) {\mathbf u}
+   -
+   \nabla\cdot \mu (\nabla {\mathbf u})^T
+   =
+   {\mathbf f},
+@f]
+and the respective bilinear form is then
+@f[
+  a({\mathbf u}, {\mathbf v}) =
+  \left(
+    \lambda \nabla\cdot {\mathbf u}, \nabla\cdot {\mathbf v}
+  \right)_\Omega
+  +
+  \sum_{k,l}
+  \left(
+    \mu \partial_k u_l, \partial_k v_l
+  \right)_\Omega
+  +
+  \sum_{k,l}
+  \left(
+    \mu \partial_k u_l, \partial_l v_k
+  \right)_\Omega,
+@f]
+or also writing the first term a sum over components:
+@f[
+  a({\mathbf u}, {\mathbf v}) =
+  \sum_{k,l}
+  \left(
+    \lambda \partial_l u_l, \partial_k v_k
+  \right)_\Omega
+  +
+  \sum_{k,l}
+  \left(
+    \mu \partial_k u_l, \partial_k v_l
+  \right)_\Omega
+  +
+  \sum_{k,l}
+  \left(
+    \mu \partial_k u_l, \partial_l v_k
+  \right)_\Omega.
+@f]
+
+@note As written, the equations above are generally considered to be the right
+description for the displacement of three-dimensional objects if the
+displacement is small and we can assume that <a
+href="http://en.wikipedia.org/wiki/Hookes_law">Hooke's law</a> is valid. In
+that case, the indices $i,j,k,l$ above all run over the set $\{1,2,3\}$ (or,
+in the C++ source, over $\{0,1,2\}$). However, as is, the program runs in 2d,
+and while the equations above also make mathematical sense in that case, they
+would only describe a truly two-dimensional solid. In particular, they are not
+the appropriate description of an $x-y$ cross-section of a body infinite in
+the $z$ direction; this is in contrast to many other two-dimensional equations
+that can be obtained by assuming that the body has infinite extent in
+$z$-direction and that the solution function does not depend on the $z$
+coordinate. On the other hand, there are equations for two-dimensional models
+of elasticity; see for example the Wikipedia article on <a
+href="http://en.wikipedia.org/wiki/Infinitesimal_strain_theory#Special_cases">plane
+strain</a>, <a
+href="http://en.wikipedia.org/wiki/Antiplane_shear">antiplane shear</a> and <a
+href="http://en.wikipedia.org/wiki/Plane_stress#Plane_stress">plan stress</a>.
+
+But let's get back to the original problem.
+How do we assemble the matrix for such an equation? A very long answer
+with a number of different alternatives is given in the documentation of the
+@ref vector_valued topic. Historically, the solution shown below was the only
+one available in the early years of the library. It turns out to also be the
+fastest. On the other hand, if a few per cent of compute time do not matter,
+there are simpler and probably more intuitive ways to assemble the linear
+system than the one discussed below but that weren't available until several
+years after this tutorial program was first written; if you are interested in
+them, take a look at the @ref vector_valued topic.
+
+Let us go back to the question of how to assemble the linear system. The first
+thing we need is some knowledge about how the shape functions work in the case
+of vector-valued finite elements. Basically, this comes down to the following:
+let $n$ be the number of shape functions for the scalar finite element of
+which we build the vector element (for example, we will use bilinear functions
+for each component of the vector-valued finite element, so the scalar finite
+element is the <code>FE_Q(1)</code> element which we have used in previous
+examples already, and $n=4$ in two space dimensions). Further, let $N$ be the
+number of shape functions for the vector element; in two space dimensions, we
+need $n$ shape functions for each component of the vector, so $N=2n$. Then,
+the $i$th shape function of the vector element has the form
+@f[
+  \Phi_i({\mathbf x}) = \varphi_{\text{base}(i)}({\mathbf x})\ {\mathbf e}_{\text{comp}(i)},
+@f]
+where $e_l$ is the $l$th unit vector, $\text{comp}(i)$ is the function that tells
+us which component of $\Phi_i$ is the one that is nonzero (for
+each vector shape function, only one component is nonzero, and all others are
+zero). $\varphi_{\text{base}(i)}(x)$ describes the space dependence of the shape
+function, which is taken to be the $\text{base}(i)$-th shape function of the scalar
+element. Of course, while $i$ is in the range $0,\ldots,N-1$, the functions
+$\text{comp}(i)$ and $\text{base}(i)$ have the ranges $0,1$ (in 2D) and $0,\ldots,n-1$,
+respectively.
+
+For example (though this sequence of shape functions is not
+guaranteed, and you should not rely on it),
+the following layout could be used by the library:
+@f{eqnarray*}{
+  \Phi_0({\mathbf x}) &=&
+  \left(\begin{array}{c}
+    \varphi_0({\mathbf x}) \\ 0
+  \end{array}\right),
+  \\
+  \Phi_1({\mathbf x}) &=&
+  \left(\begin{array}{c}
+    0 \\ \varphi_0({\mathbf x})
+  \end{array}\right),
+  \\
+  \Phi_2({\mathbf x}) &=&
+  \left(\begin{array}{c}
+    \varphi_1({\mathbf x}) \\ 0
+  \end{array}\right),
+  \\
+  \Phi_3({\mathbf x}) &=&
+  \left(\begin{array}{c}
+    0 \\ \varphi_1({\mathbf x})
+  \end{array}\right),
+  \ldots
+@f}
+where here
+@f[
+  \text{comp}(0)=0, \quad  \text{comp}(1)=1, \quad  \text{comp}(2)=0, \quad  \text{comp}(3)=1, \quad  \ldots
+@f]
+@f[
+  \text{base}(0)=0, \quad  \text{base}(1)=0, \quad  \text{base}(2)=1, \quad  \text{base}(3)=1, \quad  \ldots
+@f]
+
+In all but very rare cases, you will not need to know which shape function
+$\varphi_{\text{base}(i)}$ of the scalar element belongs to a shape function $\Phi_i$
+of the vector element. Let us therefore define
+@f[
+  \phi_i = \varphi_{\text{base}(i)}
+@f]
+by which we can write the vector shape function as
+@f[
+  \Phi_i({\mathbf x}) = \phi_{i}({\mathbf x})\ {\mathbf e}_{\text{comp}(i)}.
+@f]
+You can now safely forget about the function $\text{base}(i)$, at least for the rest
+of this example program.
+
+Now using this vector shape functions, we can write the discrete finite
+element solution as
+@f[
+  {\mathbf u}_h({\mathbf x}) =
+  \sum_i \Phi_i({\mathbf x})\ U_i
+@f]
+with scalar coefficients $U_i$. If we define an analog function ${\mathbf v}_h$ as
+test function, we can write the discrete problem as follows: Find coefficients
+$U_i$ such that
+@f[
+  a({\mathbf u}_h, {\mathbf v}_h) = ({\mathbf f}, {\mathbf v}_h)
+  \qquad
+  \forall {\mathbf v}_h.
+@f]
+
+If we insert the definition of the bilinear form and the representation of
+${\mathbf u}_h$ and ${\mathbf v}_h$ into this formula:
+@f{eqnarray*}{
+  \sum_{i,j}
+    U_i V_j
+  \sum_{k,l}
+  \left\{
+  \left(
+    \lambda \partial_l (\Phi_i)_l, \partial_k (\Phi_j)_k
+  \right)_\Omega
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_l (\Phi_j)_k
+  \right)_\Omega
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_k (\Phi_j)_l
+  \right)_\Omega
+  \right\}
+\\
+=
+  \sum_j V_j
+  \sum_l
+  \left(
+    f_l,
+    (\Phi_j)_l
+  \right)_\Omega.
+@f}
+We note that here and in the following, the indices $k,l$ run over spatial
+directions, i.e. $0\le k,l < d$, and that indices $i,j$ run over degrees
+of freedom.
+
+The local @ref GlossStiffnessMatrix "stiffness matrix" on cell $K$ therefore has the following entries:
+@f[
+  A^K_{ij}
+  =
+  \sum_{k,l}
+  \left\{
+  \left(
+    \lambda \partial_l (\Phi_i)_l, \partial_k (\Phi_j)_k
+  \right)_K
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_l (\Phi_j)_k
+  \right)_K
+  +
+  \left(
+    \mu \partial_l (\Phi_i)_k, \partial_k (\Phi_j)_l
+  \right)_K
+  \right\},
+@f]
+where $i,j$ now are local degrees of freedom and therefore $0\le i,j < N$.
+In these formulas, we always take some component of the vector shape functions
+$\Phi_i$, which are of course given as follows (see their definition):
+@f[
+  (\Phi_i)_l = \phi_i \delta_{l,\text{comp}(i)},
+@f]
+with the Kronecker symbol $\delta_{nm}$. Due to this, we can delete some of
+the sums over $k$ and $l$:
+@f{eqnarray*}{
+  A^K_{ij}
+  &=&
+  \sum_{k,l}
+  \Bigl\{
+  \left(
+    \lambda \partial_l \phi_i\ \delta_{l,\text{comp}(i)},
+            \partial_k \phi_j\ \delta_{k,\text{comp}(j)}
+  \right)_K
+\\
+  &\qquad\qquad& +
+  \left(
+    \mu \partial_l \phi_i\ \delta_{k,\text{comp}(i)},
+        \partial_l \phi_j\ \delta_{k,\text{comp}(j)}
+  \right)_K
+  +
+  \left(
+    \mu \partial_l \phi_i\ \delta_{k,\text{comp}(i)},
+        \partial_k \phi_j\ \delta_{l,\text{comp}(j)}
+  \right)_K
+  \Bigr\}
+\\
+  &=&
+  \left(
+    \lambda \partial_{\text{comp}(i)} \phi_i,
+            \partial_{\text{comp}(j)} \phi_j
+  \right)_K
+  +
+  \sum_l
+  \left(
+    \mu \partial_l \phi_i,
+        \partial_l \phi_j
+  \right)_K
+  \ \delta_{\text{comp}(i),\text{comp}(j)}
+  +
+  \left(
+    \mu \partial_{\text{comp}(j)} \phi_i,
+        \partial_{\text{comp}(i)} \phi_j
+  \right)_K
+\\
+  &=&
+  \left(
+    \lambda \partial_{\text{comp}(i)} \phi_i,
+            \partial_{\text{comp}(j)} \phi_j
+  \right)_K
+  +
+  \left(
+    \mu \nabla \phi_i,
+        \nabla \phi_j
+  \right)_K
+  \ \delta_{\text{comp}(i),\text{comp}(j)}
+  +
+  \left(
+    \mu \partial_{\text{comp}(j)} \phi_i,
+        \partial_{\text{comp}(i)} \phi_j
+  \right)_K.
+@f}
+
+Likewise, the contribution of cell $K$ to the right hand side vector is
+@f{eqnarray*}{
+  f^K_j
+  &=&
+  \sum_l
+  \left(
+    f_l,
+    (\Phi_j)_l
+  \right)_K
+\\
+  &=&
+  \sum_l
+  \left(
+    f_l,
+    \phi_j \delta_{l,\text{comp}(j)}
+  \right)_K
+\\
+  &=&
+  \left(
+    f_{\text{comp}(j)},
+    \phi_j
+  \right)_K.
+@f}
+
+This is the form in which we will implement the local stiffness matrix and
+right hand side vectors.
+
+As a final note: in the step-17 example program, we will
+revisit the elastic problem laid out here, and will show how to solve it in
+%parallel on a cluster of computers. The resulting program will thus be able to
+solve this problem to significantly higher accuracy, and more efficiently if
+this is required. In addition, in step-20, step-21,
+as well as a few other of the later tutorial programs, we will
+revisit some vector-valued problems and show a few techniques that may make it
+simpler to actually go through all the stuff shown above, with
+FiniteElement::system_to_component_index etc.
