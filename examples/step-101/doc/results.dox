@@ -6,75 +6,85 @@
 <a name="step-101-extensions"></a>
 <h3>Possibilities for extensions</h3>
 
-The goal of this tutorial is to introduce the idea and implementation of CMS. 
-However, this can be extended in a number of ways. Some of these possibilities 
+The goal of this tutorial is to introduce the idea and implementation of CMS.
+However, this can be extended in a number of ways. Some of these possibilities
 are briefly discussed below.
+
+
+<h4>3D problems</h4>
+
+This tutorial is restricted to a 2D setting in order to keep the focus on CMS,
+therefore, a possible extension would be to compute everything in 3D. Most
+components of the program are already dimension-independent and only require
+instantiating the main class with <code>dim = 3</code>. This extension would significantly
+increase the computational cost and memory requirements, but it would also
+provide a more realistic setting for more complex applications.
 
 
 <h4>Selective Mass Scaling (SMS)</h4>
 
-CMS as used in this tutorial increases the critical time step by increasing 
-the density of selected finite elements uniformly, which affects all eigenmodes 
-equally much. In particular rigid body and low frequency modes are affected. 
-However, structures tend to deform in low frequency modes. In some applications 
-modifying the density of the elements uniformly can lead to an undesired 
+CMS as used in this tutorial increases the critical time step by increasing
+the density of selected finite elements uniformly, which affects all eigenmodes
+equally much. In particular rigid body and low frequency modes are affected.
+However, structures tend to deform in low frequency modes. In some applications
+modifying the density of the elements uniformly can lead to an undesired
 influence on the physically relevant low-frequency response.
 
-In contrast, high frequency modes are relatively unimportant for the global 
-structural response, are often highly localized, and they only limit the time 
-step. Hence, the idea of Selective Mass Scaling (SMS) is to suppress high 
-frequency content and leave the low frequency modes unaffected by modifying 
-the structure of the added mass matrix to select only the affected modes. This 
-generally requires additional analysis steps, and is therefore more complex 
+In contrast, high frequency modes are relatively unimportant for the global
+structural response, are often highly localized, and they only limit the time
+step. Hence, the idea of Selective Mass Scaling (SMS) is to suppress high
+frequency content and leave the low frequency modes unaffected by modifying
+the structure of the added mass matrix to select only the affected modes. This
+generally requires additional analysis steps, and is therefore more complex
 than CMS.
 
 
 <h4>Adaptive mesh refinement</h4>
 
-The critical time step in explicit time integration methods is dictated by the 
-smallest element in the mesh. Therefore, a possible extension of this tutorial 
-would be to avoid unnecessarily small elements whenever possible through adaptive 
-mesh refinement. This could significantly reduce the number of elements that 
-impose a restriction on the critical time step. Combining adaptive mesh refinement 
+The critical time step in explicit time integration methods is dictated by the
+smallest element in the mesh. Therefore, a possible extension of this tutorial
+would be to avoid unnecessarily small elements whenever possible through adaptive
+mesh refinement. This could significantly reduce the number of elements that
+impose a restriction on the critical time step. Combining adaptive mesh refinement
 with CMS could help solve more complex simulations in advanced applications.
 
 
 <h4>Higher-order finite elements</h4>
 
-In this tutorial, we restrict ourselves to Q1 elements (TODO: DOUBLE CHECK THIS!) 
-in order to keep the discussion of stability limits and characteristic element 
-lengths transparent. A possible extension would therefore be to consider 
-higher-order finite elements. They could improve accuracy for smooth solutions, 
-but they also introduce additional stability constraints in explicit time 
-integration. Therefore, this would require extending the definition of characteristic 
-element lengths and stability estimates, but the concept of the tutorial would 
-remain the same.
+In this tutorial, we restrict ourselves to <code>FE_Q(1)</code> elements in
+order to keep the discussion of stability limits and characteristic element
+lengths the focus. A possible extension would therefore be to consider higher-order
+finite elements. They could improve accuracy for smooth solutions, but they also
+introduce additional stability constraints in explicit time integration.
+Therefore, this would require extending the definition of characteristic
+element lengths and therefore the CFL condition, but the concept of the tutorial
+would remain the same.
 
 
 <h4>Nonlinear materials</h4>
 
-This tutorial is based on small-strain linear elasticity to focus the explanation 
-on CMS. However, in many practical applications, nonlinear material behavior plays 
-a major role. Thus, this material could be extended to work with nonlinear 
-constitutive laws, such as plasticity and damage models, which would possibly 
-require to re-evaluate stability limits dynamically and potentially adapt mass 
+This tutorial is based on small-strain linear elasticity to focus the explanation
+on CMS. However, in many practical applications, nonlinear material behavior plays
+a major role. Thus, this material could be extended to work with nonlinear
+constitutive laws, such as plasticity and damage models, which would possibly
+require to re-evaluate stability limits dynamically and potentially adapt mass
 scaling factors during the simulation.
 
 
 <h4>Contact</h4>
 
-As already mentioned in the introduction, common applications of explicit 
-integration methods are crash and impact simulations. However, these kinds of 
-simulations involve contact, which involves contact stiffness and penalty 
-parameteres. Extending the prersent tutorial to include contact formulations would 
-provide additional insight into the practical use of mass scaling in realistic 
+As already mentioned in the introduction, common applications of explicit
+integration methods are crash and impact simulations. However, these kinds of
+simulations involve contact, which involves contact stiffness and penalty
+parameteres. Extending the prersent tutorial to include contact formulations would
+provide additional insight into the practical use of mass scaling in realistic
 engineering simulations.
 
 
 <h4>Parallelization</h4>
 
-A big advantage of explicit time integration schemes is that their calculations 
-can be easily parallelized because their time steps primarily consist of local 
-operations and sparse matrix-vector products. Therefore, combining this tutorial 
-with parallelization would allow CMS to be applied to significantly larger and 
+A big advantage of explicit time integration schemes is that their calculations
+can be easily parallelized because their time steps primarily consist of local
+operations and sparse matrix-vector products. Therefore, combining this tutorial
+with parallelization would allow CMS to be applied to significantly larger and
 more complex problems.
