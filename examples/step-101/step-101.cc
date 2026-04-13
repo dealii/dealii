@@ -902,14 +902,6 @@ namespace Step101
     // We print cell-by-cell debug information to better show the functionality of CMS.
     print_cell_debug_table(h_char, cms.density_scaling, cms.dt_target);
 
-    // We report the total area of our mesh, used for sanity information of our unconventional
-    // mesh.
-    double total_area = 0.0;
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      total_area += cell->measure();
-
-    std::cout << "\nTotal model area = " << total_area << "\n";
-
     // We summarize time step targeting.
     std::cout << "\nTargeting:\n";
     std::cout << "dt_factor = " << parameters.dt_factor << '\n';
