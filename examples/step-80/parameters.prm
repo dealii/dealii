@@ -78,5 +78,6 @@ subsection Navier-Stokes Immersed Problem
     set Inner solver tolerance                     = 1e-14
     set Outer solver maximum iterations            = 1000
     set Outer solver tolerance                     = 1e-05
+    set Solver type                                = augmented_split
   end
 end
