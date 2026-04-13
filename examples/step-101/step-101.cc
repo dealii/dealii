@@ -22,6 +22,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h> //TODO: CHECK
+#include <deal.II/base/exceptions.h>
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -32,6 +33,7 @@
 #include <deal.II/lac/affine_constraints.h>
 
 #include <deal.II/grid/tria.h>
+#include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h> //TODO: DELETE?
 
@@ -80,16 +82,14 @@ namespace Step101
     // set it to 1.0.
     double thickness = 1.0; 
 
-    // A critical fraction of 01 means that we want our code to choose the 1% of the smallest cells
-    // and label them as critical because they limit the critical time step too much.
-    double critical_fraction = 0.01;
-
     // To select a bigger critical step, we define the parameter dt_factor.
     // The newly selected critical step, the target critical step,
     // <code>dt_target</code> will then be calculated through
     // <code>dt_target = dt_factor * dt_crit_global</code>, which is based on the selected
     // critical cells.
-    double dt_factor = 1.2;
+    double dt_factor = 1.1;
+
+    // Acceptability criteria
 
     // Safety cap used in the assessment of the impact of the artificially added
     // mass to the system's response. If the mass increase of the model is greater
@@ -98,6 +98,9 @@ namespace Step101
     // equals or is smaller than <code>max_added_mass_fraction</code> or until
     // the maximum number of iterations is reached.
     double max_added_mass_fraction = 0.10;
+    double max_scaled_cell_fraction = 0.10;
+
+    bool auto_reduce_dt_target = true;
 
     // When the mass increase is too large, shrink <code>dt_target</code> by
     // the factor <code>dt_shrink_factor</code> and retry.
@@ -136,64 +139,163 @@ namespace Step101
      void run();
 
    private:
-     void setup_system();
-     // void assemble_system();
-     // void solve();
-     // void refine_grid();
-     // void output_results(const unsigned int cycle) const;
-     void assemble_stiffness_and_rhs();
-     void assemble_consistent_mass_matrix();
-
-     const CmsParameters parameters;
-
-     Triangulation<dim> triangulation;
-     DoFHandler<dim>    dof_handler;
-
-     const FESystem<dim> fe;
-
-     AffineConstraints<double> constraints;
-
-     SparsityPattern      sparsity_pattern;
-     SparseMatrix<double> system_matrix;
-     SparseMatrix<double> stiffness_matrix;
-     SparseMatrix<double> mass_matrix;
-
-  //    Vector<double> solution;
-     Vector<double> system_rhs;
-     static double compute_min_edge_length_of_cell(
-      const typename DoFHandler<dim>::active_cell_iterator &cell
-     );
-
-     void compute_characteristic_lengths(std::vector<double> &h_char) const;
-
-     std::pair<double, std::vector<unsigned int>>
-     select_critical_cells_by_percentile(const std::vector<double> &h_char) const;
-
-     double compute_pressure_wave_speed() const;
-
-     struct CmsResult
+   struct CmsResult
      {
-      double dt_crit_reference = 0.0;
+      double dt_crit_global_before = 0.0;
       double dt_target = 0.0;
+      double dt_crit_global_after = 0.0;
 
       double total_mass = 0.0;
       double added_mass = 0.0;
       double added_mass_ratio = 0.0;
 
+      unsigned int n_scaled = 0;
+      double scaled_fraction = 0.0;
+
+      std::vector<double> h_char;
+
       // Per-cell density scaling alpha = rho_new / rho_old
       std::vector<double> density_scaling;
      };
 
-     CmsResult apply_classical_mass_scaling(
-      const std::vector<double> &h_char, const std::vector<unsigned int> &critical_cell_ids, const double dt_target
-     ) const;
+     //void setup_system();
+     // void assemble_system();
+     // void solve();
+     // void refine_grid();
+     // void output_results(const unsigned int cycle) const;
+     //void assemble_stiffness_and_rhs();
+     //void assemble_consistent_mass_matrix();
+
+     // Mesh and geometry
+     void make_conforming_graded_mesh();
+
+     static double compute_min_edge_length_of_cell(
+      const typename Triangulation<dim>::active_cell_iterator &cell
+     );
+
+     void compute_characteristic_length(std::vector<double> &h_char) const;
+
+     // CFL / dt computations
+     double compute_dt_cell(const double h, const double rho_local) const;
+     double compute_dt_crit_global(const std::vector<double> &h_char, const std::vector<double> &density_scaling) const;
+
+     // CMS
+     CmsResult apply_cms_for_target_dt(const std::vector<double> &h_char, const double dt_target) const;
 
      CmsResult choose_dt_and_apply_cms(const std::vector<double> &h_char) const;
 
+     void verify_mesh_is_quad_and_non_degenerate() const;
+
+     void print_cell_debug_table(const std::vector<double> &h_char, const std::vector<double> &density_scaling, const double dt_target) const;
+
+     // Output
      void output_density_scaling(const std::vector<double> &density_scaling) const;
+
+     const CmsParameters parameters;
+
+     Triangulation<dim> triangulation;
+     DoFHandler<dim> dof_handler;
+     const FESystem<dim> fe;
+
+  //    const CmsParameters parameters;
+
+  //    Triangulation<dim> triangulation{Triangulation<dim>::limit_level_difference_at_vertices};
+  //    DoFHandler<dim>    dof_handler;
+
+  //    const FESystem<dim> fe;
+
+  //    AffineConstraints<double> constraints;
+
+  //    SparsityPattern      sparsity_pattern;
+  //    SparseMatrix<double> system_matrix;
+  //    SparseMatrix<double> stiffness_matrix;
+  //    SparseMatrix<double> mass_matrix;
+
+  // //    Vector<double> solution;
+  //    Vector<double> system_rhs;
+  //    static double compute_min_edge_length_of_cell(
+  //     const typename DoFHandler<dim>::active_cell_iterator &cell
+  //    );
+
+  //    std::pair<double, std::vector<unsigned int>>
+  //    select_critical_cells_by_percentile(const std::vector<double> &h_char) const;
+
+  //    double compute_pressure_wave_speed() const;
+
+  //    CmsResult apply_classical_mass_scaling(
+  //     const std::vector<double> &h_char, const std::vector<unsigned int> &critical_cell_ids, const double dt_target
+  //    ) const;
+
+  //    CmsResult choose_dt_and_apply_cms(const std::vector<double> &h_char) const;
+
+  //    void output_density_scaling(const std::vector<double> &density_scaling) const;
 
 
     };
+
+    template <int dim>
+    ElasticProblem<dim>::ElasticProblem(const CmsParameters &parameters)
+      : parameters(parameters)
+      , dof_handler(triangulation)
+      , fe(FE_Q<dim>(1) ^ dim)
+    {}
+
+    // Mesh generation without hanging nodes
+    // Build a structured quad mesh on [-1,1]² but non-uniform spacing in x/y (clustering).
+    // This yields different cell sizes AND is conforming (no hanging modes / no T-junctions).
+
+    template <int dim>
+    void ElasticProblem<dim>::make_conforming_graded_mesh()
+    {
+      Assert(dim == 2, ExcMessage("This demo is implemented for dim=2 only."));
+
+      // Coordinates with clustering in several regions:
+      //  - coarse on the left/bottom
+      //  - finer near x ~ 0.6 and y ~ 0.6
+      //  - also some refinement near x ~ -0.4, y ~ 0.2 (second region)
+      const std::vector<double> x = {
+        -1.0, -0.7, -0.4, -0.2, 0.0, 0.2, 0.4,
+        0.52, 0.58, 0.62, 0.8, 0.9, 1.0
+      };
+
+      const std::vector<double> y = {
+        -1.0, -0.7, -0.4, -0.2, 0.0, 0.15, 0.22, 0.3,
+        0.45, 0.55, 0.6, 0.63, 0.7, 0.85, 1.0
+      };
+
+      std::vector<Point<2>> vertices;
+      vertices.reserve(x.size() * y.size());
+
+      auto vid = [&](unsigned int i, unsigned int j){
+        return j * x.size() + i;
+      };
+
+      for (unsigned int j = 0; j < y.size(); ++j)
+        for (unsigned int i = 0; i < x.size(); ++i)
+          vertices.emplace_back(x[i],y[j]);
+
+      std::vector<CellData<2>> cells;
+      cells.reserve((x.size()-1) * (y.size()-1));
+
+      for (unsigned int j = 0; j < y.size()-1; ++j)
+        for (unsigned int i = 0; i < x.size()-1; ++i)
+          {
+            CellData<2> c;
+            c.vertices[0] = vid(i,j); // bottom-left
+            c.vertices[1] = vid(i+1,j); // bottom-right
+            c.vertices[2] = vid(i,j+1); // top-left
+            c.vertices[3] = vid(i+1,j+1); //top-right
+            c.material_id = 0;
+            cells.push_back(c);
+          }
+
+      SubCellData subcell_data;
+      triangulation.create_triangulation(vertices,cells,subcell_data);
+
+      // No global / local refine here -> mesh stays conforming.
+      // No hanging nodes can appear because we never do adaptive refinement
+
+    }
 
 
   // @sect3{Right hand side values}
@@ -234,12 +336,12 @@ namespace Step101
   // not make much sense since they reduce to the ordinary Laplace equation),
   // we terminate the program in the second assertion. The program will work
   // just fine in 3d, however.
-  template <int dim>
-  void right_hand_side(const std::vector<Point<dim>> &points,
-                       std::vector<Tensor<1, dim>>   &values)
-  {
-    AssertDimension(values.size(), points.size());
-    Assert(dim >= 2, ExcNotImplemented());
+  // template <int dim>
+  // void right_hand_side(const std::vector<Point<dim>> &points,
+  //                      std::vector<Tensor<1, dim>>   &values)
+  // {
+  //   AssertDimension(values.size(), points.size());
+  //   Assert(dim >= 2, ExcNotImplemented());
 
     // The rest of the function implements computing force values. We will use
     // a constant (unit) force in x-direction located in two little circles
@@ -250,29 +352,29 @@ namespace Step101
     // For this, let us first define two objects that denote the centers of
     // these areas. Note that upon construction of the Point objects, all
     // components are set to zero.
-    Point<dim> point_1, point_2;
-    point_1[0] = 0.5;
-    point_2[0] = -0.5;
+  //   Point<dim> point_1, point_2;
+  //   point_1[0] = 0.5;
+  //   point_2[0] = -0.5;
 
-    for (unsigned int point_n = 0; point_n < points.size(); ++point_n)
-      {
-        // If <code>points[point_n]</code> is in a circle (sphere) of radius
-        // 0.2 around one of these points, then set the force in x-direction
-        // to one, otherwise to zero:
-        if (((points[point_n] - point_1).norm_square() < 0.2 * 0.2) ||
-            ((points[point_n] - point_2).norm_square() < 0.2 * 0.2))
-          values[point_n][0] = 1.0;
-        else
-          values[point_n][0] = 0.0;
+  //   for (unsigned int point_n = 0; point_n < points.size(); ++point_n)
+  //     {
+  //       // If <code>points[point_n]</code> is in a circle (sphere) of radius
+  //       // 0.2 around one of these points, then set the force in x-direction
+  //       // to one, otherwise to zero:
+  //       if (((points[point_n] - point_1).norm_square() < 0.2 * 0.2) ||
+  //           ((points[point_n] - point_2).norm_square() < 0.2 * 0.2))
+  //         values[point_n][0] = 1.0;
+  //       else
+  //         values[point_n][0] = 0.0;
 
-        // Likewise, if <code>points[point_n]</code> is in the vicinity of the
-        // origin, then set the y-force to one, otherwise to zero:
-        if (points[point_n].norm_square() < 0.2 * 0.2)
-          values[point_n][1] = 1.0;
-        else
-          values[point_n][1] = 0.0;
-      }
-  }
+  //       // Likewise, if <code>points[point_n]</code> is in the vicinity of the
+  //       // origin, then set the y-force to one, otherwise to zero:
+  //       if (points[point_n].norm_square() < 0.2 * 0.2)
+  //         values[point_n][1] = 1.0;
+  //       else
+  //         values[point_n][1] = 0.0;
+  //     }
+  // }
 
 
   // @sect3{The <code>ElasticProblem</code> class implementation}
@@ -309,13 +411,13 @@ namespace Step101
 
   // @sect4{Constructor}
 
-  template <int dim>
-  // ElasticProblem<dim>::ElasticProblem()
-  ElasticProblem<dim>::ElasticProblem(const CmsParameters &parameters) //TODO: Check
-    : parameters(parameters)
-    , dof_handler(triangulation)
-    , fe(FE_Q<dim>(1) ^ dim)
-  {}
+  // template <int dim>
+  // // ElasticProblem<dim>::ElasticProblem()
+  // ElasticProblem<dim>::ElasticProblem(const CmsParameters &parameters) //TODO: Check
+  //   : parameters(parameters)
+  //   , dof_handler(triangulation)
+  //   , fe(FE_Q<dim>(1) ^ dim)
+  // {}
 
   // In fact, the FESystem class has several more constructors which can
   // perform more complex operations than just stacking together several
@@ -335,34 +437,34 @@ namespace Step101
   // i.e. whether the finite element under consideration is vector-valued or
   // whether it is, for example, a scalar Hermite element with several degrees
   // of freedom on each vertex).
-  template <int dim>
-  void ElasticProblem<dim>::setup_system()
-  {
-    dof_handler.distribute_dofs(fe);
-    // solution.reinit(dof_handler.n_dofs());
-    system_rhs.reinit(dof_handler.n_dofs());
+  // template <int dim>
+  // void ElasticProblem<dim>::setup_system()
+  // {
+  //   dof_handler.distribute_dofs(fe);
+  //   // solution.reinit(dof_handler.n_dofs());
+  //   system_rhs.reinit(dof_handler.n_dofs());
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  //   constraints.clear();
+  //   DoFTools::make_hanging_node_constraints(dof_handler, constraints);
     
-    // Same boundary condition as step-8: u=0 on boundary id 0.
-    VectorTools::interpolate_boundary_values(dof_handler,
-                                             types::boundary_id(0),
-                                             Functions::ZeroFunction<dim>(dim),
-                                             constraints);
-    constraints.close();
+  //   // Same boundary condition as step-8: u=0 on boundary id 0.
+  //   VectorTools::interpolate_boundary_values(dof_handler,
+  //                                            types::boundary_id(0),
+  //                                            Functions::ZeroFunction<dim>(dim),
+  //                                            constraints);
+  //   constraints.close();
 
-    DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler,
-                                    dsp,
-                                    constraints,
-                                    /*keep_constrained_dofs = */ false);
-    sparsity_pattern.copy_from(dsp);
+  //   DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
+  //   DoFTools::make_sparsity_pattern(dof_handler,
+  //                                   dsp,
+  //                                   constraints,
+  //                                   /*keep_constrained_dofs = */ false);
+  //   sparsity_pattern.copy_from(dsp);
 
-    system_matrix.reinit(sparsity_pattern);
-    mass_matrix.reinit(sparsity_pattern);
-    stiffness_matrix.reinit(sparsity_pattern);
-  }
+  //   system_matrix.reinit(sparsity_pattern);
+  //   mass_matrix.reinit(sparsity_pattern);
+  //   stiffness_matrix.reinit(sparsity_pattern);
+  // }
 
 
   // @sect4{ElasticProblem::assemble_system}
@@ -382,34 +484,34 @@ namespace Step101
   // underlying scalar Q1 element. Here, it is <code>dim</code> times the
   // number of degrees of freedom per cell of the Q1 element, though this is
   // not explicit knowledge we need to care about:
-  template <int dim>
-  void ElasticProblem<dim>::assemble_stiffness_and_rhs() // TODO: CHECK IF NEW NAME MAKES SENSE
-  {
-    const QGauss<dim> quadrature_formula(fe.degree + 1);
+  // template <int dim>
+  // void ElasticProblem<dim>::assemble_stiffness_and_rhs() // TODO: CHECK IF NEW NAME MAKES SENSE
+  // {
+  //   const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    FEValues<dim> fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+  //   FEValues<dim> fe_values(fe,
+  //                           quadrature_formula,
+  //                           update_values | update_gradients |
+  //                             update_quadrature_points | update_JxW_values);
 
-    const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
-    const unsigned int n_q_points    = quadrature_formula.size();
+  //   const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
+  //   const unsigned int n_q_points    = quadrature_formula.size();
 
-    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-    Vector<double>     cell_rhs(dofs_per_cell);
+  //   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+  //   Vector<double>     cell_rhs(dofs_per_cell);
 
-    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+  //   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
-    // As was shown in previous examples as well, we need a place where to
-    // store the values of the coefficients at all the quadrature points on a
-    // cell. In the present situation, we have two coefficients, lambda and
-    // mu.
+  //   // As was shown in previous examples as well, we need a place where to
+  //   // store the values of the coefficients at all the quadrature points on a
+  //   // cell. In the present situation, we have two coefficients, lambda and
+  //   // mu.
 
-    const Functions::ConstantFunction<dim> lambda(parameters.lambda);
-    const Functions::ConstantFunction<dim> mu(parameters.mu);
+  //   const Functions::ConstantFunction<dim> lambda(parameters.lambda);
+  //   const Functions::ConstantFunction<dim> mu(parameters.mu);
 
-    std::vector<double> lambda_values(n_q_points);
-    std::vector<double> mu_values(n_q_points);
+  //   std::vector<double> lambda_values(n_q_points);
+  //   std::vector<double> mu_values(n_q_points);
 
     // Well, we could as well have omitted the above two arrays since we will
     // use constant coefficients for both lambda and mu, which can be declared
@@ -421,24 +523,24 @@ namespace Step101
 
     // Like the two constant functions above, we will call the function
     // right_hand_side just once per cell to make things simpler.
-    std::vector<Tensor<1, dim>> rhs_values(n_q_points);
+    // std::vector<Tensor<1, dim>> rhs_values(n_q_points);
 
-    stiffness_matrix = 0;
-    system_rhs = 0;
+    // stiffness_matrix = 0;
+    // system_rhs = 0;
 
-    // Now we can begin with the loop over all cells:
-    for (const auto &cell : dof_handler.active_cell_iterators())
-      {
-        fe_values.reinit(cell);
+    // // Now we can begin with the loop over all cells:
+    // for (const auto &cell : dof_handler.active_cell_iterators())
+    //   {
+    //     fe_values.reinit(cell);
 
-        cell_matrix = 0;
-        cell_rhs    = 0;
+    //     cell_matrix = 0;
+    //     cell_rhs    = 0;
 
-        // Next we get the values of the coefficients at the quadrature
-        // points. Likewise for the right hand side:
-        lambda.value_list(fe_values.get_quadrature_points(), lambda_values);
-        mu.value_list(fe_values.get_quadrature_points(), mu_values);
-        right_hand_side(fe_values.get_quadrature_points(), rhs_values);
+    //     // Next we get the values of the coefficients at the quadrature
+    //     // points. Likewise for the right hand side:
+    //     lambda.value_list(fe_values.get_quadrature_points(), lambda_values);
+    //     mu.value_list(fe_values.get_quadrature_points(), mu_values);
+    //     right_hand_side(fe_values.get_quadrature_points(), rhs_values);
 
         // Then assemble the entries of the local @ref GlossStiffnessMatrix "stiffness matrix" and right
         // hand side vector. This follows almost one-to-one the pattern
@@ -462,20 +564,20 @@ namespace Step101
         //
         // With this knowledge, we can assemble the local matrix
         // contributions:
-        for (const unsigned int i : fe_values.dof_indices())
-          {
-            const unsigned int component_i =
-              fe.system_to_component_index(i).first;
+        // for (const unsigned int i : fe_values.dof_indices())
+        //   {
+        //     const unsigned int component_i =
+        //       fe.system_to_component_index(i).first;
 
-            for (const unsigned int j : fe_values.dof_indices())
-              {
-                const unsigned int component_j =
-                  fe.system_to_component_index(j).first;
+        //     for (const unsigned int j : fe_values.dof_indices())
+        //       {
+        //         const unsigned int component_j =
+        //           fe.system_to_component_index(j).first;
 
-                for (const unsigned int q_point :
-                     fe_values.quadrature_point_indices())
-                  {
-                    cell_matrix(i, j) +=
+        //         for (const unsigned int q_point :
+        //              fe_values.quadrature_point_indices())
+        //           {
+        //             cell_matrix(i, j) +=
                       // The first term is $(\lambda \partial_i u_i, \partial_j
                       // v_j) + (\mu \partial_i u_j, \partial_j v_i)$. Note
                       // that <code>shape_grad(i,q_point)</code> returns the
@@ -486,15 +588,15 @@ namespace Step101
                       // component of the i-th shape function with respect to
                       // the comp(i)th coordinate is accessed by the appended
                       // brackets.
-                      (                                                  //
-                        (fe_values.shape_grad(i, q_point)[component_i] * //
-                         fe_values.shape_grad(j, q_point)[component_j] * //
-                         lambda_values[q_point])                         //
-                        +                                                //
-                        (fe_values.shape_grad(i, q_point)[component_j] * //
-                         fe_values.shape_grad(j, q_point)[component_i] * //
-                         mu_values[q_point])                             //
-                        +                                                //
+                      // (                                                  //
+                      //   (fe_values.shape_grad(i, q_point)[component_i] * //
+                      //    fe_values.shape_grad(j, q_point)[component_j] * //
+                      //    lambda_values[q_point])                         //
+                      //   +                                                //
+                      //   (fe_values.shape_grad(i, q_point)[component_j] * //
+                      //    fe_values.shape_grad(j, q_point)[component_i] * //
+                      //    mu_values[q_point])                             //
+                      //   +                                                //
                         // The second term is $(\mu \nabla u_i, \nabla
                         // v_j)$. We need not access a specific component of
                         // the gradient, since we only have to compute the
@@ -506,61 +608,62 @@ namespace Step101
                         // do this if <tt>component_i</tt> equals
                         // <tt>component_j</tt>, otherwise a zero is added
                         // (which will be optimized away by the compiler).
-                        ((component_i == component_j) ?        //
-                           (fe_values.shape_grad(i, q_point) * //
-                            fe_values.shape_grad(j, q_point) * //
-                            mu_values[q_point]) :              //
-                           0)                                  //
-                        ) *                                    //
-                      fe_values.JxW(q_point);                  //
-                  }
-              }
-          }
+  //                       ((component_i == component_j) ?        //
+  //                          (fe_values.shape_grad(i, q_point) * //
+  //                           fe_values.shape_grad(j, q_point) * //
+  //                           mu_values[q_point]) :              //
+  //                          0)                                  //
+  //                       ) *                                    //
+  //                     fe_values.JxW(q_point);                  //
+  //                 }
+  //             }
+  //         }
 
-        // Assembling the right hand side is also just as discussed in the
-        // introduction:
-        for (const unsigned int i : fe_values.dof_indices())
-          {
-            const unsigned int component_i =
-              fe.system_to_component_index(i).first;
+  //       // Assembling the right hand side is also just as discussed in the
+  //       // introduction:
+  //       for (const unsigned int i : fe_values.dof_indices())
+  //         {
+  //           const unsigned int component_i =
+  //             fe.system_to_component_index(i).first;
 
-            for (const unsigned int q_point :
-                 fe_values.quadrature_point_indices())
-              cell_rhs(i) += fe_values.shape_value(i, q_point) *
-                             rhs_values[q_point][component_i] *
-                             fe_values.JxW(q_point);
-          }
+  //           for (const unsigned int q_point :
+  //                fe_values.quadrature_point_indices())
+  //             cell_rhs(i) += fe_values.shape_value(i, q_point) *
+  //                            rhs_values[q_point][component_i] *
+  //                            fe_values.JxW(q_point);
+  //         }
 
-        // The transfer from local degrees of freedom into the global matrix
-        // and right hand side vector does not depend on the equation under
-        // consideration, and is thus the same as in all previous
-        // examples.
-        cell->get_dof_indices(local_dof_indices);
-        constraints.distribute_local_to_global(
-          cell_matrix, cell_rhs, local_dof_indices, stiffness_matrix, system_rhs);
-      }
-  }
+  //       // The transfer from local degrees of freedom into the global matrix
+  //       // and right hand side vector does not depend on the equation under
+  //       // consideration, and is thus the same as in all previous
+  //       // examples.
+  //       cell->get_dof_indices(local_dof_indices);
+  //       constraints.distribute_local_to_global(
+  //         cell_matrix, cell_rhs, local_dof_indices, stiffness_matrix, system_rhs);
+  //     }
+  // }
 
   // @sect4{assemble_consistent_mass_matrix}
 
-  template <int dim>
-  void ElasticProblem<dim>::assemble_consistent_mass_matrix()
-  {
-    const QGauss<dim> quadrature_formula(fe.degree + 1);
+  // template <int dim>
+  // void ElasticProblem<dim>::assemble_consistent_mass_matrix()
+  // {
+  //   const QGauss<dim> quadrature_formula(fe.degree + 1);
 
-    const Functions::ConstantFunction<dim> density(parameters.rho);
+  //   const Functions::ConstantFunction<dim> density(parameters.rho);
 
-    mass_matrix = 0;
-    MatrixCreator::create_mass_matrix(
-      dof_handler, quadrature_formula, mass_matrix, &density, constraints
-    );
-  }
+  //   mass_matrix = 0;
+  //   MatrixCreator::create_mass_matrix(
+  //     dof_handler, quadrature_formula, mass_matrix, &density, constraints
+  //   );
+  // }
 
   // @sect4{Characteristic element length: minimum edge length}
 
   template <int dim>
   double ElasticProblem<dim>::compute_min_edge_length_of_cell(
-    const typename DoFHandler<dim>::active_cell_iterator &cell
+    //const typename DoFHandler<dim>::active_cell_iterator &cell
+    const typename Triangulation<dim>::active_cell_iterator &cell
   )
   {
     double min_length = std::numeric_limits<double>::max();
@@ -581,7 +684,7 @@ namespace Step101
   }
 
   template <int dim>
-  void ElasticProblem<dim>::compute_characteristic_lengths(
+  void ElasticProblem<dim>::compute_characteristic_length(
     std::vector<double> &h_char
   ) const
   {
@@ -596,66 +699,123 @@ namespace Step101
 
   // @sect4{Select critical cells by percentile}
 
-  template <int dim>
-  std::pair<double, std::vector<unsigned int>>
-  ElasticProblem<dim>::select_critical_cells_by_percentile(
-    const std::vector<double> &h_char
-  ) const
-  {
-    Assert(!h_char.empty(), ExcInternalError());
-    Assert(parameters.critical_fraction > 0.0 && parameters.critical_fraction <= 1.0, ExcMessage("critical_fraction must be in (0,1]."));
+  // template <int dim>
+  // std::pair<double, std::vector<unsigned int>>
+  // ElasticProblem<dim>::select_critical_cells_by_percentile(
+  //   const std::vector<double> &h_char
+  // ) const
+  // {
+  //   Assert(!h_char.empty(), ExcInternalError());
+  //   Assert(parameters.critical_fraction > 0.0 && parameters.critical_fraction <= 1.0, ExcMessage("critical_fraction must be in (0,1]."));
 
-    std::vector<unsigned int> ids(h_char.size());
-    std::iota(ids.begin(), ids.end(), 0);
+  //   std::vector<unsigned int> ids(h_char.size());
+  //   std::iota(ids.begin(), ids.end(), 0);
 
-    std::sort(ids.begin(), ids.end(), [&](const unsigned int a, const unsigned int b){
-      return h_char[a] < h_char[b];
-    });
+  //   std::sort(ids.begin(), ids.end(), [&](const unsigned int a, const unsigned int b){
+  //     return h_char[a] < h_char[b];
+  //   });
 
-    const unsigned int n_select = std::max<unsigned int>(1, static_cast<unsigned int>(std::ceil(parameters.critical_fraction * static_cast<double>(ids.size()))));
+  //   const unsigned int n_select = std::max<unsigned int>(1, static_cast<unsigned int>(std::ceil(parameters.critical_fraction * static_cast<double>(ids.size()))));
 
-    ids.resize(n_select);
+  //   ids.resize(n_select);
 
-    double h_reference = 0.0;
-    for (const unsigned int id: ids)
-      h_reference = std::max(h_reference, h_char[id]);
+  //   double h_reference = 0.0;
+  //   for (const unsigned int id: ids)
+  //     h_reference = std::max(h_reference, h_char[id]);
 
-    Assert(h_reference > 0.0, ExcInternalError());
-    return {h_reference, ids};
-  }
+  //   Assert(h_reference > 0.0, ExcInternalError());
+  //   return {h_reference, ids};
+  // }
+
 
   // @sect4{Wave speed}
 
-  template <int dim>
-  double ElasticProblem<dim>::compute_pressure_wave_speed() const
-  {
-    Assert(parameters.rho > 0.0, ExcMessage("Density must be positive."));
-    Assert(parameters.lambda + 2.0 * parameters.mu > 0.0, ExcMessage("lambda + 2 mu must be positive."));
+  // template <int dim>
+  // double ElasticProblem<dim>::compute_pressure_wave_speed() const
+  // {
+  //   Assert(parameters.rho > 0.0, ExcMessage("Density must be positive."));
+  //   Assert(parameters.lambda + 2.0 * parameters.mu > 0.0, ExcMessage("lambda + 2 mu must be positive."));
 
-    return std::sqrt((parameters.lambda + 2.0 * parameters.mu) / parameters.rho);
+  //   return std::sqrt((parameters.lambda + 2.0 * parameters.mu) / parameters.rho);
+  // }
+
+  // @sect{Compute global critical time step}
+  template <int dim>
+  double ElasticProblem<dim>::compute_dt_cell(
+    const double h,
+    const double rho_local
+    //const std::vector<double> &h_char,
+    //const std::vector<double> &density_scaling
+  ) const
+  {
+    // Assert(h_char.size() == triangulation.n_active_cells(), ExcInternalError());
+    // Assert(density_scaling.size() == triangulation.n_active_cells(), ExcInternalError());
+
+    const double denom = parameters.lambda + 2.0 * parameters.mu;
+    Assert(denom > 0.0, ExcMessage("lambda + 2 must be positive."));
+    Assert(rho_local > 0.0, ExcMessage("rho_local must be positive."));
+    Assert(h > 0.0, ExcMessage("h must be positive."));
+
+    // double dt_min = std::numeric_limits<double>::max();
+
+    // for (unsigned int i = 0; i < h_char.size(); ++i)
+    // {
+    //   const double rho_i = parameters.rho * density_scaling[i];
+    //   Assert(rho_i > 0.0, ExcMessage("Per-cell rho must be positive."));
+
+    //   const double dt_i = h_char[i] * std:::sqrt(rho_i / denom);
+    //   dt_min = std::min(dt_min, dt_i);
+    // }
+
+    return h * std::sqrt(rho_local / denom);
+  }
+
+  template <int dim>
+  double ElasticProblem<dim>::compute_dt_crit_global(
+    const std::vector<double> &h_char,
+    const std::vector<double> &density_scaling
+  ) const
+  {
+    Assert(h_char.size() == triangulation.n_active_cells(), ExcInternalError());
+    Assert(density_scaling.size() == triangulation.n_active_cells(), ExcInternalError());
+
+    double dt_min = std::numeric_limits<double>::max();
+
+    for (unsigned int i = 0; i < h_char.size(); ++i)
+    {
+      const double rho_i = parameters.rho * density_scaling[i];
+      const double dt_i = compute_dt_cell(h_char[i],rho_i);
+      dt_min = std::min(dt_min, dt_i);
+    }
+
+    return dt_min;
   }
 
   // @sect4{Apply classical mass scaling (CMS)}
 
   template <int dim>
   typename ElasticProblem<dim>::CmsResult
-  ElasticProblem<dim>::apply_classical_mass_scaling(
-    const std::vector <double> &h_char, const std::vector<unsigned int> &critical_cell_ids, const double dt_target
+  ElasticProblem<dim>::apply_cms_for_target_dt(
+    const std::vector<double> &h_char, const double dt_target
   ) const
   {
     Assert(dt_target > 0.0, ExcMessage("dt_target must be positive."));
     Assert(h_char.size() == triangulation.n_active_cells(), ExcInternalError());
 
     CmsResult result;
+    result.h_char = h_char;
     result.dt_target = dt_target;
-    result.density_scaling.assign(h_char.size(),1.0);
 
     const double rho0 = parameters.rho;
+    const double denom = parameters.lambda + 2.0 * parameters.mu;
 
-    std::vector<bool> is_critical(h_char.size(),false);
-    for (const unsigned int id : critical_cell_ids)
-      is_critical[id] = true;
+    result.density_scaling.assign(h_char.size(), 1.0);
 
+    // First compute dt_crit_global_before (all scaling=1)
+    std::vector<double> ones(h_char.size(),1.0);
+    result.dt_crit_global_before = compute_dt_crit_global(h_char, ones);
+
+    // Mass accounting
     double total_mass = 0.0;
     double added_mass = 0.0;
 
@@ -665,15 +825,34 @@ namespace Step101
       const double cell_volume = cell->measure() * parameters.thickness;
       total_mass += rho0 * cell_volume;
 
-      const double h = h_char[cell_index];
-      const double rho_required = (dt_target * dt_target) * (parameters.lambda + 2.0 * parameters.mu) / (h * h);
+      // Per-cell dt before scaling
+      const double dt_i = compute_dt_cell(h_char[cell_index],rho0);
+
+      // Scale exactly those cells that violate dt_target:
+      if (dt_i < dt_target)
+      {
+        // Want: dt_target = h * sqrt(rho_required / denom)
+        // => rho_required = denom * (dt_target / h)^2
+        const double h = h_char[cell_index];
+        const double rho_required = denom * (dt_target * dt_target) / (h * h);
+
+        if (rho_required > rho0)
+        {
+          const double alpha = rho_required / rho0;
+          result.density_scaling[cell_index] = alpha;
+          added_mass += (rho_required - rho0) * cell_volume;
+        }
+      }
+
+      // const double h = h_char[cell_index];
+      // const double rho_required = (dt_target * dt_target) * (parameters.lambda + 2.0 * parameters.mu) / (h * h);
 
       // Only apply mass scaling on the selected critical cells:
-      if (is_critical[cell_index] && rho_required > rho0)
-      {
-        result.density_scaling[cell_index] = rho_required / rho0;
-        added_mass += (rho_required - rho0) * cell_volume;
-      }
+      // if (is_critical[cell_index] && rho_required > rho0)
+      // {
+      //   result.density_scaling[cell_index] = rho_required / rho0;
+      //   added_mass += (rho_required - rho0) * cell_volume;
+      // }
 
       ++cell_index;
     }
@@ -682,24 +861,35 @@ namespace Step101
     result.added_mass = added_mass;
     result.added_mass_ratio = (total_mass > 0.0 ? added_mass / total_mass : 0.0);
 
-    double dt_ref = std::numeric_limits<double>::max();
-    for (const unsigned int id : critical_cell_ids)
-    {
-      const double h = h_char[id];
-      const double dt_cell = h * std::sqrt(parameters.rho / (parameters.lambda + 2.0 * parameters.mu));
-      dt_ref = std::min(dt_ref, dt_cell);
-    }
-
-    result.dt_crit_reference = dt_ref;
-
-    unsigned int n_scaled = 0;
+    // Count scaled cells
     for (const double a : result.density_scaling)
       if (a > 1.0 + 1e-12)
-        ++n_scaled;
+        ++result.n_scaled;
 
-    // Print
-    std::cout << "Scaled cells: " << n_scaled
-              << " / " << result.density_scaling.size() << std::endl;
+    result.scaled_fraction = (
+      result.density_scaling.empty() ? 0.0 : static_cast<double>(result.n_scaled) / static_cast<double>(result.density_scaling.size()));
+
+    // dt_crit_global_after
+    result.dt_crit_global_after = compute_dt_crit_global(h_char, result.density_scaling);
+
+    // double dt_ref = std::numeric_limits<double>::max();
+    // for (const unsigned int id : critical_cell_ids)
+    // {
+    //   const double h = h_char[id];
+    //   const double dt_cell = h * std::sqrt(parameters.rho / (parameters.lambda + 2.0 * parameters.mu));
+    //   dt_ref = std::min(dt_ref, dt_cell);
+    // }
+
+    // result.dt_crit_reference = dt_ref;
+
+    // unsigned int n_scaled = 0;
+    // for (const double a : result.density_scaling)
+    //   if (a > 1.0 + 1e-12)
+    //     ++n_scaled;
+
+    // // Print
+    // std::cout << "Scaled cells: " << n_scaled
+    //           << " / " << result.density_scaling.size() << std::endl;
 
     return result;
 
@@ -712,24 +902,129 @@ namespace Step101
   typename ElasticProblem<dim>::CmsResult
   ElasticProblem<dim>::choose_dt_and_apply_cms(const std::vector<double> &h_char) const
   {
-    const auto [h_ref, critical_ids] = select_critical_cells_by_percentile(h_char);
+    // global dt before CMS
+    std::vector<double> ones(h_char.size(), 1.0);
+    const double dt_global_before = compute_dt_crit_global(h_char, ones);
 
-    const double dt_crit_reference = h_ref * std::sqrt(parameters.rho / (parameters.lambda + 2.0 * parameters.mu));
+    double dt_target = parameters.dt_factor * dt_global_before;
 
-    double dt_target = parameters.dt_factor * dt_crit_reference;
+    CmsResult best = apply_cms_for_target_dt(h_char, dt_target);
 
-    for (unsigned int attempt = 0; attempt < parameters.max_dt_adjustment_steps; ++attempt)
+    if (!parameters.auto_reduce_dt_target)
+      return best;
+
+    // If constraints violated, reduce dt_target iteratively.
+    for (unsigned int k = 0; k < parameters.max_dt_adjustment_steps; ++k)
     {
-      CmsResult cms = apply_classical_mass_scaling(h_char, critical_ids, dt_target);
+      const bool too_much_mass = (best.added_mass_ratio > parameters.max_added_mass_fraction);
 
-      cms.dt_crit_reference = dt_crit_reference;
+      const bool too_many_cells = (best.scaled_fraction > parameters.max_scaled_cell_fraction);
 
-      if (cms.added_mass_ratio <= parameters.max_added_mass_fraction)
-        return cms;
+      if(!too_much_mass && !too_many_cells)
+        return best;
 
       dt_target *= parameters.dt_shrink_factor;
+      best = apply_cms_for_target_dt(h_char, dt_target);
     }
-    return apply_classical_mass_scaling(h_char,critical_ids,dt_target);
+
+    // Return best effort after max iterations
+    return best;
+
+    // const auto [h_ref, critical_ids] = select_critical_cells_by_percentile(h_char);
+
+    // const double dt_crit_reference = h_ref * std::sqrt(parameters.rho / (parameters.lambda + 2.0 * parameters.mu));
+
+    // double dt_target = parameters.dt_factor * dt_crit_reference;
+
+    // for (unsigned int attempt = 0; attempt < parameters.max_dt_adjustment_steps; ++attempt)
+    // {
+    //   CmsResult cms = apply_classical_mass_scaling(h_char, critical_ids, dt_target);
+
+    //   cms.dt_crit_reference = dt_crit_reference;
+
+    //   if (cms.added_mass_ratio <= parameters.max_added_mass_fraction)
+    //     return cms;
+
+    //   dt_target *= parameters.dt_shrink_factor;
+    // }
+    // return apply_classical_mass_scaling(h_char,critical_ids,dt_target);
+  }
+
+  // @sect4{}
+
+  template <int dim>
+  void ElasticProblem<dim>::verify_mesh_is_quad_and_non_degenerate() const
+  {
+    Assert(dim == 2, ExcNotImplemented());
+
+    // 1) Check number of vertices per cell (quad should have 4)
+    for (const auto &cell : triangulation.active_cell_iterators())
+    {
+      Assert(cell->n_vertices() == 4, ExcInternalError());
+      Assert(cell->measure() > 0.0, ExcMessage("Found a cell with non-positive area."));
+    }
+
+    // 2) Check total area
+    double area_sum = 0.0;
+    for (const auto &cell : triangulation.active_cell_iterators())
+      area_sum += cell->measure();
+
+    const double expected_area = 4.0; // [-1,1]x[-1,1]
+    std::cout << "Mesh check: sum(cell areas) = " << area_sum << " (expected ~ " << expected_area << ")\n";
+
+    AssertThrow(std::abs(area_sum - expected_area) < 1e-12, ExcMessage("Total mesh area does not match expected domain area."));
+  }
+
+  // @sect4{}
+  template <int dim>
+  void ElasticProblem<dim>::print_cell_debug_table
+  (
+    const std::vector<double> &h_char, const std::vector<double> &density_scaling, const double dt_target
+  ) const
+  {
+    Assert(h_char.size() == triangulation.n_active_cells(), ExcInternalError());
+    Assert(density_scaling.size() == triangulation.n_active_cells(), ExcInternalError());
+
+    const double denom = parameters.lambda + 2.0 * parameters.mu;
+    const double rho0 = parameters.rho;
+
+    std::cout << "\n--- Per-cell debug (first all cells) ---\n";
+    std::cout << "idx   area     e0       e1       e2     e3      h_min      dt_cell      alpha       scaled\n";
+
+    unsigned int idx = 0;
+    for (const auto &cell : triangulation.active_cell_iterators())
+    {
+      // edge lengths for quad
+      double e[4];
+      for (unsigned int l = 0; l < 4; ++l)
+      {
+        const unsigned int v0 = GeometryInfo<dim>::line_to_cell_vertices(l, 0);
+        const unsigned int v1 = GeometryInfo<dim>::line_to_cell_vertices(l, 1);
+        e[l] = cell->vertex(v0).distance(cell->vertex(v1));
+      }
+
+      const double hmin = *std::min_element(std::begin(e), std::end(e));
+      const double dt_i = hmin * std::sqrt(rho0 / denom);
+
+      const double alpha = density_scaling[idx];
+      const bool scaled = (alpha > 1.0 + 1e-12);
+
+      std::cout << idx << "   "
+                << cell->measure() << "    "
+                << e[0] << "    " << e[1] << "    " << e[2] << "    " << e[3] << "   "
+                << hmin << "    "
+                << dt_i << "    "
+                << alpha << "    "
+                << (scaled ? "YES" : "NO")
+                << "\n";
+
+      // check h_char matches what we just computed
+      AssertThrow(std::abs(h_char[idx] - hmin) < 1e-14, ExcMessage("h_char mismatch: stored h_char != recomputed min edge length"));
+
+      ++idx;
+    }
+
+    std::cout << "--- End per-cell debug ---\n";
   }
 
   // @sect4{Output density scaling to VTK}
@@ -926,61 +1221,128 @@ namespace Step101
   {
     Assert(dim == 2, ExcMessage("This step-101 is written for dim=2."));
 
-    GridGenerator::hyper_cube(triangulation,-1,1);
+    make_conforming_graded_mesh();
+
+    dof_handler.distribute_dofs(fe);
+
+    verify_mesh_is_quad_and_non_degenerate();
+
+    // GridGenerator::hyper_cube(triangulation,-1,1);
     
-    // Base mesh
-    triangulation.refine_global(3);
+    // // Base mesh
+    // triangulation.refine_global(3);
 
-    // Locally refine a small region to create a few very small cells.
-    // Here: refine cells whose center is close to (0.6, 0.6).
-    for (unsigned int step = 0; step < 4; ++step)
-    {
-      for (const auto &cell : triangulation.active_cell_iterators())
-        if (cell->center().distance(Point<2>(0.6,0.6))<0.35)
-          cell->set_refine_flag();
+    // // Locally refine a small region to create a few very small cells.
+    // // Here: refine cells whose center is close to (0.6, 0.6).
+    // for (unsigned int step = 0; step < 4; ++step)
+    // {
+    //   for (const auto &cell : triangulation.active_cell_iterators())
+    //     if (cell->center().distance(Point<2>(0.6,0.6))<0.35)
+    //       cell->set_refine_flag();
 
-      triangulation.execute_coarsening_and_refinement();
-    }
+    //   triangulation.execute_coarsening_and_refinement();
+    // }
 
-    setup_system();
+    // setup_system();
 
-    std::cout << "Step-101 (CMS) on top of step-8 elasticity\n";
+    std::cout << "Step-101 (CMS) (CMS timestep targetting)\n";
     std::cout << "Active cells: " << triangulation.n_active_cells() << '\n';
     std::cout << "DoFs: " << dof_handler.n_dofs() << '\n';
 
-    assemble_stiffness_and_rhs();
-    assemble_consistent_mass_matrix();
+    // assemble_stiffness_and_rhs();
+    // assemble_consistent_mass_matrix();
 
+    // Characteristic sizes
     std::vector<double> h_char;
-    compute_characteristic_lengths(h_char);
+    compute_characteristic_length(h_char);
 
-    const double c_p = compute_pressure_wave_speed();
+    // const double c_p = compute_pressure_wave_speed();
+
+    // const std::vector<double> density_scaling_before(triangulation.n_active_cells(),1.0);
+    // const double dt_crit_before = compute_dt_crit_global(h_char, density_scaling_before);
+
+    // const auto cms = choose_dt_and_apply_cms(h_char);
+
+    // const double dt_crit_after = compute_dt_crit_global(h_char, cms.density_scaling);
 
     const auto cms = choose_dt_and_apply_cms(h_char);
 
-    std::cout << "\nMaterial parameters: \n";
-    std::cout << "lambda = " << parameters.lambda << '\n';
-    std::cout << "mu = " << parameters.mu << '\n';
-    std::cout << "rho = " << parameters.rho << '\n';
-    std::cout << "c_p = " << c_p << " (pressure wave speed)\n";
+    print_cell_debug_table(h_char, cms.density_scaling, cms.dt_target);
 
-    std::cout << "\nCFL / CMS diagnostics:\n";
-    std::cout << "critical_fraction = " << parameters.critical_fraction << '\n';
-    std::cout << "dt_crit_reference = " << cms.dt_crit_reference << '\n';
+    double total_area = 0.0;
+    for (const auto &cell : triangulation.active_cell_iterators())
+      total_area += cell->measure();
+
+    std::cout << "\nTotal model area = " << total_area << "\n";
+
+    std::cout << "\nTargetting:\n";
+    std::cout << "dt_factor = " << parameters.dt_factor << '\n';
+    std::cout << "dt_crit_global (before) = " << cms.dt_crit_global_before << '\n';
     std::cout << "dt_target = " << cms.dt_target << '\n';
+    std::cout << "dt_crit_global (after) = " << cms.dt_crit_global_after << "\n";
+    std::cout << "improvement factor = " << (cms.dt_crit_global_after / cms.dt_crit_global_before) << "\n";
 
-    std::cout << "\nMass scaling assessment:\n";
-    std::cout << "total_mass = " << cms.total_mass << '\n';
-    std::cout << "added_mass = " << cms.added_mass << '\n';
-    std::cout << "added_mass_ratio = " << 100.0 * cms.added_mass_ratio << " %\n";
-    std::cout << "max_allowed = " << 100.0 * parameters.max_added_mass_fraction << " %\n";
+    std::cout << "\nCMS impact:\n";
+    std::cout << "Scaled cells: " << cms.n_scaled << " / " << cms.density_scaling.size() << " (" << 100.0 * cms.scaled_fraction << "%)\n";
 
+    const bool too_many_cells = (cms.scaled_fraction > parameters.max_scaled_cell_fraction);
+
+    const bool too_much_mass = (cms.added_mass_ratio > parameters.max_added_mass_fraction);
+
+    if (too_many_cells || too_much_mass)
+    {
+      std::cout << "\nWARNING: CMS may not be reasonable for this setup.\n";
+      
+      if (too_many_cells)
+      {
+        std::cout << " - Scaled-cell fraction exceeds limit: " << 100.0 * cms.scaled_fraction << " %\n";
+      }
+
+      if (too_much_mass)
+      {
+        std::cout << " - Added-mass ratio exceeds limit: " << 100.0 * cms.added_mass_ratio << " % > " << 100.0 * parameters.max_added_mass_fraction << " %\n";
+      }
+
+      std::cout << "Recommendations:\n";
+      std::cout << " - Reduce dt_factor (smaller timestep increase), or \n";
+      std::cout << " - Remesh with fewer extremely small cells / smoother grading.\n";
+    } 
+    
     if (parameters.write_density_scaling_output)
     {
       output_density_scaling(cms.density_scaling);
       std::cout << "\nWrote: cms_rho_scaling.vtk (cell data: rho_scaling)\n";
     }
   }
+
+    // std::cout << "\nGlobal critical time step check:\n";
+    // std::cout << "dt_crit_before = " << dt_crit_before << '\n';
+    // std::cout << "dt_crit_after = " << dt_crit_after << '\n';
+    // std::cout << "ratio (after/before) = " << (dt_crit_after / dt_crit_before) << '\n';
+
+    // std::cout << "\nMaterial parameters: \n";
+    // std::cout << "lambda = " << parameters.lambda << '\n';
+    // std::cout << "mu = " << parameters.mu << '\n';
+    // std::cout << "rho = " << parameters.rho << '\n';
+    // std::cout << "c_p = " << c_p << " (pressure wave speed)\n";
+
+    // std::cout << "\nCFL / CMS diagnostics:\n";
+    // std::cout << "critical_fraction = " << parameters.critical_fraction << '\n';
+    // std::cout << "dt_crit_reference = " << cms.dt_crit_reference << '\n';
+    // std::cout << "dt_target = " << cms.dt_target << '\n';
+
+    // std::cout << "\nMass scaling assessment:\n";
+    // std::cout << "total_mass = " << cms.total_mass << '\n';
+    // std::cout << "added_mass = " << cms.added_mass << '\n';
+    // std::cout << "added_mass_ratio = " << 100.0 * cms.added_mass_ratio << " %\n";
+    // std::cout << "max_allowed = " << 100.0 * parameters.max_added_mass_fraction << " %\n";
+
+  //   if (parameters.write_density_scaling_output)
+  //   {
+  //     output_density_scaling(cms.density_scaling);
+  //     std::cout << "\nWrote: cms_rho_scaling.vtk (cell data: rho_scaling)\n";
+  //   }
+  // }
     // for (unsigned int cycle = 0; cycle < 8; ++cycle)
     //   {
     //     std::cout << "Cycle " << cycle << ':' << std::endl;
@@ -1018,19 +1380,26 @@ int main()
   try
     {
       //Step101::ElasticProblem<2> elastic_problem_2d;
-      Step101::CmsParameters parameters;
+      Step101::CmsParameters prm;
 
-      parameters.lambda = 1.0;
-      parameters.mu = 1.0;
-      parameters.rho = 1.0;
-      parameters.thickness = 1.0;
-      parameters.critical_fraction = 0.01;
-      parameters.dt_factor = 1.20;
-      parameters.max_added_mass_fraction = 0.10;
-      parameters.dt_shrink_factor = 0.95;
-      parameters.max_dt_adjustment_steps = 25;
+      prm.lambda = 1.0;
+      prm.mu = 1.0;
+      prm.rho = 1.0;
 
-      Step101::ElasticProblem<2> problem(parameters);
+      prm.thickness = 1.0;
+
+      prm.dt_factor = 1.05;
+
+      prm.max_added_mass_fraction = 0.10;
+      prm.max_scaled_cell_fraction = 0.10;
+
+      prm.auto_reduce_dt_target = true;
+      prm.dt_shrink_factor = 0.95;
+      prm.max_dt_adjustment_steps = 25;
+
+      prm.write_density_scaling_output = true;
+
+      Step101::ElasticProblem<2> problem(prm);
       problem.run();
       //elastic_problem_2d.run();
     }
