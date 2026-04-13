@@ -90,10 +90,13 @@ namespace LA
 #include <deal.II/lac/petsc_solver.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/solver_minres.h>
 #include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_linear_operator.h>
 
@@ -113,6 +116,7 @@ namespace LA
 #endif
 
 #include <iostream>
+#include <map>
 #include <memory>
 
 // @sect3{Run-time parameter handling}
@@ -125,6 +129,75 @@ namespace Step80
 {
   using namespace dealii;
 
+  using AMGPreconditioner = LA::MPI::PreconditionAMG;
+  using MumpsMatrix       = LA::MPI::SparseMatrix;
+  using MumpsVector       = LA::MPI::Vector;
+
+  AMGPreconditioner::AdditionalData
+  make_amg_additional_data(const unsigned int degree,
+                           const bool         symmetric_operator = false)
+  {
+    using AdditionalData = AMGPreconditioner::AdditionalData;
+
+#ifdef USE_PETSC_LA
+    if (degree > 1)
+      return AdditionalData(symmetric_operator,
+                            0.75,
+                            0.9,
+                            0,
+                            false,
+                            AdditionalData::RelaxationType::Chebyshev,
+                            AdditionalData::RelaxationType::Chebyshev,
+                            AdditionalData::RelaxationType::GaussianElimination,
+                            1,
+                            0.0,
+                            3,
+                            false);
+
+    return AdditionalData(symmetric_operator);
+#else
+    AdditionalData data;
+    (void)symmetric_operator;
+    data.elliptic = true;
+    if (degree > 1)
+      data.higher_order_elements = true;
+    return data;
+#endif
+  }
+
+#ifdef DEAL_II_WITH_MUMPS
+  template <typename VectorType>
+  void copy_distributed_vector(
+    const VectorType                                                 &source,
+    const std::map<types::global_dof_index, types::global_dof_index> &index_map,
+    MumpsVector &destination)
+  {
+    for (const auto index : source.locally_owned_elements())
+      {
+        const auto it = index_map.find(index);
+        AssertThrow(it != index_map.end(),
+                    ExcMessage("Could not map RHS index into MUMPS system."));
+        destination[it->second] = source[index];
+      }
+  }
+
+  template <typename VectorType>
+  void copy_to_block_vector(
+    const MumpsVector                                                &source,
+    const std::map<types::global_dof_index, types::global_dof_index> &index_map,
+    VectorType &destination)
+  {
+    for (const auto index : destination.locally_owned_elements())
+      {
+        const auto it = index_map.find(index);
+        AssertThrow(it != index_map.end(),
+                    ExcMessage(
+                      "Could not map solution index from MUMPS system."));
+        destination[index] = source[it->second];
+      }
+  }
+#endif
+
 
 
   std::pair<unsigned int, unsigned int>
@@ -134,6 +207,14 @@ namespace Step80
     auto spacedim = prm.get_integer("space dimension");
     return {dim, spacedim};
   }
+
+  enum class SolverType
+  {
+    augmented_split,
+#ifdef DEAL_II_WITH_MUMPS
+    mumps
+#endif
+  };
 
   // A free function to read the dimension and spacedimension from a parameter
   // file
@@ -234,6 +315,7 @@ namespace Step80
     double       outer_tolerance                 = 1e-5;
     unsigned int inner_lagrangian_max_iterations = 1000;
     double       inner_lagrangian_tolerance      = 1e-4;
+    SolverType   solver_type                     = SolverType::augmented_split;
 
     using PrmFunction =
       ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
@@ -375,6 +457,7 @@ namespace Step80
                     inner_lagrangian_max_iterations);
       add_parameter("Inner Lagrangian solver tolerance",
                     inner_lagrangian_tolerance);
+      add_parameter("Solver type", solver_type);
     }
     leave_subsection();
 
@@ -495,8 +578,13 @@ namespace Step80
     void assemble_elasticity_system(const double &time_step);
     void assemble_elasticity_rhs(const double &time_step);
 
-    void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp);
+    void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp,
+                                    BlockDynamicSparsityPattern &dsp_t);
     void assemble_coupling();
+
+#ifdef DEAL_II_WITH_MUMPS
+    void assemble_mumps_system(const double &time_step);
+#endif
 
     void solve(const double time_step);
 
@@ -542,18 +630,27 @@ namespace Step80
     AffineConstraints<double> fluid_constraints;
     AffineConstraints<double> solid_constraints;
 
-    LA::MPI::BlockSparseMatrix        fluid_matrix; // velocity and pressure
-    LA::MPI::BlockSparseMatrix        fluid_mass_matrix;
-    LA::MPI::BlockSparseMatrix        fluid_preconditioner;
-    TrilinosWrappers::PreconditionAMG fluid_velocity_preconditioner;
-    TrilinosWrappers::PreconditionAMG fluid_pressure_preconditioner;
+    LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
+    LA::MPI::BlockSparseMatrix fluid_mass_matrix;
+    LA::MPI::BlockSparseMatrix fluid_preconditioner;
+    AMGPreconditioner          fluid_velocity_preconditioner;
+    AMGPreconditioner          fluid_pressure_preconditioner;
 
     LA::MPI::BlockSparseMatrix
-      solid_matrix; // displacement and Lagrange multiplier
-    TrilinosWrappers::PreconditionAMG solid_displacement_preconditioner;
-    TrilinosWrappers::PreconditionAMG solid_lagrange_preconditioner;
+                      solid_matrix; // displacement and Lagrange multiplier
+    AMGPreconditioner solid_displacement_preconditioner;
+    AMGPreconditioner solid_lagrange_preconditioner;
     LA::MPI::BlockSparseMatrix
       coupling_interpolation_matrix; // between displacement and velocity
+    LA::MPI::BlockSparseMatrix
+      coupling_interpolation_transpose_matrix; // transpose coupling
+#ifdef DEAL_II_WITH_MUMPS
+    MumpsMatrix mumps_system_matrix;
+    MumpsVector mumps_system_rhs;
+    MumpsVector mumps_system_solution;
+    std::array<std::map<types::global_dof_index, types::global_dof_index>, 4>
+      mumps_block_indices;
+#endif
 
     LA::MPI::BlockVector fluid_solution;
     LA::MPI::BlockVector fluid_locally_relevant_solution;
@@ -1116,8 +1213,14 @@ namespace Step80
                                solid_fe->component_mask(displacement)));
     solid_locally_relevant_solution_old = solid_solution;
 
-    solid_current_position = solid_reference_configuration;
-    solid_current_position += solid_locally_relevant_solution_old;
+    {
+      LA::MPI::BlockVector owned_current_position;
+      owned_current_position.reinit(solid_solution);
+      owned_current_position.block(0) = solid_reference_configuration.block(0);
+      owned_current_position.block(1) = solid_reference_configuration.block(1);
+      owned_current_position.block(0) += solid_solution.block(0);
+      solid_current_position = owned_current_position;
+    }
     solid_mapping =
       std::make_unique<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>(
         solid_dh,
@@ -1131,7 +1234,9 @@ namespace Step80
   void NavierStokesImmersedProblem<dim, spacedim>::setup_coupling()
   {
     BlockDynamicSparsityPattern dsp(fluid_dofs_per_block, solid_dofs_per_block);
-    assemble_coupling_sparsity(dsp);
+    BlockDynamicSparsityPattern dsp_t(solid_dofs_per_block,
+                                      fluid_dofs_per_block);
+    assemble_coupling_sparsity(dsp, dsp_t);
 
     coupling_interpolation_matrix.clear();
     coupling_interpolation_matrix.reinit(fluid_dofs_per_block.size(),
@@ -1141,9 +1246,20 @@ namespace Step80
         coupling_interpolation_matrix.block(i, j).reinit(fluid_owned_dofs[i],
                                                          solid_owned_dofs[j],
                                                          dsp.block(i, j),
-                                                         mpi_communicator,
-                                                         true);
+                                                         mpi_communicator);
     coupling_interpolation_matrix.collect_sizes();
+
+    coupling_interpolation_transpose_matrix.clear();
+    coupling_interpolation_transpose_matrix.reinit(solid_dofs_per_block.size(),
+                                                   fluid_dofs_per_block.size());
+    for (unsigned int i = 0; i < solid_dofs_per_block.size(); ++i)
+      for (unsigned int j = 0; j < fluid_dofs_per_block.size(); ++j)
+        coupling_interpolation_transpose_matrix.block(i, j).reinit(
+          solid_owned_dofs[i],
+          fluid_owned_dofs[j],
+          dsp_t.block(i, j),
+          mpi_communicator);
+    coupling_interpolation_transpose_matrix.collect_sizes();
   }
 
 
@@ -1239,8 +1355,12 @@ namespace Step80
     fluid_preconditioner.compress(VectorOperation::add);
     fluid_mass_matrix.compress(VectorOperation::add);
 
-    fluid_velocity_preconditioner.initialize(fluid_matrix.block(0, 0));
-    fluid_pressure_preconditioner.initialize(fluid_preconditioner.block(1, 1));
+    fluid_velocity_preconditioner.initialize(
+      fluid_matrix.block(0, 0),
+      make_amg_additional_data(fluid_fe->degree, true));
+    fluid_pressure_preconditioner.initialize(
+      fluid_preconditioner.block(1, 1),
+      make_amg_additional_data(fluid_fe->degree, true));
   }
 
 
@@ -1412,8 +1532,12 @@ namespace Step80
         }
     solid_matrix.compress(VectorOperation::add);
 
-    solid_displacement_preconditioner.initialize(solid_matrix.block(0, 0));
-    solid_lagrange_preconditioner.initialize(solid_matrix.block(1, 1));
+    solid_displacement_preconditioner.initialize(
+      solid_matrix.block(0, 0),
+      make_amg_additional_data(solid_fe->degree, true));
+    solid_lagrange_preconditioner.initialize(
+      solid_matrix.block(1, 1),
+      make_amg_additional_data(solid_fe->degree, true));
   }
 
 
@@ -1539,7 +1663,8 @@ namespace Step80
 
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_coupling_sparsity(
-    BlockDynamicSparsityPattern &dsp)
+    BlockDynamicSparsityPattern &dsp,
+    BlockDynamicSparsityPattern &dsp_t)
   {
     TimerOutput::Scope t(computing_timer, "Assemble Coupling sparsity");
 
@@ -1570,8 +1695,12 @@ namespace Step80
                   fluid_fe->system_to_component_index(i).first;
 
                 if (comp_i < spacedim)
-                  dsp.add(fluid_dof_indices[i],
-                          global_particle_id * spacedim + comp_i);
+                  {
+                    const auto solid_index =
+                      global_particle_id * spacedim + comp_i;
+                    dsp.add(fluid_dof_indices[i], solid_index);
+                    dsp_t.add(solid_index, fluid_dof_indices[i]);
+                  }
               }
           }
         particle = pic.end();
@@ -1590,6 +1719,7 @@ namespace Step80
     std::vector<types::global_dof_index> solid_dof_indices;
 
     FullMatrix<double> local_matrix;
+    FullMatrix<double> local_matrix_transpose;
 
     auto particle = solid_particle_handler.begin();
     while (particle != solid_particle_handler.end())
@@ -1607,6 +1737,8 @@ namespace Step80
 
         local_matrix.reinit(fluid_fe->n_dofs_per_cell(),
                             n_particles_in_cell * spacedim);
+        local_matrix_transpose.reinit(n_particles_in_cell * spacedim,
+                                      fluid_fe->n_dofs_per_cell());
 
         solid_dof_indices.resize(n_particles_in_cell * spacedim);
 
@@ -1628,8 +1760,13 @@ namespace Step80
                   fluid_fe->system_to_component_index(i).first;
 
                 if (comp_i < spacedim)
-                  local_matrix(i, local_pic_index * spacedim + comp_i) =
-                    fluid_fe->shape_value(i, ref_q);
+                  {
+                    const double value = fluid_fe->shape_value(i, ref_q);
+                    local_matrix(i, local_pic_index * spacedim + comp_i) =
+                      value;
+                    local_matrix_transpose(local_pic_index * spacedim + comp_i,
+                                           i) = value;
+                  }
               }
             local_pic_index++;
           }
@@ -1640,11 +1777,207 @@ namespace Step80
           solid_constraints,
           solid_dof_indices,
           coupling_interpolation_matrix);
+
+        solid_constraints.distribute_local_to_global(
+          local_matrix_transpose,
+          solid_dof_indices,
+          fluid_constraints,
+          fluid_dof_indices,
+          coupling_interpolation_transpose_matrix);
         particle = pic.end();
       }
 
     coupling_interpolation_matrix.compress(VectorOperation::add);
+    coupling_interpolation_transpose_matrix.compress(VectorOperation::add);
   }
+
+
+#ifdef DEAL_II_WITH_MUMPS
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::assemble_mumps_system(
+    const double &time_step)
+  {
+    TimerOutput::Scope t(computing_timer, "Assemble MUMPS system");
+
+    const auto &owned_u = fluid_owned_dofs[0];
+    const auto &owned_w = solid_owned_dofs[0];
+    const auto &owned_l = solid_owned_dofs[1];
+    const auto &owned_p = fluid_owned_dofs[1];
+
+    const auto owned_u_all =
+      Utilities::MPI::all_gather(mpi_communicator, owned_u);
+    const auto owned_w_all =
+      Utilities::MPI::all_gather(mpi_communicator, owned_w);
+    const auto owned_l_all =
+      Utilities::MPI::all_gather(mpi_communicator, owned_l);
+    const auto owned_p_all =
+      Utilities::MPI::all_gather(mpi_communicator, owned_p);
+
+    const auto local_count = owned_u.n_elements() + owned_w.n_elements() +
+                             owned_l.n_elements() + owned_p.n_elements();
+    const auto counts_per_proc =
+      Utilities::MPI::all_gather(mpi_communicator, local_count);
+
+    std::vector<types::global_dof_index> proc_offsets(counts_per_proc.size(),
+                                                      0);
+    for (unsigned int p = 1; p < counts_per_proc.size(); ++p)
+      proc_offsets[p] = proc_offsets[p - 1] + counts_per_proc[p - 1];
+
+    const types::global_dof_index my_offset =
+      proc_offsets[Utilities::MPI::this_mpi_process(mpi_communicator)];
+    const types::global_dof_index n_total =
+      proc_offsets.back() + counts_per_proc.back();
+
+    std::array<types::global_dof_index, 4> my_block_offsets = {
+      my_offset,
+      my_offset + owned_u.n_elements(),
+      my_offset + owned_u.n_elements() + owned_w.n_elements(),
+      my_offset + owned_u.n_elements() + owned_w.n_elements() +
+        owned_l.n_elements()};
+
+    mumps_block_indices[0].clear();
+    mumps_block_indices[1].clear();
+    mumps_block_indices[2].clear();
+    mumps_block_indices[3].clear();
+
+    {
+      types::global_dof_index local_index = 0;
+      for (const auto index : owned_u)
+        mumps_block_indices[0][index] = my_block_offsets[0] + local_index++;
+    }
+    {
+      types::global_dof_index local_index = 0;
+      for (const auto index : owned_w)
+        mumps_block_indices[1][index] = my_block_offsets[1] + local_index++;
+    }
+    {
+      types::global_dof_index local_index = 0;
+      for (const auto index : owned_l)
+        mumps_block_indices[2][index] = my_block_offsets[2] + local_index++;
+    }
+    {
+      types::global_dof_index local_index = 0;
+      for (const auto index : owned_p)
+        mumps_block_indices[3][index] = my_block_offsets[3] + local_index++;
+    }
+
+    auto map_index =
+      [&](const unsigned int            block,
+          const types::global_dof_index old_index) -> types::global_dof_index {
+      const std::array<const std::vector<IndexSet> *, 4> owned_sets = {
+        &owned_u_all, &owned_w_all, &owned_l_all, &owned_p_all};
+
+      for (unsigned int proc = 0; proc < counts_per_proc.size(); ++proc)
+        {
+          const auto &set = (*owned_sets[block])[proc];
+          if (set.is_element(old_index))
+            {
+              const types::global_dof_index block_offset =
+                proc_offsets[proc] +
+                (block == 0 ? 0 :
+                 block == 1 ? owned_u_all[proc].n_elements() :
+                 block == 2 ? owned_u_all[proc].n_elements() +
+                                owned_w_all[proc].n_elements() :
+                              owned_u_all[proc].n_elements() +
+                                owned_w_all[proc].n_elements() +
+                                owned_l_all[proc].n_elements());
+              return block_offset + set.index_within_set(old_index);
+            }
+        }
+
+      AssertThrow(false, ExcMessage("Could not map MUMPS index."));
+      return numbers::invalid_dof_index;
+    };
+
+    IndexSet locally_owned_dofs(n_total);
+    locally_owned_dofs.add_range(my_offset, my_offset + local_count);
+    locally_owned_dofs.compress();
+    const IndexSet locally_relevant_dofs = complete_index_set(n_total);
+
+    MumpsMatrix coupling_matrix;
+    MumpsMatrix coupling_matrix_transpose;
+    solid_matrix.block(1, 0).mmult(
+      coupling_matrix, coupling_interpolation_transpose_matrix.block(0, 0));
+    coupling_interpolation_matrix.block(0, 0).mmult(coupling_matrix_transpose,
+                                                    solid_matrix.block(0, 1));
+    coupling_matrix *= -time_step;
+    coupling_matrix_transpose *= -time_step;
+
+    DynamicSparsityPattern dsp(locally_relevant_dofs);
+    auto                   add_pattern = [&](const auto        &matrix,
+                           const unsigned int row_block,
+                           const unsigned int col_block) {
+      for (types::global_dof_index row = matrix.local_range().first;
+           row < matrix.local_range().second;
+           ++row)
+        for (auto entry = matrix.begin(row); entry != matrix.end(row); ++entry)
+          dsp.add(map_index(row_block, row),
+                  map_index(col_block, entry->column()));
+    };
+
+    add_pattern(fluid_matrix.block(0, 0), 0, 0);
+    add_pattern(solid_matrix.block(0, 0), 1, 1);
+    add_pattern(solid_matrix.block(0, 1), 1, 2);
+    add_pattern(solid_matrix.block(1, 0), 2, 1);
+    add_pattern(coupling_matrix_transpose, 0, 2);
+    add_pattern(coupling_matrix, 2, 0);
+    add_pattern(fluid_matrix.block(0, 1), 0, 3);
+    add_pattern(fluid_matrix.block(1, 0), 3, 0);
+
+    SparsityTools::distribute_sparsity_pattern(dsp,
+                                               locally_owned_dofs,
+                                               mpi_communicator,
+                                               locally_relevant_dofs);
+
+    mumps_system_matrix.reinit(locally_owned_dofs,
+                               locally_owned_dofs,
+                               dsp,
+                               mpi_communicator);
+    mumps_system_matrix = 0;
+
+    auto copy_matrix = [&](const auto        &matrix,
+                           const unsigned int row_block,
+                           const unsigned int col_block) {
+      for (types::global_dof_index row = matrix.local_range().first;
+           row < matrix.local_range().second;
+           ++row)
+        for (auto entry = matrix.begin(row); entry != matrix.end(row); ++entry)
+          mumps_system_matrix.add(map_index(row_block, row),
+                                  map_index(col_block, entry->column()),
+                                  entry->value());
+    };
+
+    copy_matrix(fluid_matrix.block(0, 0), 0, 0);
+    copy_matrix(solid_matrix.block(0, 0), 1, 1);
+    copy_matrix(solid_matrix.block(0, 1), 1, 2);
+    copy_matrix(coupling_matrix_transpose, 0, 2);
+    copy_matrix(coupling_matrix, 2, 0);
+    copy_matrix(fluid_matrix.block(0, 1), 0, 3);
+    copy_matrix(fluid_matrix.block(1, 0), 3, 0);
+    copy_matrix(solid_matrix.block(1, 0), 2, 1);
+
+    mumps_system_matrix.compress(VectorOperation::add);
+
+    mumps_system_rhs.reinit(locally_owned_dofs, mpi_communicator);
+    mumps_system_rhs = 0.;
+    copy_distributed_vector(fluid_system_rhs.block(0),
+                            mumps_block_indices[0],
+                            mumps_system_rhs);
+    copy_distributed_vector(solid_system_rhs.block(0),
+                            mumps_block_indices[1],
+                            mumps_system_rhs);
+    copy_distributed_vector(solid_system_rhs.block(1),
+                            mumps_block_indices[2],
+                            mumps_system_rhs);
+    copy_distributed_vector(fluid_system_rhs.block(1),
+                            mumps_block_indices[3],
+                            mumps_system_rhs);
+    mumps_system_rhs.compress(VectorOperation::insert);
+
+    mumps_system_solution.reinit(locally_owned_dofs, mpi_communicator);
+    mumps_system_solution = 0.;
+  }
+#endif
 
 
 
@@ -1653,6 +1986,42 @@ namespace Step80
   void NavierStokesImmersedProblem<dim, spacedim>::solve(const double time_step)
   {
     TimerOutput::Scope t(computing_timer, "Solve");
+
+#ifdef DEAL_II_WITH_MUMPS
+    if (par.solver_type == SolverType::mumps)
+      {
+        SparseDirectMUMPS::AdditionalData mumps_data;
+        SparseDirectMUMPS                 solver(mumps_data,
+                                 mumps_system_matrix.get_mpi_communicator());
+        solver.initialize(mumps_system_matrix);
+        solver.vmult(mumps_system_solution, mumps_system_rhs);
+
+        copy_to_block_vector(mumps_system_solution,
+                             mumps_block_indices[0],
+                             fluid_solution.block(0));
+        copy_to_block_vector(mumps_system_solution,
+                             mumps_block_indices[1],
+                             solid_solution.block(0));
+        copy_to_block_vector(mumps_system_solution,
+                             mumps_block_indices[2],
+                             solid_solution.block(1));
+        copy_to_block_vector(mumps_system_solution,
+                             mumps_block_indices[3],
+                             fluid_solution.block(1));
+
+        fluid_solution.compress(VectorOperation::insert);
+        solid_solution.compress(VectorOperation::insert);
+
+        fluid_constraints.distribute(fluid_solution);
+        solid_constraints.distribute(solid_solution);
+
+        fluid_locally_relevant_solution = fluid_solution;
+        solid_locally_relevant_solution = solid_solution;
+
+        pcout << "   Solved with MUMPS." << std::endl;
+        return;
+      }
+#endif
 
     using Vec   = LA::MPI::Vector;
     using LinOp = LinearOperator<Vec>;
@@ -1673,10 +2042,13 @@ namespace Step80
     const auto Z2t = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 0));
     const auto Z3t = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 1));
 
-    const auto P  = transpose_operator(Pt);
-    const auto Z1 = transpose_operator(Z1t);
-    const auto Z2 = transpose_operator(Z2t);
-    const auto Z3 = transpose_operator(Z3t);
+    const auto P = LinOp(coupling_interpolation_transpose_matrix.block(0, 0));
+    const auto Z1 =
+      0.0 * LinOp(coupling_interpolation_transpose_matrix.block(0, 1));
+    const auto Z2 =
+      0.0 * LinOp(coupling_interpolation_transpose_matrix.block(1, 0));
+    const auto Z3 =
+      0.0 * LinOp(coupling_interpolation_transpose_matrix.block(1, 1));
 
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
@@ -1689,7 +2061,7 @@ namespace Step80
                                        par.inner_tolerance,
                                        false,
                                        false);
-    SolverCG<TrilinosWrappers::MPI::Vector> cg_solver(inner_solver_control);
+    SolverCG<Vec> cg_solver(inner_solver_control);
 
     auto invMp = inverse_operator(Mp, cg_solver, fluid_pressure_preconditioner);
     const auto invW = linear_operator(M, solid_lagrange_preconditioner);
@@ -1752,7 +2124,12 @@ namespace Step80
 
 
 
-    BVec block_system_rhs(4), block_system_solution(4);
+    const std::vector<IndexSet> block_partitioning = {fluid_owned_dofs[0],
+                                                      solid_owned_dofs[0],
+                                                      solid_owned_dofs[1],
+                                                      fluid_owned_dofs[1]};
+    BVec                        block_system_rhs, block_system_solution;
+    block_system_rhs.reinit(block_partitioning, mpi_communicator);
     block_system_rhs.block(0) = fluid_system_rhs.block(0);
     block_system_rhs.block(1) = solid_system_rhs.block(0);
     block_system_rhs.block(2) = solid_system_rhs.block(1);
@@ -2006,8 +2383,14 @@ namespace Step80
     pcout << "Number of particles "
           << solid_particle_handler.n_global_particles() << std::endl;
 
-    solid_current_position = solid_reference_configuration;
-    solid_current_position += solid_locally_relevant_solution;
+    {
+      LA::MPI::BlockVector owned_current_position;
+      owned_current_position.reinit(solid_solution);
+      owned_current_position.block(0) = solid_reference_configuration.block(0);
+      owned_current_position.block(1) = solid_reference_configuration.block(1);
+      owned_current_position.block(0) += solid_solution.block(0);
+      solid_current_position = owned_current_position;
+    }
 
     // Create an intermediate vector to store particle positions
     // The issue is that solid_current_position.block(0) is distributed
@@ -2087,6 +2470,10 @@ namespace Step80
 
         setup_coupling();
         assemble_coupling();
+#ifdef DEAL_II_WITH_MUMPS
+        if (par.solver_type == SolverType::mumps)
+          assemble_mumps_system(time_step);
+#endif
 
         solve(time_step);
 
