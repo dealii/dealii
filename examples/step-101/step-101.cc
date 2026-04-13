@@ -652,6 +652,10 @@ namespace Step101
 
     const double rho0 = parameters.rho;
 
+    std::vector<bool> is_critical(h_char.size(),false);
+    for (const unsigned int id : critical_cell_ids)
+      is_critical[id] = true;
+
     double total_mass = 0.0;
     double added_mass = 0.0;
 
@@ -664,7 +668,8 @@ namespace Step101
       const double h = h_char[cell_index];
       const double rho_required = (dt_target * dt_target) * (parameters.lambda + 2.0 * parameters.mu) / (h * h);
 
-      if (rho_required > rho0)
+      // Only apply mass scaling on the selected critical cells:
+      if (is_critical[cell_index] && rho_required > rho0)
       {
         result.density_scaling[cell_index] = rho_required / rho0;
         added_mass += (rho_required - rho0) * cell_volume;
@@ -686,6 +691,15 @@ namespace Step101
     }
 
     result.dt_crit_reference = dt_ref;
+
+    unsigned int n_scaled = 0;
+    for (const double a : result.density_scaling)
+      if (a > 1.0 + 1e-12)
+        ++n_scaled;
+
+    // Print
+    std::cout << "Scaled cells: " << n_scaled
+              << " / " << result.density_scaling.size() << std::endl;
 
     return result;
 
@@ -913,7 +927,20 @@ namespace Step101
     Assert(dim == 2, ExcMessage("This step-101 is written for dim=2."));
 
     GridGenerator::hyper_cube(triangulation,-1,1);
-    triangulation.refine_global(4);
+    
+    // Base mesh
+    triangulation.refine_global(3);
+
+    // Locally refine a small region to create a few very small cells.
+    // Here: refine cells whose center is close to (0.6, 0.6).
+    for (unsigned int step = 0; step < 4; ++step)
+    {
+      for (const auto &cell : triangulation.active_cell_iterators())
+        if (cell->center().distance(Point<2>(0.6,0.6))<0.35)
+          cell->set_refine_flag();
+
+      triangulation.execute_coarsening_and_refinement();
+    }
 
     setup_system();
 
