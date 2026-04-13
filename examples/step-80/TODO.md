@@ -9,8 +9,8 @@
 - [ ] Explain very well the choicse of the reference configuration
 - [ ] Make sure we use the same format for the parameters that is used as input
 - [x] Reinsert tracers as in step-70
-- [ ] Add output with only changed parameters w.r.t. default
-- [ ] Make sure we output the correct initial condition
+- [ ] Add output with only changed parameters w.r.t. default - BB 
+- [ ] Make sure we output the correct initial condition - BB 
 - [ ] Make it robust w.r.t. going out of the domain
 - [ ] Use ARKode for time stepping
 - [ ] Allow the use of MUMPS for linear solver
