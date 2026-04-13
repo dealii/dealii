@@ -1,16 +1,27 @@
-- [x] Make output directory if it does not exist
+TODO list for step-80:
+
+- [x] Create output directory if it does not exist
 - [ ] Read second argument from CLI and make sure to save used parameter file there
 - [x] Functions should be initialized correctly
-- [ ] Default parameter should work
+- [x] Default parameter should work
 - [ ] Check default tolerances
 - [x] Move initialization of AMG preconditioners to the assembly functions
 - [ ] Assemble the augmented system directly, and use AMG on it
 - [ ] Make sure that the names of the tolerances are meaningful
-- [ ] Explain very well the choicse of the reference configuration
-- [ ] Make sure we use the same format for the parameters that is used as input
+- [ ] Explain very well the choices of the reference configuration
+- [ ] Make sure we use the same format for the parameters that is used as input (i.e., json/prm)
 - [x] Reinsert tracers as in step-70
-- [ ] Add output with only changed parameters w.r.t. default - BB 
-- [ ] Make sure we output the correct initial condition - BB 
+- [ ] Add output with only changed parameters w.r.t. default
+- [ ] Make sure we output the correct initial condition
 - [ ] Make it robust w.r.t. going out of the domain
 - [ ] Use ARKode for time stepping
-- [ ] Allow the use of MUMPS for linear solver
+- [x] Allow the use of MUMPS for linear solver
+- [ ] Make sure MUMPS work (not our issue here)
+- [ ] Add statistics on the number of inner iterations, and number of iterations for the augmented system
+- [ ] Generalize the copy to and from general matrices/vectors
+- [ ] Apply this to the mumps version
+- [ ] Sundials/PETSc TS interface
+- [ ] Recover from disaster (e.g., going out of the domain)
+- [ ] Checkpoint restart
+- [ ] Add shape derivative
+- [ ] Fix one dof of pressure if all bc are Dirichlet
