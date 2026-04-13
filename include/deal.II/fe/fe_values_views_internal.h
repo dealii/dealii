@@ -148,9 +148,10 @@ namespace FEValuesViews
       const Table<2, dealii::Tensor<1, spacedim>> &shape_gradients,
       const std::vector<typename Vector<dim, spacedim>::ShapeFunctionData>
         &shape_function_data,
-      std::vector<typename ProductType<
-        Number,
-        typename dealii::internal::CurlType<spacedim>::type>::type> &curls);
+      std::vector<
+        typename ProductType<Number,
+                             dealii::internal::CurlType<spacedim>>::type>
+        &curls);
 
     /**
      * Compute Laplacian values for Vectors.

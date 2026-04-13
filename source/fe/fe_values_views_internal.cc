@@ -457,7 +457,7 @@ namespace FEValuesViews
         &shape_function_data,
       std::vector<typename ProductType<
         Number,
-        typename dealii::internal::CurlType<spacedim>::type>::type> &curls)
+        typename dealii::internal::CurlType<spacedim>>::type> &curls)
     {
       const unsigned int dofs_per_cell       = dof_values.size();
       const unsigned int n_quadrature_points = curls.size();
@@ -466,7 +466,7 @@ namespace FEValuesViews
                 curls.end(),
                 typename ProductType<
                   Number,
-                  typename dealii::internal::CurlType<spacedim>::type>::type());
+                  typename dealii::internal::CurlType<spacedim>>::type());
 
       if constexpr (spacedim == 1)
         {

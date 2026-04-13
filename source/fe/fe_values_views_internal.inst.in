@@ -85,8 +85,7 @@ for (S : ALL_SCALAR_TYPES; deal_II_dimension : DIMENSIONS;
             &,
           std::vector<ProductType<
             S,
-            dealii::internal::CurlType<deal_II_space_dimension>::type>::type>
-            &);
+            dealii::internal::CurlType<deal_II_space_dimension>>::type> &);
 
         template void
         do_function_laplacians<deal_II_dimension, deal_II_space_dimension, S>(
