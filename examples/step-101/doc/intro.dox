@@ -236,7 +236,15 @@ CMS is still a powerful tool when we make sure that the additional mass does
 not have a dominating effect in the dynamic response of the system and it only
 results in small acceptable changes in its behavior.
 
-TODO: Add how to assess the impact.
+In this tutorial, we asses the impact of CMS through two safety caps. We
+accept CMS if the total added mass is below a set maximum allowed mass ratio, which 
+consists of and if the only a small portion of the mesh needs scaling. For this 
+tutorial, both values of these ratios have been set to certain numbers that would
+be appropriate for this specific model. When applying CMS to any model, one
+should ask themselves what specific acceptance criteria they should set.
+Nevertheless, this is not a trivial question. When dealing with CMS, you often
+have to conduct convergence studies until you find out what criteria are both
+acceptable and computationally efficient for your specific case. 
 
 
 <h3>Limitations and scope of the tutorial</h3>
