@@ -167,7 +167,7 @@ Taking into account the characteristic element length of <code>FE_Q(1)</code>
 elements and the longitudinal wave speed in linear elastic materials
 we derive the CFL condition:
 @f[
-  \Delta t \le l_{\text{min}} \, \sqrt{\frac{\rho}{\lambda + 2 \, \mu}}
+  \Delta t \le h_{\text{char}} \, \sqrt{\frac{\rho}{\lambda + 2 \, \mu}}
 ]
 expressed with the Lamé parameters $\lambda$ and $\mu$, since these parameters
 had already been used in step-8, the base for this tutorial.
