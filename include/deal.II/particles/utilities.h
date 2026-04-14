@@ -271,6 +271,14 @@ namespace Particles
      *
      * @param[in] field_comps An optional component mask that decides which
      * subset of the vector fields are interpolated
+     *
+     * @param[in] mapping The mapping used to transform the reference cell to
+     *            the real cell. Defaults to the default mapping of the
+     *            hypercube reference cell for the given dimension.
+     *
+     * @note This function is more efficient than interpolate_field_on_particles,
+     *        but requires @p n_components to be specified as a
+     *       compile-time template argument.
      */
 
     template <int n_components,
