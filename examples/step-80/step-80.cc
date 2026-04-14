@@ -501,7 +501,7 @@ namespace Step80
 
     auto helper = [&](auto &function, const std::string expression) {
       function.declare_parameters_call_back.connect(
-        [&]() { reset_function(expression); });
+        [reset_function, expression]() { reset_function(expression); });
     };
 
     // We now use these two functions to set the correct default values for all
