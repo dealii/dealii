@@ -298,6 +298,8 @@ namespace Step80
     double lame_mu     = 1.0;
     double lame_lambda = 1.0;
 
+    bool particle_predictor = true;
+
     std::list<types::boundary_id> dirichlet_ids{0};
 
     std::string name_of_fluid_grid           = "hyper_cube";
@@ -398,6 +400,13 @@ namespace Step80
                   use_ida,
                   "Use SUNDIALS IDA for adaptive time stepping instead of "
                   "the fixed-step loop.");
+
+    add_parameter(
+      "Particle predictor",
+      particle_predictor,
+      "If true, tentatively displace solid particles using the current "
+      "fluid velocity before each solve, reducing the time step if any "
+      "particles would leave the fluid domain.");
 
 #ifdef DEAL_II_WITH_SUNDIALS
     {
@@ -611,9 +620,10 @@ namespace Step80
                                  const double                tolerance);
 #endif
 
-    void setup_solid_particles();
-    void setup_tracer_particles();
-    void euler_step_tracer_particles(const double dt);
+    void                    setup_solid_particles();
+    void                    setup_tracer_particles();
+    void                    euler_step_tracer_particles(const double dt);
+    std::pair<bool, double> attempt_particle_displacement(const double dt);
 
     void initial_setup();
     void setup_dofs();
@@ -999,6 +1009,127 @@ namespace Step80
             particle_location += particle_velocity * dt;
           }
       }
+  }
+
+
+
+  // @sect4{Attempt particle displacement}
+  // This function estimates the future solid particle displacement using the
+  // current fluid velocity evaluated at each solid particle location. If any
+  // solid particles would leave the fluid domain after the tentative
+  // displacement, the time step is halved and the process is retried.
+  // Tentative positions are computed in a separate data structure and tested
+  // using a temporary ParticleHandler, so the real particles are never
+  // modified until the displacement is known to be safe. This ensures correct
+  // behavior in parallel where sort_particles_into_subdomains_and_cells()
+  // migrates particles across MPI ranks.
+  template <int dim, int spacedim>
+  std::pair<bool, double>
+  NavierStokesImmersedProblem<dim, spacedim>::attempt_particle_displacement(
+    const double dt)
+  {
+    // Evaluate the fluid velocity at each locally owned solid particle
+    // location and store it keyed by particle ID. This only needs to be done
+    // once since the starting positions don't change between retries.
+    std::map<types::particle_index, Tensor<1, spacedim>> particle_velocities;
+
+    {
+      const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
+      Vector<double>     local_dof_values(dofs_per_cell);
+
+      FEPointEvaluation<spacedim, spacedim> evaluator(
+        StaticMappingQ1<spacedim>::mapping, *fluid_fe, update_values);
+      std::vector<Point<spacedim>> particle_reference_positions;
+
+      auto particle = solid_particle_handler.begin();
+      while (particle != solid_particle_handler.end())
+        {
+          const auto cell = particle->get_surrounding_cell();
+          const auto dh_cell =
+            typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
+
+          dh_cell->get_dof_values(fluid_locally_relevant_solution,
+                                  local_dof_values);
+
+          const auto pic = solid_particle_handler.particles_in_cell(cell);
+          Assert(pic.begin() == particle, ExcInternalError());
+          particle_reference_positions.clear();
+          for (const auto &p : pic)
+            particle_reference_positions.push_back(p.get_reference_location());
+
+          evaluator.reinit(cell, particle_reference_positions);
+          evaluator.evaluate(make_array_view(local_dof_values),
+                             EvaluationFlags::values);
+
+          for (unsigned int particle_index = 0; particle != pic.end();
+               ++particle, ++particle_index)
+            {
+              particle_velocities[particle->get_id()] =
+                evaluator.get_value(particle_index);
+            }
+        }
+    }
+
+    double current_dt        = dt;
+    bool   time_step_changed = false;
+
+    // Use a temporary ParticleHandler to test if the tentative displacement
+    // would cause any particles to leave the fluid domain. We copy the real
+    // handler into it, displace the particles, and then sort — particles
+    // that leave the domain will be reported via the particle_lost signal.
+    // This leaves the real solid_particle_handler untouched during testing.
+    Particles::ParticleHandler<spacedim> test_particle_handler;
+    test_particle_handler.initialize(fluid_tria,
+                                     StaticMappingQ1<spacedim>::mapping);
+
+    types::particle_index n_locally_lost = 0;
+    test_particle_handler.signals.particle_lost.connect(
+      [&](const typename Particles::ParticleIterator<spacedim> & /*particle*/,
+          const typename Triangulation<spacedim>::active_cell_iterator
+            & /*cell*/) { ++n_locally_lost; });
+
+    while (true)
+      {
+        n_locally_lost = 0;
+
+        // Reset the test handler to the current state of the real handler
+        test_particle_handler.copy_from(solid_particle_handler);
+
+        // Displace each particle in the test handler by velocity * current_dt
+        for (auto &particle : test_particle_handler)
+          {
+            const auto it = particle_velocities.find(particle.get_id());
+            Assert(it != particle_velocities.end(), ExcInternalError());
+            particle.get_location() += it->second * current_dt;
+          }
+
+        // Sort — the particle_lost signal fires for any particle that left
+        test_particle_handler.sort_particles_into_subdomains_and_cells();
+
+        const auto n_global_lost =
+          Utilities::MPI::sum(n_locally_lost, mpi_communicator);
+
+        if (n_global_lost == 0)
+          break;
+
+        pcout << "   Solid particles would be lost (" << n_global_lost
+              << " outside domain). Halving time step from " << current_dt
+              << " to " << current_dt / 2.0 << std::endl;
+
+        current_dt /= 2.0;
+        time_step_changed = true;
+      }
+
+    // The time step is safe. Apply the displacement to the real particles.
+    for (auto &particle : solid_particle_handler)
+      {
+        const auto it = particle_velocities.find(particle.get_id());
+        Assert(it != particle_velocities.end(), ExcInternalError());
+        particle.get_location() += it->second * current_dt;
+      }
+    solid_particle_handler.sort_particles_into_subdomains_and_cells();
+
+    return {time_step_changed, current_dt};
   }
 
 
@@ -2521,16 +2652,6 @@ namespace Step80
         pcout << "Cycle " << cycle << ':' << std::endl
               << "Time : " << time << ", time step: " << time_step << std::endl;
 
-        // auto [update_timestep, time_step] =
-        // attempt_particle_displacement(time_step);
-        bool update_timestep = false;
-
-        if (update_timestep)
-          {
-            pcout << "   Time step updated to " << time_step << " due to "
-                  << "particle displacement." << std::endl;
-          }
-
         if (cycle == 0)
           {
             make_grid();
@@ -2540,6 +2661,20 @@ namespace Step80
             setup_solid_particles();
             setup_tracer_particles();
             output_results(output_cycle, time);
+          }
+
+        bool update_timestep = false;
+        if (par.particle_predictor)
+          {
+            auto [changed, new_time_step] =
+              attempt_particle_displacement(time_step);
+            update_timestep = changed;
+            if (update_timestep)
+              {
+                time_step = new_time_step;
+                pcout << "   Time step updated to " << time_step << " due to "
+                      << "particle displacement." << std::endl;
+              }
           }
 
         if (cycle == 0 || update_timestep)
