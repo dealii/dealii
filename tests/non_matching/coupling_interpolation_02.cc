@@ -17,6 +17,7 @@
 
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_tools.h>
 
@@ -73,18 +74,20 @@ test()
 
   NonMatching::DoFHandlerCoupling<dim, spacedim> dhc(dh1, dh2);
 
-  const auto locally_owned2  = dh2.locally_owned_dofs();
-  const auto globally_owned2 = dh2.n_locally_owned_dofs_per_processor();
+  const auto locally_owned2    = dh2.locally_owned_dofs();
+  IndexSet   locally_relevant2 = DoFTools::extract_locally_relevant_dofs(dh2);
+  const auto globally_owned2 =
+    Utilities::MPI::all_gather(MPI_COMM_WORLD, locally_owned2.n_elements());
 
   SparsityPattern sparsity;
   {
-    DynamicSparsityPattern dsp(dh2.n_dofs(), dh1.n_dofs());
+    DynamicSparsityPattern dsp(locally_relevant2);
     dhc.create_interpolation_sparsity_pattern(dsp);
 
     SparsityTools::distribute_sparsity_pattern(dsp,
                                                globally_owned2,
                                                MPI_COMM_WORLD,
-                                               locally_owned2);
+                                               locally_relevant2);
     sparsity.copy_from(dsp);
   }
 
