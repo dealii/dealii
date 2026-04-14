@@ -2424,7 +2424,7 @@ namespace DoFTools
                 // auxiliary variable which holds FE indices of the mother face
                 // and its subfaces. This knowledge will be needed in hp-case
                 // with neither_element_dominates.
-                std::set<types::fe_index> fe_ind_face_subface;
+                std::set<unsigned int> fe_ind_face_subface;
                 fe_ind_face_subface.insert(cell->active_fe_index());
 
                 if (dof_handler.has_hp_capabilities())
@@ -2602,8 +2602,7 @@ namespace DoFTools
                         // TODO: Change set to types::fe_index
                         const types::fe_index dominating_fe_index =
                           fe_collection.find_dominating_fe_extended(
-                            {fe_ind_face_subface.begin(),
-                             fe_ind_face_subface.end()},
+                            fe_ind_face_subface,
                             /*codim=*/1);
 
                         AssertThrow(
