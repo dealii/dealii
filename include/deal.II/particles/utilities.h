@@ -29,9 +29,9 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/sparsity_pattern_base.h>
 
-#include <deal.II/particles/particle_handler.h>
-
 #include <deal.II/matrix_free/fe_point_evaluation.h>
+
+#include <deal.II/particles/particle_handler.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -252,8 +252,9 @@ namespace Particles
      * at the position of the particles. The result is stored in an output
      * vector whose size corresponds to the number of locally owned particles *
      * number of active components. This version relies on FePointEvaluator
-     * to interpolate the field at the particle location efficiently. The drawback
-     * is that this requires knowledge of the number of components at compile time.
+     * to interpolate the field at the particle location efficiently. The
+     * drawback is that this requires knowledge of the number of components at
+     * compile time.
      *
      * @param[in] field_dh The DOF Handler which was used to generate the
      * field vector that is to be interpolated.
@@ -273,10 +274,10 @@ namespace Particles
      */
 
     template <int n_components,
-                int dim,
-                  int spacedim,
-                  typename InputVectorType,
-                  typename OutputVectorType>
+              int dim,
+              int spacedim,
+              typename InputVectorType,
+              typename OutputVectorType>
     void
     interpolate_field_on_particles_fast(
       const DoFHandler<dim, spacedim>                 &field_dh,
@@ -284,15 +285,14 @@ namespace Particles
       const InputVectorType                           &field_vector,
       OutputVectorType                                &interpolated_field,
       const ComponentMask                             &field_comps = {},
-      const Mapping<dim, spacedim> &mapping =
-  (ReferenceCells::get_hypercube<dim>()
+      const Mapping<dim, spacedim>                    &mapping =
+        (ReferenceCells::get_hypercube<dim>()
 #ifndef _MSC_VER
-     .template get_default_linear_mapping<spacedim>()
+           .template get_default_linear_mapping<spacedim>()
 #else
-     .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
+           .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
 #endif
-     )
-     )
+           ))
     {
       if (particle_handler.n_locally_owned_particles() == 0)
         {
@@ -324,11 +324,14 @@ namespace Particles
 
       std::vector<types::global_dof_index> dof_indices(fe.n_dofs_per_cell());
 
-      // Generate an evaluator that will be used to interpolate the fields at the particle location.
-      FEPointEvaluation<n_components, dim, spacedim> evaluator(mapping, fe, update_values);
-      std::vector<Point<dim>>     particle_reference_locations;
+      // Generate an evaluator that will be used to interpolate the fields at
+      // the particle location.
+      FEPointEvaluation<n_components, dim, spacedim> evaluator(mapping,
+                                                               fe,
+                                                               update_values);
+      std::vector<Point<dim>>            particle_reference_locations;
       std::vector<types::particle_index> particle_indices;
-      Vector<double> local_dof_values(fe.dofs_per_cell);
+      Vector<double>                     local_dof_values(fe.dofs_per_cell);
 
       while (particle != particle_handler.end())
         {
@@ -346,7 +349,8 @@ namespace Particles
           particle_indices.clear();
           for (auto &p : pic)
             {
-              particle_reference_locations.emplace_back(p.get_reference_location());
+              particle_reference_locations.emplace_back(
+                p.get_reference_location());
               particle_indices.emplace_back(p.get_id());
             }
 
@@ -364,12 +368,13 @@ namespace Particles
                 }
               else
                 {
-                  unsigned int j_comp =0;
-                  for (unsigned int j = 0; j  < n_components;  ++j)
+                  unsigned int j_comp = 0;
+                  for (unsigned int j = 0; j < n_components; ++j)
                     {
                       if (field_comps[j])
                         {
-                          interpolated_field[id * n_selected_comps + j_comp] = evaluator.get_value(particle_index)[j];
+                          interpolated_field[id * n_selected_comps + j_comp] =
+                            evaluator.get_value(particle_index)[j];
                           j_comp++;
                         }
                     }
