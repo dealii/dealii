@@ -34,6 +34,8 @@
 #include <deal.II/lac/affine_constraints.templates.h>
 #include <deal.II/fe/mapping_fe_field.h>
 
+#include <deal.II/sundials/ida.h>
+
 #include <boost/algorithm/string.hpp>
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
@@ -113,6 +115,10 @@ namespace LA
 #include <deal.II/opencascade/utilities.h>
 #ifdef DEAL_II_WITH_OPENCASCADE
 #  include <TopoDS.hxx>
+#endif
+
+#ifdef DEAL_II_WITH_SUNDIALS
+#  include <deal.II/sundials/ida.h>
 #endif
 
 #include <iostream>
@@ -274,6 +280,12 @@ namespace Step80
 
     unsigned int output_frequency = 1;
 
+    bool use_ida = false;
+
+#ifdef DEAL_II_WITH_SUNDIALS
+    SUNDIALS::IDA<LA::MPI::BlockVector>::AdditionalData ida_data;
+#endif
+
     unsigned int initial_fluid_refinement      = 5;
     unsigned int initial_solid_refinement      = 5;
     unsigned int particle_insertion_refinement = 3;
@@ -381,6 +393,19 @@ namespace Step80
     add_parameter("Output directory", output_directory);
 
     add_parameter("Final time", final_time);
+
+    add_parameter("Use IDA time integrator",
+                  use_ida,
+                  "Use SUNDIALS IDA for adaptive time stepping instead of "
+                  "the fixed-step loop.");
+
+#ifdef DEAL_II_WITH_SUNDIALS
+    {
+      this->prm.enter_subsection("IDA parameters");
+      ida_data.add_parameters(this->prm);
+      this->prm.leave_subsection();
+    }
+#endif
 
     enter_subsection("Physical properties");
     {
@@ -568,6 +593,24 @@ namespace Step80
 
     double compute_time_step() const;
 
+#ifdef DEAL_II_WITH_SUNDIALS
+    void run_with_ida();
+
+    void ida_residual(const double                t,
+                      const LA::MPI::BlockVector &y,
+                      const LA::MPI::BlockVector &y_dot,
+                      LA::MPI::BlockVector       &residual);
+
+    void ida_setup_jacobian(const double                t,
+                            const LA::MPI::BlockVector &y,
+                            const LA::MPI::BlockVector &y_dot,
+                            const double                alpha);
+
+    void ida_solve_with_jacobian(const LA::MPI::BlockVector &rhs,
+                                 LA::MPI::BlockVector       &dst,
+                                 const double                tolerance);
+#endif
+
     void setup_solid_particles();
     void setup_tracer_particles();
     void euler_step_tracer_particles(const double dt);
@@ -691,6 +734,14 @@ namespace Step80
 
     FEValuesExtractors::Vector displacement;
     FEValuesExtractors::Vector lagrange_multiplier;
+
+#ifdef DEAL_II_WITH_SUNDIALS
+    // Effective time step size communicated from the IDA Jacobian setup to
+    // the solve and residual callbacks.
+    double ida_current_time_step = 0.0;
+    // Output cycle counter used inside the IDA output_step callback.
+    unsigned int ida_output_cycle = 0;
+#endif
   };
 
 
@@ -2433,6 +2484,14 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::run()
   {
+#ifdef DEAL_II_WITH_SUNDIALS
+    if (par.use_ida)
+      {
+        run_with_ida();
+        return;
+      }
+#endif
+
 #ifdef USE_PETSC_LA
     pcout << "Running NavierStokesImmersedProblem<"
           << Utilities::dim_string(dim, spacedim) << "> using PETSc."
@@ -2519,6 +2578,358 @@ namespace Step80
         solid_locally_relevant_solution_old = solid_locally_relevant_solution;
       }
   }
+
+
+
+#ifdef DEAL_II_WITH_SUNDIALS
+  // @sect4{IDA residual callback}
+  // Encodes the DAE residual F(t, y, y_dot) = 0 required by IDA.
+  // The combined solution vector y holds [fluid_block(0), fluid_block(1),
+  // solid_block(0), solid_block(1)].  The residual is computed by calling the
+  // same assembly routines used in the fixed-step loop, but replacing the
+  // finite-difference time derivative with the IDA-supplied y_dot.  Because
+  // IDA drives the effective step size through alpha = d(y_dot)/dy = 1/h, the
+  // assembly routines (which take an explicit time_step argument) use
+  // ida_current_time_step, which is set in the Jacobian setup callback
+  // (called before every residual evaluation inside the same Newton step).
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::ida_residual(
+    const double /*t*/,
+    const LA::MPI::BlockVector &y,
+    const LA::MPI::BlockVector &y_dot,
+    LA::MPI::BlockVector       &residual)
+  {
+    // Unpack the combined vector into the individual block vectors
+    fluid_solution.block(0) = y.block(0);
+    fluid_solution.block(1) = y.block(1);
+    solid_solution.block(0) = y.block(2);
+    solid_solution.block(1) = y.block(3);
+
+    fluid_locally_relevant_solution = fluid_solution;
+    solid_locally_relevant_solution = solid_solution;
+
+    const double dt = ida_current_time_step;
+
+    // Use the assembly routines with the current step size to form:
+    //   residual = M*y_dot + L(y) - f(t)
+    // The existing assemble_*_rhs functions return (in fluid_system_rhs /
+    // solid_system_rhs) the quantity:
+    //   rhs = M/dt * u_old - convective - visc_rhs + f(t)
+    // and solve() then solves  (M/dt + L) * u_new = rhs.
+    // Equivalently, the DAE residual for IDA is:
+    //   F = (M/dt + L) * u_new - rhs  = 0
+    // which means: F = (fluid_matrix or solid_matrix) * y - system_rhs.
+    // We compute it as: F = system_matrix * y - old_rhs, then
+    // replace the M/dt contribution with M * y_dot.
+    //
+    // Concretely, the residual for the fluid velocity block is:
+    //   F_u = M_u * y_dot_u + viscous_terms(y_u) + grad_pressure(y_p)
+    //         - rhs_u
+    // For simplicity, we reuse the existing assembly and substitute:
+    //   M_u * (y_u - u_old)/dt  -->  M_u * y_dot_u
+    // by computing:  residual = matrix * y - old_rhs
+    //                 + M_u * (y_dot - (y - old)/dt)
+    //
+    // A cleaner but equivalent approach: assemble the rhs with the old
+    // solution in place (the existing functions already use
+    // fluid_locally_relevant_solution_old), then form residual as
+    //   residual = matrix * y - system_rhs
+    // and correct the mass-matrix row:
+    //   residual_u += M_u * y_dot_u - M_u * (y_u - u_old) / dt
+    //
+    // Since this coupling is complex, here we take the pragmatic route:
+    // assembling with the current y as the "new" solution and dt as the
+    // step, then evaluating A*y - rhs gives the standard implicit-Euler
+    // residual, which is 0 at the exact solution. Then we replace the
+    // M/dt*(u_new - u_old) term with M*y_dot.
+
+    assemble_navier_stokes_rhs(dt);
+    assemble_elasticity_rhs(dt);
+    setup_coupling();
+    assemble_coupling();
+
+    // Residual for the fluid: A*y_u - rhs_u  (where A = M/dt + viscous + ...)
+    // We use matrix-vector products via the existing LinearOperator helpers.
+    {
+      LA::MPI::BlockVector Ay;
+      Ay.reinit(fluid_solution);
+      fluid_matrix.vmult(Ay, fluid_solution);
+
+      LA::MPI::BlockVector mass_correction;
+      mass_correction.reinit(fluid_solution);
+      // mass_matrix * y_dot_u - mass_matrix * (y_u - u_old)/dt
+      fluid_mass_matrix.block(0, 0).vmult(mass_correction.block(0),
+                                          y_dot.block(0));
+      {
+        LA::MPI::Vector tmp(fluid_owned_dofs[0], mpi_communicator);
+        tmp = fluid_solution.block(0);
+        tmp -= fluid_locally_relevant_solution_old.block(0);
+        tmp /= dt;
+        LA::MPI::Vector mass_tmp(fluid_owned_dofs[0], mpi_communicator);
+        fluid_mass_matrix.block(0, 0).vmult(mass_tmp, tmp);
+        mass_correction.block(0) -= mass_tmp;
+      }
+
+      residual.block(0) = Ay.block(0);
+      residual.block(0) -= fluid_system_rhs.block(0);
+      residual.block(0) += mass_correction.block(0);
+
+      residual.block(1) = Ay.block(1);
+      residual.block(1) -= fluid_system_rhs.block(1);
+    }
+
+    // Residual for the solid
+    {
+      LA::MPI::BlockVector Ky;
+      Ky.reinit(solid_solution);
+      solid_matrix.vmult(Ky, solid_solution);
+
+      LA::MPI::BlockVector mass_correction;
+      mass_correction.reinit(solid_solution);
+      // The solid mass-like term is the (0,0) block (displacement inertia)
+      {
+        LA::MPI::Vector tmp(solid_owned_dofs[0], mpi_communicator);
+        tmp = solid_solution.block(0);
+        tmp -= solid_locally_relevant_solution_old.block(0);
+        tmp /= dt;
+        LA::MPI::Vector mass_tmp(solid_owned_dofs[0], mpi_communicator);
+        // M_disp / dt  -->  reuse the (1,0) block of solid_matrix which
+        // encodes the Lagrange multiplier coupling; the inertia
+        // contribution from displacement is the (1,0)/(0,1) blocks.
+        // Here we just add M_w * y_dot_w - M_w*(y_w - w_old)/dt using
+        // the solid mass matrix block.
+        solid_matrix.block(1, 0).vmult(mass_tmp, tmp);
+        // The rhs already contains -w_old/dt term; IDA provides y_dot_w,
+        // so the correction is:
+        //   delta = M_{lagr,disp} * y_dot_w - M_{lagr,disp}*(y_w-w_old)/dt
+        LA::MPI::Vector ydot_correction(solid_owned_dofs[1], mpi_communicator);
+        solid_matrix.block(1, 0).vmult(ydot_correction, y_dot.block(0));
+        mass_correction.block(1) = ydot_correction;
+        mass_correction.block(1) -= mass_tmp;
+      }
+
+      residual.block(2) = Ky.block(0);
+      residual.block(2) -= solid_system_rhs.block(0);
+
+      residual.block(3) = Ky.block(1);
+      residual.block(3) -= solid_system_rhs.block(1);
+      residual.block(3) += mass_correction.block(1);
+    }
+
+    residual.compress(VectorOperation::insert);
+  }
+
+
+
+  // @sect4{IDA Jacobian setup callback}
+  // Called by IDA whenever a new Jacobian is needed. We re-assemble the
+  // system matrices for the current step size h = 1/alpha (IDA passes
+  // alpha = d(y_dot)/dy for the current BDF formula).
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::ida_setup_jacobian(
+    const double /*t*/,
+    const LA::MPI::BlockVector &y,
+    const LA::MPI::BlockVector & /*y_dot*/,
+    const double alpha)
+  {
+    // alpha = d(ydot)/dy for the current BDF step, so  dt = 1/alpha.
+    const double dt                = (alpha > 0.0) ?
+                                       (1.0 / alpha) :
+                                       par.final_time / (par.number_of_time_steps - 1);
+    const bool   time_step_changed = (ida_current_time_step == dt);
+    ida_current_time_step          = dt;
+
+    // Unpack y into the individual block vectors used by the assembly routines
+    fluid_solution.block(0) = y.block(0);
+    fluid_solution.block(1) = y.block(1);
+    solid_solution.block(0) = y.block(2);
+    solid_solution.block(1) = y.block(3);
+
+    fluid_locally_relevant_solution = fluid_solution;
+    solid_locally_relevant_solution = solid_solution;
+
+    if (time_step_changed)
+      {
+        assemble_navier_stokes_system(dt);
+        assemble_elasticity_system(dt);
+      }
+    update_particle_positions();
+    setup_coupling();
+    assemble_coupling();
+  }
+
+
+
+  // @sect4{IDA linear solve callback}
+  // Called by IDA to solve J*dst = rhs.  We reuse the existing
+  // augmented-Lagrangian preconditioned GMRES solver (or MUMPS if available).
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::ida_solve_with_jacobian(
+    const LA::MPI::BlockVector &rhs,
+    LA::MPI::BlockVector       &dst,
+    const double /*tolerance*/)
+  {
+    // Wrap the four blocks into the fluid/solid sub-vectors that solve()
+    // expects on the system rhs.
+    fluid_system_rhs.block(0) = rhs.block(0);
+    fluid_system_rhs.block(1) = rhs.block(1);
+    solid_system_rhs.block(0) = rhs.block(2);
+    solid_system_rhs.block(1) = rhs.block(3);
+    fluid_system_rhs.compress(VectorOperation::insert);
+    solid_system_rhs.compress(VectorOperation::insert);
+
+    // setup_coupling() and assemble_coupling() were already called in
+    // ida_residual() for the same Newton step; call them again here
+    // to keep the coupling matrices consistent with the current y.
+    setup_coupling();
+    assemble_coupling();
+#  ifdef DEAL_II_WITH_MUMPS
+    if (par.solver_type == SolverType::mumps)
+      assemble_mumps_system(ida_current_time_step);
+#  endif
+
+    solve(ida_current_time_step);
+
+    dst.block(0) = fluid_solution.block(0);
+    dst.block(1) = fluid_solution.block(1);
+    dst.block(2) = solid_solution.block(0);
+    dst.block(3) = solid_solution.block(1);
+    dst.compress(VectorOperation::insert);
+  }
+
+
+
+  // @sect4{IDA-driven time loop}
+  // This function replaces run() when par.use_ida == true. It sets up the
+  // SUNDIALS IDA time stepper, connects the callbacks above, and calls
+  // solve_dae().
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::run_with_ida()
+  {
+#  ifdef USE_PETSC_LA
+    pcout << "Running NavierStokesImmersedProblem<"
+          << Utilities::dim_string(dim, spacedim)
+          << "> using PETSc + SUNDIALS IDA." << std::endl;
+#  else
+    pcout << "Running NavierStokesImmersedProblem<"
+          << Utilities::dim_string(dim, spacedim)
+          << "> using Trilinos + SUNDIALS IDA." << std::endl;
+#  endif
+
+    if (!std::filesystem::exists(par.output_directory))
+      std::filesystem::create_directory(par.output_directory);
+
+    par.prm.print_parameters(par.output_directory + "/" + "used_parameters_" +
+                               std::to_string(dim) + std::to_string(spacedim) +
+                               ".prm",
+                             ParameterHandler::Short);
+
+    // One-time setup (same as run())
+    make_grid();
+    initial_setup();
+    setup_dofs();
+    interpolate_initial_conditions();
+    setup_solid_particles();
+    setup_tracer_particles();
+
+    // Build the combined solution vector y = [u, p, w, lambda]
+    const std::vector<IndexSet> block_partitioning = {fluid_owned_dofs[0],
+                                                      fluid_owned_dofs[1],
+                                                      solid_owned_dofs[0],
+                                                      solid_owned_dofs[1]};
+    LA::MPI::BlockVector        y, y_dot;
+    y.reinit(block_partitioning, mpi_communicator);
+    y_dot.reinit(block_partitioning, mpi_communicator);
+
+    y.block(0) = fluid_solution.block(0);
+    y.block(1) = fluid_solution.block(1);
+    y.block(2) = solid_solution.block(0);
+    y.block(3) = solid_solution.block(1);
+    // Initial y_dot = 0; IDA will compute consistent initial derivatives
+    y_dot = 0.;
+
+    ida_output_cycle = 0;
+    output_results(ida_output_cycle, par.ida_data.initial_time);
+
+    // Build IDA with the parameters from the parameter file
+    SUNDIALS::IDA<LA::MPI::BlockVector> ida(par.ida_data, mpi_communicator);
+
+    ida.reinit_vector = [&](LA::MPI::BlockVector &v) {
+      v.reinit(block_partitioning, mpi_communicator);
+    };
+
+    ida.residual = [&](const double                t,
+                       const LA::MPI::BlockVector &yy,
+                       const LA::MPI::BlockVector &yydot,
+                       LA::MPI::BlockVector       &res) {
+      par.set_time(t);
+      ida_residual(t, yy, yydot, res);
+    };
+
+    ida.setup_jacobian = [&](const double                t,
+                             const LA::MPI::BlockVector &yy,
+                             const LA::MPI::BlockVector &yydot,
+                             const double                alpha_jac) {
+      par.set_time(t);
+      ida_setup_jacobian(t, yy, yydot, alpha_jac);
+    };
+
+    ida.solve_with_jacobian = [&](const LA::MPI::BlockVector &src,
+                                  LA::MPI::BlockVector       &dst,
+                                  const double                tol) {
+      ida_solve_with_jacobian(src, dst, tol);
+    };
+
+    ida.output_step = [&](const double                t,
+                          const LA::MPI::BlockVector &sol,
+                          const LA::MPI::BlockVector & /*sol_dot*/,
+                          const unsigned int /*step_number*/) {
+      fluid_locally_relevant_solution.block(0) = sol.block(0);
+      fluid_locally_relevant_solution.block(1) = sol.block(1);
+      solid_locally_relevant_solution.block(0) = sol.block(2);
+      solid_locally_relevant_solution.block(1) = sol.block(3);
+
+      ++ida_output_cycle;
+      output_results(ida_output_cycle, t);
+
+      // Update particle positions after each output step
+      fluid_solution.block(0) = sol.block(0);
+      fluid_solution.block(1) = sol.block(1);
+      solid_solution.block(0) = sol.block(2);
+      solid_solution.block(1) = sol.block(3);
+      update_particle_positions();
+      euler_step_tracer_particles(ida_current_time_step > 0.0 ?
+                                    ida_current_time_step :
+                                    par.ida_data.initial_step_size);
+      tracer_particle_handler.sort_particles_into_subdomains_and_cells();
+
+      fluid_locally_relevant_solution_old = fluid_locally_relevant_solution;
+      solid_locally_relevant_solution_old = solid_locally_relevant_solution;
+    };
+
+    // Indicate which components are differential (velocity and displacement
+    // are differential; pressure and Lagrange multiplier are algebraic).
+    // IDA requires an IndexSet over the global combined vector sized y.size().
+    // The combined vector blocks are:
+    //   block 0: fluid velocity  (fluid_owned_dofs[0])
+    //   block 1: fluid pressure  (fluid_owned_dofs[1])  -- algebraic
+    //   block 2: solid displace  (solid_owned_dofs[0])
+    //   block 3: solid Lagrange  (solid_owned_dofs[1])  -- algebraic
+    ida.differential_components = [&]() -> IndexSet {
+      IndexSet diff(y.size());
+      diff.add_indices(
+        y.locally_owned_elements().get_view(0, fluid_owned_dofs[0].size()));
+      diff.add_indices(y.locally_owned_elements().get_view(
+        fluid_owned_dofs[0].size() + fluid_owned_dofs[1].size(),
+        fluid_owned_dofs[0].size() + fluid_owned_dofs[1].size() +
+          solid_owned_dofs[0].size()));
+      return diff;
+    };
+
+    ida.solve_dae(y, y_dot);
+  }
+#endif // DEAL_II_WITH_SUNDIALS
+
 } // namespace Step80
 
 
@@ -2534,11 +2945,21 @@ int main(int argc, char *argv[])
       deallog.depth_console(
         Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0 ? 10 : 0);
 
-      std::string prm_file;
+      std::string prm_file, output_prm, short_prm;
       if (argc > 1)
         prm_file = argv[1];
       else
         prm_file = "parameters.prm";
+
+      if (argc > 2)
+        output_prm = argv[2];
+      else
+        output_prm = "";
+
+      if (argc > 3)
+        short_prm = argv[3];
+      else
+        short_prm = "";
 
       // Extract the dimension from the parameter file.
       auto [dim, spacedim] = get_dimension_and_spacedimension(prm_file);
@@ -2546,7 +2967,10 @@ int main(int argc, char *argv[])
       if (dim == 2 && spacedim == 2)
         {
           NavierStokesImmersedProblemParameters<2> par;
-          ParameterAcceptor::initialize(prm_file);
+          ParameterAcceptor::initialize(prm_file, output_prm);
+          if (short_prm != "")
+            ParameterAcceptor::prm.print_parameters(
+              short_prm, ParameterHandler::KeepOnlyChanged);
 
           NavierStokesImmersedProblem<2> problem(par);
           problem.run();
@@ -2554,7 +2978,10 @@ int main(int argc, char *argv[])
       else if (dim == 3 && spacedim == 3)
         {
           NavierStokesImmersedProblemParameters<3> par;
-          ParameterAcceptor::initialize(prm_file);
+          ParameterAcceptor::initialize(prm_file, output_prm);
+          if (short_prm != "")
+            ParameterAcceptor::prm.print_parameters(
+              short_prm, ParameterHandler::KeepOnlyChanged);
 
           NavierStokesImmersedProblem<3> problem(par);
           problem.run();
