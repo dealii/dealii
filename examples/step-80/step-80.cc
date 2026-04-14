@@ -315,6 +315,8 @@ namespace Step80
     double       outer_tolerance                 = 1e-5;
     unsigned int inner_lagrangian_max_iterations = 1000;
     double       inner_lagrangian_tolerance      = 1e-4;
+    bool         log_inner_lagrangian_iterations = false;
+    bool         use_grad_div_stabilization      = false;
     SolverType   solver_type                     = SolverType::augmented_split;
 
     using PrmFunction =
@@ -457,6 +459,9 @@ namespace Step80
                     inner_lagrangian_max_iterations);
       add_parameter("Inner Lagrangian solver tolerance",
                     inner_lagrangian_tolerance);
+      add_parameter("Log inner Lagrangian iterations",
+                    log_inner_lagrangian_iterations);
+      add_parameter("Use grad-div stabilization", use_grad_div_stabilization);
       add_parameter("Solver type", solver_type);
     }
     leave_subsection();
@@ -1027,6 +1032,9 @@ namespace Step80
             coupling[c][d] = DoFTools::none;
           else if (c == spacedim || d == spacedim || c == d)
             coupling[c][d] = DoFTools::always;
+          else if (par.use_grad_div_stabilization && c < spacedim &&
+                   d < spacedim)
+            coupling[c][d] = DoFTools::always;
           else
             coupling[c][d] = DoFTools::none;
 
@@ -1324,7 +1332,11 @@ namespace Step80
                         ((par.density / time_step) * phi_u[i] * phi_u[j] +
                          par.viscosity *
                            scalar_product(grad_phi_u[i], grad_phi_u[j]) -
-                         div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j]) *
+                         div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
+                         (par.use_grad_div_stabilization ?
+                            par.gamma_AL_background * div_phi_u[i] *
+                              div_phi_u[j] :
+                            0.)) *
                         fe_values.JxW(q);
 
                       cell_fluid_preconditioner(i, j) +=
@@ -1829,11 +1841,11 @@ namespace Step80
       proc_offsets.back() + counts_per_proc.back();
 
     std::array<types::global_dof_index, 4> my_block_offsets = {
-      my_offset,
-      my_offset + owned_u.n_elements(),
-      my_offset + owned_u.n_elements() + owned_w.n_elements(),
-      my_offset + owned_u.n_elements() + owned_w.n_elements() +
-        owned_l.n_elements()};
+      {my_offset,
+       my_offset + owned_u.n_elements(),
+       my_offset + owned_u.n_elements() + owned_w.n_elements(),
+       my_offset + owned_u.n_elements() + owned_w.n_elements() +
+         owned_l.n_elements()}};
 
     mumps_block_indices[0].clear();
     mumps_block_indices[1].clear();
@@ -1865,7 +1877,7 @@ namespace Step80
       [&](const unsigned int            block,
           const types::global_dof_index old_index) -> types::global_dof_index {
       const std::array<const std::vector<IndexSet> *, 4> owned_sets = {
-        &owned_u_all, &owned_w_all, &owned_l_all, &owned_p_all};
+        {&owned_u_all, &owned_w_all, &owned_l_all, &owned_p_all}};
 
       for (unsigned int proc = 0; proc < counts_per_proc.size(); ++proc)
         {
@@ -2069,7 +2081,11 @@ namespace Step80
     const auto gamma1 = par.gamma_AL_background;
     const auto gamma2 = par.gamma_AL_immersed * time_step;
 
-    auto A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
+    auto A11_aug = null_operator(A);
+    if (par.use_grad_div_stabilization)
+      A11_aug = A + gamma1 * Ct * invW * C;
+    else
+      A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
     auto A22_aug = (1 / time_step) * K + gamma2 * Dt * invW * D;
     auto A12_aug = gamma1 * Ct * invW * D;
     auto A21_aug = gamma2 * Dt * invW * C;
@@ -2078,7 +2094,7 @@ namespace Step80
       par.inner_lagrangian_max_iterations,
       par.inner_lagrangian_tolerance,
       false,
-      false);
+      par.log_inner_lagrangian_iterations);
     SolverCG<Vec> cg_solver_lagrangian(inner_solver_control_lagrangian);
 
     auto A11_aug_inv =
