@@ -24,7 +24,7 @@ template <typename Number>
 void
 test()
 {
-  if (typeid(internal::CurlType<1, Number>) != typeid(Number))
+  if (typeid(internal::CurlType<1, Number>) != typeid(std::monostate))
     deallog << "NOT OK!" << std::endl;
   if (typeid(internal::CurlType<2, Number>) != typeid(Number))
     deallog << "NOT OK!" << std::endl;
