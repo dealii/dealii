@@ -1239,9 +1239,8 @@ FEEvaluationData<dim, Number, is_face>::set_data_pointers(
   const unsigned int allocated_size = size_scratch_data + size_data_arrays + 12;
   if constexpr (running_in_debug_mode())
     {
-      scratch_data_array->clear();
-      scratch_data_array->resize(
-        allocated_size, Number(numbers::signaling_nan<ScalarNumber>()));
+      scratch_data_array->resize(allocated_size);
+      scratch_data_array->fill(Number(numbers::signaling_nan<ScalarNumber>()));
     }
   else
     {
