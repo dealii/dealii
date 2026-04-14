@@ -1,0 +1,9 @@
+Changed: There are some functions in deal.II that compute the curl of
+vector fields. The curl is only defined for vector fields in ${\mathbb
+R}^3$, or for two-dimensional vector fields on two-dimensional
+manifolds (perhaps embedded in ${\mathbb R}^3$). Historically, it was
+possible to also call these functions for `dim==1`, which made no
+sense but was syntactically allowed. However, this is now forbidden
+and will lead to syntax errors.
+<br>
+(Wolfgang Bangerth, 2026/04/13)
