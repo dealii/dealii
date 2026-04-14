@@ -12,4 +12,4 @@ now fixed: The data type defined by FEValuesViews::Vector::curl_type used for
 curls is not simply a scalar value for `dim==2`. For `dim==3`, it is
 unchanged from what it was before.
 <br>
-(Wolfgang Bangerth, 2025/03/31)
+(Wolfgang Bangerth, 2026/03/31)
