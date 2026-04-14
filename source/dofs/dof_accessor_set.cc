@@ -134,8 +134,11 @@ namespace internal
             const bool old_ghost_state = values.has_ghost_elements();
             set_ghost_state(values, true);
 
-            Vector<number> local_values_old(cell.get_fe().n_dofs_per_cell());
-            cell.get_dof_values(values, local_values_old);
+            boost::container::small_vector<number, 200> local_values_old(
+              cell.get_fe().n_dofs_per_cell());
+            cell.get_dof_values(values,
+                                local_values_old.begin(),
+                                local_values_old.end());
 
             for (unsigned int i = 0; i < cell.get_fe().n_dofs_per_cell(); ++i)
               {
