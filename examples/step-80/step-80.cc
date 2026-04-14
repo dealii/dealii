@@ -728,8 +728,9 @@ namespace Step80
     LA::MPI::BlockVector solid_reference_configuration;
     LA::MPI::BlockVector solid_current_position;
 
-    Particles::ParticleHandler<spacedim> tracer_particle_handler;
-    Particles::ParticleHandler<spacedim> solid_particle_handler;
+    Particles::ParticleHandler<spacedim>      tracer_particle_handler;
+    Particles::ParticleHandler<spacedim>      solid_particle_handler;
+    Particles::ParticleHandler<dim, spacedim> quadrature_particle_handler;
 
     IndexSet locally_owned_tracer_particle_coordinates;
     IndexSet locally_relevant_tracer_particle_coordinates;
@@ -1554,6 +1555,108 @@ namespace Step80
                                                        local_dof_indices,
                                                        fluid_mass_matrix);
         }
+
+    // Add augmented Lagrangian penalty on the immersed domain through particles
+    if (par.use_grad_div_stabilization)
+      {
+        // Generate quadrature particles on the solid mesh, storing JxW as
+        // property
+        {
+          const unsigned int n_properties = 1;
+          quadrature_particle_handler.initialize(
+            fluid_tria, StaticMappingQ1<spacedim>::mapping, n_properties);
+
+          const QGauss<dim> quadrature(solid_fe->degree + 1);
+
+          std::vector<Point<spacedim>>     quadrature_points_vec;
+          std::vector<std::vector<double>> properties;
+          quadrature_points_vec.reserve(quadrature.size() *
+                                        solid_tria.n_active_cells());
+          properties.reserve(quadrature.size() * solid_tria.n_active_cells());
+
+
+          FEValues<dim, spacedim> fe_v(*solid_mapping,
+                                       *solid_fe,
+                                       quadrature,
+                                       update_JxW_values |
+                                         update_quadrature_points);
+          for (const auto &cell : solid_dh.active_cell_iterators())
+            if (cell->is_locally_owned())
+              {
+                fe_v.reinit(cell);
+                const auto &points = fe_v.get_quadrature_points();
+                const auto &JxW    = fe_v.get_JxW_values();
+
+                for (unsigned int q = 0; q < points.size(); ++q)
+                  {
+                    quadrature_points_vec.emplace_back(points[q]);
+                    properties.emplace_back(
+                      std::vector<double>(n_properties, JxW[q]));
+                  }
+              }
+
+          quadrature_particle_handler.insert_global_particles(
+            quadrature_points_vec, global_fluid_bounding_boxes, properties);
+
+          pcout << "   Number of quadrature points-particles: "
+                << quadrature_particle_handler.n_global_particles()
+                << std::endl;
+        }
+
+
+        std::vector<types::global_dof_index> fluid_dof_indices(
+          fluid_fe->n_dofs_per_cell());
+
+        FullMatrix<double> local_matrix(fluid_fe->n_dofs_per_cell(),
+                                        fluid_fe->n_dofs_per_cell());
+
+        auto particle = quadrature_particle_handler.begin();
+        while (particle != quadrature_particle_handler.end())
+          {
+            local_matrix     = 0;
+            const auto &cell = particle->get_surrounding_cell();
+            const auto &dh_cell =
+              typename DoFHandler<dim, spacedim>::cell_iterator(*cell,
+                                                                &fluid_dh);
+            dh_cell->get_dof_indices(fluid_dof_indices);
+
+            const auto pic =
+              quadrature_particle_handler.particles_in_cell(cell);
+            Assert(pic.begin() == particle, ExcInternalError());
+            for (const auto &p : pic)
+              {
+                const auto   ref_q = p.get_reference_location();
+                const double JxW   = p.get_properties()[0];
+
+                for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
+                  {
+                    const auto comp_i =
+                      fluid_fe->system_to_component_index(i).first;
+                    if (comp_i >= spacedim)
+                      continue;
+
+                    for (unsigned int j = 0; j < fluid_fe->n_dofs_per_cell();
+                         ++j)
+                      {
+                        const auto comp_j =
+                          fluid_fe->system_to_component_index(j).first;
+                        if (comp_j >= spacedim || comp_i != comp_j)
+                          continue;
+
+                        local_matrix(i, j) +=
+                          par.gamma_AL_background * time_step * time_step *
+                          fluid_fe->shape_value(i, ref_q) *
+                          fluid_fe->shape_value(j, ref_q) * JxW;
+                      }
+                  }
+              }
+
+            fluid_constraints.distribute_local_to_global(local_matrix,
+                                                         fluid_dof_indices,
+                                                         fluid_matrix);
+            particle = pic.end();
+          }
+      }
 
     fluid_matrix.compress(VectorOperation::add);
     fluid_preconditioner.compress(VectorOperation::add);
