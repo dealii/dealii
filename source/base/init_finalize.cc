@@ -61,6 +61,11 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <psb_c_base.h>
 #endif
 
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  include <cfenv>
+#endif
+
+
 #include <set>
 #include <string>
 
@@ -88,6 +93,24 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
 #ifdef DEAL_II_WITH_MPI
   if (static_cast<bool>(libraries & InitializeLibrary::MPI))
     {
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+      // Some MPI installations, during initializing the MPI system,
+      // read configuration files via libxml that computes some NaN
+      // constants at run time. This triggers floating point exceptions
+      // if these have been requested by the application program (or
+      // as part of our own test suite). To avoid this, save FP flags,
+      // reset these flags to allow such computations, and at the end
+      // of the block re-set the flags to the saved state.
+      //
+      // References:
+      // https://stackoverflow.com/questions/79739650/libxml2-throws-sigfpe-in-debian-13
+      fenv_t fe_state;
+      ierr = fegetenv(&fe_state);
+      AssertThrow(ierr == 0, ExcInternalError());
+
+      fedisableexcept(FE_DIVBYZERO | FE_INVALID);
+#  endif
+
       // if we have PETSc, we will initialize it and let it handle MPI.
       // Otherwise, we will do it.
       int MPI_has_been_started = 0;
@@ -110,6 +133,11 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
       // Assert(max_num_threads==1 || provided != MPI_THREAD_SINGLE,
       //    ExcMessage("MPI reports that we are not allowed to use multiple
       //    threads."));
+
+#  ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+      ierr = fesetenv(&fe_state);
+      AssertThrow(ierr == 0, ExcInternalError());
+#  endif
     }
 #endif
 
