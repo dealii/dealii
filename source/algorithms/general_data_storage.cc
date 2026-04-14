@@ -11,6 +11,8 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/general_data_storage.h>
 
 

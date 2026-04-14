@@ -11,9 +11,17 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/discrete_time.h>
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <cstddef>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 

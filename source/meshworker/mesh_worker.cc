@@ -11,10 +11,21 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
+
 #include <deal.II/lac/block_indices.h>
 
 #include <deal.II/meshworker/local_integrator.h>
 #include <deal.II/meshworker/local_results.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <cstddef>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

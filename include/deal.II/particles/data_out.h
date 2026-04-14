@@ -19,6 +19,8 @@
 #include <deal.II/numerics/data_component_interpretation.h>
 
 #include <string>
+#include <tuple>
+#include <variant>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

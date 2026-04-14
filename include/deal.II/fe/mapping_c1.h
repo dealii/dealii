@@ -16,7 +16,15 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q.h>
+
+#include <deal.II/grid/tria.h>
+
+#include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

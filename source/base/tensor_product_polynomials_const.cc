@@ -11,10 +11,21 @@
 // -----------------------------------------------------------------------------
 
 
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/tensor_product_polynomials_const.h>
+#include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/scalar_polynomials_base.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_product_polynomials_const.h>
+#include <deal.II/base/utilities.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <array>
 #include <memory>
+#include <ostream>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -10,14 +10,23 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/enable_observer_pointer.h>
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
 
 #include <algorithm>
+#include <atomic>
+#include <exception>
 #include <iostream>
+#include <map>
+#include <mutex>
 #include <string>
 #include <typeinfo>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

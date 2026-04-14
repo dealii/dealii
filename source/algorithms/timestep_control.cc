@@ -11,9 +11,14 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/timestep_control.h>
 
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/patterns.h>
+
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 

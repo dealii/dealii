@@ -20,6 +20,7 @@
 #include <deal.II/base/function.h>
 
 #include <array>
+#include <iterator>
 
 
 DEAL_II_NAMESPACE_OPEN

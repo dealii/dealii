@@ -10,8 +10,13 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/geometry_info.h>
+#include <deal.II/base/ndarray.h>
 #include <deal.II/base/tensor.h>
+
+#include <array>
 
 DEAL_II_NAMESPACE_OPEN
 

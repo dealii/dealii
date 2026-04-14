@@ -15,11 +15,20 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/symmetric_tensor.h>
+#include <deal.II/base/tensor.h>
+
+#include <cstddef>
+#include <ostream>
+#include <vector>
+
 #ifdef DEAL_II_WITH_GSL
 #  include <deal.II/base/function.h>
 #  include <deal.II/base/mutex.h>
 #  include <deal.II/base/point.h>
 
+#  include <gsl/gsl_interp.h>
 #  include <gsl/gsl_spline.h>
 
 #  include <memory>

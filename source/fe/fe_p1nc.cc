@@ -11,9 +11,36 @@
 // -----------------------------------------------------------------------------
 
 
-#include <deal.II/fe/fe_p1nc.h>
+#include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
+
+#include <deal.II/fe/component_mask.h>
+#include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_data.h>
+#include <deal.II/fe/fe_p1nc.h>
+#include <deal.II/fe/mapping_related_data.h>
+
+#include <deal.II/grid/tria_accessor.h>
+#include <deal.II/grid/tria_iterator.h>
+
+#include <deal.II/hp/collection.h>
+#include <deal.II/hp/q_collection.h>
+
+#include <deal.II/lac/full_matrix.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <array>
 #include <memory>
+#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -11,6 +11,8 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/conditional_ostream.h>
 
 #include <ostream>

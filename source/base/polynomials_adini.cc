@@ -10,10 +10,22 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/polynomials_adini.h>
+#include <deal.II/base/scalar_polynomials_base.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
+
+#include <Kokkos_Macros.hpp>
 
 #include <memory>
+#include <vector>
 
 #define ENTER_COEFFICIENTS(                                   \
   koefs, z, a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11) \

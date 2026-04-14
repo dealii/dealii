@@ -10,9 +10,24 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/auto_derivative_function.h>
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function_parser.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/parsed_function.h>
+#include <deal.II/base/patterns.h>
 #include <deal.II/base/utilities.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <algorithm>
+#include <map>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

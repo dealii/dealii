@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#include "deal.II/base/exception_macros.h"
+#include <deal.II/base/exception_macros.h>
 
 #ifdef DEAL_II_TRILINOS_WITH_NOX
 

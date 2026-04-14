@@ -10,11 +10,26 @@
 //
 // -----------------------------------------------------------------------------
 
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/polynomial_space.h>
-#include <deal.II/base/table.h>
+#include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomial_space.h>
+#include <deal.II/base/scalar_polynomials_base.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/table_indices.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
+#include <deal.II/base/utilities.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <array>
 #include <memory>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

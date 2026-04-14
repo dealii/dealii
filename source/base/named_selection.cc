@@ -10,8 +10,13 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/algorithms/any_data.h>
 #include <deal.II/algorithms/named_selection.h>
+
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

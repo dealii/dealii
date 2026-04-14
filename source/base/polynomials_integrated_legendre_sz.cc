@@ -11,6 +11,9 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
 
 #include <vector>

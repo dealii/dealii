@@ -10,13 +10,26 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/parameter_acceptor.h>
+#include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/utilities.h>
 
 #include <boost/core/demangle.hpp>
+#include <boost/iterator/iterator_facade.hpp>
+#include <boost/move/utility_core.hpp>
+#include <boost/signals2/optional_last_value.hpp>
+#include <boost/smart_ptr/make_shared_object.hpp>
 
 #include <fstream>
+#include <functional>
+#include <iterator>
+#include <list>
 #include <set>
+#include <typeinfo>
 
 
 DEAL_II_NAMESPACE_OPEN

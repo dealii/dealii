@@ -10,11 +10,17 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/array_view.h>
+
 #include <deal.II/lac/sparsity_pattern_base.h>
 
 #include <boost/container/small_vector.hpp>
+#include <boost/container/vector.hpp>
 
 #include <algorithm>
+#include <iterator>
 #include <utility>
 
 DEAL_II_NAMESPACE_OPEN

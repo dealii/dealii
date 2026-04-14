@@ -10,6 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/lac/matrix_out.h>
 
 #include <string>
