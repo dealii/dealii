@@ -18,6 +18,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/iterator_range.h>
 #include <deal.II/base/quadrature.h>
 
@@ -28,6 +29,7 @@
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping_q1.h>
 
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/grid_tools_cache.h>
 
@@ -60,16 +62,16 @@ namespace NonMatching
    * @author Luca Heltai, Bruno Blais, 2019
    */
   template <int dim, int spacedim>
-  class DoFHandlerCoupling : public Subscriptor
+  class DoFHandlerCoupling : public EnableObserverPointer
   {
   public:
     DoFHandlerCoupling(
-      const GridTools::Cache<spacedim> &     cache1,
+      const GridTools::Cache<spacedim>      &cache1,
       const GridTools::Cache<dim, spacedim> &cache2,
-      const DoFHandler<spacedim> &           dh1,
-      const DoFHandler<dim, spacedim> &      dh2,
-      const ComponentMask &                  comps1_ = ComponentMask(),
-      const ComponentMask &                  comps2_ = ComponentMask(),
+      const DoFHandler<spacedim>            &dh1,
+      const DoFHandler<dim, spacedim>       &dh2,
+      const ComponentMask                   &comps1_ = ComponentMask(),
+      const ComponentMask                   &comps2_ = ComponentMask(),
       const Mapping<spacedim> &mapping1 = StaticMappingQ1<spacedim>::mapping,
       const Mapping<dim, spacedim> &mapping2 =
         StaticMappingQ1<dim, spacedim>::mapping);
@@ -90,10 +92,10 @@ namespace NonMatching
      * @param mapping2
      */
     DoFHandlerCoupling(
-      const DoFHandler<spacedim> &     dh1,
+      const DoFHandler<spacedim>      &dh1,
       const DoFHandler<dim, spacedim> &dh2,
-      const ComponentMask &            comps1 = ComponentMask(),
-      const ComponentMask &            comps2 = ComponentMask(),
+      const ComponentMask             &comps1 = ComponentMask(),
+      const ComponentMask             &comps2 = ComponentMask(),
       const Mapping<spacedim> &mapping1 = StaticMappingQ1<spacedim>::mapping,
       const Mapping<dim, spacedim> &mapping2 =
         StaticMappingQ1<dim, spacedim>::mapping);
@@ -111,7 +113,7 @@ namespace NonMatching
     template <class Sparsity, typename number = double>
     void
     create_interpolation_sparsity_pattern(
-      Sparsity &                       sparsity,
+      Sparsity                        &sparsity,
       const AffineConstraints<number> &constraints =
         AffineConstraints<number>(),
       const bool reuse_internal_data_structures = false) const
@@ -126,7 +128,7 @@ namespace NonMatching
 
       while (particle != particle_handler->end())
         {
-          const auto &cell = particle->get_surrounding_cell(*tria1);
+          const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
           dh_cell->get_dof_indices(dof_indices1);
@@ -172,11 +174,11 @@ namespace NonMatching
     template <class MatrixType, class VectorType, typename number = double>
     void
     create_nitsche_restriction(
-      const Quadrature<dim> &          quadrature,
-      const Function<spacedim> &       rhs_function,
-      const double &                   penalty_term,
-      MatrixType &                     matrix,
-      VectorType &                     rhs,
+      const Quadrature<dim>           &quadrature,
+      const Function<spacedim>        &rhs_function,
+      const double                    &penalty_term,
+      MatrixType                      &matrix,
+      VectorType                      &rhs,
       const AffineConstraints<number> &constraints =
         AffineConstraints<number>(),
       const bool reuse_internal_data_structures = false) const
@@ -197,7 +199,7 @@ namespace NonMatching
         {
           local_matrix     = 0;
           local_rhs        = 0;
-          const auto &cell = particle->get_surrounding_cell(*tria1);
+          const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
           dh_cell->get_dof_indices(dof_indices1);
@@ -240,7 +242,7 @@ namespace NonMatching
 
     template <class Matrix, typename number = double>
     void
-    create_interpolation_matrix(Matrix &                         matrix,
+    create_interpolation_matrix(Matrix                          &matrix,
                                 const AffineConstraints<number> &constraints =
                                   AffineConstraints<number>()) const
     {
@@ -267,7 +269,7 @@ namespace NonMatching
 
       while (particle != particle_handler->end())
         {
-          const auto &cell = particle->get_surrounding_cell(*tria1);
+          const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
           dh_cell->get_dof_indices(dof_indices1);
@@ -340,9 +342,8 @@ namespace NonMatching
       // There should be a position per per local particles
       AssertDimension(positions_vector.size(),
                       quadrature_particle_handler->n_local_particles());
-      Particles::Utilities::set_particle_positions(positions_vector,
-                                                   *quadrature_particle_handler,
-                                                   displace_particles);
+      quadrature_particle_handler->set_particle_positions(positions_vector,
+                                                          displace_particles);
     }
 
     /**
@@ -358,9 +359,8 @@ namespace NonMatching
       // There should be a position per per local particles
       AssertDimension(positions_vector.size(),
                       particle_handler->n_local_particles());
-      Particles::Utilities::set_particle_positions(positions_vector,
-                                                   *particle_handler,
-                                                   displace_particles);
+      particle_handler->set_particle_positions(positions_vector,
+                                               displace_particles);
     }
 
     /**
@@ -372,9 +372,8 @@ namespace NonMatching
       const Function<spacedim> &function,
       const bool                displace_particles = true) const
     {
-      Particles::Utilities::set_particle_positions(function,
-                                                   *quadrature_particle_handler,
-                                                   displace_particles);
+      quadrature_particle_handler->set_particle_positions(function,
+                                                          displace_particles);
     }
 
     /**
@@ -385,30 +384,28 @@ namespace NonMatching
     set_particles_positions(const Function<spacedim> &function,
                             const bool displace_particles = true) const
     {
-      Particles::Utilities::set_particle_positions(function,
-                                                   *quadrature_particle_handler,
-                                                   displace_particles);
+      particle_handler->set_particle_positions(function, displace_particles);
     }
 
 
   private:
-    SmartPointer<const Mapping<spacedim>>      mapping1;
-    SmartPointer<const Mapping<dim, spacedim>> mapping2;
+    ObserverPointer<const Mapping<spacedim>>      mapping1;
+    ObserverPointer<const Mapping<dim, spacedim>> mapping2;
 
-    SmartPointer<const Triangulation<spacedim>>      tria1;
-    SmartPointer<const Triangulation<dim, spacedim>> tria2;
+    ObserverPointer<const Triangulation<spacedim>>      tria1;
+    ObserverPointer<const Triangulation<dim, spacedim>> tria2;
 
-    SmartPointer<const DoFHandler<spacedim>>      dh1;
-    SmartPointer<const DoFHandler<dim, spacedim>> dh2;
+    ObserverPointer<const DoFHandler<spacedim>>      dh1;
+    ObserverPointer<const DoFHandler<dim, spacedim>> dh2;
 
-    SmartPointer<const FiniteElement<spacedim>>      fe1;
-    SmartPointer<const FiniteElement<dim, spacedim>> fe2;
+    ObserverPointer<const FiniteElement<spacedim>>      fe1;
+    ObserverPointer<const FiniteElement<dim, spacedim>> fe2;
 
     std::unique_ptr<const GridTools::Cache<spacedim>>      cache1_ptr;
     std::unique_ptr<const GridTools::Cache<dim, spacedim>> cache2_ptr;
 
-    SmartPointer<const GridTools::Cache<spacedim>>      cache1;
-    SmartPointer<const GridTools::Cache<dim, spacedim>> cache2;
+    ObserverPointer<const GridTools::Cache<spacedim>>      cache1;
+    ObserverPointer<const GridTools::Cache<dim, spacedim>> cache2;
 
     std::vector<std::pair<typename DoFHandler<spacedim>::cell_iterator,
                           ImmersedSurfaceQuadrature<spacedim>>>
@@ -439,14 +436,14 @@ namespace NonMatching
   // Implementation
   template <int dim, int spacedim>
   DoFHandlerCoupling<dim, spacedim>::DoFHandlerCoupling(
-    const GridTools::Cache<spacedim> &     cache1,
+    const GridTools::Cache<spacedim>      &cache1,
     const GridTools::Cache<dim, spacedim> &cache2,
-    const DoFHandler<spacedim> &           dh1,
-    const DoFHandler<dim, spacedim> &      dh2,
-    const ComponentMask &                  comps1_,
-    const ComponentMask &                  comps2_,
-    const Mapping<spacedim> &              mapping1,
-    const Mapping<dim, spacedim> &         mapping2)
+    const DoFHandler<spacedim>            &dh1,
+    const DoFHandler<dim, spacedim>       &dh2,
+    const ComponentMask                   &comps1_,
+    const ComponentMask                   &comps2_,
+    const Mapping<spacedim>               &mapping1,
+    const Mapping<dim, spacedim>          &mapping2)
     : mapping1(&mapping1)
     , mapping2(&mapping2)
     , tria1(&dh1.get_triangulation())
@@ -516,12 +513,12 @@ namespace NonMatching
 
   template <int dim, int spacedim>
   DoFHandlerCoupling<dim, spacedim>::DoFHandlerCoupling(
-    const DoFHandler<spacedim> &     dh1,
+    const DoFHandler<spacedim>      &dh1,
     const DoFHandler<dim, spacedim> &dh2,
-    const ComponentMask &            comps1,
-    const ComponentMask &            comps2,
-    const Mapping<spacedim> &        mapping1,
-    const Mapping<dim, spacedim> &   mapping2)
+    const ComponentMask             &comps1,
+    const ComponentMask             &comps2,
+    const Mapping<spacedim>         &mapping1,
+    const Mapping<dim, spacedim>    &mapping2)
     : DoFHandlerCoupling(
         *(new GridTools::Cache<spacedim>(dh1.get_triangulation(), mapping1)),
         *(new GridTools::Cache<dim, spacedim>(dh2.get_triangulation(),
@@ -574,19 +571,18 @@ namespace NonMatching
                                                  temp_mask);
 
             const auto dh2_selected_indices =
-              DoFTools::extract_dofs_per_component(
-                *dh2, DoFTools::OwnershipType::owned, comps2);
+              DoFTools::locally_owned_dofs_per_component(*dh2, comps2);
 
             std::vector<Point<spacedim>> support_points_vec;
             support_points_vec.reserve(support_points_map.size());
 
 
-            for (auto const &element : support_points_map)
+            for (const auto &element : support_points_map)
               if (dh2_selected_indices[first_comp].is_element(element.first))
                 support_points_vec.emplace_back(element.second);
 
-            std::vector<double> properties(support_points_vec.size() *
-                                           (n_comps + 1));
+            std::vector<std::vector<double>> properties(
+              support_points_vec.size(), std::vector<double>(n_comps + 1));
 
             std::vector<typename IndexSet::ElementIterator> elements;
 
@@ -598,9 +594,9 @@ namespace NonMatching
 
             for (unsigned int i = 0; i < support_points_vec.size(); ++i)
               {
-                properties[i * (n_comps + 1)] = mpi_proc;
+                properties[i][0] = mpi_proc;
                 for (unsigned int c = 0; c < n_comps; ++c)
-                  properties[i * (n_comps + 1) + c + 1] = *(elements[c]++);
+                  properties[i][c + 1] = static_cast<double>(*(elements[c]++));
               }
 
             auto cpu_to_index =
@@ -674,9 +670,15 @@ namespace NonMatching
                     }
                   ++cell_index;
                 }
+            std::vector<std::vector<double>> quad_properties(
+              quadrature_points_vec.size(), std::vector<double>(n_properties));
+            for (unsigned int i = 0; i < quadrature_points_vec.size(); ++i)
+              for (unsigned int j = 0; j < n_properties; ++j)
+                quad_properties[i][j] = properties[i * n_properties + j];
+
             auto cpu_to_index =
               quadrature_particle_handler->insert_global_particles(
-                quadrature_points_vec, global_bounding_boxes, properties);
+                quadrature_points_vec, global_bounding_boxes, quad_properties);
           }
       }
   }
