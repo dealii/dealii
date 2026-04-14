@@ -24,3 +24,5 @@ TODO list for step-80:
 - [ ] Checkpoint restart
 - [ ] Add shape derivative
 - [ ] Fix one dof of pressure if all bc are Dirichlet
+- [ ] Use FEPointEvaluation for the particle interpolation operator
+- [ ] Make sure we work with fullydistributed and simplex grids.

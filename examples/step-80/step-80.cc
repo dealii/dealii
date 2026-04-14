@@ -912,7 +912,7 @@ namespace Step80
 
     FEPointEvaluation<spacedim, spacedim> evaluator(
       StaticMappingQ1<spacedim>::mapping, *fluid_fe, update_values);
-    std::vector<Point<spacedim>> particle_positions;
+    std::vector<Point<spacedim>> particle_reference_positions;
 
     auto particle = tracer_particle_handler.begin();
     while (particle != tracer_particle_handler.end())
@@ -926,11 +926,11 @@ namespace Step80
 
         const auto pic = tracer_particle_handler.particles_in_cell(cell);
         Assert(pic.begin() == particle, ExcInternalError());
-        particle_positions.clear();
+        particle_reference_positions.clear();
         for (auto &p : pic)
-          particle_positions.push_back(p.get_reference_location());
+          particle_reference_positions.push_back(p.get_reference_location());
 
-        evaluator.reinit(cell, particle_positions);
+        evaluator.reinit(cell, particle_reference_positions);
         evaluator.evaluate(make_array_view(local_dof_values),
                            EvaluationFlags::values);
 
@@ -2435,16 +2435,26 @@ namespace Step80
                                ".prm",
                              ParameterHandler::Short);
 
-    const double time_step    = par.final_time / (par.number_of_time_steps - 1);
+    double       time_step    = par.final_time / (par.number_of_time_steps - 1);
     double       time         = 0;
     unsigned int output_cycle = 0;
 
-    for (unsigned int cycle = 0; cycle < par.number_of_time_steps;
+    for (unsigned int cycle = 0; time < par.final_time;
          ++cycle, time += time_step)
       {
         par.set_time(time);
         pcout << "Cycle " << cycle << ':' << std::endl
               << "Time : " << time << ", time step: " << time_step << std::endl;
+
+        // auto [update_timestep, time_step] =
+        // attempt_particle_displacement(time_step);
+        bool update_timestep = false;
+
+        if (update_timestep)
+          {
+            pcout << "   Time step updated to " << time_step << " due to "
+                  << "particle displacement." << std::endl;
+          }
 
         if (cycle == 0)
           {
@@ -2455,18 +2465,16 @@ namespace Step80
             setup_solid_particles();
             setup_tracer_particles();
             output_results(output_cycle, time);
+          }
 
+        if (cycle == 0 || update_timestep)
+          {
             assemble_navier_stokes_system(time_step);
             assemble_elasticity_system(time_step);
+          }
 
-            assemble_navier_stokes_rhs(time_step);
-            assemble_elasticity_rhs(time_step);
-          }
-        else
-          {
-            assemble_navier_stokes_rhs(time_step);
-            assemble_elasticity_rhs(time_step);
-          }
+        assemble_navier_stokes_rhs(time_step);
+        assemble_elasticity_rhs(time_step);
 
         setup_coupling();
         assemble_coupling();
