@@ -1107,6 +1107,12 @@ namespace LinearAlgebra
       dealii::IndexSet local_entries;
 
       /**
+       * To avoid creating new views for element-wise access, store
+       * a const host view.
+       */
+      Teuchos::ArrayRCP<const Number> const_1d_host_view;
+
+      /**
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */

@@ -104,7 +104,8 @@ namespace LinearAlgebra
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
                                                           Teuchos::Copy);
         }
-      local_entries = V.local_entries;
+      local_entries      = V.local_entries;
+      const_1d_host_view = vector->get1dView();
     }
 
 
@@ -116,7 +117,9 @@ namespace LinearAlgebra
       , has_ghost(V->getMap()->isOneToOne() == false)
       , last_action(VectorOperation::unknown)
       , vector(V)
-    {}
+    {
+      const_1d_host_view = vector->get1dView();
+    }
 
 
 
@@ -131,7 +134,9 @@ namespace LinearAlgebra
           parallel_partitioner.make_tpetra_map_rcp<
             TpetraTypes::NodeType<MemorySpace>>(communicator, true)))
       , local_entries(parallel_partitioner)
-    {}
+    {
+      const_1d_host_view = vector->get1dView();
+    }
 
 
 
@@ -174,7 +179,8 @@ namespace LinearAlgebra
                 communicator, true));
         }
 
-      has_ghost = (vector->getMap()->isOneToOne() == false);
+      has_ghost          = (vector->getMap()->isOneToOne() == false);
+      const_1d_host_view = vector->get1dView();
 
       if constexpr (running_in_debug_mode())
         {
@@ -222,7 +228,8 @@ namespace LinearAlgebra
         parallel_partitioner
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
             communicator, true));
-      local_entries = parallel_partitioner;
+      local_entries      = parallel_partitioner;
+      const_1d_host_view = vector->get1dView();
     }
 
 
@@ -278,9 +285,10 @@ namespace LinearAlgebra
                 communicator, true));
         }
 
-      has_ghost   = (vector->getMap()->isOneToOne() == false);
-      compressed  = true;
-      last_action = VectorOperation::unknown;
+      has_ghost          = (vector->getMap()->isOneToOne() == false);
+      compressed         = true;
+      last_action        = VectorOperation::unknown;
+      const_1d_host_view = vector->get1dView();
     }
 
 
@@ -328,10 +336,11 @@ namespace LinearAlgebra
                omit_zeroing_entries == false)
         nonlocal_vector->putScalar(Number(0));
 
-      has_ghost     = V.has_ghost;
-      local_entries = V.local_entries;
-      compressed    = true;
-      last_action   = VectorOperation::unknown;
+      has_ghost          = V.has_ghost;
+      local_entries      = V.local_entries;
+      compressed         = true;
+      last_action        = VectorOperation::unknown;
+      const_1d_host_view = vector->get1dView();
 
       // Cached import state depends on previous source layouts and should
       // not survive reinitialization.
@@ -734,7 +743,7 @@ namespace LinearAlgebra
 #  endif
         }
       else
-        value = vector->getData()[local_index];
+        value = const_1d_host_view[local_index];
 
       return value;
     }
