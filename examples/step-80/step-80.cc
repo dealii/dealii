@@ -699,9 +699,10 @@ namespace Step80
     AMGPreconditioner solid_displacement_preconditioner;
     AMGPreconditioner solid_lagrange_preconditioner;
     LA::MPI::BlockSparseMatrix
-      coupling_interpolation_matrix; // between displacement and velocity
+      coupling_interpolation_matrix_transpose; // between displacement and
+                                               // velocity
     LA::MPI::BlockSparseMatrix
-      coupling_interpolation_transpose_matrix; // transpose coupling
+      coupling_interpolation_matrix; // transpose coupling
 #ifdef DEAL_II_WITH_MUMPS
     MumpsMatrix mumps_system_matrix;
     MumpsVector mumps_system_rhs;
@@ -712,6 +713,7 @@ namespace Step80
 
     LA::MPI::BlockVector fluid_solution;
     LA::MPI::BlockVector fluid_locally_relevant_solution;
+    LA::MPI::BlockVector fluid_locally_relevant_solution_dot;
     LA::MPI::BlockVector fluid_locally_relevant_solution_old;
     LA::MPI::BlockVector fluid_system_rhs;
     LA::MPI::BlockVector fluid_dual_of_constant_pressure;
@@ -719,6 +721,7 @@ namespace Step80
 
     LA::MPI::BlockVector solid_solution;
     LA::MPI::BlockVector solid_locally_relevant_solution;
+    LA::MPI::BlockVector solid_locally_relevant_solution_dot;
     LA::MPI::BlockVector solid_locally_relevant_solution_old;
     LA::MPI::BlockVector solid_system_rhs;
 
@@ -1292,6 +1295,9 @@ namespace Step80
     fluid_locally_relevant_solution.reinit(fluid_owned_dofs,
                                            fluid_relevant_dofs,
                                            mpi_communicator);
+    fluid_locally_relevant_solution_dot.reinit(fluid_owned_dofs,
+                                               fluid_relevant_dofs,
+                                               mpi_communicator);
     fluid_locally_relevant_solution_old.reinit(fluid_owned_dofs,
                                                fluid_relevant_dofs,
                                                mpi_communicator);
@@ -1344,6 +1350,10 @@ namespace Step80
       solid_locally_relevant_solution.reinit(solid_owned_dofs,
                                              solid_relevant_dofs,
                                              mpi_communicator);
+
+      solid_locally_relevant_solution_dot.reinit(solid_owned_dofs,
+                                                 solid_relevant_dofs,
+                                                 mpi_communicator);
 
       solid_locally_relevant_solution_old.reinit(solid_owned_dofs,
                                                  solid_relevant_dofs,
@@ -1428,28 +1438,28 @@ namespace Step80
                                       fluid_dofs_per_block);
     assemble_coupling_sparsity(dsp, dsp_t);
 
-    coupling_interpolation_matrix.clear();
-    coupling_interpolation_matrix.reinit(fluid_dofs_per_block.size(),
-                                         solid_dofs_per_block.size());
+    coupling_interpolation_matrix_transpose.clear();
+    coupling_interpolation_matrix_transpose.reinit(fluid_dofs_per_block.size(),
+                                                   solid_dofs_per_block.size());
     for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
       for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
-        coupling_interpolation_matrix.block(i, j).reinit(fluid_owned_dofs[i],
-                                                         solid_owned_dofs[j],
-                                                         dsp.block(i, j),
-                                                         mpi_communicator);
-    coupling_interpolation_matrix.collect_sizes();
+        coupling_interpolation_matrix_transpose.block(i, j).reinit(
+          fluid_owned_dofs[i],
+          solid_owned_dofs[j],
+          dsp.block(i, j),
+          mpi_communicator);
+    coupling_interpolation_matrix_transpose.collect_sizes();
 
-    coupling_interpolation_transpose_matrix.clear();
-    coupling_interpolation_transpose_matrix.reinit(solid_dofs_per_block.size(),
-                                                   fluid_dofs_per_block.size());
+    coupling_interpolation_matrix.clear();
+    coupling_interpolation_matrix.reinit(solid_dofs_per_block.size(),
+                                         fluid_dofs_per_block.size());
     for (unsigned int i = 0; i < solid_dofs_per_block.size(); ++i)
       for (unsigned int j = 0; j < fluid_dofs_per_block.size(); ++j)
-        coupling_interpolation_transpose_matrix.block(i, j).reinit(
-          solid_owned_dofs[i],
-          fluid_owned_dofs[j],
-          dsp_t.block(i, j),
-          mpi_communicator);
-    coupling_interpolation_transpose_matrix.collect_sizes();
+        coupling_interpolation_matrix.block(i, j).reinit(solid_owned_dofs[i],
+                                                         fluid_owned_dofs[j],
+                                                         dsp_t.block(i, j),
+                                                         mpi_communicator);
+    coupling_interpolation_matrix.collect_sizes();
   }
 
 
@@ -1970,19 +1980,19 @@ namespace Step80
           fluid_dof_indices,
           solid_constraints,
           solid_dof_indices,
-          coupling_interpolation_matrix);
+          coupling_interpolation_matrix_transpose);
 
         solid_constraints.distribute_local_to_global(
           local_matrix_transpose,
           solid_dof_indices,
           fluid_constraints,
           fluid_dof_indices,
-          coupling_interpolation_transpose_matrix);
+          coupling_interpolation_matrix);
         particle = pic.end();
       }
 
+    coupling_interpolation_matrix_transpose.compress(VectorOperation::add);
     coupling_interpolation_matrix.compress(VectorOperation::add);
-    coupling_interpolation_transpose_matrix.compress(VectorOperation::add);
   }
 
 
@@ -2090,10 +2100,10 @@ namespace Step80
 
     MumpsMatrix coupling_matrix;
     MumpsMatrix coupling_matrix_transpose;
-    solid_matrix.block(1, 0).mmult(
-      coupling_matrix, coupling_interpolation_transpose_matrix.block(0, 0));
-    coupling_interpolation_matrix.block(0, 0).mmult(coupling_matrix_transpose,
-                                                    solid_matrix.block(0, 1));
+    solid_matrix.block(1, 0).mmult(coupling_matrix,
+                                   coupling_interpolation_matrix.block(0, 0));
+    coupling_interpolation_matrix_transpose.block(0, 0).mmult(
+      coupling_matrix_transpose, solid_matrix.block(0, 1));
     coupling_matrix *= -time_step;
     coupling_matrix_transpose *= -time_step;
 
@@ -2231,18 +2241,18 @@ namespace Step80
     const auto D  = LinOp(solid_matrix.block(1, 0));
     const auto M  = LinOp(solid_matrix.block(1, 1));
 
-    const auto Pt  = LinOp(coupling_interpolation_matrix.block(0, 0));
-    const auto Z1t = 0.0 * LinOp(coupling_interpolation_matrix.block(0, 1));
-    const auto Z2t = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 0));
-    const auto Z3t = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 1));
+    const auto Pt = LinOp(coupling_interpolation_matrix_transpose.block(0, 0));
+    const auto Z1t =
+      0.0 * LinOp(coupling_interpolation_matrix_transpose.block(0, 1));
+    const auto Z2t =
+      0.0 * LinOp(coupling_interpolation_matrix_transpose.block(1, 0));
+    const auto Z3t =
+      0.0 * LinOp(coupling_interpolation_matrix_transpose.block(1, 1));
 
-    const auto P = LinOp(coupling_interpolation_transpose_matrix.block(0, 0));
-    const auto Z1 =
-      0.0 * LinOp(coupling_interpolation_transpose_matrix.block(0, 1));
-    const auto Z2 =
-      0.0 * LinOp(coupling_interpolation_transpose_matrix.block(1, 0));
-    const auto Z3 =
-      0.0 * LinOp(coupling_interpolation_transpose_matrix.block(1, 1));
+    const auto P  = LinOp(coupling_interpolation_matrix.block(0, 0));
+    const auto Z1 = 0.0 * LinOp(coupling_interpolation_matrix.block(0, 1));
+    const auto Z2 = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 0));
+    const auto Z3 = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 1));
 
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
@@ -2734,123 +2744,203 @@ namespace Step80
     const LA::MPI::BlockVector &y_dot,
     LA::MPI::BlockVector       &residual)
   {
-    // Unpack the combined vector into the individual block vectors
+    // Unpack state and derivative vectors.
+    fluid_locally_relevant_solution.block(0) = y.block(0);
+    fluid_locally_relevant_solution.block(1) = y.block(1);
+    solid_locally_relevant_solution.block(0) = y.block(2);
+    solid_locally_relevant_solution.block(1) = y.block(3);
+
+    fluid_locally_relevant_solution_dot.block(0) = y_dot.block(0);
+    fluid_locally_relevant_solution_dot.block(1) = y_dot.block(1);
+    solid_locally_relevant_solution_dot.block(0) = y_dot.block(2);
+    solid_locally_relevant_solution_dot.block(1) = y_dot.block(3);
+
+    // I need these two for the coupling terms
     fluid_solution.block(0) = y.block(0);
     fluid_solution.block(1) = y.block(1);
+
     solid_solution.block(0) = y.block(2);
     solid_solution.block(1) = y.block(3);
 
-    fluid_locally_relevant_solution = fluid_solution;
-    solid_locally_relevant_solution = solid_solution;
-
     const double dt = ida_current_time_step;
 
-    // Use the assembly routines with the current step size to form:
-    //   residual = M*y_dot + L(y) - f(t)
-    // The existing assemble_*_rhs functions return (in fluid_system_rhs /
-    // solid_system_rhs) the quantity:
-    //   rhs = M/dt * u_old - convective - visc_rhs + f(t)
-    // and solve() then solves  (M/dt + L) * u_new = rhs.
-    // Equivalently, the DAE residual for IDA is:
-    //   F = (M/dt + L) * u_new - rhs  = 0
-    // which means: F = (fluid_matrix or solid_matrix) * y - system_rhs.
-    // We compute it as: F = system_matrix * y - old_rhs, then
-    // replace the M/dt contribution with M * y_dot.
-    //
-    // Concretely, the residual for the fluid velocity block is:
-    //   F_u = M_u * y_dot_u + viscous_terms(y_u) + grad_pressure(y_p)
-    //         - rhs_u
-    // For simplicity, we reuse the existing assembly and substitute:
-    //   M_u * (y_u - u_old)/dt  -->  M_u * y_dot_u
-    // by computing:  residual = matrix * y - old_rhs
-    //                 + M_u * (y_dot - (y - old)/dt)
-    //
-    // A cleaner but equivalent approach: assemble the rhs with the old
-    // solution in place (the existing functions already use
-    // fluid_locally_relevant_solution_old), then form residual as
-    //   residual = matrix * y - system_rhs
-    // and correct the mass-matrix row:
-    //   residual_u += M_u * y_dot_u - M_u * (y_u - u_old) / dt
-    //
-    // Since this coupling is complex, here we take the pragmatic route:
-    // assembling with the current y as the "new" solution and dt as the
-    // step, then evaluating A*y - rhs gives the standard implicit-Euler
-    // residual, which is 0 at the exact solution. Then we replace the
-    // M/dt*(u_new - u_old) term with M*y_dot.
+    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
+    const unsigned int n_q_points = quadrature_formula.size();
 
-    assemble_navier_stokes_rhs(dt);
-    assemble_elasticity_rhs(dt);
+
+    // Coupling matrices are assembled explicitly so that residual and Jacobian
+    // are consistent in the same Newton step.
+    update_particle_positions();
+
     setup_coupling();
     assemble_coupling();
 
-    // Residual for the fluid: A*y_u - rhs_u  (where A = M/dt + viscous + ...)
-    // We use matrix-vector products via the existing LinearOperator helpers.
-    {
-      LA::MPI::BlockVector Ay;
-      Ay.reinit(fluid_solution);
-      fluid_matrix.vmult(Ay, fluid_solution);
+    using Vec        = LA::MPI::Vector;
+    using BVec       = typename LA::MPI::BlockVector;
+    using LinOp      = LinearOperator<Vec>;
+    using BlockLinOp = LinearOperator<BVec>;
 
-      LA::MPI::BlockVector mass_correction;
-      mass_correction.reinit(fluid_solution);
-      // mass_matrix * y_dot_u - mass_matrix * (y_u - u_old)/dt
-      fluid_mass_matrix.block(0, 0).vmult(mass_correction.block(0),
-                                          y_dot.block(0));
-      {
-        LA::MPI::Vector tmp(fluid_owned_dofs[0], mpi_communicator);
-        tmp = fluid_solution.block(0);
-        tmp -= fluid_locally_relevant_solution_old.block(0);
-        tmp /= dt;
-        LA::MPI::Vector mass_tmp(fluid_owned_dofs[0], mpi_communicator);
-        fluid_mass_matrix.block(0, 0).vmult(mass_tmp, tmp);
-        mass_correction.block(0) -= mass_tmp;
-      }
+    const auto P  = BlockLinOp(coupling_interpolation_matrix);
+    const auto Pt = BlockLinOp(coupling_interpolation_matrix_transpose);
 
-      residual.block(0) = Ay.block(0);
-      residual.block(0) -= fluid_system_rhs.block(0);
-      residual.block(0) += mass_correction.block(0);
+    BVec interpolated_velocity            = P * fluid_solution;
+    BVec interpolated_lagrange_multiplier = Pt * solid_solution;
 
-      residual.block(1) = Ay.block(1);
-      residual.block(1) -= fluid_system_rhs.block(1);
-    }
+    // -------------------------------------------------------------------------
+    // Fluid residual: same weak form as in assemble_navier_stokes_system(),
+    // with the time derivative term replaced by IDA's y_dot.
+    // -------------------------------------------------------------------------
+    FEValues<spacedim> fluid_fe_values(*fluid_fe,
+                                       quadrature_formula,
+                                       update_values | update_gradients |
+                                         update_quadrature_points |
+                                         update_JxW_values);
 
-    // Residual for the solid
-    {
-      LA::MPI::BlockVector Ky;
-      Ky.reinit(solid_solution);
-      solid_matrix.vmult(Ky, solid_solution);
+    const unsigned int fluid_dofs_per_cell = fluid_fe->n_dofs_per_cell();
+    Vector<double>     fluid_local_residual(fluid_dofs_per_cell);
+    std::vector<types::global_dof_index> fluid_dof_indices(fluid_dofs_per_cell);
 
-      LA::MPI::BlockVector mass_correction;
-      mass_correction.reinit(solid_solution);
-      // The solid mass-like term is the (0,0) block (displacement inertia)
-      {
-        LA::MPI::Vector tmp(solid_owned_dofs[0], mpi_communicator);
-        tmp = solid_solution.block(0);
-        tmp -= solid_locally_relevant_solution_old.block(0);
-        tmp /= dt;
-        LA::MPI::Vector mass_tmp(solid_owned_dofs[0], mpi_communicator);
-        // M_disp / dt  -->  reuse the (1,0) block of solid_matrix which
-        // encodes the Lagrange multiplier coupling; the inertia
-        // contribution from displacement is the (1,0)/(0,1) blocks.
-        // Here we just add M_w * y_dot_w - M_w*(y_w - w_old)/dt using
-        // the solid mass matrix block.
-        solid_matrix.block(1, 0).vmult(mass_tmp, tmp);
-        // The rhs already contains -w_old/dt term; IDA provides y_dot_w,
-        // so the correction is:
-        //   delta = M_{lagr,disp} * y_dot_w - M_{lagr,disp}*(y_w-w_old)/dt
-        LA::MPI::Vector ydot_correction(solid_owned_dofs[1], mpi_communicator);
-        solid_matrix.block(1, 0).vmult(ydot_correction, y_dot.block(0));
-        mass_correction.block(1) = ydot_correction;
-        mass_correction.block(1) -= mass_tmp;
-      }
+    std::vector<Tensor<1, spacedim>> u_val(n_q_points);
+    std::vector<Tensor<1, spacedim>> u_dot_val(n_q_points);
+    std::vector<Tensor<2, spacedim>> u_grad(n_q_points);
+    std::vector<double>              u_div(n_q_points);
+    std::vector<double>              p_val(n_q_points);
+    std::vector<Vector<double>>      fluid_rhs_values(n_q_points,
+                                                 Vector<double>(spacedim + 1));
 
-      residual.block(2) = Ky.block(0);
-      residual.block(2) -= solid_system_rhs.block(0);
+    fluid_system_rhs = 0;
+    for (const auto &cell : fluid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          fluid_fe_values.reinit(cell);
+          fluid_local_residual = 0;
 
-      residual.block(3) = Ky.block(1);
-      residual.block(3) -= solid_system_rhs.block(1);
-      residual.block(3) += mass_correction.block(1);
-    }
+          fluid_fe_values[velocity].get_function_values(
+            fluid_locally_relevant_solution, u_val);
+          fluid_fe_values[velocity].get_function_values(
+            fluid_locally_relevant_solution_dot, u_dot_val);
+          fluid_fe_values[velocity].get_function_gradients(
+            fluid_locally_relevant_solution, u_grad);
+          fluid_fe_values[velocity].get_function_divergences(
+            fluid_locally_relevant_solution, u_div);
+          fluid_fe_values[pressure].get_function_values(
+            fluid_locally_relevant_solution, p_val);
+          par.navier_stokes_rhs.vector_value_list(
+            fluid_fe_values.get_quadrature_points(), fluid_rhs_values);
 
+          cell->get_dof_indices(fluid_dof_indices);
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            for (unsigned int i = 0; i < fluid_dofs_per_cell; ++i)
+              {
+                const double JxW   = fluid_fe_values.JxW(q);
+                const auto  &phi_i = fluid_fe_values[velocity].value(i, q);
+                const auto  &div_phi_i =
+                  fluid_fe_values[velocity].divergence(i, q);
+                const auto &grad_phi_i =
+                  fluid_fe_values[velocity].gradient(i, q);
+                const auto &psi_i = fluid_fe_values[pressure].value(i, q);
+                const unsigned int component_i =
+                  fluid_fe->system_to_component_index(i).first;
+
+                fluid_local_residual(i) +=
+                  (par.density * u_dot_val[q] * phi_i +
+                   par.density * (u_grad[q] * u_val[q]) * phi_i +
+                   par.viscosity * scalar_product(u_grad[q], grad_phi_i) -
+                   p_val[q] * div_phi_i - psi_i * u_div[q] +
+                   (par.use_grad_div_stabilization ?
+                      par.gamma_AL_background * u_div[q] * div_phi_i :
+                      0) -
+                   par.density * fluid_fe_values.shape_value(i, q) *
+                     fluid_rhs_values[q](component_i)) *
+                  JxW;
+              }
+
+          fluid_constraints.distribute_local_to_global(fluid_local_residual,
+                                                       fluid_dof_indices,
+                                                       fluid_system_rhs);
+        }
+    fluid_system_rhs.compress(VectorOperation::add);
+
+    // -------------------------------------------------------------------------
+    // Solid residual: same weak form as in assemble_elasticity_system(), but
+    // replacing (w - w_old)/dt with w_dot in the lagrange-multiplier equation.
+    // -------------------------------------------------------------------------
+    FEValues<spacedim> solid_fe_values(*solid_fe,
+                                       quadrature_formula,
+                                       update_values | update_gradients |
+                                         update_quadrature_points |
+                                         update_JxW_values);
+
+    const unsigned int solid_dofs_per_cell = solid_fe->n_dofs_per_cell();
+    Vector<double>     solid_local_residual(solid_dofs_per_cell);
+    std::vector<types::global_dof_index> solid_dof_indices(solid_dofs_per_cell);
+
+    std::vector<SymmetricTensor<2, spacedim>> eps_w(n_q_points);
+    std::vector<double>                       div_w(n_q_points);
+    std::vector<Tensor<1, spacedim>>          w_dot_val(n_q_points);
+    std::vector<Tensor<1, spacedim>>          lambda_val(n_q_points);
+    std::vector<Vector<double>>               solid_rhs_values(n_q_points,
+                                                 Vector<double>(2 * spacedim));
+
+    solid_system_rhs = 0;
+    for (const auto &cell : solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          solid_fe_values.reinit(cell);
+          solid_local_residual = 0;
+
+          solid_fe_values[displacement].get_function_symmetric_gradients(
+            solid_locally_relevant_solution, eps_w);
+          solid_fe_values[displacement].get_function_divergences(
+            solid_locally_relevant_solution, div_w);
+          solid_fe_values[displacement].get_function_values(
+            solid_locally_relevant_solution_dot, w_dot_val);
+          solid_fe_values[lagrange_multiplier].get_function_values(
+            solid_locally_relevant_solution, lambda_val);
+
+          par.solid_rhs.vector_value_list(
+            solid_fe_values.get_quadrature_points(), solid_rhs_values);
+
+          cell->get_dof_indices(solid_dof_indices);
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            for (unsigned int i = 0; i < solid_dofs_per_cell; ++i)
+              {
+                const double JxW = solid_fe_values.JxW(q);
+                const auto  &eps_phi_w_i =
+                  solid_fe_values[displacement].symmetric_gradient(i, q);
+                const auto &div_phi_w_i =
+                  solid_fe_values[displacement].divergence(i, q);
+                const auto &phi_w_i = solid_fe_values[displacement].value(i, q);
+                const auto &phi_l_i =
+                  solid_fe_values[lagrange_multiplier].value(i, q);
+
+                const auto comp_i =
+                  solid_fe->system_to_component_index(i).first;
+
+                solid_local_residual(i) +=
+                  (2.0 * par.lame_mu * scalar_product(eps_w[q], eps_phi_w_i) +
+                   par.lame_lambda * div_w[q] * div_phi_w_i -
+                   (lambda_val[q] * phi_w_i)
+
+                   - (w_dot_val[q] * phi_l_i)
+
+                   - solid_rhs_values[q](comp_i) *
+                       solid_fe_values.shape_value(i, q)) *
+                  JxW;
+              }
+
+          solid_constraints.distribute_local_to_global(solid_local_residual,
+                                                       solid_dof_indices,
+                                                       solid_system_rhs);
+        }
+    solid_system_rhs.compress(VectorOperation::add);
+
+    residual.block(0) = fluid_system_rhs.block(0);
+    residual.block(1) = fluid_system_rhs.block(1);
+    residual.block(2) = solid_system_rhs.block(0);
+    residual.block(3) = solid_system_rhs.block(1);
     residual.compress(VectorOperation::insert);
   }
 
@@ -2868,11 +2958,11 @@ namespace Step80
     const double alpha)
   {
     // alpha = d(ydot)/dy for the current BDF step, so  dt = 1/alpha.
-    const double dt                = (alpha > 0.0) ?
-                                       (1.0 / alpha) :
-                                       par.final_time / (par.number_of_time_steps - 1);
-    const bool   time_step_changed = (ida_current_time_step == dt);
-    ida_current_time_step          = dt;
+    const double old_dt   = ida_current_time_step;
+    const double dt       = (alpha > 0.0) ?
+                              (1.0 / alpha) :
+                              par.final_time / (par.number_of_time_steps - 1);
+    ida_current_time_step = dt;
 
     // Unpack y into the individual block vectors used by the assembly routines
     fluid_solution.block(0) = y.block(0);
@@ -2883,7 +2973,12 @@ namespace Step80
     fluid_locally_relevant_solution = fluid_solution;
     solid_locally_relevant_solution = solid_solution;
 
-    if (time_step_changed)
+    // Use an inexact (symmetric) Jacobian: the convective term is not
+    // updated here to avoid velocity-dependence.  Only reassemble when dt
+    // changes so the mass-matrix scaling M/dt stays current.
+    const bool dt_changed =
+      (std::abs(dt - old_dt) > 1e-14 * std::max(dt, old_dt));
+    if (dt_changed)
       {
         assemble_navier_stokes_system(dt);
         assemble_elasticity_system(dt);
@@ -3060,6 +3155,19 @@ namespace Step80
           solid_owned_dofs[0].size()));
       return diff;
     };
+
+    // IDACalcIC (called inside solve_dae) evaluates the residual before it
+    // ever calls setup_jacobian, so we must assemble the system matrices
+    // and RHS at the initial condition beforehand.
+    double initial_dt     = par.ida_data.initial_step_size;
+    ida_current_time_step = initial_dt;
+
+    assemble_navier_stokes_system(initial_dt);
+    assemble_elasticity_system(initial_dt);
+    assemble_navier_stokes_rhs(initial_dt);
+    assemble_elasticity_rhs(initial_dt);
+    setup_coupling();
+    assemble_coupling();
 
     ida.solve_dae(y, y_dot);
   }
