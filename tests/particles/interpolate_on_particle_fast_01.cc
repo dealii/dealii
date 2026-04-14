@@ -13,10 +13,10 @@
 // Test that a Monomial function interpolated to a field
 // can be interpolated at the particle position correctly
 // using the fast implementation of the method which requires
-// knowing the number of components at compile time.`
+// knowing the number of components at compile time.
 // This tests for the case of one or multiple components.
 // When more than one component is used, odd components are false
-// and even components are false. For example n_components = 3 leads to a
+// and even components are true. For example n_components = 3 leads to a
 // mask that is [true, false, true].
 
 #include <deal.II/base/function_lib.h>
@@ -63,7 +63,6 @@ test()
 
   Particles::Generators::regular_reference_locations<dim, spacedim>(
     tria, QGauss<dim>(2).get_points(), particle_handler);
-
 
   FESystem<dim, spacedim> fe(FE_Q<dim, spacedim>(1) ^ n_components);
 
@@ -121,8 +120,13 @@ test()
   // Interpolate function to vector than interpolate field to particles
   VectorTools::interpolate(space_dh, linear, field_owned);
   field_relevant = field_owned;
-  Particles::Utilities::interpolate_field_on_particles_fast<1, dim, spacedim>(
-    space_dh, particle_handler, field_relevant, interpolation_on_particles);
+  Particles::Utilities::
+    interpolate_field_on_particles_fast<n_components, dim, spacedim>(
+      space_dh,
+      particle_handler,
+      field_relevant,
+      interpolation_on_particles,
+      mask);
 
   Vector<double> values(mask.size());
 
@@ -146,13 +150,24 @@ main(int argc, char **argv)
 
   MPILogInitAll init;
 
-  deallog.push("2d/2d");
+  deallog.push("1c/2d/2d");
   test<1, 2, 2>();
   deallog.pop();
-  deallog.push("2d/3d");
+  deallog.push("1c/2d/3d");
   test<1, 2, 3>();
   deallog.pop();
-  deallog.push("3d/3d");
+  deallog.push("1c/3d/3d");
   test<1, 3, 3>();
+  deallog.pop();
+
+
+  deallog.push("3c/2d/2d");
+  test<3, 2, 2>();
+  deallog.pop();
+  deallog.push("3c/2d/3d");
+  test<3, 2, 3>();
+  deallog.pop();
+  deallog.push("3c/3d/3d");
+  test<3, 3, 3>();
   deallog.pop();
 }
