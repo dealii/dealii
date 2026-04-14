@@ -1,0 +1,9 @@
+
+DEAL:0:2d/2d::dim: 2, spacedim: 2
+DEAL:0:2d/2d::Total number of particles: 64
+DEAL:0:2d/3d::dim: 2, spacedim: 3
+DEAL:0:2d/3d::Total number of particles: 64
+DEAL:0:3d/3d::dim: 3, spacedim: 3
+DEAL:0:3d/3d::Total number of particles: 512
+
+
