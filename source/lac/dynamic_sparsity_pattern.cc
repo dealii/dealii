@@ -30,184 +30,106 @@ template <typename ForwardIterator>
 void
 DynamicSparsityPattern::Line::add_entries(ForwardIterator begin,
                                           ForwardIterator end,
-                                          const bool      indices_are_sorted)
+                                          const bool      indices_are_sorted,
+                                          ScratchData    &scratch_data)
 {
-  const int n_elements = end - begin;
+  const auto n_elements = end - begin;
   if (n_elements <= 0)
     return;
 
-  const size_type stop_size = entries.size() + n_elements;
+  // Given some current size, find the next power of 2 (or number of the form
+  // 2^{k + 1} + 2^k) not less than size.
+  auto compute_next_size = [](const std::size_t size) {
+    std::size_t current_size = 1;
+    while (current_size < size)
+      {
+        // try to slot in a not-quite power of 2 if it is a better fit:
+        const auto next          = 2 * current_size;
+        const auto next_and_half = 3 * current_size;
+        if (next < size && size <= next_and_half)
+          return next_and_half;
+        else
+          current_size *= 2;
+      }
+    return current_size;
+  };
 
-  if (indices_are_sorted == true && n_elements > 3)
-    {
-      // in debug mode, check whether the
-      // indices really are sorted.
-      if constexpr (running_in_debug_mode())
-        {
-          {
-            ForwardIterator test = begin, test1 = begin;
-            ++test1;
-            for (; test1 != end; ++test, ++test1)
-              Assert(*test1 > *test, ExcInternalError());
-          }
-        }
-
-      if (entries.empty() || entries.back() < *begin)
-        {
-          entries.insert(entries.end(), begin, end);
-          return;
-        }
-
-      // find a possible insertion point for
-      // the first entry. check whether the
-      // first entry is a duplicate before
-      // actually doing something.
-      ForwardIterator                  my_it = begin;
-      size_type                        col   = *my_it;
-      std::vector<size_type>::iterator it =
-        Utilities::lower_bound(entries.begin(), entries.end(), col);
-      while (*it == col)
-        {
-          ++my_it;
-          if (my_it == end)
-            break;
-          col = *my_it;
-          // check the very next entry in the
-          // current array
-          ++it;
-          if (it == entries.end())
-            break;
-          if (*it > col)
-            break;
-          if (*it == col)
-            continue;
-          // ok, it wasn't the very next one, do a
-          // binary search to find the insert point
-          it = Utilities::lower_bound(it, entries.end(), col);
-          if (it == entries.end())
-            break;
-        }
-      // all input entries were duplicates.
-      if (my_it == end)
-        return;
-
-      // resize vector by just inserting the
-      // list
-      const size_type pos1 = it - entries.begin();
-      Assert(pos1 <= entries.size(), ExcInternalError());
-      entries.insert(it, my_it, end);
-      it = entries.begin() + pos1;
-      Assert(entries.size() >= static_cast<size_type>(it - entries.begin()),
-             ExcInternalError());
-
-      // now merge the two lists.
-      std::vector<size_type>::iterator it2 = it + (end - my_it);
-
-      // as long as there are indices both in
-      // the end of the entries list and in the
-      // input list
-      while (my_it != end && it2 != entries.end())
-        {
-          if (*my_it < *it2)
-            *it++ = *my_it++;
-          else if (*my_it == *it2)
-            {
-              *it++ = *it2++;
-              ++my_it;
-            }
-          else
-            *it++ = *it2++;
-        }
-      // in case there are indices left in the
-      // input list
-      while (my_it != end)
-        *it++ = *my_it++;
-
-      // in case there are indices left in the
-      // end of entries
-      while (it2 != entries.end())
-        *it++ = *it2++;
-
-      // resize and return
-      const size_type new_size = it - entries.begin();
-      Assert(new_size <= stop_size, ExcInternalError());
-      entries.resize(new_size);
+  auto reserve_next_size = [&](const std::size_t       size,
+                               std::vector<size_type> &vec) {
+    if (vec.capacity() >= size)
       return;
-    }
 
-  // unsorted case or case with too few
-  // elements
-  ForwardIterator my_it = begin;
+    // Try to minimize the number of allocations via some empirical measurements
+    // to map values of n_elements to row sizes:
+    // 1. 1  -> one constraint
+    // 2. 8  -> FE_Q<3>(1), use 32 to cover the full row
+    // 3. 10 -> FE_SimplexP<3>(2), experiments show 75% of rows have 27 entries
+    //    or fewer, so use 32
+    // 4. 27 -> FE_Q<3>(2), half of all rows have <= 45 entries, so use 64
+    //
+    // A common lower bound is 2 * dofs_per_cell, so use either a hard-coded
+    // case or that estimate with an upper bound (e.g., we shouldn't allocate 2
+    // * n_elements if someone wants to fill a row of a constrained matrix with
+    // all 1s).
+    std::size_t next_size = 0u;
+    if (entries.size() == 0)
+      switch (n_elements)
+        {
+          case 1:
+            next_size = 1;
+            break;
+          case 8:
+            next_size = 32;
+            break;
+          default:
+            next_size = n_elements < 256 ? compute_next_size(2 * n_elements) :
+                                           compute_next_size(n_elements);
+        }
+    else
+      next_size = compute_next_size(size);
+    Assert(next_size >= size, ExcInternalError());
+    vec.reserve(next_size);
+  };
 
-  // If necessary, increase the size of the
-  // array.
-  if (stop_size > entries.capacity())
-    entries.reserve(stop_size);
-
-  size_type                        col = *my_it;
-  std::vector<size_type>::iterator it, it2;
-  // insert the first element as for one
-  // entry only first check the last
-  // element (or if line is still empty)
-  if ((entries.empty()) || (entries.back() < col))
+  if (indices_are_sorted)
     {
-      entries.push_back(col);
-      it = entries.end() - 1;
+      Assert(std::is_sorted(begin, end), ExcInternalError());
+      Assert(std::adjacent_find(begin, end) == end, ExcInternalError());
+
+      std::vector<size_type> &scratch_indices = scratch_data.indices;
+      reserve_next_size(n_elements + entries.size(), scratch_indices);
+      scratch_indices.resize(n_elements + entries.size());
+      scratch_indices.erase(std::set_union(begin,
+                                           end,
+                                           entries.begin(),
+                                           entries.end(),
+                                           scratch_indices.begin()),
+                            scratch_indices.end());
+      scratch_indices.swap(entries);
     }
   else
     {
-      // do a binary search to find the place
-      // where to insert:
-      it2 = Utilities::lower_bound(entries.begin(), entries.end(), col);
+      reserve_next_size(n_elements + entries.size(), entries);
 
-      // If this entry is a duplicate, continue
-      // immediately Insert at the right place
-      // in the vector. Vector grows
-      // automatically to fit elements. Always
-      // doubles its size.
-      if (*it2 != col)
-        it = entries.insert(it2, col);
-      else
-        it = it2;
+      auto lower = entries.begin();
+      auto upper = entries.end();
+      for (auto new_it = begin; new_it < end; ++new_it)
+        {
+          auto it = Utilities::lower_bound(lower, upper, *new_it);
+          if (it == upper || *it != *new_it)
+            {
+              entries.insert(it, *new_it);
+              lower = entries.begin();
+              upper = entries.end();
+            }
+        }
     }
 
-  ++my_it;
-  // Now try to be smart and insert with
-  // bias in the direction we are
-  // walking. This has the advantage that
-  // for sorted lists, we always search in
-  // the right direction, what should
-  // decrease the work needed in here.
-  for (; my_it != end; ++my_it)
-    {
-      col = *my_it;
-      // need a special insertion command when
-      // we're at the end of the list
-      if (col > entries.back())
-        {
-          entries.push_back(col);
-          it = entries.end() - 1;
-        }
-      // search to the right (preferred search
-      // direction)
-      else if (col > *it)
-        {
-          it2 = Utilities::lower_bound(it++, entries.end(), col);
-          if (*it2 != col)
-            it = entries.insert(it2, col);
-        }
-      // search to the left
-      else if (col < *it)
-        {
-          it2 = Utilities::lower_bound(entries.begin(), it, col);
-          if (*it2 != col)
-            it = entries.insert(it2, col);
-        }
-      // if we're neither larger nor smaller,
-      // then this was a duplicate and we can
-      // just continue.
-    }
+  Assert(std::is_sorted(entries.begin(), entries.end()), ExcInternalError());
+  Assert(std::adjacent_find(entries.begin(), entries.end()) == entries.end(),
+         ExcInternalError());
 }
+
 
 
 DynamicSparsityPattern::size_type
@@ -676,21 +598,27 @@ DynamicSparsityPattern::column_index(
 
 // explicit instantiations
 template void
-DynamicSparsityPattern::Line::add_entries(size_type *, size_type *, const bool);
+DynamicSparsityPattern::Line::add_entries(size_type *,
+                                          size_type *,
+                                          const bool,
+                                          ScratchData &);
 template void
 DynamicSparsityPattern::Line::add_entries(const size_type *,
                                           const size_type *,
-                                          const bool);
+                                          const bool,
+                                          ScratchData &);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void
 DynamicSparsityPattern::Line::add_entries(std::vector<size_type>::iterator,
                                           std::vector<size_type>::iterator,
-                                          const bool);
+                                          const bool,
+                                          ScratchData &);
 template void
 DynamicSparsityPattern::Line::add_entries(
   std::vector<size_type>::const_iterator,
   std::vector<size_type>::const_iterator,
-  const bool);
+  const bool,
+  ScratchData &);
 #endif
 
 template void

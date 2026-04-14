@@ -91,6 +91,14 @@ public:
 
   /**
    * Optimized function for adding new entries to a given row.
+   *
+   * @param[in] row The row into which we are adding indices.
+   *
+   * @param[in] columns Column indices for that row.
+   *
+   * @param[in] indices_are_sorted Whether or not the indices are both sorted
+   *            and unique. Sorted and unique indices are faster to process than
+   *            arbitrary ones.
    */
   virtual void
   add_row_entries(const size_type                  &row,
