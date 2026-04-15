@@ -1,17 +1,14 @@
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-// Copyright (C) 2019 by the deal.II authors
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #ifndef dealii_non_matching_dof_handler_coupling
 #define dealii_non_matching_dof_handler_coupling
@@ -48,23 +45,60 @@ namespace NonMatching
 {
   /**
    * Handle coupling between two DoFHandler objects built on non-matching
-   * Triangulation objects.
+   * triangulations.
    *
-   * @param cache1
-   * @param cache2
-   * @param dh1
-   * @param dh2
-   * @param comps1
-   * @param comps2
-   * @param mapping1
-   * @param mapping2
+   * Let $V_h = \mathrm{span}\{\varphi_i\}_{i=0}^{N_1-1}$ be the finite
+   * element space associated with @p dh1 (the embedding/background space), and
+   * let $W_h = \mathrm{span}\{\psi_a\}_{a=0}^{N_2-1}$ be the finite element
+   * space associated with @p dh2 (the immersed/coupled space). The class builds
+   * particle-based search and transfer data so that one can assemble coupling
+   * operators on arbitrarily distributed and fully distributed non-matching
+   * meshes.
    *
-   * @author Luca Heltai, Bruno Blais, 2019
+   * In particular, this class supports:
+   * - interpolation/restriction operators of the form
+   *   \f[
+   *   u_h(x_a) = \sum_{i=0}^{N_1-1} U_i\,\varphi_i(x_a),
+   *   \f]
+   *   where $x_a$ are support points associated with selected DoFs of @p dh2;
+   * - penalty-type Nitsche restriction terms on the immersed manifold/cells,
+   *   resulting in a matrix
+   *   \f[
+   *   A^{\gamma}_{ij} = \gamma\int_{\Gamma_h} \varphi_i\,\varphi_j\,d\Gamma,
+   *   \f]
+   *   and right-hand side
+   *   \f[
+   *   b^{\gamma}_{i} = \gamma\int_{\Gamma_h} g\,\varphi_i\,d\Gamma,
+   *   \f]
+   *   where $\gamma$ is the penalty parameter and $g$ is the prescribed
+   *   restriction data.
+   *
+   * These operators are central in immersed and mixed-dimensional couplings:
+   * they encode, respectively, pointwise transfer from the background field to
+   * immersed DoFs and weak enforcement of constraints through consistent
+   * variational terms.
    */
   template <int dim, int spacedim>
   class DoFHandlerCoupling : public EnableObserverPointer
   {
   public:
+    /**
+     * Construct a coupling object using externally managed grid caches.
+     *
+     * @param cache1 Geometric search cache for the background triangulation.
+     * @param cache2 Geometric search cache for the immersed triangulation.
+     * @param dh1 DoFHandler defining the source/background space $V_h$.
+     * @param dh2 DoFHandler defining the immersed/target space $W_h$.
+     * @param comps1 Active components of @p dh1 used in coupling.
+     * @param comps2 Active components of @p dh2 used in coupling.
+     * @param mapping1 Mapping used to interpret geometry on @p dh1.
+     * @param mapping2 Mapping used to interpret geometry on @p dh2.
+     *
+     * If component masks are omitted, all components are considered active.
+     * Active components are matched in order: the first selected component in
+     * @p comps1 couples with the first selected component in @p comps2, and so
+     * on, up to the minimum number of selected components.
+     */
     DoFHandlerCoupling(
       const GridTools::Cache<spacedim>      &cache1,
       const GridTools::Cache<dim, spacedim> &cache2,
@@ -78,18 +112,26 @@ namespace NonMatching
 
 
 
+    /**
+     * Iterator type over cached pairs of background cells and immersed-surface
+     * quadratures used during geometric coupling setup.
+     */
     using CellsAndQuadratureIterator = typename std::vector<
       std::pair<typename DoFHandler<spacedim>::cell_iterator,
                 ImmersedSurfaceQuadrature<spacedim>>>::iterator;
 
     /**
-     * @brief DoFHandlerCoupling
-     * @param dh1
-     * @param dh2
-     * @param comps1
-     * @param comps2
-     * @param mapping1
-     * @param mapping2
+     * Construct a coupling object by creating internal grid caches.
+     *
+     * This constructor is equivalent to the cache-based constructor, but
+     * allocates and owns the two GridTools::Cache objects internally.
+     *
+     * @param dh1 DoFHandler defining the source/background space $V_h$.
+     * @param dh2 DoFHandler defining the immersed/target space $W_h$.
+     * @param comps1 Active components of @p dh1 used in coupling.
+     * @param comps2 Active components of @p dh2 used in coupling.
+     * @param mapping1 Mapping used on the background mesh.
+     * @param mapping2 Mapping used on the immersed mesh.
      */
     DoFHandlerCoupling(
       const DoFHandler<spacedim>      &dh1,
@@ -103,12 +145,23 @@ namespace NonMatching
 
 
     /**
-     * Assemble sparsity.
+     * Build the sparsity pattern for the interpolation/restriction matrix.
      *
-     * @param[in] quad
-     * @param[out] sparsity
-     * @param[in] constraints
-     * @param[in] reuse_internal_data_structures
+     * The resulting matrix $I$ maps DoFs of @p dh1 to selected DoFs of @p dh2,
+     * with entries
+     * \f[
+     * I_{a i} = \varphi_i(x_a),
+     * \f]
+     * where $x_a$ is the support point associated with the $a$-th selected DoF
+     * of @p dh2 and $\varphi_i$ is the $i$-th shape function of @p dh1.
+     *
+     * Only nonzero couplings $(a,i)$ are inserted in @p sparsity, accounting
+     * for component matching and for the provided affine constraints.
+     *
+     * @param[out] sparsity Sparsity pattern to be filled.
+     * @param[in] constraints Constraints used while inserting matrix entries.
+     * @param[in] reuse_internal_data_structures If true, reuse cached particle
+     *   data when available.
      */
     template <class Sparsity, typename number = double>
     void
@@ -164,12 +217,33 @@ namespace NonMatching
     }
 
     /**
-     * Assemble sparsity for Nitsche method.
+     * Assemble penalty-type Nitsche restriction contributions.
      *
-     * @param[in] quadrature
-     * @param[out] sparsity
-     * @param[in] constraints
-     * @param[in] reuse_internal_data_structures
+     * For each active component, this function adds to @p matrix and @p rhs the
+     * terms
+     * \f[
+     * A^{\gamma}_{ij} = \gamma\int_{\Gamma_h} \varphi_i\,\varphi_j\,d\Gamma,
+     * \qquad
+     * b^{\gamma}_i = \gamma\int_{\Gamma_h} g\,\varphi_i\,d\Gamma,
+     * \f]
+     * where $\Gamma_h$ is the immersed integration set, $\gamma$ is
+     * @p penalty_term, and $g$ is @p rhs_function. The basis functions are the
+     * shape functions of @p dh1, evaluated at quadrature points on the immersed
+     * mesh and integrated in the background mesh using the particle-based
+     * quadrature representation.
+     *
+     * The matrix is the penalty block that enforces restriction/Dirichlet data
+     * in a weak sense, while the right-hand side contains the prescribed target
+     * values projected with the same basis.
+     *
+     * @param[in] quadrature Reference quadrature on the immersed cells.
+     * @param[in] rhs_function Prescribed field $g$ in physical coordinates.
+     * @param[in] penalty_term Penalty parameter $\gamma$.
+     * @param[in,out] matrix Global matrix receiving Nitsche penalty entries.
+     * @param[in,out] rhs Global right-hand side receiving penalty forcing.
+     * @param[in] constraints Constraints used in local-to-global distribution.
+     * @param[in] reuse_internal_data_structures If true, reuse cached particle
+     *   data when available.
      */
     template <class MatrixType, class VectorType, typename number = double>
     void
@@ -192,7 +266,7 @@ namespace NonMatching
 
 
       FullMatrix<double> local_matrix(fe1->dofs_per_cell, fe1->dofs_per_cell);
-      dealii::Vector<double> local_rhs(fe1->dofs_per_cell);
+      Vector<double>     local_rhs(fe1->dofs_per_cell);
 
       auto particle = quadrature_particle_handler->begin();
       while (particle != quadrature_particle_handler->end())
@@ -240,6 +314,28 @@ namespace NonMatching
 
 
 
+    /**
+     * Assemble the interpolation/restriction matrix between @p dh1 and @p dh2.
+     *
+     * The assembled matrix $I$ satisfies
+     * \f[
+     * \mathbf{u}_{\mathrm{immersed}} = I\,\mathbf{u}_{\mathrm{background}},
+     * \f]
+     * and has entries
+     * \f[
+     * I_{a i} = \varphi_i(x_a),
+     * \f]
+     * with $x_a$ support points of selected DoFs in @p dh2.
+     *
+     * Significance: this matrix is the discrete trace/transfer operator from
+     * the background field to immersed DoFs. It is typically used for
+     * interpolation constraints, projection-like couplings, and
+     * mixed-dimensional transfer operators.
+     *
+     * @param[in,out] matrix Global matrix with shape
+     *   $(\text{n\_dofs}(dh2),\text{n\_dofs}(dh1))$.
+     * @param[in] constraints Constraints applied during assembly.
+     */
     template <class Matrix, typename number = double>
     void
     create_interpolation_matrix(Matrix                          &matrix,
@@ -252,8 +348,9 @@ namespace NonMatching
           return; // nothing else to do here
         }
 
-      AssertDimension(matrix.n(), dh1->n_dofs());
+      // Expect: matrix rows = dofs on dh2, matrix columns = dofs on dh1.
       AssertDimension(matrix.m(), dh2->n_dofs());
+      AssertDimension(matrix.n(), dh1->n_dofs());
 
       auto       particle = particle_handler->begin();
       const auto max_particles_per_cell =
@@ -278,6 +375,7 @@ namespace NonMatching
           const auto n_particles = particle_handler->n_particles_in_cell(cell);
           dof_indices2.resize(n_particles * n_comps);
           local_matrix.reinit({n_particles * n_comps, fe1->dofs_per_cell});
+          local_matrix = 0;
 
           Assert(pic.begin() == particle, ExcInternalError());
           for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
@@ -311,6 +409,14 @@ namespace NonMatching
       matrix.compress(VectorOperation::add);
     }
 
+    /**
+     * Return the particle handler representing immersed support points mapped
+     * into the background triangulation.
+     *
+     * Particles store, in their properties, ownership metadata and selected
+     * DoF indices of @p dh2 used to build interpolation sparsity and matrix
+     * entries.
+     */
     const Particles::ParticleHandler<spacedim> &
     get_particle_handler() const
     {
@@ -320,6 +426,13 @@ namespace NonMatching
       return *particle_handler;
     }
 
+    /**
+     * Return the quadrature particle handler used for immersed integration.
+     *
+     * Particles represent physical quadrature points on the immersed mesh,
+     * located in the background mesh, and store at least $JxW$ in their
+     * properties (and normals when `dim < spacedim`).
+     */
     const Particles::ParticleHandler<spacedim> &
     get_quadrature_particle_handler() const
     {
@@ -329,11 +442,36 @@ namespace NonMatching
       return *quadrature_particle_handler;
     }
 
+    /**
+     * Lazily create particle-based internal data structures.
+     *
+     * If @p quadrature is empty, the function builds @ref particle_handler from
+     * support points of selected @p dh2 DoFs. Otherwise, it builds
+     * @ref quadrature_particle_handler from immersed quadrature points and stores
+     * geometric weights (and normals in codimension one).
+     *
+     * @param[in] reuse_internal_data_structures If true, skip re-creation when
+     *   handlers are already available.
+     * @param[in] quadrature Optional quadrature rule used to generate
+     *   integration particles.
+     */
     void
     possibly_generate_particle_handler(
       bool                   reuse_internal_data_structures,
       const Quadrature<dim> &quadrature = Quadrature<dim>()) const;
 
+    /**
+     * Set positions of quadrature particles using an explicit vector.
+     *
+     * This updates quadrature-point particle positions used in immersed
+     * integration. With @p displace_particles set to true, values are treated
+     * as displacements; otherwise they are interpreted as absolute coordinates.
+     *
+     * @param[in] positions_vector New positions/displacements, one per local
+     *   quadrature particle.
+     * @param[in] displace_particles Interpret @p positions_vector as
+     *   displacements (true) or absolute coordinates (false).
+     */
     void
     set_quadrature_particles_positions(
       const std::vector<Tensor<1, spacedim>> &positions_vector,
@@ -347,9 +485,15 @@ namespace NonMatching
     }
 
     /**
-     * Displace the particles of the quadrature_particle_handler using a
-     * vector of Tensor<1,spacedim> of size
-     * quadrature_particle_handler.n_local_particles()
+     * Set positions of interpolation particles using an explicit vector.
+     *
+     * This updates support-point particles used by interpolation sparsity and
+     * interpolation matrix assembly.
+     *
+     * @param[in] positions_vector New positions/displacements, one per local
+     *   interpolation particle.
+     * @param[in] displace_particles Interpret @p positions_vector as
+     *   displacements (true) or absolute coordinates (false).
      */
     void
     set_particles_positions(
@@ -364,8 +508,12 @@ namespace NonMatching
     }
 
     /**
-     * Displace the particles of the quadrature particle_handler using a
-     * function
+     * Set quadrature-particle positions from a vector-valued function.
+     *
+     * @param[in] function Function prescribing displacements or absolute
+     *   coordinates.
+     * @param[in] displace_particles Interpret @p function as displacement field
+     *   (true) or position field (false).
      */
     void
     set_quadrature_particles_positions(
@@ -377,8 +525,12 @@ namespace NonMatching
     }
 
     /**
-     * Displace the particles of the particle_handler using a
-     * function
+     * Set interpolation-particle positions from a vector-valued function.
+     *
+     * @param[in] function Function prescribing displacements or absolute
+     *   coordinates.
+     * @param[in] displace_particles Interpret @p function as displacement field
+     *   (true) or position field (false).
      */
     void
     set_particles_positions(const Function<spacedim> &function,
@@ -389,44 +541,87 @@ namespace NonMatching
 
 
   private:
-    ObserverPointer<const Mapping<spacedim>>      mapping1;
+    /** Mapping used to evaluate shape functions on the background mesh. */
+    ObserverPointer<const Mapping<spacedim>> mapping1;
+    /** Mapping used to evaluate shape functions and quadrature on the immersed
+     * mesh. */
     ObserverPointer<const Mapping<dim, spacedim>> mapping2;
 
-    ObserverPointer<const Triangulation<spacedim>>      tria1;
+    /** Background triangulation carrying space $V_h$. */
+    ObserverPointer<const Triangulation<spacedim>> tria1;
+    /** Immersed triangulation carrying space $W_h$. */
     ObserverPointer<const Triangulation<dim, spacedim>> tria2;
 
-    ObserverPointer<const DoFHandler<spacedim>>      dh1;
+    /** DoFHandler for the background/source finite element space. */
+    ObserverPointer<const DoFHandler<spacedim>> dh1;
+    /** DoFHandler for the immersed/target finite element space. */
     ObserverPointer<const DoFHandler<dim, spacedim>> dh2;
 
-    ObserverPointer<const FiniteElement<spacedim>>      fe1;
+    /** Finite element of @ref dh1 defining basis functions $\varphi_i$. */
+    ObserverPointer<const FiniteElement<spacedim>> fe1;
+    /** Finite element of @ref dh2 defining basis functions $\psi_a$. */
     ObserverPointer<const FiniteElement<dim, spacedim>> fe2;
 
-    std::unique_ptr<const GridTools::Cache<spacedim>>      cache1_ptr;
+    /** Optional ownership of internally created cache for @ref tria1. */
+    std::unique_ptr<const GridTools::Cache<spacedim>> cache1_ptr;
+    /** Optional ownership of internally created cache for @ref tria2. */
     std::unique_ptr<const GridTools::Cache<dim, spacedim>> cache2_ptr;
 
-    ObserverPointer<const GridTools::Cache<spacedim>>      cache1;
+    /** Geometric search cache associated with @ref tria1. */
+    ObserverPointer<const GridTools::Cache<spacedim>> cache1;
+    /** Geometric search cache associated with @ref tria2. */
     ObserverPointer<const GridTools::Cache<dim, spacedim>> cache2;
 
+    /**
+     * Cached cell/quadrature pairs for immersed-surface integration kernels.
+     */
     std::vector<std::pair<typename DoFHandler<spacedim>::cell_iterator,
                           ImmersedSurfaceQuadrature<spacedim>>>
       cells_and_quadratures;
 
+    /** Active component mask for background DoFs. */
     ComponentMask comps1;
+    /** Active component mask for immersed DoFs. */
     ComponentMask comps2;
 
+    /** Number of coupled components:
+     * $\min(\#\mathrm{comps1},\#\mathrm{comps2})$. */
     unsigned int n_comps;
+    /** Rank of the current MPI process in @ref communicator. */
     unsigned int mpi_proc;
+    /** Number of MPI processes participating in @ref communicator. */
     unsigned int n_mpi_procs;
-    MPI_Comm     communicator;
+    /** MPI communicator used by the background triangulation. */
+    MPI_Comm communicator;
 
+    /**
+     * Background global-to-localized component map: for each FE component of
+     * @ref fe1, stores the contiguous coupled-component index or
+     * `numbers::invalid_unsigned_int` if inactive.
+     */
     std::vector<unsigned int> gtl1;
+    /**
+     * Immersed global-to-localized component map analogous to @ref gtl1.
+     */
     std::vector<unsigned int> gtl2;
 
+    /**
+     * Bounding boxes of locally owned background cells on all MPI ranks,
+     * used to route particles to owning processes.
+     */
     std::vector<std::vector<BoundingBox<spacedim>>> global_bounding_boxes;
 
+    /**
+     * Particle representation of immersed support points used for
+     * interpolation matrix/sparsity construction.
+     */
     mutable std::unique_ptr<Particles::ParticleHandler<spacedim>>
       particle_handler;
 
+    /**
+     * Particle representation of immersed quadrature points used for Nitsche
+     * and other quadrature-based coupling terms.
+     */
     mutable std::unique_ptr<Particles::ParticleHandler<spacedim>>
       quadrature_particle_handler;
   };
