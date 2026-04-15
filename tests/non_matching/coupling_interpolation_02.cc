@@ -26,9 +26,8 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
-#include <deal.II/lac/sparse_direct.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparsity_pattern.h>
 
 #include <deal.II/non_matching/coupling.h>
 #include <deal.II/non_matching/dof_handler_coupling.h>
@@ -74,24 +73,22 @@ test()
 
   NonMatching::DoFHandlerCoupling<dim, spacedim> dhc(dh1, dh2);
 
+  const auto locally_owned1    = dh1.locally_owned_dofs();
   const auto locally_owned2    = dh2.locally_owned_dofs();
   IndexSet   locally_relevant2 = DoFTools::extract_locally_relevant_dofs(dh2);
-  const auto globally_owned2 =
-    Utilities::MPI::all_gather(MPI_COMM_WORLD, locally_owned2.n_elements());
 
-  SparsityPattern sparsity;
+  TrilinosWrappers::SparseMatrix matrix;
   {
-    DynamicSparsityPattern dsp(locally_relevant2);
+    DynamicSparsityPattern dsp(dh2.n_dofs(), dh1.n_dofs(), locally_relevant2);
     dhc.create_interpolation_sparsity_pattern(dsp);
 
     SparsityTools::distribute_sparsity_pattern(dsp,
-                                               globally_owned2,
+                                               locally_owned2,
                                                MPI_COMM_WORLD,
                                                locally_relevant2);
-    sparsity.copy_from(dsp);
+    matrix.reinit(locally_owned2, locally_owned1, dsp, MPI_COMM_WORLD);
   }
 
-  SparseMatrix<double> matrix(sparsity);
   dhc.create_interpolation_matrix(matrix);
   matrix.print(deallog.get_file_stream());
 }
