@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_fe_tools_extrapolate_templates_H
-#define dealii_fe_tools_extrapolate_templates_H
+#ifndef dealii_fe_tools_extrapolate_templates_h
+#define dealii_fe_tools_extrapolate_templates_h
 
 
 #include <deal.II/base/config.h>
