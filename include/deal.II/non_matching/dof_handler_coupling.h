@@ -110,16 +110,6 @@ namespace NonMatching
       const Mapping<dim, spacedim> &mapping2 =
         StaticMappingQ1<dim, spacedim>::mapping);
 
-
-
-    /**
-     * Iterator type over cached pairs of background cells and immersed-surface
-     * quadratures used during geometric coupling setup.
-     */
-    using CellsAndQuadratureIterator = typename std::vector<
-      std::pair<typename DoFHandler<spacedim>::cell_iterator,
-                ImmersedSurfaceQuadrature<spacedim>>>::iterator;
-
     /**
      * Construct a coupling object by creating internal grid caches.
      *
