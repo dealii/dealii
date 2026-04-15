@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_closest_surface_point
-#define dealii_closest_surface_point
+#ifndef dealii_non_matching_closest_surface_point_h
+#define dealii_non_matching_closest_surface_point_h
 
 #include <deal.II/base/config.h>
 

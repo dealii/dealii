@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_non_matching_fe_values
-#define dealii_non_matching_fe_values
+#ifndef dealii_non_matching_fe_values_h
+#define dealii_non_matching_fe_values_h
 
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/observer_pointer.h>

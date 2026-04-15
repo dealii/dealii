@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_trilinos_nox
-#define dealii_trilinos_nox
+#ifndef dealii_trilinos_nox_h
+#define dealii_trilinos_nox_h
 
 #include <deal.II/base/config.h>
 
