@@ -34,11 +34,15 @@
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
+#  include <deal.II/lac/petsc_block_sparse_matrix.h>
+#  include <deal.II/lac/petsc_block_vector.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_vector.h>
 #endif
@@ -676,6 +680,13 @@ private:
    * IndexSet storing the locally owned rows of the matrix.
    */
   IndexSet locally_owned_rows;
+
+  /**
+   * Pointer array for MUMPS block format (ICNTL(15)=1).
+   * blkptr[iblk] gives the 1-based index of the first variable in block iblk.
+   * Dimension: nblk+1.
+   */
+  std::vector<types::mumps_index> blkptr;
 
   /**
    * This function initializes a MUMPS instance and hands over the system's
