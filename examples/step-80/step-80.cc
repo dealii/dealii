@@ -330,7 +330,7 @@ namespace Step80
     unsigned int inner_lagrangian_max_iterations = 1000;
     double       inner_lagrangian_tolerance      = 1e-4;
     bool         log_inner_lagrangian_iterations = false;
-    bool         use_grad_div_stabilization      = false;
+    bool         use_operator_augmentation       = false;
     SolverType   solver_type                     = SolverType::augmented_split;
 
     using PrmFunction =
@@ -495,7 +495,7 @@ namespace Step80
                     inner_lagrangian_tolerance);
       add_parameter("Log inner Lagrangian iterations",
                     log_inner_lagrangian_iterations);
-      add_parameter("Use grad-div stabilization", use_grad_div_stabilization);
+      add_parameter("Use operator augmentation", use_operator_augmentation);
       add_parameter("Solver type", solver_type);
     }
     leave_subsection();
@@ -1218,7 +1218,7 @@ namespace Step80
             coupling[c][d] = DoFTools::none;
           else if (c == spacedim || d == spacedim || c == d)
             coupling[c][d] = DoFTools::always;
-          else if (par.use_grad_div_stabilization && c < spacedim &&
+          else if (par.use_operator_augmentation && c < spacedim &&
                    d < spacedim)
             coupling[c][d] = DoFTools::always;
           else
@@ -1528,7 +1528,7 @@ namespace Step80
                          par.viscosity *
                            scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                         (par.use_grad_div_stabilization ?
+                         (par.use_operator_augmentation ?
                             par.gamma_AL_background * div_phi_u[i] *
                               div_phi_u[j] :
                             0.)) *
@@ -1559,7 +1559,7 @@ namespace Step80
         }
 
     // Add augmented Lagrangian penalty on the immersed domain through particles
-    if (par.use_grad_div_stabilization)
+    if (par.use_operator_augmentation)
       {
         // Generate quadrature particles on the solid mesh, storing JxW as
         // property
@@ -2390,7 +2390,7 @@ namespace Step80
     const auto gamma2 = par.gamma_AL_immersed * time_step;
 
     auto A11_aug = null_operator(A);
-    if (par.use_grad_div_stabilization)
+    if (par.use_operator_augmentation)
       A11_aug = A;
     else
       A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
@@ -2804,7 +2804,7 @@ namespace Step80
               }
           }
 
-        if (cycle == 0 || update_timestep || par.use_grad_div_stabilization)
+        if (cycle == 0 || update_timestep || par.use_operator_augmentation)
           assemble_navier_stokes_system(time_step);
         if (cycle == 0 || update_timestep)
           assemble_elasticity_system(time_step);
@@ -2964,7 +2964,7 @@ namespace Step80
                    par.density * (u_grad[q] * u_val[q]) * phi_i +
                    par.viscosity * scalar_product(u_grad[q], grad_phi_i) -
                    p_val[q] * div_phi_i - psi_i * u_div[q] +
-                   (par.use_grad_div_stabilization ?
+                   (par.use_operator_augmentation ?
                       par.gamma_AL_background * u_div[q] * div_phi_i :
                       0) -
                    par.density * fluid_fe_values.shape_value(i, q) *
