@@ -1643,10 +1643,10 @@ namespace Step80
                         if (comp_j >= spacedim || comp_i != comp_j)
                           continue;
 
-                        local_matrix(i, j) +=
-                          par.gamma_AL_background * time_step * time_step *
-                          fluid_fe->shape_value(i, ref_q) *
-                          fluid_fe->shape_value(j, ref_q) * JxW;
+                        local_matrix(i, j) += par.gamma_AL_background *
+                                              fluid_fe->shape_value(i, ref_q) *
+                                              fluid_fe->shape_value(j, ref_q) *
+                                              JxW;
                       }
                   }
               }
@@ -2340,9 +2340,11 @@ namespace Step80
     const auto Mp = LinOp(fluid_preconditioner.block(1, 1));
 
     const auto K  = LinOp(solid_matrix.block(0, 0));
-    const auto Dt = LinOp(solid_matrix.block(0, 1));
-    const auto D  = LinOp(solid_matrix.block(1, 0));
-    const auto M  = LinOp(solid_matrix.block(1, 1));
+    const auto Dt = LinOp(
+      solid_matrix.block(0, 1)); // C2^T/delta_t (minus sign already included)
+    const auto D = LinOp(
+      solid_matrix.block(1, 0)); // C2/delta_t (minus sign already included)
+    const auto M = LinOp(solid_matrix.block(1, 1));
 
     const auto Pt = LinOp(coupling_interpolation_matrix_transpose.block(0, 0));
     const auto Z1t =
@@ -2360,6 +2362,7 @@ namespace Step80
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
 
+    // now these are with + sign. delta_t in front needed to get right scaling
     auto C  = -time_step * D * P;
     auto Ct = -time_step * Pt * Dt;
 
@@ -2371,17 +2374,17 @@ namespace Step80
     SolverCG<Vec> cg_solver(inner_solver_control);
 
     auto invMp = inverse_operator(Mp, cg_solver, fluid_pressure_preconditioner);
-    const auto invW = linear_operator(M, solid_lagrange_preconditioner);
+    auto invW  = inverse_operator(M, cg_solver, solid_lagrange_preconditioner);
 
     const auto gamma1 = par.gamma_AL_background;
     const auto gamma2 = par.gamma_AL_immersed * time_step;
 
     auto A11_aug = null_operator(A);
     if (par.use_grad_div_stabilization)
-      A11_aug = A + gamma1 * Ct * invW * C;
+      A11_aug = A;
     else
       A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
-    auto A22_aug = (1 / time_step) * K + gamma2 * Dt * invW * D;
+    auto A22_aug = K + gamma2 * Dt * invW * D;
     auto A12_aug = gamma1 * Ct * invW * D;
     auto A21_aug = gamma2 * Dt * invW * C;
 
@@ -2790,11 +2793,10 @@ namespace Step80
               }
           }
 
+        if (cycle == 0 || update_timestep || par.use_grad_div_stabilization)
+          assemble_navier_stokes_system(time_step);
         if (cycle == 0 || update_timestep)
-          {
-            assemble_navier_stokes_system(time_step);
-            assemble_elasticity_system(time_step);
-          }
+          assemble_elasticity_system(time_step);
 
         assemble_navier_stokes_rhs(time_step);
         assemble_elasticity_rhs(time_step);
