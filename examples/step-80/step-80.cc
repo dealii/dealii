@@ -1448,7 +1448,8 @@ namespace Step80
           fluid_owned_dofs[i],
           solid_owned_dofs[j],
           dsp.block(i, j),
-          mpi_communicator);
+          mpi_communicator,
+          true);
     coupling_interpolation_matrix_transpose.collect_sizes();
 
     coupling_interpolation_matrix.clear();
@@ -1459,7 +1460,8 @@ namespace Step80
         coupling_interpolation_matrix.block(i, j).reinit(solid_owned_dofs[i],
                                                          fluid_owned_dofs[j],
                                                          dsp_t.block(i, j),
-                                                         mpi_communicator);
+                                                         mpi_communicator,
+                                                         true);
     coupling_interpolation_matrix.collect_sizes();
   }
 
@@ -1839,9 +1841,17 @@ namespace Step80
         }
     solid_matrix.compress(VectorOperation::add);
 
-    solid_displacement_preconditioner.initialize(
-      solid_matrix.block(0, 0),
-      make_amg_additional_data(solid_fe->degree, true));
+    // Provide the rigid-body translational modes (near-null-space) to the
+    // elasticity AMG preconditioner. Without these, Trilinos aggregation
+    // across MPI partition boundaries can degenerate
+    auto       disp_amg_data = make_amg_additional_data(solid_fe->degree, true);
+    const auto constant_modes =
+      DoFTools::extract_constant_modes(solid_dh,
+                                       solid_fe->component_mask(displacement));
+    disp_amg_data.constant_modes = constant_modes;
+
+    solid_displacement_preconditioner.initialize(solid_matrix.block(0, 0),
+                                                 disp_amg_data);
     solid_lagrange_preconditioner.initialize(
       solid_matrix.block(1, 1),
       make_amg_additional_data(solid_fe->degree, true));
@@ -2481,6 +2491,7 @@ namespace Step80
           << std::endl;
 
     fluid_constraints.distribute(fluid_solution);
+    solid_constraints.distribute(solid_solution);
 
     if (fluid_constant_pressure.size() == 0)
       {
