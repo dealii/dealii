@@ -871,16 +871,25 @@ namespace FEValuesViews
                     fe_values->present_cell.n_dofs_for_dof_handler());
     AssertDimension(curls.size(), fe_values->n_quadrature_points);
 
-    // get function values of dofs on this cell
-    boost::container::small_vector<Number, 200> dof_values(
-      fe_values->dofs_per_cell);
-    fe_values->present_cell.get_interpolated_dof_values(
-      fe_function, make_array_view(dof_values.begin(), dof_values.end()));
-    internal::do_function_curls<dim, spacedim>(
-      make_array_view(dof_values.cbegin(), dof_values.cend()),
-      fe_values->finite_element_output.shape_gradients,
-      shape_function_data,
-      curls);
+    if constexpr ((dim == 2) || (dim == 3))
+      {
+        // get function values of dofs on this cell
+        boost::container::small_vector<Number, 200> dof_values(
+          fe_values->dofs_per_cell);
+        fe_values->present_cell.get_interpolated_dof_values(
+          fe_function, make_array_view(dof_values.begin(), dof_values.end()));
+        internal::do_function_curls<dim, spacedim>(
+          make_array_view(dof_values.cbegin(), dof_values.cend()),
+          fe_values->finite_element_output.shape_gradients,
+          shape_function_data,
+          curls);
+      }
+    else
+      AssertThrow(false,
+                  ExcMessage("The curl is only defined for vector fields "
+                             "that are either two- or three-dimensional. "
+                             "You cannot ask for the curl for dim=" +
+                             std::to_string(dim) + "."));
   }
 
 

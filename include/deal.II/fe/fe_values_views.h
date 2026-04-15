@@ -27,6 +27,7 @@
 #include <deal.II/lac/read_vector.h>
 
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -49,15 +50,25 @@ namespace internal
    * the curl is a vector that's perpendicular to the manifold; that
    * is, it's a vector whose direction is fixed, and so the only thing
    * that matters is the vector's magnitude and the curl of such a
-   * field is described by a scalar. For 1d or higher dimensions, the
-   * curl is not defined, and so we use a scalar type as a placeholder.
+   * field is described by a scalar.
    *
-   * The second argument denotes the scalar over which the vector
+   * The second template argument denotes the scalar over which the vector
    * field (and correspondingly the curl) is defined.
+   *
+   * @note The curl has no valid meaning for vector fields that are
+   *   not either defined in ${\mathbb R}^3$ or that are two-dimensional
+   *   vector fields on two-dimensional manifolds (perhaps embedded in
+   *   ${\mathbb R}^3$). As a consequence, CurlType is an invalid
+   *   type for `dim==1` or `dim>3`. For this invalid type, the
+   *   declaration here uses std::monostate, an empty class for which
+   *   one can create objects but that does not allow any arithmetic
+   *   to be done on it.
    */
   template <int dim, typename NumberType = double>
-  using CurlType =
-    std::conditional_t<dim == 3, Tensor<1, 3, NumberType>, NumberType>;
+  using CurlType = std::conditional_t<
+    dim == 3,
+    Tensor<1, 3, NumberType>,
+    std::conditional_t<dim == 2, NumberType, std::monostate>>;
 } // namespace internal
 
 

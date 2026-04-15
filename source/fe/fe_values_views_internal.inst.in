@@ -76,6 +76,7 @@ for (S : ALL_SCALAR_TYPES; deal_II_dimension : DIMENSIONS;
           std::vector<Vector<deal_II_dimension, deal_II_space_dimension>::
                         template solution_divergence_type<S>> &);
 
+#    if deal_II_space_dimension >= 2
         template void
         do_function_curls<deal_II_dimension, deal_II_space_dimension, S>(
           const ArrayView<const S> &,
@@ -86,6 +87,7 @@ for (S : ALL_SCALAR_TYPES; deal_II_dimension : DIMENSIONS;
           std::vector<ProductType<
             S,
             dealii::internal::CurlType<deal_II_space_dimension>>::type> &);
+#    endif
 
         template void
         do_function_laplacians<deal_II_dimension, deal_II_space_dimension, S>(
