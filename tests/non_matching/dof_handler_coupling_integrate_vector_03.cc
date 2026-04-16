@@ -71,6 +71,8 @@ test()
 
   QGauss<dim> quadrature(2);
 
+  // For deal.II vectors we need to know the relevant indices at the moment
+  // where we call reinit. So we extract them from the dhc.
   IndexSet locally_relevant_2 = dhc.extract_immersed_dof_indexset(quadrature);
 
   LinearAlgebra::distributed::Vector<double> dst;
