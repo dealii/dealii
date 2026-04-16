@@ -653,6 +653,9 @@ namespace NonMatching
       const std::vector<Tensor<1, spacedim>> &positions_vector,
       const bool                              displace_particles = true) const
     {
+      Assert(quadrature_particle_handler,
+             ExcMessage("You need to call possibly_generate_particle_handler "
+                        "function first."));
       // There should be a position per per local particles
       AssertDimension(positions_vector.size(),
                       quadrature_particle_handler->n_local_particles());
@@ -676,6 +679,9 @@ namespace NonMatching
       const std::vector<Tensor<1, spacedim>> &positions_vector,
       const bool                              displace_particles = true) const
     {
+      Assert(particle_handler,
+             ExcMessage("You need to call possibly_generate_particle_handler "
+                        "function first."));
       // There should be a position per per local particles
       AssertDimension(positions_vector.size(),
                       particle_handler->n_local_particles());
@@ -696,6 +702,9 @@ namespace NonMatching
       const Function<spacedim> &function,
       const bool                displace_particles = true) const
     {
+      Assert(quadrature_particle_handler,
+             ExcMessage("You need to call possibly_generate_particle_handler "
+                        "function first."));
       quadrature_particle_handler->set_particle_positions(function,
                                                           displace_particles);
     }
@@ -712,6 +721,9 @@ namespace NonMatching
     set_particles_positions(const Function<spacedim> &function,
                             const bool displace_particles = true) const
     {
+      Assert(particle_handler,
+             ExcMessage("You need to call possibly_generate_particle_handler "
+                        "function first."));
       particle_handler->set_particle_positions(function, displace_particles);
     }
 
