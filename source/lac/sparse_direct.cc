@@ -1351,230 +1351,25 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                   ExcMessage("The matrix communicator must match the MUMPS "
                              "communicator."));
 
-      // Distributed block matrix case
-      id.icntl[17] = 3; // distributed matrix assembly
+      // extract individual block pointers and delegate to
+      // initialize_matrix_from_individual_blocks()
+      using MatrixBlockType = std::conditional_t<
+        std::is_same_v<Matrix, TrilinosWrappers::BlockSparseMatrix>,
+        TrilinosWrappers::SparseMatrix,
+        PETScWrappers::MPI::SparseMatrix>;
 
       const unsigned int n_block_rows = matrix.n_block_rows();
       const unsigned int n_block_cols = matrix.n_block_cols();
 
-      // Compute row and column offsets for each block
-      std::vector<size_type> row_block_offset(n_block_rows + 1, 0);
-      std::vector<size_type> col_block_offset(n_block_cols + 1, 0);
-      for (unsigned int br = 0; br < n_block_rows; ++br)
-        row_block_offset[br + 1] =
-          row_block_offset[br] + matrix.block(br, 0).m();
-      for (unsigned int bc = 0; bc < n_block_cols; ++bc)
-        col_block_offset[bc + 1] =
-          col_block_offset[bc] + matrix.block(0, bc).n();
-
-      // activate MUMPS block format and describe the block structure
-      id.icntl[14] = 1; // ICNTL(15) = 1:user-provided block format
-      id.nblk      = n_block_rows;
-
-      // blkptr[iblk] gives the position of the first variable in block iblk.
-      blkptr.resize(n_block_rows + 1);
-      for (unsigned int br = 0; br <= n_block_rows; ++br)
-        blkptr[br] = row_block_offset[br] + 1; // 1-based Fortran indexing
-      id.blkptr = blkptr.data();
-
-      // blkvar = nullptr means identity permutation. Variables are assumed to
-      // be already in block order, which is the case for deal.II block matrices
-      // with component-wise DoF renumbering.
-      id.blkvar = nullptr;
-
-      // count total nonzeros across all blocks
-      types::mumps_nnz total_nnz = 0;
+      std::vector<const MatrixBlockType *> block_ptrs(n_block_rows *
+                                                      n_block_cols);
       for (unsigned int br = 0; br < n_block_rows; ++br)
         for (unsigned int bc = 0; bc < n_block_cols; ++bc)
-          total_nnz += matrix.block(br, bc).n_nonzero_elements();
-      id.nnz = total_nnz;
-      nnz    = total_nnz;
+          block_ptrs[br * n_block_cols + bc] = &matrix.block(br, bc);
 
-      // Count local nonzeros and local rows
-      size_type total_local_non_zeros = 0;
-      size_type total_local_rows      = 0;
-
-      for (unsigned int br = 0; br < n_block_rows; ++br)
-        for (unsigned int bc = 0; bc < n_block_cols; ++bc)
-          {
-            const auto &block = matrix.block(br, bc);
-            if constexpr (std::is_same_v<Matrix,
-                                         TrilinosWrappers::BlockSparseMatrix>)
-              total_local_non_zeros += block.trilinos_matrix().NumMyNonzeros();
-            else if constexpr (std::is_same_v<
-                                 Matrix,
-                                 PETScWrappers::MPI::BlockSparseMatrix>)
-              {
-#  ifdef DEAL_II_WITH_PETSC
-                Mat &petsc_mat =
-                  const_cast<PETScWrappers::MPI::SparseMatrix &>(block)
-                    .petsc_matrix();
-                MatInfo info;
-                MatGetInfo(petsc_mat, MAT_LOCAL, &info);
-                total_local_non_zeros += static_cast<size_type>(info.nz_used);
-#  endif
-              }
-          }
-
-      for (unsigned int br = 0; br < n_block_rows; ++br)
-        {
-          const auto &block = matrix.block(br, 0);
-          if constexpr (std::is_same_v<Matrix,
-                                       TrilinosWrappers::BlockSparseMatrix>)
-            total_local_rows += block.trilinos_matrix().NumMyRows();
-          else if constexpr (std::is_same_v<
-                               Matrix,
-                               PETScWrappers::MPI::BlockSparseMatrix>)
-            {
-#  ifdef DEAL_II_WITH_PETSC
-              Mat &petsc_mat =
-                const_cast<PETScWrappers::MPI::SparseMatrix &>(block)
-                  .petsc_matrix();
-              PetscInt rstart, rend;
-              MatGetOwnershipRange(petsc_mat, &rstart, &rend);
-              total_local_rows += (rend - rstart);
-#  endif
-            }
-        }
-
-      // Allocate COO arrays
-      irn = std::make_unique<MUMPS_INT[]>(total_local_non_zeros);
-      jcn = std::make_unique<MUMPS_INT[]>(total_local_non_zeros);
-      a   = std::make_unique<double[]>(total_local_non_zeros);
-      irhs_loc.resize(total_local_rows);
-
-      size_type n_non_zero_local = 0;
-      locally_owned_rows         = IndexSet(n);
-      size_type irhs_idx         = 0;
-
-      // Iterate over all blocks and fill coordinate arrays
-      for (unsigned int br = 0; br < n_block_rows; ++br)
-        {
-          const size_type row_offset = row_block_offset[br];
-
-          if constexpr (std::is_same_v<Matrix,
-                                       TrilinosWrappers::BlockSparseMatrix>)
-            {
-              const auto block_owned =
-                matrix.block(br, 0).locally_owned_range_indices();
-
-              for (const auto &local_row_idx : block_owned)
-                locally_owned_rows.add_index(row_offset + local_row_idx);
-
-              for (unsigned int bc = 0; bc < n_block_cols; ++bc)
-                {
-                  const size_type col_offset = col_block_offset[bc];
-                  const auto     &trilinos_mat =
-                    matrix.block(br, bc).trilinos_matrix();
-
-                  for (int local_row = 0; local_row < trilinos_mat.NumMyRows();
-                       ++local_row)
-                    {
-                      int     num_entries;
-                      double *values;
-                      int    *local_cols;
-                      int     ierr = trilinos_mat.ExtractMyRowView(local_row,
-                                                               num_entries,
-                                                               values,
-                                                               local_cols);
-                      (void)ierr;
-                      Assert(ierr == 0,
-                             ExcMessage(
-                               "Error extracting row view from Trilinos block "
-                               "matrix."));
-
-                      const int global_row = trilinos_mat.GRID(local_row);
-
-                      for (int j = 0; j < num_entries; ++j)
-                        {
-                          const int global_col =
-                            trilinos_mat.GCID(local_cols[j]);
-
-                          if (additional_data.symmetric &&
-                              (col_offset + global_col) <
-                                (row_offset + global_row))
-                            continue;
-
-                          irn[n_non_zero_local] = row_offset + global_row + 1;
-                          jcn[n_non_zero_local] = col_offset + global_col + 1;
-                          a[n_non_zero_local]   = values[j];
-                          ++n_non_zero_local;
-                        }
-                    }
-                }
-
-              for (const auto &local_row_idx : block_owned)
-                irhs_loc[irhs_idx++] = row_offset + local_row_idx + 1;
-            }
-          else if constexpr (std::is_same_v<
-                               Matrix,
-                               PETScWrappers::MPI::BlockSparseMatrix>)
-            {
-#  ifdef DEAL_II_WITH_PETSC
-              Mat &first_block_mat =
-                const_cast<PETScWrappers::MPI::SparseMatrix &>(
-                  matrix.block(br, 0))
-                  .petsc_matrix();
-              PetscInt rstart, rend;
-              MatGetOwnershipRange(first_block_mat, &rstart, &rend);
-
-              for (PetscInt i = rstart; i < rend; ++i)
-                locally_owned_rows.add_index(row_offset + i);
-
-              for (unsigned int bc = 0; bc < n_block_cols; ++bc)
-                {
-                  const size_type col_offset = col_block_offset[bc];
-                  Mat            &petsc_mat =
-                    const_cast<PETScWrappers::MPI::SparseMatrix &>(
-                      matrix.block(br, bc))
-                      .petsc_matrix();
-
-                  PetscInt block_rstart, block_rend;
-                  MatGetOwnershipRange(petsc_mat, &block_rstart, &block_rend);
-
-                  for (PetscInt i = block_rstart; i < block_rend; ++i)
-                    {
-                      PetscInt           p_n_cols;
-                      const PetscInt    *cols;
-                      const PetscScalar *values;
-                      MatGetRow(petsc_mat, i, &p_n_cols, &cols, &values);
-
-                      for (PetscInt j = 0; j < p_n_cols; ++j)
-                        {
-                          if (additional_data.symmetric &&
-                              (col_offset + cols[j]) < (row_offset + i))
-                            continue;
-
-                          irn[n_non_zero_local] = row_offset + i + 1;
-                          jcn[n_non_zero_local] = col_offset + cols[j] + 1;
-                          a[n_non_zero_local]   = values[j];
-                          ++n_non_zero_local;
-                        }
-                      MatRestoreRow(petsc_mat, i, &p_n_cols, &cols, &values);
-                    }
-                }
-
-              for (PetscInt i = rstart; i < rend; ++i)
-                irhs_loc[irhs_idx++] = row_offset + i + 1;
-#  endif
-            }
-        }
-
-      locally_owned_rows.compress();
-
-      // Hand over local arrays to MUMPS
-      id.nnz_loc  = n_non_zero_local;
-      id.irn_loc  = irn.get();
-      id.jcn_loc  = jcn.get();
-      id.a_loc    = a.get();
-      id.irhs_loc = irhs_loc.data();
-
-      // rhs parameters
-      id.icntl[19] = 10; // distributed rhs
-      id.icntl[20] = 0;  // centralized solution, stored on rank 0 by MUMPS
-      id.nrhs      = 1;
-      id.lrhs_loc  = n;
-      id.nloc_rhs  = locally_owned_rows.n_elements();
+      initialize_matrix_from_individual_blocks(block_ptrs,
+                                               n_block_rows,
+                                               n_block_cols);
     }
   else
     {
@@ -1636,10 +1431,10 @@ SparseDirectMUMPS::initialize(const Matrix &matrix)
 
 
 
-template <class BlockMatrixType>
+template <class MatrixBlockType>
 void
 SparseDirectMUMPS::initialize_from_individual_blocks(
-  const std::vector<const BlockMatrixType *> &blocks,
+  const std::vector<const MatrixBlockType *> &blocks,
   const unsigned int                          n_block_rows,
   const unsigned int                          n_block_cols)
 {
@@ -1652,10 +1447,10 @@ SparseDirectMUMPS::initialize_from_individual_blocks(
 
 
 
-template <class BlockMatrixType>
+template <class MatrixBlockType>
 void
 SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
-  const std::vector<const BlockMatrixType *> &blocks,
+  const std::vector<const MatrixBlockType *> &blocks,
   const unsigned int                          n_block_rows,
   const unsigned int                          n_block_cols)
 {
@@ -1670,7 +1465,7 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
   for (unsigned int br = 0; br < n_block_rows; ++br)
     for (unsigned int bc = 0; bc < n_block_cols; ++bc)
       {
-        const BlockMatrixType *block = blocks[br * n_block_cols + bc];
+        const MatrixBlockType *block = blocks[br * n_block_cols + bc];
         if (block != nullptr)
           {
             if (block_row_size[br] == 0)
@@ -1721,7 +1516,7 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
   for (unsigned int br = 0; br < n_block_rows; ++br)
     for (unsigned int bc = 0; bc < n_block_cols; ++bc)
       {
-        const BlockMatrixType *block = blocks[br * n_block_cols + bc];
+        const MatrixBlockType *block = blocks[br * n_block_cols + bc];
         if (block != nullptr)
           total_nnz += block->n_nonzero_elements();
       }
@@ -1735,21 +1530,21 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
   for (unsigned int br = 0; br < n_block_rows; ++br)
     for (unsigned int bc = 0; bc < n_block_cols; ++bc)
       {
-        const BlockMatrixType *block = blocks[br * n_block_cols + bc];
+        const MatrixBlockType *block = blocks[br * n_block_cols + bc];
         if (block == nullptr)
           continue;
 
-        if constexpr (std::is_same_v<BlockMatrixType,
+        if constexpr (std::is_same_v<MatrixBlockType,
                                      TrilinosWrappers::SparseMatrix>)
           {
             total_local_non_zeros += block->trilinos_matrix().NumMyNonzeros();
           }
-        else if constexpr (std::is_same_v<BlockMatrixType,
+        else if constexpr (std::is_same_v<MatrixBlockType,
                                           PETScWrappers::MPI::SparseMatrix>)
           {
 #  ifdef DEAL_II_WITH_PETSC
             Mat &petsc_mat =
-              const_cast<BlockMatrixType &>(*block).petsc_matrix();
+              const_cast<MatrixBlockType &>(*block).petsc_matrix();
             MatInfo info;
             MatGetInfo(petsc_mat, MAT_LOCAL, &info);
             total_local_non_zeros += static_cast<size_type>(info.nz_used);
@@ -1764,7 +1559,7 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
   for (unsigned int br = 0; br < n_block_rows; ++br)
     {
       // Find the first non-null block in this row to determine local rows
-      const BlockMatrixType *first_block = nullptr;
+      const MatrixBlockType *first_block = nullptr;
       for (unsigned int bc = 0; bc < n_block_cols; ++bc)
         {
           first_block = blocks[br * n_block_cols + bc];
@@ -1774,17 +1569,17 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
       if (first_block == nullptr)
         continue;
 
-      if constexpr (std::is_same_v<BlockMatrixType,
+      if constexpr (std::is_same_v<MatrixBlockType,
                                    TrilinosWrappers::SparseMatrix>)
         {
           total_local_rows += first_block->trilinos_matrix().NumMyRows();
         }
-      else if constexpr (std::is_same_v<BlockMatrixType,
+      else if constexpr (std::is_same_v<MatrixBlockType,
                                         PETScWrappers::MPI::SparseMatrix>)
         {
 #  ifdef DEAL_II_WITH_PETSC
           Mat &petsc_mat =
-            const_cast<BlockMatrixType &>(*first_block).petsc_matrix();
+            const_cast<MatrixBlockType &>(*first_block).petsc_matrix();
           PetscInt rstart, rend;
           MatGetOwnershipRange(petsc_mat, &rstart, &rend);
           total_local_rows += (rend - rstart);
@@ -1807,11 +1602,11 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
     {
       const size_type row_offset = row_block_offset[br];
 
-      if constexpr (std::is_same_v<BlockMatrixType,
+      if constexpr (std::is_same_v<MatrixBlockType,
                                    TrilinosWrappers::SparseMatrix>)
         {
           // Find the first non-null block in this row to get owned rows
-          const BlockMatrixType *first_block = nullptr;
+          const MatrixBlockType *first_block = nullptr;
           for (unsigned int bc = 0; bc < n_block_cols; ++bc)
             {
               first_block = blocks[br * n_block_cols + bc];
@@ -1828,7 +1623,7 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
 
           for (unsigned int bc = 0; bc < n_block_cols; ++bc)
             {
-              const BlockMatrixType *block = blocks[br * n_block_cols + bc];
+              const MatrixBlockType *block = blocks[br * n_block_cols + bc];
               if (block == nullptr)
                 continue;
 
@@ -1871,12 +1666,12 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
           for (const auto &local_row_idx : block_owned)
             irhs_loc[irhs_idx++] = row_offset + local_row_idx + 1;
         }
-      else if constexpr (std::is_same_v<BlockMatrixType,
+      else if constexpr (std::is_same_v<MatrixBlockType,
                                         PETScWrappers::MPI::SparseMatrix>)
         {
 #  ifdef DEAL_II_WITH_PETSC
           // Find the first non-null block in this row
-          const BlockMatrixType *first_block = nullptr;
+          const MatrixBlockType *first_block = nullptr;
           for (unsigned int bc = 0; bc < n_block_cols; ++bc)
             {
               first_block = blocks[br * n_block_cols + bc];
@@ -1887,7 +1682,7 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
             continue;
 
           Mat &first_block_mat =
-            const_cast<BlockMatrixType &>(*first_block).petsc_matrix();
+            const_cast<MatrixBlockType &>(*first_block).petsc_matrix();
           PetscInt rstart, rend;
           MatGetOwnershipRange(first_block_mat, &rstart, &rend);
 
@@ -1896,13 +1691,13 @@ SparseDirectMUMPS::initialize_matrix_from_individual_blocks(
 
           for (unsigned int bc = 0; bc < n_block_cols; ++bc)
             {
-              const BlockMatrixType *block = blocks[br * n_block_cols + bc];
+              const MatrixBlockType *block = blocks[br * n_block_cols + bc];
               if (block == nullptr)
                 continue;
 
               const size_type col_offset = col_block_offset[bc];
               Mat            &petsc_mat =
-                const_cast<BlockMatrixType &>(*block).petsc_matrix();
+                const_cast<MatrixBlockType &>(*block).petsc_matrix();
 
               PetscInt block_rstart, block_rend;
               MatGetOwnershipRange(petsc_mat, &block_rstart, &block_rend);

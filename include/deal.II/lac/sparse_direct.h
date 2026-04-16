@@ -610,30 +610,29 @@ public:
    * square, i.e. the sum of block row sizes must equal the sum of block column
    * sizes.
    *
-   * @p BlockMatrixType is the type of the individual sparse matrices (e.g.
+   * @p MatrixBlockType is the type of the individual sparse matrices (e.g.
    * <tt>TrilinosWrappers::SparseMatrix</tt> or
    * <tt>PETScWrappers::MPI::SparseMatrix</tt>).
    *
    * Null pointers are allowed and are treated as zero blocks. The corresponding
-   * block is simply skipped during assembly. The block dimensions are inferred
-   * from the non-null blocks in the same row/column position.
+   * block is simply skipped during copying information into MUMPS data
+   * structures. The block dimensions are inferred from the non-null blocks in
+   * the same row/column position.
    *
-   *If case of a 2 by 2 block system for Stokes problem, the usage looks as
-   *follows:
+   * In the case of a 2 by 2 block Stokes system, the usage looks as follows:
    * @code
-   *     std::vector<const PETScWrappers::MPI::SparseMatrix *> blocks = {
-      &system_matrix.block(0, 0),
-      &system_matrix.block(0, 1),
-      &system_matrix.block(1, 0),
-      nullptr};
-    solver.initialize_from_individual_blocks(blocks, 2, 2);
-   sparse_direct.initialize_from_individual_blocks(blocks, 2, 2);
+   * std::vector<const PETScWrappers::MPI::SparseMatrix *> blocks = {
+   *   &system_matrix.block(0, 0),
+   *   &system_matrix.block(0, 1),
+   *   &system_matrix.block(1, 0),
+   *   nullptr};
+   * solver.initialize_from_individual_blocks(blocks, 2, 2);
    * @endcode
    */
-  template <class BlockMatrixType>
+  template <class MatrixBlockType>
   void
   initialize_from_individual_blocks(
-    const std::vector<const BlockMatrixType *> &blocks,
+    const std::vector<const MatrixBlockType *> &blocks,
     const unsigned int                          n_block_rows,
     const unsigned int                          n_block_cols);
 
@@ -720,9 +719,14 @@ private:
   IndexSet locally_owned_rows;
 
   /**
-   * Pointer array for MUMPS block format (ICNTL(15)=1).
+   * Integer pointer array exploited by MUMPS when the input matrix is in block
+   * format (ICNTL(15)=1).
    * blkptr[iblk] gives the 1-based index of the first variable in block iblk.
-   * Dimension: nblk+1.
+   * The dimension of this vector is nblk+1, where nblk is the number of blocks
+   * in the matrix.
+   *
+   * @note This variable is used only if the MUMPS option ICNTL(15) is set to
+   * 1, which means that the matrix is stored in a user-provided block format.
    */
   std::vector<types::mumps_index> blkptr;
 
@@ -738,10 +742,10 @@ private:
    * This function initializes a MUMPS instance from individual block matrices
    * stored in a row-major order. Used by initialize_from_individual_blocks().
    */
-  template <class BlockMatrixType>
+  template <class MatrixBlockType>
   void
   initialize_matrix_from_individual_blocks(
-    const std::vector<const BlockMatrixType *> &blocks,
+    const std::vector<const MatrixBlockType *> &blocks,
     const unsigned int                          n_block_rows,
     const unsigned int                          n_block_cols);
 
