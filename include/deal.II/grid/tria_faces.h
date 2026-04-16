@@ -69,6 +69,22 @@ namespace internal
       allocate(const std::size_t n_lines, const std::size_t n_quads);
 
       /**
+       * Allocate space at the end of each array for new quads and populate
+       * the new values with default values.
+       *
+       * @param[in] new_quads_in_pairs Number of new quads which should
+       *            be added as pairs.
+       *
+       * @param[in] new_quads_single Number of new quads which should be
+       *            added alone (i.e., not in pairs).
+       *
+       * @note If `dim < 3` then this function does nothing.
+       */
+      void
+      allocate_end(const std::size_t new_quads_in_pairs,
+                   const std::size_t new_quads_single);
+
+      /**
        * Maximum number of lines for each quad (i.e., face of a 3d cell).
        * Only used for `dim == 3`.
        */

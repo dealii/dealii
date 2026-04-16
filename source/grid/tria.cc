@@ -2005,91 +2005,6 @@ namespace internal
       << " appears multiple times with different (valid) " << arg5
       << ". This is not allowed.");
 
-    /*
-     * Reserve space for TriaFaces. Details:
-     *
-     * Reserve space for line_orientations.
-     *
-     * @note Used only for dim=3.
-     */
-    template <int dim>
-    void
-    reserve_space(TriaFaces<dim>    &tria_faces,
-                  const unsigned int new_quads_in_pairs,
-                  const unsigned int new_quads_single)
-    {
-      AssertDimension(dim, 3);
-
-      Assert(new_quads_in_pairs % 2 == 0, ExcInternalError());
-
-      unsigned int next_free_single = 0;
-      unsigned int next_free_pair   = 0;
-
-      // count the number of objects, of unused single objects and of
-      // unused pairs of objects
-      unsigned int n_quads          = 0;
-      unsigned int n_unused_pairs   = 0;
-      unsigned int n_unused_singles = 0;
-      for (unsigned int i = 0; i < tria_faces.quads.used.size(); ++i)
-        {
-          if (tria_faces.quads.used[i])
-            ++n_quads;
-          else if (i + 1 < tria_faces.quads.used.size())
-            {
-              if (tria_faces.quads.used[i + 1])
-                {
-                  ++n_unused_singles;
-                  if (next_free_single == 0)
-                    next_free_single = i;
-                }
-              else
-                {
-                  ++n_unused_pairs;
-                  if (next_free_pair == 0)
-                    next_free_pair = i;
-                  ++i;
-                }
-            }
-          else
-            ++n_unused_singles;
-        }
-      Assert(n_quads + 2 * n_unused_pairs + n_unused_singles ==
-               tria_faces.quads.used.size(),
-             ExcInternalError());
-
-      // how many single quads are needed in addition to n_unused_quads?
-      const int additional_single_quads = new_quads_single - n_unused_singles;
-
-      unsigned int new_size =
-        tria_faces.quads.used.size() + new_quads_in_pairs - 2 * n_unused_pairs;
-      if (additional_single_quads > 0)
-        new_size += additional_single_quads;
-
-      // see above...
-      if (new_size > tria_faces.quads.n_objects())
-        {
-          // reserve the field of the derived class
-          tria_faces.quads_line_orientations.resize(
-            new_size * tria_faces.quads.faces_per_object, true);
-
-          auto &q_is_q = tria_faces.quad_is_quadrilateral;
-          q_is_q.reserve(new_size);
-          q_is_q.insert(q_is_q.end(), new_size - q_is_q.size(), true);
-        }
-    }
-
-
-
-    /**
-     * Reserve space for TriaLevel. Details:
-     *
-     * Reserve enough space to accommodate @p total_cells cells on this
-     * level. Since there are no @p used flags on this level, you have to
-     * give the total number of cells, not only the number of newly to
-     * accommodate ones, like in the <tt>TriaLevel<N>::reserve_space</tt>
-     * functions, with <tt>N>0</tt>.
-     */
-
     /**
      * Exception
      */
@@ -6579,9 +6494,8 @@ namespace internal
               needed_vertices += 1;
             }
 
-          reserve_space(*triangulation.faces,
-                        needed_faces_pair,
-                        needed_faces_single);
+          triangulation.faces->allocate_end(needed_faces_pair,
+                                            needed_faces_single);
           triangulation.faces->lines.allocate_end(needed_lines_pair,
                                                   needed_lines_single);
           triangulation.faces->quads.allocate_end(needed_faces_pair,
@@ -8226,9 +8140,8 @@ namespace internal
                                                 needed_lines_single);
 
         // reserve space for needed_quads new quads stored in pairs
-        reserve_space(*triangulation.faces,
-                      needed_quads_pair,
-                      needed_quads_single);
+        triangulation.faces->allocate_end(needed_quads_pair,
+                                          needed_quads_single);
         triangulation.faces->quads.allocate_end(needed_quads_pair,
                                                 needed_quads_single);
 
