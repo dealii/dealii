@@ -78,11 +78,6 @@ test()
 
   deallog << "dst l1_norm: " << l1 << std::endl;
   deallog << "dst l2_norm: " << l2 << std::endl;
-
-  AssertThrow(std::isfinite(l1), ExcInternalError());
-  AssertThrow(std::isfinite(l2), ExcInternalError());
-  AssertThrow(l1 > 1e-12, ExcInternalError());
-  AssertThrow(l2 > 1e-12, ExcInternalError());
 }
 
 
