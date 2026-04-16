@@ -600,6 +600,44 @@ public:
   initialize(const Matrix &matrix);
 
   /**
+   * Initialize the MUMPS solver from individual block matrices. The blocks are
+   * provided as a flat vector ordered row-major. In case of a 2 by 2 block
+   * system, the vector must contain 4 pointers to individual sparse matrices,
+   * stored as <tt>{A,B,C,D}</tt>.
+   *
+   * This is useful when the individual blocks have been assembled separately
+   * rather than into a monolithic block matrix. The overall system must be
+   * square, i.e. the sum of block row sizes must equal the sum of block column
+   * sizes.
+   *
+   * @p BlockMatrixType is the type of the individual sparse matrices (e.g.
+   * <tt>TrilinosWrappers::SparseMatrix</tt> or
+   * <tt>PETScWrappers::MPI::SparseMatrix</tt>).
+   *
+   * Null pointers are allowed and are treated as zero blocks. The corresponding
+   * block is simply skipped during assembly. The block dimensions are inferred
+   * from the non-null blocks in the same row/column position.
+   *
+   *If case of a 2 by 2 block system for Stokes problem, the usage looks as
+   *follows:
+   * @code
+   *     std::vector<const PETScWrappers::MPI::SparseMatrix *> blocks = {
+      &system_matrix.block(0, 0),
+      &system_matrix.block(0, 1),
+      &system_matrix.block(1, 0),
+      nullptr};
+    solver.initialize_from_individual_blocks(blocks, 2, 2);
+   sparse_direct.initialize_from_individual_blocks(blocks, 2, 2);
+   * @endcode
+   */
+  template <class BlockMatrixType>
+  void
+  initialize_from_individual_blocks(
+    const std::vector<const BlockMatrixType *> &blocks,
+    const unsigned int                          n_block_rows,
+    const unsigned int                          n_block_cols);
+
+  /**
    * Apply the inverse of the matrix to the input vector <tt>src</tt> and store
    * the solution in the output vector <tt>dst</tt>.
    */
@@ -695,6 +733,17 @@ private:
   template <class Matrix>
   void
   initialize_matrix(const Matrix &matrix);
+
+  /**
+   * This function initializes a MUMPS instance from individual block matrices
+   * stored in a row-major order. Used by initialize_from_individual_blocks().
+   */
+  template <class BlockMatrixType>
+  void
+  initialize_matrix_from_individual_blocks(
+    const std::vector<const BlockMatrixType *> &blocks,
+    const unsigned int                          n_block_rows,
+    const unsigned int                          n_block_cols);
 
   /**
    * Copy the computed solution into the solution vector.
