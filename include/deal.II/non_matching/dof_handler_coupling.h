@@ -171,7 +171,7 @@ namespace NonMatching
         {
           const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
-            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
           dh_cell->get_dof_indices(dof_indices1);
 
           const auto pic         = particle_handler->particles_in_cell(cell);
@@ -263,7 +263,7 @@ namespace NonMatching
           local_rhs        = 0;
           const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
-            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
           dh_cell->get_dof_indices(dof_indices1);
 
           const auto pic = quadrature_particle_handler->particles_in_cell(cell);
@@ -356,7 +356,7 @@ namespace NonMatching
         {
           const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
-            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
           dh_cell->get_dof_indices(dof_indices1);
 
           const auto pic         = particle_handler->particles_in_cell(cell);
@@ -393,6 +393,163 @@ namespace NonMatching
                                                  dof_indices2,
                                                  dof_indices1,
                                                  matrix);
+        }
+      matrix.compress(VectorOperation::add);
+    }
+
+    /**
+     * Build the sparsity pattern for the coupling mass matrix.
+     *
+     * The resulting sparsity pattern has the same layout as the matrix
+     * assembled by create_coupling_mass_matrix(), i.e., rows correspond to
+     * DoFs of @p dh2 and columns to DoFs of @p dh1. For each quadrature
+     * particle, entries $(a, i)$ are inserted for all component-matching
+     * pairs of immersed DoF $a$ and background DoF $i$.
+     *
+     * @param[in] quadrature Reference quadrature on the immersed cells.
+     * @param[out] sparsity Sparsity pattern to be filled.
+     * @param[in] constraints Constraints used while inserting entries.
+     * @param[in] reuse_internal_data_structures If true, reuse cached particle
+     *   data when available.
+     */
+    template <class Sparsity, typename number = double>
+    void
+    create_coupling_mass_sparsity_pattern(
+      const Quadrature<dim>           &quadrature,
+      Sparsity                        &sparsity,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>(),
+      const bool reuse_internal_data_structures = false) const
+    {
+      possibly_generate_particle_handler(reuse_internal_data_structures,
+                                         quadrature);
+
+      std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
+
+      auto particle = quadrature_particle_handler->begin();
+      while (particle != quadrature_particle_handler->end())
+        {
+          const auto &cell = particle->get_surrounding_cell();
+          const auto &dh1_cell =
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
+          dh1_cell->get_dof_indices(dof_indices1);
+
+          const auto pic = quadrature_particle_handler->particles_in_cell(cell);
+
+          for (; particle != pic.end(); ++particle)
+            {
+              const auto &properties = particle->get_properties();
+
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                dof_indices2[i] = unpack_quadrature_dof_index(properties, i);
+
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                {
+                  const auto comp_i =
+                    gtl2[fe2->system_to_component_index(i).first];
+                  if (comp_i != numbers::invalid_unsigned_int &&
+                      comp_i < n_comps)
+                    for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
+                      {
+                        const auto comp_j =
+                          gtl1[fe1->system_to_component_index(j).first];
+                        if (comp_j == comp_i)
+                          constraints.add_entries_local_to_global(
+                            {dof_indices2[i]}, {dof_indices1[j]}, sparsity);
+                      }
+                }
+            }
+        }
+    }
+
+    /**
+     * Assemble the coupling mass matrix between @p dh1 and @p dh2.
+     *
+     * The assembled matrix $M$ has entries
+     * \f[
+     * M_{a i} = \int_{\Gamma_h} \psi_a\,\varphi_i\,d\Gamma,
+     * \f]
+     * where $\varphi_i$ are basis functions of @p dh1 and $\psi_a$ are basis
+     * functions of @p dh2, both evaluated at quadrature points on the immersed
+     * mesh $\Gamma_h$.
+     *
+     * The matrix has shape $(\text{n\_dofs}(dh2),\text{n\_dofs}(dh1))$, i.e.,
+     * the same layout as the interpolation matrix. This is the $L^2$ coupling
+     * operator between the two non-matching spaces and is the matrix form of
+     * the vector operations performed by integrate_dh1_field_against_dh2_basis.
+     *
+     * @param[in] quadrature Reference quadrature on the immersed cells.
+     * @param[in,out] matrix Global matrix receiving the coupling mass entries.
+     * @param[in] constraints Constraints applied during assembly.
+     * @param[in] reuse_internal_data_structures If true, reuse cached particle
+     *   data when available.
+     */
+    template <class MatrixType, typename number = double>
+    void
+    create_coupling_mass_matrix(
+      const Quadrature<dim>           &quadrature,
+      MatrixType                      &matrix,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>(),
+      const bool reuse_internal_data_structures = false) const
+    {
+      possibly_generate_particle_handler(reuse_internal_data_structures,
+                                         quadrature);
+
+      AssertDimension(matrix.m(), dh2->n_dofs());
+      AssertDimension(matrix.n(), dh1->n_dofs());
+
+      std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
+
+      auto particle = quadrature_particle_handler->begin();
+      while (particle != quadrature_particle_handler->end())
+        {
+          const auto &cell = particle->get_surrounding_cell();
+          const auto &dh1_cell =
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
+          dh1_cell->get_dof_indices(dof_indices1);
+
+          const auto pic = quadrature_particle_handler->particles_in_cell(cell);
+
+          for (; particle != pic.end(); ++particle)
+            {
+              const auto &properties = particle->get_properties();
+              const auto  JxW        = unpack_quadrature_jxw(properties);
+              const auto &ref_q1     = particle->get_reference_location();
+              const auto  ref_q2 =
+                unpack_quadrature_reference_location(properties);
+
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                dof_indices2[i] = unpack_quadrature_dof_index(properties, i);
+
+              FullMatrix<double> local_matrix(fe2->dofs_per_cell,
+                                              fe1->dofs_per_cell);
+              local_matrix = 0.;
+
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                {
+                  const auto comp_i =
+                    gtl2[fe2->system_to_component_index(i).first];
+                  if (comp_i != numbers::invalid_unsigned_int &&
+                      comp_i < n_comps)
+                    for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
+                      {
+                        const auto comp_j =
+                          gtl1[fe1->system_to_component_index(j).first];
+                        if (comp_j == comp_i)
+                          local_matrix(i, j) +=
+                            fe2->shape_value(i, ref_q2) *
+                            fe1->shape_value(j, ref_q1) * JxW;
+                      }
+                }
+
+              constraints.distribute_local_to_global(local_matrix,
+                                                      dof_indices2,
+                                                      dof_indices1,
+                                                      matrix);
+            }
         }
       matrix.compress(VectorOperation::add);
     }
@@ -439,7 +596,7 @@ namespace NonMatching
         {
           const auto &cell = particle->get_surrounding_cell();
           const auto &dh1_cell =
-            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
           dh1_cell->get_dof_indices(dof_indices1);
 
           const auto pic = quadrature_particle_handler->particles_in_cell(cell);
@@ -532,7 +689,7 @@ namespace NonMatching
         {
           const auto &cell = particle->get_surrounding_cell();
           const auto &dh1_cell =
-            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
           dh1_cell->get_dof_indices(dof_indices1);
 
           Vector<double> local_rhs_dh1(fe1->dofs_per_cell);
@@ -1123,7 +1280,7 @@ namespace NonMatching
               &(*tria1));
 
             particle_handler =
-              std::make_unique<Particles::ParticleHandler<dim, spacedim>>(
+              std::make_unique<Particles::ParticleHandler<spacedim>>(
                 *tr, *mapping1, n_comps + 1);
 
             ComponentMask temp_mask(fe2->n_components(), false);
@@ -1200,7 +1357,7 @@ namespace NonMatching
             const unsigned int n_properties = quadrature_properties_size();
 
             quadrature_particle_handler =
-              std::make_unique<Particles::ParticleHandler<dim, spacedim>>(
+              std::make_unique<Particles::ParticleHandler<spacedim>>(
                 *tr1, *mapping1, n_properties);
 
 
