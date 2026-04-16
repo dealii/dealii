@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_non_matching_mesh_classifier
-#define dealii_non_matching_mesh_classifier
+#ifndef dealii_non_matching_mesh_classifier_h
+#define dealii_non_matching_mesh_classifier_h
 
 #include <deal.II/base/config.h>
 

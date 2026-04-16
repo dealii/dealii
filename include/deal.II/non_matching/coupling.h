@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_non_matching_coupling
-#define dealii_non_matching_coupling
+#ifndef dealii_non_matching_coupling_h
+#define dealii_non_matching_coupling_h
 
 #include <deal.II/base/config.h>
 

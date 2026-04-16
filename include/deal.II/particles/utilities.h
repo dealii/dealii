@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_particles_utilities
-#define dealii_particles_utilities
+#ifndef dealii_particles_utilities_h
+#define dealii_particles_utilities_h
 
 #include <deal.II/base/config.h>
 

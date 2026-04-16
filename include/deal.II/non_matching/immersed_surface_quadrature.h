@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_non_matching_immersed_surface_quadrature
-#define dealii_non_matching_immersed_surface_quadrature
+#ifndef dealii_non_matching_immersed_surface_quadrature_h
+#define dealii_non_matching_immersed_surface_quadrature_h
 
 #include <deal.II/base/config.h>
 

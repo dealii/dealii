@@ -18,8 +18,8 @@
 // here with permission.
 //
 
-#ifndef BIG_MPI_COMPAT_H
-#define BIG_MPI_COMPAT_H
+#ifndef dealii_base_mpi_large_count_h
+#define dealii_base_mpi_large_count_h
 
 #include <deal.II/base/config.h>
 
