@@ -12,6 +12,7 @@
 
 // Integrate a constant field represented on dh1 against basis functions on dh2.
 
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
@@ -22,6 +23,7 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/non_matching/dof_handler_coupling.h>
 
@@ -42,8 +44,8 @@ test()
   GridGenerator::hyper_cube(tria1, -1.0, 1.0);
   GridGenerator::hyper_cube(tria2, -0.8, 0.7);
 
-  tria1.refine_global(2);
-  tria2.refine_global(1);
+  tria1.refine_global(3);
+  tria2.refine_global(2);
 
   FE_Q<spacedim>      fe1(1);
   FE_Q<dim, spacedim> fe2(1);
@@ -63,12 +65,16 @@ test()
   const IndexSet locally_owned_2 = dh2.locally_owned_dofs();
   IndexSet locally_relevant_1    = DoFTools::extract_locally_relevant_dofs(dh1);
 
-  LinearAlgebra::distributed::Vector<double> src;
-  src.reinit(locally_owned_1, locally_relevant_1, MPI_COMM_WORLD);
-  src = 1.0;
-  src.update_ghost_values();
+  TrilinosWrappers::MPI::Vector tmp;
+  tmp.reinit(locally_owned_1, MPI_COMM_WORLD);
+  tmp = 1;
 
-  LinearAlgebra::distributed::Vector<double> dst;
+  TrilinosWrappers::MPI::Vector src;
+  src.reinit(locally_owned_1, locally_relevant_1, MPI_COMM_WORLD);
+
+  src = tmp;
+
+  TrilinosWrappers::MPI::Vector dst;
   dst.reinit(locally_owned_2, MPI_COMM_WORLD);
 
   dhc.integrate_dh1_field_against_dh2_basis(QGauss<dim>(2), src, dst);
