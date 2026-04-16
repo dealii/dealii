@@ -85,12 +85,17 @@ test()
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
     dof_handler_coupling.create_coupling_mass_sparsity_pattern(
-      quad, dsp, AffineConstraints<double>(), true);
+      quad,
+      dsp,
+      AffineConstraints<double>(),
+      AffineConstraints<double>(),
+      true);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
   dof_handler_coupling.create_coupling_mass_matrix(quad,
                                                    coupling,
+                                                   AffineConstraints<double>(),
                                                    AffineConstraints<double>(),
                                                    true);
 
