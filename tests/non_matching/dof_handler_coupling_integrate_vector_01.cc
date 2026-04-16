@@ -61,9 +61,7 @@ test()
 
   const IndexSet locally_owned_1 = dh1.locally_owned_dofs();
   const IndexSet locally_owned_2 = dh2.locally_owned_dofs();
-  IndexSet       locally_relevant_1(dh1.n_dofs());
-  locally_relevant_1.add_range(0, dh1.n_dofs());
-  locally_relevant_1.compress();
+  IndexSet locally_relevant_1    = DoFTools::extract_locally_relevant_dofs(dh1);
 
   LinearAlgebra::distributed::Vector<double> src;
   src.reinit(locally_owned_1, locally_relevant_1, MPI_COMM_WORLD);
