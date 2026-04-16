@@ -10,8 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
-#ifndef dealii_fe_tools_templates_H
-#define dealii_fe_tools_templates_H
+#ifndef dealii_fe_tools_templates_h
+#define dealii_fe_tools_templates_h
 
 
 #include <deal.II/base/config.h>
@@ -3411,4 +3411,4 @@ namespace FETools
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif /* dealii_fe_tools_templates_H */
+#endif /* dealii_fe_tools_templates_h */
