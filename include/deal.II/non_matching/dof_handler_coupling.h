@@ -31,7 +31,6 @@
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/affine_constraints.h>
-#include <deal.II/lac/read_write_vector.h>
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
@@ -451,27 +450,6 @@ namespace NonMatching
       std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
       std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
 
-      LinearAlgebra::ReadWriteVector<double> src_rw;
-
-      if (src_on_dh2)
-        {
-          IndexSet relevant_dofs(dh2->n_dofs());
-
-          for (auto particle = quadrature_particle_handler->begin();
-               particle != quadrature_particle_handler->end();
-               ++particle)
-            {
-              const auto &properties = particle->get_properties();
-              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
-                relevant_dofs.add_index(
-                  unpack_quadrature_dof_index(properties, i));
-            }
-
-          relevant_dofs.compress();
-          src_rw.reinit(relevant_dofs);
-          src_rw.import_elements(src, VectorOperation::insert);
-        }
-
       auto particle = quadrature_particle_handler->begin();
       while (particle != quadrature_particle_handler->end())
         {
@@ -517,7 +495,7 @@ namespace NonMatching
                     if (comp_j != numbers::invalid_unsigned_int &&
                         comp_j < n_comps)
                       coupled_values(comp_j) +=
-                        src_rw[dof_indices2[j]] * fe2->shape_value(j, ref_q2);
+                        src[dof_indices2[j]] * fe2->shape_value(j, ref_q2);
                   }
 
               if (dst_on_dh2)
@@ -694,6 +672,42 @@ namespace NonMatching
       particle_handler->set_particle_positions(function, displace_particles);
     }
 
+
+    /**
+     * Extract the locally relevant DoF indices of the immersed space (@p dh2)
+     * that are referenced by quadrature particles.
+     *
+     * This function generates (or reuses) quadrature particles for the given
+     * @p quadrature rule, then iterates through all locally owned particles
+     * and collects all global DoF indices from the immersed finite element
+     * space that appear in these particles. The resulting IndexSet is suitable
+     * for constructing ghosted vectors on @p dh2, ensuring that all DoF values
+     * needed during vector integration are accessible.
+     *
+     * @param[in] quadrature Quadrature rule used to generate particles.
+     * @return IndexSet containing all immersed DoF indices that appear in
+     *   quadrature particles available on the current process. The IndexSet
+     *   is compressed and ready for use in ghosted vector construction.
+     */
+    IndexSet
+    extract_immersed_dof_indexset(const Quadrature<dim> &quadrature) const
+    {
+      possibly_generate_particle_handler(true, quadrature);
+
+      IndexSet immersed_dofs(dh2->n_dofs());
+
+      for (auto particle = quadrature_particle_handler->begin();
+           particle != quadrature_particle_handler->end();
+           ++particle)
+        {
+          const auto &properties = particle->get_properties();
+          for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+            immersed_dofs.add_index(unpack_quadrature_dof_index(properties, i));
+        }
+
+      immersed_dofs.compress();
+      return immersed_dofs;
+    }
 
   private:
     /**
