@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2018 - 2025 by the deal.II authors
+// Copyright (C) 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -10,7 +10,11 @@
 //
 // -----------------------------------------------------------------------------
 
-// Integrate a constant field represented on dh1 against basis functions on dh2.
+// Integrate a constant field represented on dh1 against basis functions on dh2
+// Identical to the dof_handler_coupling_integrate_vector_01 test, but
+// using deal.II parallel distributed vector instead of the ones from Trilinos.
+// The main difference is that the locally_relevant_dofs must be gathered
+// from the DofHandlerCoupling before calling reinit on the vector.
 
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -66,7 +70,7 @@ test()
 
   LinearAlgebra::distributed::Vector<double> src;
   src.reinit(locally_owned_1, locally_relevant_1, MPI_COMM_WORLD);
-  src=1.;
+  src = 1.;
   src.update_ghost_values();
 
   QGauss<dim> quadrature(2);
