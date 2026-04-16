@@ -410,12 +410,19 @@ namespace NonMatching
      *
      * The source vector must already provide read access to all DoF indices
      * touched by local quadrature particles.
+     *
+     * Constraints are applied during assembly via distribute_local_to_global.
+     * If no constraints should be applied, pass a default-constructed
+     * AffineConstraints object.
      */
     template <class VectorType, typename number = double>
     void
-    integrate_dh1_field_against_dh2_basis(const Quadrature<dim> &quadrature,
-                                          const VectorType      &src_dh1,
-                                          VectorType            &dst_dh2) const
+    integrate_dh1_field_against_dh2_basis(
+      const Quadrature<dim>           &quadrature,
+      const VectorType                &src_dh1,
+      VectorType                      &dst_dh2,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>()) const
     {
       possibly_generate_particle_handler(true, quadrature);
 
@@ -474,9 +481,9 @@ namespace NonMatching
                                         fe2->shape_value(i, ref_q2) * JxW;
                 }
 
-              dst_dh2.add(fe2->dofs_per_cell,
-                          dof_indices2.data(),
-                          local_rhs_dh2.begin());
+              constraints.distribute_local_to_global(local_rhs_dh2,
+                                                     dof_indices2,
+                                                     dst_dh2);
             }
         }
 
@@ -496,12 +503,19 @@ namespace NonMatching
      *
      * The source vector must already provide read access to all DoF indices
      * touched by local quadrature particles.
+     *
+     * Constraints are applied during assembly via distribute_local_to_global.
+     * If no constraints should be applied, pass a default-constructed
+     * AffineConstraints object.
      */
     template <class VectorType, typename number = double>
     void
-    integrate_dh2_field_against_dh1_basis(const Quadrature<dim> &quadrature,
-                                          const VectorType      &src_dh2,
-                                          VectorType            &dst_dh1) const
+    integrate_dh2_field_against_dh1_basis(
+      const Quadrature<dim>           &quadrature,
+      const VectorType                &src_dh2,
+      VectorType                      &dst_dh1,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>()) const
     {
       possibly_generate_particle_handler(true, quadrature);
 
@@ -561,9 +575,9 @@ namespace NonMatching
                 }
             }
 
-          dst_dh1.add(fe1->dofs_per_cell,
-                      dof_indices1.data(),
-                      local_rhs_dh1.begin());
+          constraints.distribute_local_to_global(local_rhs_dh1,
+                                                 dof_indices1,
+                                                 dst_dh1);
         }
 
       dst_dh1.compress(VectorOperation::add);
