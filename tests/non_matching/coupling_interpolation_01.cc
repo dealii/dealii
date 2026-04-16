@@ -78,17 +78,21 @@ test()
   NonMatching::DoFHandlerCoupling<dim, spacedim> dof_handler_coupling(space_dh,
                                                                       dh);
 
-  // The coupling mass matrix has shape (dh.n_dofs(), space_dh.n_dofs()),
-  // which is the transpose of the layout used by the free functions in
-  // non_matching/coupling.h.
+  // With assemble_transpose=true, the coupling mass matrix has shape
+  // (space_dh.n_dofs(), dh.n_dofs()), matching the layout used by the
+  // free functions in non_matching/coupling.h.
   SparsityPattern sparsity;
   {
-    DynamicSparsityPattern dsp(dh.n_dofs(), space_dh.n_dofs());
-    dof_handler_coupling.create_coupling_mass_sparsity_pattern(quad, dsp);
+    DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
+    dof_handler_coupling.create_coupling_mass_sparsity_pattern(
+      quad, dsp, AffineConstraints<double>(), true);
     sparsity.copy_from(dsp);
   }
   SparseMatrix<double> coupling(sparsity);
-  dof_handler_coupling.create_coupling_mass_matrix(quad, coupling);
+  dof_handler_coupling.create_coupling_mass_matrix(quad,
+                                                   coupling,
+                                                   AffineConstraints<double>(),
+                                                   true);
 
   SparsityPattern mass_sparsity;
   {
@@ -108,7 +112,7 @@ test()
   Vector<double> ones(dh.n_dofs());
 
   space_ones = 1.0;
-  coupling.vmult(ones, space_ones);
+  coupling.Tvmult(ones, space_ones);
   mass_matrix_inv.solve(ones);
 
   Vector<double> real_ones(dh.n_dofs());
