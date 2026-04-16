@@ -39,8 +39,9 @@
 #include "../tests.h"
 
 
-// Test that a coupling mass matrix can be constructed for each pair of dimension
-// and immersed dimension, and check that constants are projected correctly.
+// Test that a coupling mass matrix can be constructed for each pair of
+// dimension and immersed dimension, and check that constants are projected
+// correctly.
 
 template <int dim, int spacedim>
 void
@@ -49,7 +50,7 @@ test()
   deallog << "dim: " << dim << ", spacedim: " << spacedim << std::endl;
 
   parallel::distributed::Triangulation<dim, spacedim> tria(MPI_COMM_WORLD);
-  parallel::distributed::Triangulation<spacedim>      space_tria(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<spacedim> space_tria(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tria, -.4, .3);
   GridGenerator::hyper_cube(space_tria, -1, 1);

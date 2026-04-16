@@ -539,16 +539,16 @@ namespace NonMatching
                         const auto comp_j =
                           gtl1[fe1->system_to_component_index(j).first];
                         if (comp_j == comp_i)
-                          local_matrix(i, j) +=
-                            fe2->shape_value(i, ref_q2) *
-                            fe1->shape_value(j, ref_q1) * JxW;
+                          local_matrix(i, j) += fe2->shape_value(i, ref_q2) *
+                                                fe1->shape_value(j, ref_q1) *
+                                                JxW;
                       }
                 }
 
               constraints.distribute_local_to_global(local_matrix,
-                                                      dof_indices2,
-                                                      dof_indices1,
-                                                      matrix);
+                                                     dof_indices2,
+                                                     dof_indices1,
+                                                     matrix);
             }
         }
       matrix.compress(VectorOperation::add);
