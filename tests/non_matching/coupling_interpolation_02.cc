@@ -11,9 +11,9 @@
 // -----------------------------------------------------------------------------
 
 // Test that a coupling mass matrix can be constructed using
-// DoFHandlerCoupling for each pair of dimension and immersed dimension,
+// DoFHandlerCoupling with a non trivial component selection in the space_dh,
 // and check that constants are projected correctly.
-// This is equivalent to coupling_01.cc but uses DoFHandlerCoupling instead of
+// This is equivalent to coupling_02.cc but uses DoFHandlerCoupling instead of
 // the free functions in non_matching/coupling.h.
 
 #include <deal.II/base/mpi_stub.h>
@@ -24,6 +24,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <deal.II/grid/grid_generator.h>
 
@@ -40,8 +41,8 @@
 
 
 // Test that a coupling mass matrix can be constructed for each pair of
-// dimension and immersed dimension, and check that constants are projected
-// correctly.
+// dimension and immersed dimension, with a non trivial component selection in
+// the space_dh, and check that constants are projected correctly.
 
 template <int dim, int spacedim>
 void
@@ -59,7 +60,9 @@ test()
   space_tria.refine_global(2);
 
   FE_Q<dim, spacedim> fe(1);
-  FE_Q<spacedim>      space_fe(1);
+  FESystem<spacedim>  space_fe(FE_Q<spacedim>(1), spacedim + 1);
+  ComponentMask       space_mask(spacedim + 1, false);
+  space_mask.set(spacedim, true);
 
   deallog << "FE      : " << fe.get_name() << std::endl
           << "Space FE: " << space_fe.get_name() << std::endl;
@@ -75,8 +78,9 @@ test()
 
   QGauss<dim> quad(3); // Quadrature for coupling
 
-  NonMatching::DoFHandlerCoupling<dim, spacedim> dof_handler_coupling(space_dh,
-                                                                      dh);
+  // Pass the component mask for dh1 (space_dh) via the constructor.
+  NonMatching::DoFHandlerCoupling<dim, spacedim> dof_handler_coupling(
+    space_dh, dh, space_mask);
 
   // With assemble_transpose=true, the coupling mass matrix has shape
   // (space_dh.n_dofs(), dh.n_dofs()), matching the layout used by the
