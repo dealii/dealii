@@ -71,7 +71,7 @@ test()
   LinearAlgebra::distributed::Vector<double> dst;
   dst.reinit(locally_owned_2, MPI_COMM_WORLD);
 
-  dhc.integrate_vector(QGauss<dim>(2), src, dst);
+  dhc.integrate_dh1_field_against_dh2_basis(QGauss<dim>(2), src, dst);
 
   const double l1 = dst.l1_norm();
   const double l2 = dst.l2_norm();

@@ -398,54 +398,31 @@ namespace NonMatching
     }
 
     /**
-     * Integrate a discrete field from one coupled space against the basis
-     * functions of the other space.
-     *
-     * When @p src has size `dh1.n_dofs()` and @p dst has size `dh2.n_dofs()`,
-     * this function computes the vector with entries \f[ (\mathrm{dst})_a =
-     * \int_{\Gamma_h} u_h\,\psi_a\,d\Gamma, \f] where $u_h$ is the field
-     * represented by @p src on @p dh1 and $\psi_a$ are the basis functions of
+     * Integrate a field represented on @p dh1 against basis functions of
      * @p dh2.
      *
-     * If the vector sizes are reversed, then the function computes instead
+     * This function computes
      * \f[
-     * (\mathrm{dst})_i = \int_{\Gamma_h} w_h\,\varphi_i\,d\Gamma, \f] where
-     * $w_h$ is represented on @p dh2 and $\varphi_i$ are the basis functions of
-     * @p dh1.
+     * (\mathrm{dst\_dh2})_a = \int_{\Gamma_h} u_h\,\psi_a\,d\Gamma,
+     * \f]
+     * where $u_h$ is represented by @p src_dh1 and $\psi_a$ are basis
+     * functions of @p dh2.
      *
-     * Integration is performed using the immersed quadrature rule supplied in
-     * @p quadrature and the same particle-based transfer data used by the
-     * Nitsche assembly routines.
-     *
-     * The source vector must give access to all locally relevant DoFs of the
-     * corresponding DoFHandler.
+     * The source vector must already provide read access to all DoF indices
+     * touched by local quadrature particles.
      */
     template <class VectorType, typename number = double>
     void
-    integrate_vector(const Quadrature<dim> &quadrature,
-                     const VectorType      &src,
-                     VectorType            &dst) const
+    integrate_dh1_field_against_dh2_basis(const Quadrature<dim> &quadrature,
+                                          const VectorType      &src_dh1,
+                                          VectorType            &dst_dh2) const
     {
       possibly_generate_particle_handler(true, quadrature);
 
-      const bool src_on_dh1 = (src.size() == dh1->n_dofs());
-      const bool src_on_dh2 = (src.size() == dh2->n_dofs());
-      const bool dst_on_dh1 = (dst.size() == dh1->n_dofs());
-      const bool dst_on_dh2 = (dst.size() == dh2->n_dofs());
+      AssertDimension(src_dh1.size(), dh1->n_dofs());
+      AssertDimension(dst_dh2.size(), dh2->n_dofs());
 
-      Assert(src_on_dh1 || src_on_dh2,
-             ExcMessage("The source vector must have size dh1.n_dofs() or "
-                        "dh2.n_dofs()."));
-      Assert(dst_on_dh1 || dst_on_dh2,
-             ExcMessage("The destination vector must have size dh1.n_dofs() "
-                        "or dh2.n_dofs()."));
-      Assert(src_on_dh1 != src_on_dh2, ExcInternalError());
-      Assert(dst_on_dh1 != dst_on_dh2, ExcInternalError());
-      Assert(src_on_dh1 != dst_on_dh1,
-             ExcMessage("integrate_vector() expects one vector on dh1 and the "
-                        "other on dh2."));
-
-      dst = 0.;
+      dst_dh2 = 0.;
 
       std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
       std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
@@ -458,10 +435,7 @@ namespace NonMatching
             typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
           dh1_cell->get_dof_indices(dof_indices1);
 
-          Vector<double> local_rhs_dh1(fe1->dofs_per_cell);
           const auto pic = quadrature_particle_handler->particles_in_cell(cell);
-
-          local_rhs_dh1 = 0.;
 
           for (; particle != pic.end(); ++particle)
             {
@@ -477,67 +451,122 @@ namespace NonMatching
               Vector<double> coupled_values(n_comps);
               coupled_values = 0.;
 
-              if (src_on_dh1)
-                for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
-                  {
-                    const auto comp_j =
-                      gtl1[fe1->system_to_component_index(j).first];
-                    if (comp_j != numbers::invalid_unsigned_int &&
-                        comp_j < n_comps)
-                      coupled_values(comp_j) +=
-                        src[dof_indices1[j]] * fe1->shape_value(j, ref_q1);
-                  }
-              else
-                for (unsigned int j = 0; j < fe2->dofs_per_cell; ++j)
-                  {
-                    const auto comp_j =
-                      gtl2[fe2->system_to_component_index(j).first];
-                    if (comp_j != numbers::invalid_unsigned_int &&
-                        comp_j < n_comps)
-                      coupled_values(comp_j) +=
-                        src[dof_indices2[j]] * fe2->shape_value(j, ref_q2);
-                  }
-
-              if (dst_on_dh2)
+              for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
                 {
-                  Vector<double> local_rhs_dh2(fe2->dofs_per_cell);
-                  local_rhs_dh2 = 0.;
+                  const auto comp_j =
+                    gtl1[fe1->system_to_component_index(j).first];
+                  if (comp_j != numbers::invalid_unsigned_int &&
+                      comp_j < n_comps)
+                    coupled_values(comp_j) +=
+                      src_dh1[dof_indices1[j]] * fe1->shape_value(j, ref_q1);
+                }
 
-                  for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
-                    {
-                      const auto comp_i =
-                        gtl2[fe2->system_to_component_index(i).first];
-                      if (comp_i != numbers::invalid_unsigned_int &&
-                          comp_i < n_comps)
-                        local_rhs_dh2(i) += coupled_values(comp_i) *
-                                            fe2->shape_value(i, ref_q2) * JxW;
-                    }
+              Vector<double> local_rhs_dh2(fe2->dofs_per_cell);
+              local_rhs_dh2 = 0.;
 
-                  dst.add(fe2->dofs_per_cell,
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                {
+                  const auto comp_i =
+                    gtl2[fe2->system_to_component_index(i).first];
+                  if (comp_i != numbers::invalid_unsigned_int &&
+                      comp_i < n_comps)
+                    local_rhs_dh2(i) += coupled_values(comp_i) *
+                                        fe2->shape_value(i, ref_q2) * JxW;
+                }
+
+              dst_dh2.add(fe2->dofs_per_cell,
                           dof_indices2.data(),
                           local_rhs_dh2.begin());
-                }
-              else
+            }
+        }
+
+      dst_dh2.compress(VectorOperation::add);
+    }
+
+    /**
+     * Integrate a field represented on @p dh2 against basis functions of
+     * @p dh1.
+     *
+     * This function computes
+     * \f[
+     * (\mathrm{dst\_dh1})_i = \int_{\Gamma_h} w_h\,\varphi_i\,d\Gamma,
+     * \f]
+     * where $w_h$ is represented by @p src_dh2 and $\varphi_i$ are basis
+     * functions of @p dh1.
+     *
+     * The source vector must already provide read access to all DoF indices
+     * touched by local quadrature particles.
+     */
+    template <class VectorType, typename number = double>
+    void
+    integrate_dh2_field_against_dh1_basis(const Quadrature<dim> &quadrature,
+                                          const VectorType      &src_dh2,
+                                          VectorType            &dst_dh1) const
+    {
+      possibly_generate_particle_handler(true, quadrature);
+
+      AssertDimension(src_dh2.size(), dh2->n_dofs());
+      AssertDimension(dst_dh1.size(), dh1->n_dofs());
+
+      dst_dh1 = 0.;
+
+      std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
+
+      auto particle = quadrature_particle_handler->begin();
+      while (particle != quadrature_particle_handler->end())
+        {
+          const auto &cell = particle->get_surrounding_cell();
+          const auto &dh1_cell =
+            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+          dh1_cell->get_dof_indices(dof_indices1);
+
+          Vector<double> local_rhs_dh1(fe1->dofs_per_cell);
+          local_rhs_dh1 = 0.;
+
+          const auto pic = quadrature_particle_handler->particles_in_cell(cell);
+
+          for (; particle != pic.end(); ++particle)
+            {
+              const auto &properties = particle->get_properties();
+              const auto  JxW        = unpack_quadrature_jxw(properties);
+              const auto &ref_q1     = particle->get_reference_location();
+              const auto  ref_q2 =
+                unpack_quadrature_reference_location(properties);
+
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                dof_indices2[i] = unpack_quadrature_dof_index(properties, i);
+
+              Vector<double> coupled_values(n_comps);
+              coupled_values = 0.;
+
+              for (unsigned int j = 0; j < fe2->dofs_per_cell; ++j)
                 {
-                  for (unsigned int i = 0; i < fe1->dofs_per_cell; ++i)
-                    {
-                      const auto comp_i =
-                        gtl1[fe1->system_to_component_index(i).first];
-                      if (comp_i != numbers::invalid_unsigned_int &&
-                          comp_i < n_comps)
-                        local_rhs_dh1(i) += coupled_values(comp_i) *
-                                            fe1->shape_value(i, ref_q1) * JxW;
-                    }
+                  const auto comp_j =
+                    gtl2[fe2->system_to_component_index(j).first];
+                  if (comp_j != numbers::invalid_unsigned_int &&
+                      comp_j < n_comps)
+                    coupled_values(comp_j) +=
+                      src_dh2[dof_indices2[j]] * fe2->shape_value(j, ref_q2);
+                }
+
+              for (unsigned int i = 0; i < fe1->dofs_per_cell; ++i)
+                {
+                  const auto comp_i =
+                    gtl1[fe1->system_to_component_index(i).first];
+                  if (comp_i != numbers::invalid_unsigned_int &&
+                      comp_i < n_comps)
+                    local_rhs_dh1(i) += coupled_values(comp_i) *
+                                        fe1->shape_value(i, ref_q1) * JxW;
                 }
             }
 
-          if (dst_on_dh1)
-            dst.add(fe1->dofs_per_cell,
-                    dof_indices1.data(),
-                    local_rhs_dh1.begin());
+          dst_dh1.add(fe1->dofs_per_cell,
+                      dof_indices1.data(),
+                      local_rhs_dh1.begin());
         }
 
-      dst.compress(VectorOperation::add);
+      dst_dh1.compress(VectorOperation::add);
     }
 
     /**
