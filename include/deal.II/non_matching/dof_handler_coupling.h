@@ -398,7 +398,7 @@ namespace NonMatching
     }
 
     /**
-     * Build the sparsity pattern for the coupling mass matrix.
+     * Build the sparsity pattern for the coupling matrix.
      *
      * By default, the resulting sparsity pattern has the same layout as the
      * matrix assembled by create_coupling_mass_matrix(), i.e., rows
@@ -420,7 +420,7 @@ namespace NonMatching
      */
     template <class Sparsity>
     void
-    create_coupling_mass_sparsity_pattern(
+    create_coupling_sparsity_pattern(
       const Quadrature<dim>           &quadrature,
       Sparsity                        &sparsity,
       const AffineConstraints<double> &constraints1 =

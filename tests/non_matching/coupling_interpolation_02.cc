@@ -88,7 +88,7 @@ test()
   SparsityPattern sparsity;
   {
     DynamicSparsityPattern dsp(space_dh.n_dofs(), dh.n_dofs());
-    dof_handler_coupling.create_coupling_mass_sparsity_pattern(
+    dof_handler_coupling.create_coupling_sparsity_pattern(
       quad,
       dsp,
       AffineConstraints<double>(),
