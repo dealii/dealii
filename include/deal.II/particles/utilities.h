@@ -368,7 +368,7 @@ namespace Particles
           for (unsigned int particle_index = 0; particle != pic.end();
                ++particle, ++particle_index)
             {
-              const unsigned id = particle_indices[particle_index];
+              const types::particle_index id = particle_indices[particle_index];
 
               if constexpr (n_components == 1)
                 {
