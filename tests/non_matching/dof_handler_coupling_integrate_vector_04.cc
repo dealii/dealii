@@ -11,6 +11,10 @@
 // -----------------------------------------------------------------------------
 
 // Integrate a constant field represented on dh2 against basis functions on dh1.
+// Identical to the dof_handler_coupling_integrate_vector_02 test, but
+// using deal.II parallel distributed vector instead of the ones from Trilinos.
+// The main difference is that the locally_relevant_dofs must be gathered
+// from the DofHandlerCoupling before calling reinit on the vector.
 
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/quadrature_lib.h>
