@@ -6498,8 +6498,6 @@ namespace internal
                                             needed_faces_single);
           triangulation.faces->lines.allocate_end(needed_lines_pair,
                                                   needed_lines_single);
-          triangulation.faces->quads.allocate_end(needed_faces_pair,
-                                                  needed_faces_single);
 
           // add to needed vertices how many vertices are already in use
           needed_vertices += std::count(triangulation.vertices_used.begin(),
@@ -8142,8 +8140,6 @@ namespace internal
         // reserve space for needed_quads new quads stored in pairs
         triangulation.faces->allocate_end(needed_quads_pair,
                                           needed_quads_single);
-        triangulation.faces->quads.allocate_end(needed_quads_pair,
-                                                needed_quads_single);
 
         // add to needed vertices how many vertices are already in use
         needed_vertices += std::count(triangulation.vertices_used.begin(),
