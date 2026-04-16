@@ -12,6 +12,7 @@
 
 // Integrate a constant field represented on dh2 against basis functions on dh1.
 
+#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
@@ -22,6 +23,7 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <deal.II/non_matching/dof_handler_coupling.h>
 
@@ -64,13 +66,16 @@ test()
   const IndexSet locally_relevant_2 =
     dhc.extract_immersed_dof_indexset(QGauss<dim>(2));
 
-  LinearAlgebra::distributed::Vector<double> src;
+  TrilinosWrappers::MPI::Vector tmp;
+  tmp.reinit(locally_owned_2, MPI_COMM_WORLD);
+  tmp = 2.0;
+
+  TrilinosWrappers::MPI::Vector src;
   src.reinit(locally_owned_2, locally_relevant_2, MPI_COMM_WORLD);
-  src = 2.0;
-  src.update_ghost_values();
 
+  src = tmp;
 
-  LinearAlgebra::distributed::Vector<double> dst;
+  TrilinosWrappers::MPI::Vector dst;
   dst.reinit(locally_owned_1, MPI_COMM_WORLD);
 
   dhc.integrate_dh2_field_against_dh1_basis(QGauss<dim>(2), src, dst);
