@@ -31,6 +31,7 @@
 #include <deal.II/grid/grid_tools_cache.h>
 
 #include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/read_write_vector.h>
 
 #include <deal.II/non_matching/immersed_surface_quadrature.h>
 
@@ -162,13 +163,11 @@ namespace NonMatching
       const bool reuse_internal_data_structures = false) const
     {
       possibly_generate_particle_handler(reuse_internal_data_structures);
-
       std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
 
       auto       particle = particle_handler->begin();
       const auto max_particles_per_cell =
         particle_handler->n_global_max_particles_per_cell();
-
       while (particle != particle_handler->end())
         {
           const auto &cell = particle->get_surrounding_cell();
@@ -190,8 +189,8 @@ namespace NonMatching
                     gtl1[fe1->system_to_component_index(j).first];
                   if (comp_j != numbers::invalid_unsigned_int)
                     {
-                      const auto cj = static_cast<types::global_dof_index>(
-                        properties[1 + comp_j]);
+                      const auto cj =
+                        unpack_interpolation_dof_index(properties, comp_j);
                       constraints.add_entries_local_to_global({cj},
                                                               {dof_indices1[j]},
                                                               sparsity);
@@ -223,8 +222,8 @@ namespace NonMatching
      * quadrature representation.
      *
      * The matrix is the penalty block that enforces restriction/Dirichlet data
-     * in a weak sense, while the right-hand side contains the prescribed target
-     * values projected with the same basis.
+     * in a weak sense, while the right-hand side contains the prescribed
+     * target values projected with the same basis.
      *
      * @param[in] quadrature Reference quadrature on the immersed cells.
      * @param[in] rhs_function Prescribed field $g$ in physical coordinates.
@@ -377,7 +376,7 @@ namespace NonMatching
 
               for (unsigned int d = 0; d < n_comps; ++d)
                 dof_indices2[i * n_comps + d] =
-                  static_cast<types::global_dof_index>(properties[1 + d]);
+                  unpack_interpolation_dof_index(properties, d);
 
               for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
                 {
@@ -397,6 +396,170 @@ namespace NonMatching
                                                  matrix);
         }
       matrix.compress(VectorOperation::add);
+    }
+
+    /**
+     * Integrate a discrete field from one coupled space against the basis
+     * functions of the other space.
+     *
+     * When @p src has size `dh1.n_dofs()` and @p dst has size `dh2.n_dofs()`,
+     * this function computes the vector with entries \f[ (\mathrm{dst})_a =
+     * \int_{\Gamma_h} u_h\,\psi_a\,d\Gamma, \f] where $u_h$ is the field
+     * represented by @p src on @p dh1 and $\psi_a$ are the basis functions of
+     * @p dh2.
+     *
+     * If the vector sizes are reversed, then the function computes instead
+     * \f[
+     * (\mathrm{dst})_i = \int_{\Gamma_h} w_h\,\varphi_i\,d\Gamma, \f] where
+     * $w_h$ is represented on @p dh2 and $\varphi_i$ are the basis functions of
+     * @p dh1.
+     *
+     * Integration is performed using the immersed quadrature rule supplied in
+     * @p quadrature and the same particle-based transfer data used by the
+     * Nitsche assembly routines.
+     *
+     * The source vector must give access to all locally relevant DoFs of the
+     * corresponding DoFHandler.
+     */
+    template <class VectorType, typename number = double>
+    void
+    integrate_vector(const Quadrature<dim> &quadrature,
+                     const VectorType      &src,
+                     VectorType            &dst) const
+    {
+      possibly_generate_particle_handler(true, quadrature);
+
+      const bool src_on_dh1 = (src.size() == dh1->n_dofs());
+      const bool src_on_dh2 = (src.size() == dh2->n_dofs());
+      const bool dst_on_dh1 = (dst.size() == dh1->n_dofs());
+      const bool dst_on_dh2 = (dst.size() == dh2->n_dofs());
+
+      Assert(src_on_dh1 || src_on_dh2,
+             ExcMessage("The source vector must have size dh1.n_dofs() or "
+                        "dh2.n_dofs()."));
+      Assert(dst_on_dh1 || dst_on_dh2,
+             ExcMessage("The destination vector must have size dh1.n_dofs() "
+                        "or dh2.n_dofs()."));
+      Assert(src_on_dh1 != src_on_dh2, ExcInternalError());
+      Assert(dst_on_dh1 != dst_on_dh2, ExcInternalError());
+      Assert(src_on_dh1 != dst_on_dh1,
+             ExcMessage("integrate_vector() expects one vector on dh1 and the "
+                        "other on dh2."));
+
+      dst = 0.;
+
+      std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
+      std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
+
+      LinearAlgebra::ReadWriteVector<double> src_rw;
+
+      if (src_on_dh2)
+        {
+          IndexSet relevant_dofs(dh2->n_dofs());
+
+          for (auto particle = quadrature_particle_handler->begin();
+               particle != quadrature_particle_handler->end();
+               ++particle)
+            {
+              const auto &properties = particle->get_properties();
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                relevant_dofs.add_index(
+                  unpack_quadrature_dof_index(properties, i));
+            }
+
+          relevant_dofs.compress();
+          src_rw.reinit(relevant_dofs);
+          src_rw.import_elements(src, VectorOperation::insert);
+        }
+
+      auto particle = quadrature_particle_handler->begin();
+      while (particle != quadrature_particle_handler->end())
+        {
+          const auto &cell = particle->get_surrounding_cell();
+          const auto &dh1_cell =
+            typename DoFHandler<dim, spacedim>::cell_iterator(*cell, dh1);
+          dh1_cell->get_dof_indices(dof_indices1);
+
+          Vector<double> local_rhs_dh1(fe1->dofs_per_cell);
+          const auto pic = quadrature_particle_handler->particles_in_cell(cell);
+
+          local_rhs_dh1 = 0.;
+
+          for (; particle != pic.end(); ++particle)
+            {
+              const auto &properties = particle->get_properties();
+              const auto  JxW        = unpack_quadrature_jxw(properties);
+              const auto &ref_q1     = particle->get_reference_location();
+              const auto  ref_q2 =
+                unpack_quadrature_reference_location(properties);
+
+              for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                dof_indices2[i] = unpack_quadrature_dof_index(properties, i);
+
+              Vector<double> coupled_values(n_comps);
+              coupled_values = 0.;
+
+              if (src_on_dh1)
+                for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
+                  {
+                    const auto comp_j =
+                      gtl1[fe1->system_to_component_index(j).first];
+                    if (comp_j != numbers::invalid_unsigned_int &&
+                        comp_j < n_comps)
+                      coupled_values(comp_j) +=
+                        src[dof_indices1[j]] * fe1->shape_value(j, ref_q1);
+                  }
+              else
+                for (unsigned int j = 0; j < fe2->dofs_per_cell; ++j)
+                  {
+                    const auto comp_j =
+                      gtl2[fe2->system_to_component_index(j).first];
+                    if (comp_j != numbers::invalid_unsigned_int &&
+                        comp_j < n_comps)
+                      coupled_values(comp_j) +=
+                        src_rw[dof_indices2[j]] * fe2->shape_value(j, ref_q2);
+                  }
+
+              if (dst_on_dh2)
+                {
+                  Vector<double> local_rhs_dh2(fe2->dofs_per_cell);
+                  local_rhs_dh2 = 0.;
+
+                  for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+                    {
+                      const auto comp_i =
+                        gtl2[fe2->system_to_component_index(i).first];
+                      if (comp_i != numbers::invalid_unsigned_int &&
+                          comp_i < n_comps)
+                        local_rhs_dh2(i) += coupled_values(comp_i) *
+                                            fe2->shape_value(i, ref_q2) * JxW;
+                    }
+
+                  dst.add(fe2->dofs_per_cell,
+                          dof_indices2.data(),
+                          local_rhs_dh2.begin());
+                }
+              else
+                {
+                  for (unsigned int i = 0; i < fe1->dofs_per_cell; ++i)
+                    {
+                      const auto comp_i =
+                        gtl1[fe1->system_to_component_index(i).first];
+                      if (comp_i != numbers::invalid_unsigned_int &&
+                          comp_i < n_comps)
+                        local_rhs_dh1(i) += coupled_values(comp_i) *
+                                            fe1->shape_value(i, ref_q1) * JxW;
+                    }
+                }
+            }
+
+          if (dst_on_dh1)
+            dst.add(fe1->dofs_per_cell,
+                    dof_indices1.data(),
+                    local_rhs_dh1.begin());
+        }
+
+      dst.compress(VectorOperation::add);
     }
 
     /**
@@ -420,8 +583,9 @@ namespace NonMatching
      * Return the quadrature particle handler used for immersed integration.
      *
      * Particles represent physical quadrature points on the immersed mesh,
-     * located in the background mesh, and store at least $JxW$ in their
-     * properties (and normals when `dim < spacedim`).
+     * located in the background mesh, and store at least $JxW$, reference
+     * coordinates on the immersed cell, and immersed-cell DoF indices in
+     * their properties (and normals when `dim < spacedim`).
      */
     const Particles::ParticleHandler<spacedim> &
     get_quadrature_particle_handler() const
@@ -440,8 +604,8 @@ namespace NonMatching
      * @ref quadrature_particle_handler from immersed quadrature points and stores
      * geometric weights (and normals in codimension one).
      *
-     * @param[in] reuse_internal_data_structures If true, skip re-creation when
-     *   handlers are already available.
+     * @param[in] reuse_internal_data_structures If true, skip re-creation
+     * when handlers are already available.
      * @param[in] quadrature Optional quadrature rule used to generate
      *   integration particles.
      */
@@ -455,7 +619,8 @@ namespace NonMatching
      *
      * This updates quadrature-point particle positions used in immersed
      * integration. With @p displace_particles set to true, values are treated
-     * as displacements; otherwise they are interpreted as absolute coordinates.
+     * as displacements; otherwise they are interpreted as absolute
+     * coordinates.
      *
      * @param[in] positions_vector New positions/displacements, one per local
      *   quadrature particle.
@@ -531,29 +696,182 @@ namespace NonMatching
 
 
   private:
+    /**
+     * Offset of the first immersed DoF index in interpolation-particle
+     * properties.
+     *
+     * Interpolation particles store process id in entry 0 and coupled
+     * immersed DoF indices starting at this offset.
+     */
+    static constexpr unsigned int
+    interpolation_dof_property_offset()
+    {
+      return 1;
+    }
+
+    /**
+     * Offset of $JxW$ in quadrature-particle properties.
+     */
+    static constexpr unsigned int
+    quadrature_jxw_property_offset()
+    {
+      return 0;
+    }
+
+    /**
+     * Offset of immersed reference coordinates in quadrature-particle
+     * properties.
+     *
+     * For codimension one, normal components are stored between $JxW$ and
+     * the reference coordinates.
+     */
+    static constexpr unsigned int
+    quadrature_reference_property_offset()
+    {
+      return (dim == spacedim) ? 1 : spacedim + 1;
+    }
+
+    /**
+     * Offset of immersed-cell DoF indices in quadrature-particle
+     * properties.
+     */
+    static constexpr unsigned int
+    quadrature_dof_property_offset()
+    {
+      return quadrature_reference_property_offset() + dim;
+    }
+
+    /**
+     * Number of scalar entries stored per quadrature particle.
+     */
+    unsigned int
+    quadrature_properties_size() const
+    {
+      return quadrature_dof_property_offset() + fe2->dofs_per_cell;
+    }
+
+    /**
+     * Unpack one immersed DoF index from interpolation-particle properties.
+     *
+     * @param[in] properties Property array attached to a particle.
+     * @param[in] coupled_component Coupled component number in
+     *   `[0, n_comps)`.
+     */
+    template <typename PropertiesType>
+    types::global_dof_index
+    unpack_interpolation_dof_index(const PropertiesType &properties,
+                                   const unsigned int coupled_component) const
+    {
+      return static_cast<types::global_dof_index>(
+        properties[interpolation_dof_property_offset() + coupled_component]);
+    }
+
+    /**
+     * Unpack the integration weight $JxW$ from quadrature-particle
+     * properties.
+     */
+    template <typename PropertiesType>
+    double
+    unpack_quadrature_jxw(const PropertiesType &properties) const
+    {
+      return properties[quadrature_jxw_property_offset()];
+    }
+
+    /**
+     * Unpack the immersed reference coordinates of the quadrature point from
+     * quadrature-particle properties.
+     */
+    template <typename PropertiesType>
+    Point<dim>
+    unpack_quadrature_reference_location(const PropertiesType &properties) const
+    {
+      Point<dim> reference_location;
+      for (unsigned int d = 0; d < dim; ++d)
+        reference_location[d] =
+          properties[quadrature_reference_property_offset() + d];
+      return reference_location;
+    }
+
+    /**
+     * Unpack a DoF index of the immersed cell from quadrature-particle
+     * properties.
+     *
+     * @param[in] properties Property array attached to a quadrature particle.
+     * @param[in] local_dof Local DoF number in the immersed cell.
+     */
+    template <typename PropertiesType>
+    types::global_dof_index
+    unpack_quadrature_dof_index(const PropertiesType &properties,
+                                const unsigned int    local_dof) const
+    {
+      return static_cast<types::global_dof_index>(
+        properties[quadrature_dof_property_offset() + local_dof]);
+    }
+
+    /**
+     * Pack quadrature metadata into a flat property array.
+     *
+     * The following values are written at offsets starting at @p base_index:
+     * - $JxW$
+     * - normal (only when `dim < spacedim`)
+     * - immersed reference coordinates
+     * - immersed-cell DoF indices.
+     */
+    void
+    pack_quadrature_properties(
+      std::vector<double>                        &properties,
+      const unsigned int                          base_index,
+      const double                                jxw,
+      const Tensor<1, spacedim>                  &normal,
+      const Point<dim>                           &reference_q,
+      const std::vector<types::global_dof_index> &dof_indices2) const
+    {
+      AssertIndexRange(base_index + quadrature_properties_size(),
+                       properties.size() + 1);
+
+      properties[base_index + quadrature_jxw_property_offset()] = jxw;
+
+      if (dim < spacedim)
+        for (unsigned int d = 0; d < spacedim; ++d)
+          properties[base_index + 1 + d] = normal[d];
+
+      for (unsigned int d = 0; d < dim; ++d)
+        properties[base_index + quadrature_reference_property_offset() + d] =
+          reference_q[d];
+
+      for (unsigned int i = 0; i < fe2->dofs_per_cell; ++i)
+        properties[base_index + quadrature_dof_property_offset() + i] =
+          static_cast<double>(dof_indices2[i]);
+    }
+
     /** Mapping used to evaluate shape functions on the background mesh. */
     ObserverPointer<const Mapping<spacedim>> mapping1;
-    /** Mapping used to evaluate shape functions and quadrature on the immersed
-     * mesh. */
+
+    /** Mapping used to evaluate shape functions and quadrature on the
+     * immersed mesh. */
     ObserverPointer<const Mapping<dim, spacedim>> mapping2;
 
     /** Background triangulation carrying space $V_h$. */
     ObserverPointer<const Triangulation<spacedim>> tria1;
+
     /** Immersed triangulation carrying space $W_h$. */
     ObserverPointer<const Triangulation<dim, spacedim>> tria2;
 
     /** DoFHandler for the background/source finite element space. */
     ObserverPointer<const DoFHandler<spacedim>> dh1;
+
     /** DoFHandler for the immersed/target finite element space. */
     ObserverPointer<const DoFHandler<dim, spacedim>> dh2;
 
     /** Finite element of @ref dh1 defining basis functions $\varphi_i$. */
     ObserverPointer<const FiniteElement<spacedim>> fe1;
+
     /** Finite element of @ref dh2 defining basis functions $\psi_a$. */
     ObserverPointer<const FiniteElement<dim, spacedim>> fe2;
 
     /** Optional ownership of internally created cache for @ref tria1. */
     std::unique_ptr<const GridTools::Cache<spacedim>> cache1_ptr;
+
     /** Optional ownership of internally created cache for @ref tria2. */
     std::unique_ptr<const GridTools::Cache<dim, spacedim>> cache2_ptr;
 
@@ -803,15 +1121,14 @@ namespace NonMatching
                               "triangulations"));
 
             auto tr2 = dynamic_cast<
-              const parallel::distributed::Triangulation<spacedim> *>(
+              const parallel::distributed::Triangulation<dim, spacedim> *>(
               &(*tria2));
 
             Assert(tr2,
                    ExcMessage("Only available for parallel distributed "
                               "triangulations"));
 
-            const unsigned int n_properties =
-              (dim == spacedim) ? 1 : spacedim + 1;
+            const unsigned int n_properties = quadrature_properties_size();
 
             quadrature_particle_handler =
               std::make_unique<Particles::ParticleHandler<dim, spacedim>>(
@@ -837,21 +1154,28 @@ namespace NonMatching
                   fe_v.reinit(cell);
                   const auto &points = fe_v.get_quadrature_points();
                   const auto &JxW    = fe_v.get_JxW_values();
+                  std::vector<types::global_dof_index> dof_indices2(
+                    fe2->dofs_per_cell);
+                  cell->get_dof_indices(dof_indices2);
 
                   for (unsigned int q = 0; q < points.size(); ++q)
                     {
                       quadrature_points_vec[cell_index * points.size() + q] =
                         points[q];
-                      properties[cell_index * n_properties * points.size() +
-                                 q * n_properties] = JxW[q];
+                      Tensor<1, spacedim> normal;
                       if (dim < spacedim)
-                        for (unsigned int d = 0; d < spacedim; ++d)
-                          {
-                            properties[cell_index * n_properties *
-                                         points.size() +
-                                       q * n_properties + 1 + d] =
-                              fe_v.normal_vector(q)[d];
-                          }
+                        normal = fe_v.normal_vector(q);
+
+                      const unsigned int base_index =
+                        cell_index * n_properties * points.size() +
+                        q * n_properties;
+
+                      pack_quadrature_properties(properties,
+                                                 base_index,
+                                                 JxW[q],
+                                                 normal,
+                                                 quadrature.point(q),
+                                                 dof_indices2);
                     }
                   ++cell_index;
                 }
