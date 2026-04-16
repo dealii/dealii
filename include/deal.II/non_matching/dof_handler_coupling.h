@@ -411,19 +411,22 @@ namespace NonMatching
      *
      * @param[in] quadrature Reference quadrature on the immersed cells.
      * @param[out] sparsity Sparsity pattern to be filled.
-     * @param[in] constraints Constraints used while inserting entries.
+     * @param[in] constraints1 Constraints on the background space @p dh1.
+     * @param[in] constraints2 Constraints on the immersed space @p dh2.
      * @param[in] assemble_transpose If true, build the sparsity for the
      *   transposed matrix $(\text{n\_dofs}(dh1),\text{n\_dofs}(dh2))$.
      * @param[in] reuse_internal_data_structures If true, reuse cached particle
      *   data when available.
      */
-    template <class Sparsity, typename number = double>
+    template <class Sparsity>
     void
     create_coupling_mass_sparsity_pattern(
       const Quadrature<dim>           &quadrature,
       Sparsity                        &sparsity,
-      const AffineConstraints<number> &constraints =
-        AffineConstraints<number>(),
+      const AffineConstraints<double> &constraints1 =
+        AffineConstraints<double>(),
+      const AffineConstraints<double> &constraints2 =
+        AffineConstraints<double>(),
       const bool assemble_transpose             = false,
       const bool reuse_internal_data_structures = false) const
     {
@@ -463,11 +466,19 @@ namespace NonMatching
                         if (comp_j == comp_i)
                           {
                             if (assemble_transpose)
-                              constraints.add_entries_local_to_global(
-                                {dof_indices1[j]}, {dof_indices2[i]}, sparsity);
+                              // Transposed: rows=dh1, cols=dh2
+                              constraints1.add_entries_local_to_global(
+                                {dof_indices1[j]},
+                                constraints2,
+                                {dof_indices2[i]},
+                                sparsity);
                             else
-                              constraints.add_entries_local_to_global(
-                                {dof_indices2[i]}, {dof_indices1[j]}, sparsity);
+                              // Default: rows=dh2, cols=dh1
+                              constraints2.add_entries_local_to_global(
+                                {dof_indices2[i]},
+                                constraints1,
+                                {dof_indices1[j]},
+                                sparsity);
                           }
                       }
                 }
@@ -496,19 +507,22 @@ namespace NonMatching
      *
      * @param[in] quadrature Reference quadrature on the immersed cells.
      * @param[in,out] matrix Global matrix receiving the coupling mass entries.
-     * @param[in] constraints Constraints applied during assembly.
+     * @param[in] constraints1 Constraints on the background space @p dh1.
+     * @param[in] constraints2 Constraints on the immersed space @p dh2.
      * @param[in] assemble_transpose If true, assemble the transposed matrix
      *   $(\text{n\_dofs}(dh1),\text{n\_dofs}(dh2))$.
      * @param[in] reuse_internal_data_structures If true, reuse cached particle
      *   data when available.
      */
-    template <class MatrixType, typename number = double>
+    template <class MatrixType>
     void
     create_coupling_mass_matrix(
       const Quadrature<dim>           &quadrature,
       MatrixType                      &matrix,
-      const AffineConstraints<number> &constraints =
-        AffineConstraints<number>(),
+      const AffineConstraints<double> &constraints1 =
+        AffineConstraints<double>(),
+      const AffineConstraints<double> &constraints2 =
+        AffineConstraints<double>(),
       const bool assemble_transpose             = false,
       const bool reuse_internal_data_structures = false) const
     {
@@ -573,10 +587,12 @@ namespace NonMatching
                           }
                     }
 
-                  constraints.distribute_local_to_global(local_matrix,
-                                                         dof_indices1,
-                                                         dof_indices2,
-                                                         matrix);
+                  // Transposed: rows=dh1, cols=dh2
+                  constraints1.distribute_local_to_global(local_matrix,
+                                                          dof_indices1,
+                                                          constraints2,
+                                                          dof_indices2,
+                                                          matrix);
                 }
               else
                 {
@@ -601,10 +617,12 @@ namespace NonMatching
                           }
                     }
 
-                  constraints.distribute_local_to_global(local_matrix,
-                                                         dof_indices2,
-                                                         dof_indices1,
-                                                         matrix);
+                  // Default: rows=dh2, cols=dh1
+                  constraints2.distribute_local_to_global(local_matrix,
+                                                          dof_indices2,
+                                                          constraints1,
+                                                          dof_indices1,
+                                                          matrix);
                 }
             }
         }
