@@ -23,9 +23,8 @@
 #include <deal.II/lac/vector_operation.h>
 #include <deal.II/lac/vector_type_traits.h>
 
-#include <memory.h>
-
 #include <cstddef>
+#include <memory>
 
 #ifdef DEAL_II_WITH_PSBLAS
 
