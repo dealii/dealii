@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2026 by the deal.II authors
+// Copyright (C) 2018 - 2025 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -10,11 +10,7 @@
 //
 // -----------------------------------------------------------------------------
 
-// Integrate a constant field represented on dh1 against basis functions on dh2
-// Identical to the dof_handler_coupling_integrate_vector_01 test, but
-// using deal.II parallel distributed vector instead of the ones from Trilinos.
-// The main difference is that the locally_relevant_dofs must be gathered
-// from the DofHandlerCoupling before calling reinit on the vector.
+// Integrate a constant field represented on dh2 against basis functions on dh1.
 
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -39,7 +35,7 @@ template <int dim, int spacedim>
 void
 test()
 {
-  deallog << "integrate_vector_01" << std::endl;
+  deallog << "integrate_vector_02" << std::endl;
 
   parallel::distributed::Triangulation<spacedim>      tria1(MPI_COMM_WORLD);
   parallel::distributed::Triangulation<dim, spacedim> tria2(MPI_COMM_WORLD);
@@ -47,8 +43,8 @@ test()
   GridGenerator::hyper_cube(tria1, -1.0, 1.0);
   GridGenerator::hyper_cube(tria2, -0.8, 0.7);
 
-  tria1.refine_global(3);
-  tria2.refine_global(2);
+  tria1.refine_global(2);
+  tria2.refine_global(1);
 
   FE_Q<spacedim>      fe1(1);
   FE_Q<dim, spacedim> fe2(1);
@@ -59,36 +55,40 @@ test()
   dh1.distribute_dofs(fe1);
   dh2.distribute_dofs(fe2);
 
+  QGauss<dim> quadrature(2);
+
   deallog << "n_dofs(dh1): " << dh1.n_dofs() << std::endl;
   deallog << "n_dofs(dh2): " << dh2.n_dofs() << std::endl;
 
   NonMatching::DoFHandlerCoupling<dim, spacedim> dhc(dh1, dh2);
 
   const IndexSet locally_owned_1 = dh1.locally_owned_dofs();
+  const IndexSet locally_relevant_1 =
+    DoFTools::extract_locally_relevant_dofs(dh1);
   const IndexSet locally_owned_2 = dh2.locally_owned_dofs();
-  IndexSet locally_relevant_1    = DoFTools::extract_locally_relevant_dofs(dh1);
+  const IndexSet locally_relevant_2 =
+    dhc.extract_immersed_dof_indexset(quadrature);
 
   LinearAlgebra::distributed::Vector<double> src;
-  src.reinit(locally_owned_1, locally_relevant_1, MPI_COMM_WORLD);
-  src = 1.;
+  src.reinit(locally_owned_2, locally_relevant_2, MPI_COMM_WORLD);
+  src = 2.0;
   src.update_ghost_values();
 
-  QGauss<dim> quadrature(2);
-
-  // For deal.II vectors we need to know the relevant indices at the moment
-  // where we call reinit. So we extract them from the dhc.
-  IndexSet locally_relevant_2 = dhc.extract_immersed_dof_indexset(quadrature);
-
   LinearAlgebra::distributed::Vector<double> dst;
-  dst.reinit(locally_owned_2, locally_relevant_2, MPI_COMM_WORLD);
+  dst.reinit(locally_owned_1, locally_relevant_1, MPI_COMM_WORLD);
 
-  dhc.integrate_dh1_field_against_dh2_basis(quadrature, src, dst);
+  dhc.integrate_dh2_field_against_dh1_basis(quadrature, src, dst);
 
   const double l1 = dst.l1_norm();
   const double l2 = dst.l2_norm();
 
   deallog << "dst l1_norm: " << l1 << std::endl;
   deallog << "dst l2_norm: " << l2 << std::endl;
+
+  AssertThrow(std::isfinite(l1), ExcInternalError());
+  AssertThrow(std::isfinite(l2), ExcInternalError());
+  AssertThrow(l1 > 1e-12, ExcInternalError());
+  AssertThrow(l2 > 1e-12, ExcInternalError());
 }
 
 
