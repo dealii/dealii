@@ -18,7 +18,6 @@
 #include <deal.II/base/exceptions.h>
 
 #ifdef DEAL_II_WITH_CGAL
-
 #  include <CGAL/version.h>
 #  if CGAL_VERSION_MAJOR >= 6
 #    include <CGAL/Installation/internal/disable_deprecation_warnings_and_errors.h>
@@ -26,8 +25,13 @@
 #  include <CGAL/Mesh_facet_topology.h>
 
 #  include <limits>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_CGAL
+
 namespace CGALWrappers
 {
   enum class FacetTopology
@@ -203,11 +207,9 @@ namespace CGALWrappers
   };
 
 } // namespace CGALWrappers
-DEAL_II_NAMESPACE_CLOSE
 
 #else
 
-DEAL_II_NAMESPACE_OPEN
 namespace CGALWrappers
 {
   /**
@@ -218,7 +220,9 @@ namespace CGALWrappers
   {};
 } // namespace CGALWrappers
 
-DEAL_II_NAMESPACE_CLOSE
 #endif
+
+DEAL_II_NAMESPACE_CLOSE
+
 
 #endif

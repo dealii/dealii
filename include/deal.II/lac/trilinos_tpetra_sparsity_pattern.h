@@ -34,9 +34,11 @@
 #  include <memory>
 #  include <vector>
 
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 // forward declarations
 #  ifndef DOXYGEN
 class DynamicSparsityPattern;
@@ -1352,18 +1354,8 @@ namespace LinearAlgebra
 
 } // namespace LinearAlgebra
 
-
-DEAL_II_NAMESPACE_CLOSE
-
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_TRILINOS_WITH_TPETRA
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

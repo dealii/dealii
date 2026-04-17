@@ -25,8 +25,11 @@
 
 #  include <numeric>
 
+#endif // DEAL_II_WITH_HDF5
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_HDF5
 // It is necessary to turn clang-format off in order to maintain the Doxygen
 // links because they are longer than 80 characters
 // clang-format off
@@ -2245,17 +2248,8 @@ namespace HDF5
   }
 } // namespace HDF5
 
-DEAL_II_NAMESPACE_CLOSE
-
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_HDF5
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_hdf5_h

@@ -21,14 +21,9 @@
 #  include <deal.II/lac/trilinos_tpetra_precondition.h>
 #  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
+#endif
 
-#else
-
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 #  include <deal.II/base/enable_observer_pointer.h>
 
 #  include <deal.II/lac/la_parallel_vector.h>
@@ -55,8 +50,11 @@ namespace ML_Epetra
 }
 #  endif
 
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 // forward declarations
 #  ifndef DOXYGEN
 template <typename number>
@@ -2195,8 +2193,8 @@ namespace TrilinosWrappers
 
 /** @} */
 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
 #endif

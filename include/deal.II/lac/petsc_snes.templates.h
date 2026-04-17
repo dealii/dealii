@@ -26,8 +26,11 @@
 #  include <petscerror.h>
 #  include <petscsnes.h>
 
+#endif // DEAL_II_WITH_PETSC
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_PETSC
 // Shorthand notation for PETSc error codes.
 // This is used in deal.II code to raise exceptions
 #  define AssertPETSc(code)                          \
@@ -705,16 +708,8 @@ namespace PETScWrappers
 #    undef undefPetscCall
 #  endif
 
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_PETSC
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

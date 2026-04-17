@@ -41,10 +41,11 @@
 #  include <gp_Pnt.hxx>
 #  undef HAVE_CONFIG_H
 
-
+#endif // DEAL_II_WITH_OPENCASCADE
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_OPENCASCADE
 /**
  * We collect in this namespace all utilities which operate on OpenCASCADE
  * entities. OpenCASCADE splits every object into a topological description
@@ -461,17 +462,8 @@ namespace OpenCASCADE
   DeclException0(ExcUnsupportedShape);
 } // namespace OpenCASCADE
 
-
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_OPENCASCADE
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -28,9 +28,11 @@
 #  include <deal.II/lac/vector_operation.h>
 #  include <deal.II/lac/vector_type_traits.h>
 
+#endif // DEAL_II_WITH_PETSC
+
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifdef DEAL_II_WITH_PETSC
 /**
  * @addtogroup PETScWrappers
  * @{
@@ -565,17 +567,8 @@ template <>
 struct is_serial_vector<PETScWrappers::MPI::Vector> : std::false_type
 {};
 
-
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_PETSC
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

@@ -20,13 +20,9 @@
 #  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #  include <deal.II/lac/trilinos_tpetra_vector.h>
 
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
+#endif
 
-#else
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/base/mpi_stub.h>
 #  include <deal.II/base/partitioner.h>
@@ -49,8 +45,11 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <utility>
 #  include <vector>
 
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 // Forward declarations
 #  ifndef DOXYGEN
 namespace LinearAlgebra
@@ -2374,9 +2373,8 @@ template <>
 struct is_serial_vector<TrilinosWrappers::MPI::Vector> : std::false_type
 {};
 
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
 
 #endif

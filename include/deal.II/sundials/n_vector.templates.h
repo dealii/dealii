@@ -39,8 +39,11 @@
 
 #  include <limits>
 
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_SUNDIALS
 namespace SUNDIALS
 {
   namespace internal
@@ -1382,15 +1385,7 @@ namespace SUNDIALS
   } // namespace internal
 } // namespace SUNDIALS
 
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif
+
+DEAL_II_NAMESPACE_CLOSE
 #endif

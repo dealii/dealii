@@ -22,14 +22,16 @@
 #include <cstdio>
 
 #ifdef DEAL_II_WITH_GMSH
-
-
 #  ifdef DEAL_II_WITH_OPENCASCADE
 #    include <TopoDS_Edge.hxx>
 #  endif
+#endif
+
+
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_GMSH
 namespace Gmsh
 {
   AdditionalParameters::AdditionalParameters(
@@ -152,7 +154,7 @@ namespace Gmsh
 #    include "gmsh/utilities.inst"
 #  endif
 } // namespace Gmsh
+#endif
+
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

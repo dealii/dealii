@@ -20,12 +20,9 @@
 #  include <deal.II/lac/trilinos_tpetra_block_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-#else
+#endif
+
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 #  include <deal.II/lac/block_indices.h>
 #  include <deal.II/lac/block_vector_base.h>
 #  include <deal.II/lac/exceptions.h>
@@ -33,8 +30,11 @@ DEAL_II_NAMESPACE_CLOSE
 
 #  include <functional>
 
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 // forward declaration
 #  ifndef DOXYGEN
 template <typename Number>
@@ -503,8 +503,8 @@ template <>
 struct is_serial_vector<TrilinosWrappers::MPI::BlockVector> : std::false_type
 {};
 
-DEAL_II_NAMESPACE_CLOSE
+#endif
 
-#endif // DEAL_II_WITH_TRILINOS
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
