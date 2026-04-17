@@ -708,6 +708,8 @@ namespace Step80
 
     LA::MPI::BlockSparseMatrix
                       solid_matrix; // displacement and Lagrange multiplier
+    LA::MPI::BlockSparseMatrix solid_preconditioner; // Preconditioner matrix
+
     AMGPreconditioner solid_displacement_preconditioner;
     AMGPreconditioner solid_lagrange_preconditioner;
     LA::MPI::BlockSparseMatrix
@@ -1412,9 +1414,45 @@ namespace Step80
         locally_relevant_solid_dofs);
 
       solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
-
       solid_reference_configuration.reinit(solid_locally_relevant_solution);
       solid_current_position.reinit(solid_locally_relevant_solution);
+
+      // Setup system for the solid preconditioner
+      {
+        solid_preconditioner.clear();
+
+        std::cout << "Solid preconditioner" << std::endl;
+        Table<2, DoFTools::Coupling> coupling(2*spacedim, 2*spacedim);
+        for (unsigned int c =0; c < spacedim; ++c)
+          for (unsigned int d =0; d < spacedim; ++d)
+            coupling[c][d] = DoFTools::none;
+
+        for (unsigned int c =spacedim; c < 2 * spacedim; ++c)
+          for (unsigned int d = spacedim; d < 2 * spacedim; ++d)
+            if (c == d)
+              coupling[c][d] = DoFTools::always;
+            else
+              coupling[c][d] = DoFTools::none;
+
+        std::cout << "Coupling is made" << std::endl;
+
+
+        BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
+                                solid_dofs_per_block);
+        std::cout << "DSP is made " << std::endl;
+
+
+        DoFTools::make_sparsity_pattern(
+          solid_dh, coupling, dsp, solid_constraints, false);
+        SparsityTools::distribute_sparsity_pattern(
+          dsp,
+          locally_owned_solid_dofs_per_processor,
+          mpi_communicator,
+          locally_relevant_solid_dofs);
+        solid_preconditioner.reinit(solid_owned_dofs, dsp, mpi_communicator);
+      }
+
+
     }
   }
 
@@ -1853,6 +1891,8 @@ namespace Step80
     const unsigned int n_q_points    = solid_quadrature.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_preconditioner(dofs_per_cell, dofs_per_cell);
+
 
     std::vector<SymmetricTensor<2, spacedim>> grad_eps_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_w(dofs_per_cell);
@@ -1865,6 +1905,7 @@ namespace Step80
       if (cell->is_locally_owned())
         {
           cell_matrix = 0;
+        cell_preconditioner = 0;
 
           fe_values.reinit(cell);
 
@@ -1891,9 +1932,12 @@ namespace Step80
                          // lagrange * disp
                          (phi_lagrange[i] * phi_w[j] / time_step) -
                          // disp * lagrange
-                         (phi_w[i] * phi_lagrange[j] / time_step) +
-                         // lagr * lagr
-                         phi_lagrange[i] * phi_lagrange[j]) *
+                         (phi_w[i] * phi_lagrange[j] / time_step)) *
+                        // JxW
+                        fe_values.JxW(q);
+
+                    cell_preconditioner(i, j) += // lagr * lagr
+                         phi_lagrange[i] * phi_lagrange[j] *
                         // JxW
                         fe_values.JxW(q);
                     }
@@ -1904,8 +1948,13 @@ namespace Step80
           solid_constraints.distribute_local_to_global(cell_matrix,
                                                        local_dof_indices,
                                                        solid_matrix);
+        solid_constraints.distribute_local_to_global(cell_preconditioner,
+                                             local_dof_indices,
+                                             solid_preconditioner);
         }
     solid_matrix.compress(VectorOperation::add);
+    solid_preconditioner.compress(VectorOperation::add);
+
 
     // Provide the rigid-body translational modes (near-null-space) to the
     // elasticity AMG preconditioner. Without these, Trilinos aggregation
@@ -1919,7 +1968,7 @@ namespace Step80
     solid_displacement_preconditioner.initialize(solid_matrix.block(0, 0),
                                                  disp_amg_data);
     solid_lagrange_preconditioner.initialize(
-      solid_matrix.block(1, 1),
+      solid_preconditioner.block(1, 1),
       make_amg_additional_data(solid_fe->degree, true));
   }
 
@@ -2306,7 +2355,7 @@ namespace Step80
       solid_matrix.block(0, 1)); // C2^T/delta_t (minus sign already included)
     const auto D = LinOp(
       solid_matrix.block(1, 0)); // C2/delta_t (minus sign already included)
-    const auto M = LinOp(solid_matrix.block(1, 1));
+    const auto M = LinOp(solid_preconditioner.block(1, 1));
 
     const auto C   = 1.0 * LinOp(coupling_matrix.block(1, 0));
     const auto Ct  = 1.0 * LinOp(coupling_transpose_matrix.block(0, 1));
