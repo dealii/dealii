@@ -22,10 +22,12 @@
 #  include <deal.II/differentiation/ad/ad_number_traits.h>
 #  include <deal.II/differentiation/ad/sacado_number_types.h>
 
-
-#  ifndef DOXYGEN
+#endif // DEAL_II_TRILINOS_WITH_SACADO
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
+#  ifndef DOXYGEN
 /**
  * Implementation of the error function for real-valued Sacado numbers.
  */
@@ -87,18 +89,11 @@ erfc(const ADNumberType &x)
   return 1.0 - std::erf(x);
 }
 
-DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DOXYGEN
 
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_TRILINOS_WITH_SACADO
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif

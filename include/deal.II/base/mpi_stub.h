@@ -25,16 +25,17 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
+#endif
 
-#else
+
+DEAL_II_NAMESPACE_OPEN
+
+#ifndef DEAL_II_WITH_MPI
 
 // Without MPI, we would still like to use some constructs with MPI
 // data types. Therefore, create some dummies. Since we only ever use
 // them inside our own constructs, the right thing to do is to put
 // them into namespace dealii:
-DEAL_II_NAMESPACE_OPEN
 
 using MPI_Comm     = int;
 using MPI_Request  = int;
@@ -50,8 +51,8 @@ constexpr MPI_Op      MPI_MAX          = 0;
 constexpr MPI_Op      MPI_SUM          = 0;
 constexpr MPI_Op      MPI_LAND         = 0;
 constexpr MPI_Op      MPI_LOR          = 0;
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
 #endif

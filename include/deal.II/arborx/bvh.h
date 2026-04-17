@@ -22,8 +22,11 @@
 #  include <ArborX_LinearBVH.hpp>
 #  include <Kokkos_Core.hpp>
 
+#endif
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_ARBORX
 /**
  * This namespace contains wrappers for the ArborX library.
  */
@@ -309,15 +312,7 @@ namespace ArborXWrappers
 #  endif
 } // namespace ArborXWrappers
 
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif
+
+DEAL_II_NAMESPACE_CLOSE
 #endif

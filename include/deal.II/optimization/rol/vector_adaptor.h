@@ -18,9 +18,11 @@
 #ifdef DEAL_II_TRILINOS_WITH_ROL
 #  include <deal.II/trilinos/rol_adaptor.h>
 
+#endif // DEAL_II_TRILINOS_WITH_ROL
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_ROL
 namespace Rol
 {
   /**
@@ -34,16 +36,8 @@ namespace Rol
     dealii::TrilinosWrappers::ROLAdaptor<VectorType>;
 } // namespace Rol
 
-DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_TRILINOS_WITH_ROL
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_optimization_rol_vector_adaptor_h

@@ -29,8 +29,11 @@
 
 #    include <memory>
 
+#  endif // DEAL_II_WITH_SLEPC
+
 DEAL_II_NAMESPACE_OPEN
 
+#  ifdef DEAL_II_WITH_SLEPC
 /**
  * Base namespace for solver classes using the SLEPc solvers which are
  * selected based on flags passed to the eigenvalue problem solver context.
@@ -851,17 +854,9 @@ namespace SLEPcWrappers
 
 } // namespace SLEPcWrappers
 
-DEAL_II_NAMESPACE_CLOSE
-
-#  else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #  endif // DEAL_II_WITH_SLEPC
+
+DEAL_II_NAMESPACE_CLOSE
 
 /*----------------------------   slepc_solver.h  ---------------------------*/
 

@@ -37,8 +37,13 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Teuchos_RCPDecl.hpp>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+#  endif // DEAL_II_TRILINOS_WITH_AMESOS2
+#endif   // DEAL_II_TRILINOS_WITH_TPETRA
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  ifdef DEAL_II_TRILINOS_WITH_AMESOS2
 namespace LinearAlgebra
 {
   namespace TpetraWrappers
@@ -308,17 +313,11 @@ namespace LinearAlgebra
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
-DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_TRILINOS_WITH_AMESOS2
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_TPETRA
+
+DEAL_II_NAMESPACE_CLOSE
 
 #endif
