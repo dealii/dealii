@@ -1175,7 +1175,71 @@ namespace LinearAlgebra
                         "VectorOperation before this compress() call."));
         }
 
-      if (!nonlocal_vector.is_null())
+      bool nonlocal_vector_is_temporary = false;
+      if (nonlocal_vector.is_null())
+        {
+          // Use a temporary vector created from cached entries
+          nonlocal_vector_is_temporary = true;
+
+          Assert(nonlocal_cached_indices.size() ==
+                   nonlocal_cached_values.size(),
+                 ExcInternalError());
+
+          // First create the index set of ghost indices we will need to
+          // ship to other processes.
+          IndexSet ghost_indices(local_entries.size());
+          for (const auto &index : nonlocal_cached_indices)
+            ghost_indices.add_index(index);
+
+          ghost_indices.compress();
+
+          // Create a temporary nonlocal vector with a map that corresponds
+          // to the cached entries stored on this process.
+          // Create an overlapping map, because we dont know
+          // how many processes may write into one entry.
+          nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::VectorType<Number, MemorySpace>>(
+            ghost_indices
+              .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
+                get_mpi_communicator(), true));
+
+          // Now fill the nonlocal vector with the cached entries
+          {
+            // Extract a view into the vector in order to modify it
+            auto vector_2d_nonlocal =
+              nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
+                Tpetra::Access::ReadWriteStruct{});
+
+            auto vector_1d_nonlocal =
+              Kokkos::subview(vector_2d_nonlocal, Kokkos::ALL(), 0);
+
+            const auto n_elements = nonlocal_cached_indices.size();
+            for (size_type i = 0; i < n_elements; ++i)
+              {
+                const size_type row = nonlocal_cached_indices[i];
+                const TrilinosWrappers::types::int_type local_row =
+                  nonlocal_vector->getMap()->getLocalElement(row);
+
+                // We created nonlocal_vector to contain this entry locally
+                Assert(local_row != Teuchos::OrdinalTraits<int>::invalid(),
+                       ExcInternalError());
+
+                if (operation == VectorOperation::insert)
+                  vector_1d_nonlocal(local_row) = nonlocal_cached_values[i];
+                else if (operation == VectorOperation::add)
+                  vector_1d_nonlocal(local_row) += nonlocal_cached_values[i];
+                else
+                  DEAL_II_NOT_IMPLEMENTED();
+              }
+          }
+        }
+
+      // Handle vector additions
+      // If the nonlocal vector is permanent (=fixed-size) we cannot guarantee
+      // that all processes that store an entry have written into it. Therefore
+      // only perform insertions if the nonlocal vector is temporary, because
+      // then only processes that have modified it, will try to write into it.
+      if (nonlocal_vector_is_temporary || operation == VectorOperation::add)
         {
           Tpetra::CombineMode tpetra_operation = Tpetra::ZERO;
           if (operation == VectorOperation::insert)
@@ -1185,17 +1249,20 @@ namespace LinearAlgebra
           else
             DEAL_II_NOT_IMPLEMENTED();
 
-          // Handle vector additions
-          if (operation == VectorOperation::add)
-            {
-              Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>>
-                exporter = Tpetra::createExport(nonlocal_vector->getMap(),
-                                                vector->getMap());
-              vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
-            }
-
-          nonlocal_vector->putScalar(Number(0));
+          Teuchos::RCP<const TpetraTypes::ExportType<MemorySpace>> exporter =
+            Tpetra::createExport(nonlocal_vector->getMap(), vector->getMap());
+          vector->doExport(*nonlocal_vector, *exporter, tpetra_operation);
         }
+
+      // And reset or destroy the temporary nonlocal_vector again
+      if (nonlocal_vector_is_temporary)
+        {
+          nonlocal_vector.reset();
+          nonlocal_cached_values.clear();
+          nonlocal_cached_indices.clear();
+        }
+      else
+        nonlocal_vector->putScalar(Number(0));
 
       compressed  = true;
       last_action = VectorOperation::unknown;

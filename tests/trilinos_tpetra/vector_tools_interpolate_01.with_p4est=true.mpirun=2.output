@@ -1,0 +1,13 @@
+
+DEAL:2d:TrilinosWrappers::norm: 14.1659
+DEAL:2d:TrilinosWrappers::error: 1.23083e-16
+DEAL:3d:TrilinosWrappers::norm: 96.9871
+DEAL:3d:TrilinosWrappers::error: 3.37034e-16
+DEAL:2d:TpetraWrappers::Host::norm: 14.1659
+DEAL:2d:TpetraWrappers::Host::error: 1.23083e-16
+DEAL:3d:TpetraWrappers::Host::norm: 96.9871
+DEAL:3d:TpetraWrappers::Host::error: 3.37034e-16
+DEAL:2d:TpetraWrappers::Default::norm: 14.1659
+DEAL:2d:TpetraWrappers::Default::error: 1.23083e-16
+DEAL:3d:TpetraWrappers::Default::norm: 96.9871
+DEAL:3d:TpetraWrappers::Default::error: 3.37034e-16
