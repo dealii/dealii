@@ -1106,11 +1106,20 @@ namespace LinearAlgebra
        */
       dealii::IndexSet local_entries;
 
+      using dual_view_type =
+        typename TpetraTypes::VectorType<Number, MemorySpace>::dual_view_type;
+      using host_view_type = typename dual_view_type::t_host;
+
+      using array_view_type =
+        Kokkos::Subview<host_view_type,
+                        std::remove_const_t<decltype(Kokkos::ALL)>,
+                        unsigned>;
       /**
-       * To avoid creating new views for element-wise access, store
-       * a const host view.
+       * To avoid creating new views during element-wise access, store
+       * views to the vector.
        */
-      Teuchos::ArrayRCP<const Number> const_1d_host_view;
+      host_view_type  vector_2d;
+      array_view_type vector_1d;
 
       /**
        * CommunicationPattern for the communication between the
@@ -1205,18 +1214,7 @@ namespace LinearAlgebra
 
       last_action = VectorOperation::add;
 
-      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-
-      // Having extracted a view into the multivectors above, now also
-      // extract a view into the one vector we actually store. We can
-      // do this right away for the locally owned part. We defer creating
-      // the view into the nonlocal part to when we know that we actually
-      // need it; this also makes sure that we correctly deal with the
-      // case where we do not actually store a nonlocal part.
-      auto vector_1d_local = Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
-      using ViewType1d     = decltype(vector_1d_local);
-      std::optional<ViewType1d> vector_1d_nonlocal;
+      std::optional<array_view_type> vector_1d_nonlocal;
 
       for (size_type i = 0; i < n_elements; ++i)
         {
@@ -1229,7 +1227,7 @@ namespace LinearAlgebra
                 vector->getMap()->getLocalElement(row);
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
-              vector_1d_local(local_row) += values[i];
+              vector_1d(local_row) += values[i];
 
               // Set the compressed state to false only if there is nonlocal
               // part in this distributed vector, otherwise it's always
@@ -1315,18 +1313,7 @@ namespace LinearAlgebra
 
       last_action = VectorOperation::insert;
 
-      auto vector_2d_local = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-
-      // Having extracted a view into the multivectors above, now also
-      // extract a view into the one vector we actually store. We can
-      // do this right away for the locally owned part. We defer creating
-      // the view into the nonlocal part to when we know that we actually
-      // need it; this also makes sure that we correctly deal with the
-      // case where we do not actually store a nonlocal part.
-      auto vector_1d_local = Kokkos::subview(vector_2d_local, Kokkos::ALL(), 0);
-      using ViewType1d     = decltype(vector_1d_local);
-      std::optional<ViewType1d> vector_1d_nonlocal;
+      std::optional<array_view_type> vector_1d_nonlocal;
 
       for (size_type i = 0; i < n_elements; ++i)
         {
@@ -1339,7 +1326,7 @@ namespace LinearAlgebra
                 vector->getMap()->getLocalElement(row);
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
-              vector_1d_local(local_row) = values[i];
+              vector_1d(local_row) = values[i];
 
               // Set the compressed state to false only if there is nonlocal
               // part in this distributed vector, otherwise it's always
