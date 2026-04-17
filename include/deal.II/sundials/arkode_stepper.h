@@ -69,6 +69,14 @@ namespace SUNDIALS
   template <typename VectorType>
   class ARKode;
 
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+  /**
+   * Forward declare SplittingStepper.
+   */
+  template <typename VectorType>
+  class SplittingStepper;
+#  endif
+
   /**
    * A base class for the implementation of ARKode stepper classes.
    *
@@ -88,6 +96,14 @@ namespace SUNDIALS
      * method.
      */
     friend class ARKode<VectorType>;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+    /**
+     * Make SplittingStepper a friend so that it can call reinit() on its
+     * sub-steppers.
+     */
+    friend class SplittingStepper<VectorType>;
+#  endif
 
     /**
      * Destructor. Made `virtual` to allow this class to be used as an abstract
@@ -1827,6 +1843,192 @@ namespace SUNDIALS
   }
 
 #  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+
+  /**
+   * Wrapper for SUNDIALS' SplittingStep operator-splitting time-stepping
+   * module.
+   *
+   * SplittingStep integrates an ODE that is partitioned into $P$ additive
+   * parts
+   * \f[
+   *   \dot y = \sum_{i=1}^{P} f_i(t,y), \qquad y(t_0) = y_0,
+   * \f]
+   * using operator-splitting (Lie–Trotter, Strang, Yoshida, etc.). Each
+   * partition $f_i$ is evolved by an independent sub-stepper (any
+   * @ref ARKodeStepper derived class such as @ref ERKStepper or
+   * @ref ARKStepper).
+   *
+   * Users must provide one initialized sub-stepper per partition. The
+   * sub-steppers are passed at construction time and are stored as non-owning
+   * pointers; the user is responsible for keeping them alive for the lifetime
+   * of this object.
+   *
+   * The splitting coefficients (i.e., the operator-splitting method) are
+   * selected via AdditionalData::method_name. If left empty, SUNDIALS defaults
+   * to the first-order Lie–Trotter splitting. Named coefficients can be loaded
+   * by the strings defined in `arkode/arkode_splittingstep.h`, e.g.,
+   * `"ARKODE_SPLITTING_STRANG_2_2_2"`, `"ARKODE_SPLITTING_YOSHIDA_4_4_2"`.
+   * The built-in pre-defined coefficients are all for two-partition problems;
+   * for other partition counts or custom coefficients use custom_setup().
+   *
+   * The user has to supply the sub-steppers at construction:
+   * @code
+   * using VectorType = Vector<double>;
+   *
+   * SUNDIALS::ERKStepper<VectorType> stepper1, stepper2;
+   * stepper1.explicit_function = f1;
+   * stepper2.explicit_function = f2;
+   *
+   * SUNDIALS::SplittingStepper<VectorType> splitting(
+   *   {&stepper1, &stepper2},
+   *   SUNDIALS::SplittingStepper<VectorType>::AdditionalData(
+   *     "ARKODE_SPLITTING_STRANG_2_2_2"));
+   *
+   * SUNDIALS::ARKode<VectorType> ode(splitting, arkode_data);
+   * ode.solve_ode(y);
+   * @endcode
+   *
+   * @note This class is only available when deal.II is compiled against
+   *   SUNDIALS 6.2.0 or newer.
+   */
+  template <typename VectorType = Vector<double>>
+  class SplittingStepper : public ARKodeStepper<VectorType>
+  {
+  public:
+    /**
+     * Additional parameters for the SplittingStepper class.
+     */
+    class AdditionalData
+    {
+    public:
+      /**
+       * Constructor.
+       *
+       * @param method_name Name of the operator-splitting coefficients to use.
+       *   If empty, SUNDIALS selects the default (Lie--Trotter, first order).
+       *   Must be a name recognised by
+       *   SplittingStepCoefficients_LoadCoefficientsByName(), e.g.,
+       *   `"ARKODE_SPLITTING_STRANG_2_2_2"`,
+       *   `"ARKODE_SPLITTING_YOSHIDA_4_4_2"`. The built-in named methods are
+       *   designed for two-partition problems; for other counts use
+       *   custom_setup().
+       */
+      AdditionalData(const std::string &method_name = "")
+        : method_name(method_name)
+      {}
+
+      /**
+       * Add all AdditionalData() parameters to the given ParameterHandler
+       * object. When the parameters are parsed from a file, the internal
+       * parameters are automatically updated.
+       */
+      void
+      add_parameters(ParameterHandler &prm);
+
+      /**
+       * Name of the operator-splitting coefficients. If empty, SUNDIALS
+       * selects the default (Lie--Trotter).
+       */
+      std::string method_name;
+    };
+
+    /**
+     * Constructor.
+     *
+     * @param sub_steppers Non-owning pointers to the sub-stepper objects, one
+     *   per IVP partition. Must contain at least two entries (SUNDIALS
+     *   requires $P > 1$). The caller is responsible for keeping them alive
+     *   for the lifetime of this object.
+     * @param data SplittingStepper configuration data.
+     */
+    SplittingStepper(
+      const std::vector<ARKodeStepper<VectorType> *> &sub_steppers,
+      const AdditionalData                           &data = AdditionalData());
+
+    /**
+     * Destructor. Frees the SplittingStep memory block and all SUNStepper
+     * wrappers.
+     */
+    ~SplittingStepper();
+
+    void *
+    get_arkode_memory() const override;
+
+    /**
+     * A function object that users may supply and which is intended to perform
+     * custom settings on the supplied @p arkode_mem object. Refer to the
+     * SUNDIALS documentation for valid options.
+     *
+     * For instance, the following code attaches custom splitting coefficients
+     * constructed via SplittingStepCoefficients_Strang():
+     *
+     * @code
+     *   stepper.custom_setup = [&](void *arkode_mem) {
+     *     SplittingStepCoefficients coeffs =
+     *       SplittingStepCoefficients_Strang(2);
+     *     const int status =
+     *       SplittingStepSetCoefficients(arkode_mem, coeffs);
+     *     SplittingStepCoefficients_Destroy(&coeffs);
+     *     AssertARKode(status);
+     *   };
+     * @endcode
+     *
+     * @note This function will be called at the end of all other set up right
+     *   before the actual time evolution is started or continued with
+     *   solve_ode(). Consult the SUNDIALS manual to see which options are
+     *   still available at this point.
+     *
+     * @param arkode_mem pointer to the ARKODE memory block which can be used
+     *   for custom calls to `SplittingStepSet...` methods.
+     */
+    std::function<void(void *arkode_mem)> custom_setup;
+
+  private:
+    void
+    reinit(double                      t0,
+           const VectorType           &y0,
+           internal::InvocationContext inv_ctx) override;
+
+    /**
+     * SplittingStep ARKODE memory object.
+     */
+    void *arkode_mem;
+
+    /**
+     * Non-owning pointers to the sub-steppers, one per partition.
+     */
+    std::vector<ARKodeStepper<VectorType> *> sub_steppers;
+
+    /**
+     * SUNDIALS SUNStepper wrappers, one per sub-stepper. Managed by this
+     * object and destroyed when reinit() is called again or in the destructor.
+     */
+    std::vector<SUNStepper> sun_steppers;
+
+    /**
+     * SplittingStepper configuration data.
+     */
+    AdditionalData data;
+  };
+
+
+  template <typename VectorType>
+  void
+  SplittingStepper<VectorType>::AdditionalData::add_parameters(
+    ParameterHandler &prm)
+  {
+    prm.add_parameter(
+      "Method name",
+      method_name,
+      "Operator-splitting coefficients name passed to "
+      "SplittingStepCoefficients_LoadCoefficientsByName. "
+      "If empty, SUNDIALS uses the default (Lie-Trotter)");
+  }
+
+#  endif // DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
 
 } // namespace SUNDIALS
 

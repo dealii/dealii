@@ -32,6 +32,9 @@
 
 #  include <arkode/arkode_arkstep.h>
 #  include <arkode/arkode_erkstep.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+#    include <arkode/arkode_splittingstep.h>
+#  endif
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 #    include <arkode/arkode_lsrkstep.h>
 #  endif
@@ -915,6 +918,106 @@ namespace SUNDIALS
   }
 
 #  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+
+
+  // ---------------------------------------------------------------------------
+  // SplittingStepper implementation
+  // ---------------------------------------------------------------------------
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+
+  template <typename VectorType>
+  SplittingStepper<VectorType>::SplittingStepper(
+    const std::vector<ARKodeStepper<VectorType> *> &sub_steppers,
+    const AdditionalData                           &data)
+    : arkode_mem(nullptr)
+    , sub_steppers(sub_steppers)
+    , data(data)
+  {}
+
+
+  template <typename VectorType>
+  SplittingStepper<VectorType>::~SplittingStepper()
+  {
+    if (arkode_mem)
+      ARKodeFree(&arkode_mem);
+    for (auto &s : sun_steppers)
+      SUNStepper_Destroy(&s);
+  }
+
+
+  template <typename VectorType>
+  void
+  SplittingStepper<VectorType>::reinit(double                      t0,
+                                       const VectorType           &y0,
+                                       internal::InvocationContext inv_ctx)
+  {
+    if (arkode_mem)
+      ARKodeFree(&arkode_mem);
+    for (auto &s : sun_steppers)
+      SUNStepper_Destroy(&s);
+    sun_steppers.clear();
+
+    Assert(sub_steppers.size() > 1,
+           ExcMessage(
+             "SplittingStepper requires at least two sub-steppers (P > 1)."));
+
+    // Initialize each partition sub-stepper.
+    for (auto *sub : sub_steppers)
+      {
+        Assert(sub != nullptr, ExcInternalError());
+        sub->reinit(t0, y0, inv_ctx);
+      }
+
+    // Wrap each sub-stepper's ARKODE memory block in a SUNStepper object.
+    sun_steppers.resize(sub_steppers.size(), nullptr);
+    for (std::size_t i = 0; i < sub_steppers.size(); ++i)
+      {
+        const int status =
+          ARKodeCreateSUNStepper(sub_steppers[i]->get_arkode_memory(),
+                                 &sun_steppers[i]);
+        AssertARKode(status);
+      }
+
+    auto initial_condition_nvector =
+      internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
+
+    arkode_mem = SplittingStepCreate(sun_steppers.data(),
+                                     static_cast<int>(sun_steppers.size()),
+                                     t0,
+                                     initial_condition_nvector,
+                                     inv_ctx.arkode_ctx);
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    if (!data.method_name.empty())
+      {
+        SplittingStepCoefficients coeffs =
+          SplittingStepCoefficients_LoadCoefficientsByName(
+            data.method_name.c_str());
+        AssertThrow(
+          coeffs != nullptr,
+          ExcMessage(
+            "SplittingStepCoefficients_LoadCoefficientsByName could not load "
+            "coefficients named '" +
+            data.method_name + "'."));
+        const int status = SplittingStepSetCoefficients(arkode_mem, coeffs);
+        SplittingStepCoefficients_Destroy(&coeffs);
+        AssertARKode(status);
+      }
+
+    if (custom_setup)
+      custom_setup(arkode_mem);
+  }
+
+
+  template <typename VectorType>
+  void *
+  SplittingStepper<VectorType>::get_arkode_memory() const
+  {
+    return arkode_mem;
+  }
+
+#  endif // DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
 
 } // namespace SUNDIALS
 
