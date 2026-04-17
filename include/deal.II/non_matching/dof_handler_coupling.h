@@ -205,41 +205,86 @@ namespace NonMatching
     }
 
     /**
-     * Assemble penalty-type Nitsche restriction contributions.
+     * Assemble the matrix contribution of a penalty-type Nitsche restriction.
      *
-     * For each active component, this function adds to @p matrix and @p rhs the
-     * terms
+     * This function adds
      * \f[
-     * A^{\gamma}_{ij} = \gamma\int_{\Gamma_h} \varphi_i\,\varphi_j\,d\Gamma,
-     * \qquad
-     * b^{\gamma}_i = \gamma\int_{\Gamma_h} g\,\varphi_i\,d\Gamma,
+     * A^{\gamma}_{ij} = \gamma\int_{\Gamma_h} \varphi_i\,\varphi_j\,d\Gamma
      * \f]
-     * where $\Gamma_h$ is the immersed integration set, $\gamma$ is
-     * @p penalty_term, and $g$ is @p rhs_function. The basis functions are the
-     * shape functions of @p dh1, evaluated at quadrature points on the immersed
-     * mesh and integrated in the background mesh using the particle-based
-     * quadrature representation.
-     *
-     * The matrix is the penalty block that enforces restriction/Dirichlet data
-     * in a weak sense, while the right-hand side contains the prescribed
-     * target values projected with the same basis.
-     *
-     * @param[in] quadrature Reference quadrature on the immersed cells.
-     * @param[in] rhs_function Prescribed field $g$ in physical coordinates.
-     * @param[in] penalty_term Penalty parameter $\gamma$.
-     * @param[in,out] matrix Global matrix receiving Nitsche penalty entries.
-     * @param[in,out] rhs Global right-hand side receiving penalty forcing.
-     * @param[in] constraints Constraints used in local-to-global distribution.
-     * @param[in] reuse_internal_data_structures If true, reuse cached particle
-     *   data when available.
+     * to @p matrix.
      */
-    template <class MatrixType, class VectorType, typename number = double>
+    template <class MatrixType, typename number = double>
     void
-    create_nitsche_restriction(
+    create_nitsche_restriction_matrix(
+      const Quadrature<dim>           &quadrature,
+      const double                    &penalty_term,
+      MatrixType                      &matrix,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>(),
+      const bool reuse_internal_data_structures = false) const
+    {
+      if (penalty_term == 0.0)
+        return;
+      possibly_generate_particle_handler(reuse_internal_data_structures,
+                                         quadrature);
+
+      std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
+      FullMatrix<double> local_matrix(fe1->dofs_per_cell, fe1->dofs_per_cell);
+
+      auto particle = quadrature_particle_handler->begin();
+      while (particle != quadrature_particle_handler->end())
+        {
+          local_matrix     = 0;
+          const auto &cell = particle->get_surrounding_cell();
+          const auto &dh_cell =
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
+          dh_cell->get_dof_indices(dof_indices1);
+
+          const auto pic = quadrature_particle_handler->particles_in_cell(cell);
+
+          for (const auto &p : pic)
+            {
+              const auto  ref_q      = p.get_reference_location();
+              const auto  properties = p.get_properties();
+              const auto &JxW        = properties[0];
+              for (unsigned int i = 0; i < fe1->dofs_per_cell; ++i)
+                {
+                  const auto comp_i = fe1->system_to_component_index(i).first;
+                  if (comps1[comp_i])
+                    for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
+                      {
+                        const auto comp_j =
+                          fe1->system_to_component_index(j).first;
+                        if (comp_i == comp_j)
+                          local_matrix(i, j) +=
+                            penalty_term * fe1->shape_value(i, ref_q) *
+                            fe1->shape_value(j, ref_q) * JxW;
+                      }
+                }
+            }
+          constraints.distribute_local_to_global(local_matrix,
+                                                 dof_indices1,
+                                                 matrix);
+          particle = pic.end();
+        }
+    }
+
+    /**
+     * Assemble the right-hand-side contribution of a penalty-type Nitsche
+     * restriction.
+     *
+     * This function adds
+     * \f[
+     * b^{\gamma}_i = \gamma\int_{\Gamma_h} g\,\varphi_i\,d\Gamma
+     * \f]
+     * to @p rhs.
+     */
+    template <class VectorType, typename number = double>
+    void
+    create_nitsche_restriction_rhs(
       const Quadrature<dim>           &quadrature,
       const Function<spacedim>        &rhs_function,
       const double                    &penalty_term,
-      MatrixType                      &matrix,
       VectorType                      &rhs,
       const AffineConstraints<number> &constraints =
         AffineConstraints<number>(),
@@ -251,15 +296,11 @@ namespace NonMatching
                                          quadrature);
 
       std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
-
-
-      FullMatrix<double> local_matrix(fe1->dofs_per_cell, fe1->dofs_per_cell);
-      Vector<double>     local_rhs(fe1->dofs_per_cell);
+      Vector<double>                       local_rhs(fe1->dofs_per_cell);
 
       auto particle = quadrature_particle_handler->begin();
       while (particle != quadrature_particle_handler->end())
         {
-          local_matrix     = 0;
           local_rhs        = 0;
           const auto &cell = particle->get_surrounding_cell();
           const auto &dh_cell =
@@ -278,26 +319,40 @@ namespace NonMatching
                 {
                   const auto comp_i = fe1->system_to_component_index(i).first;
                   if (comps1[comp_i])
-                    {
-                      for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
-                        {
-                          const auto comp_j =
-                            fe1->system_to_component_index(j).first;
-                          if (comp_i == comp_j)
-                            local_matrix(i, j) +=
-                              penalty_term * fe1->shape_value(i, ref_q) *
-                              fe1->shape_value(j, ref_q) * JxW;
-                        }
-                      local_rhs(i) += penalty_term *
-                                      rhs_function.value(real_q, comp_i) *
-                                      fe1->shape_value(i, ref_q) * JxW;
-                    }
+                    local_rhs(i) += penalty_term *
+                                    rhs_function.value(real_q, comp_i) *
+                                    fe1->shape_value(i, ref_q) * JxW;
                 }
             }
-          constraints.distribute_local_to_global(
-            local_matrix, local_rhs, dof_indices1, matrix, rhs);
+          constraints.distribute_local_to_global(local_rhs, dof_indices1, rhs);
           particle = pic.end();
         }
+    }
+
+    /**
+     * Assemble penalty-type Nitsche restriction contributions.
+     *
+     * Convenience wrapper that assembles both matrix and rhs contributions.
+     */
+    template <class MatrixType, class VectorType, typename number = double>
+    void
+    create_nitsche_restriction(
+      const Quadrature<dim>           &quadrature,
+      const Function<spacedim>        &rhs_function,
+      const double                    &penalty_term,
+      MatrixType                      &matrix,
+      VectorType                      &rhs,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>(),
+      const bool reuse_internal_data_structures = false) const
+    {
+      create_nitsche_restriction_matrix(quadrature,
+                                        penalty_term,
+                                        matrix,
+                                        constraints,
+                                        reuse_internal_data_structures);
+      create_nitsche_restriction_rhs(
+        quadrature, rhs_function, penalty_term, rhs, constraints, true);
     }
 
 
@@ -631,21 +686,17 @@ namespace NonMatching
 
     /**
      * Integrate a field represented on @p dh1 against basis functions of
-     * @p dh2.
+     * @p dh2, and add the result to @p dst_dh2.
      *
-     * This function computes
-     * \f[
-     * (\mathrm{dst\_dh2})_a = \int_{\Gamma_h} u_h\,\psi_a\,d\Gamma,
-     * \f]
-     * where $u_h$ is represented by @p src_dh1 and $\psi_a$ are basis
-     * functions of @p dh2.
+     * This function computes \f[ (\mathrm{dst\_dh2})_a += \int_{\Gamma_h}
+     * u_h\,\psi_a\,d\Gamma, \f] where $u_h$ is represented by @p src_dh1 and
+     * $\psi_a$ are basis functions of @p dh2.
      *
-     * The source vector must already provide read access to all DoF indices
-     * touched by local quadrature particles.
+     * The source vector must provide read access to all DoF indices touched by
+     * local quadrature particles.
      *
      * Constraints are applied during assembly via distribute_local_to_global.
-     * If no constraints should be applied, pass a default-constructed
-     * AffineConstraints object.
+     * The entries of the field are scaled by @p factor during assembly.
      */
     template <class VectorType, typename number = double>
     void
@@ -654,14 +705,15 @@ namespace NonMatching
       const VectorType                &src_dh1,
       VectorType                      &dst_dh2,
       const AffineConstraints<number> &constraints =
-        AffineConstraints<number>()) const
+        AffineConstraints<number>(),
+      bool         reuse_internal_data_structures = false,
+      const number factor                         = 1.0) const
     {
-      possibly_generate_particle_handler(true, quadrature);
+      possibly_generate_particle_handler(reuse_internal_data_structures,
+                                         quadrature);
 
       AssertDimension(src_dh1.size(), dh1->n_dofs());
       AssertDimension(dst_dh2.size(), dh2->n_dofs());
-
-      dst_dh2 = 0.;
 
       std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
       std::vector<types::global_dof_index> dof_indices2(fe2->dofs_per_cell);
@@ -709,7 +761,7 @@ namespace NonMatching
                     gtl2[fe2->system_to_component_index(i).first];
                   if (comp_i != numbers::invalid_unsigned_int &&
                       comp_i < n_comps)
-                    local_rhs_dh2(i) += coupled_values(comp_i) *
+                    local_rhs_dh2(i) += factor * coupled_values(comp_i) *
                                         fe2->shape_value(i, ref_q2) * JxW;
                 }
 
@@ -724,11 +776,11 @@ namespace NonMatching
 
     /**
      * Integrate a field represented on @p dh2 against basis functions of
-     * @p dh1.
+     * @p dh1 and add the result to @p dst_hd1.
      *
      * This function computes
      * \f[
-     * (\mathrm{dst\_dh1})_i = \int_{\Gamma_h} w_h\,\varphi_i\,d\Gamma,
+     * (\mathrm{dst\_dh1})_i += \int_{\Gamma_h} w_h\,\varphi_i\,d\Gamma,
      * \f]
      * where $w_h$ is represented by @p src_dh2 and $\varphi_i$ are basis
      * functions of @p dh1.
@@ -737,8 +789,7 @@ namespace NonMatching
      * touched by local quadrature particles.
      *
      * Constraints are applied during assembly via distribute_local_to_global.
-     * If no constraints should be applied, pass a default-constructed
-     * AffineConstraints object.
+     * The global @p factor is applied to the field entries during assembly.
      */
     template <class VectorType, typename number = double>
     void
@@ -747,9 +798,12 @@ namespace NonMatching
       const VectorType                &src_dh2,
       VectorType                      &dst_dh1,
       const AffineConstraints<number> &constraints =
-        AffineConstraints<number>()) const
+        AffineConstraints<number>(),
+      bool         reuse_internal_data_structures = false,
+      const number factor                         = 1.0) const
     {
-      possibly_generate_particle_handler(true, quadrature);
+      possibly_generate_particle_handler(reuse_internal_data_structures,
+                                         quadrature);
 
       AssertDimension(src_dh2.size(), dh2->n_dofs());
       AssertDimension(dst_dh1.size(), dh1->n_dofs());
@@ -802,7 +856,7 @@ namespace NonMatching
                     gtl1[fe1->system_to_component_index(i).first];
                   if (comp_i != numbers::invalid_unsigned_int &&
                       comp_i < n_comps)
-                    local_rhs_dh1(i) += coupled_values(comp_i) *
+                    local_rhs_dh1(i) += factor * coupled_values(comp_i) *
                                         fe1->shape_value(i, ref_q1) * JxW;
                 }
             }
