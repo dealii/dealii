@@ -642,11 +642,11 @@ namespace Step80
     void interpolate_initial_conditions();
     void setup_coupling();
 
-    void assemble_navier_stokes_system(const double &time_step);
-    void assemble_navier_stokes_rhs(const double &time_step);
+    void assemble_navier_stokes_system(const double &alpha);
+    void assemble_navier_stokes_rhs(const double &alpha);
 
-    void assemble_elasticity_system(const double &time_step);
-    void assemble_elasticity_rhs(const double &time_step);
+    void assemble_elasticity_system(const double &alpha);
+    void assemble_elasticity_rhs(const double &alpha);
 
     void assemble_coupling();
 
@@ -1560,7 +1560,7 @@ namespace Step80
   template <int dim, int spacedim>
   void
   NavierStokesImmersedProblem<dim, spacedim>::assemble_navier_stokes_system(
-    const double &time_step)
+    const double &alpha)
   {
     fluid_matrix = 0;
 
@@ -1612,7 +1612,7 @@ namespace Step80
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
                       cell_fluid_matrix(i, j) +=
-                        ((par.density / time_step) * phi_u[i] * phi_u[j] +
+                        ((par.density * alpha) * phi_u[i] * phi_u[j] +
                          par.viscosity *
                            scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
@@ -1626,7 +1626,7 @@ namespace Step80
                         phi_p[i] * phi_p[j] * fe_values.JxW(q);
 
                       cell_fluid_mass_matrix(i, j) +=
-                        (par.density / time_step) * phi_u[i] * phi_u[j] *
+                        (par.density * alpha) * phi_u[i] * phi_u[j] *
                         fe_values.JxW(q);
                     }
                 }
@@ -1778,7 +1778,7 @@ namespace Step80
 
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_navier_stokes_rhs(
-    const double &time_step)
+    const double &alpha)
   {
     fluid_system_rhs = 0;
 
@@ -1839,7 +1839,7 @@ namespace Step80
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
                         {
                           cell_matrix(i, j) +=
-                            (par.density / time_step * phi_u[i] * phi_u[j] +
+                            (par.density * alpha * phi_u[i] * phi_u[j] +
                              par.viscosity *
                                scalar_product(grad_phi_u[i], grad_phi_u[j]) -
                              div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
@@ -1856,7 +1856,7 @@ namespace Step80
                   cell_rhs(i) +=
                     (par.density *
                      (fe_values.shape_value(i, q) * rhs_values[q](component_i) +
-                      (u[q] / time_step - grad_u[q] * u[q]) * phi_u[i])) *
+                      (u[q] * alpha - grad_u[q] * u[q]) * phi_u[i])) *
                     fe_values.JxW(q);
                 }
             }
@@ -1875,7 +1875,7 @@ namespace Step80
 
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_system(
-    const double &time_step)
+    const double &alpha)
   {
     solid_matrix = 0;
 
@@ -1930,9 +1930,9 @@ namespace Step80
                                           grad_eps_phi_w[j]) +
                          par.lame_lambda * div_phi_w[i] * div_phi_w[j] -
                          // lagrange * disp
-                         (phi_lagrange[i] * phi_w[j] / time_step) -
+                         (phi_lagrange[i] * phi_w[j] * alpha) -
                          // disp * lagrange
-                         (phi_w[i] * phi_lagrange[j] / time_step)) *
+                         (phi_w[i] * phi_lagrange[j] * alpha)) *
                         // JxW
                         fe_values.JxW(q);
 
@@ -1976,7 +1976,7 @@ namespace Step80
 
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_rhs(
-    const double &time_step)
+    const double &alpha)
   {
     solid_system_rhs = 0;
 
@@ -2031,7 +2031,7 @@ namespace Step80
                   const auto comp_i =
                     solid_fe->system_to_component_index(i).first;
 
-                  cell_rhs(i) += (-w_old[q] / time_step * phi_w +
+                  cell_rhs(i) += (-w_old[q] * alpha * phi_w +
                                   solid_rhs_values[q](comp_i) *
                                     fe_values_rhs.shape_value(i, q)) *
                                  fe_values_rhs.JxW(q);
@@ -2066,9 +2066,9 @@ namespace Step80
                                               grad_eps_phi_w[j]) +
                              par.lame_lambda * div_phi_w[i] * div_phi_w[j] -
                              // lagrange * disp
-                             (phi_lagrange[i] * phi_w[j] / time_step) -
+                             (phi_lagrange[i] * phi_w[j] * alpha) -
                              // disp * lagrange
-                             (phi_w[i] * phi_lagrange[j] / time_step) +
+                             (phi_w[i] * phi_lagrange[j] * alpha) +
                              // lagr * lagr
                              phi_lagrange[i] * phi_lagrange[j]) *
                             // JxW
@@ -2796,12 +2796,12 @@ namespace Step80
           }
 
         if (cycle == 0 || update_timestep || par.use_operator_augmentation)
-          assemble_navier_stokes_system(time_step);
+          assemble_navier_stokes_system(1./time_step);
         if (cycle == 0 || update_timestep)
-          assemble_elasticity_system(time_step);
+          assemble_elasticity_system(1./time_step);
 
-        assemble_navier_stokes_rhs(time_step);
-        assemble_elasticity_rhs(time_step);
+        assemble_navier_stokes_rhs(1./time_step);
+        assemble_elasticity_rhs(1./time_step);
 
         setup_coupling();
         assemble_coupling();
