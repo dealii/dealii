@@ -25,7 +25,7 @@
 #include "../tests.h"
 
 
-// Test MappingP1's subface values by comparing with MappingFE.
+// Test MappingP1's subface values by comparing with MappingFE
 
 using namespace dealii;
 
@@ -60,6 +60,16 @@ test()
   else
     GridGenerator::subdivided_hyper_cube_with_simplices(
       tria, 1, 1.0, 2.0, true);
+
+  // create a case of two unrefined cells in the interior that are completely
+  // surrounded by finer cells, which we use for the subface integration
+  // checks
+  tria.refine_global(1);
+  for (const auto &cell : tria.active_cell_iterators())
+    if (cell->at_boundary())
+      cell->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
+
   FE_SimplexP<dim, spacedim> fe(1);
   MappingP1<dim, spacedim>   mapping;
   MappingFE<dim, spacedim>   mapping_fe(fe);
@@ -86,158 +96,172 @@ test()
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
-      deallog << std::endl;
-
-      deallog << "cell vertices" << std::endl;
-      for (const unsigned int vertex_no : cell->vertex_indices())
-        deallog << "  " << cell->vertex(vertex_no) << std::endl;
-      deallog << std::endl;
-
+      bool cell_has_subfaces = false;
       for (unsigned int face_no : cell->face_indices())
+        if (cell->at_boundary(face_no) == false &&
+            cell->neighbor(face_no)->has_children())
+          cell_has_subfaces = true;
+
+      if (cell_has_subfaces)
         {
-          for (unsigned int subface_no = 0; subface_no < (dim == 2 ? 2 : 4);
-               ++subface_no)
+          deallog << std::endl;
 
+          deallog << "cell vertices" << std::endl;
+          for (const unsigned int vertex_no : cell->vertex_indices())
+            deallog << "  " << cell->vertex(vertex_no) << std::endl;
+          deallog << std::endl;
+
+          for (unsigned int face_no : cell->face_indices())
             {
-              fe_values.reinit(cell, face_no, subface_no);
-              fe_values_2.reinit(cell, face_no, subface_no);
+              for (unsigned int subface_no = 0; subface_no < (dim == 2 ? 2 : 4);
+                   ++subface_no)
 
-              deallog << "JxW" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
                 {
-                  deallog << "  " << fe_values.JxW(qp_n) << std::endl;
+                  fe_values.reinit(cell, face_no, subface_no);
+                  fe_values_2.reinit(cell, face_no, subface_no);
 
-                  Assert(std::abs((fe_values.JxW(qp_n) -
-                                   fe_values_2.JxW(qp_n))) < 1e-12,
-                         ExcInternalError());
-                }
-              deallog << std::endl;
-
-              deallog << "quadrature points" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  const Point<dim> p = mapping.transform_real_to_unit_cell(
-                    cell, fe_values.quadrature_point(qp_n));
-                  deallog << "  " << p << " -> "
-                          << fe_values.quadrature_point(qp_n) << std::endl;
-                  Assert(reference_cell.contains_point(p, 1e-12),
-                         ExcInternalError());
-
-                  Assert((fe_values.quadrature_point(qp_n) -
-                          fe_values_2.quadrature_point(qp_n))
-                             .norm() < 1e-12,
-                         ExcInternalError());
-                }
-              deallog << std::endl;
-
-              if constexpr (dim == spacedim)
-                {
-                  deallog << "normal vectors" << std::endl;
+                  deallog << "JxW" << std::endl;
                   for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
                     {
-                      deallog << fe_values.normal_vector(qp_n) << std::endl;
+                      deallog << "  " << fe_values.JxW(qp_n) << std::endl;
 
-                      Assert((fe_values.normal_vector(qp_n) -
-                              fe_values_2.normal_vector(qp_n))
+                      Assert(std::abs((fe_values.JxW(qp_n) -
+                                       fe_values_2.JxW(qp_n))) < 1e-12,
+                             ExcInternalError());
+                    }
+                  deallog << std::endl;
+
+                  deallog << "quadrature points" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      const Point<dim> p = mapping.transform_real_to_unit_cell(
+                        cell, fe_values.quadrature_point(qp_n));
+                      deallog << "  " << p << " -> "
+                              << fe_values.quadrature_point(qp_n) << std::endl;
+                      Assert(reference_cell.contains_point(p, 1e-12),
+                             ExcInternalError());
+
+                      Assert((fe_values.quadrature_point(qp_n) -
+                              fe_values_2.quadrature_point(qp_n))
                                  .norm() < 1e-12,
                              ExcInternalError());
                     }
                   deallog << std::endl;
-                }
 
-              deallog << "Jacobians" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  " << fe_values.jacobian(qp_n) << std::endl;
+                  if constexpr (dim == spacedim)
+                    {
+                      deallog << "normal vectors" << std::endl;
+                      for (unsigned int qp_n = 0; qp_n < quadrature.size();
+                           ++qp_n)
+                        {
+                          deallog << fe_values.normal_vector(qp_n) << std::endl;
 
-                  for (unsigned int d = 0; d < spacedim; ++d)
-                    Assert((fe_values.jacobian(qp_n)[d] -
-                            fe_values_2.jacobian(qp_n)[d])
-                               .norm() < 1e-12,
-                           ExcInternalError());
-                }
-              deallog << std::endl;
+                          Assert((fe_values.normal_vector(qp_n) -
+                                  fe_values_2.normal_vector(qp_n))
+                                     .norm() < 1e-12,
+                                 ExcInternalError());
+                        }
+                      deallog << std::endl;
+                    }
 
-              deallog << "Jacobian gradients" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  all zero = "
-                          << (fe_values.jacobian_grad(qp_n).norm() == 0)
+                  deallog << "Jacobians" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog << "  " << fe_values.jacobian(qp_n) << std::endl;
+
+                      for (unsigned int d = 0; d < spacedim; ++d)
+                        Assert((fe_values.jacobian(qp_n)[d] -
+                                fe_values_2.jacobian(qp_n)[d])
+                                   .norm() < 1e-12,
+                               ExcInternalError());
+                    }
+                  deallog << std::endl;
+
+                  deallog << "Jacobian gradients" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog << "  all zero = "
+                              << (fe_values.jacobian_grad(qp_n).norm() == 0)
+                              << std::endl;
+
+                      for (unsigned int d = 0; d < spacedim; ++d)
+                        Assert((fe_values.jacobian_grad(qp_n)[d] -
+                                fe_values_2.jacobian_grad(qp_n)[d])
+                                   .norm() < 1e-12,
+                               ExcInternalError());
+                    }
+                  deallog << std::endl;
+
+                  deallog << "inverse jacobians" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog << "  " << fe_values.inverse_jacobian(qp_n)
+                              << std::endl;
+
+                      for (unsigned int d = 0; d < dim; ++d)
+                        Assert((fe_values.inverse_jacobian(qp_n)[d] -
+                                fe_values_2.inverse_jacobian(qp_n)[d])
+                                   .norm() < 1e-12,
+                               ExcInternalError());
+                    }
+                  deallog << std::endl;
+
+                  deallog << "Jacobian push forward gradients" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog << "  all zero = "
+                              << (fe_values.jacobian_pushed_forward_grad(qp_n)
+                                    .norm() == 0)
+                              << std::endl;
+                    }
+                  deallog << std::endl;
+
+                  deallog << "Jacobian 2nd derivatives" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog
+                        << "  all zero = "
+                        << (fe_values.jacobian_2nd_derivative(qp_n).norm() == 0)
+                        << std::endl;
+                    }
+                  deallog << std::endl;
+
+                  deallog << "Jacobian push forward 2nd derivatives"
                           << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog
+                        << "  all zero = "
+                        << (fe_values
+                              .jacobian_pushed_forward_2nd_derivative(qp_n)
+                              .norm() == 0)
+                        << std::endl;
+                    }
+                  deallog << std::endl;
 
-                  for (unsigned int d = 0; d < spacedim; ++d)
-                    Assert((fe_values.jacobian_grad(qp_n)[d] -
-                            fe_values_2.jacobian_grad(qp_n)[d])
-                               .norm() < 1e-12,
-                           ExcInternalError());
-                }
-              deallog << std::endl;
+                  deallog << "Jacobian 3rd derivatives" << std::endl;
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog
+                        << "  all zero = "
+                        << (fe_values.jacobian_3rd_derivative(qp_n).norm() == 0)
+                        << std::endl;
+                    }
+                  deallog << std::endl;
 
-              deallog << "inverse jacobians" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  " << fe_values.inverse_jacobian(qp_n)
+                  deallog << "Jacobian push forward 3rd derivatives"
                           << std::endl;
-
-                  for (unsigned int d = 0; d < dim; ++d)
-                    Assert((fe_values.inverse_jacobian(qp_n)[d] -
-                            fe_values_2.inverse_jacobian(qp_n)[d])
-                               .norm() < 1e-12,
-                           ExcInternalError());
+                  for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
+                    {
+                      deallog
+                        << "  all zero = "
+                        << (fe_values
+                              .jacobian_pushed_forward_3rd_derivative(qp_n)
+                              .norm() == 0)
+                        << std::endl;
+                    }
+                  deallog << std::endl;
                 }
-              deallog << std::endl;
-
-              deallog << "Jacobian push forward gradients" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  all zero = "
-                          << (fe_values.jacobian_pushed_forward_grad(qp_n)
-                                .norm() == 0)
-                          << std::endl;
-                }
-              deallog << std::endl;
-
-              deallog << "Jacobian 2nd derivatives" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  all zero = "
-                          << (fe_values.jacobian_2nd_derivative(qp_n).norm() ==
-                              0)
-                          << std::endl;
-                }
-              deallog << std::endl;
-
-              deallog << "Jacobian push forward 2nd derivatives" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  all zero = "
-                          << (fe_values
-                                .jacobian_pushed_forward_2nd_derivative(qp_n)
-                                .norm() == 0)
-                          << std::endl;
-                }
-              deallog << std::endl;
-
-              deallog << "Jacobian 3rd derivatives" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  all zero = "
-                          << (fe_values.jacobian_3rd_derivative(qp_n).norm() ==
-                              0)
-                          << std::endl;
-                }
-              deallog << std::endl;
-
-              deallog << "Jacobian push forward 3rd derivatives" << std::endl;
-              for (unsigned int qp_n = 0; qp_n < quadrature.size(); ++qp_n)
-                {
-                  deallog << "  all zero = "
-                          << (fe_values
-                                .jacobian_pushed_forward_3rd_derivative(qp_n)
-                                .norm() == 0)
-                          << std::endl;
-                }
-              deallog << std::endl;
             }
         }
     }

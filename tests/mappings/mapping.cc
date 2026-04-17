@@ -126,69 +126,12 @@ plot_faces(Mapping<dim>                            &mapping,
 
 
 
-template <int dim>
-inline void
-plot_subfaces(Mapping<dim>                            &mapping,
-              FiniteElement<dim>                      &fe,
-              typename DoFHandler<dim>::cell_iterator &cell,
-              const std::string                       &name)
-{
-  deallog.push(name);
-
-  QGauss<dim - 1>    q(4);
-  const unsigned int nq =
-    (unsigned int)(.01 + std::pow(q.size(), 1. / (dim - 1)));
-
-  FESubfaceValues<dim> fe_values(mapping,
-                                 fe,
-                                 q,
-                                 UpdateFlags(update_quadrature_points |
-                                             update_normal_vectors));
-  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
-    for (unsigned int sub_nr = 0;
-         sub_nr < GeometryInfo<dim>::max_children_per_face;
-         ++sub_nr)
-      {
-        fe_values.reinit(cell, face_nr, sub_nr);
-
-        const std::vector<Tensor<1, dim>> &normals =
-          fe_values.get_normal_vectors();
-
-        unsigned int k = 0;
-        for (unsigned int ny = 0; ny < ((dim > 2) ? nq : 1); ++ny)
-          {
-            for (unsigned int nx = 0; nx < nq; ++nx)
-              {
-                Point<dim>     x = fe_values.quadrature_point(k);
-                Tensor<1, dim> n = normals[k];
-                deallog << x << '\t' << n << std::endl;
-                ++k;
-              }
-            deallog << std::endl;
-          }
-        deallog << std::endl;
-      }
-  deallog.pop();
-}
-
-
-
 template <>
 inline void
 plot_faces(Mapping<1> &,
            FiniteElement<1> &,
            DoFHandler<1>::cell_iterator &,
            const std::string &)
-{}
-
-
-
-template <>
-inline void
-plot_subfaces(Mapping<1> &,
-              FiniteElement<1> &,
-              DoFHandler<1>::cell_iterator &,
-              const std::string &)
 {}
 
 
@@ -500,16 +443,6 @@ mapping_test()
                 deallog << ost.str() << std::endl;
                 plot_faces(*mapping_ptr[j], fe_q4, cell, ost.str());
               }
-
-            if (dim > 1)
-              {
-                std::ostringstream ost;
-                ost << "MappingSubface" << dim << "d-" << i << '-'
-                    << mapping_strings[j];
-                deallog << ost.str() << std::endl;
-                plot_subfaces(*mapping_ptr[j], fe_q4, cell, ost.str());
-              }
-
 
             // Test for transform_*_to_*_cell
             if (true)

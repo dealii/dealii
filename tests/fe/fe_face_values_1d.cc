@@ -88,51 +88,6 @@ plot_faces(Mapping<dim>                            &mapping,
 
 
 template <int dim>
-inline void
-plot_subfaces(Mapping<dim>                            &mapping,
-              FiniteElement<dim>                      &fe,
-              typename DoFHandler<dim>::cell_iterator &cell)
-{
-  // create a QGauss<0>(4), which should
-  // still only have 1 quadrature point
-  QGauss<dim - 1> q(4);
-  Assert(q.size() == 1, ExcInternalError());
-
-  FESubfaceValues<dim> fe_values(
-    mapping,
-    fe,
-    q,
-    UpdateFlags(update_quadrature_points | update_JxW_values | update_values |
-                update_gradients | update_hessians | update_normal_vectors));
-  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
-    for (unsigned int sub_nr = 0;
-         sub_nr < GeometryInfo<dim>::max_children_per_face;
-         ++sub_nr)
-      {
-        deallog << "Face=" << face_nr << ", subface=" << sub_nr << std::endl;
-
-        fe_values.reinit(cell, face_nr, sub_nr);
-
-        // print some data on the location
-        deallog << "x=" << fe_values.quadrature_point(0) << std::endl;
-        deallog << "n=" << fe_values.normal_vector(0) << std::endl;
-        deallog << "JxW=" << fe_values.JxW(0) << std::endl;
-
-        // now print some data on the shape
-        // functions
-        for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
-          deallog << "shape_function " << i << ':' << std::endl
-                  << "  phi=" << fe_values.shape_value(i, 0) << std::endl
-                  << "  grad phi=" << fe_values.shape_grad(i, 0) << std::endl
-                  << "  grad^2 phi=" << fe_values.shape_hessian(i, 0)
-                  << std::endl;
-
-        deallog << std::endl;
-      }
-}
-
-
-template <int dim>
 void
 mapping_test()
 {
@@ -157,13 +112,6 @@ mapping_test()
     ost << "MappingFace" << dim << "d-" << mapping_name;
     deallog << ost.str() << std::endl;
     plot_faces(mapping, fe_q4, cell);
-  }
-
-  {
-    std::ostringstream ost;
-    ost << "MappingSubface" << dim << "d-" << mapping_name;
-    deallog << ost.str() << std::endl;
-    plot_subfaces(mapping, fe_q4, cell);
   }
 }
 

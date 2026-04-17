@@ -13,7 +13,6 @@
 
 // Test FESubfaceValues for different subface quadrature rules on triangles.
 
-
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -60,9 +59,15 @@ test<2>()
       update_values | update_quadrature_points | update_JxW_values;
 
     Triangulation<dim> tria;
+
+    // create a mesh with two unrefined cells in the interior that are
+    // completely surrounded by finer cells, which we use for the subface
+    // integration checks
     GridGenerator::subdivided_hyper_cube_with_simplices(tria, 1);
-    tria.begin_active()->set_refine_flag(
-      RefinementCase<dim>::isotropic_refinement);
+    tria.refine_global(1);
+    for (const auto &cell : tria.active_cell_iterators())
+      if (cell->at_boundary())
+        cell->set_refine_flag();
     tria.execute_coarsening_and_refinement();
 
     DoFHandler<dim> dof_handler(tria);
@@ -94,36 +99,40 @@ test<2>()
 
         for (const auto &cell : dof_handler.active_cell_iterators())
           for (const auto face_no : cell->face_indices())
-            for (unsigned int subface_no = 0; subface_no < 2; ++subface_no)
-              {
-                fe_face_values.reinit(cell, face_no, subface_no);
+            if (cell->at_boundary() == false &&
+                cell->neighbor(face_no)->has_children())
+              for (unsigned int subface_no = 0; subface_no < 2; ++subface_no)
+                {
+                  fe_face_values.reinit(cell, face_no, subface_no);
 
-                values_0.resize(fe_face_values.n_quadrature_points);
-                values_1.resize(fe_face_values.n_quadrature_points);
+                  values_0.resize(fe_face_values.n_quadrature_points);
+                  values_1.resize(fe_face_values.n_quadrature_points);
 
-                fe_face_values.get_function_values(vector_0, values_0);
-                fe_face_values.get_function_values(vector_1, values_1);
+                  fe_face_values.get_function_values(vector_0, values_0);
+                  fe_face_values.get_function_values(vector_1, values_1);
 
-                for (unsigned int q = 0; q < values_0.size(); ++q)
-                  {
-                    if (std::abs(values_0[q] -
-                                 fe_face_values.quadrature_point(q)[0]) < 1e-12)
-                      deallog << "Ok"
-                              << " ";
-                    else
-                      deallog << "False"
-                              << " ";
+                  for (unsigned int q = 0; q < values_0.size(); ++q)
+                    {
+                      if (std::abs(values_0[q] -
+                                   fe_face_values.quadrature_point(q)[0]) <
+                          1e-12)
+                        deallog << "Ok"
+                                << " ";
+                      else
+                        deallog << "False"
+                                << " ";
 
-                    if (std::abs(values_1[q] -
-                                 fe_face_values.quadrature_point(q)[1]) < 1e-12)
-                      deallog << "Ok"
-                              << " ";
-                    else
-                      deallog << "False"
-                              << " ";
-                    deallog << std::endl;
-                  }
-              }
+                      if (std::abs(values_1[q] -
+                                   fe_face_values.quadrature_point(q)[1]) <
+                          1e-12)
+                        deallog << "Ok"
+                                << " ";
+                      else
+                        deallog << "False"
+                                << " ";
+                      deallog << std::endl;
+                    }
+                }
       }
     deallog << std::endl;
   }

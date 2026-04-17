@@ -43,23 +43,19 @@ check(const Triangulation<dim> &tria)
 
   QGauss<dim - 1> q_face(3);
 
-  FEFaceValues<dim>    fe_face_values(fe,
+  FEFaceValues<dim> fe_face_values(fe,
                                    q_face,
                                    update_normal_vectors | update_JxW_values);
-  FESubfaceValues<dim> fe_subface_values(
-    fe, q_face, update_normal_vectors | update_JxW_values);
 
   for (typename DoFHandler<dim>::active_cell_iterator cell =
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
     {
-      Tensor<1, dim> n1, n2;
+      Tensor<1, dim> n1;
 
-      // first integrate over faces
-      // and make sure that the
-      // result of the integration is
-      // close to zero
+      // integrate over faces and make sure that the result of the integration
+      // is close to zero
       for (const unsigned int f : GeometryInfo<dim>::face_indices())
         {
           fe_face_values.reinit(cell, f);
@@ -68,21 +64,6 @@ check(const Triangulation<dim> &tria)
         }
       Assert(n1 * n1 < 1e-24, ExcInternalError());
       deallog << cell << " face integration is ok: " << std::sqrt(n1 * n1)
-              << std::endl;
-
-      // now same for subface
-      // integration
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
-        for (unsigned int sf = 0; sf < GeometryInfo<dim>::max_children_per_face;
-             ++sf)
-          {
-            fe_subface_values.reinit(cell, f, sf);
-            for (unsigned int q = 0; q < q_face.size(); ++q)
-              n2 +=
-                fe_subface_values.normal_vector(q) * fe_subface_values.JxW(q);
-          }
-      Assert(n2 * n2 < 1e-24, ExcInternalError());
-      deallog << cell << " subface integration is ok: " << std::sqrt(n2 * n2)
               << std::endl;
     }
 }
