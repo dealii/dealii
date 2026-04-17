@@ -2569,7 +2569,7 @@ namespace internal
       std::vector<std::size_t> cells_to_faces_offsets(cell_types.size() + 1);
       cells_to_faces_offsets[0] = 0;
 
-      static const unsigned int offset = 1;
+      constexpr unsigned int offset = 1;
 
       // loop over all cells
       for (unsigned int c = 0, counter = 0; c < cell_types.size(); ++c)
@@ -3517,7 +3517,7 @@ namespace internal
         // first index:  dimension (minus 2)
         // second index: local face index
         // third index:  face_orientation (false and true)
-        static const unsigned int left_right_offset[2][6][2] = {
+        constexpr unsigned int left_right_offset[2][6][2] = {
           // quadrilateral
           {{0, 1},  // face 0, face_orientation = false and true
            {1, 0},  // face 1, face_orientation = false and true
@@ -3859,8 +3859,8 @@ namespace internal
           }
         else // 1d
           {
-            static const unsigned int t_tba   = static_cast<unsigned int>(-1);
-            static const unsigned int t_inner = static_cast<unsigned int>(-2);
+            constexpr unsigned int t_tba   = static_cast<unsigned int>(-1);
+            constexpr unsigned int t_inner = static_cast<unsigned int>(-2);
 
             std::vector<unsigned int> type(vertices.size(), t_tba);
 
@@ -5632,16 +5632,16 @@ namespace internal
 
           // Assign lines to child cells:
           constexpr unsigned int X = numbers::invalid_unsigned_int;
-          static constexpr dealii::ndarray<unsigned int, 4, 4> tri_child_lines =
-            {{{{0, 8, 5, X}}, //
-              {{1, 2, 6, X}}, //
-              {{7, 3, 4, X}}, //
-              {{6, 7, 8, X}}}};
-          static constexpr dealii::ndarray<unsigned int, 4, 4>
-            quad_child_lines = {{{{0, 8, 4, 10}},
-                                 {{8, 2, 5, 11}},
-                                 {{1, 9, 10, 6}},
-                                 {{9, 3, 11, 7}}}};
+          constexpr dealii::ndarray<unsigned int, 4, 4> tri_child_lines = {
+            {{{0, 8, 5, X}}, //
+             {{1, 2, 6, X}}, //
+             {{7, 3, 4, X}}, //
+             {{6, 7, 8, X}}}};
+          constexpr dealii::ndarray<unsigned int, 4, 4> quad_child_lines = {
+            {{{0, 8, 4, 10}},
+             {{8, 2, 5, 11}},
+             {{1, 9, 10, 6}},
+             {{9, 3, 11, 7}}}};
           // Here and below we assume that child cells have the same reference
           // cell type as the parent.
           const auto &child_lines =
@@ -6302,8 +6302,8 @@ namespace internal
       execute_refinement_isotropic(Triangulation<3, spacedim> &triangulation,
                                    const bool check_for_distorted_cells)
       {
-        static const int          dim = 3;
-        static const unsigned int X   = numbers::invalid_unsigned_int;
+        constexpr int          dim = 3;
+        constexpr unsigned int X   = numbers::invalid_unsigned_int;
         using raw_line_iterator =
           typename Triangulation<dim, spacedim>::raw_line_iterator;
         using raw_quad_iterator =
@@ -6727,25 +6727,25 @@ namespace internal
               // 4---8---5   .-10.11-.   .---.---.
               // |   |   |   0   8   2   | 0 | 1 |
               // 0---6---1   .-4-.-5-.   .---.---.
-              static constexpr dealii::ndarray<unsigned int, 12, 2>
-                line_vertices_quad{{{{0, 4}},
-                                    {{4, 2}},
-                                    {{1, 5}},
-                                    {{5, 3}},
-                                    {{0, 6}},
-                                    {{6, 1}},
-                                    {{2, 7}},
-                                    {{7, 3}},
-                                    {{6, 8}},
-                                    {{8, 7}},
-                                    {{4, 8}},
-                                    {{8, 5}}}};
+              constexpr dealii::ndarray<unsigned int, 12, 2> line_vertices_quad{
+                {{{0, 4}},
+                 {{4, 2}},
+                 {{1, 5}},
+                 {{5, 3}},
+                 {{0, 6}},
+                 {{6, 1}},
+                 {{2, 7}},
+                 {{7, 3}},
+                 {{6, 8}},
+                 {{8, 7}},
+                 {{4, 8}},
+                 {{8, 5}}}};
 
-              static constexpr dealii::ndarray<unsigned int, 4, 4>
-                quad_lines_quad{{{{0, 8, 4, 10}},
-                                 {{8, 2, 5, 11}},
-                                 {{1, 9, 10, 6}},
-                                 {{9, 3, 11, 7}}}};
+              constexpr dealii::ndarray<unsigned int, 4, 4> quad_lines_quad{
+                {{{0, 8, 4, 10}},
+                 {{8, 2, 5, 11}},
+                 {{1, 9, 10, 6}},
+                 {{9, 3, 11, 7}}}};
 
               //  2                *                *             .
               //  |\               |\               |\            .
@@ -6756,31 +6756,31 @@ namespace internal
               //  v  ^  ^  ^       5  8  6  2       |  \  |  \    .
               //  |    \|    \     |    \|    \     | 0  \| 1  \  .
               //  0-->--3-->--1    *--0--*--1--*    *-----*-----* .
-              static constexpr dealii::ndarray<unsigned int, 12, 2>
-                line_vertices_tri{{{{0, 3}},
-                                   {{3, 1}},
-                                   {{1, 4}},
-                                   {{4, 2}},
-                                   {{2, 5}},
-                                   {{5, 0}},
-                                   {{3, 4}},
-                                   {{4, 5}},
-                                   {{3, 5}},
-                                   {{X, X}},
-                                   {{X, X}},
-                                   {{X, X}}}};
+              constexpr dealii::ndarray<unsigned int, 12, 2> line_vertices_tri{
+                {{{0, 3}},
+                 {{3, 1}},
+                 {{1, 4}},
+                 {{4, 2}},
+                 {{2, 5}},
+                 {{5, 0}},
+                 {{3, 4}},
+                 {{4, 5}},
+                 {{3, 5}},
+                 {{X, X}},
+                 {{X, X}},
+                 {{X, X}}}};
 
-              static constexpr dealii::ndarray<unsigned int, 4, 4>
-                tri_lines_tri{{{{0, 8, 5, X}},
-                               {{1, 2, 6, X}},
-                               {{7, 3, 4, X}},
-                               {{6, 7, 8, X}}}};
+              constexpr dealii::ndarray<unsigned int, 4, 4> tri_lines_tri{
+                {{{0, 8, 5, X}},
+                 {{1, 2, 6, X}},
+                 {{7, 3, 4, X}},
+                 {{6, 7, 8, X}}}};
 
               // The defined lines in `line_vertices_tri` do not satisfy the
               // expected orientations of all the children's reference cells.
               // This table specifies the expected line orientations (i.e.
               // vertex order) necessary for `set_line_orientation(...)`.
-              static constexpr dealii::ndarray<unsigned int, 4, 4, 2>
+              constexpr dealii::ndarray<unsigned int, 4, 4, 2>
                 tri_line_vertices_tri{
                   {{{{{0, 3}}, {{3, 5}}, {{5, 0}}, {{X, X}}}},
                    {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
@@ -6901,7 +6901,7 @@ namespace internal
               // with cheap algorithm.
               if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
-                  static constexpr dealii::ndarray<unsigned int, 4, 2>
+                  constexpr dealii::ndarray<unsigned int, 4, 2>
                     quad_child_line_vertices{{{{0, 2}}, //
                                               {{1, 3}}, //
                                               {{0, 1}}, //
@@ -7150,7 +7150,7 @@ namespace internal
                           // possibilities (6,8), (5,7), (4,9) -> pick the
                           // shortest line to guarantee the best possible aspect
                           // ratios
-                          static constexpr dealii::ndarray<unsigned int, 3, 2>
+                          constexpr dealii::ndarray<unsigned int, 3, 2>
                             new_line_vertices = {{{{6, 8}}, //
                                                   {{5, 7}}, //
                                                   {{4, 9}}}};
@@ -7219,7 +7219,7 @@ namespace internal
                         {
                           // Directions so that middle tri looks like a 'normal'
                           // refined tri (refined quads define outer lines)
-                          static constexpr dealii::ndarray<unsigned int, 3, 2>
+                          constexpr dealii::ndarray<unsigned int, 3, 2>
                             new_line_vertices = {{{{15, 16}}, //
                                                   {{16, 17}}, //
                                                   {{15, 17}}}};
@@ -7233,7 +7233,7 @@ namespace internal
 
                       case ReferenceCells::Hexahedron:
                         {
-                          static constexpr dealii::ndarray<unsigned int, 6, 2>
+                          constexpr dealii::ndarray<unsigned int, 6, 2>
                             new_line_vertices = {{{{22, 26}},
                                                   {{26, 23}},
                                                   {{20, 26}},
@@ -7348,11 +7348,11 @@ namespace internal
                         // Modifications to this behavior would result in
                         // extensive rewriting of tables in `ReferenceCell`.
                         //
-                        // static constexpr std::
+                        // constexpr std::
                         //   pair<unsigned int, std::array<unsigned int, 2>>
                         //     quad_relevant_children_and_lines = {{0, {1, 3}},
                         //                                         {3, {0, 2}}};
-                        static constexpr dealii::ndarray<unsigned int, 4, 2>
+                        constexpr dealii::ndarray<unsigned int, 4, 2>
                           quad_relevant_children_and_lines = {{{{0, 1}}, //
                                                                {{3, 0}}, //
                                                                {{0, 3}}, //
@@ -7398,8 +7398,7 @@ namespace internal
                             // Permutations of reference cell indices against
                             // real world indices given the real world
                             // orientation of the face.
-                            static const std::array<std::array<unsigned int, 3>,
-                                                    6>
+                            const std::array<std::array<unsigned int, 3>, 6>
                               // Extract newly created lines surrounding the
                               // center child (child 3) of the refined
                               // triangular faces in a predictable manner (i.e.,
@@ -7462,7 +7461,7 @@ namespace internal
                     // calculated orientation of one line can be used for some
                     // other lines as well. This connection is described in this
                     // table.
-                    static constexpr dealii::ndarray<unsigned int, 4, 2>
+                    constexpr dealii::ndarray<unsigned int, 4, 2>
                       representative_lines{{{{0, 2}}, //
                                             {{2, 0}}, //
                                             {{3, 3}}, //
@@ -7811,7 +7810,7 @@ namespace internal
                     // from the parent on the outer faces; the inner faces can
                     // be skipped as their orientation is always the default
                     // one set above.
-                    static constexpr dealii::ndarray<unsigned int, 6, 4>
+                    constexpr dealii::ndarray<unsigned int, 6, 4>
                       face_to_child_indices_hex{{{{0, 2, 4, 6}},
                                                  {{1, 3, 5, 7}},
                                                  {{0, 1, 4, 5}},
