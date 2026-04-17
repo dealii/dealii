@@ -1429,7 +1429,7 @@ namespace Step80
                              fluid_solution,
                              ComponentMask(fluid_fe->component_mask(velocity)));
     fluid_locally_relevant_solution_old = fluid_solution;
-    fluid_locally_relevant_solution = fluid_solution;
+    fluid_locally_relevant_solution     = fluid_solution;
 
     VectorTools::interpolate(solid_dh,
                              par.solid_reference_configuration,
@@ -1444,7 +1444,7 @@ namespace Step80
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
     solid_locally_relevant_solution_old = solid_solution;
-    solid_locally_relevant_solution = solid_solution;
+    solid_locally_relevant_solution     = solid_solution;
 
     {
       LA::MPI::BlockVector owned_current_position;
@@ -1713,12 +1713,28 @@ namespace Step80
     fluid_preconditioner.compress(VectorOperation::add);
     fluid_mass_matrix.compress(VectorOperation::add);
 
-    fluid_velocity_preconditioner.initialize(
-      fluid_matrix.block(0, 0),
-      make_amg_additional_data(fluid_fe->degree, true));
-    fluid_pressure_preconditioner.initialize(
-      fluid_preconditioner.block(1, 1),
-      make_amg_additional_data(fluid_fe->degree, true));
+    // Provide the constant (near-null-space) modes to the velocity and
+    // pressure AMG preconditioners. For the velocity block this yields one
+    // constant mode per spatial component; for the pressure block a single
+    // constant mode. Without these, Trilinos aggregation across MPI partition
+    // boundaries can degenerate.
+    auto velocity_amg_data = make_amg_additional_data(fluid_fe->degree, true);
+    const auto velocity_constant_modes =
+      DoFTools::extract_constant_modes(fluid_dh,
+                                       fluid_fe->component_mask(velocity));
+    velocity_amg_data.constant_modes = velocity_constant_modes;
+
+    fluid_velocity_preconditioner.initialize(fluid_matrix.block(0, 0),
+                                             velocity_amg_data);
+
+    auto pressure_amg_data = make_amg_additional_data(fluid_fe->degree, true);
+    const auto pressure_constant_modes =
+      DoFTools::extract_constant_modes(fluid_dh,
+                                       fluid_fe->component_mask(pressure));
+    pressure_amg_data.constant_modes = pressure_constant_modes;
+
+    fluid_pressure_preconditioner.initialize(fluid_preconditioner.block(1, 1),
+                                             pressure_amg_data);
   }
 
 
@@ -1788,8 +1804,11 @@ namespace Step80
                             (par.density / time_step * phi_u[i] * phi_u[j] +
                              par.viscosity *
                                scalar_product(grad_phi_u[i], grad_phi_u[j]) -
-                             div_phi_u[i] * phi_p[j] -
-                             phi_p[i] * div_phi_u[j]) *
+                             div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
+                             (par.use_operator_augmentation ?
+                                par.gamma_AL_background * div_phi_u[i] *
+                                  div_phi_u[j] :
+                                0.)) *
                             fe_values.JxW(q);
                         }
                     }
