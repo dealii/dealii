@@ -707,7 +707,7 @@ namespace Step80
     AMGPreconditioner          fluid_pressure_preconditioner;
 
     LA::MPI::BlockSparseMatrix
-                      solid_matrix; // displacement and Lagrange multiplier
+      solid_matrix; // displacement and Lagrange multiplier
     LA::MPI::BlockSparseMatrix solid_preconditioner; // Preconditioner matrix
 
     AMGPreconditioner solid_displacement_preconditioner;
@@ -1422,12 +1422,12 @@ namespace Step80
         solid_preconditioner.clear();
 
         std::cout << "Solid preconditioner" << std::endl;
-        Table<2, DoFTools::Coupling> coupling(2*spacedim, 2*spacedim);
-        for (unsigned int c =0; c < spacedim; ++c)
-          for (unsigned int d =0; d < spacedim; ++d)
+        Table<2, DoFTools::Coupling> coupling(2 * spacedim, 2 * spacedim);
+        for (unsigned int c = 0; c < spacedim; ++c)
+          for (unsigned int d = 0; d < spacedim; ++d)
             coupling[c][d] = DoFTools::none;
 
-        for (unsigned int c =spacedim; c < 2 * spacedim; ++c)
+        for (unsigned int c = spacedim; c < 2 * spacedim; ++c)
           for (unsigned int d = spacedim; d < 2 * spacedim; ++d)
             if (c == d)
               coupling[c][d] = DoFTools::always;
@@ -1438,7 +1438,7 @@ namespace Step80
 
 
         BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
-                                solid_dofs_per_block);
+                                        solid_dofs_per_block);
         std::cout << "DSP is made " << std::endl;
 
 
@@ -1451,8 +1451,6 @@ namespace Step80
           locally_relevant_solid_dofs);
         solid_preconditioner.reinit(solid_owned_dofs, dsp, mpi_communicator);
       }
-
-
     }
   }
 
@@ -1625,9 +1623,9 @@ namespace Step80
                       cell_fluid_preconditioner(i, j) +=
                         phi_p[i] * phi_p[j] * fe_values.JxW(q);
 
-                      cell_fluid_mass_matrix(i, j) +=
-                        (par.density * alpha) * phi_u[i] * phi_u[j] *
-                        fe_values.JxW(q);
+                      cell_fluid_mass_matrix(i, j) += (par.density * alpha) *
+                                                      phi_u[i] * phi_u[j] *
+                                                      fe_values.JxW(q);
                     }
                 }
             }
@@ -1904,8 +1902,8 @@ namespace Step80
     for (const auto &cell : solid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
-          cell_matrix = 0;
-        cell_preconditioner = 0;
+          cell_matrix         = 0;
+          cell_preconditioner = 0;
 
           fe_values.reinit(cell);
 
@@ -1936,8 +1934,8 @@ namespace Step80
                         // JxW
                         fe_values.JxW(q);
 
-                    cell_preconditioner(i, j) += // lagr * lagr
-                         phi_lagrange[i] * phi_lagrange[j] *
+                      cell_preconditioner(i, j) += // lagr * lagr
+                        phi_lagrange[i] * phi_lagrange[j] *
                         // JxW
                         fe_values.JxW(q);
                     }
@@ -1948,9 +1946,9 @@ namespace Step80
           solid_constraints.distribute_local_to_global(cell_matrix,
                                                        local_dof_indices,
                                                        solid_matrix);
-        solid_constraints.distribute_local_to_global(cell_preconditioner,
-                                             local_dof_indices,
-                                             solid_preconditioner);
+          solid_constraints.distribute_local_to_global(cell_preconditioner,
+                                                       local_dof_indices,
+                                                       solid_preconditioner);
         }
     solid_matrix.compress(VectorOperation::add);
     solid_preconditioner.compress(VectorOperation::add);
@@ -2796,12 +2794,12 @@ namespace Step80
           }
 
         if (cycle == 0 || update_timestep || par.use_operator_augmentation)
-          assemble_navier_stokes_system(1./time_step);
+          assemble_navier_stokes_system(1. / time_step);
         if (cycle == 0 || update_timestep)
-          assemble_elasticity_system(1./time_step);
+          assemble_elasticity_system(1. / time_step);
 
-        assemble_navier_stokes_rhs(1./time_step);
-        assemble_elasticity_rhs(1./time_step);
+        assemble_navier_stokes_rhs(1. / time_step);
+        assemble_elasticity_rhs(1. / time_step);
 
         setup_coupling();
         assemble_coupling();
