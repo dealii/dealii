@@ -27,7 +27,10 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * Definition of a finite element space with zero degrees of freedom and that,
- * consequently, can only represent a single function: the zero function.
+ * consequently, can only represent a single function: the zero function. Note
+ * that contrary to its name, this element describes a function that exists
+ * and has a value (zero) that can be queried; it's just that it has no degrees
+ * of freedom.
  *
  * This class is useful (in the context of an hp-method) to represent empty
  * cells in the triangulation on which no degrees of freedom should be
