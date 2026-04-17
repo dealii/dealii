@@ -1429,6 +1429,7 @@ namespace Step80
                              fluid_solution,
                              ComponentMask(fluid_fe->component_mask(velocity)));
     fluid_locally_relevant_solution_old = fluid_solution;
+    fluid_locally_relevant_solution = fluid_solution;
 
     VectorTools::interpolate(solid_dh,
                              par.solid_reference_configuration,
@@ -1443,6 +1444,7 @@ namespace Step80
                              ComponentMask(
                                solid_fe->component_mask(displacement)));
     solid_locally_relevant_solution_old = solid_solution;
+    solid_locally_relevant_solution = solid_solution;
 
     {
       LA::MPI::BlockVector owned_current_position;
