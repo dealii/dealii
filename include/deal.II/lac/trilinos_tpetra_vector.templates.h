@@ -720,32 +720,20 @@ namespace LinearAlgebra
         vector->getMap()->getLocalElement(
           static_cast<TrilinosWrappers::types::int_type>(index));
 
-      Number value = 0.0;
-
       // If the element is not present on the current processor, we can't
       // continue. This is the main difference to the el() function.
-      if (local_index == Teuchos::OrdinalTraits<int>::invalid())
-        {
+      Assert(local_index != Teuchos::OrdinalTraits<int>::invalid(),
+             ExcAccessToNonLocalElement(index,
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-          Assert(
-            false,
-            ExcAccessToNonLocalElement(index,
-                                       vector->getMap()->getLocalNumElements(),
-                                       vector->getMap()->getMinLocalIndex(),
-                                       vector->getMap()->getMaxLocalIndex()));
-#  else
-          Assert(
-            false,
-            ExcAccessToNonLocalElement(index,
-                                       vector->getMap()->getNodeNumElements(),
-                                       vector->getMap()->getMinLocalIndex(),
-                                       vector->getMap()->getMaxLocalIndex()));
-#  endif
-        }
-      else
-        value = const_1d_host_view[local_index];
 
-      return value;
+                                        vector->getMap()->getLocalNumElements(),
+#  else
+                                         vector->getMap()->getNodeNumElements(),
+#  endif
+                                        vector->getMap()->getMinLocalIndex(),
+                                        vector->getMap()->getMaxLocalIndex()));
+
+      return const_1d_host_view[local_index];
     }
 
 
