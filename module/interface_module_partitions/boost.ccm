@@ -102,6 +102,7 @@ module;
 #include <boost/signals2.hpp>
 #include <boost/signals2/connection.hpp>
 #include <boost/signals2/signal.hpp>
+#include <boost/type_index.hpp>
 #include <boost/type_traits.hpp>
 #include <boost/variant.hpp>
 #include <boost/version.hpp>
@@ -368,6 +369,18 @@ export
       using boost::signals2::connection;
       using boost::signals2::signal;
     } // namespace signals2
+
+    namespace typeindex
+    {
+      using boost::typeindex::stl_type_index;
+      using boost::typeindex::type_index;
+      using boost::typeindex::operator==;
+      using boost::typeindex::operator!=;
+      using boost::typeindex::operator<;
+      using boost::typeindex::operator>;
+      using boost::typeindex::operator<=;
+      using boost::typeindex::operator>=;
+    } // namespace typeindex
 
     using boost::apply_visitor;
     using boost::bad_lexical_cast;
