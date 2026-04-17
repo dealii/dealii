@@ -2061,9 +2061,9 @@ namespace Step80
                                               grad_eps_phi_w[j]) +
                              par.lame_lambda * div_phi_w[i] * div_phi_w[j] -
                              // lagrange * disp
-                             (phi_lagrange[i] * phi_w[j] / time_step) -
+                             (phi_lagrange[i] * phi_w[j] * alpha) -
                              // disp * lagrange
-                             (phi_w[i] * phi_lagrange[j] / time_step) +
+                             (phi_w[i] * phi_lagrange[j]) +
                              // lagr * lagr
                              phi_lagrange[i] * phi_lagrange[j]) *
                             // JxW
