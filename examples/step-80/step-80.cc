@@ -1930,12 +1930,9 @@ namespace Step80
                          // lagrange * disp
                          (phi_lagrange[i] * phi_w[j] * alpha) -
                          // disp * lagrange
-                         (phi_w[i] * phi_lagrange[j] * alpha)) *
-                        // JxW
-                        fe_values.JxW(q);
-
-                      cell_preconditioner(i, j) += // lagr * lagr
-                        phi_lagrange[i] * phi_lagrange[j] *
+                         (phi_w[i] * phi_lagrange[j]) +
+                         // lagr * lagr
+                         phi_lagrange[i] * phi_lagrange[j]) *
                         // JxW
                         fe_values.JxW(q);
                     }
@@ -2023,13 +2020,13 @@ namespace Step80
             {
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
-                  const auto &phi_w =
+                  const auto &phi_lagrange =
                     fe_values_rhs[lagrange_multiplier].value(i, q);
 
                   const auto comp_i =
                     solid_fe->system_to_component_index(i).first;
 
-                  cell_rhs(i) += (-w_old[q] * alpha * phi_w +
+                  cell_rhs(i) += (-w_old[q] * alpha * phi_lagrange +
                                   solid_rhs_values[q](comp_i) *
                                     fe_values_rhs.shape_value(i, q)) *
                                  fe_values_rhs.JxW(q);
@@ -2064,9 +2061,9 @@ namespace Step80
                                               grad_eps_phi_w[j]) +
                              par.lame_lambda * div_phi_w[i] * div_phi_w[j] -
                              // lagrange * disp
-                             (phi_lagrange[i] * phi_w[j] * alpha) -
+                             (phi_lagrange[i] * phi_w[j] / time_step) -
                              // disp * lagrange
-                             (phi_w[i] * phi_lagrange[j] * alpha) +
+                             (phi_w[i] * phi_lagrange[j] / time_step) +
                              // lagr * lagr
                              phi_lagrange[i] * phi_lagrange[j]) *
                             // JxW
@@ -2348,9 +2345,9 @@ namespace Step80
     const auto Z6 = 0.0 * LinOp(fluid_matrix.block(1, 1));
     const auto Mp = LinOp(fluid_preconditioner.block(1, 1));
 
-    const auto K  = LinOp(solid_matrix.block(0, 0));
-    const auto Dt = LinOp(
-      solid_matrix.block(0, 1)); // C2^T/delta_t (minus sign already included)
+    const auto K = LinOp(solid_matrix.block(0, 0));
+    const auto Dt =
+      LinOp(solid_matrix.block(0, 1)); // C2^T (minus sign already included)
     const auto D = LinOp(
       solid_matrix.block(1, 0)); // C2/delta_t (minus sign already included)
     const auto M = LinOp(solid_preconditioner.block(1, 1));
@@ -2860,24 +2857,9 @@ namespace Step80
     solid_locally_relevant_solution_dot.block(0) = y_dot.block(2);
     solid_locally_relevant_solution_dot.block(1) = y_dot.block(3);
 
-    // I need these two for the coupling terms
-    fluid_solution.block(0) = y.block(0);
-    fluid_solution.block(1) = y.block(1);
-
-    solid_solution.block(0) = y.block(2);
-    solid_solution.block(1) = y.block(3);
-
     const double dt = ida_current_time_step;
 
     const unsigned int n_q_points = fluid_quadrature.size();
-
-
-    // Coupling matrices are assembled explicitly so that residual and Jacobian
-    // are consistent in the same Newton step.
-    update_particle_positions();
-
-    setup_coupling();
-    assemble_coupling();
 
     // -------------------------------------------------------------------------
     // Fluid residual: same weak form as in assemble_navier_stokes_system(),
@@ -2953,6 +2935,26 @@ namespace Step80
                                                        fluid_dof_indices,
                                                        fluid_system_rhs);
         }
+
+    // add to the fluid system residual, the integral of lagrange
+    // multiplier times the basis functions of the fluid:
+    // - C^T * lambda
+    LA::MPI::BlockVector lambda_block;
+    IndexSet             lambda_relevant_dofs =
+      dof_handler_coupling->extract_immersed_dof_indexset(coupling_quadrature);
+    lambda_block.reinit(lambda_relevant_dofs.split_by_block(
+                          solid_dofs_per_block),
+                        mpi_communicator);
+    lambda_block = solid_solution;
+
+    dof_handler_coupling->integrate_dh2_field_against_dh1_basis(
+      coupling_quadrature,
+      lambda_block,
+      fluid_system_rhs,
+      solid_constraints,
+      true,
+      -1.0);
+
     fluid_system_rhs.compress(VectorOperation::add);
 
     // -------------------------------------------------------------------------
@@ -3015,12 +3017,9 @@ namespace Step80
                   solid_fe->system_to_component_index(i).first;
 
                 solid_local_residual(i) +=
-                  (2.0 * par.lame_mu * scalar_product(eps_w[q], eps_phi_w_i) +
-                   par.lame_lambda * div_w[q] * div_phi_w_i -
-                   (lambda_val[q] * phi_w_i)
-
-                   - (w_dot_val[q] * phi_l_i)
-
+                  (2.0 * par.lame_mu * scalar_product(eps_w[q], eps_phi_w_i) //
+                   + par.lame_lambda * div_w[q] * div_phi_w_i                //
+                   - (lambda_val[q] * phi_w_i) - (w_dot_val[q] * phi_l_i)    //
                    - solid_rhs_values[q](comp_i) *
                        solid_fe_values.shape_value(i, q)) *
                   JxW;
@@ -3030,6 +3029,16 @@ namespace Step80
                                                        solid_dof_indices,
                                                        solid_system_rhs);
         }
+
+    // add to the solid system residual, the integral of u times the lagrange
+    // multiplier: C u
+    dof_handler_coupling->integrate_dh1_field_against_dh2_basis(
+      coupling_quadrature,
+      fluid_locally_relevant_solution,
+      solid_system_rhs,
+      solid_constraints,
+      true);
+
     solid_system_rhs.compress(VectorOperation::add);
 
     residual.block(0) = fluid_system_rhs.block(0);
