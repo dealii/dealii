@@ -1907,6 +1907,11 @@ namespace SUNDIALS
       /**
        * Constructor.
        *
+       * @param step_size Fixed outer step size. When positive,
+       *   ARKodeSetFixedStep() is called with this value during reinit().
+       *   SplittingStep does not support adaptive outer time-stepping, so
+       *   this must be set to a positive value (or ARKodeSetFixedStep()
+       *   called manually via custom_setup()).
        * @param method_name Name of the operator-splitting coefficients to use.
        *   If empty, SUNDIALS selects the default (Lie--Trotter, first order).
        *   Must be a name recognised by
@@ -1916,8 +1921,10 @@ namespace SUNDIALS
        *   designed for two-partition problems; for other counts use
        *   custom_setup().
        */
-      AdditionalData(const std::string &method_name = "")
-        : method_name(method_name)
+      AdditionalData(const double       step_size   = 0.0,
+                     const std::string &method_name = "")
+        : step_size(step_size)
+        , method_name(method_name)
       {}
 
       /**
@@ -1929,6 +1936,15 @@ namespace SUNDIALS
       add_parameters(ParameterHandler &prm);
 
       /**
+       * Fixed outer step size. When positive, ARKodeSetFixedStep() is
+       * called with this value during reinit(). SplittingStep does not
+       * support adaptive outer time-stepping, so this must be set to a
+       * positive value (or ARKodeSetFixedStep() called manually in
+       * custom_setup()).
+       */
+      double step_size;
+
+      /**
        * Name of the operator-splitting coefficients. If empty, SUNDIALS
        * selects the default (Lie--Trotter).
        */
@@ -1938,15 +1954,15 @@ namespace SUNDIALS
     /**
      * Constructor.
      *
-     * @param sub_steppers Non-owning pointers to the sub-stepper objects, one
+     * @param sub_steppers Shared pointers to the sub-stepper objects, one
      *   per IVP partition. Must contain at least two entries (SUNDIALS
-     *   requires $P > 1$). The caller is responsible for keeping them alive
-     *   for the lifetime of this object.
+     *   requires $P > 1$).
      * @param data SplittingStepper configuration data.
      */
     SplittingStepper(
-      const std::vector<ARKodeStepper<VectorType> *> &sub_steppers,
-      const AdditionalData                           &data = AdditionalData());
+      const std::vector<std::shared_ptr<ARKodeStepper<VectorType>>>
+                           &sub_steppers,
+      const AdditionalData &data = AdditionalData());
 
     /**
      * Destructor. Frees the SplittingStep memory block and all SUNStepper
@@ -1998,9 +2014,9 @@ namespace SUNDIALS
     void *arkode_mem;
 
     /**
-     * Non-owning pointers to the sub-steppers, one per partition.
+     * Shared pointers to the sub-steppers, one per partition.
      */
-    std::vector<ARKodeStepper<VectorType> *> sub_steppers;
+    std::vector<std::shared_ptr<ARKodeStepper<VectorType>>> sub_steppers;
 
     /**
      * SUNDIALS SUNStepper wrappers, one per sub-stepper. Managed by this
@@ -2020,12 +2036,15 @@ namespace SUNDIALS
   SplittingStepper<VectorType>::AdditionalData::add_parameters(
     ParameterHandler &prm)
   {
-    prm.add_parameter(
-      "Method name",
-      method_name,
-      "Operator-splitting coefficients name passed to "
-      "SplittingStepCoefficients_LoadCoefficientsByName. "
-      "If empty, SUNDIALS uses the default (Lie-Trotter)");
+    prm.add_parameter("Step size",
+                      step_size,
+                      "Fixed outer step size passed to ARKodeSetFixedStep(). "
+                      "SplittingStep requires a fixed outer step.");
+    prm.add_parameter("Method name",
+                      method_name,
+                      "Operator-splitting coefficients name passed to "
+                      "SplittingStepCoefficients_LoadCoefficientsByName. "
+                      "If empty, SUNDIALS uses the default (Lie-Trotter)");
   }
 
 #  endif // DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)

@@ -928,8 +928,8 @@ namespace SUNDIALS
 
   template <typename VectorType>
   SplittingStepper<VectorType>::SplittingStepper(
-    const std::vector<ARKodeStepper<VectorType> *> &sub_steppers,
-    const AdditionalData                           &data)
+    const std::vector<std::shared_ptr<ARKodeStepper<VectorType>>> &sub_steppers,
+    const AdditionalData                                          &data)
     : arkode_mem(nullptr)
     , sub_steppers(sub_steppers)
     , data(data)
@@ -963,7 +963,7 @@ namespace SUNDIALS
              "SplittingStepper requires at least two sub-steppers (P > 1)."));
 
     // Initialize each partition sub-stepper.
-    for (auto *sub : sub_steppers)
+    for (const auto &sub : sub_steppers)
       {
         Assert(sub != nullptr, ExcInternalError());
         sub->reinit(t0, y0, inv_ctx);
@@ -988,6 +988,12 @@ namespace SUNDIALS
                                      initial_condition_nvector,
                                      inv_ctx.arkode_ctx);
     Assert(arkode_mem != nullptr, ExcInternalError());
+
+    if (data.step_size > 0.0)
+      {
+        const int status = ARKodeSetFixedStep(arkode_mem, data.step_size);
+        AssertARKode(status);
+      }
 
     if (!data.method_name.empty())
       {

@@ -19,9 +19,8 @@
 #include <deal.II/sundials/arkode.h>
 #include <deal.II/sundials/arkode_stepper.h>
 
-#include <arkode/arkode.h>
-
 #include <cmath>
+#include <memory>
 
 #include "../tests.h"
 
@@ -42,8 +41,9 @@
 //   Partition 2 (nonlinear): ARKStepper, adaptive timestep
 // The outer SplittingStep uses a fixed step dt = 0.01.
 //
-// SplittingStep does not support adaptive time stepping; all step sizes are
-// fixed via custom_setup() callbacks using ARKodeSetFixedStep().
+// SplittingStep does not support adaptive outer time-stepping; the fixed
+// outer step is set via SplittingStepper::AdditionalData::step_size.
+// Sub-steppers may use adaptive or fixed stepping at their own discretion.
 //
 // Two sub-tests:
 //   1. Lie-Trotter splitting (1st order, SUNDIALS default).
@@ -72,25 +72,24 @@ run(const SUNDIALS::SplittingStepper<VectorType>::AdditionalData &split_data,
   deallog << "=== " << label << " ===" << std::endl;
 
   // Partition 1: linear, f1(t,y) = -lambda*y, integrated with ERKStepper
-  SUNDIALS::ERKStepper<VectorType> linear_stepper;
-  linear_stepper.explicit_function =
+  auto linear_stepper = std::make_shared<SUNDIALS::ERKStepper<VectorType>>();
+  linear_stepper->explicit_function =
     [](const double /*t*/, const VectorType &y, VectorType &ydot) {
       ydot[0] = -lambda * y[0];
     };
 
   // Partition 2: nonlinear, f2(t,y) = y^2, integrated with ARKStepper
-  SUNDIALS::ARKStepper<VectorType> nonlinear_stepper;
-  nonlinear_stepper.implicit_function =
+  auto nonlinear_stepper = std::make_shared<SUNDIALS::ARKStepper<VectorType>>();
+  nonlinear_stepper->implicit_function =
     [](const double /*t*/, const VectorType &y, VectorType &ydot) {
       ydot[0] = y[0] * y[0];
     };
 
-  // Outer operator-splitting stepper
-  SUNDIALS::SplittingStepper<VectorType> splitting({&linear_stepper,
-                                                    &nonlinear_stepper},
+  // Outer operator-splitting stepper; step_size in split_data sets the fixed
+  // outer step via ARKodeSetFixedStep() inside SplittingStepper::reinit().
+  SUNDIALS::SplittingStepper<VectorType> splitting({linear_stepper,
+                                                    nonlinear_stepper},
                                                    split_data);
-  // SplittingStep requires a fixed outer step.
-  splitting.custom_setup = [](void *mem) { ARKodeSetFixedStep(mem, dt); };
 
   // ARKode driver
   SUNDIALS::ARKode<VectorType>::AdditionalData arkode_data(
@@ -127,11 +126,12 @@ main()
   deallog.precision(5);
 
   // Sub-test 1: default (Lie-Trotter, 1st order)
-  run(SUNDIALS::SplittingStepper<VectorType>::AdditionalData(), "Lie-Trotter");
+  run(SUNDIALS::SplittingStepper<VectorType>::AdditionalData(dt),
+      "Lie-Trotter");
 
   // Sub-test 2: Strang splitting (2nd order, two partitions)
   run(SUNDIALS::SplittingStepper<VectorType>::AdditionalData(
-        "ARKODE_SPLITTING_STRANG_2_2_2"),
+        dt, "ARKODE_SPLITTING_STRANG_2_2_2"),
       "Strang");
 }
 
