@@ -640,6 +640,7 @@ namespace Step80
     void initial_setup();
     void setup_dofs();
     void interpolate_initial_conditions();
+    void update_solid_current_position();
     void setup_coupling();
 
     void assemble_navier_stokes_system(const double &alpha);
@@ -651,10 +652,11 @@ namespace Step80
     void assemble_coupling();
 
 #ifdef DEAL_II_WITH_MUMPS
-    void assemble_mumps_system(const double &time_step);
+    void assemble_mumps_matrix();
+    void assemble_mumps_rhs();
 #endif
 
-    void solve(const double time_step);
+    void solve();
 
     void refine_and_transfer();
 
@@ -717,9 +719,11 @@ namespace Step80
     LA::MPI::BlockSparseMatrix
       coupling_transpose_matrix; // direct lagrange-to-velocity coupling matrix
 #ifdef DEAL_II_WITH_MUMPS
-    MumpsMatrix mumps_system_matrix;
-    MumpsVector mumps_system_rhs;
-    MumpsVector mumps_system_solution;
+    MumpsMatrix                        mumps_system_matrix;
+    MumpsVector                        mumps_system_rhs;
+    MumpsVector                        mumps_system_solution;
+    SparseDirectMUMPS::AdditionalData  mumps_data;
+    std::unique_ptr<SparseDirectMUMPS> mumps_solver;
     std::array<std::map<types::global_dof_index, types::global_dof_index>, 4>
       mumps_block_indices;
 #endif
@@ -1458,6 +1462,20 @@ namespace Step80
 
   template <int dim, int spacedim>
   void
+  NavierStokesImmersedProblem<dim, spacedim>::update_solid_current_position()
+  {
+    LA::MPI::BlockVector owned_current_position;
+    owned_current_position.reinit(solid_solution);
+    owned_current_position.block(0) = solid_reference_configuration.block(0);
+    owned_current_position.block(1) = solid_reference_configuration.block(1);
+    owned_current_position.block(0) += solid_solution.block(0);
+    solid_current_position = owned_current_position;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
   NavierStokesImmersedProblem<dim, spacedim>::interpolate_initial_conditions()
   {
     VectorTools::interpolate(fluid_dh,
@@ -1482,14 +1500,7 @@ namespace Step80
     solid_locally_relevant_solution_old = solid_solution;
     solid_locally_relevant_solution     = solid_solution;
 
-    {
-      LA::MPI::BlockVector owned_current_position;
-      owned_current_position.reinit(solid_solution);
-      owned_current_position.block(0) = solid_reference_configuration.block(0);
-      owned_current_position.block(1) = solid_reference_configuration.block(1);
-      owned_current_position.block(0) += solid_solution.block(0);
-      solid_current_position = owned_current_position;
-    }
+    update_solid_current_position();
     solid_mapping =
       std::make_unique<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>(
         solid_dh,
@@ -2114,10 +2125,9 @@ namespace Step80
 
 #ifdef DEAL_II_WITH_MUMPS
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::assemble_mumps_system(
-    const double &time_step)
+  void NavierStokesImmersedProblem<dim, spacedim>::assemble_mumps_matrix()
   {
-    TimerOutput::Scope t(computing_timer, "Assemble MUMPS system");
+    TimerOutput::Scope t(computing_timer, "Assemble MUMPS matrix");
 
     const auto &owned_u = fluid_owned_dofs[0];
     const auto &owned_w = solid_owned_dofs[0];
@@ -2269,6 +2279,29 @@ namespace Step80
 
     mumps_system_matrix.compress(VectorOperation::add);
 
+    if (!mumps_solver)
+      mumps_solver = std::make_unique<SparseDirectMUMPS>(
+        mumps_data, mumps_system_matrix.get_mpi_communicator());
+    mumps_solver->initialize(mumps_system_matrix);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::assemble_mumps_rhs()
+  {
+    TimerOutput::Scope t(computing_timer, "Assemble MUMPS RHS");
+
+    AssertThrow(mumps_system_matrix.m() > 0,
+                ExcMessage(
+                  "assemble_mumps_matrix() must be called before assembling "
+                  "the MUMPS RHS."));
+
+    IndexSet locally_owned_dofs(mumps_system_matrix.m());
+    locally_owned_dofs.add_range(mumps_system_matrix.local_range().first,
+                                 mumps_system_matrix.local_range().second);
+    locally_owned_dofs.compress();
+
     mumps_system_rhs.reinit(locally_owned_dofs, mpi_communicator);
     mumps_system_rhs = 0.;
     copy_distributed_vector(fluid_system_rhs.block(0),
@@ -2294,20 +2327,17 @@ namespace Step80
 
   // @sect4{Solving the coupled system}
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::solve(const double time_step)
+  void NavierStokesImmersedProblem<dim, spacedim>::solve()
   {
     TimerOutput::Scope t(computing_timer, "Solve");
 
 #ifdef DEAL_II_WITH_MUMPS
     if (par.solver_type == SolverType::mumps)
       {
-        // TODO @fdrmrc: once the MUMPS PR with block matrices is merged, use
-        // that one.
-        SparseDirectMUMPS::AdditionalData mumps_data;
-        SparseDirectMUMPS                 solver(mumps_data,
-                                 mumps_system_matrix.get_mpi_communicator());
-        solver.initialize(mumps_system_matrix);
-        solver.vmult(mumps_system_solution, mumps_system_rhs);
+        AssertThrow(
+          mumps_solver != nullptr,
+          ExcMessage("assemble_mumps_matrix() must be called before solve()."));
+        mumps_solver->vmult(mumps_system_solution, mumps_system_rhs);
 
         copy_to_block_vector(mumps_system_solution,
                              mumps_block_indices[0],
@@ -2373,7 +2403,7 @@ namespace Step80
     auto invW  = inverse_operator(M, cg_solver, solid_lagrange_preconditioner);
 
     const auto gamma1 = par.gamma_AL_background;
-    const auto gamma2 = par.gamma_AL_immersed * time_step;
+    const auto gamma2 = par.gamma_AL_immersed;
 
     auto A11_aug = null_operator(A);
     if (par.use_operator_augmentation)
@@ -2694,14 +2724,7 @@ namespace Step80
     pcout << "Number of particles "
           << solid_particle_handler.n_global_particles() << std::endl;
 
-    {
-      LA::MPI::BlockVector owned_current_position;
-      owned_current_position.reinit(solid_solution);
-      owned_current_position.block(0) = solid_reference_configuration.block(0);
-      owned_current_position.block(1) = solid_reference_configuration.block(1);
-      owned_current_position.block(0) += solid_solution.block(0);
-      solid_current_position = owned_current_position;
-    }
+    update_solid_current_position();
 
     // Create an intermediate vector to store particle positions
     // The issue is that solid_current_position.block(0) is distributed
@@ -2802,10 +2825,13 @@ namespace Step80
         assemble_coupling();
 #ifdef DEAL_II_WITH_MUMPS
         if (par.solver_type == SolverType::mumps)
-          assemble_mumps_system(time_step);
+          {
+            assemble_mumps_matrix();
+            assemble_mumps_rhs();
+          }
 #endif
 
-        solve(time_step);
+        solve();
 
         update_particle_positions();
 
@@ -2856,8 +2882,6 @@ namespace Step80
     fluid_locally_relevant_solution_dot.block(1) = y_dot.block(1);
     solid_locally_relevant_solution_dot.block(0) = y_dot.block(2);
     solid_locally_relevant_solution_dot.block(1) = y_dot.block(3);
-
-    const double dt = ida_current_time_step;
 
     const unsigned int n_q_points = fluid_quadrature.size();
 
@@ -2945,7 +2969,7 @@ namespace Step80
     lambda_block.reinit(lambda_relevant_dofs.split_by_block(
                           solid_dofs_per_block),
                         mpi_communicator);
-    lambda_block = solid_solution;
+    lambda_block.block(1) = y.block(3);
 
     dof_handler_coupling->integrate_dh2_field_against_dh1_basis(
       coupling_quadrature,
@@ -3045,7 +3069,6 @@ namespace Step80
     residual.block(1) = fluid_system_rhs.block(1);
     residual.block(2) = solid_system_rhs.block(0);
     residual.block(3) = solid_system_rhs.block(1);
-    residual.compress(VectorOperation::insert);
   }
 
 
@@ -3061,18 +3084,15 @@ namespace Step80
     const LA::MPI::BlockVector & /*y_dot*/,
     const double alpha)
   {
-    // alpha = d(ydot)/dy for the current BDF step, so  dt = 1/alpha.
-    const double old_dt   = ida_current_time_step;
-    const double dt       = (alpha > 0.0) ?
-                              (1.0 / alpha) :
-                              par.final_time / (par.number_of_time_steps - 1);
-    ida_current_time_step = dt;
-
     // Unpack y into the individual block vectors used by the assembly routines
     fluid_solution.block(0) = y.block(0);
     fluid_solution.block(1) = y.block(1);
     solid_solution.block(0) = y.block(2);
     solid_solution.block(1) = y.block(3);
+
+    update_solid_current_position();
+    setup_coupling();
+    assemble_coupling();
 
     fluid_locally_relevant_solution = fluid_solution;
     solid_locally_relevant_solution = solid_solution;
@@ -3080,16 +3100,17 @@ namespace Step80
     // Use an inexact (symmetric) Jacobian: the convective term is not
     // updated here to avoid velocity-dependence.  Only reassemble when dt
     // changes so the mass-matrix scaling M/dt stays current.
-    const bool dt_changed =
-      (std::abs(dt - old_dt) > 1e-14 * std::max(dt, old_dt));
-    if (dt_changed)
-      {
-        assemble_navier_stokes_system(dt);
-        assemble_elasticity_system(dt);
-      }
-    update_particle_positions();
-    setup_coupling();
-    assemble_coupling();
+    // if (alpha_changed)
+    {
+      assemble_navier_stokes_system(alpha);
+      assemble_elasticity_system(alpha);
+    }
+    // update_particle_positions();
+
+#  ifdef DEAL_II_WITH_MUMPS
+    if (par.solver_type == SolverType::mumps)
+      assemble_mumps_matrix();
+#  endif
   }
 
 
@@ -3109,26 +3130,18 @@ namespace Step80
     fluid_system_rhs.block(1) = rhs.block(1);
     solid_system_rhs.block(0) = rhs.block(2);
     solid_system_rhs.block(1) = rhs.block(3);
-    fluid_system_rhs.compress(VectorOperation::insert);
-    solid_system_rhs.compress(VectorOperation::insert);
 
-    // setup_coupling() and assemble_coupling() were already called in
-    // ida_residual() for the same Newton step; call them again here
-    // to keep the coupling matrices consistent with the current y.
-    setup_coupling();
-    assemble_coupling();
 #  ifdef DEAL_II_WITH_MUMPS
     if (par.solver_type == SolverType::mumps)
-      assemble_mumps_system(ida_current_time_step);
+      assemble_mumps_rhs();
 #  endif
 
-    solve(ida_current_time_step);
+    solve();
 
     dst.block(0) = fluid_solution.block(0);
     dst.block(1) = fluid_solution.block(1);
     dst.block(2) = solid_solution.block(0);
     dst.block(3) = solid_solution.block(1);
-    dst.compress(VectorOperation::insert);
   }
 
 
