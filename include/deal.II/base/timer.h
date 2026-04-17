@@ -22,6 +22,7 @@
 #include <chrono>
 #include <list>
 #include <map>
+#include <optional>
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
@@ -965,9 +966,10 @@ private:
   std::list<std::string> active_sections;
 
   /**
-   * mpi communicator
+   * An optional mpi communicator used to synchronize the timing results across
+   * MPI processes.
    */
-  MPI_Comm mpi_communicator;
+  std::optional<MPI_Comm> mpi_communicator_timing;
 
   /**
    * A lock that makes sure that this class gives reasonable results even when
