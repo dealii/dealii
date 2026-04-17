@@ -24,6 +24,7 @@
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/quadrature_selector.h>
 #include <deal.II/base/timer.h>
 
 #include <deal.II/lac/generic_linear_algebra.h>
@@ -37,6 +38,7 @@
 #include <deal.II/sundials/ida.h>
 
 #include <boost/algorithm/string.hpp>
+#include <deal.II/non_matching/dof_handler_coupling.h>
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
 #include <filesystem>
@@ -320,8 +322,10 @@ namespace Step80
     unsigned int max_cells            = 20000;
     int          refinement_frequency = 5;
 
-    double gamma_AL_background = 100;
-    double gamma_AL_immersed   = 1e-2;
+    double       gamma_AL_background            = 100;
+    double       gamma_AL_immersed              = 1e-2;
+    std::string  coupling_quadrature_type       = "gauss_lobatto";
+    unsigned int coupling_quadrature_iterations = 1;
 
     unsigned int inner_max_iterations            = 100;
     double       inner_tolerance                 = 1e-14;
@@ -485,6 +489,14 @@ namespace Step80
     {
       add_parameter("Gamma AL background", gamma_AL_background);
       add_parameter("Gamma AL immersed", gamma_AL_immersed);
+      add_parameter("Coupling quadrature type",
+                    coupling_quadrature_type,
+                    "",
+                    this->prm,
+                    Patterns::Selection(
+                      QuadratureSelector<dim>::get_quadrature_names()));
+      add_parameter("Coupling quadrature iterations",
+                    coupling_quadrature_iterations);
       add_parameter("Inner solver maximum iterations", inner_max_iterations);
       add_parameter("Inner solver tolerance", inner_tolerance);
       add_parameter("Outer solver maximum iterations", outer_max_iterations);
@@ -636,8 +648,6 @@ namespace Step80
     void assemble_elasticity_system(const double &time_step);
     void assemble_elasticity_rhs(const double &time_step);
 
-    void assemble_coupling_sparsity(BlockDynamicSparsityPattern &dsp,
-                                    BlockDynamicSparsityPattern &dsp_t);
     void assemble_coupling();
 
 #ifdef DEAL_II_WITH_MUMPS
@@ -675,6 +685,8 @@ namespace Step80
 
     std::unique_ptr<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>
       solid_mapping;
+    std::unique_ptr<NonMatching::DoFHandlerCoupling<dim, spacedim>>
+      dof_handler_coupling;
 
     std::vector<types::global_dof_index> fluid_dofs_per_block;
     std::vector<types::global_dof_index> solid_dofs_per_block;
@@ -699,10 +711,9 @@ namespace Step80
     AMGPreconditioner solid_displacement_preconditioner;
     AMGPreconditioner solid_lagrange_preconditioner;
     LA::MPI::BlockSparseMatrix
-      coupling_interpolation_matrix_transpose; // between displacement and
-                                               // velocity
+      coupling_matrix; // direct velocity-to-lagrange coupling mass matrix
     LA::MPI::BlockSparseMatrix
-      coupling_interpolation_matrix; // transpose coupling
+      coupling_transpose_matrix; // direct lagrange-to-velocity coupling matrix
 #ifdef DEAL_II_WITH_MUMPS
     MumpsMatrix mumps_system_matrix;
     MumpsVector mumps_system_rhs;
@@ -742,6 +753,9 @@ namespace Step80
     LA::MPI::Vector relevant_tracer_particle_displacements;
 
     std::vector<std::vector<BoundingBox<spacedim>>> global_fluid_bounding_boxes;
+    Quadrature<spacedim>                            fluid_quadrature;
+    Quadrature<spacedim>                            solid_quadrature;
+    Quadrature<dim>                                 coupling_quadrature;
 
     FEValuesExtractors::Vector velocity;
     FEValuesExtractors::Scalar pressure;
@@ -1162,6 +1176,22 @@ namespace Step80
   {
     TimerOutput::Scope t(computing_timer, "Setup dofs");
 
+    dof_handler_coupling.reset();
+    coupling_matrix.clear();
+    coupling_transpose_matrix.clear();
+    fluid_quadrature = QGauss<spacedim>(fluid_fe->degree + 1);
+    solid_quadrature = QGauss<spacedim>(solid_fe->degree + 1);
+    const unsigned int coupling_order =
+      std::max(fluid_fe->degree, solid_fe->degree) + 1;
+    if (par.coupling_quadrature_type == "gauss_lobatto")
+      coupling_quadrature = QIterated<dim>(QGaussLobatto<1>(coupling_order),
+                                           par.coupling_quadrature_iterations);
+    else
+      coupling_quadrature =
+        QIterated<dim>(QuadratureSelector<1>(par.coupling_quadrature_type,
+                                             coupling_order),
+                       par.coupling_quadrature_iterations);
+
     fluid_dh.distribute_dofs(*fluid_fe);
 
     std::vector<unsigned int> navier_stokes_sub_blocks(spacedim + 1, 0);
@@ -1308,7 +1338,7 @@ namespace Step80
 
     VectorTools::create_right_hand_side(
       fluid_dh,
-      QGauss<spacedim>(fluid_fe->degree + 1),
+      fluid_quadrature,
       ComponentSelectFunction<spacedim>(spacedim, 1.0, spacedim + 1),
       fluid_dual_of_constant_pressure,
       fluid_constraints);
@@ -1434,35 +1464,54 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::setup_coupling()
   {
-    BlockDynamicSparsityPattern dsp(fluid_dofs_per_block, solid_dofs_per_block);
-    BlockDynamicSparsityPattern dsp_t(solid_dofs_per_block,
-                                      fluid_dofs_per_block);
-    assemble_coupling_sparsity(dsp, dsp_t);
+    BlockDynamicSparsityPattern dsp(solid_dofs_per_block, fluid_dofs_per_block);
+    BlockDynamicSparsityPattern dsp_t(fluid_dofs_per_block,
+                                      solid_dofs_per_block);
 
-    coupling_interpolation_matrix_transpose.clear();
-    coupling_interpolation_matrix_transpose.reinit(fluid_dofs_per_block.size(),
-                                                   solid_dofs_per_block.size());
-    for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
-      for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
-        coupling_interpolation_matrix_transpose.block(i, j).reinit(
-          fluid_owned_dofs[i],
-          solid_owned_dofs[j],
-          dsp.block(i, j),
-          mpi_communicator,
-          true);
-    coupling_interpolation_matrix_transpose.collect_sizes();
+    if (!dof_handler_coupling)
+      dof_handler_coupling =
+        std::make_unique<NonMatching::DoFHandlerCoupling<dim, spacedim>>(
+          fluid_dh,
+          solid_dh,
+          ComponentMask(fluid_fe->component_mask(velocity)),
+          ComponentMask(solid_fe->component_mask(lagrange_multiplier)),
+          StaticMappingQ1<spacedim>::mapping,
+          *solid_mapping);
 
-    coupling_interpolation_matrix.clear();
-    coupling_interpolation_matrix.reinit(solid_dofs_per_block.size(),
-                                         fluid_dofs_per_block.size());
+    dof_handler_coupling->create_coupling_sparsity_pattern(coupling_quadrature,
+                                                           dsp,
+                                                           fluid_constraints,
+                                                           solid_constraints);
+    dof_handler_coupling->create_coupling_sparsity_pattern(coupling_quadrature,
+                                                           dsp_t,
+                                                           fluid_constraints,
+                                                           solid_constraints,
+                                                           true,
+                                                           true);
+
+    coupling_matrix.clear();
+    coupling_matrix.reinit(solid_dofs_per_block.size(),
+                           fluid_dofs_per_block.size());
     for (unsigned int i = 0; i < solid_dofs_per_block.size(); ++i)
       for (unsigned int j = 0; j < fluid_dofs_per_block.size(); ++j)
-        coupling_interpolation_matrix.block(i, j).reinit(solid_owned_dofs[i],
-                                                         fluid_owned_dofs[j],
-                                                         dsp_t.block(i, j),
-                                                         mpi_communicator,
-                                                         true);
-    coupling_interpolation_matrix.collect_sizes();
+        coupling_matrix.block(i, j).reinit(solid_owned_dofs[i],
+                                           fluid_owned_dofs[j],
+                                           dsp.block(i, j),
+                                           mpi_communicator,
+                                           true);
+    coupling_matrix.collect_sizes();
+
+    coupling_transpose_matrix.clear();
+    coupling_transpose_matrix.reinit(fluid_dofs_per_block.size(),
+                                     solid_dofs_per_block.size());
+    for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
+      for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
+        coupling_transpose_matrix.block(i, j).reinit(fluid_owned_dofs[i],
+                                                     solid_owned_dofs[j],
+                                                     dsp_t.block(i, j),
+                                                     mpi_communicator,
+                                                     true);
+    coupling_transpose_matrix.collect_sizes();
   }
 
 
@@ -1477,15 +1526,14 @@ namespace Step80
 
     TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes terms");
 
-    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
     FEValues<spacedim> fe_values(*fluid_fe,
-                                 quadrature_formula,
+                                 fluid_quadrature,
                                  update_values | update_gradients |
                                    update_quadrature_points |
                                    update_JxW_values);
 
     const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
-    const unsigned int n_q_points    = quadrature_formula.size();
+    const unsigned int n_q_points    = fluid_quadrature.size();
 
     FullMatrix<double> cell_fluid_matrix(dofs_per_cell, dofs_per_cell);
     FullMatrix<double> cell_fluid_preconditioner(dofs_per_cell, dofs_per_cell);
@@ -1568,18 +1616,17 @@ namespace Step80
           quadrature_particle_handler.initialize(
             fluid_tria, StaticMappingQ1<spacedim>::mapping, n_properties);
 
-          const QGauss<dim> quadrature(solid_fe->degree + 1);
-
           std::vector<Point<spacedim>>     quadrature_points_vec;
           std::vector<std::vector<double>> properties;
-          quadrature_points_vec.reserve(quadrature.size() *
+          quadrature_points_vec.reserve(coupling_quadrature.size() *
                                         solid_tria.n_active_cells());
-          properties.reserve(quadrature.size() * solid_tria.n_active_cells());
+          properties.reserve(coupling_quadrature.size() *
+                             solid_tria.n_active_cells());
 
 
           FEValues<dim, spacedim> fe_v(*solid_mapping,
                                        *solid_fe,
-                                       quadrature,
+                                       coupling_quadrature,
                                        update_JxW_values |
                                          update_quadrature_points);
           for (const auto &cell : solid_dh.active_cell_iterators())
@@ -1681,15 +1728,14 @@ namespace Step80
 
     TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes rhs terms");
 
-    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
     FEValues<spacedim> fe_values(*fluid_fe,
-                                 quadrature_formula,
+                                 fluid_quadrature,
                                  update_values | update_gradients |
                                    update_quadrature_points |
                                    update_JxW_values);
 
     const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
-    const unsigned int n_q_points    = quadrature_formula.size();
+    const unsigned int n_q_points    = fluid_quadrature.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
@@ -1776,15 +1822,14 @@ namespace Step80
 
     TimerOutput::Scope t(computing_timer, "Assemble Elasticity terms");
 
-    QGauss<spacedim>   quadrature_formula(solid_fe->degree + 1);
     FEValues<spacedim> fe_values(*solid_fe,
-                                 quadrature_formula,
+                                 solid_quadrature,
                                  update_values | update_gradients |
                                    update_quadrature_points |
                                    update_JxW_values);
 
     const unsigned int dofs_per_cell = solid_fe->n_dofs_per_cell();
-    const unsigned int n_q_points    = quadrature_formula.size();
+    const unsigned int n_q_points    = solid_quadrature.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
 
@@ -1867,19 +1912,18 @@ namespace Step80
 
     TimerOutput::Scope t(computing_timer, "Assemble Elastic rhs terms");
 
-    QGauss<spacedim>   quadrature_formula(solid_fe->degree + 1);
     FEValues<spacedim> fe_values_rhs(*solid_fe,
-                                     quadrature_formula,
+                                     solid_quadrature,
                                      update_values | update_quadrature_points |
                                        update_JxW_values);
 
     FEValues<spacedim> fe_values_matrix(*solid_fe,
-                                        quadrature_formula,
+                                        solid_quadrature,
                                         update_values | update_gradients |
                                           update_JxW_values);
 
     const unsigned int dofs_per_cell = solid_fe->n_dofs_per_cell();
-    const unsigned int n_q_points    = quadrature_formula.size();
+    const unsigned int n_q_points    = solid_quadrature.size();
 
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs(dofs_per_cell);
@@ -1979,133 +2023,27 @@ namespace Step80
 
 
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::assemble_coupling_sparsity(
-    BlockDynamicSparsityPattern &dsp,
-    BlockDynamicSparsityPattern &dsp_t)
-  {
-    TimerOutput::Scope t(computing_timer, "Assemble Coupling sparsity");
-
-    std::vector<types::global_dof_index> fluid_dof_indices(
-      fluid_fe->n_dofs_per_cell());
-
-    FullMatrix<double> local_matrix;
-
-    auto particle = solid_particle_handler.begin();
-    while (particle != solid_particle_handler.end())
-      {
-        const auto &cell = particle->get_surrounding_cell();
-        const auto &dh_cell =
-          typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
-        dh_cell->get_dof_indices(fluid_dof_indices);
-
-
-        const auto pic = solid_particle_handler.particles_in_cell(cell);
-
-        Assert(pic.begin() == particle, ExcInternalError());
-        for (const auto &p : pic)
-          {
-            const auto global_particle_id = p.get_id();
-
-            for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
-              {
-                const auto comp_i =
-                  fluid_fe->system_to_component_index(i).first;
-
-                if (comp_i < spacedim)
-                  {
-                    const auto solid_index =
-                      global_particle_id * spacedim + comp_i;
-                    dsp.add(fluid_dof_indices[i], solid_index);
-                    dsp_t.add(solid_index, fluid_dof_indices[i]);
-                  }
-              }
-          }
-        particle = pic.end();
-      }
-  }
-
-
-
-  template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::assemble_coupling()
   {
     TimerOutput::Scope t(computing_timer, "Assemble Coupling terms");
+    Assert(dof_handler_coupling,
+           ExcMessage(
+             "setup_coupling() must be called before assemble_coupling()."));
 
-    std::vector<types::global_dof_index> fluid_dof_indices(
-      fluid_fe->n_dofs_per_cell());
-    std::vector<types::global_dof_index> solid_dof_indices;
-
-    FullMatrix<double> local_matrix;
-    FullMatrix<double> local_matrix_transpose;
-
-    auto particle = solid_particle_handler.begin();
-    while (particle != solid_particle_handler.end())
-      {
-        const auto &cell = particle->get_surrounding_cell();
-        const auto &dh_cell =
-          typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
-        dh_cell->get_dof_indices(fluid_dof_indices);
-
-
-        const auto pic = solid_particle_handler.particles_in_cell(cell);
-
-        const auto n_particles_in_cell =
-          solid_particle_handler.n_particles_in_cell(cell);
-
-        local_matrix.reinit(fluid_fe->n_dofs_per_cell(),
-                            n_particles_in_cell * spacedim);
-        local_matrix_transpose.reinit(n_particles_in_cell * spacedim,
-                                      fluid_fe->n_dofs_per_cell());
-
-        solid_dof_indices.resize(n_particles_in_cell * spacedim);
-
-        unsigned int local_solid_dof_index = 0;
-        unsigned int local_pic_index       = 0;
-        Assert(pic.begin() == particle, ExcInternalError());
-        for (const auto &p : pic)
-          {
-            const auto &ref_q              = p.get_reference_location();
-            const auto  global_particle_id = p.get_id();
-
-            for (unsigned int d = 0; d < spacedim; ++d)
-              solid_dof_indices[local_solid_dof_index++] =
-                global_particle_id * spacedim + d;
-
-            for (unsigned int i = 0; i < fluid_fe->n_dofs_per_cell(); ++i)
-              {
-                const auto comp_i =
-                  fluid_fe->system_to_component_index(i).first;
-
-                if (comp_i < spacedim)
-                  {
-                    const double value = fluid_fe->shape_value(i, ref_q);
-                    local_matrix(i, local_pic_index * spacedim + comp_i) =
-                      value;
-                    local_matrix_transpose(local_pic_index * spacedim + comp_i,
-                                           i) = value;
-                  }
-              }
-            local_pic_index++;
-          }
-
-        fluid_constraints.distribute_local_to_global(
-          local_matrix,
-          fluid_dof_indices,
-          solid_constraints,
-          solid_dof_indices,
-          coupling_interpolation_matrix_transpose);
-
-        solid_constraints.distribute_local_to_global(
-          local_matrix_transpose,
-          solid_dof_indices,
-          fluid_constraints,
-          fluid_dof_indices,
-          coupling_interpolation_matrix);
-        particle = pic.end();
-      }
-
-    coupling_interpolation_matrix_transpose.compress(VectorOperation::add);
-    coupling_interpolation_matrix.compress(VectorOperation::add);
+    coupling_matrix           = 0;
+    coupling_transpose_matrix = 0;
+    dof_handler_coupling->create_coupling_mass_matrix(coupling_quadrature,
+                                                      coupling_matrix,
+                                                      fluid_constraints,
+                                                      solid_constraints,
+                                                      false,
+                                                      true);
+    dof_handler_coupling->create_coupling_mass_matrix(coupling_quadrature,
+                                                      coupling_transpose_matrix,
+                                                      fluid_constraints,
+                                                      solid_constraints,
+                                                      true,
+                                                      true);
   }
 
 
@@ -2211,15 +2149,6 @@ namespace Step80
     locally_owned_dofs.compress();
     const IndexSet locally_relevant_dofs = complete_index_set(n_total);
 
-    MumpsMatrix coupling_matrix;
-    MumpsMatrix coupling_matrix_transpose;
-    solid_matrix.block(1, 0).mmult(coupling_matrix,
-                                   coupling_interpolation_matrix.block(0, 0));
-    coupling_interpolation_matrix_transpose.block(0, 0).mmult(
-      coupling_matrix_transpose, solid_matrix.block(0, 1));
-    coupling_matrix *= -time_step;
-    coupling_matrix_transpose *= -time_step;
-
     DynamicSparsityPattern dsp(locally_relevant_dofs);
     auto                   add_pattern = [&](const auto        &matrix,
                            const unsigned int row_block,
@@ -2236,8 +2165,8 @@ namespace Step80
     add_pattern(solid_matrix.block(0, 0), 1, 1);
     add_pattern(solid_matrix.block(0, 1), 1, 2);
     add_pattern(solid_matrix.block(1, 0), 2, 1);
-    add_pattern(coupling_matrix_transpose, 0, 2);
-    add_pattern(coupling_matrix, 2, 0);
+    add_pattern(coupling_transpose_matrix.block(0, 1), 0, 2);
+    add_pattern(coupling_matrix.block(1, 0), 2, 0);
     add_pattern(fluid_matrix.block(0, 1), 0, 3);
     add_pattern(fluid_matrix.block(1, 0), 3, 0);
 
@@ -2267,8 +2196,8 @@ namespace Step80
     copy_matrix(fluid_matrix.block(0, 0), 0, 0);
     copy_matrix(solid_matrix.block(0, 0), 1, 1);
     copy_matrix(solid_matrix.block(0, 1), 1, 2);
-    copy_matrix(coupling_matrix_transpose, 0, 2);
-    copy_matrix(coupling_matrix, 2, 0);
+    copy_matrix(coupling_transpose_matrix.block(0, 1), 0, 2);
+    copy_matrix(coupling_matrix.block(1, 0), 2, 0);
     copy_matrix(fluid_matrix.block(0, 1), 0, 3);
     copy_matrix(fluid_matrix.block(1, 0), 3, 0);
     copy_matrix(solid_matrix.block(1, 0), 2, 1);
@@ -2358,25 +2287,15 @@ namespace Step80
       solid_matrix.block(1, 0)); // C2/delta_t (minus sign already included)
     const auto M = LinOp(solid_matrix.block(1, 1));
 
-    const auto Pt = LinOp(coupling_interpolation_matrix_transpose.block(0, 0));
-    const auto Z1t =
-      0.0 * LinOp(coupling_interpolation_matrix_transpose.block(0, 1));
-    const auto Z2t =
-      0.0 * LinOp(coupling_interpolation_matrix_transpose.block(1, 0));
-    const auto Z3t =
-      0.0 * LinOp(coupling_interpolation_matrix_transpose.block(1, 1));
-
-    const auto P  = LinOp(coupling_interpolation_matrix.block(0, 0));
-    const auto Z1 = 0.0 * LinOp(coupling_interpolation_matrix.block(0, 1));
-    const auto Z2 = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 0));
-    const auto Z3 = 0.0 * LinOp(coupling_interpolation_matrix.block(1, 1));
+    const auto C   = 1.0 * LinOp(coupling_matrix.block(1, 0));
+    const auto Ct  = 1.0 * LinOp(coupling_transpose_matrix.block(0, 1));
+    const auto Z2t = 0.0 * LinOp(coupling_transpose_matrix.block(1, 0));
+    const auto Z2  = 0.0 * LinOp(coupling_matrix.block(0, 1));
+    const auto Z3  = 0.0 * LinOp(coupling_matrix.block(1, 1));
+    const auto Z3t = 0.0 * LinOp(coupling_transpose_matrix.block(1, 1));
 
     const auto Z4 = 0.0 * M;
     using BVec    = typename LA::MPI::BlockVector;
-
-    // now these are with + sign. delta_t in front needed to get right scaling
-    auto C  = -time_step * D * P;
-    auto Ct = -time_step * Pt * Dt;
 
     // Inversion of the mass matrices
     SolverControl inner_solver_control(par.inner_max_iterations,
@@ -2882,8 +2801,7 @@ namespace Step80
 
     const double dt = ida_current_time_step;
 
-    QGauss<spacedim>   quadrature_formula(fluid_fe->degree + 1);
-    const unsigned int n_q_points = quadrature_formula.size();
+    const unsigned int n_q_points = fluid_quadrature.size();
 
 
     // Coupling matrices are assembled explicitly so that residual and Jacobian
@@ -2893,23 +2811,12 @@ namespace Step80
     setup_coupling();
     assemble_coupling();
 
-    using Vec        = LA::MPI::Vector;
-    using BVec       = typename LA::MPI::BlockVector;
-    using LinOp      = LinearOperator<Vec>;
-    using BlockLinOp = LinearOperator<BVec>;
-
-    const auto P  = BlockLinOp(coupling_interpolation_matrix);
-    const auto Pt = BlockLinOp(coupling_interpolation_matrix_transpose);
-
-    BVec interpolated_velocity            = P * fluid_solution;
-    BVec interpolated_lagrange_multiplier = Pt * solid_solution;
-
     // -------------------------------------------------------------------------
     // Fluid residual: same weak form as in assemble_navier_stokes_system(),
     // with the time derivative term replaced by IDA's y_dot.
     // -------------------------------------------------------------------------
     FEValues<spacedim> fluid_fe_values(*fluid_fe,
-                                       quadrature_formula,
+                                       fluid_quadrature,
                                        update_values | update_gradients |
                                          update_quadrature_points |
                                          update_JxW_values);
@@ -2985,7 +2892,7 @@ namespace Step80
     // replacing (w - w_old)/dt with w_dot in the lagrange-multiplier equation.
     // -------------------------------------------------------------------------
     FEValues<spacedim> solid_fe_values(*solid_fe,
-                                       quadrature_formula,
+                                       solid_quadrature,
                                        update_values | update_gradients |
                                          update_quadrature_points |
                                          update_JxW_values);
@@ -2994,11 +2901,13 @@ namespace Step80
     Vector<double>     solid_local_residual(solid_dofs_per_cell);
     std::vector<types::global_dof_index> solid_dof_indices(solid_dofs_per_cell);
 
-    std::vector<SymmetricTensor<2, spacedim>> eps_w(n_q_points);
-    std::vector<double>                       div_w(n_q_points);
-    std::vector<Tensor<1, spacedim>>          w_dot_val(n_q_points);
-    std::vector<Tensor<1, spacedim>>          lambda_val(n_q_points);
-    std::vector<Vector<double>>               solid_rhs_values(n_q_points,
+    const unsigned int n_solid_q_points = solid_quadrature.size();
+
+    std::vector<SymmetricTensor<2, spacedim>> eps_w(n_solid_q_points);
+    std::vector<double>                       div_w(n_solid_q_points);
+    std::vector<Tensor<1, spacedim>>          w_dot_val(n_solid_q_points);
+    std::vector<Tensor<1, spacedim>>          lambda_val(n_solid_q_points);
+    std::vector<Vector<double>>               solid_rhs_values(n_solid_q_points,
                                                  Vector<double>(2 * spacedim));
 
     solid_system_rhs = 0;
@@ -3022,7 +2931,7 @@ namespace Step80
 
           cell->get_dof_indices(solid_dof_indices);
 
-          for (unsigned int q = 0; q < n_q_points; ++q)
+          for (unsigned int q = 0; q < n_solid_q_points; ++q)
             for (unsigned int i = 0; i < solid_dofs_per_cell; ++i)
               {
                 const double JxW = solid_fe_values.JxW(q);
