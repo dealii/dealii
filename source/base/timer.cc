@@ -25,6 +25,7 @@
 #include <iostream>
 #include <map>
 #include <mutex>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -388,7 +389,7 @@ TimerOutput::TimerOutput(std::ostream         &stream,
   , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
-  , mpi_communicator(MPI_COMM_SELF)
+  , mpi_communicator_timing(std::nullopt)
 {}
 
 
@@ -402,7 +403,7 @@ TimerOutput::TimerOutput(ConditionalOStream   &stream,
   , sections()
   , out_stream(stream)
   , output_is_enabled(true)
-  , mpi_communicator(MPI_COMM_SELF)
+  , mpi_communicator_timing(std::nullopt)
 {}
 
 
@@ -417,7 +418,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
   , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
-  , mpi_communicator(mpi_communicator)
+  , mpi_communicator_timing(mpi_communicator)
 {}
 
 
@@ -432,7 +433,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
   , sections()
   , out_stream(stream)
   , output_is_enabled(true)
-  , mpi_communicator(mpi_communicator)
+  , mpi_communicator_timing(mpi_communicator)
 {}
 
 
@@ -457,10 +458,11 @@ TimerOutput::~TimerOutput()
   // avoid communicating with other processes if there is an uncaught
   // exception
 #ifdef DEAL_II_WITH_MPI
-  if (std::uncaught_exceptions() > 0 && mpi_communicator != MPI_COMM_SELF)
+  if (std::uncaught_exceptions() > 0 && mpi_communicator_timing.has_value() &&
+      Utilities::MPI::n_mpi_processes(*mpi_communicator_timing) > 1)
     {
       const unsigned int myid =
-        Utilities::MPI::this_mpi_process(mpi_communicator);
+        Utilities::MPI::this_mpi_process(*mpi_communicator_timing);
       if (myid == 0)
         std::cerr
           << "---------------------------------------------------------\n"
@@ -501,10 +503,10 @@ TimerOutput::enter_subsection(const std::string &section_name)
       // Ensure MPI operations only happen if an MPI communicator was
       // initialized. No need to call start() for the timers, since
       // the constructor already starts them.
-      if (mpi_communicator != MPI_COMM_SELF)
-        sections[section_name] = Timer(mpi_communicator, true);
+      if (mpi_communicator_timing.has_value())
+        sections[section_name] = Timer(*mpi_communicator_timing, true);
       else
-        sections[section_name] = Timer(mpi_communicator, false);
+        sections[section_name] = Timer(MPI_COMM_SELF, false);
     }
   else
     {
@@ -943,14 +945,15 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
 
 #ifdef DEAL_II_WITH_MPI
   // calling wall_time() below requires global communication over
-  // mpi_communicator, if timers are constructed with an MPI
+  // mpi_communicator_timing, if timers are constructed with an MPI
   // communicator
-  // -> make sure the two communicators mpi_communicator and
+  // -> make sure the two communicators mpi_communicator_timing and
   // mpi_comm contain the same ranks
-  if (mpi_communicator != MPI_COMM_SELF)
+  if (mpi_communicator_timing.has_value())
     {
       int       result;
-      const int ierr = MPI_Comm_compare(mpi_comm, mpi_communicator, &result);
+      const int ierr =
+        MPI_Comm_compare(mpi_comm, *mpi_communicator_timing, &result);
       AssertThrowMPI(ierr);
 
       Assert(result == MPI_IDENT || result == MPI_CONGRUENT ||
