@@ -1,0 +1,7 @@
+Fixed: When configuring for using both MPI and VTK, then VTK's CMake scripts
+unset information about the MPI version. As a consequence, the
+variables `DEAL_II_MPI_VERSION_MAJOR` and `DEAL_II_MPI_VERSION_MINOR`
+were left blank, and we always fell back to using MPI 3 functionality
+even if the MPI installation would have supported newer MPI functions.
+<br>
+(Wolfgang Bangerth, Matthias Maier, 2026/04/13)

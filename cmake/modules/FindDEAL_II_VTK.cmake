@@ -28,7 +28,20 @@ if(NOT "${VTK_DIR}" STREQUAL "")
   set(VTK_DIR ${VTK_DIR})
 endif()
 
+# Call find_package(VTK). In an unfriendly twist, the VTK package
+# configuration *unsets* the MPI version variables that we have
+# previously found and set. So we have to save them around the call to
+# find_package().
+set (_mpi_version ${MPI_VERSION})
+set (_mpi_version_major ${MPI_VERSION_MAJOR})
+set (_mpi_version_minor ${MPI_VERSION_MINOR})
+
 find_package(VTK 9.0.0 QUIET HINTS ${VTK_DIR})
+
+set (MPI_VERSION ${_mpi_version})
+set (MPI_VERSION_MAJOR ${_mpi_version_major})
+set (MPI_VERSION_MINOR ${_mpi_version_minor})
+
 
 if(VTK_FOUND)
   set(VTK_VERSION "${VTK_VERSION}")
