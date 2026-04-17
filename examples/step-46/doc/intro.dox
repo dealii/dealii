@@ -218,7 +218,23 @@ space:
       & y_h|_{\Omega_s} \in Z^d \times Z \times Q_r^d \}.
 @f}
 
+<h3>A note on interface values</h3>
 
+It is important to realize that while the extension by zero is a convenient tool,
+it creates a literal jump discontinuity in the global solution field at the
+interface $\Gamma_i$. This has practical implications for functions that evaluate
+the solution at specific coordinates (for example, VectorTools::point_values()).
+
+If one evaluates the pressure $p$ at a point exactly on the interface and passes an
+<b>averaging</b> flag to VectorTools::point_values(), it will return the mean of the fluid value
+and the zero-extension:
+@f[
+  p_{interface} = \frac{p|_{\Omega_f} + p|_{\Omega_s}}{2} = \frac{p|_{\Omega_f} + 0}{2}
+@f]
+
+For a fluid pressure of 1, the result will be <b>0.5</b>. While this is the
+mathematically correct average for the extended field $P_h$, it is often not the
+value a user expects for the underlying physical problem.
 
 <h3>Implementation</h3>
 
