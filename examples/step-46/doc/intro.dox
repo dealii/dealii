@@ -151,7 +151,7 @@ $\mathbf v, p$ to both the original and the extended function.
 
 For discretization, we need finite dimensional subspaces $V_h,P_h$ of
 $V, P$. For Stokes, we know from step-22 that an appropriate choice is
-$Q_{p+1}^d\times Q_P$ but this only holds for that part of the domain
+$Q_{p+1}^d\times Q_p$ but this only holds for that part of the domain
 occupied by the fluid. For the extended field, let's use the following
 subspaces defined on the triangulation $\mathbb T$:
 @f{align*}{
@@ -193,8 +193,8 @@ describe the elasticity equation. Here, for the extended variables, we
 have
 @f{align*}{
   \tilde {\mathbf u} &\in U
-   = \{\tilde {\mathbf u}|_{\Omega_s} \in H^1(\Omega_f)^d, \quad
-       \tilde {\mathbf u}|_{\Omega_f} \in Z(\Omega_s)^d \},
+   = \{\tilde {\mathbf u}|_{\Omega_s} \in H^1(\Omega_s)^d, \quad
+       \tilde {\mathbf u}|_{\Omega_f} \in Z(\Omega_f)^d \},
 @f}
 and we will typically use a finite element space of the kind
 @f{align*}{
@@ -202,7 +202,7 @@ and we will typically use a finite element space of the kind
    &= \{{\mathbf u}_h \quad | \quad
        \forall K \in {\mathbb T}:
        {\mathbf u}_h|_K \in Q_r^d\  \text{if}\ K\subset {\Omega_s}, \quad
-       {\mathbf u}_h|_{\Omega_f}\ \text{is continuous}, \quad
+       {\mathbf u}_h|_{\Omega_s}\ \text{is continuous}, \quad
        {\mathbf u}_h|_K \in Z^d\ \text{if}\ K\subset {\Omega_f}\}
    && \subset U
 @f}
@@ -247,7 +247,7 @@ number of vector components but have different polynomial degrees &mdash; this
 smells very much like what one would do in $hp$ finite element methods, and it
 is exactly what we are going to do here: we are going to (ab)use the classes
 and facilities of the hp-namespace to assign different elements to different
-cells. In other words, we will use collect the two finite elements in an
+cells. In other words, we will collect the two finite elements in an
 hp::FECollection, will integrate with an appropriate hp::QCollection using an
 hp::FEValues object, and our DoFHandler will be in <i>hp</i>-mode. You
 may wish to take a look at step-27 for an overview of all of these concepts.
@@ -281,7 +281,7 @@ mapping the problem on to the hp-framework makes sense:
 - There is essentially no cost: The trick with the FE_Nothing does not add any
   degrees of freedom to the overall problem, nor do we ever have to handle a
   shape function that belongs to these components &mdash; the FE_Nothing has
-  no degrees of freedom, not does it have shape functions, all it does is take
+  no degrees of freedom, nor does it have shape functions, all it does is take
   up vector components.
 
 
