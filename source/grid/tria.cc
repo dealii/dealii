@@ -5272,12 +5272,23 @@ namespace internal
 
 
 
-      template <int dim, int spacedim>
-      static typename Triangulation<dim, spacedim>::DistortedCellList
-      execute_refinement_isotropic(Triangulation<dim, spacedim> &triangulation,
+      template <int spacedim>
+      static typename Triangulation<1, spacedim>::DistortedCellList
+      execute_refinement_isotropic(
+        Triangulation<1, spacedim> & /*triangulation*/,
+        const bool /*check_for_distorted_cells*/)
+      {
+        DEAL_II_ASSERT_UNREACHABLE();
+      }
+
+
+
+      template <int spacedim>
+      static typename Triangulation<2, spacedim>::DistortedCellList
+      execute_refinement_isotropic(Triangulation<2, spacedim> &triangulation,
                                    const bool check_for_distorted_cells)
       {
-        AssertDimension(dim, 2);
+        constexpr int dim = 2;
 
         // Check whether a new level is needed. We have to check for
         // this on the highest level only
