@@ -1941,11 +1941,12 @@ namespace Step80
                          // lagrange * disp
                          (phi_lagrange[i] * phi_w[j] * alpha) -
                          // disp * lagrange
-                         (phi_w[i] * phi_lagrange[j]) +
-                         // lagr * lagr
-                         phi_lagrange[i] * phi_lagrange[j]) *
+                         (phi_w[i] * phi_lagrange[j])) *
                         // JxW
                         fe_values.JxW(q);
+
+                      cell_preconditioner(i, j) +=
+                        phi_lagrange[i] * phi_lagrange[j] * fe_values.JxW(q);
                     }
                 }
             }
