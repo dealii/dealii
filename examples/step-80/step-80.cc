@@ -2307,6 +2307,8 @@ namespace Step80
 #ifdef DEAL_II_WITH_MUMPS
     if (par.solver_type == SolverType::mumps)
       {
+        // TODO @fdrmrc: once the MUMPS PR with block matrices is merged, use
+        // that one.
         SparseDirectMUMPS::AdditionalData mumps_data;
         SparseDirectMUMPS                 solver(mumps_data,
                                  mumps_system_matrix.get_mpi_communicator());
