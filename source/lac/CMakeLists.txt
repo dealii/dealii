@@ -94,6 +94,7 @@ if(DEAL_II_WITH_PETSC)
     petsc_matrix_free.cc
     petsc_parallel_block_sparse_matrix.cc
     petsc_parallel_block_vector.cc
+    petsc_parallel_full_matrix.cc
     petsc_parallel_sparse_matrix.cc
     petsc_parallel_vector.cc
     petsc_precondition.cc
