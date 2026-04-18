@@ -98,11 +98,8 @@ namespace parallel
      * mesh.
      *
      * @ingroup distributed
-     *
-     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {
@@ -436,10 +433,9 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     template <class Archive>
-    void Triangulation<dim, spacedim>::load(Archive           &ar,
-                                            const unsigned int version)
+    void
+    Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int version)
     {
       dealii::Triangulation<dim, spacedim>::load(ar, version);
       partition();
@@ -460,11 +456,8 @@ namespace parallel
      * Since the constructor of this class is deleted, no such objects
      * can actually be created as this would be pointless given that
      * MPI is not available.
-     *
-     * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
      */
     template <int dim, int spacedim = dim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     class Triangulation
       : public dealii::parallel::TriangulationBase<dim, spacedim>
     {

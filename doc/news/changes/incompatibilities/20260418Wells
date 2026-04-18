@@ -1,0 +1,7 @@
+Removed: The DoFHandler and Triangulation classes no longer rely on the
+is_valid_dim_spacedim concept: instead, they implement the same check with a
+static_assert(). This change will keep older forward declarations working but
+newer forward declarations, which include a concept requires statement, will
+need to be rewritten.
+<br>
+(David Wells, 2026/04/18)

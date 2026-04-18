@@ -73,7 +73,6 @@ namespace parallel
    * classes derived from the current one it actually is).
    */
   template <int dim, int spacedim = dim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   class TriangulationBase : public dealii::Triangulation<dim, spacedim>
   {
   public:
@@ -464,11 +463,8 @@ namespace parallel
    *       return false;
    *   }
    * @endcode
-   *
-   * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
    */
   template <int dim, int spacedim = dim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   class DistributedTriangulationBase
     : public dealii::parallel::TriangulationBase<dim, spacedim>
   {

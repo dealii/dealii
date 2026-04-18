@@ -334,7 +334,6 @@ namespace internal
    * A structure that binds information about data attached to cells.
    */
   template <int dim, int spacedim = dim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   struct CellAttachedData
   {
     using cell_iterator = TriaIterator<CellAccessor<dim, spacedim>>;
@@ -373,7 +372,6 @@ namespace internal
    * It is designed to store all data buffers intended for serialization.
    */
   template <int dim, int spacedim = dim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   class CellAttachedDataSerializer
   {
   public:
@@ -1314,11 +1312,8 @@ namespace internal
  * data stored in the triangulation.
  *
  * @ingroup grid
- *
- * @dealiiConceptRequires{(concepts::is_valid_dim_spacedim<dim, spacedim>)}
  */
 template <int dim, int spacedim = dim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class Triangulation : public EnableObserverPointer
 {
 private:
@@ -1330,6 +1325,11 @@ private:
     dealii::internal::TriangulationImplementation::Iterators<dim, spacedim>;
 
 public:
+  static_assert(dim >= 1 && spacedim <= 3 && dim <= spacedim,
+                "This class requires that the dimension and space dimension "
+                "correspond to a 1d, 2d, or 3d structure embedded in a 1d, 2d, "
+                "or 3d space with nonnegative codimension.");
+
   /**
    * Declare some symbolic names for mesh smoothing algorithms. The meaning of
    * these flags is documented in the Triangulation class.
@@ -4667,9 +4667,8 @@ namespace internal
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline bool Triangulation<dim, spacedim>::vertex_used(
-  const unsigned int index) const
+inline bool
+Triangulation<dim, spacedim>::vertex_used(const unsigned int index) const
 {
   AssertIndexRange(index, vertices_used.size());
   return vertices_used[index];
@@ -4678,23 +4677,23 @@ inline bool Triangulation<dim, spacedim>::vertex_used(
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline unsigned int Triangulation<dim, spacedim>::n_levels() const
+inline unsigned int
+Triangulation<dim, spacedim>::n_levels() const
 {
   return number_cache.n_levels;
 }
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline unsigned int Triangulation<dim, spacedim>::n_global_levels() const
+inline unsigned int
+Triangulation<dim, spacedim>::n_global_levels() const
 {
   return number_cache.n_levels;
 }
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline unsigned int Triangulation<dim, spacedim>::n_vertices() const
+inline unsigned int
+Triangulation<dim, spacedim>::n_vertices() const
 {
   return vertices.size();
 }
@@ -4702,18 +4701,17 @@ inline unsigned int Triangulation<dim, spacedim>::n_vertices() const
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline const std::vector<Point<spacedim>>
-  &Triangulation<dim, spacedim>::get_vertices() const
+inline const std::vector<Point<spacedim>> &
+Triangulation<dim, spacedim>::get_vertices() const
 {
   return vertices;
 }
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 template <class Archive>
-void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
+void
+Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 {
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
@@ -4752,9 +4750,9 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 template <class Archive>
-void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
+void
+Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
 {
   // clear previous content. this also calls the respective signal
   clear();
@@ -4829,10 +4827,9 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-inline unsigned int Triangulation<dim, spacedim>::
-  coarse_cell_id_to_coarse_cell_index(
-    const types::coarse_cell_id coarse_cell_id) const
+inline unsigned int
+Triangulation<dim, spacedim>::coarse_cell_id_to_coarse_cell_index(
+  const types::coarse_cell_id coarse_cell_id) const
 {
   return coarse_cell_id;
 }
@@ -4840,10 +4837,9 @@ inline unsigned int Triangulation<dim, spacedim>::
 
 
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 inline types::coarse_cell_id
-  Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
-    const unsigned int coarse_cell_index) const
+Triangulation<dim, spacedim>::coarse_cell_index_to_coarse_cell_id(
+  const unsigned int coarse_cell_index) const
 {
   return coarse_cell_index;
 }
