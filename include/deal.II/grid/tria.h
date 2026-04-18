@@ -4108,12 +4108,6 @@ protected:
   void
   update_periodic_face_map();
 
-  /**
-   * Update the internal reference_cells vector.
-   */
-  virtual void
-  update_reference_cells();
-
 
 private:
   /**
@@ -4725,6 +4719,8 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
   // well as boundary and manifold description but everything else
   ar &smooth_grid;
 
+  ar &reference_cells;
+
   unsigned int n_levels = levels.size();
   ar          &n_levels;
   for (const auto &level : levels)
@@ -4766,6 +4762,8 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
   ar &smooth_grid;
+
+  ar &reference_cells;
 
   unsigned int size;
   ar          &size;

@@ -2323,9 +2323,22 @@ namespace internal
     template <int dim>
     struct Connectivity
     {
-      Connectivity(const std::vector<ReferenceCell<dim>> &cell_types)
+      Connectivity(const std::vector<ReferenceCell<dim>> &cell_types,
+                   const std::set<ReferenceCell<dim>>    &all_reference_cells)
         : cell_types(cell_types)
-      {}
+        , all_reference_cells_(all_reference_cells)
+      {
+        if constexpr (running_in_debug_mode())
+          for (const auto &reference_cell : cell_types)
+            Assert(all_reference_cells_.count(reference_cell) == 1u,
+                   ExcInternalError());
+      }
+
+      inline const std::set<ReferenceCell<dim>> &
+      all_reference_cells() const
+      {
+        return all_reference_cells_;
+      }
 
       inline std::vector<types::geometric_orientation> &
       entity_orientations(const unsigned int structdim)
@@ -2421,6 +2434,8 @@ namespace internal
 
     private:
       std::vector<ReferenceCell<dim>> cell_types;
+
+      std::set<ReferenceCell<dim>> all_reference_cells_;
 
       ArrayOfArrays line_vertices;
 
@@ -2914,9 +2929,10 @@ namespace internal
     template <int dim>
     Connectivity<dim>
     build_connectivity(const std::vector<ReferenceCell<dim>> &cell_types,
-                       const ArrayOfArrays                   &cells_to_vertices)
+                       const std::set<ReferenceCell<dim>> &all_reference_cells,
+                       const ArrayOfArrays                &cells_to_vertices)
     {
-      Connectivity<dim> connectivity(cell_types);
+      Connectivity<dim> connectivity(cell_types, all_reference_cells);
 
       ArrayOfArrays temp1; // needed for 3d
 
@@ -3021,6 +3037,9 @@ namespace internal
       std::vector<ReferenceCell<dim>> cell_types;
       cell_types.reserve(cells.size());
 
+      // Looping over all the cells can be expensive, so we mark the kinds of
+      // ReferenceCells we have just once
+      std::set<ReferenceCell<dim>> all_reference_cells;
       // loop over cells and create CRS
       for (const auto &cell : cells)
         {
@@ -3045,6 +3064,7 @@ namespace internal
 
           cell_types.push_back(
             ReferenceCell<dim>::n_vertices_to_type(dim, cell.vertices.size()));
+          all_reference_cells.insert(cell_types.back());
 
           // create CRS of vertices (to remove template argument dim)
           cell_vertices.insert(cell_vertices.end(),
@@ -3055,6 +3075,7 @@ namespace internal
 
       // do the actual work
       return build_connectivity(cell_types,
+                                all_reference_cells,
                                 {std::move(cell_vertices_offsets),
                                  std::move(cell_vertices)});
     }
@@ -3680,6 +3701,13 @@ namespace internal
         const auto connectivity = build_connectivity(cells);
         const auto n_cells      = cells.size();
 
+        // set up reference cells for the first time
+        const auto all_reference_cells =
+          Utilities::MPI::compute_set_union(connectivity.all_reference_cells(),
+                                            tria.get_mpi_communicator());
+        tria.reference_cells.assign(all_reference_cells.begin(),
+                                    all_reference_cells.end());
+
         const ArrayOfArrays  empty;
         const ArrayOfArrays &lines_to_vertices =
           dim > 1 ? connectivity.entity_to_entities(1, 0) : empty;
@@ -3790,6 +3818,9 @@ namespace internal
               // set entity types
               level.reference_cell[cell] =
                 connectivity.template entity_types<dim>()[cell];
+              Assert(all_reference_cells.count(level.reference_cell[cell]) ==
+                       1u,
+                     ExcInternalError());
 
               // loop over faces
               const auto faces     = cells_to_faces[cell];
@@ -13249,8 +13280,6 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::reset_policy()
 {
-  this->update_reference_cells();
-
   if (this->all_reference_cells_are_hyper_cube())
     {
       this->policy =
@@ -16674,22 +16703,6 @@ void Triangulation<dim, spacedim>::update_periodic_face_map()
                  ExcInternalError());
         }
     }
-}
-
-
-
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void Triangulation<dim, spacedim>::update_reference_cells()
-{
-  std::set<ReferenceCell<dim>> reference_cells_set;
-  for (auto cell : active_cell_iterators())
-    if (cell->is_locally_owned())
-      reference_cells_set.insert(cell->reference_cell());
-
-  this->reference_cells =
-    std::vector<ReferenceCell<dim>>(reference_cells_set.begin(),
-                                    reference_cells_set.end());
 }
 
 

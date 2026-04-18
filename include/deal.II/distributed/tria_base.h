@@ -417,9 +417,6 @@ namespace parallel
      */
     void
     reset_global_cell_indices();
-
-    void
-    update_reference_cells() override;
   };
 
 
