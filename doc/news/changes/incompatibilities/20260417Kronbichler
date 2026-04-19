@@ -1,0 +1,7 @@
+Changed: FESubfaceValues::reinit() now checks whether the face under
+consideration actually belongs to a cell whose neighbor is more refined. This
+was previously only enforced on cell iterators based on a Triangulation
+object, not those associated to a DoFHandler object. The new behavior is
+now uniform in both cases.
+<br>
+(Martin Kronbichler, 2026/04/17)

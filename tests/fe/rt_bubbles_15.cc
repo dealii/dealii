@@ -15,8 +15,6 @@
 
 #include <deal.II/base/quadrature_lib.h>
 
-#include <deal.II/dofs/dof_accessor.h>
-
 #include <deal.II/fe/fe_rt_bubbles.h>
 #include <deal.II/fe/fe_values.h>
 
@@ -52,17 +50,28 @@ test(const unsigned int degree)
       deallog << "  h=" << h << std::endl;
 
       Triangulation<dim> tr;
-      GridGenerator::hyper_cube(tr, 0., h);
 
-      DoFHandler<dim> dof(tr);
-      dof.distribute_dofs(fe_rt_bubbles);
+      // Construct refinement situation where the first active cell is
+      // adjacent to a refined cell with face 0
+      Point<dim> l, r;
+      l[0] = -h;
+      for (unsigned int d = 0; d < dim; ++d)
+        r[d] = h;
+      std::vector<unsigned int> refine(dim, 1);
+      refine[0] = 2;
+      GridGenerator::subdivided_hyper_rectangle(tr, refine, l, r);
+
+      // Create refinement setting by refining second to last element one more
+      // time
+      tr.begin_active()->set_refine_flag();
+      tr.execute_coarsening_and_refinement();
 
       QTrapezoid<dim - 1> quadrature;
 
       FESubfaceValues<dim> fe_values(fe_rt_bubbles,
                                      quadrature,
                                      update_gradients);
-      fe_values.reinit(dof.begin_active(), 0, 0);
+      fe_values.reinit(tr.begin_active(), 0, 0);
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
           deallog << "    Quadrature point " << q << ": ";

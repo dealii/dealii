@@ -51,18 +51,13 @@ check(const Triangulation<dim> &tria, const unsigned int order)
 
   QGauss<dim - 1> q_face(3);
 
-  FEFaceValues<dim>    fe_face_values(mapping,
+  FEValues<dim>     fe_values(mapping, fe, QGauss<dim>(3), update_JxW_values);
+  FEFaceValues<dim> fe_face_values(mapping,
                                    fe,
                                    q_face,
                                    update_normal_vectors |
                                      update_quadrature_points |
                                      update_JxW_values);
-  FESubfaceValues<dim> fe_subface_values(mapping,
-                                         fe,
-                                         q_face,
-                                         update_normal_vectors |
-                                           update_quadrature_points |
-                                           update_JxW_values);
 
   double v1 = 0, v2 = 0;
   for (typename DoFHandler<dim>::active_cell_iterator cell =
@@ -70,10 +65,12 @@ check(const Triangulation<dim> &tria, const unsigned int order)
        cell != dof_handler.end();
        ++cell)
     {
-      // first integrate over faces
-      // and make sure that the
-      // result of the integration is
-      // close to zero
+      fe_values.reinit(cell);
+      for (const unsigned int q : fe_values.quadrature_point_indices())
+        v2 += fe_values.JxW(q);
+
+      // integrate over faces and make sure that the result of the integration
+      // is close to the one with the cell integral
       for (const unsigned int f : GeometryInfo<dim>::face_indices())
         if (cell->at_boundary(f))
           {
@@ -83,26 +80,10 @@ check(const Triangulation<dim> &tria, const unsigned int order)
                      fe_face_values.quadrature_point(q)) *
                     fe_face_values.JxW(q);
           }
-
-      // now same for subface
-      // integration
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
-        if (cell->at_boundary(f))
-          for (unsigned int sf = 0;
-               sf < GeometryInfo<dim>::max_children_per_face;
-               ++sf)
-            {
-              fe_subface_values.reinit(cell, f, sf);
-              for (unsigned int q = 0; q < q_face.size(); ++q)
-                v2 += (fe_subface_values.normal_vector(q) *
-                       fe_subface_values.quadrature_point(q)) *
-                      fe_subface_values.JxW(q);
-            }
     }
 
   deallog << " face integration: " << v1 / dim << std::endl;
-  deallog << " subface integration: " << v2 / dim << std::endl;
-  const double relative_error = std::fabs(v1 - v2) / v1;
+  const double relative_error = std::fabs(v1 / dim - v2) / v1;
   deallog << " relative error: " << relative_error << std::endl;
   Assert(relative_error < 5e-4, ExcInternalError());
 }

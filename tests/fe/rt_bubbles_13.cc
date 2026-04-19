@@ -47,6 +47,10 @@ test(const unsigned int degree)
 
   deallog << "Degree=" << degree << std::endl;
 
+  // Move expensive init work out of loop
+  QTrapezoid<dim - 1> quadrature;
+  FEFaceValues<dim>   fe_values(fe_rt_bubbles, quadrature, update_gradients);
+
   for (double h = 1; h > 1. / 128; h /= 2)
     {
       deallog << "  h=" << h << std::endl;
@@ -54,13 +58,7 @@ test(const unsigned int degree)
       Triangulation<dim> tr;
       GridGenerator::hyper_cube(tr, 0., h);
 
-      DoFHandler<dim> dof(tr);
-      dof.distribute_dofs(fe_rt_bubbles);
-
-      QTrapezoid<dim - 1> quadrature;
-
-      FEFaceValues<dim> fe_values(fe_rt_bubbles, quadrature, update_gradients);
-      fe_values.reinit(dof.begin_active(), 0);
+      fe_values.reinit(tr.begin_active(), 0);
       for (unsigned int q = 0; q < quadrature.size(); ++q)
         {
           deallog << "    Quadrature point " << q << ": ";
