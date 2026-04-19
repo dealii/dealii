@@ -2490,8 +2490,10 @@ namespace internal
         cells_to_cells_offsets.back(),
         /* default: cells is at the boundary in this direction */ -1);
 
-      std::vector<std::pair<unsigned int, unsigned int>> neighbors(n_faces,
-                                                                   {-1, -1});
+      std::vector<std::pair<unsigned int, unsigned int>> neighbors(
+        n_faces,
+        std::make_pair(numbers::invalid_unsigned_int,
+                       numbers::invalid_unsigned_int));
 
       // loop over all cells
       unsigned int global_face_index = 0;
@@ -2501,7 +2503,7 @@ namespace internal
           const auto faces = cells_to_faces[cell];
           for (unsigned int f = 0; f < faces.size(); ++f, ++global_face_index)
             {
-              if (neighbors[faces[f]].first == static_cast<unsigned int>(-1))
+              if (neighbors[faces[f]].first == numbers::invalid_unsigned_int)
                 {
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer

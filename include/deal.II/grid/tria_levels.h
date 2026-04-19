@@ -375,7 +375,7 @@ namespace internal
       AssertIndexRange(face_no, faces_per_object);
       const std::size_t i = index * faces_per_object + face_no;
       AssertIndexRange(i, neighbors.size());
-      return neighbors[i].second;
+      return neighbors[i].first;
     }
 
 
