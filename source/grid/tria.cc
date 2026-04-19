@@ -2505,9 +2505,7 @@ namespace internal
                 {
                   // face is visited the first time -> save the visiting cell
                   // and the face pointer
-                  neighbors[faces[f]] =
-                    std::pair<unsigned int, unsigned int>(cell,
-                                                          global_face_index);
+                  neighbors[faces[f]] = std::make_pair(cell, global_face_index);
                 }
               else
                 {
@@ -3829,12 +3827,11 @@ namespace internal
                    ++f, ++global_face_index)
                 {
                   // set neighbor if not at boundary
-                  const auto index = cell * level.faces_per_object + f;
-                  if (neighbors[f] != static_cast<unsigned int>(-1))
-                    level.neighbors[index] = {0, neighbors[f]};
+                  if (neighbors[f] != numbers::invalid_unsigned_int)
+                    level.set_neighbor(cell, f, 0, neighbors[f]);
 
                   // set face indices
-                  cells_0.cells[index] = faces[f];
+                  cells_0.cells[cell * level.faces_per_object + f] = faces[f];
 
                   // set face orientation if needed
                   if (orientation_needed)

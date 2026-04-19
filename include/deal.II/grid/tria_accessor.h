@@ -7648,10 +7648,8 @@ inline int
 CellAccessor<dim, spacedim>::neighbor_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
-  return this->tria->levels[this->level()]
-    ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
-                face_no]
-    .second;
+  return this->tria->levels[this->level()]->neighbor_index(this->present_index,
+                                                           face_no);
 }
 
 
@@ -7661,10 +7659,8 @@ inline int
 CellAccessor<dim, spacedim>::neighbor_level(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, this->n_faces());
-  return this->tria->levels[this->level()]
-    ->neighbors[this->present_index * ReferenceCells::max_n_faces<dim>() +
-                face_no]
-    .first;
+  return this->tria->levels[this->level()]->neighbor_level(this->present_index,
+                                                           face_no);
 }
 
 
