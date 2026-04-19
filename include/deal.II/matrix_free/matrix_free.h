@@ -158,22 +158,35 @@ public:
    * MappingQEulerian), it suffices to initialize the mapping only.
    *
    * The two parameters @p cell_vectorization_categories and
-   * @p cell_vectorization_categories_strict control the formation of batches
-   * for vectorization over several cells. It is used implicitly when working
-   * with hp-adaptivity but can also be useful in other contexts, such as in
-   * local time stepping where one would like to control which elements
-   * together form a batch of cells. The array @p cell_vectorization_categories
-   * is accessed by the number given by cell->active_cell_index() when working
-   * on the active cells with @p mg_level set to `numbers::invalid_unsigned_int`
-   * and by cell->index() for the level cells. By default, the different
-   * categories in @p cell_vectorization_category can be mixed and the algorithm
-   * is allowed to merge lower category numbers with the next higher categories
-   * if it is necessary inside the algorithm, in order to avoid partially
-   * filled SIMD lanes as much as possible. This gives a better utilization of
-   * the vectorization but might need special treatment, in particular for
-   * face integrals. If set to `true', the algorithm will instead keep
-   * different categories separate and not mix them in a single vectorized
-   * array.
+   * @p cell_vectorization_categories_strict control how batches of cells are
+   * formed for SIMD vectorization. This mechanism is used implicitly when
+   * working with hp-adaptivity, but it can also be useful in other contexts,
+   * such as local time stepping, where one may want to control which cells
+   * are grouped together into a vectorized batch. The array @p
+   * cell_vectorization_categories is indexed by cell->active_cell_index()
+   * when operating on active cells (i.e., when @p mg_level is set to
+   * numbers::invalid_unsigned_int), and by cell->index() when operating on
+   * multigrid level cells.
+   *
+   * By default, cells belonging to different categories may be combined. In
+   * particular, the algorithm may merge cells from lower category numbers
+   * into the next higher category when necessary in order to avoid partially
+   * filled SIMD lanes and improve vectorization efficiency. This generally
+   * leads to better SIMD utilization, but may require special handling in
+   * some situations, in particular for face integrals. If
+   * @p cell_vectorization_categories_strict is set to `true`, cells from
+   * different categories are kept separate and are never combined within the
+   * same vectorized batch.
+   *
+   * The chosen categorization also affects the cell ordering strategy: if no
+   * categories, or only a small number of categories, are provided (where
+   * "small" means fewer than roughly one quarter of the number of SIMD
+   * batches), cells are ordered according to a Morton-like traversal to
+   * improve data locality. Communication/computation overlap is then
+   * organized accordingly. For a larger number of categories, the algorithm
+   * instead follows the order prescribed by @p cell_vectorization_categories,
+   * with no attempt made to organize the cells or overlap communication and
+   * communication.
    *
    * Finally, @p allow_ghosted_vectors_in_loops allows to enable and disable
    * checks and @p communicator_sm gives the MPI communicator to be used
@@ -497,6 +510,16 @@ public:
      * possibility to merge cells of a lower number with the next higher
      * categories according to the variable
      * @p cell_vectorization_categories_strict.
+     *
+     * The chosen categorization also affects the cell ordering strategy: if
+     * no categories, or only a small number of categories, are provided
+     * (where "small" means fewer than roughly one quarter of the number of
+     * SIMD batches), cells are ordered according to a Morton-like traversal
+     * to improve data locality. Communication/computation overlap is then
+     * organized accordingly. For a larger number of categories, the algorithm
+     * instead follows the order prescribed by
+     * @p cell_vectorization_categories, with no attempt made to organize the
+     * cells or overlap communication and communication.
      *
      * @note This field is empty upon construction of AdditionalData. It is
      * the responsibility of the user to resize this field to

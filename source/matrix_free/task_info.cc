@@ -835,14 +835,15 @@ namespace internal
           AssertDimension(cell_vectorization_categories.size(),
                           n_active_cells + n_ghost_cells);
 
-          std::set<unsigned int> used_categories;
-          for (unsigned int i = 0; i < n_active_cells; ++i)
-            used_categories.insert(cell_vectorization_categories[i]);
           std::vector<unsigned int> used_categories_vector(
-            used_categories.size());
-          n_categories = 0;
-          for (const auto &it : used_categories)
-            used_categories_vector[n_categories++] = it;
+            cell_vectorization_categories);
+          std::sort(used_categories_vector.begin(),
+                    used_categories_vector.end());
+          used_categories_vector.erase(
+            std::unique(used_categories_vector.begin(),
+                        used_categories_vector.end()),
+            used_categories_vector.end());
+
           for (unsigned int i = 0; i < n_active_cells; ++i)
             {
               const unsigned int index =
@@ -853,127 +854,180 @@ namespace internal
               AssertIndexRange(index, used_categories_vector.size());
               tight_category_map[i] = index;
             }
+          n_categories = used_categories_vector.size();
         }
 
-      // Step 2: Sort the cells by the category. If we want to fill up the
-      // ranges in vectorization, promote some of the cells to a higher
-      // category
-      std::vector<std::vector<unsigned int>> renumbering_category(n_categories);
-      for (unsigned int i = 0; i < n_active_cells; ++i)
-        renumbering_category[tight_category_map[i]].push_back(i);
-
-      if (cell_vectorization_categories_strict == false && n_categories > 1)
-        for (unsigned int j = n_categories - 1; j > 0; --j)
-          {
-            unsigned int lower_index = j - 1;
-            while ((renumbering_category[j].size() % n_lanes) != 0u)
-              {
-                while (((renumbering_category[j].size() % n_lanes) != 0u) &&
-                       !renumbering_category[lower_index].empty())
-                  {
-                    renumbering_category[j].push_back(
-                      renumbering_category[lower_index].back());
-                    renumbering_category[lower_index].pop_back();
-                  }
-                if (lower_index == 0)
-                  break;
-                else
-                  --lower_index;
-              }
-          }
-
-      // Step 3: Use the parent relation to find a good grouping of cells. To
-      // do this, we first put cells of each category defined above into two
-      // bins, those which we know can be grouped together by the given parent
-      // relation and those which cannot
       std::vector<unsigned int> temporary_numbering;
       temporary_numbering.reserve(n_active_cells +
                                   (n_lanes - 1) * n_categories);
-      const unsigned int n_cells_per_parent =
-        std::count(parent_relation.begin(), parent_relation.end(), 0);
       std::vector<unsigned int> category_size;
-      for (unsigned int j = 0; j < n_categories; ++j)
+
+      // Step 2: Sort the cells by the category
+      //
+      // If we have many categories, there is no point in trying to be clever
+      // to group things, so then we just sort the cells by the order given by
+      // the categories
+      bool do_advanced_reordering = false;
+      if (cell_vectorization_categories_strict == true &&
+          n_categories >= n_active_cells / n_lanes / 4)
         {
-          std::vector<std::pair<unsigned int, unsigned int>> grouped_cells;
-          std::vector<unsigned int>                          other_cells;
-          for (const unsigned int cell : renumbering_category[j])
-            if (parent_relation.empty() ||
-                parent_relation[cell] == numbers::invalid_unsigned_int)
-              other_cells.push_back(cell);
-            else
-              grouped_cells.emplace_back(parent_relation[cell], cell);
+          std::vector<std::pair<unsigned int, unsigned int>> renumbered(
+            n_active_cells);
+          for (unsigned int i = 0; i < n_active_cells; ++i)
+            renumbered[i] = std::make_pair(tight_category_map[i], i);
+          std::sort(renumbered.begin(), renumbered.end());
+          for (unsigned int i = 0; i < n_active_cells;)
+            {
+              unsigned int j = 1;
+              while (i + j < n_active_cells &&
+                     renumbered[i + j].first == renumbered[i].first)
+                ++j;
+              for (unsigned int k = 0; k < j; ++k)
+                temporary_numbering.push_back(renumbered[i + k].second);
+              while (temporary_numbering.size() % n_lanes != 0)
+                temporary_numbering.push_back(numbers::invalid_unsigned_int);
+              i += j;
+            }
+        }
+      // if the number of categories is the same as the number of cells and
+      // are allowed to merge categories, we simply pick the order specified
+      // by the categories.
+      else if (cell_vectorization_categories_strict == false &&
+               n_categories >= n_active_cells)
+        {
+          temporary_numbering.resize(n_active_cells);
+          for (unsigned int i = 0; i < n_active_cells; ++i)
+            temporary_numbering[tight_category_map[i]] = i;
+        }
+      // In all other cases, we perform the sorting by categories by trying to
+      // fill up the ranges in vectorization through promotion of cells to a
+      // higher category if possible, otherwise some lanes remain empty.
+      else
+        {
+          do_advanced_reordering = true;
+          std::vector<std::vector<unsigned int>> renumbering_category(
+            n_categories);
+          for (unsigned int i = 0; i < n_active_cells; ++i)
+            renumbering_category[tight_category_map[i]].push_back(i);
 
-          // Compute the number of cells per group
-          std::sort(grouped_cells.begin(), grouped_cells.end());
-          std::vector<unsigned int> n_cells_per_group;
-          unsigned int              length = 0;
-          for (unsigned int i = 0; i < grouped_cells.size(); ++i, ++length)
-            if (i > 0 && grouped_cells[i].first != grouped_cells[i - 1].first)
+          if (cell_vectorization_categories_strict == false && n_categories > 1)
+            for (unsigned int j = n_categories - 1; j > 0; --j)
               {
+                unsigned int lower_index = j - 1;
+                while ((renumbering_category[j].size() % n_lanes) != 0u)
+                  {
+                    while (((renumbering_category[j].size() % n_lanes) != 0u) &&
+                           !renumbering_category[lower_index].empty())
+                      {
+                        renumbering_category[j].push_back(
+                          renumbering_category[lower_index].back());
+                        renumbering_category[lower_index].pop_back();
+                      }
+                    if (lower_index == 0)
+                      break;
+                    else
+                      --lower_index;
+                  }
+              }
+
+          // Step 3: Use the parent relation to find a good grouping of cells.
+          // To do this, we first put cells of each category defined above into
+          // two bins, those which we know can be grouped together by the given
+          // parent relation and those which cannot
+          const unsigned int n_cells_per_parent =
+            std::count(parent_relation.begin(), parent_relation.end(), 0);
+          for (unsigned int j = 0; j < n_categories; ++j)
+            {
+              std::vector<std::pair<unsigned int, unsigned int>> grouped_cells;
+              std::vector<unsigned int>                          other_cells;
+              for (const unsigned int cell : renumbering_category[j])
+                if (parent_relation.empty() ||
+                    parent_relation[cell] == numbers::invalid_unsigned_int)
+                  other_cells.push_back(cell);
+                else
+                  grouped_cells.emplace_back(parent_relation[cell], cell);
+
+              // Compute the number of cells per group
+              std::sort(grouped_cells.begin(), grouped_cells.end());
+              std::vector<unsigned int> n_cells_per_group;
+              unsigned int              length = 0;
+              for (unsigned int i = 0; i < grouped_cells.size(); ++i, ++length)
+                if (i > 0 &&
+                    grouped_cells[i].first != grouped_cells[i - 1].first)
+                  {
+                    n_cells_per_group.push_back(length);
+                    length = 0;
+                  }
+              if (length > 0)
                 n_cells_per_group.push_back(length);
-                length = 0;
-              }
-          if (length > 0)
-            n_cells_per_group.push_back(length);
 
-          // Move groups that do not have the complete size (due to
-          // categories) to the 'other_cells'. The cells with correct group
-          // size are immediately appended to the temporary cell numbering
-          auto group_it = grouped_cells.begin();
-          for (const unsigned int length : n_cells_per_group)
-            if (length < n_cells_per_parent)
-              for (unsigned int j = 0; j < length; ++j)
-                other_cells.push_back((group_it++)->second);
-            else
-              {
-                // we should not have more cells in a group than in the first
-                // check we did above
-                AssertDimension(length, n_cells_per_parent);
-                for (unsigned int j = 0; j < length; ++j)
-                  temporary_numbering.push_back((group_it++)->second);
-              }
+              // Move groups that do not have the complete size (due to
+              // categories) to the 'other_cells'. The cells with correct group
+              // size are immediately appended to the temporary cell numbering
+              auto group_it = grouped_cells.begin();
+              for (const unsigned int length : n_cells_per_group)
+                if (length < n_cells_per_parent)
+                  for (unsigned int j = 0; j < length; ++j)
+                    other_cells.push_back((group_it++)->second);
+                else
+                  {
+                    // we should not have more cells in a group than in the
+                    // first check we did above
+                    AssertDimension(length, n_cells_per_parent);
+                    for (unsigned int j = 0; j < length; ++j)
+                      temporary_numbering.push_back((group_it++)->second);
+                  }
 
-          // Sort the remaining cells and append them as well
-          std::sort(other_cells.begin(), other_cells.end());
-          temporary_numbering.insert(temporary_numbering.end(),
-                                     other_cells.begin(),
-                                     other_cells.end());
+              // Sort the remaining cells and append them as well
+              std::sort(other_cells.begin(), other_cells.end());
+              temporary_numbering.insert(temporary_numbering.end(),
+                                         other_cells.begin(),
+                                         other_cells.end());
 
-          while (temporary_numbering.size() % n_lanes != 0)
-            temporary_numbering.push_back(numbers::invalid_unsigned_int);
+              while (temporary_numbering.size() % n_lanes != 0)
+                temporary_numbering.push_back(numbers::invalid_unsigned_int);
 
-          category_size.push_back(temporary_numbering.size());
+              category_size.push_back(temporary_numbering.size());
+            }
         }
 
+      while (temporary_numbering.size() % n_lanes != 0)
+        temporary_numbering.push_back(numbers::invalid_unsigned_int);
+
       // Step 4: Identify the batches with cells marked as "comm"
-      std::vector<bool> batch_with_comm(temporary_numbering.size() / n_lanes,
-                                        false);
       std::vector<unsigned int> temporary_numbering_inverse(n_active_cells);
       for (unsigned int i = 0; i < temporary_numbering.size(); ++i)
         if (temporary_numbering[i] != numbers::invalid_unsigned_int)
           temporary_numbering_inverse[temporary_numbering[i]] = i;
+      std::vector<bool> batch_with_comm(temporary_numbering.size() / n_lanes,
+                                        false);
       for (const unsigned int cell : cells_with_comm)
         batch_with_comm[temporary_numbering_inverse[cell] / n_lanes] = true;
 
-      // Step 5: Sort the batches of cells by their last cell index to get
-      // good locality, assuming that the initial cell order is of good
-      // locality. In case we have hp-calculations with categories, we need to
-      // sort also by the category.
+      // Step 5: Sort the batches of cells. We do this by two different cases:
+      // If we have many categories according to step 2 above, where no
+      // additional numbering is performed, we go by the numbering of the
+      // categories in ascending order. In the other case, we sort cells by
+      // their last cell index to get good locality, assuming that the initial
+      // cell order is of good locality. In case we have hp-calculations with
+      // categories, we prioritize the order given by the category.
       std::vector<std::array<unsigned int, 3>> batch_order;
       std::vector<std::array<unsigned int, 3>> batch_order_comm;
       for (unsigned int i = 0; i < temporary_numbering.size(); i += n_lanes)
         {
           unsigned int max_index = 0;
-          for (unsigned int j = 0; j < n_lanes; ++j)
-            if (temporary_numbering[i + j] < numbers::invalid_unsigned_int)
-              max_index = std::max(temporary_numbering[i + j], max_index);
+          if (do_advanced_reordering)
+            for (unsigned int j = 0; j < n_lanes; ++j)
+              if (temporary_numbering[i + j] < numbers::invalid_unsigned_int)
+                max_index = std::max(temporary_numbering[i + j], max_index);
+
           const unsigned int category_hp =
             categories_are_hp ?
               std::upper_bound(category_size.begin(), category_size.end(), i) -
                 category_size.begin() :
               0;
           const std::array<unsigned int, 3> next{{category_hp, max_index, i}};
-          if (batch_with_comm[i / n_lanes])
+          if (batch_with_comm[i / n_lanes] || !do_advanced_reordering)
             batch_order_comm.emplace_back(next);
           else
             batch_order.emplace_back(next);
