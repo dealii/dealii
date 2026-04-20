@@ -694,6 +694,20 @@ namespace StandardExceptions
                  << "for more information.");
 
   /**
+   * An exception that is used when an algorithm finds that the
+   * coarsening flags set on the cells of a mesh are not consistent,
+   * presumably because the user has not yet called
+   * Triangulation::prepare_coarsening_and_refinement() after flagging
+   * some cells for refinement and/or coarsening.
+   */
+  DeclExceptionMsg(
+    ExcInconsistentCoarseningFlags,
+    "A cell is flagged for coarsening, but either not all of its siblings "
+    "are active or flagged for coarsening as well. Please clean up all "
+    "coarsen flags on your triangulation via "
+    "Triangulation::prepare_coarsening_and_refinement() beforehand!");
+
+  /**
    * Some of our numerical classes allow for setting all entries to zero using
    * the assignment operator <tt>=</tt>.
    *

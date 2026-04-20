@@ -601,9 +601,9 @@ namespace hp
                   if constexpr (running_in_debug_mode())
                     {
                       for (const auto &child : parent->child_iterators())
-                        Assert(child->is_active() && child->coarsen_flag_set(),
-                               typename Triangulation<
-                                 dim>::ExcInconsistentCoarseningFlags());
+                        Assert(
+                          child->is_active() && child->coarsen_flag_set(),
+                          StandardExceptions::ExcInconsistentCoarseningFlags());
                     }
 
                   parent_future_fe_index =
@@ -943,8 +943,7 @@ namespace hp
             for (const auto &child : parent->child_iterators())
               {
                 Assert(child->is_active() && child->coarsen_flag_set(),
-                       (typename Triangulation<dim, spacedim>::
-                          ExcInconsistentCoarseningFlags()));
+                       StandardExceptions::ExcInconsistentCoarseningFlags());
 
                 const level_type child_level = static_cast<level_type>(
                   future_levels[child->global_active_cell_index()]);

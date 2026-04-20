@@ -192,8 +192,7 @@ namespace parallel
             {
               for (const auto &child : cell->child_iterators())
                 Assert(child->is_active() && child->coarsen_flag_set(),
-                       typename dealii::Triangulation<
-                         dim>::ExcInconsistentCoarseningFlags());
+                       StandardExceptions::ExcInconsistentCoarseningFlags());
             }
 
           fe_index = dealii::internal::hp::DoFHandlerImplementation::
