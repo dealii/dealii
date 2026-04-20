@@ -18,7 +18,12 @@
 #  include <deal.II/lac/trilinos_index_access.h>
 
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_TRILINOS
 
 namespace TrilinosWrappers
 {
@@ -201,6 +206,6 @@ namespace TrilinosWrappers
 } /* end of namespace TrilinosWrappers */
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE

@@ -17,7 +17,12 @@
 #  include <deal.II/lac/block_sparse_matrix.h>
 #  include <deal.II/lac/block_sparsity_pattern.h>
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_TRILINOS
 
 namespace TrilinosWrappers
 {
@@ -327,6 +332,6 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE

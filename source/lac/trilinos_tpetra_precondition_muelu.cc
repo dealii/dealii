@@ -13,11 +13,11 @@
 
 #include <deal.II/lac/trilinos_tpetra_precondition_muelu.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #  ifdef DEAL_II_TRILINOS_WITH_IFPACK2
 #    ifdef DEAL_II_TRILINOS_WITH_TPETRA_MUELU
-
-DEAL_II_NAMESPACE_OPEN
 
 #      ifndef DOXYGEN
 // explicit instantiations
@@ -54,8 +54,8 @@ namespace LinearAlgebra
 
 } // namespace LinearAlgebra
 #      endif // def DOXYGEN
-DEAL_II_NAMESPACE_CLOSE
 
 #    endif
 #  endif // DEAL_II_TRILINOS_WITH_IFPACK2
 #endif   // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_NAMESPACE_CLOSE

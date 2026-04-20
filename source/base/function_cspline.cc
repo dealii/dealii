@@ -20,7 +20,12 @@
 #  include <cmath>
 
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_GSL
 namespace Functions
 {
   template <int dim>
@@ -149,6 +154,7 @@ namespace Functions
 
 } // namespace Functions
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

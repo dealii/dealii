@@ -12,10 +12,10 @@
 
 #include <deal.II/lac/trilinos_tpetra_solver_direct.templates.h>
 
+DEAL_II_NAMESPACE_OPEN
+
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 #  ifdef DEAL_II_TRILINOS_WITH_AMESOS2
-
-DEAL_II_NAMESPACE_OPEN
 
 #    ifndef DOXYGEN
 // explicit instantiations
@@ -68,7 +68,7 @@ namespace LinearAlgebra
   } // namespace TpetraWrappers
 
 } // namespace LinearAlgebra
-DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_TRILINOS_WITH_AMESOS2
 #endif   // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_NAMESPACE_CLOSE

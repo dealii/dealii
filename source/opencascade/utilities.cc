@@ -83,7 +83,12 @@
 #  include <vector>
 
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_OPENCASCADE
 
 namespace OpenCASCADE
 {
@@ -925,6 +930,7 @@ namespace OpenCASCADE
 
 } // namespace OpenCASCADE
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

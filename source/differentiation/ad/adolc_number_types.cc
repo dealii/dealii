@@ -26,7 +26,12 @@
 #    include <adolc/adtl.h>    // Tapeless double
 #  endif
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_ADOLC
 
 
 #  ifdef DEAL_II_ADOLC_WITH_ADVANCED_BRANCHING
@@ -87,6 +92,6 @@ namespace numbers
 
 #  include "differentiation/ad/adolc_number_types.inst"
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE

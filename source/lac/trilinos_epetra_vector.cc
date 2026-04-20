@@ -33,7 +33,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <memory>
 
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_TRILINOS
 
 namespace LinearAlgebra
 {
@@ -675,6 +680,6 @@ namespace LinearAlgebra
   } // namespace EpetraWrappers
 } // namespace LinearAlgebra
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE

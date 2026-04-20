@@ -18,7 +18,12 @@
 
 #  include <deal.II/lac/exceptions.h>
 
+
+#endif // DEAL_II_WITH_PETSC
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_PETSC
 // Shorthand notation for PETSc error codes.
 #  define AssertPETSc(code)                          \
     do                                               \
@@ -533,6 +538,6 @@ namespace PETScWrappers
 // Explicit instantiations
 #  include "lac/petsc_communication_pattern.inst"
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
+DEAL_II_NAMESPACE_CLOSE

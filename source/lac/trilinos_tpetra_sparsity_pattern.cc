@@ -26,7 +26,12 @@
 
 #  include <limits>
 
+
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 namespace LinearAlgebra
 {
@@ -1156,6 +1161,6 @@ namespace LinearAlgebra
 
 } // namespace LinearAlgebra
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_NAMESPACE_CLOSE

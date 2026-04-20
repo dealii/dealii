@@ -43,7 +43,12 @@
 #  include <iomanip>
 #  include <iostream>
 
+
+#endif // DEAL_II_WITH_SUNDIALS
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_SUNDIALS
 
 namespace SUNDIALS
 {
@@ -550,6 +555,6 @@ namespace SUNDIALS
 
 } // namespace SUNDIALS
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SUNDIALS
+DEAL_II_NAMESPACE_CLOSE

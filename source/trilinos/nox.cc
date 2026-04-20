@@ -31,7 +31,11 @@
 
 #  include <deal.II/trilinos/nox.templates.h>
 
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_NOX
 
 namespace TrilinosWrappers
 {
@@ -44,6 +48,6 @@ namespace TrilinosWrappers
 #  endif
 } // namespace TrilinosWrappers
 
-DEAL_II_NAMESPACE_CLOSE
-
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

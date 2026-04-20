@@ -24,7 +24,12 @@
 #    include <sundials/sundials_context.h>
 #  endif
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_SUNDIALS
 
 // We don't build the .inst file if deal.II isn't configured
 // with SUNDIALS, but doxygen doesn't know that and tries to find that
@@ -34,6 +39,6 @@ DEAL_II_NAMESPACE_OPEN
 #    include "sundials/n_vector.inst"
 #  endif
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE

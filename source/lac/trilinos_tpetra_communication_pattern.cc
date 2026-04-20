@@ -23,7 +23,12 @@
 
 #  include <memory>
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 namespace LinearAlgebra
 {
@@ -134,6 +139,6 @@ template class LinearAlgebra::TpetraWrappers::CommunicationPattern<
 template class LinearAlgebra::TpetraWrappers::CommunicationPattern<
   MemorySpace::Host>;
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE
