@@ -93,7 +93,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::Vector(const Vector<Number, MemorySpace> &V)
       : compressed(V.compressed)
       , has_ghost(V.has_ghost)
-      , last_action(VectorOperation::unknown)
+      , last_action(V.last_action)
       , vector(Utilities::Trilinos::internal::make_rcp<
                TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
                                                              Teuchos::Copy))
@@ -104,7 +104,9 @@ namespace LinearAlgebra
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
                                                           Teuchos::Copy);
         }
-      local_entries = V.local_entries;
+      local_entries           = V.local_entries;
+      nonlocal_cached_indices = V.nonlocal_cached_indices;
+      nonlocal_cached_values  = V.nonlocal_cached_values;
     }
 
 
@@ -201,6 +203,8 @@ namespace LinearAlgebra
       compressed  = true;
       last_action = VectorOperation::unknown;
       nonlocal_vector.reset();
+      nonlocal_cached_indices.clear();
+      nonlocal_cached_values.clear();
     }
 
 
@@ -213,6 +217,8 @@ namespace LinearAlgebra
     {
       vector.reset();
       nonlocal_vector.reset();
+      nonlocal_cached_indices.clear();
+      nonlocal_cached_values.clear();
 
       compressed  = true;
       has_ghost   = false;
@@ -236,6 +242,8 @@ namespace LinearAlgebra
     {
       // release memory before reallocation
       nonlocal_vector.reset();
+      nonlocal_cached_indices.clear();
+      nonlocal_cached_values.clear();
 
       local_entries = locally_owned_entries;
 
@@ -328,6 +336,8 @@ namespace LinearAlgebra
                omit_zeroing_entries == false)
         nonlocal_vector->putScalar(Number(0));
 
+      nonlocal_cached_indices.clear();
+      nonlocal_cached_values.clear();
       has_ghost     = V.has_ghost;
       local_entries = V.local_entries;
       compressed    = true;
@@ -469,6 +479,10 @@ namespace LinearAlgebra
           tpetra_comm_pattern    = V.tpetra_comm_pattern;
         }
 
+      // Because V is compressed and has no pending changes
+      // clear our local cache as well.
+      nonlocal_cached_indices.clear();
+      nonlocal_cached_values.clear();
       last_action = VectorOperation::unknown;
 
       return *this;
@@ -483,6 +497,8 @@ namespace LinearAlgebra
     {
       vector.reset();
       nonlocal_vector.reset();
+      nonlocal_cached_indices.clear();
+      nonlocal_cached_values.clear();
 
       Teuchos::Array<Number> vector_data(V.begin(), V.end());
       vector = Utilities::Trilinos::internal::make_rcp<
