@@ -77,7 +77,7 @@ namespace internal
 
 
 template <int dim, typename PolynomialType>
-inline void
+void
 TensorProductPolynomials<dim, PolynomialType>::compute_index(
   const unsigned int             i,
   std::array<unsigned int, dim> &indices) const
@@ -128,7 +128,7 @@ TensorProductPolynomials<dim, PolynomialType>::output_indices(
 
 
 template <int dim>
-inline const std::vector<unsigned int> &
+const std::vector<unsigned int> &
 AnisotropicPolynomials<dim>::get_numbering() const
 {
   return index_map;
@@ -137,7 +137,7 @@ AnisotropicPolynomials<dim>::get_numbering() const
 
 
 template <int dim>
-inline const std::vector<unsigned int> &
+const std::vector<unsigned int> &
 AnisotropicPolynomials<dim>::get_numbering_inverse() const
 {
   return index_map_inverse;
