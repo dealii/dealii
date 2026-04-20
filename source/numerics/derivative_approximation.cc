@@ -133,7 +133,7 @@ namespace DerivativeApproximation
 
     template <int dim>
     template <class InputVector, int spacedim>
-    inline typename Gradient<dim>::ProjectedDerivative
+    typename Gradient<dim>::ProjectedDerivative
     Gradient<dim>::get_projected_derivative(
       const FEValues<dim, spacedim> &fe_values,
       const InputVector             &solution,
@@ -159,7 +159,7 @@ namespace DerivativeApproximation
 
 
     template <int dim>
-    inline double
+    double
     Gradient<dim>::derivative_norm(const Derivative &d)
     {
       double s = 0;
@@ -171,7 +171,7 @@ namespace DerivativeApproximation
 
 
     template <int dim>
-    inline void
+    void
     Gradient<dim>::symmetrize(Derivative &)
     {
       // nothing to do here
@@ -248,7 +248,7 @@ namespace DerivativeApproximation
 
     template <int dim>
     template <class InputVector, int spacedim>
-    inline typename SecondDerivative<dim>::ProjectedDerivative
+    typename SecondDerivative<dim>::ProjectedDerivative
     SecondDerivative<dim>::get_projected_derivative(
       const FEValues<dim, spacedim> &fe_values,
       const InputVector             &solution,
@@ -277,7 +277,7 @@ namespace DerivativeApproximation
 
 
     template <>
-    inline double
+    double
     SecondDerivative<1>::derivative_norm(const Derivative &d)
     {
       return std::fabs(d[0][0]);
@@ -286,7 +286,7 @@ namespace DerivativeApproximation
 
 
     template <>
-    inline double
+    double
     SecondDerivative<2>::derivative_norm(const Derivative &d)
     {
       // note that d should be a
@@ -309,7 +309,7 @@ namespace DerivativeApproximation
 
 
     template <>
-    inline double
+    double
     SecondDerivative<3>::derivative_norm(const Derivative &d)
     {
       /*
@@ -485,7 +485,7 @@ namespace DerivativeApproximation
 
 
     template <int dim>
-    inline double
+    double
     SecondDerivative<dim>::derivative_norm(const Derivative &)
     {
       // computing the spectral norm is
@@ -508,7 +508,7 @@ namespace DerivativeApproximation
 
 
     template <int dim>
-    inline void
+    void
     SecondDerivative<dim>::symmetrize(Derivative &d)
     {
       // symmetrize non-diagonal entries
@@ -586,7 +586,7 @@ namespace DerivativeApproximation
 
     template <int dim>
     template <class InputVector, int spacedim>
-    inline typename ThirdDerivative<dim>::ProjectedDerivative
+    typename ThirdDerivative<dim>::ProjectedDerivative
     ThirdDerivative<dim>::get_projected_derivative(
       const FEValues<dim, spacedim> &fe_values,
       const InputVector             &solution,
@@ -615,7 +615,7 @@ namespace DerivativeApproximation
 
 
     template <>
-    inline double
+    double
     ThirdDerivative<1>::derivative_norm(const Derivative &d)
     {
       return std::fabs(d[0][0][0]);
@@ -624,7 +624,7 @@ namespace DerivativeApproximation
 
 
     template <int dim>
-    inline double
+    double
     ThirdDerivative<dim>::derivative_norm(const Derivative &d)
     {
       // return the Frobenius-norm. this is a
@@ -634,7 +634,7 @@ namespace DerivativeApproximation
 
 
     template <int dim>
-    inline void
+    void
     ThirdDerivative<dim>::symmetrize(Derivative &d)
     {
       // symmetrize non-diagonal entries
