@@ -1,0 +1,6 @@
+Fixed: TimerOutput::print_wall_time_statistics() no longer requires all processes
+to enter the same sections when the TimerOutput is constructed without an MPI
+communicator. Sections that are not entered on a process are now reported with
+zero timing. Previously, this could trigger an assertion or lead to a deadlock.
+<br>
+(Torsten Schmid, 2026/04/20)
