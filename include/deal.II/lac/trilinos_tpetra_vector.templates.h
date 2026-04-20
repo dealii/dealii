@@ -105,6 +105,9 @@ namespace LinearAlgebra
                                                           Teuchos::Copy);
         }
       local_entries = V.local_entries;
+      vector_2d     = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     }
 
 
@@ -116,7 +119,11 @@ namespace LinearAlgebra
       , has_ghost(V->getMap()->isOneToOne() == false)
       , last_action(VectorOperation::unknown)
       , vector(V)
-    {}
+    {
+      vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+    }
 
 
 
@@ -131,7 +138,11 @@ namespace LinearAlgebra
           parallel_partitioner.make_tpetra_map_rcp<
             TpetraTypes::NodeType<MemorySpace>>(communicator, true)))
       , local_entries(parallel_partitioner)
-    {}
+    {
+      vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+    }
 
 
 
@@ -175,6 +186,9 @@ namespace LinearAlgebra
         }
 
       has_ghost = (vector->getMap()->isOneToOne() == false);
+      vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       if constexpr (running_in_debug_mode())
         {
@@ -223,6 +237,9 @@ namespace LinearAlgebra
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
             communicator, true));
       local_entries = parallel_partitioner;
+      vector_2d     = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     }
 
 
@@ -281,6 +298,9 @@ namespace LinearAlgebra
       has_ghost   = (vector->getMap()->isOneToOne() == false);
       compressed  = true;
       last_action = VectorOperation::unknown;
+      vector_2d   = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     }
 
 
@@ -332,6 +352,9 @@ namespace LinearAlgebra
       local_entries = V.local_entries;
       compressed    = true;
       last_action   = VectorOperation::unknown;
+      vector_2d     = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadWriteStruct{});
+      vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       // Cached import state depends on previous source layouts and should
       // not survive reinitialization.
@@ -348,10 +371,6 @@ namespace LinearAlgebra
       const ArrayView<Number>                        &elements) const
     {
       AssertDimension(indices.size(), elements.size());
-
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnlyStruct{});
-      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       for (unsigned int i = 0; i < indices.size(); ++i)
         {
@@ -409,15 +428,8 @@ namespace LinearAlgebra
           auto source_vector_1d =
             Kokkos::subview(source_vector_2d, Kokkos::ALL(), 0);
 
-          // Create a read/write Kokkos view from the target vector
-          auto target_vector_2d =
-            vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
-          auto target_vector_1d =
-            Kokkos::subview(target_vector_2d, Kokkos::ALL(), 0);
-
           // Copy the data
-          Kokkos::deep_copy(target_vector_1d, source_vector_1d);
+          Kokkos::deep_copy(vector_1d, source_vector_1d);
         }
       else if (size() == V.size())
         {
@@ -711,32 +723,20 @@ namespace LinearAlgebra
         vector->getMap()->getLocalElement(
           static_cast<TrilinosWrappers::types::int_type>(index));
 
-      Number value = 0.0;
-
       // If the element is not present on the current processor, we can't
       // continue. This is the main difference to the el() function.
-      if (local_index == Teuchos::OrdinalTraits<int>::invalid())
-        {
+      Assert(local_index != Teuchos::OrdinalTraits<int>::invalid(),
+             ExcAccessToNonLocalElement(index,
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-          Assert(
-            false,
-            ExcAccessToNonLocalElement(index,
-                                       vector->getMap()->getLocalNumElements(),
-                                       vector->getMap()->getMinLocalIndex(),
-                                       vector->getMap()->getMaxLocalIndex()));
-#  else
-          Assert(
-            false,
-            ExcAccessToNonLocalElement(index,
-                                       vector->getMap()->getNodeNumElements(),
-                                       vector->getMap()->getMinLocalIndex(),
-                                       vector->getMap()->getMaxLocalIndex()));
-#  endif
-        }
-      else
-        value = vector->getData()[local_index];
 
-      return value;
+                                        vector->getMap()->getLocalNumElements(),
+#  else
+                                        vector->getMap()->getNodeNumElements(),
+#  endif
+                                        vector->getMap()->getMinLocalIndex(),
+                                        vector->getMap()->getMaxLocalIndex()));
+
+      return vector_1d[local_index];
     }
 
 
@@ -750,10 +750,6 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      auto vector_1d = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       const size_t localLength = vector->getLocalLength();
       for (size_t k = 0; k < localLength; ++k)
@@ -1014,16 +1010,13 @@ namespace LinearAlgebra
       if (this_local_length != other_local_length)
         return false;
 
-      auto this_vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnlyStruct{});
       auto other_vector_2d = v.vector->template getLocalView<Kokkos::HostSpace>(
         Tpetra::Access::ReadOnlyStruct{});
 
-      auto this_vector_1d  = Kokkos::subview(this_vector_2d, Kokkos::ALL(), 0);
       auto other_vector_1d = Kokkos::subview(other_vector_2d, Kokkos::ALL(), 0);
 
       for (size_type i = 0; i < this_local_length; ++i)
-        if (this_vector_1d(i) != other_vector_1d(i))
+        if (vector_1d(i) != other_vector_1d(i))
           return false;
 
       return true;
@@ -1331,10 +1324,6 @@ namespace LinearAlgebra
       else
         out.setf(std::ios::fixed, std::ios::floatfield);
 
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadOnlyStruct{});
-
-      auto         vector_1d    = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
       const size_t local_length = vector->getLocalLength();
 
       if (size() != local_length)
