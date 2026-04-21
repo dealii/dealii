@@ -4493,8 +4493,7 @@ namespace
         // copying any actual data, since we typically have multiple sidesets
         // per face):
         std::deque<ArrayView<std::pair<std::size_t, int>>>
-                    face_id_to_sideset_ids;
-        std::size_t n_faces = 0;
+          face_id_to_sideset_ids;
         if (face_sidesets.size() > 0)
           {
             auto start = face_sidesets.begin();
@@ -4505,11 +4504,9 @@ namespace
                   face_id_to_sideset_ids.emplace_back(
                     make_array_view(start, it));
                   start = it;
-                  ++n_faces;
                 }
             face_id_to_sideset_ids.emplace_back(
               make_array_view(start, face_sidesets.end()));
-            ++n_faces;
           }
 
         // Sort by sideset ids per face, so that faces with the same sidesets
