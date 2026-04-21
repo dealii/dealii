@@ -334,6 +334,9 @@ namespace internal
     {
       ar &refine_flags &coarsen_flags;
 
+      ar &children_per_object;
+      ar &faces_per_object;
+
       // do not serialize `active_cell_indices` and `vertex_indices_cache`
       // here. instead of storing them to the stream and re-reading them again
       // later, we just rebuild them in Triangulation::load()
