@@ -179,7 +179,8 @@ export
   // objects:
   using ::operator<<;
 
-#  ifdef DEAL_II_TRILINOS_WITH_AMESOS2
+#  if defined(DEAL_II_TRILINOS_WITH_AMESOS2) && \
+    DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
   namespace Amesos2
   {
     using ::Amesos2::create;
@@ -352,6 +353,10 @@ export
   }   // namespace Sacado
 #  endif
 
+#  ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  using ::ex_strerror;
+#  endif
+
   namespace Teuchos
   {
     using ::Teuchos::Array;
@@ -484,7 +489,11 @@ CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_precond)
 #  undef AZ_precond
 EXPORT_PREPROCESSOR_SYMBOL(AZ_precond)
 
-
+#  ifdef DEAL_II_TRILINOS_WITH_SEACAS
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_NOERR)
+#    undef EX_NOERR
+EXPORT_PREPROCESSOR_SYMBOL(EX_NOERR)
+#  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(ZOLTAN_OK)
