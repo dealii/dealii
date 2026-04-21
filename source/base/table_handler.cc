@@ -39,41 +39,24 @@ namespace internal
     // the value if this happens to be a number
     //
     // first try with int
-    try
-      {
-        return std::get<int>(value);
-      }
-    catch (...)
-      {}
-
+    if (const auto *stored_value = std::get_if<int>(&value))
+      return *stored_value;
 
     // ... then with unsigned int...
-    try
-      {
-        return std::get<unsigned int>(value);
-      }
-    catch (...)
-      {}
+    if (const auto *stored_value = std::get_if<unsigned int>(&value))
+      return *stored_value;
 
     // ... then with std::uint64_t...
-    try
-      {
-        return std::get<std::uint64_t>(value);
-      }
-    catch (...)
-      {}
+    if (const auto *stored_value = std::get_if<std::uint64_t>(&value))
+      return *stored_value;
 
     // ...and finally with double precision:
-    try
-      {
-        return std::get<double>(value);
-      }
-    catch (...)
-      {
-        Assert(false,
-               ExcMessage("The number stored by this element of the "
-                          "table is not a number."));
-      }
+    if (const auto *stored_value = std::get_if<double>(&value))
+      return *stored_value;
+
+    Assert(false,
+           ExcMessage("The entry stored by this element of the "
+                      "table is not a number."));
 
     return 0;
   }
