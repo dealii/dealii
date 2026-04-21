@@ -17,10 +17,8 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/auto_derivative_function.h>
-#include <deal.II/base/exceptions.h>
 #include <deal.II/base/mu_parser_internal.h>
 #include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
 
 #include <map>
 #include <vector>

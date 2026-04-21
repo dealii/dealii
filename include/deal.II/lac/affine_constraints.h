@@ -26,8 +26,6 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/vector_element_access.h>
 
-#include <boost/range/iterator_range.hpp>
-
 #include <algorithm>
 #include <set>
 #include <type_traits>
