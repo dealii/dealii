@@ -661,12 +661,16 @@ namespace ArborXWrappers
   };
 #  endif
 } // namespace ArborXWrappers
+#endif
+
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
 
 /**
  * This namespace contains the implementation of AccessTraits used by ArborX.
  */
-namespace ArborX
+#ifdef DEAL_II_WITH_ARBORX
+  namespace ArborX
 {
 #  if ARBORX_VERSION_MAJOR < 2
   /**
@@ -1200,9 +1204,8 @@ namespace ArborX
 
 
 
-  inline auto
-  AccessTraits<dealii::ArborXWrappers::BoundingBoxNearestPredicate,
-               PredicatesTag>::
+  inline auto AccessTraits<dealii::ArborXWrappers::BoundingBoxNearestPredicate,
+                           PredicatesTag>::
     get(const dealii::ArborXWrappers::BoundingBoxNearestPredicate &bb_nearest,
         std::size_t                                                i)
   {
@@ -1217,19 +1220,18 @@ namespace ArborX
 
 
 
-  inline std::size_t
-  AccessTraits<dealii::ArborXWrappers::SphereIntersectPredicate,
-               PredicatesTag>::
-    size(const dealii::ArborXWrappers::SphereIntersectPredicate &sph_intersect)
+  inline std::size_t AccessTraits<
+    dealii::ArborXWrappers::SphereIntersectPredicate,
+    PredicatesTag>::size(const dealii::ArborXWrappers::SphereIntersectPredicate
+                           &sph_intersect)
   {
     return sph_intersect.size();
   }
 
 
 
-  inline auto
-  AccessTraits<dealii::ArborXWrappers::SphereIntersectPredicate,
-               PredicatesTag>::
+  inline auto AccessTraits<dealii::ArborXWrappers::SphereIntersectPredicate,
+                           PredicatesTag>::
     get(const dealii::ArborXWrappers::SphereIntersectPredicate &sph_intersect,
         std::size_t                                             i)
   {
@@ -1311,8 +1313,7 @@ namespace ArborX
 
 
   template <int dim, typename Number>
-  inline std::size_t
-  AccessTraits<
+  inline std::size_t AccessTraits<
     dealii::ArborXWrappers::BoundingBoxIntersectPredicate<dim, Number>>::
     size(
       const dealii::ArborXWrappers::BoundingBoxIntersectPredicate<dim, Number>
@@ -1324,8 +1325,7 @@ namespace ArborX
 
 
   template <int dim, typename Number>
-  inline auto
-  AccessTraits<
+  inline auto AccessTraits<
     dealii::ArborXWrappers::BoundingBoxIntersectPredicate<dim, Number>>::
     get(const dealii::ArborXWrappers::BoundingBoxIntersectPredicate<dim, Number>
                    &bb_intersect,
@@ -1343,8 +1343,7 @@ namespace ArborX
 
 
   template <int dim, typename Number>
-  inline std::size_t
-  AccessTraits<
+  inline std::size_t AccessTraits<
     dealii::ArborXWrappers::BoundingBoxNearestPredicate<dim, Number>>::
     size(const dealii::ArborXWrappers::BoundingBoxNearestPredicate<dim, Number>
            &bb_nearest)
@@ -1355,8 +1354,7 @@ namespace ArborX
 
 
   template <int dim, typename Number>
-  inline auto
-  AccessTraits<
+  inline auto AccessTraits<
     dealii::ArborXWrappers::BoundingBoxNearestPredicate<dim, Number>>::
     get(const dealii::ArborXWrappers::BoundingBoxNearestPredicate<dim, Number>
                    &bb_nearest,
@@ -1429,6 +1427,7 @@ namespace ArborX
 
 #endif
 
-DEAL_II_NAMESPACE_CLOSE
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
+  DEAL_II_NAMESPACE_CLOSE
 
 #endif
