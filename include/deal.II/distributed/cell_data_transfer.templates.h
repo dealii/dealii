@@ -260,9 +260,9 @@ namespace parallel
                        ++child_index)
                     {
                       const auto &child = cell->child(child_index);
-                      Assert(child->is_active() && child->coarsen_flag_set(),
-                             typename dealii::Triangulation<
-                               dim>::ExcInconsistentCoarseningFlags());
+                      Assert(
+                        child->is_active() && child->coarsen_flag_set(),
+                        StandardExceptions::ExcInconsistentCoarseningFlags());
 
                       children_values[child_index] =
                         (**it_input)[child->active_cell_index()];

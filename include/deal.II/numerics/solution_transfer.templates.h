@@ -376,9 +376,9 @@ SolutionTransfer<dim, VectorType, spacedim>::pack_callback(
               if constexpr (running_in_debug_mode())
                 {
                   for (const auto &child : cell->child_iterators())
-                    Assert(child->is_active() && child->coarsen_flag_set(),
-                           typename dealii::Triangulation<
-                             dim>::ExcInconsistentCoarseningFlags());
+                    Assert(
+                      child->is_active() && child->coarsen_flag_set(),
+                      StandardExceptions::ExcInconsistentCoarseningFlags());
                 }
 
               fe_index = dealii::internal::hp::DoFHandlerImplementation::
@@ -871,8 +871,7 @@ namespace Legacy
             for (const auto &child : cell->child_iterators())
               {
                 Assert(child->is_active() && child->coarsen_flag_set(),
-                       typename dealii::Triangulation<
-                         dim>::ExcInconsistentCoarseningFlags());
+                       StandardExceptions::ExcInconsistentCoarseningFlags());
 
                 fe_indices_children.insert(child->active_fe_index());
               }

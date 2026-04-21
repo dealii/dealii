@@ -107,8 +107,7 @@ CellDataTransfer<dim, spacedim, VectorType>::
               for (const auto &sibling : parent->child_iterators())
                 {
                   Assert(sibling->is_active() && sibling->coarsen_flag_set(),
-                         typename dealii::Triangulation<
-                           dim>::ExcInconsistentCoarseningFlags());
+                         StandardExceptions::ExcInconsistentCoarseningFlags());
 
                   indices_children.insert(sibling->active_cell_index());
                 }

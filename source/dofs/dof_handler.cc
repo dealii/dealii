@@ -1504,8 +1504,8 @@ namespace internal
                             for (const auto &child : parent->child_iterators())
                               Assert(child->is_active() &&
                                        child->coarsen_flag_set(),
-                                     typename dealii::Triangulation<
-                                       dim>::ExcInconsistentCoarseningFlags());
+                                     StandardExceptions::
+                                       ExcInconsistentCoarseningFlags());
                           }
 
                         const types::fe_index fe_index = dealii::internal::hp::
