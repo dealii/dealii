@@ -112,6 +112,30 @@ namespace internal
       size() const;
 
       /**
+       * Return the index of @p index's neighbor on face @p face_no. See the
+       * documentation of neighbors for more information.
+       */
+      int
+      neighbor_index(const int index, const unsigned int face_no) const;
+
+      /**
+       * Return the level of @p index's neighbor on face @p face_no. See the
+       * documentation of neighbors for more information.
+       */
+      int
+      neighbor_level(const int index, const unsigned int face_no) const;
+
+      /**
+       * Set the @p face_no-th neighbor of cell @p index to (@p neighbor_level,
+       * @p neighbor_index).
+       */
+      void
+      set_neighbor(const int          index,
+                   const unsigned int face_no,
+                   const int          neighbor_level,
+                   const int          neighbor_index);
+
+      /**
        * The number of children stored per object. In practice, to support mixed
        * meshes, this is the maximum number of children per ReferenceCell across
        * all relevant ReferenceCell types used by the Triangulation.
@@ -164,41 +188,6 @@ namespace internal
        * Global cell index of each cell on the given level.
        */
       std::vector<types::global_cell_index> global_level_cell_indices;
-
-      /**
-       * Levels and indices of the neighbors of the cells. Convention is, that
-       * the neighbors of the cell with index @p i are stored in the fields
-       * following $i*(2*real\_space\_dimension)$, e.g. in one spatial
-       * dimension, the neighbors of cell 0 are stored in
-       * <tt>neighbors[0]</tt> and <tt>neighbors[1]</tt>, the neighbors of
-       * cell 1 are stored in <tt>neighbors[2]</tt> and <tt>neighbors[3]</tt>,
-       * and so on.
-       *
-       * In neighbors, <tt>neighbors[i].first</tt> is the level, while
-       * <tt>neighbors[i].second</tt> is the index of the neighbor.
-       *
-       * If a neighbor does not exist (cell is at the boundary),
-       * <tt>level=index=-1</tt> is set.
-       *
-       * <em>Conventions:</em> The @p ith neighbor of a cell is the one which
-       * shares the @p ith face (@p Line in 2d, @p Quad in 3d) of this cell.
-       *
-       * The neighbor of a cell has at most the same level as this cell, i.e.
-       * it may or may not be refined.
-       *
-       * In one dimension, a neighbor may have any level less or equal the
-       * level of this cell. If it has the same level, it may be refined an
-       * arbitrary number of times, but the neighbor pointer still points to
-       * the cell on the same level, while the neighbors of the children of
-       * the neighbor may point to this cell or its children.
-       *
-       * In two and more dimensions, the neighbor is either on the same level
-       * and refined (in which case its children have neighbor pointers to
-       * this cell or its direct children), unrefined on the same level or one
-       * level down (in which case its neighbor pointer points to the parent
-       * cell of this cell).
-       */
-      std::vector<std::pair<int, int>> neighbors;
 
       /**
        * One integer per cell to store which subdomain it belongs to. This
@@ -302,6 +291,42 @@ namespace internal
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int version);
+
+    private:
+      /**
+       * Levels and indices of the neighbors of the cells. Convention is, that
+       * the neighbors of the cell with index @p i are stored in the fields
+       * following $i*(2*real\_space\_dimension)$, e.g. in one spatial
+       * dimension, the neighbors of cell 0 are stored in
+       * <tt>neighbors[0]</tt> and <tt>neighbors[1]</tt>, the neighbors of
+       * cell 1 are stored in <tt>neighbors[2]</tt> and <tt>neighbors[3]</tt>,
+       * and so on.
+       *
+       * In neighbors, <tt>neighbors[i].first</tt> is the level, while
+       * <tt>neighbors[i].second</tt> is the index of the neighbor.
+       *
+       * If a neighbor does not exist (cell is at the boundary),
+       * <tt>level=index=-1</tt> is set.
+       *
+       * <em>Conventions:</em> The @p ith neighbor of a cell is the one which
+       * shares the @p ith face (@p Line in 2d, @p Quad in 3d) of this cell.
+       *
+       * The neighbor of a cell has at most the same level as this cell, i.e.
+       * it may or may not be refined.
+       *
+       * In one dimension, a neighbor may have any level less or equal the
+       * level of this cell. If it has the same level, it may be refined an
+       * arbitrary number of times, but the neighbor pointer still points to
+       * the cell on the same level, while the neighbors of the children of
+       * the neighbor may point to this cell or its children.
+       *
+       * In two and more dimensions, the neighbor is either on the same level
+       * and refined (in which case its children have neighbor pointers to
+       * this cell or its direct children), unrefined on the same level or one
+       * level down (in which case its neighbor pointer points to the parent
+       * cell of this cell).
+       */
+      std::vector<std::pair<int, int>> neighbors;
     };
 
 
@@ -328,11 +353,64 @@ namespace internal
 
 
     template <int dim, int spacedim>
+    inline int
+    TriaLevel<dim, spacedim>::neighbor_index(const int          index,
+                                             const unsigned int face_no) const
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(face_no, faces_per_object);
+      const std::size_t i = index * faces_per_object + face_no;
+      AssertIndexRange(i, neighbors.size());
+      return neighbors[i].second;
+    }
+
+
+
+    template <int dim, int spacedim>
+    inline int
+    TriaLevel<dim, spacedim>::neighbor_level(const int          index,
+                                             const unsigned int face_no) const
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(face_no, faces_per_object);
+      const std::size_t i = index * faces_per_object + face_no;
+      AssertIndexRange(i, neighbors.size());
+      return neighbors[i].first;
+    }
+
+
+
+    template <int dim, int spacedim>
+    inline void
+    TriaLevel<dim, spacedim>::set_neighbor(const int          index,
+                                           const unsigned int face_no,
+                                           const int          neighbor_level,
+                                           const int          neighbor_index)
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(face_no, faces_per_object);
+      Assert(neighbor_level >= -1,
+             ExcMessage("The neighbor level must be -1 (for a cell at the "
+                        "boundary) or a nonnegative number."));
+      Assert(neighbor_index >= -1,
+             ExcMessage("The neighbor index must be -1 (for a cell at the "
+                        "boundary) or a nonnegative number."));
+      const std::size_t i = index * faces_per_object + face_no;
+      AssertIndexRange(i, neighbors.size());
+      neighbors[i] = std::make_pair(neighbor_level, neighbor_index);
+    }
+
+
+
+    template <int dim, int spacedim>
     template <class Archive>
     void
     TriaLevel<dim, spacedim>::serialize(Archive &ar, const unsigned int)
     {
       ar &refine_flags &coarsen_flags;
+
+      ar &children_per_object;
+      ar &faces_per_object;
 
       // do not serialize `active_cell_indices` and `vertex_indices_cache`
       // here. instead of storing them to the stream and re-reading them again
