@@ -22,8 +22,11 @@
 #  include <map>
 #  include <vector>
 
+#endif // DEAL_II_WITH_SYMENGINE
+
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_SYMENGINE
 namespace Differentiation
 {
   namespace SD
@@ -70,16 +73,20 @@ namespace Differentiation
   } // namespace SD
 } // namespace Differentiation
 
+#endif // DEAL_II_WITH_SYMENGINE
 
-DEAL_II_NAMESPACE_CLOSE
+// Close the dealii namespace, but do not close the export{} block yet if we
+// are building C++20 modules:
+DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
+#ifdef DEAL_II_WITH_SYMENGINE
 
 #  ifndef DOXYGEN
 
-// Add serialization capability for SD::types::internal::ExpressionKeyLess
-// We need to define this so that we can use this comparator in maps that
-// are to be serialized.
-namespace boost
+  // Add serialization capability for SD::types::internal::ExpressionKeyLess
+  // We need to define this so that we can use this comparator in maps that
+  // are to be serialized.
+  namespace boost
 {
   namespace serialization
   {
@@ -98,14 +105,11 @@ namespace boost
 
 #  endif // DOXYGEN
 
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_SYMENGINE
+
+// Re-open and then close the namespace, and this time also close the
+// export{} block if we are building C++20 modules:
+DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
+  DEAL_II_NAMESPACE_CLOSE
 
 #endif // dealii_differentiation_sd_symengine_types_h
