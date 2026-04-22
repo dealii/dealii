@@ -150,12 +150,14 @@ export
   using ::Amesos_BaseSolver;
   using ::AztecOO;
   using ::AztecOO_StatusTest;
+  using ::Copy;
   using ::Epetra_AddLocalAlso;
   using ::Epetra_BlockMap;
   using ::Epetra_CombineMode;
   using ::Epetra_Comm;
   using ::Epetra_CrsGraph;
   using ::Epetra_CrsMatrix;
+  using ::Epetra_DataAccess;
   using ::Epetra_Export;
   using ::Epetra_FECrsGraph;
   using ::Epetra_FECrsMatrix;
@@ -354,6 +356,14 @@ export
 #  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_SEACAS
+  using ::ex_close;
+  using ::ex_get_block;
+  using ::ex_get_conn;
+  using ::ex_get_coord;
+  using ::ex_get_ids;
+  using ::ex_get_init;
+  using ::ex_get_set;
+  using ::ex_get_set_param;
   using ::ex_strerror;
 #  endif
 
@@ -489,10 +499,29 @@ CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_precond)
 #  undef AZ_precond
 EXPORT_PREPROCESSOR_SYMBOL(AZ_precond)
 
+
 #  ifdef DEAL_II_TRILINOS_WITH_SEACAS
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_ELEM_BLOCK)
+#    undef EX_ELEM_BLOCK
+EXPORT_PREPROCESSOR_SYMBOL(EX_ELEM_BLOCK)
+
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_NOERR)
 #    undef EX_NOERR
 EXPORT_PREPROCESSOR_SYMBOL(EX_NOERR)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_READ)
+#    undef EX_READ
+EXPORT_PREPROCESSOR_SYMBOL(EX_READ)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_SIDE_SET)
+#    undef EX_SIDE_SET
+EXPORT_PREPROCESSOR_SYMBOL(EX_SIDE_SET)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(MAX_LINE_LENGTH)
+#    undef MAX_LINE_LENGTH
+EXPORT_PREPROCESSOR_SYMBOL(MAX_LINE_LENGTH)
+
 #  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
