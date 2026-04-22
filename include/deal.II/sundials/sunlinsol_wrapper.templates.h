@@ -44,7 +44,7 @@ namespace SUNDIALS
 #  define AssertSundialsSolver(code) \
     Assert(code >= 0, ExcSundialsSolverError(code))
 
-  namespace
+  namespace internal
   {
     /**
      * A function that calls the function object given by its first argument
@@ -113,11 +113,9 @@ namespace SUNDIALS
           return -1;
         }
     }
-  } // namespace
 
 
-  namespace internal
-  {
+
     /**
      * storage for internal content of the linear solver wrapper
      */
@@ -159,11 +157,8 @@ namespace SUNDIALS
        */
       std::exception_ptr &pending_exception;
     };
-  } // namespace internal
 
-  namespace
-  {
-    using namespace SUNDIALS::internal;
+
 
     /**
      * Access our LinearSolverContent from the generic content of the
@@ -290,7 +285,7 @@ namespace SUNDIALS
       content->preconditioner_solve = p_solve;
       return 0;
     }
-  } // namespace
+  } // namespace internal
 
 
 
