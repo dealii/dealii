@@ -839,18 +839,36 @@ namespace LinearAlgebra
                                       const Number                       a,
                                       const Vector<Number, MemorySpace> &V)
     {
-      AssertIsFinite(s);
-      AssertIsFinite(a);
-
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+      AssertDimension(size(), V.size());
+      AssertIsFinite(s);
+      AssertIsFinite(a);
 
-      *this *= s;
+      // We assume that the vectors have the same Map
+      // if the local size is the same and if the vectors are not ghosted
+      if (locally_owned_size() == V.locally_owned_size() &&
+          !V.has_ghost_elements())
+        {
+          Assert(vector->getMap()->isSameAs(*(V.vector->getMap())) == true,
+                 ExcDifferentParallelPartitioning());
+          vector->update(a, *(V.vector), s);
+        }
+      else
+        {
+          // The two vectors are partitioned differently, or 'v'
+          // has ghost entries. In that case, we first have to create
+          // a temporary vector that holds a re-partitioned 'v'
+          // and to which we can then apply the current operation.
+          Vector tmp(locally_owned_elements(), get_mpi_communicator());
+          tmp = V;
 
-      Vector<Number, MemorySpace> tmp(V);
-      tmp *= a;
-      *this += tmp;
+          // Now that we have vectors of the right kind, simply forward
+          // to the current function again, which should land us in the
+          // 'if' branch above.
+          sadd(s, a, tmp);
+        }
     }
 
 
