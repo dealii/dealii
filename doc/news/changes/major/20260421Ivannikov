@@ -1,0 +1,18 @@
+New/Changed: The SUNDIALS ARKODE wrapper has been substantially
+extended and refactored. The time-stepper functionality previously
+embedded in SUNDIALS::ARKode has been extracted into the new
+SUNDIALS::ARKodeStepper interface. A concrete implementation is
+currently provided for the SUNDIALS implicit/explicit ARKStep
+integration module (SUNDIALS::ARKStepper), but the design is open to
+further ARKODE time-steppers. A stepper object is constructed
+independently and passed to the SUNDIALS::ARKode driver, which handles
+the time-marching loop. Method-specific parameters are configured
+through per-class AdditionalData structures.
+<br>
+The previous interface of SUNDIALS::ARKode that exposed the
+right-hand side functions directly on the ARKode object is still
+available but is now deprecated and will be removed in a future
+version. Users are encouraged to migrate to the new stepper-based
+interface.
+<br>
+(Vladimir Ivannikov, 2026/04/21)

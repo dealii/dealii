@@ -894,8 +894,8 @@ namespace SUNDIALS
     std::function<void(void *arkode_mem)> custom_setup;
 
   private:
-    using CallbackContext = typename ARKodeStepper<VectorType>::CallbackContext<
-      ARKStepper<VectorType>>;
+    using CallbackContext = typename ARKodeStepper<
+      VectorType>::template CallbackContext<ARKStepper<VectorType>>;
 
     /**
      * Rebuild the stepper at a given time instance and for a given state
