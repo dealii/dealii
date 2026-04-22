@@ -12,9 +12,9 @@
 
 #include <deal.II/lac/trilinos_tpetra_block_vector.templates.h>
 
-#ifdef DEAL_II_TRILINOS_WITH_TPETRA
-
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 namespace LinearAlgebra
 {
@@ -73,6 +73,6 @@ namespace LinearAlgebra
   } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_NAMESPACE_CLOSE

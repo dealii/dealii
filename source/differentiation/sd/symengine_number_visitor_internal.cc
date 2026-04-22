@@ -16,12 +16,17 @@
 
 #  include <deal.II/differentiation/sd/symengine_number_visitor_internal.h>
 
+
+#endif // DEAL_II_WITH_SYMENGINE
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_SYMENGINE
 
 /* --- Explicit instantiations --- */
 #  include "differentiation/sd/symengine_number_visitor_internal.inst"
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE
+DEAL_II_NAMESPACE_CLOSE

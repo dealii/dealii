@@ -34,7 +34,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <memory>
 
 
+
+#endif // DEAL_II_WITH_TRILINOS
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_TRILINOS
 
 namespace TrilinosWrappers
 {
@@ -865,6 +870,6 @@ namespace TrilinosWrappers
   } // namespace MPI
 } // namespace TrilinosWrappers
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_TRILINOS
+DEAL_II_NAMESPACE_CLOSE

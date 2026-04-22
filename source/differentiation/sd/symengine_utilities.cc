@@ -17,7 +17,12 @@
 #  include <deal.II/differentiation/sd/symengine_number_types.h>
 #  include <deal.II/differentiation/sd/symengine_utilities.h>
 
+
+#endif // DEAL_II_WITH_SYMENGINE
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_SYMENGINE
 
 namespace Differentiation
 {
@@ -113,6 +118,6 @@ namespace Differentiation
 } // namespace Differentiation
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE
+DEAL_II_NAMESPACE_CLOSE

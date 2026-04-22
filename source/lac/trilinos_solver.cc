@@ -34,7 +34,12 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <limits>
 #  include <memory>
 
+
+#endif // DEAL_II_WITH_PETSC
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_TRILINOS
 
 namespace TrilinosWrappers
 {
@@ -988,6 +993,6 @@ namespace TrilinosWrappers
   SolverBase::do_solve(const Epetra_Operator &preconditioner);
 } // namespace TrilinosWrappers
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
+DEAL_II_NAMESPACE_CLOSE

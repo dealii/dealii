@@ -23,7 +23,14 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <ml_MultiLevelPreconditioner.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
+
+#  endif // DEAL_II_TRILINOS_WITH_MUELU
+#endif   // DEAL_II_WITH_TRILINOS
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_MUELU
 
 namespace TrilinosWrappers
 {
@@ -273,7 +280,7 @@ namespace TrilinosWrappers
 
 } // namespace TrilinosWrappers
 
-DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_TRILINOS_WITH_MUELU
 #endif   // DEAL_II_WITH_TRILINOS
+DEAL_II_NAMESPACE_CLOSE

@@ -19,7 +19,14 @@
 #    include <deal.II/lac/petsc_block_sparse_matrix.h>
 #    include <deal.II/lac/petsc_ts.templates.h>
 
+
+#  endif // DEAL_II_WITH_PETSC
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifndef DOXYGEN
+#  ifdef DEAL_II_WITH_PETSC
 
 namespace PETScWrappers
 {
@@ -87,7 +94,7 @@ template class PETScWrappers::TimeStepper<
   PETScWrappers::MPI::BlockSparseMatrix>;
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #  endif // DEAL_II_WITH_PETSC
 #endif
+DEAL_II_NAMESPACE_CLOSE

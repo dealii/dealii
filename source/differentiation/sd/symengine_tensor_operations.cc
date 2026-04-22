@@ -25,7 +25,12 @@
 #  include <deal.II/differentiation/sd/symengine_types.h>
 #  include <deal.II/differentiation/sd/symengine_utilities.h>
 
+
+#endif // DEAL_II_WITH_SYMENGINE
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_SYMENGINE
 
 namespace Differentiation
 {
@@ -289,6 +294,6 @@ namespace Differentiation
 
 #  include "differentiation/sd/symengine_tensor_operations.inst"
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE
+DEAL_II_NAMESPACE_CLOSE

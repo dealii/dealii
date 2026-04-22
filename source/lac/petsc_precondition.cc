@@ -26,7 +26,12 @@
 
 #  include <cmath>
 
+
+#endif // DEAL_II_WITH_PETSC
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_PETSC
 
 namespace PETScWrappers
 {
@@ -1233,6 +1238,6 @@ namespace PETScWrappers
 template class PETScWrappers::PreconditionBDDC<2>;
 template class PETScWrappers::PreconditionBDDC<3>;
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
+DEAL_II_NAMESPACE_CLOSE

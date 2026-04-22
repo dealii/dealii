@@ -21,7 +21,12 @@
 #  include <petscmat.h>
 
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_PETSC
 
 namespace
 {
@@ -408,6 +413,5 @@ namespace PETScWrappers
 
 
 
-DEAL_II_NAMESPACE_CLOSE
-
 #endif
+DEAL_II_NAMESPACE_CLOSE

@@ -22,7 +22,12 @@
 #  include <symengine/mul.h>
 #  include <symengine/pow.h>
 
+
+#endif // DEAL_II_WITH_SYMENGINE
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_SYMENGINE
 
 namespace Differentiation
 {
@@ -328,6 +333,6 @@ namespace Differentiation
   } // namespace SD
 } // namespace Differentiation
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_SYMENGINE
+DEAL_II_NAMESPACE_CLOSE

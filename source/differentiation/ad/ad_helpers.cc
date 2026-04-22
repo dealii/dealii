@@ -20,7 +20,12 @@
 #  include <type_traits>
 
 
+
+#endif // defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
+
 DEAL_II_NAMESPACE_OPEN
+
+#if defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
 
 
 namespace Differentiation
@@ -1889,6 +1894,6 @@ namespace Differentiation
 #  endif
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // defined(DEAL_II_WITH_ADOLC) || defined(DEAL_II_TRILINOS_WITH_SACADO)
+DEAL_II_NAMESPACE_CLOSE

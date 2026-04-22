@@ -16,7 +16,12 @@
 
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.templates.h>
 
+
+#endif // DEAL_II_TRILINOS_WITH_TPETRA
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  ifndef DOXYGEN
 
@@ -41,6 +46,6 @@ namespace LinearAlgebra::TpetraWrappers
 
 #  endif
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_TRILINOS_WITH_TPETRA
+DEAL_II_NAMESPACE_CLOSE

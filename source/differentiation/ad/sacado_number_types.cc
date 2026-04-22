@@ -17,7 +17,12 @@
 
 #  include <deal.II/differentiation/ad/sacado_number_types.h>
 
+
+#endif
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_TRILINOS_WITH_SACADO
 
 /*---------------------- Explicit Instantiations ----------------------*/
 
@@ -26,6 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 #    include "differentiation/ad/sacado_number_types.inst2"
 #  endif
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif
+DEAL_II_NAMESPACE_CLOSE

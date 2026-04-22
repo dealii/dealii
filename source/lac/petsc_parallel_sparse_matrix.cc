@@ -22,7 +22,12 @@
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_pattern.h>
 
+
+#endif // DEAL_II_WITH_PETSC
+
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_PETSC
 
 namespace PETScWrappers
 {
@@ -927,6 +932,6 @@ namespace PETScWrappers
 } // namespace PETScWrappers
 
 
-DEAL_II_NAMESPACE_CLOSE
 
 #endif // DEAL_II_WITH_PETSC
+DEAL_II_NAMESPACE_CLOSE
