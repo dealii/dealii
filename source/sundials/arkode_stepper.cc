@@ -33,6 +33,7 @@
 #    include <deal.II/lac/petsc_block_vector.h>
 #    include <deal.II/lac/petsc_vector.h>
 #  endif
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -40,10 +41,10 @@ DEAL_II_NAMESPACE_OPEN
 // with SUNDIALS, but doxygen doesn't know that and tries to find that
 // file anyway for parsing -- which then of course it fails on. So
 // exclude the following from doxygen consideration.
+#ifdef DEAL_II_WITH_SUNDIALS
 #  ifndef DOXYGEN
 #    include "sundials/arkode_stepper.inst"
 #  endif
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif
