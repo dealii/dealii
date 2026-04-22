@@ -13,12 +13,15 @@
 #include <deal.II/distributed/field_transfer.h>
 
 #ifdef DEAL_II_WITH_P4EST
-
 #  include <deal.II/lac/lapack_full_matrix.h>
 
 #  include <limits>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
+
+#ifdef DEAL_II_WITH_P4EST
 
 namespace parallel
 {
@@ -319,6 +322,6 @@ namespace parallel
 // explicit instantiations
 #  include "distributed/field_transfer.inst"
 
-DEAL_II_NAMESPACE_CLOSE
-
 #endif
+
+DEAL_II_NAMESPACE_CLOSE

@@ -19,7 +19,6 @@
 #include <deal.II/lac/vector.h>
 
 #ifdef DEAL_II_WITH_P4EST
-
 #  include <deal.II/distributed/grid_refinement.h>
 
 #  include <deal.II/grid/filtered_iterator.h>
@@ -32,11 +31,11 @@
 #  include <functional>
 #  include <limits>
 #  include <numeric>
-
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
-
+#ifdef DEAL_II_WITH_P4EST
 namespace
 {
   template <int dim, int spacedim>
@@ -636,7 +635,6 @@ namespace parallel
 
 // explicit instantiations
 #  include "distributed/grid_refinement.inst"
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

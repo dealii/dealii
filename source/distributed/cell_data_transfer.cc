@@ -12,13 +12,11 @@
 
 #include <deal.II/distributed/cell_data_transfer.templates.h>
 
-#ifdef DEAL_II_WITH_P4EST
-
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations
+#ifdef DEAL_II_WITH_P4EST
 #  include "distributed/cell_data_transfer.inst"
+#endif /* DEAL_II_WITH_P4EST */
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif /* DEAL_II_WITH_P4EST */
