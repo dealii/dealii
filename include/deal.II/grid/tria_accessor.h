@@ -5232,9 +5232,7 @@ TriaAccessor<structdim, dim, spacedim>::vertex_index(
       // This branch needs to be first (and not combined with the structdim ==
       // dim branch) so that we can get line vertex indices when setting up the
       // cell vertex index cache
-      const auto &objects = this->objects();
-      return objects
-        .cells[this->present_index * objects.faces_per_object + corner];
+      return this->objects().get_bounding_object(this->present_index, corner);
     }
   else if constexpr (structdim == dim)
     {
@@ -5304,8 +5302,7 @@ TriaAccessor<structdim, dim, spacedim>::line_index(const unsigned int i) const
 
   if constexpr (structdim == 2)
     {
-      const auto &objects = this->objects();
-      return objects.cells[this->present_index * objects.faces_per_object + i];
+      return this->objects().get_bounding_object(this->present_index, i);
     }
   else if constexpr (structdim == 3)
     {
@@ -5338,21 +5335,18 @@ inline typename dealii::internal::TriangulationImplementation::
 
 template <int structdim, int dim, int spacedim>
 inline unsigned int
-TriaAccessor<structdim, dim, spacedim>::quad_index(const unsigned int i) const
+TriaAccessor<structdim, dim, spacedim>::quad_index(
+  const unsigned int face_no) const
 {
   Assert(structdim == 3,
          ExcMessage("You can't ask for the index of a quad bounding "
                     "a one- or two-dimensional cell because it is not "
                     "bounded by quads."));
-  // work around a bogus GCC-9 warning which considers i unused except in 3d
-  (void)i;
+  // work around a bogus GCC-9 warning which considers face_no unused except in
+  // 3d
+  (void)face_no;
   if constexpr (structdim == 3)
-    {
-      AssertIndexRange(i, n_faces());
-      return this->tria->levels[this->level()]
-        ->cells
-        .cells[this->present_index * ReferenceCells::max_n_faces<3>() + i];
-    }
+    return this->objects().get_bounding_object(this->present_index, face_no);
   else
     return numbers::invalid_unsigned_int;
 }

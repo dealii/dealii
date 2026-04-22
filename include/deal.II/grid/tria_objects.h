@@ -116,20 +116,25 @@ namespace internal
       unsigned int faces_per_object;
 
       /**
-       * Vector of the objects bounding each cell in this level. This is
-       * typically accessed via get_bounding_object_indices().
-       *
-       * @note In this context, "cells" means "geometric entities bounded by
-       * other geometric entities": for example, TriaFaces::quads stores quads
-       * (structdim 2 objects) which are bounded by lines.
-       */
-      std::vector<int> cells;
-
-      /**
        * Return number of geometric objects stored by this class.
        */
       std::size_t
       n_objects() const;
+
+      /**
+       * Return the index of the bounding object of @p index on face @p face_no.
+       */
+      int
+      get_bounding_object(const int index, const unsigned int face_no) const;
+
+      /**
+       * Set the index of the bounding object of @p index on face @p face_no to
+       * @p neighbor_index.
+       */
+      void
+      set_bounding_object(const int          index,
+                          const unsigned int face_no,
+                          const int          neighbor_index);
 
       /**
        * Return a view on the indices of the objects that bound the @p
@@ -420,6 +425,17 @@ namespace internal
        * access will not be allowed to change the type of data accessed.
        */
       mutable UserDataType user_data_type;
+
+    private:
+      /**
+       * Vector of the objects bounding each cell in this level. This is
+       * typically accessed via get_bounding_object_indices().
+       *
+       * @note In this context, "bounding_objects" means "geometric entities bounded by
+       * other geometric entities": for example, TriaFaces::quads stores quads
+       * (structdim 2 objects) which are bounded by lines.
+       */
+      std::vector<int> bounding_objects;
     };
 
 
@@ -430,8 +446,39 @@ namespace internal
     {
       // ensure that sizes are consistent, and then return one that
       // corresponds to the number of objects
-      AssertDimension(cells.size(), manifold_id.size() * faces_per_object);
+      AssertDimension(bounding_objects.size(),
+                      manifold_id.size() * faces_per_object);
       return manifold_id.size();
+    }
+
+
+
+    inline int
+    TriaObjects::get_bounding_object(const int          index,
+                                     const unsigned int face_no) const
+    {
+      // Accessors with an index of -1 shouldn't get here
+      Assert(index != -1, ExcInternalError());
+      AssertIndexRange(face_no, faces_per_object);
+      const auto i = index * faces_per_object + face_no;
+      AssertIndexRange(i, bounding_objects.size());
+      return bounding_objects[i];
+    }
+
+
+
+    inline void
+    TriaObjects::set_bounding_object(const int          index,
+                                     const unsigned int face_no,
+                                     const int          neighbor_index)
+    {
+      // Accessors with an index of -1 shouldn't get here
+      Assert(index != -1, ExcInternalError());
+      Assert(neighbor_index >= -1, ExcInternalError());
+      AssertIndexRange(face_no, faces_per_object);
+      const auto i = index * faces_per_object + face_no;
+      AssertIndexRange(i, bounding_objects.size());
+      bounding_objects[i] = neighbor_index;
     }
 
 
@@ -440,7 +487,7 @@ namespace internal
     TriaObjects::get_bounding_object_indices(const unsigned int index)
     {
       // each cell has the same number of subcell objects
-      return ArrayView<int>(cells.data() + index * faces_per_object,
+      return ArrayView<int>(bounding_objects.data() + index * faces_per_object,
                             faces_per_object);
     }
 
@@ -594,7 +641,7 @@ namespace internal
       ar                                   &structdim;
       ar                                   &children_per_object;
       ar                                   &faces_per_object;
-      ar &cells                            &children;
+      ar &bounding_objects                 &children;
       ar                                   &refinement_cases;
       ar                                   &used;
       ar                                   &user_flags;

@@ -77,7 +77,7 @@ namespace internal
       Assert(children_per_object % 2 == 0, ExcNotImplemented());
       children.assign(children_per_object / 2 * n_objects, -1);
 
-      cells.assign(n_objects * faces_per_object, -1);
+      bounding_objects.assign(n_objects * faces_per_object, -1);
 
       if (structdim <= 2)
         {
@@ -152,10 +152,11 @@ namespace internal
           // only allocate space if necessary
           if (new_size > this->n_objects())
             {
-              cells.reserve(new_size * faces_per_object);
-              cells.insert(cells.end(),
-                           (new_size - this->n_objects()) * faces_per_object,
-                           -1);
+              bounding_objects.reserve(new_size * faces_per_object);
+              bounding_objects.insert(bounding_objects.end(),
+                                      (new_size - this->n_objects()) *
+                                        faces_per_object,
+                                      -1);
 
               used.reserve(new_size);
               used.insert(used.end(), new_size - used.size(), false);
@@ -209,10 +210,11 @@ namespace internal
           // see above...
           if (new_size > this->n_objects())
             {
-              cells.reserve(new_size * faces_per_object);
-              cells.insert(cells.end(),
-                           (new_size - this->n_objects()) * faces_per_object,
-                           -1);
+              bounding_objects.reserve(new_size * faces_per_object);
+              bounding_objects.insert(bounding_objects.end(),
+                                      (new_size - this->n_objects()) *
+                                        faces_per_object,
+                                      -1);
 
               used.reserve(new_size);
               used.insert(used.end(), new_size - used.size(), false);
@@ -257,7 +259,7 @@ namespace internal
     std::size_t
     TriaObjects::memory_consumption() const
     {
-      return (MemoryConsumption::memory_consumption(cells) +
+      return (MemoryConsumption::memory_consumption(bounding_objects) +
               MemoryConsumption::memory_consumption(children) +
               MemoryConsumption::memory_consumption(used) +
               MemoryConsumption::memory_consumption(user_flags) +

@@ -3728,9 +3728,7 @@ namespace internal
               {
                 const auto vertices = lines_to_vertices[line];
                 for (unsigned int v = 0; v < vertices.size(); ++v)
-                  faces.lines
-                    .cells[line * faces.lines.children_per_object + v] =
-                    vertices[v]; // set vertex indices
+                  faces.lines.set_bounding_object(line, v, vertices[v]);
               }
           }
 
@@ -3754,8 +3752,7 @@ namespace internal
                   {
                     AssertIndexRange(l, face_reference_cell.n_lines());
                     // set line index
-                    faces.quads.cells[q * faces.quads.children_per_object + l] =
-                      lines[l];
+                    faces.quads.set_bounding_object(q, l, lines[l]);
 
                     // set line orientations
                     const auto combined_orientation =
@@ -3833,7 +3830,7 @@ namespace internal
                     level.set_neighbor(cell, f, 0, neighbors[f]);
 
                   // set face indices
-                  cells_0.cells[cell * level.faces_per_object + f] = faces[f];
+                  cells_0.set_bounding_object(cell, f, faces[f]);
 
                   // set face orientation if needed
                   if (orientation_needed)
