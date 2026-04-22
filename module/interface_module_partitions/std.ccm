@@ -449,6 +449,7 @@ export
     using std::fill;
     using std::fill_n;
     using std::find;
+    using std::find_first_of;
     using std::find_if;
     using std::for_each;
     using std::inner_product;
@@ -754,12 +755,46 @@ export
   using ::size_t;
   using ::strcmp;
 
+
   // And then also a couple of things that have to do with floating
   // point exceptions:
 #ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+  using ::fedisableexcept;
+  using ::fegetenv;
   using ::feholdexcept;
   using ::fenv_t;
   using ::fesetenv;
 #endif
 
 } // export
+
+
+// We have to export a couple of symbols that are declared in system
+// header files that are not actually exportable. Do like for all other
+// packages.
+#define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+  namespace dealii                                        \
+  {                                                       \
+    namespace Global_Macros                               \
+    {                                                     \
+      [[maybe_unused]] const auto exportable_##sym = sym; \
+    }                                                     \
+  } // namespace dealii
+
+#define EXPORT_PREPROCESSOR_SYMBOL(sym)                               \
+  namespace dealii                                                    \
+  {                                                                   \
+    export const auto &sym = dealii::Global_Macros::exportable_##sym; \
+  }
+
+
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(FE_DIVBYZERO)
+#  undef FE_DIVBYZERO
+EXPORT_PREPROCESSOR_SYMBOL(FE_DIVBYZERO)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(FE_INVALID)
+#  undef FE_INVALID
+EXPORT_PREPROCESSOR_SYMBOL(FE_INVALID)
+
+#endif
