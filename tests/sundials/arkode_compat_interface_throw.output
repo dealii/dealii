@@ -1,0 +1,13 @@
+
+DEAL::explicit_function: OK
+DEAL::implicit_function: OK
+DEAL::mass_times_vector: OK
+DEAL::mass_times_setup: OK
+DEAL::jacobian_times_vector: OK
+DEAL::jacobian_times_setup: OK
+DEAL::solve_linearized_system: OK
+DEAL::solve_mass: OK
+DEAL::jacobian_preconditioner_solve: OK
+DEAL::jacobian_preconditioner_setup: OK
+DEAL::mass_preconditioner_solve: OK
+DEAL::mass_preconditioner_setup: OK
