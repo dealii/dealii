@@ -119,7 +119,7 @@ namespace SUNDIALS
       FunctionProxy &
       operator=(std::function<Fn> f)
       {
-        Assert(
+        AssertThrow(
           target,
           ExcMessage(
             "Unable to assign the function since the target is not set in the "
