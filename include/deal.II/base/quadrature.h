@@ -192,10 +192,13 @@ public:
 
   /**
    * Construct a dummy quadrature formula from a list of points, with weights
-   * set to infinity. The resulting object is therefore not meant to actually
-   * perform integrations, but rather to be used with FEValues objects in
-   * order to find the position of some points (the quadrature points in this
-   * object) on the transformed cell in real space.
+   * set to numbers::signaling_nan(). The resulting object is therefore not
+   * meant to actually perform integrations, but rather to be used with FEValues
+   * objects in order to find the position of some points (the quadrature points
+   * in this object) on the transformed cell in real space.
+   *
+   * The use of numbers::signaling_nan() ensures that any use of the weights
+   * leads to a floating point exception.
    */
   Quadrature(const std::vector<Point<dim>> &points);
 
@@ -233,10 +236,13 @@ public:
   /**
    * Set the quadrature points and weights to the values provided in the
    * arguments. The weights array is allowed to be empty, in which case the
-   * weights are set to infinity. The resulting object is therefore not meant
-   * to actually perform integrations, but rather to be used with FEValues
-   * objects in order to find the position of some points (the quadrature
-   * points in this object) on the transformed cell in real space.
+   * weights are set to numbers::signaling_nan(). The resulting object is
+   * therefore not meant to actually perform integrations, but rather to be used
+   * with FEValues objects in order to find the position of some points (the
+   * quadrature points in this object) on the transformed cell in real space.
+   *
+   * The use of numbers::signaling_nan() ensures that any use of the weights
+   * leads to a floating point exception.
    */
   void
   initialize(const ArrayView<const Point<dim>> &points,
