@@ -10,9 +10,24 @@
 //
 // -----------------------------------------------------------------------------
 
-#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/types.h>
+
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_levels.h>
+#include <deal.II/grid/tria_objects.h>
+#include <deal.II/grid/tria_objects_orientations.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <cstddef>
+#include <cstdint>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

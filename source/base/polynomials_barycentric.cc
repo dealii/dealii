@@ -10,7 +10,12 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomials_barycentric.h>
+#include <deal.II/base/scalar_polynomials_base.h>
 
 #include <deal.II/grid/reference_cell.h>
 

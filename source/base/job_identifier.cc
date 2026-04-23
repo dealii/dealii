@@ -10,6 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/job_identifier.h>
 
 #include <ctime>

@@ -11,9 +11,28 @@
 // -----------------------------------------------------------------------------
 
 
-#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/config.h>
 
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/table.h>
+
+#include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern_base.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <cstddef>
+#include <memory>
+#include <ostream>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

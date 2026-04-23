@@ -10,10 +10,21 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_bernstein.h>
 
+#include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/binomial.hpp>
+#include <boost/math/tools/precision.hpp>
 
+#include <Kokkos_Macros.hpp>
+
+#include <cmath>
+#include <string>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

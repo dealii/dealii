@@ -11,9 +11,18 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_faces.h>
+#include <deal.II/grid/tria_objects.h>
+
+#include <cstddef>
+#include <ostream>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

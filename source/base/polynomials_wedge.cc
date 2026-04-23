@@ -11,8 +11,20 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/point.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/polynomials_wedge.h>
+#include <deal.II/base/scalar_polynomials_base.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

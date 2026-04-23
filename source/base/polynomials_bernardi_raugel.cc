@@ -11,9 +11,20 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/geometry_info.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_bernardi_raugel.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/tensor_polynomials_base.h>
+
+#include <Kokkos_Macros.hpp>
 
 #include <memory>
+#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -15,7 +15,27 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/table.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/fe/fe.h>
+#include <deal.II/fe/fe_data.h>
+#include <deal.II/fe/fe_update_flags.h>
+#include <deal.II/fe/mapping.h>
+#include <deal.II/fe/mapping_related_data.h>
+
+#include <deal.II/grid/reference_cell.h>
+#include <deal.II/grid/tria.h>
+
+#include <deal.II/hp/q_collection.h>
+
+#include <deal.II/lac/full_matrix.h>
+
+#include <iterator>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

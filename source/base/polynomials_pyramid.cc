@@ -11,15 +11,35 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/polynomials_pyramid.h>
+#include <deal.II/base/scalar_polynomials_base.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/reference_cell.h>
 
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/vector.h>
+
+#include <Kokkos_Macros.hpp>
+
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

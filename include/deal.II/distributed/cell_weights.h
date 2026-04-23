@@ -19,7 +19,15 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/fe.h>
+
+#include <deal.II/grid/cell_status.h>
+#include <deal.II/grid/tria.h>
+
 #include <boost/signals2/connection.hpp>
+
+#include <functional>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN

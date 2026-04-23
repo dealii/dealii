@@ -10,13 +10,26 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/function.h>
 #include <deal.II/base/function_lib.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/vector.h>
 
+#include <Kokkos_Macros.hpp>
+
+#include <algorithm>
+#include <array>
 #include <cmath>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -11,7 +11,15 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/polynomial.h>
+#include <deal.II/base/polynomial_space.h>
 #include <deal.II/base/polynomials_p.h>
+
+#include <Kokkos_Macros.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -16,10 +16,17 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/point.h>
 
+#include <Kokkos_Macros.hpp>
+
+#include <algorithm>
+#include <iterator>
 #include <limits>
+#include <string>
+#include <utility>
 
 DEAL_II_NAMESPACE_OPEN
 

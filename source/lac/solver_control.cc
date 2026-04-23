@@ -10,14 +10,25 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/numbers.h>
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/patterns.h>
 #include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/lac/solver_control.h>
 
+#include <Kokkos_Macros.hpp>
+
 #include <cmath>
 #include <sstream>
+#include <string>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

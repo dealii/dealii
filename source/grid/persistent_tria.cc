@@ -10,12 +10,23 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/magic_numbers.h>
 #include <deal.II/grid/persistent_tria.h>
+#include <deal.II/grid/tria.h>
 
+#include <Kokkos_Macros.hpp>
+
+#include <cstddef>
 #include <iostream>
+#include <typeinfo>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

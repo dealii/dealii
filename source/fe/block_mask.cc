@@ -11,11 +11,15 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/memory_consumption.h>
 
 #include <deal.II/fe/block_mask.h>
 
+#include <cstddef>
 #include <iostream>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN

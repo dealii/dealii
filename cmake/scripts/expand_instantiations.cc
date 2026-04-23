@@ -45,9 +45,11 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <list>
 #include <map>
 #include <string>
+#include <utility>
 
 // Returns a map from the keys in the expansion lists to the list itself. For
 // instance, the example above will lead to the entry

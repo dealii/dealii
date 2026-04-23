@@ -16,9 +16,24 @@
 #  include <deal.II/base/config.h>
 
 #  include <deal.II/base/data_out_base.h>
+#  include <deal.II/base/exception_macros.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/point.h>
+#  include <deal.II/base/table.h>
+#  include <deal.II/base/tensor.h>
+#  include <deal.II/base/types.h>
+
+#  include <deal.II/grid/reference_cell.h>
 
 #  include <deal.II/lac/block_sparse_matrix.h>
 #  include <deal.II/lac/sparse_matrix.h>
+
+#  include <algorithm>
+#  include <array>
+#  include <cmath>
+#  include <new>
+#  include <string>
+#  include <vector>
 
 #  ifdef DEAL_II_WITH_TRILINOS
 #    include <deal.II/lac/trilinos_block_sparse_matrix.h>

@@ -10,11 +10,20 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/convergence_table.h>
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table_handler.h>
 
+#include <Kokkos_Macros.hpp>
+
 #include <cmath>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 

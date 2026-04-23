@@ -10,13 +10,21 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/array_view.h>
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/tensor.h>
 
 #include <deal.II/lac/exceptions.h>
+#include <deal.II/lac/lapack_support.h>
 #include <deal.II/lac/lapack_templates.h>
 
+#include <Kokkos_Macros.hpp>
+
 #include <array>
+#include <cstddef>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -10,8 +10,14 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_hermite.h>
 #include <deal.II/base/utilities.h>
+
+#include <Kokkos_Macros.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 

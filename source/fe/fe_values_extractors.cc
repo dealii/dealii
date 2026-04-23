@@ -10,9 +10,13 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/fe/fe_values_extractors.h>
+
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 

@@ -10,12 +10,22 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/types.h>
 
 #include <deal.II/dofs/number_cache.h>
 
+#include <Kokkos_Macros.hpp>
+
+#include <cstddef>
 #include <numeric>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN

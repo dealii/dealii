@@ -11,8 +11,11 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/config.h>
+
 #include <deal.II/base/event.h>
 
+#include <algorithm>
 #include <string>
 #include <vector>
 

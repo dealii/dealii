@@ -10,8 +10,15 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/base/config.h>
+
+#include <deal.II/base/table.h>
+
+#include <deal.II/lac/precondition_block.h>
 #include <deal.II/lac/precondition_block.templates.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
+
+#include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
 

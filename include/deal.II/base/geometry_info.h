@@ -16,14 +16,22 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/std_cxx20/iota_view.h>
 #include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 
+#include <Kokkos_Macros.hpp>
+
+#include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
+#include <ostream>
+#include <string>
 
 
 
