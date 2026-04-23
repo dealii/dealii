@@ -30,7 +30,6 @@
 
 #include <boost/container/small_vector.hpp>
 
-#include <limits>
 #include <set>
 #include <type_traits>
 #include <vector>

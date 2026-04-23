@@ -21,11 +21,6 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/enable_observer_pointer.h>
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/observer_pointer.h>
-#include <deal.II/base/table.h>
-
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_matrix_base.h>
 #include <deal.II/lac/sparse_matrix_ez.h>

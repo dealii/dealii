@@ -17,11 +17,8 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomials_integrated_legendre_sz.h>
-#include <deal.II/base/qprojector.h>
-#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe.h>
-#include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping.h>
 
 DEAL_II_NAMESPACE_OPEN

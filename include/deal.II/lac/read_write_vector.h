@@ -18,8 +18,6 @@
 #include <deal.II/base/aligned_vector.h>
 #include <deal.II/base/communication_pattern_base.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/base/memory_consumption.h>
-#include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
@@ -28,8 +26,6 @@
 #include <deal.II/lac/vector_operation.h>
 
 #include <cstdlib>
-#include <cstring>
-#include <iomanip>
 
 #ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_epetra_communication_pattern.h>

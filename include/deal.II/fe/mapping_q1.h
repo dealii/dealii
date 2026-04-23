@@ -18,7 +18,6 @@
 
 #include <deal.II/fe/mapping_q.h>
 
-#include <cmath>
 
 DEAL_II_NAMESPACE_OPEN
 

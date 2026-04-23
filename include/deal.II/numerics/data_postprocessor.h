@@ -18,14 +18,10 @@
 #include <deal.II/base/config.h>
 
 #include <deal.II/base/enable_observer_pointer.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/tensor.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_update_flags.h>
-
-#include <deal.II/lac/vector.h>
 
 #include <deal.II/numerics/data_component_interpretation.h>
 

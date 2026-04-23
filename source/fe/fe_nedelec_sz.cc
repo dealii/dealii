@@ -11,6 +11,8 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/qprojector.h>
+
 #include <deal.II/fe/fe_nedelec_sz.h>
 #include <deal.II/fe/fe_tools.h>
 
