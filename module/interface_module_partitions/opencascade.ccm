@@ -119,8 +119,13 @@ export
   using ::BRep_Tool;
   using ::BRepAdaptor_CompCurve;
   using ::BRepAdaptor_Curve;
+  using ::BRepAdaptor_HCompCurve;
   using ::BRepAdaptor_Surface;
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::BRepAlgoAPI_Section;
+#  else
+  using ::BRepAlgo_Section;
+#  endif
   using ::BRepBuilderAPI_MakeEdge;
   using ::BRepBuilderAPI_Sewing;
   using ::BRepBuilderAPI_Transform;
@@ -142,8 +147,24 @@ export
   using ::gp_Pnt2d;
   using ::gp_Trsf;
   using ::gp_Vec;
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::Handle_Adaptor3d_Curve;
+#  else
+  using ::Handle_Adaptor3d_HCurve;
+#  endif
+  using ::BRepAdaptor_Curve;
+  using ::BRepAdaptor_HCompCurve;
+  using ::BRepAdaptor_HCurve;
+  using ::Handle_Adaptor3d_HCurve;
+  using ::Handle_BRepAdaptor_HCompCurve;
+  using ::Handle_BRepAdaptor_HCurve;
   using ::Handle_Geom_BoundedCurve;
+  using ::Handle_Geom_BSplineCurve;
+  using ::Handle_Geom_Curve;
+  using ::Handle_Geom_Plane;
+  using ::Handle_Geom_Surface;
+  using ::Handle_Poly_Triangulation;
+  using ::Handle_TColgp_HArray1OfPnt;
   using ::IFSelect_PrintCount;
   using ::IFSelect_ReturnStatus;
   using ::IGESControl_Controller;
@@ -153,12 +174,23 @@ export
   using ::Poly_Triangulation;
   using ::ShapeAnalysis_Curve;
   using ::ShapeAnalysis_Surface;
+  using ::STEPControl_AsIs;
   using ::STEPControl_Controller;
   using ::STEPControl_Reader;
   using ::STEPControl_Writer;
   using ::StlAPI_Reader;
+  using ::StlAPI_StatusOK;
   using ::StlAPI_Writer;
   using ::TColgp_HArray1OfPnt;
+  using ::TopAbs_COMPOUND;
+  using ::TopAbs_COMPSOLID;
+  using ::TopAbs_EDGE;
+  using ::TopAbs_FACE;
+  using ::TopAbs_REVERSED;
+  using ::TopAbs_SHELL;
+  using ::TopAbs_SOLID;
+  using ::TopAbs_VERTEX;
+  using ::TopAbs_WIRE;
   using ::TopExp_Explorer;
   using ::TopLoc_Location;
   using ::TopoDS;
