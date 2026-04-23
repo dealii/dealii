@@ -1458,28 +1458,12 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * initialized with the same IndexSet that was used for the column indices
      * of the matrix.
      *
-     * This function will be called when the underlying number type for the
-     * matrix object and the one for the vector object are the same.
-     * Despite looking complicated, the return type is just `void`.
-     *
      * In case of a serial vector, this function will only work when
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, an exception will be thrown.
      */
     template <typename VectorType>
-    std::enable_if_t<
-      std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
-    vmult(VectorType &dst, const VectorType &src) const;
-
-    /**
-     * Same as the function above for the case that the underlying number type
-     * for the matrix object and the one for the vector object do not coincide.
-     * This case is not implemented. Calling it will result in a runtime error.
-     * Despite looking complicated, the return type is just `void`.
-     */
-    template <typename VectorType>
-    std::enable_if_t<
-      !std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
+    void
     vmult(VectorType &dst, const VectorType &src) const;
 
     /**
@@ -1491,25 +1475,9 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      *
      * This function can be called with several types of vector objects,
      * see the discussion about @p VectorType in vmult().
-     *
-     * This function will be called when the underlying number type for the
-     * matrix object and the one for the vector object are the same.
-     * Despite looking complicated, the return type is just `void`.
      */
     template <typename VectorType>
-    std::enable_if_t<
-      std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
-    Tvmult(VectorType &dst, const VectorType &src) const;
-
-    /**
-     * Same as the function above for the case that the underlying number type
-     * for the matrix object and the one for the vector object do not coincide.
-     * This case is not implemented. Calling it will result in a runtime error.
-     * Despite looking complicated, the return type is just `void`.
-     */
-    template <typename VectorType>
-    std::enable_if_t<
-      !std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
+    void
     Tvmult(VectorType &dst, const VectorType &src) const;
 
     /**
