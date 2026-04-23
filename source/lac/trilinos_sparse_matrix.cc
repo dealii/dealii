@@ -1986,82 +1986,80 @@ namespace TrilinosWrappers
 
 
   template <typename VectorType>
-  std::enable_if_t<
-    std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
+  void
   SparseMatrix::vmult(VectorType &dst, const VectorType &src) const
   {
-    Assert(&src != &dst, ExcSourceEqualsDestination());
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    if constexpr (std::is_same_v<typename VectorType::value_type,
+                                 TrilinosScalar>)
+      {
+        Assert(&src != &dst, ExcSourceEqualsDestination());
+        Assert(matrix->Filled(), ExcMatrixNotCompressed());
 
-    internal::SparseMatrixImplementation::check_vector_map_equality(*matrix,
-                                                                    src,
-                                                                    dst);
-    const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
-    AssertDimension(dst_local_size, matrix->RangeMap().NumMyPoints());
-    const size_type src_local_size = internal::end(src) - internal::begin(src);
-    AssertDimension(src_local_size, matrix->DomainMap().NumMyPoints());
+        internal::SparseMatrixImplementation::check_vector_map_equality(*matrix,
+                                                                        src,
+                                                                        dst);
+        const size_type dst_local_size =
+          internal::end(dst) - internal::begin(dst);
+        AssertDimension(dst_local_size, matrix->RangeMap().NumMyPoints());
+        const size_type src_local_size =
+          internal::end(src) - internal::begin(src);
+        AssertDimension(src_local_size, matrix->DomainMap().NumMyPoints());
 
-    Epetra_MultiVector tril_dst(
-      View, matrix->RangeMap(), internal::begin(dst), dst_local_size, 1);
-    Epetra_MultiVector tril_src(View,
-                                matrix->DomainMap(),
-                                const_cast<TrilinosScalar *>(
-                                  internal::begin(src)),
-                                src_local_size,
-                                1);
+        Epetra_MultiVector tril_dst(
+          View, matrix->RangeMap(), internal::begin(dst), dst_local_size, 1);
+        Epetra_MultiVector tril_src(View,
+                                    matrix->DomainMap(),
+                                    const_cast<TrilinosScalar *>(
+                                      internal::begin(src)),
+                                    src_local_size,
+                                    1);
 
-    const int ierr = matrix->Multiply(false, tril_src, tril_dst);
-    Assert(ierr == 0, ExcTrilinosError(ierr));
+        const int ierr = matrix->Multiply(false, tril_src, tril_dst);
+        Assert(ierr == 0, ExcTrilinosError(ierr));
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
   }
 
 
 
   template <typename VectorType>
-  std::enable_if_t<
-    !std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
-  SparseMatrix::vmult(VectorType & /*dst*/, const VectorType & /*src*/) const
-  {
-    AssertThrow(false, ExcNotImplemented());
-  }
-
-
-
-  template <typename VectorType>
-  std::enable_if_t<
-    std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
+  void
   SparseMatrix::Tvmult(VectorType &dst, const VectorType &src) const
   {
-    Assert(&src != &dst, ExcSourceEqualsDestination());
-    Assert(matrix->Filled(), ExcMatrixNotCompressed());
+    if constexpr (std::is_same_v<typename VectorType::value_type,
+                                 TrilinosScalar>)
+      {
+        Assert(&src != &dst, ExcSourceEqualsDestination());
+        Assert(matrix->Filled(), ExcMatrixNotCompressed());
 
-    internal::SparseMatrixImplementation::check_vector_map_equality(*matrix,
-                                                                    dst,
-                                                                    src);
-    const size_type dst_local_size = internal::end(dst) - internal::begin(dst);
-    AssertDimension(dst_local_size, matrix->DomainMap().NumMyPoints());
-    const size_type src_local_size = internal::end(src) - internal::begin(src);
-    AssertDimension(src_local_size, matrix->RangeMap().NumMyPoints());
+        internal::SparseMatrixImplementation::check_vector_map_equality(*matrix,
+                                                                        dst,
+                                                                        src);
+        const size_type dst_local_size =
+          internal::end(dst) - internal::begin(dst);
+        AssertDimension(dst_local_size, matrix->DomainMap().NumMyPoints());
+        const size_type src_local_size =
+          internal::end(src) - internal::begin(src);
+        AssertDimension(src_local_size, matrix->RangeMap().NumMyPoints());
 
-    Epetra_MultiVector tril_dst(
-      View, matrix->DomainMap(), internal::begin(dst), dst_local_size, 1);
-    Epetra_MultiVector tril_src(View,
-                                matrix->RangeMap(),
-                                const_cast<double *>(internal::begin(src)),
-                                src_local_size,
-                                1);
+        Epetra_MultiVector tril_dst(
+          View, matrix->DomainMap(), internal::begin(dst), dst_local_size, 1);
+        Epetra_MultiVector tril_src(View,
+                                    matrix->RangeMap(),
+                                    const_cast<double *>(internal::begin(src)),
+                                    src_local_size,
+                                    1);
 
-    const int ierr = matrix->Multiply(true, tril_src, tril_dst);
-    Assert(ierr == 0, ExcTrilinosError(ierr));
-  }
-
-
-
-  template <typename VectorType>
-  std::enable_if_t<
-    !std::is_same_v<typename VectorType::value_type, TrilinosScalar>>
-  SparseMatrix::Tvmult(VectorType & /*dst*/, const VectorType & /*src*/) const
-  {
-    AssertThrow(false, ExcNotImplemented());
+        const int ierr = matrix->Multiply(true, tril_src, tril_dst);
+        Assert(ierr == 0, ExcTrilinosError(ierr));
+      }
+    else
+      {
+        AssertThrow(false, ExcNotImplemented());
+      }
   }
 
 
