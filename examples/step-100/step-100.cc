@@ -552,7 +552,7 @@ namespace Step100
                                     false);
     sparsity_pattern.copy_from(dsp);
     system_matrix.reinit(sparsity_pattern);
-  };
+  }
 
   // @sect3{DPGHelmholtz::assemble_system}
 
