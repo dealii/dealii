@@ -148,8 +148,11 @@ export
   using ::SUNContext_Create;
   using ::SUNContext_Free;
 #  endif
+  using ::SUNDIALS_NVEC_CUSTOM;
   using ::sunindextype;
   using ::SUNLinearSolver;
+  using ::SUNLINEARSOLVER_ITERATIVE;
+  using ::SUNLINEARSOLVER_MATRIX_ITERATIVE;
   using ::SUNLinearSolver_Type;
   using ::SUNLinSol_SPGMR;
   using ::SUNLinSolFree;
@@ -158,9 +161,11 @@ export
   using ::SUNMatDestroy;
   using ::SUNMatNewEmpty;
   using ::SUNMatrix;
+  using ::SUNMATRIX_CUSTOM;
   using ::SUNMatrix_ID;
   using ::SUNNonlinearSolver;
   using ::SUNNonlinSol_FixedPoint;
+
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   using ::SUNPSetupFn;
   using ::SUNPSolveFn;
@@ -200,8 +205,6 @@ export
     const auto sun_false = SUNFALSE;
     const auto sun_true  = SUNTRUE;
 
-    const auto sunlinearsolver_iterative = SUNLINEARSOLVER_ITERATIVE;
-
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
     const auto comm_null = SUN_COMM_NULL;
 #  endif
@@ -220,8 +223,6 @@ export
 
 #  undef SUNFALSE
 #  undef SUNTRUE
-
-#  undef SUNLINEARSOLVER_ITERATIVE
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
 #    undef SUN_COMM_NULL
@@ -244,9 +245,28 @@ export
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
   const auto &SUN_COMM_NULL = SUNDIALS_Macros::comm_null;
 #  endif
-
-  const auto &SUNLINEARSOLVER_ITERATIVE =
-    SUNDIALS_Macros::sunlinearsolver_iterative;
 }
+
+
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace SUNDIALS_Macros                             \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                                 \
+    namespace dealii                                                      \
+    {                                                                     \
+      export const auto &sym = dealii::SUNDIALS_Macros::exportable_##sym; \
+    }
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PREC_NONE)
+#  undef PREC_NONE
+EXPORT_PREPROCESSOR_SYMBOL(PREC_NONE)
+
 
 #endif
