@@ -51,7 +51,33 @@ input.close()
 match_dealii_open = re.compile(r"^ *DEAL_II_NAMESPACE_OPEN *$")
 match_dealii_close = re.compile(r"^ *DEAL_II_NAMESPACE_CLOSE *$")
 
-# Then scan through it and collect the deal.II headers that are
+# In a first step, we need to remove the header include guard
+# structure of the file. That's because the standard says that the
+# 'module' statements we generate cannot be in code controlled by
+# preprocessor directives. In a first step, remove the lines that
+# matcha A regular expression for the check and define the header
+# inclusion guards.
+match_header_include_guard = re.compile(r"^\# *(ifndef|define) dealii_.*_h$")
+n_lines_before = len(lines)
+lines = [line for line in lines if not match_header_include_guard.match(line)]
+n_lines_after = len(lines)
+assert (
+    n_lines_before == n_lines_after + 2
+), f"The file {header_file} either has no header guard that follows the expected convention, or it deals with header guards in an unexpected way."
+
+# Then drop the last empty lines of the file
+while lines[-1] == "\n" or lines[-1].startswith("//") or lines[-1].startswith("/*"):
+    lines.pop()
+# The last line of the file should now be the closing #endif, perhaps
+# followed by a comment. Drop that too, as it is closing the header
+# include guard:
+assert lines[-1].startswith(
+    "#endif"
+), f"The last non-comment line of a header file is supposed to be the closing of the header include guard. But it is <{lines[-1]}>."
+lines.pop()
+
+
+# Then scan through the file and collect the deal.II headers that are
 # '#include'd, excluding "config.h" and "exception_macros.h", both of
 # which declare macros and so much be #included rather than imported:
 dealii_include_list = header_to_partition_maps.get_dealii_includes(lines)
@@ -74,7 +100,6 @@ output.write("#include <deal.II/macros.h>\n\n")
 
 # Then go through the lines of the input file again:
 for line in lines:
-
     # If this was an '#include' directive for a deal.II header, or an
     # external project that we wrap, then just ignore/remove this
     # line.
