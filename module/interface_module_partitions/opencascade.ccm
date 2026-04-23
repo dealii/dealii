@@ -155,6 +155,7 @@ export
   using ::BRepAdaptor_Curve;
   using ::BRepAdaptor_HCompCurve;
   using ::BRepAdaptor_HCurve;
+  using ::GCPnts_AbscissaPoint;
   using ::Handle_Adaptor3d_HCurve;
   using ::Handle_BRepAdaptor_HCompCurve;
   using ::Handle_BRepAdaptor_HCurve;
@@ -172,8 +173,12 @@ export
   using ::IGESControl_Writer;
   using ::IntCurvesFace_ShapeIntersector;
   using ::Poly_Triangulation;
+  using ::RealLast;
   using ::ShapeAnalysis_Curve;
   using ::ShapeAnalysis_Surface;
+  using ::Standard_Boolean;
+  using ::Standard_Integer;
+  using ::Standard_Real;
   using ::STEPControl_AsIs;
   using ::STEPControl_Controller;
   using ::STEPControl_Reader;
@@ -204,5 +209,27 @@ export
   using ::TopoDS_Vertex;
   using ::TopoDS_Wire;
 }
+
+// Deal with non-exportable entities like for all
+// of the other external libraries:
+#  define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)        \
+    namespace dealii                                        \
+    {                                                       \
+      namespace OpenCASCADE_Macros                          \
+      {                                                     \
+        [[maybe_unused]] const auto exportable_##sym = sym; \
+      }                                                     \
+    } // namespace dealii
+
+#  define EXPORT_PREPROCESSOR_SYMBOL(sym)                                    \
+    namespace dealii                                                         \
+    {                                                                        \
+      export const auto &sym = dealii::OpenCASCADE_Macros::exportable_##sym; \
+    }
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(Standard_False)
+#  undef Standard_False
+EXPORT_PREPROCESSOR_SYMBOL(Standard_False)
 
 #endif

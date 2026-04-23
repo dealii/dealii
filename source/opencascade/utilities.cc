@@ -82,7 +82,21 @@
 #  include <algorithm>
 #  include <vector>
 
-
+// OpenCASCADE defines a macro that creates class names. When building
+// modules, we don't #include any of the OpenCASCADE header files, and
+// we can't export macros, so the macro is not available. Re-declare
+// it here if it is not defined. (And if it is defined, we have a
+// problem: Apparently some header #include above is left in the file
+// by accident. Error out in that case so we get alerted to the
+// problem.)
+#  ifdef DEAL_II_BUILDING_CXX20_MODULE
+#    ifndef HANDLE
+#      define Handle(ClassName) Handle_##ClassName
+#    else
+#      error \
+        "Some OpenCASCADE header file is apparently included even when building modules!"
+#    endif
+#  endif
 
 #endif
 

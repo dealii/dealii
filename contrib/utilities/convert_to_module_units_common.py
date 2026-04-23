@@ -48,6 +48,7 @@ opencascade_includes = [
     "Adaptor3d_Curve.hxx",
     "Adaptor3d_HCurve.hxx",
     "BRep.*.hxx",
+    "GCPnts_AbscissaPoint.hxx",
     "Geom.*.hxx",
     "Handle.*.hxx",
     "IGESControl.*.hxx",
