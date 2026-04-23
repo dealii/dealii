@@ -183,6 +183,11 @@ export
   using ::p8est_vtk_write_file;
   using ::p8est_weight_t;
 
+  using ::P4EST_CONNECT_CORNER;
+  using ::P4EST_CONNECT_FULL;
+  using ::P8EST_CONNECT_CORNER;
+  using ::P8EST_CONNECT_FULL;
+
   using ::sc_array_bsearch;
   using ::sc_array_destroy_null;
   using ::sc_array_new_count;
