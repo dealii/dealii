@@ -126,3 +126,39 @@ export
 #endif
   } // namespace Kokkos
 }
+
+
+// Also have ways to deal with non-exportable symbols, just
+// like for the other external packages. The difference to
+// the other files is that we have to place the new symbol into
+// namespace Kokkos.
+#define CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(sym)                \
+  namespace dealii                                                \
+  {                                                               \
+    namespace Kokkos_Macros                                       \
+    {                                                             \
+      [[maybe_unused]] const auto exportable_##sym = Kokkos::sym; \
+    }                                                             \
+  } // namespace dealii
+
+#define EXPORT_PREPROCESSOR_SYMBOL(sym)                               \
+  namespace Kokkos                                                    \
+  {                                                                   \
+    export const auto &sym = dealii::Kokkos_Macros::exportable_##sym; \
+  }
+
+#if !DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(WithoutInitializing)
+#  undef WithoutInitializing
+EXPORT_PREPROCESSOR_SYMBOL(WithoutInitializing)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(ALL)
+#  undef ALL
+EXPORT_PREPROCESSOR_SYMBOL(ALL)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AUTO)
+#  undef AUTO
+EXPORT_PREPROCESSOR_SYMBOL(AUTO)
+
+#endif
