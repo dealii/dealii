@@ -104,9 +104,11 @@ namespace LinearAlgebra
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
                                                           Teuchos::Copy);
         }
+      source_stored_elements  = V.source_stored_elements;
       local_entries           = V.local_entries;
       nonlocal_cached_indices = V.nonlocal_cached_indices;
       nonlocal_cached_values  = V.nonlocal_cached_values;
+      tpetra_comm_pattern     = V.tpetra_comm_pattern;
     }
 
 
@@ -118,7 +120,15 @@ namespace LinearAlgebra
       , has_ghost(V->getMap()->isOneToOne() == false)
       , last_action(VectorOperation::unknown)
       , vector(V)
-    {}
+    {
+      // If there are ghost entries, we do not know which process owns which
+      // entries. Assume no one owns any entries, which will allow read access,
+      // but no write access.
+      if (has_ghost)
+        local_entries = IndexSet(vector->getGlobalLength());
+      else
+        local_entries = IndexSet(vector->getMap());
+    }
 
 
 
@@ -203,8 +213,12 @@ namespace LinearAlgebra
       compressed  = true;
       last_action = VectorOperation::unknown;
       nonlocal_vector.reset();
+      source_stored_elements.clear();
+      local_entries.clear();
+      local_entries.set_size(0);
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
+      tpetra_comm_pattern = Teuchos::null;
     }
 
 
@@ -217,8 +231,10 @@ namespace LinearAlgebra
     {
       vector.reset();
       nonlocal_vector.reset();
+      source_stored_elements.clear();
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
+      tpetra_comm_pattern = Teuchos::null;
 
       compressed  = true;
       has_ghost   = false;
@@ -242,8 +258,10 @@ namespace LinearAlgebra
     {
       // release memory before reallocation
       nonlocal_vector.reset();
+      source_stored_elements.clear();
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
+      tpetra_comm_pattern = Teuchos::null;
 
       local_entries = locally_owned_entries;
 
@@ -473,17 +491,32 @@ namespace LinearAlgebra
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
                                                           Teuchos::Copy);
 
+          if (!V.nonlocal_vector.is_null())
+            {
+              nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
+                TpetraTypes::VectorType<Number, MemorySpace>>(
+                *V.nonlocal_vector, Teuchos::Copy);
+            }
+          else
+            nonlocal_vector.reset();
+
           compressed             = V.compressed;
           has_ghost              = V.has_ghost;
           source_stored_elements = V.source_stored_elements;
           tpetra_comm_pattern    = V.tpetra_comm_pattern;
+          local_entries          = V.local_entries;
         }
 
       // Because V is compressed and has no pending changes
       // clear our local cache as well.
+      if (!nonlocal_vector.is_null())
+        nonlocal_vector->putScalar(Number(0));
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
-      last_action = VectorOperation::unknown;
+      source_stored_elements.clear();
+      tpetra_comm_pattern = Teuchos::null;
+      compressed          = true;
+      last_action         = VectorOperation::unknown;
 
       return *this;
     }
@@ -507,9 +540,13 @@ namespace LinearAlgebra
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(),
         vector_data);
 
-      has_ghost   = false;
-      compressed  = true;
-      last_action = VectorOperation::unknown;
+      local_entries = V.locally_owned_elements();
+
+      source_stored_elements.clear();
+      tpetra_comm_pattern = Teuchos::null;
+      has_ghost           = false;
+      compressed          = true;
+      last_action         = VectorOperation::unknown;
 
       return *this;
     }

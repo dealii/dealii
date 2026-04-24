@@ -39,6 +39,7 @@
 
 #  include <memory>
 #  include <optional>
+#  include <utility>
 
 #endif
 
@@ -1163,11 +1164,22 @@ namespace LinearAlgebra
       return compressed;
     }
 
+
+
     template <typename Number, typename MemorySpace>
     inline void
     Vector<Number, MemorySpace>::swap(Vector<Number, MemorySpace> &v) noexcept
     {
+      std::swap(compressed, v.compressed);
+      std::swap(has_ghost, v.has_ghost);
+      std::swap(last_action, v.last_action);
       vector.swap(v.vector);
+      nonlocal_vector.swap(v.nonlocal_vector);
+      std::swap(source_stored_elements, v.source_stored_elements);
+      std::swap(local_entries, v.local_entries);
+      std::swap(nonlocal_cached_indices, v.nonlocal_cached_indices);
+      std::swap(nonlocal_cached_values, v.nonlocal_cached_values);
+      tpetra_comm_pattern.swap(v.tpetra_comm_pattern);
     }
 
 
