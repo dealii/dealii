@@ -24,9 +24,13 @@
 #  include <deal.II/lac/block_vector.h>
 #  include <deal.II/lac/la_parallel_block_vector.h>
 #  include <deal.II/lac/la_parallel_vector.h>
-#  ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
 #    include <deal.II/lac/trilinos_vector.h>
+#  endif
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#    include <deal.II/lac/trilinos_tpetra_vector.h>
 #  endif
 #  ifdef DEAL_II_WITH_PETSC
 #    include <deal.II/lac/petsc_block_vector.h>
@@ -600,10 +604,23 @@ namespace SUNDIALS
 
 #  ifdef DEAL_II_WITH_MPI
 
-#    ifdef DEAL_II_WITH_TRILINOS
+#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
   template class KINSOL<TrilinosWrappers::MPI::Vector>;
   template class KINSOL<TrilinosWrappers::MPI::BlockVector>;
 #    endif
+
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  template class KINSOL<
+    LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host>>;
+  template class KINSOL<
+    LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>>;
+
+  template class KINSOL<
+    LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default>>;
+  template class KINSOL<
+    LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Default>>;
+#    endif
+
 
 #    ifdef DEAL_II_WITH_PETSC
 #      ifndef PETSC_USE_COMPLEX
