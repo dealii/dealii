@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2004 - 2026 by the deal.II authors
+// Copyright (C) 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -31,7 +31,7 @@ namespace PETScWrappers
       // just like for vectors and sparse matrices: since we
       // create an empty matrix, we can as
       // well make it sequential
-      const int            m = 0, n = 0;
+      const PetscInt       m = 0, n = 0;
       const PetscErrorCode ierr =
         MatCreateSeqDense(PETSC_COMM_SELF, m, n, nullptr, &matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -53,13 +53,12 @@ namespace PETScWrappers
 
 
 
-    FullMatrix::FullMatrix(
-      const MPI_Comm                communicator,
-      const size_type               m,
-      const size_type               n,
-      const std::vector<size_type> &local_rows_per_process,
-      const std::vector<size_type> &local_columns_per_process,
-      const unsigned int            this_process)
+    FullMatrix::FullMatrix(const MPI_Comm     communicator,
+                           const size_type    m,
+                           const size_type    n,
+                           const size_type    local_rows_per_process,
+                           const size_type    local_columns_per_process,
+                           const unsigned int this_process)
     {
       do_reinit(communicator,
                 m,
@@ -72,12 +71,12 @@ namespace PETScWrappers
 
 
     void
-    FullMatrix::reinit(const MPI_Comm                communicator,
-                       const size_type               m,
-                       const size_type               n,
-                       const std::vector<size_type> &local_rows_per_process,
-                       const std::vector<size_type> &local_columns_per_process,
-                       const unsigned int            this_process)
+    FullMatrix::reinit(const MPI_Comm     communicator,
+                       const size_type    m,
+                       const size_type    n,
+                       const size_type    local_rows_per_process,
+                       const size_type    local_columns_per_process,
+                       const unsigned int this_process)
     {
       // get rid of old matrix and generate a new one
       const PetscErrorCode ierr = MatDestroy(&matrix);
@@ -94,15 +93,15 @@ namespace PETScWrappers
 
 
     void
-    FullMatrix::do_reinit(
-      const MPI_Comm                communicator,
-      const size_type               m,
-      const size_type               n,
-      const std::vector<size_type> &local_rows_per_process,
-      const std::vector<size_type> &local_columns_per_process,
-      const unsigned int            this_process)
+    FullMatrix::do_reinit(const MPI_Comm     communicator,
+                          const size_type    m,
+                          const size_type    n,
+                          const size_type    local_rows_per_process,
+                          const size_type    local_columns_per_process,
+                          const unsigned int this_process)
     {
-      Assert(this_process < local_rows_per_process.size(), ExcInternalError());
+      // Assert(this_process < local_rows_per_process.size(),
+      // ExcInternalError());
 
       // convert dimensions into PETScInt
       AssertThrowIntegerConversion(static_cast<PetscInt>(m), m);
@@ -112,14 +111,13 @@ namespace PETScWrappers
       // this will create by default a sequential dense matrix(MATSEQDENSE) if
       // constructed with a single process communicator and a distributed dense
       // matrix (MATMPIDENSE) if constructed with more than one.
-      PetscErrorCode ierr =
-        MatCreateDense(communicator,
-                       local_rows_per_process[this_process],
-                       local_columns_per_process[this_process],
-                       m,
-                       n,
-                       nullptr,
-                       &matrix);
+      PetscErrorCode ierr = MatCreateDense(communicator,
+                                           local_rows_per_process,
+                                           local_columns_per_process,
+                                           m,
+                                           n,
+                                           nullptr,
+                                           &matrix);
       AssertThrow(ierr == 0, ExcPETScError(ierr));
     }
 

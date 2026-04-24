@@ -19,47 +19,29 @@
 #include "../tests.h"
 
 
-
-unsigned int
-get_n_mpi_processes()
-{
-  int n_jobs;
-  MPI_Comm_size(MPI_COMM_WORLD, &n_jobs);
-
-  return n_jobs;
-}
-
-
-
-unsigned int
-get_this_mpi_process()
-{
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  return rank;
-}
-
-
 void
 test()
 {
   using size_type = PETScWrappers::MPI::FullMatrix::size_type;
 
+  unsigned int myid     = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+  if (myid == 0)
+    deallog << "Running on " << numprocs << " CPU(s)." << std::endl;
+
   // create a parallel matrix where the first
   // process has 10 rows, the second one 20,
   // the third one 30, and so on
-  unsigned int           N = 0;
-  std::vector<size_type> local_rows_per_process(get_n_mpi_processes());
-  std::vector<size_type> start_row(get_n_mpi_processes());
-  for (unsigned int i = 0; i < get_n_mpi_processes(); ++i)
+
+  size_type local_rows_per_process = 15;
+  size_type N                      = local_rows_per_process * numprocs;
+  // size_type start_row(get_n_mpi_processes());
+  /*for (unsigned int i = 0; i < get_n_mpi_processes(); ++i)
     {
       N += (i + 1) * 10;
       local_rows_per_process[i] = (i + 1) * 10;
       start_row[i] += i * 10;
-    }
-
-
+    }*/
   // now create a matrix
   PETScWrappers::MPI::FullMatrix m;
   m.reinit(MPI_COMM_WORLD,
@@ -68,12 +50,34 @@ test()
            local_rows_per_process,
            local_rows_per_process,
            get_this_mpi_process());
+  PETScWrappers::MPI::FullMatrix m2;
+  m2.reinit(MPI_COMM_WORLD,
+            N,
+            N,
+            local_rows_per_process,
+            local_rows_per_process,
+            get_this_mpi_process());
 
-  for (unsigned int i = 0; i < N; ++i)
-    for (unsigned int j = 0; j < N; ++j)
-      m.add(i, j, 1.);
+  const auto range = m.local_range();
 
-  deallog << "OK" << std::endl;
+  for (size_type i = range.first; i < range.second; ++i)
+    for (size_type j = 0; j < N; ++j)
+      {
+        m.add(i, j, 1.0);
+        m2.add(i, j, 2.0);
+      }
+
+  m.compress(VectorOperation::add);
+  m2.compress(VectorOperation::add);
+
+
+  PetscScalar trace = (m.add(-1.0, m2)).trace();
+
+  if (myid == 0)
+    {
+      deallog << "TRACE: " << trace << std::endl;
+      deallog << "done" << std::endl;
+    }
 }
 
 

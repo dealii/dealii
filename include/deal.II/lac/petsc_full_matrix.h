@@ -109,12 +109,12 @@ namespace PETScWrappers
        * happening over the provided @p communicator.
        * For the meaning of the @p local_rows_per_process and @p
        * local_columns_per_process parameters, see the class documentation. */
-      FullMatrix(const MPI_Comm                communicator,
-                 const size_type               m,
-                 const size_type               n,
-                 const std::vector<size_type> &local_rows_per_process,
-                 const std::vector<size_type> &local_columns_per_process,
-                 const unsigned int            this_process);
+      FullMatrix(const MPI_Comm     communicator,
+                 const size_type    m,
+                 const size_type    n,
+                 const size_type    local_rows_per_process,
+                 const size_type    local_columns_per_process,
+                 const unsigned int this_process);
 
       /**
        * Initialize a FullMatrix from a PETSc Mat object. Note that we do not
@@ -131,12 +131,12 @@ namespace PETScWrappers
       ~FullMatrix() override;
 
       void
-      reinit(const MPI_Comm                communicator,
-             const size_type               m,
-             const size_type               n,
-             const std::vector<size_type> &local_rows_per_process,
-             const std::vector<size_type> &local_columns_per_process,
-             const unsigned int            this_process);
+      reinit(const MPI_Comm     communicator,
+             const size_type    m,
+             const size_type    n,
+             const size_type    local_rows_per_process,
+             const size_type    local_columns_per_process,
+             const unsigned int this_process);
 
     private:
       /**
@@ -145,12 +145,12 @@ namespace PETScWrappers
        * previous matrix is left to the caller.
        */
       void
-      do_reinit(const MPI_Comm                communicator,
-                const size_type               m,
-                const size_type               n,
-                const std::vector<size_type> &local_rows_per_process,
-                const std::vector<size_type> &local_columns_per_process,
-                const unsigned int            this_process);
+      do_reinit(const MPI_Comm     communicator,
+                const size_type    m,
+                const size_type    n,
+                const size_type    local_rows_per_process,
+                const size_type    local_columns_per_process,
+                const unsigned int this_process);
     };
   } // namespace MPI
 
