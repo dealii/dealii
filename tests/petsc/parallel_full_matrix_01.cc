@@ -35,13 +35,7 @@ test()
 
   size_type local_rows_per_process = 15;
   size_type N                      = local_rows_per_process * numprocs;
-  // size_type start_row(get_n_mpi_processes());
-  /*for (unsigned int i = 0; i < get_n_mpi_processes(); ++i)
-    {
-      N += (i + 1) * 10;
-      local_rows_per_process[i] = (i + 1) * 10;
-      start_row[i] += i * 10;
-    }*/
+
   // now create a matrix
   PETScWrappers::MPI::FullMatrix m;
   m.reinit(MPI_COMM_WORLD,

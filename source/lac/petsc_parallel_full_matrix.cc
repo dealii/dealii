@@ -100,9 +100,6 @@ namespace PETScWrappers
                           const size_type    local_columns_per_process,
                           const unsigned int this_process)
     {
-      // Assert(this_process < local_rows_per_process.size(),
-      // ExcInternalError());
-
       // convert dimensions into PETScInt
       AssertThrowIntegerConversion(static_cast<PetscInt>(m), m);
       AssertThrowIntegerConversion(static_cast<PetscInt>(n), n);
