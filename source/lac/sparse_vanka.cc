@@ -17,10 +17,6 @@
 #include <deal.II/lac/sparse_vanka.h>
 #include <deal.II/lac/sparse_vanka.templates.h>
 
-#include <taskflow/core/async.hpp>
-#include <taskflow/core/graph.hpp>
-#include <taskflow/utility/traits.hpp>
-
 #include <ostream>
 
 DEAL_II_NAMESPACE_OPEN
