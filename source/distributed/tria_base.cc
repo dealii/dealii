@@ -41,7 +41,6 @@ DEAL_II_NAMESPACE_OPEN
 namespace parallel
 {
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   TriangulationBase<dim, spacedim>::TriangulationBase(
     const MPI_Comm mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
@@ -61,8 +60,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void TriangulationBase<dim, spacedim>::copy_triangulation(
+  void
+  TriangulationBase<dim, spacedim>::copy_triangulation(
     const dealii::Triangulation<dim, spacedim> &other_tria)
   {
 #ifndef DEAL_II_WITH_MPI
@@ -86,8 +85,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  std::size_t TriangulationBase<dim, spacedim>::memory_consumption() const
+  std::size_t
+  TriangulationBase<dim, spacedim>::memory_consumption() const
   {
     std::size_t mem =
       this->dealii::Triangulation<dim, spacedim>::memory_consumption() +
@@ -102,7 +101,6 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   TriangulationBase<dim, spacedim>::~TriangulationBase()
   {
     // release unused vector memory because the vector layout is going to look
@@ -114,7 +112,6 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   TriangulationBase<dim, spacedim>::NumberCache::NumberCache()
     : n_locally_owned_active_cells(0)
     , n_global_active_cells(0)
@@ -125,9 +122,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  unsigned int TriangulationBase<dim, spacedim>::n_locally_owned_active_cells()
-    const
+  unsigned int
+  TriangulationBase<dim, spacedim>::n_locally_owned_active_cells() const
   {
     return number_cache.n_locally_owned_active_cells;
   }
@@ -135,8 +131,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  unsigned int TriangulationBase<dim, spacedim>::n_global_levels() const
+  unsigned int
+  TriangulationBase<dim, spacedim>::n_global_levels() const
   {
     return number_cache.n_global_levels;
   }
@@ -144,9 +140,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   types::global_cell_index
-    TriangulationBase<dim, spacedim>::n_global_active_cells() const
+  TriangulationBase<dim, spacedim>::n_global_active_cells() const
   {
     return number_cache.n_global_active_cells;
   }
@@ -154,8 +149,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  MPI_Comm TriangulationBase<dim, spacedim>::get_mpi_communicator() const
+  MPI_Comm
+  TriangulationBase<dim, spacedim>::get_mpi_communicator() const
   {
     return mpi_communicator;
   }
@@ -164,8 +159,8 @@ namespace parallel
 
 #ifdef DEAL_II_WITH_MPI
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void TriangulationBase<dim, spacedim>::update_number_cache()
+  void
+  TriangulationBase<dim, spacedim>::update_number_cache()
   {
     number_cache.ghost_owners.clear();
     number_cache.level_ghost_owners.clear();
@@ -301,8 +296,8 @@ namespace parallel
 #else
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void TriangulationBase<dim, spacedim>::update_number_cache()
+  void
+  TriangulationBase<dim, spacedim>::update_number_cache()
   {
     Assert(false, ExcNeedsMPI());
   }
@@ -310,9 +305,8 @@ namespace parallel
 #endif
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   types::subdomain_id
-    TriangulationBase<dim, spacedim>::locally_owned_subdomain() const
+  TriangulationBase<dim, spacedim>::locally_owned_subdomain() const
   {
     return my_subdomain;
   }
@@ -320,9 +314,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  const std::set<types::subdomain_id>
-    &TriangulationBase<dim, spacedim>::ghost_owners() const
+  const std::set<types::subdomain_id> &
+  TriangulationBase<dim, spacedim>::ghost_owners() const
   {
     return number_cache.ghost_owners;
   }
@@ -330,9 +323,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  const std::set<types::subdomain_id>
-    &TriangulationBase<dim, spacedim>::level_ghost_owners() const
+  const std::set<types::subdomain_id> &
+  TriangulationBase<dim, spacedim>::level_ghost_owners() const
   {
     return number_cache.level_ghost_owners;
   }
@@ -340,9 +332,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  std::vector<types::boundary_id> TriangulationBase<dim, spacedim>::
-    get_boundary_ids() const
+  std::vector<types::boundary_id>
+  TriangulationBase<dim, spacedim>::get_boundary_ids() const
   {
     return Utilities::MPI::compute_set_union(
       dealii::Triangulation<dim, spacedim>::get_boundary_ids(),
@@ -352,9 +343,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  std::vector<types::manifold_id> TriangulationBase<dim, spacedim>::
-    get_manifold_ids() const
+  std::vector<types::manifold_id>
+  TriangulationBase<dim, spacedim>::get_manifold_ids() const
   {
     return Utilities::MPI::compute_set_union(
       dealii::Triangulation<dim, spacedim>::get_manifold_ids(),
@@ -364,8 +354,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void TriangulationBase<dim, spacedim>::reset_global_cell_indices()
+  void
+  TriangulationBase<dim, spacedim>::reset_global_cell_indices()
   {
 #ifndef DEAL_II_WITH_MPI
     Assert(false, ExcNeedsMPI());
@@ -548,8 +538,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void TriangulationBase<dim, spacedim>::communicate_locally_moved_vertices(
+  void
+  TriangulationBase<dim, spacedim>::communicate_locally_moved_vertices(
     const std::vector<bool> &vertex_locally_moved)
   {
     AssertDimension(vertex_locally_moved.size(), this->n_vertices());
@@ -604,10 +594,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  std::weak_ptr<const Utilities::MPI::Partitioner> TriangulationBase<
-    dim,
-    spacedim>::global_active_cell_index_partitioner() const
+  std::weak_ptr<const Utilities::MPI::Partitioner>
+  TriangulationBase<dim, spacedim>::global_active_cell_index_partitioner() const
   {
     return number_cache.active_cell_index_partitioner;
   }
@@ -615,10 +603,9 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  std::weak_ptr<const Utilities::MPI::Partitioner> TriangulationBase<dim,
-                                                                     spacedim>::
-    global_level_cell_index_partitioner(const unsigned int level) const
+  std::weak_ptr<const Utilities::MPI::Partitioner>
+  TriangulationBase<dim, spacedim>::global_level_cell_index_partitioner(
+    const unsigned int level) const
   {
     Assert(this->is_multilevel_hierarchy_constructed(), ExcNotImplemented());
     AssertIndexRange(level, this->n_global_levels());
@@ -629,9 +616,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   types::coarse_cell_id
-    TriangulationBase<dim, spacedim>::n_global_coarse_cells() const
+  TriangulationBase<dim, spacedim>::n_global_coarse_cells() const
   {
     return number_cache.number_of_global_coarse_cells;
   }
@@ -639,7 +625,6 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
   DistributedTriangulationBase<dim, spacedim>::DistributedTriangulationBase(
     const MPI_Comm mpi_communicator,
     const typename dealii::Triangulation<dim, spacedim>::MeshSmoothing
@@ -654,8 +639,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  void TriangulationBase<dim, spacedim>::clear()
+  void
+  TriangulationBase<dim, spacedim>::clear()
   {
     dealii::Triangulation<dim, spacedim>::clear();
 
@@ -665,8 +650,8 @@ namespace parallel
 
 
   template <int dim, int spacedim>
-  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-  bool DistributedTriangulationBase<dim, spacedim>::has_hanging_nodes() const
+  bool
+  DistributedTriangulationBase<dim, spacedim>::has_hanging_nodes() const
   {
     if (this->n_global_levels() <= 1)
       return false; // can not have hanging nodes without refined cells

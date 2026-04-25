@@ -54,7 +54,6 @@ class BlockVector;
 template <int dim, int spacedim>
 class Mapping;
 template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 class DoFHandler;
 
 namespace hp

@@ -685,6 +685,12 @@ namespace concepts
    * - `dim<=spacedim`.
    * These are the kinds of requirements that are imposed, for
    * example, on class Triangulation.
+   *
+   * @deprecated
+   * The use of this concept has been superseded by
+   * @code
+   *     static_assert(dim >= 1 && spacedim <= 3 && dim <= spacedim)
+   * @endcode
    */
   template <int dim, int spacedim>
   concept is_valid_dim_spacedim =
@@ -882,32 +888,27 @@ namespace concepts
 } // namespace concepts
 
 
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+template <int, int>
 class Triangulation;
 
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+template <int, int>
 class DoFHandler;
 
 namespace parallel
 {
   namespace distributed
   {
-    template <int dim, int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    template <int, int>
     class Triangulation;
   }
   namespace shared
   {
-    template <int dim, int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    template <int, int>
     class Triangulation;
   }
   namespace fullydistributed
   {
-    template <int dim, int spacedim>
-    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    template <int, int>
     class Triangulation;
   }
 } // namespace parallel
