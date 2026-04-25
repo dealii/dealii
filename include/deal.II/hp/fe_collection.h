@@ -352,11 +352,20 @@ namespace hp
     /**
      * Same as hp_vertex_dof_indices(), except that the function treats degrees
      * of freedom on quads.
+     *
+     * If @p face_number_belongs_to_first_fe_index is true, the provided face
+     * number is understood to refer to the first fe index in the given
+     * set. If it is false, the face number is interpreted as belonging to the
+     * second fe index in the set. This parameter is only meaningful if the set
+     * contains exactly two fe indices. For sets with more than two elements,
+     * the dof identities are computed for all combinations of fe indices at the
+     * specified face @p face_no.
      */
     std::vector<std::map<unsigned int, unsigned int>>
-    hp_quad_dof_identities(const std::set<unsigned int> &fes,
-                           const unsigned int            face_no = 0) const;
-
+    hp_quad_dof_identities(
+      const std::set<unsigned int> &fes,
+      const unsigned int            face_no            = 0,
+      const bool face_number_belongs_to_first_fe_index = true) const;
 
     /**
      * Return the indices of finite elements in this FECollection that dominate

@@ -561,14 +561,31 @@ namespace hp
   std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_quad_dof_identities(
     const std::set<unsigned int> &fes,
-    const unsigned int            face_no) const
+    const unsigned int            face_no,
+    const bool                    face_number_belongs_to_first_fe_index) const
   {
-    auto query_quad_dof_identities = [this,
-                                      face_no](const unsigned int fe_index_1,
-                                               const unsigned int fe_index_2) {
-      return (*this)[fe_index_1].hp_quad_dof_identities((*this)[fe_index_2],
-                                                        face_no);
-    };
+    // Either face_number_belongs_to_first_fe_index is true, or the set has to
+    // have exactly two entries for it to have meaning.
+    Assert(face_number_belongs_to_first_fe_index || fes.size() == 2,
+           ExcInternalError());
+
+    auto query_quad_dof_identities =
+      [this, face_no, face_number_belongs_to_first_fe_index](
+        const unsigned int fe_index_1, const unsigned int fe_index_2) {
+        if (face_number_belongs_to_first_fe_index)
+          return (*this)[fe_index_1].hp_quad_dof_identities((*this)[fe_index_2],
+                                                            face_no);
+
+        std::vector<std::pair<unsigned int, unsigned int>> identities =
+          (*this)[fe_index_2].hp_quad_dof_identities((*this)[fe_index_1],
+                                                     face_no);
+        // in the returned vector it is expected that the first entry in the
+        // pair belongs to the first fe index
+        for (auto &identity : identities)
+          std::swap(identity.first, identity.second);
+
+        return identities;
+      };
     return compute_hp_dof_identities(fes, query_quad_dof_identities);
   }
 
