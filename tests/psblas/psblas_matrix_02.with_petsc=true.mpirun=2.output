@@ -1,0 +1,7 @@
+
+DEAL:0::Testing PSBLAS matrix with dim=2
+DEAL:0::Matrix-vector product: OK
+
+DEAL:1::Testing PSBLAS matrix with dim=2
+DEAL:1::Matrix-vector product: OK
+
