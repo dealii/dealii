@@ -22,6 +22,7 @@
 #include <chrono>
 #include <list>
 #include <map>
+#include <optional>
 #include <string>
 
 DEAL_II_NAMESPACE_OPEN
@@ -761,85 +762,45 @@ public:
   };
 
   /**
-   * Constructor.
+   * Constructor **not** taking an MPI communicator as input. Timers managed
+   * by this class are default-constructed and do not require communication for
+   * synchronization in MPI-parallel computations. This corresponds to the
+   * second variant described in the documentation of this class.
    *
-   * @param stream The stream (of type std::ostream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
-   * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time).
+   * @param stream The output stream (of type std::ostream) to which results are written.
+   * @param output_frequency Specifies how often output is written to the stream.
+   * @param output_type Specifies the type of timing to report (CPU or wall time).
    */
   TimerOutput(std::ostream         &stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
 
   /**
-   * Constructor.
-   *
-   * @param stream The stream (of type ConditionalOstream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
-   * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time).
+   * Same as above, but accepts a ConditionalOStream.
    */
   TimerOutput(ConditionalOStream   &stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
 
   /**
-   * Constructor that takes an MPI communicator as input. A timer constructed
-   * this way will sum up the CPU times over all processors in the MPI network
-   * for calculating the CPU time, or take the maximum over all processors,
-   * depending on the value of @p output_type . See the documentation of this
-   * class for the rationale for this constructor and an example.
-   *
-   * @param mpi_comm An MPI communicator across which we should accumulate or
-   * otherwise synchronize the timing information we produce on every MPI
-   * process.
-   * @param stream The stream (of type std::ostream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
-   * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time). In this parallel context, when this
-   * argument selects CPU time, then times are accumulated over all processes
-   * participating in the MPI communicator. If this argument selects wall
-   * time, then reported times are the maximum over all processors' run times
-   * for this section. (The latter is computed by placing an
-   * <code>MPI_Barrier</code> call before starting and stopping the timer for
-   * each section.
+   * Constructor that additionally takes an MPI communicator. Timers managed by
+   * this class are initialized with @p mpi_communicator_timing and
+   * <code>sync_lap_times = true</code>. This ensures synchronization via global
+   * communication in MPI-parallel computations. CPU times are accumulated
+   * across all processes, while the reported wall time corresponds to the
+   * maximum observed over all processes in the given @p mpi_communicator_timing.
+   * This corresponds to the first variant described in this class
+   * documentation.
    */
-  TimerOutput(const MPI_Comm        mpi_comm,
+  TimerOutput(const MPI_Comm        mpi_communicator_timing,
               std::ostream         &stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
 
   /**
-   * Constructor that takes an MPI communicator as input. A timer constructed
-   * this way will sum up the CPU times over all processors in the MPI network
-   * for calculating the CPU time, or take the maximum over all processors,
-   * depending on the value of @p output_type . See the documentation of this
-   * class for the rationale for this constructor and an example.
-   *
-   * @param mpi_comm An MPI communicator across which we should accumulate or
-   * otherwise synchronize the timing information we produce on every MPI
-   * process.
-   * @param stream The stream (of type ConditionalOstream) to which output is
-   * written.
-   * @param output_frequency A variable indicating when output is to be
-   * written to the given stream.
-   * @param output_type A variable indicating what kind of timing the output
-   * should represent (CPU or wall time). In this parallel context, when this
-   * argument selects CPU time, then times are accumulated over all processes
-   * participating in the MPI communicator. If this argument selects wall
-   * time, then reported times are the maximum over all processors' run times
-   * for this section. (The latter is computed by placing an
-   * <code>MPI_Barrier</code> call before starting and stopping the timer for
-   * each section.)
+   * Same as above but for an ConditionalOStream.
    */
-  TimerOutput(const MPI_Comm        mpi_comm,
+  TimerOutput(const MPI_Comm        mpi_communicator_timing,
               ConditionalOStream   &stream,
               const OutputFrequency output_frequency,
               const OutputType      output_type);
@@ -883,8 +844,14 @@ public:
    * maximum of times in the various sections and the MPI ranks where the
    * minimum and maximum are attained. Note that this call only provides
    * useful information when the TimerOutput object is constructed without an
-   * MPI_Comm argument, to let individual sections run without being disturbed
-   * by barriers.
+   * MPI communicator, allowing individual sections to run without being
+   * disturbed by barriers. Calling this function in this case is still valid,
+   * but requires mpi_communicator_statistics to contain the same processes as
+   * the MPI communicator used to construct the TimerOutput. If the TimerOutput
+   * is constructed without an MPI communicator ranks within the provided
+   * mpi_communicator_statistics are not required to enter the same sections; in
+   * this case, an appropriate zero timing will be reported for not entered
+   * sections.
    *
    * The optional argument `quantile` allows to add two additional columns to
    * the output in terms of the distribution of run times. If quantile = 0.1,
@@ -895,7 +862,7 @@ public:
    * median is given).
    */
   void
-  print_wall_time_statistics(const MPI_Comm mpi_comm,
+  print_wall_time_statistics(const MPI_Comm mpi_communicator_statistics,
                              const double   print_quantile = 0.) const;
 
   /**
@@ -965,9 +932,10 @@ private:
   std::list<std::string> active_sections;
 
   /**
-   * mpi communicator
+   * An optional mpi communicator used to synchronize the timing results across
+   * MPI processes.
    */
-  MPI_Comm mpi_communicator;
+  std::optional<MPI_Comm> mpi_communicator_timing;
 
   /**
    * A lock that makes sure that this class gives reasonable results even when

@@ -26,4 +26,15 @@ TimerOutput::Scope with MPI_COMM_SELF
 | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | xxxxxxxxx | xxxxxxxxxx | xxxxxxxxxx |
 +---------------------------------+-----------+------------+------------+
 
+TimerOutput::Scope with other single process communicator
+
+
++---------------------------------------------+------------+------------+
+| Total CPU time elapsed since start          | xxxxxxxxxx |            |
+|                                             |            |            |
+| Section                         | no. calls |  CPU time  | % of total |
++---------------------------------+-----------+------------+------------+
+| xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | xxxxxxxxx | xxxxxxxxxx | xxxxxxxxxx |
++---------------------------------+-----------+------------+------------+
+
 

@@ -10,8 +10,9 @@
 //
 // -----------------------------------------------------------------------------
 
+#include "deal.II/base/mpi.h"
 #include <deal.II/base/exceptions.h>
-#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
@@ -23,6 +24,8 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <mutex>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -386,7 +389,7 @@ TimerOutput::TimerOutput(std::ostream         &stream,
   , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
-  , mpi_communicator(MPI_COMM_SELF)
+  , mpi_communicator_timing(std::nullopt)
 {}
 
 
@@ -400,7 +403,7 @@ TimerOutput::TimerOutput(ConditionalOStream   &stream,
   , sections()
   , out_stream(stream)
   , output_is_enabled(true)
-  , mpi_communicator(MPI_COMM_SELF)
+  , mpi_communicator_timing(std::nullopt)
 {}
 
 
@@ -415,7 +418,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
   , sections()
   , out_stream(stream, true)
   , output_is_enabled(true)
-  , mpi_communicator(mpi_communicator)
+  , mpi_communicator_timing(mpi_communicator)
 {}
 
 
@@ -430,7 +433,7 @@ TimerOutput::TimerOutput(const MPI_Comm        mpi_communicator,
   , sections()
   , out_stream(stream)
   , output_is_enabled(true)
-  , mpi_communicator(mpi_communicator)
+  , mpi_communicator_timing(mpi_communicator)
 {}
 
 
@@ -455,10 +458,11 @@ TimerOutput::~TimerOutput()
   // avoid communicating with other processes if there is an uncaught
   // exception
 #ifdef DEAL_II_WITH_MPI
-  if (std::uncaught_exceptions() > 0 && mpi_communicator != MPI_COMM_SELF)
+  if (std::uncaught_exceptions() > 0 && mpi_communicator_timing.has_value() &&
+      Utilities::MPI::n_mpi_processes(*mpi_communicator_timing) > 1)
     {
       const unsigned int myid =
-        Utilities::MPI::this_mpi_process(mpi_communicator);
+        Utilities::MPI::this_mpi_process(*mpi_communicator_timing);
       if (myid == 0)
         std::cerr
           << "---------------------------------------------------------\n"
@@ -499,10 +503,10 @@ TimerOutput::enter_subsection(const std::string &section_name)
       // Ensure MPI operations only happen if an MPI communicator was
       // initialized. No need to call start() for the timers, since
       // the constructor already starts them.
-      if (mpi_communicator != MPI_COMM_SELF)
-        sections[section_name] = Timer(mpi_communicator, true);
+      if (mpi_communicator_timing.has_value())
+        sections[section_name] = Timer(*mpi_communicator_timing, true);
       else
-        sections[section_name] = Timer(mpi_communicator, false);
+        sections[section_name] = Timer(MPI_COMM_SELF, false);
     }
   else
     {
@@ -929,26 +933,58 @@ TimerOutput::print_summary() const
 
 
 void
-TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
-                                        const double   quantile) const
+TimerOutput::print_wall_time_statistics(
+  const MPI_Comm mpi_communicator_statistics,
+  const double   quantile) const
 {
   Assert(active_sections.empty(),
          ExcMessage(
            "Cannot print data from TimerOutput while inside a timed section."));
 
+  Assert(quantile >= 0. && quantile <= 0.5,
+         ExcMessage("The quantile must be between 0 and 0.5"));
+
+#ifdef DEAL_II_WITH_MPI
+  // calling wall_time() below requires global communication over
+  // mpi_communicator_timing, if timers are constructed with an MPI
+  // communicator
+  // -> make sure the two communicators mpi_communicator_timing and
+  // mpi_communicator_statistics contain the same ranks
+  if (mpi_communicator_timing.has_value())
+    {
+      int       result;
+      const int ierr = MPI_Comm_compare(mpi_communicator_statistics,
+                                        *mpi_communicator_timing,
+                                        &result);
+      AssertThrowMPI(ierr);
+
+      Assert(result == MPI_IDENT || result == MPI_CONGRUENT ||
+               result == MPI_SIMILAR,
+             ExcMessage(
+               "The passed MPI communicator must contain the same processes as "
+               "the one used to construct the TimerOutput."));
+    }
+#endif
+
   // we are going to change the precision and width of output below. store the
   // old values so the get restored when exiting this function
   const boost::io::ios_base_all_saver restore_stream(out_stream.get_stream());
 
-  AssertDimension(sections.size(),
-                  Utilities::MPI::max(sections.size(), mpi_comm));
-  Assert(quantile >= 0. && quantile <= 0.5,
-         ExcMessage("The quantile must be between 0 and 0.5"));
+  // Obtain the global list of all sections entered by the ranks within
+  // mpi_communicator_statistics
+  std::vector<std::string> my_section_names;
+  my_section_names.reserve(sections.size());
+  for (const auto &[section, timer] : sections)
+    my_section_names.push_back(section);
+
+  const std::vector<std::string> global_section_names =
+    Utilities::MPI::compute_set_union(my_section_names,
+                                      mpi_communicator_statistics);
 
   // get the maximum width among all sections
   unsigned int max_width = 0;
-  for (const auto &i : sections)
-    max_width = std::max(max_width, static_cast<unsigned int>(i.first.size()));
+  for (const auto &i : global_section_names)
+    max_width = std::max(max_width, static_cast<unsigned int>(i.size()));
 
   // 17 is the default width until | character
   max_width = std::max(max_width + 1, static_cast<unsigned int>(17));
@@ -957,11 +993,12 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
 
   // function to print data in a nice table
   const auto print_statistics = [&](const double given_time) {
-    const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+    const unsigned int n_ranks =
+      Utilities::MPI::n_mpi_processes(mpi_communicator_statistics);
     if (n_ranks == 1 || quantile == 0.)
       {
         Utilities::MPI::MinMaxAvg data =
-          Utilities::MPI::min_max_avg(given_time, mpi_comm);
+          Utilities::MPI::min_max_avg(given_time, mpi_communicator_statistics);
 
         out_stream << std::setw(10) << std::setprecision(4) << std::right;
         out_stream << data.min << "s ";
@@ -976,7 +1013,8 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
       }
     else
       {
-        const unsigned int my_rank = Utilities::MPI::this_mpi_process(mpi_comm);
+        const unsigned int my_rank =
+          Utilities::MPI::this_mpi_process(mpi_communicator_statistics);
         std::vector<double> receive_data(my_rank == 0 ? n_ranks : 0);
         std::vector<double> result(9);
 #ifdef DEAL_II_WITH_MPI
@@ -987,7 +1025,7 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                               1,
                               MPI_DOUBLE,
                               0,
-                              mpi_comm);
+                              mpi_communicator_statistics);
         AssertThrowMPI(ierr);
         if (my_rank == 0)
           {
@@ -1015,7 +1053,8 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
             result[7] = data_rank[n_ranks - 1].first;
             result[8] = data_rank[n_ranks - 1].second;
           }
-        ierr = MPI_Bcast(result.data(), 9, MPI_DOUBLE, 0, mpi_comm);
+        ierr = MPI_Bcast(
+          result.data(), 9, MPI_DOUBLE, 0, mpi_communicator_statistics);
         AssertThrowMPI(ierr);
 #endif
         out_stream << std::setw(10) << std::setprecision(4) << std::right;
@@ -1045,7 +1084,8 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
 
   // in case we want to write out wallclock times
   {
-    const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(mpi_comm);
+    const unsigned int n_ranks =
+      Utilities::MPI::n_mpi_processes(mpi_communicator_statistics);
 
     const std::string time_rank_column = "------------------+";
     const std::string time_rank_space  = "                  |";
@@ -1084,9 +1124,11 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
                << "------------+"
                << (n_ranks > 1 && quantile > 0. ? time_rank_column : "")
                << time_rank_column << '\n';
-    for (const auto &i : sections)
+
+    for (const auto &global_section_name : global_section_names)
       {
-        std::string name_out = i.first;
+        std::string name_out   = global_section_name;
+        const auto  section_it = sections.find(global_section_name);
 
         // resize the array so that it is always of the same size
         unsigned int pos_non_space = name_out.find_first_not_of(' ');
@@ -1095,9 +1137,14 @@ TimerOutput::print_wall_time_statistics(const MPI_Comm mpi_comm,
         out_stream << "| " << name_out;
         out_stream << "| ";
         out_stream << std::setw(9);
-        out_stream << i.second.n_laps() << " |";
+        const unsigned n_laps =
+          section_it == sections.end() ? 0 : section_it->second.n_laps();
 
-        print_statistics(i.second.wall_time());
+        out_stream << n_laps << " |";
+
+        const double wall_time =
+          section_it == sections.end() ? 0.0 : section_it->second.wall_time();
+        print_statistics(wall_time);
       }
     out_stream << "+------------------------------" << extra_dash << "+"
                << time_rank_column
