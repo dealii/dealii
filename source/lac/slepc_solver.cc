@@ -13,7 +13,6 @@
 #include <deal.II/lac/slepc_solver.h>
 
 #ifdef DEAL_II_WITH_SLEPC
-
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_vector_base.h>
 #  include <deal.II/lac/slepc_spectral_transformation.h>
@@ -24,8 +23,12 @@
 
 #  include <cmath>
 #  include <vector>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
+
+
+#ifdef DEAL_II_WITH_SLEPC
 
 namespace SLEPcWrappers
 {
@@ -492,6 +495,6 @@ namespace SLEPcWrappers
   }
 } // namespace SLEPcWrappers
 
-DEAL_II_NAMESPACE_CLOSE
-
 #endif // DEAL_II_WITH_SLEPC
+
+DEAL_II_NAMESPACE_CLOSE
