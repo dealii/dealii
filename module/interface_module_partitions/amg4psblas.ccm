@@ -20,7 +20,7 @@
 // external packages into partitions that we can 'import' wherever we
 // need.
 
-// This is the file that wraps everything we need from PSBLAS into one
+// This is the file that wraps everything we need from AMG4PSBLAS into one
 // module partition.
 
 
@@ -28,26 +28,23 @@ module;
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_PSBLAS
-#  include <psb_base_cbind.h>
-#  include <psb_c_base.h>
-#  include <psb_c_dbase.h>
+#ifdef DEAL_II_WITH_AMG4PSBLAS
+#  include <amg_cbind.h>
 #endif
 
 
-export module dealii.external.psblas;
+export module dealii.external.amg4psblas;
 
-#ifdef DEAL_II_WITH_PSBLAS
+#ifdef DEAL_II_WITH_AMG4PSBLAS
 
 export
 {
-  using ::psb_c_ctxt;
-  using ::psb_c_descriptor;
-  using ::psb_c_dspmat;
-  using ::psb_c_dvector;
-  using ::psb_d_t;
-  using ::psb_i_t;
-  using ::psb_l_t;
+  using ::amg_c_dprec;
+  using ::amg_c_dprecbld;
+  using ::amg_c_dprecfree;
+  using ::amg_c_dprecinit;
+  using ::amg_c_dprecset;
+  using ::amg_c_dprecsol;
 }
 
 #endif

@@ -192,6 +192,16 @@ if(DEAL_II_WITH_PSBLAS)
   set(_unity_include_src
     ${_unity_include_src}
     psblas_vector.cc
+    psblas_sparsity_pattern.cc
+    psblas_sparse_matrix.cc
+  )
+endif()
+
+
+if(DEAL_II_WITH_AMG4PSBLAS)
+  set(_unity_include_src
+    ${_unity_include_src}
+    psblas_precondition.cc
   )
 endif()
 

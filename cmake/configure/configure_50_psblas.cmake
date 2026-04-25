@@ -14,7 +14,7 @@
 # Configuration for the PSBLAS library:
 #
 
-set(FEATURE_PSBLAS_DEPENDS MPI)
+set(FEATURE_PSBLAS_DEPENDS MPI LAPACK)
 
 macro(feature_psblas_find_external var)
     find_package(DEAL_II_PSBLAS)
@@ -36,4 +36,11 @@ macro(feature_psblas_find_external var)
         endif()
     endif()
 endmacro()
+
+macro(feature_psblas_configure_external)
+  set(DEAL_II_EXPAND_PSBLAS_VECTOR "PSCToolkitWrappers::Vector")
+  set(DEAL_II_EXPAND_PSBLAS_SPARSE_MATRICES "PSCToolkitWrappers::SparseMatrix")
+  set(DEAL_II_EXPAND_PSBLAS_SPARSITY_PATTERN "PSCToolkitWrappers::SparsityPattern")
+endmacro()
+
 configure_feature(PSBLAS)
