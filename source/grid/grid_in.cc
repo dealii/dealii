@@ -544,7 +544,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         in >> tmp_int;
 
 
-      // Processing the CELL_DATA and FIELD_DATA sections
+      // Processing the CELL_DATA, FIELD_DATA and POINT_DATA sections
 
       // Ignore everything up to CELL_DATA
       while (in >> keyword)
@@ -746,6 +746,78 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                   this->cell_data[section_name] = std::move(temp_data);
                 }
             }
+
+          // Addition of POINT_DATA
+          else if (keyword == "POINT_DATA")
+            {
+              unsigned int n_ids;
+              in >> n_ids;
+
+              AssertThrow(n_ids == vertices.size(),
+                          ExcMessage(
+                            "The VTK reader found a POINT_DATA statement "
+                            "that lists a total of " +
+                            Utilities::int_to_string(n_ids) +
+                            " cell data objects, but this needs to "
+                            "equal the number of vertices (which is " +
+                            Utilities::int_to_string(vertices.size()) + ")"));
+
+
+              in >> keyword;
+
+              // Ignore everything until we get to a SCALARS data set
+              if (keyword == "SCALARS")
+                {
+                  //
+                  std::string field_name;
+                  std::string data_type;
+                  in >> field_name;
+                  in >> data_type;
+
+                  in >> keyword;
+                  AssertThrow(
+                    keyword == "LOOKUP_TABLE",
+                    ExcMessage(
+                      "While reading VTK file, missing keyword 'LOOKUP_TABLE'."));
+
+                  in >> keyword;
+                  AssertThrow(
+                    keyword == "default",
+                    ExcMessage(
+                      "While reading VTK file, missing keyword 'default'."));
+
+                  Vector<double> temp_data(n_ids);
+                  for (unsigned int j = 0; j < n_ids; ++j)
+                    in >> temp_data[j];
+                  AssertThrow(in.fail() == false, ExcIO());
+                  this->point_data[field_name] = std::move(temp_data);
+                }
+
+              in >> keyword;
+              // Vector case
+              if (keyword == "VECTORS")
+                {
+                  std::string field_name;
+                  std::string data_type;
+                  in >> field_name;
+                  in >> data_type;
+
+                  Vector<double> temp_data;
+                  temp_data.reinit(n_ids *
+                                   3); // assuming always 3 components per point
+
+                  for (unsigned int j = 0; j < n_ids; ++j)
+                    {
+                      // now, three components for each point
+                      for (unsigned int d = 0; d < 3; ++d)
+                        {
+                          in >> temp_data[j * 3 + d];
+                        }
+                    }
+                  AssertThrow(in.fail() == false, ExcIO());
+                  this->point_data[field_name] = std::move(temp_data);
+                }
+            }
           else
             {
               // just ignore a line that doesn't start with any of the
@@ -768,6 +840,13 @@ const std::map<std::string, Vector<double>> &
 GridIn<dim, spacedim>::get_cell_data() const
 {
   return this->cell_data;
+}
+
+template <int dim, int spacedim>
+const std::map<std::string, Vector<double>> &
+GridIn<dim, spacedim>::get_point_data() const
+{
+  return this->point_data;
 }
 
 template <int dim, int spacedim>
