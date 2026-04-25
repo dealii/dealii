@@ -364,7 +364,27 @@ export
   using ::ex_get_init;
   using ::ex_get_set;
   using ::ex_get_set_param;
+  using ::ex_open_int;
   using ::ex_strerror;
+
+// There is also the case of ex_open. This symbol is declared
+// as follows:
+//   #define ex_open(path, mode, comp_ws, io_ws, version) \
+  //    ex_open_int(path, mode, comp_ws, io_ws, version, EX_API_VERS_NODOT)
+// Of course, this is a major headache because it cannot be exported.
+// We could declare a similar preprocessor function in the same
+// way as we do it for preprocessor function-like macros that are
+// part of PETSc in module/include/petsc_macros.h, but the following
+// is perhaps a simpler work-around:
+#    undef ex_open
+
+  extern "C" inline int ex_open(
+    const char *path, int mode, int *comp_ws, int *io_ws, float *version)
+  {
+    return ex_open_int(path, mode, comp_ws, io_ws, version, EX_API_VERS_NODOT);
+  }
+
+
 #  endif
 
   namespace Teuchos
@@ -501,6 +521,10 @@ EXPORT_PREPROCESSOR_SYMBOL(AZ_precond)
 
 
 #  ifdef DEAL_II_TRILINOS_WITH_SEACAS
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_API_VERS_NODOT)
+#    undef EX_API_VERS_NODOT
+EXPORT_PREPROCESSOR_SYMBOL(EX_API_VERS_NODOT)
 
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EX_ELEM_BLOCK)
 #    undef EX_ELEM_BLOCK
