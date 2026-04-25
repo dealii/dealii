@@ -1,0 +1,8 @@
+Added:  This adds a new interpolate_field_on_particles_fast
+function which uses the FePointEvaluator class to interpolate fields on particles.
+This does not replace the old interpolate_field_on_particles because the
+new function requires knowing the number of components at compile time
+whereas the regular one does not. The fast version can also use a mapping
+whereas the regular one inherently assumes a mappingQ1.
+<br>
+(Bruno Blais, 2026/04/14)
