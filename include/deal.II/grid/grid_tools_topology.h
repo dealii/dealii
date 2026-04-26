@@ -466,6 +466,25 @@ namespace GridTools
   DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
   bool have_same_coarse_mesh(const MeshType &mesh_1, const MeshType &mesh_2);
 
+  namespace internal
+  {
+    /**
+     * Extract the vertex indices of @p cell without using the cache.
+     *
+     * @param[in] cell The cell whose vertices we will extract.
+     *
+     * @param[in] vertex_indices ArrayView of size `cell->n_vertices()` which
+     * will be filled with the vertex indices.
+     *
+     * @note This function should only be called when setting up a Triangulation.
+     */
+    template <int dim, int spacedim>
+    void
+    extract_vertices_without_cache(
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      ArrayView<unsigned int> vertex_indices);
+  } // namespace internal
+
   /** @} */
 
   /**
