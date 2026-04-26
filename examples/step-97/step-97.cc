@@ -18,7 +18,6 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/convergence_table.h>
-#include <deal.II/base/timer.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/base/multithread_info.h>
@@ -77,20 +76,24 @@ enum BoundaryConditionType
 // potential, $\vec{A}$. The solver that solves for the current vector
 // potential,
 // $\vec{T}$, applies the Dirichlet boundary condition. This cannot be changed.
-// Recall, that forcing to zero the tangential component of $\vec{T}$ on the
-// boundary allows us to skip the boundary integral $I_{b3-2}$. The boundary ID
-// is set in the geo files that describe the mesh geometry. This is done by
-// specifying the physical surface, i.e.,
+// Recall that forcing to zero the tangential component of $\vec{T}$ on the
+// boundary allows us to [skip](@ref Step97_Numerical_Recipe_A) the boundary
+// integral $I_{b3-2}$. The boundary ID is set in the `.geo` files that describe
+// the mesh geometry. This is done by specifying the physical surface, i.e.,
 // @code
 // Physical Surface(2) = {115, 479, 665, 297, 847, 1029};
 // @endcode
-// The boundary ID in the geo file must match the boundary ID setting below.
+// The boundary ID in the `.geo` file must match the boundary ID setting below.
 // If `project_exact_solution = true`, the program projects the exact
 // solutions for $\vec{J}_f$ and $\vec{B}$ onto $H(\text{div})$ function space
-// and saves the results into corresponding vtu files next to the numerical
-// solutions. If the projected exact solution and the numerical solution look
-// alike, it is a good sign. In case of problems with the convergence of the
-// CG solver the parameter $\eta^2$ must be increased just a bit.
+// and saves the results into corresponding `.vtu` files next to the numerical
+// solutions. By default, this feature is switched off. It is used only in the
+// [Possibilities for extensions](@ref Step97_PossibilitiesForExtensions)
+// section. In case of problems with the convergence of the CG solver the
+// parameter $\eta^2$ must be increased just a bit. To gain more insight
+// into workings of the $\eta^2$ parameter see the
+// [Possibilities for extensions](@ref Step98_PossibilitiesForExtensions)
+// section of step-98.
 namespace Settings
 {
   const double permeability_fs = 1.2566370614359172954e-6;
@@ -125,13 +128,16 @@ namespace Settings
 
   const unsigned int n_threads_max = 0; // If >0 limits the number of threads.
   const double eps = 1e-12; // Two doubles are equal if their difference < eps.
-  const bool   log_cg_convergence = false; // Save the CG convergence data.
-  const bool print_time_tables = false; // Print the time tables on the screen.
+
   const bool project_exact_solution = false; // Save the exact solution.
 } // namespace Settings
 
-// Next comes the weight function used to limit the region in which the $L^2$
-// error norms are computed. The error norms are computed if $r < d2$.
+
+// @sect3{Auxiliary classes}
+
+// The following class describes the weight function used to limit the region
+// in which the $L^2$ error norms are computed. The error norms are computed
+// if $r < d2$.
 class Weight : public Function<3>
 {
 public:
@@ -145,29 +151,19 @@ public:
   }
 };
 
-// This class describes a convergence table. The convergence tables are saved on
-// disk in TeX format.
+// The following class describes a convergence table. The convergence tables
+// are saved on disk in TeX format.
 class MainOutputTable : public ConvergenceTable
 {
 public:
   MainOutputTable() = delete;
 
-  MainOutputTable(const unsigned int dimensions)
+  MainOutputTable(const unsigned int dim)
     : ConvergenceTable()
-    , dimensions(dimensions)
+    , dim(dim)
   {}
 
-  void set_new_order(const std::vector<std::string> &new_order_in)
-  {
-    new_order = new_order_in;
-  }
-
-  void append_new_order(const std::string &new_column)
-  {
-    new_order.push_back(new_column);
-  }
-
-  void format()
+  void save(const std::string &fname)
   {
     set_precision("L2", 2);
 
@@ -176,7 +172,7 @@ public:
     evaluate_convergence_rates("L2",
                                "ncells",
                                ConvergenceTable::reduction_rate_log2,
-                               dimensions);
+                               dim);
 
     set_tex_caption("p", "p");
     set_tex_caption("r", "r");
@@ -184,40 +180,35 @@ public:
     set_tex_caption("ndofs", "nr. dofs");
     set_tex_caption("L2", "L2 norm");
 
-    set_column_order(new_order);
-  }
-
-  void save(const std::string &fname)
-  {
-    format();
+    set_column_order({"p", "r", "ncells", "ndofs", "L2"});
 
     std::ofstream ofs(fname + ".tex");
     write_tex(ofs);
   }
 
 private:
-  const unsigned int       dimensions;
-  std::vector<std::string> new_order = {"p", "r", "ncells", "ndofs", "L2"};
+  const unsigned int dim;
 };
 
 // @sect3{Equations}
 
-// This name space contains all closed-form analytical expressions mentioned in
-// the introduction to this tutorial.
+// The following namespace contains all closed-form analytical expressions
+// mentioned in the introduction to this tutorial.
 namespace ExactSolutions
 {
 
-  // This function describes the free-current density, $\vec{J}_f$, inside the
-  // current region.
+  // The following function describes the
+  // [free-current density](@ref Step97_Equation_Jf),
+  // $\vec{J}_f$, inside the current region.
   inline Tensor<1, 3> volume_free_current_density(const Point<3> &p,
                                                   const double    K0)
   {
     return Tensor<1, 3>({-K0 * p[1], K0 * p[0], 0.0});
   }
 
-  // This function computes the magnetic field induced by the free current in
-  // absence of the magnetic core, see the expression for $\vec{B}_J$ in the
-  // introduction.
+  // The following function computes the magnetic field induced by the free
+  // current in absence of the magnetic core, see the
+  // [expression](@ref Step97_Equation_BJ) for $\vec{B}_J$ in the introduction.
   inline Tensor<1, 3> magnetic_field_coil(const Point<3> &p,
                                           const double    K0,
                                           const double    mu_0,
@@ -262,8 +253,9 @@ namespace ExactSolutions
     return Tensor<1, 3>({0.404, 0.404, 0.404});
   }
 
-  // This function computes the magnetic field induced by the magnetic core, see
-  // the expression for $\vec{B}_{\mu}$ in the introduction.
+  // The following function computes the magnetic field induced by the magnetic
+  // core, see the [expression](@ref Step97_Equation_BMU) for $\vec{B}_{\mu}$
+  // in the introduction.
   inline Tensor<1, 3> magnetic_field_core(const Point<3> &p,
                                           const double    H0,
                                           const double    mur,
@@ -314,8 +306,9 @@ namespace ExactSolutions
     return Tensor<1, 3>({0.404, 0.404, 0.404});
   }
 
-  // This class implements the closed-form analytical expression for the
-  // free-current density, $\vec{J}_f$, in the entire domain.
+  // The following class implements the closed-form analytical expression for
+  // the [free-current density](@ref Step97_Equation_Jf), $\vec{J}_f$, in the
+  // entire domain.
   class FreeCurrentDensity : public Function<3>
   {
   public:
@@ -346,18 +339,14 @@ namespace ExactSolutions
               values[i][2] = Jf[2];
             }
           else
-            {
-              values[i][0] = 0.0;
-              values[i][1] = 0.0;
-              values[i][2] = 0.0;
-            }
+            values[i] = 0;
         }
     }
   };
 
-  // This class implements the closed-form analytical expression for the
-  // magnetic field induced by the coil, $\vec{B} = \vec{B}_J + \vec{B}_{\mu}$,
-  // see the introduction.
+  // The following class implements the closed-form analytical
+  // [expression](@ref Step97_Equation_B) for the magnetic field induced by the
+  // coil, $\vec{B}$.
   class MagneticField : public Function<3>
   {
   public:
@@ -391,14 +380,16 @@ namespace ExactSolutions
 
 // @sect3{Solver - T}
 
-// This name space contains all the code related to the computation of the
-// current vector potential, $\vec{T}$.
+// The following namespace contains all the code related to the computation of
+// the current vector potential, $\vec{T}$.
 namespace SolverT
 {
-  // This class describes the free-current density, $\vec{J}_f$, on the
+  // The following class describes the free-current density, $\vec{J}_f$, on the
   // right-hand side of the curl-curl equation, see equation (i) in the
-  // boundary value problem for $\vec{T}$. The free-current density is given as
-  // a closed-form analytical expression by the definition of the problem.
+  // [boundary value problem](@ref Step97_BVP_T) for $\vec{T}$. The
+  // free-current density is given as a
+  // [closed-form analytical expression](@ref Step97_Equation_Jf) by the
+  // definition of the problem.
   class FreeCurrentDensity
   {
   public:
@@ -411,8 +402,7 @@ namespace SolverT
 
       if ((mid == Settings::material_id_free_space) ||
           (mid == Settings::material_id_core))
-        for (unsigned int i = 0; i < values.size(); i++)
-          values[i] = Tensor<1, 3>({0.0, 0.0, 0.0});
+        std::fill(values.begin(), values.end(), Tensor<1, 3>({0.0, 0.0, 0.0}));
 
       if (mid == Settings::material_id_free_current)
         for (unsigned int i = 0; i < values.size(); i++)
@@ -421,7 +411,8 @@ namespace SolverT
     }
   };
 
-  // This class implements the solver that minimizes the functional
+  // The following class implements the solver that minimizes the
+  // [functional](@ref Step97_Functional_T)
   // $F(\vec{T})$, see the introduction. The mesh is loaded in this class.
   // All other solvers use a reference to this mesh.
   class Solver
@@ -434,11 +425,11 @@ namespace SolverT
            const double       eta_squared = 0.0,
            const std::string &fname       = "data");
 
-    void make_mesh();  // Loads the mesh. Assigns mat. IDs. Attaches manifold.
-    void setup();      // Initializes dofs, vectors, matrices.
-    void assemble();   // Assembles the system of linear equations.
-    void solve();      // Solves the system of linear equations.
-    void save() const; // Saves computed T into a vtu file.
+    void make_mesh(); // Loads the mesh. Assigns mat. IDs. Attaches manifold.
+    void setup();     // Initializes dofs, vectors, matrices.
+    void assemble();  // Assembles the system of linear equations.
+    void solve();     // Solves the system of linear equations.
+    void output_results() const; // Saves computed T into a vtu file.
     void clear()
     { // Clears the memory for the next solver.
       system_matrix.clear();
@@ -447,8 +438,8 @@ namespace SolverT
     void run(); /* Executes the last six functions in the proper order
                    and measures the execution time for each function. */
 
-    // These three get-functions are used to channel the mesh and the solution
-    // to the next solver.
+    // The following three get-functions are used to channel the mesh and the
+    // solution to the next solver.
     const Triangulation<3> &get_tria() const
     {
       return triangulation;
@@ -486,11 +477,10 @@ namespace SolverT
     const unsigned int mapping_degree;
     const double       eta_squared;
     const std::string  fname;
-    TimerOutput        timer;
 
     // The program utilizes the WorkStream technology. The Step-9 tutorial
     // does a much better job of explaining the workings of WorkStream.
-    // Reading the "WorkStream paper", see the glossary, is recommended.
+    // Reading the @ref workstream_paper "WorkStream paper" is recommended.
     // The following structures and functions are related to WorkStream.
     struct AssemblyScratchData
     {
@@ -510,8 +500,7 @@ namespace SolverT
 
       std::vector<Tensor<1, 3>> Jf_list;
 
-      const double                     eta_squared;
-      const FEValuesExtractors::Vector ve;
+      const double eta_squared;
     };
 
     struct AssemblyCopyData
@@ -539,10 +528,6 @@ namespace SolverT
     , mapping_degree(mapping_degree)
     , eta_squared(eta_squared)
     , fname(fname)
-    , timer(std::cout,
-            (Settings::print_time_tables) ? TimerOutput::summary :
-                                            TimerOutput::never,
-            TimerOutput::cpu_and_wall_times_grouped)
   {}
 
   // The following function loads the mesh, assigns material IDs to all cells,
@@ -595,18 +580,21 @@ namespace SolverT
     triangulation.set_manifold(1, sphere);
   }
 
-  // This function initializes the dofs, applies the Dirichlet boundary
-  // condition, and initializes the vectors and matrices.
+  // The following function initializes the dofs, applies the Dirichlet
+  // boundary condition, and initializes the vectors and matrices. The first
+  // two lines of the code initialize the dof handler and distribute the dofs.
+  // The segment of the code in between `constraints.clear()` and
+  // `constraints.close()` applies the homogeneous Dirichlet boundary condition.
+  // As discussed in the introduction, the Dirichlet boundary condition is an
+  // essential condition and must be enforced by constraining the system matrix.
+  // This segment of the code does the constraining. The rest of the function
+  // arranges the dofs in a sparsity pattern and initializes the system matrices
+  // and vectors.
   void Solver::setup()
   {
     dof_handler.reinit(triangulation);
     dof_handler.distribute_dofs(fe);
 
-    // The following segment of the code applies the homogeneous Dirichlet
-    // boundary condition. As discussed in the introduction, the Dirichlet
-    // boundary condition is an essential condition and must be enforced
-    // by constraining the system matrix. This segment of the code does the
-    // constraining.
     constraints.clear();
 
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
@@ -621,8 +609,6 @@ namespace SolverT
 
     constraints.close();
 
-    // The rest of the function arranges the dofs in a sparsity pattern and
-    // initializes the system matrices and vectors.
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
     sparsity_pattern.copy_from(dsp);
@@ -636,7 +622,7 @@ namespace SolverT
   // In reality, however, it just spells all the magic words to get the
   // WorkStream going. The interesting part, i.e., the actual assembling of the
   // system matrix and the right-hand side, happens below in the function
-  // Solver::system_matrix_local().
+  // `Solver::system_matrix_local()`.
   void Solver::assemble()
   {
     WorkStream::run(dof_handler.begin_active(),
@@ -666,7 +652,6 @@ namespace SolverT
     , n_q_points(fe_values.get_quadrature().size())
     , Jf_list(n_q_points, Tensor<1, 3>())
     , eta_squared(eta_squared)
-    , ve(0)
   {}
 
   Solver::AssemblyScratchData::AssemblyScratchData(
@@ -682,21 +667,31 @@ namespace SolverT
     , n_q_points(fe_values.get_quadrature().size())
     , Jf_list(n_q_points, Tensor<1, 3>())
     , eta_squared(scratch_data.eta_squared)
-    , ve(0)
   {}
 
-  // This function assembles a fraction of the system matrix and the system
-  // right-hand side related to a single cell. These fractions are
+  // The following function assembles a fraction of the system matrix and the
+  // system right-hand side related to a single cell. These fractions are
   // `copy_data.cell_matrix` and `copy_data.cell_rhs`. They are copied into
   // the system matrix, $A_{ij}$, and the right-hand side, $b_i$, by the
   // function `Solver::copy_local_to_global()`.
+  //
+  // In the first four statements of the function we reinitialize the matrices
+  // and vectors related to the current cell and compute the finite element
+  // values. Next, we compute the free-current density, $\vec{J}_f$, at the
+  // quadrature points by calling `scratch_data.Jf.value_list`. After that we
+  // declare a vector values extractor, `ve`, and compute the
+  // [components](@ref Step97_Numerical_Recipe_T) of the cell matrix and cell
+  // right-hand side in the nested `for` loops. The labels of the integrals are
+  // the same as in the introduction to this tutorial. In the last line of the
+  // function we query the dof indices on the current cell and store them in the
+  // copy data structure, so we know to which locations of the system matrix and
+  // right-hand side the components of the cell matrix and cell right-hand side
+  // must be copied.
   void Solver::system_matrix_local(
     const typename DoFHandler<3>::active_cell_iterator &cell,
     AssemblyScratchData                                &scratch_data,
     AssemblyCopyData                                   &copy_data)
   {
-    // First, we reinitialize the matrices and vectors related to the current
-    // cell and compute the FE values.
     copy_data.cell_matrix.reinit(scratch_data.dofs_per_cell,
                                  scratch_data.dofs_per_cell);
 
@@ -706,15 +701,12 @@ namespace SolverT
 
     scratch_data.fe_values.reinit(cell);
 
-    // Second, we compute the free-current density, $\vec{J}_f$, at the
-    // quadrature points.
     scratch_data.Jf.value_list(scratch_data.fe_values.get_quadrature_points(),
                                cell->material_id(),
                                scratch_data.Jf_list);
 
-    // Third, we compute the components of the cell matrix and cell right-hand
-    // side. The labels of the integrals are the same as in the introduction to
-    // this tutorial.
+    const FEValuesExtractors::Vector ve(0);
+
     for (unsigned int q_index = 0; q_index < scratch_data.n_q_points; ++q_index)
       {
         for (unsigned int i = 0; i < scratch_data.dofs_per_cell; ++i)
@@ -722,35 +714,32 @@ namespace SolverT
             for (unsigned int j = 0; j < scratch_data.dofs_per_cell; ++j)
               {
                 copy_data.cell_matrix(i, j) += // Integral I_a1+I_a3.
-                  (scratch_data.fe_values[scratch_data.ve].curl(
-                     i, q_index) * // curl N_i
-                     scratch_data.fe_values[scratch_data.ve].curl(
-                       j, q_index)              // curl N_j
-                   + scratch_data.eta_squared * // eta^2
-                       scratch_data.fe_values[scratch_data.ve].value(
-                         i, q_index) * // N_i
-                       scratch_data.fe_values[scratch_data.ve].value(
-                         j, q_index) // N_j
+                  (scratch_data.fe_values[ve].curl(i,
+                                                   q_index) * // curl phi_i(x_q)
+                     scratch_data.fe_values[ve].curl(j,
+                                                     q_index) // curl phi_j(x_q)
+                   +
+                   scratch_data.eta_squared * // eta^2
+                     scratch_data.fe_values[ve].value(i,
+                                                      q_index) *  // phi_i(x_q)
+                     scratch_data.fe_values[ve].value(j, q_index) // phi_j(x_q)
                    ) *
-                  scratch_data.fe_values.JxW(q_index); // dV
+                  scratch_data.fe_values.JxW(q_index); // dx
               }
             copy_data.cell_rhs(i) += // Integral I_b3-1.
               (scratch_data.Jf_list[q_index] *
-               scratch_data.fe_values[scratch_data.ve].curl(i, q_index)) *
-              scratch_data.fe_values.JxW(q_index); // J_f.(curl N_i)dV.
+               scratch_data.fe_values[ve].curl(i, q_index)) *
+              scratch_data.fe_values.JxW(
+                q_index); // J_f(x_q).(curl phi_i(x_q))dx.
           }
       }
 
-    // Finally, we query the dof indices on the current cell and store them
-    // in the copy data structure, so we know to which locations of the system
-    // matrix and right-hand side the components of the cell matrix and
-    // cell right-hand side must be copied.
     cell->get_dof_indices(copy_data.local_dof_indices);
   }
 
-  // This function copies the components of a cell matrix and a cell right-hand
-  // side into the system matrix, $A_{i,j}$, and the system right-hand side,
-  // $b_i$.
+  // The following function copies the components of a cell matrix and a cell
+  // right-hand side into the system matrix, $A_{ij}$, and the system right-hand
+  // side, $b_i$.
   void Solver::copy_local_to_global(const AssemblyCopyData &copy_data)
   {
     constraints.distribute_local_to_global(copy_data.cell_matrix,
@@ -760,29 +749,16 @@ namespace SolverT
                                            system_rhs);
   }
 
-  // This function solves the system of linear equations.
-  // If `Settings::log_cg_convergence == true`, the convergence data is saved
-  // into a file. In theory, a CG solver can solve an $m \times m$ system of
-  // linear equations in at most $m$ steps. In practice, it can take more steps
-  // to converge. The convergence of the algorithm depends on the spectral
-  // properties of the system matrix. The best case is if the eigenvalues form a
-  // compact cluster away from zero. In our case, however, the eigenvalues are
-  // spread in between zero and the maximal eigenvalue. Consequently, we expect
-  // a poor convergence and increase the maximal number of iteration steps by a
-  // factor of 10, i.e., `10*system_rhs.size()`. The stopping condition is \f[
-  // |\boldsymbol{b} - \boldsymbol{A}\boldsymbol{c}|
-  // < 10^{-6} |\boldsymbol{b}|.
-  // \f]
-  // As soon as we use constraints, we must not forget to distribute them.
+  // The following function solves the system of linear equations. In theory,
+  // the CG solver can solve an $m \times m$ system of linear equations in at
+  // most $m$ steps. Accordingly, we set the maximum number of iteration steps
+  // to `system_rhs.size()`. The stopping condition is
+  // \f[\|\boldsymbol{b} - \boldsymbol{A}\boldsymbol{c}\| < 10^{-6}
+  // \|\boldsymbol{b}\|.\f] As soon as we use constraints, we must not forget to
+  // distribute them.
   void Solver::solve()
   {
-    SolverControl control(10 * system_rhs.size(),
-                          1.0e-6 * system_rhs.l2_norm(),
-                          false,
-                          false);
-
-    if (Settings::log_cg_convergence)
-      control.enable_history_data();
+    SolverControl control(system_rhs.size(), 1.0e-6 * system_rhs.l2_norm());
 
     GrowingVectorMemory<Vector<double>> memory;
     SolverCG<Vector<double>>            cg(control, memory);
@@ -793,20 +769,11 @@ namespace SolverT
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     constraints.distribute(solution);
-
-    if (Settings::log_cg_convergence)
-      {
-        const std::vector<double> history_data = control.get_history_data();
-
-        std::ofstream ofs(fname + "_cg_convergence.csv");
-
-        for (unsigned int i = 1; i < history_data.size(); i++)
-          ofs << i << ", " << history_data[i] << "\n";
-      }
   }
 
-  // This function saves the computed current vector potential into a vtu file.
-  void Solver::save() const
+  // The following function saves the computed current vector potential into a
+  // `.vtu` file.
+  void Solver::output_results() const
   {
     const std::vector<std::string> solution_names(3, "VectorField");
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -834,39 +801,23 @@ namespace SolverT
     data_out.write_vtu(ofs);
   }
 
+  // The `run` function below aggregates all the computation steps in the
+  // correct order.
   void Solver::run()
   {
-    {
-      TimerOutput::Scope timer_section(timer, "Make mesh");
-      make_mesh();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Setup");
-      setup();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Assemble");
-      assemble();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Solve");
-      solve();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Save");
-      save();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Clear");
-      clear();
-    }
+    make_mesh();
+    setup();
+    assemble();
+    solve();
+    output_results();
+    clear();
   }
 } // namespace SolverT
 
 // @sect3{Solver - A}
 
-// This name space contains all the code related to the computation of the
-// magnetic vector potential, $\vec{A}$. The main difference between this
+// The following namespace contains all the code related to the computation of
+// the magnetic vector potential, $\vec{A}$. The main difference between this
 // solver and the solver for the current vector potential, $\vec{T}$, is in how
 // the information on the source is fed to respective solvers. The solver for
 // $\vec{T}$ is fed data sampled from the analytical closed-form expression for
@@ -874,9 +825,9 @@ namespace SolverT
 // numerically computed current vector potential, $\vec{T}$.
 namespace SolverA
 {
-  // This class describes the permeability in the entire problem domain. The
-  // permeability is given by the definition of the problem, see the
-  // introduction.
+  // The following class describes the permeability in the entire problem
+  // domain. The permeability is [given](@ref Step97_Equation_MU) by the
+  // definition of the problem, see the introduction.
   class Permeability
   {
   public:
@@ -892,7 +843,7 @@ namespace SolverA
     }
   };
 
-  // This class describes the parameter $\gamma$ in the Robin boundary
+  // The following class describes the parameter $\gamma$ in the Robin boundary
   // condition. As soon as it is evaluated on the boundary, the permeability
   // equals to that of free space. Therefore, we evaluate the parameter gamma as
   // \f[
@@ -912,12 +863,12 @@ namespace SolverA
     }
   };
 
-  // This class implements the solver that minimizes the functional
-  // $F(\vec{A})$. The numerically computed current vector potential, $\vec{T}$,
-  // is fed to this solver by means of the input parameters `dof_handler_T` and
-  // `solution_T`. Moreover, this solver reuses the mesh on which $\vec{T}$ has
-  // been computed. The reference to the mesh is passed via the input parameter
-  // `triangulation_T`.
+  // The following class implements the solver that minimizes the
+  // [functional](@ref Step97_Functional_A) $F(\vec{A})$. The numerically
+  // computed current vector potential, $\vec{T}$, is fed to this solver by
+  // means of the input parameters `dof_handler_T` and `solution_T`. Moreover,
+  // this solver reuses the mesh on which $\vec{T}$ has been computed. The
+  // reference to the mesh is passed via the input parameter `triangulation_T`.
   class Solver
   {
   public:
@@ -930,11 +881,11 @@ namespace SolverA
            const double            eta_squared = 0.0,
            const std::string      &fname       = "data");
 
-    void setup();      // Initializes dofs, vectors, matrices.
-    void assemble();   // Assembles the system of linear equations.
-    void solve();      // Solves the system of linear equations.
-    void save() const; // Saves computed T into a vtu file.
-    void clear()       // Clears the memory for the next solver.
+    void setup();                // Initializes dofs, vectors, matrices.
+    void assemble();             // Assembles the system of linear equations.
+    void solve();                // Solves the system of linear equations.
+    void output_results() const; // Saves computed A into a vtu file.
+    void clear()                 // Clears the memory for the next solver.
     {
       system_matrix.clear();
       system_rhs.reinit(0);
@@ -973,7 +924,6 @@ namespace SolverA
     const unsigned int mapping_degree;
     const double       eta_squared;
     const std::string  fname;
-    TimerOutput        timer;
 
     // This time we have two dof handlers, `dof_handler_T` for $\vec{T}$ and
     // `dof_handler` for $\vec{A}$. The WorkStream needs to walk through
@@ -988,7 +938,7 @@ namespace SolverA
 
     // The program utilizes the WorkStream technology. The Step-9 tutorial
     // does a much better job of explaining the workings of WorkStream.
-    // Reading the "WorkStream paper", see the glossary, is recommended.
+    // Reading the @ref workstream_paper "WorkStream paper" is recommended.
     // The following structures and functions are related to WorkStream.
     struct AssemblyScratchData
     {
@@ -1017,8 +967,6 @@ namespace SolverA
       std::vector<double>       permeability_list;
       std::vector<double>       gamma_list;
       std::vector<Tensor<1, 3>> T_values;
-
-      const FEValuesExtractors::Vector ve;
 
       const DoFHandler<3>  &dof_hand_T;
       const Vector<double> &dofs_T;
@@ -1055,24 +1003,27 @@ namespace SolverA
     , mapping_degree(mapping_degree)
     , eta_squared(eta_squared)
     , fname(fname)
-    , timer(std::cout,
-            (Settings::print_time_tables) ? TimerOutput::summary :
-                                            TimerOutput::never,
-            TimerOutput::cpu_and_wall_times_grouped)
   {}
 
-  // This function initializes the dofs, applies the Dirichlet boundary
-  // condition, and initializes the vectors and matrices.
+  // The following function initializes the dofs, applies the Dirichlet
+  // boundary condition, and initializes the vectors and matrices. The first
+  // two lines of the code initialize the dof handler and distribute the dofs.
+  // The segment of the code in between `constraints.clear()` and
+  // `constraints.close()` applies the homogeneous Dirichlet boundary condition.
+  // As discussed in the introduction, the Dirichlet boundary condition is an
+  // essential condition and must be enforced by constraining the system matrix.
+  // This segment of the code does the constraining. The program can be
+  // [switched](@ref Step97_TXT_BCSwitch) between the Dirichlet, Neumann, and
+  // Robin boundary conditions. For this reason, we use the `if` statement to
+  // make sure that the system matrix is constrained only if the Dirichlet
+  // boundary condition is chosen by the user. The rest of the function arranges
+  // the dofs in a sparsity pattern and initializes the system matrices and
+  // vectors.
   void Solver::setup()
   {
     dof_handler.reinit(triangulation_T);
     dof_handler.distribute_dofs(fe);
 
-    // The following segment of the code applies the homogeneous Dirichlet
-    // boundary condition. As discussed in the introduction, the Dirichlet
-    // boundary condition is an essential condition and must be enforced
-    // by constraining the system matrix. This segment of code does the
-    // constraining.
     constraints.clear();
 
     DoFTools::make_hanging_node_constraints(dof_handler, constraints);
@@ -1088,8 +1039,6 @@ namespace SolverA
 
     constraints.close();
 
-    // The rest of the function arranges the dofs in a sparsity pattern and
-    // initializes the system matrix and the system vectors.
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints, false);
 
@@ -1099,21 +1048,20 @@ namespace SolverA
     system_rhs.reinit(dof_handler.n_dofs());
   }
 
-  // Formally, this function assembles the system of linear equations. In
-  // reality, however, it just spells all the magic words to get the WorkStream
-  // going. The interesting part, i.e., the actual assembling of the system
-  // matrix and the right-hand side happens below in the
-  // Solver::system_matrix_local function. Note that this time the first two
+  // Formally, the following function assembles the system of linear equations.
+  // In reality, however, it just spells all the magic words to get the
+  // WorkStream going. The interesting part, i.e., the actual assembling of the
+  // system matrix and the right-hand side happens below in the
+  // `Solver::system_matrix_local` function. Note that this time the first two
   // input parameters to `WorkStream::run` are pairs of iterators, not
   // iterators themselves as per usual. Note also the order in which we package
   // the iterators: first the iterator of `dof_handler`, then the iterator of
   // the `dof_handler_T`. We will extract them in the same order.
   void Solver::assemble()
   {
-    WorkStream::run(IteratorPair(IteratorTuple(dof_handler.begin_active(),
-                                               dof_handler_T.begin_active())),
-                    IteratorPair(
-                      IteratorTuple(dof_handler.end(), dof_handler_T.end())),
+    WorkStream::run(IteratorPair({dof_handler.begin_active(),
+                                  dof_handler_T.begin_active()}),
+                    IteratorPair({dof_handler.end(), dof_handler_T.end()}),
                     *this,
                     &Solver::system_matrix_local,
                     &Solver::copy_local_to_global,
@@ -1158,7 +1106,6 @@ namespace SolverA
     , permeability_list(n_q_points)
     , gamma_list(n_q_points_face)
     , T_values(n_q_points)
-    , ve(0)
     , dof_hand_T(dof_hand_T)
     , dofs_T(dofs_T)
     , eta_squared(eta_squared)
@@ -1189,24 +1136,44 @@ namespace SolverA
     , permeability_list(n_q_points)
     , gamma_list(n_q_points_face)
     , T_values(n_q_points)
-    , ve(0)
     , dof_hand_T(scratch_data.dof_hand_T)
     , dofs_T(scratch_data.dofs_T)
     , eta_squared(scratch_data.eta_squared)
     , boundary_condition_type(scratch_data.boundary_condition_type)
   {}
 
-  // This function assembles a fraction of the system matrix and the system
-  // right-hand side related to a single cell. These fractions are
+  // The following function assembles a fraction of the system matrix and the
+  // system right-hand side related to a single cell. These fractions are
   // `copy_data.cell_matrix` and `copy_data.cell_rhs`. They are copied into
   // to the system matrix, $A_{ij}$, and the right-hand side, $b_i$, by the
   // function `Solver::copy_local_to_global()`.
+  //
+  // In the first three statements of the function we reinitialize the matrices
+  // and vectors related to the current cell. Next, we extract the cells from
+  // the cell pair. We extract them in the correct order, see above. After that
+  // we compute the finite element values for both types of the finite elements,
+  // compute the permeability, declare the vector values extractor, `ve`, and
+  // compute current vector potential, $\vec{T}$, at quadrature points. Next,
+  // we compute the three [volume integrals](@ref Step97_Numerical_Recipe_A),
+  // $I_{a1}$, $I_{a3}$, and $I_{b3-1}$ in the three nested `for` loops. The
+  // labels of the integrals are the same as in the introduction to this
+  // tutorial. The program can be [switched](@ref Step97_TXT_BCSwitch) between
+  // the Dirichlet, Neumann, and Robin boundary conditions. For this reason, we
+  // compute the surface integral $I_{a2}$ only if the Robin boundary condition
+  // is chosen by the user. For this reason, we use the `if` statement to make
+  // sure that the surface integral $I_{a2}$ is added to the components of the
+  // system matrix only if the Robin boundary condition is chosen by the user.
+  // In all other cases the integral $I_{a2}$ is omitted. Omitting the $I_{a2}$
+  // integral is as good as setting $\gamma = 0$ in the
+  // [boundary value problem](@ref Step97_BVP_A). In the last line of the
+  // function we query the dof indices on the current cell and store them in
+  // the copy data structure, so we know to which locations of the system
+  // matrix and right-hand side the components of the cell matrix and cell
+  // right-hand side must be copied.
   void Solver::system_matrix_local(const IteratorPair  &IP,
                                    AssemblyScratchData &scratch_data,
                                    AssemblyCopyData    &copy_data)
   {
-    // First we reinitialize the matrices and vectors related to the current
-    // cell.
     copy_data.cell_matrix.reinit(scratch_data.dofs_per_cell,
                                  scratch_data.dofs_per_cell);
 
@@ -1214,25 +1181,21 @@ namespace SolverA
 
     copy_data.local_dof_indices.resize(scratch_data.dofs_per_cell);
 
-    // Second, we extract the cells from the pair. We extract them in the
-    // correct order, see above.
-    auto cell   = std::get<0>(*IP);
-    auto cell_T = std::get<1>(*IP);
+    const typename DoFHandler<3>::active_cell_iterator cell = std::get<0>(*IP);
+    const typename DoFHandler<3>::active_cell_iterator cell_T =
+      std::get<1>(*IP);
 
-    // Third, we compute the ordered FE values, the permeability, and the values
-    // of the current vector potential, $\vec{T}$, on the cell.
     scratch_data.fe_values.reinit(cell);
     scratch_data.fe_values_T.reinit(cell_T);
 
     scratch_data.permeability.value_list(cell->material_id(),
                                          scratch_data.permeability_list);
 
-    scratch_data.fe_values_T[scratch_data.ve].get_function_values(
-      scratch_data.dofs_T, scratch_data.T_values);
+    const FEValuesExtractors::Vector ve(0);
 
-    // Fourth, we compute the components of the cell matrix and cell right-hand
-    // side. The labels of the integrals are the same as in the introduction to
-    // this tutorial.
+    scratch_data.fe_values_T[ve].get_function_values(scratch_data.dofs_T,
+                                                     scratch_data.T_values);
+
     for (unsigned int q_index = 0; q_index < scratch_data.n_q_points; ++q_index)
       {
         for (unsigned int i = 0; i < scratch_data.dofs_per_cell; ++i)
@@ -1241,27 +1204,25 @@ namespace SolverA
               {
                 copy_data.cell_matrix(i, j) += // Integral I_a1+I_a3.
                   (1.0 / scratch_data.permeability_list[q_index]) * // 1 / mu
-                  (scratch_data.fe_values[scratch_data.ve].curl(
-                     i, q_index) * // curl N_i
-                     scratch_data.fe_values[scratch_data.ve].curl(
-                       j, q_index)              // curl N_j
-                   + scratch_data.eta_squared * // eta^2
-                       scratch_data.fe_values[scratch_data.ve].value(
-                         i, q_index) * // N_i
-                       scratch_data.fe_values[scratch_data.ve].value(
-                         j, q_index) // N_j
+                  (scratch_data.fe_values[ve].curl(i,
+                                                   q_index) * // curl phi_i(x_q)
+                     scratch_data.fe_values[ve].curl(j,
+                                                     q_index) // curl phi_j(x_q)
+                   +
+                   scratch_data.eta_squared * // eta^2
+                     scratch_data.fe_values[ve].value(i,
+                                                      q_index) *  // phi_i(x_q)
+                     scratch_data.fe_values[ve].value(j, q_index) // phi_j(x_q)
                    ) *
-                  scratch_data.fe_values.JxW(q_index); // dV
+                  scratch_data.fe_values.JxW(q_index); // dx
               }
             copy_data.cell_rhs(i) += // Integral I_b3-1.
               (scratch_data.T_values[q_index] *
-               scratch_data.fe_values[scratch_data.ve].curl(i, q_index)) *
-              scratch_data.fe_values.JxW(q_index); // T.(curl N_i)dV
+               scratch_data.fe_values[ve].curl(i, q_index)) *
+              scratch_data.fe_values.JxW(q_index); // T(x_q).(curl phi_i(x_q))dx
           }
       }
 
-    // If the Robin boundary condition (first-order ABC) is ordered,
-    // we compute an extra integral over the boundary.
     if (scratch_data.boundary_condition_type == BoundaryConditionType::Robin)
       {
         for (unsigned int f = 0; f < cell->n_faces(); ++f)
@@ -1286,19 +1247,17 @@ namespace SolverA
                           {
                             copy_data.cell_matrix(i, j) += // Integral I_a2.
                               scratch_data.gamma_list[q_index_face] * // gamma
-                              (cross_product_3d(
-                                 scratch_data.fe_face_values.normal_vector(
-                                   q_index_face),
-                                 scratch_data.fe_face_values[scratch_data.ve]
-                                   .value(i, q_index_face)) *
-                               cross_product_3d(
-                                 scratch_data.fe_face_values.normal_vector(
-                                   q_index_face),
-                                 scratch_data.fe_face_values[scratch_data.ve]
-                                   .value(j,
-                                          q_index_face))) // (n x N_i).(n x N_j)
+                              (cross_product_3d(scratch_data.fe_face_values
+                                                  .normal_vector(q_index_face),
+                                                scratch_data.fe_face_values[ve]
+                                                  .value(i, q_index_face)) *
+                               cross_product_3d(scratch_data.fe_face_values
+                                                  .normal_vector(q_index_face),
+                                                scratch_data.fe_face_values[ve]
+                                                  .value(j, q_index_face)))
+                              /* (n x phi_i(x_q)).(n x phi_j(x_q)) */
                               * scratch_data.fe_face_values.JxW(
-                                  q_index_face); // dS
+                                  q_index_face); // dx
                           }                      // for j
                       }                          // for i
                   }                              // for q_index_face
@@ -1307,15 +1266,11 @@ namespace SolverA
       }         /* if (scratch_data.boundary_condition_type ==
                    BoundaryConditionType::Robin) */
 
-    // Finally, we query the dof indices on the current cell and store them
-    // in the copy data structure, so we know to which locations of the system
-    // matrix and right-hand side the components of the cell matrix and
-    // cell right-hand side must be copied.
     cell->get_dof_indices(copy_data.local_dof_indices);
   }
 
   // This function copies the components of a cell matrix and a cell right-hand
-  // side into the system matrix, $A_{i,j}$, and the system right-hand side,
+  // side into the system matrix, $A_{ij}$, and the system right-hand side,
   // $b_i$.
   void Solver::copy_local_to_global(const AssemblyCopyData &copy_data)
   {
@@ -1326,29 +1281,16 @@ namespace SolverA
                                            system_rhs);
   }
 
-  // This function solves the system of linear equations.
-  // If `Settings::log_cg_convergence == true`, the convergence data is saved
-  // into a file. In theory, a CG solver can solve an $m \times m$ system of
-  // linear equations in at most $m$ steps. In practice, it can take more steps
-  // to converge. The convergence of the algorithm depends on the spectral
-  // properties of the system matrix. The best case is if the eigenvalues form a
-  // compact cluster away from zero. In our case, however, the eigenvalues are
-  // spread in between zero and the maximal eigenvalue. Consequently, we expect
-  // a poor convergence and increase the maximal number of iteration steps by a
-  // factor of 10, i.e., `10*system_rhs.size()`. The stopping condition is \f[
-  // |\boldsymbol{b} - \boldsymbol{A}\boldsymbol{c}|
-  // < 10^{-6} |\boldsymbol{b}|.
-  // \f]
-  // As soon as we use constraints, we must not forget to distribute them.
+  // The following function solves the system of linear equations. In theory,
+  // the CG solver can solve an $m \times m$ system of linear equations in at
+  // most $m$ steps. Accordingly, we set the maximum number of iteration steps
+  // to `system_rhs.size()`. The stopping condition is
+  // \f[\|\boldsymbol{b} - \boldsymbol{A}\boldsymbol{c}\| < 10^{-6}
+  // \|\boldsymbol{b}\|.\f] As soon as we use constraints, we must not forget to
+  // distribute them.
   void Solver::solve()
   {
-    SolverControl control(10 * system_rhs.size(),
-                          1.0e-6 * system_rhs.l2_norm(),
-                          false,
-                          false);
-
-    if (Settings::log_cg_convergence)
-      control.enable_history_data();
+    SolverControl control(system_rhs.size(), 1.0e-6 * system_rhs.l2_norm());
 
     GrowingVectorMemory<Vector<double>> memory;
     SolverCG<Vector<double>>            cg(control, memory);
@@ -1359,20 +1301,11 @@ namespace SolverA
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     constraints.distribute(solution);
-
-    if (Settings::log_cg_convergence)
-      {
-        const std::vector<double> history_data = control.get_history_data();
-
-        std::ofstream ofs(fname + "_cg_convergence.csv");
-
-        for (unsigned int i = 1; i < history_data.size(); i++)
-          ofs << i << ", " << history_data[i] << "\n";
-      }
   }
 
-  // This function saves the computed magnetic vector potential into a vtu file.
-  void Solver::save() const
+  // The following function saves the computed magnetic vector potential into a
+  // `.vtu` file.
+  void Solver::output_results() const
   {
     std::vector<std::string> solution_names(3, "VectorField");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -1400,50 +1333,37 @@ namespace SolverA
     data_out.write_vtu(ofs);
   }
 
+  // The `run` function below aggregates all the computation steps in the
+  // correct order.
   void Solver::run()
   {
-    {
-      TimerOutput::Scope timer_section(timer, "Setup");
-      setup();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Assemble");
-      assemble();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Solve");
-      solve();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Save");
-      save();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Clear");
-      clear();
-    }
+    setup();
+    assemble();
+    solve();
+    output_results();
+    clear();
   }
 } // namespace SolverA
 
 
 // @sect3{Projector from H(curl) to H(div)}
-// This name space contains all the code related to the conversion of the
-// magnetic vector potential, $\vec{A}$, into magnetic field, $\vec{B}$.
+// The following namespace contains all the code related to the conversion of
+// the magnetic vector potential, $\vec{A}$, into magnetic field, $\vec{B}$.
 // The magnetic vector potential is modeled by the FE_Nedelec finite elements,
 // while the magnetic field is modeled by the FE_RaviartThomas finite elements.
 // This code is also used for converting the current vector potential,
-// $\vec{T}$ into the free-current density, $\vec{J}_f$.
+// $\vec{T}$, into the free-current density, $\vec{J}_f$.
 namespace ProjectorHcurlToHdiv
 {
 
-  // This class implements the solver that minimizes the functional $F(\vec{B})$
-  // or $F(\vec{J}_f)$, see the introduction. The input vector field,
-  // $\vec{A}$ or $\vec{T}$, is fed to the solver by means of the input
-  // parameters `dof_handler_Hcurl` and `solution_Hcurl`. Moreover, this solver
-  // reuses the mesh on which the input vector field has been computed. The
-  // reference to the mesh is passed via the input parameter
-  // `triangulation_Hcurl`. There are no constraints this time around as we are
-  // not going to apply the Dirichlet boundary condition.
+  // This class implements the solver that minimizes the
+  // [functional](@ref Step97_Functional_B) $F(\vec{B})$ or $F(\vec{J}_f)$, see
+  // the introduction. The input vector field, $\vec{A}$ or $\vec{T}$, is fed to
+  // the solver by means of the input parameters `dof_handler_Hcurl` and
+  // `solution_Hcurl`. Moreover, this solver reuses the mesh on which the input
+  // vector field has been computed. The reference to the mesh is passed via the
+  // input parameter `triangulation_Hcurl`. There are no constraints this time
+  // around as we are not going to apply the Dirichlet boundary condition.
   class Solver
   {
   public:
@@ -1471,11 +1391,11 @@ namespace ProjectorHcurlToHdiv
       return dof_handler_Hdiv.n_dofs();
     }
 
-    void setup();               // Initializes dofs, vectors, matrices.
-    void assemble();            // Assembles the system of linear equations.
-    void solve();               // Solves the system of linear equations.
-    void save() const;          // Saves computed T into a vtu file.
-    void compute_error_norms(); // Computes L^2 error norm.
+    void setup();                // Initializes dofs, vectors, matrices.
+    void assemble();             // Assembles the system of linear equations.
+    void solve();                // Solves the system of linear equations.
+    void output_results() const; // Saves computed Jf or B into a vtu file.
+    void compute_error_norms();  // Computes L^2 error norm.
     void project_exact_solution_fcn(); // Projects exact solution.
     void clear()
     {
@@ -1515,7 +1435,6 @@ namespace ProjectorHcurlToHdiv
     double         L2_norm;
 
     const std::string fname;
-    TimerOutput       timer;
 
     // This time we have two dof handlers, `dof_handler_Hcurl` for the input
     // vector field and `dof_handler_Hdiv` for the output vector field. The
@@ -1531,7 +1450,7 @@ namespace ProjectorHcurlToHdiv
 
     // The program utilizes the WorkStream technology. The Step-9 tutorial
     // does a much better job of explaining the workings of WarkStream.
-    // Reading the "WorkStream paper", see the glossary, is recommended.
+    // Reading the @ref workstream_paper "WorkStream paper" is recommended.
     // The following structures and functions are related to WorkStream.
     struct AssemblyScratchData
     {
@@ -1550,8 +1469,6 @@ namespace ProjectorHcurlToHdiv
       const unsigned int n_q_points;
 
       std::vector<Tensor<1, 3>> curl_vec_in_Hcurl;
-
-      const FEValuesExtractors::Vector ve;
 
       const DoFHandler<3>  &dof_hand_Hcurl;
       const Vector<double> &dofs_Hcurl;
@@ -1585,17 +1502,14 @@ namespace ProjectorHcurlToHdiv
     , exact_solution(exact_solution)
     , mapping_degree(mapping_degree)
     , fname(fname)
-    , timer(std::cout,
-            (Settings::print_time_tables) ? TimerOutput::summary :
-                                            TimerOutput::never,
-            TimerOutput::cpu_and_wall_times_grouped)
   {
     Assert(exact_solution != nullptr,
            ExcMessage("The exact solution is missing."));
   }
 
-  // This function initializes the dofs, vectors and matrices. This time there
-  // are no constraints as we do not apply Dirichlet boundary condition.
+  // The following function initializes the dofs, vectors and matrices. This
+  // time there are no constraints as we do not apply Dirichlet boundary
+  // condition.
   void Solver::setup()
   {
     constraints.close();
@@ -1619,18 +1533,21 @@ namespace ProjectorHcurlToHdiv
       L2_per_cell.reinit(triangulation_Hcurl.n_active_cells());
   }
 
-  // Formally, this function assembles the system of linear equations. In
-  // reality, however, it just spells all the magic words to get the WorkStream
-  // going. The interesting part, i.e., the actual assembling of the system
-  // matrix and the right-hand side happens below in the
-  // Solver::system_matrix_local function.
+  // Formally, the following function assembles the system of linear equations.
+  // In reality, however, it just spells all the magic words to get the
+  // WorkStream going. The interesting part, i.e., the actual assembling of the
+  // system matrix and the right-hand side happens below in the
+  // `Solver::system_matrix_local` function. Note that this time the first two
+  // input parameters to `WorkStream::run` are pairs of iterators, not
+  // iterators themselves as per usual. Note also the order in which we package
+  // the iterators: first the iterator of `dof_handler_Hdiv`, then the iterator
+  // of the `dof_handler_Hcurl`. We will extract them in the same order.
   void Solver::assemble()
   {
-    WorkStream::run(IteratorPair(
-                      IteratorTuple(dof_handler_Hdiv.begin_active(),
-                                    dof_handler_Hcurl.begin_active())),
-                    IteratorPair(IteratorTuple(dof_handler_Hdiv.end(),
-                                               dof_handler_Hcurl.end())),
+    WorkStream::run(IteratorPair({dof_handler_Hdiv.begin_active(),
+                                  dof_handler_Hcurl.begin_active()}),
+                    IteratorPair(
+                      {dof_handler_Hdiv.end(), dof_handler_Hcurl.end()}),
                     *this,
                     &Solver::system_matrix_local,
                     &Solver::copy_local_to_global,
@@ -1661,7 +1578,6 @@ namespace ProjectorHcurlToHdiv
     , dofs_per_cell(fe_values_Hdiv.dofs_per_cell)
     , n_q_points(fe_values_Hdiv.get_quadrature().size())
     , curl_vec_in_Hcurl(n_q_points)
-    , ve(0)
     , dof_hand_Hcurl(dof_hand_Hcurl)
     , dofs_Hcurl(dofs_Hcurl)
   {}
@@ -1680,23 +1596,33 @@ namespace ProjectorHcurlToHdiv
     , dofs_per_cell(fe_values_Hdiv.dofs_per_cell)
     , n_q_points(fe_values_Hdiv.get_quadrature().size())
     , curl_vec_in_Hcurl(scratch_data.n_q_points)
-    , ve(0)
     , dof_hand_Hcurl(scratch_data.dof_hand_Hcurl)
     , dofs_Hcurl(scratch_data.dofs_Hcurl)
   {}
 
-  // This function assembles a fraction of the system matrix and the system
-  // right-hand side related to a single cell. These fractions are
+  // The following function assembles a fraction of the system matrix and the
+  // system right-hand side related to a single cell. These fractions are
   // `copy_data.cell_matrix` and `copy_data.cell_rhs`. They are copied into
   // to the system matrix, $A_{ij}$, and the right-hand side, $b_i$, by the
   // function `Solver::copy_local_to_global()`.
+  //
+  // First, we reinitialize the matrices and vectors related to the current
+  // cell, update the finite element values, and compute the curl of the input
+  // vector field at quadrature points. The variable
+  // `scratch_data.curl_vec_in_Hcurl` denotes the curl of the input vector
+  // field, $\vec{\nabla} \times \vec{T}$ or $\vec{\nabla} \times \vec{A}$,
+  // depending on the context. Second, we compute the
+  // [components](@ref Step97_Numerical_Recipe_B) of the cell matrix and cell
+  // right-hand side in the three nested `for` loops. The labels of the
+  // integrals are the same as in the introduction to this tutorial. Third, we
+  // query the dof indices on the current cell and store them in the copy data
+  // structure, so we know to which locations of the system matrix and
+  // right-hand side the components of the cell matrix and cell right-hand side
+  // must be copied.
   void Solver::system_matrix_local(const IteratorPair  &IP,
                                    AssemblyScratchData &scratch_data,
                                    AssemblyCopyData    &copy_data)
   {
-    // First we reinitialize the matrices and vectors related to the current
-    // cell, update the FE values, and compute the curl of the input vector
-    // field.
     copy_data.cell_matrix.reinit(scratch_data.dofs_per_cell,
                                  scratch_data.dofs_per_cell);
 
@@ -1704,18 +1630,19 @@ namespace ProjectorHcurlToHdiv
 
     copy_data.local_dof_indices.resize(scratch_data.dofs_per_cell);
 
-    scratch_data.fe_values_Hdiv.reinit(std::get<0>(*IP));
-    scratch_data.fe_values_Hcurl.reinit(std::get<1>(*IP));
+    const typename DoFHandler<3>::active_cell_iterator cell_Hdiv =
+      std::get<0>(*IP);
+    const typename DoFHandler<3>::active_cell_iterator cell_Hcurl =
+      std::get<1>(*IP);
 
-    // The variable `curl_vec_in_Hcurl` denotes the curl of the input vector
-    // field, $\vec{\nabla} \times \vec{T}$ or $\vec{\nabla} \times \vec{A}$,
-    // depending on the context.
-    scratch_data.fe_values_Hcurl[scratch_data.ve].get_function_curls(
+    scratch_data.fe_values_Hdiv.reinit(cell_Hdiv);
+    scratch_data.fe_values_Hcurl.reinit(cell_Hcurl);
+
+    const FEValuesExtractors::Vector ve(0);
+
+    scratch_data.fe_values_Hcurl[ve].get_function_curls(
       scratch_data.dofs_Hcurl, scratch_data.curl_vec_in_Hcurl);
 
-    // Second, we compute the components of the cell matrix and cell right-hand
-    // side. The labels of the integrals are the same as in the introduction to
-    // this tutorial.
     for (unsigned int q_index = 0; q_index < scratch_data.n_q_points; ++q_index)
       {
         for (unsigned int i = 0; i < scratch_data.dofs_per_cell; ++i)
@@ -1723,30 +1650,28 @@ namespace ProjectorHcurlToHdiv
             for (unsigned int j = 0; j < scratch_data.dofs_per_cell; ++j)
               {
                 copy_data.cell_matrix(i, j) += // Integral I_a
-                  scratch_data.fe_values_Hdiv[scratch_data.ve].value(i,
-                                                                     q_index) *
-                  scratch_data.fe_values_Hdiv[scratch_data.ve].value(j,
-                                                                     q_index) *
-                  scratch_data.fe_values_Hdiv.JxW(q_index);
+                  scratch_data.fe_values_Hdiv[ve].value(i,
+                                                        q_index) * // phi_i(x_q)
+                  scratch_data.fe_values_Hdiv[ve].value(j,
+                                                        q_index) * // phi_j(x_q)
+                  scratch_data.fe_values_Hdiv.JxW(q_index);        // dx
               }
 
             copy_data.cell_rhs(i) += // Integral I_b
-              scratch_data.curl_vec_in_Hcurl[q_index] *
-              scratch_data.fe_values_Hdiv[scratch_data.ve].value(i, q_index) *
-              scratch_data.fe_values_Hdiv.JxW(q_index);
+              scratch_data
+                .curl_vec_in_Hcurl[q_index] * /* curl A(x_q) OR curl T(x_q),
+                                                 depending on the context. */
+              scratch_data.fe_values_Hdiv[ve].value(i, q_index) * // phi_i(x_q)
+              scratch_data.fe_values_Hdiv.JxW(q_index);           // dx
           }
       }
 
-    // Finally, we query the dof indices on the current cell and store them
-    // in the copy data structure, so we know to which locations of the system
-    // matrix and right-hand side the components of the cell matrix and
-    // cell right-hand side must be copied.
-    std::get<0>(*IP)->get_dof_indices(copy_data.local_dof_indices);
+    cell_Hdiv->get_dof_indices(copy_data.local_dof_indices);
   }
 
-  // This function copies the components of a cell matrix and a cell right-hand
-  // side into the system matrix, $A_{i,j}$, and the system right-hand side,
-  // $b_i$.
+  // The following function copies the components of a cell matrix and a cell
+  // right-hand side into the system matrix, $A_{ij}$, and the system right-hand
+  // side, $b_i$.
   void Solver::copy_local_to_global(const AssemblyCopyData &copy_data)
   {
     constraints.distribute_local_to_global(copy_data.cell_matrix,
@@ -1760,53 +1685,59 @@ namespace ProjectorHcurlToHdiv
   // solution.
   void Solver::compute_error_norms()
   {
-    const Weight               weight;
-    const Function<3, double> *mask = &weight;
+    if (exact_solution)
+      {
+        const Weight               weight;
+        const Function<3, double> *mask = &weight;
 
-    VectorTools::integrate_difference(MappingQ<3>(mapping_degree),
-                                      dof_handler_Hdiv,
-                                      solution_Hdiv,
-                                      *exact_solution,
-                                      L2_per_cell,
-                                      QGauss<3>(fe_Hdiv.degree + 4),
-                                      VectorTools::L2_norm,
-                                      mask);
+        VectorTools::integrate_difference(MappingQ<3>(mapping_degree),
+                                          dof_handler_Hdiv,
+                                          solution_Hdiv,
+                                          *exact_solution,
+                                          L2_per_cell,
+                                          QGauss<3>(fe_Hdiv.degree + 4),
+                                          VectorTools::L2_norm,
+                                          mask);
 
-    L2_norm = VectorTools::compute_global_error(triangulation_Hcurl,
-                                                L2_per_cell,
-                                                VectorTools::L2_norm);
+        L2_norm = VectorTools::compute_global_error(triangulation_Hcurl,
+                                                    L2_per_cell,
+                                                    VectorTools::L2_norm);
+      }
   }
 
   void Solver::project_exact_solution_fcn()
   {
-    AffineConstraints<double> constraints_empty;
-    constraints_empty.close();
+    if (Settings::project_exact_solution && exact_solution)
+      {
+        AffineConstraints<double> constraints_empty;
 
-    VectorTools::project(MappingQ<3>(mapping_degree),
-                         dof_handler_Hdiv,
-                         constraints_empty,
-                         QGauss<3>(fe_Hdiv.degree + 2),
-                         *exact_solution,
-                         projected_exact_solution);
+        constraints_empty.clear();
+
+        DoFTools::make_hanging_node_constraints(dof_handler_Hdiv,
+                                                constraints_empty);
+
+        constraints_empty.close();
+
+        VectorTools::project(MappingQ<3>(mapping_degree),
+                             dof_handler_Hdiv,
+                             constraints_empty,
+                             QGauss<3>(fe_Hdiv.degree + 2),
+                             *exact_solution,
+                             projected_exact_solution);
+      }
   }
 
-  // This function solves the system of linear equations. This time we are
-  // dealing with a mass matrix. It has good spectral properties. Consequently,
-  // we do not use the factor of 10 as in preceding two solvers.
-  // The stopping condition is
-  // \f[
-  // |\boldsymbol{b} - \boldsymbol{A}\boldsymbol{c}|
-  // < 10^{-6} |\boldsymbol{b}|.
-  // \f]
+  // The following function solves the system of linear equations. In theory,
+  // the CG solver can solve an $m \times m$ system of linear equations in at
+  // most $m$ steps. Accordingly, we set the maximum number of iteration steps
+  // to `system_rhs.size()`. The stopping condition is
+  // \f[\|\boldsymbol{b} - \boldsymbol{A}\boldsymbol{c}\| < 10^{-6}
+  // \|\boldsymbol{b}\|.\f] This time the constraints are empty as we do not
+  // use the Dirichlet boundary condition. Consequently, we do not have to
+  // distribute the constraints.
   void Solver::solve()
   {
-    SolverControl control(system_rhs.size(),
-                          1.0e-6 * system_rhs.l2_norm(),
-                          false,
-                          false);
-
-    if (Settings::log_cg_convergence)
-      control.enable_history_data();
+    SolverControl control(system_rhs.size(), 1.0e-6 * system_rhs.l2_norm());
 
     GrowingVectorMemory<Vector<double>> memory;
     SolverCG<Vector<double>>            cg(control, memory);
@@ -1815,22 +1746,13 @@ namespace ProjectorHcurlToHdiv
     preconditioner.initialize(system_matrix, 1.2);
 
     cg.solve(system_matrix, solution_Hdiv, system_rhs, preconditioner);
-
-    if (Settings::log_cg_convergence)
-      {
-        const std::vector<double> history_data = control.get_history_data();
-
-        std::ofstream ofs(fname + "_cg_convergence.csv");
-
-        for (unsigned int i = 1; i < history_data.size(); i++)
-          ofs << i << ", " << history_data[i] << "\n";
-      }
   }
 
-  // This function saves the computed fields into a vtu file. This time we also
-  // save the projected exact solution and the $L^2$ error norm. The exact
-  // solution is only saved if the `Settings::project_exact_solution = true`
-  void Solver::save() const
+  // The following function saves the computed fields into a `.vtu` file.
+  // This time we also save the projected exact solution and the $L^2$ error
+  // norm. The exact solution is only saved if
+  // `Settings::project_exact_solution = true`
+  void Solver::output_results() const
   {
     std::vector<std::string> solution_names(3, "VectorField");
     std::vector<DataComponentInterpretation::DataComponentInterpretation>
@@ -1873,51 +1795,24 @@ namespace ProjectorHcurlToHdiv
     data_out.write_vtu(ofs);
   }
 
+  // The `run` function below aggregates all the computation steps in the
+  // correct order.
   void Solver::run()
   {
-    {
-      TimerOutput::Scope timer_section(timer, "Setup");
-      setup();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Assemble");
-      assemble();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Solve");
-      solve();
-    }
-
-    if (exact_solution)
-      {
-        {
-          TimerOutput::Scope timer_section(timer, "Compute error norms");
-          compute_error_norms();
-        }
-
-        if (Settings::project_exact_solution)
-          {
-            {
-              TimerOutput::Scope timer_section(timer, "Project exact solution");
-              project_exact_solution_fcn();
-            }
-          }
-      }
-    {
-      TimerOutput::Scope timer_section(timer, "Save");
-      save();
-    }
-    {
-      TimerOutput::Scope timer_section(timer, "Clear");
-      clear();
-    }
+    setup();
+    assemble();
+    solve();
+    compute_error_norms();
+    project_exact_solution_fcn();
+    output_results();
+    clear();
   }
 } // namespace ProjectorHcurlToHdiv
 
 
 // @sect3{The main loop}
 
-// This class contains the main loop of the program.
+// The following class contains the main loop of the program.
 class MagneticProblem
 {
 public:
@@ -1928,9 +1823,6 @@ public:
 
     MainOutputTable table_Jf(3);
     MainOutputTable table_B(3);
-
-    table_Jf.clear();
-    table_B.clear();
 
     std::cout << "Solving for (p = " << Settings::fe_degree
               << "): " << std::flush;
@@ -2014,10 +1906,10 @@ public:
         table_B.add_value("ncells", B.get_n_cells());
         table_B.add_value("L2", B.get_L2_norm());
         // End stage 4.
-
-        table_Jf.save("table_Jf_p" + std::to_string(Settings::fe_degree));
-        table_B.save("table_B_p" + std::to_string(Settings::fe_degree));
       }
+
+    table_Jf.save("table_Jf_p" + std::to_string(Settings::fe_degree));
+    table_B.save("table_B_p" + std::to_string(Settings::fe_degree));
     std::cout << std::endl;
   }
 };
