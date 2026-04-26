@@ -420,12 +420,13 @@ namespace SUNDIALS
        * @param anderson_acceleration_subspace The number of vectors to use for
        *   Anderson acceleration within the packaged SUNDIALS solver.
        */
-      AdditionalData(const unsigned int order                         = 0,
-                     const unsigned int maximum_non_linear_iterations = 10,
-                     const bool         implicit_function_is_linear   = false,
-                     const bool implicit_function_is_time_independent = false,
-                     const bool mass_is_time_independent              = false,
-                     const int  anderson_acceleration_subspace        = 3);
+      explicit AdditionalData(
+        const unsigned int order                                 = 0,
+        const unsigned int maximum_non_linear_iterations         = 10,
+        const bool         implicit_function_is_linear           = false,
+        const bool         implicit_function_is_time_independent = false,
+        const bool         mass_is_time_independent              = false,
+        const int          anderson_acceleration_subspace        = 3);
 
       /**
        * Add all AdditionalData() parameters to the given ParameterHandler
