@@ -139,6 +139,11 @@ namespace SUNDIALS
     {
     public:
       /**
+       * Initialize class with default values.
+       */
+      AdditionalData();
+
+      /**
        * Initialization parameters for ARKode. Some parameters are provided for
        * interface backward compatibility and have been effectively moved to the
        * AKRStepper additional parameters.
@@ -173,9 +178,9 @@ namespace SUNDIALS
       DEAL_II_DEPRECATED_WITH_COMMENT(
         "Use another constructor and ARKStepper::AdditionalData to initialize "
         "with the ARKStepper relevant parameters instead.")
-      AdditionalData(
+      explicit AdditionalData(
         // Initial parameters
-        const double initial_time      = 0.0,
+        const double initial_time,
         const double final_time        = 1.0,
         const double initial_step_size = 1e-2,
         const double output_period     = 1e-1,
@@ -837,6 +842,7 @@ namespace SUNDIALS
   };
 
 
+
   template <typename VectorType>
   ARKode<VectorType>::AdditionalData::AdditionalData(
     // Initial parameters
@@ -871,6 +877,27 @@ namespace SUNDIALS
     , anderson_acceleration_subspace(anderson_acceleration_subspace)
   {}
 
+
+
+  template <typename VectorType>
+  ARKode<VectorType>::AdditionalData::AdditionalData()
+    : initial_time(0.0)
+    , final_time(1.0)
+    , initial_step_size(1e-2)
+    , output_period(1e-1)
+    , minimum_step_size(1e-6)
+    , absolute_tolerance(1e-6)
+    , relative_tolerance(1e-5)
+    , maximum_order(5)
+    , maximum_non_linear_iterations(10)
+    , implicit_function_is_linear(false)
+    , implicit_function_is_time_independent(false)
+    , mass_is_time_independent(false)
+    , anderson_acceleration_subspace(3)
+  {}
+
+
+
   template <typename VectorType>
   ARKode<VectorType>::AdditionalData::AdditionalData(
     // Initial parameters
@@ -897,6 +924,8 @@ namespace SUNDIALS
     , mass_is_time_independent(false)
     , anderson_acceleration_subspace(3)
   {}
+
+
 
   template <typename VectorType>
   void
