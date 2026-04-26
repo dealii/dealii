@@ -482,7 +482,7 @@ namespace GridTools
     void
     extract_vertices_without_cache(
       const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-      ArrayView<unsigned int> vertex_indices);
+      const ArrayView<unsigned int> &vertex_indices);
   } // namespace internal
 
   /** @} */

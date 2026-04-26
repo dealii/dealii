@@ -104,7 +104,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
                                        deal_II_space_dimension>(
           const Triangulation<deal_II_dimension,
                               deal_II_space_dimension>::cell_iterator &,
-          ArrayView<unsigned int>);
+          const ArrayView<unsigned int> &);
       \}
     \}
 #endif
