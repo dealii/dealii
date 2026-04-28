@@ -3244,6 +3244,137 @@ namespace GridGenerator
 
 
 
+  template <int dim, int spacedim>
+  void
+  cheese(Triangulation<dim, spacedim> &tria,
+         const Table<dim, bool>       &present_voxels,
+         const double                  voxel_edge_length)
+  {
+    // First create all vertices of the mesh (regardless of whether they
+    // are used -- unused ones will simply be deleted later on). The
+    // points are indexed lexicographically.
+    std::array<unsigned int, dim> voxels_per_direction;
+    for (unsigned int d = 0; d < dim; ++d)
+      {
+        Assert(present_voxels.size()[d] > 0,
+               ExcMessage(
+                 "The 2d or 3d array that describes which pixels/voxels "
+                 "are present in the domain must have a non-zero extent in"
+                 "in coordinate direction."));
+        voxels_per_direction[d] = present_voxels.size()[d];
+      }
+
+    std::vector<Point<spacedim>> points;
+    switch (dim)
+      {
+        case 1:
+          points.reserve(voxels_per_direction[0] + 1);
+          for (unsigned int x = 0; x < voxels_per_direction[0] + 1; ++x)
+            points.emplace_back(x * voxel_edge_length);
+          break;
+
+        case 2:
+          points.reserve((voxels_per_direction[0] + 1) *
+                         (voxels_per_direction[1] + 1));
+          for (unsigned int y = 0; y < voxels_per_direction[1] + 1; ++y)
+            for (unsigned int x = 0; x < voxels_per_direction[0] + 1; ++x)
+              points.emplace_back(x * voxel_edge_length, y * voxel_edge_length);
+          break;
+
+        case 3:
+          points.reserve((voxels_per_direction[0] + 1) *
+                         (voxels_per_direction[1] + 1) *
+                         (voxels_per_direction[2] + 1));
+          for (unsigned int z = 0; z < voxels_per_direction[2] + 1; ++z)
+            for (unsigned int y = 0; y < voxels_per_direction[1] + 1; ++y)
+              for (unsigned int x = 0; x < voxels_per_direction[0] + 1; ++x)
+                points.emplace_back(x * voxel_edge_length,
+                                    y * voxel_edge_length,
+                                    z * voxel_edge_length);
+          break;
+
+        default:
+          DEAL_II_NOT_IMPLEMENTED();
+      }
+
+    // Next count and then create the cells we need:
+    unsigned int n_voxels = 0;
+    if constexpr (dim == 2)
+      {
+        for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
+          for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+            if (present_voxels[x][y] == true)
+              ++n_voxels;
+      }
+    else if constexpr (dim == 3)
+      {
+        for (unsigned int z = 0; z < voxels_per_direction[2]; ++z)
+          for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
+            for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+              if (present_voxels[x][y][z] == true)
+                ++n_voxels;
+      }
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+
+    std::vector<CellData<dim>> cells(n_voxels);
+    if constexpr (dim == 2)
+      {
+        const unsigned int n_x = (voxels_per_direction[0] + 1);
+
+        unsigned int c = 0;
+        for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
+          for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+            if (present_voxels[x][y] == true)
+              {
+                cells[c].vertices[0] = y * n_x + x;
+                cells[c].vertices[1] = y * n_x + x + 1;
+                cells[c].vertices[2] = (y + 1) * n_x + x;
+                cells[c].vertices[3] = (y + 1) * n_x + x + 1;
+                cells[c].material_id = 0;
+                ++c;
+              }
+        Assert(c == cells.size(), ExcInternalError());
+      }
+    else if constexpr (dim == 3)
+      {
+        const unsigned int n_x = (voxels_per_direction[0] + 1);
+        const unsigned int n_xy =
+          (voxels_per_direction[0] + 1) * (voxels_per_direction[1] + 1);
+
+        unsigned int c = 0;
+        for (unsigned int z = 0; z < voxels_per_direction[2]; ++z)
+          for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
+            for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+              if (present_voxels[x][y][z] == true)
+                {
+                  Assert(c < cells.size(), ExcInternalError());
+                  cells[c].vertices[0] = z * n_xy + y * n_x + x;
+                  cells[c].vertices[1] = z * n_xy + y * n_x + x + 1;
+                  cells[c].vertices[2] = z * n_xy + (y + 1) * n_x + x;
+                  cells[c].vertices[3] = z * n_xy + (y + 1) * n_x + x + 1;
+                  cells[c].vertices[4] = (z + 1) * n_xy + y * n_x + x;
+                  cells[c].vertices[5] = (z + 1) * n_xy + y * n_x + x + 1;
+                  cells[c].vertices[6] = (z + 1) * n_xy + (y + 1) * n_x + x;
+                  cells[c].vertices[7] = (z + 1) * n_xy + (y + 1) * n_x + x + 1;
+                  cells[c].material_id = 0;
+                  ++c;
+                }
+        Assert(c == cells.size(), ExcInternalError());
+      }
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+
+    // We may have vertices that are not part of any cell because all
+    // cells that might be adjacent were not part of the mask. Delete these:
+    SubCellData subcell_data;
+    GridTools::delete_unused_vertices(points, cells, subcell_data);
+
+    tria.create_triangulation(points, cells, SubCellData());
+  }
+
+
+
   template <>
   void
   plate_with_a_hole(Triangulation<1> & /*tria*/,

@@ -381,6 +381,37 @@ namespace GridGenerator
          const std::vector<unsigned int> &holes);
 
   /**
+   * A function that creates a mesh whose cells are the pixels (if `dim==2`)
+   * or voxels (if `dim==3`) of the two- or three-dimensional table of booleans
+   * provided as the second argument. The edge length of each pixel or voxel
+   * is provided via the third argument.
+   *
+   * This function is useful when creating a finite element mesh out of a
+   * data set that describes a domain as a collection of pixels or voxels.
+   * Such data sets are common in many disciplines, for example when volumes
+   * have been scanned via X-rays or other imaging methods, and the volume
+   * has then been segmented into different components (say, $A, B, \ldots$)
+   * where each component has different physical properties. An example may
+   * be a battery that consists of solid particles (component $A$), an
+   * electrically conducting phase ($B$), and a liquid electolyte (component
+   * $C$). If one then wants to compute the electric potential or current,
+   * one has to solve a differential equation on only those voxels that are
+   * labeled as $C$. To achieve this, one would create a mask `present_voxels`
+   * in which `present_voxels[i][j][k] == true` if the voxel should be
+   * present in the mesh, i.e., if the component associated with voxel $ijk$
+   * is $C$.
+   *
+   * The function's name refers to the fact that the resulting meshes
+   * typically look like slices of (Swiss) cheese with lots of holes (in 2d)
+   * or blocks of cheese with holes (in 3d).
+   */
+  template <int dim, int spacedim>
+  void
+  cheese(Triangulation<dim, spacedim> &tria,
+         const Table<dim, bool>       &present_voxels,
+         const double                  voxel_edge_length);
+
+  /**
    * \brief Rectangular plate with an (offset) cylindrical hole.
    *
    * Generate a rectangular plate with an (offset) cylindrical hole. The
