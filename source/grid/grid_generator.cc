@@ -3124,6 +3124,8 @@ namespace GridGenerator
       }
   }
 
+
+
   template <int dim, int spacedim>
   void
   cheese(Triangulation<dim, spacedim>    &tria,
@@ -3134,15 +3136,10 @@ namespace GridGenerator
     // some point to change the geometry of the cells, they can be
     // made an argument to the function.
 
-    Point<spacedim> p1;
-    Point<spacedim> p2;
-    for (unsigned int d = 0; d < dim; ++d)
-      p2[d] = 1.;
+    Point<spacedim> origin;
 
-    // then check that all repetitions
-    // are >= 1, and calculate deltas
-    // convert repetitions from double
-    // to int by taking the ceiling.
+    // then calculate the number of repetitions and check that
+    // they are >= 1
     std::array<Point<spacedim>, dim> delta;
     std::array<unsigned int, dim>    repetitions;
     for (unsigned int i = 0; i < dim; ++i)
@@ -3150,7 +3147,7 @@ namespace GridGenerator
         Assert(holes[i] >= 1,
                ExcMessage("At least one hole needed in each direction"));
         repetitions[i] = 2 * holes[i] + 1;
-        delta[i][i]    = (p2[i] - p1[i]);
+        delta[i]       = Point<spacedim>::unit_vector(i);
       }
 
     // then generate the necessary
@@ -3159,21 +3156,25 @@ namespace GridGenerator
     switch (dim)
       {
         case 1:
+          points.reserve(repetitions[0] + 1);
           for (unsigned int x = 0; x <= repetitions[0]; ++x)
-            points.push_back(p1 + x * delta[0]);
+            points.push_back(origin + x * delta[0]);
           break;
 
         case 2:
+          points.reserve((repetitions[0] + 1) * (repetitions[1] + 1));
           for (unsigned int y = 0; y <= repetitions[1]; ++y)
             for (unsigned int x = 0; x <= repetitions[0]; ++x)
-              points.push_back(p1 + x * delta[0] + y * delta[1]);
+              points.push_back(origin + x * delta[0] + y * delta[1]);
           break;
 
         case 3:
+          points.reserve((repetitions[0] + 1) * (repetitions[1] + 1) *
+                         (repetitions[2] + 1));
           for (unsigned int z = 0; z <= repetitions[2]; ++z)
             for (unsigned int y = 0; y <= repetitions[1]; ++y)
               for (unsigned int x = 0; x <= repetitions[0]; ++x)
-                points.push_back(p1 + x * delta[0] + y * delta[1] +
+                points.push_back(origin + x * delta[0] + y * delta[1] +
                                  z * delta[2]);
           break;
 
@@ -3188,6 +3189,8 @@ namespace GridGenerator
       {
         case 2:
           {
+            const unsigned int n_x = (repetitions[0] + 1);
+
             cells.resize(repetitions[1] * repetitions[0] - holes[1] * holes[0]);
             unsigned int c = 0;
             for (unsigned int y = 0; y < repetitions[1]; ++y)
@@ -3196,10 +3199,10 @@ namespace GridGenerator
                   if ((x % 2 == 1) && (y % 2 == 1))
                     continue;
                   Assert(c < cells.size(), ExcInternalError());
-                  cells[c].vertices[0] = y * (repetitions[0] + 1) + x;
-                  cells[c].vertices[1] = y * (repetitions[0] + 1) + x + 1;
-                  cells[c].vertices[2] = (y + 1) * (repetitions[0] + 1) + x;
-                  cells[c].vertices[3] = (y + 1) * (repetitions[0] + 1) + x + 1;
+                  cells[c].vertices[0] = y * n_x + x;
+                  cells[c].vertices[1] = y * n_x + x + 1;
+                  cells[c].vertices[2] = (y + 1) * n_x + x;
+                  cells[c].vertices[3] = (y + 1) * n_x + x + 1;
                   cells[c].material_id = 0;
                   ++c;
                 }
