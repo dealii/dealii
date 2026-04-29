@@ -131,16 +131,27 @@ public:
   ArrayView(value_type *starting_element, const std::size_t n_elements);
 
   /**
-   * Copy constructor from array views that point to non-@p const elements. If
-   * the current object will point to non-@p const elements, then this is a
-   * straight forward copy constructor. On the other hand, if the current
-   * type's @p ElementType template argument is a @p const qualified type,
-   * then the current constructor is a conversion constructor that converts a
-   * non-@p const view to a @p const view, akin to converting a non-@p const
-   * pointer to a @p const pointer.
+   * Copy constructor.
    */
-  ArrayView(
-    const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &view);
+  ArrayView(const ArrayView &view) = default;
+
+  /**
+   * Copy constructor from array views that point to non-@p const elements.
+   *
+   * This constructor only exists if the current ArrayView object
+   * points to `const` elements and the one given as argument points
+   * to non-`const` elements. If both point to `const` or non-`const`
+   * ones, the straightforward copy-constructor above is used. If the
+   * current object would point to non-`const` elements but the given
+   * argument points to `const` elements, the conversion is clearly
+   * not valid because it would remove the `const`ness of the
+   * argument.
+   */
+  template <typename OtherElementType,
+            typename = std::enable_if_t<
+              std::is_same_v<ElementType, const OtherElementType> &&
+              !std::is_same_v<OtherElementType, const ElementType>>>
+  ArrayView(const ArrayView<OtherElementType, MemorySpaceType> &view);
 
   /**
    * A constructor that automatically creates a view from a single value_type
@@ -318,6 +329,31 @@ public:
   ArrayView(
     const std::initializer_list<std::remove_cv_t<value_type>> &initializer_list)
     DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>);
+
+  /**
+   * Copy operator.
+   */
+  ArrayView<ElementType, MemorySpaceType> &
+  operator=(const ArrayView &view) = default;
+
+  /**
+   * Copy operator from array views that point to non-@p const elements.
+   *
+   * This operator only exists if the current ArrayView object
+   * points to `const` elements and the one given as argument points
+   * to non-`const` elements. If both point to `const` or non-`const`
+   * ones, the straightforward copy-constructor above is used. If the
+   * current object would point to non-`const` elements but the given
+   * argument points to `const` elements, the conversion is clearly
+   * not valid because it would remove the `const`ness of the
+   * argument.
+   */
+  template <typename OtherElementType,
+            typename = std::enable_if_t<
+              std::is_same_v<ElementType, const OtherElementType> &&
+              !std::is_same_v<OtherElementType, const ElementType>>>
+  ArrayView<ElementType, MemorySpaceType>
+  operator=(const ArrayView<OtherElementType, MemorySpaceType> &view);
 
   /**
    * Reinitialize a view.
@@ -546,8 +582,9 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(ElementType &element)
 
 
 template <typename ElementType, typename MemorySpaceType>
+template <typename OtherElementType, typename>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &view)
+  const ArrayView<OtherElementType, MemorySpaceType> &view)
   : starting_element(view.starting_element)
   , n_elements(view.n_elements)
 {}
@@ -622,6 +659,19 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   : // use delegating constructor
   ArrayView(initializer.begin(), initializer.size())
 {}
+
+
+
+template <typename ElementType, typename MemorySpaceType>
+template <typename OtherElementType, typename>
+ArrayView<ElementType, MemorySpaceType>
+ArrayView<ElementType, MemorySpaceType>::operator=(
+  const ArrayView<OtherElementType, MemorySpaceType> &view)
+{
+  starting_element = view.starting_element;
+  n_elements       = view.n_elements;
+  return *this;
+}
 
 
 
