@@ -3301,16 +3301,16 @@ namespace GridGenerator
     unsigned int n_voxels = 0;
     if constexpr (dim == 2)
       {
-        for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
-          for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+        for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+          for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
             if (present_voxels[x][y] == true)
               ++n_voxels;
       }
     else if constexpr (dim == 3)
       {
-        for (unsigned int z = 0; z < voxels_per_direction[2]; ++z)
+        for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
           for (unsigned int y = 0; y < voxels_per_direction[1]; ++y)
-            for (unsigned int x = 0; x < voxels_per_direction[0]; ++x)
+            for (unsigned int z = 0; z < voxels_per_direction[2]; ++z)
               if (present_voxels[x][y][z] == true)
                 ++n_voxels;
       }
