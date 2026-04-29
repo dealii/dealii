@@ -75,6 +75,7 @@ module;
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/special_functions/relative_difference.hpp>
 #include <boost/math/special_functions/sign.hpp>
+#include <boost/math/special_functions/spherical_harmonic.hpp>
 #include <boost/math/tools/roots.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
