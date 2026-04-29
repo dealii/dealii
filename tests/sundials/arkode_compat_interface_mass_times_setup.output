@@ -1,0 +1,3 @@
+
+DEAL::mass_times_setup_called: true
+DEAL::Final |y - exp(-1)| < 1e-4: true
