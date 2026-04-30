@@ -192,7 +192,7 @@ class TestTriangulationWrapper(unittest.TestCase):
                 holes = [2, 3, 2]
                 triangulation.generate_cheese(holes)
                 n_cells = triangulation.n_active_cells()
-                self.assertEqual(n_cells, 175)
+                self.assertEqual(n_cells, 175 - 2 * 3 * 2)
 
     def test_generate_plate_with_hole(self):
         for dim in self.dim:

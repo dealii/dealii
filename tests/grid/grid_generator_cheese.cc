@@ -33,6 +33,10 @@ dim_2(std::ostream &os)
   holes[1] = 2;
   GridGenerator::cheese(tr, holes);
 
+  // The mesh has 3*2=6 holes among (3*2+1)*(2*2+1)=7*5=35 possible
+  // cell locations. So there must be 35-6=29 cells:
+  Assert(tr.n_active_cells() == 29, ExcInternalError());
+
   GridOut gout;
   gout.write_vtk(tr, os);
 }
@@ -48,6 +52,11 @@ dim_3(std::ostream &os)
   holes[1] = 2;
   holes[2] = 4;
   GridGenerator::cheese(tr, holes);
+
+  // The mesh has 3*2*4=24 holes among
+  // (3*2+1)*(2*2+1)*(4*2+1)=7*5*9=315 possible cell locations. So
+  // there must be 315-24=291 cells:
+  Assert(tr.n_active_cells() == 291, ExcInternalError());
 
   GridOut gout;
   gout.write_vtk(tr, os);

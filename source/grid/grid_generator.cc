@@ -3193,8 +3193,11 @@ namespace GridGenerator
             for (unsigned int y = 0; y < repetitions[1]; ++y)
               for (unsigned int x = 0; x < repetitions[0]; ++x)
                 {
+                  // Holes are on a regular grid of cells: Namely, on cells
+                  // that are both on odd rows and odd columns.
                   if ((x % 2 == 1) && (y % 2 == 1))
                     continue;
+
                   Assert(c < cells.size(), ExcInternalError());
                   cells[c].vertices[0] = y * (repetitions[0] + 1) + x;
                   cells[c].vertices[1] = y * (repetitions[0] + 1) + x + 1;
@@ -3203,6 +3206,7 @@ namespace GridGenerator
                   cells[c].material_id = 0;
                   ++c;
                 }
+            Assert(c == cells.size(), ExcInternalError());
             break;
           }
 
@@ -3212,6 +3216,8 @@ namespace GridGenerator
             const unsigned int n_xy =
               (repetitions[0] + 1) * (repetitions[1] + 1);
 
+            // Allocate as many cells as there are voxels (whether we need
+            // them or not):
             cells.resize(repetitions[2] * repetitions[1] * repetitions[0]);
 
             unsigned int c = 0;
@@ -3219,6 +3225,12 @@ namespace GridGenerator
               for (unsigned int y = 0; y < repetitions[1]; ++y)
                 for (unsigned int x = 0; x < repetitions[0]; ++x)
                   {
+                    // Holes are on a regular grid of cells: Namely, on cells
+                    // that are both on odd rows and odd columns, and the same
+                    // for the third direction.
+                    if ((x % 2 == 1) && (y % 2 == 1) && z % 2 == 1)
+                      continue;
+
                     Assert(c < cells.size(), ExcInternalError());
                     cells[c].vertices[0] = z * n_xy + y * n_x + x;
                     cells[c].vertices[1] = z * n_xy + y * n_x + x + 1;
@@ -3232,6 +3244,11 @@ namespace GridGenerator
                     cells[c].material_id = 0;
                     ++c;
                   }
+            // If there are holes in each coordinate direction, then we have
+            // fewer cells than possible cell locations previously allocated.
+            // Check this, then drop all of the unused memory locations.
+            Assert(c < cells.size(), ExcInternalError());
+            cells.resize(c);
             break;
           }
 
