@@ -1,0 +1,117 @@
+
+DEAL::dim = 2
+DEAL::
+DEAL::test_infinite_cylinder_signed_distance
+DEAL::on axis (singular case)
+DEAL::point = 0.00000 0.00000
+DEAL::value = -1.00000
+DEAL::inside
+DEAL::point = 0.500000 0.00000
+DEAL::value = -0.500000
+DEAL::on surface
+DEAL::point = 1.00000 0.00000
+DEAL::value = 0.00000
+DEAL::outside
+DEAL::point = 2.00000 0.00000
+DEAL::value = 1.00000
+DEAL::diagonal in cross-section
+DEAL::point = 1.00000 1.00000
+DEAL::value = 0.00000
+DEAL::shift along axis
+DEAL::point = 0.500000 10.0000
+DEAL::value = -0.500000
+DEAL::far outside
+DEAL::point = 3.00000 4.00000
+DEAL::value = 2.00000
+DEAL::gradient tests
+DEAL::surface point in x-direction
+DEAL::point = 1.00000 0.00000
+DEAL::gradient = 1.00000 0.00000
+DEAL::outside point in x-direction
+DEAL::point = 2.00000 0.00000
+DEAL::gradient = 1.00000 0.00000
+DEAL::diagonal cross-section point
+DEAL::point = 1.00000 1.00000
+DEAL::gradient = 1.00000 0.00000
+DEAL::shifted along axis
+DEAL::point = 1.00000 10.0000
+DEAL::gradient = 1.00000 0.00000
+DEAL::shifted + angled axis test
+DEAL::point on axis
+DEAL::point = 1.00000 -1.00000
+DEAL::value = -1.00000
+DEAL::point on surface (orthogonal direction)
+DEAL::point = 1.70711 -1.70711
+DEAL::value = -1.11022e-16
+DEAL::point = 1.70711 -1.70711
+DEAL::gradient = 0.707107 -0.707107
+DEAL::inside point
+DEAL::point = 1.35355 -1.35355
+DEAL::value = -0.500000
+DEAL::outside point
+DEAL::point = 2.41421 -2.41421
+DEAL::value = 1.00000
+DEAL::shift along axis
+DEAL::point = 4.88909 2.18198
+DEAL::value = -0.500000
+DEAL::point = 4.88909 2.18198
+DEAL::gradient = 0.707107 -0.707107
+DEAL::
+DEAL::dim = 3
+DEAL::
+DEAL::test_infinite_cylinder_signed_distance
+DEAL::on axis (singular case)
+DEAL::point = 0.00000 0.00000 0.00000
+DEAL::value = -1.00000
+DEAL::inside
+DEAL::point = 0.500000 0.00000 0.00000
+DEAL::value = -0.500000
+DEAL::on surface
+DEAL::point = 1.00000 0.00000 0.00000
+DEAL::value = 0.00000
+DEAL::outside
+DEAL::point = 2.00000 0.00000 0.00000
+DEAL::value = 1.00000
+DEAL::diagonal in cross-section
+DEAL::point = 1.00000 1.00000 0.00000
+DEAL::value = 0.414214
+DEAL::shift along axis
+DEAL::point = 0.500000 0.00000 10.0000
+DEAL::value = -0.500000
+DEAL::far outside
+DEAL::point = 3.00000 4.00000 0.00000
+DEAL::value = 4.00000
+DEAL::gradient tests
+DEAL::surface point in x-direction
+DEAL::point = 1.00000 0.00000 0.00000
+DEAL::gradient = 1.00000 0.00000 0.00000
+DEAL::outside point in x-direction
+DEAL::point = 2.00000 0.00000 0.00000
+DEAL::gradient = 1.00000 0.00000 0.00000
+DEAL::diagonal cross-section point
+DEAL::point = 1.00000 1.00000 0.00000
+DEAL::gradient = 0.707107 0.707107 0.00000
+DEAL::shifted along axis
+DEAL::point = 1.00000 0.00000 10.0000
+DEAL::gradient = 1.00000 0.00000 0.00000
+DEAL::shifted + angled axis test
+DEAL::point on axis
+DEAL::point = 1.00000 -1.00000 0.00000
+DEAL::value = -1.00000
+DEAL::point on surface (orthogonal direction)
+DEAL::point = 1.70711 -1.70711 0.00000
+DEAL::value = -1.11022e-16
+DEAL::point = 1.70711 -1.70711 0.00000
+DEAL::gradient = 0.707107 -0.707107 0.00000
+DEAL::inside point
+DEAL::point = 1.35355 -1.35355 0.00000
+DEAL::value = -0.500000
+DEAL::outside point
+DEAL::point = 2.41421 -2.41421 0.00000
+DEAL::value = 1.00000
+DEAL::shift along axis
+DEAL::point = 4.88909 2.18198 0.00000
+DEAL::value = -0.500000
+DEAL::point = 4.88909 2.18198 0.00000
+DEAL::gradient = 0.707107 -0.707107 0.00000
+DEAL::

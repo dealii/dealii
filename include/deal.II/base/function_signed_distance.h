@@ -314,6 +314,75 @@ namespace Functions
        */
       const Functions::SignedDistance::Rectangle<dim> notch;
     };
+
+
+    /**
+     * Signed-distance level set function of an infinite cylinder:
+     *
+     * @f[
+     * \psi(x) = \|\underbrace{(\boldsymbol{x} - \boldsymbol{x}^0) -
+     * ((\boldsymbol{x} - \boldsymbol{x}^0)\cdot a)\,
+     * a}_{\boldsymbol{q}^{\text{perp}}} \| - R
+     * @f]
+     *
+     * Here, $\boldsymbol{x}^0$ is a point on the cylinder axis,
+     * $\boldsymbol{a}$ is the (unit) axis direction, $R$ is the cylinder
+     * radius, and $\boldsymbol{q}^\perp$ is the projected distance
+     * vector orthogonal to the axis. This function is thus zero
+     * on the cylinder surface, negative inside the cylinder, and positive
+     * in the rest of $\mathbb{R}^{dim}$.
+     *
+     * This function has gradient:
+     *
+     * @f[
+     * $\partial_i \psi(x) = \frac{q_i^\perp}{\|\boldsymbol{q}^\perp\|}$
+     * @f]
+     *
+     * @note The gradient is singular on the cylinder axis
+     * (i.e., when $\|q^\perp\|=0$). If the incoming @p point is too close
+     * to the axis, a floating-point exception may be thrown or entries
+     * may become +inf/-inf or +nan/-nan.
+     *
+     * @image html signed_distance_infinite_cylinder.png
+     *
+     * @ingroup functions
+     */
+    template <int dim>
+    class InfiniteCylinder : public Function<dim>
+    {
+    public:
+      /**
+       * Constructor, takes a point on the axis, the (normalized) axis
+       * direction, and the radius of the cylinder.
+       */
+      InfiniteCylinder(
+        const double          radius,
+        const Tensor<1, dim> &axis_direction =
+          [] {
+            Tensor<1, dim> a;
+            a[dim - 1] = 1.0;
+            return a;
+          }(),
+        const Point<dim> &axis_point = Point<dim>());
+
+      double
+      value(const Point<dim>  &point,
+            const unsigned int component = 0) const override;
+
+      /**
+       * @copydoc Function::gradient()
+       *
+       * @note The gradient is singular on the cylinder axis.
+       */
+      Tensor<1, dim>
+      gradient(const Point<dim>  &point,
+               const unsigned int component = 0) const override;
+
+    private:
+      const Point<dim>     x0;
+      const Tensor<1, dim> axis;
+      const double         R;
+    };
   } // namespace SignedDistance
 } // namespace Functions
 
