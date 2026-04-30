@@ -2281,7 +2281,7 @@ void SolverMPGMRES<VectorType>::solve_internal(
 
   const auto preconditioner_vmult = [&](auto &dst, const auto &src) {
     // We have no preconditioner that we could apply
-    if (n_preconditioners == 0)
+    if constexpr (n_preconditioners == 0)
       dst = src;
     else
       {
@@ -2294,28 +2294,30 @@ void SolverMPGMRES<VectorType>::solve_internal(
   // Krylov space sequence according to the chosen indexing strategy
 
   const auto previous_vector_index =
-    [n_preconditioners, indexing_strategy](unsigned int i) -> unsigned int {
+    [indexing_strategy](unsigned int i) -> unsigned int {
     // In the special case of no preconditioners we simply fall back to the
     // FGMRES indexing strategy.
-    if (n_preconditioners == 0)
+    if constexpr (n_preconditioners == 0)
+      return i;
+    else
       {
-        return i;
-      }
-
-    switch (indexing_strategy)
-      {
-        case IndexingStrategy::fgmres:
-          // 0, 1, 2, 3, ...
-          return i;
-        case IndexingStrategy::full_mpgmres:
-          // 0, 0, ..., 1, 1, ..., 2, 2, ..., 3, 3, ...
-          return i / n_preconditioners;
-        case IndexingStrategy::truncated_mpgmres:
-          // 0, 0, ..., 1, 2, 3, ...
-          return (1 + i >= n_preconditioners) ? (1 + i - n_preconditioners) : 0;
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-          return 0;
+        switch (indexing_strategy)
+          {
+            case IndexingStrategy::fgmres:
+              // 0, 1, 2, 3, ...
+              return i;
+            case IndexingStrategy::full_mpgmres:
+              // 0, 0, ..., 1, 1, ..., 2, 2, ..., 3, 3, ...
+              return i / n_preconditioners;
+            case IndexingStrategy::truncated_mpgmres:
+              // 0, 0, ..., 1, 2, 3, ...
+              return (1 + i >= n_preconditioners) ?
+                       (1 + i - n_preconditioners) :
+                       0;
+            default:
+              DEAL_II_ASSERT_UNREACHABLE();
+              return 0;
+          }
       }
   };
 
