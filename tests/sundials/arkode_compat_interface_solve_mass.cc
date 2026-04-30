@@ -39,11 +39,7 @@ main()
 
   SUNDIALS::ARKode<VectorType>::AdditionalData data(0.0 /*t0*/,
                                                     1.0 /*tf*/,
-                                                    0.01 /*dt*/,
-                                                    0.5 /*output_period*/,
-                                                    1e-8 /*min dt*/,
-                                                    1e-8 /*abstol*/,
-                                                    1e-6 /*reltol*/);
+                                                    0.01 /*dt*/);
 
   SUNDIALS::ARKode<VectorType> ode(data);
 
@@ -59,15 +55,14 @@ main()
 
   // Assign via the backwards-compat proxy.
   // For M=I, solving Mx=b is simply x=b.
-  ode.solve_mass =
-    [&](SUNDIALS::SundialsOperator<VectorType> &,
-        SUNDIALS::SundialsPreconditioner<VectorType> &,
-        VectorType                                   &x,
-        const VectorType                             &b,
-        double) {
-      x               = b;
-      callback_called = true;
-    };
+  ode.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType> &,
+                       SUNDIALS::SundialsPreconditioner<VectorType> &,
+                       VectorType       &x,
+                       const VectorType &b,
+                       double) {
+    x               = b;
+    callback_called = true;
+  };
 
   VectorType y(1);
   y[0] = 1.0;

@@ -46,11 +46,7 @@ main()
 
   SUNDIALS::ARKode<VectorType>::AdditionalData data(0.0 /*t0*/,
                                                     1.0 /*tf*/,
-                                                    0.01 /*dt*/,
-                                                    0.5 /*output_period*/,
-                                                    1e-8 /*min dt*/,
-                                                    1e-8 /*abstol*/,
-                                                    1e-6 /*reltol*/);
+                                                    0.01 /*dt*/);
 
   SUNDIALS::ARKode<VectorType> ode(data);
 
