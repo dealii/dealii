@@ -2819,9 +2819,15 @@ ReferenceCell<dim>::standard_vertex_to_face_and_vertex_index(
   switch (this->kind)
     {
       case ReferenceCells::Vertex:
-      case ReferenceCells::Line:
         DEAL_II_NOT_IMPLEMENTED();
         break;
+      case ReferenceCells::Line:
+        {
+          static constexpr ndarray<unsigned int, 2, 2> table = {
+            {{{0, 0}}, {{1, 0}}}};
+
+          return table[vertex];
+        }
       case ReferenceCells::Triangle:
         {
           static constexpr ndarray<unsigned int, 6, 2> table = {
