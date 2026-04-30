@@ -356,7 +356,7 @@ jobs:
         # deleting 15GB
         rm -rf /usr/share/dotnet/
         df -h
-    - uses: lukka/get-cmake@v3.27.9
+    - uses: lukka/get-cmake@v4.3.2
     - name: info
       run: |
         mpicc -v
@@ -449,7 +449,7 @@ jobs:
             numdiff \
             openmpi-bin \
             libboost-all-dev
-    - uses: lukka/get-cmake@v3.27.9
+    - uses: lukka/get-cmake@v4.3.2
     - name: info
       run: |
         mpicc -v
@@ -531,7 +531,7 @@ jobs:
         echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee -a /etc/apt/sources.list.d/llvm.list
         apt-get update && apt-get install -yq --no-install-recommends \
              libc++-20-dev clang-tools-20 clang-20
-    - uses: lukka/get-cmake@v3.28.3
+    - uses: lukka/get-cmake@v4.3.2
     - uses: actions/checkout@v6
       with:
         repository: kokkos/kokkos
