@@ -308,7 +308,7 @@ namespace SUNDIALS
    *
    * If the @ref GlossMassMatrix "mass matrix" is different from the identity, the user should supply
    *  - mass_times_vector() and, optionally,
-   *  - mass_times_setup()
+   *  - mass_times_vector_setup()
    *
    * If the use of a Newton method is desired, then the user should also supply
    * jacobian_times_vector(). jacobian_times_vector_setup() is optional.
@@ -539,8 +539,9 @@ namespace SUNDIALS
      * A function object that users may supply and that is intended to compute
      * the product of the @ref GlossMassMatrix "mass matrix" with a given vector `v`.
      * This function will be called by ARKode (possibly several times) after
-     * mass_times_setup() has been called at least once. ARKode tries to do its
-     * best to call mass_times_setup() the minimum amount of times.
+     * mass_times_vector_setup() has been called at least once. ARKode tries to
+     * do its best to call mass_times_vector_setup() the minimum amount of
+     * times.
      *
      * A call to this function should store in `Mv` the result of $M$
      * applied to `v`.
@@ -567,8 +568,8 @@ namespace SUNDIALS
      * not the case where the mass matrix depends on the solution itself.
      *
      * If the user does not provide a mass_times_vector() function, then the
-     * identity is used. If the mass_times_setup() function is not provided,
-     * then mass_times_vector() should do all the work by itself.
+     * identity is used. If the mass_times_vector_setup() function is not
+     * provided, then mass_times_vector() should do all the work by itself.
      *
      * If the user uses a matrix-based computation of the mass matrix, then
      * this is the right place where an assembly routine should be called to
@@ -578,7 +579,7 @@ namespace SUNDIALS
      *
      * @note No assumption is made by this interface on what the user
      *   should do in this function. ARKode only assumes that after a call to
-     *   mass_times_setup() it is possible to call mass_times_vector().
+     *   mass_times_vector_setup() it is possible to call mass_times_vector().
      *
      * @param t The current evaluation time
      *
@@ -589,7 +590,7 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double t)> mass_times_setup;
+    std::function<void(const double t)> mass_times_vector_setup;
 
     /**
      * A function object that users may supply and that is intended to compute

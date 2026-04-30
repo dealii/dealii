@@ -527,7 +527,7 @@ namespace SUNDIALS
      * to ARKode as a stepper. If this requirement is violated, an exception is
      * triggered upon access to this field.
      *
-     * @deprecated Specify @p ARKStepper::mass_times_setup instead.
+     * @deprecated Specify @p ARKStepper::mass_times_vector_setup instead.
      */
     FunctionProxy<void(const double t)> mass_times_setup;
 

@@ -70,7 +70,7 @@ namespace SUNDIALS
     explicit_function     = &ark_stepper_storage->explicit_function;
     implicit_function     = &ark_stepper_storage->implicit_function;
     mass_times_vector     = &ark_stepper_storage->mass_times_vector;
-    mass_times_setup      = &ark_stepper_storage->mass_times_setup;
+    mass_times_setup      = &ark_stepper_storage->mass_times_vector_setup;
     jacobian_times_vector = &ark_stepper_storage->jacobian_times_vector;
     jacobian_times_setup  = &ark_stepper_storage->jacobian_times_vector_setup;
 

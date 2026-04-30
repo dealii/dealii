@@ -432,7 +432,7 @@ namespace SUNDIALS
           auto &callback_ctx = *static_cast<CallbackContext *>(mtimes_data);
 
           return Utilities::call_and_possibly_capture_exception(
-            callback_ctx.stepper->mass_times_setup,
+            callback_ctx.stepper->mass_times_vector_setup,
             *callback_ctx.pending_exception,
             t);
         };
@@ -456,11 +456,11 @@ namespace SUNDIALS
         };
 
         status = ARKStepSetMassTimes(arkode_mem,
-                                     mass_times_setup ?
+                                     mass_times_vector_setup ?
                                        mass_matrix_times_vector_setup_callback :
                                        ARKLsMassTimesSetupFn(nullptr),
                                      mass_matrix_times_vector_callback,
-                                     this);
+                                     &callback_ctx);
         AssertARKode(status);
 
         if (mass_preconditioner_solve)
