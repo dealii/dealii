@@ -367,6 +367,7 @@ export
 
     namespace signals2
     {
+      using boost::signals2::at_front;
       using boost::signals2::connection;
       using boost::signals2::signal;
     } // namespace signals2

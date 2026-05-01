@@ -42,6 +42,7 @@ export
   using ::Bytef;
   using ::compress2;
   using ::compressBound;
+  using ::uLong;
   using ::uLongf;
   using ::uncompress;
 }

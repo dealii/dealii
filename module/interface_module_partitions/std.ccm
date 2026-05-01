@@ -44,6 +44,7 @@ module;
 #include <chrono>
 #include <cmath>
 #include <complex>
+#include <csignal>
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
@@ -405,9 +406,12 @@ export
     using std::getline;
     using std::isalnum;
     using std::isdigit;
+    using std::match_results;
     using std::regex;
     using std::regex_match;
+    using std::regex_replace;
     using std::regex_search;
+    using std::snprintf;
     using std::sscanf;
     using std::stod;
     using std::stoi;
@@ -423,6 +427,10 @@ export
     using std::tolower;
     using std::toupper;
 
+    namespace regex_constants
+    {
+      using std::regex_constants::format_first_only;
+    }
 
     inline namespace literals
     {
@@ -614,6 +622,7 @@ export
     using std::basic_istream;
     using std::basic_ostream;
     using std::cerr;
+    using std::cin;
     using std::cout;
     using std::dec;
     using std::endl;
@@ -659,6 +668,7 @@ export
 
     // Things and tools that don't seem to go into any of the other
     // categories:
+    using std::_Exit;
     using std::abort;
     using std::as_bytes;
     using std::as_const;
@@ -669,6 +679,7 @@ export
     using std::denorm_absent;
     using std::endian;
     using std::exchange;
+    using std::exit;
     using std::forward;
     using std::getenv;
     using std::hash;
@@ -689,6 +700,7 @@ export
     using std::ref;
     using std::reference_wrapper;
     using std::round_toward_zero;
+    using std::signal;
     using std::strong_ordering;
     using std::swap;
     using std::swap_ranges;
@@ -796,5 +808,18 @@ EXPORT_PREPROCESSOR_SYMBOL(FE_DIVBYZERO)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(FE_INVALID)
 #  undef FE_INVALID
 EXPORT_PREPROCESSOR_SYMBOL(FE_INVALID)
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(SIGABRT)
+#  undef SIGABRT
+EXPORT_PREPROCESSOR_SYMBOL(SIGABRT)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(SIGFPE)
+#  undef SIGFPE
+EXPORT_PREPROCESSOR_SYMBOL(SIGFPE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EXIT_FAILURE)
+#  undef EXIT_FAILURE
+EXPORT_PREPROCESSOR_SYMBOL(EXIT_FAILURE)
 
 #endif
