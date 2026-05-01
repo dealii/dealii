@@ -797,10 +797,10 @@ namespace Step70
   {
     if (std::filesystem::exists(par.output_directory))
       {
-        Assert(std::filesystem::is_directory(par.output_directory),
-               ExcMessage("You specified <" + par.output_directory +
-                          "> as the output directory in the input file, "
-                          "but this is not in fact a directory."));
+        AssertThrow(std::filesystem::is_directory(par.output_directory),
+                    ExcMessage("You specified <" + par.output_directory +
+                               "> as the output directory in the input file, "
+                               "but this is not in fact a directory."));
       }
     else
       std::filesystem::create_directory(par.output_directory);
@@ -1432,7 +1432,6 @@ namespace Step70
   {
     TimerOutput::Scope t(computing_timer, "Assemble Nitsche terms");
 
-    const FEValuesExtractors::Vector velocities(0);
     const FEValuesExtractors::Scalar pressure(spacedim);
 
     SolidVelocity<spacedim> solid_velocity(par.angular_velocity);
