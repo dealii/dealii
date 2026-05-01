@@ -990,7 +990,9 @@ namespace LinearAlgebra
         "getNorm1",
         range_type(0, equalInfo.colNorms.extent(0)),
         KOKKOS_LAMBDA(int i, Number &max) {
-          max = Kokkos::max(max, equalInfo.colNorms(i));
+          auto column_norm = equalInfo.colNorms(i);
+          if (column_norm > max)
+            max = column_norm;
         },
         Kokkos::Max<Number>(myMax));
       Number totalMax = 0;
@@ -1023,7 +1025,9 @@ namespace LinearAlgebra
         "getNormInf",
         range_type(0, equalInfo.rowNorms.extent(0)),
         KOKKOS_LAMBDA(int i, Number &max) {
-          max = Kokkos::max(max, equalInfo.rowNorms(i));
+          auto row_norm = equalInfo.rowNorms(i);
+          if (row_norm > max)
+            max = row_norm;
         },
         Kokkos::Max<Number>(myMax));
       Number totalMax = 0;
