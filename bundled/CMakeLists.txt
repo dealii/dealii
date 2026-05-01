@@ -92,6 +92,12 @@ endif()
 
 if(DEAL_II_FEATURE_MUPARSER_BUNDLED_CONFIGURED)
   add_subdirectory(${MUPARSER_FOLDER})
+
+  file(GLOB _muparser_header_files ${MUPARSER_FOLDER}/include/*.h)
+  install(FILES ${_muparser_header_files}
+    DESTINATION ${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled
+    COMPONENT library
+    )
 endif()
 
 
