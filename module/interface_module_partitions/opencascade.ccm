@@ -119,7 +119,9 @@ export
   using ::BRep_Tool;
   using ::BRepAdaptor_CompCurve;
   using ::BRepAdaptor_Curve;
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::BRepAdaptor_HCompCurve;
+#  endif
   using ::BRepAdaptor_Surface;
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::BRepAlgoAPI_Section;
@@ -153,12 +155,16 @@ export
   using ::Handle_Adaptor3d_HCurve;
 #  endif
   using ::BRepAdaptor_Curve;
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::BRepAdaptor_HCompCurve;
   using ::BRepAdaptor_HCurve;
+#  endif
   using ::GCPnts_AbscissaPoint;
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::Handle_Adaptor3d_HCurve;
   using ::Handle_BRepAdaptor_HCompCurve;
   using ::Handle_BRepAdaptor_HCurve;
+#  endif
   using ::Handle_Geom_BoundedCurve;
   using ::Handle_Geom_BSplineCurve;
   using ::Handle_Geom_Curve;
@@ -184,7 +190,9 @@ export
   using ::STEPControl_Reader;
   using ::STEPControl_Writer;
   using ::StlAPI_Reader;
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
   using ::StlAPI_StatusOK;
+#  endif
   using ::StlAPI_Writer;
   using ::TColgp_HArray1OfPnt;
   using ::TopAbs_COMPOUND;
