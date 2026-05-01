@@ -355,7 +355,9 @@ namespace GridGenerator
    * by subdivided_hyper_rectangle(). The argument <code>holes</code>
    * specifies how many square holes the domain should have in each coordinate
    * direction. The total number of mesh cells in that direction is then twice
-   * this number plus one.
+   * this number plus one. Each cell (as well as hole) has edge length equal to
+   * one. The domain's lower left corner is at the origin of the coordinate
+   * system.
    *
    * The number of holes in one direction must be at least one.
    *
