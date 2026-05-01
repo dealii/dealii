@@ -1087,8 +1087,8 @@ namespace Step100
 
             const double kn_omega =
               (current_boundary_id == 1) ?
-                cos(theta) :
-                ((current_boundary_id == 3) ? sin(theta) : 1.);
+                std::cos(theta) :
+                ((current_boundary_id == 3) ? std::sin(theta) : 1.);
 
             for (unsigned int q_point = 0; q_point < n_face_q_points; ++q_point)
               {
