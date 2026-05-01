@@ -396,6 +396,7 @@ export
     using std::basic_string_view;
     using std::string;
     using std::string_view;
+    using std::wstring;
 
     using std::atoi;
     using std::char_traits;
@@ -407,6 +408,7 @@ export
     using std::isalnum;
     using std::isdigit;
     using std::match_results;
+    using std::printf;
     using std::regex;
     using std::regex_match;
     using std::regex_replace;
@@ -656,6 +658,7 @@ export
     using std::streampos;
     using std::streamsize;
     using std::stringstream;
+    using std::wostream;
 
     namespace filesystem
     {
@@ -821,5 +824,14 @@ EXPORT_PREPROCESSOR_SYMBOL(SIGFPE)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EXIT_FAILURE)
 #  undef EXIT_FAILURE
 EXPORT_PREPROCESSOR_SYMBOL(EXIT_FAILURE)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(EEXIST)
+#  undef EEXIST
+EXPORT_PREPROCESSOR_SYMBOL(EEXIST)
+
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(RAND_MAX)
+#  undef RAND_MAX
+EXPORT_PREPROCESSOR_SYMBOL(RAND_MAX)
 
 #endif
