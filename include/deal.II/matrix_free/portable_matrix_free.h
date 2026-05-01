@@ -224,19 +224,7 @@ namespace Portable
         , overlap_communication_computation(overlap_communication_computation)
         , mg_level(mg_level)
         , team_size(team_size)
-      {
-#ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
-        AssertThrow(
-          overlap_communication_computation == false,
-          ExcMessage(
-            "Overlapping communication and computation requires device-aware MPI."));
-#endif
-
-        AssertThrow(
-          use_coloring == false || overlap_communication_computation == false,
-          ExcMessage(
-            "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
-      }
+      {}
 
       /**
        * This flag is used to determine which quantities should be cached. This

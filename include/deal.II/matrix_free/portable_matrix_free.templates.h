@@ -550,6 +550,19 @@ namespace Portable
     const IteratorFiltersType                            &iterator_filter,
     const AdditionalData                                 &additional_data)
   {
+#ifndef DEAL_II_MPI_WITH_DEVICE_SUPPORT
+    AssertThrow(
+      additional_data.overlap_communication_computation == false,
+      ExcMessage(
+        "Overlapping communication and computation requires device-aware MPI."));
+#endif
+
+    AssertThrow(
+      additional_data.use_coloring == false ||
+        additional_data.overlap_communication_computation == false,
+      ExcMessage(
+        "Overlapping communication and coloring are incompatible options. Only one of them can be enabled."));
+
     const auto &triangulation = dof_handler[0]->get_triangulation();
 
     if (const auto parallel_triangulation =
