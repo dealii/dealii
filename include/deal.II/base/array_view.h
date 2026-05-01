@@ -180,8 +180,8 @@ public:
   template <typename ContiguousContainer>
   ArrayView(const ContiguousContainer &container)
     requires(std::is_same_v<
-               std::remove_cv_t<ElementType>,
-               std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+               std::remove_const_t<ElementType>,
+               std::remove_const_t<typename ContiguousContainer::value_type>> &&
              std::is_const_v<ElementType> &&
              concepts::is_contiguous_container<ContiguousContainer>);
 
@@ -205,8 +205,8 @@ public:
   template <typename ContiguousContainer>
   ArrayView(ContiguousContainer &container)
     requires(std::is_same_v<
-               std::remove_cv_t<ElementType>,
-               std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+               std::remove_const_t<ElementType>,
+               std::remove_const_t<typename ContiguousContainer::value_type>> &&
              concepts::is_contiguous_container<ContiguousContainer>);
 
 #else
@@ -233,9 +233,9 @@ public:
             typename = decltype(std::data(std::declval<ContiguousContainer>())),
             typename = decltype(std::size(std::declval<ContiguousContainer>())),
             typename = std::enable_if_t<
-              std::is_same_v<
-                std::remove_cv_t<ElementType>,
-                std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+              std::is_same_v<std::remove_const_t<ElementType>,
+                             std::remove_const_t<
+                               typename ContiguousContainer::value_type>> &&
               std::is_const_v<ElementType>>>
   ArrayView(const ContiguousContainer &container);
 
@@ -260,8 +260,8 @@ public:
             typename = decltype(std::data(std::declval<ContiguousContainer>())),
             typename = decltype(std::size(std::declval<ContiguousContainer>())),
             typename = std::enable_if_t<std::is_same_v<
-              std::remove_cv_t<ElementType>,
-              std::remove_cv_t<typename ContiguousContainer::value_type>>>>
+              std::remove_const_t<ElementType>,
+              std::remove_const_t<typename ContiguousContainer::value_type>>>>
   ArrayView(ContiguousContainer &container);
 
 #endif
@@ -326,8 +326,8 @@ public:
    *   f(a);
    * @endcode
    */
-  ArrayView(
-    const std::initializer_list<std::remove_cv_t<value_type>> &initializer_list)
+  ArrayView(const std::initializer_list<std::remove_const_t<value_type>>
+              &initializer_list)
     DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>);
 
   /**
@@ -408,7 +408,7 @@ public:
    * This version always compares with the non-const value_type.
    */
   bool
-  operator==(const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType>
+  operator==(const ArrayView<std::remove_const_t<value_type>, MemorySpaceType>
                &other_view) const;
 
   /**
@@ -445,7 +445,7 @@ public:
    * This version always compares with the non-const value_type.
    */
   bool
-  operator!=(const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType>
+  operator!=(const ArrayView<std::remove_const_t<value_type>, MemorySpaceType>
                &other_view) const;
 
   /**
@@ -597,8 +597,8 @@ template <typename ContiguousContainer>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   const ContiguousContainer &container)
   requires(std::is_same_v<
-             std::remove_cv_t<ElementType>,
-             std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+             std::remove_const_t<ElementType>,
+             std::remove_const_t<typename ContiguousContainer::value_type>> &&
            std::is_const_v<ElementType> &&
            concepts::is_contiguous_container<ContiguousContainer>)
   : // use delegating constructor
@@ -612,8 +612,8 @@ template <typename ContiguousContainer>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
   ContiguousContainer &container)
   requires(std::is_same_v<
-             std::remove_cv_t<ElementType>,
-             std::remove_cv_t<typename ContiguousContainer::value_type>> &&
+             std::remove_const_t<ElementType>,
+             std::remove_const_t<typename ContiguousContainer::value_type>> &&
            concepts::is_contiguous_container<ContiguousContainer>)
   : // use delegating constructor
   ArrayView(std::data(container), std::size(container))
@@ -654,7 +654,7 @@ inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
 
 template <typename ElementType, typename MemorySpaceType>
 inline ArrayView<ElementType, MemorySpaceType>::ArrayView(
-  const std::initializer_list<std::remove_cv_t<value_type>> &initializer)
+  const std::initializer_list<std::remove_const_t<value_type>> &initializer)
   DEAL_II_CXX20_REQUIRES(std::is_const_v<ElementType>)
   : // use delegating constructor
   ArrayView(initializer.begin(), initializer.size())
@@ -689,7 +689,7 @@ ArrayView<ElementType, MemorySpaceType>::operator==(
 template <typename ElementType, typename MemorySpaceType>
 inline bool
 ArrayView<ElementType, MemorySpaceType>::operator==(
-  const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &other_view)
+  const ArrayView<std::remove_const_t<value_type>, MemorySpaceType> &other_view)
   const
 {
   return (other_view.data() == starting_element) &&
@@ -724,7 +724,7 @@ inline DEAL_II_HOST_DEVICE
 template <typename ElementType, typename MemorySpaceType>
 inline bool
 ArrayView<ElementType, MemorySpaceType>::operator!=(
-  const ArrayView<std::remove_cv_t<value_type>, MemorySpaceType> &other_view)
+  const ArrayView<std::remove_const_t<value_type>, MemorySpaceType> &other_view)
   const
 {
   return !(*this == other_view);
