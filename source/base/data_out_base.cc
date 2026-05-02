@@ -160,7 +160,6 @@ namespace
                             reinterpret_cast<const Bytef *>(data.data()),
                             uncompressed_size,
                             get_zlib_compression_level(compression_level));
-        (void)err;
         Assert(err == Z_OK, ExcInternalError());
 
         // Discard the unnecessary bytes
