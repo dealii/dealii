@@ -353,6 +353,40 @@ export
       using ::Sacado::Rad::sqrt;
     } // namespace Rad
   }   // namespace Sacado
+
+  // Sacado also places some symbols into namespace std, namely
+  // overloads of math functions. We need to export those as well.
+  //
+  // The list of functions here is taken from Sacado_MathFunctions.hpp.
+  namespace std
+  {
+    // Unary functions:
+    using std::abs;
+    using std::acos;
+    using std::acosh;
+    using std::asin;
+    using std::asinh;
+    using std::atan;
+    using std::atanh;
+    using std::cbrt;
+    using std::cos;
+    using std::cosh;
+    using std::exp;
+    using std::fabs;
+    using std::log;
+    using std::log10;
+    using std::sin;
+    using std::sinh;
+    using std::sqrt;
+    using std::tan;
+    using std::tanh;
+
+    // Binary functions:
+    using std::atan2;
+    using std::max;
+    using std::min;
+    using std::pow;
+  } // namespace std
 #  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_SEACAS
@@ -479,9 +513,45 @@ CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_cgs)
 #  undef AZ_cgs
 EXPORT_PREPROCESSOR_SYMBOL(AZ_cgs)
 
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_dom_decomp)
+#  undef AZ_dom_decomp
+EXPORT_PREPROCESSOR_SYMBOL(AZ_dom_decomp)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_subdomain_solve)
+#  undef AZ_subdomain_solve
+EXPORT_PREPROCESSOR_SYMBOL(AZ_subdomain_solve)
+
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_gmres)
 #  undef AZ_gmres
 EXPORT_PREPROCESSOR_SYMBOL(AZ_gmres)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_ilut)
+#  undef AZ_ilut
+EXPORT_PREPROCESSOR_SYMBOL(AZ_ilut)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_ilut_fill)
+#  undef AZ_ilut_fill
+EXPORT_PREPROCESSOR_SYMBOL(AZ_ilut_fill)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_athresh)
+#  undef AZ_athresh
+EXPORT_PREPROCESSOR_SYMBOL(AZ_athresh)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_rthresh)
+#  undef AZ_rthresh
+EXPORT_PREPROCESSOR_SYMBOL(AZ_rthresh)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_drop)
+#  undef AZ_drop
+EXPORT_PREPROCESSOR_SYMBOL(AZ_drop)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_overlap)
+#  undef AZ_overlap
+EXPORT_PREPROCESSOR_SYMBOL(AZ_overlap)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_reorder)
+#  undef AZ_reorder
+EXPORT_PREPROCESSOR_SYMBOL(AZ_reorder)
 
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(AZ_kspace)
 #  undef AZ_kspace
