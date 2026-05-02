@@ -68,12 +68,11 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
-
+#include <deal.II/numerics/solution_transfer.h>
 
 #include <fstream>
 #include <iostream>
 
-#include <deal.II/numerics/solution_transfer.h>
 
 // We then open a namespace for this program and import everything from the
 // dealii namespace into it, as in previous programs:
