@@ -2595,6 +2595,16 @@ namespace DataOutBase
     static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
 
     std::vector<Point<spacedim>> node_positions;
+    std::size_t                  n_nodes = 0;
+    for (const auto &patch : patches)
+      {
+        if (patch.reference_cell != ReferenceCells::get_hypercube<dim>())
+          n_nodes += patch.data.n_cols();
+        else
+          n_nodes += Utilities::fixed_power<dim>(patch.n_subdivisions + 1);
+      }
+    node_positions.reserve(n_nodes);
+
     for (const auto &patch : patches)
       {
         // special treatment of non-hypercube cells
