@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -61,6 +61,9 @@ main()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
+  SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+  stepper_data.add_parameters(prm);
+
   if (false)
     {
       std::ofstream ofile(SOURCE_DIR "/arkode_06_in.prm");
@@ -71,40 +74,43 @@ main()
   std::ifstream ifile(SOURCE_DIR "/arkode_06_in.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(data);
+  SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
+  SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
   // Parameters
   double u0 = 3.9, v0 = 1.1, w0 = 2.8, a = 1.2, b = 2.5, eps = 1e-5;
   // Explicit jacobian.
   FullMatrix<double> J(3, 3);
 
-  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = 0;
-    ydot[1] = 0;
-    ydot[2] = -y[2] / eps;
-  };
+  stepper.implicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = 0;
+      ydot[1] = 0;
+      ydot[2] = -y[2] / eps;
+    };
 
 
-  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
-    ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
-    ydot[2] = b / eps - y[2] * y[0];
-  };
+  stepper.explicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
+      ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
+      ydot[2] = b / eps - y[2] * y[0];
+    };
 
 
-  ode.jacobian_times_setup =
+  stepper.jacobian_times_vector_setup =
     [&](SUNDIALS::realtype t, const VectorType &y, const VectorType &fy) {
       J       = 0;
       J(2, 2) = -1.0 / eps;
     };
 
-  ode.jacobian_times_vector = [&](const VectorType &v,
-                                  VectorType       &Jv,
-                                  double            t,
-                                  const VectorType &y,
-                                  const VectorType &fy) { J.vmult(Jv, v); };
+  stepper.jacobian_times_vector = [&](const VectorType &v,
+                                      VectorType       &Jv,
+                                      double            t,
+                                      const VectorType &y,
+                                      const VectorType &fy) { J.vmult(Jv, v); };
 
-  ode.solve_linearized_system =
+  stepper.solve_linearized_system =
     [&](SUNDIALS::SundialsOperator<VectorType> &op,
         SUNDIALS::SundialsPreconditioner<VectorType> &,
         VectorType       &x,

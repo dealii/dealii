@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2023 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,18 +57,23 @@ main()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
+  SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+  stepper_data.add_parameters(prm);
+
   // Use the same parameters of test 1.
   std::ifstream ifile(SOURCE_DIR "/arkode_01_in.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(data);
+  SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
+  SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
   double kappa = 1.0;
 
-  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = y[1];
-    ydot[1] = -kappa * kappa * y[0];
-  };
+  stepper.implicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = y[1];
+      ydot[1] = -kappa * kappa * y[0];
+    };
 
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int step_number) {
