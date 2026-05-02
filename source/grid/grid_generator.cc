@@ -9429,7 +9429,7 @@ namespace GridGenerator
     //    also, that it will not reorder the vertices.
 
     // dimension of the boundary mesh
-    const unsigned int boundary_dim = dim - 1;
+    static constexpr unsigned int boundary_dim = dim - 1;
 
     // temporary map for level==0
     // iterator to face is stored along with face number
@@ -9460,27 +9460,54 @@ namespace GridGenerator
     // is considered and vertices 1 and 2 of the corresponding boundary cell
     // are swapped to get proper normal orientation, swap_matrix[3]=( 0, 2, 1,
     // 3 )
-    Table<2, unsigned int> swap_matrix(
-      GeometryInfo<spacedim>::faces_per_cell,
-      GeometryInfo<dim - 1>::vertices_per_cell);
-    for (unsigned int i1 = 0; i1 < GeometryInfo<spacedim>::faces_per_cell; ++i1)
+    //
+    // Permutation depends on the volume cell's reference cell. Currently only
+    // hypercube and simplex meshes are supported
+    const ReferenceCell<dim> reference_cell =
+      volume_mesh.begin(0)->reference_cell();
+
+    // Size the table to the maximum number of vertices that can occur on any
+    // face of the cell (4 for hypercubes, 3 for simplices). Unused entries
+    // are left at the identity.
+    const unsigned int max_n_face_vertices =
+      reference_cell.is_hyper_cube() ?
+        GeometryInfo<dim - 1>::vertices_per_cell :
+        (dim - 1 == 1 ? 2 : 3);
+
+    Table<2, unsigned int> swap_matrix(reference_cell.n_faces(),
+                                       max_n_face_vertices);
+    for (unsigned int f = 0; f < reference_cell.n_faces(); ++f)
+      for (unsigned int j = 0; j < max_n_face_vertices; ++j)
+        swap_matrix[f][j] = j;
+
+    if (reference_cell.is_hyper_cube())
       {
-        for (unsigned int i2 = 0; i2 < GeometryInfo<dim - 1>::vertices_per_cell;
-             i2++)
-          swap_matrix[i1][i2] = i2;
+        // Hard-coded permutations for hypercube cells
+        if (dim == 3)
+          {
+            std::swap(swap_matrix[0][1], swap_matrix[0][2]);
+            std::swap(swap_matrix[2][1], swap_matrix[2][2]);
+            std::swap(swap_matrix[4][1], swap_matrix[4][2]);
+          }
+        else if (dim == 2)
+          {
+            std::swap(swap_matrix[1][0], swap_matrix[1][1]);
+            std::swap(swap_matrix[2][0], swap_matrix[2][1]);
+          }
       }
-    // vertex swapping such that normals on the surface mesh point out of the
-    // underlying volume
-    if (dim == 3)
+    else if (reference_cell == ReferenceCells::get_simplex<dim>())
       {
-        std::swap(swap_matrix[0][1], swap_matrix[0][2]);
-        std::swap(swap_matrix[2][1], swap_matrix[2][2]);
-        std::swap(swap_matrix[4][1], swap_matrix[4][2]);
+        // Hard-coded permutations for simplex cells.
+        // For both triangles (3 faces) and tetrahedra (4 faces) we swap the
+        // first two face vertices so that the resulting boundary cell's normal
+        // points outward.
+        for (unsigned int f = 0; f < reference_cell.n_faces(); ++f)
+          std::swap(swap_matrix[f][0], swap_matrix[f][1]);
       }
-    else if (dim == 2)
+    else
       {
-        std::swap(swap_matrix[1][0], swap_matrix[1][1]);
-        std::swap(swap_matrix[2][0], swap_matrix[2][1]);
+        // Wedges, pyramids, and mixed meshes are not currently supported.
+        DEAL_II_NOT_IMPLEMENTED();
       }
 
     // Create boundary mesh and mapping
@@ -9498,10 +9525,9 @@ namespace GridGenerator
               (boundary_ids.empty() ||
                (boundary_ids.find(face->boundary_id()) != boundary_ids.end())))
             {
-              CellData<boundary_dim> c_data;
+              CellData<boundary_dim> c_data(face->n_vertices());
 
-              for (const unsigned int j :
-                   GeometryInfo<boundary_dim>::vertex_indices())
+              for (const unsigned int j : face->vertex_indices())
                 {
                   const unsigned int v_index = face->vertex_index(j);
 
@@ -9526,7 +9552,7 @@ namespace GridGenerator
               // we set default boundary ids for boundary lines
               // and numbers::internal_face_boundary_id for internal lines
               if (dim == 3)
-                for (unsigned int e = 0; e < 4; ++e)
+                for (unsigned int e = 0; e < face->n_lines(); ++e)
                   {
                     // see if we already saw this edge from a
                     // neighboring face, either in this or the reverse
