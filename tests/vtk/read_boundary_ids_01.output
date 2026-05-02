@@ -1,0 +1,33 @@
+
+DEAL::Reading file: data/square_with_ids.vtk
+DEAL::  Unstructured grid: 25 points, 20 cells
+DEAL::  Cell arrays: MaterialID ManifoldID Boundary ID
+DEAL::  Boundary field: Boundary ID
+DEAL::  Triangulation: 16 cells, 25 vertices
+DEAL::  Boundary faces: 16
+DEAL::    id 0: 12
+DEAL::    id 1: 4
+DEAL::Reading file: data/square_with_ids.vtu
+DEAL::  Unstructured grid: 25 points, 20 cells
+DEAL::  Cell arrays: MaterialID ManifoldID Boundary ID
+DEAL::  Boundary field: Boundary ID
+DEAL::  Triangulation: 16 cells, 25 vertices
+DEAL::  Boundary faces: 16
+DEAL::    id 0: 12
+DEAL::    id 1: 4
+DEAL::Reading file: data/cube_with_ids.vtk
+DEAL::  Unstructured grid: 125 points, 80 cells
+DEAL::  Cell arrays: MaterialID Boundary ID
+DEAL::  Boundary field: Boundary ID
+DEAL::  Triangulation: 64 cells, 125 vertices
+DEAL::  Boundary faces: 96
+DEAL::    id 0: 80
+DEAL::    id 1: 16
+DEAL::Reading file: data/cube_with_ids.vtu
+DEAL::  Unstructured grid: 125 points, 80 cells
+DEAL::  Cell arrays: MaterialID Boundary ID
+DEAL::  Boundary field: Boundary ID
+DEAL::  Triangulation: 64 cells, 125 vertices
+DEAL::  Boundary faces: 96
+DEAL::    id 0: 80
+DEAL::    id 1: 16

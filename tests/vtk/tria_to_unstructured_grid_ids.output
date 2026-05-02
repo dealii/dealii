@@ -1,0 +1,13 @@
+
+DEAL::2d arrays present: material=1 boundary=1 manifold=1
+DEAL::2d material id (cell 0): 7
+DEAL::2d boundary id (cell 0): 0
+DEAL::2d manifold id (cell 0): -1
+DEAL::2d n_tuples: 5
+DEAL::2d found boundary face with id 13: 1
+DEAL::3d arrays present: material=1 boundary=1 manifold=1
+DEAL::3d material id (cell 0): 11
+DEAL::3d boundary id (cell 0): 0
+DEAL::3d manifold id (cell 0): -1
+DEAL::3d n_tuples: 7
+DEAL::3d found manifold id 5 on subcell: 1

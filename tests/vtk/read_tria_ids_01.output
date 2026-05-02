@@ -1,0 +1,45 @@
+
+DEAL::Reading file: data/square_with_ids.vtk
+DEAL::  Triangulation: 16 cells, 25 vertices
+DEAL::  Material ids:
+DEAL::    id 0: 16
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 16
+DEAL::  Boundary ids:
+DEAL::    id 0: 12
+DEAL::    id 1: 4
+DEAL::  Boundary manifold ids:
+DEAL::    id -1: 16
+DEAL::Reading file: data/square_with_ids.vtu
+DEAL::  Triangulation: 16 cells, 25 vertices
+DEAL::  Material ids:
+DEAL::    id 0: 16
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 16
+DEAL::  Boundary ids:
+DEAL::    id 0: 12
+DEAL::    id 1: 4
+DEAL::  Boundary manifold ids:
+DEAL::    id -1: 16
+DEAL::Reading file: data/cube_with_ids.vtk
+DEAL::  Triangulation: 64 cells, 125 vertices
+DEAL::  Material ids:
+DEAL::    id 0: 64
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 64
+DEAL::  Boundary ids:
+DEAL::    id 0: 80
+DEAL::    id 1: 16
+DEAL::  Boundary manifold ids:
+DEAL::    id -1: 96
+DEAL::Reading file: data/cube_with_ids.vtu
+DEAL::  Triangulation: 64 cells, 125 vertices
+DEAL::  Material ids:
+DEAL::    id 0: 64
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 64
+DEAL::  Boundary ids:
+DEAL::    id 0: 80
+DEAL::    id 1: 16
+DEAL::  Boundary manifold ids:
+DEAL::    id -1: 96

@@ -48,15 +48,27 @@ module;
 #endif
 #if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
 #  include <vtkCleanUnstructuredGrid.h>
+#  include <vtkGenericDataObjectReader.h>
+#  include <vtkXMLGenericDataObjectReader.h>
 #endif
+#include <vtkAppendDataSets.h>
 #include <vtkCellData.h>
 #include <vtkCellType.h>
 #include <vtkDataArray.h>
+#include <vtkDataObject.h>
+#include <vtkDataSet.h>
+#include <vtkDataSetReader.h>
 #include <vtkDoubleArray.h>
+#include <vtkFieldData.h>
+#include <vtkGenericCell.h>
+#include <vtkIntArray.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridReader.h>
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
 #endif
 
 
@@ -66,19 +78,31 @@ export module dealii.external.vtk;
 
 export
 {
+  using ::vtkAppendDataSets;
   using ::vtkCell;
   using ::vtkCellData;
   using ::VTKCellType;
+  using enum ::VTKCellType;
 #if DEAL_II_VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9, 3, 0)
   using ::vtkCleanUnstructuredGrid;
+  using ::vtkGenericDataObjectReader;
+  using ::vtkXMLGenericDataObjectReader;
 #endif
   using ::vtkDataArray;
+  using ::vtkDataObject;
+  using ::vtkDataSet;
+  using ::vtkDataSetReader;
   using ::vtkDoubleArray;
+  using ::vtkFieldData;
+  using ::vtkGenericCell;
+  using ::vtkIntArray;
   using ::vtkPointData;
   using ::vtkPoints;
   using ::vtkSmartPointer;
   using ::vtkUnstructuredGrid;
   using ::vtkUnstructuredGridReader;
+  using ::vtkUnstructuredGridWriter;
+  using ::vtkXMLUnstructuredGridWriter;
 }
 
 #endif

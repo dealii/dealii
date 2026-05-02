@@ -46,7 +46,12 @@ test(const std::string &filename)
   VTKWrappers::read_vtk(std::string(SOURCE_DIR) + "/" + filename,
                         dh,
                         data,
-                        names);
+                        names,
+                        true,
+                        0.0,
+                        "",
+                        "",
+                        "");
 
   deallog << "  Data names: " << Patterns::Tools::to_string(names) << std::endl;
 

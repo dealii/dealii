@@ -1,0 +1,37 @@
+
+DEAL::2d quad cells: 1
+DEAL::2d material id: 7
+DEAL::2d cell manifold id: 17
+DEAL::2d boundary line ids: 42 142
+DEAL::2d quad default cells: 1
+DEAL::2d default material id: 0
+DEAL::2d triangle cells: 1
+DEAL::2d material id: 7
+DEAL::2d cell manifold id: 17
+DEAL::2d boundary line ids: 42 142
+DEAL::2d triangle default cells: 1
+DEAL::2d default material id: 0
+DEAL::3d hex cells: 1
+DEAL::3d material id: 11
+DEAL::3d cell manifold id: 21
+DEAL::3d boundary face ids: 55 155
+DEAL::3d hex default cells: 1
+DEAL::3d default material id: 0
+DEAL::3d tet cells: 1
+DEAL::3d material id: 11
+DEAL::3d cell manifold id: 21
+DEAL::3d boundary face ids: 55 155
+DEAL::3d tet default cells: 1
+DEAL::3d default material id: 0
+DEAL::3d pyramid cells: 1
+DEAL::3d material id: 11
+DEAL::3d cell manifold id: 21
+DEAL::3d boundary face ids: 55 155
+DEAL::3d pyramid default cells: 1
+DEAL::3d default material id: 0
+DEAL::3d wedge cells: 1
+DEAL::3d material id: 11
+DEAL::3d cell manifold id: 21
+DEAL::3d boundary face ids: 55 155
+DEAL::3d wedge default cells: 1
+DEAL::3d default material id: 0

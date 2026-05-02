@@ -33,7 +33,12 @@ test(const std::string &filename)
 
   Triangulation<dim, spacedim> triangulation;
   VTKWrappers::read_tria(std::string(SOURCE_DIR) + "/" + filename,
-                         triangulation);
+                         triangulation,
+                         true,
+                         0.0,
+                         "",
+                         "",
+                         "");
 
   Vector<double> data;
   VTKWrappers::read_cell_data(std::string(SOURCE_DIR) + "/" + filename,
