@@ -5452,8 +5452,11 @@ namespace DataOutBase
 
       unsigned int first_vertex_of_patch = 0;
 
+      std::vector<unsigned int> local_vertex_order;
       for (const auto &patch : patches)
         {
+          local_vertex_order.clear();
+
           // First treat a slight oddball case: For triangles and tetrahedra,
           // the case with n_subdivisions==2 is treated as if the cell was
           // output as a single, quadratic, cell rather than as one would
@@ -5518,9 +5521,6 @@ namespace DataOutBase
             {
               const unsigned int n_subdivisions         = patch.n_subdivisions;
               const unsigned int n_points_per_direction = n_subdivisions + 1;
-
-              std::vector<unsigned> local_vertex_order;
-
               // Output the current state of the local_vertex_order array,
               // then clear it:
               const auto flush_current_cell = [&flags,
