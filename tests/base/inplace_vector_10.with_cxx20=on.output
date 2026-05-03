@@ -1,0 +1,37 @@
+
+DEAL::
+DEAL:A::is_trivially_copy_constructible_v<T> = 0
+DEAL:A::is_trivially_copy_constructible_v<inplace_vector<T, 1>> = 0
+DEAL:A::is_trivially_move_constructible_v<T> = 0
+DEAL:A::is_trivially_move_constructible_v<inplace_vector<T, 1>> = 0
+DEAL:A::is_trivially_copy_assignable_v<T> = 0
+DEAL:A::is_trivially_copy_assignable_v<inplace_vector<T, 1>> = 0
+DEAL:A::is_trivially_move_assignable_v<T> = 0
+DEAL:A::is_trivially_move_assignable_v<inplace_vector<T, 1>> = 0
+DEAL:A::is_trivially_destructible_v<T> = 0
+DEAL:A::is_trivially_destructible_v<inplace_vector<T, 1>> = 0
+DEAL:A::
+DEAL::
+DEAL:int::is_trivially_copy_constructible_v<T> = 1
+DEAL:int::is_trivially_copy_constructible_v<inplace_vector<T, 1>> = 1
+DEAL:int::is_trivially_move_constructible_v<T> = 1
+DEAL:int::is_trivially_move_constructible_v<inplace_vector<T, 1>> = 1
+DEAL:int::is_trivially_copy_assignable_v<T> = 1
+DEAL:int::is_trivially_copy_assignable_v<inplace_vector<T, 1>> = 1
+DEAL:int::is_trivially_move_assignable_v<T> = 1
+DEAL:int::is_trivially_move_assignable_v<inplace_vector<T, 1>> = 1
+DEAL:int::is_trivially_destructible_v<T> = 1
+DEAL:int::is_trivially_destructible_v<inplace_vector<T, 1>> = 1
+DEAL:int::
+DEAL::
+DEAL:vector<int>::is_trivially_copy_constructible_v<T> = 0
+DEAL:vector<int>::is_trivially_copy_constructible_v<inplace_vector<T, 1>> = 0
+DEAL:vector<int>::is_trivially_move_constructible_v<T> = 0
+DEAL:vector<int>::is_trivially_move_constructible_v<inplace_vector<T, 1>> = 0
+DEAL:vector<int>::is_trivially_copy_assignable_v<T> = 0
+DEAL:vector<int>::is_trivially_copy_assignable_v<inplace_vector<T, 1>> = 0
+DEAL:vector<int>::is_trivially_move_assignable_v<T> = 0
+DEAL:vector<int>::is_trivially_move_assignable_v<inplace_vector<T, 1>> = 0
+DEAL:vector<int>::is_trivially_destructible_v<T> = 0
+DEAL:vector<int>::is_trivially_destructible_v<inplace_vector<T, 1>> = 0
+DEAL:vector<int>::

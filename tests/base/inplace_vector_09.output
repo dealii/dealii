@@ -1,0 +1,68 @@
+
+DEAL::
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::size : 0
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::size : 0
+DEAL:A::ctors = 27 dtors = 24
+DEAL:A::
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL::
+DEAL:int::-11, -9, -11, -9, -11, -9, -11, -9
+DEAL:int::-10, -10, -10, -10
+DEAL:int::
+DEAL::
+DEAL:vector<int>::{1, 1, 2}, {3, 5}, {1, 1, 2}, {3, 5}, {1, 1, 2}, {3, 5}, {1, 1, 2}, {3, 5}
+DEAL:vector<int>::{42}, {42}, {42}, {42}
+DEAL:vector<int>::

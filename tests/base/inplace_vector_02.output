@@ -1,0 +1,142 @@
+
+DEAL:assignments::
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::copy assignment
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::A::operator=(const A&)
+DEAL:assignments:A::A::operator=(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::size : 2
+DEAL:assignments:A::size : 2
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::ctors = 7 dtors = 4
+DEAL:assignments:A::
+DEAL:assignments:A::move assignment
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::A::A()
+DEAL:assignments:A::A::operator=(const A&)
+DEAL:assignments:A::A::operator=(const A&)
+DEAL:assignments:A::A::A(A&&)
+DEAL:assignments:A::A::A(A&&)
+DEAL:assignments:A::size : 2
+DEAL:assignments:A::size : 2
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::ctors = 11 dtors = 8
+DEAL:assignments:A::
+DEAL:assignments:A::initializer list assignment
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::size : 3
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::ctors = 17 dtors = 14
+DEAL:assignments:A::
+DEAL:assignments:A::range assignment
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::size : 3
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::ctors = 20 dtors = 17
+DEAL:assignments:A::
+DEAL:assignments:A::count assignment
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::size : 8
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::ctors = 28 dtors = 25
+DEAL:assignments:A::
+DEAL:assignments:A::initializer list assignment 2
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::A(const A&)
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::size : 3
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::ctors = 34 dtors = 31
+DEAL:assignments:A::
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments:A::A::~A()
+DEAL:assignments::
+DEAL:assignments:int::copy assignment
+DEAL:assignments:int::-11, -10
+DEAL:assignments:int::-11, -10
+DEAL:assignments:int::
+DEAL:assignments:int::move assignment
+DEAL:assignments:int::-11, -10
+DEAL:assignments:int::-11, -10
+DEAL:assignments:int::
+DEAL:assignments:int::initializer list assignment
+DEAL:assignments:int::-11, -10, -9
+DEAL:assignments:int::
+DEAL:assignments:int::range assignment
+DEAL:assignments:int::-11, -10, -9
+DEAL:assignments:int::
+DEAL:assignments:int::count assignment
+DEAL:assignments:int::-11, -11, -11, -11, -11, -11, -11, -11
+DEAL:assignments:int::
+DEAL:assignments:int::initializer list assignment 2
+DEAL:assignments:int::-11, -10, -9
+DEAL:assignments:int::
+DEAL:assignments::
+DEAL:assignments:vector<int>::copy assignment
+DEAL:assignments:vector<int>::{1, 1, 2}, {42}
+DEAL:assignments:vector<int>::{1, 1, 2}, {42}
+DEAL:assignments:vector<int>::
+DEAL:assignments:vector<int>::move assignment
+DEAL:assignments:vector<int>::{1, 1, 2}, {42}
+DEAL:assignments:vector<int>::{}, {}
+DEAL:assignments:vector<int>::
+DEAL:assignments:vector<int>::initializer list assignment
+DEAL:assignments:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:assignments:vector<int>::
+DEAL:assignments:vector<int>::range assignment
+DEAL:assignments:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:assignments:vector<int>::
+DEAL:assignments:vector<int>::count assignment
+DEAL:assignments:vector<int>::{1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}
+DEAL:assignments:vector<int>::
+DEAL:assignments:vector<int>::initializer list assignment 2
+DEAL:assignments:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:assignments:vector<int>::

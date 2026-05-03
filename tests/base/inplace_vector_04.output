@@ -1,0 +1,193 @@
+
+DEAL::
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::emplace_back
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(A&&)
+DEAL:A::size : 5
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::ctors = 11 dtors = 8
+DEAL:A::
+DEAL:A::push_back
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(A&&)
+DEAL:A::size : 5
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::ctors = 19 dtors = 16
+DEAL:A::
+DEAL:A::pop_back
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::~A()
+DEAL:A::size : 2
+DEAL:A::A::~A()
+DEAL:A::size : 1
+DEAL:A::A::~A()
+DEAL:A::ctors = 22 dtors = 19
+DEAL:A::
+DEAL:A::unchecked_emplace_back
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(A&&)
+DEAL:A::size : 5
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::ctors = 30 dtors = 27
+DEAL:A::
+DEAL:A::unchecked_push_back (move)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(A&&)
+DEAL:A::size : 4
+DEAL:A::A::A(A&&)
+DEAL:A::size : 5
+DEAL:A::A::A(A&&)
+DEAL:A::size : 6
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::ctors = 39 dtors = 36
+DEAL:A::
+DEAL:A::unchecked_push_back (copy)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 4
+DEAL:A::A::A(const A&)
+DEAL:A::size : 5
+DEAL:A::A::A(const A&)
+DEAL:A::size : 6
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::ctors = 48 dtors = 45
+DEAL:A::
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL::
+DEAL:int::emplace_back
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10, -9, -11, -10
+DEAL:int::
+DEAL:int::push_back
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10, -9, -11, -10
+DEAL:int::
+DEAL:int::pop_back
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10
+DEAL:int::-11
+DEAL:int::
+DEAL:int::unchecked_emplace_back
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10, -9, -11, -10
+DEAL:int::
+DEAL:int::unchecked_push_back (move)
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10, -9, -11
+DEAL:int::-11, -10, -9, -11, -10
+DEAL:int::-11, -10, -9, -11, -10, -9
+DEAL:int::
+DEAL:int::unchecked_push_back (copy)
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10, -9, -11
+DEAL:int::-11, -10, -9, -11, -10
+DEAL:int::-11, -10, -9, -11, -10, -9
+DEAL:int::
+DEAL::
+DEAL:vector<int>::emplace_back
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {42, 42, 42, 42, 42}
+DEAL:vector<int>::
+DEAL:vector<int>::push_back
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}
+DEAL:vector<int>::
+DEAL:vector<int>::pop_back
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {42}
+DEAL:vector<int>::{1, 1, 2}
+DEAL:vector<int>::
+DEAL:vector<int>::unchecked_emplace_back
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {42, 42, 42, 42, 42}
+DEAL:vector<int>::
+DEAL:vector<int>::unchecked_push_back (move)
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::
+DEAL:vector<int>::unchecked_push_back (copy)
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::
