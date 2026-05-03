@@ -547,64 +547,45 @@ PreconditionBlockJacobi<MatrixType, inverse_type>::do_vmult(
 
   Vector<number2> b_cell(this->blocksize), x_cell(this->blocksize);
 
-  // cell_row, cell_column are the
-  // numbering of the blocks (cells).
-  // row_cell, column_cell are the local
-  // numbering of the unknowns in the
+  // row_cell, column_cell are the local numbering of the unknowns in the
   // blocks.
-  // row, column are the global numbering
-  // of the unknowns.
-  size_type row, row_cell, begin_diag_block = 0;
-
   if (!this->inverses_ready())
     {
       FullMatrix<number> M_cell(this->blocksize);
       for (unsigned int cell = 0; cell < this->size(); ++cell)
         {
-          for (row = cell * this->blocksize, row_cell = 0;
-               row_cell < this->blocksize;
-               ++row_cell, ++row)
+          const auto offset = cell * this->blocksize;
+          for (size_type row_cell = 0; row_cell < this->blocksize; ++row_cell)
             {
-              b_cell(row_cell) = src(row);
-              for (size_type column_cell = 0, column = cell * this->blocksize;
-                   column_cell < this->blocksize;
-                   ++column_cell, ++column)
-                M_cell(row_cell, column_cell) = M(row, column);
+              b_cell[row_cell] = src[offset + row_cell];
+              for (size_type column_cell = 0; column_cell < this->blocksize;
+                   ++column_cell)
+                M_cell(row_cell, column_cell) =
+                  M(offset + row_cell, offset + column_cell);
             }
           Householder<number> house(M_cell);
           house.least_squares(x_cell, b_cell);
           // distribute x_cell to dst
-          for (row = cell * this->blocksize, row_cell = 0;
-               row_cell < this->blocksize;
-               ++row_cell, ++row)
+          for (size_type row_cell = 0; row_cell < this->blocksize; ++row_cell)
             if (adding)
-              dst(row) += x_cell(row_cell);
+              dst[offset + row_cell] += x_cell[row_cell];
             else
-              dst(row) = x_cell(row_cell);
-
-          begin_diag_block += this->blocksize;
+              dst[offset + row_cell] = x_cell[row_cell];
         }
     }
   else
     for (unsigned int cell = 0; cell < this->size(); ++cell)
       {
-        for (row = cell * this->blocksize, row_cell = 0;
-             row_cell < this->blocksize;
-             ++row_cell, ++row)
-          {
-            b_cell(row_cell) = src(row);
-          }
+        const auto offset = cell * this->blocksize;
+        for (size_type row_cell = 0; row_cell < this->blocksize; ++row_cell)
+          b_cell[row_cell] = src[offset + row_cell];
         this->inverse_vmult(cell, x_cell, b_cell);
         // distribute x_cell to dst
-        for (row = cell * this->blocksize, row_cell = 0;
-             row_cell < this->blocksize;
-             ++row_cell, ++row)
+        for (size_type row_cell = 0; row_cell < this->blocksize; ++row_cell)
           if (adding)
-            dst(row) += x_cell(row_cell);
+            dst[offset + row_cell] += x_cell[row_cell];
           else
-            dst(row) = x_cell(row_cell);
-
-        begin_diag_block += this->blocksize;
+            dst[offset + row_cell] = x_cell[row_cell];
       }
   dst *= this->relaxation;
 }
