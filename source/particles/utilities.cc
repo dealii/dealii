@@ -86,7 +86,7 @@ namespace Particles
           const auto n_particles = particle_handler.n_particles_in_cell(cell);
           particle_indices.resize(n_particles * n_comps);
           Assert(pic.begin() == particle, ExcInternalError());
-          for (unsigned int i = 0; particle != pic.end(); ++particle, ++i)
+          for (; particle != pic.end(); ++particle)
             {
               const auto p_id = particle->get_id();
               for (unsigned int j = 0; j < fe.n_dofs_per_cell(); ++j)
