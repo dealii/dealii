@@ -1267,20 +1267,16 @@ PointValueHistory<dim>::get_postprocessor_locations(
   std::vector<Point<dim>> evaluation_points;
 
   // Loop over points and find correct cell
-  typename std::vector<
-    internal::PointValueHistoryImplementation::PointGeometryData<dim>>::iterator
-    point = point_geometry_data.begin();
   Assert(!dof_handler->get_triangulation().is_mixed_mesh(),
          ExcNotImplemented());
   const auto reference_cell =
     dof_handler->get_triangulation().get_reference_cells()[0];
-  for (unsigned int data_store_index = 0; point != point_geometry_data.end();
-       ++point, ++data_store_index)
+  for (const auto &point : point_geometry_data)
     {
       // we now have a point to query,
       // need to know what cell it is in
-      Point<dim> requested_location = point->requested_location;
-      typename DoFHandler<dim>::active_cell_iterator cell =
+      Point<dim> requested_location = point.requested_location;
+      const auto cell =
         GridTools::find_active_cell_around_point(
           reference_cell.template get_default_linear_mapping<dim>(),
           *dof_handler,
