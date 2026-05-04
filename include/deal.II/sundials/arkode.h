@@ -123,8 +123,12 @@ namespace SUNDIALS
           target,
           ExcMessage(
             "Unable to assign the function since the target is not set in the "
-            "proxy. Most probably, you tried to use it with a stepper that does "
-            "not support this type of callback."));
+            "proxy. Most probably, you explicitly provided a stepper to create "
+            "the ARKode object and then tried to bind a callback to the latter. "
+            "For such use cases, assign the user callbacks directly to the "
+            "stepper. Assignment of callbacks to the ARKode object is permitted "
+            "only if one of the constructors without a stepper parameter was "
+            "used for instantiation of the ARKode object."));
 
         *target = std::move(f);
         return *this;
