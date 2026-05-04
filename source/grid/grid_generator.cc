@@ -10,6 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
+#include "deal.II/base/exception_macros.h"
+#include "deal.II/base/exceptions.h"
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/parameter_handler.h>
 
@@ -9429,7 +9431,7 @@ namespace GridGenerator
     //    also, that it will not reorder the vertices.
 
     // dimension of the boundary mesh
-    static constexpr unsigned int boundary_dim = dim - 1;
+    constexpr unsigned int boundary_dim = dim - 1;
 
     // temporary map for level==0
     // iterator to face is stored along with face number
@@ -9462,7 +9464,11 @@ namespace GridGenerator
     // 3 )
     //
     // Permutation depends on the volume cell's reference cell. Currently only
-    // hypercube and simplex meshes are supported
+    // hypercube and simplex meshes are supported.
+    AssertThrow(
+      (volume_mesh.get_triangulation().is_mixed_mesh() == false),
+      ExcNotImplemented(
+        "Boundary extraction for mixed meshes is currently not supported."));
     const ReferenceCell<dim> reference_cell =
       volume_mesh.begin(0)->reference_cell();
 
@@ -9470,9 +9476,7 @@ namespace GridGenerator
     // face of the cell (4 for hypercubes, 3 for simplices). Unused entries
     // are left at the identity.
     const unsigned int max_n_face_vertices =
-      reference_cell.is_hyper_cube() ?
-        GeometryInfo<dim - 1>::vertices_per_cell :
-        (dim - 1 == 1 ? 2 : 3);
+      reference_cell.face_reference_cell(0).n_vertices();
 
     Table<2, unsigned int> swap_matrix(reference_cell.n_faces(),
                                        max_n_face_vertices);
