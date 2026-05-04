@@ -10,8 +10,6 @@
 //
 // -----------------------------------------------------------------------------
 
-#include "deal.II/base/exception_macros.h"
-#include "deal.II/base/exceptions.h"
 #include <deal.II/base/ndarray.h>
 #include <deal.II/base/parameter_handler.h>
 
