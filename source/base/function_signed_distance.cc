@@ -411,6 +411,55 @@ namespace Functions
       // sphere and the notch
       return std::max(sphere.value(p), -notch.value(p));
     }
+
+
+    template <int dim>
+    InfiniteCylinder<dim>::InfiniteCylinder(
+      const double          radius,
+      const Tensor<1, dim> &axis_direction,
+      const Point<dim>     &axis_point)
+      : Function<dim>()
+      , x0(axis_point)
+      , axis(axis_direction / axis_direction.norm())
+      , R(radius)
+    {
+      AssertThrow(radius > 0.0,
+                  ExcMessage("Cylinder radius must be positive."));
+
+      const double norm = axis.norm();
+
+      AssertThrow(std::abs(norm - 1.0) < 1e-12,
+                  ExcMessage("Axis vector must be normalized (||axis|| = 1)."));
+    }
+
+
+    template <int dim>
+    double
+    InfiniteCylinder<dim>::value(const Point<dim> &point,
+                                 const unsigned int) const
+    {
+      const Tensor<1, dim> q      = point - x0;
+      const double         s      = q * axis;
+      const Tensor<1, dim> q_perp = q - s * axis;
+
+      return q_perp.norm() - R;
+    }
+
+
+    template <int dim>
+    Tensor<1, dim>
+    InfiniteCylinder<dim>::gradient(const Point<dim> &point,
+                                    const unsigned int) const
+    {
+      const Tensor<1, dim> q      = point - x0;
+      const double         s      = q * axis;
+      const Tensor<1, dim> q_perp = q - s * axis;
+
+      const double r = q_perp.norm();
+
+      return q_perp / r;
+    }
+
   } // namespace SignedDistance
 } // namespace Functions
 
