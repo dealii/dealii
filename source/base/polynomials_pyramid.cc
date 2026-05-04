@@ -21,16 +21,12 @@
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/polynomials_pyramid.h>
-#include <deal.II/base/scalar_polynomials_base.h>
+#include <deal.II/base/scalar_polynomials_vandermonde_base.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/reference_cell.h>
-
-#include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/householder.h>
-#include <deal.II/lac/vector.h>
 
 #include <Kokkos_Macros.hpp>
 
@@ -87,56 +83,12 @@ ScalarLagrangePolynomialPyramid<dim>::ScalarLagrangePolynomialPyramid(
   const unsigned int             degree,
   const unsigned int             n_dofs,
   const std::vector<Point<dim>> &support_points)
-  : ScalarPolynomialsBase<dim>(degree, n_dofs)
+  : ScalarPolynomialsVandermondeBase<dim>(degree, n_dofs)
 {
-  (void)n_dofs;
-
   AssertThrow(dim == 3,
               ExcNotImplemented("Pyramid elements only make sense in 3D."));
 
-  AssertThrow(
-    support_points.size() == n_dofs,
-    ExcNotImplemented(
-      "The number of DoF must be equal to the number of support points."));
-
-  // fill VDM Matrix
-  const unsigned int n = support_points.size();
-  FullMatrix<double> VDM(n);
-
-  for (unsigned i = 0; i < n; ++i)
-    for (unsigned j = 0; j < n; ++j)
-      VDM[i][j] =
-        this->evaluate_orthogonal_basis_function(i, support_points[j]);
-
-  // get the inverse matrix
-  Householder<double> householder(VDM);
-  Vector<double>      e(n);
-  Vector<double>      x(n);
-
-  // assume e_j are unit vectors
-  // compute (VDM^-1)_ij by using (VDM^-1)_ij = e_i (VDM^-1) e_j
-  // loop over all vectors e_j
-  for (unsigned int j = 0; j < n; ++j)
-    {
-      e    = 0.;
-      e[j] = 1.;
-
-      x = 0.;
-      // get x = (VDM^-1) e_j
-      householder.least_squares(x, e);
-
-      for (unsigned int i = 0; i < n; ++i)
-        // (VDM^-1)_ij = e_i (VDM^-1) e_j
-        VDM(i, j) = x[i];
-    }
-
-  vandermonde_matrix_inverse = VDM;
-
-  // clean up small values
-  for (unsigned int i = 0; i < n; ++i)
-    for (unsigned int j = 0; j < n; ++j)
-      if (std::abs(vandermonde_matrix_inverse[i][j]) < 1e-14)
-        vandermonde_matrix_inverse[i][j] = 0.;
+  this->reinit(support_points);
 }
 
 
@@ -354,152 +306,6 @@ ScalarLagrangePolynomialPyramid<dim>::evaluate_orthogonal_basis_derivative(
   DEAL_II_ASSERT_UNREACHABLE();
   return Tensor<1, dim>();
 }
-
-
-
-template <int dim>
-double
-ScalarLagrangePolynomialPyramid<dim>::compute_value(const unsigned int i,
-                                                    const Point<dim>  &p) const
-{
-  AssertDimension(dim, 3);
-  AssertIndexRange(i, vandermonde_matrix_inverse.m());
-
-  double result = 0.;
-  for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
-    result += vandermonde_matrix_inverse[i][j] *
-              this->evaluate_orthogonal_basis_function(j, p);
-
-  if (std::fabs(result) < 1e-14)
-    result = 0.0;
-
-  return result;
-}
-
-
-
-template <int dim>
-Tensor<1, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_grad(const unsigned int i,
-                                                   const Point<dim>  &p) const
-{
-  AssertDimension(dim, 3);
-  AssertIndexRange(i, vandermonde_matrix_inverse.m());
-
-  Tensor<1, dim> grad;
-
-  grad = 0.;
-  for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
-    grad += vandermonde_matrix_inverse[i][j] *
-            this->evaluate_orthogonal_basis_derivative(j, p);
-
-  for (unsigned int d = 0; d < dim; ++d)
-    if (std::fabs(grad[d]) < 1e-14)
-      grad[d] = 0.0;
-
-  return grad;
-}
-
-
-
-template <int dim>
-Tensor<2, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_grad_grad(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-  return Tensor<2, dim>();
-}
-
-
-
-template <int dim>
-void
-ScalarLagrangePolynomialPyramid<dim>::evaluate(
-  const Point<dim>            &unit_point,
-  std::vector<double>         &values,
-  std::vector<Tensor<1, dim>> &grads,
-  std::vector<Tensor<2, dim>> &grad_grads,
-  std::vector<Tensor<3, dim>> &third_derivatives,
-  std::vector<Tensor<4, dim>> &fourth_derivatives) const
-{
-  (void)grads;
-  (void)grad_grads;
-  (void)third_derivatives;
-  (void)fourth_derivatives;
-
-  if (values.size() == this->n())
-    for (unsigned int i = 0; i < this->n(); ++i)
-      values[i] = compute_value(i, unit_point);
-
-  if (grads.size() == this->n())
-    for (unsigned int i = 0; i < this->n(); ++i)
-      grads[i] = compute_grad(i, unit_point);
-}
-
-
-
-template <int dim>
-Tensor<1, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_1st_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  return compute_grad(i, p);
-}
-
-
-
-template <int dim>
-Tensor<2, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_2nd_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-
-  return {};
-}
-
-
-
-template <int dim>
-Tensor<3, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_3rd_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-
-  return {};
-}
-
-
-
-template <int dim>
-Tensor<4, dim>
-ScalarLagrangePolynomialPyramid<dim>::compute_4th_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-
-  return {};
-}
-
 
 
 template <int dim>
