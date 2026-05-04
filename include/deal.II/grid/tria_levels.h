@@ -64,11 +64,17 @@ namespace internal
        * @param[in] max_faces_per_cell Maximum number of faces (i.e., neighbors)
        *            per cell. Like @p max_children_per_cell, this is the maximum
        *            over all relevant ReferenceCell types.
+       *
+       * @param[in] max_vertices_per_cell Maximum number of vertices (i.e.,
+       *            neighbors) per cell. Like @p max_children_per_cell, this is
+       *            the maximum over all relevant ReferenceCell types.
        */
       TriaLevel(const unsigned int max_children_per_cell,
-                const unsigned int max_faces_per_cell)
+                const unsigned int max_faces_per_cell,
+                const unsigned int max_vertices_per_cell)
         : children_per_object(max_children_per_cell)
         , faces_per_object(max_faces_per_cell)
+        , vertices_per_object(max_vertices_per_cell)
         , cells(dim, max_children_per_cell, max_faces_per_cell)
         , face_orientations(0, max_faces_per_cell)
       {}
@@ -148,6 +154,13 @@ namespace internal
        * relevant ReferenceCell types.
        */
       unsigned int faces_per_object;
+
+      /**
+       * The number of vertices stored per object. Like children_per_object,
+       * this is typically the maximum value across all relevant ReferenceCell
+       * types.
+       */
+      unsigned int vertices_per_object;
 
       /**
        * @p RefinementCase<dim>::Type flags for the cells to be refined with
@@ -411,6 +424,7 @@ namespace internal
 
       ar &children_per_object;
       ar &faces_per_object;
+      ar &vertices_per_object;
 
       // do not serialize `active_cell_indices` and `vertex_indices_cache`
       // here. instead of storing them to the stream and re-reading them again

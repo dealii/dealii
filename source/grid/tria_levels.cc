@@ -40,6 +40,7 @@ namespace internal
     TriaLevel<dim, spacedim>::TriaLevel()
       : children_per_object(numbers::invalid_unsigned_int)
       , faces_per_object(numbers::invalid_unsigned_int)
+      , vertices_per_object(numbers::invalid_unsigned_int)
     {}
 
 
@@ -76,6 +77,8 @@ namespace internal
       Assert(children_per_object == cells.children_per_object,
              ExcInternalError());
       Assert(faces_per_object == cells.faces_per_object, ExcInternalError());
+      Assert(vertices_per_object != numbers::invalid_unsigned_int,
+             ExcInternalError());
       active_cell_indices.assign(n_cells, numbers::invalid_unsigned_int);
       subdomain_ids.assign(n_cells, 0);
       level_subdomain_ids.assign(n_cells, 0);

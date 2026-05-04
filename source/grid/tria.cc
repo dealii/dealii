@@ -3685,7 +3685,8 @@ namespace internal
           std::make_unique<
             internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
             ReferenceCells::max_n_children<dim>(),
-            ReferenceCells::max_n_faces<dim>()));
+            ReferenceCells::max_n_faces<dim>(),
+            ReferenceCells::max_n_vertices<dim>()));
 
         if (dim > 1)
           tria.faces = std::make_unique<
@@ -5327,7 +5328,8 @@ namespace internal
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>()));
+                  ReferenceCells::max_n_faces<dim>(),
+                  ReferenceCells::max_n_vertices<dim>()));
               break;
             }
 
@@ -5807,7 +5809,8 @@ namespace internal
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>()));
+                  ReferenceCells::max_n_faces<dim>(),
+                  ReferenceCells::max_n_vertices<dim>()));
               break;
             }
 
@@ -6060,7 +6063,8 @@ namespace internal
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>()));
+                  ReferenceCells::max_n_faces<dim>(),
+                  ReferenceCells::max_n_vertices<dim>()));
               break;
             }
 
@@ -6363,7 +6367,8 @@ namespace internal
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>()));
+                  ReferenceCells::max_n_faces<dim>(),
+                  ReferenceCells::max_n_vertices<dim>()));
               break;
             }
 
@@ -7933,7 +7938,8 @@ namespace internal
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
                   ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>()));
+                  ReferenceCells::max_n_faces<dim>(),
+                  ReferenceCells::max_n_vertices<dim>()));
               break;
             }
 
