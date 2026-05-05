@@ -1,6 +1,8 @@
 
 DEAL::Forward Euler
 DEAL::0
+DEAL::Runge-Kutta third order (Heun-Euler)
+DEAL::0
 DEAL::Runge-Kutta third order
 DEAL::0
 DEAL::Strong Stability Preserving Runge-Kutta third order
@@ -49,6 +51,14 @@ DEAL::dt 0.06250    error 0.02543    rate 0.8621
 DEAL::dt 0.03125    error 0.01339    rate 0.9248    
 DEAL::dt 0.01562    error 0.006882   rate 0.9606    
 DEAL::dt 0.007812   error 0.003490   rate 0.9798    
+DEAL::Runge-Kutta second order (Heun-Euler)
+DEAL::convergence rate
+DEAL::dt 0.2500     error 0.005740   rate 1.927
+DEAL::dt 0.1250     error 0.001443   rate 1.992
+DEAL::dt 0.06250    error 0.0003588  rate 2.008
+DEAL::dt 0.03125    error 8.920e-05  rate 2.008
+DEAL::dt 0.01562    error 2.222e-05  rate 2.005
+DEAL::dt 0.007812   error 5.543e-06  rate 2.003
 DEAL::Runge-Kutta third order
 DEAL::convergence rate
 DEAL::dt 0.2500     error 3.856e-05  rate 0.05239   

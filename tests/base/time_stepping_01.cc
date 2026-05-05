@@ -295,6 +295,11 @@ main()
       TimeStepping::FORWARD_EULER);
     test(fe, f1, id_minus_tau_J_inv1, my1);
 
+    deallog << "Runge-Kutta third order (Heun-Euler)" << std::endl;
+    TimeStepping::ExplicitRungeKutta<Vector<double>> rk2(
+      TimeStepping::HEUN_EULER);
+    test(rk2, f2, id_minus_tau_J_inv2, my2);
+
     deallog << "Runge-Kutta third order" << std::endl;
     TimeStepping::ExplicitRungeKutta<Vector<double>> rk3(
       TimeStepping::RK_THIRD_ORDER);
@@ -406,6 +411,14 @@ main()
     test_convergence(rk1,
                      my_rhs_function,
                      id_minus_tau_J_inv1,
+                     my_exact_solution);
+
+    deallog << "Runge-Kutta second order (Heun-Euler)" << std::endl;
+    TimeStepping::ExplicitRungeKutta<Vector<double>> rk2(
+      TimeStepping::HEUN_EULER);
+    test_convergence(rk2,
+                     my_rhs_function,
+                     id_minus_tau_J_inv2,
                      my_exact_solution);
 
     deallog << "Runge-Kutta third order" << std::endl;
