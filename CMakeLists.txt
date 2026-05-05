@@ -32,7 +32,7 @@ message(STATUS "")
 
 cmake_minimum_required(VERSION 3.13.4)
 #
-# We support all policy changes up to version 3.11.
+# We support all policy changes up to version 3.13.4.
 #
 cmake_policy(VERSION 3.13.4)
 
