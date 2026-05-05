@@ -16556,90 +16556,14 @@ void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
                    numbers::invalid_unsigned_int);
       for (const auto &cell : cell_iterators_on_level(l))
         {
-          const unsigned int my_index =
-            cell->index() * ReferenceCells::max_n_vertices<dim>();
-
-          // to reduce the cost of this function when passing down into quads,
-          // then lines, then vertices, we use a more low-level access method
-          // for hexahedral cells, where we can streamline most of the logic
-          const ReferenceCell<dim> ref_cell = cell->reference_cell();
-          if (ref_cell == ReferenceCells::Hexahedron)
-            for (unsigned int face = 4; face < 6; ++face)
-              {
-                const auto face_iter = cell->face(face);
-                const std::array<types::geometric_orientation, 2>
-                  line_orientations{{face_iter->line_orientation(0),
-                                     face_iter->line_orientation(1)}};
-                const std::array<unsigned int, 2> line_vertex_indices{
-                  {line_orientations[0] ==
-                     numbers::default_geometric_orientation,
-                   line_orientations[1] ==
-                     numbers::default_geometric_orientation}};
-                const std::array<unsigned int, 4> raw_vertex_indices{
-                  {face_iter->line(0)->vertex_index(1 - line_vertex_indices[0]),
-                   face_iter->line(1)->vertex_index(1 - line_vertex_indices[1]),
-                   face_iter->line(0)->vertex_index(line_vertex_indices[0]),
-                   face_iter->line(1)->vertex_index(line_vertex_indices[1])}};
-
-                const auto combined_orientation =
-                  levels[l]->face_orientations.get_combined_orientation(
-                    cell->index(), face);
-                const std::array<unsigned int, 4> vertex_order{
-                  {ref_cell.standard_to_real_face_vertex(0,
-                                                         face,
-                                                         combined_orientation),
-                   ref_cell.standard_to_real_face_vertex(1,
-                                                         face,
-                                                         combined_orientation),
-                   ref_cell.standard_to_real_face_vertex(2,
-                                                         face,
-                                                         combined_orientation),
-                   ref_cell.standard_to_real_face_vertex(
-                     3, face, combined_orientation)}};
-
-                const unsigned int index = my_index + 4 * (face - 4);
-                for (unsigned int i = 0; i < 4; ++i)
-                  cache[index + i] = raw_vertex_indices[vertex_order[i]];
-              }
-          else if (ref_cell == ReferenceCells::Quadrilateral)
-            {
-              const std::array<types::geometric_orientation, 2>
-                line_orientations{
-                  {cell->line_orientation(0), cell->line_orientation(1)}};
-              const std::array<unsigned int, 2> line_vertex_indices{
-                {line_orientations[0] == numbers::default_geometric_orientation,
-                 line_orientations[1] ==
-                   numbers::default_geometric_orientation}};
-              const std::array<unsigned int, 4> raw_vertex_indices{
-                {cell->line(0)->vertex_index(1 - line_vertex_indices[0]),
-                 cell->line(1)->vertex_index(1 - line_vertex_indices[1]),
-                 cell->line(0)->vertex_index(line_vertex_indices[0]),
-                 cell->line(1)->vertex_index(line_vertex_indices[1])}};
-              for (unsigned int i = 0; i < 4; ++i)
-                cache[my_index + i] = raw_vertex_indices[i];
-            }
-          else if (ref_cell == ReferenceCells::Line)
-            {
-              cache[my_index + 0] = cell->vertex_index(0);
-              cache[my_index + 1] = cell->vertex_index(1);
-            }
-          else
-            {
-              Assert(dim == 2 || dim == 3, ExcInternalError());
-              for (const unsigned int i : cell->vertex_indices())
-                {
-                  const auto [face_index, vertex_index] =
-                    ref_cell.standard_vertex_to_face_and_vertex_index(i);
-                  const auto vertex_within_face_index =
-                    ref_cell.standard_to_real_face_vertex(
-                      vertex_index,
-                      face_index,
-                      cell->combined_face_orientation(face_index));
-                  cache[my_index + i] =
-                    cell->face(face_index)
-                      ->vertex_index(vertex_within_face_index);
-                }
-            }
+          // Avoid obscure problems with old versions of libc++ with GNU
+          // compilers by explicitly creating the ArrayView before copying it
+          ArrayView<unsigned int> cell_vertices(
+            cache.data() +
+              cell->index() * ReferenceCells::max_n_vertices<dim>(),
+            cell->n_vertices());
+          GridTools::internal::extract_vertices_without_cache<dim, spacedim>(
+            cell, cell_vertices);
         }
     }
 }

@@ -97,6 +97,15 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int      level,
         DynamicSparsityPattern &cell_connectivity);
 
+      namespace internal
+      \{
+        template void
+        extract_vertices_without_cache<deal_II_dimension,
+                                       deal_II_space_dimension>(
+          const Triangulation<deal_II_dimension,
+                              deal_II_space_dimension>::cell_iterator &,
+          const ArrayView<unsigned int> &);
+      \}
     \}
 #endif
   }
