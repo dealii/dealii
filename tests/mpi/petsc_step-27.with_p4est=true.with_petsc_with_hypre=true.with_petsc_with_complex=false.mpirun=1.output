@@ -18,7 +18,7 @@ DEAL::Cycle 3:
 DEAL::   Number of active cells      : 1365
 DEAL::   Number of degrees of freedom: 12493
 DEAL::   Number of constraints       : 3079
-DEAL::   Solved in 17 iterations.
+DEAL::   Solved in 16 iterations.
 DEAL::Cycle 4:
 DEAL::   Number of active cells      : 1668
 DEAL::   Number of degrees of freedom: 18490
