@@ -502,13 +502,13 @@ jobs:
         make compile_test_executables
 
   ####################
-  # clang-22-modules #
+  # clang-21-modules #
   ####################
 
-  clang-22-modules:
+  clang-21-modules:
     # simple build testing C++20 modules
 
-    name: debian bookworm clang-22 modules
+    name: debian bookworm clang-21 modules
     runs-on: [ubuntu-latest]
     container:
       image: gcc:15-bookworm
@@ -527,10 +527,10 @@ jobs:
         apt-get install -yq --no-install-recommends \
             ninja-build wget lsb-release software-properties-common gnupg
         wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
-        echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-22 main" | tee /etc/apt/sources.list.d/llvm.list
-        echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-22 main" | tee -a /etc/apt/sources.list.d/llvm.list
+        echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-21 main" | tee /etc/apt/sources.list.d/llvm.list
+        echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-21 main" | tee -a /etc/apt/sources.list.d/llvm.list
         apt-get update && apt-get install -yq --no-install-recommends \
-             libc++-22-dev clang-tools-22 clang-22
+             libc++-21-dev clang-tools-21 clang-21
     - uses: lukka/get-cmake@v3.28.3
     - uses: actions/checkout@v6
       with:
@@ -544,7 +544,7 @@ jobs:
         cd build
         cmake -GNinja \
               -D BUILD_SHARED_LIBS=ON \
-              -D CMAKE_CXX_COMPILER=clang++-22 \
+              -D CMAKE_CXX_COMPILER=clang++-21 \
               -D CMAKE_CXX_STANDARD=23 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
@@ -558,8 +558,8 @@ jobs:
         export LDFLAGS="-stdlib=libc++"
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D CMAKE_CXX_STANDARD=23 \
-              -D CMAKE_C_COMPILER=clang-22 \
-              -D CMAKE_CXX_COMPILER=clang++-22 \
+              -D CMAKE_C_COMPILER=clang-21 \
+              -D CMAKE_CXX_COMPILER=clang++-21 \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CXX20_MODULE=ON \
               -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
