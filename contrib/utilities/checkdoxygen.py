@@ -19,11 +19,17 @@ def check_doxygen_groups(lines):
         elif "@}" in l:
             count = count - 1
         if count < 0:
-            sys.exit("Error in file '%s' in line %d" % (filename, lineno))
+            sys.exit(
+                "Error in file '%s' in line %d: This file has more closing '@}' statements than opening '@{' statements."
+                % (filename, lineno)
+            )
         lineno = lineno + 1
 
     if count != 0:
-        sys.exit("Error: missing closing braces in file '%s'" % (filename))
+        sys.exit(
+            "Error in file '%s': This file has more opening '@{' statements than closing '@}' statements."
+            % (filename)
+        )
 
     return
 
