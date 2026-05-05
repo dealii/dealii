@@ -1,0 +1,5 @@
+
+DEAL::Divergence theorem for 2D hex   : ok 
+DEAL::Divergence theorem for 2D simplex: ok 
+DEAL::Divergence theorem for 3D hex   : ok 
+DEAL::Divergence theorem for 3D simplex: ok 
