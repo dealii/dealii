@@ -128,11 +128,11 @@ std_includes = [
     "string_view",
     "bitset",
     "initializer_list",
-    #                    "queue",   # excluded for now due to https://github.com/llvm/llvm-project/issues/138558
+    "queue",
     "strstream",
     "charconv",
     "iomanip",
-    #                    "random",   # excluded for now due to https://github.com/llvm/llvm-project/issues/138558
+    "random",
     "syncstream",
     "chrono",
     "ios",
@@ -180,7 +180,7 @@ std_includes = [
     "variant",
     "filesystem",
     "memory",
-    #                    "stack",   # excluded for now due to https://github.com/llvm/llvm-project/issues/138558
+    "stack",
     "vector",
     "flat_map",
     "memory_resource",
