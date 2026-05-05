@@ -90,6 +90,22 @@ namespace TimeStepping
 
             break;
           }
+        case (HEUN_EULER):
+          {
+            this->n_stages = 2;
+            this->b.push_back(1.0 / 2.0);
+            this->b.push_back(1.0 / 2.0);
+            this->c.push_back(0.0);
+            this->c.push_back(1.0);
+
+            std::vector<double> tmp;
+            this->a.push_back(tmp);
+            tmp.resize(1);
+            tmp[0] = 1.0;
+            this->a.push_back(tmp);
+
+            break;
+          }
         case (RK_THIRD_ORDER):
           {
             this->n_stages = 3;

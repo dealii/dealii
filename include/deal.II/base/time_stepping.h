@@ -33,6 +33,7 @@ namespace TimeStepping
    * The following Runge-Kutta methods are available:
    * - Explicit methods (see ExplicitRungeKutta::initialize):
    *   - FORWARD_EULER (first order)
+   *   - HEUN_EULER (second order)
    *   - RK_THIRD_ORDER (third order Runge-Kutta)
    *   - SSP_THIRD_ORDER (third order SSP Runge-Kutta)
    *   - RK_CLASSIC_FOURTH_ORDER (classical fourth order Runge-Kutta)
