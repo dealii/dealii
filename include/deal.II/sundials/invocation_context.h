@@ -21,7 +21,10 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
-#  include <sundials/sundials_types.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+#    include <sundials/sundials_context.h>
+#    include <sundials/sundials_types.h>
+#  endif
 
 #  include <exception>
 
