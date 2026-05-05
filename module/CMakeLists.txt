@@ -132,12 +132,9 @@ if(DEAL_II_WITH_CXX20_MODULE)
   endforeach()
 
   #
-  # Append interface units for external libraries:
-  #
   # We have some other interface units that we need to add to the list,
   # namely the ones that were written by hand instead of created via
-  # script above. We need to add these to the list of interface units
-  # as well.
+  # script above.
   #
   # Specifically: It is very inefficient in the module system to have
   # repeated #includes in many module partition files because when you
@@ -148,16 +145,24 @@ if(DEAL_II_WITH_CXX20_MODULE)
   # our external dependencies into partitions that we can 'import'
   # wherever we need.
   #
-  set(_external_interface_module_partition_units
+  # Some of these wrappers need to be public because we reference
+  # these external libraries' symbols in our own headers/interface units.
+  # Some others (e.g., muParser and METIS) are only used in our source
+  # files/implementation units and so downstream projects will not have
+  # to have access to these wrappers and we should then also not install
+  # them because then downstream projects need not have access to these
+  # wrapped projects' header files. This is specifically relevant for
+  # muParser, which we have in the bundled/ directory but for which we
+  # do not want to install header files.
+  #
+  set(_external_interface_module_partition_units_public
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/adolc.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/boost.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/cgal.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/hdf5.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/kokkos.ccm"
-    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/metis.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mumps.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mpi.ccm"
-    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/muparser.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/opencascade.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/p4est.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/petsc.ccm"
@@ -171,6 +176,11 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/umfpack.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/vtk.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/zlib.ccm"
+    )
+
+  set(_external_interface_module_partition_units_private
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/metis.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/muparser.ccm"
     )
 
   #
@@ -303,9 +313,17 @@ if(DEAL_II_WITH_CXX20_MODULE)
     # files separately
     target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PUBLIC
-      FILE_SET external_module_interface_units
+      FILE_SET external_module_interface_units_public
       TYPE CXX_MODULES
-      FILES ${_external_interface_module_partition_units}
+      FILES ${_external_interface_module_partition_units_public}
+      BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions"
+      )
+
+    target_sources(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+      PRIVATE
+      FILE_SET external_module_interface_units_private
+      TYPE CXX_MODULES
+      FILES ${_external_interface_module_partition_units_private}
       BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions"
       )
 
