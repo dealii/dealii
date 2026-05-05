@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -39,6 +39,9 @@ main()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
+  SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+  stepper_data.add_parameters(prm);
+
   if (false)
     {
       std::ofstream ofile(SOURCE_DIR "/arkode_10_in.prm");
@@ -49,7 +52,8 @@ main()
   std::ifstream ifile(SOURCE_DIR "/arkode_08_in.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(data);
+  SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
+  SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
   // Explicit jacobian = stiffness matrix
   FullMatrix<double> K(2, 2);
@@ -61,21 +65,21 @@ main()
   M(0, 0) = M(1, 1) = 2.0 / 3;
   M(1, 0) = M(0, 1) = 1.0 / 3;
 
-  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    K.vmult(ydot, y);
-  };
+  stepper.implicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) { K.vmult(ydot, y); };
 
 
-  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = 1;
-    ydot[1] = 2;
-  };
+  stepper.explicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = 1;
+      ydot[1] = 2;
+    };
 
-  ode.jacobian_times_vector = [&](const VectorType &v,
-                                  VectorType       &Jv,
-                                  double            t,
-                                  const VectorType &y,
-                                  const VectorType &fy) { K.vmult(Jv, v); };
+  stepper.jacobian_times_vector = [&](const VectorType &v,
+                                      VectorType       &Jv,
+                                      double            t,
+                                      const VectorType &y,
+                                      const VectorType &fy) { K.vmult(Jv, v); };
 
   [&](SUNDIALS::SundialsOperator<VectorType> &,
       SUNDIALS::SundialsPreconditioner<VectorType> &,
@@ -86,7 +90,7 @@ main()
     throw RecoverableUserCallbackError();
   };
 
-  ode.solve_linearized_system =
+  stepper.solve_linearized_system =
     [&](SUNDIALS::SundialsOperator<VectorType> &,
         SUNDIALS::SundialsPreconditioner<VectorType> &,
         VectorType &,
@@ -98,11 +102,11 @@ main()
     };
 
 
-  ode.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType>       &op,
-                       SUNDIALS::SundialsPreconditioner<VectorType> &prec,
-                       VectorType                                   &x,
-                       const VectorType                             &b,
-                       double                                        tol) {
+  stepper.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType>       &op,
+                           SUNDIALS::SundialsPreconditioner<VectorType> &prec,
+                           VectorType                                   &x,
+                           const VectorType                             &b,
+                           double                                        tol) {
     ReductionControl     control;
     SolverCG<VectorType> solver_cg(control);
     solver_cg.solve(op, x, b, prec);
@@ -110,22 +114,22 @@ main()
 
   FullMatrix<double> M_inv(2, 2);
 
-  ode.mass_preconditioner_solve =
+  stepper.mass_preconditioner_solve =
     [&](double t, const VectorType &r, VectorType &z, double gamma, int lr) {
       LogStream::Prefix prefix("mass_preconditioner_solve");
       deallog << "applied" << std::endl;
       M_inv.vmult(z, r);
     };
 
-  ode.mass_preconditioner_setup = [&](double t) {
+  stepper.mass_preconditioner_setup = [&](double t) {
     LogStream::Prefix prefix("mass_preconditioner_setup");
     deallog << "applied" << std::endl;
     M_inv.invert(M);
   };
 
-  ode.mass_times_vector = [&](const double      t,
-                              const VectorType &v,
-                              VectorType       &Mv) { M.vmult(Mv, v); };
+  stepper.mass_times_vector = [&](const double      t,
+                                  const VectorType &v,
+                                  VectorType       &Mv) { M.vmult(Mv, v); };
 
 
   ode.output_step =

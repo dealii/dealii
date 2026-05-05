@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,6 +56,9 @@ main()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
+  SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+  stepper_data.add_parameters(prm);
+
   if (false)
     {
       std::ofstream ofile(SOURCE_DIR "/arkode_03_in.prm");
@@ -66,23 +69,26 @@ main()
   std::ifstream ifile(SOURCE_DIR "/arkode_03_in.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(data);
+  SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
+  SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
   // Parameters
   double u0 = 3.9, v0 = 1.1, w0 = 2.8, a = 1.2, b = 2.5, eps = 1e-5;
 
-  ode.implicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = 0;
-    ydot[1] = 0;
-    ydot[2] = -y[2] / eps;
-  };
+  stepper.implicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = 0;
+      ydot[1] = 0;
+      ydot[2] = -y[2] / eps;
+    };
 
 
-  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
-    ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
-    ydot[2] = b / eps - y[2] * y[0];
-  };
+  stepper.explicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = a - (y[2] + 1) * y[0] + y[1] * y[0] * y[0];
+      ydot[1] = y[2] * y[0] - y[1] * y[0] * y[0];
+      ydot[2] = b / eps - y[2] * y[0];
+    };
 
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int step_number) {

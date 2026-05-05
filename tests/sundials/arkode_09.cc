@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2023 - 2024 by the deal.II authors
+// Copyright (C) 2023 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,6 +36,9 @@ main()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
+  SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+  stepper_data.add_parameters(prm);
+
   // Set to true to reset input file.
   if (false)
     {
@@ -47,11 +50,12 @@ main()
   std::ifstream ifile(SOURCE_DIR "/arkode_09_in.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(data);
+  SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
+  SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
   double kappa = 1.0;
 
-  ode.explicit_function =
+  stepper.explicit_function =
     [&](const double t, const VectorType &y, VectorType &ydot) {
       deallog << "Evaluating right hand side at t=" << t << " with y=" << y[0]
               << std::endl;

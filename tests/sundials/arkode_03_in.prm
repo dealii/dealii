@@ -2,6 +2,13 @@ set Final time                        = 10
 set Initial time                      = 0
 set Time interval between each output = 0.1
 
+set Integration accuracy order             = 5
+set Maximum number of nonlinear iterations = 50
+set Implicit function is linear            = true
+set Implicit function is time independent  = true
+# A larger subspace, combined with looser tolerances, are required by 5.4
+set Anderson-acceleration subspace         = 10
+
 subsection Error control
   # making this tolerance any lower prevents convergence in 5.4:
   # this is fixed in 6.2
@@ -10,12 +17,6 @@ subsection Error control
 end
 
 subsection Running parameters
-  set Implicit function is linear            = true
-  set Implicit function is time independent  = true
-  set Initial step size                      = 1e-6
-  set Maximum number of nonlinear iterations = 50
-  set Maximum order of ARK                   = 5
-  set Minimum step size                      = 1e-7
-  # A larger subspace, combined with looser tolerances, are required by 5.4
-  set Anderson-acceleration subspace = 10
+  set Initial step size = 1e-6
+  set Minimum step size = 1e-7
 end

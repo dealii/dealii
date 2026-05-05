@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2024 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -57,6 +57,9 @@ main()
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
+  SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+  stepper_data.add_parameters(prm);
+
   // Set to true to reset input file.
   if (false)
     {
@@ -68,17 +71,19 @@ main()
   std::ifstream ifile(SOURCE_DIR "/arkode_01_in.prm");
   prm.parse_input(ifile);
 
-  SUNDIALS::ARKode<VectorType> ode(data);
+  SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
+  SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
   double kappa = 1.0;
 
   unsigned int n_rhs_evaluations = 0;
-  ode.explicit_function = [&](double, const VectorType &y, VectorType &ydot) {
-    ydot[0] = y[1];
-    ydot[1] = -kappa * kappa * y[0];
+  stepper.explicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = y[1];
+      ydot[1] = -kappa * kappa * y[0];
 
-    ++n_rhs_evaluations;
-  };
+      ++n_rhs_evaluations;
+    };
 
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int step_number) {
