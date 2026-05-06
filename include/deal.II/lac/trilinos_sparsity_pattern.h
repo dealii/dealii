@@ -676,7 +676,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &row_parallel_partitioning,
            const IndexSet &col_parallel_partitioning,
-           const IndexSet &writeable_rows,
+           const IndexSet &writable_rows,
            const MPI_Comm  communicator,
            const size_type n_entries_per_row);
 
@@ -685,7 +685,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &row_parallel_partitioning,
            const IndexSet &col_parallel_partitioning,
-           const IndexSet &writeable_rows,
+           const IndexSet &writable_rows,
            const MPI_Comm  communicator);
 
     DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
@@ -693,7 +693,7 @@ namespace TrilinosWrappers
     void
     reinit(const IndexSet &row_parallel_partitioning,
            const IndexSet &col_parallel_partitioning,
-           const IndexSet &writeable_rows);
+           const IndexSet &writable_rows);
 
     /**
      * Same as before, but now using a vector <tt>n_entries_per_row</tt> for
