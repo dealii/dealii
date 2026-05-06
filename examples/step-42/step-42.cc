@@ -69,11 +69,10 @@
 #include <fstream>
 #include <iostream>
 
-// Finally, we include two system headers that let us create a directory for
-// output files. The first header provides the <code>mkdir</code> function and
-// the second lets us determine what happened if <code>mkdir</code> fails.
-#include <sys/stat.h>
-#include <cerrno>
+// Finally, we include a system header that lets us create a directory for
+// output files
+#include <filesystem>
+
 
 namespace Step42
 {
@@ -854,8 +853,16 @@ namespace Step42
     // If necessary, create a new directory for the output.
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
-        const int ierr = mkdir(output_dir.c_str(), 0777);
-        AssertThrow(ierr == 0 || errno == EEXIST, ExcIO());
+        if (std::filesystem::exists(output_dir))
+          {
+            AssertThrow(std::filesystem::is_directory(output_dir),
+                        ExcMessage(
+                          "You specified <" + output_dir +
+                          "> as the output directory in the input file, "
+                          "but this is not in fact a directory."));
+          }
+        else
+          std::filesystem::create_directory(output_dir);
       }
 
     pcout << "    Using output directory '" << output_dir << "'" << std::endl;
