@@ -561,6 +561,7 @@ jobs:
               -D DEAL_II_WITH_CGAL=OFF \
               -D DEAL_II_WITH_OPENCASCADE=OFF \
               -D DEAL_II_WITH_SYMENGINE=OFF \
+              -D DEAL_II_WITH_VTK=OFF \
               -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
               -G Ninja \
               ..
