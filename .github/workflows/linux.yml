@@ -502,16 +502,16 @@ jobs:
         make compile_test_executables
 
   ####################
-  # clang-20-modules #
+  # clang-23-modules #
   ####################
 
-  clang-20-modules:
+  clang-23-modules:
     # simple build testing C++20 modules
 
-    name: debian bookworm clang-20 modules
+    name: noble clang-23 modules
     runs-on: [ubuntu-latest]
     container:
-      image: gcc:15-bookworm
+      image: dealii/dependencies:noble-v9.7.1
 
     # The following condition only runs the workflow on 'push' or if the
     # 'pull_request' is not a draft. This is only useful for hackathons or
@@ -523,15 +523,12 @@ jobs:
     steps:
     - name: modules
       run: |
-        apt-get update
-        apt-get install -yq --no-install-recommends \
-            ninja-build wget lsb-release software-properties-common gnupg
-        wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
-        echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee /etc/apt/sources.list.d/llvm.list
-        echo "deb-src http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-20 main" | tee -a /etc/apt/sources.list.d/llvm.list
-        apt-get update && apt-get install -yq --no-install-recommends \
-             libc++-20-dev clang-tools-20 clang-20
-    - uses: lukka/get-cmake@v3.28.3
+        sudo apt-get install software-properties-common
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        sudo apt-get update
+        sudo apt-get install -yq --no-install-recommends \
+            ninja-build wget lsb-release gnupg g++-15
+        sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 23
     - uses: actions/checkout@v6
       with:
         repository: kokkos/kokkos
@@ -544,7 +541,7 @@ jobs:
         cd build
         cmake -GNinja \
               -D BUILD_SHARED_LIBS=ON \
-              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D CMAKE_CXX_COMPILER=clang++-23 \
               -D CMAKE_CXX_STANDARD=23 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
@@ -554,14 +551,16 @@ jobs:
       run: |
         mkdir build
         cd build
-        export CXXFLAGS="-stdlib=libc++"
-        export LDFLAGS="-stdlib=libc++"
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D CMAKE_CXX_STANDARD=23 \
-              -D CMAKE_C_COMPILER=clang-20 \
-              -D CMAKE_CXX_COMPILER=clang++-20 \
+              -D CMAKE_C_COMPILER=clang-23 \
+              -D CMAKE_CXX_COMPILER=clang++-23 \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CXX20_MODULE=ON \
+              -D DEAL_II_WITH_ADOLC=OFF \
+              -D DEAL_II_WITH_CGAL=OFF \
+              -D DEAL_II_WITH_OPENCASCADE=OFF \
+              -D DEAL_II_WITH_SYMENGINE=OFF \
               -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
               -G Ninja \
               ..
