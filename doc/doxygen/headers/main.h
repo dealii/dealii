@@ -185,7 +185,7 @@
  *   stores values for all degrees of freedom associated with a
  *   triangulation.
  *
- *   It is worth noting that, just as triangulations, DoFHandler
+ *   It is worth noting that, just as with triangulations, DoFHandler
  *   classes do not know anything about the mapping from the unit cell
  *   to its individual cells. It is also ignorant of the shape
  *   functions that correspond to the degrees of freedom it manages:
@@ -229,7 +229,7 @@
  *   think that it is necessary to describe finite element spaces as
  *   continuous spaces. However, in practice, this is not necessary:
  *   all integrals are in actual computations replaced by
- *   approximations using quadrature formula, and what is therefore
+ *   approximations using quadrature formulas, and what is therefore
  *   really only necessary is the ability to evaluate shape functions
  *   at a finite number of given locations inside a domain. The
  *   FEValues classes offer exactly this information: Given finite
