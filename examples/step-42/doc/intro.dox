@@ -385,7 +385,7 @@ Compared to step-41, the programs has a few new classes:
   Whether this or the next class is used to describe the obstacle is
   determined from the input parameter file.
 
-<li> <code>ChineseObstacle</code> (and a helper class) is a class that
+<li> <code>ChineseCharacterObstacle</code> (and a helper class) is a class that
   allows us to read in an obstacle from a file. In the example we
   will show in the results section, this file will be
   <code>'obstacle_file.dat'</code> and will correspond to data that shows the

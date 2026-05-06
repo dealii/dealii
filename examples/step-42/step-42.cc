@@ -398,7 +398,7 @@ namespace Step42
         values(c) = SphereObstacle<dim>::value(p, c);
     }
 
-    // @sect4{The <code>BitmapFile</code> and <code>ChineseObstacle</code> classes}
+    // @sect4{The <code>BitmapFile</code> and <code>ChineseCharacterObstacle</code> classes}
 
     // The following two classes describe the obstacle outlined in the
     // introduction, i.e., the Chinese character. The first of the two,
@@ -516,10 +516,11 @@ namespace Step42
     // the BitmapFile class reports a zero). The following function should then
     // be self-explanatory.
     template <int dim>
-    class ChineseObstacle : public Function<dim>
+    class ChineseCharacterObstacle : public Function<dim>
     {
     public:
-      ChineseObstacle(const std::string &filename, const double z_surface);
+      ChineseCharacterObstacle(const std::string &filename,
+                               const double       z_surface);
 
       virtual double value(const Point<dim>  &p,
                            const unsigned int component = 0) const override;
@@ -534,8 +535,9 @@ namespace Step42
 
 
     template <int dim>
-    ChineseObstacle<dim>::ChineseObstacle(const std::string &filename,
-                                          const double       z_surface)
+    ChineseCharacterObstacle<dim>::ChineseCharacterObstacle(
+      const std::string &filename,
+      const double       z_surface)
       : Function<dim>(dim)
       , input_obstacle(filename)
       , z_surface(z_surface)
@@ -543,8 +545,9 @@ namespace Step42
 
 
     template <int dim>
-    double ChineseObstacle<dim>::value(const Point<dim>  &p,
-                                       const unsigned int component) const
+    double
+    ChineseCharacterObstacle<dim>::value(const Point<dim>  &p,
+                                         const unsigned int component) const
     {
       if (component == 0)
         return p[0];
@@ -562,11 +565,12 @@ namespace Step42
     }
 
     template <int dim>
-    void ChineseObstacle<dim>::vector_value(const Point<dim> &p,
-                                            Vector<double>   &values) const
+    void
+    ChineseCharacterObstacle<dim>::vector_value(const Point<dim> &p,
+                                                Vector<double>   &values) const
     {
       for (unsigned int c = 0; c < this->n_components; ++c)
-        values(c) = ChineseObstacle<dim>::value(p, c);
+        values(c) = ChineseCharacterObstacle<dim>::value(p, c);
     }
   } // namespace EquationData
 
@@ -822,7 +826,7 @@ namespace Step42
     , base_mesh(prm.get("base mesh"))
     , obstacle(prm.get("obstacle") == "read from file" ?
                  static_cast<const Function<dim> *>(
-                   new EquationData::ChineseObstacle<dim>(
+                   new EquationData::ChineseCharacterObstacle<dim>(
                      "obstacle.pbm",
                      (base_mesh == "box" ? 1.0 : 0.5))) :
                  static_cast<const Function<dim> *>(
