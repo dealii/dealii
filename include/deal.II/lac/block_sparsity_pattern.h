@@ -853,6 +853,8 @@ BlockSparsityPatternBase<SparsityPatternType>::add_entries(
   if (indices_are_sorted && n_cols > 0)
     {
       block_column_indices[0].resize(0);
+      Assert(std::is_sorted(begin, end), ExcInternalError());
+      Assert(std::adjacent_find(begin, end) == end, ExcInternalError());
 
       const std::pair<size_type, size_type> row_index =
         this->row_indices.global_to_local(row);
