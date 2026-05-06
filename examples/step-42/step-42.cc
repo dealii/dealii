@@ -432,9 +432,9 @@ namespace Step42
     private:
       std::vector<double> obstacle_data;
       double              hx, hy;
-      int                 nx, ny;
+      unsigned int        nx, ny;
 
-      double get_pixel_value(const int i, const int j) const;
+      double get_pixel_value(const unsigned int i, const unsigned int j) const;
     };
 
     // The constructor of this class reads in the data that describes
@@ -453,9 +453,7 @@ namespace Step42
       std::string temp;
       f >> temp >> nx >> ny;
 
-      AssertThrow(nx > 0 && ny > 0, ExcMessage("Invalid file format."));
-
-      for (int k = 0; k < nx * ny; ++k)
+      for (unsigned int k = 0; k < nx * ny; ++k)
         {
           double val;
           f >> val;
@@ -483,18 +481,21 @@ namespace Step42
     // and above to avoid problems when evaluating the function outside
     // of its defined range as may happen due to roundoff errors.
     template <int dim>
-    double BitmapFile<dim>::get_pixel_value(const int i, const int j) const
+    double BitmapFile<dim>::get_pixel_value(const unsigned int i,
+                                            const unsigned int j) const
     {
-      assert(i >= 0 && i < nx);
-      assert(j >= 0 && j < ny);
+      AssertIndexRange(i, nx);
+      AssertIndexRange(j, ny);
       return obstacle_data[nx * (ny - 1 - j) + i];
     }
 
     template <int dim>
     double BitmapFile<dim>::get_value(const double x, const double y) const
     {
-      const int ix = std::clamp(static_cast<int>(x / hx), 0, nx - 2);
-      const int iy = std::clamp(static_cast<int>(y / hy), 0, ny - 2);
+      const unsigned int ix =
+        static_cast<unsigned int>(std::clamp<double>(x / hx, 0, nx - 2));
+      const unsigned int iy =
+        static_cast<unsigned int>(std::clamp<double>(y / hy, 0, ny - 2));
 
       const double xi  = std::clamp((x - ix * hx) / hx, 0., 1.);
       const double eta = std::clamp((y - iy * hy) / hy, 0., 1.);
