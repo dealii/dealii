@@ -155,7 +155,7 @@ namespace VTKWrappers
         vtkCell *cell = grid.GetCell(i);
         if constexpr (dim == 1)
           {
-            if (cell->GetCellType() != VTK_LINE)
+            if (cell->GetCellType() != VTKCellType::VTK_LINE)
               AssertThrow(false,
                           ExcMessage(
                             "Unsupported cell type in 1D VTK file: only "
@@ -171,7 +171,7 @@ namespace VTKWrappers
           }
         else if constexpr (dim == 2)
           {
-            if (cell->GetCellType() == VTK_QUAD)
+            if (cell->GetCellType() == VTKCellType::VTK_QUAD)
               {
                 AssertThrow(cell->GetNumberOfPoints() == 4,
                             ExcMessage(
@@ -183,7 +183,7 @@ namespace VTKWrappers
                 cell_data.material_id = 0;
                 cells.push_back(cell_data);
               }
-            else if (cell->GetCellType() == VTK_TRIANGLE)
+            else if (cell->GetCellType() == VTKCellType::VTK_TRIANGLE)
               {
                 AssertThrow(
                   cell->GetNumberOfPoints() == 3,
@@ -203,7 +203,7 @@ namespace VTKWrappers
           }
         else if constexpr (dim == 3)
           {
-            if (cell->GetCellType() == VTK_HEXAHEDRON)
+            if (cell->GetCellType() == VTKCellType::VTK_HEXAHEDRON)
               {
                 AssertThrow(cell->GetNumberOfPoints() == 8,
                             ExcMessage(
@@ -218,7 +218,7 @@ namespace VTKWrappers
                 std::swap(cell_data.vertices[6], cell_data.vertices[7]);
                 cells.push_back(cell_data);
               }
-            else if (cell->GetCellType() == VTK_TETRA)
+            else if (cell->GetCellType() == VTKCellType::VTK_TETRA)
               {
                 AssertThrow(
                   cell->GetNumberOfPoints() == 4,
@@ -230,7 +230,7 @@ namespace VTKWrappers
                 cell_data.material_id = 0;
                 cells.push_back(cell_data);
               }
-            else if (cell->GetCellType() == VTK_WEDGE)
+            else if (cell->GetCellType() == VTKCellType::VTK_WEDGE)
               {
                 AssertThrow(cell->GetNumberOfPoints() == 6,
                             ExcMessage(
@@ -241,7 +241,7 @@ namespace VTKWrappers
                 cell_data.material_id = 0;
                 cells.push_back(cell_data);
               }
-            else if (cell->GetCellType() == VTK_PYRAMID)
+            else if (cell->GetCellType() == VTKCellType::VTK_PYRAMID)
               {
                 AssertThrow(
                   cell->GetNumberOfPoints() == 5,
@@ -302,17 +302,17 @@ namespace VTKWrappers
           {
             AssertThrow(n_vertices == 2,
                         ExcMessage("Unsupported 1D cell with != 2 vertices."));
-            vtk_cell_type = VTK_LINE;
+            vtk_cell_type = VTKCellType::VTK_LINE;
           }
         else if constexpr (dim == 2)
           {
             if (n_vertices == 4)
               {
-                vtk_cell_type = VTK_QUAD;
+                vtk_cell_type = VTKCellType::VTK_QUAD;
                 std::swap(point_ids[2], point_ids[3]);
               }
             else if (n_vertices == 3)
-              vtk_cell_type = VTK_TRIANGLE;
+              vtk_cell_type = VTKCellType::VTK_TRIANGLE;
             else
               AssertThrow(false,
                           ExcMessage("Unsupported 2D cell type: only "
@@ -322,16 +322,16 @@ namespace VTKWrappers
           {
             if (n_vertices == 8)
               {
-                vtk_cell_type = VTK_HEXAHEDRON;
+                vtk_cell_type = VTKCellType::VTK_HEXAHEDRON;
                 std::swap(point_ids[2], point_ids[3]);
                 std::swap(point_ids[6], point_ids[7]);
               }
             else if (n_vertices == 4)
-              vtk_cell_type = VTK_TETRA;
+              vtk_cell_type = VTKCellType::VTK_TETRA;
             else if (n_vertices == 6)
-              vtk_cell_type = VTK_WEDGE;
+              vtk_cell_type = VTKCellType::VTK_WEDGE;
             else if (n_vertices == 5)
-              vtk_cell_type = VTK_PYRAMID;
+              vtk_cell_type = VTKCellType::VTK_PYRAMID;
             else
               AssertThrow(false,
                           ExcMessage("Unsupported 3D cell type: only "
@@ -491,7 +491,7 @@ namespace VTKWrappers
         const int cell_type = cell->GetCellType();
         if constexpr (dim == 2)
           {
-            if (cell_type == VTK_TRIANGLE)
+            if (cell_type == VTKCellType::VTK_TRIANGLE)
               {
                 is_simplex = true;
                 break;
@@ -499,7 +499,7 @@ namespace VTKWrappers
           }
         else if constexpr (dim == 3)
           {
-            if (cell_type == VTK_TETRA)
+            if (cell_type == VTKCellType::VTK_TETRA)
               {
                 is_simplex = true;
                 break;
