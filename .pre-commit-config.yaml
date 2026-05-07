@@ -51,7 +51,7 @@ repos:
             ^contrib/utilities/dotgdbinit.py
         )
 - repo: https://github.com/crate-ci/typos
-  rev: v1.44.0
+  rev: v1.46.0
   hooks:
   - id: typos
     files: (?x) ^(doc|examples|include|source|tests)/
