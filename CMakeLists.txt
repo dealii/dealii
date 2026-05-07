@@ -57,6 +57,12 @@ if(POLICY CMP0177)
   cmake_policy(SET CMP0177 NEW)
 endif()
 
+# Allow CMake to support C++23-style 'import std' statements by
+# querying the compiler whether it has support for this:
+set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "0e5672d5-25f0-410a-b320-b4618e00155b")
+
+
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
 #
@@ -95,6 +101,7 @@ endif()
 # do it at this point:
 #
 verbose_include(${CMAKE_SOURCE_DIR}/cmake/setup_cached_variables.cmake)
+
 
 #
 # Now, set the project and set up the rest:

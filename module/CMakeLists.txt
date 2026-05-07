@@ -168,7 +168,6 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/petsc.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/psblas.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/slepc.ccm"
-    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/sundials.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/taskflow.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/tbb.ccm"
@@ -177,6 +176,26 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/vtk.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/zlib.ccm"
     )
+
+  #
+  # If CMake is new enough, and if we are building in C++23 or later
+  # mode, then we can use 'import std;' with a compiler-provided
+  # module that wraps everything in namespace std, assuming the
+  # compiler supports it. For compatibility with the situation where
+  # we can't support that, we want everything in namespace std to be
+  # in a module partition dealii.external.std, which we do in the file
+  # std_cxx23.ccm.
+  #
+  if ((CMAKE_VERSION VERSION_GREATER_EQUAL 3.30) AND
+        (${CMAKE_CXX_STANDARD} GREATER_EQUAL 23) AND
+        ("23" IN_LIST CMAKE_CXX_COMPILER_IMPORT_STD))
+    list(APPEND _external_interface_module_partition_units_public
+      "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std_cxx23.ccm")
+  else()
+    list(APPEND _external_interface_module_partition_units_public
+      "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std.ccm")
+  endif()
+
 
   set(_external_interface_module_partition_units_private
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/metis.ccm"
@@ -372,6 +391,20 @@ if(DEAL_II_WITH_CXX20_MODULE)
     target_compile_features(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       INTERFACE cxx_std_${CMAKE_CXX_STANDARD}
       )
+
+    #
+    # If CMake is new enough, and if we are building in C++23 or later
+    # mode, then we can use 'import std;' with a compiler-provided
+    # module that wraps everything in namespace std, assuming the
+    # compiler supports it. Set the appropriate property on the
+    # library to enable this behavior.
+    #
+    if ((CMAKE_VERSION VERSION_GREATER_EQUAL 3.30) AND
+        (${CMAKE_CXX_STANDARD} GREATER_EQUAL 23) AND
+        ("23" IN_LIST CMAKE_CXX_COMPILER_IMPORT_STD))
+      set_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+        PROPERTIES CXX_MODULE_STD ON)
+    endif()
 
     set_target_properties(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
       PROPERTIES

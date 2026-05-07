@@ -11,6 +11,10 @@
 // -----------------------------------------------------------------------------
 
 
+// This file is used in C++20 mode where compilers did not support
+// 'import std;'. As a consequence, we have to wrap everything in
+// namespace std ourselves.
+
 // It is very inefficient in the module system to have repeated
 // #includes in many module partition files because when you 'import'
 // those partitions, you also have to load everything they

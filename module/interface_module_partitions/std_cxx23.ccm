@@ -1,0 +1,33 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+// This file is used in C++23 mode and later where compilers do support
+// 'import std;'. As a consequence, we do not have to to wrap everything in
+// namespace std ourselves.
+
+module;
+
+#include <deal.II/macros.h>
+
+#ifndef DEAL_II_HAVE_CXX23
+#  error "This file should not be compiled in pre-C++23 mode"
+#endif
+
+
+
+export module dealii.external.std;
+
+// Instead of wrapping everything ourselves, simply take what compiler writers
+// wrapped and re-export it under the module name dealii.external.std where we
+// would otherwise have our own wrappers.
+export import std;
