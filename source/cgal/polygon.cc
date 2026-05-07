@@ -19,13 +19,11 @@
 #include <deal.II/grid/grid_tools_topology.h>
 #include <deal.II/grid/tria.h> //should be ok to delete is in grid tools
 
-#ifdef DEAL_II_WITH_CGAL
-
-#  include <CGAL/Boolean_set_operations_2.h>
+#include <CGAL/Boolean_set_operations_2.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 // Template implementations
 namespace CGALWrappers
 {
@@ -164,14 +162,12 @@ namespace CGALWrappers
 // configured with CGAL, but doxygen doesn't know that and tries to
 // find that file anyway for parsing -- which then of course it fails
 // on. So exclude the following from doxygen consideration.
-#    ifndef DOXYGEN
-#      include "cgal/polygon.inst"
-#    endif
+#  ifndef DOXYGEN
+#    include "cgal/polygon.inst"
+#  endif
 
 } // namespace  CGALWrappers
-#  endif
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

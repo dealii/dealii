@@ -14,11 +14,9 @@
 
 #include <deal.II/cgal/surface_mesh.h>
 
-#ifdef DEAL_II_WITH_CGAL
-
-#  include <CGAL/Exact_predicates_exact_constructions_kernel.h>
-#  include <CGAL/Simple_cartesian.h>
-#  include <CGAL/Surface_mesh/Surface_mesh.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel.h>
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Surface_mesh/Surface_mesh.h>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -104,7 +102,7 @@ namespace
 
 
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 // Template implementations
 namespace CGALWrappers
 {
@@ -216,14 +214,12 @@ namespace CGALWrappers
 // configured with CGAL, but doxygen doesn't know that and tries to
 // find that file anyway for parsing -- which then of course it fails
 // on. So exclude the following from doxygen consideration.
-#    ifndef DOXYGEN
-#      include "cgal/surface_mesh.inst"
-#    endif
+#  ifndef DOXYGEN
+#    include "cgal/surface_mesh.inst"
+#  endif
 
 } // namespace CGALWrappers
-#  endif
+#endif
 
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif

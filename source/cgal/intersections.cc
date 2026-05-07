@@ -12,50 +12,48 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/utilities.h>
+
 #include <deal.II/cgal/intersections.h>
+
+#include <deal.II/fe/mapping.h>
+
+#include <deal.II/grid/tria.h>
 
 #include <algorithm>
 
-#ifdef DEAL_II_WITH_CGAL
-
-#  include <deal.II/base/quadrature_lib.h>
-#  include <deal.II/base/utilities.h>
-
-#  include <deal.II/fe/mapping.h>
-
-#  include <deal.II/grid/tria.h>
-
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#  include <CGAL/Boolean_set_operations_2.h>
+#include <CGAL/Boolean_set_operations_2.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-#  include <deal.II/cgal/utilities.h>
+#include <deal.II/cgal/utilities.h>
 
-#  include <CGAL/Cartesian.h>
-#  include <CGAL/Circular_kernel_intersections.h>
-#  include <CGAL/Constrained_Delaunay_triangulation_2.h>
-#  include <CGAL/Delaunay_mesh_face_base_2.h>
-#  include <CGAL/Delaunay_mesh_size_criteria_2.h>
-#  include <CGAL/Delaunay_mesher_2.h>
-#  include <CGAL/Delaunay_triangulation_2.h>
-#  include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
-#  include <CGAL/Kernel_traits.h>
-#  include <CGAL/Polygon_2.h>
-#  include <CGAL/Polygon_with_holes_2.h>
-#  include <CGAL/Projection_traits_xy_3.h>
-#  include <CGAL/Segment_3.h>
-#  include <CGAL/Simple_cartesian.h>
-#  include <CGAL/Surface_mesh/Surface_mesh.h>
-#  include <CGAL/Tetrahedron_3.h>
-#  include <CGAL/Triangle_2.h>
-#  include <CGAL/Triangle_3.h>
-#  include <CGAL/Triangulation_2.h>
-#  include <CGAL/Triangulation_3.h>
-#  include <CGAL/Triangulation_face_base_with_id_2.h>
-#  include <CGAL/Triangulation_face_base_with_info_2.h>
+#include <CGAL/Cartesian.h>
+#include <CGAL/Circular_kernel_intersections.h>
+#include <CGAL/Constrained_Delaunay_triangulation_2.h>
+#include <CGAL/Delaunay_mesh_face_base_2.h>
+#include <CGAL/Delaunay_mesh_size_criteria_2.h>
+#include <CGAL/Delaunay_mesher_2.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Exact_predicates_exact_constructions_kernel_with_sqrt.h>
+#include <CGAL/Kernel_traits.h>
+#include <CGAL/Polygon_2.h>
+#include <CGAL/Polygon_with_holes_2.h>
+#include <CGAL/Projection_traits_xy_3.h>
+#include <CGAL/Segment_3.h>
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Surface_mesh/Surface_mesh.h>
+#include <CGAL/Tetrahedron_3.h>
+#include <CGAL/Triangle_2.h>
+#include <CGAL/Triangle_3.h>
+#include <CGAL/Triangulation_2.h>
+#include <CGAL/Triangulation_3.h>
+#include <CGAL/Triangulation_face_base_with_id_2.h>
+#include <CGAL/Triangulation_face_base_with_info_2.h>
 
-#  include <optional>
-#  include <variant>
+#include <optional>
+#include <variant>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -337,7 +335,7 @@ namespace CGALWrappers
       const ArrayView<const Point<3>> &tetrahedron,
       const ArrayView<const Point<3>> &segment)
     {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
+#if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
 
       AssertDimension(tetrahedron.size(), 4);
       AssertDimension(segment.size(), 2);
@@ -359,7 +357,7 @@ namespace CGALWrappers
       CGALSegment3 cgal_segment{pts1[0], pts1[1]};
       return convert_boost_to_std(
         CGAL::intersection(cgal_segment, cgal_tetrahedron));
-#  else
+#else
       Assert(
         false,
         ExcMessage(
@@ -367,7 +365,7 @@ namespace CGALWrappers
       (void)tetrahedron;
       (void)segment;
       return {};
-#  endif
+#endif
     }
 
 
@@ -380,7 +378,7 @@ namespace CGALWrappers
       const ArrayView<const Point<3>> &tetrahedron,
       const ArrayView<const Point<3>> &triangle)
     {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
+#if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
 
       AssertDimension(tetrahedron.size(), 4);
       AssertDimension(triangle.size(), 3);
@@ -402,7 +400,7 @@ namespace CGALWrappers
       CGALTriangle3 cgal_triangle{pts1[0], pts1[1], pts1[2]};
       return convert_boost_to_std(
         CGAL::intersection(cgal_triangle, cgal_tetrahedron));
-#  else
+#else
 
       Assert(
         false,
@@ -411,7 +409,7 @@ namespace CGALWrappers
       (void)tetrahedron;
       (void)triangle;
       return {};
-#  endif
+#endif
     }
 
     // quad-quad
@@ -531,7 +529,7 @@ namespace CGALWrappers
                                    const ArrayView<const Point<3>> &line,
                                    const double                     tol)
     {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
+#if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
 
       AssertDimension(hexa.size(), 8);
       AssertDimension(line.size(), 2);
@@ -575,7 +573,7 @@ namespace CGALWrappers
             }
         }
       return vertices;
-#  else
+#else
       Assert(
         false,
         ExcMessage(
@@ -584,7 +582,7 @@ namespace CGALWrappers
       (void)line;
       (void)tol;
       return {};
-#  endif
+#endif
     }
 
     std::vector<std::array<Point<3>, 3>>
@@ -592,7 +590,7 @@ namespace CGALWrappers
                                    const ArrayView<const Point<3>> &quad,
                                    const double                     tol)
     {
-#  if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
+#if DEAL_II_CGAL_VERSION_GTE(5, 5, 0)
 
       AssertDimension(hexa.size(), 8);
       AssertDimension(quad.size(), 4);
@@ -675,7 +673,7 @@ namespace CGALWrappers
         }
 
       return vertices;
-#  else
+#else
       Assert(
         false,
         ExcMessage(
@@ -684,7 +682,7 @@ namespace CGALWrappers
       (void)quad;
       (void)tol;
       return {};
-#  endif
+#endif
     }
 
     std::vector<std::array<Point<3>, 4>>
@@ -871,52 +869,10 @@ namespace CGALWrappers
 // configured with CGAL, but doxygen doesn't know that and tries to
 // find that file anyway for parsing -- which then of course it fails
 // on. So exclude the following from doxygen consideration.
-#  ifndef DOXYGEN
-#    include "cgal/intersections.inst"
-#  endif
+#ifndef DOXYGEN
+#  include "cgal/intersections.inst"
+#endif
 
 } // namespace CGALWrappers
 
 DEAL_II_NAMESPACE_CLOSE
-
-#else
-
-DEAL_II_NAMESPACE_OPEN
-
-template <int structdim0,
-          int structdim1,
-          int spacedim,
-          int n_components0,
-          int n_components1>
-std::vector<std::array<Point<spacedim>, structdim1 + 1>>
-compute_intersection_of_cells(
-  const std::array<Point<spacedim>, n_components0> &vertices0,
-  const std::array<Point<spacedim>, n_components1> &vertices1,
-  const double                                      tol)
-{
-  (void)vertices0;
-  (void)vertices1;
-  (void)tol;
-  AssertThrow(false, ExcNeedsCGAL());
-}
-
-template <int structdim0, int structdim1, int spacedim>
-std::vector<std::array<Point<spacedim>, structdim1 + 1>>
-compute_intersection_of_cells(
-  const typename Triangulation<structdim0, spacedim>::cell_iterator &cell0,
-  const typename Triangulation<structdim1, spacedim>::cell_iterator &cell1,
-  const Mapping<structdim0, spacedim>                               &mapping0,
-  const Mapping<structdim1, spacedim>                               &mapping1,
-  const double                                                       tol)
-{
-  (void)cell0;
-  (void)cell1;
-  (void)mapping0;
-  (void)mapping1;
-  (void)tol;
-  AssertThrow(false, ExcNeedsCGAL());
-}
-
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
