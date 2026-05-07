@@ -456,8 +456,9 @@ private:
     const typename Triangulation<dim, spacedim>::cell_iterator     &cell,
     const CellStatus                                                status,
     const boost::iterator_range<std::vector<char>::const_iterator> &data_range,
-    std::vector<VectorType *>                                      &all_out,
-    VectorType                                                     &valence);
+    std::vector<Vector<typename VectorType::value_type>> &cell_dof_values,
+    std::vector<VectorType *>                            &all_out,
+    VectorType                                           &valence);
 
 
   /**
