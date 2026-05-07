@@ -16553,25 +16553,23 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 {
+  std::array<unsigned int, ReferenceCells::max_n_vertices<dim>()>
+    cell_vertices{};
   for (unsigned int l = 0; l < levels.size(); ++l)
-    {
-      std::vector<unsigned int> &cache = levels[l]->cell_vertex_indices_cache;
-      cache.clear();
-      cache.resize(levels[l]->refine_flags.size() *
-                     ReferenceCells::max_n_vertices<dim>(),
-                   numbers::invalid_unsigned_int);
-      for (const auto &cell : cell_iterators_on_level(l))
-        {
-          // Avoid obscure problems with old versions of libc++ with GNU
-          // compilers by explicitly creating the ArrayView before copying it
-          ArrayView<unsigned int> cell_vertices(
-            cache.data() +
-              cell->index() * ReferenceCells::max_n_vertices<dim>(),
-            cell->n_vertices());
-          GridTools::internal::extract_vertices_without_cache<dim, spacedim>(
-            cell, cell_vertices);
-        }
-    }
+    for (const auto &cell : cell_iterators_on_level(l))
+      {
+        if constexpr (running_in_debug_mode())
+          cell_vertices.fill(numbers::invalid_unsigned_int);
+
+        const auto n_vertices = cell->n_vertices();
+        Assert(n_vertices <= cell_vertices.size(), ExcInternalError());
+        GridTools::internal::extract_vertices_without_cache<dim, spacedim>(
+          cell, ArrayView<unsigned int>(cell_vertices.data(), n_vertices));
+        for (unsigned int vertex_no = 0; vertex_no < n_vertices; ++vertex_no)
+          levels[l]->set_cached_vertex_index(cell->index(),
+                                             vertex_no,
+                                             cell_vertices[vertex_no]);
+      }
 }
 
 

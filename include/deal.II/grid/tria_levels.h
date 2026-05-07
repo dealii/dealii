@@ -142,6 +142,26 @@ namespace internal
                    const int          neighbor_index);
 
       /**
+       * Set the @p vertex_no-th vertex index of cell @p index to @p
+       * vertex_index.
+       */
+      void
+      set_cached_vertex_index(const int          index,
+                              const unsigned int vertex_no,
+                              const unsigned int vertex_index);
+
+      /**
+       * Get the vertex index for cell @p vertex and vertex @p vertex_no.
+       *
+       * @note These vertices are cached, meaning this information duplicates
+       * the vertex indices stored in the usual way (as objects which bound
+       * lines) for performance reasons (e.g., the cache bypasses orientation
+       * calculations).
+       */
+      unsigned int
+      cached_vertex_index(const int index, const unsigned int vertex_no) const;
+
+      /**
        * The number of children stored per object. In practice, to support mixed
        * meshes, this is the maximum number of children per ReferenceCell across
        * all relevant ReferenceCell types used by the Triangulation.
@@ -282,14 +302,6 @@ namespace internal
       std::vector<ReferenceCell<dim>> reference_cell;
 
       /**
-       * A cache for the vertex indices of the cells (`structdim == dim`), in
-       * order to more quickly retrieve these frequently accessed quantities.
-       * For simplified addressing, the information is indexed by the maximum
-       * number of vertices possible for a cell (quadrilateral/hexahedron).
-       */
-      std::vector<unsigned int> cell_vertex_indices_cache;
-
-      /**
        * Determine an estimate for the memory consumption (in bytes) of this
        * object.
        */
@@ -340,6 +352,13 @@ namespace internal
        * cell of this cell).
        */
       std::vector<std::pair<int, int>> neighbors;
+
+      /**
+       * A cache for the vertex indices of the cells (`structdim == dim`), in
+       * order to more quickly retrieve these frequently accessed quantities.
+       * Analogously to other arrays, the stride is vertices_per_object.
+       */
+      std::vector<unsigned int> cell_vertex_indices_cache;
     };
 
 
@@ -416,6 +435,39 @@ namespace internal
 
 
     template <int dim, int spacedim>
+    inline void
+    TriaLevel<dim, spacedim>::set_cached_vertex_index(
+      const int          index,
+      const unsigned int vertex_no,
+      const unsigned int vertex_index)
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(vertex_no, vertices_per_object);
+      const std::size_t i =
+        std::size_t(index) * vertices_per_object + vertex_no;
+      AssertIndexRange(i, cell_vertex_indices_cache.size());
+      cell_vertex_indices_cache[i] = vertex_index;
+    }
+
+
+
+    template <int dim, int spacedim>
+    inline unsigned int
+    TriaLevel<dim, spacedim>::cached_vertex_index(
+      const int          index,
+      const unsigned int vertex_no) const
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(vertex_no, vertices_per_object);
+      const std::size_t i =
+        std::size_t(index) * vertices_per_object + vertex_no;
+      AssertIndexRange(i, cell_vertex_indices_cache.size());
+      return cell_vertex_indices_cache[i];
+    }
+
+
+
+    template <int dim, int spacedim>
     template <class Archive>
     void
     TriaLevel<dim, spacedim>::serialize(Archive &ar, const unsigned int)
@@ -438,6 +490,22 @@ namespace internal
       ar &cells;
       ar &face_orientations;
       ar &reference_cell;
+
+      // we do need to resize them so they can be populated in the other
+      // functions though.
+      if (cell_vertex_indices_cache.size() !=
+          refine_flags.size() * vertices_per_object)
+        {
+          cell_vertex_indices_cache.assign(refine_flags.size() *
+                                             vertices_per_object,
+                                           numbers::invalid_unsigned_int);
+          active_cell_indices.assign(refine_flags.size(),
+                                     numbers::invalid_unsigned_int);
+          global_active_cell_indices.assign(refine_flags.size(),
+                                            numbers::invalid_coarse_cell_id);
+          global_level_cell_indices.assign(refine_flags.size(),
+                                           numbers::invalid_coarse_cell_id);
+        }
     }
 
   } // namespace TriangulationImplementation

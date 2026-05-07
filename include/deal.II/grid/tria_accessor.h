@@ -5223,36 +5223,39 @@ TriaAccessor<structdim, dim, spacedim>::reference_cell() const
 template <int structdim, int dim, int spacedim>
 inline unsigned int
 TriaAccessor<structdim, dim, spacedim>::vertex_index(
-  const unsigned int corner) const
+  const unsigned int vertex_no) const
 {
-  AssertIndexRange(corner, this->n_vertices());
+  AssertIndexRange(vertex_no, this->n_vertices());
 
   if constexpr (structdim == 1)
     {
       // This branch needs to be first (and not combined with the structdim ==
       // dim branch) so that we can get line vertex indices when setting up the
       // cell vertex index cache
-      return this->objects().get_bounding_object(this->present_index, corner);
+      return this->objects().get_bounding_object(this->present_index,
+                                                 vertex_no);
     }
   else if constexpr (structdim == dim)
     {
       // This branch should only be used after the cell vertex index cache is
       // set up
-      const auto my_index = static_cast<std::size_t>(this->present_index) *
-                            ReferenceCells::max_n_vertices<dim>();
-      AssertIndexRange(
-        my_index + corner,
-        this->tria->levels[this->level()]->cell_vertex_indices_cache.size());
-      const unsigned int vertex_index =
-        this->tria->levels[this->level()]
-          ->cell_vertex_indices_cache[my_index + corner];
-      Assert(vertex_index != numbers::invalid_unsigned_int, ExcInternalError());
+      const auto vertex_index =
+        this->tria->levels[this->level()]->cached_vertex_index(
+          this->present_index, vertex_no);
+      Assert(
+        vertex_index != numbers::invalid_unsigned_int,
+        ExcMessage(
+          "The present vertex's vertex_index is not valid. This is typically "
+          "caused by calling cell->vertex_index() during grid refinement for "
+          "a newly created cell, since the cell vertex index cache is not "
+          "complete at that point."));
       return vertex_index;
     }
   else if constexpr (structdim == 2)
     {
       const auto [line_index, vertex_index] =
-        this->reference_cell().standard_vertex_to_face_and_vertex_index(corner);
+        this->reference_cell().standard_vertex_to_face_and_vertex_index(
+          vertex_no);
       const auto vertex_within_line_index =
         this->reference_cell().standard_to_real_face_vertex(
           vertex_index, line_index, this->line_orientation(line_index));

@@ -4776,20 +4776,11 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   ar &anisotropic_refinement;
   ar &number_cache;
 
-  // the levels do not serialize the active_cell_indices because
-  // they are easy enough to rebuild upon re-loading data. do
-  // this here. don't forget to first resize the fields appropriately
-  {
-    for (const auto &level : levels)
-      {
-        level->active_cell_indices.resize(level->refine_flags.size());
-        level->global_active_cell_indices.resize(level->refine_flags.size());
-        level->global_level_cell_indices.resize(level->refine_flags.size());
-      }
-    reset_cell_vertex_indices_cache();
-    reset_active_cell_indices();
-    reset_global_cell_indices();
-  }
+  // the levels do not serialize the active_cell_indices or cached cell vertices
+  // because they are easy enough to rebuild upon re-loading data. do this here.
+  reset_cell_vertex_indices_cache();
+  reset_active_cell_indices();
+  reset_global_cell_indices();
 
   reset_policy();
 
