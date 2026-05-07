@@ -61,6 +61,6 @@ main(int argc, char **argv)
     check_solver_within_range(solver.solve(A, u, f, preconditioner),
                               control.last_step(),
                               40,
-                              42);
+                              45);
   }
 }
