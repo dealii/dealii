@@ -99,6 +99,9 @@ public:
    * @param[in] indices_are_sorted Whether or not the indices are both sorted
    *            and unique. Sorted and unique indices are faster to process than
    *            arbitrary ones.
+   *
+   * @warning Since this function updates internal buffers it is not thread-safe
+   * (even across different rows).
    */
   virtual void
   add_row_entries(const size_type                  &row,
@@ -111,6 +114,9 @@ public:
    * This function is useful when multiple entries need to be added which do
    * not correspond to a particular row, e.g., when assembling a flux sparsity
    * pattern.
+   *
+   * @warning Since this function updates internal buffers it is not thread-safe
+   * (even across different rows).
    */
   virtual void
   add_entries(const ArrayView<const std::pair<size_type, size_type>> &entries);

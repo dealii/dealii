@@ -232,6 +232,9 @@ public:
    * This function simply finds out to which blocks <tt>(row,col)</tt> for
    * <tt>col</tt> in the iterator range belong and then relays to those
    * blocks.
+   *
+   * @warning Since this function updates internal buffers it is not thread-safe
+   * (even across different rows).
    */
   template <typename ForwardIterator>
   void
@@ -244,6 +247,9 @@ public:
    * Add several nonzero entries to the specified matrix row. This function may
    * only be called for non-compressed sparsity patterns and works the same way
    * as the overload which takes iterators.
+   *
+   * @warning Since this function updates internal buffers it is not thread-safe
+   * (even across different rows).
    */
   virtual void
   add_row_entries(const size_type                  &row,
