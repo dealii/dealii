@@ -165,6 +165,10 @@ export
   using ::Handle_BRepAdaptor_HCompCurve;
   using ::Handle_BRepAdaptor_HCurve;
 #  endif
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
+  using ::Handle_BRepAdaptor_CompCurve;
+  using ::Handle_BRepAdaptor_Curve;
+#  endif
   using ::Handle_Geom_BoundedCurve;
   using ::Handle_Geom_BSplineCurve;
   using ::Handle_Geom_Curve;
