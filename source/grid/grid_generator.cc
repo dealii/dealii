@@ -916,7 +916,7 @@ namespace GridGenerator
         set_boundary_ids(Triangulation<2> &tria)
         {
           for (auto cell : tria.active_cell_iterators())
-            for (const unsigned int f : GeometryInfo<2>::face_indices())
+            for (const unsigned int f : cell->face_indices())
               {
                 if (cell->face(f)->at_boundary() == false)
                   continue;
@@ -978,7 +978,7 @@ namespace GridGenerator
 
           // loop over vertices of all cells
           for (const auto &cell : tria.cell_iterators())
-            for (const unsigned int v : GeometryInfo<2>::vertex_indices())
+            for (const unsigned int v : cell->vertex_indices())
               {
                 // vertex has been already processed: nothing to do
                 if (vertex_processed[cell->vertex_index(v)])
@@ -1251,14 +1251,11 @@ namespace GridGenerator
     colorize_hyper_rectangle(Triangulation<dim, spacedim> &tria)
     {
       // there is nothing to do in 1d
-      if (dim > 1)
+      if constexpr (dim > 1)
         {
-          // there is only one cell, so
-          // simple task
-          const typename Triangulation<dim, spacedim>::cell_iterator cell =
-            tria.begin();
-          for (auto f : GeometryInfo<dim>::face_indices())
-            cell->face(f)->set_boundary_id(f);
+          // there is only one cell
+          for (const auto &f : tria.begin()->face_indices())
+            tria.begin()->face(f)->set_boundary_id(f);
         }
     }
 
@@ -1271,14 +1268,11 @@ namespace GridGenerator
                                         const Point<spacedim> &,
                                         const double)
     {
-      for (typename Triangulation<1, spacedim>::cell_iterator cell =
-             tria.begin();
-           cell != tria.end();
-           ++cell)
+      for (const auto &cell : tria.cell_iterators())
+        // boundary indicators are set to
+        // 0 (left) and 1 (right) by default.
         if (cell->center()[0] > 0)
           cell->set_material_id(1);
-      // boundary indicators are set to
-      // 0 (left) and 1 (right) by default.
     }
 
 
@@ -1538,7 +1532,8 @@ namespace GridGenerator
         p2[i] = std::max(p_1[i], p_2[i]);
       }
 
-    std::vector<Point<spacedim>> vertices(GeometryInfo<dim>::vertices_per_cell);
+    std::vector<Point<spacedim>> vertices(
+      ReferenceCells::get_hypercube<dim>().n_vertices());
     switch (dim)
       {
         case 1:
@@ -1573,7 +1568,8 @@ namespace GridGenerator
 
     // Prepare cell data
     std::vector<CellData<dim>> cells(1);
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int i :
+         ReferenceCells::get_hypercube<dim>().vertex_indices())
       cells[0].vertices[i] = i;
     cells[0].material_id = 0;
 
@@ -2077,10 +2073,10 @@ namespace GridGenerator
     for (const auto &cell : tria.cell_iterators())
       {
         // identify faces on torus surface and set manifold to 1
-        for (const unsigned int f : GeometryInfo<3>::face_indices())
+        for (const unsigned int f : cell->face_indices())
           {
-            // faces 4 and 5 are those with normal vector aligned with torus
-            // centerline
+            // This is a hex mesh, so faces 4 and 5 are those with
+            // normal vector aligned with torus centerline
             if (cell->face(f)->at_boundary() && f != 4 && f != 5)
               {
                 cell->face(f)->set_all_manifold_ids(1);
@@ -2115,15 +2111,16 @@ namespace GridGenerator
                const std::vector<Point<spacedim>> &vertices,
                const bool                          colorize)
   {
-    Assert(vertices.size() == dealii::GeometryInfo<dim>::vertices_per_cell,
+    Assert(vertices.size() == ReferenceCells::get_hypercube<dim>().n_vertices(),
            ExcMessage("Wrong number of vertices."));
 
     // First create a hyper_rectangle and then deform it.
     hyper_cube(tria, 0, 1, colorize);
 
+    // Then move the vertices of that one cell as requested:
     typename Triangulation<dim, spacedim>::active_cell_iterator cell =
       tria.begin_active();
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int i : cell->vertex_indices())
       cell->vertex(i) = vertices[i];
 
     // Check that the order of the vertices makes sense, i.e., the volume of the
@@ -2453,17 +2450,12 @@ namespace GridGenerator
     // Finally assign boundary indicators according to hyper_rectangle
     if (colorize)
       {
-        typename Triangulation<dim>::active_cell_iterator cell =
-                                                            tria.begin_active(),
-                                                          endc = tria.end();
-        for (; cell != endc; ++cell)
-          {
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
-              {
-                if (cell->face(face)->at_boundary())
-                  cell->face(face)->set_boundary_id(face);
-              }
-          }
+        for (const auto &cell : tria.active_cell_iterators())
+          for (const unsigned int face : cell->face_indices())
+            {
+              if (cell->face(face)->at_boundary())
+                cell->face(face)->set_boundary_id(face);
+            }
       }
   }
 
@@ -2999,7 +2991,7 @@ namespace GridGenerator
         for (; cell != endc; ++cell)
           {
             Point<2> cell_center = cell->center();
-            for (const unsigned int f : GeometryInfo<2>::face_indices())
+            for (const unsigned int f : cell->face_indices())
               if (cell->face(f)->boundary_id() == 0)
                 {
                   Point<2> face_center = cell->face(f)->center();
@@ -3108,7 +3100,7 @@ namespace GridGenerator
         for (; cell != endc; ++cell)
           {
             Point<dim> cell_center = cell->center();
-            for (auto f : GeometryInfo<dim>::face_indices())
+            for (auto f : cell->face_indices())
               if (cell->face(f)->boundary_id() == 0)
                 {
                   Point<dim> face_center = cell->face(f)->center();
