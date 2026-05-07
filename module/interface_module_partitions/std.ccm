@@ -71,14 +71,14 @@ module;
 #include <numeric>
 #include <optional>
 #include <ostream>
-// #include <queue> // See https://github.com/llvm/llvm-project/issues/138558
+#include <queue>
 #include <random>
 #include <ranges>
 #include <regex>
 #include <set>
 #include <shared_mutex>
 #include <sstream>
-// #include <stack> // See https://github.com/llvm/llvm-project/issues/138558
+#include <stack>
 #include <string>
 #include <thread>
 #include <tuple>
@@ -344,12 +344,10 @@ export
     using std::multiset;
     using std::nullopt;
     using std::optional;
-    // For now, don't export this class to work around a compiler bug:
-    // using std::queue;
+    using std::queue;
     using std::set;
     using std::span;
-    // For now, don't export this class to work around a compiler bug:
-    // using std::stack;
+    using std::stack;
     using std::unordered_map;
     using std::unordered_multimap;
     using std::unordered_multiset;
@@ -541,9 +539,8 @@ export
     // Random generators
     using std::discrete_distribution;
     using std::geometric_distribution;
-    // For now, don't export these two to work around a compiler bug:
-    // using std::mt19937;
-    // using std::mt19937_64;
+    using std::mt19937;
+    using std::mt19937_64;
     using std::normal_distribution;
     using std::random_device;
     using std::uniform_int_distribution;
