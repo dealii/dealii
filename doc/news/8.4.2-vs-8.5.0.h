@@ -526,7 +526,7 @@ inconvenience this causes.
 
  <li>
   Refactored: The contrib/ directory has been cleaned up and the
-  Parameter GUI has be relocated into its own repository:
+  Parameter GUI has been relocated into its own repository:
   https://github.com/dealii/parameter_gui
   <br>
   (Matthias Maier, Timo Heister, 2016/07/06)
