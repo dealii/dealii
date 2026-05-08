@@ -12,7 +12,7 @@
 
 
 // Test the support points of FE_SimplexP for consistency with equidistant
-// suppoort points.
+// support points.
 
 #include <deal.II/fe/fe_simplex_p.h>
 

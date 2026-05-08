@@ -50,7 +50,7 @@ namespace
           return {1, degree - 1, (degree - 2) * (degree - 1) / 2};
         case 3:
           // the number of support points in the volume are that of a tet
-          // with a lower degree (degree -4)
+          // with a lower degree (degree-4)
           return {1,
                   degree - 1,
                   (degree - 2) * (degree - 1) / 2,
