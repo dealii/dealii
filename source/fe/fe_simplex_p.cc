@@ -31,29 +31,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  // TODO: replace this with QProjector once QProjector learns how to project
-  // quadrature points onto separate faces of simplices
-  template <int dim>
-  Point<dim>
-  face_midpoint(const unsigned int face_no)
-  {
-    const auto reference_cell = ReferenceCells::get_simplex<dim>();
-    const auto face_reference_cell =
-      reference_cell.face_reference_cell(face_no);
-
-    Point<dim> midpoint;
-    for (const auto face_vertex_no : face_reference_cell.vertex_indices())
-      {
-        const auto vertex_no = reference_cell.face_to_cell_vertices(
-          face_no, face_vertex_no, numbers::default_geometric_orientation);
-
-        midpoint += reference_cell.vertex(vertex_no);
-      }
-
-    midpoint /= reference_cell.face_reference_cell(0).n_vertices();
-    return midpoint;
-  }
-
   /**
    * Helper function to set up the dpo vector of FE_SimplexP for a given @p dim and
    * @p degree.
@@ -61,47 +38,26 @@ namespace
   std::vector<unsigned int>
   get_dpo_vector_fe_p(const unsigned int dim, const unsigned int degree)
   {
+    Assert(degree != 0, ExcNotImplemented());
+
     switch (dim)
       {
         case 1:
-          switch (degree)
-            {
-              case 1:
-                return {1, 0};
-              case 2:
-                return {1, 1};
-              case 3:
-                return {1, 2};
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          return {1, degree - 1};
         case 2:
-          switch (degree)
-            {
-              case 1:
-                return {1, 0, 0};
-              case 2:
-                return {1, 1, 0};
-              case 3:
-                return {1, 2, 1};
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          // the number of support points on the face is
+          // \sum_{i=1}^{degree - 2} i = (degree-2)*(degree-1)/2
+          return {1, degree - 1, (degree - 2) * (degree - 1) / 2};
         case 3:
-          switch (degree)
-            {
-              case 1:
-                return {1, 0, 0, 0};
-              case 2:
-                return {1, 1, 0, 0};
-              case 3:
-                return {1, 2, 1, 0};
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
-            }
+          // the number of support points in the volume are that of a tet
+          // with a lower degree (degree -4)
+          return {1,
+                  degree - 1,
+                  (degree - 2) * (degree - 1) / 2,
+                  (degree - 3) * (degree - 2) * (degree - 1) / 6};
       }
 
-    DEAL_II_NOT_IMPLEMENTED();
+    DEAL_II_ASSERT_UNREACHABLE();
     return {};
   }
 
@@ -116,7 +72,6 @@ namespace
   unit_support_points_fe_p(const unsigned int degree)
   {
     Assert(dim != 0, ExcInternalError());
-    Assert(degree <= 3, ExcNotImplemented());
     std::vector<Point<dim>> unit_points;
     const auto              reference_cell = ReferenceCells::get_simplex<dim>();
 
@@ -132,9 +87,11 @@ namespace
     const auto dpo = get_dpo_vector_fe_p(dim, degree);
     Assert(dpo.size() == dim + 1, ExcInternalError());
     Assert(dpo[0] == 1, ExcNotImplemented());
+
     // vertices:
     for (const unsigned int d : reference_cell.vertex_indices())
       unit_points.push_back(reference_cell.vertex(d));
+
     // lines:
     for (const unsigned int l : reference_cell.line_indices())
       {
@@ -146,15 +103,62 @@ namespace
           unit_points.push_back((double(dpo[1] - p) / (dpo[1] + 1)) * p0 +
                                 (double(p + 1) / (dpo[1] + 1)) * p1);
       }
-    // quads:
-    if (dim > 1 && dpo[2] > 0)
+
+    // faces:
+    if constexpr (dim == 2)
       {
-        Assert(dpo[2] == 1, ExcNotImplemented());
-        if (dim == 2)
-          unit_points.push_back(reference_cell.barycenter());
-        if (dim == 3)
-          for (const unsigned int f : reference_cell.face_indices())
-            unit_points.push_back(face_midpoint<dim>(f));
+        unsigned int counter = 0;
+        for (unsigned int i = 1; i < degree; ++i)
+          for (unsigned int j = 1; j < degree - i; ++j, ++counter)
+            {
+              const double x = static_cast<double>(j) / degree;
+              const double y = static_cast<double>(i) / degree;
+
+              unit_points.push_back(Point<dim>(x, y));
+            }
+        Assert(counter == dpo[2], ExcInternalError());
+      }
+
+    if constexpr (dim == 3)
+      for (const unsigned int f : reference_cell.face_indices())
+        {
+          const Point<dim> p0 =
+            unit_points[reference_cell.face_to_cell_vertices(
+              f, 0, numbers::default_geometric_orientation)];
+          const Point<dim> p1 =
+            unit_points[reference_cell.face_to_cell_vertices(
+              f, 1, numbers::default_geometric_orientation)];
+          const Point<dim> p2 =
+            unit_points[reference_cell.face_to_cell_vertices(
+              f, 2, numbers::default_geometric_orientation)];
+
+          unsigned int counter = 0;
+          for (unsigned int i = 1; i < degree; ++i)
+            for (unsigned int j = 1; j < degree - i; ++j, ++counter)
+              {
+                const double a = static_cast<double>(j) / degree;
+                const double b = static_cast<double>(i) / degree;
+                const double c = 1.0 - a - b;
+                unit_points.push_back(c * p0 + a * p1 + b * p2);
+              }
+          Assert(counter == dpo[2], ExcInternalError());
+        }
+
+    // interior
+    if constexpr (dim == 3)
+      {
+        unsigned int counter = 0;
+        for (unsigned int i = 1; i < degree; ++i)
+          for (unsigned int j = 1; j < degree - i; ++j)
+            for (unsigned int k = 1; k < degree - i - j; ++k, ++counter)
+              {
+                const double x = static_cast<double>(i) / degree;
+                const double y = static_cast<double>(j) / degree;
+                const double z = static_cast<double>(k) / degree;
+
+                unit_points.push_back(Point<dim>(x, y, z));
+              }
+        Assert(counter == dpo[3], ExcInternalError());
       }
 
     return unit_points;
