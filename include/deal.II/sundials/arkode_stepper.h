@@ -410,8 +410,9 @@ namespace SUNDIALS
        *
        * @param order Desired order of accuracy for the time integration.
        *   If set to 0 the default order for the chosen method is used. This
-       *   parameter is mutually exclusive with @p implicit_butcher_table and
-       *   @p explicit_butcher_table.
+       *   parameter can't be set to a nonzero value if either of the
+       *   parameters @p implicit_butcher_table or @p explicit_butcher_table
+       *   is set to a non-empty string.
        * @param maximum_non_linear_iterations Maximum number of nonlinear
        *   iterations
        * @param implicit_function_is_linear Specifies that the implicit portion
@@ -423,13 +424,31 @@ namespace SUNDIALS
        * @param anderson_acceleration_subspace The number of vectors to use for
        *   Anderson acceleration within the packaged SUNDIALS solver.
        * @param implicit_butcher_table Name of the implicit (DIRK) Butcher
-       *   table. An empty string means no implicit table is selected, which
-       *   is equivalent to passing `"ARKODE_DIRK_NONE"` to SUNDIALS. This
-       *   parameter is mutually exclusive with @p order.
+       *   table. The default is an empty string.
+       *   If both @p implicit_butcher_table and @p explicit_butcher_table are
+       *   left as empty strings, then ARKStep will default to the method
+       *   corresponding to the specified order (or the default order if
+       *   @p order is set to 0).
+       *   If @p implicit_butcher_table is left empty but
+       *   @p explicit_butcher_table is set to a non-empty string, that means
+       *   no implicit table is selected, which is equivalent to passing
+       *   `"ARKODE_DIRK_NONE"` to SUNDIALS.
+       *   If @p implicit_butcher_table is set to a non-empty string, then
+       *   the method corresponding to the specified table will be used.
+       *   This option is supported if SUNDIALS version 6.4.0 or later is used.
        * @param explicit_butcher_table Name of the explicit (ERK) Butcher
-       *   table. An empty string means no explicit table is selected, which
-       *   is equivalent to passing `"ARKODE_ERK_NONE"` to SUNDIALS. This
-       *   parameter is mutually exclusive with @p order.
+       *   table. The default is an empty string.
+       *   If both @p implicit_butcher_table and @p explicit_butcher_table are
+       *   left as empty strings, then ARKStep will default to the method
+       *   corresponding to the specified order (or the default order if
+       *   @p order is set to 0).
+       *   If @p explicit_butcher_table is left empty but
+       *   @p implicit_butcher_table is set to a non-empty string, that means
+       *   no explicit table is selected, which is equivalent to passing
+       *   `"ARKODE_ERK_NONE"` to SUNDIALS.
+       *   If @p explicit_butcher_table is set to a non-empty string, then
+       *   the method corresponding to the specified table will be used.
+       *   This option is supported if SUNDIALS version 6.4.0 or later is used.
        */
       explicit AdditionalData(
         const unsigned int order                                 = 0,
@@ -463,8 +482,8 @@ namespace SUNDIALS
        * the default order for the chosen method is used.
        *
        * This option is mutually exclusive with implicit_butcher_table and
-       * explicit_butcher_table: either the order is specified, or specific
-       * Butcher tables are chosen, but not both.
+       * explicit_butcher_table: either the order is specified as a nonzero
+       * value, or specific Butcher tables are chosen, but not both.
        */
       unsigned int order;
 
@@ -911,13 +930,12 @@ namespace SUNDIALS
      * custom settings on the supplied @p arkode_mem object. Refer to the
      * SUNDIALS documentation for valid options.
      *
-     * For instance, the following code indicates to use specific built-in
-     * Butcher tables for the ERK, DIRK or ARK method of the ARKStep module:
+     * For instance, the following code specifies the fraction of the estimated
+     * explicitly stable step to use as 0.25 instead of the default value 0.5:
      *
      * @code
      *      stepper.custom_setup = [&](void *arkode_mem) {
-     *        const int status = ARKStepSetTableName(
-     *          arkode_mem, implicit_method_name, explicit_method_name);
+     *        const int status = ARKStepSetCFLFraction(arkode_mem, 0.25);
      *
      *        AssertARKode(status);
      *      };

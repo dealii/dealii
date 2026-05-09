@@ -48,7 +48,25 @@ namespace SUNDIALS
   ARKStepper<VectorType>::ARKStepper(const AdditionalData &data)
     : arkode_mem(nullptr)
     , data(data)
-  {}
+  {
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 4, 0)
+    AssertThrow(
+      data.implicit_butcher_table.empty() &&
+        data.explicit_butcher_table.empty(),
+      ExcMessage(
+        "Setting ARK Butcher tables by name requires SUNDIALS version 6.4.0 "
+        "or later. Set the order of accuracy instead or use custom_setup "
+        "callback to set the Butcher tables manually using "
+        "function ARKStepSetTableNum()."));
+#  endif
+
+    AssertThrow(
+      data.order == 0 || (data.implicit_butcher_table.empty() &&
+                          data.explicit_butcher_table.empty()),
+      ExcMessage(
+        "Either the order of accuracy or the Butcher table names may be "
+        "specified, but not both."));
+  }
 
 
 
@@ -146,13 +164,6 @@ namespace SUNDIALS
 
     setup_mass_solver(y0, inv_ctx);
 
-    AssertThrow(
-      data.order == 0 || (data.implicit_butcher_table.empty() &&
-                          data.explicit_butcher_table.empty()),
-      ExcMessage(
-        "Either the order of accuracy or the Butcher table names may be "
-        "specified, but not both."));
-
     if (data.order != 0)
       {
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
@@ -165,6 +176,7 @@ namespace SUNDIALS
     else if (!data.implicit_butcher_table.empty() ||
              !data.explicit_butcher_table.empty())
       {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
         const std::string itable = data.implicit_butcher_table.empty() ?
                                      "ARKODE_DIRK_NONE" :
                                      data.implicit_butcher_table;
@@ -174,6 +186,7 @@ namespace SUNDIALS
         status =
           ARKStepSetTableName(arkode_mem, itable.c_str(), etable.c_str());
         AssertARKode(status);
+#  endif
       }
 
     if (custom_setup)
