@@ -170,6 +170,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/slepc.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/std.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/sundials.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/symengine.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/taskflow.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/tbb.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/trilinos.ccm"
