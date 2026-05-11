@@ -73,6 +73,7 @@ set(_unity_include_src
   polynomials_p.cc
   polynomials_piecewise.cc
   polynomials_pyramid.cc
+  polynomials_simplex.cc
   polynomials_rannacher_turek.cc
   polynomials_raviart_thomas.cc
   polynomials_rt_bubbles.cc
