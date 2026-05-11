@@ -1685,15 +1685,18 @@ Point<structdim>
 TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   const Point<spacedim> &point) const
 {
-  Assert(this->reference_cell().is_hyper_cube(), ExcNotImplemented());
-
-  std::array<Point<spacedim>, GeometryInfo<structdim>::vertices_per_cell>
-    vertices;
+  // Use a small_vector sized to the actual number of vertices so that the
+  // ArrayView passed to affine_cell_approximation carries the correct size
+  // (which is used to determine the reference cell type).
+  boost::container::small_vector<Point<spacedim>,
+                                 GeometryInfo<structdim>::vertices_per_cell>
+    vertices(this->n_vertices());
   for (const unsigned int v : this->vertex_indices())
     vertices[v] = this->vertex(v);
 
   const auto A_b =
-    GridTools::affine_cell_approximation<structdim, spacedim>(vertices);
+    GridTools::affine_cell_approximation<structdim, spacedim>(
+      make_array_view(vertices.begin(), vertices.end()));
   DerivativeForm<1, spacedim, structdim> A_inv =
     A_b.first.covariant_form().transpose();
   return Point<structdim>(apply_transformation(A_inv, point - A_b.second));

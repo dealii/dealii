@@ -22,6 +22,7 @@
 #include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/grid_tools_geometry.h>
 #include <deal.II/grid/tria.h>
 
@@ -212,6 +213,65 @@ namespace GridTools
       static const double Kb[GeometryInfo<dim>::vertices_per_cell];
     };
 
+    struct TransformR2UAffineTriangle
+    {
+      static const double KA[3][2];
+      static const double Kb[3];
+    };
+    struct TransformR2UAffineTetrahedron
+    {
+      static const double KA[4][3];
+      static const double Kb[4];
+    };
+    struct TransformR2UAffineWedge
+    {
+      static const double KA[6][3];
+      static const double Kb[6];
+    };
+    struct TransformR2UAffinePyramid
+    {
+      static const double KA[5][3];
+      static const double Kb[5];
+    };
+
+
+    const double TransformR2UAffineTriangle::KA[3][2] = {
+      {-1.000000, -1.000000},
+      {1.000000, 0.000000},
+      {0.000000, 1.000000}};
+
+    const double TransformR2UAffineTriangle::Kb[3] = {1.000000, 0.000000, 0.000000};
+
+
+    const double TransformR2UAffineTetrahedron::KA[4][3] = {
+      {-1.000000, -1.000000, -1.000000},
+      {1.000000, 0.000000, 0.000000},
+      {0.000000, 1.000000, 0.000000},
+      {0.000000, 0.000000, 1.000000}};
+
+    const double TransformR2UAffineTetrahedron::Kb[4] = {1.000000, 0.000000, 0.000000, 0.000000};
+
+
+    const double TransformR2UAffineWedge::KA[6][3] = {
+      {-0.5, -0.5, -1.0 / 3.0},
+      {0.5, 0.0, -1.0 / 3.0},
+      {0.0, 0.5, -1.0 / 3.0},
+      {-0.5, -0.5, 1.0 / 3.0},
+      {0.5, 0.0, 1.0 / 3.0},
+      {0.0, 0.5, 1.0 / 3.0}};
+
+    const double TransformR2UAffineWedge::Kb[6] = {2.0 / 3.0, 1.0 / 6.0, 1.0 / 6.0, 1.0 / 3.0, -1.0 / 6.0, -1.0 / 6.0};
+
+
+    const double TransformR2UAffinePyramid::KA[5][3] = {
+      {-0.250000, -0.250000, -0.250000},
+      {0.250000, -0.250000, -0.250000},
+      {-0.250000, 0.250000, -0.250000},
+      {0.250000, 0.250000, -0.250000},
+      {0.000000, 0.000000, 1.000000}};
+
+    const double TransformR2UAffinePyramid::Kb[5] = {0.250000, 0.250000, 0.250000, 0.250000, 0.000000};
+
 
     /*
       Octave code:
@@ -285,20 +345,64 @@ namespace GridTools
   std::pair<DerivativeForm<1, dim, spacedim>, Tensor<1, spacedim>>
   affine_cell_approximation(const ArrayView<const Point<spacedim>> &vertices)
   {
-    AssertDimension(vertices.size(), GeometryInfo<dim>::vertices_per_cell);
+    const ReferenceCell<dim> reference_cell =
+      ReferenceCell<dim>::n_vertices_to_type(dim, vertices.size());
 
-    // A = vertex * KA
     DerivativeForm<1, dim, spacedim> A;
+    Tensor<1, spacedim>              b;
 
-    for (unsigned int d = 0; d < spacedim; ++d)
-      for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-        for (unsigned int e = 0; e < dim; ++e)
-          A[d][e] += vertices[v][d] * TransformR2UAffine<dim>::KA[v][e];
+    if (reference_cell == ReferenceCells::get_hypercube<dim>())
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+            for (unsigned int e = 0; e < dim; ++e)
+              A[d][e] += vertices[v][d] * TransformR2UAffine<dim>::KA[v][e];
 
-    // b = vertex * Kb
-    Tensor<1, spacedim> b;
-    for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-      b += vertices[v] * TransformR2UAffine<dim>::Kb[v];
+        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
+          b += vertices[v] * TransformR2UAffine<dim>::Kb[v];
+      }
+    else if (reference_cell == ReferenceCells::Triangle)
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          for (unsigned int v = 0; v < 3; ++v)
+            for (unsigned int e = 0; e < 2; ++e)
+              A[d][e] += vertices[v][d] * TransformR2UAffineTriangle::KA[v][e];
+
+        for (unsigned int v = 0; v < 3; ++v)
+          b += vertices[v] * TransformR2UAffineTriangle::Kb[v];
+      }
+    else if (reference_cell == ReferenceCells::Tetrahedron)
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          for (unsigned int v = 0; v < 4; ++v)
+            for (unsigned int e = 0; e < 3; ++e)
+              A[d][e] += vertices[v][d] * TransformR2UAffineTetrahedron::KA[v][e];
+
+        for (unsigned int v = 0; v < 4; ++v)
+          b += vertices[v] * TransformR2UAffineTetrahedron::Kb[v];
+      }
+    else if (reference_cell == ReferenceCells::Wedge)
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          for (unsigned int v = 0; v < 6; ++v)
+            for (unsigned int e = 0; e < 3; ++e)
+              A[d][e] += vertices[v][d] * TransformR2UAffineWedge::KA[v][e];
+
+        for (unsigned int v = 0; v < 6; ++v)
+          b += vertices[v] * TransformR2UAffineWedge::Kb[v];
+      }
+    else if (reference_cell == ReferenceCells::Pyramid)
+      {
+        for (unsigned int d = 0; d < spacedim; ++d)
+          for (unsigned int v = 0; v < 5; ++v)
+            for (unsigned int e = 0; e < 3; ++e)
+              A[d][e] += vertices[v][d] * TransformR2UAffinePyramid::KA[v][e];
+
+        for (unsigned int v = 0; v < 5; ++v)
+          b += vertices[v] * TransformR2UAffinePyramid::Kb[v];
+      }
+    else
+      Assert(false, ExcNotImplemented());
 
     return std::make_pair(A, b);
   }
