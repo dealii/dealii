@@ -856,6 +856,31 @@ namespace MatrixFreeOperators
    * Note that this class only supports the non-blocked vector variant of the
    * Base operator because only a single FEEvaluation object is used in the
    * apply function.
+   *
+   * @tparam dim Dimension in which this class is to be used
+   *
+   * @tparam fe_degree Degree of the tensor product finite element with
+   * fe_degree+1 degrees of freedom per coordinate direction. Can be set to -1
+   * if the degree is not known at compile time, but performance will usually be
+   * worse by a factor of 2-3 (see detailed description in the documentation
+   * of the FEEvaluation class).
+   *
+   * @tparam n_q_points_1d Number of points in the quadrature formula in 1d,
+   * defaults to fe_degree+1
+   *
+   * @tparam n_components Number of vector components handled simultaneously by
+   * the operator. Since the same scalar Laplace operator is applied
+   * independently to each component, multiple components can be evaluated
+   * together in a single FEEvaluation object, which is often more efficient
+   * than separate operator applications. Defaults to 1.
+   *
+   * @tparam VectorType Type of vector on which the operator is applied.
+   * Defaults to LinearAlgebra::distributed::Vector<double>.
+   *
+   * @tparam VectorizedArrayType Type of array to be worked on in a vectorized
+   * fashion. Defaults to VectorizedArray<typename VectorType::value_type>.
+   *
+   * @ingroup matrixfree
    */
   template <int dim,
             int fe_degree,
