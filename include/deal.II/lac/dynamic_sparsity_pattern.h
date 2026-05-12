@@ -18,6 +18,7 @@
 
 #include <deal.II/base/enable_observer_pointer.h>
 #include <deal.II/base/index_set.h>
+#include <deal.II/base/thread_local_storage.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/lac/exceptions.h>
@@ -429,6 +430,8 @@ public:
   /**
    * Add several nonzero entries to the specified row. Already existing
    * entries are ignored.
+   *
+   * @note This function is thread-safe.
    */
   template <typename ForwardIterator>
   void
@@ -670,9 +673,26 @@ private:
   /**
    * A set that contains the valid rows.
    */
-
   IndexSet rowset;
 
+  /**
+   * Scratch data used for updating Lines.
+   */
+  struct ScratchData
+  {
+    /**
+     * Scratch array of indices. Used to merge the current indices in a Line and
+     * new indices in Line::add_entries().
+     */
+    std::vector<size_type> indices;
+  };
+
+  /**
+   * The current strategy used by Line::add_entries() requires some temporary
+   * storage for merging indices. This object stores said buffers for each
+   * thread.
+   */
+  Threads::ThreadLocalStorage<ScratchData> scratch_data;
 
   /**
    * Store some data for each row describing which entries of this row are
@@ -697,12 +717,25 @@ private:
 
     /**
      * Add the columns specified by the iterator range to this line.
+     *
+     * @param[in] begin Iterator to the beginning of the range.
+     *
+     * @param[in] end Iterator to the end of the range.
+     *
+     * @param[in] indices_are_sorted Whether or not the indices are both sorted
+     *            and unique.
+     *
+     * @param[in] scratch_data Scratch object containing buffers used to merge
+     *            the existing indices and the new indices. This is typically
+     *            the thread-local one stored by DynamicSparsityPattern: this
+     *            function will reallocate said buffers as needed.
      */
     template <typename ForwardIterator>
     void
     add_entries(ForwardIterator begin,
                 ForwardIterator end,
-                const bool      indices_are_sorted);
+                const bool      indices_are_sorted,
+                ScratchData    &scratch_data);
 
     /**
      * estimates memory consumption.
@@ -710,7 +743,6 @@ private:
     size_type
     memory_consumption() const;
   };
-
 
   /**
    * Actual data: store for each row the set of nonzero entries.
@@ -1030,7 +1062,10 @@ DynamicSparsityPattern::add_entries(const size_type row,
 
   const size_type rowindex =
     rowset.size() == 0 ? row : rowset.index_within_set(row);
-  lines[rowindex].add_entries(begin, end, indices_are_sorted);
+  lines[rowindex].add_entries(begin,
+                              end,
+                              indices_are_sorted,
+                              scratch_data.get());
 }
 
 
