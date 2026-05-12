@@ -106,15 +106,6 @@ namespace internal
       std::vector<bool> quads_line_orientations;
 
       /**
-       * Whether or not each quad is a Quadrilateral. Since, if dim = 3, faces
-       * are either Triangles or Quadrilaterals, it suffices to store a
-       * boolean.
-       *
-       * @note Used only for dim=3.
-       */
-      std::vector<bool> quad_is_quadrilateral;
-
-      /**
        * Helper accessor function for quad_is_quadrilateral
        */
       ReferenceCell<dim - 1>
@@ -148,6 +139,16 @@ namespace internal
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int version);
+
+    private:
+      /**
+       * Whether or not each quad is a Quadrilateral. Since, if dim = 3, faces
+       * are either Triangles or Quadrilaterals, it suffices to store a
+       * boolean.
+       *
+       * @note Used only for dim=3.
+       */
+      std::vector<bool> quad_is_quadrilateral;
     };
 
 
