@@ -47,20 +47,20 @@ namespace internal
        * Constructor. Sets up objects in the default orientation (orientation
        * = `true`).
        */
-      TriaObjectsOrientations(const unsigned int n_objects,
+      TriaObjectsOrientations(const std::size_t  n_objects,
                               const unsigned int n_faces_per_object);
 
       /**
        * Return number of geometric objects stored by this class.
        */
-      unsigned int
+      std::size_t
       n_objects() const;
 
       /**
        * Reset the object to a default state.
        */
       void
-      reinit(const unsigned int n_objects,
+      reinit(const std::size_t  n_objects,
              const unsigned int n_faces_per_object);
 
       /**
@@ -68,7 +68,7 @@ namespace internal
        * the default orientation (true, false, false).
        */
       void
-      resize(const unsigned int n_objects);
+      resize(const std::size_t n_objects);
 
       /**
        * Return the size of objects of this kind.
@@ -81,35 +81,33 @@ namespace internal
        * documentation.
        */
       types::geometric_orientation
-      get_combined_orientation(const unsigned int object_no,
+      get_combined_orientation(const int          index,
                                const unsigned int face_no) const;
 
       /**
        * Get the orientation bit of the object.
        */
       bool
-      get_orientation(const unsigned int object_no,
-                      const unsigned int face_no) const;
+      get_orientation(const int index, const unsigned int face_no) const;
 
       /**
        * Get the rotation bit of the object.
        */
       bool
-      get_rotation(const unsigned int object_no,
-                   const unsigned int face_no) const;
+      get_rotation(const int index, const unsigned int face_no) const;
 
       /**
        * Get the flip bit of the object.
        */
       bool
-      get_flip(const unsigned int object_no, const unsigned int face_no) const;
+      get_flip(const int index, const unsigned int face_no) const;
 
       /**
        * Set the combined orientation of the object, as described in the class
        * documentation.
        */
       void
-      set_combined_orientation(const unsigned int                 object_no,
+      set_combined_orientation(const int                          index,
                                const unsigned int                 face_no,
                                const types::geometric_orientation value);
 
@@ -149,7 +147,7 @@ namespace internal
 
 
     inline TriaObjectsOrientations::TriaObjectsOrientations(
-      const unsigned int n_objects,
+      const std::size_t  n_objects,
       const unsigned int n_faces_per_object)
     {
       reinit(n_objects, n_faces_per_object);
@@ -158,7 +156,7 @@ namespace internal
 
 
     inline void
-    TriaObjectsOrientations::reinit(const unsigned int n_objects,
+    TriaObjectsOrientations::reinit(const std::size_t  n_objects,
                                     const unsigned int n_faces_per_object)
     {
       n_stored_objects = n_objects;
@@ -170,7 +168,7 @@ namespace internal
 
 
     inline void
-    TriaObjectsOrientations::resize(const unsigned int n_objects)
+    TriaObjectsOrientations::resize(const std::size_t n_objects)
     {
       n_stored_objects = n_objects;
       face_orientations.resize(n_objects * faces_per_object,
@@ -189,7 +187,7 @@ namespace internal
 
 
 
-    inline unsigned int
+    inline std::size_t
     TriaObjectsOrientations::n_objects() const
     {
       AssertDimension(n_stored_objects,
@@ -201,56 +199,55 @@ namespace internal
 
     inline types::geometric_orientation
     TriaObjectsOrientations::get_combined_orientation(
-      const unsigned int object_no,
+      const int          index,
       const unsigned int face_no) const
     {
+      Assert(index >= 0, ExcInternalError());
       AssertIndexRange(face_no, faces_per_object);
-      const auto index = object_no * faces_per_object + face_no;
-      AssertIndexRange(index, face_orientations.size());
-      return face_orientations[index];
+      const auto i = index * faces_per_object + face_no;
+      AssertIndexRange(i, face_orientations.size());
+      return face_orientations[i];
     }
 
 
 
     inline bool
-    TriaObjectsOrientations::get_orientation(const unsigned int object_no,
+    TriaObjectsOrientations::get_orientation(const int          index,
                                              const unsigned int face_no) const
     {
-      return !Utilities::get_bit(get_combined_orientation(object_no, face_no),
-                                 0);
+      return !Utilities::get_bit(get_combined_orientation(index, face_no), 0);
     }
 
 
 
     inline bool
-    TriaObjectsOrientations::get_rotation(const unsigned int object_no,
+    TriaObjectsOrientations::get_rotation(const int          index,
                                           const unsigned int face_no) const
     {
-      return Utilities::get_bit(get_combined_orientation(object_no, face_no),
-                                1);
+      return Utilities::get_bit(get_combined_orientation(index, face_no), 1);
     }
 
 
 
     inline bool
-    TriaObjectsOrientations::get_flip(const unsigned int object_no,
+    TriaObjectsOrientations::get_flip(const int          index,
                                       const unsigned int face_no) const
     {
-      return Utilities::get_bit(get_combined_orientation(object_no, face_no),
-                                2);
+      return Utilities::get_bit(get_combined_orientation(index, face_no), 2);
     }
 
 
 
     inline void
     TriaObjectsOrientations::set_combined_orientation(
-      const unsigned int                 object_no,
+      const int                          index,
       const unsigned int                 face_no,
       const types::geometric_orientation value)
     {
-      const auto index = object_no * faces_per_object + face_no;
-      AssertIndexRange(index, face_orientations.size());
-      face_orientations[index] = value;
+      Assert(index >= 0, ExcInternalError());
+      const auto i = index * faces_per_object + face_no;
+      AssertIndexRange(i, face_orientations.size());
+      face_orientations[i] = value;
     }
 
 
