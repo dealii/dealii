@@ -1828,6 +1828,12 @@ BoundingBox<spacedim>
 MappingQ<dim, spacedim>::get_bounding_box(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
+  Assert(is_compatible_with(cell->reference_cell()),
+         ExcMessage(
+           "You are trying to call a MappingQ function with a cell of type " +
+           cell->reference_cell().to_string() +
+           " but MappingQ only works for hypercube cells."));
+
   boost::container::small_vector<Point<spacedim>, 200> points;
   this->compute_mapping_support_points(cell, points);
   return BoundingBox<spacedim>(points);

@@ -49,7 +49,18 @@ namespace Functions
     , mapping(mymapping)
     , cache(dh->get_triangulation(), mymapping)
     , cell_hint(dh->end())
-  {}
+  {
+    // Make sure the mapping is compatible with the cell type of the
+    // mesh. Since we only accept a single mapping, the mesh must also
+    // use only one kind of cell.
+    Assert(mydh.get_triangulation().is_mixed_mesh() == false,
+           ExcNotImplemented());
+    Assert(mapping.is_compatible_with(
+             mydh.get_triangulation().get_reference_cells()[0]),
+           ExcMessage("The mapping you provided (or that was chosen via the "
+                      "constructor's default argument) is not compatible "
+                      "with the cell type of the mesh you are using."));
+  }
 
 
 

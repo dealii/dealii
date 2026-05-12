@@ -188,7 +188,8 @@ namespace Functions
      * lifetime of this object. The number of components of this functions is
      * equal to the number of components of the finite element object. If a
      * mapping is specified, that is what is used to find out where the points
-     * lay. Otherwise the standard Q1 mapping is used.
+     * lay. Otherwise the standard $Q_1$ mapping is used, which is appropriate
+     * for quad and hex meshes, but not for simplex or mixed meshes.
      */
     FEFieldFunction(
       const DoFHandler<dim, spacedim> &dh,
