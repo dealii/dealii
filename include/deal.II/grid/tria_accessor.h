@@ -5511,7 +5511,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   else
     {
       DEAL_II_ASSERT_UNREACHABLE();
-      return false;
+      return numbers::invalid_geometric_orientation;
     }
 }
 
