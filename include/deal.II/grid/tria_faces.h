@@ -85,10 +85,10 @@ namespace internal
                    const std::size_t new_quads_single);
 
       /**
-       * Maximum number of lines for each quad (i.e., face of a 3d cell).
-       * Only used for `dim == 3`.
+       * Number of lines for each quad (i.e., face of a 3d cell). Only used for
+       * `dim == 3`.
        */
-      unsigned int max_lines_per_quad;
+      unsigned int lines_per_quad;
 
       /**
        * The TriaObject containing the data of quads.
@@ -194,7 +194,7 @@ namespace internal
     void
     TriaFaces<dim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &max_lines_per_quad &quads &lines &quads_line_orientations
+      ar &lines_per_quad &quads &lines &quads_line_orientations
         &quad_is_quadrilateral;
     }
   } // namespace TriangulationImplementation
