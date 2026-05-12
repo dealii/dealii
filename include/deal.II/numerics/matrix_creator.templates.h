@@ -83,14 +83,14 @@ namespace MatrixCreator
                         fe_collection,
                         quadrature_collection,
                         update_flags)
+          , exemplar_vector(fe_collection.n_components())
           , coefficient_values(quadrature_collection.max_n_quadrature_points())
           , coefficient_vector_values(
               quadrature_collection.max_n_quadrature_points(),
-              dealii::Vector<number>(fe_collection.n_components()))
+              exemplar_vector)
           , rhs_values(quadrature_collection.max_n_quadrature_points())
           , rhs_vector_values(quadrature_collection.max_n_quadrature_points(),
-                              dealii::Vector<number>(
-                                fe_collection.n_components()))
+                              exemplar_vector)
           , coefficient(coefficient)
           , rhs_function(rhs_function)
           , update_flags(update_flags)
@@ -104,6 +104,7 @@ namespace MatrixCreator
                         fe_collection,
                         quadrature_collection,
                         data.update_flags)
+          , exemplar_vector(data.exemplar_vector)
           , coefficient_values(data.coefficient_values)
           , coefficient_vector_values(data.coefficient_vector_values)
           , rhs_values(data.rhs_values)
@@ -111,7 +112,10 @@ namespace MatrixCreator
           , coefficient(data.coefficient)
           , rhs_function(data.rhs_function)
           , update_flags(data.update_flags)
-        {}
+        {
+          Assert(exemplar_vector.size() == fe_collection.n_components(),
+                 ExcInternalError());
+        }
 
         Scratch &
         operator=(const Scratch &)
@@ -127,6 +131,8 @@ namespace MatrixCreator
           &mapping_collection;
 
         ::dealii::hp::FEValues<dim, spacedim> x_fe_values;
+
+        dealii::Vector<number> exemplar_vector;
 
         std::vector<number>                 coefficient_values;
         std::vector<dealii::Vector<number>> coefficient_vector_values;
@@ -199,8 +205,7 @@ namespace MatrixCreator
             }
           else
             {
-              data.rhs_vector_values.resize(
-                n_q_points, dealii::Vector<number>(n_components));
+              data.rhs_vector_values.resize(n_q_points, data.exemplar_vector);
               data.rhs_function->vector_value_list(
                 fe_values.get_quadrature_points(), data.rhs_vector_values);
             }
@@ -217,8 +222,8 @@ namespace MatrixCreator
             }
           else
             {
-              data.coefficient_vector_values.resize(
-                n_q_points, dealii::Vector<number>(n_components));
+              data.coefficient_vector_values.resize(n_q_points,
+                                                    data.exemplar_vector);
               data.coefficient->vector_value_list(
                 fe_values.get_quadrature_points(),
                 data.coefficient_vector_values);
@@ -1012,11 +1017,12 @@ namespace MatrixCreator
         update_flags = update_flags | update_mapping;
       FEFaceValues<dim, spacedim> fe_values(mapping, fe, q, update_flags);
 
+      Vector<number> exemplar_vector(n_components);
       // two variables for the coefficient, one for the two cases
       // indicated in the name
       std::vector<number> coefficient_values(fe_values.n_quadrature_points, 1.);
       std::vector<Vector<number>> coefficient_vector_values(
-        fe_values.n_quadrature_points, Vector<number>(n_components));
+        fe_values.n_quadrature_points, exemplar_vector);
       const bool coefficient_is_vector =
         (coefficient != nullptr && coefficient->n_components != 1);
 
@@ -1454,6 +1460,7 @@ namespace MatrixCreator
                                                   q,
                                                   update_flags);
 
+      Vector<number> exemplar_vector(n_components);
       // two variables for the coefficient,
       // one for the two cases indicated in
       // the name
@@ -1498,7 +1505,7 @@ namespace MatrixCreator
               // FE has several components
               {
                 coefficient_vector_values.resize(fe_values.n_quadrature_points,
-                                                 Vector<number>(n_components));
+                                                 exemplar_vector);
                 coefficient_values.resize(fe_values.n_quadrature_points, 1.);
 
                 rhs_values_system.resize(fe_values.n_quadrature_points,
