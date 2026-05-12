@@ -40,6 +40,7 @@ namespace internal
     TriaLevel<dim, spacedim>::TriaLevel()
       : children_per_object(numbers::invalid_unsigned_int)
       , faces_per_object(numbers::invalid_unsigned_int)
+      , vertices_per_object(numbers::invalid_unsigned_int)
     {}
 
 
@@ -76,6 +77,8 @@ namespace internal
       Assert(children_per_object == cells.children_per_object,
              ExcInternalError());
       Assert(faces_per_object == cells.faces_per_object, ExcInternalError());
+      Assert(vertices_per_object != numbers::invalid_unsigned_int,
+             ExcInternalError());
       active_cell_indices.assign(n_cells, numbers::invalid_unsigned_int);
       subdomain_ids.assign(n_cells, 0);
       level_subdomain_ids.assign(n_cells, 0);
@@ -95,6 +98,8 @@ namespace internal
                                faces_per_object);
 
       neighbors.assign(n_cells * faces_per_object, {-1, -1});
+      cell_vertex_indices_cache.assign(n_cells * vertices_per_object,
+                                       numbers::invalid_unsigned_int);
 
       reference_cell.assign(n_cells, ReferenceCells::Invalid<dim>);
 
@@ -178,6 +183,12 @@ namespace internal
 
       parents.reserve((total_cells + 1) / 2);
       parents.insert(parents.end(), (total_cells + 1) / 2 - parents.size(), -1);
+
+      reference_cell.reserve(total_cells);
+      cell_vertex_indices_cache.insert(cell_vertex_indices_cache.end(),
+                                       vertices_per_object * total_cells -
+                                         cell_vertex_indices_cache.size(),
+                                       numbers::invalid_unsigned_int);
 
       neighbors.reserve(total_cells * faces_per_object);
       neighbors.insert(neighbors.end(),
