@@ -98,12 +98,23 @@ namespace internal
       TriaObjects quads;
 
       /**
-       * Orientation of each line of each quad. Like elsewhere, `true` refers to
-       * the standard orientation and `false` refers to the reverse orientation.
+       * Get the orientation of the @p line_no-th line of the index-th face.
        *
        * @note Used only for dim=3.
        */
-      std::vector<bool> quads_line_orientations;
+      types::geometric_orientation
+      get_line_orientation(const int index, const unsigned int line_no) const;
+
+      /**
+       * Set the orientation of the @p line_no-th line of the index-th face to
+       * @p line_orientation.
+       *
+       * @note Used only for dim=3.
+       */
+      void
+      set_line_orientation(const int                    index,
+                           const unsigned int           line_no,
+                           types::geometric_orientation line_orientation);
 
       /**
        * Helper accessor function for quad_is_quadrilateral
@@ -149,6 +160,14 @@ namespace internal
        * @note Used only for dim=3.
        */
       std::vector<bool> quad_is_quadrilateral;
+
+      /**
+       * Orientation of each line of each quad. Like elsewhere, `true` refers to
+       * the standard orientation and `false` refers to the reverse orientation.
+       *
+       * @note Used only for dim=3.
+       */
+      std::vector<bool> quads_line_orientations;
     };
 
 
@@ -185,6 +204,51 @@ namespace internal
         quad_is_quadrilateral[index] = true;
       else
         quad_is_quadrilateral[index] = false;
+    }
+
+
+
+    template <int dim>
+    inline types::geometric_orientation
+    TriaFaces<dim>::get_line_orientation(const int          index,
+                                         const unsigned int line_no) const
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(line_no, lines_per_quad);
+      const std::size_t i = index * lines_per_quad + line_no;
+      AssertIndexRange(i, quads_line_orientations.size());
+      if constexpr (dim == 3)
+        return quads_line_orientations[i] ?
+                 numbers::default_geometric_orientation :
+                 numbers::reverse_line_orientation;
+      else
+        {
+          DEAL_II_ASSERT_UNREACHABLE();
+          return numbers::invalid_geometric_orientation;
+        }
+    }
+
+
+
+    template <int dim>
+    inline void
+    TriaFaces<dim>::set_line_orientation(
+      const int                          index,
+      const unsigned int                 line_no,
+      const types::geometric_orientation line_orientation)
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(line_no, lines_per_quad);
+      const std::size_t i = index * lines_per_quad + line_no;
+      AssertIndexRange(i, quads_line_orientations.size());
+      Assert(line_orientation == numbers::default_geometric_orientation ||
+               line_orientation == numbers::reverse_line_orientation,
+             ExcInternalError());
+      if constexpr (dim == 3)
+        quads_line_orientations[i] =
+          line_orientation == numbers::default_geometric_orientation;
+      else
+        DEAL_II_ASSERT_UNREACHABLE();
     }
 
 

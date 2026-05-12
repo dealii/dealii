@@ -3757,22 +3757,8 @@ namespace internal
                     faces.quads.set_bounding_object(q, l, lines[l]);
 
                     // set line orientations
-                    const auto combined_orientation =
-                      connectivity.entity_orientations(1)[k];
-                    // it doesn't make sense to set any flags except
-                    // orientation for a line
-                    Assert(combined_orientation ==
-                               numbers::default_geometric_orientation ||
-                             combined_orientation ==
-                               numbers::reverse_line_orientation,
-                           ExcInternalError());
-                    // Same convention as TriaAccessor::set_line_orientation():
-                    // store true for the default orientation and false for
-                    // reversed.
-                    faces.quads_line_orientations
-                      [q * faces.quads.children_per_object + l] =
-                      combined_orientation ==
-                      numbers::default_geometric_orientation;
+                    faces.set_line_orientation(
+                      q, l, connectivity.entity_orientations(1)[k]);
                   }
               }
           }
