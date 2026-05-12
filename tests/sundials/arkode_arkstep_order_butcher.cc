@@ -203,6 +203,7 @@ main()
     print_work_stats(order_3_result);
   }
 
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
   // Sub-test 2: select order-2 paired ARK Butcher tables explicitly.
   // ARKODE_ARK2_DIRK_3_1_2 (implicit) and ARKODE_ARK2_ERK_3_1_2 (explicit)
   // form a second-order additive Runge-Kutta pair.
@@ -220,4 +221,5 @@ main()
             << butcher_2_result.final_state[2] << std::endl;
     print_work_stats(butcher_2_result);
   }
+#endif
 }
