@@ -91,29 +91,34 @@ namespace internal
      * Optimized unpack function for values assigned on degrees of freedom.
      */
     template <typename value_type>
-    std::vector<Vector<value_type>>
+    void
     unpack_dof_values(
       const boost::iterator_range<std::vector<char>::const_iterator>
-                        &data_range,
-      const unsigned int dofs_per_cell)
+                                      &data_range,
+      const unsigned int               dofs_per_cell,
+      std::vector<Vector<value_type>> &cell_dof_values)
     {
       const std::size_t  bytes_per_entry = sizeof(value_type) * dofs_per_cell;
       const unsigned int n_elements      = data_range.size() / bytes_per_entry;
 
       Assert((data_range.size() % bytes_per_entry == 0), ExcInternalError());
 
-      std::vector<Vector<value_type>> unpacked_data;
-      unpacked_data.reserve(n_elements);
-      for (unsigned int i = 0; i < n_elements; ++i)
+      if (cell_dof_values.size() != n_elements ||
+          (cell_dof_values.size() > 0 &&
+           cell_dof_values[0].size() != dofs_per_cell))
         {
-          Vector<value_type> dof_values(dofs_per_cell);
-          std::memcpy(&dof_values(0),
-                      &(*std::next(data_range.begin(), i * bytes_per_entry)),
-                      bytes_per_entry);
-          unpacked_data.emplace_back(std::move(dof_values));
+          cell_dof_values.resize(n_elements);
+          for (auto &v : cell_dof_values)
+            v.reinit(dofs_per_cell);
         }
+      if constexpr (running_in_debug_mode())
+        for (const auto &vector : cell_dof_values)
+          AssertDimension(vector.size(), dofs_per_cell);
 
-      return unpacked_data;
+      for (unsigned int i = 0; i < n_elements; ++i)
+        std::memcpy(&cell_dof_values[i][0],
+                    &(*std::next(data_range.begin(), i * bytes_per_entry)),
+                    bytes_per_entry);
     }
   } // namespace SolutionTransferImplementation
 } // namespace internal
@@ -281,14 +286,16 @@ SolutionTransfer<dim, VectorType, spacedim>::interpolate(
   if (average_values)
     valence.reinit(*all_out[0]);
 
+  std::vector<Vector<typename VectorType::value_type>> cell_dof_values;
   tria->notify_ready_to_unpack(
     handle,
-    [this, &all_out, &valence](
+    [this, &all_out, &valence, &cell_dof_values](
       const typename Triangulation<dim, spacedim>::cell_iterator &cell_,
       const CellStatus                                            status,
       const boost::iterator_range<std::vector<char>::const_iterator>
-        &data_range) {
-      this->unpack_callback(cell_, status, data_range, all_out, valence);
+        &data_range) mutable {
+      this->unpack_callback(
+        cell_, status, data_range, cell_dof_values, all_out, valence);
     });
 
   if (average_values)
@@ -418,8 +425,9 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
   const typename Triangulation<dim, spacedim>::cell_iterator     &cell_,
   const CellStatus                                                status,
   const boost::iterator_range<std::vector<char>::const_iterator> &data_range,
-  std::vector<VectorType *>                                      &all_out,
-  VectorType                                                     &valence)
+  std::vector<Vector<typename VectorType::value_type>> &cell_dof_values,
+  std::vector<VectorType *>                            &all_out,
+  VectorType                                           &valence)
 {
   typename DoFHandler<dim, spacedim>::cell_iterator cell(*cell_, dof_handler);
 
@@ -463,28 +471,25 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
   if (dofs_per_cell == 0)
     return; // nothing to do for FE_Nothing
 
-  const std::vector<::dealii::Vector<typename VectorType::value_type>>
-    dof_values = internal::SolutionTransferImplementation::unpack_dof_values<
-      typename VectorType::value_type>(data_range, dofs_per_cell);
-
-  // check if sizes match
-  AssertDimension(dof_values.size(), all_out.size());
+  internal::SolutionTransferImplementation::unpack_dof_values<
+    typename VectorType::value_type>(data_range,
+                                     dofs_per_cell,
+                                     cell_dof_values);
+  AssertDimension(cell_dof_values.size(), all_out.size());
 
   // check if we have enough dofs provided by the FE object
   // to interpolate the transferred data correctly
-  for (auto it_dof_values = dof_values.begin();
-       it_dof_values != dof_values.end();
-       ++it_dof_values)
+  for (const auto &vector : cell_dof_values)
     Assert(
-      dofs_per_cell == it_dof_values->size(),
+      dofs_per_cell == vector.size(),
       ExcMessage(
-        "The transferred data was packed with a different number of dofs than the "
-        "currently registered FE object assigned to the DoFHandler has."));
+        "The transferred data was packed with a different number of dofs than "
+        "the currently registered FE object assigned to the DoFHandler has."));
 
   // distribute data for each registered vector on mesh
-  auto it_input  = dof_values.cbegin();
+  auto it_input  = cell_dof_values.cbegin();
   auto it_output = all_out.begin();
-  for (; it_input != dof_values.cend(); ++it_input, ++it_output)
+  for (; it_input != cell_dof_values.cend(); ++it_input, ++it_output)
     if (average_values)
       cell->distribute_local_to_global_by_interpolation(*it_input,
                                                         *(*it_output),
@@ -497,9 +502,11 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
 
   if (average_values)
     {
-      // compute valence vector if averaging should be performed
-      Vector<typename VectorType::value_type> ones(dofs_per_cell);
-      ones = 1.0;
+      if (cell_dof_values.empty())
+        cell_dof_values.emplace_back(dofs_per_cell);
+      auto &ones = cell_dof_values.back();
+      ones       = 1.0;
+
       cell->distribute_local_to_global_by_interpolation(ones,
                                                         valence,
                                                         fe_index);
