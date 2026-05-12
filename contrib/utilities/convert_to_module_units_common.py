@@ -224,6 +224,8 @@ sundials_includes = [
     "sunnonlinsol/sunnonlinsol_.*",
 ]
 
+symengine_includes = ["symengine/.*"]
+
 taskflow_includes = ["taskflow/.*"]
 
 tbb_includes = ["tbb/.*"]
@@ -274,6 +276,9 @@ match_std_includes = re.compile("# *include *<(" + "|".join(std_includes) + ")>"
 match_sundials_includes = re.compile(
     "# *include *<(" + "|".join(sundials_includes) + ")>"
 )
+match_symengine_includes = re.compile(
+    "# *include *<(" + "|".join(symengine_includes) + ")>"
+)
 match_taskflow_includes = re.compile(
     "# *include *<(" + "|".join(taskflow_includes) + ")>"
 )
@@ -303,6 +308,7 @@ external_package_headers_regex_map = {
     "slepc": match_slepc_includes,
     "std": match_std_includes,
     "sundials": match_sundials_includes,
+    "symengine": match_symengine_includes,
     "taskflow": match_taskflow_includes,
     "tbb": match_tbb_includes,
     "trilinos": match_trilinos_includes,

@@ -1,0 +1,197 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import;
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of
+// SymEngine into one partition that we can 'import' wherever we need.
+// This is the file that wraps everything we need from SymEngine into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#include <symengine/add.h>
+#include <symengine/basic.h>
+#include <symengine/derivative.h>
+#include <symengine/dict.h>
+#include <symengine/eval.h>
+#include <symengine/eval_arb.h>
+#include <symengine/eval_double.h>
+#include <symengine/expression.h>
+#include <symengine/functions.h>
+#include <symengine/integer.h>
+#include <symengine/lambda_double.h>
+#include <symengine/logic.h>
+#include <symengine/mul.h>
+#include <symengine/number.h>
+#include <symengine/parser.h>
+#include <symengine/pow.h>
+#include <symengine/rational.h>
+#include <symengine/symengine_exception.h>
+#include <symengine/symengine_rcp.h>
+
+export module dealii.external.symengine;
+
+#ifdef DEAL_II_WITH_SYMENGINE
+
+export
+{
+  namespace SymEngine
+  {
+    using ::SymEngine::abs;
+    using ::SymEngine::Abs;
+    using ::SymEngine::acos;
+    using ::SymEngine::ACos;
+    using ::SymEngine::acosh;
+    using ::SymEngine::ACosh;
+    using ::SymEngine::acot;
+    using ::SymEngine::ACot;
+    using ::SymEngine::acoth;
+    using ::SymEngine::ACoth;
+    using ::SymEngine::acsc;
+    using ::SymEngine::ACsc;
+    using ::SymEngine::acsch;
+    using ::SymEngine::ACsch;
+    using ::SymEngine::add;
+    using ::SymEngine::Add;
+    using ::SymEngine::asec;
+    using ::SymEngine::ASec;
+    using ::SymEngine::asech;
+    using ::SymEngine::ASech;
+    using ::SymEngine::asin;
+    using ::SymEngine::ASin;
+    using ::SymEngine::asinh;
+    using ::SymEngine::ASinh;
+    using ::SymEngine::atan;
+    using ::SymEngine::ATan;
+    using ::SymEngine::atan2;
+    using ::SymEngine::ATan2;
+    using ::SymEngine::atanh;
+    using ::SymEngine::ATanh;
+    using ::SymEngine::BaseVisitor;
+    using ::SymEngine::Basic;
+    using ::SymEngine::boolean;
+    using ::SymEngine::Boolean;
+    using ::SymEngine::boolTrue;
+    using ::SymEngine::cbrt;
+    using ::SymEngine::ceiling;
+    using ::SymEngine::ComplexDouble;
+    using ::SymEngine::ComplexInf;
+    using ::SymEngine::Constant;
+    using ::SymEngine::cos;
+    using ::SymEngine::Cos;
+    using ::SymEngine::cosh;
+    using ::SymEngine::Cosh;
+    using ::SymEngine::cot;
+    using ::SymEngine::Cot;
+    using ::SymEngine::coth;
+    using ::SymEngine::Coth;
+    using ::SymEngine::csc;
+    using ::SymEngine::Csc;
+    using ::SymEngine::csch;
+    using ::SymEngine::Csch;
+    using ::SymEngine::cse;
+    using ::SymEngine::Derivative;
+    using ::SymEngine::diff;
+    using ::SymEngine::div;
+    using ::SymEngine::down_cast;
+    using ::SymEngine::eq;
+    using ::SymEngine::Eq;
+    using ::SymEngine::erf;
+    using ::SymEngine::Erf;
+    using ::SymEngine::erfc;
+    using ::SymEngine::Erfc;
+    using ::SymEngine::exp;
+    using ::SymEngine::Expression;
+    using ::SymEngine::floor;
+    using ::SymEngine::function_symbol;
+    using ::SymEngine::FunctionSymbol;
+    using ::SymEngine::Gamma;
+    using ::SymEngine::Ge;
+    using ::SymEngine::Gt;
+    using ::SymEngine::hash_t;
+    using ::SymEngine::I;
+    using ::SymEngine::Inf;
+    using ::SymEngine::integer;
+    using ::SymEngine::Integer;
+    using ::SymEngine::integer_class;
+    using ::SymEngine::is_a;
+    using ::SymEngine::is_a_Boolean;
+    using ::SymEngine::is_a_Number;
+    using ::SymEngine::LambdaComplexDoubleVisitor;
+    using ::SymEngine::LambdaRealDoubleVisitor;
+    using ::SymEngine::Le;
+    using ::SymEngine::log;
+    using ::SymEngine::Log;
+    using ::SymEngine::LogGamma;
+    using ::SymEngine::logical_and;
+    using ::SymEngine::logical_not;
+    using ::SymEngine::logical_or;
+    using ::SymEngine::logical_xor;
+    using ::SymEngine::Lt;
+    using ::SymEngine::map_basic_basic;
+    using ::SymEngine::max;
+    using ::SymEngine::Max;
+    using ::SymEngine::min;
+    using ::SymEngine::Min;
+    using ::SymEngine::minus_one;
+    using ::SymEngine::mul;
+    using ::SymEngine::Mul;
+    using ::SymEngine::Nan;
+    using ::SymEngine::Ne;
+    using ::SymEngine::NegInf;
+    using ::SymEngine::Number;
+    using ::SymEngine::one;
+    using ::SymEngine::parse;
+    using ::SymEngine::piecewise;
+    using ::SymEngine::PiecewiseVec;
+    using ::SymEngine::pow;
+    using ::SymEngine::Pow;
+    using ::SymEngine::Rational;
+    using ::SymEngine::rational_class;
+    using ::SymEngine::RCP;
+    using ::SymEngine::rcp_static_cast;
+    using ::SymEngine::RCPBasicKeyLess;
+    using ::SymEngine::real_double;
+    using ::SymEngine::RealDouble;
+    using ::SymEngine::sdiff;
+    using ::SymEngine::sec;
+    using ::SymEngine::Sec;
+    using ::SymEngine::sech;
+    using ::SymEngine::Sech;
+    using ::SymEngine::sign;
+    using ::SymEngine::sin;
+    using ::SymEngine::Sin;
+    using ::SymEngine::sinh;
+    using ::SymEngine::Sinh;
+    using ::SymEngine::sqrt;
+    using ::SymEngine::sub;
+    using ::SymEngine::symbol;
+    using ::SymEngine::Symbol;
+    using ::SymEngine::tan;
+    using ::SymEngine::Tan;
+    using ::SymEngine::tanh;
+    using ::SymEngine::Tanh;
+    using ::SymEngine::vec_basic;
+    using ::SymEngine::vec_pair;
+    using ::SymEngine::Visitor;
+    using ::SymEngine::zero;
+  } // namespace SymEngine
+}
+#endif
