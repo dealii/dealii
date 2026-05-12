@@ -118,14 +118,13 @@ namespace internal
        * Helper accessor function for quad_is_quadrilateral
        */
       ReferenceCell<dim - 1>
-      get_quad_type(const std::size_t index) const;
+      get_quad_type(const int index) const;
 
       /**
        * Helper accessor function for quad_is_quadrilateral
        */
       void
-      set_quad_type(const std::size_t            index,
-                    const ReferenceCell<dim - 1> face_type);
+      set_quad_type(const int index, const ReferenceCell<dim - 1> face_type);
 
       /**
        * The TriaObject containing the data of lines.
@@ -155,8 +154,9 @@ namespace internal
 
     template <int dim>
     inline ReferenceCell<dim - 1>
-    TriaFaces<dim>::get_quad_type(const std::size_t index) const
+    TriaFaces<dim>::get_quad_type(const int index) const
     {
+      Assert(index >= 0, ExcInternalError());
       AssertIndexRange(index, quad_is_quadrilateral.size());
       if constexpr (dim == 3)
         return quad_is_quadrilateral[index] ? ReferenceCells::Quadrilateral :
@@ -172,9 +172,10 @@ namespace internal
 
     template <int dim>
     inline void
-    TriaFaces<dim>::set_quad_type(const std::size_t            index,
+    TriaFaces<dim>::set_quad_type(const int                    index,
                                   const ReferenceCell<dim - 1> face_type)
     {
+      Assert(index >= 0, ExcInternalError());
       AssertIndexRange(index, quad_is_quadrilateral.size());
       Assert(face_type == ReferenceCells::Quadrilateral ||
                face_type == ReferenceCells::Triangle,
