@@ -65,6 +65,22 @@ namespace Functions
 
 
   template <int dim, typename VectorType, int spacedim>
+  FEFieldFunction<dim, VectorType, spacedim>::FEFieldFunction(
+    const DoFHandler<dim, spacedim> &mydh,
+    const VectorType                &myv)
+    : // Defer to the other constructor, but with a mapping that
+      // is appropriate for the cell type used
+    FEFieldFunction<dim, VectorType, spacedim>(
+      mydh,
+      myv,
+      mydh.get_triangulation()
+        .get_reference_cells()[0]
+        .template get_default_linear_mapping<spacedim>())
+  {}
+
+
+
+  template <int dim, typename VectorType, int spacedim>
   void
   FEFieldFunction<dim, VectorType, spacedim>::set_active_cell(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &newcell)
