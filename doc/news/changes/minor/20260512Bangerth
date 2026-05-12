@@ -1,0 +1,6 @@
+Fixed: The default mapping provided to FEFieldFunction only worked for
+hypercube meshes. This is now fixed by introducing a second
+constructor that determines what the appropriate linear mapping for a
+given mesh is, and then using this mapping.
+<br>
+(Wolfgang Bangerth, Sam Scheuerman, David Wells, 2026/05/12)
