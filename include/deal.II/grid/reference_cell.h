@@ -134,7 +134,11 @@ public:
    * `n_vertices==4`, this function will return ReferenceCells::Quadrilateral.
    * But if `dim==3` and `n_vertices==4`, it will return
    * ReferenceCells::Tetrahedron.
+   *
+   * @deprecated Use ReferenceCells::n_vertices_to_reference_cell() instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use ReferenceCells::n_vertices_to_reference_cell() instead")
   static ReferenceCell
   n_vertices_to_type(const int dim_, const unsigned int n_vertices);
 
@@ -1423,6 +1427,23 @@ namespace ReferenceCells
   template <int dim>
   constexpr const ReferenceCell<dim> &
   get_hypercube();
+
+  /**
+   * Given the number of vertices a reference cell has (provided as
+   * a function argument), and the dimension the reference cell lives in
+   * (provided as a template argument), return the ReferenceCell object
+   * that corresponds to this input. For example, if you call
+   * `ReferenceCells::n_vertices_to_reference_cell<2>(4)`, you will get
+   * ReferenceCells::Quadrilateral because the only 2d reference cell
+   * with four vertices is a quadrilateral. On the other hand, if you call
+   * `ReferenceCells::n_vertices_to_reference_cell<3>(4)`, you will get
+   * ReferenceCells::Tetrahedron because the only 3d reference cell
+   * with four vertices is a tetrahedron.
+   */
+  template <int dim>
+  ReferenceCell<dim>
+  n_vertices_to_reference_cell(const unsigned int n_vertices);
+
 
   /**
    * Return the maximum number of vertices an object of dimension `structdim`
@@ -3425,6 +3446,49 @@ namespace ReferenceCells
 
 
 
+  template <int dim>
+  inline ReferenceCell<dim>
+  n_vertices_to_reference_cell(const unsigned int n_vertices)
+  {
+    if constexpr (dim == 0)
+      if (n_vertices == 1)
+        return ReferenceCells::Vertex;
+
+    if constexpr (dim == 1)
+      {
+        if (n_vertices == 2)
+          return ReferenceCells::Line;
+      }
+
+    if constexpr (dim == 2)
+      {
+        if (n_vertices == 3)
+          return ReferenceCells::Triangle;
+        else if (n_vertices == 4)
+          return ReferenceCells::Quadrilateral;
+      }
+
+    if constexpr (dim == 3)
+      {
+        if (n_vertices == 4)
+          return ReferenceCells::Tetrahedron;
+        else if (n_vertices == 5)
+          return ReferenceCells::Pyramid;
+        if (n_vertices == 6)
+          return ReferenceCells::Wedge;
+        else if (n_vertices == 8)
+          return ReferenceCells::Hexahedron;
+      }
+
+    Assert(false,
+           ExcMessage("The combination of dim = " + std::to_string(dim) +
+                      " and n_vertices = " + std::to_string(n_vertices) +
+                      " does not correspond to a known reference cell type."));
+    return ReferenceCells::Invalid<dim>;
+  }
+
+
+
   template <int structdim>
   inline constexpr unsigned int
   max_n_vertices()
@@ -3468,42 +3532,7 @@ ReferenceCell<dim>::n_vertices_to_type(const int          dim_,
                                        const unsigned int n_vertices)
 {
   AssertDimension(dim, dim_);
-
-  if constexpr (dim == 0)
-    if (n_vertices == 1)
-      return ReferenceCells::Vertex;
-
-  if constexpr (dim == 1)
-    {
-      if (n_vertices == 2)
-        return ReferenceCells::Line;
-    }
-
-  if constexpr (dim == 2)
-    {
-      if (n_vertices == 3)
-        return ReferenceCells::Triangle;
-      else if (n_vertices == 4)
-        return ReferenceCells::Quadrilateral;
-    }
-
-  if constexpr (dim == 3)
-    {
-      if (n_vertices == 4)
-        return ReferenceCells::Tetrahedron;
-      else if (n_vertices == 5)
-        return ReferenceCells::Pyramid;
-      if (n_vertices == 6)
-        return ReferenceCells::Wedge;
-      else if (n_vertices == 8)
-        return ReferenceCells::Hexahedron;
-    }
-
-  Assert(false,
-         ExcMessage("The combination of dim = " + std::to_string(dim) +
-                    " and n_vertices = " + std::to_string(n_vertices) +
-                    " does not correspond to a known reference cell type."));
-  return ReferenceCells::Invalid<dim>;
+  return ReferenceCells::n_vertices_to_reference_cell<dim>(n_vertices);
 }
 
 
