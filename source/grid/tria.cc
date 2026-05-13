@@ -3715,8 +3715,14 @@ namespace internal
           dim > 1 ? connectivity.entity_to_entities(1, 0) : empty;
         const ArrayOfArrays &quads_to_lines =
           dim == 3 ? connectivity.entity_to_entities(2, 1) : empty;
-        const unsigned int n_lines = lines_to_vertices.size();
-        const unsigned int n_quads = quads_to_lines.size();
+        const auto n_lines = lines_to_vertices.size();
+        AssertThrow(
+          n_lines <= std::size_t(std::numeric_limits<int>::max()),
+          ExcMessage("The number of lines must be less than the largest int."));
+        const auto n_quads = quads_to_lines.size();
+        AssertThrow(
+          n_quads <= std::size_t(std::numeric_limits<int>::max()),
+          ExcMessage("The number of quads must be less than the largest int."));
 
         if (dim > 1)
           tria.faces->allocate(n_lines, n_quads);
@@ -3726,7 +3732,7 @@ namespace internal
           {
             auto &faces = *tria.faces;
             // loop over lines
-            for (unsigned int line = 0; line < n_lines; ++line)
+            for (int line = 0; line < int(n_lines); ++line)
               {
                 const auto vertices = lines_to_vertices[line];
                 for (unsigned int v = 0; v < vertices.size(); ++v)
@@ -3741,7 +3747,7 @@ namespace internal
             // get connectivity between quads and lines
 
             // loop over all quads -> entity type, line indices/orientations
-            for (unsigned int q = 0, k = 0; q < n_quads; ++q)
+            for (int q = 0, k = 0; q < int(n_quads); ++q)
               {
                 // set entity type of quads
                 const auto face_reference_cell =
