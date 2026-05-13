@@ -3063,7 +3063,8 @@ namespace internal
             }
 
           cell_types.push_back(
-            ReferenceCell<dim>::n_vertices_to_type(dim, cell.vertices.size()));
+            ReferenceCells::n_vertices_to_reference_cell<dim>(
+              cell.vertices.size()));
           all_reference_cells.insert(cell_types.back());
 
           // create CRS of vertices (to remove template argument dim)

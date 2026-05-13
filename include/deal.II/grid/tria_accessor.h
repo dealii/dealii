@@ -4387,7 +4387,7 @@ namespace internal
         vertices)
     {
       const ReferenceCell<dim> reference_cell =
-        ReferenceCell<dim>::n_vertices_to_type(dim, vertices.size());
+        ReferenceCells::n_vertices_to_reference_cell<dim>(vertices.size());
 
       if (reference_cell == ReferenceCells::Line)
         // Return the distance between the two vertices

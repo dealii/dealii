@@ -621,7 +621,7 @@ namespace CGALWrappers
 
     if constexpr (spacedim == 2)
       if ((structdim == 2) &&
-          (ReferenceCell<2>::n_vertices_to_type(structdim, vertices.size()) ==
+          (ReferenceCells::n_vertices_to_reference_cell<2>(vertices.size()) ==
            ReferenceCells::Quadrilateral))
         std::swap(vertices[2], vertices[3]);
   }

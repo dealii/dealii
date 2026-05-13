@@ -77,8 +77,8 @@ struct CellData
    * `vertices` member variable after construction.
    *
    * The kind of cell described by the current object is then determined by
-   * calling ReferenceCell::n_vertices_to_type() on the number of vertices
-   * described by this array.
+   * calling ReferenceCells::n_vertices_to_reference_cell() on the number of
+   * vertices described by this array.
    */
   std::vector<unsigned int> vertices;
 
