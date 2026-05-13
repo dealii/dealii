@@ -1,0 +1,118 @@
+// ------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: LGPL-2.1-or-later
+// Copyright (C) 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Part of the source code is dual licensed under Apache-2.0 WITH
+// LLVM-exception OR LGPL-2.1-or-later. Detailed license information
+// governing the source code and code contributions can be found in
+// LICENSE.md and CONTRIBUTING.md at the top level directory of deal.II.
+//
+// ------------------------------------------------------------------------
+
+#include <deal.II/lac/vector.h>
+
+#include <deal.II/sundials/arkode.h>
+#include <deal.II/sundials/arkode_stepper.h>
+
+#include "../tests.h"
+
+
+// Test ERKStepper functionality on the harmonic oscillator problem (cf.
+// arkode_01). Three sub-tests are run:
+//   1. Default ERKStepper settings.
+//   2. ERKStepper with the order of accuracy set to 4 via
+//      AdditionalData::order.
+//   3. ERKStepper with an explicit Butcher table selected by name via
+//      AdditionalData::explicit_butcher_table (ARKODE_DORMAND_PRINCE_7_4_5,
+//      a classical order-5 explicit Runge-Kutta method).
+//
+// The harmonic oscillator problem:
+//
+//   u'' = -k^2 u,  u(0) = 0,  u'(0) = k
+//
+// written as a first-order system:
+//
+//   y[0]' =        y[1]
+//   y[1]' = -k^2 * y[0]
+//
+// Exact solution: y[0](t) = sin(k t), y[1](t) = k cos(k t).
+
+using VectorType = Vector<double>;
+
+// Common ARKode outer settings: integrate [0, 2*pi] outputting every 0.05
+// time units, matching the tolerance and step-size settings of arkode_01.
+static SUNDIALS::ARKode<VectorType>::AdditionalData
+make_arkode_data()
+{
+  return {0.0 /*initial_time*/,
+          6.28 /*final_time*/,
+          0.01 /*initial_step_size*/,
+          0.05 /*output_period*/,
+          1e-6 /*minimum_step_size*/,
+          1e-6 /*absolute_tolerance*/,
+          1e-5 /*relative_tolerance*/};
+}
+
+
+static void
+run(const SUNDIALS::ERKStepper<VectorType>::AdditionalData &data)
+{
+  SUNDIALS::ERKStepper<VectorType> stepper(data);
+
+  const double kappa = 1.0;
+
+  stepper.explicit_function =
+    [&](double, const VectorType &y, VectorType &ydot) {
+      ydot[0] = y[1];
+      ydot[1] = -kappa * kappa * y[0];
+    };
+
+  SUNDIALS::ARKode<VectorType> ode(stepper, make_arkode_data());
+
+  ode.output_step =
+    [&](const double t, const VectorType &sol, const unsigned int /*step*/) {
+      deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
+    };
+
+  VectorType y(2);
+  y[0] = 0;
+  y[1] = kappa;
+
+  ode.solve_ode(y);
+}
+
+
+int
+main()
+{
+  initlog();
+
+  // Sub-test 1: default ERKStepper settings.
+  {
+    deallog << "=== Default ===" << std::endl;
+    SUNDIALS::ERKStepper<VectorType>::AdditionalData data;
+    run(data);
+  }
+
+  // Sub-test 2: explicitly request order 6.
+  {
+    deallog << "=== Order 6 ===" << std::endl;
+    SUNDIALS::ERKStepper<VectorType>::AdditionalData data;
+    data.order = 6;
+    run(data);
+  }
+
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
+  // Sub-test 3: select a specific ERK Butcher table by name.
+  // ARKODE_DORMAND_PRINCE_7_4_5 is the classical Dormand-Prince 4(5) method.
+  {
+    deallog << "=== Butcher table ARKODE_DORMAND_PRINCE_7_4_5 ===" << std::endl;
+    SUNDIALS::ERKStepper<VectorType>::AdditionalData data;
+    data.explicit_butcher_table = "ARKODE_DORMAND_PRINCE_7_4_5";
+    run(data);
+  }
+#endif
+}
