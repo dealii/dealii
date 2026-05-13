@@ -1242,10 +1242,19 @@ namespace deal_II_exceptions
      * A function that compares two values for equality, after converting to a
      * common type to avoid compiler warnings when comparing objects of
      * different types (e.g., unsigned and signed variables).
+     *
+     * This function takes its arguments by value, rather than reference,
+     * because this ensures that we can also compare variables that may
+     * not live in a memory space accessible at the place where the
+     * comparison occurs -- say, comparing `static constexpr` member
+     * variables (which are variables that live in global memory) on
+     * a device that has a separate memory space. The copy this implies
+     * is generally not problematic because we apply this function to
+     * scalar values with integer types.
      */
     template <typename T, typename U>
     inline DEAL_II_HOST_DEVICE constexpr bool
-    compare_for_equality(const T &t, const U &u)
+    compare_for_equality(const T t, const U u)
     {
       using common_type = std::common_type_t<T, U>;
       return static_cast<common_type>(t) == static_cast<common_type>(u);
@@ -1256,10 +1265,19 @@ namespace deal_II_exceptions
      * A function that compares two values with `operator<`, after converting to
      * a common type to avoid compiler warnings when comparing objects of
      * different types (e.g., unsigned and signed variables).
+     *
+     * This function takes its arguments by value, rather than reference,
+     * because this ensures that we can also compare variables that may
+     * not live in a memory space accessible at the place where the
+     * comparison occurs -- say, comparing `static constexpr` member
+     * variables (which are variables that live in global memory) on
+     * a device that has a separate memory space. The copy this implies
+     * is generally not problematic because we apply this function to
+     * scalar values with integer types.
      */
     template <typename T, typename U>
     inline DEAL_II_HOST_DEVICE constexpr bool
-    compare_less_than(const T &t, const U &u)
+    compare_less_than(const T t, const U u)
     {
       using common_type = std::common_type_t<T, U>;
       return (static_cast<common_type>(t) < static_cast<common_type>(u));
