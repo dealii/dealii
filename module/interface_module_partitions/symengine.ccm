@@ -26,25 +26,27 @@ module;
 
 #include <deal.II/base/config.h>
 
-#include <symengine/add.h>
-#include <symengine/basic.h>
-#include <symengine/derivative.h>
-#include <symengine/dict.h>
-#include <symengine/eval.h>
-#include <symengine/eval_arb.h>
-#include <symengine/eval_double.h>
-#include <symengine/expression.h>
-#include <symengine/functions.h>
-#include <symengine/integer.h>
-#include <symengine/lambda_double.h>
-#include <symengine/logic.h>
-#include <symengine/mul.h>
-#include <symengine/number.h>
-#include <symengine/parser.h>
-#include <symengine/pow.h>
-#include <symengine/rational.h>
-#include <symengine/symengine_exception.h>
-#include <symengine/symengine_rcp.h>
+#ifdef DEAL_II_WITH_SYMENGINE
+#  include <symengine/add.h>
+#  include <symengine/basic.h>
+#  include <symengine/derivative.h>
+#  include <symengine/dict.h>
+#  include <symengine/eval.h>
+#  include <symengine/eval_arb.h>
+#  include <symengine/eval_double.h>
+#  include <symengine/expression.h>
+#  include <symengine/functions.h>
+#  include <symengine/integer.h>
+#  include <symengine/lambda_double.h>
+#  include <symengine/logic.h>
+#  include <symengine/mul.h>
+#  include <symengine/number.h>
+#  include <symengine/parser.h>
+#  include <symengine/pow.h>
+#  include <symengine/rational.h>
+#  include <symengine/symengine_exception.h>
+#  include <symengine/symengine_rcp.h>
+#endif
 
 export module dealii.external.symengine;
 
