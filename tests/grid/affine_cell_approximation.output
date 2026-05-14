@@ -1,3 +1,4 @@
+
 DEAL::Cell 0_0: with center 0.00000: A = [2.00000] b = -1.00000
 DEAL::Cell 0_1:0 with center -0.500000: A = [1.00000] b = -1.00000
 DEAL::Cell 0_1:1 with center 0.500000: A = [1.00000] b = 0.00000
