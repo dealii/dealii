@@ -5488,16 +5488,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
     }
   else if constexpr (structdim == 2 && dim == 3)
     {
-      // line orientations in 3d are stored in their own array as bools: here
-      // 'true' is the default orientation and 'false' is the reversed one
-      // (which matches set_line_orientation())
-      const auto index =
-        this->present_index * ReferenceCells::max_n_lines<2>() + line;
-      Assert(index < this->tria->faces->quads_line_orientations.size(),
-             ExcInternalError());
-      return this->tria->faces->quads_line_orientations[index] ?
-               numbers::default_geometric_orientation :
-               numbers::reverse_line_orientation;
+      return this->tria->faces->get_line_orientation(this->present_index, line);
     }
   else if constexpr (structdim == 3 && dim == 3)
     {
@@ -5520,7 +5511,7 @@ TriaAccessor<structdim, dim, spacedim>::line_orientation(
   else
     {
       DEAL_II_ASSERT_UNREACHABLE();
-      return false;
+      return numbers::invalid_geometric_orientation;
     }
 }
 
@@ -5551,12 +5542,7 @@ TriaAccessor<structdim, dim, spacedim>::set_line_orientation(
       // We set line orientations per face, not per cell, so this only works for
       // faces in 3d.
       Assert(structdim == 2, ExcNotImplemented());
-      const auto index =
-        this->present_index * ReferenceCells::max_n_lines<2>() + line;
-      Assert(index < this->tria->faces->quads_line_orientations.size(),
-             ExcInternalError());
-      this->tria->faces->quads_line_orientations[index] =
-        value == numbers::default_geometric_orientation;
+      this->tria->faces->set_line_orientation(this->present_index, line, value);
     }
 }
 

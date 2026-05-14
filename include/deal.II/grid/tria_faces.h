@@ -85,10 +85,10 @@ namespace internal
                    const std::size_t new_quads_single);
 
       /**
-       * Maximum number of lines for each quad (i.e., face of a 3d cell).
-       * Only used for `dim == 3`.
+       * Number of lines for each quad (i.e., face of a 3d cell). Only used for
+       * `dim == 3`.
        */
-      unsigned int max_lines_per_quad;
+      unsigned int lines_per_quad;
 
       /**
        * The TriaObject containing the data of quads.
@@ -98,34 +98,35 @@ namespace internal
       TriaObjects quads;
 
       /**
-       * Orientation of each line of each quad. Like elsewhere, `true` refers to
-       * the standard orientation and `false` refers to the reverse orientation.
+       * Get the orientation of the @p line_no-th line of the index-th face.
        *
        * @note Used only for dim=3.
        */
-      std::vector<bool> quads_line_orientations;
+      types::geometric_orientation
+      get_line_orientation(const int index, const unsigned int line_no) const;
 
       /**
-       * Whether or not each quad is a Quadrilateral. Since, if dim = 3, faces
-       * are either Triangles or Quadrilaterals, it suffices to store a
-       * boolean.
+       * Set the orientation of the @p line_no-th line of the index-th face to
+       * @p line_orientation.
        *
        * @note Used only for dim=3.
        */
-      std::vector<bool> quad_is_quadrilateral;
+      void
+      set_line_orientation(const int                    index,
+                           const unsigned int           line_no,
+                           types::geometric_orientation line_orientation);
 
       /**
        * Helper accessor function for quad_is_quadrilateral
        */
       ReferenceCell<dim - 1>
-      get_quad_type(const std::size_t index) const;
+      get_quad_type(const int index) const;
 
       /**
        * Helper accessor function for quad_is_quadrilateral
        */
       void
-      set_quad_type(const std::size_t            index,
-                    const ReferenceCell<dim - 1> face_type);
+      set_quad_type(const int index, const ReferenceCell<dim - 1> face_type);
 
       /**
        * The TriaObject containing the data of lines.
@@ -149,14 +150,33 @@ namespace internal
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int version);
+
+    private:
+      /**
+       * Whether or not each quad is a Quadrilateral. Since, if dim = 3, faces
+       * are either Triangles or Quadrilaterals, it suffices to store a
+       * boolean.
+       *
+       * @note Used only for dim=3.
+       */
+      std::vector<bool> quad_is_quadrilateral;
+
+      /**
+       * Orientation of each line of each quad. Like elsewhere, `true` refers to
+       * the standard orientation and `false` refers to the reverse orientation.
+       *
+       * @note Used only for dim=3.
+       */
+      std::vector<bool> quads_line_orientations;
     };
 
 
 
     template <int dim>
     inline ReferenceCell<dim - 1>
-    TriaFaces<dim>::get_quad_type(const std::size_t index) const
+    TriaFaces<dim>::get_quad_type(const int index) const
     {
+      Assert(index >= 0, ExcInternalError());
       AssertIndexRange(index, quad_is_quadrilateral.size());
       if constexpr (dim == 3)
         return quad_is_quadrilateral[index] ? ReferenceCells::Quadrilateral :
@@ -172,9 +192,10 @@ namespace internal
 
     template <int dim>
     inline void
-    TriaFaces<dim>::set_quad_type(const std::size_t            index,
+    TriaFaces<dim>::set_quad_type(const int                    index,
                                   const ReferenceCell<dim - 1> face_type)
     {
+      Assert(index >= 0, ExcInternalError());
       AssertIndexRange(index, quad_is_quadrilateral.size());
       Assert(face_type == ReferenceCells::Quadrilateral ||
                face_type == ReferenceCells::Triangle,
@@ -188,11 +209,56 @@ namespace internal
 
 
     template <int dim>
+    inline types::geometric_orientation
+    TriaFaces<dim>::get_line_orientation(const int          index,
+                                         const unsigned int line_no) const
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(line_no, lines_per_quad);
+      const std::size_t i = index * lines_per_quad + line_no;
+      AssertIndexRange(i, quads_line_orientations.size());
+      if constexpr (dim == 3)
+        return quads_line_orientations[i] ?
+                 numbers::default_geometric_orientation :
+                 numbers::reverse_line_orientation;
+      else
+        {
+          DEAL_II_ASSERT_UNREACHABLE();
+          return numbers::invalid_geometric_orientation;
+        }
+    }
+
+
+
+    template <int dim>
+    inline void
+    TriaFaces<dim>::set_line_orientation(
+      const int                          index,
+      const unsigned int                 line_no,
+      const types::geometric_orientation line_orientation)
+    {
+      Assert(index >= 0, ExcInternalError());
+      AssertIndexRange(line_no, lines_per_quad);
+      const std::size_t i = index * lines_per_quad + line_no;
+      AssertIndexRange(i, quads_line_orientations.size());
+      Assert(line_orientation == numbers::default_geometric_orientation ||
+               line_orientation == numbers::reverse_line_orientation,
+             ExcInternalError());
+      if constexpr (dim == 3)
+        quads_line_orientations[i] =
+          line_orientation == numbers::default_geometric_orientation;
+      else
+        DEAL_II_ASSERT_UNREACHABLE();
+    }
+
+
+
+    template <int dim>
     template <class Archive>
     void
     TriaFaces<dim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &max_lines_per_quad &quads &lines &quads_line_orientations
+      ar &lines_per_quad &quads &lines &quads_line_orientations
         &quad_is_quadrilateral;
     }
   } // namespace TriangulationImplementation
