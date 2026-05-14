@@ -898,13 +898,20 @@
  *
  * @ingroup Exceptions
  */
-#define AssertIndexRange(index, range)                                         \
-  Assert(::dealii::deal_II_exceptions::internals::compare_less_than(index,     \
-                                                                    range),    \
-         ::dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( \
-           std::common_type_t<decltype(index), decltype(range)>)>>((index),    \
-                                                                   0,          \
-                                                                   (range)))
+#define AssertIndexRange(index, range)                                    \
+  Assert(                                                                 \
+    ::dealii::deal_II_exceptions::internals::compare_less_than(index,     \
+                                                               range) &&  \
+      [](const auto ind) {                                                \
+        if constexpr (std::is_unsigned_v<decltype(ind)>)                  \
+          return true;                                                    \
+        else                                                              \
+          return (ind >= decltype(ind)(0));                               \
+      }(index),                                                           \
+    ::dealii::ExcIndexRangeType<::dealii::internal::argument_type_t<void( \
+      std::common_type_t<decltype(index), decltype(range)>)>>((index),    \
+                                                              0,          \
+                                                              (range)))
 
 /**
  * An assertion that checks whether a number is finite or not. We explicitly
