@@ -1694,9 +1694,8 @@ TriaAccessor<structdim, dim, spacedim>::real_to_unit_cell_affine_approximation(
   for (const unsigned int v : this->vertex_indices())
     vertices[v] = this->vertex(v);
 
-  const auto A_b =
-    GridTools::affine_cell_approximation<structdim, spacedim>(
-      make_array_view(vertices.begin(), vertices.end()));
+  const auto A_b = GridTools::affine_cell_approximation<structdim, spacedim>(
+    make_array_view(vertices.begin(), vertices.end()));
   DerivativeForm<1, spacedim, structdim> A_inv =
     A_b.first.covariant_form().transpose();
   return Point<structdim>(apply_transformation(A_inv, point - A_b.second));
