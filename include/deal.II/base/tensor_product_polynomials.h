@@ -576,19 +576,15 @@ TensorProductPolynomials<dim, PolynomialType>::compute_derivative(
   std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  ndarray<double, dim, 5> v;
-  {
-    std::vector<double> tmp(5);
-    for (unsigned int d = 0; d < dim; ++d)
-      {
-        polynomials[indices[d]].value(p[d], tmp);
-        v[d][0] = tmp[0];
-        v[d][1] = tmp[1];
-        v[d][2] = tmp[2];
-        v[d][3] = tmp[3];
-        v[d][4] = tmp[4];
-      }
-  }
+  ndarray<double, dim, order + 1> v;
+  if constexpr (running_in_debug_mode())
+    for (auto &array : v)
+      array.fill(std::numeric_limits<double>::signaling_NaN());
+
+  for (unsigned int d = 0; d < dim; ++d)
+    {
+      polynomials[indices[d]].value(p[d], order, v[d].data());
+    }
 
   if constexpr (order == 1)
     {
@@ -755,9 +751,14 @@ AnisotropicPolynomials<dim>::compute_derivative(const unsigned int i,
   std::array<unsigned int, dim> indices;
   compute_index(i, indices);
 
-  std::vector<std::vector<double>> v(dim, std::vector<double>(order + 1));
+  ndarray<double, dim, order + 1> v;
+  if constexpr (running_in_debug_mode())
+    for (auto &array : v)
+      array.fill(std::numeric_limits<double>::signaling_NaN());
   for (unsigned int d = 0; d < dim; ++d)
-    polynomials[d][indices[d]].value(p[d], v[d]);
+    {
+      polynomials[d][indices[d]].value(p[d], order, v[d].data());
+    }
 
   if constexpr (order == 1)
     {
