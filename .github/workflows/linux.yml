@@ -356,7 +356,9 @@ jobs:
         # deleting 15GB
         rm -rf /usr/share/dotnet/
         df -h
-    - uses: lukka/get-cmake@v3.27.9
+    - uses: lukka/get-cmake@v4.3.2
+      with:
+        cmakeVersion: 3.27.9
     - name: info
       run: |
         mpicc -v
@@ -449,7 +451,9 @@ jobs:
             numdiff \
             openmpi-bin \
             libboost-all-dev
-    - uses: lukka/get-cmake@v3.27.9
+    - uses: lukka/get-cmake@v4.3.2
+      with:
+        cmakeVersion: 3.27.9
     - name: info
       run: |
         mpicc -v
