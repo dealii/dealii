@@ -22,8 +22,8 @@
 #include <deal.II/fe/mapping_fe.h>
 #include <deal.II/fe/mapping_q.h>
 
-#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/grid_tools_geometry.h>
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/lapack_full_matrix.h>
@@ -31,6 +31,7 @@
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
 
 #include <functional>
+#include <iterator>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -235,12 +236,13 @@ namespace GridTools
     };
 
 
-    const double TransformR2UAffineTriangle::KA[3][2] = {
-      {-1.000000, -1.000000},
-      {1.000000, 0.000000},
-      {0.000000, 1.000000}};
+    const double TransformR2UAffineTriangle::KA[3][2] = {{-1.000000, -1.000000},
+                                                         {1.000000, 0.000000},
+                                                         {0.000000, 1.000000}};
 
-    const double TransformR2UAffineTriangle::Kb[3] = {1.000000, 0.000000, 0.000000};
+    const double TransformR2UAffineTriangle::Kb[3] = {1.000000,
+                                                      0.000000,
+                                                      0.000000};
 
 
     const double TransformR2UAffineTetrahedron::KA[4][3] = {
@@ -249,18 +251,21 @@ namespace GridTools
       {0.000000, 1.000000, 0.000000},
       {0.000000, 0.000000, 1.000000}};
 
-    const double TransformR2UAffineTetrahedron::Kb[4] = {1.000000, 0.000000, 0.000000, 0.000000};
+    const double TransformR2UAffineTetrahedron::Kb[4] = {1.000000,
+                                                         0.000000,
+                                                         0.000000,
+                                                         0.000000};
 
 
-    const double TransformR2UAffineWedge::KA[6][3] = {
-      {-0.5, -0.5, -1.0 / 3.0},
-      {0.5, 0.0, -1.0 / 3.0},
-      {0.0, 0.5, -1.0 / 3.0},
-      {-0.5, -0.5, 1.0 / 3.0},
-      {0.5, 0.0, 1.0 / 3.0},
-      {0.0, 0.5, 1.0 / 3.0}};
+    const double TransformR2UAffineWedge::KA[6][3] = {{-0.5, -0.5, -1.0 / 3.0},
+                                                      {0.5, 0.0, -1.0 / 3.0},
+                                                      {0.0, 0.5, -1.0 / 3.0},
+                                                      {-0.5, -0.5, 1.0 / 3.0},
+                                                      {0.5, 0.0, 1.0 / 3.0},
+                                                      {0.0, 0.5, 1.0 / 3.0}};
 
-    const double TransformR2UAffineWedge::Kb[6] = {2.0 / 3.0, 1.0 / 6.0, 1.0 / 6.0, 1.0 / 3.0, -1.0 / 6.0, -1.0 / 6.0};
+    const double TransformR2UAffineWedge::Kb[6] =
+      {2.0 / 3.0, 1.0 / 6.0, 1.0 / 6.0, 1.0 / 3.0, -1.0 / 6.0, -1.0 / 6.0};
 
 
     const double TransformR2UAffinePyramid::KA[5][3] = {
@@ -270,7 +275,11 @@ namespace GridTools
       {0.250000, 0.250000, -0.250000},
       {0.000000, 0.000000, 1.000000}};
 
-    const double TransformR2UAffinePyramid::Kb[5] = {0.250000, 0.250000, 0.250000, 0.250000, 0.000000};
+    const double TransformR2UAffinePyramid::Kb[5] = {0.250000,
+                                                     0.250000,
+                                                     0.250000,
+                                                     0.250000,
+                                                     0.000000};
 
 
     /*
@@ -322,9 +331,7 @@ namespace GridTools
                                             {-0.250000, -0.250000, 0.250000},
                                             {0.250000, -0.250000, 0.250000},
                                             {-0.250000, 0.250000, 0.250000},
-                                            {0.250000, 0.250000, 0.250000}
-
-    };
+                                            {0.250000, 0.250000, 0.250000}};
 
 
     template <>
@@ -348,58 +355,49 @@ namespace GridTools
     const ReferenceCell<dim> reference_cell =
       ReferenceCell<dim>::n_vertices_to_type(dim, vertices.size());
 
-    DerivativeForm<1, dim, spacedim> A;
-    Tensor<1, spacedim>              b;
+    DerivativeForm<1, dim, spacedim> A{};
+    Tensor<1, spacedim>              b{};
+
+    const auto accumulate_affine_transform = [&](const auto &KA,
+                                                 const auto &Kb) {
+      const unsigned int n_vertices = vertices.size();
+
+      AssertDimension(n_vertices, std::size(KA));
+      AssertDimension(n_vertices, std::size(Kb));
+
+      for (unsigned int d = 0; d < spacedim; ++d)
+        for (unsigned int v = 0; v < n_vertices; ++v)
+          for (unsigned int e = 0; e < std::size(KA[v]); ++e)
+            A[d][e] += vertices[v][d] * KA[v][e];
+
+      for (unsigned int v = 0; v < n_vertices; ++v)
+        b += vertices[v] * Kb[v];
+    };
 
     if (reference_cell == ReferenceCells::get_hypercube<dim>())
+      accumulate_affine_transform(TransformR2UAffine<dim>::KA,
+                                  TransformR2UAffine<dim>::Kb);
+    else if constexpr (dim == 2)
       {
-        for (unsigned int d = 0; d < spacedim; ++d)
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-            for (unsigned int e = 0; e < dim; ++e)
-              A[d][e] += vertices[v][d] * TransformR2UAffine<dim>::KA[v][e];
-
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell; ++v)
-          b += vertices[v] * TransformR2UAffine<dim>::Kb[v];
+        if (reference_cell == ReferenceCells::Triangle)
+          accumulate_affine_transform(TransformR2UAffineTriangle::KA,
+                                      TransformR2UAffineTriangle::Kb);
+        else
+          Assert(false, ExcNotImplemented());
       }
-    else if (reference_cell == ReferenceCells::Triangle)
+    else if constexpr (dim == 3)
       {
-        for (unsigned int d = 0; d < spacedim; ++d)
-          for (unsigned int v = 0; v < 3; ++v)
-            for (unsigned int e = 0; e < 2; ++e)
-              A[d][e] += vertices[v][d] * TransformR2UAffineTriangle::KA[v][e];
-
-        for (unsigned int v = 0; v < 3; ++v)
-          b += vertices[v] * TransformR2UAffineTriangle::Kb[v];
-      }
-    else if (reference_cell == ReferenceCells::Tetrahedron)
-      {
-        for (unsigned int d = 0; d < spacedim; ++d)
-          for (unsigned int v = 0; v < 4; ++v)
-            for (unsigned int e = 0; e < 3; ++e)
-              A[d][e] += vertices[v][d] * TransformR2UAffineTetrahedron::KA[v][e];
-
-        for (unsigned int v = 0; v < 4; ++v)
-          b += vertices[v] * TransformR2UAffineTetrahedron::Kb[v];
-      }
-    else if (reference_cell == ReferenceCells::Wedge)
-      {
-        for (unsigned int d = 0; d < spacedim; ++d)
-          for (unsigned int v = 0; v < 6; ++v)
-            for (unsigned int e = 0; e < 3; ++e)
-              A[d][e] += vertices[v][d] * TransformR2UAffineWedge::KA[v][e];
-
-        for (unsigned int v = 0; v < 6; ++v)
-          b += vertices[v] * TransformR2UAffineWedge::Kb[v];
-      }
-    else if (reference_cell == ReferenceCells::Pyramid)
-      {
-        for (unsigned int d = 0; d < spacedim; ++d)
-          for (unsigned int v = 0; v < 5; ++v)
-            for (unsigned int e = 0; e < 3; ++e)
-              A[d][e] += vertices[v][d] * TransformR2UAffinePyramid::KA[v][e];
-
-        for (unsigned int v = 0; v < 5; ++v)
-          b += vertices[v] * TransformR2UAffinePyramid::Kb[v];
+        if (reference_cell == ReferenceCells::Tetrahedron)
+          accumulate_affine_transform(TransformR2UAffineTetrahedron::KA,
+                                      TransformR2UAffineTetrahedron::Kb);
+        else if (reference_cell == ReferenceCells::Wedge)
+          accumulate_affine_transform(TransformR2UAffineWedge::KA,
+                                      TransformR2UAffineWedge::Kb);
+        else if (reference_cell == ReferenceCells::Pyramid)
+          accumulate_affine_transform(TransformR2UAffinePyramid::KA,
+                                      TransformR2UAffinePyramid::Kb);
+        else
+          Assert(false, ExcNotImplemented());
       }
     else
       Assert(false, ExcNotImplemented());
