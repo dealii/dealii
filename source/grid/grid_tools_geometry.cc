@@ -353,7 +353,7 @@ namespace GridTools
   affine_cell_approximation(const ArrayView<const Point<spacedim>> &vertices)
   {
     const ReferenceCell<dim> reference_cell =
-      ReferenceCell<dim>::n_vertices_to_type(dim, vertices.size());
+      ReferenceCells::n_vertices_to_reference_cell<dim>(vertices.size());
 
     DerivativeForm<1, dim, spacedim> A{};
     Tensor<1, spacedim>              b{};
@@ -383,7 +383,7 @@ namespace GridTools
           accumulate_affine_transform(TransformR2UAffineTriangle::KA,
                                       TransformR2UAffineTriangle::Kb);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     else if constexpr (dim == 3)
       {
@@ -397,10 +397,10 @@ namespace GridTools
           accumulate_affine_transform(TransformR2UAffinePyramid::KA,
                                       TransformR2UAffinePyramid::Kb);
         else
-          Assert(false, ExcNotImplemented());
+          DEAL_II_NOT_IMPLEMENTED();
       }
     else
-      Assert(false, ExcNotImplemented());
+      DEAL_II_NOT_IMPLEMENTED();
 
     return std::make_pair(A, b);
   }
