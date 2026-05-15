@@ -316,8 +316,14 @@ export
     using std::reverse_iterator;
 
 #ifdef DEAL_II_HAVE_CXX23
+    // When using clang++-23 with the GCC 12 standard library, one can
+    // compile modules but because the GCC standard library is so
+    // old, it doesn't yet have a full complement of C++23 ranges
+    // functionality. Check for that with the requisite feature macro.
+#  if __cpp_lib_containers_ranges >= 202202L
     using std::from_range;
     using std::from_range_t;
+#  endif
 #endif
 
     namespace ranges
