@@ -546,11 +546,6 @@ namespace SUNDIALS
      */
     ARKStepper(const AdditionalData &data = AdditionalData());
 
-    /**
-     * Destructor. Cleans up the internal ARKODE memory block.
-     */
-    ~ARKStepper();
-
     void *
     get_arkode_memory() const override;
 
@@ -1001,7 +996,7 @@ namespace SUNDIALS
     /**
      * ARKode memory object.
      */
-    void *arkode_mem;
+    std::unique_ptr<void, void (*)(void *)> arkode_mem;
 
     /**
      * ARKStepper configuration data.
