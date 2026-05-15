@@ -12,9 +12,7 @@
 
 #include <deal.II/base/process_grid.h>
 
-#ifdef DEAL_II_WITH_SCALAPACK
-
-#  include <deal.II/lac/scalapack.templates.h>
+#include <deal.II/lac/scalapack.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -268,5 +266,3 @@ template void
 Utilities::MPI::ProcessGrid::send_to_inactive<int>(int *, const int) const;
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif // DEAL_II_WITH_SCALAPACK
