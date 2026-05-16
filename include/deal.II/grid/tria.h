@@ -335,15 +335,17 @@ namespace internal
      * data, such as face orientations, neighbors, and the vertex index cache.
      * For simplicity, we index those arrays by the largest stride required by
      * all present ReferenceCell objects: e.g., if the only ReferenceCell is
-     * Tetrahedron then we only need to store 4 face orientations per cell (and
-     * thus the stride is 4), whereas if the Triangulation contains a Hexahedron
-     * then we store 6 per cell (and, for all cells, the stride is 6).
+     * ReferenceCells::Tetrahedron then we only need to store 4 face
+     * orientations per cell (and thus the stride is 4), whereas if the
+     * Triangulation contains a Hexahedron then we store 6 per cell (and, for
+     * all cells, the stride is 6).
      *
      * @note Since refining a ReferenceCell produces the same ReferenceCell
-     * (except for Pyramid, which produces Tetrahedron and Pyramid), these
-     * strides only need to be set on level 0 and do not need to be updated
-     * during refinement (as a Tetrahedron has fewer vertices, lines, and faces
-     * then a Pyramid).
+     * (except for ReferenceCells::Pyramid, which produces
+     * ReferenceCells::Tetrahedron and ReferenceCells::Pyramid), these strides
+     * only need to be set on level 0 and do not need to be updated during
+     * refinement (as a ReferenceCells::Tetrahedron has fewer vertices, lines,
+     * and faces then a ReferenceCells::Pyramid).
      */
     template <int dim>
     struct Strides

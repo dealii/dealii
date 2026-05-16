@@ -3739,21 +3739,6 @@ namespace internal
             }
 #endif
 
-        // clear old content
-        tria.levels.clear();
-        tria.levels.push_back(
-          std::make_unique<
-            internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
-            ReferenceCells::max_n_children<dim>(),
-            ReferenceCells::max_n_faces<dim>(),
-            ReferenceCells::max_n_vertices<dim>()));
-
-        if (dim > 1)
-          tria.faces = std::make_unique<
-            dealii::internal::TriangulationImplementation::TriaFaces<dim>>(
-            ReferenceCells::max_n_children<2>(),
-            ReferenceCells::max_n_lines<2>());
-
         // copy vertices
         tria.vertices = vertices;
         tria.vertices_used.assign(vertices.size(), true);
@@ -3770,6 +3755,21 @@ namespace internal
                                     all_reference_cells.end());
         tria.strides = internal::TriangulationImplementation::Strides<dim>(
           tria.reference_cells);
+
+        // clear old content
+        tria.levels.clear();
+        tria.levels.push_back(
+          std::make_unique<
+            internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
+            tria.strides.max_children_per_cell,
+            tria.strides.max_faces_per_cell,
+            tria.strides.max_vertices_per_cell));
+
+        if (dim > 1)
+          tria.faces = std::make_unique<
+            dealii::internal::TriangulationImplementation::TriaFaces<dim>>(
+            tria.strides.max_children_per_face,
+            tria.strides.max_lines_per_face);
 
         const ArrayOfArrays  empty;
         const ArrayOfArrays &lines_to_vertices =
@@ -5381,9 +5381,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -5862,9 +5862,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -6116,9 +6116,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -6420,9 +6420,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -7122,7 +7122,13 @@ namespace internal
                     new_face->set_boundary_id_internal(
                       numbers::internal_face_boundary_id);
                     new_face->set_manifold_id(cell->manifold_id());
-                    for (const auto j : new_faces[i]->line_indices())
+
+                    // At this point the face doesn't have its ReferenceCell
+                    // set, so rely on lower-level functionality to reset
+                    // per-line data
+                    for (unsigned int j = 0;
+                         j < triangulation.faces->lines_per_quad;
+                         ++j)
                       new_face->set_line_orientation(
                         j, numbers::default_geometric_orientation);
                   }
@@ -7991,9 +7997,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
