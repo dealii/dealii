@@ -29,27 +29,6 @@
 #include "../tests.h"
 
 
-unsigned int
-get_n_mpi_processes()
-{
-  int n_jobs;
-  MPI_Comm_size(MPI_COMM_WORLD, &n_jobs);
-
-  return n_jobs;
-}
-
-
-
-unsigned int
-get_this_mpi_process()
-{
-  int rank;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  return rank;
-}
-
-
 void
 test()
 {
@@ -59,9 +38,12 @@ test()
   // process has 10 rows, the second one 20,
   // the third one 30, and so on
   unsigned int           N = 0;
-  std::vector<size_type> local_rows_per_process(get_n_mpi_processes());
-  std::vector<size_type> start_row(get_n_mpi_processes());
-  for (unsigned int i = 0; i < get_n_mpi_processes(); ++i)
+  std::vector<size_type> local_rows_per_process(
+    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD));
+  std::vector<size_type> start_row(
+    Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD));
+  for (unsigned int i = 0; i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+       ++i)
     {
       N += (i + 1) * 10;
       local_rows_per_process[i] = (i + 1) * 10;
@@ -102,7 +84,7 @@ test()
            csp,
            local_rows_per_process,
            local_rows_per_process,
-           get_this_mpi_process());
+           Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
 
   // no write into the exact same matrix
   // entries as have been created by the
