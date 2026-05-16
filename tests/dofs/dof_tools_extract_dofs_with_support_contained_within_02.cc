@@ -13,7 +13,12 @@
 
 // test DoFTools::extract_dofs_with_support_contained_within() for the
 // p::d::Tria. As an MPI test, make sure that the total number of shape
-// functions that are non-zero within the domain is the same.
+// functions that are non-zero within the predicate domain is the same
+// regardless of how many MPI processes are used.
+// Note: the function DoFTools::extract_dofs_with_support_contained_within()
+// does not return the total number of shape functions contained within the
+// predicate domain, but only a local subset that contains locally active DoFs,
+// as well as DoFs by which a locally active DoF is constrained.
 
 #include <deal.II/base/point.h>
 
@@ -33,10 +38,6 @@
 #include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/numerics/data_out.h>
-
-#include <list>
-#include <set>
-#include <sstream>
 
 #include "../tests.h"
 
@@ -76,9 +77,7 @@ test(const unsigned int flag)
   DoFHandler<dim> dh(triangulation);
 
   // Extra refinement to generate hanging nodes
-  for (typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
-       cell != dh.end();
-       ++cell)
+  for (const auto &cell : dh.active_cell_iterators())
     if (cell->is_locally_owned() &&
         ((flag == 1 && pred_d<dim>(cell)) || (flag == 2 && !pred_d<dim>(cell))))
       cell->set_refine_flag();
@@ -94,20 +93,23 @@ test(const unsigned int flag)
 
   const IndexSet locally_relevant_set =
     DoFTools::extract_locally_relevant_dofs(dh);
+  const IndexSet locally_active_set = DoFTools::extract_locally_active_dofs(dh);
 
   AffineConstraints<double> cm;
   cm.reinit(dh.locally_owned_dofs(), locally_relevant_set);
   DoFTools::make_hanging_node_constraints(dh, cm);
   cm.close();
 
-  const IndexSet support = DoFTools::extract_dofs_with_support_contained_within(
-    dh,
-    std::function<bool(const typename DoFHandler<dim>::active_cell_iterator &)>(
-      &pred_d<dim>),
-    cm);
+  const IndexSet support =
+    DoFTools::extract_dofs_with_support_contained_within(dh, &pred_d<dim>, cm);
   const IndexSet support_local = support & dh.locally_owned_dofs();
 
-  deallog << support.n_elements() << std::endl;
+  deallog << "Number of locally active dofs: "
+          << locally_active_set.n_elements() << std::endl;
+  deallog << "Number of dofs with contained support: " << support.n_elements()
+          << std::endl;
+  deallog << "Number of owned dofs with contained support: "
+          << support_local.n_elements() << std::endl;
 
   // now accumulate the number of indices and make sure it's the same for
   // various runs with different number of MPI cores
@@ -115,8 +117,8 @@ test(const unsigned int flag)
     Utilities::MPI::sum(support_local.n_elements(), MPI_COMM_WORLD);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
-      deallog << "accumulated: " << std::endl;
-      deallog << dofs_support << std::endl;
+      deallog << "Total number of dofs with contained support: " << dofs_support
+              << std::endl;
     }
 
   // print grid and DoFs for visual inspection
@@ -160,9 +162,10 @@ test(const unsigned int flag)
       if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
         {
           std::vector<std::string> filenames;
-          for (unsigned int i = 0;
-               i < Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
-               ++i)
+          const unsigned           n_ranks =
+            Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD);
+          filenames.reserve(n_ranks);
+          for (unsigned int i = 0; i < n_ranks; ++i)
             filenames.push_back(output_name(flag, i));
 
           const std::string pvtu_filename =

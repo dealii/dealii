@@ -1,30 +1,57 @@
 
-DEAL:0:0::16
-DEAL:0:0::accumulated: 
-DEAL:0:0::16
-DEAL:0:0::49
-DEAL:0:0::accumulated: 
-DEAL:0:0::76
-DEAL:0:0::16
-DEAL:0:0::accumulated: 
-DEAL:0:0::16
+DEAL:0:0::Number of locally active dofs: 25
+DEAL:0:0::Number of dofs with contained support: 16
+DEAL:0:0::Number of owned dofs with contained support: 16
+DEAL:0:0::Total number of dofs with contained support: 16
+DEAL:0:0::Number of locally active dofs: 25
+DEAL:0:0::Number of dofs with contained support: 25
+DEAL:0:0::Number of owned dofs with contained support: 25
+DEAL:0:0::Total number of dofs with contained support: 76
+DEAL:0:0::Number of locally active dofs: 68
+DEAL:0:0::Number of dofs with contained support: 16
+DEAL:0:0::Number of owned dofs with contained support: 16
+DEAL:0:0::Total number of dofs with contained support: 16
 
-DEAL:1:1::15
-DEAL:1:1::69
-DEAL:1:1::15
+DEAL:1:1::Number of locally active dofs: 25
+DEAL:1:1::Number of dofs with contained support: 0
+DEAL:1:1::Number of owned dofs with contained support: 0
+DEAL:1:1::Number of locally active dofs: 49
+DEAL:1:1::Number of dofs with contained support: 45
+DEAL:1:1::Number of owned dofs with contained support: 36
+DEAL:1:1::Number of locally active dofs: 45
+DEAL:1:1::Number of dofs with contained support: 0
+DEAL:1:1::Number of owned dofs with contained support: 0
 
 
-DEAL:2:2::0
-DEAL:2:2::46
-DEAL:2:2::15
+DEAL:2:2::Number of locally active dofs: 0
+DEAL:2:2::Number of dofs with contained support: 0
+DEAL:2:2::Number of owned dofs with contained support: 0
+DEAL:2:2::Number of locally active dofs: 25
+DEAL:2:2::Number of dofs with contained support: 22
+DEAL:2:2::Number of owned dofs with contained support: 15
+DEAL:2:2::Number of locally active dofs: 65
+DEAL:2:2::Number of dofs with contained support: 0
+DEAL:2:2::Number of owned dofs with contained support: 0
 
 
-DEAL:3:3::15
-DEAL:3:3::45
-DEAL:3:3::9
+DEAL:3:3::Number of locally active dofs: 25
+DEAL:3:3::Number of dofs with contained support: 0
+DEAL:3:3::Number of owned dofs with contained support: 0
+DEAL:3:3::Number of locally active dofs: 49
+DEAL:3:3::Number of dofs with contained support: 0
+DEAL:3:3::Number of owned dofs with contained support: 0
+DEAL:3:3::Number of locally active dofs: 49
+DEAL:3:3::Number of dofs with contained support: 0
+DEAL:3:3::Number of owned dofs with contained support: 0
 
 
-DEAL:4:4::9
-DEAL:4:4::9
-DEAL:4:4::0
+DEAL:4:4::Number of locally active dofs: 25
+DEAL:4:4::Number of dofs with contained support: 0
+DEAL:4:4::Number of owned dofs with contained support: 0
+DEAL:4:4::Number of locally active dofs: 25
+DEAL:4:4::Number of dofs with contained support: 0
+DEAL:4:4::Number of owned dofs with contained support: 0
+DEAL:4:4::Number of locally active dofs: 65
+DEAL:4:4::Number of dofs with contained support: 0
+DEAL:4:4::Number of owned dofs with contained support: 0
 
