@@ -96,6 +96,7 @@ export
   using ::MatConvert;
   using ::MatCopy;
   using ::MatCreate;
+  using ::MatCreateDense;
   using ::MatCreateIS;
   using ::MatCreateNest;
   using ::MatCreateSeqAIJ;
