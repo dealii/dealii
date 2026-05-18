@@ -2714,9 +2714,12 @@ FEInterfaceValues<dim, spacedim>::reinit(
         interface_dof_indices.begin() + v.size();
       for (unsigned int i = 0; i < v2.size(); ++i)
         {
-          auto it = std::find(interface_dof_indices.begin(),
-                              interface_dof_indices_end_after_v,
-                              v2[i]);
+          // Find out whether v2[i] is a DoF that also exists on the first side
+          // of the interface. If it does, we need to record 'i' in the second
+          // slot of the map. If it doesn't, record an {invalid,i} entry.
+          const auto it = std::find(interface_dof_indices.begin(),
+                                    interface_dof_indices_end_after_v,
+                                    v2[i]);
           if (it != interface_dof_indices_end_after_v)
             {
               dofmap[it - interface_dof_indices.begin()][1] = i;
