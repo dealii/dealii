@@ -46,7 +46,11 @@ namespace SUNDIALS
 {
   template <typename VectorType>
   ARKStepper<VectorType>::ARKStepper(const AdditionalData &data)
-    : arkode_mem(nullptr)
+    : arkode_mem(nullptr,
+                 [](void *mem) {
+                   if (mem)
+                     ARKStepFree(&mem);
+                 })
     , data(data)
   {
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 4, 0)
@@ -71,28 +75,12 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
-  ARKStepper<VectorType>::~ARKStepper()
-  {
-    if (arkode_mem)
-      {
-        ARKStepFree(&arkode_mem);
-        arkode_mem = nullptr;
-      }
-  }
-
-
-
-  template <typename VectorType>
   void
   ARKStepper<VectorType>::reinit(double                      t0,
                                  const VectorType           &y0,
                                  internal::InvocationContext inv_ctx)
   {
-    if (arkode_mem)
-      {
-        ARKStepFree(&arkode_mem);
-        arkode_mem = nullptr;
-      }
+    arkode_mem.reset();
 
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
@@ -143,21 +131,20 @@ namespace SUNDIALS
 #  endif
       );
 
-    arkode_mem = ARKStepCreate(explicit_function ? explicit_function_callback :
-                                                   ARKRhsFn(nullptr),
-                               implicit_function ? implicit_function_callback :
-                                                   ARKRhsFn(nullptr),
-                               t0,
-                               initial_condition_nvector
+    arkode_mem.reset(ARKStepCreate(
+      explicit_function ? explicit_function_callback : ARKRhsFn(nullptr),
+      implicit_function ? implicit_function_callback : ARKRhsFn(nullptr),
+      t0,
+      initial_condition_nvector
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                               ,
-                               inv_ctx.arkode_ctx
+      ,
+      inv_ctx.arkode_ctx
 #  endif
-    );
+      ));
     Assert(arkode_mem != nullptr, ExcInternalError());
 
     callback_ctx = {this, &inv_ctx.pending_exception};
-    int status   = ARKStepSetUserData(arkode_mem, &callback_ctx);
+    int status   = ARKStepSetUserData(arkode_mem.get(), &callback_ctx);
     AssertARKode(status);
 
     setup_system_solver(y0, inv_ctx);
@@ -167,9 +154,9 @@ namespace SUNDIALS
     if (data.order != 0)
       {
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
-        status = ARKodeSetOrder(arkode_mem, data.order);
+        status = ARKodeSetOrder(arkode_mem.get(), data.order);
 #  else
-        status = ARKStepSetOrder(arkode_mem, data.order);
+        status = ARKStepSetOrder(arkode_mem.get(), data.order);
 #  endif
         AssertARKode(status);
       }
@@ -184,13 +171,13 @@ namespace SUNDIALS
                                      "ARKODE_ERK_NONE" :
                                      data.explicit_butcher_table;
         status =
-          ARKStepSetTableName(arkode_mem, itable.c_str(), etable.c_str());
+          ARKStepSetTableName(arkode_mem.get(), itable.c_str(), etable.c_str());
         AssertARKode(status);
 #  endif
       }
 
     if (custom_setup)
-      custom_setup(arkode_mem);
+      custom_setup(arkode_mem.get());
   }
 
 
@@ -248,7 +235,8 @@ namespace SUNDIALS
                               inv_ctx.arkode_ctx);
 #  endif
           }
-        status = ARKStepSetLinearSolver(arkode_mem, sun_linear_solver, nullptr);
+        status =
+          ARKStepSetLinearSolver(arkode_mem.get(), sun_linear_solver, nullptr);
         AssertARKode(status);
 
         auto jacobian_times_vector_callback = [](N_Vector           v,
@@ -294,7 +282,7 @@ namespace SUNDIALS
             *src_y,
             *src_fy);
         };
-        status = ARKStepSetJacTimes(arkode_mem,
+        status = ARKStepSetJacTimes(arkode_mem.get(),
                                     jacobian_times_vector_setup ?
                                       jacobian_times_vector_setup_callback :
                                       ARKLsJacTimesSetupFn(nullptr),
@@ -358,7 +346,7 @@ namespace SUNDIALS
                 gamma);
             };
 
-            status = ARKStepSetPreconditioner(arkode_mem,
+            status = ARKStepSetPreconditioner(arkode_mem.get(),
                                               jacobian_preconditioner_setup ?
                                                 jacobian_solver_setup_callback :
                                                 ARKLsPrecSetupFn(nullptr),
@@ -367,8 +355,10 @@ namespace SUNDIALS
           }
         if (data.implicit_function_is_linear)
           {
-            status = ARKStepSetLinear(
-              arkode_mem, data.implicit_function_is_time_independent ? 0 : 1);
+            status =
+              ARKStepSetLinear(arkode_mem.get(),
+                               data.implicit_function_is_time_independent ? 0 :
+                                                                            1);
             AssertARKode(status);
           }
       }
@@ -392,12 +382,13 @@ namespace SUNDIALS
                                   inv_ctx.arkode_ctx);
 #  endif
 
-        status = ARKStepSetNonlinearSolver(arkode_mem, fixed_point_solver);
+        status =
+          ARKStepSetNonlinearSolver(arkode_mem.get(), fixed_point_solver);
         AssertARKode(status);
       }
 
-    status =
-      ARKStepSetMaxNonlinIters(arkode_mem, data.maximum_non_linear_iterations);
+    status = ARKStepSetMaxNonlinIters(arkode_mem.get(),
+                                      data.maximum_non_linear_iterations);
     AssertARKode(status);
   }
 
@@ -453,7 +444,7 @@ namespace SUNDIALS
         SUNDIALS::booltype mass_time_dependent =
           data.mass_is_time_independent ? SUNFALSE : SUNTRUE;
 
-        status = ARKStepSetMassLinearSolver(arkode_mem,
+        status = ARKStepSetMassLinearSolver(arkode_mem.get(),
                                             sun_mass_linear_solver,
                                             nullptr,
                                             mass_time_dependent);
@@ -488,7 +479,7 @@ namespace SUNDIALS
             *dst_Mv);
         };
 
-        status = ARKStepSetMassTimes(arkode_mem,
+        status = ARKStepSetMassTimes(arkode_mem.get(),
                                      mass_times_vector_setup ?
                                        mass_matrix_times_vector_setup_callback :
                                        ARKLsMassTimesSetupFn(nullptr),
@@ -532,7 +523,7 @@ namespace SUNDIALS
             };
 
             status =
-              ARKStepSetMassPreconditioner(arkode_mem,
+              ARKStepSetMassPreconditioner(arkode_mem.get(),
                                            mass_preconditioner_setup ?
                                              mass_matrix_solver_setup_callback :
                                              ARKLsMassPrecSetupFn(nullptr),
@@ -548,7 +539,7 @@ namespace SUNDIALS
   void *
   ARKStepper<VectorType>::get_arkode_memory() const
   {
-    return arkode_mem;
+    return arkode_mem.get();
   }
 
 } // namespace SUNDIALS
