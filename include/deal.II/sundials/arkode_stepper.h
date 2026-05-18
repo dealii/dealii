@@ -146,6 +146,15 @@ namespace SUNDIALS
       Stepper            *stepper           = nullptr;
       std::exception_ptr *pending_exception = nullptr;
     };
+
+    /**
+     * Alias for the memory management of the ARKODE memory block introduced to
+     * avoid repeating the long type. This smart pointer is created and
+     * destroyed by the corresponding stepper specific functions: for example,
+     * for ARKStep these are ARKStepCreate and ARKStepFree, respectively. The
+     * underlying object is supplied to the native ARKODE functions.
+     */
+    using ARKodeMemoryPtr = std::unique_ptr<void, void (*)(void *)>;
   };
 
   /**
@@ -951,6 +960,8 @@ namespace SUNDIALS
     using CallbackContext = typename ARKodeStepper<
       VectorType>::template CallbackContext<ARKStepper<VectorType>>;
 
+    using ARKodeMemoryPtr = typename ARKodeStepper<VectorType>::ARKodeMemoryPtr;
+
     /**
      * Rebuild the stepper at a given time instance and for a given state
      * vector. Required by the ARKodeStepper interface.
@@ -996,7 +1007,7 @@ namespace SUNDIALS
     /**
      * ARKode memory object.
      */
-    std::unique_ptr<void, void (*)(void *)> arkode_mem;
+    ARKodeMemoryPtr arkode_mem;
 
     /**
      * ARKStepper configuration data.
