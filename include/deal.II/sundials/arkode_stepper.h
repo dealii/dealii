@@ -1964,12 +1964,6 @@ namespace SUNDIALS
                            &sub_steppers,
       const AdditionalData &data = AdditionalData());
 
-    /**
-     * Destructor. Frees the SplittingStep memory block and all SUNStepper
-     * wrappers.
-     */
-    ~SplittingStepper();
-
     void *
     get_arkode_memory() const override;
 
@@ -2003,15 +1997,19 @@ namespace SUNDIALS
     std::function<void(void *arkode_mem)> custom_setup;
 
   private:
+    using ARKodeMemoryPtr = typename ARKodeStepper<VectorType>::ARKodeMemoryPtr;
+
+    /**
+     * RAII wrapper for a single SUNStepper handle. The deleter calls
+     * SUNStepper_Destroy, mirroring ARKodeMemoryPtr for the ARKode memory.
+     */
+    using SUNStepperPtr =
+      std::unique_ptr<std::remove_pointer_t<SUNStepper>, void (*)(SUNStepper)>;
+
     void
     reinit(double                      t0,
            const VectorType           &y0,
            internal::InvocationContext inv_ctx) override;
-
-    /**
-     * SplittingStep ARKODE memory object.
-     */
-    void *arkode_mem;
 
     /**
      * Shared pointers to the sub-steppers, one per partition.
@@ -2020,9 +2018,17 @@ namespace SUNDIALS
 
     /**
      * SUNDIALS SUNStepper wrappers, one per sub-stepper. Managed by this
-     * object and destroyed when reinit() is called again or in the destructor.
+     * object; each entry is freed automatically via SUNStepperPtr.
      */
-    std::vector<SUNStepper> sun_steppers;
+    std::vector<SUNStepperPtr> sun_steppers;
+
+    /**
+     * SplittingStep ARKODE memory object. Declared after sun_steppers so that
+     * it is destroyed before sun_steppers (reverse member declaration order),
+     * which is required because SplittingStep holds internal references to the
+     * SUNStepper handles.
+     */
+    ARKodeMemoryPtr arkode_mem;
 
     /**
      * SplittingStepper configuration data.
