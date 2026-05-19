@@ -2700,37 +2700,39 @@ FEInterfaceValues<dim, spacedim>::reinit(
         fe_face_values_neighbor->get_fe().n_dofs_per_cell());
       cell_neighbor->get_active_or_mg_dof_indices(v2);
 
-      // Fill a map from the global dof index to the left and right
-      // local index.
-      std::map<types::global_dof_index, std::pair<unsigned int, unsigned int>>
-                                            tempmap;
-      std::pair<unsigned int, unsigned int> invalid_entry(
-        numbers::invalid_unsigned_int, numbers::invalid_unsigned_int);
+      dofmap.resize(v.size() + v2.size());
+      interface_dof_indices.resize(v.size() + v2.size());
 
       for (unsigned int i = 0; i < v.size(); ++i)
         {
-          // If not already existing, add an invalid entry:
-          auto result = tempmap.insert(std::make_pair(v[i], invalid_entry));
-          result.first->second.first = i;
+          interface_dof_indices[i] = v[i];
+          dofmap[i]                = {{i, numbers::invalid_unsigned_int}};
         }
 
+      unsigned int idx = v.size();
+      auto         interface_dof_indices_end_after_v =
+        interface_dof_indices.begin() + v.size();
       for (unsigned int i = 0; i < v2.size(); ++i)
         {
-          // If not already existing, add an invalid entry:
-          auto result = tempmap.insert(std::make_pair(v2[i], invalid_entry));
-          result.first->second.second = i;
+          // Find out whether v2[i] is a DoF that also exists on the first side
+          // of the interface. If it does, we need to record 'i' in the second
+          // slot of the map. If it doesn't, record an {invalid,i} entry.
+          const auto it = std::find(interface_dof_indices.begin(),
+                                    interface_dof_indices_end_after_v,
+                                    v2[i]);
+          if (it != interface_dof_indices_end_after_v)
+            {
+              dofmap[it - interface_dof_indices.begin()][1] = i;
+            }
+          else
+            {
+              interface_dof_indices[idx] = v2[i];
+              dofmap[idx]                = {{numbers::invalid_unsigned_int, i}};
+              ++idx;
+            }
         }
-
-      // Transfer from the map to the sorted std::vectors.
-      dofmap.resize(tempmap.size());
-      interface_dof_indices.resize(tempmap.size());
-      unsigned int idx = 0;
-      for (auto &x : tempmap)
-        {
-          interface_dof_indices[idx] = x.first;
-          dofmap[idx]                = {{x.second.first, x.second.second}};
-          ++idx;
-        }
+      dofmap.resize(idx);
+      interface_dof_indices.resize(idx);
     }
   else
     {
