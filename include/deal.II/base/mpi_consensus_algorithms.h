@@ -329,8 +329,12 @@ namespace Utilities
          */
         virtual ~NBX() = default;
 
-        // Import the declarations from the base class.
-        using Interface<RequestType, AnswerType>::run;
+        DEAL_II_DEPRECATED
+        std::vector<unsigned int>
+        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
+        {
+          return Interface<RequestType, AnswerType>::run(process, comm);
+        }
 
         /**
          * @copydoc Interface::run()
@@ -579,8 +583,12 @@ namespace Utilities
          */
         virtual ~PEX() = default;
 
-        // Import the declarations from the base class.
-        using Interface<RequestType, AnswerType>::run;
+        DEAL_II_DEPRECATED
+        std::vector<unsigned int>
+        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
+        {
+          return Interface<RequestType, AnswerType>::run(process, comm);
+        }
 
         /**
          * @copydoc Interface::run()
@@ -794,8 +802,12 @@ namespace Utilities
          */
         Serial() = default;
 
-        // Import the declarations from the base class.
-        using Interface<RequestType, AnswerType>::run;
+        DEAL_II_DEPRECATED
+        std::vector<unsigned int>
+        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
+        {
+          return Interface<RequestType, AnswerType>::run(process, comm);
+        }
 
         /**
          * @copydoc Interface::run()
@@ -922,8 +934,12 @@ namespace Utilities
          */
         virtual ~Selector() = default;
 
-        // Import the declarations from the base class.
-        using Interface<RequestType, AnswerType>::run;
+        DEAL_II_DEPRECATED
+        std::vector<unsigned int>
+        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
+        {
+          return Interface<RequestType, AnswerType>::run(process, comm);
+        }
 
         /**
          * @copydoc Interface::run()
