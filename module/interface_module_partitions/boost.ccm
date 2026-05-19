@@ -95,6 +95,7 @@ module;
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_free.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/unique_ptr.hpp>
@@ -357,6 +358,7 @@ export
       using boost::serialization::base_object;
       using boost::serialization::make_array;
       using boost::serialization::make_binary_object;
+      using boost::serialization::split_free;
       using boost::serialization::split_member;
       using boost::serialization::tracking_type;
 
