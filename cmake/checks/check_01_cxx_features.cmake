@@ -522,10 +522,12 @@ CHECK_CXX_SOURCE_COMPILES(
       default:
         break;
       }
-   }
-   "
-   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-   )
+
+    return i + j;
+  }
+  "
+  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
+  )
 
 #
 # see if the current compiler configuration supports the GCC extension
@@ -548,6 +550,8 @@ CHECK_CXX_SOURCE_COMPILES(
       default:
         break;
       }
+
+    return i + j;
   }
   "
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
