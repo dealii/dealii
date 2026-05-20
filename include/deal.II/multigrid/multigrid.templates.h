@@ -178,7 +178,9 @@ Multigrid<VectorType>::level_v_step(const unsigned int level)
 
 template <typename VectorType>
 void
-Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
+Multigrid<VectorType>::level_step(const unsigned int level,
+                                  const Cycle        cycle,
+                                  const unsigned int iteration)
 {
   // Combine the defect from the initial copy_to_mg with the one that has come
   // from the finer level by the transfer
@@ -195,7 +197,10 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
 
   // smoothing of the residual
   this->signals.pre_smoother_step(true, level);
-  pre_smooth->apply(level, solution[level], defect2[level]);
+  if (iteration == 0)
+    pre_smooth->apply(level, solution[level], defect2[level]);
+  else
+    pre_smooth->smooth(level, solution[level], defect2[level]);
   this->signals.pre_smoother_step(false, level);
 
   // compute residual on level, which includes the (CG) edge matrix
@@ -218,7 +223,7 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
   this->signals.restriction(false, level);
 
   // Every cycle starts with a recursion of its type.
-  level_step(level - 1, cycle);
+  level_step(level - 1, cycle, 0);
 
   // For W and F-cycle, repeat the process on the next coarser level except
   // for the coarse solver which we invoke just once
@@ -226,10 +231,10 @@ Multigrid<VectorType>::level_step(const unsigned int level, Cycle cycle)
     {
       // while the W-cycle repeats itself, ...
       if (cycle == w_cycle)
-        level_step(level - 1, cycle);
+        level_step(level - 1, cycle, 1);
       // ... the F-cycle does a V-cycle after an F-cycle, ...
       else if (cycle == f_cycle)
-        level_step(level - 1, v_cycle);
+        level_step(level - 1, v_cycle, 1);
       // ... and the V-cycle does nothing.
     }
 
@@ -292,7 +297,7 @@ Multigrid<VectorType>::cycle()
   if (cycle_type == v_cycle)
     level_v_step(maxlevel);
   else
-    level_step(maxlevel, cycle_type);
+    level_step(maxlevel, cycle_type, 0);
 }
 
 

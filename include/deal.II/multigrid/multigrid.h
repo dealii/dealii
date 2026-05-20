@@ -379,7 +379,9 @@ private:
    * solves the problem exactly.
    */
   void
-  level_step(const unsigned int level, Cycle cycle);
+  level_step(const unsigned int level,
+             const Cycle        cycle,
+             const unsigned int iteration);
 
   /**
    * Cycle type performed by the method cycle().
