@@ -1526,7 +1526,17 @@ public:
   DeclExceptionMsg(
     ExcFEDontMatch,
     "The FiniteElement you provided to FEValues and the FiniteElement that belongs "
-    "to the DoFHandler that provided the cell iterator do not match.");
+    "to the DoFHandler that provided the cell iterator do not match. "
+    "In most cases, this is a bug: You're calling FEValues::reinit() with a cell "
+    "from the wrong DoFHandler.\n"
+    "\n"
+    "On the other hand, there are cases where you want to only use an FEValues "
+    "object with the geometric information of a cell, without the information "
+    "about degrees of freedom associated with this cell. In those cases, you "
+    "may want to cast the cell iterator to one that only has the "
+    "geometric information of the triangulation, and initialize with that instead:\n"
+    "\tfe_values.reinit(\n"
+    "\t\tstatic_cast<Triangulation<dim, spacedim>::cell_iterator>(cell));");
   /**
    * A given shape function is not primitive, but it needs to be.
    *
