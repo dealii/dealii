@@ -46,12 +46,11 @@ namespace SUNDIALS
 {
   template <typename VectorType>
   ARKStepper<VectorType>::ARKStepper(const AdditionalData &data)
-    : arkode_mem(nullptr,
-                 [](void *mem) {
-                   if (mem)
-                     ARKStepFree(&mem);
-                 })
-    , data(data)
+    : data(data)
+    , arkode_mem(nullptr, [](void *mem) {
+      if (mem)
+        ARKStepFree(&mem);
+    })
   {
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 4, 0)
     AssertThrow(

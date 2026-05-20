@@ -1005,17 +1005,30 @@ namespace SUNDIALS
                       internal::InvocationContext inv_ctx);
 
     /**
-     * ARKode memory object.
-     */
-    ARKodeMemoryPtr arkode_mem;
-
-    /**
      * ARKStepper configuration data.
      */
     AdditionalData data;
 
+    /**
+     * Linear solver for applying the Jacobian of the implicit function in the
+     * nonlinear solver. This is used if the user provides both
+     * jacobian_times_vector() and solve_linearized_system().
+     */
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
+
+    /**
+     * Linear solver for applying the mass matrix. This is used if the user
+     * provides both mass_times_vector() and solve_mass().
+     */
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
+
+    /**
+     * ARKODE memory object. Declared after linear_solver and mass_solver so
+     * that it is destroyed first (C++ destroys members in reverse declaration
+     * order), ensuring ARKStepFree is called before the solver wrappers free
+     * their SUNLinearSolver objects.
+     */
+    ARKodeMemoryPtr arkode_mem;
 
     /**
      * ARKStepper callback context.
