@@ -42,7 +42,7 @@ repos:
             \.h
         )$
 - repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 26.3.1
+  rev: 26.5.1
   hooks:
     - id: black
       exclude: |
