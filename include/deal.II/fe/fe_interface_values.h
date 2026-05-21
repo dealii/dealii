@@ -2691,40 +2691,73 @@ FEInterfaceValues<dim, spacedim>::reinit(
   if constexpr (is_dof_cell_accessor_neighbor && is_dof_cell_accessor)
     {
       // Get dof indices first:
-      std::vector<types::global_dof_index> v(
+      std::vector<types::global_dof_index> v_1(
         fe_face_values->get_fe().n_dofs_per_cell());
-      cell->get_active_or_mg_dof_indices(v);
-      std::vector<types::global_dof_index> v2(
+      cell->get_active_or_mg_dof_indices(v_1);
+      std::vector<types::global_dof_index> v_2(
         fe_face_values_neighbor->get_fe().n_dofs_per_cell());
-      cell_neighbor->get_active_or_mg_dof_indices(v2);
+      cell_neighbor->get_active_or_mg_dof_indices(v_2);
 
-      interface_dof_data.resize(v.size() + v2.size());
+      interface_dof_data.resize(v_1.size() + v_2.size());
 
-      for (unsigned int i = 0; i < v.size(); ++i)
-        {
-          interface_dof_data[i] = {v[i], {{i, numbers::invalid_unsigned_int}}};
-        }
+      // First create a mapping for the DoFs on the first side
+      // of the interface:
+      for (unsigned int i = 0; i < v_1.size(); ++i)
+        interface_dof_data[i] = {v_1[i], {{i, numbers::invalid_unsigned_int}}};
 
-      unsigned int idx = v.size();
-      auto         interface_dof_data_end_after_v =
-        interface_dof_data.begin() + v.size();
-      for (unsigned int i = 0; i < v2.size(); ++i)
+      // Then we need to add the DoFs on the second side. We need
+      // to merge this information with the mapping on the first
+      // side, which if we left things as is, would result in an O(N^2)
+      // complexity: For each DoF on the second side, we'd have to search
+      // all of the ones on the first side. But we can reduce this to
+      // O(N*log(N)) by sorting the DoFs on the first side, in which
+      // case finding whether a second-side DoF already exists on the
+      // first side only requires log(N) steps. So sort the information
+      // we added above.
+      //
+      // In practice, DoF indices on many cells are already sorted
+      // (because we number them in the first place in the same order
+      // as we encounter them here). So guard the sorting step by a cheap
+      // check for whether the data is already sorted:
+      const auto compare_interface_dofs = [](const auto &interface_dof_1,
+                                             const auto &interface_dof_2) {
+        return (interface_dof_1.first < interface_dof_2.first);
+      };
+      const auto interface_dof_data_end_after_v_1 =
+        interface_dof_data.begin() + v_1.size();
+      if (std::is_sorted(interface_dof_data.begin(),
+                         interface_dof_data_end_after_v_1,
+                         compare_interface_dofs) == false)
+        std::sort(interface_dof_data.begin(),
+                  interface_dof_data_end_after_v_1,
+                  compare_interface_dofs);
+
+      // Now add the second set of DoFs:
+      unsigned int idx = v_1.size();
+      for (unsigned int i = 0; i < v_2.size(); ++i)
         {
           // Find out whether v2[i] is a DoF that also exists on the first side
           // of the interface. If it does, we need to record 'i' in the second
           // slot of the map. If it doesn't, record an {invalid,i} entry.
-          const auto it = std::find_if(interface_dof_data.begin(),
-                                       interface_dof_data_end_after_v,
-                                       [&](const auto &interface_dof) {
-                                         return interface_dof.first == v2[i];
-                                       });
-          if (it != interface_dof_data_end_after_v)
+          //
+          // Because we sorted the first set of interface DoFs, finding whether
+          // a given v_2[i] already exists can be done via std::lower_bound(),
+          // rather than requiring the much more expensive std::find().
+          const auto it =
+            std::lower_bound(interface_dof_data.begin(),
+                             interface_dof_data_end_after_v_1,
+                             v_2[i],
+                             [](const auto &interface_dof_1,
+                                const auto &index) {
+                               return (interface_dof_1.first < index);
+                             });
+          if ((it != interface_dof_data_end_after_v_1) && (it->first == v_2[i]))
             {
               it->second[1] = i;
             }
           else
             {
-              interface_dof_data[idx] = {v2[i],
+              interface_dof_data[idx] = {v_2[i],
                                          {{numbers::invalid_unsigned_int, i}}};
               ++idx;
             }
@@ -2732,6 +2765,10 @@ FEInterfaceValues<dim, spacedim>::reinit(
       interface_dof_data.resize(idx);
     }
   else
+    // We don't have DoF indices associated with at least one of the two
+    // cells. In that case, only build the mapping from the local numbering
+    // on the interface to the local numbering on either side, without
+    // reference to global DoF indices.
     {
       const unsigned int n_dofs_per_cell_1 = fe_face_values->dofs_per_cell;
       const unsigned int n_dofs_per_cell_2 =
