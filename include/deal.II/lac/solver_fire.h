@@ -363,12 +363,10 @@ void SolverFIRE<VectorType>::solve(const MatrixType         &A,
 {
   std::function<double(VectorType &, const VectorType &)> compute_func =
     [&](VectorType &g, const VectorType &x) -> double {
-    // Residual of the quadratic form $ \frac{1}{2} xAx - xb $.
-    // G = b - Ax
-    A.residual(g, x, b);
-
-    // Gradient G = Ax -b.
-    g *= -1.;
+    // The residual of the quadratic form $ \frac{1}{2} xAx - xb $ is
+    // g = b - Ax, but at the end of the day we need g = Ax -b:
+    A.vmult(g, x);
+    g -= b;
 
     // The quadratic form $\frac{1}{2} xAx - xb $.
     return 0.5 * A.matrix_norm_square(x) - x * b;
