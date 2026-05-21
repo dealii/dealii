@@ -238,10 +238,12 @@ public:
   el(size_type i, size_type j) const;
 
   /**
-   * Stores the inverse of the diagonal blocks in @p inverse. This costs some
-   * additional memory - for DG methods about 1/3 (for double inverses) or 1/6
-   * (for float inverses) of that used for the matrix - but it makes the
-   * preconditioning much faster.
+   * Compute and store the inverses of the diagonal blocks in @p inverse. This costs some
+   * additional memory - for DG methods about 1/3 (when the inverses are stored
+   * in `double` precision) or 1/6 (when the inverses are stored as `float`)
+   * of that used for the matrix - but it makes the
+   * preconditioning much faster than if the diagonal blocks are inverted
+   * every time the inverses are needed.
    *
    * It is not allowed to call this function twice (will produce an error)
    * before a call of <tt>clear(...)</tt>  because at the second time there
@@ -508,7 +510,7 @@ public:
   };
 
   /**
-   * import functions from private base class
+   * Import functions from the private base class.
    */
   using typename PreconditionBlock<MatrixType, inverse_type>::AdditionalData;
   using PreconditionBlock<MatrixType, inverse_type>::initialize;
@@ -671,7 +673,7 @@ public:
   using number = typename MatrixType::value_type;
 
   /**
-   * import types and functions from protected base class.
+   * Import types and functions from the protected base class.
    */
   using typename PreconditionBlock<MatrixType, inverse_type>::AdditionalData;
   using PreconditionBlock<MatrixType, inverse_type>::initialize;
@@ -835,7 +837,7 @@ public:
   // which we want to keep
   // accessible.
   /**
-   * Make initialization function publicly available.
+   * Import functions from the private base class.
    */
   using PreconditionBlockSOR<MatrixType, inverse_type>::initialize;
   using PreconditionBlockSOR<MatrixType, inverse_type>::clear;
