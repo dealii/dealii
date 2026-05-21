@@ -124,7 +124,8 @@ make_arkode_data(const double absolute_tolerance,
 static RunResult
 run(const SUNDIALS::ARKStepper<VectorType>::AdditionalData &stepper_data,
     const double                                            absolute_tolerance,
-    const double                                            relative_tolerance)
+    const double                                            relative_tolerance,
+    const std::function<void(void *)>                      &extra_setup = {})
 {
   RunResult result;
 
@@ -166,6 +167,9 @@ run(const SUNDIALS::ARKStepper<VectorType>::AdditionalData &stepper_data,
 
     int status = ARKStepSetMaxNumSteps(arkode_mem_ptr, 100000);
     AssertARKode(status);
+
+    if (extra_setup)
+      extra_setup(arkode_mem_ptr);
   };
 
   VectorType y(2);
@@ -236,15 +240,16 @@ main()
     deallog << "=== Butcher tables order 5 ===" << std::endl;
 
     SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+    std::function<void(void *)>                      extra_setup;
+
 #if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
     stepper_data.implicit_butcher_table = "ARKODE_ARK548L2SA_DIRK_8_4_5";
     stepper_data.explicit_butcher_table = "ARKODE_ARK548L2SA_ERK_8_4_5";
 #else
-    stepper_data.custom_setup = [](void *arkode_mem_ptr) {
+    // ARKStepSetTableName is available in SUNDIALS 6.4.0 and later, we
+    // fallback to ARKStepSetTableNum.
+    extra_setup = [](void *arkode_mem_ptr) {
       int status;
-
-      // ARKStepSetTableName is available in SUNDIALS 6.4.0 and later, we
-      // fallback to ARKStepSetTableNum.
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
       status = ARKStepSetTableNum(arkode_mem_ptr,
                                   ARKODE_ARK548L2SA_DIRK_8_4_5,
@@ -258,7 +263,7 @@ main()
     };
 #endif
 
-    const auto result = run(stepper_data, tol, tol);
+    const auto result = run(stepper_data, tol, tol, extra_setup);
     deallog << std::fixed << std::setprecision(6)
             << "final = " << result.final_state[0] << ' '
             << result.final_state[1] << std::endl;
