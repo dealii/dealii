@@ -1222,11 +1222,6 @@ namespace SUNDIALS
      */
     ERKStepper(const AdditionalData &data = AdditionalData());
 
-    /**
-     * Destructor. Cleans up the internal ARKODE memory block.
-     */
-    ~ERKStepper();
-
     void *
     get_arkode_memory() const override;
 
@@ -1273,9 +1268,10 @@ namespace SUNDIALS
     std::function<void(void *arkode_mem)> custom_setup;
 
   protected:
-    template <typename Stepper>
-    using ARKCallbackContext =
-      typename ARKodeStepper<VectorType>::template ARKCallbackContext<Stepper>;
+    using CallbackContext = typename ARKodeStepper<
+      VectorType>::template CallbackContext<ERKStepper<VectorType>>;
+
+    using ARKodeMemoryPtr = typename ARKodeStepper<VectorType>::ARKodeMemoryPtr;
 
   private:
     /**
@@ -1294,19 +1290,19 @@ namespace SUNDIALS
            internal::InvocationContext inv_ctx) override;
 
     /**
-     * ARKODE memory object.
-     */
-    void *arkode_mem;
-
-    /**
      * ERKStepper configuration data.
      */
     AdditionalData data;
 
     /**
+     * ARKODE memory object.
+     */
+    ARKodeMemoryPtr arkode_mem;
+
+    /**
      * ERKStepper callback context.
      */
-    ARKCallbackContext<ERKStepper<VectorType>> callback_ctx;
+    CallbackContext callback_ctx;
   };
 
 

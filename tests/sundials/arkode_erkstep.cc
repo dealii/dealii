@@ -17,6 +17,12 @@
 #include <deal.II/sundials/arkode.h>
 #include <deal.II/sundials/arkode_stepper.h>
 
+#include <arkode/arkode_erkstep.h>
+
+#if DEAL_II_SUNDIALS_VERSION_LT(6, 4, 0)
+#  include <arkode/arkode_butcher_erk.h>
+#endif
+
 #include "../tests.h"
 
 
@@ -58,7 +64,8 @@ make_arkode_data()
 
 
 static void
-run(const SUNDIALS::ERKStepper<VectorType>::AdditionalData &data)
+run(const SUNDIALS::ERKStepper<VectorType>::AdditionalData &data,
+    const std::function<void(void *)>                      &extra_setup = {})
 {
   SUNDIALS::ERKStepper<VectorType> stepper(data);
 
@@ -71,6 +78,9 @@ run(const SUNDIALS::ERKStepper<VectorType>::AdditionalData &data)
     };
 
   SUNDIALS::ARKode<VectorType> ode(stepper, make_arkode_data());
+
+  if (extra_setup)
+    ode.custom_setup = extra_setup;
 
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int /*step*/) {
@@ -105,14 +115,30 @@ main()
     run(data);
   }
 
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
-  // Sub-test 3: select a specific ERK Butcher table by name.
+  // Sub-test 3: select a specific ERK Butcher table by name (SUNDIALS >= 6.4)
+  // or by number (fallback).
   // ARKODE_DORMAND_PRINCE_7_4_5 is the classical Dormand-Prince 4(5) method.
   {
     deallog << "=== Butcher table ARKODE_DORMAND_PRINCE_7_4_5 ===" << std::endl;
     SUNDIALS::ERKStepper<VectorType>::AdditionalData data;
+    std::function<void(void *)>                      extra_setup;
+
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
     data.explicit_butcher_table = "ARKODE_DORMAND_PRINCE_7_4_5";
-    run(data);
-  }
+#else
+    // ERKStepSetTableName is available in SUNDIALS 6.4.0 and later, we
+    // fallback to ERKStepSetTableNum.
+    extra_setup = [](void *arkode_mem_ptr) {
+      int status;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      status = ERKStepSetTableNum(arkode_mem_ptr, ARKODE_DORMAND_PRINCE_7_4_5);
+#  else
+      status = ERKStepSetTableNum(arkode_mem_ptr, DORMAND_PRINCE_7_4_5);
+#  endif
+      AssertARKode(status);
+    };
 #endif
+
+    run(data, extra_setup);
+  }
 }
