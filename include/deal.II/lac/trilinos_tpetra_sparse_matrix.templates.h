@@ -1531,11 +1531,15 @@ namespace LinearAlgebra
     void
     SparseMatrix<Number, MemorySpace>::compress(VectorOperation::values)
     {
-      // We can't use fillComplete multiple times in a row, so we need to know
-      // if any process has changed matrix entries
-      if (!dealii::Utilities::MPI::logical_or(compressed,
-                                              this->get_mpi_communicator()))
+      // fillComplete() has to be called by all processes if at least one
+      // process needs to compress. However, it cannot be called if there are
+      // processes which have not called resumeFill() first. So first check if
+      // any process has changed matrix entries, if so, first call resumeFill(),
+      // then fillComplete() on all processes.
+      if (!dealii::Utilities::MPI::logical_and(compressed,
+                                               this->get_mpi_communicator()))
         {
+          matrix->resumeFill();
           matrix->fillComplete(column_space_map, matrix->getRowMap());
           compressed = true;
         }
