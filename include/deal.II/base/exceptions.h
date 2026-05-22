@@ -31,7 +31,6 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <deal.II/base/exception_macros.h>
 
-#include <complex>
 #include <exception>
 #include <ostream>
 #include <string>
@@ -208,13 +207,11 @@ namespace StandardExceptions
    * This exception should be used to catch infinite or not a number results
    * of arithmetic operations that do not result from a division by zero (use
    * ExcDivideByZero for those).
-   *
-   * The exception uses std::complex as its argument to ensure that we can use
-   * it for all scalar arguments (real or complex-valued).
    */
+  template <typename Number>
   DeclException1(
     ExcNumberNotFinite,
-    std::complex<double>,
+    Number,
     << "In a significant number of places, deal.II checks that some intermediate "
     << "value is a finite number (as opposed to plus or minus infinity, or "
     << "NaN/Not a Number). In the current function, we encountered a number "

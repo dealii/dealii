@@ -31,6 +31,7 @@
 
 #include <deal.II/numerics/vector_tools_common.h>
 
+#include <complex>
 #include <memory>
 #include <string>
 #include <vector>

@@ -24,6 +24,8 @@
 #  include <cfenv>
 #endif
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
 
