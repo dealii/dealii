@@ -152,7 +152,7 @@ namespace SUNDIALS
 
     if (data.order != 0)
       {
-#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
         status = ARKodeSetOrder(arkode_mem.get(), data.order);
 #  else
         status = ARKStepSetOrder(arkode_mem.get(), data.order);
