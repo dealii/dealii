@@ -43,6 +43,8 @@
 #  include <deal.II/lac/petsc_vector.h>
 #endif
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace types

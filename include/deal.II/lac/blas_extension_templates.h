@@ -18,10 +18,6 @@
 
 #include <deal.II/lac/lapack_support.h>
 
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
-#  include <cfenv>
-#endif
-
 // Intel-MKL specific functions
 #ifdef DEAL_II_LAPACK_WITH_MKL
 // see
@@ -31,6 +27,11 @@
 #  include <mkl_trans.h>
 #endif
 
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  include <cfenv>
+#endif
+
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 

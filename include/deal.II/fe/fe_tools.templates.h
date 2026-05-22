@@ -63,6 +63,7 @@
 #include <deal.II/lac/householder.h>
 
 #include <cctype>
+#include <complex>
 #include <iostream>
 #include <memory>
 #include <shared_mutex>

@@ -914,10 +914,7 @@
                                                               (range)))
 
 /**
- * An assertion that checks whether a number is finite or not. We explicitly
- * cast the number to std::complex to match the signature of the exception
- * (see there for an explanation of why we use std::complex at all) and to
- * satisfy the fact that std::complex has no implicit conversions.
+ * An assertion that checks whether a number is finite or not.
  *
  * @note This and similar macro names are examples of preprocessor definitions
  * in the deal.II library that are not prefixed by a string that likely makes
@@ -932,9 +929,8 @@
  *
  * @ingroup Exceptions
  */
-#define AssertIsFinite(number)               \
-  Assert(dealii::numbers::is_finite(number), \
-         dealii::ExcNumberNotFinite(std::complex<double>(number)))
+#define AssertIsFinite(number) \
+  Assert(dealii::numbers::is_finite(number), dealii::ExcNumberNotFinite(number))
 
 /**
  * Assert that a geometric object is not used. This assertion is used when

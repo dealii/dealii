@@ -37,6 +37,7 @@
 #  include <Tpetra_Vector.hpp>
 #  include <Tpetra_Version.hpp>
 
+#  include <complex>
 #  include <memory>
 #  include <optional>
 #  include <utility>

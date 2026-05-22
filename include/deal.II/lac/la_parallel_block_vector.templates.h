@@ -23,6 +23,7 @@
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 
