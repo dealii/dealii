@@ -140,7 +140,7 @@ namespace internal
 
     for (unsigned int i = 0; i < n_global_levels; ++i)
       max_cell_index +=
-        Utilities::pow<std::uint64_t>(GeometryInfo<dim>::max_children_per_cell,
+        Utilities::pow<std::uint64_t>(ReferenceCells::max_n_children<dim>(),
                                       i) *
         n_coarse_cells;
 
@@ -166,7 +166,7 @@ namespace internal
     for (unsigned int i = 0; i < n_global_levels; ++i)
       tree_sizes.push_back(tree_sizes.back() +
                            Utilities::pow<types::global_cell_index>(
-                             GeometryInfo<dim>::max_children_per_cell, i) *
+                             ReferenceCells::max_n_children<dim>(), i) *
                              n_coarse_cells);
   }
 
@@ -178,7 +178,7 @@ namespace internal
   {
     return n_coarse_cells *
            (Utilities::pow<types::global_cell_index>(
-              GeometryInfo<dim>::max_children_per_cell, n_global_levels) -
+              ReferenceCells::max_n_children<dim>(), n_global_levels) -
             1);
   }
 
@@ -226,7 +226,7 @@ namespace internal
                   "The information can only be queried for cells.");
 
     return (translate(cell) - tree_sizes[cell->level()]) *
-             GeometryInfo<dim>::max_children_per_cell +
+             ReferenceCells::max_n_children<dim>() +
            i + tree_sizes[cell->level() + 1];
   }
 
@@ -252,8 +252,8 @@ namespace internal
     for (types::global_cell_index l = 0; l < level; ++l)
       {
         child_indices.push_back(id_temp %
-                                GeometryInfo<dim>::max_children_per_cell);
-        id_temp /= GeometryInfo<dim>::max_children_per_cell;
+                                ReferenceCells::max_n_children<dim>());
+        id_temp /= ReferenceCells::max_n_children<dim>();
       }
 
     std::reverse(child_indices.begin(), child_indices.end());
