@@ -29,6 +29,7 @@ module;
 #ifdef DEAL_II_WITH_SUNDIALS
 #  include <arkode/arkode.h>
 #  include <arkode/arkode_arkstep.h>
+#  include <arkode/arkode_erkstep.h>
 #  include <arkode/arkode_ls.h>
 #  include <ida/ida.h>
 #  include <idas/idas.h>
@@ -71,6 +72,12 @@ export
   using ::ARKLsMassPrecSetupFn;
   using ::ARKLsMassTimesSetupFn;
   using ::ARKLsPrecSetupFn;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
+  using ::ARKodeSetOrder;
+#  else
+  using ::ARKStepSetOrder;
+  using ::ERKStepSetOrder;
+#  endif
   using ::ARKRhsFn;
   using ::ARKStepCreate;
   using ::ARKStepEvolve;
@@ -85,7 +92,6 @@ export
   using ::ARKStepSetMassTimes;
   using ::ARKStepSetMaxNonlinIters;
   using ::ARKStepSetNonlinearSolver;
-  using ::ARKStepSetOrder;
   using ::ARKStepSetPreconditioner;
   using ::ARKStepSetStopTime;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
@@ -94,6 +100,12 @@ export
   using ::ARKStepSetUserData;
   using ::ARKStepSStolerances;
   using ::ARKStepSVtolerances;
+  using ::ERKStepCreate;
+  using ::ERKStepFree;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
+  using ::ERKStepSetTableName;
+#  endif
+  using ::ERKStepSetUserData;
   using ::IDACalcIC;
   using ::IDACreate;
   using ::IDAFree;
