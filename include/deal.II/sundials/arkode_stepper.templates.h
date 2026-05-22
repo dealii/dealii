@@ -31,6 +31,9 @@
 #  include <deal.II/sundials/utilities.h>
 
 #  include <arkode/arkode_arkstep.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+#    include <arkode/arkode.h>
+#  endif
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
 
