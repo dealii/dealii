@@ -1,0 +1,136 @@
+
+DEAL::
+DEAL:A::size : 12
+DEAL:A::size : 12
+DEAL:A::size : 12
+DEAL:A::vec == vec  = 1
+DEAL:A::vec != vec  = 0
+DEAL:A::vec < vec   = 0
+DEAL:A::vec > vec   = 0
+DEAL:A::vec <= vec  = 1
+DEAL:A::vec >= vec  = 1
+DEAL:A::vec == vec2 = 1
+DEAL:A::vec != vec2 = 0
+DEAL:A::vec < vec2  = 0
+DEAL:A::vec > vec2  = 0
+DEAL:A::vec <= vec2 = 1
+DEAL:A::vec >= vec2 = 1
+DEAL:A::vec == vec3 = 1
+DEAL:A::vec != vec3 = 0
+DEAL:A::vec < vec3  = 0
+DEAL:A::vec > vec3  = 0
+DEAL:A::vec <= vec3 = 1
+DEAL:A::vec >= vec3 = 1
+DEAL:A::
+DEAL:A::size : 12
+DEAL:A::size : 8
+DEAL:A::size : 13
+DEAL:A::vec == vec  = 1
+DEAL:A::vec != vec  = 0
+DEAL:A::vec < vec   = 0
+DEAL:A::vec > vec   = 0
+DEAL:A::vec <= vec  = 1
+DEAL:A::vec >= vec  = 1
+DEAL:A::vec == vec2 = 0
+DEAL:A::vec != vec2 = 1
+DEAL:A::vec < vec2  = 0
+DEAL:A::vec > vec2  = 1
+DEAL:A::vec <= vec2 = 0
+DEAL:A::vec >= vec2 = 1
+DEAL:A::vec == vec3 = 0
+DEAL:A::vec != vec3 = 1
+DEAL:A::vec < vec3  = 1
+DEAL:A::vec > vec3  = 0
+DEAL:A::vec <= vec3 = 1
+DEAL:A::vec >= vec3 = 0
+DEAL:A::
+DEAL::
+DEAL:int::-11, -10, -9, -11, -10, -9, -11, -10, -9, -11, -10, -9
+DEAL:int::-11, -11, -11, -11, -10, -10, -10, -10, -9, -9, -9, -9
+DEAL:int::-9, -9, -9, -9, -10, -10, -10, -10, -11, -11, -11, -11
+DEAL:int::vec == vec  = 1
+DEAL:int::vec != vec  = 0
+DEAL:int::vec < vec   = 0
+DEAL:int::vec > vec   = 0
+DEAL:int::vec <= vec  = 1
+DEAL:int::vec >= vec  = 1
+DEAL:int::vec == vec2 = 0
+DEAL:int::vec != vec2 = 1
+DEAL:int::vec < vec2  = 0
+DEAL:int::vec > vec2  = 1
+DEAL:int::vec <= vec2 = 0
+DEAL:int::vec >= vec2 = 1
+DEAL:int::vec == vec3 = 0
+DEAL:int::vec != vec3 = 1
+DEAL:int::vec < vec3  = 1
+DEAL:int::vec > vec3  = 0
+DEAL:int::vec <= vec3 = 1
+DEAL:int::vec >= vec3 = 0
+DEAL:int::
+DEAL:int::-11, -10, -9, -11, -10, -9, -11, -10, -9, -11, -10, -9
+DEAL:int::-11, -11, -11, -10, -10, -10, -9, -9
+DEAL:int::-9, -9, -9, -9, -10, -10, -10, -10, -11, -11, -11, -11, -11
+DEAL:int::vec == vec  = 1
+DEAL:int::vec != vec  = 0
+DEAL:int::vec < vec   = 0
+DEAL:int::vec > vec   = 0
+DEAL:int::vec <= vec  = 1
+DEAL:int::vec >= vec  = 1
+DEAL:int::vec == vec2 = 0
+DEAL:int::vec != vec2 = 1
+DEAL:int::vec < vec2  = 0
+DEAL:int::vec > vec2  = 1
+DEAL:int::vec <= vec2 = 0
+DEAL:int::vec >= vec2 = 1
+DEAL:int::vec == vec3 = 0
+DEAL:int::vec != vec3 = 1
+DEAL:int::vec < vec3  = 1
+DEAL:int::vec > vec3  = 0
+DEAL:int::vec <= vec3 = 1
+DEAL:int::vec >= vec3 = 0
+DEAL:int::
+DEAL::
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {3, 5}, {3, 5}, {3, 5}, {3, 5}, {42}, {42}, {42}, {42}
+DEAL:vector<int>::{42}, {42}, {42}, {42}, {3, 5}, {3, 5}, {3, 5}, {3, 5}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}
+DEAL:vector<int>::vec == vec  = 1
+DEAL:vector<int>::vec != vec  = 0
+DEAL:vector<int>::vec < vec   = 0
+DEAL:vector<int>::vec > vec   = 0
+DEAL:vector<int>::vec <= vec  = 1
+DEAL:vector<int>::vec >= vec  = 1
+DEAL:vector<int>::vec == vec2 = 0
+DEAL:vector<int>::vec != vec2 = 1
+DEAL:vector<int>::vec < vec2  = 0
+DEAL:vector<int>::vec > vec2  = 1
+DEAL:vector<int>::vec <= vec2 = 0
+DEAL:vector<int>::vec >= vec2 = 1
+DEAL:vector<int>::vec == vec3 = 0
+DEAL:vector<int>::vec != vec3 = 1
+DEAL:vector<int>::vec < vec3  = 1
+DEAL:vector<int>::vec > vec3  = 0
+DEAL:vector<int>::vec <= vec3 = 1
+DEAL:vector<int>::vec >= vec3 = 0
+DEAL:vector<int>::
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}, {1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {3, 5}, {3, 5}, {42}, {42}, {42}
+DEAL:vector<int>::{42}, {42}, {42}, {42}, {3, 5}, {3, 5}, {3, 5}, {3, 5}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}, {1, 1, 2}
+DEAL:vector<int>::vec == vec  = 1
+DEAL:vector<int>::vec != vec  = 0
+DEAL:vector<int>::vec < vec   = 0
+DEAL:vector<int>::vec > vec   = 0
+DEAL:vector<int>::vec <= vec  = 1
+DEAL:vector<int>::vec >= vec  = 1
+DEAL:vector<int>::vec == vec2 = 0
+DEAL:vector<int>::vec != vec2 = 1
+DEAL:vector<int>::vec < vec2  = 0
+DEAL:vector<int>::vec > vec2  = 1
+DEAL:vector<int>::vec <= vec2 = 0
+DEAL:vector<int>::vec >= vec2 = 1
+DEAL:vector<int>::vec == vec3 = 0
+DEAL:vector<int>::vec != vec3 = 1
+DEAL:vector<int>::vec < vec3  = 1
+DEAL:vector<int>::vec > vec3  = 0
+DEAL:vector<int>::vec <= vec3 = 1
+DEAL:vector<int>::vec >= vec3 = 0
+DEAL:vector<int>::

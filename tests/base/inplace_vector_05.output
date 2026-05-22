@@ -1,0 +1,41 @@
+
+DEAL::
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::size : 3
+DEAL:A::A::A(A&&)
+DEAL:A::A::operator=(A&&)
+DEAL:A::A::~A()
+DEAL:A::A::A(A&&)
+DEAL:A::A::operator=(A&&)
+DEAL:A::A::~A()
+DEAL:A::size : 3
+DEAL:A::A::A(A&&)
+DEAL:A::A::operator=(A&&)
+DEAL:A::A::~A()
+DEAL:A::A::A(A&&)
+DEAL:A::A::operator=(A&&)
+DEAL:A::A::~A()
+DEAL:A::size : 3
+DEAL:A::ctors = 10 dtors = 4
+DEAL:A::
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL::
+DEAL:int::-11, -10, -9
+DEAL:int::-11, -10, -9
+DEAL:int::-9, -10, -11
+DEAL:int::
+DEAL::
+DEAL:vector<int>::{1, 1, 2}, {42}, {3, 5}
+DEAL:vector<int>::{1, 1, 2}, {3, 5}, {42}
+DEAL:vector<int>::{42}, {3, 5}, {1, 1, 2}
+DEAL:vector<int>::
