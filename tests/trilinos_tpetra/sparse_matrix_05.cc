@@ -62,5 +62,6 @@ main(int argc, char **argv)
     Assert(matrix.is_compressed() == true, ExcInternalError());
 
   matrix.compress(VectorOperation::insert);
+  Assert(matrix.is_compressed() == true, ExcInternalError());
   deallog << "OK" << std::endl;
 }
