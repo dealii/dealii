@@ -42,7 +42,7 @@ test(int n_refinements, MPI_Comm comm)
   for (unsigned int l = 0; l < tria.n_global_levels(); ++l)
     {
       deallog.push("level=" + std::to_string(l));
-      for (const auto cell : tria.cell_iterators_on_level(l))
+      for (const auto &cell : tria.cell_iterators_on_level(l))
         if (cell->level_subdomain_id() !=
             dealii::numbers::artificial_subdomain_id)
           deallog << cell->id() << " -> " << cell->level_subdomain_id() << ' '
