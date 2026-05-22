@@ -268,42 +268,16 @@ namespace internal
   CellIDTranslator<dim>::convert_cell_id_binary_type_to_level_coarse_cell_id(
     const typename CellId::binary_type &binary_representation)
   {
-    // exploiting the structure of CellId::binary_type
-    // see also the documentation of CellId
+    CellId cell_id(binary_representation);
 
-    // actual coarse-grid id
-    const unsigned int coarse_cell_id  = binary_representation[0];
-    const unsigned int n_child_indices = binary_representation[1] >> 2;
+    // compute level id: c_{i+1} = c_{i}*(max_n_children) + q on path to cell
+    auto level_cell_id = cell_id.get_coarse_cell_id();
+    for (const auto &child_index : cell_id.get_child_indices())
+      level_cell_id =
+        level_cell_id * ReferenceCells::max_n_children<dim>() + child_index;
 
-    const unsigned int children_per_value =
-      sizeof(CellId::binary_type::value_type) * 8 / dim;
-    unsigned int child_level  = 0;
-    unsigned int binary_entry = 2;
-
-    // compute new coarse-grid id: c_{i+1} = c_{i}*2^dim + q on path to cell
-    types::global_cell_index level_coarse_cell_id = coarse_cell_id;
-    while (child_level < n_child_indices)
-      {
-        Assert(binary_entry < binary_representation.size(), ExcInternalError());
-
-        for (unsigned int j = 0; j < children_per_value; ++j)
-          {
-            unsigned int cell_index =
-              (((binary_representation[binary_entry] >> (j * dim))) &
-               (GeometryInfo<dim>::max_children_per_cell - 1));
-            level_coarse_cell_id =
-              level_coarse_cell_id * GeometryInfo<dim>::max_children_per_cell +
-              cell_index;
-            ++child_level;
-            if (child_level == n_child_indices)
-              break;
-          }
-        ++binary_entry;
-      }
-
-    return level_coarse_cell_id;
+    return level_cell_id;
   }
-
 } // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE
