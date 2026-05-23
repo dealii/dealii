@@ -12,6 +12,7 @@
 
 #include <deal.II/numerics/matrix_creator.templates.h>
 
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 

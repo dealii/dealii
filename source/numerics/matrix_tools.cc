@@ -47,6 +47,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <complex>
 
 
 DEAL_II_NAMESPACE_OPEN

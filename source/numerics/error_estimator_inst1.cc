@@ -12,6 +12,8 @@
 
 #include <deal.II/numerics/error_estimator.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #define SPLIT_INSTANTIATIONS_COUNT 2

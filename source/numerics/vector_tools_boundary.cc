@@ -13,6 +13,8 @@
 
 #include <deal.II/numerics/vector_tools_boundary.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 // ---------------------------- explicit instantiations --------------------

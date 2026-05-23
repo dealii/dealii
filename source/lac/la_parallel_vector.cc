@@ -13,6 +13,8 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/la_parallel_vector.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #include "lac/la_parallel_vector.inst"

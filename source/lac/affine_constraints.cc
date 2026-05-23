@@ -13,6 +13,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/affine_constraints.templates.h>
 
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 

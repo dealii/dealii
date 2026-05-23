@@ -31,6 +31,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/vector.h>
 
+#include <complex>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN

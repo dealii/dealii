@@ -13,6 +13,8 @@
 
 #include <deal.II/lac/block_vector.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #include "lac/block_vector.inst"

@@ -15,6 +15,8 @@
 
 #include <deal.II/lac/vector.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 namespace Functions

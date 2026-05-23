@@ -15,6 +15,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <cmath>
+#include <complex>
 #include <ctime>
 #include <limits>
 #include <map>
