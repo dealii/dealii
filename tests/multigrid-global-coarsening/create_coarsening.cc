@@ -46,7 +46,7 @@ test()
   deallog << "Test in " << dim << "d" << std::endl;
   auto triangulations =
     MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(tria);
-  for (const auto tr : triangulations)
+  for (const auto &tr : triangulations)
     deallog << "Active cells in level triangulation: "
             << tr->n_global_active_cells() << std::endl;
   deallog << std::endl;

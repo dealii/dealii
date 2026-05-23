@@ -36,7 +36,7 @@ test(int n_refinements, MPI_Comm comm)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(n_refinements);
 
-  for (const auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     if (!cell->is_artificial())
       deallog << cell->id() << " -> " << cell->subdomain_id() << ' '
               << cell->global_active_cell_index() << std::endl;
