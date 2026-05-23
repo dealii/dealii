@@ -33,6 +33,7 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <complex>
 #include <iomanip>
 #include <memory>
 #include <type_traits>

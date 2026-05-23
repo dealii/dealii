@@ -12,6 +12,8 @@
 
 #include <deal.II/base/symbolic_function.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_WITH_SYMENGINE
 namespace Functions

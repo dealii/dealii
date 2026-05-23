@@ -12,6 +12,8 @@
 
 #include <deal.II/base/tensor_function.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations

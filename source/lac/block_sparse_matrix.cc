@@ -13,6 +13,8 @@
 
 #include <deal.II/lac/block_sparse_matrix.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #include "lac/block_sparse_matrix.inst"

@@ -12,6 +12,8 @@
 
 #include <deal.II/base/function.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 // explicit instantiations

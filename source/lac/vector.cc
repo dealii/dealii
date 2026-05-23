@@ -12,6 +12,8 @@
 
 #include <deal.II/lac/vector.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #ifndef DOXYGEN

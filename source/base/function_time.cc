@@ -14,6 +14,7 @@
 #include <deal.II/base/function_time.h>
 #include <deal.II/base/function_time.templates.h>
 
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 

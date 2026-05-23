@@ -13,6 +13,8 @@
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/read_write_vector.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #include "lac/read_write_vector.inst"

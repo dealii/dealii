@@ -15,6 +15,8 @@
 #include <deal.II/lac/la_parallel_block_vector.templates.h>
 #include <deal.II/lac/lapack_full_matrix.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 #include "lac/la_parallel_block_vector.inst"

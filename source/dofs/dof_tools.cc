@@ -44,6 +44,7 @@
 #include <deal.II/numerics/vector_tools_interpolate.h>
 
 #include <algorithm>
+#include <complex>
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN

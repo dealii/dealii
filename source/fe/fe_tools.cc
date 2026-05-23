@@ -13,6 +13,8 @@
 
 #include <deal.II/fe/fe_tools.templates.h>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 

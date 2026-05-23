@@ -44,6 +44,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <complex>
 #include <functional>
 #include <numeric>
 #include <vector>

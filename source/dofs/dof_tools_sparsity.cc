@@ -41,6 +41,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <algorithm>
+#include <complex>
 #include <numeric>
 
 DEAL_II_NAMESPACE_OPEN

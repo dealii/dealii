@@ -34,6 +34,7 @@
 
 #include <deal.II/non_matching/coupling.h>
 
+#include <complex>
 #include <limits>
 
 DEAL_II_NAMESPACE_OPEN
