@@ -23,10 +23,6 @@
 #include <iostream>
 #include <vector>
 
-#ifdef DEAL_II_WITH_P4EST
-#  include <deal.II/distributed/p4est_wrappers.h>
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declarations
@@ -216,20 +212,17 @@ private:
   unsigned int n_child_indices;
 
   /**
-   * An array of integers that denotes which child to pick from one
-   * refinement level to the next, starting with the coarse cell,
-   * until we get to the cell represented by the current object.
-   * Only the first n_child_indices entries are used, but we use a statically
-   * allocated array instead of a vector of size n_child_indices to speed up
-   * creation of this object. If the given dimensions ever become a limitation
-   * the array can be extended.
+   * An array of integers that denotes which child to pick from one refinement
+   * level to the next, starting with the coarse cell, until we get to the cell
+   * represented by the current object. Only the first n_child_indices entries
+   * are used, but we use a statically allocated array instead of a vector of
+   * size n_child_indices to speed up creation of this object. If the given
+   * dimensions ever become a limitation the array can be extended.
+   *
+   * @note Since this array stores child indices, it does not need to store a
+   * child index on the finest level, so its size is decremented by 1.
    */
-#ifdef DEAL_II_WITH_P4EST
-  std::array<std::uint8_t, internal::p4est::functions<2>::max_level>
-    child_indices;
-#else
-  std::array<std::uint8_t, 30> child_indices;
-#endif
+  std::array<std::uint8_t, numbers::max_n_levels - 1> child_indices;
 
   friend std::istream &
   operator>>(std::istream &is, CellId &cid);

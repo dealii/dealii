@@ -413,6 +413,14 @@ namespace numbers
    */
   constexpr types::subdomain_id artificial_subdomain_id =
     static_cast<types::subdomain_id>(-2);
+
+  /**
+   * Maximum number of levels, including the coarsest level.
+   *
+   * @note This is the same limit imposed by p4est, which bounds the maximum
+   * level index by 30 via `P4EST_MAX_LEVEL` and `P8EST_MAX_LEVEL`.
+   */
+  constexpr std::uint8_t max_n_levels = 31;
 } // namespace numbers
 
 DEAL_II_NAMESPACE_CLOSE
