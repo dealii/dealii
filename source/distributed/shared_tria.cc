@@ -249,9 +249,7 @@ namespace parallel
                       if (cell->has_children())
                         {
                           bool keep_cell = false;
-                          for (unsigned int c = 0;
-                               c < GeometryInfo<dim>::max_children_per_cell;
-                               ++c)
+                          for (unsigned int c = 0; c < cell->n_children(); ++c)
                             if (cell->child(c)->level_subdomain_id() ==
                                 this->my_subdomain)
                               {
