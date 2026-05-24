@@ -21,7 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 CellId::CellId()
   : coarse_cell_id(numbers::invalid_coarse_cell_id)
-  , n_child_indices(numbers::invalid_unsigned_int)
+  , n_child_indices(std::numeric_limits<std::uint8_t>::max())
 {
   // initialize the child indices to invalid values
   // (the only allowed values are between zero and
