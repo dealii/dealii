@@ -22,8 +22,6 @@
 #include <deal.II/grid/tria_objects.h>
 #include <deal.II/grid/tria_objects_orientations.h>
 
-#include <boost/serialization/utility.hpp>
-
 #include <cstdint>
 #include <vector>
 
@@ -319,19 +317,9 @@ namespace internal
 
     private:
       /**
-       * Levels and indices of the neighbors of the cells. Convention is, that
-       * the neighbors of the cell with index @p i are stored in the fields
-       * following $i*(2*real\_space\_dimension)$, e.g. in one spatial
-       * dimension, the neighbors of cell 0 are stored in
-       * <tt>neighbors[0]</tt> and <tt>neighbors[1]</tt>, the neighbors of
-       * cell 1 are stored in <tt>neighbors[2]</tt> and <tt>neighbors[3]</tt>,
-       * and so on.
-       *
-       * In neighbors, <tt>neighbors[i].first</tt> is the level, while
-       * <tt>neighbors[i].second</tt> is the index of the neighbor.
-       *
-       * If a neighbor does not exist (cell is at the boundary),
-       * <tt>level=index=-1</tt> is set.
+       * Levels of the neighbors of the cells. This array uses a stride of
+       * faces_per_object. If a neighbor does not exist (cell is at the
+       * boundary), then <tt>level=-1</tt> is set.
        *
        * <em>Conventions:</em> The @p ith neighbor of a cell is the one which
        * shares the @p ith face (@p Line in 2d, @p Quad in 3d) of this cell.
@@ -351,7 +339,16 @@ namespace internal
        * level down (in which case its neighbor pointer points to the parent
        * cell of this cell).
        */
-      std::vector<std::pair<int, int>> neighbors;
+      std::vector<std::int8_t> neighbor_levels;
+
+      /**
+       * Indices of the neighbors of the cells. This array uses a stride of
+       * faces_per_object.
+       *
+       * If a neighbor does not exist (cell is at the boundary),
+       * <tt>index=-1</tt> is set.
+       */
+      std::vector<int> neighbor_indices;
 
       /**
        * A cache for the vertex indices of the cells (`structdim == dim`), in
@@ -392,8 +389,8 @@ namespace internal
       Assert(index >= 0, ExcInternalError());
       AssertIndexRange(face_no, faces_per_object);
       const std::size_t i = index * faces_per_object + face_no;
-      AssertIndexRange(i, neighbors.size());
-      return neighbors[i].second;
+      AssertIndexRange(i, neighbor_indices.size());
+      return neighbor_indices[i];
     }
 
 
@@ -406,8 +403,8 @@ namespace internal
       Assert(index >= 0, ExcInternalError());
       AssertIndexRange(face_no, faces_per_object);
       const std::size_t i = index * faces_per_object + face_no;
-      AssertIndexRange(i, neighbors.size());
-      return neighbors[i].first;
+      AssertIndexRange(i, neighbor_levels.size());
+      return neighbor_levels[i];
     }
 
 
@@ -424,12 +421,15 @@ namespace internal
       Assert(neighbor_level >= -1,
              ExcMessage("The neighbor level must be -1 (for a cell at the "
                         "boundary) or a nonnegative number."));
+      Assert(neighbor_level < int(numbers::max_n_levels), ExcInternalError());
       Assert(neighbor_index >= -1,
              ExcMessage("The neighbor index must be -1 (for a cell at the "
                         "boundary) or a nonnegative number."));
       const std::size_t i = index * faces_per_object + face_no;
-      AssertIndexRange(i, neighbors.size());
-      neighbors[i] = std::make_pair(neighbor_level, neighbor_index);
+      AssertIndexRange(i, neighbor_levels.size());
+      AssertIndexRange(i, neighbor_indices.size());
+      neighbor_levels[i]  = neighbor_level;
+      neighbor_indices[i] = neighbor_index;
     }
 
 
@@ -482,7 +482,8 @@ namespace internal
       // here. instead of storing them to the stream and re-reading them again
       // later, we just rebuild them in Triangulation::load()
 
-      ar &neighbors;
+      ar &neighbor_levels;
+      ar &neighbor_indices;
       ar &subdomain_ids;
       ar &level_subdomain_ids;
       ar &parents;
