@@ -28,6 +28,7 @@
 // half the preprocessed size of <iterator>) from <array>
 #  include <algorithm>
 #  include <array>
+#  include <cstdint>
 #  include <initializer_list>
 #  include <limits>
 #  include <type_traits>
