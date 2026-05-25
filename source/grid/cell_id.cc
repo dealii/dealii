@@ -55,39 +55,42 @@ CellId::CellId(const types::coarse_cell_id coarse_cell_id,
 
 
 CellId::CellId(const CellId::binary_type &binary_representation)
+  : coarse_cell_id(binary_representation[0])
+  , n_child_indices(static_cast<std::uint8_t>(binary_representation[2] & 0xFF))
 {
-  // The first entry stores the coarse cell id
-  coarse_cell_id = binary_representation[0];
+  Assert(n_child_indices <= child_indices.size(), ExcInternalError());
+  child_indices.fill(std::numeric_limits<std::uint8_t>::max());
 
-  // The rightmost two bits of the second entry store the dimension,
-  // the rest stores the number of child indices.
-  const unsigned int two_bit_mask = (1 << 2) - 1;
-  const unsigned int dim          = binary_representation[1] & two_bit_mask;
-  n_child_indices                 = (binary_representation[1] >> 2);
-
-  Assert(n_child_indices < child_indices.size(), ExcInternalError());
-
-  // Each child requires 'dim' bits to store its index
-  const unsigned int children_per_value =
-    sizeof(binary_type::value_type) * 8 / dim;
-  const unsigned int child_mask = (1 << dim) - 1;
-
-  // Loop until all child indices have been read
-  unsigned int child_level  = 0;
-  unsigned int binary_entry = 2;
-  while (child_level < n_child_indices)
+  // This is the reverse of to_binary()
+  unsigned int binary_entry_index        = 1;
+  int          index_within_binary_entry = 7;
+  for (std::uint8_t child_no = 0; child_no < n_child_indices; ++child_no)
     {
-      for (unsigned int j = 0; j < children_per_value; ++j)
+      binary_type::value_type mask = 0;
+      if (child_no % 2 == 0)
+        mask |= (0x0F << 4);
+      else
+        mask |= 0x0F;
+
+      AssertIndexRange(binary_entry_index, binary_representation.size());
+      auto value = (binary_representation[binary_entry_index] >>
+                    (8 * index_within_binary_entry)) &
+                   mask;
+      if (child_no % 2 == 0)
+        value >>= 4;
+
+      // We don't have dim available here, so make sure everything fits in the
+      // 3d limit instead
+      AssertIndexRange(value, ReferenceCells::max_n_children<3>());
+      child_indices[child_no] = static_cast<std::uint8_t>(value);
+
+      if (child_no % 2 == 1)
+        --index_within_binary_entry;
+      if (index_within_binary_entry == -1)
         {
-          // Read the current child index by shifting to the current
-          // index's position and doing a bitwise-and with the child_mask.
-          child_indices[child_level] =
-            (binary_representation[binary_entry] >> (dim * j)) & child_mask;
-          ++child_level;
-          if (child_level == n_child_indices)
-            break;
+          ++binary_entry_index;
+          index_within_binary_entry = 7;
         }
-      ++binary_entry;
     }
 }
 
@@ -105,43 +108,55 @@ template <int dim>
 CellId::binary_type
 CellId::to_binary() const
 {
-  CellId::binary_type binary_representation;
+  binary_type binary_representation;
   binary_representation.fill(0);
 
-  Assert(n_child_indices < child_indices.size(), ExcInternalError());
-
-  // The first entry stores the coarse cell id
-  binary_representation[0] = coarse_cell_id;
-
-  // The rightmost two bits of the second entry store the dimension,
-  // the rest stores the number of child indices.
-  binary_representation[1] = (n_child_indices << 2);
-  binary_representation[1] |= dim;
-
-  // Each child requires 'dim' bits to store its index
-  const unsigned int children_per_value =
-    sizeof(binary_type::value_type) * 8 / dim;
-  unsigned int child_level  = 0;
-  unsigned int binary_entry = 2;
-
-  // Loop until all child indices have been written
-  while (child_level < n_child_indices)
+  binary_representation[0]               = coarse_cell_id;
+  unsigned int binary_entry_index        = 1;
+  int          index_within_binary_entry = 7;
+  // This encoding only makes sense if we can use 7 as an index of sorts (see
+  // below) into that binary type, so future-proof a little by asserting that
+  // binary_type::value_type is big enough for this to work:
+  Assert(index_within_binary_entry < int(sizeof(binary_type::value_type)),
+         ExcInternalError());
+  // Encode each child as a distinct power of 2 inside the binary
+  // representation. Rather than memcpy(), this representation is constructed
+  // from high values to low values so that we have a unique numerical value in
+  // the integers of binary_representation for any cell: that way we get results
+  // independent of the endianness of the machine (i.e., text_oarchive will have
+  // the same results across platforms). Even though we don't need it, this
+  // particular choice preserves lexical ordering (i.e., if cell_id_1 <
+  // cell_id_2, then cell_id_1.to_binary() < cell_id_2.to_binary()).
+  for (std::uint8_t child_no = 0; child_no < n_child_indices; ++child_no)
     {
-      Assert(binary_entry < binary_representation.size(), ExcInternalError());
+      Assert(child_indices[child_no] < ReferenceCells::max_n_children<dim>(),
+             ExcInternalError());
+      Assert(ReferenceCells::max_n_children<dim>() <= 0x0F, ExcInternalError());
 
-      for (unsigned int j = 0; j < children_per_value; ++j)
+      binary_type::value_type entry = 0;
+
+      if (child_no % 2 == 0)
+        entry |= (child_indices[child_no] & 0x0F) << 4;
+      else
+        entry |= child_indices[child_no] & 0x0F;
+
+      AssertIndexRange(binary_entry_index, binary_representation.size());
+      binary_representation[binary_entry_index] |=
+        (entry << 8 * index_within_binary_entry);
+
+      if (child_no % 2 == 1)
+        --index_within_binary_entry;
+      if (index_within_binary_entry == -1)
         {
-          const unsigned int child_index =
-            static_cast<unsigned int>(child_indices[child_level]);
-          // Shift the child index to its position in the unsigned int and store
-          // it
-          binary_representation[binary_entry] |= (child_index << (j * dim));
-          ++child_level;
-          if (child_level == n_child_indices)
-            break;
+          ++binary_entry_index;
+          index_within_binary_entry = 7;
         }
-      ++binary_entry;
     }
+
+  if (binary_entry_index == 2)
+    Assert(index_within_binary_entry > 0, ExcInternalError());
+  // finally store the number of children at the end:
+  binary_representation[2] |= n_child_indices;
 
   return binary_representation;
 }
