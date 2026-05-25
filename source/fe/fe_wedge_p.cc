@@ -118,16 +118,7 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   const FE_Q<1>        fe_line(degree);
   const FE_Q<2>        fe_quad(degree);
 
-  for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-    {
-      const auto pair = this->degree == 1 ? internal::wedge_table_1[i] :
-                                            internal::wedge_table_2[i];
-
-      this->unit_support_points.emplace_back(
-        fe_triangle.get_unit_support_points()[pair[0]][0],
-        fe_triangle.get_unit_support_points()[pair[0]][1],
-        fe_line.get_unit_support_points()[pair[1]][0]);
-    }
+  this->unit_support_points = internal::get_wedge_support_points<dim>(degree);
 
   this->unit_face_support_points.resize(this->reference_cell().n_faces());
 
