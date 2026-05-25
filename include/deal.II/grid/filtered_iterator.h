@@ -273,7 +273,6 @@ namespace IteratorFilters
    * pointed to is equal to a value or set of values given to the constructor,
    * assuming that the iterator allows querying for an active FE index.
    *
-   *
    * @ingroup Iterators
    */
   class ActiveFEIndexEqualTo
@@ -540,6 +539,9 @@ namespace IteratorFilters
  * namespace, but writing different ones is simple following the examples
  * above.
  *
+ * Predicates are assumed to not contain any mutable state, i.e., calling the
+ * predicate may not modify the predicate itself. They may be copied or shared
+ * between filtered iterators in an arbitrary way.
  *
  * <h3>Initialization of filtered iterators</h3>
  *
@@ -831,13 +833,6 @@ private:
      */
     virtual bool
     operator()(const BaseIterator &bi) const = 0;
-
-    /**
-     * Generate a copy of this object, i.e. of the actual type of this
-     * pointer.
-     */
-    virtual std::unique_ptr<PredicateBase>
-    clone() const = 0;
   };
 
 
@@ -864,13 +859,6 @@ private:
     virtual bool
     operator()(const BaseIterator &bi) const override;
 
-    /**
-     * Generate a copy of this object, i.e. of the actual type of this
-     * pointer.
-     */
-    virtual std::unique_ptr<PredicateBase>
-    clone() const override;
-
   private:
     /**
      * Copy of the predicate.
@@ -882,7 +870,7 @@ private:
    * Pointer to an object that encapsulated the actual data type of the
    * predicate given to the constructor.
    */
-  std::unique_ptr<const PredicateBase> predicate;
+  std::shared_ptr<const PredicateBase> predicate;
 };
 
 
@@ -1155,7 +1143,7 @@ template <typename BaseIterator>
 template <typename Predicate>
 DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate p)
-  : predicate(new PredicateTemplate<Predicate>(p))
+  : predicate(std::make_shared<PredicateTemplate<Predicate>>(p))
 {}
 
 
@@ -1166,7 +1154,7 @@ DEAL_II_CXX20_REQUIRES((std::predicate<Predicate, BaseIterator>))
 inline FilteredIterator<BaseIterator>::FilteredIterator(Predicate           p,
                                                         const BaseIterator &bi)
   : BaseIterator(bi)
-  , predicate(new PredicateTemplate<Predicate>(p))
+  , predicate(std::make_shared<PredicateTemplate<Predicate>>(p))
 {
   if ((this->state() == IteratorState::valid) && !(*predicate)(*this))
     set_to_next_positive(bi);
@@ -1182,7 +1170,7 @@ inline FilteredIterator<BaseIterator>::FilteredIterator(
     // BaseIterator but tries to go through constructing a new
     // BaseIterator with an Accessor.
   BaseIterator(*static_cast<const BaseIterator *>(&fi))
-  , predicate(fi.predicate->clone())
+  , predicate(fi.predicate)
 {}
 
 
@@ -1368,16 +1356,6 @@ FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::operator()(
   const BaseIterator &bi) const
 {
   return predicate(bi);
-}
-
-
-
-template <typename BaseIterator>
-template <typename Predicate>
-std::unique_ptr<typename FilteredIterator<BaseIterator>::PredicateBase>
-FilteredIterator<BaseIterator>::PredicateTemplate<Predicate>::clone() const
-{
-  return std::make_unique<PredicateTemplate>(predicate);
 }
 
 
