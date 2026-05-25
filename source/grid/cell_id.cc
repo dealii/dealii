@@ -21,14 +21,12 @@ DEAL_II_NAMESPACE_OPEN
 
 CellId::CellId()
   : coarse_cell_id(numbers::invalid_coarse_cell_id)
-  , n_child_indices(numbers::invalid_unsigned_int)
+  , n_child_indices(std::numeric_limits<std::uint8_t>::max())
 {
   // initialize the child indices to invalid values
-  // (the only allowed values are between zero and
-  // GeometryInfo<dim>::max_children_per_cell)
   std::fill(child_indices.begin(),
             child_indices.end(),
-            std::numeric_limits<char>::max());
+            std::numeric_limits<std::uint8_t>::max());
 }
 
 
