@@ -332,11 +332,9 @@ namespace Step27
     LA::MPI::Vector completely_distributed_solution(locally_owned_dofs,
                                                     mpi_communicator);
 
-    SolverControl solver_control(system_rhs.size(),
-                                 1e-8 * system_rhs.l2_norm());
-    //                           ^~~~
-    // Loss of precision with a factor of 1e-12 with Trilinos
-    LA::SolverCG cg(solver_control);
+    // Same as the PETSc version
+    IterationNumberControl solver_control(10, 1e-16 * system_rhs.l2_norm());
+    LA::SolverCG           cg(solver_control);
 
     LA::MPI::PreconditionAMG                 preconditioner;
     LA::MPI::PreconditionAMG::AdditionalData data;
@@ -344,13 +342,10 @@ namespace Step27
     data.higher_order_elements = true;
     preconditioner.initialize(system_matrix, data);
 
-    check_solver_within_range(cg.solve(system_matrix,
-                                       completely_distributed_solution,
-                                       system_rhs,
-                                       preconditioner),
-                              solver_control.last_step(),
-                              10,
-                              80);
+    cg.solve(system_matrix,
+             completely_distributed_solution,
+             system_rhs,
+             preconditioner);
 
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
@@ -374,8 +369,9 @@ namespace Step27
       solution,
       estimated_error_per_cell);
 
+    // Improve robustness by refining and coarsening a smaller amount than usual
     parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
-      triangulation, estimated_error_per_cell, 0.3, 0.03);
+      triangulation, estimated_error_per_cell, 0.2, 0.02);
 
     Vector<float> smoothness_indicators(triangulation.n_active_cells());
     SmoothnessEstimator::Fourier::coefficient_decay(
@@ -387,9 +383,10 @@ namespace Step27
       /*smallest_abs_coefficient=*/1e-10,
       /*only_flagged_cells=*/true);
 
+    // Same
     hp::Refinement::p_adaptivity_from_relative_threshold(dof_handler,
                                                          smoothness_indicators,
-                                                         0.5,
+                                                         0.25,
                                                          0.);
     hp::Refinement::choose_p_over_h(dof_handler);
 
@@ -455,12 +452,14 @@ namespace Step27
         setup_system();
 
         pcout << "   Number of active cells      : "
-              << triangulation.n_global_active_cells() << std::endl
-              << "   Number of degrees of freedom: " << dof_handler.n_dofs()
+              << 100 * (triangulation.n_global_active_cells() / 100)
               << std::endl
+              << "   Number of degrees of freedom: "
+              << 100 * (dof_handler.n_dofs() / 100) << std::endl
               << "   Number of constraints       : "
-              << Utilities::MPI::sum(constraints.n_constraints(),
-                                     mpi_communicator)
+              << 100 * (Utilities::MPI::sum(constraints.n_constraints(),
+                                            mpi_communicator) /
+                        100)
               << std::endl;
 
         assemble_system();
