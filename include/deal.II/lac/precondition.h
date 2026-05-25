@@ -2372,15 +2372,19 @@ namespace internal
 
     const auto n_local_elements = vector.locally_owned_size();
     Number    *values_ptr       = vector.get_values();
+    typename MemorySpace::kokkos_space::execution_space exec;
     Kokkos::RangePolicy<typename MemorySpace::kokkos_space::execution_space,
                         Kokkos::IndexType<types::global_dof_index>>
-      policy(0, n_local_elements);
+      policy(exec, 0, n_local_elements);
+
     Kokkos::parallel_for(
       "dealii::PreconditionChebyshev::set_initial_guess",
       policy,
       KOKKOS_LAMBDA(types::global_dof_index i) {
         values_ptr[i] = (i + first_local_range) % 11;
       });
+    exec.fence();
+
     const Number mean_value = vector.mean_value();
     vector.add(-mean_value);
   }
