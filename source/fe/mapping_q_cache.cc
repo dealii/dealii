@@ -99,7 +99,9 @@ MappingQCache<dim, spacedim>::initialize(
         dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping);
       if (mapping_q != nullptr && this->get_degree() == mapping_q->get_degree())
         {
-          return mapping_q->compute_mapping_support_points(cell);
+          boost::container::small_vector<Point<spacedim>, 200> points;
+          mapping_q->compute_mapping_support_points(cell, points);
+          return std::vector<Point<spacedim>>(points.begin(), points.end());
         }
       else
         {
@@ -155,8 +157,9 @@ MappingQCache<dim, spacedim>::initialize(
     [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell,
         void *,
         void *) {
-      (*support_point_cache)[cell->level()][cell->index()] =
-        compute_points_on_cell(cell);
+      const auto result = compute_points_on_cell(cell);
+      (*support_point_cache)[cell->level()][cell->index()].assign(
+        result.begin(), result.end());
       // Do not use `this` in Assert because nvcc when using C++20 assumes that
       // `this` is an integer and we get the following error: invalid type
       // argument of unary '*' (have 'int')
@@ -194,14 +197,14 @@ MappingQCache<dim, spacedim>::initialize(
   this->initialize(
     tria,
     [&](const typename Triangulation<dim, spacedim>::cell_iterator &cell) {
-      std::vector<Point<spacedim>> points;
+      boost::container::small_vector<Point<spacedim>, 200> points;
 
       const auto mapping_q =
         dynamic_cast<const MappingQ<dim, spacedim> *>(&mapping);
 
       if (mapping_q != nullptr && this->get_degree() == mapping_q->get_degree())
         {
-          points = mapping_q->compute_mapping_support_points(cell);
+          mapping_q->compute_mapping_support_points(cell, points);
         }
       else
         {
@@ -226,7 +229,8 @@ MappingQCache<dim, spacedim>::initialize(
             }
 
           fe_values->reinit(cell);
-          points = fe_values->get_quadrature_points();
+          const auto &quadrature_points = fe_values->get_quadrature_points();
+          points.assign(quadrature_points.begin(), quadrature_points.end());
         }
 
       for (auto &p : points)
@@ -235,7 +239,7 @@ MappingQCache<dim, spacedim>::initialize(
         else
           p = transformation_function(cell, p);
 
-      return points;
+      return std::vector<Point<spacedim>>(points.begin(), points.end());
     });
 
   uses_level_info = true;
@@ -393,7 +397,7 @@ MappingQCache<dim, spacedim>::initialize(
             fe_values->reinit(cell_tria);
         }
 
-      std::vector<Point<spacedim>> result;
+      boost::container::small_vector<Point<spacedim>, 200> points;
 
       // Step 2b) read of quadrature points in the relative displacement case
       // note: we also take this path for non-active or artificial cells so that
@@ -403,19 +407,25 @@ MappingQCache<dim, spacedim>::initialize(
         {
           if (mapping_q != nullptr &&
               this->get_degree() == mapping_q->get_degree())
-            result = mapping_q->compute_mapping_support_points(cell_tria);
+            {
+              mapping_q->compute_mapping_support_points(cell_tria, points);
+            }
           else
-            result = fe_values_all.get()->get_quadrature_points();
+            {
+              const auto &quadrature_points =
+                fe_values_all.get()->get_quadrature_points();
+              points.assign(quadrature_points.begin(), quadrature_points.end());
+            }
 
           // for non-active or artificial cells we are done here and return
           // the absolute positions, since the provided vector cannot contain
           // any useful information for these cells
           if (is_active_non_artificial_cell == false)
-            return result;
+            return std::vector<Point<spacedim>>(points.begin(), points.end());
         }
       else
         {
-          result.resize(
+          points.resize(
             Utilities::pow<unsigned int>(this->get_degree() + 1, dim));
         }
 
@@ -436,20 +446,20 @@ MappingQCache<dim, spacedim>::initialize(
                 {
                   // case 1a: FE_Q
                   if (vector_describes_relative_displacement)
-                    result[id.second][id.first] +=
+                    points[id.second][id.first] +=
                       vector_ghosted(dof_indices[i]);
                   else
-                    result[id.second][id.first] =
+                    points[id.second][id.first] =
                       vector_ghosted(dof_indices[i]);
                 }
               else
                 {
                   // case 1b: FE_DGQ
                   if (vector_describes_relative_displacement)
-                    result[lexicographic_to_hierarchic_numbering[id.second]]
+                    points[lexicographic_to_hierarchic_numbering[id.second]]
                           [id.first] += vector_ghosted(dof_indices[i]);
                   else
-                    result[lexicographic_to_hierarchic_numbering[id.second]]
+                    points[lexicographic_to_hierarchic_numbering[id.second]]
                           [id.first] = vector_ghosted(dof_indices[i]);
                 }
             }
@@ -471,12 +481,12 @@ MappingQCache<dim, spacedim>::initialize(
           for (unsigned int q = 0; q < fe_values->n_quadrature_points; ++q)
             for (unsigned int c = 0; c < spacedim; ++c)
               if (vector_describes_relative_displacement)
-                result[q][c] += values[q][c];
+                points[q][c] += values[q][c];
               else
-                result[q][c] = values[q][c];
+                points[q][c] = values[q][c];
         }
 
-      return result;
+      return std::vector<Point<spacedim>>(points.begin(), points.end());
     });
 
   uses_level_info = false;
@@ -597,7 +607,7 @@ MappingQCache<dim, spacedim>::initialize(
             fe_values->reinit(cell_tria);
         }
 
-      std::vector<Point<spacedim>> result;
+      boost::container::small_vector<Point<spacedim>, 200> points;
 
       // Step 2b) read of quadrature points in the relative displacement case
       // note: we also take this path for non-active or artificial cells so that
@@ -607,19 +617,25 @@ MappingQCache<dim, spacedim>::initialize(
         {
           if (mapping_q != nullptr &&
               this->get_degree() == mapping_q->get_degree())
-            result = mapping_q->compute_mapping_support_points(cell_tria);
+            {
+              mapping_q->compute_mapping_support_points(cell_tria, points);
+            }
           else
-            result = fe_values_all.get()->get_quadrature_points();
+            {
+              const auto &quadrature_points =
+                fe_values_all.get()->get_quadrature_points();
+              points.assign(quadrature_points.begin(), quadrature_points.end());
+            }
 
           // for non-active or artificial cells we are done here and return
           // the absolute positions, since the provided vector cannot contain
           // any useful information for these cells
           if (is_non_artificial_cell == false)
-            return result;
+            return std::vector<Point<spacedim>>(points.begin(), points.end());
         }
       else
         {
-          result.resize(
+          points.resize(
             Utilities::pow<unsigned int>(this->get_degree() + 1, dim));
         }
 
@@ -640,21 +656,21 @@ MappingQCache<dim, spacedim>::initialize(
                 {
                   // case 1a: FE_Q
                   if (vector_describes_relative_displacement)
-                    result[id.second][id.first] +=
+                    points[id.second][id.first] +=
                       vectors_ghosted[cell_tria->level()](dof_indices[i]);
                   else
-                    result[id.second][id.first] =
+                    points[id.second][id.first] =
                       vectors_ghosted[cell_tria->level()](dof_indices[i]);
                 }
               else
                 {
                   // case 1b: FE_DGQ
                   if (vector_describes_relative_displacement)
-                    result[lexicographic_to_hierarchic_numbering[id.second]]
+                    points[lexicographic_to_hierarchic_numbering[id.second]]
                           [id.first] +=
                       vectors_ghosted[cell_tria->level()](dof_indices[i]);
                   else
-                    result[lexicographic_to_hierarchic_numbering[id.second]]
+                    points[lexicographic_to_hierarchic_numbering[id.second]]
                           [id.first] =
                             vectors_ghosted[cell_tria->level()](dof_indices[i]);
                 }
@@ -682,14 +698,14 @@ MappingQCache<dim, spacedim>::initialize(
             for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
               for (unsigned int q = 0; q < fe_values->n_quadrature_points; ++q)
                 if (vector_describes_relative_displacement == false && i == 0)
-                  result[q][c] =
+                  points[q][c] =
                     dof_values[i] * fe_values->shape_value_component(i, q, c);
                 else
-                  result[q][c] +=
+                  points[q][c] +=
                     dof_values[i] * fe_values->shape_value_component(i, q, c);
         }
 
-      return result;
+      return std::vector<Point<spacedim>>(points.begin(), points.end());
     });
 
   uses_level_info = true;
@@ -711,9 +727,10 @@ MappingQCache<dim, spacedim>::memory_consumption() const
 
 
 template <int dim, int spacedim>
-std::vector<Point<spacedim>>
+void
 MappingQCache<dim, spacedim>::compute_mapping_support_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  boost::container::small_vector<Point<spacedim>, 200>       &points) const
 {
   Assert(support_point_cache.get() != nullptr,
          ExcMessage("Must call MappingQCache::initialize() before "
@@ -723,7 +740,9 @@ MappingQCache<dim, spacedim>::compute_mapping_support_points(
 
   AssertIndexRange(cell->level(), support_point_cache->size());
   AssertIndexRange(cell->index(), (*support_point_cache)[cell->level()].size());
-  return (*support_point_cache)[cell->level()][cell->index()];
+  const auto &cached_points =
+    (*support_point_cache)[cell->level()][cell->index()];
+  points.assign(cached_points.begin(), cached_points.end());
 }
 
 
