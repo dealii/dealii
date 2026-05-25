@@ -130,6 +130,65 @@ namespace internal
               MemoryConsumption::memory_consumption(n_active_hexes) +
               MemoryConsumption::memory_consumption(n_active_hexes_level));
     }
+
+
+
+    template <int dim>
+    Strides<dim>::Strides()
+      : max_children_per_cell(numbers::invalid_unsigned_int)
+      , max_faces_per_cell(numbers::invalid_unsigned_int)
+      , max_lines_per_cell(numbers::invalid_unsigned_int)
+      , max_vertices_per_cell(numbers::invalid_unsigned_int)
+      , max_children_per_face(numbers::invalid_unsigned_int)
+      , max_lines_per_face(numbers::invalid_unsigned_int)
+    {}
+
+
+
+    template <int dim>
+    Strides<dim>::Strides(
+      const std::vector<ReferenceCell<dim>> &reference_cells)
+      : max_children_per_cell(0u)
+      , max_faces_per_cell(0u)
+      , max_lines_per_cell(0u)
+      , max_vertices_per_cell(0u)
+      , max_children_per_face(0u)
+      , max_lines_per_face(0u)
+    {
+      for (const ReferenceCell<dim> &reference_cell : reference_cells)
+        {
+          // TODO: remove this once we support Pyramid refinement
+          if (reference_cell == ReferenceCells::Pyramid)
+            {
+              Assert(reference_cell.n_isotropic_children() == 0,
+                     ExcMessage("This function must be updated once we support "
+                                "Pyramid refinement."));
+              // for now, use the standard 3d value
+              max_children_per_cell = 8;
+            }
+
+          max_children_per_cell =
+            std::max(max_children_per_cell,
+                     reference_cell.n_isotropic_children());
+          max_faces_per_cell =
+            std::max(max_faces_per_cell, reference_cell.n_faces());
+          max_lines_per_cell =
+            std::max(max_lines_per_cell, reference_cell.n_lines());
+          max_vertices_per_cell =
+            std::max(max_vertices_per_cell, reference_cell.n_vertices());
+
+          for (unsigned int face_no : reference_cell.face_indices())
+            {
+              const auto face_reference_cell =
+                reference_cell.face_reference_cell(face_no);
+              max_children_per_face =
+                std::max(max_children_per_face,
+                         face_reference_cell.n_isotropic_children());
+              max_lines_per_face =
+                std::max(max_lines_per_face, face_reference_cell.n_lines());
+            }
+        }
+    }
   } // namespace TriangulationImplementation
 
 
@@ -3680,21 +3739,6 @@ namespace internal
             }
 #endif
 
-        // clear old content
-        tria.levels.clear();
-        tria.levels.push_back(
-          std::make_unique<
-            internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
-            ReferenceCells::max_n_children<dim>(),
-            ReferenceCells::max_n_faces<dim>(),
-            ReferenceCells::max_n_vertices<dim>()));
-
-        if (dim > 1)
-          tria.faces = std::make_unique<
-            dealii::internal::TriangulationImplementation::TriaFaces<dim>>(
-            ReferenceCells::max_n_children<2>(),
-            ReferenceCells::max_n_lines<2>());
-
         // copy vertices
         tria.vertices = vertices;
         tria.vertices_used.assign(vertices.size(), true);
@@ -3709,6 +3753,23 @@ namespace internal
                                             tria.get_mpi_communicator());
         tria.reference_cells.assign(all_reference_cells.begin(),
                                     all_reference_cells.end());
+        tria.strides = internal::TriangulationImplementation::Strides<dim>(
+          tria.reference_cells);
+
+        // clear old content
+        tria.levels.clear();
+        tria.levels.push_back(
+          std::make_unique<
+            internal::TriangulationImplementation::TriaLevel<dim, spacedim>>(
+            tria.strides.max_children_per_cell,
+            tria.strides.max_faces_per_cell,
+            tria.strides.max_vertices_per_cell));
+
+        if (dim > 1)
+          tria.faces = std::make_unique<
+            dealii::internal::TriangulationImplementation::TriaFaces<dim>>(
+            tria.strides.max_children_per_face,
+            tria.strides.max_lines_per_face);
 
         const ArrayOfArrays  empty;
         const ArrayOfArrays &lines_to_vertices =
@@ -5320,9 +5381,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -5801,9 +5862,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -6055,9 +6116,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -6362,9 +6423,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -7064,7 +7125,13 @@ namespace internal
                     new_face->set_boundary_id_internal(
                       numbers::internal_face_boundary_id);
                     new_face->set_manifold_id(cell->manifold_id());
-                    for (const auto j : new_faces[i]->line_indices())
+
+                    // At this point the face doesn't have its ReferenceCell
+                    // set, so rely on lower-level functionality to reset
+                    // per-line data
+                    for (unsigned int j = 0;
+                         j < triangulation.faces->lines_per_quad;
+                         ++j)
                       new_face->set_line_orientation(
                         j, numbers::default_geometric_orientation);
                   }
@@ -7936,9 +8003,9 @@ namespace internal
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
-                  ReferenceCells::max_n_children<dim>(),
-                  ReferenceCells::max_n_faces<dim>(),
-                  ReferenceCells::max_n_vertices<dim>()));
+                  triangulation.strides.max_children_per_cell,
+                  triangulation.strides.max_faces_per_cell,
+                  triangulation.strides.max_vertices_per_cell));
               break;
             }
 
@@ -12831,6 +12898,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , cell_attached_data(std::move(tria.cell_attached_data))
   , smooth_grid(tria.smooth_grid)
   , reference_cells(std::move(tria.reference_cells))
+  , strides(tria.strides)
   , periodic_face_pairs_level_0(std::move(tria.periodic_face_pairs_level_0))
   , periodic_face_map(std::move(tria.periodic_face_map))
   , levels(std::move(tria.levels))
@@ -12861,6 +12929,7 @@ Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
   cell_attached_data           = std::move(tria.cell_attached_data);
   smooth_grid                  = tria.smooth_grid;
   reference_cells              = std::move(tria.reference_cells);
+  strides                      = tria.strides;
   periodic_face_pairs_level_0  = std::move(tria.periodic_face_pairs_level_0);
   periodic_face_map            = std::move(tria.periodic_face_map);
   levels                       = std::move(tria.levels);
@@ -13203,6 +13272,7 @@ void Triangulation<dim, spacedim>::copy_triangulation(
   anisotropic_refinement = other_tria.anisotropic_refinement;
   smooth_grid            = other_tria.smooth_grid;
   reference_cells        = other_tria.reference_cells;
+  strides                = other_tria.strides;
 
   if (dim > 1)
     faces =

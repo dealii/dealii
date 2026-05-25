@@ -327,6 +327,70 @@ namespace internal
       void
       serialize(Archive &ar, const unsigned int version);
     };
+
+    /**
+     * @brief Strides of various arrays in a Triangulation.
+     *
+     * The implementation of a Triangulation contains many arrays of subcell
+     * data, such as face orientations, neighbors, and the vertex index cache.
+     * For simplicity, we index those arrays by the largest stride required by
+     * all present ReferenceCell objects: e.g., if the only ReferenceCell is
+     * ReferenceCells::Tetrahedron then we only need to store 4 face
+     * orientations per cell (and thus the stride is 4), whereas if the
+     * Triangulation contains a Hexahedron then we store 6 per cell (and, for
+     * all cells, the stride is 6).
+     *
+     * @note Since refining a ReferenceCell produces the same ReferenceCell
+     * (except for ReferenceCells::Pyramid, which produces
+     * ReferenceCells::Tetrahedron and ReferenceCells::Pyramid), these strides
+     * only need to be set on level 0 and do not need to be updated during
+     * refinement (as a ReferenceCells::Tetrahedron has fewer vertices, lines,
+     * and faces then a ReferenceCells::Pyramid).
+     */
+    template <int dim>
+    struct Strides
+    {
+      /**
+       * Default constructor. Sets all fields to invalid values.
+       */
+      Strides();
+
+      /**
+       * Constructor. Sets all fields to the maximum values over all
+       * ReferenceCell objects.
+       */
+      Strides(const std::vector<ReferenceCell<dim>> &reference_cells);
+
+      /**
+       * Maximum number of children per cell.
+       */
+      unsigned int max_children_per_cell;
+
+      /**
+       * Maximum number of faces per cell.
+       */
+      unsigned int max_faces_per_cell;
+
+      /**
+       * Maximum number of lines per cell.
+       */
+      unsigned int max_lines_per_cell;
+
+      /**
+       * Maximum number of vertices per cell.
+       */
+      unsigned int max_vertices_per_cell;
+
+      /**
+       * Maximum number of vertices per cell.
+       */
+      unsigned int max_children_per_face;
+
+      /**
+       * Maximum number of vertices per cell.
+       */
+      unsigned int max_lines_per_face;
+    };
   } // namespace TriangulationImplementation
 
 
@@ -4065,6 +4129,11 @@ protected:
   std::vector<ReferenceCell<dim>> reference_cells;
 
   /**
+   * Strides of non-cell arrays stored by TriaLevel, TriaFaces, etc.
+   */
+  internal::TriangulationImplementation::Strides<dim> strides;
+
+  /**
    * Write a bool vector to the given stream, writing a pre- and a postfix
    * magic number. The vector is written in an almost binary format, i.e. the
    * bool flags are packed but the data is written as ASCII text.
@@ -4653,7 +4722,6 @@ namespace internal
       ar &n_hexes        &n_hexes_level;
       ar &n_active_hexes &n_active_hexes_level;
     }
-
   } // namespace TriangulationImplementation
 } // namespace internal
 
@@ -4757,6 +4825,8 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   ar &smooth_grid;
 
   ar &reference_cells;
+  strides =
+    internal::TriangulationImplementation::Strides<dim>(reference_cells);
 
   unsigned int n_levels;
   ar          &n_levels;
