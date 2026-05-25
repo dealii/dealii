@@ -2984,11 +2984,10 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
   std::vector<std::pair<int, int>> entities;
   gmsh::model::getEntities(entities);
 
-  for (const auto &e : entities)
+  for (const auto &[entity_dim, entity_tag] : entities)
     {
       // Dimension and tag of the entity:
-      const int &entity_dim = e.first;
-      const int &entity_tag = e.second;
+
 
       types::manifold_id manifold_id = numbers::flat_manifold_id;
       types::boundary_id boundary_id = 0;
@@ -3017,10 +3016,8 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
                     bool found_boundary_id      = false;
                     // If the above did not throw, we keep going, and retrieve
                     // all the information that we know how to translate.
-                    for (const auto &it : id_names)
+                    for (const auto &[name, id] : id_names)
                       {
-                        const auto &name = it.first;
-                        const auto &id   = it.second;
                         if (entity_dim == dim && name == "MaterialID")
                           {
                             boundary_id = static_cast<types::boundary_id>(id);
@@ -3345,8 +3342,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                                          entity_dim,
                                          entity_tag);
 
-          for (unsigned int i = 0; i < count_element_ids.size(); ++i)
-            total_volume_elements += count_element_ids[i].size();
+          for (const auto &count_element_id : count_element_ids)
+            total_volume_elements += count_element_id.size();
         }
     }
 

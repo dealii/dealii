@@ -2261,7 +2261,7 @@ ParameterHandler::assert_that_entries_have_been_set() const
       std::string list_of_missing_parameters = "\n\n";
       for (const auto &it : entries_wrongly_not_set)
         list_of_missing_parameters += "  " + it + "\n";
-      list_of_missing_parameters += "\n";
+      list_of_missing_parameters += '\n';
 
       AssertThrow(
         entries_wrongly_not_set.empty(),

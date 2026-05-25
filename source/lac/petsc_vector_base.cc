@@ -1061,7 +1061,7 @@ namespace PETScWrappers
     // missing swap for IndexSet
     IndexSet t(this->ghost_indices);
     this->ghost_indices = v.ghost_indices;
-    v.ghost_indices     = t;
+    v.ghost_indices     = std::move(t);
     std::swap(this->ghost_vector, v.ghost_vector);
     std::swap(this->ghost_vector_array, v.ghost_vector_array);
   }

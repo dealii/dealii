@@ -9963,7 +9963,7 @@ namespace GridGenerator
                   const double ax = std::fabs(cell->face(f)->vertex(v)[0]);
                   const double ay = std::fabs(cell->face(f)->vertex(v)[1]);
                   const double az = std::fabs(cell->face(f)->vertex(v)[2]);
-                  const double max_coord = std::max(std::max(ax, ay), az);
+                  const double max_coord = std::max({ax, ay, az});
                   cell->face(f)->vertex(v) *= outer_radius / max_coord;
                 }
       }

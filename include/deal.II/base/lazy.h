@@ -281,6 +281,7 @@ private:
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
+// NOLINTNEXTLINE(modernize-use-equals-default)
 inline Lazy<T>::Lazy()
   : object_is_initialized(false)
 {}

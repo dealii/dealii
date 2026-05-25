@@ -3255,9 +3255,8 @@ namespace DataOutBase
     UcdStream ucd_out(out, flags);
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
+
+    auto [n_nodes, n_cells] = count_nodes_and_cells(patches);
     //---------------------
     // preamble
     if (flags.write_preamble)
@@ -3348,9 +3347,8 @@ namespace DataOutBase
     const unsigned int n_data_sets = data_names.size();
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
+
+    auto [n_nodes, n_cells] = count_nodes_and_cells(patches);
 
     // start with vertices order is lexicographical, x varying fastest
     out << "object \"vertices\" class array type float rank 1 shape "
@@ -4742,9 +4740,8 @@ namespace DataOutBase
     out << "gmvinput ascii" << '\n' << '\n';
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
+
+    auto [n_nodes, n_cells] = count_nodes_and_cells(patches);
 
     // For the format we write here, we need to write all node values relating
     // to one variable at a time. We could in principle do this by looping
@@ -4870,9 +4867,8 @@ namespace DataOutBase
                                 patches[0].data.n_rows()));
 
     // first count the number of cells and cells for later use
-    unsigned int n_nodes;
-    unsigned int n_cells;
-    std::tie(n_nodes, n_cells) = count_nodes_and_cells(patches);
+
+    auto [n_nodes, n_cells] = count_nodes_and_cells(patches);
 
     //---------
     // preamble

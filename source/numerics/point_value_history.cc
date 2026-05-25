@@ -492,7 +492,7 @@ PointValueHistory<dim>::add_field_name(const std::string   &vector_name,
     point_geometry_data.size() * n_stored; // each point has n_stored sub parts
   std::vector<std::vector<double>> vector_size(n_datastreams,
                                                std::vector<double>(0));
-  pair_data.second = vector_size;
+  pair_data.second = std::move(vector_size);
   data_store.insert(pair_data);
 }
 
@@ -1244,7 +1244,7 @@ PointValueHistory<dim>::get_support_locations(
     {
       actual_points.push_back(point->support_point_locations);
     }
-  locations = actual_points;
+  locations = std::move(actual_points);
 }
 
 

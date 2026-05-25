@@ -447,7 +447,7 @@ namespace FETools
       TrilinosWrappers::MPI::Vector u2(dof2_locally_owned_dofs,
                                        dof2_locally_relevant_dofs,
                                        u1.get_mpi_communicator());
-      u2 = u2_out;
+      u2 = std::move(u2_out);
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 
@@ -478,7 +478,7 @@ namespace FETools
       TrilinosWrappers::MPI::Vector u2(dof2_locally_owned_dofs,
                                        dof2_locally_relevant_dofs,
                                        mpi_communicator);
-      u2 = u2_out;
+      u2 = std::move(u2_out);
       interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
     }
 

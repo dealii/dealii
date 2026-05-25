@@ -16469,7 +16469,7 @@ void Triangulation<dim, spacedim>::unpack_data_serial()
             temp.push_back(cell);
         }
 
-      this->local_cell_relations = temp;
+      this->local_cell_relations = std::move(temp);
     }
 }
 

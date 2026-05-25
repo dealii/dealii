@@ -25,6 +25,7 @@ Checks: >
   cppcoreguidelines-pro-type-static-cast-downcast,
   modernize-*,
   -modernize-avoid-c-arrays,
+  -modernize-avoid-c-style-cast,
   -modernize-concat-nested-namespaces,
   -modernize-pass-by-value,
   -modernize-raw-string-literal,
@@ -33,6 +34,7 @@ Checks: >
   -modernize-use-default-member-init,
   -modernize-use-nodiscard,
   -modernize-use-override,
+  -modernize-use-string-view,
   -modernize-use-trailing-return-type,
   -modernize-use-transparent-functors,
   mpi-*,
@@ -40,6 +42,7 @@ Checks: >
   -performance-avoid-endl,
   -performance-enum-size,
   -performance-inefficient-string-concatenation,
+  -performance-unnecessary-value-param,
   -performance-no-automatic-move,
   readability-qualified-auto
 

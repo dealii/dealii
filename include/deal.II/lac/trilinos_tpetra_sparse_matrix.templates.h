@@ -514,7 +514,7 @@ namespace LinearAlgebra
       SparseMatrix<Number, MemorySpace> &&other) noexcept
       : column_space_map(std::move(other.column_space_map))
       , matrix(std::move(other.matrix))
-      , compressed(std::move(other.compressed))
+      , compressed(other.compressed)
     {
       other.compressed = false;
     }
@@ -528,7 +528,7 @@ namespace LinearAlgebra
     {
       column_space_map = std::move(other.column_space_map);
       matrix           = std::move(other.matrix);
-      compressed       = std::move(other.compressed);
+      compressed       = other.compressed;
 
       return *this;
     }

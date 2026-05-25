@@ -1953,11 +1953,9 @@ namespace GridTools
                     //
 
                     // Add cell to all dofs of parent face
-                    std::pair<unsigned int, unsigned int>
-                      neighbor_face_no_subface_no =
-                        cell->neighbor_of_coarser_neighbor(f);
-                    unsigned int face_no = neighbor_face_no_subface_no.first;
-                    unsigned int subface = neighbor_face_no_subface_no.second;
+                    auto [face_no, subface] =
+                      cell->neighbor_of_coarser_neighbor(f);
+
 
                     const unsigned int n_dofs_per_face =
                       cell->get_fe().n_dofs_per_face(face_no);

@@ -79,6 +79,7 @@ namespace TrilinosWrappers
     const bool                      exchange_data)
   {
     std::vector<Epetra_Map> epetra_maps;
+    epetra_maps.reserve(block_sparsity_pattern.n_block_rows());
     for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
       epetra_maps.push_back(
         parallel_partitioning[i].make_trilinos_map(communicator, false));
@@ -127,6 +128,7 @@ namespace TrilinosWrappers
     const BlockSparsityPatternType &block_sparsity_pattern)
   {
     std::vector<IndexSet> parallel_partitioning;
+    parallel_partitioning.reserve(block_sparsity_pattern.n_block_rows());
     for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
       parallel_partitioning.emplace_back(
         complete_index_set(block_sparsity_pattern.block(i, 0).n_rows()));
@@ -210,6 +212,7 @@ namespace TrilinosWrappers
                                 dealii_block_sparse_matrix.n()));
 
     std::vector<IndexSet> parallel_partitioning;
+    parallel_partitioning.reserve(dealii_block_sparse_matrix.n_block_rows());
     for (size_type i = 0; i < dealii_block_sparse_matrix.n_block_rows(); ++i)
       parallel_partitioning.emplace_back(
         complete_index_set(dealii_block_sparse_matrix.block(i, 0).m()));

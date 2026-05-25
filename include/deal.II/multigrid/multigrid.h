@@ -714,7 +714,7 @@ namespace internal
               typename VectorType,
               typename TransferType,
               typename OtherVectorType>
-    std::enable_if_t<TransferType::supports_dof_handler_vector>
+    void
     vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
           Multigrid<VectorType>                      &multigrid,
           const TransferType                         &transfer,
@@ -724,21 +724,43 @@ namespace internal
           const typename dealii::mg::Signals         &signals,
           int)
     {
-      signals.transfer_to_mg(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_to_mg(dof_handler_vector, multigrid.defect, src);
-      else
-        transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
-      signals.transfer_to_mg(false);
+      if constexpr (TransferType::supports_dof_handler_vector)
+        {
+          signals.transfer_to_mg(true);
+          if (uses_dof_handler_vector)
+            transfer.copy_to_mg(dof_handler_vector, multigrid.defect, src);
+          else
+            transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
+          signals.transfer_to_mg(false);
 
-      multigrid.cycle();
+          multigrid.cycle();
 
-      signals.transfer_to_global(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_from_mg(dof_handler_vector, dst, multigrid.solution);
+          signals.transfer_to_global(true);
+          if (uses_dof_handler_vector)
+            transfer.copy_from_mg(dof_handler_vector, dst, multigrid.solution);
+          else
+            transfer.copy_from_mg(*dof_handler_vector[0],
+                                  dst,
+                                  multigrid.solution);
+          signals.transfer_to_global(false);
+        }
       else
-        transfer.copy_from_mg(*dof_handler_vector[0], dst, multigrid.solution);
-      signals.transfer_to_global(false);
+        {
+          (void)uses_dof_handler_vector;
+          Assert(!uses_dof_handler_vector, ExcInternalError());
+
+          signals.transfer_to_mg(true);
+          transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
+          signals.transfer_to_mg(false);
+
+          multigrid.cycle();
+
+          signals.transfer_to_global(true);
+          transfer.copy_from_mg(*dof_handler_vector[0],
+                                dst,
+                                multigrid.solution);
+          signals.transfer_to_global(false);
+        }
     }
 
     template <int dim,
@@ -746,34 +768,6 @@ namespace internal
               typename TransferType,
               typename OtherVectorType>
     void
-    vmult(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
-          Multigrid<VectorType>                      &multigrid,
-          const TransferType                         &transfer,
-          OtherVectorType                            &dst,
-          const OtherVectorType                      &src,
-          const bool                                  uses_dof_handler_vector,
-          const typename dealii::mg::Signals         &signals,
-          ...)
-    {
-      (void)uses_dof_handler_vector;
-      Assert(!uses_dof_handler_vector, ExcInternalError());
-
-      signals.transfer_to_mg(true);
-      transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
-      signals.transfer_to_mg(false);
-
-      multigrid.cycle();
-
-      signals.transfer_to_global(true);
-      transfer.copy_from_mg(*dof_handler_vector[0], dst, multigrid.solution);
-      signals.transfer_to_global(false);
-    }
-
-    template <int dim,
-              typename VectorType,
-              typename TransferType,
-              typename OtherVectorType>
-    std::enable_if_t<TransferType::supports_dof_handler_vector>
     vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
               Multigrid<VectorType>                      &multigrid,
               const TransferType                         &transfer,
@@ -783,53 +777,45 @@ namespace internal
               const typename dealii::mg::Signals &signals,
               int)
     {
-      signals.transfer_to_mg(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_to_mg(dof_handler_vector, multigrid.defect, src);
+      if constexpr (TransferType::supports_dof_handler_vector)
+        {
+          signals.transfer_to_mg(true);
+          if (uses_dof_handler_vector)
+            transfer.copy_to_mg(dof_handler_vector, multigrid.defect, src);
+          else
+            transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
+          signals.transfer_to_mg(false);
+
+          multigrid.cycle();
+
+          signals.transfer_to_global(true);
+          if (uses_dof_handler_vector)
+            transfer.copy_from_mg_add(dof_handler_vector,
+                                      dst,
+                                      multigrid.solution);
+          else
+            transfer.copy_from_mg_add(*dof_handler_vector[0],
+                                      dst,
+                                      multigrid.solution);
+          signals.transfer_to_global(false);
+        }
       else
-        transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
-      signals.transfer_to_mg(false);
+        {
+          (void)uses_dof_handler_vector;
+          Assert(!uses_dof_handler_vector, ExcInternalError());
 
-      multigrid.cycle();
+          signals.transfer_to_mg(true);
+          transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
+          signals.transfer_to_mg(false);
 
-      signals.transfer_to_global(true);
-      if (uses_dof_handler_vector)
-        transfer.copy_from_mg_add(dof_handler_vector, dst, multigrid.solution);
-      else
-        transfer.copy_from_mg_add(*dof_handler_vector[0],
-                                  dst,
-                                  multigrid.solution);
-      signals.transfer_to_global(false);
-    }
+          multigrid.cycle();
 
-    template <int dim,
-              typename VectorType,
-              typename TransferType,
-              typename OtherVectorType>
-    void
-    vmult_add(const std::vector<const DoFHandler<dim> *> &dof_handler_vector,
-              Multigrid<VectorType>                      &multigrid,
-              const TransferType                         &transfer,
-              OtherVectorType                            &dst,
-              const OtherVectorType                      &src,
-              const bool                          uses_dof_handler_vector,
-              const typename dealii::mg::Signals &signals,
-              ...)
-    {
-      (void)uses_dof_handler_vector;
-      Assert(!uses_dof_handler_vector, ExcInternalError());
-
-      signals.transfer_to_mg(true);
-      transfer.copy_to_mg(*dof_handler_vector[0], multigrid.defect, src);
-      signals.transfer_to_mg(false);
-
-      multigrid.cycle();
-
-      signals.transfer_to_global(true);
-      transfer.copy_from_mg_add(*dof_handler_vector[0],
-                                dst,
-                                multigrid.solution);
-      signals.transfer_to_global(false);
+          signals.transfer_to_global(true);
+          transfer.copy_from_mg_add(*dof_handler_vector[0],
+                                    dst,
+                                    multigrid.solution);
+          signals.transfer_to_global(false);
+        }
     }
   } // namespace PreconditionMGImplementation
 } // namespace internal
