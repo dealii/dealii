@@ -58,6 +58,7 @@ public:
   virtual std::unique_ptr<Mapping<dim, spacedim>>
   clone() const override;
 
+protected:
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape functions
    * located on bounding lines to the vector @p a. Points located on the
