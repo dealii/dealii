@@ -6356,6 +6356,9 @@ namespace internal
                triangulation.levels.size() - 1))
           if (cell->refine_flag_set())
             {
+              AssertThrow(
+                triangulation.levels.size() < numbers::max_n_levels,
+                (typename Triangulation<3, spacedim>::ExcTooManyLevels()));
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
@@ -7927,6 +7930,9 @@ namespace internal
                triangulation.levels.size() - 1))
           if (cell->refine_flag_set())
             {
+              AssertThrow(
+                triangulation.levels.size() < numbers::max_n_levels,
+                (typename Triangulation<3, spacedim>::ExcTooManyLevels()));
               triangulation.levels.push_back(
                 std::make_unique<internal::TriangulationImplementation::
                                    TriaLevel<dim, spacedim>>(
@@ -13207,6 +13213,7 @@ void Triangulation<dim, spacedim>::copy_triangulation(
     set_manifold(p.first, *p.second);
 
 
+  Assert(other_tria.levels.size() <= numbers::max_n_levels, ExcInternalError());
   levels.reserve(other_tria.levels.size());
   for (const auto &level : other_tria.levels)
     levels.push_back(

@@ -3990,6 +3990,11 @@ public:
    *
    * @ingroup Exceptions
    */
+  DeclExceptionMsg(ExcTooManyLevels,
+                   "The provided refinement pattern requires creating a level "
+                   "in the Triangulation. However, the maximum number of "
+                   "levels has already been reached, so that is not allowed.");
+
   DeclException2(ExcInvalidLevel,
                  int,
                  int,
@@ -4710,6 +4715,7 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
   unsigned int n_levels = levels.size();
   ar          &n_levels;
+  Assert(n_levels <= numbers::max_n_levels, ExcInternalError());
   for (const auto &level : levels)
     ar &level;
 
@@ -4752,9 +4758,10 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
 
   ar &reference_cells;
 
-  unsigned int size;
-  ar          &size;
-  levels.resize(size);
+  unsigned int n_levels;
+  ar          &n_levels;
+  Assert(n_levels <= numbers::max_n_levels, ExcInternalError());
+  levels.resize(n_levels);
   for (auto &level_ : levels)
     {
       std::unique_ptr<
