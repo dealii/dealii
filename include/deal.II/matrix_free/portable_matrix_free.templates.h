@@ -1518,6 +1518,8 @@ namespace Portable
                 team_policy,
                 apply_kernel);
             }
+
+        exec.fence();
         dst.compress(VectorOperation::add);
       }
 
@@ -1593,7 +1595,10 @@ namespace Portable
           // In parallel, it's possible that some processors do not own any
           // cells.
           if (n_cells[0] > 0)
-            do_color(0);
+            {
+              do_color(0);
+              // No fence() is necessary here.
+            }
 
           src.update_ghost_values_finish();
 
@@ -1643,6 +1648,8 @@ namespace Portable
                   team_policy,
                   apply_kernel);
               }
+
+          exec.fence();
           dst.compress(VectorOperation::add);
         }
 
