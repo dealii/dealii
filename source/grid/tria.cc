@@ -6487,8 +6487,8 @@ namespace internal
                           break;
 
                         case ReferenceCells::Wedge:
-                          // - We wont need vertices (all required vertices will
-                          //   be provided by the refined faces)
+                          // - We won't need vertices (all required vertices
+                          //   will be provided by the refined faces)
                           // - 3 lines will be required to build up the
                           //   "refined" middle triangle
                           // - 4 faces for the new refined middle triangle + 6

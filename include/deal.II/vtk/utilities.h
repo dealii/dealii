@@ -251,7 +251,7 @@ namespace VTKWrappers
    * - The DoFHandler must have been initialized with the finite element
    *   obtained through the vtk_to_finite_element() method, and degrees of
    *   freedom must have been already distributed.
-   * - The triangulation associated with the DoFHandler doest not need to be
+   * - The triangulation associated with the DoFHandler does not need to be
    *   same as the input triangulation, but it must be obtained from it. It may
    *   be, for example, a parallel::fullydistributed::Triangulation obtained by
    *   distributing the serial triangulation.

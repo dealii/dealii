@@ -140,15 +140,15 @@ namespace internal
         const std::vector<MappingKind> &mapping_kind,
         std::vector<double>            &line_dof_sign)
       {
-        // The Nedelec finite elements in two spacial dimensions have two types
+        // The Nedelec finite elements in two spatial dimensions have two types
         // of dofs: the line dofs and the quad dofs. The line dofs are
         // associated with the edges. They are shared between the neighbouring
         // cells and, consequently, need to be adjusted to compensate for a
         // possible mismatch in the edge orientation. The quad dofs, they are
         // associated with the interiors of the cells, are not shared between
-        // the cells in two spacial dimensions and need no adjustments.
+        // the cells in two spatial dimensions and need no adjustments.
         //
-        // The Nedelec finite elements in two spacial dimensions have
+        // The Nedelec finite elements in two spatial dimensions have
         // 2*(k+1)*(k+2) dofs per cell. All dofs are distributed between the
         // line and quad dofs as the following:
         //
