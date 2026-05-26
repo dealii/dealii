@@ -8704,7 +8704,7 @@ namespace GridGenerator
                 cell_data.material_id =
                   material_or_boundary_id;           // inherit material id
                 cell_data.manifold_id = manifold_id; // inherit cell-manifold id
-                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                for (unsigned int i = 0; i < cell_data.vertices.size(); ++i)
                   {
                     AssertIndexRange(index_vertices[i],
                                      local_vertex_indices.size());
@@ -8720,7 +8720,7 @@ namespace GridGenerator
                 CellData<1> boundary_line(2);
                 boundary_line.boundary_id = material_or_boundary_id;
                 boundary_line.manifold_id = manifold_id;
-                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                for (unsigned int i = 0; i < boundary_line.vertices.size(); ++i)
                   {
                     AssertIndexRange(index_vertices[i],
                                      local_vertex_indices.size());
@@ -8737,7 +8737,7 @@ namespace GridGenerator
                 CellData<2> boundary_quad(3);
                 boundary_quad.material_id = material_or_boundary_id;
                 boundary_quad.manifold_id = manifold_id;
-                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                for (unsigned int i = 0; i < boundary_quad.vertices.size(); ++i)
                   {
                     AssertIndexRange(index_vertices[i],
                                      local_vertex_indices.size());
@@ -8754,7 +8754,7 @@ namespace GridGenerator
                 CellData<1> boundary_line(2);
                 boundary_line.boundary_id = material_or_boundary_id;
                 boundary_line.manifold_id = manifold_id;
-                for (unsigned int i = 0; i < index_vertices.size(); ++i)
+                for (unsigned int i = 0; i < boundary_line.vertices.size(); ++i)
                   {
                     AssertIndexRange(index_vertices[i],
                                      local_vertex_indices.size());
@@ -9282,7 +9282,7 @@ namespace GridGenerator
               CellData<1> boundary_line(2);
               boundary_line.boundary_id = material_or_boundary_id;
               boundary_line.manifold_id = manifold_id;
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+              for (unsigned int i = 0; i < boundary_line.vertices.size(); ++i)
                 {
                   AssertIndexRange(index_vertices[i],
                                    local_vertex_indices.size());
@@ -9299,7 +9299,7 @@ namespace GridGenerator
               CellData<2> boundary_quad(3);
               boundary_quad.material_id = material_or_boundary_id;
               boundary_quad.manifold_id = manifold_id;
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+              for (unsigned int i = 0; i < boundary_quad.vertices.size(); ++i)
                 {
                   AssertIndexRange(index_vertices[i],
                                    local_vertex_indices.size());
@@ -9316,7 +9316,7 @@ namespace GridGenerator
               CellData<1> boundary_line(2);
               boundary_line.boundary_id = material_or_boundary_id;
               boundary_line.manifold_id = manifold_id;
-              for (unsigned int i = 0; i < index_vertices.size(); ++i)
+              for (unsigned int i = 0; i < boundary_line.vertices.size(); ++i)
                 {
                   AssertIndexRange(index_vertices[i],
                                    local_vertex_indices.size());

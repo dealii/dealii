@@ -232,7 +232,8 @@ namespace Step83
     std::vector<CellData<dim>> cells((nx - 1) * (ny - 1), CellData<dim>());
     for (unsigned int i = 0; i < cells.size(); ++i)
       {
-        cells[i].vertices    = cell_vertices[i];
+        cells[i].vertices.assign(cell_vertices[i].begin(),
+                                 cell_vertices[i].end());
         cells[i].material_id = 0;
       }
 

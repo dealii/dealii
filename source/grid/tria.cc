@@ -4014,8 +4014,9 @@ namespace internal
 
         [[maybe_unused]] unsigned int counter = 0;
 
-        std::vector<unsigned int> key;
-        key.reserve(ReferenceCells::max_n_vertices<structdim>());
+        std_cxx26::inplace_vector<unsigned int,
+                                  ReferenceCells::max_n_vertices<structdim>()>
+          key;
 
         for (unsigned int o = 0; o < obj.n_objects(); ++o)
           {
@@ -5563,7 +5564,6 @@ namespace internal
           cell->clear_refine_flag();
 
           unsigned int n_new_vertices = 0;
-
           if (cell->reference_cell() == ReferenceCells::Triangle)
             n_new_vertices = 6;
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
@@ -5571,8 +5571,8 @@ namespace internal
           else
             AssertThrow(false, ExcNotImplemented());
 
-          std::vector<unsigned int> new_vertices(n_new_vertices,
-                                                 numbers::invalid_unsigned_int);
+          std_cxx26::inplace_vector<unsigned int, 9> new_vertices(
+            n_new_vertices, numbers::invalid_unsigned_int);
           for (unsigned int vertex_no = 0; vertex_no < cell->n_vertices();
                ++vertex_no)
             new_vertices[vertex_no] = cell->vertex_index(vertex_no);
