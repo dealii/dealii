@@ -849,7 +849,6 @@ namespace LinearAlgebra
 #  else
       Assert(local_index != Teuchos::OrdinalTraits<int>::invalid(),
              ExcAccessToNonLocalElement(index,
-                                        vector->getMap()->getLocalNumElements(),
                                         vector->getMap()->getNodeNumElements(),
                                         vector->getMap()->getMinLocalIndex(),
                                         vector->getMap()->getMaxLocalIndex()));
