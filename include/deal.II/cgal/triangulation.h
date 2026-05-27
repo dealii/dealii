@@ -499,10 +499,10 @@ namespace CGALWrappers
                         ExcMessage("Only triangle or quadrilateral surface "
                                    "meshes are supported in deal.II"));
 
-            CellData<2> c(face_vertices.size());
-            auto        it_vertex = c.vertices.begin();
+            CellData<2>  c(face_vertices.size());
+            unsigned int vertex_no = 0;
             for (const auto &v : face_vertices)
-              *(it_vertex++) = vertex_map[v];
+              c.vertices[vertex_no++] = vertex_map[v];
 
             // Make sure the numberfing is consistent with the one in deal.II
             if (face_vertices.size() == 4)
@@ -544,10 +544,10 @@ namespace CGALWrappers
                                    " vertices per face."));
 
             CellData<2> c(vertices_per_face);
-            auto        it = c.vertices.begin();
-            for (unsigned int i = 0; i < vertices_per_face; ++i)
+            for (unsigned int vertex_no = 0; vertex_no < vertices_per_face;
+                 ++vertex_no)
               {
-                *(it++) = vertex_map[j->vertex()];
+                c.vertices[vertex_no] = vertex_map[j->vertex()];
                 ++j;
               }
 
