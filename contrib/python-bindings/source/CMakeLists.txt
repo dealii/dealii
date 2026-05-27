@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2016 - 2023 by the deal.II authors
+## Copyright (C) 2016 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -24,7 +24,7 @@ include_directories(
 # DEAL_II_BUILD_TYPES (usually PyDealIIDebug and PyDealIIRelease)
 #
 
-include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
+include_directories(SYSTEM ${Python_INCLUDE_DIRS})
 
 set(_src
   wrappers.cc
@@ -48,7 +48,7 @@ set(_src
 foreach(_build ${DEAL_II_BUILD_TYPES})
   string(TOLOWER ${_build} _build_lowercase)
 
-  PYTHON_ADD_MODULE(PyDealII_${_build_lowercase} ${_src})
+  Python_add_library(PyDealII_${_build_lowercase} ${_src})
 
   set_target_properties(PyDealII_${_build_lowercase} PROPERTIES
     OUTPUT_NAME "${PYTHON_BINDINGS_${_build}_NAME}"
@@ -67,10 +67,9 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
       )
   endif()
 
-  target_link_libraries(PyDealII_${_build_lowercase}
+  target_link_libraries(PyDealII_${_build_lowercase} PRIVATE
     ${DEAL_II_TARGET_NAME}_${_build_lowercase}
     ${Boost_LIBRARIES}
-    ${PYTHON_LIBRARIES}
     )
 
   export(TARGETS PyDealII_${_build_lowercase}
@@ -78,7 +77,7 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
     APPEND
     )
 
-  install(TARGETS  PyDealII_${_build_lowercase}
+  install(TARGETS PyDealII_${_build_lowercase}
     COMPONENT python_bindings
     EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
     LIBRARY DESTINATION ${DEAL_II_PYTHON_RELDIR}
