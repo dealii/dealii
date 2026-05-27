@@ -55,6 +55,11 @@
 // each step is more expensive (more stages), the total number of function
 // evaluations is significantly lower, demonstrating the benefit of high-order
 // ImEx methods on smooth problems.
+//
+// The test behaves differently for SUNDIALS >=7.3.0 since the default method
+// pairs for most of the integration orders were changed (affects sub-test 1).
+// Additionally, the default time step adaptivity parameters were also changed
+// in SUNDIALS 7.3.0 - this modification affects both sub-tests.
 
 using VectorType = LinearAlgebra::distributed::Vector<double>;
 
