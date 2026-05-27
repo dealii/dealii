@@ -98,11 +98,10 @@ namespace internal
 
   private:
     /**
-     * Convert a binary representation to a index.
+     * Convert a CellId to a index on that cell's level.
      */
     static types::global_cell_index
-    convert_cell_id_binary_type_to_level_coarse_cell_id(
-      const typename CellId::binary_type &binary_representation);
+    to_level_cell_index(const CellId &cell_id);
 
     /**
      * Number of global coarse cells.
@@ -207,10 +206,8 @@ namespace internal
                     dim == Accessor::structure_dimension,
                   "The information can only be queried for cells.");
 
-    return convert_cell_id_binary_type_to_level_coarse_cell_id(
-      CellAccessor<Accessor::dimension, Accessor::space_dimension>(*cell)
-        .id()
-        .template to_binary<dim>());
+    return to_level_cell_index(
+      CellAccessor<Accessor::dimension, Accessor::space_dimension>(*cell).id());
   }
 
 
@@ -265,11 +262,8 @@ namespace internal
 
   template <int dim>
   types::global_cell_index
-  CellIDTranslator<dim>::convert_cell_id_binary_type_to_level_coarse_cell_id(
-    const typename CellId::binary_type &binary_representation)
+  CellIDTranslator<dim>::to_level_cell_index(const CellId &cell_id)
   {
-    CellId cell_id(binary_representation);
-
     // compute level id: c_{i+1} = c_{i}*(max_n_children) + q on path to cell
     auto level_cell_id = cell_id.get_coarse_cell_id();
     for (const auto &child_index : cell_id.get_child_indices())
