@@ -119,9 +119,10 @@ ScalarPolynomialsVandermondeBase<dim>::compute_grad(const unsigned int i,
     grad += vandermonde_matrix_inverse[i][j] *
             evaluate_orthogonal_basis_derivative(j, p);
 
-  for (unsigned int d = 0; d < dim; ++d)
-    if (std::fabs(grad[d]) < 1e-14)
-      grad[d] = 0.0;
+  if constexpr (dim > 0)
+    for (unsigned int d = 0; d < dim; ++d)
+      if (std::fabs(grad[d]) < 1e-14)
+        grad[d] = 0.0;
 
   return grad;
 }
