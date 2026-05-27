@@ -34,7 +34,8 @@
 #  include <type_traits>
 #endif
 
-#include <boost/serialization/binary_object.hpp>
+#include <boost/serialization/array_wrapper.hpp>
+#include <boost/serialization/collection_size_type.hpp>
 #include <boost/serialization/split_free.hpp>
 
 DEAL_II_NAMESPACE_OPEN
@@ -1234,18 +1235,10 @@ namespace boost
          const dealii::std_cxx26::inplace_vector<T, N> &vec,
          const unsigned int /*version*/)
     {
-      if constexpr (std::is_trivially_copyable_v<T>)
-        {
-          ar &boost::serialization::make_binary_object(&vec, sizeof(vec));
-        }
-      else
-        {
-          const auto vec_size = vec.size();
-          ar        &vec_size;
-          if (vec_size > 0)
-            for (const auto &v : vec)
-              ar << v;
-        }
+      const boost::serialization::collection_size_type count(vec.size());
+      ar << count;
+      if (!vec.empty())
+        ar << boost::serialization::make_array(vec.data(), count);
     }
 
     template <class Archive, typename T, std::size_t N>
@@ -1254,18 +1247,11 @@ namespace boost
          dealii::std_cxx26::inplace_vector<T, N> &vec,
          const unsigned int /*version*/)
     {
-      if constexpr (std::is_trivially_copyable_v<T>)
-        {
-          ar &boost::serialization::make_binary_object(&vec, sizeof(vec));
-        }
-      else
-        {
-          decltype(vec.size()) vec_size = 0;
-          ar                  &vec_size;
-          vec.resize(vec_size);
-          for (std::size_t i = 0; i < vec_size; ++i)
-            ar >> vec[i];
-        }
+      boost::serialization::collection_size_type count(vec.size());
+      ar >> count;
+      vec.resize(count);
+      if (!vec.empty())
+        ar >> boost::serialization::make_array(vec.data(), count);
     }
   } // namespace serialization
 } // namespace boost

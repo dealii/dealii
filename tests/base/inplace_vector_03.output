@@ -63,13 +63,13 @@ DEAL:serialization:A::A::~A()
 DEAL:serialization:A::A::~A()
 DEAL:serialization:A::A::~A()
 DEAL:serialization::
-DEAL:serialization:int::size = 177
+DEAL:serialization:int::size = 65
 DEAL:serialization:int::-11, -10, -9
-DEAL:serialization:int::size = 177
+DEAL:serialization:int::size = 65
 DEAL:serialization:int::-11, -10, -9
-DEAL:serialization:int::size = 172
+DEAL:serialization:int::size = 60
 DEAL:serialization:int::-11, -10, -9
-DEAL:serialization:int::size = 172
+DEAL:serialization:int::size = 60
 DEAL:serialization:int::-11, -10, -9
 DEAL:serialization::
 DEAL:serialization:vector<int>::size = 101
