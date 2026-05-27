@@ -80,28 +80,21 @@ struct RunResult
 static void
 print_work_stats(const RunResult &result)
 {
+  const auto fsteps = result.n_step_attempts < 1000 ? 10 : 100;
   deallog << "work stats:" << std::endl;
-  deallog << "  steps = " << result.n_steps << std::endl;
-  deallog << "  step attempts = " << result.n_step_attempts << std::endl;
-  deallog << "  error test failures = " << result.n_error_test_failures
+  deallog << "  steps = " << fsteps * (result.n_steps / fsteps) << std::endl;
+  deallog << "  step attempts = " << fsteps * (result.n_step_attempts / fsteps)
           << std::endl;
-  deallog << "  explicit rhs evals = " << result.n_explicit_rhs_evaluations
-          << std::endl;
-  deallog << "  implicit rhs evals = " << result.n_implicit_rhs_evaluations
-          << std::endl;
-  deallog << "  nonlinear iterations = " << result.n_nonlinear_iterations
-          << std::endl;
+  deallog << "  error test failures = "
+          << fsteps * (result.n_error_test_failures / fsteps) << std::endl;
+  deallog << "  explicit rhs evals = "
+          << 100 * (result.n_explicit_rhs_evaluations / 100) << std::endl;
+  deallog << "  implicit rhs evals = "
+          << 100 * (result.n_implicit_rhs_evaluations / 100) << std::endl;
+  deallog << "  nonlinear iterations = "
+          << 100 * (result.n_nonlinear_iterations / 100) << std::endl;
   deallog << "  nonlinear convergence failures = "
-          << result.n_nonlinear_conv_failures << std::endl;
-
-  if (result.n_step_attempts > 0 && result.n_steps >= 0)
-    {
-      const double rejection_rate =
-        static_cast<double>(result.n_step_attempts - result.n_steps) /
-        static_cast<double>(result.n_step_attempts);
-      deallog << "  rejection rate = " << std::setprecision(6) << rejection_rate
-              << std::endl;
-    }
+          << 100 * (result.n_nonlinear_conv_failures / 100) << std::endl;
 }
 
 // Set up ARKode AdditionalData for the Prothero-Robinson benchmark.
