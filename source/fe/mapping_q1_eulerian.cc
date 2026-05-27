@@ -113,17 +113,13 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
 
 
 template <int dim, typename VectorType, int spacedim>
-std::vector<Point<spacedim>>
+void
 MappingQ1Eulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  boost::container::small_vector<Point<spacedim>, 200>       &points) const
 {
   const auto vertices = this->get_vertices(cell);
-
-  std::vector<Point<spacedim>> a(GeometryInfo<dim>::vertices_per_cell);
-  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-    a[i] = vertices[i];
-
-  return a;
+  points.assign(vertices.begin(), vertices.end());
 }
 
 

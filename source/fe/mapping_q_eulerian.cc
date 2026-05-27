@@ -104,8 +104,8 @@ boost::container::small_vector<Point<spacedim>,
 MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  // get the vertices as the first 2^dim mapping support points
-  const std::vector<Point<spacedim>> a = compute_mapping_support_points(cell);
+  boost::container::small_vector<Point<spacedim>, 200> points;
+  compute_mapping_support_points(cell, points);
 
   boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
@@ -114,7 +114,7 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
                                  GeometryInfo<dim>::vertices_per_cell
 #endif
                                  >
-    vertex_locations(a.begin(), a.begin() + cell->n_vertices());
+    vertex_locations(points.begin(), points.begin() + cell->n_vertices());
 
   return vertex_locations;
 }
@@ -122,9 +122,10 @@ MappingQEulerian<dim, VectorType, spacedim>::get_vertices(
 
 
 template <int dim, typename VectorType, int spacedim>
-std::vector<Point<spacedim>>
+void
 MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  boost::container::small_vector<Point<spacedim>, 200>       &points) const
 {
   const bool mg_vector = level != numbers::invalid_unsigned_int;
 
@@ -177,15 +178,13 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
 
   // and finally compute the positions of the support points in the deformed
   // configuration.
-  std::vector<Point<spacedim>> a(n_support_pts);
+  points.resize(n_support_pts);
   for (unsigned int q = 0; q < n_support_pts; ++q)
     {
-      a[q] = fe_values.quadrature_point(q);
+      points[q] = fe_values.quadrature_point(q);
       for (unsigned int d = 0; d < spacedim; ++d)
-        a[q][d] += shift_vector[q][d];
+        points[q][d] += shift_vector[q][d];
     }
-
-  return a;
 }
 
 

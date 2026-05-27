@@ -284,12 +284,16 @@ MappingQ<dim, spacedim>::transform_unit_to_real_cell(
         internal::evaluate_tensor_product_value_linear(vertices.data(), p));
     }
   else
-    return Point<spacedim>(internal::evaluate_tensor_product_value(
-      polynomials_1d,
-      make_const_array_view(this->compute_mapping_support_points(cell)),
-      p,
-      polynomials_1d.size() == 2,
-      renumber_lexicographic_to_hierarchic));
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      return Point<spacedim>(internal::evaluate_tensor_product_value(
+        polynomials_1d,
+        ArrayView<const Point<spacedim>>(points.data(), points.size()),
+        p,
+        polynomials_1d.size() == 2,
+        renumber_lexicographic_to_hierarchic));
+    }
 }
 
 
@@ -333,8 +337,6 @@ MappingQ<1, 1>::transform_real_to_unit_cell_internal(
   const Point<1>                           &p,
   const Point<1>                           &initial_p_unit) const
 {
-  // dispatch to the various specializations for spacedim=dim,
-  // spacedim=dim+1, etc
   if (polynomial_degree == 1)
     {
       const auto vertices = this->get_vertices(cell);
@@ -342,18 +344,22 @@ MappingQ<1, 1>::transform_real_to_unit_cell_internal(
         do_transform_real_to_unit_cell_internal<1>(
           p,
           initial_p_unit,
-          ArrayView<const Point<1>>(vertices.data(), vertices.size()),
+          ArrayView<const Point<1>>(vertices),
           polynomials_1d,
           renumber_lexicographic_to_hierarchic);
     }
   else
-    return internal::MappingQImplementation::
-      do_transform_real_to_unit_cell_internal<1>(
-        p,
-        initial_p_unit,
-        make_const_array_view(this->compute_mapping_support_points(cell)),
-        polynomials_1d,
-        renumber_lexicographic_to_hierarchic);
+    {
+      boost::container::small_vector<Point<1>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      return internal::MappingQImplementation::
+        do_transform_real_to_unit_cell_internal<1>(
+          p,
+          initial_p_unit,
+          ArrayView<const Point<1>>(points),
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
+    }
 }
 
 
@@ -372,18 +378,22 @@ MappingQ<2, 2>::transform_real_to_unit_cell_internal(
         do_transform_real_to_unit_cell_internal<2>(
           p,
           initial_p_unit,
-          ArrayView<const Point<2>>(vertices.data(), vertices.size()),
+          ArrayView<const Point<2>>(vertices),
           polynomials_1d,
           renumber_lexicographic_to_hierarchic);
     }
   else
-    return internal::MappingQImplementation::
-      do_transform_real_to_unit_cell_internal<2>(
-        p,
-        initial_p_unit,
-        make_const_array_view(this->compute_mapping_support_points(cell)),
-        polynomials_1d,
-        renumber_lexicographic_to_hierarchic);
+    {
+      boost::container::small_vector<Point<2>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      return internal::MappingQImplementation::
+        do_transform_real_to_unit_cell_internal<2>(
+          p,
+          initial_p_unit,
+          ArrayView<const Point<2>>(points),
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
+    }
 }
 
 
@@ -407,13 +417,17 @@ MappingQ<3, 3>::transform_real_to_unit_cell_internal(
           renumber_lexicographic_to_hierarchic);
     }
   else
-    return internal::MappingQImplementation::
-      do_transform_real_to_unit_cell_internal<3>(
-        p,
-        initial_p_unit,
-        make_const_array_view(this->compute_mapping_support_points(cell)),
-        polynomials_1d,
-        renumber_lexicographic_to_hierarchic);
+    {
+      boost::container::small_vector<Point<3>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      return internal::MappingQImplementation::
+        do_transform_real_to_unit_cell_internal<3>(
+          p,
+          initial_p_unit,
+          ArrayView<const Point<3>>(points.data(), points.size()),
+          polynomials_1d,
+          renumber_lexicographic_to_hierarchic);
+    }
 }
 
 
@@ -436,7 +450,9 @@ MappingQ<1, 2>::transform_real_to_unit_cell_internal(
   auto mdata = Utilities::dynamic_unique_cast<InternalData>(
     get_data(update_flags, point_quadrature));
 
-  mdata->mapping_support_points = this->compute_mapping_support_points(cell);
+  boost::container::small_vector<Point<2>, 200> points;
+  this->compute_mapping_support_points(cell, points);
+  mdata->mapping_support_points.assign(points.begin(), points.end());
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -469,7 +485,9 @@ MappingQ<2, 3>::transform_real_to_unit_cell_internal(
   auto mdata = Utilities::dynamic_unique_cast<InternalData>(
     get_data(update_flags, point_quadrature));
 
-  mdata->mapping_support_points = this->compute_mapping_support_points(cell);
+  boost::container::small_vector<Point<spacedim>, 200> points;
+  this->compute_mapping_support_points(cell, points);
+  mdata->mapping_support_points.assign(points.begin(), points.end());
 
   // dispatch to the various specializations for spacedim=dim,
   // spacedim=dim+1, etc
@@ -636,7 +654,8 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
     }
 
   AssertDimension(real_points.size(), unit_points.size());
-  std::vector<Point<spacedim>> support_points_higher_order;
+  boost::container::small_vector<Point<spacedim>, 200>
+    support_points_higher_order;
   boost::container::small_vector<Point<spacedim>,
 #ifndef _MSC_VER
                                  ReferenceCells::max_n_vertices<dim>()
@@ -648,7 +667,7 @@ MappingQ<dim, spacedim>::transform_points_real_to_unit_cell(
   if (polynomial_degree == 1)
     vertices = this->get_vertices(cell);
   else
-    support_points_higher_order = this->compute_mapping_support_points(cell);
+    this->compute_mapping_support_points(cell, support_points_higher_order);
   const ArrayView<const Point<spacedim>> support_points(
     polynomial_degree == 1 ? vertices.data() :
                              support_points_higher_order.data(),
@@ -860,7 +879,11 @@ MappingQ<dim, spacedim>::fill_fe_values(
         data.mapping_support_points[i] = vertices[i];
     }
   else
-    data.mapping_support_points = this->compute_mapping_support_points(cell);
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      data.mapping_support_points.assign(points.begin(), points.end());
+    }
 
   // if the order of the mapping is greater than 1, then do not reuse any cell
   // similarity information. This is necessary because the cell similarity
@@ -1077,7 +1100,11 @@ MappingQ<dim, spacedim>::fill_fe_face_values(
         data.mapping_support_points[i] = vertices[i];
     }
   else
-    data.mapping_support_points = this->compute_mapping_support_points(cell);
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      data.mapping_support_points.assign(points.begin(), points.end());
+    }
 
   internal::MappingQImplementation::do_fill_fe_face_values(
     *this,
@@ -1124,7 +1151,11 @@ MappingQ<dim, spacedim>::fill_fe_subface_values(
         data.mapping_support_points[i] = vertices[i];
     }
   else
-    data.mapping_support_points = this->compute_mapping_support_points(cell);
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      data.mapping_support_points.assign(points.begin(), points.end());
+    }
 
   internal::MappingQImplementation::do_fill_fe_face_values(
     *this,
@@ -1174,7 +1205,12 @@ MappingQ<dim, spacedim>::fill_fe_immersed_surface_values(
         data.mapping_support_points[i] = vertices[i];
     }
   else
-    data.mapping_support_points = this->compute_mapping_support_points(cell);
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      data.mapping_support_points.assign(points.begin(), points.end());
+    }
+
 
   internal::MappingQImplementation::maybe_update_q_points_Jacobians_generic(
     CellSimilarity::none,
@@ -1318,7 +1354,11 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_generic_points(
         data.mapping_support_points[i] = vertices[i];
     }
   else
-    data.mapping_support_points = this->compute_mapping_support_points(cell);
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      data.mapping_support_points.assign(points.begin(), points.end());
+    }
 
   internal::MappingQImplementation::maybe_update_q_points_Jacobians_generic(
     CellSimilarity::none,
@@ -1359,7 +1399,12 @@ MappingQ<dim, spacedim>::fill_mapping_data_for_face_quadrature(
         data.mapping_support_points[i] = vertices[i];
     }
   else
-    data.mapping_support_points = this->compute_mapping_support_points(cell);
+    {
+      boost::container::small_vector<Point<spacedim>, 200> points;
+      this->compute_mapping_support_points(cell, points);
+      data.mapping_support_points.assign(points.begin(), points.end());
+    }
+
   data.output_data = &output_data;
 
   internal::MappingQImplementation::do_fill_fe_face_values(
@@ -1509,7 +1554,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::add_line_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  std::vector<Point<spacedim>>                               &a) const
+  boost::container::small_vector<Point<spacedim>, 200>       &a) const
 {
   // if we only need the midpoint, then ask for it.
   if (this->polynomial_degree == 2)
@@ -1536,7 +1581,6 @@ MappingQ<dim, spacedim>::add_line_support_points(
     // otherwise call the more complicated functions and ask for inner points
     // from the manifold description
     {
-      std::vector<Point<spacedim>> tmp_points;
       for (unsigned int line_no = 0;
            line_no < GeometryInfo<dim>::lines_per_cell;
            ++line_no)
@@ -1575,13 +1619,10 @@ MappingQ<dim, spacedim>::add_line_support_points(
 template <>
 void
 MappingQ<3, 3>::add_quad_support_points(
-  const Triangulation<3, 3>::cell_iterator &cell,
-  std::vector<Point<3>>                    &a) const
+  const Triangulation<3, 3>::cell_iterator      &cell,
+  boost::container::small_vector<Point<3>, 200> &a) const
 {
   const unsigned int faces_per_cell = GeometryInfo<3>::faces_per_cell;
-
-  // used if face quad at boundary or entirely in the interior of the domain
-  std::vector<Point<3>> tmp_points;
 
   // loop over all faces and collect points on them
   for (unsigned int face_no = 0; face_no < faces_per_cell; ++face_no)
@@ -1646,8 +1687,8 @@ MappingQ<3, 3>::add_quad_support_points(
 template <>
 void
 MappingQ<2, 3>::add_quad_support_points(
-  const Triangulation<2, 3>::cell_iterator &cell,
-  std::vector<Point<3>>                    &a) const
+  const Triangulation<2, 3>::cell_iterator      &cell,
+  boost::container::small_vector<Point<3>, 200> &a) const
 {
   std::array<Point<3>, GeometryInfo<2>::vertices_per_cell> vertices;
   for (const unsigned int i : GeometryInfo<2>::vertex_indices())
@@ -1677,7 +1718,7 @@ template <int dim, int spacedim>
 void
 MappingQ<dim, spacedim>::add_quad_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
-  std::vector<Point<spacedim>> &) const
+  boost::container::small_vector<Point<spacedim>, 200> &) const
 {
   DEAL_II_ASSERT_UNREACHABLE();
 }
@@ -1685,15 +1726,16 @@ MappingQ<dim, spacedim>::add_quad_support_points(
 
 
 template <int dim, int spacedim>
-std::vector<Point<spacedim>>
+void
 MappingQ<dim, spacedim>::compute_mapping_support_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+  boost::container::small_vector<Point<spacedim>, 200>       &a) const
 {
-  // get the vertices first
-  std::vector<Point<spacedim>> a;
-  a.reserve(Utilities::fixed_power<dim>(polynomial_degree + 1));
+  // Get the vertices first. Don't use push_back() to get around an arcane GCC
+  // error about buffer overflows
+  a.resize(cell->n_vertices());
   for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-    a.push_back(cell->vertex(i));
+    a[i] = cell->vertex(i);
 
   if (this->polynomial_degree > 1)
     {
@@ -1777,8 +1819,6 @@ MappingQ<dim, spacedim>::compute_mapping_support_points(
               break;
           }
     }
-
-  return a;
 }
 
 
@@ -1788,7 +1828,9 @@ BoundingBox<spacedim>
 MappingQ<dim, spacedim>::get_bounding_box(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  return BoundingBox<spacedim>(this->compute_mapping_support_points(cell));
+  boost::container::small_vector<Point<spacedim>, 200> points;
+  this->compute_mapping_support_points(cell, points);
+  return BoundingBox<spacedim>(points);
 }
 
 

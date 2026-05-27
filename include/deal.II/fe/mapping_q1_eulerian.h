@@ -173,9 +173,10 @@ protected:
    * documentation of MappingQ::compute_mapping_support_points() for
    * more information.
    */
-  virtual std::vector<Point<spacedim>>
+  virtual void
   compute_mapping_support_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    boost::container::small_vector<Point<spacedim>, 200>       &points)
     const override;
 
   /**

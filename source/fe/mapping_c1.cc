@@ -36,8 +36,9 @@ MappingC1<dim, spacedim>::MappingC1()
 
 template <>
 void
-MappingC1<1>::add_line_support_points(const Triangulation<1>::cell_iterator &,
-                                      std::vector<Point<1>> &) const
+MappingC1<1>::add_line_support_points(
+  const Triangulation<1>::cell_iterator &,
+  boost::container::small_vector<Point<1>, 200> &) const
 {
   const unsigned int dim = 1;
   (void)dim;
@@ -49,8 +50,8 @@ MappingC1<1>::add_line_support_points(const Triangulation<1>::cell_iterator &,
 template <>
 void
 MappingC1<2>::add_line_support_points(
-  const Triangulation<2>::cell_iterator &cell,
-  std::vector<Point<2>>                 &a) const
+  const Triangulation<2>::cell_iterator         &cell,
+  boost::container::small_vector<Point<2>, 200> &a) const
 {
   const unsigned int          dim = 2;
   const std::array<double, 2> interior_gl_points{
@@ -156,7 +157,7 @@ template <int dim, int spacedim>
 void
 MappingC1<dim, spacedim>::add_line_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
-  std::vector<Point<spacedim>> &) const
+  boost::container::small_vector<Point<spacedim>, 200> &) const
 {
   DEAL_II_NOT_IMPLEMENTED();
 }
@@ -165,8 +166,9 @@ MappingC1<dim, spacedim>::add_line_support_points(
 
 template <>
 void
-MappingC1<1>::add_quad_support_points(const Triangulation<1>::cell_iterator &,
-                                      std::vector<Point<1>> &) const
+MappingC1<1>::add_quad_support_points(
+  const Triangulation<1>::cell_iterator &,
+  boost::container::small_vector<Point<1>, 200> &) const
 {
   const unsigned int dim = 1;
   (void)dim;
@@ -177,8 +179,9 @@ MappingC1<1>::add_quad_support_points(const Triangulation<1>::cell_iterator &,
 
 template <>
 void
-MappingC1<2>::add_quad_support_points(const Triangulation<2>::cell_iterator &,
-                                      std::vector<Point<2>> &) const
+MappingC1<2>::add_quad_support_points(
+  const Triangulation<2>::cell_iterator &,
+  boost::container::small_vector<Point<2>, 200> &) const
 {
   const unsigned int dim = 2;
   (void)dim;
@@ -191,7 +194,7 @@ template <int dim, int spacedim>
 void
 MappingC1<dim, spacedim>::add_quad_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &,
-  std::vector<Point<spacedim>> &) const
+  boost::container::small_vector<Point<spacedim>, 200> &) const
 {
   DEAL_II_NOT_IMPLEMENTED();
 }
