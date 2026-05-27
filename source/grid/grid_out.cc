@@ -1603,10 +1603,8 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
 
   // Now for each individual pair of dim and entry, add a physical group, if
   // necessary
-  for (const auto &it : dim_entity_tag)
+  for (const auto &[d, entity_tag] : dim_entity_tag)
     {
-      const auto &d           = it.first;
-      const auto &entity_tag  = it.second;
       const auto &boundary_id = all_pairs[entity_tag - 1].first;
       const auto &manifold_id = all_pairs[entity_tag - 1].second;
 

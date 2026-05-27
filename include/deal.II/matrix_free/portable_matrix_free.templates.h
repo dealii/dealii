@@ -273,7 +273,7 @@ namespace Portable
         std::vector<types::global_dof_index> &lexicographic_dof_indices =
           scratch_data.lexicographic_dof_indices;
 
-        auto triacell = graph[cell_id];
+        const auto &triacell = graph[cell_id];
 
         typename DoFHandler<dim>::cell_iterator cell(
           &(dof_data.dof_handler->get_triangulation()),

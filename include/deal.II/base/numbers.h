@@ -16,6 +16,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/types.h>
 
 #include <Kokkos_MathematicalFunctions.hpp>
@@ -644,30 +645,11 @@ namespace internal
    * type to the other.
    */
   template <typename From, typename To>
-  struct is_explicitly_convertible
-  {
-    // Source: https://stackoverflow.com/a/16944130
-  private:
-    template <typename T>
-    static void f(T);
-
-    template <typename F, typename T>
-    static constexpr auto
-    test(int) -> decltype(f(static_cast<T>(std::declval<F>())), true)
-    {
-      return true;
-    }
-
-    template <typename F, typename T>
-    static constexpr auto
-    test(...) -> bool
-    {
-      return false;
-    }
-
-  public:
-    static const bool value = test<From, To>(0);
-  };
+  using get_is_explicitly_convertible =
+    decltype(static_cast<To>(std::declval<From>()));
+  template <typename From, typename To>
+  constexpr bool is_explicitly_convertible =
+    internal::is_supported_operation<get_is_explicitly_convertible, From, To>;
 
   /*
    * The structs below are needed to convert between some special number types.
@@ -705,8 +687,7 @@ namespace internal
     value(const F &f,
           std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<F>> &&
                            !std::is_constructible_v<T, F> &&
-                           is_explicitly_convertible<const F, T>::value> * =
-            nullptr)
+                           is_explicitly_convertible<const F, T>> * = nullptr)
     {
       return static_cast<T>(f);
     }
@@ -721,7 +702,7 @@ namespace internal
       const F &f,
       std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::decay_t<F>> &&
                        !std::is_constructible_v<T, F> &&
-                       !is_explicitly_convertible<const F, T>::value &&
+                       !is_explicitly_convertible<const F, T> &&
                        Differentiation::AD::is_ad_number<F>::value> * = nullptr)
     {
       return Differentiation::AD::internal::NumberType<T>::value(f);

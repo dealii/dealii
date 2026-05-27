@@ -1632,7 +1632,7 @@ FullMatrix<number>::left_invert(const FullMatrix<number2> &A)
       A_t_times_A_inv.invert(A_t_times_A);
       A_t_times_A_inv.mmult(left_inv, A_t);
 
-      *this = left_inv;
+      *this = std::move(left_inv);
     }
 }
 
@@ -1673,7 +1673,7 @@ FullMatrix<number>::right_invert(const FullMatrix<number2> &A)
       A_times_A_t_inv.invert(A_times_A_t);
       A_t.mmult(right_inv, A_times_A_t_inv);
 
-      *this = right_inv;
+      *this = std::move(right_inv);
     }
 }
 

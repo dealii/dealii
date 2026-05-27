@@ -129,11 +129,13 @@ namespace PETScWrappers
       this->sub_objects.reinit(bdsp.n_block_rows(), bdsp.n_block_cols());
 
       std::vector<types::global_dof_index> row_sizes;
+      row_sizes.reserve(bdsp.n_block_rows());
       for (unsigned int r = 0; r < bdsp.n_block_rows(); ++r)
         row_sizes.push_back(bdsp.block(r, 0).n_rows());
       this->row_block_indices.reinit(row_sizes);
 
       std::vector<types::global_dof_index> col_sizes;
+      col_sizes.reserve(bdsp.n_block_cols());
       for (unsigned int c = 0; c < bdsp.n_block_cols(); ++c)
         col_sizes.push_back(bdsp.block(0, c).n_cols());
       this->column_block_indices.reinit(col_sizes);
@@ -286,6 +288,7 @@ namespace PETScWrappers
     {
       std::vector<IndexSet> index_sets;
 
+      index_sets.reserve(this->n_block_cols());
       for (unsigned int i = 0; i < this->n_block_cols(); ++i)
         index_sets.push_back(this->block(0, i).locally_owned_domain_indices());
 
@@ -299,6 +302,7 @@ namespace PETScWrappers
     {
       std::vector<IndexSet> index_sets;
 
+      index_sets.reserve(this->n_block_rows());
       for (unsigned int i = 0; i < this->n_block_rows(); ++i)
         index_sets.push_back(this->block(i, 0).locally_owned_range_indices());
 

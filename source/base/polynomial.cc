@@ -239,7 +239,7 @@ namespace Polynomials
     for (unsigned int i = 0; i < q->coefficients.size(); ++i)
       for (unsigned int j = 0; j < this->coefficients.size(); ++j)
         new_coefficients[i + j] += this->coefficients[j] * q->coefficients[i];
-    this->coefficients = new_coefficients;
+    this->coefficients = std::move(new_coefficients);
 
     return *this;
   }

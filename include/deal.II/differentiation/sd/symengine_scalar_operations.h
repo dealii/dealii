@@ -307,7 +307,7 @@ namespace Differentiation
                 !std::is_base_of_v<Expression, SymbolicType> &&
                 dealii::internal::is_explicitly_convertible<
                   SymbolicType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value>>
+                  const SymEngine::RCP<const SymEngine::Basic> &>>>
     void
     add_to_symbol_map(types::substitution_map &symbol_map,
                       const SymbolicType      &symbol);
@@ -463,7 +463,7 @@ namespace Differentiation
               typename T = std::enable_if_t<
                 dealii::internal::is_explicitly_convertible<
                   SymbolicType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                  const SymEngine::RCP<const SymEngine::Basic> &> &&
                 std::is_constructible_v<SymbolicType, ValueType>>>
     void
     set_value_in_symbol_map(types::substitution_map &substitution_map,
@@ -652,7 +652,7 @@ namespace Differentiation
               typename T = std::enable_if_t<
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                  const SymEngine::RCP<const SymEngine::Basic> &> &&
                 std::is_constructible_v<ExpressionType, ValueType>>>
     types::substitution_map
     make_substitution_map(const ExpressionType &symbol, const ValueType &value);
@@ -895,7 +895,7 @@ namespace Differentiation
               typename = std::enable_if_t<
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                  const SymEngine::RCP<const SymEngine::Basic> &> &&
                 std::is_constructible_v<ExpressionType, ValueType>>>
     void
     add_to_substitution_map(types::substitution_map &substitution_map,
@@ -941,7 +941,7 @@ namespace Differentiation
               typename = std::enable_if_t<
                 dealii::internal::is_explicitly_convertible<
                   ExpressionType,
-                  const SymEngine::RCP<const SymEngine::Basic> &>::value &&
+                  const SymEngine::RCP<const SymEngine::Basic> &> &&
                 std::is_constructible_v<ExpressionType, ValueType>>>
     void
     add_to_substitution_map(types::substitution_map           &substitution_map,

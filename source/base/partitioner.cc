@@ -444,7 +444,7 @@ namespace Utilities
               ghost_indices_subset_chunks_by_rank_data[p + 1] =
                 ghost_indices_subset.size();
             }
-          ghost_indices_subset_data = ghost_indices_subset;
+          ghost_indices_subset_data = std::move(ghost_indices_subset);
         }
     }
 
