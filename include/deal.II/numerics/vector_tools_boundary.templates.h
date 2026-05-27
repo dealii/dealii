@@ -228,7 +228,9 @@ namespace VectorTools
             finite_elements,
             q_collection,
             update_quadrature_points);
-
+          std::vector<Point<spacedim>> dof_locations;
+          Vector<number>               exemplar_vector(
+            dof.get_fe_collection().n_components());
           for (const auto &cell : dof.active_cell_iterators())
             if (!cell->is_artificial())
               for (const unsigned int face_no : cell->face_indices())
@@ -282,15 +284,13 @@ namespace VectorTools
                       // dofs on this face
                       face_dofs.resize(fe.n_dofs_per_face(face_no));
                       face->get_dof_indices(face_dofs, cell->active_fe_index());
-                      std::vector<Point<spacedim>> dof_locations =
-                        fe_values.get_quadrature_points();
+                      dof_locations = fe_values.get_quadrature_points();
                       dof_locations.resize(fe.n_dofs_per_face(face_no));
 
                       if (fe_is_system)
                         {
                           dof_values_system.resize(fe.n_dofs_per_face(face_no),
-                                                   Vector<number>(
-                                                     fe.n_components()));
+                                                   exemplar_vector);
 
                           function_map.find(boundary_component)
                             ->second->vector_value_list(dof_locations,
