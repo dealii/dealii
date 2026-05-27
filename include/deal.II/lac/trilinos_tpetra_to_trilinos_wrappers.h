@@ -83,6 +83,9 @@ namespace LinearAlgebra::TpetraWrappers
 
   template <typename Number, typename MemorySpace>
   class PreconditionBlockSSOR;
+
+  template <typename Number, typename MemorySpace>
+  class PreconditionAMGMueLu;
 } // namespace LinearAlgebra::TpetraWrappers
 #  endif
 
@@ -155,6 +158,8 @@ namespace TrilinosWrappers
     PreconditionBlockSOR<double, MemorySpace::Host>;
   using PreconditionBlockSSOR = ::dealii::LinearAlgebra::TpetraWrappers::
     PreconditionBlockSSOR<double, MemorySpace::Host>;
+  using PreconditionAMG = ::dealii::LinearAlgebra::TpetraWrappers::
+    PreconditionAMGMueLu<double, MemorySpace::Host>;
 #  else
   class PreconditionBase;
   class PreconditionIdentity;
@@ -171,6 +176,7 @@ namespace TrilinosWrappers
   class PreconditionBlockJacobi;
   class PreconditionBlockSOR;
   class PreconditionBlockSSOR;
+  class PreconditionAMG;
 #  endif
 } // namespace TrilinosWrappers
 

@@ -261,7 +261,7 @@ namespace Step32
         if (do_solve_A == true)
           {
             SolverControl solver_control(5000, utmp.l2_norm() * 1e-2);
-            TrilinosWrappers::SolverCG solver(solver_control);
+            SolverCG<TrilinosWrappers::MPI::Vector> solver(solver_control);
             solver.solve(stokes_matrix->block(0, 0),
                          dst.block(0),
                          utmp,
@@ -2163,19 +2163,25 @@ namespace Step32
 
     assemble_stokes_preconditioner();
 
-    const FEValuesExtractors::Vector     velocity_components(0);
-    const std::vector<std::vector<bool>> constant_modes =
-      DoFTools::extract_constant_modes(
-        stokes_dof_handler, stokes_fe.component_mask(velocity_components));
+    const FEValuesExtractors::Vector velocity_components(0);
 
     Mp_preconditioner =
       std::make_shared<TrilinosWrappers::PreconditionJacobi>();
     Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
 
     TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    // constant modes and higher order element parameters are not available in
+    // MueLu, which is the AMG package used in Tpetra.
+    const std::vector<std::vector<bool>> constant_modes =
+      DoFTools::extract_constant_modes(
+        stokes_dof_handler, stokes_fe.component_mask(velocity_components));
     Amg_data.constant_modes        = constant_modes;
-    Amg_data.elliptic              = true;
     Amg_data.higher_order_elements = true;
+#endif
+
+    Amg_data.elliptic              = true;
     Amg_data.smoother_sweeps       = 2;
     Amg_data.aggregation_threshold = 0.02;
 

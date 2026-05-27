@@ -1638,13 +1638,18 @@ namespace Step42
     {
       TimerOutput::Scope t(computing_timer, "Solve: setup preconditioner");
 
+      TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
+
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+      // the parameter constant_modes and n_cycles are not available in
+      // MueLu, which is the AMG package used with Tpetra containers.
       const std::vector<std::vector<bool>> constant_modes =
         DoFTools::extract_constant_modes(dof_handler);
+      additional_data.constant_modes = constant_modes;
+      additional_data.n_cycles       = 1;
+#endif
 
-      TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
-      additional_data.constant_modes        = constant_modes;
       additional_data.elliptic              = true;
-      additional_data.n_cycles              = 1;
       additional_data.w_cycle               = false;
       additional_data.output_details        = false;
       additional_data.smoother_sweeps       = 2;

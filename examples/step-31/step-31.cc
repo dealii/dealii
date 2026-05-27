@@ -515,7 +515,15 @@ namespace Step31
     unsigned int timestep_number;
 
     std::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    using MpPreconditionType = TrilinosWrappers::PreconditionIC;
+#else
+    // IC is not available in Tpetra. Use Jacobi instead, as we do in step-32
+    // TODO: Update the documentation of this step, when we require Tpetra.
+    using MpPreconditionType = TrilinosWrappers::PreconditionJacobi;
+#endif
+    std::shared_ptr<MpPreconditionType> Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -1083,6 +1091,8 @@ namespace Step31
         stokes_constraints.distribute_local_to_global(
           local_matrix, local_dof_indices, stokes_preconditioner_matrix);
       }
+
+    stokes_preconditioner_matrix.compress(VectorOperation::add);
   }
 
 
@@ -1124,12 +1134,19 @@ namespace Step31
 
     Amg_preconditioner = std::make_shared<TrilinosWrappers::PreconditionAMG>();
 
-    const FEValuesExtractors::Vector     velocity_components(0);
+    const FEValuesExtractors::Vector velocity_components(0);
+
+    TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
+
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    // constant modes and higher order element parameters are not available in
+    // MueLu, which is the AMG package used in Tpetra.
     const std::vector<std::vector<bool>> constant_modes =
       DoFTools::extract_constant_modes(
         stokes_dof_handler, stokes_fe.component_mask(velocity_components));
-    TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
-    amg_data.constant_modes = constant_modes;
+    amg_data.constant_modes        = constant_modes;
+    amg_data.higher_order_elements = true;
+#endif
 
     // Next, we set some more options of the AMG preconditioner. In
     // particular, we need to tell the AMG setup that we use quadratic basis
@@ -1161,13 +1178,12 @@ namespace Step31
     // around since we do not have to care about destroying the previously
     // used object.
     amg_data.elliptic              = true;
-    amg_data.higher_order_elements = true;
     amg_data.smoother_sweeps       = 2;
     amg_data.aggregation_threshold = 0.02;
     Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0, 0),
                                    amg_data);
 
-    Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC>();
+    Mp_preconditioner = std::make_shared<MpPreconditionType>();
     Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1, 1));
 
     std::cout << std::endl;
@@ -1359,6 +1375,9 @@ namespace Step31
                                                         stokes_rhs);
       }
 
+    stokes_matrix.compress(VectorOperation::add);
+    stokes_rhs.compress(VectorOperation::add);
+
     rebuild_stokes_matrix = false;
 
     std::cout << std::endl;
@@ -1456,6 +1475,8 @@ namespace Step31
           temperature_stiffness_matrix);
       }
 
+    temperature_mass_matrix.compress(VectorOperation::add);
+    temperature_stiffness_matrix.compress(VectorOperation::add);
     rebuild_temperature_matrices = false;
   }
 
@@ -1698,13 +1719,13 @@ namespace Step31
 
     {
       const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                         TrilinosWrappers::PreconditionIC>
+                                         MpPreconditionType>
         mp_inverse(stokes_preconditioner_matrix.block(1, 1),
                    *Mp_preconditioner);
 
       const LinearSolvers::BlockSchurPreconditioner<
         TrilinosWrappers::PreconditionAMG,
-        TrilinosWrappers::PreconditionIC>
+        MpPreconditionType>
         preconditioner(stokes_matrix, mp_inverse, *Amg_preconditioner);
 
       SolverControl solver_control(stokes_matrix.m(),
@@ -1785,7 +1806,7 @@ namespace Step31
                                    1e-8 * temperature_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
-      TrilinosWrappers::PreconditionIC preconditioner;
+      MpPreconditionType preconditioner;
       preconditioner.initialize(temperature_matrix);
 
       cg.solve(temperature_matrix,

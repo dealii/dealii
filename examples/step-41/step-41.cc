@@ -308,6 +308,9 @@ namespace Step41
                                                system_rhs,
                                                true);
       }
+
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
   }
 
 
@@ -368,6 +371,8 @@ namespace Step41
                                                local_dof_indices,
                                                mass_matrix);
       }
+
+    mass_matrix.compress(VectorOperation::add);
   }
 
 
