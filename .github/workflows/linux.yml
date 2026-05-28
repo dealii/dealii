@@ -562,7 +562,6 @@ jobs:
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CXX20_MODULE=ON \
               -D DEAL_II_WITH_CGAL=OFF \
-              -D DEAL_II_WITH_HDF5=OFF \
               -D DEAL_II_WITH_MPI=ON \
               -D DEAL_II_WITH_TRILINOS=OFF \
               -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
