@@ -1146,6 +1146,11 @@ namespace internal
                                               transpose>
   {
   public:
+    // Compiling with gcc 16.1.1 results in an annoying warning for the
+    // following constructor: <unknown>’ may be used uninitialized
+    // This may be due to (*this) being passed to the base class constructor.
+    // We disable this warning.
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     inline DEAL_II_ALWAYS_INLINE_RELEASE
     Helper(const unsigned int &given_degree,
            const bool         &type_x,
@@ -1177,6 +1182,7 @@ namespace internal
     {
       static_assert(fe_degree == -1, "Only working for fe_degree = -1.");
     }
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
     const unsigned int points;
 
@@ -1306,6 +1312,11 @@ namespace internal
                                               transpose>
   {
   public:
+    // Compiling with gcc 16.1.1 results in an annoying warning for the
+    // following constructor: <unknown>’ may be used uninitialized
+    // This may be due to (*this) being passed to the base class constructor.
+    // We disable this warning.
+    DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     inline DEAL_II_ALWAYS_INLINE_RELEASE
     Helper(const unsigned int &given_degree,
            const bool         &type_x,
@@ -1336,6 +1347,7 @@ namespace internal
     {
       static_assert(fe_degree != -1, "Only working for fe_degree != -1.");
     }
+    DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
     inline DEAL_II_ALWAYS_INLINE_RELEASE unsigned int
