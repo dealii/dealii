@@ -60,22 +60,27 @@ check_matrix(const double *matrix_pointer, const bool make_imaginary)
     }
   deallog << std::endl;
 
-  // LAPACK might produce different signs in the eigenvectors depending on the
-  // implementation. To avoid these problems, print eigenvectors normalized by
-  // the sign of the first non-zero real part of the eigenvectors
+  // There are a variety of ways to normalize complex eigenvectors. In this
+  // specific example the first entry is always nonzero: normalize twice, first
+  // by dividing through by that value (so that it is 1 + 0i) and then again by
+  // the magnitude of the vector.
   const auto print_eigenvectors =
     [](const FullMatrix<std::complex<double>> &eigenvectors) {
       for (unsigned int col = 0; col < eigenvectors.n(); ++col)
         {
-          double sign = 1.;
+          const auto first_value = eigenvectors(0, col);
+          // we assume this assertion will always pass for all matrices present
+          // in this test (obviously in general it does not hold)
+          Assert(std::abs(first_value) > 1.0e-10, ExcInternalError());
+          // Similarly, this is not Kahan summation, but it is fine for this
+          // test with very small matrices
+          double norm = 0.0;
           for (unsigned int row = 0; row < eigenvectors.n(); ++row)
-            if (std::abs(eigenvectors(row, col).real()) > 1e-12)
-              {
-                sign = (eigenvectors(row, col).real() > 0.) ? 1.0 : -1.0;
-                break;
-              }
+            norm += std::norm(eigenvectors(row, col) / first_value);
+          norm = std::sqrt(norm);
+
           for (unsigned int row = 0; row < eigenvectors.n(); ++row)
-            deallog << sign * eigenvectors(row, col) << "  ";
+            deallog << (eigenvectors(row, col) / (first_value * norm)) << "  ";
           deallog << std::endl;
         }
     };
