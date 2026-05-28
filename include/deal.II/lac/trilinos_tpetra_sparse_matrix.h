@@ -254,6 +254,18 @@ namespace LinearAlgebra
        */
       void
       reinit(const SparsityPattern<MemorySpace> &sparsity_pattern);
+
+      /**
+       * This function initializes the Trilinos matrix with a sparsity
+       * pattern from another matrix, i.e. it makes the underlying Trilinos
+       * Tpetra::CrsMatrix know the position of nonzero entries according
+       * to the sparsity pattern of the other matrix.
+       *
+       * This is a collective operation that needs to be called on all
+       * processors in order to avoid a dead lock.
+       */
+      void
+      reinit(const SparseMatrix<Number, MemorySpace> &matrix);
       /** @} */
 
       /**
@@ -321,7 +333,7 @@ namespace LinearAlgebra
                    const std::vector<unsigned int> &n_entries_per_row);
 
       /**
-       * This function is initializes the Trilinos Tpetra matrix according to
+       * This function initializes the Trilinos Tpetra matrix according to
        * the specified @p sparsity_pattern, and also reassigns the matrix rows to
        * different processes according to the user-supplied index set @p parallel_partitioning and
        * %parallel communicator. In programs following the style of the tutorial

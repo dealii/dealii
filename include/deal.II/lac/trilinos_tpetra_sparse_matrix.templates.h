@@ -578,6 +578,31 @@ namespace LinearAlgebra
 
 
 
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::reinit(
+      const SparseMatrix<Number, MemorySpace> &sparse_matrix)
+    {
+      if (this == &sparse_matrix)
+        return;
+
+      Assert(sparse_matrix.is_compressed(),
+             ExcMessage(
+               "This matrix can only be reinitialized to the structure of "
+               "another matrix, if the other matrix is compressed. Call "
+               "SparseMatrix::compress() before calling reinit()."));
+
+      // Create a new matrix of the correct size
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
+        sparse_matrix.matrix->getCrsGraph());
+
+      column_space_map = sparse_matrix.column_space_map;
+      compress(VectorOperation::insert);
+    }
+
+
+
     // Constructors and initialization using an IndexSet description:
 
     template <typename Number, typename MemorySpace>

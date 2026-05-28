@@ -40,6 +40,10 @@ for (S : TRILINOS_SCALARS)
           const dealii::DynamicSparsityPattern &);
 
         template void
+        SparseMatrix<S, MemorySpace::Host>::reinit(
+          const dealii::SparsityPattern &);
+
+        template void
         SparseMatrix<S, MemorySpace::Host>::vmult(
           Vector<S, MemorySpace::Host>       &dst,
           const Vector<S, MemorySpace::Host> &src) const;
@@ -106,6 +110,10 @@ for (S : TRILINOS_SCALARS)
         template void
         SparseMatrix<S, MemorySpace::Default>::reinit(
           const dealii::DynamicSparsityPattern &);
+
+        template void
+        SparseMatrix<S, MemorySpace::Default>::reinit(
+          const dealii::SparsityPattern &);
 
         template void
         SparseMatrix<S, MemorySpace::Default>::vmult(
