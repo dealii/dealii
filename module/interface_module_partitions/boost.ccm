@@ -92,6 +92,7 @@ module;
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/array_wrapper.hpp>
 #include <boost/serialization/binary_object.hpp>
+#include <boost/serialization/collection_size_type.hpp>
 #include <boost/serialization/complex.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -356,6 +357,7 @@ export
       using boost::serialization::access;
       using boost::serialization::array_wrapper;
       using boost::serialization::base_object;
+      using boost::serialization::collection_size_type;
       using boost::serialization::make_array;
       using boost::serialization::make_binary_object;
       using boost::serialization::split_free;
