@@ -1525,12 +1525,6 @@ public:
     const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
     const;
 
-  /**
-   * This class can both be used with a single DoFHandler
-   * or a separate DoFHandler for each block.
-   */
-  static const bool supports_dof_handler_vector = true;
-
 protected:
   /**
    * Return the right non-block transfer operator. Has to be implemented by
