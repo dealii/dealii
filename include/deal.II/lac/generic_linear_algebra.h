@@ -19,6 +19,8 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/precondition.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
@@ -157,7 +159,7 @@ namespace LinearAlgebraPETSc
 } // namespace LinearAlgebraPETSc
 #endif // DEAL_II_WITH_PETSC
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_WITH_TRILINOS
 
 /**
  * A namespace in which the wrappers to the Trilinos linear algebra classes
@@ -167,6 +169,7 @@ namespace LinearAlgebraPETSc
  */
 namespace LinearAlgebraTrilinos
 {
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Typedef for the CG solver type used.
    */
@@ -176,6 +179,19 @@ namespace LinearAlgebraTrilinos
    * Typedef for the GMRES solver type used.
    */
   using SolverGMRES = TrilinosWrappers::SolverGMRES;
+#  else
+#    ifdef DEAL_II_TRILINOS_WITH_TPETRA
+  /**
+   * Typedef for the CG solver type used.
+   */
+  using SolverCG = dealii::SolverCG<TrilinosWrappers::MPI::Vector>;
+
+  /**
+   * Typedef for the GMRES solver type used.
+   */
+  using SolverGMRES = dealii::SolverGMRES<TrilinosWrappers::MPI::Vector>;
+#    endif
+#  endif
 
   /**
    * A namespace with alias to generic names for parallel Trilinos linear
@@ -205,13 +221,13 @@ namespace LinearAlgebraTrilinos
      */
     using BlockSparseMatrix = TrilinosWrappers::BlockSparseMatrix;
 
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Typedef for the type used for compressed block sparsity pattern.
      */
     using BlockCompressedSparsityPattern =
       TrilinosWrappers::BlockSparsityPattern;
 
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Typedef for the AMG preconditioner type.
      */
