@@ -259,7 +259,8 @@ namespace LinearAlgebra
        * This function initializes the Trilinos matrix with a sparsity
        * pattern from another matrix, i.e. it makes the underlying Trilinos
        * Tpetra::CrsMatrix know the position of nonzero entries according
-       * to the sparsity pattern of the other matrix.
+       * to the sparsity pattern of the other matrix. The values are not
+       * copied, but you can use copy_from() for this.
        *
        * This is a collective operation that needs to be called on all
        * processors in order to avoid a dead lock.

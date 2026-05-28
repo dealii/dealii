@@ -44,12 +44,11 @@ main(int argc, char **argv)
   matrix.reinit(sparsity);
   {
     double value = 1;
-    for (auto p = matrix.begin(); p != matrix.end();
-         ++p, ++value)
+    for (auto p = matrix.begin(); p != matrix.end(); ++p, ++value)
       p->value() = value;
   }
   matrix.compress(VectorOperation::insert);
-  
+
   deallog << "Original:" << std::endl;
   matrix.print(deallog.get_file_stream());
 

@@ -59,7 +59,8 @@ main(int argc, char **argv)
                                              MPI_COMM_WORLD,
                                              locally_relevant_dofs);
 
-  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default> matrix;
+  LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>
+    matrix;
   matrix.reinit(locally_owned_dofs, dsp, MPI_COMM_WORLD);
 
   deallog << "Original:" << std::endl;
