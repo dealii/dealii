@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2016 - 2023 by the deal.II authors
+## Copyright (C) 2016 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,11 +18,7 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   #
   # Find Python:
   #
-  find_package(Python3)
-  set(PYTHON_VERSION_MAJOR ${Python3_VERSION_MAJOR})
-  set(PYTHON_VERSION_MINOR ${Python3_VERSION_MINOR})
-  set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
-  include(FindPythonLibs)
+  find_package(Python COMPONENTS Development Interpreter)
 
   if(DEAL_II_FEATURE_BOOST_BUNDLED_CONFIGURED)
     message(FATAL_ERROR
@@ -44,7 +40,7 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   if(${BOOST_VERSION} VERSION_LESS 1.67)
     find_package(Boost 1.59 COMPONENTS python REQUIRED)
   else()
-    find_package(Boost 1.67 COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED)
+    find_package(Boost 1.67 COMPONENTS python${Python_VERSION_MAJOR}${Python_VERSION_MINOR} REQUIRED)
   endif()
   list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
 
@@ -78,7 +74,7 @@ if(DEAL_II_COMPONENT_PYTHON_BINDINGS)
   set_if_empty(PYTHON_BINDINGS_RELEASE_NAME "Release")
 
   set_if_empty(DEAL_II_PYTHON_RELDIR
-    "${DEAL_II_LIBRARY_RELDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/${PYTHON_BINDINGS_BASE_NAME}"
+    "${DEAL_II_LIBRARY_RELDIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages/${PYTHON_BINDINGS_BASE_NAME}"
     )
 
   add_subdirectory(source)
