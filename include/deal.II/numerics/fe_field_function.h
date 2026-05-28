@@ -183,17 +183,32 @@ namespace Functions
   {
   public:
     /**
-     * Construct a vector function. A smart pointers is stored to the dof
-     * handler, so you have to make sure that it make sense for the entire
-     * lifetime of this object. The number of components of this functions is
-     * equal to the number of components of the finite element object. If a
-     * mapping is specified, that is what is used to find out where the points
-     * lay. Otherwise the standard Q1 mapping is used.
+     * Construct a vector function. The number of components of this functions
+     * is equal to the number of components of the finite element object. The
+     * mapping provided is used to find out where the points at which the
+     * function is evaluated are located in reference space.
+     *
+     * This class stores pointers to the arguments
+     * provided, so you have to make sure that they remain alive for the entire
+     * lifetime of this object.
      */
-    FEFieldFunction(
-      const DoFHandler<dim, spacedim> &dh,
-      const VectorType                &data_vector,
-      const Mapping<dim>              &mapping = StaticMappingQ1<dim>::mapping);
+    FEFieldFunction(const DoFHandler<dim, spacedim> &dh,
+                    const VectorType                &data_vector,
+                    const Mapping<dim>              &mapping);
+
+    /**
+     * Construct a vector function. The number of components of this functions
+     * is equal to the number of components of the finite element object. In
+     * contrast to the previous constructor, this constructor uses a linear
+     * mapping appropriate for the reference cell type used by the triangulation
+     * that underlies the `dh` object.
+     *
+     * This class stores pointers to the arguments
+     * provided, so you have to make sure that they remain alive for the entire
+     * lifetime of this object.
+     */
+    FEFieldFunction(const DoFHandler<dim, spacedim> &dh,
+                    const VectorType                &data_vector);
 
     /**
      * Set the current cell. If you know in advance where your points lie, you

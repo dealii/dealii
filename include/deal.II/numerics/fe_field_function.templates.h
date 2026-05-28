@@ -49,6 +49,33 @@ namespace Functions
     , mapping(mymapping)
     , cache(dh->get_triangulation(), mymapping)
     , cell_hint(dh->end())
+  {
+    // Make sure the mapping is compatible with the cell type of the
+    // mesh. Since we only accept a single mapping, the mesh must also
+    // use only one kind of cell.
+    Assert(mydh.get_triangulation().is_mixed_mesh() == false,
+           ExcNotImplemented());
+    Assert(mapping.is_compatible_with(
+             mydh.get_triangulation().get_reference_cells()[0]),
+           ExcMessage("The mapping you provided (or that was chosen via the "
+                      "constructor's default argument) is not compatible "
+                      "with the cell type of the mesh you are using."));
+  }
+
+
+
+  template <int dim, typename VectorType, int spacedim>
+  FEFieldFunction<dim, VectorType, spacedim>::FEFieldFunction(
+    const DoFHandler<dim, spacedim> &mydh,
+    const VectorType                &myv)
+    : // Defer to the other constructor, but with a mapping that
+      // is appropriate for the cell type used
+    FEFieldFunction<dim, VectorType, spacedim>(
+      mydh,
+      myv,
+      mydh.get_triangulation()
+        .get_reference_cells()[0]
+        .template get_default_linear_mapping<spacedim>())
   {}
 
 
