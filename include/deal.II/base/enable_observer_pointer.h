@@ -218,16 +218,6 @@ private:
   mutable std::map<std::string, unsigned int> counter_map;
 
   /**
-   * The data type used in #counter_map.
-   */
-  using map_value_type = decltype(counter_map)::value_type;
-
-  /**
-   * The iterator type used in #counter_map.
-   */
-  using map_iterator = decltype(counter_map)::iterator;
-
-  /**
    * In this vector, we store pointers to the validity bool in the
    * ObserverPointer objects that subscribe to this class.
    */

@@ -163,7 +163,7 @@ EnableObserverPointer::unsubscribe(std::atomic<bool> *const validity,
 
   std::lock_guard<std::mutex> lock(mutex);
 
-  map_iterator it = counter_map.find(id);
+  auto it = counter_map.find(id);
   if (it == counter_map.end())
     {
       AssertNothrow(it != counter_map.end(),
