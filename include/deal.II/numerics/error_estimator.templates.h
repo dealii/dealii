@@ -302,8 +302,7 @@ namespace internal
   copy_local_to_global(
     const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
                    std::vector<double>> &local_face_integrals,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>       &face_integrals)
+    Table<2, double>                    &face_integrals)
   {
     // now copy locally computed elements into the global map
     for (typename std::map<typename DoFHandler<dim, spacedim>::face_iterator,
@@ -312,18 +311,18 @@ namespace internal
          p != local_face_integrals.end();
          ++p)
       {
-        // double check that the element does not already exists in the
-        // global map
-        Assert(face_integrals.find(p->first) == face_integrals.end(),
-               ExcInternalError());
+        AssertDimension(p->second.size(), face_integrals.size(1));
+        const auto face_no = p->first->index();
 
-        for (unsigned int i = 0; i < p->second.size(); ++i)
+        // double check that we haven't yet computed these values
+        for (unsigned int col_no = 0; col_no < face_integrals.size(1); ++col_no)
           {
-            Assert(numbers::is_finite(p->second[i]), ExcInternalError());
-            Assert(p->second[i] >= 0, ExcInternalError());
+            AssertIsFinite(p->second[col_no]);
+            Assert(p->second[col_no] >= 0, ExcInternalError());
+            Assert(std::isnan(face_integrals(face_no, col_no)),
+                   ExcInternalError());
+            face_integrals(face_no, col_no) = p->second[col_no];
           }
-
-        face_integrals[p->first] = p->second;
       }
   }
 
@@ -1239,14 +1238,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
            ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
 
   const unsigned int n_solution_vectors = solutions.size();
-
-  // Map of integrals indexed by the corresponding face. In this map we store
-  // the integrated jump of the gradient for each face.  At the end of the
-  // function, we again loop over the cells and collect the contributions of
-  // the different faces of the cell.
-  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-           std::vector<double>>
-    face_integrals;
+  Table<2, double> face_integrals(dof_handler.get_triangulation().n_raw_faces(),
+                                  n_solution_vectors);
+  face_integrals.fill(std::numeric_limits<double>::quiet_NaN());
 
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
@@ -1312,21 +1306,17 @@ KellyErrorEstimator<dim, spacedim>::estimate(
         // loop over all faces of this cell
         for (const unsigned int face_no : cell->face_indices())
           {
-            Assert(face_integrals.find(cell->face(face_no)) !=
-                     face_integrals.end(),
-                   ExcInternalError());
             const double factor = internal::cell_factor<dim, spacedim>(
               cell, face_no, dof_handler, strategy);
 
+            const auto face_index = cell->face(face_no)->index();
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               {
-                // make sure that we have written a meaningful value into this
-                // slot
-                Assert(face_integrals[cell->face(face_no)][n] >= 0,
-                       ExcInternalError());
+                AssertIsFinite(face_integrals(face_index, n));
+                Assert(face_integrals(face_index, n) >= 0, ExcInternalError());
 
                 (*errors[n])(present_cell) +=
-                  (face_integrals[cell->face(face_no)][n] * factor);
+                  (face_integrals(face_index, n) * factor);
               }
           }
 
