@@ -352,6 +352,8 @@ struct PointerComparison
   /**
    * Comparison function for pointers of the same type. Returns @p true if the
    * two pointers are equal.
+   * @param p1 The p1 used by this operation.
+   * @param p2 The p2 used by this operation.
    */
   template <typename T>
   static bool
@@ -665,6 +667,7 @@ namespace concepts
    * in one contiguous array in which we access all elements via a pointer to
    * the first element plus an offset. In contrast, linked lists, maps, and
    * similar objects are typically not stored as contiguous containers.
+   * @param c The container object whose interface is checked.
    */
   template <typename C>
   concept is_contiguous_container = requires(C &c) {
@@ -1003,6 +1006,13 @@ namespace concepts
    * interface to serve as a vector in vector-space operations -- principally
    * what is required to run iterative solvers: things such as norms, dot
    * products, etc.
+   * @param U The vector object on which the required operations are tested.
+   * @param V An additional vector object used as an input operand.
+   * @param W A third vector object used in multi-vector operations.
+   * @param a A scalar coefficient used in scaling and axpy-like operations.
+   * @param b A second scalar coefficient used in linear combinations.
+   * @param s The scalar weight used in `sadd()`-style operations.
+   * @param operation The compression operation passed to `compress()`.
    */
   template <typename VectorType>
   concept is_vector_space_vector = requires(VectorType                      U,
@@ -1095,6 +1105,9 @@ namespace concepts
    * a `VectorType` object as input and produce another `VectorType`
    * as output (both objects being taken as arguments to the `vmult()`
    * function).
+   * @param A The matrix or linear operator whose interface is being tested.
+   * @param dst The destination vector into which `vmult()` writes the result.
+   * @param src The source vector that is multiplied by @p A.
    */
   template <typename MatrixType, typename VectorType>
   concept is_linear_operator_on =
@@ -1110,6 +1123,10 @@ namespace concepts
    * take a `VectorType` object as input and produce another `VectorType`
    * as output (both objects being taken as arguments to the `vmult()`
    * function).
+   * @param A The matrix or linear operator whose transpose interface is being
+   * tested.
+   * @param dst The destination vector into which `Tvmult()` writes the result.
+   * @param src The source vector that is multiplied by the transpose of @p A.
    */
   template <typename MatrixType, typename VectorType>
   concept is_transpose_linear_operator_on =

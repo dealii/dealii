@@ -175,6 +175,8 @@ public:
 
   /**
    * Copy operator.
+   * @param it The iterator associated with the range processed by this
+   * operation.
    */
   DerivedIterator &
   operator=(const DerivedIterator &it);
@@ -205,24 +207,28 @@ public:
 
   /**
    * Return an iterator that is @p n entries ahead of the current one.
+   * @param n The n used by this operation.
    */
   DerivedIterator
   operator+(const difference_type n) const;
 
   /**
    * Return an iterator that is @p n entries behind the current one.
+   * @param n The n used by this operation.
    */
   DerivedIterator
   operator-(const difference_type n) const;
 
   /**
    * Increment the iterator position by @p n.
+   * @param n The n used by this operation.
    */
   DerivedIterator &
   operator+=(const difference_type n);
 
   /**
    * Decrement the iterator position by @p n.
+   * @param n The n used by this operation.
    */
   DerivedIterator &
   operator-=(const difference_type n);
@@ -232,6 +238,7 @@ public:
    * distance is given by how many times one has to apply operator++() to the
    * current iterator to get the argument (for a positive return value), or
    * operator--() (for a negative return value).
+   * @param p The point at which to evaluate the function.
    */
   difference_type
   operator-(const DerivedIterator &p) const;
@@ -251,6 +258,7 @@ public:
   /**
    * Comparison operator. Returns <code>true</code> if both iterators point to
    * the same entry in the same container.
+   * @param right The right-hand operand.
    */
   template <typename OtherIterator>
   std::enable_if_t<std::is_convertible_v<OtherIterator, DerivedIterator>, bool>
@@ -262,6 +270,7 @@ public:
 
   /**
    * Opposite of operator==().
+   * @param right The right-hand operand.
    */
   template <typename OtherIterator>
   std::enable_if_t<std::is_convertible_v<OtherIterator, DerivedIterator>, bool>

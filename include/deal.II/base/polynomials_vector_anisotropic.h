@@ -49,6 +49,9 @@ public:
    * Constructor. Creates all basis functions for anisotropic vector-valued
    * polynomials of given degrees in normal and tangential directions,
    * respectively.
+   * @param degree_normal The degree normal.
+   * @param degree_tangential The degree tangential.
+   * @param polynomial_ordering The polynomial ordering.
    */
   PolynomialsVectorAnisotropic(
     const unsigned int               degree_normal,
@@ -57,6 +60,7 @@ public:
 
   /**
    * Copy constructor.
+   * @param other The object to copy or move from.
    */
   PolynomialsVectorAnisotropic(const PolynomialsVectorAnisotropic &other) =
     default;
@@ -68,6 +72,12 @@ public:
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>. In
    * the first case, the function will not compute these values.
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   void
   evaluate(const Point<dim>            &unit_point,
@@ -88,6 +98,8 @@ public:
    * Return the number of polynomials in the space without requiring to
    * build an object of PolynomialsVectorAnisotropic. This is required by the
    * FiniteElement classes.
+   * @param normal_degree The normal degree.
+   * @param tangential_degree The tangential degree.
    */
   static unsigned int
   n_polynomials(const unsigned int normal_degree,

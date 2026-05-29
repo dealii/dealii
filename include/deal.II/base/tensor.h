@@ -152,6 +152,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
+   * @param initializer The tensor argument supplied to this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -161,6 +162,7 @@ public:
   /**
    * Constructor, where the data is copied from a C-style array.
    *
+   * @param initializer The initializer used by this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -170,12 +172,14 @@ public:
 #ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
   /**
    * Copy constructor
+   * @param other The object to copy or move from.
    */
   constexpr DEAL_II_HOST_DEVICE
   Tensor(const Tensor<0, dim, Number> &other);
 
   /**
    * Move constructor
+   * @param other The object to copy or move from.
    */
   constexpr DEAL_II_HOST_DEVICE
   Tensor(Tensor<0, dim, Number> &&other) noexcept;
@@ -208,6 +212,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
+   * @param rhs The right-hand-side operand.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -221,6 +226,7 @@ public:
    * copy constructor for Sacado::Rad::ADvar types automatically.
    * See https://github.com/dealii/dealii/pull/5865.
    *
+   * @param rhs The right-hand-side operand.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -230,6 +236,7 @@ public:
 #ifdef DEAL_II_DELETED_MOVE_CONSTRUCTOR_BUG
   /**
    * Move assignment operator
+   * @param other The object to copy or move from.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor<0, dim, Number> &
   operator=(Tensor<0, dim, Number> &&other) noexcept;
@@ -239,6 +246,7 @@ public:
    * This operator assigns a scalar to a tensor. This obviously requires
    * that the @p OtherNumber type is convertible to @p Number.
    *
+   * @param d The scalar value to assign.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -249,6 +257,7 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param d The scalar value to assign.
    */
   template <typename OtherNumber>
   constexpr DEAL_II_HOST_DEVICE Tensor &
@@ -256,6 +265,7 @@ public:
 
   /**
    * Test for equality of two tensors.
+   * @param rhs The right-hand-side operand.
    */
   template <typename OtherNumber>
   constexpr bool
@@ -263,6 +273,7 @@ public:
 
   /**
    * Test for inequality of two tensors.
+   * @param rhs The right-hand-side operand.
    */
   template <typename OtherNumber>
   constexpr bool
@@ -271,6 +282,7 @@ public:
   /**
    * Add another scalar.
    *
+   * @param rhs The right-hand-side operand.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -280,6 +292,7 @@ public:
   /**
    * Subtract another scalar.
    *
+   * @param rhs The right-hand-side operand.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -289,6 +302,7 @@ public:
   /**
    * Multiply the scalar with a <tt>factor</tt>.
    *
+   * @param factor The scalar factor by which all entries are scaled.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -298,6 +312,7 @@ public:
   /**
    * Divide the scalar by <tt>factor</tt>.
    *
+   * @param factor The scalar divisor by which all entries are divided.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -531,6 +546,7 @@ public:
   /**
    * A constructor where the data is copied from a C-style array.
    *
+   * @param initializer The initializer used by this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE explicit Tensor(const array_type &initializer);
@@ -545,6 +561,7 @@ public:
    * This constructor obviously requires that the @p ElementType type is
    * either equal to @p Number, or is convertible to @p Number.
    *
+   * @param initializer The initializer used by this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename ElementType, typename MemorySpace>
@@ -556,6 +573,7 @@ public:
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
+   * @param initializer The tensor argument supplied to this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -564,6 +582,7 @@ public:
 
   /**
    * Constructor that converts from a "tensor of tensors".
+   * @param initializer The tensor argument supplied to this operation.
    */
   template <typename OtherNumber>
   constexpr Tensor(
@@ -591,6 +610,7 @@ public:
   /**
    * Read-Write access operator.
    *
+   * @param i The index of the entry.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE value_type &
@@ -599,6 +619,7 @@ public:
   /**
    * Read-only access operator.
    *
+   * @param i The index of the entry.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE const value_type &
@@ -606,12 +627,16 @@ public:
 
   /**
    * Read access using TableIndices <tt>indices</tt>
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   constexpr const Number &
   operator[](const TableIndices<rank_> &indices) const;
 
   /**
    * Read and write access using TableIndices <tt>indices</tt>
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   constexpr Number &
   operator[](const TableIndices<rank_> &indices);
@@ -649,6 +674,7 @@ public:
    * This obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
    *
+   * @param rhs The right-hand-side operand.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -660,6 +686,7 @@ public:
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * <tt>t=0</tt> to reset all elements of the tensor to zero.
+   * @param d The scalar value to assign.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor &
   operator=(const Number &d) &;
@@ -668,6 +695,7 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param d The scalar value to assign.
    */
   constexpr DEAL_II_HOST_DEVICE Tensor &
   operator=(const Number &d) && = delete;
@@ -722,6 +750,7 @@ public:
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
    *
+   * @param factor The scalar factor by which all entries are scaled.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -731,6 +760,7 @@ public:
   /**
    * Scale the vector by <tt>1/factor</tt>.
    *
+   * @param factor The scalar divisor by which all entries are divided.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -798,6 +828,8 @@ public:
   /**
    * Return an unrolled index in the range $[0,\text{dim}^{\text{rank}}-1]$
    * for the element of the tensor indexed by the argument to the function.
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   static constexpr DEAL_II_HOST_DEVICE unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
@@ -806,6 +838,7 @@ public:
    * Opposite of  component_to_unrolled_index: For an index in the range
    * $[0, \text{dim}^{\text{rank}}-1]$, return which set of indices it would
    * correspond to.
+   * @param i The index of the entry.
    */
   static constexpr DEAL_II_HOST_DEVICE TableIndices<rank_>
   unrolled_to_component_indices(const unsigned int i);
@@ -1960,6 +1993,8 @@ operator<<(std::ostream &out, const Tensor<0, dim, Number> &p)
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
+ * @param object The object used by this operation.
+ * @param t The time associated with the evaluation.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -1980,6 +2015,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * This function unwraps the underlying @p Number stored in the Tensor and
  * multiplies @p object with it.
  *
+ * @param t The time associated with the evaluation.
+ * @param object The object used by this operation.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2000,6 +2037,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * OtherNumber that are stored within the Tensor and multiplies them. It
  * returns an unwrapped number of product type.
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2018,6 +2057,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Division of a tensor of rank 0 by a scalar number.
  *
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2037,6 +2078,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
 /**
  * Add two tensors of rank 0.
  *
+ * @param p The point at which to evaluate the function.
+ * @param q The quadrature formula used by this operation.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2054,6 +2097,8 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
 /**
  * Subtract two tensors of rank 0.
  *
+ * @param p The point at which to evaluate the function.
+ * @param q The quadrature formula used by this operation.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2076,6 +2121,8 @@ constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2102,6 +2149,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * number, a complex floating point number, etc.) is allowed, see the
  * documentation of EnableIfScalar for details.
  *
+ * @param factor The scalar factor by which all entries are scaled.
+ * @param t The time associated with the evaluation.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2125,6 +2174,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * discussion on operator*() above for more information about template
  * arguments and the return type.
  *
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relatesalso Tensor
@@ -2146,6 +2197,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
 /**
  * Addition of two tensors of general rank.
  *
+ * @param p The point at which to evaluate the function.
+ * @param q The quadrature formula used by this operation.
  * @tparam rank The rank of both tensors.
  *
  * @note This function can also be used in @ref GlossDevice "device" code.
@@ -2167,6 +2220,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
 /**
  * Subtraction of two tensors of general rank.
  *
+ * @param p The point at which to evaluate the function.
+ * @param q The quadrature formula used by this operation.
  * @tparam rank The rank of both tensors.
  *
  * @note This function can also be used in @ref GlossDevice "device" code.
@@ -2189,6 +2244,8 @@ constexpr DEAL_II_HOST_DEVICE inline DEAL_II_ALWAYS_INLINE
  * multiplication of two scalar values).
  *
  * @relatesalso Tensor
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  */
 template <int dim, typename Number, typename OtherNumber>
 inline constexpr DEAL_II_ALWAYS_INLINE
@@ -2215,6 +2272,8 @@ inline constexpr DEAL_II_ALWAYS_INLINE
  *     \text{right}_{i, j}
  * @f]
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @tparam rank The rank of both tensors.
  *
  * @relatesalso Tensor
@@ -2255,6 +2314,8 @@ inline constexpr DEAL_II_ALWAYS_INLINE
  *     \text{right}_{k, j_1,\ldots,j_{r2}}
  * @f]
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @note For the Tensor class, the multiplication operator only performs a
  * contraction over a single pair of indices. This is in contrast to the
  * multiplication operator for SymmetricTensor, for which the corresponding
@@ -2363,6 +2424,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  *   contract<0, 2>(t1, t2);
  * @endcode
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @note The position of the index is counted from 0, i.e.,
  * $0\le\text{index}_i<\text{range}_i$.
  *
@@ -2436,6 +2499,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  *   double_contract<0, 2, 1, 0>(t1, t2);
  * @endcode
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @note The position of the index is counted from 0, i.e.,
  * $0\le\text{index}_i<\text{range}_i$.
  *
@@ -2532,6 +2597,8 @@ constexpr inline
  * @f]
  *
  * @relatesalso Tensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank, int dim, typename Number, typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE
@@ -2596,6 +2663,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  * @f]
  *
  * @relatesalso Tensor
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  */
 template <int rank_1,
           int rank_2,
@@ -2633,6 +2702,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  * (e.g. from the <tt>dim==2</tt> case in the switch).
  *
  * @relatesalso Tensor
+ * @param src The tensor argument supplied to this operation.
  */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
@@ -2657,6 +2727,8 @@ cross_product_2d(const Tensor<1, dim, Number> &src)
  * case in the switch).
  *
  * @relatesalso Tensor
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  */
 template <int dim, typename Number1, typename Number2>
 constexpr inline DEAL_II_ALWAYS_INLINE
@@ -2691,6 +2763,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  * Compute the determinant of a tensor or rank 2.
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Number
@@ -2719,6 +2792,7 @@ determinant(const Tensor<2, dim, Number> &t)
  * Specialization for dim==1.
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2731,6 +2805,7 @@ determinant(const Tensor<2, 1, Number> &t)
  * Specialization for dim==2.
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2744,6 +2819,7 @@ determinant(const Tensor<2, 2, Number> &t)
  * Specialization for dim==3.
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <typename Number>
 constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2765,6 +2841,7 @@ determinant(const Tensor<2, 3, Number> &t)
  * diagonal entries.
  *
  * @relatesalso Tensor
+ * @param d The value on which this function operates.
  */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Number
@@ -2866,6 +2943,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
  * Return the transpose of the given tensor.
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, dim, Number>
@@ -2894,6 +2972,7 @@ transpose(const Tensor<2, dim, Number> &t)
  * \; .
  * @f]
  *
+ * @param t The time associated with the evaluation.
  * @note This requires that the tensor is invertible.
  *
  * @relatesalso Tensor
@@ -2915,6 +2994,7 @@ adjugate(const Tensor<2, dim, Number> &t)
  *    = \left[ \textrm{adj}\mathbf A \right]^{T} \; .
  * @f]
  *
+ * @param t The time associated with the evaluation.
  * @note This requires that the tensor is invertible.
  *
  * @relatesalso Tensor
@@ -3001,6 +3081,7 @@ project_onto_orthogonal_tensors(const Tensor<2, dim, Number> &A);
  * (maximum of the sums over columns).
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 inline Number
@@ -3027,6 +3108,7 @@ l1_norm(const Tensor<2, dim, Number> &t)
  * (maximum of the sums over rows).
  *
  * @relatesalso Tensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 inline Number

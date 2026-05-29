@@ -89,6 +89,8 @@ namespace Functions
      * Constructor which should be provided with a set of points at which
      * interpolation is to be done @p interpolation_points and a set of function
      * values @p interpolation_values .
+     * @param interpolation_points The interpolation points.
+     * @param interpolation_values The interpolation values.
      */
     CSpline(const std::vector<double> &interpolation_points,
             const std::vector<double> &interpolation_values);

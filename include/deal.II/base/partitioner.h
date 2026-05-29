@@ -207,6 +207,7 @@ namespace Utilities
       /**
        * Constructor with size argument. Creates an MPI_COMM_SELF structure
        * where there is no real parallel layout.
+       * @param size The number of entries in the object to create or resize.
        */
       Partitioner(const unsigned int size);
 
@@ -218,6 +219,9 @@ namespace Utilities
        * and one-to-one fashion, i.e., the indices of process $p$ sit exactly
        * between the indices of the processes $p-1$ and $p+1$, respectively.
        *
+       * @param local_size The local size.
+       * @param ghost_size The ghost size.
+       * @param communicator The MPI communicator.
        * @note Setting the @p ghost_size variable to an appropriate value
        *   provides memory space for the ghost data in a vector's memory
        *   allocation as and allows access to it via local_element(). However,
@@ -234,6 +238,9 @@ namespace Utilities
        * describing the locally owned range and another one for describing
        * ghost indices that are owned by other processors, but that we need to
        * have read or write access to.
+       * @param locally_owned_indices The locally owned indices.
+       * @param ghost_indices_in The ghost indices in.
+       * @param communicator_in The communicator in.
        */
       Partitioner(const IndexSet &locally_owned_indices,
                   const IndexSet &ghost_indices_in,
@@ -245,6 +252,8 @@ namespace Utilities
        * describing the locally owned range. It allows to set the ghost
        * indices at a later time. Apart from this, it is similar to the other
        * constructor with two index sets.
+       * @param locally_owned_indices The locally owned indices.
+       * @param communicator_in The communicator in.
        */
       Partitioner(const IndexSet &locally_owned_indices,
                   const MPI_Comm  communicator_in);
@@ -269,6 +278,7 @@ namespace Utilities
 
       /**
        * Set the locally owned indices. Used in the constructor.
+       * @param locally_owned_indices The locally owned indices.
        */
       void
       set_owned_indices(const IndexSet &locally_owned_indices);
@@ -282,6 +292,8 @@ namespace Utilities
        * useful if a distributed vector is based on that larger ghost index
        * set but only a tighter subset should be communicated according to
        * @p ghost_indices.
+       * @param ghost_indices The ghost indices.
+       * @param larger_ghost_index_set The larger ghost index set.
        */
       void
       set_ghost_indices(const IndexSet &ghost_indices,
@@ -322,6 +334,7 @@ namespace Utilities
       /**
        * Return true if the given global index is in the local range of this
        * processor.
+       * @param global_index The global index.
        */
       bool
       in_local_range(const types::global_dof_index global_index) const;
@@ -335,6 +348,7 @@ namespace Utilities
        * between 0 and locally_owned_size() - 1, and the local index for
        * ghosts is between locally_owned_size() and locally_owned_size() +
        * n_ghost_indices() - 1.
+       * @param global_index The global index.
        */
       unsigned int
       global_to_local(const types::global_dof_index global_index) const;
@@ -346,6 +360,7 @@ namespace Utilities
        * and locally_owned_size() - 1, and the local index for ghosts must be
        * between locally_owned_size() and locally_owned_size() +
        * n_ghost_indices() - 1.
+       * @param local_index The local index.
        */
       types::global_dof_index
       local_to_global(const unsigned int local_index) const;
@@ -354,6 +369,7 @@ namespace Utilities
        * Return whether the given global index is a ghost index on the
        * present processor. Returns false for indices that are owned locally
        * and for indices not present at all.
+       * @param global_index The global index.
        */
       bool
       is_ghost_entry(const types::global_dof_index global_index) const;
@@ -431,6 +447,7 @@ namespace Utilities
        * only, i.e., if only some processors decide that the partitioning is
        * not compatible, only these processors will return @p false, whereas
        * the other processors will return @p true.
+       * @param part The part used by this operation.
        */
       bool
       is_compatible(const Partitioner &part) const;
@@ -450,6 +467,7 @@ namespace Utilities
        * This method performs global communication, so make sure to use it
        * only in a context where all processors call it the same number of
        * times.
+       * @param part The part used by this operation.
        */
       bool
       is_globally_compatible(const Partitioner &part) const;

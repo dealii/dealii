@@ -81,6 +81,8 @@ namespace Utilities
    * The depth of the Hilbert curve (i.e. the number of bits per dimension) by
    * default is equal to <code>64</code>.
    *
+   * @param points The points at which to evaluate the function.
+   * @param bits_per_dim The bits per dim.
    * @note This function can also handle degenerate cases, e.g. when the bounding
    * box has zero size in one of the dimensions.
    */
@@ -92,6 +94,8 @@ namespace Utilities
 
   /**
    * Same as above, but for points in integer coordinates.
+   * @param points The points at which to evaluate the function.
+   * @param bits_per_dim The bits per dim.
    */
   template <int dim>
   std::vector<std::array<std::uint64_t, dim>>
@@ -110,6 +114,8 @@ namespace Utilities
    * The function is useful in debugging and visualization of indices returned
    * by inverse_Hilbert_space_filling_curve().
    *
+   * @param index The index of the entry.
+   * @param bits_per_dim The bits per dim.
    * @note There is no need to use this function in order to compare indices
    * returned by inverse_Hilbert_space_filling_curve(), as that can easily be
    * done via <code>std::lexicographical_compare()</code>.
@@ -193,6 +199,8 @@ namespace Utilities
    * printed result might show the effects of an overflow upon conversion
    * to `unsigned int`.
    *
+   * @param value The value associated with the function.
+   * @param digits The digits used by this operation.
    * @note The use of this function is discouraged and users should use
    * <code>Utilities::to_string()</code> instead. In its current
    * implementation the function simply calls <code>to_string@<unsigned
@@ -212,6 +220,8 @@ namespace Utilities
    * padded with leading zeros. The result is then the same as if the C++
    * function `std::to_string()` had been called (for integral types),
    * or if `boost::lexical_cast()` had been called (for all other types).
+   * @param value The value associated with the function.
+   * @param digits The digits used by this operation.
    */
   template <typename number>
   std::string
@@ -221,6 +231,7 @@ namespace Utilities
   /**
    * Determine how many digits are needed to represent numbers at most as
    * large as the given number.
+   * @param max_number The max number.
    */
   unsigned int
   needed_digits(const unsigned int max_number);
@@ -232,6 +243,8 @@ namespace Utilities
    * operation, this function reduces the absolute value of a floating point
    * number and always rounds towards zero, since decimal places are simply
    * cut off.
+   * @param number The number used by this operation.
+   * @param n_digits The number of digits.
    */
   template <typename Number>
   Number
@@ -240,6 +253,7 @@ namespace Utilities
   /**
    * Given a string, convert it to an integer. Throw an assertion if that is
    * not possible.
+   * @param s The value on which this function operates.
    */
   int
   string_to_int(const std::string &s);
@@ -254,6 +268,8 @@ namespace Utilities
    * string is usually contracted to "<dim>", instead of "<dim,spacedim>".
    * This function returns a string containing "dim" if dim is equal to
    * spacedim, otherwise it returns "dim,spacedim".
+   * @param dim The dim used by this operation.
+   * @param spacedim The spacedim used by this operation.
    */
   std::string
   dim_string(const int dim, const int spacedim);
@@ -261,6 +277,7 @@ namespace Utilities
   /**
    * Given a list of strings, convert it to a list of integers. Throw an
    * assertion if that is not possible.
+   * @param s The value on which this function operates.
    */
   std::vector<int>
   string_to_int(const std::vector<std::string> &s);
@@ -268,6 +285,7 @@ namespace Utilities
   /**
    * Given a string, convert it to an double. Throw an assertion if that is
    * not possible.
+   * @param s The value on which this function operates.
    */
   double
   string_to_double(const std::string &s);
@@ -276,6 +294,7 @@ namespace Utilities
   /**
    * Given a list of strings, convert it to a list of doubles. Throw an
    * assertion if that is not possible.
+   * @param s The value on which this function operates.
    */
   std::vector<double>
   string_to_double(const std::vector<std::string> &s);
@@ -322,6 +341,8 @@ namespace Utilities
    *   Utilities::split_string_list("      ", ' ');
    * @endcode
    * yields an empty list regardless of the number of spaces in the string.
+   * @param s The value on which this function operates.
+   * @param delimiter The delimiter used by this operation.
    */
   std::vector<std::string>
   split_string_list(const std::string &s, const std::string &delimiter = ",");
@@ -330,6 +351,8 @@ namespace Utilities
   /**
    * Specialization of split_string_list() for the case where the delimiter
    * is a single char.
+   * @param s The value on which this function operates.
+   * @param delimiter The delimiter used by this operation.
    */
   std::vector<std::string>
   split_string_list(const std::string &s, const char delimiter);
@@ -343,6 +366,9 @@ namespace Utilities
    * default value of the delimiter is a space character. If original_text
    * contains newline characters (\n), the string is split at these locations,
    * too.
+   * @param original_text The original text.
+   * @param width The width used by this operation.
+   * @param delimiter The delimiter used by this operation.
    */
   std::vector<std::string>
   break_text_into_lines(const std::string &original_text,
@@ -352,6 +378,8 @@ namespace Utilities
   /**
    * Return true if the given pattern string appears in the first position of
    * the string.
+   * @param name The name associated with the object being created or queried.
+   * @param pattern The pattern that valid parameter values must satisfy.
    */
   bool
   match_at_string_start(const std::string &name, const std::string &pattern);
@@ -363,6 +391,8 @@ namespace Utilities
    *
    * If no integer can be read at the indicated position, return
    * (-1,numbers::invalid_unsigned_int)
+   * @param name The name associated with the object being created or queried.
+   * @param position The position of the entry to access.
    */
   std::pair<int, unsigned int>
   get_integer_at_position(const std::string &name, const unsigned int position);
@@ -370,6 +400,9 @@ namespace Utilities
   /**
    * Return a string with all occurrences of @p from in @p input replaced by
    * @p to.
+   * @param input The input data or stream from which values are read.
+   * @param from The from used by this operation.
+   * @param to The to used by this operation.
    */
   std::string
   replace_in_string(const std::string &input,
@@ -380,6 +413,7 @@ namespace Utilities
    * Return a string with all standard whitespace characters (including
    * '<tt>\\t</tt>', '<tt>\\n</tt>', and '<tt>\\r</tt>') at the beginning and
    * end of @p input removed.
+   * @param input The input data or stream from which values are read.
    */
   std::string
   trim(const std::string &input);
@@ -400,6 +434,8 @@ namespace Utilities
    * random number generator objects every time you want to start from a
    * defined point.
    *
+   * @param a The value on which this function operates.
+   * @param sigma The sigma used by this operation.
    * @note Like the system function rand(), this function produces the same
    * sequence of random numbers every time a program is started. This is an
    * important property for debugging codes, but it makes it impossible to
@@ -450,6 +486,7 @@ namespace Utilities
    * is vastly slower.
    *
    * Use this function as in `fixed_power<dim> (t)` or `fixed_power<7> (t)`.
+   * @param t The time associated with the evaluation.
    */
   template <int N, typename T>
   constexpr T
@@ -461,6 +498,8 @@ namespace Utilities
    * is a positive integer. The @p base must be an arithmetic type
    * (i.e., an integer or floating point type),
    * and the exponent @p iexp must not be negative.
+   * @param base The base used by this operation.
+   * @param iexp The iexp used by this operation.
    */
   template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
   constexpr DEAL_II_HOST_DEVICE T
@@ -486,6 +525,11 @@ namespace Utilities
    *
    * This function simply makes the assumption that the sequence is sorted,
    * and we simply don't do the additional check.
+   * @param first The iterator associated with the range processed by this
+   * operation.
+   * @param last The iterator associated with the range processed by this
+   * operation.
+   * @param val The val used by this operation.
    */
   template <typename Iterator, typename T>
   Iterator
@@ -495,6 +539,12 @@ namespace Utilities
    * The same function as above, but taking an argument that is used to
    * compare individual elements of the sequence of objects pointed to by the
    * iterators.
+   * @param first The iterator associated with the range processed by this
+   * operation.
+   * @param last The iterator associated with the range processed by this
+   * operation.
+   * @param val The val used by this operation.
+   * @param comp The component or SIMD lane index to access.
    */
   template <typename Iterator, typename T, typename Comp>
   Iterator
@@ -504,6 +554,7 @@ namespace Utilities
    * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
    * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the reverse
    * permutation $q_i=N-1-p_i$.
+   * @param permutation The permutation used by this operation.
    */
   template <typename Integer>
   std::vector<Integer>
@@ -513,6 +564,7 @@ namespace Utilities
    * Given a permutation vector (i.e. a vector $p_0\ldots p_{N-1}$ where each
    * $p_i\in [0,N)$ and $p_i\neq p_j$ for $i\neq j$), produce the inverse
    * permutation $q_0\ldots q_{N-1}$ so that $q_{p_i}=p_{q_i}=i$.
+   * @param permutation The permutation used by this operation.
    */
   template <typename Integer>
   std::vector<Integer>
@@ -571,6 +623,9 @@ namespace Utilities
    * types are also special-cased, this covers many of the most common kinds of
    * messages one sends around with MPI or one wants to serialize (the two
    * most common use cases for this function).
+   * @param object The object used by this operation.
+   * @param dest_buffer The object in which to store the dest buffer.
+   * @param allow_compression The allow compression.
    */
   template <typename T>
   std::size_t
@@ -585,6 +640,8 @@ namespace Utilities
    * If the library has been compiled with ZLIB enabled, then the output buffer
    * can be compressed. This can be triggered with the parameter
    * @p allow_compression, and is only of effect if ZLIB is enabled.
+   * @param object The object used by this operation.
+   * @param allow_compression The allow compression.
    */
   template <typename T>
   std::vector<char>
@@ -603,6 +660,8 @@ namespace Utilities
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
    *
+   * @param buffer The buffer used by this operation.
+   * @param allow_compression The allow compression.
    * @note Since no arguments to this function depend on the template type
    *  @p T, you must manually specify the template argument when calling
    *  this function.
@@ -632,6 +691,11 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
+   * @param cbegin The iterator associated with the range processed by this
+   * operation.
+   * @param cend The iterator associated with the range processed by this
+   * operation.
+   * @param allow_compression The allow compression.
    */
   template <typename T>
   T
@@ -651,6 +715,8 @@ namespace Utilities
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
    *
+   * @param buffer The buffer used by this operation.
+   * @param allow_compression The allow compression.
    * @note This function exists due to a quirk of C++. Specifically,
    *  if you want to pack() or unpack() arrays of objects, then the
    *  following works:
@@ -684,6 +750,11 @@ namespace Utilities
    * The @p allow_compression parameter denotes if the buffer to
    * read from could have been previously compressed with ZLIB, and
    * is only of effect if ZLIB is enabled.
+   * @param cbegin The iterator associated with the range processed by this
+   * operation.
+   * @param cend The iterator associated with the range processed by this
+   * operation.
+   * @param allow_compression The allow compression.
    */
   template <typename T, int N>
   void
@@ -694,6 +765,8 @@ namespace Utilities
 
   /**
    * Check if the bit at position @p n in @p number is set.
+   * @param number The number used by this operation.
+   * @param n The n used by this operation.
    */
   bool
   get_bit(const unsigned char number, const unsigned int n);
@@ -701,6 +774,9 @@ namespace Utilities
 
   /**
    * Set the bit at position @p n in @p number to value @p x.
+   * @param number The number used by this operation.
+   * @param n The n used by this operation.
+   * @param x The value on which this function operates.
    */
   void
   set_bit(unsigned char &number, const unsigned int n, const bool x);
@@ -758,6 +834,7 @@ namespace Utilities
    *     // transferred to 'd'!
    * @endcode
    *
+   * @param p The point at which to evaluate the function.
    * @note This function does not try to convert the `Deleter` objects stored
    *   by `std::unique_ptr` objects. The function therefore only works if the
    *   deleter objects are at their defaults, i.e., if they are of type
@@ -769,6 +846,7 @@ namespace Utilities
 
   /**
    * Return underlying value. Default: return input.
+   * @param p The point at which to evaluate the function.
    */
   template <typename T>
   T &
@@ -776,6 +854,7 @@ namespace Utilities
 
   /**
    * Return underlying value. Specialization for std::shared_ptr<T>.
+   * @param p The point at which to evaluate the function.
    */
   template <typename T>
   T &
@@ -783,6 +862,7 @@ namespace Utilities
 
   /**
    * Return underlying value. Specialization for const std::shared_ptr<T>.
+   * @param p The point at which to evaluate the function.
    */
   template <typename T>
   T &
@@ -790,6 +870,7 @@ namespace Utilities
 
   /**
    * Return underlying value. Specialization for std::unique_ptr<T>.
+   * @param p The point at which to evaluate the function.
    */
   template <typename T>
   T &
@@ -797,6 +878,7 @@ namespace Utilities
 
   /**
    * Return underlying value. Specialization for const std::unique_ptr<T>.
+   * @param p The point at which to evaluate the function.
    */
   template <typename T>
   T &

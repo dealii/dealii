@@ -59,6 +59,7 @@ namespace internal
     /**
      * Constructor. Initialize this table element with the value
      * <code>t</code>.
+     * @param t The time associated with the evaluation.
      */
     template <typename T>
     explicit TableEntry(const T &t);
@@ -88,6 +89,8 @@ namespace internal
      * formatting. The value is cached as a string internally in cached_value.
      * The cache needs to be invalidated with this routine if the formatting
      * of the column changes.
+     * @param scientific Whether to scientific.
+     * @param precision The precision used by this operation.
      */
     void
     cache_string(bool scientific, unsigned int precision) const;
@@ -395,6 +398,7 @@ public:
    * possible for small programs, but may not be feasible for
    * large code bases in which parts of the code base are only
    * executed based on run-time parameters.)
+   * @param key The key used by this operation.
    */
   void
   declare_column(const std::string &key);
@@ -404,6 +408,8 @@ public:
    * the value of type <tt>T</tt> to the column. Values of type <tt>T</tt>
    * must be convertible to one of <code>int, unsigned int, double,
    * std::uint64_t, std::string</code> or a compiler error will result.
+   * @param key The key used by this operation.
+   * @param value The value associated with the function.
    */
   template <typename T>
   void
@@ -428,6 +434,7 @@ public:
   /**
    * Switch auto-fill mode on or off. See the general documentation of this
    * class for a description of what auto-fill mode does.
+   * @param state Whether to state.
    */
   void
   set_auto_fill_mode(const bool state);
@@ -443,6 +450,8 @@ public:
    * Concerning the order of the columns, the supercolumn replaces the first
    * column that is added to the supercolumn. Within the supercolumn the order
    * of output follows the order the columns are added to the supercolumn.
+   * @param key The key used by this operation.
+   * @param superkey The superkey used by this operation.
    */
   void
   add_column_to_supercolumn(const std::string &key,
@@ -463,6 +472,7 @@ public:
    * five columns and then call one of the <tt>write_*</tt> functions, then
    * call this function with the next five columns and again <tt>write_*</tt>,
    * and so on.
+   * @param new_order The new order.
    */
   void
   set_column_order(const std::vector<std::string> &new_order);
@@ -471,6 +481,8 @@ public:
    * Set the <tt>precision</tt> e.g. double or float variables are written
    * with. <tt>precision</tt> is the same as in calling
    * <tt>out<<setprecision(precision)</tt>.
+   * @param key The key used by this operation.
+   * @param precision The precision used by this operation.
    */
   void
   set_precision(const std::string &key, const unsigned int precision);
@@ -478,6 +490,8 @@ public:
   /**
    * Set the <tt>scientific_flag</tt>. True means scientific, false means
    * fixed point notation.
+   * @param key The key used by this operation.
+   * @param scientific Whether to scientific.
    */
   void
   set_scientific(const std::string &key, const bool scientific);
@@ -486,18 +500,22 @@ public:
    * Set the caption of the column <tt>key</tt> for tex output. You may want
    * to chose this different from <tt>key</tt>, if it contains formulas or
    * similar constructs.
+   * @param key The key used by this operation.
+   * @param tex_caption The tex caption.
    */
   void
   set_tex_caption(const std::string &key, const std::string &tex_caption);
 
   /**
    * Set the tex caption of the entire <tt>table</tt> for tex output.
+   * @param table_caption The table caption.
    */
   void
   set_tex_table_caption(const std::string &table_caption);
 
   /**
    * Set the label of this <tt>table</tt> for tex output.
+   * @param table_label The table label.
    */
   void
   set_tex_table_label(const std::string &table_label);
@@ -506,6 +524,8 @@ public:
    * Set the caption the supercolumn <tt>superkey</tt> for tex output.
    * You may want to chose this different from <tt>superkey</tt>, if it
    * contains formulas or similar constructs.
+   * @param superkey The superkey used by this operation.
+   * @param tex_supercaption The tex supercaption.
    */
   void
   set_tex_supercaption(const std::string &superkey,
@@ -516,6 +536,8 @@ public:
    * <tt>l</tt>, or <tt>p{3cm}</tt>. The default is <tt>c</tt>. Also if this
    * function is not called for a column, the default is preset to be
    * <tt>c</tt>.
+   * @param key The key used by this operation.
+   * @param format The format used by this operation.
    */
   void
   set_tex_format(const std::string &key, const std::string &format = "c");
@@ -530,6 +552,8 @@ public:
    *
    * The second argument indicates how column keys are to be displayed. See
    * the description of TextOutputFormat for more information.
+   * @param out The output stream to which data is written.
+   * @param format The format used by this operation.
    */
   void
   write_text(std::ostream          &out,
@@ -541,6 +565,8 @@ public:
    * <code>\\end{document}</code> are used. In this way the file can be
    * included into an existing tex file using a command like
    * <code>\\input{table_file}</code>.
+   * @param file The file name or path associated with the operation.
+   * @param with_header The with header.
    */
   void
   write_tex(std::ostream &file, const bool with_header = true) const;
@@ -630,12 +656,14 @@ protected:
 
     /**
      * Constructor.
+     * @param tex_caption The tex caption.
      */
     explicit Column(const std::string &tex_caption);
 
     /**
      * Pad this column with default constructed elements to the number of rows
      * given by the argument.
+     * @param length The length used by this operation.
      */
     void
     pad_column_below(const unsigned int length);
@@ -738,6 +766,7 @@ protected:
    *
    * This function implicitly checks the consistency of the data. The result
    * is returned in <tt>sel_columns</tt>.
+   * @param sel_columns The object in which to store the sel columns.
    */
   void
   get_selected_columns(std::vector<std::string> &sel_columns) const;

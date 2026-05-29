@@ -154,17 +154,20 @@ public:
 
   /**
    * Standard copy constructor operator.
+   * @param box The box used by this operation.
    */
   BoundingBox(const BoundingBox<spacedim, Number> &box) = default;
 
   /**
    * Standard copy assignment operator.
+   * @param t The time associated with the evaluation.
    */
   BoundingBox<spacedim, Number> &
   operator=(const BoundingBox<spacedim, Number> &t) = default;
 
   /**
    * Standard constructor for an empty box around a point @p point.
+   * @param point The point at which to evaluate the function.
    */
   BoundingBox(const Point<spacedim, Number> &point);
 
@@ -172,6 +175,7 @@ public:
    * Standard constructor for non-empty boxes: it uses a pair of points
    * which describe the box: one for the bottom and one for the top
    * corner.
+   * @param boundary_points The boundary points.
    */
   BoundingBox(const std::pair<Point<spacedim, Number>, Point<spacedim, Number>>
                 &boundary_points);
@@ -200,12 +204,14 @@ public:
 
   /**
    * Test for equality.
+   * @param box The box used by this operation.
    */
   bool
   operator==(const BoundingBox<spacedim, Number> &box) const;
 
   /**
    * Test for inequality.
+   * @param box The box used by this operation.
    */
   bool
   operator!=(const BoundingBox<spacedim, Number> &box) const;
@@ -213,6 +219,8 @@ public:
   /**
    * Check if the current object and @p other_bbox are neighbors, i.e. if the boxes
    * have dimension spacedim, check if their intersection is non empty.
+   * @param other_bbox The other bbox.
+   * @param tolerance The tolerance used by this operation.
    */
   bool
   has_overlap_with(
@@ -221,6 +229,8 @@ public:
 
   /**
    * Check which NeighborType @p other_bbox is to the current object.
+   * @param other_bbox The other bbox.
+   * @param tolerance The tolerance used by this operation.
    */
   NeighborType
   get_neighbor_type(
@@ -231,6 +241,7 @@ public:
    * Enlarge the current object so that it contains @p other_bbox .
    * If the current object already contains @p other_bbox then it is not changed
    * by this function.
+   * @param other_bbox The other bbox.
    */
   void
   merge_with(const BoundingBox<spacedim, Number> &other_bbox);
@@ -240,6 +251,8 @@ public:
    * parameter @p tolerance is a factor by which the bounding box is enlarged
    * relative to the dimensions of the bounding box in order to determine in a
    * numerically robust way whether the point is inside.
+   * @param p The point at which to evaluate the function.
+   * @param tolerance The tolerance used by this operation.
    */
   bool
   point_inside(
@@ -255,6 +268,7 @@ public:
    * If you call this method with a negative number, and one of the axes of the
    * original bounding box is smaller than amount/2, the method will trigger
    * an assertion.
+   * @param amount The amount used by this operation.
    */
   void
   extend(const Number amount);
@@ -262,6 +276,7 @@ public:
   /**
    * The same as above with the difference that a new BoundingBox instance is
    * created without changing the current object.
+   * @param amount The amount used by this operation.
    */
   BoundingBox<spacedim, Number>
   create_extended(const Number amount) const;
@@ -278,6 +293,7 @@ public:
    * If you call this method with a negative number, and one of the axes of the
    * original bounding box is smaller than relative_amount *
    * side_length(direction) / 2, the method will trigger an assertion.
+   * @param relative_amount The relative amount.
    */
   BoundingBox<spacedim, Number>
   create_extended_relative(const Number relative_amount) const;
@@ -296,24 +312,28 @@ public:
 
   /**
    * Returns the side length of the box in @p direction.
+   * @param direction The coordinate direction to which this operation refers.
    */
   Number
   side_length(const unsigned int direction) const;
 
   /**
    * Return the lower bound of the box in @p direction.
+   * @param direction The coordinate direction to which this operation refers.
    */
   Number
   lower_bound(const unsigned int direction) const;
 
   /**
    * Return the upper bound of the box in @p direction.
+   * @param direction The coordinate direction to which this operation refers.
    */
   Number
   upper_bound(const unsigned int direction) const;
 
   /**
    * Return the bounds of the box in @p direction, as a one-dimensional box.
+   * @param direction The coordinate direction to which this operation refers.
    */
   BoundingBox<1, Number>
   bounds(const unsigned int direction) const;
@@ -321,6 +341,7 @@ public:
   /**
    * Returns the indexth vertex of the box. Vertex is meant in the same way as
    * for a cell, so that @p index $\in [0, 2^{\text{dim}} - 1]$.
+   * @param index The index of the entry.
    */
   Point<spacedim, Number>
   vertex(const unsigned int index) const;
@@ -328,6 +349,7 @@ public:
   /**
    * Returns the indexth child of the box. Child is meant in the same way as for
    * a cell.
+   * @param index The index of the entry.
    */
   BoundingBox<spacedim, Number>
   child(const unsigned int index) const;
@@ -336,6 +358,7 @@ public:
    * Returns the cross section of the box orthogonal to @p direction.
    * This is a box in one dimension lower.
    *
+   * @param direction The coordinate direction to which this operation refers.
    * @note Calling this method in 1d will result in an exception since
    * <code>BoundingBox&lt;0&gt;</code> is not implemented.
    */
@@ -349,6 +372,7 @@ public:
    * If $B$ is this bounding box, and $\hat{B}$ is the unit bounding box,
    * compute the affine mapping that satisfies $G(B) = \hat{B}$ and apply it to
    * @p point.
+   * @param point The point at which to evaluate the function.
    */
   Point<spacedim, Number>
   real_to_unit(const Point<spacedim, Number> &point) const;
@@ -360,6 +384,7 @@ public:
    * If $B$ is this bounding box, and $\hat{B}$ is the unit bounding box,
    * compute the affine mapping that satisfies $F(\hat{B}) = B$ and apply it to
    * @p point.
+   * @param point The point at which to evaluate the function.
    */
   Point<spacedim, Number>
   unit_to_real(const Point<spacedim, Number> &point) const;
@@ -369,6 +394,8 @@ public:
    * interval described by the bounds of the rectangle in the respective
    * direction, zero for points on the interval boundary and positive for points
    * outside.
+   * @param point The point at which to evaluate the function.
+   * @param direction The coordinate direction to which this operation refers.
    */
   Number
   signed_distance(const Point<spacedim, Number> &point,
@@ -378,6 +405,7 @@ public:
    * Returns the signed distance from a @p point to the bounds of the box. The
    * signed distance is negative for points inside the rectangle, zero for
    * points on the rectangle and positive for points outside the rectangle.
+   * @param point The point at which to evaluate the function.
    */
   Number
   signed_distance(const Point<spacedim, Number> &point) const;

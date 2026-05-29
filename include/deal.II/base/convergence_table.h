@@ -11,17 +11,17 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_convergence_table_h
-#define dealii_convergence_table_h
+#  define dealii_convergence_table_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/table_handler.h>
-#include <deal.II/base/types.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/table_handler.h>
+#  include <deal.II/base/types.h>
 
-#include <ostream>
-#include <string>
+#  include <ostream>
+#  include <string>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -129,6 +129,10 @@ public:
    * described by the last parameter of this function, the formula needs to be
    * $ C (1/\sqrt[dim]{k})^r $.
    *
+   * @param data_column_key The data column key.
+   * @param reference_column_key The reference column key.
+   * @param rate_mode The rate mode.
+   * @param dim The dim used by this operation.
    * @note Since this function adds columns to the table after several rows
    * have already been filled, it switches off the auto fill mode of the
    * TableHandler base class. If you intend to add further data with auto
@@ -152,6 +156,8 @@ public:
    * one of the data column. This may be changed by using the
    * set_tex_supercaption() function of the base class TableHandler.
    *
+   * @param data_column_key The data column key.
+   * @param rate_mode The rate mode.
    * @note Since this function adds columns to the table after several rows
    * have already been filled, it switches off the auto fill mode of the
    * TableHandler base class. If you intend to add further data with auto
@@ -167,6 +173,7 @@ public:
    *
    * The Column::flag==1 is reserved for omitting the column from convergence
    * rate evaluation.
+   * @param key The key used by this operation.
    */
   void
   omit_column_from_convergence_rate_evaluation(const std::string &key);
@@ -184,6 +191,8 @@ public:
    * wanted to be omitted in the evaluation of the convergence rates. Hence
    * they should omitted by calling the
    * omit_column_from_convergence_rate_evaluation().
+   * @param reference_column_key The reference column key.
+   * @param rate_mode The rate mode.
    */
   void
   evaluate_all_convergence_rates(const std::string &reference_column_key,
@@ -201,6 +210,7 @@ public:
    * wanted to be omitted in the evaluation of the convergence rates. Hence
    * they should omitted by calling the
    * omit_column_from_convergence_rate_evaluation().
+   * @param rate_mode The rate mode.
    */
   void
   evaluate_all_convergence_rates(const RateMode rate_mode);
@@ -216,10 +226,6 @@ public:
   DeclException1(ExcRateColumnAlreadyExists,
                  std::string,
                  << "Rate column <" << arg1 << "> does already exist.");
-  /** @} */
-};
-
-
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
+  /**
+   *  @} */
+  ****AL_II_NAMESPACE_CLOSE **ndif * /

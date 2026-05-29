@@ -63,6 +63,7 @@ public:
    * Variant of the n_polynomials() function taking only a single argument
    * `degree`, assuming `degree + 1` in the normal direction and `degree` in
    * the tangential directions.
+   * @param degree The polynomial degree.
    */
   static unsigned int
   n_polynomials(const unsigned int degree);
@@ -73,6 +74,7 @@ public:
   /**
    * Compute the lexicographic to hierarchic numbering underlying this class,
    * computed as a free function.
+   * @param degree The polynomial degree.
    */
   static std::vector<unsigned int>
   get_lexicographic_numbering(const unsigned int degree);

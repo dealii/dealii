@@ -63,6 +63,7 @@ namespace Functions
     /**
      * Store an adjustment for the pressure function, such that its mean value
      * is <tt>p</tt>.
+     * @param p The point at which to evaluate the function.
      */
     void
     pressure_adjustment(double p);
@@ -71,6 +72,8 @@ namespace Functions
      * Values in a structure more suitable for vector valued functions. The
      * outer vector is indexed by solution component, the inner by quadrature
      * point.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_values(const std::vector<Point<dim>>    &points,
@@ -79,6 +82,8 @@ namespace Functions
      * Gradients in a structure more suitable for vector valued functions. The
      * outer vector is indexed by solution component, the inner by quadrature
      * point.
+     * @param points The points at which to evaluate the function.
+     * @param gradients The object in which to store the computed gradients.
      */
     virtual void
     vector_gradients(
@@ -89,6 +94,8 @@ namespace Functions
      * The outer vector is indexed by solution component, the inner by
      * quadrature point.
      *
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      * @warning This is not the true Laplacian, but the force term to be used
      * as right hand side in Stokes' equations
      */
@@ -111,6 +118,8 @@ namespace Functions
       std::vector<std::vector<Tensor<1, dim>>> &gradients) const override;
     /**
      * The force term in the momentum equation.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_laplacian_list(const std::vector<Point<dim>> &points,
@@ -159,6 +168,8 @@ namespace Functions
     /**
      * Construct an object for the given channel radius <tt>r</tt> and the
      * Reynolds number <tt>Re</tt>.
+     * @param r The value on which this function operates.
+     * @param Re The re used by this operation.
      */
     PoisseuilleFlow(const double r, const double Re);
 
@@ -200,10 +211,14 @@ namespace Functions
     /**
      * Constructor setting the Reynolds number required for pressure
      * computation and scaling of the right hand side.
+     * @param viscosity The viscosity used by this operation.
+     * @param reaction The reaction used by this operation.
      */
     StokesCosine(const double viscosity = 1., const double reaction = 0.);
     /**
      * Change the viscosity and the reaction parameter.
+     * @param viscosity The viscosity used by this operation.
+     * @param reaction The reaction used by this operation.
      */
     void
     set_parameters(const double viscosity, const double reaction);
@@ -307,6 +322,8 @@ namespace Functions
      * equation returned by vector_laplacians() contains the nonlinearity,
      * such that the Kovasznay solution can be obtained as the solution to a
      * Stokes problem.
+     * @param Re The re used by this operation.
+     * @param Stokes Whether to stokes.
      */
     Kovasznay(const double Re, bool Stokes = false);
 

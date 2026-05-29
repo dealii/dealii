@@ -452,6 +452,7 @@ public:
   /**
    * Constructor. Initialize the object with the given argument representing a
    * vertex, line, etc.
+   * @param object The object used by this operation.
    */
   GeometryPrimitive(const Object object);
 
@@ -459,6 +460,7 @@ public:
    * Constructor. Initialize the object with an integer that should represent
    * the dimensionality of the geometric object in question. This will usually
    * be a number between zero (a vertex) and three (a hexahedron).
+   * @param object_dimension The object dimension.
    */
   GeometryPrimitive(const unsigned int object_dimension);
 
@@ -798,6 +800,7 @@ public:
   /**
    * Constructor. Take and store a value indicating a particular refinement
    * from the list of possible refinements specified in the base class.
+   * @param refinement_case The refinement case.
    */
   constexpr RefinementCase(
     const typename RefinementPossibilities<dim>::Possibilities refinement_case);
@@ -806,6 +809,7 @@ public:
    * Constructor. Take and store a value indicating a particular refinement as
    * a bit field. To avoid implicit conversions to and from integral values,
    * this constructor is marked as explicit.
+   * @param refinement_case The refinement case.
    */
   constexpr explicit RefinementCase(const std::uint8_t refinement_case);
 
@@ -826,6 +830,7 @@ public:
   /**
    * Return the union of the refinement flags represented by the current
    * object and the one given as argument.
+   * @param r The value on which this function operates.
    */
   constexpr RefinementCase
   operator|(const RefinementCase &r) const;
@@ -833,6 +838,7 @@ public:
   /**
    * Return the intersection of the refinement flags represented by the
    * current object and the one given as argument.
+   * @param r The value on which this function operates.
    */
   constexpr RefinementCase
   operator&(const RefinementCase &r) const;
@@ -852,6 +858,7 @@ public:
    * Return the flag that corresponds to cutting a cell along the axis given
    * as argument. For example, if <code>i=0</code> then the returned value is
    * <tt>RefinementPossibilities<dim>::cut_x</tt>.
+   * @param i The index of the entry.
    */
   static constexpr RefinementCase
   cut_axis(const unsigned int i);
@@ -1168,6 +1175,7 @@ namespace internal
      * Constructor. Take and store a value indicating a particular subface
      * possibility in the list of possible situations specified in the base
      * class.
+     * @param subface_possibility The subface possibility.
      */
     SubfaceCase(const typename SubfacePossibilities<dim>::Possibilities
                   subface_possibility);
@@ -1285,6 +1293,7 @@ struct GeometryInfo<0>
    * Return the number of children of a cell (or face) refined with
    * <tt>ref_case</tt>. Since we are concerned here with points, the number of
    * children is equal to one.
+   * @param refinement_case The refinement case.
    */
   static unsigned int
   n_children(const RefinementCase<0> &refinement_case);
@@ -1337,6 +1346,11 @@ struct GeometryInfo<0>
    *
    * Of course, since this class is for the case `dim==0`, this function
    * is not implemented.
+   * @param face The local face index to which the query refers.
+   * @param vertex The local vertex index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   face_to_cell_vertices(const unsigned int face,
@@ -1358,6 +1372,11 @@ struct GeometryInfo<0>
    *
    * Of course, since this class is for the case `dim==0`, this function
    * is not implemented.
+   * @param face The local face index to which the query refers.
+   * @param line The local line index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   face_to_cell_lines(const unsigned int face,
@@ -2137,6 +2156,7 @@ struct GeometryInfo
   /**
    * Return the number of children of a cell (or face) refined with
    * <tt>ref_case</tt>.
+   * @param refinement_case The refinement case.
    */
   static unsigned int
   n_children(const RefinementCase<dim> &refinement_case);
@@ -2144,6 +2164,7 @@ struct GeometryInfo
   /**
    * Return the number of subfaces of a face refined according to
    * internal::SubfaceCase @p face_ref_case.
+   * @param subface_case The subface case.
    */
   static unsigned int
   n_subfaces(const internal::SubfaceCase<dim> &subface_case);
@@ -2156,6 +2177,8 @@ struct GeometryInfo
    *
    * E.g. for internal::SubfaceCase::cut_xy the ratio is 1/4 for each of the
    * subfaces.
+   * @param subface_case The subface case.
+   * @param subface_no The subface no.
    */
   static double
   subface_ratio(const internal::SubfaceCase<dim> &subface_case,
@@ -2165,6 +2188,11 @@ struct GeometryInfo
    * Given a cell refined with the <code>RefinementCase</code> @p
    * cell_refinement_case return the <code>SubfaceCase</code> of the @p
    * face_no th face.
+   * @param cell_refinement_case The cell refinement case.
+   * @param face_no The face no.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static RefinementCase<dim - 1>
   face_refinement_case(const RefinementCase<dim> &cell_refinement_case,
@@ -2177,6 +2205,11 @@ struct GeometryInfo
    * Given the SubfaceCase @p face_refinement_case of the @p face_no th face,
    * return the smallest RefinementCase of the cell, which corresponds to that
    * refinement of the face.
+   * @param face_refinement_case The face refinement case.
+   * @param face_no The face no.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static RefinementCase<dim>
   min_cell_refinement_case_for_face_refinement(
@@ -2189,6 +2222,8 @@ struct GeometryInfo
   /**
    * Given a cell refined with the RefinementCase @p cell_refinement_case
    * return the RefinementCase of the @p line_no th face.
+   * @param cell_refinement_case The cell refinement case.
+   * @param line_no The line no.
    */
   static RefinementCase<1>
   line_refinement_case(const RefinementCase<dim> &cell_refinement_case,
@@ -2197,6 +2232,7 @@ struct GeometryInfo
   /**
    * Return the minimal / smallest RefinementCase of the cell, which ensures
    * refinement of line @p line_no.
+   * @param line_no The line no.
    */
   static RefinementCase<dim>
   min_cell_refinement_case_for_line_refinement(const unsigned int line_no);
@@ -2246,6 +2282,13 @@ struct GeometryInfo
    * RefinementCase of the face, <tt>face_ref_case</tt>, might have an
    * influence on which child is behind which given subface, thus this is an
    * additional argument, defaulting to isotropic refinement of the face.
+   * @param ref_case The ref case.
+   * @param face The local face index to which the query refers.
+   * @param subface The subface used by this operation.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
+   * @param face_refinement_case The face refinement case.
    */
   static unsigned int
   child_cell_on_face(const RefinementCase<dim>     &ref_case,
@@ -2269,6 +2312,8 @@ struct GeometryInfo
    *
    * For <tt>dim=2</tt> this call is simply passed down to the
    * face_to_cell_vertices() function.
+   * @param line The local line index to which the query refers.
+   * @param vertex The local vertex index to which the query refers.
    */
   static unsigned int
   line_to_cell_vertices(const unsigned int line, const unsigned int vertex);
@@ -2292,6 +2337,11 @@ struct GeometryInfo
    * cell, this call is passed down to the child_cell_on_face() function.
    * Hence this function is simply a wrapper of child_cell_on_face() giving it
    * a suggestive name.
+   * @param face The local face index to which the query refers.
+   * @param vertex The local vertex index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   face_to_cell_vertices(const unsigned int face,
@@ -2310,6 +2360,11 @@ struct GeometryInfo
    * the standard and non-standard orientation. <tt>face_orientation</tt>
    * defaults to <tt>true</tt>, <tt>face_flip</tt> and <tt>face_rotation</tt>
    * default to <tt>false</tt> (standard orientation) and has no effect in 2d.
+   * @param face The local face index to which the query refers.
+   * @param line The local line index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   face_to_cell_lines(const unsigned int face,
@@ -2326,6 +2381,10 @@ struct GeometryInfo
    * describes a face in standard orientation.
    *
    * This function is only implemented in 3d.
+   * @param vertex The local vertex index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   standard_to_real_face_vertex(const unsigned int vertex,
@@ -2341,6 +2400,10 @@ struct GeometryInfo
    * describes a face in standard orientation.
    *
    * This function is only implemented in 3d.
+   * @param vertex The local vertex index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   real_to_standard_face_vertex(const unsigned int vertex,
@@ -2356,6 +2419,10 @@ struct GeometryInfo
    * describes a face in standard orientation.
    *
    * This function is only implemented in 3d.
+   * @param line The local line index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   standard_to_real_face_line(const unsigned int line,
@@ -2367,6 +2434,8 @@ struct GeometryInfo
    * Map the vertex index @p vertex of a line in standard orientation to one of a
    * face with arbitrary @p line_orientation. The value of this flag default to
    * <tt>true</tt>.
+   * @param vertex The local vertex index to which the query refers.
+   * @param line_orientation The line orientation.
    */
   static unsigned int
   standard_to_real_line_vertex(const unsigned int vertex,
@@ -2376,6 +2445,7 @@ struct GeometryInfo
    * Decompose the vertex index in a quad into a pair of a line index and a
    * vertex index within this line.
    *
+   * @param vertex The local vertex index to which the query refers.
    * @note Which line is selected is not of importance (and not exposed on
    *   purpose).
    */
@@ -2386,6 +2456,7 @@ struct GeometryInfo
    * Decompose the vertex index in a hex into a pair of a quad index and a
    * vertex index within this quad.
    *
+   * @param vertex The local vertex index to which the query refers.
    * @note Which quad is selected is not of importance (and not exposed on
    *   purpose).
    */
@@ -2396,6 +2467,7 @@ struct GeometryInfo
    * Decompose the line index in a hex into a pair of a quad index and a line
    * index within this quad.
    *
+   * @param line The local line index to which the query refers.
    * @note Which quad is selected is not of importance (and not exposed on
    *   purpose).
    */
@@ -2410,6 +2482,10 @@ struct GeometryInfo
    * standard orientation.
    *
    * This function is only implemented in 3d.
+   * @param line The local line index to which the query refers.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   static unsigned int
   real_to_standard_face_line(const unsigned int line,
@@ -2421,6 +2497,7 @@ struct GeometryInfo
    * Return the position of the @p ith vertex on the unit cell. The order of
    * vertices is the canonical one in deal.II, as described in the general
    * documentation of this class.
+   * @param vertex The local vertex index to which the query refers.
    */
   static Point<dim>
   unit_cell_vertex(const unsigned int vertex);
@@ -2433,6 +2510,7 @@ struct GeometryInfo
    *
    * The order of child cells is described the general documentation of this
    * class.
+   * @param p The point at which to evaluate the function.
    */
   static unsigned int
   child_cell_from_point(const Point<dim> &p);
@@ -2443,6 +2521,9 @@ struct GeometryInfo
    * Neither original nor returned coordinates need actually be inside the
    * cell, we simply perform a scale-and-shift operation with a shift that
    * depends on the number of the child.
+   * @param p The point at which to evaluate the function.
+   * @param child_index The child index.
+   * @param refine_case The refine case.
    */
   static Point<dim>
   cell_to_child_coordinates(const Point<dim>         &p,
@@ -2454,6 +2535,9 @@ struct GeometryInfo
    * The reverse function to the one above: take a point in the coordinate
    * system of the child, and transform it to the coordinate system of the
    * parent cell.
+   * @param p The point at which to evaluate the function.
+   * @param child_index The child index.
+   * @param refine_case The refine case.
    */
   static Point<dim>
   child_to_cell_coordinates(const Point<dim>         &p,
@@ -2464,6 +2548,7 @@ struct GeometryInfo
   /**
    * Return true if the given point is inside the unit cell of the present
    * space dimension.
+   * @param p The point at which to evaluate the function.
    */
   static bool
   is_inside_unit_cell(const Point<dim> &p);
@@ -2478,6 +2563,8 @@ struct GeometryInfo
    *
    * The tolerance parameter may be less than zero, indicating that the point
    * should be safely inside the cell.
+   * @param p The point at which to evaluate the function.
+   * @param eps The eps used by this operation.
    */
   static bool
   is_inside_unit_cell(const Point<dim> &p, const double eps);
@@ -2485,6 +2572,7 @@ struct GeometryInfo
   /**
    * Projects a given point onto the unit cell, i.e. each coordinate outside
    * [0..1] is modified to lie within that interval.
+   * @param p The point at which to evaluate the function.
    */
   template <typename Number = double>
   static Point<dim, Number>
@@ -2494,6 +2582,7 @@ struct GeometryInfo
    * Return the infinity norm of the vector between a given point @p p
    * outside the unit cell to the closest unit cell boundary. For points
    * inside the cell, this is defined as zero.
+   * @param p The point at which to evaluate the function.
    */
   static double
   distance_to_unit_cell(const Point<dim> &p);
@@ -2501,6 +2590,8 @@ struct GeometryInfo
   /**
    * Compute the value of the $i$-th $d$-linear (i.e. (bi-,tri-)linear) shape
    * function at location $\xi$.
+   * @param xi The point associated with this operation.
+   * @param i The index of the entry.
    */
   static double
   d_linear_shape_function(const Point<dim> &xi, const unsigned int i);
@@ -2508,6 +2599,8 @@ struct GeometryInfo
   /**
    * Compute the gradient of the $i$-th $d$-linear (i.e. (bi-,tri-)linear)
    * shape function at location $\xi$.
+   * @param xi The point associated with this operation.
+   * @param i The index of the entry.
    */
   static Tensor<1, dim>
   d_linear_shape_function_gradient(const Point<dim> &xi, const unsigned int i);

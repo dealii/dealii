@@ -50,6 +50,7 @@ namespace GeometricUtilities
      * @f}
      *
      * The use of this function is demonstrated in step-75.
+     * @param point The point at which to evaluate the function.
      */
     template <int dim>
     std::array<double, dim>
@@ -67,6 +68,7 @@ namespace GeometricUtilities
      *  y &= r\, \sin(\theta) \, \sin(\phi) \\
      *  z &= r\, \cos(\phi)
      * @f}
+     * @param scoord The scoord used by this operation.
      */
     template <std::size_t dim>
     Point<dim>

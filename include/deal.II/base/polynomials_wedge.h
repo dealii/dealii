@@ -34,6 +34,7 @@ namespace internal
   /**
    * Return the support points of a wedge in a way that can also be compiled
    * for dim==1 and dim==2.
+   * @param degree The polynomial degree.
    */
   template <int dim>
   std::vector<Point<dim>>

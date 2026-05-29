@@ -99,6 +99,7 @@ public:
    * executed by Utilities::MPI::MPI_InitFinalize. Use the appropriate
    * argument of the constructor of Utilities::MPI::MPI_InitFinalize if you
    * have an MPI based code.
+   * @param max_threads The max threads.
    */
   static void
   set_thread_limit(

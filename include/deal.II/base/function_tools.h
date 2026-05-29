@@ -56,6 +56,11 @@ namespace FunctionTools
    * If the function has more than 1 component the @p component parameter can
    * be used to specify which function component the bounds should be computed
    * for.
+   * @param function The function object.
+   * @param box The box used by this operation.
+   * @param value_bounds The object in which to store the value bounds.
+   * @param gradient_bounds The object in which to store the gradient bounds.
+   * @param component The component to evaluate.
    */
   template <int dim>
   void

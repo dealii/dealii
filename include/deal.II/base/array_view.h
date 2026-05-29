@@ -132,6 +132,7 @@ public:
 
   /**
    * Copy constructor.
+   * @param view The view used by this operation.
    */
   ArrayView(const ArrayView &view) = default;
 
@@ -146,6 +147,7 @@ public:
    * argument points to `const` elements, the conversion is clearly
    * not valid because it would remove the `const`ness of the
    * argument.
+   * @param view The view used by this operation.
    */
   template <typename OtherElementType,
             typename = std::enable_if_t<
@@ -156,6 +158,8 @@ public:
   /**
    * A constructor that automatically creates a view from a single value_type
    * object. The view so created then has length one.
+   * @param element The value assigned to each entry that is initialized by
+   * this operation.
    */
   explicit ArrayView(value_type &element);
 
@@ -223,6 +227,7 @@ public:
    * a function that takes an ArrayView object as argument, and passing in
    * a container.
    *
+   * @param container The container used by this operation.
    * @note This constructor takes a reference to a @p const container as argument.
    *   It can only be used to initialize ArrayView objects that point to
    *   @p const memory locations, such as <code>ArrayView@<const double@></code>.
@@ -250,6 +255,7 @@ public:
    * a function that takes an ArrayView object as argument, and passing in
    * a container.
    *
+   * @param container The container used by this operation.
    * @note This constructor takes a reference to a non-@p const container as
    *   argument. It can be used to initialize ArrayView objects that point to
    *   either @p const memory locations, such as
@@ -332,6 +338,7 @@ public:
 
   /**
    * Copy operator.
+   * @param view The view used by this operation.
    */
   ArrayView<ElementType, MemorySpaceType> &
   operator=(const ArrayView &view) = default;
@@ -347,6 +354,7 @@ public:
    * argument points to `const` elements, the conversion is clearly
    * not valid because it would remove the `const`ness of the
    * argument.
+   * @param view The view used by this operation.
    */
   template <typename OtherElementType,
             typename = std::enable_if_t<
@@ -389,6 +397,7 @@ public:
    * views point to are the same.
    *
    * This version always compares with the const value_type.
+   * @param other_view The other view.
    */
   bool
   operator==(
@@ -406,6 +415,7 @@ public:
    * views point to are the same.
    *
    * This version always compares with the non-const value_type.
+   * @param other_view The other view.
    */
   bool
   operator==(const ArrayView<std::remove_const_t<value_type>, MemorySpaceType>
@@ -426,6 +436,7 @@ public:
    * views point to are the same.
    *
    * This version always compares with the const value_type.
+   * @param other_view The other view.
    */
   bool
   operator!=(
@@ -443,6 +454,7 @@ public:
    * views point to are the same.
    *
    * This version always compares with the non-const value_type.
+   * @param other_view The other view.
    */
   bool
   operator!=(const ArrayView<std::remove_const_t<value_type>, MemorySpaceType>
@@ -503,6 +515,7 @@ public:
    *
    * This function is only allowed to be called if the underlying data is indeed
    * stored in CPU memory.
+   * @param i The index of the entry.
    */
   value_type &
   operator[](const std::size_t i) const;
@@ -864,6 +877,7 @@ public:
    *
    * This function is only allowed to be called if the underlying data is indeed
    * stored in CPU memory.
+   * @param i The index of the entry.
    */
   value_type &
   operator[](const std::size_t i) const;
@@ -984,6 +998,8 @@ namespace internal
  * of the ArrayView is inferred from the value type of the iterator (e.g., the
  * view created from two const iterators will have a const type).
  *
+ * @param begin The begin of the range.
+ * @param end The end of the range.
  * @warning The iterators @p begin and @p end must bound (in the usual half-open
  * way) a contiguous in memory range of values. This function is intended for
  * use with iterators into containers like
@@ -1028,6 +1044,8 @@ make_array_view(const Iterator begin, const Iterator end)
  * Create a view from a pair of pointers. <code>ElementType</code> may be
  * const-qualified.
  *
+ * @param begin The begin of the range.
+ * @param end The end of the range.
  * @warning The pointers @p begin and @p end must bound (in the usual
  * half-open way) a contiguous in memory range of values.
  *
@@ -1271,6 +1289,7 @@ make_array_view(const std::vector<ElementType> &vector,
  * information.
  *
  * @relatesalso ArrayView
+ * @param vector The vector used by this operation.
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
@@ -1287,6 +1306,7 @@ make_array_view(AlignedVector<ElementType> &vector)
  * information.
  *
  * @relatesalso ArrayView
+ * @param vector The vector used by this operation.
  */
 template <typename ElementType>
 inline ArrayView<const ElementType>
@@ -1303,6 +1323,9 @@ make_array_view(const AlignedVector<ElementType> &vector)
  * information.
  *
  * @relatesalso ArrayView
+ * @param vector The vector used by this operation.
+ * @param starting_index The starting index.
+ * @param size_of_view The size of view.
  */
 template <typename ElementType>
 inline ArrayView<ElementType>
@@ -1325,6 +1348,9 @@ make_array_view(AlignedVector<ElementType> &vector,
  * information.
  *
  * @relatesalso ArrayView
+ * @param vector The vector used by this operation.
+ * @param starting_index The starting index.
+ * @param size_of_view The size of view.
  */
 template <typename ElementType>
 inline ArrayView<const ElementType>

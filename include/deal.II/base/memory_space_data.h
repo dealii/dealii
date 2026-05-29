@@ -45,6 +45,8 @@ namespace MemorySpace
     /**
      * Copy the class member values to @p begin.
      * If the data is on the @ref GlossDevice "device" it is moved to the host.
+     * @param begin The begin of the range.
+     * @param n_elements The number of elements.
      */
     void
     copy_to(T *begin, const std::size_t n_elements);
@@ -52,6 +54,8 @@ namespace MemorySpace
     /**
      * Copy the data in @p begin to the class member values.
      * The pointer @p begin must be on the host.
+     * @param begin The begin of the range.
+     * @param n_elements The number of elements.
      */
     void
     copy_from(const T *begin, const std::size_t n_elements);
@@ -93,6 +97,8 @@ namespace MemorySpace
 
   /**
    * Swap function similar to std::swap.
+   * @param u The value on which this function operates.
+   * @param v The value on which this function operates.
    */
   template <typename T, typename MemorySpace>
   inline void
@@ -164,6 +170,8 @@ namespace MemorySpace
 
   /**
    * Swap function similar to std::swap.
+   * @param u The value on which this function operates.
+   * @param v The value on which this function operates.
    */
   template <typename T, typename MemorySpace>
   inline void

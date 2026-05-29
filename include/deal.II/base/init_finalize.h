@@ -74,6 +74,8 @@ enum class InitializeLibrary
 /**
  * Global operator which returns an object in which all bits are set which are
  * either set in the first or the second argument.
+ * @param f1 The first callback to combine.
+ * @param f2 The second callback to combine.
  */
 inline InitializeLibrary
 operator|(const InitializeLibrary f1, const InitializeLibrary f2)
@@ -87,6 +89,8 @@ operator|(const InitializeLibrary f1, const InitializeLibrary f2)
 /**
  * Global operator which returns an object in which all bits are set that are
  * set both in the first and second argument.
+ * @param f1 The first callback to combine.
+ * @param f2 The second callback to combine.
  */
 inline InitializeLibrary
 operator&(const InitializeLibrary f1, const InitializeLibrary f2)
@@ -107,6 +111,10 @@ public:
   /**
    * Initialize deal.II and the requested external libraries.
    *
+   * @param argc The argc used by this operation.
+   * @param argv The argv used by this operation.
+   * @param libraries The libraries used by this operation.
+   * @param max_num_threads The max num threads.
    * @note This function calls MultithreadInfo::set_thread_limit() with
    * either @p max_num_threads or, following the discussion above, a
    * number of threads equal to the number of cores allocated to this MPI
@@ -171,12 +179,14 @@ public:
    *   MPI_IBarrier(comm, &request);
    * }
    * @endcode
+   * @param request The request used by this operation.
    */
   static void
   register_request(MPI_Request &request);
 
   /**
    * Unregister a request previously added using register_request().
+   * @param request The request used by this operation.
    */
   static void
   unregister_request(MPI_Request &request);

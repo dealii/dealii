@@ -170,6 +170,7 @@ namespace TensorAccessors
    *  - use the contract function below that contracts the _last_ elements of
    * tensors.
    *
+   * @param t The time associated with the evaluation.
    * @note This function returns an internal class object consisting of an
    * array subscript operator <code>operator[](unsigned int)</code> and an
    * alias <code>value_type</code> describing its return value.
@@ -204,6 +205,9 @@ namespace TensorAccessors
    * @endcode
    * This is equivalent to <code>tensor[0][1][2][3][4] = 42.</code>.
    *
+   * @param t The time associated with the evaluation.
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    * @tparam T A tensorial object of rank @p rank. @p T must provide a local
    * alias <code>value_type</code> and an index operator
    * <code>operator[]()</code> that returns a (const or non-const) reference
@@ -257,6 +261,9 @@ namespace TensorAccessors
    * with r = rank_1 + rank_2 - 2 * no_contr, l = rank_1 - no_contr, l1 =
    * rank_1, and c = no_contr.
    *
+   * @param result The result used by this operation.
+   * @param left The left-hand operand.
+   * @param right The right-hand operand.
    * @note The Types @p T1, @p T2, and @p T3 must have rank rank_1 + rank_2 -
    * 2 * no_contr, rank_1, or rank_2, respectively. Obviously, no_contr must
    * be less or equal than rank_1 and rank_2.
@@ -310,6 +317,9 @@ namespace TensorAccessors
    *                           * right[j_0]..[j_];
    * @endcode
    *
+   * @param left The left-hand operand.
+   * @param middle The middle used by this operation.
+   * @param right The right-hand operand.
    * @note The Types @p T2, @p T3, and @p T4 must have rank rank_1, rank_1 +
    * rank_2, and rank_3, respectively. @p T1 must be a scalar type.
    */

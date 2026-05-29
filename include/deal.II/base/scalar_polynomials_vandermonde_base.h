@@ -44,6 +44,8 @@ public:
   /**
    * Constructor. This takes the degree @p degree of the space and the number
    * of polynomials @p n.
+   * @param degree The polynomial degree.
+   * @param n_dofs The number of dofs.
    */
   ScalarPolynomialsVandermondeBase(const unsigned int degree,
                                    const unsigned int n_dofs);
@@ -57,6 +59,12 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
    *
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    * @note Currently, only the vectors @p values and @p grads are filled.
    */
   void
@@ -69,6 +77,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_value()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -76,6 +86,8 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_derivative()
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @note Currently, only implemented for first derivative.
    */
   template <int order>
@@ -84,6 +96,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
@@ -92,6 +106,8 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @note Not implemented yet.
    */
   Tensor<2, dim>
@@ -101,6 +117,8 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @note Not implemented yet.
    */
   Tensor<3, dim>
@@ -110,6 +128,8 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @note Not implemented yet.
    */
   Tensor<4, dim>
@@ -118,6 +138,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -125,6 +147,8 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad_grad()
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @note Not implemented yet.
    */
   Tensor<2, dim>

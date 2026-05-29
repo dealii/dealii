@@ -81,12 +81,14 @@ public:
 
   /**
    * Read-Write access operator.
+   * @param i The index of the entry.
    */
   Tensor<order, dim, Number> &
   operator[](const unsigned int i);
 
   /**
    * Read-only access operator.
+   * @param i The index of the entry.
    */
   const Tensor<order, dim, Number> &
   operator[](const unsigned int i) const;
@@ -111,6 +113,7 @@ public:
 
   /**
    * Number conversion operator.
+   * @param df The df used by this operation.
    */
   template <typename OtherNumber>
   DerivativeForm &
@@ -491,6 +494,8 @@ operator<<(std::ostream                                       &out,
  * $[\Delta \mathbf x] [\nabla \mathbf F(\mathbf x)]^T$ in matrix notation.
  *
  * @relatesalso DerivativeForm
+ * @param grad_F The grad f.
+ * @param d_x The d x.
  */
 template <int spacedim, int dim, typename Number1, typename Number2>
 inline Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>
@@ -563,6 +568,7 @@ apply_transformation(const DerivativeForm<1, dim, dim, Number1> &grad_F,
  * by @p grad_F.
  *
  * @relatesalso DerivativeForm
+ * @param grad_F The grad f.
  */
 template <int spacedim,
           int dim,
@@ -602,6 +608,8 @@ apply_transformation(
  * @f]
  *
  * @relatesalso DerivativeForm
+ * @param DF1 The df1 used by this operation.
+ * @param DF2 The df2 used by this operation.
  */
 template <int spacedim, int dim, typename Number1, typename Number2>
 inline Tensor<2, spacedim, typename ProductType<Number1, Number2>::type>
@@ -623,6 +631,7 @@ apply_transformation(const DerivativeForm<1, dim, spacedim, Number1> &DF1,
  * reasons.
  *
  * @relatesalso DerivativeForm
+ * @param DF The df used by this operation.
  */
 template <int dim, int spacedim, typename Number>
 inline DerivativeForm<1, spacedim, dim, Number>
@@ -637,6 +646,8 @@ transpose(const DerivativeForm<1, dim, spacedim, Number> &DF)
  * Specialization of apply_transformation() for a diagonal DerivativeForm.
  *
  * @relatesalso DerivativeForm
+ * @param grad_F The grad f.
+ * @param d_x The d x.
  */
 template <int spacedim, int dim, typename Number1, typename Number2>
 inline Tensor<1, spacedim, typename ProductType<Number1, Number2>::type>
@@ -662,6 +673,7 @@ apply_diagonal_transformation(
  * notation.
  *
  * @relatesalso DerivativeForm
+ * @param grad_F The grad f.
  */
 template <int dim, typename Number1, typename Number2>
 inline Tensor<2, dim, typename ProductType<Number1, Number2>::type>
@@ -684,6 +696,7 @@ apply_diagonal_transformation(
  * by @p grad_F.
  *
  * @relatesalso DerivativeForm
+ * @param grad_F The grad f.
  */
 template <int spacedim,
           int dim,

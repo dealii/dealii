@@ -88,6 +88,8 @@ namespace Utilities
     /**
      * Construct a MutableBind object specifying the function, and
      * each arguments separately.
+     * @param function The function object.
+     * @param arguments The arguments used by this operation.
      */
     template <typename FunctionType>
     MutableBind(FunctionType function, FunctionArgs &&...arguments);
@@ -95,6 +97,8 @@ namespace Utilities
     /**
      * Construct a MutableBind object specifying the function, and
      * the arguments as a tuple.
+     * @param function The function object.
+     * @param arguments The arguments used by this operation.
      */
     template <typename FunctionType>
     MutableBind(FunctionType function, TupleType &&arguments);
@@ -102,6 +106,7 @@ namespace Utilities
     /**
      * Construct a MutableBind object specifying only the function. By default,
      * the arguments are left to their default constructor values.
+     * @param function The function object.
      */
     template <typename FunctionType>
     MutableBind(FunctionType function);
@@ -116,6 +121,7 @@ namespace Utilities
     /**
      * Set the arguments to use in @p function, for next time
      * operator()() is called, using move semantic.
+     * @param arguments The arguments used by this operation.
      */
     void
     set_arguments(TupleType &&arguments);
@@ -123,6 +129,7 @@ namespace Utilities
     /**
      * Set the arguments to use in @p function, for next time
      * operator()() is called, using move semantic.
+     * @param arguments The arguments used by this operation.
      */
     void
     set_arguments(FunctionArgs &&...arguments);
@@ -178,6 +185,8 @@ namespace Utilities
    * bound.parse_arguments("3: 4.0");
    * bound(); // will execute my_function(3, 4.0);
    * @endcode
+   * @param function The function object.
+   * @param arguments The arguments used by this operation.
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
@@ -186,6 +195,7 @@ namespace Utilities
 
   /**
    * Same as above, using a std::function object.
+   * @param arguments The arguments used by this operation.
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>
@@ -201,6 +211,7 @@ namespace Utilities
    * object, then the arguments passed to the function object will be
    * initialized with the values coming from each of the arguments' default
    * constructors.
+   * @param function The function object.
    */
   template <typename ReturnType, class... FunctionArgs>
   MutableBind<ReturnType, FunctionArgs...>

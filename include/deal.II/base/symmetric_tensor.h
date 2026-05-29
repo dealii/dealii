@@ -311,6 +311,9 @@ namespace internal
      * <tt>position-1</tt> are taken from previous_indices, and new_index is
      * put at position <tt>position</tt>. The remaining indices remain in
      * invalid state.
+     * @param previous_indices The previous indices.
+     * @param new_index The new index.
+     * @param position The position of the entry to access.
      */
     DEAL_II_HOST_DEVICE
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE TableIndices<2>
@@ -333,6 +336,9 @@ namespace internal
      * <tt>position-1</tt> are taken from previous_indices, and new_index is
      * put at position <tt>position</tt>. The remaining indices remain in
      * invalid state.
+     * @param previous_indices The previous indices.
+     * @param new_index The new index.
+     * @param position The position of the entry to access.
      */
     DEAL_II_HOST_DEVICE
     DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE TableIndices<4>
@@ -584,6 +590,7 @@ namespace internal
     public:
       /**
        * Index operator.
+       * @param i The index of the entry.
        */
       DEAL_II_HOST_DEVICE
       constexpr Accessor<rank, dim, constness, P - 1, Number>
@@ -591,6 +598,7 @@ namespace internal
 
       /**
        * Index operator.
+       * @param i The index of the entry.
        */
       DEAL_II_HOST_DEVICE
       constexpr Accessor<rank, dim, constness, P - 1, Number>
@@ -825,6 +833,7 @@ public:
    *
    * Because we check for symmetry via a non-constexpr function call, you will
    * have to use the symmetrize() function in constexpr contexts instead.
+   * @param t The time associated with the evaluation.
    */
   template <typename OtherNumber>
   explicit DEAL_II_HOST_DEVICE
@@ -852,6 +861,7 @@ public:
    * Copy constructor from tensors with different underlying scalar type. This
    * obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
+   * @param initializer The tensor argument supplied to this operation.
    */
   template <typename OtherNumber>
   DEAL_II_HOST_DEVICE constexpr explicit SymmetricTensor(
@@ -862,6 +872,7 @@ public:
    * type.
    * This obviously requires that the @p OtherNumber type is convertible to
    * @p Number.
+   * @param rhs The right-hand-side operand.
    */
   template <typename OtherNumber>
   DEAL_II_HOST_DEVICE constexpr SymmetricTensor &
@@ -872,6 +883,7 @@ public:
    * exactly it means to assign a scalar value to a tensor, zero is the only
    * value allowed for <tt>d</tt>, allowing the intuitive notation
    * $\mathbf A = 0$ to reset all elements of the tensor to zero.
+   * @param d The scalar value to assign.
    */
   DEAL_II_HOST_DEVICE
   constexpr SymmetricTensor &
@@ -915,6 +927,7 @@ public:
   /**
    * Scale the tensor by <tt>factor</tt>, i.e. multiply all components by
    * <tt>factor</tt>.
+   * @param factor The scalar factor by which all entries are scaled.
    */
   template <typename OtherNumber>
   DEAL_II_HOST_DEVICE constexpr SymmetricTensor &
@@ -922,6 +935,7 @@ public:
 
   /**
    * Scale the tensor by <tt>1/factor</tt>.
+   * @param factor The scalar divisor by which all entries are divided.
    */
   template <typename OtherNumber>
   DEAL_II_HOST_DEVICE constexpr SymmetricTensor &
@@ -972,6 +986,7 @@ public:
    * value, they write it into the first argument to the function in the same
    * way as the corresponding functions for the Tensor class do things.
    *
+   * @param s The operand supplied to this operation.
    * @note The origin of the difference in how `operator*()` is implemented between
    *   Tensor and SymmetricTensor is that for the former, the product between
    *   two Tensor objects of same rank and dimension results in another Tensor
@@ -995,6 +1010,7 @@ public:
   /**
    * Contraction over the last two indices of the present object with the first
    * two indices of the rank-4 symmetric tensor given as argument.
+   * @param s The operand supplied to this operation.
    */
   template <typename OtherNumber>
   DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR
@@ -1004,6 +1020,7 @@ public:
 
   /**
    * Return a read-write reference to the indicated element.
+   * @param indices The multi-index that identifies the tensor entry to access.
    */
   DEAL_II_HOST_DEVICE
   constexpr Number &
@@ -1011,6 +1028,7 @@ public:
 
   /**
    * Return a @p const reference to the value referred to by the argument.
+   * @param indices The multi-index that identifies the tensor entry to access.
    */
   DEAL_II_HOST_DEVICE
   constexpr const Number &
@@ -1019,6 +1037,7 @@ public:
   /**
    * Access the elements of a row of this symmetric tensor. This function is
    * called for constant tensors.
+   * @param row The row index to access.
    */
   DEAL_II_HOST_DEVICE
   constexpr internal::SymmetricTensorAccessors::
@@ -1028,6 +1047,7 @@ public:
   /**
    * Access the elements of a row of this symmetric tensor. This function is
    * called for non-constant tensors.
+   * @param row The row index to access.
    */
   DEAL_II_HOST_DEVICE
   constexpr internal::SymmetricTensorAccessors::
@@ -1038,6 +1058,8 @@ public:
    * Return a @p const reference to the value referred to by the argument.
    *
    * Exactly the same as operator().
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   DEAL_II_HOST_DEVICE
   constexpr const Number &
@@ -1047,6 +1069,8 @@ public:
    * Return a read-write reference to the indicated element.
    *
    * Exactly the same as operator().
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   DEAL_II_HOST_DEVICE
   constexpr Number &
@@ -1057,6 +1081,7 @@ public:
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(unrolled_index)]</tt>, but more
    * efficiently.
+   * @param unrolled_index The unrolled index.
    */
   DEAL_II_HOST_DEVICE
   constexpr const Number &
@@ -1067,6 +1092,7 @@ public:
    * <tt>s.access_raw_entry(unrolled_index)</tt> does the same as
    * <tt>s[s.unrolled_to_component_indices(unrolled_index)]</tt>, but more
    * efficiently.
+   * @param unrolled_index The unrolled index.
    */
   DEAL_II_HOST_DEVICE
   constexpr Number &
@@ -1091,6 +1117,8 @@ public:
    * symmetric tensors, this function returns which index within the range
    * <code>[0,n_independent_components)</code> the given entry in a symmetric
    * tensor has.
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   static DEAL_II_HOST_DEVICE constexpr unsigned int
   component_to_unrolled_index(const TableIndices<rank_> &indices);
@@ -1099,6 +1127,7 @@ public:
    * The opposite of the previous function: given an index $i$ in the unrolled
    * form of the tensor, return what set of indices $(k,l)$ (for rank-2
    * tensors) or $(k,l,m,n)$ (for rank-4 tensors) corresponds to it.
+   * @param i The index of the entry.
    */
   static DEAL_II_HOST_DEVICE constexpr TableIndices<rank_>
   unrolled_to_component_indices(const unsigned int i);
@@ -1846,6 +1875,8 @@ namespace internal
 {
   /**
    * Perform the double contraction between two rank-2 symmetric tensors.
+   * @param data The data values to read from or write to the current object.
+   * @param sdata The sdata used by this operation.
    */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -1888,6 +1919,8 @@ namespace internal
   /**
    * Perform the double contraction between a rank-4 and a rank-2
    * symmetric tensor.
+   * @param data The data values to read from or write to the current object.
+   * @param sdata The sdata used by this operation.
    */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -1918,6 +1951,8 @@ namespace internal
   /**
    * Perform the double contraction between a rank-2 and a rank-4
    * symmetric tensor.
+   * @param data The data values to read from or write to the current object.
+   * @param sdata The sdata used by this operation.
    */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -1963,6 +1998,8 @@ namespace internal
 
   /**
    * Perform the double contraction between two rank-4 symmetric tensors.
+   * @param data The data values to read from or write to the current object.
+   * @param sdata The sdata used by this operation.
    */
   template <int dim, typename Number, typename OtherNumber = Number>
   DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
@@ -2648,6 +2685,8 @@ SymmetricTensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
  * creation of a temporary variable.
  *
  * @relatesalso SymmetricTensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -2673,6 +2712,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * creation of a temporary variable.
  *
  * @relatesalso SymmetricTensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -2693,6 +2734,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * operation.
  *
  * @relatesalso SymmetricTensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -2710,6 +2753,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * operation.
  *
  * @relatesalso SymmetricTensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -2727,6 +2772,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * operation.
  *
  * @relatesalso SymmetricTensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -2744,6 +2791,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * operation.
  *
  * @relatesalso SymmetricTensor
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -2795,6 +2844,7 @@ determinant(const SymmetricTensor<2, dim, Number> &t)
  * \f]
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR DEAL_II_ALWAYS_INLINE Number
@@ -2826,6 +2876,7 @@ trace(const SymmetricTensor<2, dim, Number> &d)
  * \f]
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr Number
@@ -2872,6 +2923,7 @@ second_invariant(const SymmetricTensor<2, 1, Number> &)
  * invariant are the same; the determinant is the third invariant.)
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <typename Number>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2889,6 +2941,7 @@ second_invariant(const SymmetricTensor<2, 2, Number> &t)
  * \left[ (\text{tr} \mathbf A)^2 - \text{tr} (\mathbf{A}^2) \right]$.
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <typename Number>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE Number
@@ -2906,6 +2959,7 @@ second_invariant(const SymmetricTensor<2, 3, Number> &t)
  * eigenvalue.
  *
  * @relatesalso SymmetricTensor
+ * @param T The time associated with the evaluation.
  */
 template <typename Number>
 std::array<Number, 1>
@@ -2925,6 +2979,7 @@ eigenvalues(const SymmetricTensor<2, 1, Number> &T);
  * $\lambda_1, \lambda_2 = \frac{1}{2} \left[ \text{tr} \mathbf{T} \pm
  * \sqrt{(\text{tr} \mathbf{T})^2 - 4 \det \mathbf{T}} \right]$.
  *
+ * @param T The time associated with the evaluation.
  * @warning The algorithm employed here determines the eigenvalues by
  * computing the roots of the characteristic polynomial. In the case that there
  * exists a common root (the eigenvalues are equal), the computation is
@@ -2953,6 +3008,7 @@ eigenvalues(const SymmetricTensor<2, 2, Number> &T);
  * \left[\text{tr}(\mathbf{T}^2) - (\text{tr}\mathbf T)^2\right] -
  * \det \mathbf T$.
  *
+ * @param T The time associated with the evaluation.
  * @warning The algorithm employed here determines the eigenvalues by
  * computing the roots of the characteristic polynomial. In the case that there
  * exists a common root (the eigenvalues are equal), the computation is
@@ -3093,6 +3149,7 @@ namespace internal
 // of this global enumeration into the documentation
 // See https://stackoverflow.com/a/1717984
 /** @file */
+
 /**
  * An enumeration for the algorithm to be employed when performing
  * the computation of normalized eigenvectors and their corresponding
@@ -3145,6 +3202,8 @@ enum struct SymmetricTensorEigenvectorMethod
  * presented in @cite Kopp2008.
  *
  * @relatesalso SymmetricTensor
+ * @param T The time associated with the evaluation.
+ * @param method The numerical method to use.
  */
 template <int dim, typename Number>
 std::array<std::pair<Number, Tensor<1, dim, Number>>, dim>
@@ -3161,6 +3220,7 @@ eigenvectors(const SymmetricTensor<2, dim, Number> &T,
  * class.
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <int rank_, int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -3276,6 +3336,7 @@ DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 /**
  * Invert a symmetric rank-2 tensor.
  *
+ * @param t The time associated with the evaluation.
  * @note If a tensor is not invertible, then the result is unspecified, but will
  * likely contain the results of a division by zero or a very small number at
  * the very least.
@@ -3302,6 +3363,7 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * the very least.
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr SymmetricTensor<4, dim, Number>
@@ -3333,6 +3395,8 @@ invert(const SymmetricTensor<4, dim, Number> &t)
  * of a symmetric tensor ($\mathbf I : \mathbf B = \text{tr} \mathbf B$).
  *
  * @relatesalso SymmetricTensor
+ * @param t1 The first object to compare.
+ * @param t2 The second object to compare.
  */
 template <int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr inline SymmetricTensor<4, dim, Number>
@@ -3565,6 +3629,7 @@ positive_negative_projectors(
  * as a symmetric rank-2 tensor. This is the version for general dimensions.
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
  */
 template <int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -3655,6 +3720,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * type as is used to store the elements of the symmetric tensor.
  *
  * @relatesalso SymmetricTensor
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  */
 template <int rank_, int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -3674,6 +3741,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * type as is used to store the elements of the symmetric tensor.
  *
  * @relatesalso SymmetricTensor
+ * @param factor The scalar factor by which all entries are scaled.
+ * @param t The time associated with the evaluation.
  */
 template <int rank_, int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -3709,6 +3778,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * input tensor by the scalar factor.
  *
  * @relates SymmetricTensor
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<
@@ -3738,6 +3809,8 @@ operator*(const SymmetricTensor<rank_, dim, Number> &t,
  * information about template arguments and the return type.
  *
  * @relates SymmetricTensor
+ * @param factor The scalar factor by which all entries are scaled.
+ * @param t The time associated with the evaluation.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE SymmetricTensor<
@@ -3758,6 +3831,8 @@ operator*(const Number                                   &factor,
  * Division of a symmetric tensor of general rank by a scalar.
  *
  * @relates SymmetricTensor
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  */
 template <int rank_, int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline SymmetricTensor<
@@ -3781,6 +3856,8 @@ operator/(const SymmetricTensor<rank_, dim, Number> &t,
  * right.
  *
  * @relates SymmetricTensor
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  */
 template <int rank_, int dim>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -3799,6 +3876,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * left.
  *
  * @relates SymmetricTensor
+ * @param factor The scalar factor by which all entries are scaled.
+ * @param t The time associated with the evaluation.
  */
 template <int rank_, int dim>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -3816,6 +3895,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * Division of a symmetric tensor of general rank by a scalar.
  *
  * @relates SymmetricTensor
+ * @param t The time associated with the evaluation.
+ * @param factor The scalar factor by which all entries are scaled.
  */
 template <int rank_, int dim>
 DEAL_II_HOST_DEVICE constexpr inline SymmetricTensor<rank_, dim>
@@ -3834,6 +3915,8 @@ operator/(const SymmetricTensor<rank_, dim> &t, const double factor)
  * <code>SymmetricTensor::operator*()</code>.
  *
  * @relates SymmetricTensor
+ * @param t1 The first object to compare.
+ * @param t2 The second object to compare.
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -3856,6 +3939,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
  * @relates SymmetricTensor
+ * @param t1 The first object to compare.
+ * @param t2 The second object to compare.
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
@@ -3883,6 +3968,8 @@ DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE
  * $(\mathbf A \cdot\mathbf B)_{ij}=\sum_k A_{ik}B_{kj}$.
  *
  * @relates SymmetricTensor
+ * @param t1 The first object to compare.
+ * @param t2 The second object to compare.
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
@@ -3907,6 +3994,9 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  * with the general Tensor class.
  *
  * @relates SymmetricTensor
+ * @param tmp The tensor argument supplied to this operation.
+ * @param t The time associated with the evaluation.
+ * @param s The value on which this function operates.
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline DEAL_II_ALWAYS_INLINE void
@@ -3933,6 +4023,9 @@ double_contract(
  * with the general Tensor class.
  *
  * @relates SymmetricTensor
+ * @param tmp The tensor argument supplied to this operation.
+ * @param s The value on which this function operates.
+ * @param t The time associated with the evaluation.
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline void
@@ -3959,6 +4052,9 @@ double_contract(
  * with the general Tensor class.
  *
  * @relates SymmetricTensor
+ * @param tmp The tensor argument supplied to this operation.
+ * @param t The time associated with the evaluation.
+ * @param s The value on which this function operates.
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline void
@@ -3990,6 +4086,9 @@ double_contract(
  * with the general Tensor class.
  *
  * @relates SymmetricTensor
+ * @param tmp The tensor argument supplied to this operation.
+ * @param s The value on which this function operates.
+ * @param t The time associated with the evaluation.
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline void
@@ -4021,6 +4120,9 @@ double_contract(
  * with the general Tensor class.
  *
  * @relates SymmetricTensor
+ * @param tmp The tensor argument supplied to this operation.
+ * @param t The time associated with the evaluation.
+ * @param s The value on which this function operates.
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline void
@@ -4053,6 +4155,9 @@ double_contract(
  * with the general Tensor class.
  *
  * @relates SymmetricTensor
+ * @param tmp The tensor argument supplied to this operation.
+ * @param s The value on which this function operates.
+ * @param t The time associated with the evaluation.
  */
 template <typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr inline void
@@ -4077,6 +4182,8 @@ double_contract(
  * (i.e., a vector). The result is a rank-1 tensor (i.e., a vector).
  *
  * @relates SymmetricTensor
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr Tensor<
@@ -4102,6 +4209,8 @@ operator*(const SymmetricTensor<2, dim, Number> &src1,
  * (i.e., a matrix). The result is a rank-1 tensor (i.e., a vector).
  *
  * @relates SymmetricTensor
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  */
 template <int dim, typename Number, typename OtherNumber>
 DEAL_II_HOST_DEVICE constexpr Tensor<
@@ -4129,6 +4238,8 @@ operator*(const Tensor<1, dim, Number>               &src1,
  *     \text{right}_{k, j_1,\ldots,j_{r2}}
  * @f]
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @note As one operand is a Tensor, the multiplication operator only performs a
  * contraction over a single pair of indices. This is in contrast to the
  * multiplication operator for SymmetricTensor, which does the double
@@ -4165,6 +4276,8 @@ DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
  *     \text{right}_{k, j_1,\ldots,j_{r2}}
  * @f]
  *
+ * @param src1 The first source tensor involved in the contraction.
+ * @param src2 The second source tensor involved in the contraction.
  * @note As one operand is a Tensor, the multiplication operator only performs a
  * contraction over a single pair of indices. This is in contrast to the
  * multiplication operator for SymmetricTensor, which does the double

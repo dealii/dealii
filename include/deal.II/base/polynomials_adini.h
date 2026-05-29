@@ -58,6 +58,12 @@ public:
    * If you need values or derivatives of all polynomials then use this
    * function, rather than using any of the compute_value(), compute_grad() or
    * compute_grad_grad() functions, see below, in a loop over all polynomials.
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   void
   evaluate(const Point<dim>            &unit_point,
@@ -71,12 +77,16 @@ public:
    * Compute the value of the <tt>i</tt>th polynomial at <tt>unit_point</tt>.
    *
    * Consider using evaluate() instead.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
@@ -84,6 +94,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
@@ -91,6 +103,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
@@ -98,6 +112,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
@@ -108,6 +124,8 @@ public:
    * <tt>unit_point</tt>.
    *
    * Consider using evaluate() instead.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -117,6 +135,8 @@ public:
    * at <tt>unit_point</tt>.
    *
    * Consider using evaluate() instead.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;

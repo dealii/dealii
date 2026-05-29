@@ -326,6 +326,7 @@ namespace GraphColoring
      * odd) zone. Consequently, we can combine colors from all even and all
      * odd zones. This function tries to create colors of similar number of
      * elements.
+     * @param partition_coloring The partition coloring.
      */
     template <typename Iterator>
     std::vector<std::vector<Iterator>>
@@ -579,6 +580,8 @@ namespace GraphColoring
    * SparsityTools::color_sparsity_pattern, is an alternate method for
    * coloring using graph connections represented by SparsityPattern.
    * For further details, refer to SparsityTools::color_sparsity_pattern.
+   * @param sparsity_pattern The sparsity pattern.
+   * @param color_indices The object in which to store the color indices.
    */
   unsigned int
   color_sparsity_pattern(const SparsityPattern     &sparsity_pattern,

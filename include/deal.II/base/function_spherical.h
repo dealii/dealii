@@ -51,6 +51,8 @@ namespace Functions
      * Note that components of this function are treated as entirely separate
      * quantities -- not as the components of a vector that will be
      * re-interpreted in a different coordinate system.
+     * @param center The point associated with this operation.
+     * @param n_components The number of components.
      */
     Spherical(const Point<dim>  &center       = Point<dim>(),
               const unsigned int n_components = 1);
@@ -60,6 +62,8 @@ namespace Functions
      *
      * This function converts the given point to spherical coordinates,
      * calls svalue() with it, and returns the result.
+     * @param point The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim>  &point,
@@ -71,6 +75,8 @@ namespace Functions
      * This function converts the given point to spherical coordinates,
      * calls sgradient() with it, and converts the result into Cartesian
      * coordinates.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -82,6 +88,8 @@ namespace Functions
      * This function converts the given point to spherical coordinates,
      * calls sgradient and shessian() with it, and converts the result into
      * Cartesian coordinates.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual SymmetricTensor<2, dim>
     hessian(const Point<dim>  &p,

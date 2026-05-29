@@ -113,6 +113,7 @@ public:
 
   /**
    * Prints the list of the indices to <tt>out</tt>.
+   * @param out The output stream to which data is written.
    */
   template <typename StreamType>
   void
@@ -121,6 +122,7 @@ public:
   /**
    * Set the ordering of the polynomials. Requires
    * <tt>renumber.size()==n()</tt>. Stores a copy of <tt>renumber</tt>.
+   * @param renumber The renumber used by this operation.
    */
   void
   set_numbering(const std::vector<unsigned int> &renumber);
@@ -137,6 +139,12 @@ public:
    * If you need values or derivatives of all polynomials then use this
    * function, rather than using any of the compute_value(), compute_grad() or
    * compute_grad_grad() functions, see below, in a loop over all polynomials.
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   void
   evaluate(const Point<dim>            &unit_point,
@@ -151,6 +159,8 @@ public:
    * <tt>p</tt>.
    *
    * Consider using evaluate() instead.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -161,6 +171,8 @@ public:
    *
    * Consider using evaluate() instead.
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @tparam order The order of the derivative.
    */
   template <int order>
@@ -169,6 +181,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
@@ -176,6 +190,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
@@ -183,6 +199,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
@@ -190,6 +208,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
@@ -200,6 +220,8 @@ public:
    * <tt>p</tt>.
    *
    * Consider using evaluate() instead.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -209,6 +231,8 @@ public:
    * at unit point <tt>p</tt>.
    *
    * Consider using evaluate() instead.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -218,6 +242,7 @@ public:
    * class. Here, if <tt>N</tt> is the number of one-dimensional polynomials
    * given, then the result of this function is <i>N</i> in 1d,
    * <i>N(N+1)/2</i> in 2d, and <i>N(N+1)(N+2)/6</i> in 3d.
+   * @param n The n used by this operation.
    */
   static unsigned int
   n_polynomials(const unsigned int n);

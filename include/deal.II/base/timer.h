@@ -142,6 +142,8 @@ public:
    * only performed if Timer::stop() is called before the timer is queried for
    * time duration values.
    *
+   * @param mpi_communicator The MPI communicator.
+   * @param sync_lap_times The sync lap times.
    * @note The timer is stopped before the synchronization over the
    * communicator occurs; the extra cost of the synchronization is not
    * measured.
@@ -169,6 +171,7 @@ public:
   /**
    * Print the data returned by Timer::get_last_lap_wall_time_data() to the
    * given stream.
+   * @param stream The stream used by this operation.
    */
   template <typename StreamType>
   void
@@ -177,6 +180,7 @@ public:
   /**
    * Print the data returned by Timer::get_accumulated_wall_time_data() to the
    * given stream.
+   * @param stream The stream used by this operation.
    */
   template <typename StreamType>
   void
@@ -660,6 +664,8 @@ public:
     /**
      * Enter the given section in the timer. Exit automatically when calling
      * stop() or when the destructor runs.
+     * @param timer_ The object in which to store the timer .
+     * @param section_name The section name.
      */
     Scope(dealii::TimerOutput &timer_, const std::string &section_name);
 
@@ -777,6 +783,9 @@ public:
 
   /**
    * Same as above, but accepts a ConditionalOStream.
+   * @param stream The output stream to which data is written.
+   * @param output_frequency The output frequency.
+   * @param output_type The output type.
    */
   TimerOutput(ConditionalOStream   &stream,
               const OutputFrequency output_frequency,
@@ -791,6 +800,10 @@ public:
    * maximum observed over all processes in the given @p mpi_communicator_timing.
    * This corresponds to the first variant described in this class
    * documentation.
+   * @param mpi_communicator_timing The mpi communicator timing.
+   * @param stream The output stream to which data is written.
+   * @param output_frequency The output frequency.
+   * @param output_type The output type.
    */
   TimerOutput(const MPI_Comm        mpi_communicator_timing,
               std::ostream         &stream,
@@ -799,6 +812,10 @@ public:
 
   /**
    * Same as above but for an ConditionalOStream.
+   * @param mpi_communicator_timing The mpi communicator timing.
+   * @param stream The output stream to which data is written.
+   * @param output_frequency The output frequency.
+   * @param output_type The output type.
    */
   TimerOutput(const MPI_Comm        mpi_communicator_timing,
               ConditionalOStream   &stream,
@@ -814,6 +831,7 @@ public:
   /**
    * Open a section by given a string name of it. In case the name already
    * exists, that section is entered once again and times are accumulated.
+   * @param section_name The section name.
    */
   void
   enter_subsection(const std::string &section_name);
@@ -821,12 +839,14 @@ public:
   /**
    * Leave a section. If no name is given, the last section that was entered
    * is left.
+   * @param section_name The section name.
    */
   void
   leave_subsection(const std::string &section_name = "");
 
   /**
    * Get a map with the collected data of the specified type for each subsection
+   * @param kind The kind used by this operation.
    */
   std::map<std::string, double>
   get_summary_data(const OutputData kind) const;
@@ -860,6 +880,8 @@ public:
    * and the maximum. The value of `quantile` needs to be between 0 (no
    * quantiles are printed besides the minimum and maximum) and 0.5 (when the
    * median is given).
+   * @param mpi_communicator_statistics The mpi communicator statistics.
+   * @param print_quantile The print quantile.
    */
   void
   print_wall_time_statistics(const MPI_Comm mpi_communicator_statistics,

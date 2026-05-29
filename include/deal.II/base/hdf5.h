@@ -367,6 +367,7 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     * @param attr_name The attr name.
      */
     template <typename T>
     T
@@ -383,6 +384,8 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     * @param attr_name The attr name.
+     * @param value The value associated with the function.
      */
     template <typename T>
     void
@@ -497,6 +500,7 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     * @param coordinates The coordinates used by this operation.
      */
     template <typename Container>
     Container
@@ -573,6 +577,12 @@ namespace HDF5
      * `Vector<std::complex<double>>`, `FullMatrix<float>`,
      * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
      * `FullMatrix<std::complex<double>>`.
+     * @param data_dimensions The data dimensions.
+     * @param offset The offset into the underlying storage or file at which
+     * the operation starts.
+     * @param stride The stride used by this operation.
+     * @param count The number of elements to process.
+     * @param block The block used by this operation.
      */
     template <typename Container>
     Container
@@ -614,6 +624,8 @@ namespace HDF5
      * `Vector<std::complex<double>>`, `FullMatrix<float>`,
      * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
      * `FullMatrix<std::complex<double>>`.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename Container>
     void
@@ -646,6 +658,9 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     * @param data The data values to read from or write to the current
+     * object.
+     * @param coordinates The coordinates used by this operation.
      */
     template <typename Container>
     void
@@ -716,6 +731,14 @@ namespace HDF5
      * `Vector<std::complex<double>>`, `FullMatrix<float>`,
      * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
      * `FullMatrix<std::complex<double>>`.
+     * @param data The data values to read from or write to the current
+     * object.
+     * @param data_dimensions The data dimensions.
+     * @param offset The offset into the underlying storage or file at which
+     * the operation starts.
+     * @param stride The stride used by this operation.
+     * @param count The number of elements to process.
+     * @param block The block used by this operation.
      */
     template <typename Container>
     void
@@ -768,6 +791,7 @@ namespace HDF5
 
     /**
      * This function sets the boolean query_io_mode.
+     * @param new_query_io_mode The new query io mode.
      */
     void
     set_query_io_mode(const bool new_query_io_mode);
@@ -1013,18 +1037,24 @@ namespace HDF5
   public:
     /**
      * Opens a sub-group of the current Group or File.
+     * @param name The name associated with the object being created or
+     * queried.
      */
     Group
     open_group(const std::string &name) const;
 
     /**
      * Creates a sub-group in the current Group or File.
+     * @param name The name associated with the object being created or
+     * queried.
      */
     Group
     create_group(const std::string &name) const;
 
     /**
      * Opens a dataset.
+     * @param name The name associated with the object being created or
+     * queried.
      */
     DataSet
     open_dataset(const std::string &name) const;
@@ -1038,6 +1068,9 @@ namespace HDF5
      * href="https://support.hdfgroup.org/HDF5/doc/UG/HDF5_Users_Guide-Responsive%20HTML5/index.html#t=HDF5_Users_Guide%2FDatatypes%2FHDF5_Datatypes.htm%23TOC_6_10_Data_Transferbc-26&rhtocid=6.5_2">Data
      * Transfer: Datatype Conversion and Selection</a>  section in the HDF5
      * User's Guide.
+     * @param name The name associated with the object being created or
+     * queried.
+     * @param dimensions The dimensions used by this operation.
      */
     template <typename number>
     DataSet
@@ -1061,6 +1094,10 @@ namespace HDF5
      * `Vector<std::complex<double>>`, `FullMatrix<float>`,
      * `FullMatrix<double>`, `FullMatrix<std::complex<float>>` or
      * `FullMatrix<std::complex<double>>`.
+     * @param name The name associated with the object being created or
+     * queried.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename Container>
     void
@@ -1092,6 +1129,9 @@ namespace HDF5
      * Creates or opens an HDF5 file for serial operations. This call does not
      * require MPI support. It creates or opens an HDF5 file depending on the
      * value of @p mode.
+     * @param name The name associated with the object being created or
+     * queried.
+     * @param mode The mode used by this operation.
      */
     File(const std::string &name, const FileAccessMode mode);
 
@@ -1101,6 +1141,10 @@ namespace HDF5
      * HDF5 file depending on the value of @p mode. @p mpi_communicator
      * defines the processes that participate in this call; `MPI_COMM_WORLD` is
      * a common value for the MPI communicator.
+     * @param name The name associated with the object being created or
+     * queried.
+     * @param mode The mode used by this operation.
+     * @param mpi_communicator The MPI communicator.
      */
     File(const std::string   &name,
          const FileAccessMode mode,
@@ -1145,6 +1189,8 @@ namespace HDF5
      * one-dimensional array that specifies the size of each dimension of the
      * container, see:
      * https://support.hdfgroup.org/HDF5/doc1.8/RM/RM_H5S.html#Dataspace-CreateSimple
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename number>
     std::vector<hsize_t>
@@ -1153,6 +1199,8 @@ namespace HDF5
     /**
      * Return the dimensions of `data`. For a Vector this function returns
      * `std::vector<hsize_t>{vector_size}`.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename number>
     std::vector<hsize_t>
@@ -1161,6 +1209,8 @@ namespace HDF5
     /**
      * Return the dimensions of `data`. For a FullMatrix the function returns
      * `std::vector<hsize_t>{rows, columns}`.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename number>
     std::vector<hsize_t>
@@ -1169,6 +1219,8 @@ namespace HDF5
     /**
      * This function returns the total size of the container. For a std::vector
      * the function returns `int(vector_size)`.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename number>
     unsigned int
@@ -1177,6 +1229,8 @@ namespace HDF5
     /**
      * This function returns the total size of the container. For a Vector the
      * function returns `int(vector_size)`.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename number>
     unsigned int
@@ -1185,6 +1239,8 @@ namespace HDF5
     /**
      * This function returns the total size of the container. For a FullMatrix
      * the function returns `int(rows*columns)`.
+     * @param data The data values to read from or write to the current
+     * object.
      */
     template <typename number>
     unsigned int
@@ -1207,6 +1263,7 @@ namespace HDF5
      *
      * A FullMatrix can store only data of HDF5 datasets with rank 2. The size
      * of the FullMatrix will be FullMatrix(dim_0,dim_2)
+     * @param dimensions The dimensions used by this operation.
      */
     template <typename Container>
     std::enable_if_t<
@@ -1216,6 +1273,7 @@ namespace HDF5
 
     /**
      * Same as above.
+     * @param dimensions The dimensions used by this operation.
      */
     template <typename Container>
     std::enable_if_t<
@@ -1225,6 +1283,7 @@ namespace HDF5
 
     /**
      * Same as above.
+     * @param dimensions The dimensions used by this operation.
      */
     template <typename Container>
     std::enable_if_t<
@@ -1237,6 +1296,8 @@ namespace HDF5
      * operations of DataSet. A property list has to be created for the MPI
      * driver. For the serial driver the default H5P_DEFAULT can be used. In
      * addition H5Pset_dxpl_mpio is used to set the MPI mode to collective.
+     * @param plist The plist used by this operation.
+     * @param mpi Whether to mpi.
      */
     inline void
     set_plist(hid_t &plist, const bool mpi);
@@ -1248,6 +1309,12 @@ namespace HDF5
      * query_io_mode is True then H5Pget_mpio_actual_io_mode and
      * H5Pget_mpio_no_collective_cause are used to check if the operation has
      * been collective.
+     * @param plist The plist used by this operation.
+     * @param io_mode The object in which to store the io mode.
+     * @param local_no_collective_cause The object in which to store the local no collective cause.
+     * @param global_no_collective_cause The object in which to store the global no collective cause.
+     * @param mpi Whether to mpi.
+     * @param query_io_mode The query io mode.
      */
     inline void
     release_plist(hid_t                     &plist,
@@ -1259,6 +1326,7 @@ namespace HDF5
 
     /**
      * Convert a HDF5 no_collective_cause code to a human readable string.
+     * @param no_collective_cause The no collective cause.
      */
     inline std::string
     no_collective_cause_to_string(const std::uint32_t no_collective_cause);

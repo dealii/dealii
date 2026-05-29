@@ -85,6 +85,8 @@ namespace Functions
      * @p n_components components (defaults to 1). The parameter @p h is used
      * to initialize the AutoDerivativeFunction class from which this class is
      * derived.
+     * @param n_components The number of components.
+     * @param h The h used by this operation.
      */
     ParsedFunction(const unsigned int n_components = 1, const double h = 1e-8);
 
@@ -105,6 +107,9 @@ namespace Functions
      *  set Variable names      = x,y,t
      *
      *  @endcode
+     * @param prm The prm used by this operation.
+     * @param n_components The number of components.
+     * @param input_expr The input expr.
      */
     static void
     declare_parameters(ParameterHandler  &prm,
@@ -181,6 +186,7 @@ namespace Functions
      *
      * The time variable can be set according to specifications in the
      * FunctionTime base class.
+     * @param prm The prm used by this operation.
      */
     void
     parse_parameters(ParameterHandler &prm);
@@ -188,6 +194,8 @@ namespace Functions
     /**
      * Return all components of a vector-valued function at the given point @p
      * p.
+     * @param p The point at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value(const Point<dim> &p, Vector<double> &values) const override;
@@ -197,6 +205,8 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -206,6 +216,7 @@ namespace Functions
      *
      * We need to overwrite this to set the time also in the accessor
      * FunctionParser<dim>.
+     * @param newtime The newtime used by this operation.
      */
     virtual void
     set_time(const double newtime) override;

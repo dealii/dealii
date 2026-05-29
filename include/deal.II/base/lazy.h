@@ -142,6 +142,7 @@ public:
    * Copy constructor. If the `other` object contains an initialized
    * value, then that value will be copied into the current object. If the
    * `other` object is uninitialized, then the current object will be as well.
+   * @param other The object to copy or move from.
    */
   Lazy(const Lazy &other);
 
@@ -151,6 +152,7 @@ public:
    * value, then that value will be moved into the current object, and the
    * `other` object will end up being empty (as if default initialized). If the
    * `other` object is uninitialized, then the current object will be as well.
+   * @param other The object to copy or move from.
    */
   Lazy(Lazy &&other) noexcept;
 
@@ -161,6 +163,7 @@ public:
    * `other` object is uninitialized, then the current object will be as well.
    *
    * Any content of the current object is lost in the assignment.
+   * @param other The object to copy or move from.
    */
   Lazy &
   operator=(const Lazy &other);
@@ -173,6 +176,7 @@ public:
    * `other` object is uninitialized, then the current object will be as well.
    *
    * Any content of the current object is lost in the move assignment.
+   * @param other The object to copy or move from.
    */
   Lazy &
   operator=(Lazy &&other) noexcept;

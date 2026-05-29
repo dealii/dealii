@@ -161,11 +161,13 @@ public:
    *
    * If dim == 0, the resulting quadrature formula will be a single Point<0>
    * having unit weight.
+   * @param quadrature_1d The quadrature 1d.
    */
   explicit Quadrature(const Quadrature<dim != 1 ? 1 : 0> &quadrature_1d);
 
   /**
    * Copy constructor.
+   * @param q The quadrature formula used by this operation.
    */
   Quadrature(const Quadrature<dim> &q);
 
@@ -179,6 +181,9 @@ public:
    * Construct a quadrature formula from given vectors of quadrature points
    * (which should really be in the unit cell) and the corresponding weights.
    * You will want to have the weights sum up to one, but this is not checked.
+   * @param points The points at which to evaluate the function.
+   * @param weights The weights used in the quadrature rule or linear
+   * combination.
    */
   Quadrature(const std::vector<Point<dim>> &points,
              const std::vector<double>     &weights);
@@ -187,6 +192,9 @@ public:
    * Construct a quadrature formula from given vectors of quadrature points
    * (which should really be in the unit cell) and the corresponding weights,
    * moving the points and weights into the present object.
+   * @param points The points at which to evaluate the function.
+   * @param weights The weights used in the quadrature rule or linear
+   * combination.
    */
   Quadrature(std::vector<Point<dim>> &&points, std::vector<double> &&weights);
 
@@ -196,12 +204,14 @@ public:
    * perform integrations, but rather to be used with FEValues objects in
    * order to find the position of some points (the quadrature points in this
    * object) on the transformed cell in real space.
+   * @param points The points at which to evaluate the function.
    */
   Quadrature(const std::vector<Point<dim>> &points);
 
   /**
    * Constructor for a one-point quadrature. Sets the weight of this point to
    * one.
+   * @param point The point at which to evaluate the function.
    */
   Quadrature(const Point<dim> &point);
 
@@ -226,6 +236,7 @@ public:
 
   /**
    * Test for equality of two quadratures.
+   * @param p The point at which to evaluate the function.
    */
   bool
   operator==(const Quadrature<dim> &p) const;
@@ -237,6 +248,9 @@ public:
    * to actually perform integrations, but rather to be used with FEValues
    * objects in order to find the position of some points (the quadrature
    * points in this object) on the transformed cell in real space.
+   * @param points The points at which to evaluate the function.
+   * @param weights The weights used in the quadrature rule or linear
+   * combination.
    */
   void
   initialize(const ArrayView<const Point<dim>> &points,
@@ -256,6 +270,7 @@ public:
 
   /**
    * Return the <tt>i</tt>th quadrature point.
+   * @param i The index of the entry.
    */
   const Point<dim> &
   point(const unsigned int i) const;
@@ -268,6 +283,7 @@ public:
 
   /**
    * Return the weight of the <tt>i</tt>th quadrature point.
+   * @param i The index of the entry.
    */
   double
   weight(const unsigned int i) const;
@@ -389,16 +405,22 @@ public:
   /**
    * Constructor for a one-dimensional formula. This one just copies the given
    * quadrature rule.
+   * @param qx The qx used by this operation.
    */
   QAnisotropic(const Quadrature<1> &qx);
 
   /**
    * Constructor for a two-dimensional formula.
+   * @param qx The qx used by this operation.
+   * @param qy The qy used by this operation.
    */
   QAnisotropic(const Quadrature<1> &qx, const Quadrature<1> &qy);
 
   /**
    * Constructor for a three-dimensional formula.
+   * @param qx The qx used by this operation.
+   * @param qy The qy used by this operation.
+   * @param qz The qz used by this operation.
    */
   QAnisotropic(const Quadrature<1> &qx,
                const Quadrature<1> &qy,
@@ -438,6 +460,8 @@ public:
    * in each direction. The result is a tensor product quadrature formula
    * defined on the unit hypercube (i.e., the line segment, unit square, or
    * unit cube in 1d, 2d, and 3d respectively).
+   * @param base_quadrature The base quadrature.
+   * @param n_copies The number of copies.
    */
   QIterated(const Quadrature<1> &base_quadrature, const unsigned int n_copies);
 
@@ -450,6 +474,8 @@ public:
    * defined on the unit hypercube (i.e., the line segment, unit square, or
    * unit cube in 1d, 2d, and 3d respectively).
    *
+   * @param base_quadrature The base quadrature.
+   * @param intervals The point associated with this operation.
    * @note We require that `intervals.front() == 0` and `interval.back() == 1`.
    */
   QIterated(const Quadrature<1>         &base_quadrature,
@@ -457,6 +483,8 @@ public:
 
   /**
    * Exception
+   * @param ExcInvalidQuadratureFormula The exc invalid quadrature formula
+   * used by this operation.
    */
   DeclExceptionMsg(ExcInvalidQuadratureFormula,
                    "The quadrature formula you provided cannot be used "

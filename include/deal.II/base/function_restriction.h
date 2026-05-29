@@ -54,6 +54,10 @@ namespace Functions
      *
      * A pointer to the incoming function is stored internally, so the function
      * must have a longer lifetime than the created restriction.
+     * @param function The function object.
+     * @param direction The coordinate direction to which this operation
+     * refers.
+     * @param coordinate_value The coordinate value.
      */
     CoordinateRestriction(const Function<dim + 1> &function,
                           const unsigned int       direction,
@@ -114,6 +118,9 @@ namespace Functions
      *
      * A pointer to the incoming function is stored internally, so the function
      * must have a longer lifetime than the created restriction.
+     * @param function The function object.
+     * @param open_direction The open direction.
+     * @param point The point at which to evaluate the function.
      */
     PointRestriction(const Function<dim + 1> &function,
                      const unsigned int       open_direction,
@@ -158,6 +165,9 @@ namespace internal
    * convention given by the function coordinate_to_one_dim_higher. Thus, the
    * order of coordinates on the lower-dimensional point are not preserved:
    * $\{(z, x), 1, y \}$ creates the point $(x, y, z)$.
+   * @param point The point at which to evaluate the function.
+   * @param component_in_dim_plus_1 The component in dim plus 1.
+   * @param coordinate_value The coordinate value.
    */
   template <int dim>
   Point<dim + 1>

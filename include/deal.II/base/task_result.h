@@ -96,6 +96,7 @@ namespace Threads
     /**
      * A constructor that takes a Task object and initializes the
      * current object to be the result of that task.
+     * @param task The task used by this operation.
      */
     TaskResult(const Task<T> &task)
       : result_is_available(false)
@@ -254,6 +255,7 @@ namespace Threads
      * is working on data that is changing as it is working, with obviously
      * unpredictable results.)
      *
+     * @param t The time associated with the evaluation.
      * @note As mentioned above, it is a considered a bug to assign a task to
      *   a TaskResult object that already has a task running. That means that
      *   you will get in trouble if multiple threads (or multiple tasks running

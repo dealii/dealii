@@ -110,6 +110,7 @@ public:
    * initialized with the initialize() method before you can use it. If an
    * attempt to use this function is made before the initialize() method has
    * been called, then an exception is thrown.
+   * @param initial_time The initial time.
    */
   TensorFunctionParser(const double initial_time = 0.0);
 
@@ -120,6 +121,9 @@ public:
    * then an exception is thrown.
    * Takes a semicolon separated list of expressions (one for each component
    * of the tensor function), an optional comma-separated list of constants.
+   * @param expression The expression used by this operation.
+   * @param constants The constants used by this operation.
+   * @param variable_names The variable names.
    */
   TensorFunctionParser(
     const std::string &expression,
@@ -205,6 +209,10 @@ public:
    * are expected to be separated by a semicolon. An exception is thrown if
    * this method is called and the number of components successfully parsed
    * does not match the number of components of the base function.
+   * @param vars The vars used by this operation.
+   * @param expression The expression used by this operation.
+   * @param constants The constants used by this operation.
+   * @param time_dependent The time dependent.
    */
   void
   initialize(const std::string &vars,
@@ -222,12 +230,15 @@ public:
 
   /**
    * Return the value of the tensor function at the given point.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<rank, dim, Number>
   value(const Point<dim> &p) const override;
 
   /**
    * Return the value of the tensor function at the given point.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   value_list(const std::vector<Point<dim>>          &p,

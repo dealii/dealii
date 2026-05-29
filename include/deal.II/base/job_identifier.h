@@ -53,6 +53,7 @@ public:
    * <tt>file</tt>. For example, this function can be called from a
    * user program with argument <tt>__FILE__</tt> to create an
    * identifier for the program being run.
+   * @param filename The file name.
    */
   static std::string
   base_name(const std::string &filename);

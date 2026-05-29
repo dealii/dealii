@@ -60,6 +60,9 @@ struct FloatingPointComparator
 
   /**
    * Constructor.
+   * @param tolerance The tolerance used by this operation.
+   * @param use_absolute_tolerance The use absolute tolerance.
+   * @param mask The mask used by this operation.
    */
   FloatingPointComparator(
     const ScalarNumber        tolerance,
@@ -75,6 +78,8 @@ struct FloatingPointComparator
    * object is less than the second one. This function calls the compare()
    * functions below, so only types supported by compare() will work with this
    * function.
+   * @param object1 The left-hand object in the comparison.
+   * @param object2 The right-hand object in the comparison.
    */
   template <typename T>
   bool
@@ -84,6 +89,8 @@ struct FloatingPointComparator
    * Compare two vectors of numbers (not necessarily of the same length),
    * where vectors of different lengths are first sorted by their length and
    * then by the entries.
+   * @param v1 The v1 used by this operation.
+   * @param v2 The v2 used by this operation.
    */
   template <typename T>
   ComparisonResult
@@ -91,6 +98,8 @@ struct FloatingPointComparator
 
   /**
    * Compare two arrays.
+   * @param t1 The first object to compare.
+   * @param t2 The second object to compare.
    */
   template <std::size_t dim, typename T>
   ComparisonResult
@@ -98,6 +107,8 @@ struct FloatingPointComparator
 
   /**
    * Compare two tensors.
+   * @param t1 The first object to compare.
+   * @param t2 The second object to compare.
    */
   template <int rank, int dim, typename T>
   ComparisonResult
@@ -105,6 +116,8 @@ struct FloatingPointComparator
 
   /**
    * Compare two derivative forms.
+   * @param t1 The first object to compare.
+   * @param t2 The second object to compare.
    */
   template <int rank, int dim, int spacedim, typename T>
   ComparisonResult
@@ -113,6 +126,8 @@ struct FloatingPointComparator
 
   /**
    * Compare two tables.
+   * @param t1 The first object to compare.
+   * @param t2 The second object to compare.
    */
   template <typename T>
   ComparisonResult
@@ -120,12 +135,16 @@ struct FloatingPointComparator
 
   /**
    * Compare two scalar numbers.
+   * @param s1 The s1 used by this operation.
+   * @param s2 The s2 used by this operation.
    */
   ComparisonResult
   compare(const ScalarNumber s1, const ScalarNumber s2) const;
 
   /**
    * Compare two VectorizedArray instances.
+   * @param v1 The v1 used by this operation.
+   * @param v2 The v2 used by this operation.
    */
   ComparisonResult
   compare(const VectorizedArray<ScalarNumber, width> &v1,

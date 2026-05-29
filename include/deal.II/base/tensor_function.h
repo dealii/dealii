@@ -74,6 +74,7 @@ public:
   /**
    * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
+   * @param initial_time The initial time.
    */
   TensorFunction(const time_type initial_time = time_type(0.0));
 
@@ -86,6 +87,7 @@ public:
 
   /**
    * Return the value of the function at the given point.
+   * @param p The point at which to evaluate the function.
    */
   virtual value_type
   value(const Point<dim> &p) const;
@@ -94,6 +96,8 @@ public:
    * Set <tt>values</tt> to the point values of the function at the
    * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
    * right size, i.e.  the same size as the <tt>points</tt> array.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   value_list(const std::vector<Point<dim>> &points,
@@ -101,6 +105,7 @@ public:
 
   /**
    * Return the gradient of the function at the given point.
+   * @param p The point at which to evaluate the function.
    */
   virtual gradient_type
   gradient(const Point<dim> &p) const;
@@ -109,6 +114,8 @@ public:
    * Set <tt>gradients</tt> to the gradients of the function at the
    * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
    * right size, i.e.  the same size as the <tt>points</tt> array.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   gradient_list(const std::vector<Point<dim>> &points,
@@ -138,6 +145,8 @@ public:
    *
    * An initial value for the time variable may be specified, otherwise it
    * defaults to zero.
+   * @param value The value associated with the function.
+   * @param initial_time The initial time.
    */
   ConstantTensorFunction(const dealii::Tensor<rank, dim, Number> &value,
                          const time_type initial_time = 0.0);
@@ -190,6 +199,7 @@ public:
    *
    * An initial value for the time variable may be specified, otherwise it
    * defaults to zero.
+   * @param initial_time The initial time.
    */
   ZeroTensorFunction(const time_type initial_time = 0.0);
 };

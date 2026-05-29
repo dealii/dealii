@@ -171,12 +171,15 @@ public:
    * Constructor. May take an initial value for the number of components
    * (which defaults to one, i.e. a scalar function), and the time variable,
    * which defaults to zero.
+   * @param n_components The number of components.
+   * @param initial_time The initial time.
    */
   explicit Function(const unsigned int n_components = 1,
                     const time_type    initial_time = 0.0);
 
   /**
    * Copy constructor.
+   * @param f The function object.
    */
   Function(const Function &f) = default;
 
@@ -208,6 +211,7 @@ public:
    * derived classes in containers, or assign them otherwise. It will raise an
    * exception if the object from which you assign has a different number of
    * components than the one being assigned to.
+   * @param f The function object.
    */
   Function &
   operator=(const Function &f);
@@ -217,6 +221,8 @@ public:
    * one component (i.e. the function is scalar), you should state the
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   value(const Point<dim> &p, const unsigned int component = 0) const;
@@ -227,6 +233,8 @@ public:
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
    *
    * The default implementation will call value() for each component.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_value(const Point<dim> &p, Vector<RangeNumberType> &values) const;
@@ -239,6 +247,9 @@ public:
    *
    * By default, this function repeatedly calls value() for each point
    * separately, to fill the output array.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param component The component to evaluate.
    */
   virtual void
   value_list(const std::vector<Point<dim>> &points,
@@ -254,6 +265,8 @@ public:
    *
    * By default, this function repeatedly calls vector_value() for each point
    * separately, to fill the output array.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_value_list(const std::vector<Point<dim>>        &points,
@@ -266,6 +279,8 @@ public:
    * The default implementation of this function in Function calls
    * value_list() for each component. In order to improve performance, this
    * can be reimplemented in derived classes to speed up performance.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_values(const std::vector<Point<dim>>             &points,
@@ -274,12 +289,16 @@ public:
   /**
    * Return the gradient of the specified component of the function at the
    * given point.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual Tensor<1, dim, RangeNumberType>
   gradient(const Point<dim> &p, const unsigned int component = 0) const;
 
   /**
    * Return the gradient of all components of the function at the given point.
+   * @param p The point at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradient(
@@ -291,6 +310,9 @@ public:
    * function at the <tt>points</tt>.  It is assumed that <tt>gradients</tt>
    * already has the right size, i.e.  the same size as the <tt>points</tt>
    * array.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
+   * @param component The component to evaluate.
    */
   virtual void
   gradient_list(const std::vector<Point<dim>>                &points,
@@ -304,6 +326,8 @@ public:
    * The default implementation of this function in Function calls
    * value_list() for each component. In order to improve performance, this
    * can be reimplemented in derived classes to speed up performance.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradients(
@@ -318,6 +342,8 @@ public:
    *
    * The outer loop over <tt>gradients</tt> is over the points in the list,
    * the inner loop over the different components of the function.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradient_list(
@@ -326,6 +352,8 @@ public:
 
   /**
    * Compute the Laplacian of a given component at point <tt>p</tt>.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   laplacian(const Point<dim> &p, const unsigned int component = 0) const;
@@ -333,12 +361,17 @@ public:
   /**
    * Compute the Laplacian of all components at point <tt>p</tt> and store
    * them in <tt>values</tt>.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_laplacian(const Point<dim> &p, Vector<RangeNumberType> &values) const;
 
   /**
    * Compute the Laplacian of one component at a set of points.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param component The component to evaluate.
    */
   virtual void
   laplacian_list(const std::vector<Point<dim>> &points,
@@ -347,6 +380,8 @@ public:
 
   /**
    * Compute the Laplacians of all components at a set of points.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_laplacian_list(const std::vector<Point<dim>>        &points,
@@ -355,6 +390,8 @@ public:
   /**
    * Compute the Hessian of a given component at point <tt>p</tt>, that is the
    * gradient of the gradient of the function.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual SymmetricTensor<2, dim, RangeNumberType>
   hessian(const Point<dim> &p, const unsigned int component = 0) const;
@@ -362,6 +399,8 @@ public:
   /**
    * Compute the Hessian of all components at point <tt>p</tt> and store them
    * in <tt>values</tt>.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_hessian(
@@ -370,6 +409,9 @@ public:
 
   /**
    * Compute the Hessian of one component at a set of points.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param component The component to evaluate.
    */
   virtual void
   hessian_list(const std::vector<Point<dim>>                         &points,
@@ -378,6 +420,8 @@ public:
 
   /**
    * Compute the Hessians of all components at a set of points.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_hessian_list(
@@ -411,6 +455,8 @@ namespace Functions
     /**
      * Constructor; set values of all components to the provided one. The
      * default number of components is one.
+     * @param value The constant value.
+     * @param n_components The number of components.
      */
     explicit ConstantFunction(const RangeNumberType value,
                               const unsigned int    n_components = 1);
@@ -419,6 +465,7 @@ namespace Functions
      * Constructor; takes an <tt>std::vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
+     * @param values The values associated with the function.
      */
     explicit ConstantFunction(const std::vector<RangeNumberType> &values);
 
@@ -426,12 +473,15 @@ namespace Functions
      * Constructor; takes an <tt>Vector<RangeNumberType></tt> object as an
      * argument. The number of components is determined by
      * <tt>values.size()</tt>.
+     * @param values The values associated with the function.
      */
     explicit ConstantFunction(const Vector<RangeNumberType> &values);
 
     /**
      * Constructor; uses whatever stores in [begin_ptr, begin_ptr+n_components)
      * to initialize a new object.
+     * @param begin_ptr A pointer to the first stored value.
+     * @param n_components The number of components.
      */
     ConstantFunction(const RangeNumberType *begin_ptr,
                      const unsigned int     n_components);
@@ -510,6 +560,7 @@ namespace Functions
   public:
     /**
      * Constructor. The number of components is preset to one.
+     * @param n_components The number of components.
      */
     explicit ZeroFunction(const unsigned int n_components = 1);
   };
@@ -535,12 +586,16 @@ namespace Functions
 
     /**
      * @copydoc Function::value()
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual RangeNumberType
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * @copydoc Function::gradient()
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim, RangeNumberType>
     gradient(const Point<dim>  &p,
@@ -548,6 +603,8 @@ namespace Functions
 
     /**
      * @copydoc Function::laplacian()
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual RangeNumberType
     laplacian(const Point<dim>  &p,
@@ -555,6 +612,8 @@ namespace Functions
 
     /**
      * @copydoc Function::hessian()
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual SymmetricTensor<2, dim, RangeNumberType>
     hessian(const Point<dim>  &p,
@@ -584,6 +643,9 @@ public:
    * Constructor if only a single component shall be non-zero. Arguments
    * denote the component selected, the value for that component and the total
    * number of vector components.
+   * @param selected The selected component or component range.
+   * @param value The value associated with the function.
+   * @param n_components The number of components.
    */
   ComponentSelectFunction(const unsigned int    selected,
                           const RangeNumberType value,
@@ -592,6 +654,8 @@ public:
   /**
    * Constructor. As before, but the value for the selected component is
    * assumed to be one. In essence, this function then works as a mask.
+   * @param selected The selected component or component range.
+   * @param n_components The number of components.
    */
   ComponentSelectFunction(const unsigned int selected,
                           const unsigned int n_components);
@@ -602,6 +666,8 @@ public:
    * denotes a half-open interval of components (for example std::pair(0,dim)
    * for the first dim components), and the second argument is the total
    * number of vector components.
+   * @param selected The selected component or component range.
+   * @param n_components The number of components.
    */
   ComponentSelectFunction(const std::pair<unsigned int, unsigned int> &selected,
                           const unsigned int n_components);
@@ -616,6 +682,7 @@ public:
    * <tt>ComponentSelectFunction@<dim, RangeNumberType@></tt> class can only
    * have same value for all components.
    *
+   * @param f The function object.
    * @note We copy the underlying component value data from @p f from its
    * beginning. So the number of components of @p f cannot be less than the
    * calling object.
@@ -626,6 +693,8 @@ public:
 
   /**
    * Return the value of the function at the given point for all components.
+   * @param p The point at which to evaluate the function.
+   * @param return_value The object in which to store the computed values.
    */
   virtual void
   vector_value(const Point<dim>        &p,
@@ -636,6 +705,8 @@ public:
    * <tt>points</tt>, for all components. It is assumed that <tt>values</tt>
    * already has the right size, i.e. the same size as the <tt>points</tt>
    * array.
+   * @param points The points at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_value_list(
@@ -805,6 +876,7 @@ public:
    * Given a function object that takes a Point and returns a RangeNumberType
    * value, convert this into an object that matches the Function<dim,
    * RangeNumberType> interface.
+   * @param function_object The function object.
    */
   explicit ScalarFunctionFromFunctionObject(
     const std::function<RangeNumberType(const Point<dim> &)> &function_object);
@@ -813,6 +885,7 @@ public:
    * Given a function object that takes  a time and a Point and returns a
    * RangeNumberType value, convert this into an object that matches the
    * Function<dim, RangeNumberType> interface.
+   * @param function_object_t The function object t.
    */
   explicit ScalarFunctionFromFunctionObject(
     const std::function<RangeNumberType(const double, const Point<dim> &)>
@@ -821,6 +894,8 @@ public:
   /**
    * Return the value of the function at the given point. Returns the value
    * the function given to the constructor produces for this point.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -899,6 +974,8 @@ public:
   /**
    * Return the value of the function at the given point. Returns the value
    * the function given to the constructor produces for this point.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -907,6 +984,8 @@ public:
    * Return all components of a vector-valued function at a given point.
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_value(const Point<dim>        &p,
@@ -973,6 +1052,8 @@ public:
    * usable function, you need to call at least the set_function_values()
    * method. If you need also the gradients of the solution, then you must
    * also call the set_function_gradients() method.
+   * @param n_components The number of components.
+   * @param initial_time The initial time.
    */
   explicit FunctionFromFunctionObjects(const unsigned int n_components = 1,
                                        const double       initial_time = 0);
@@ -984,6 +1065,8 @@ public:
    * of the vector @p values. A call to the FunctionFromFunctionObject::gradient()
    * method will trigger an exception, unless you first call the
    * set_function_gradients() method.
+   * @param values The values associated with the function.
+   * @param initial_time The initial time.
    */
   explicit FunctionFromFunctionObjects(
     const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
@@ -997,6 +1080,9 @@ public:
    * A call to the FunctionFromFunctionObject::gradient()
    * method will trigger an exception, unless you first call the
    * set_function_gradients() method.
+   * @param values The values associated with the function.
+   * @param n_components The number of components.
+   * @param initial_time The initial time.
    */
   explicit FunctionFromFunctionObjects(
     const std::function<RangeNumberType(const Point<dim> &, const unsigned int)>
@@ -1011,6 +1097,9 @@ public:
    * The resulting function will have a number of components equal to the size
    * of the vector @p values. If the size of @p values and @p gradients does not
    * match, an exception is triggered.
+   * @param values The values associated with the function.
+   * @param gradients The gradients associated with the function.
+   * @param initial_time The initial time.
    */
   FunctionFromFunctionObjects(
     const std::vector<std::function<RangeNumberType(const Point<dim> &)>>
@@ -1026,6 +1115,8 @@ public:
    * one component (i.e. the function is scalar), you should state the
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -1035,6 +1126,8 @@ public:
    * only one component (i.e. the function is scalar), you should state the
    * component you want to have evaluated; it defaults to zero, i.e. the first
    * component.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual Tensor<1, dim, RangeNumberType>
   gradient(const Point<dim>  &p,
@@ -1044,6 +1137,7 @@ public:
    * Reset the function values of this object. An assertion is thrown if the
    * size of the @p values parameter does not match the number of components of
    * this object.
+   * @param values The values associated with the function.
    */
   void
   set_function_values(
@@ -1054,6 +1148,7 @@ public:
    * Reset the function gradients of this object. An assertion is thrown if the
    * size of the @p gradients parameter does not match the number of components of
    * this object.
+   * @param gradients The gradients associated with the function.
    */
   void
   set_function_gradients(
@@ -1145,6 +1240,8 @@ public:
 
   /**
    * Return a single component of a vector-valued function at a given point.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -1153,6 +1250,8 @@ public:
    * Return all components of a vector-valued function at a given point.
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_value(const Point<dim>        &p,
@@ -1164,6 +1263,8 @@ public:
    * <tt>value_list</tt> shall be the same size as <tt>points</tt> and each
    * element of the vector will be passed to vector_value() to evaluate the
    * function
+   * @param points The points at which to evaluate the function.
+   * @param value_list The object in which to store the computed values.
    */
   virtual void
   vector_value_list(
@@ -1173,6 +1274,8 @@ public:
   /**
    * Return the gradient of the specified component of the function at the given
    * point.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual Tensor<1, dim, RangeNumberType>
   gradient(const Point<dim>  &p,
@@ -1180,6 +1283,8 @@ public:
 
   /**
    * Return the gradient of all components of the function at the given point.
+   * @param p The point at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradient(
@@ -1191,6 +1296,9 @@ public:
    * function at the <tt>points</tt>.  It is assumed that <tt>gradients</tt>
    * already has the right size, i.e.  the same size as the <tt>points</tt>
    * array.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
+   * @param component The component to evaluate.
    */
   virtual void
   gradient_list(const std::vector<Point<dim>>                &points,
@@ -1204,6 +1312,8 @@ public:
    * The default implementation of this function in Function calls
    * value_list() for each component. In order to improve performance, this
    * can be reimplemented in derived classes to speed up performance.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradients(const std::vector<Point<dim>> &points,
@@ -1218,6 +1328,8 @@ public:
    *
    * The outer loop over <tt>gradients</tt> is over the points in the list,
    * the inner loop over the different components of the function.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradient_list(const std::vector<Point<dim>> &points,
@@ -1310,6 +1422,8 @@ public:
 
   /**
    * Return a single component of a vector-valued function at a given point.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual RangeNumberType
   value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -1318,6 +1432,8 @@ public:
    * Return all components of a vector-valued function at a given point.
    *
    * <tt>values</tt> shall have the right size beforehand, i.e. #n_components.
+   * @param p The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
    */
   virtual void
   vector_value(const Point<dim>        &p,
@@ -1329,6 +1445,8 @@ public:
    * <tt>value_list</tt> shall be the same size as <tt>points</tt> and each
    * element of the vector will be passed to vector_value() to evaluate the
    * function
+   * @param points The points at which to evaluate the function.
+   * @param value_list The object in which to store the computed values.
    */
   virtual void
   vector_value_list(

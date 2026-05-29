@@ -81,6 +81,8 @@ public:
    * After the data is initialized, it can be modified using the get_data()
    * function.
    *
+   * @param cell The cell on which the operation is performed.
+   * @param number_of_data_points_per_cell The number of data points per cell.
    * @note Subsequent calls of this function with the same @p cell will not
    * alter the objects associated with it. In order to remove the stored data,
    * use the erase() function.
@@ -105,6 +107,9 @@ public:
    * Same as above but for a range of iterators starting at @p cell_start
    * until, but not including, @p cell_end for all locally owned cells, i.e.
    * for which `cell->is_locally_owned()==true` .
+   * @param cell_start The cell start.
+   * @param cell_end The cell end.
+   * @param number_of_data_points_per_cell The number of data points per cell.
    */
   template <typename T = DataType>
   void
@@ -118,6 +123,7 @@ public:
    * If no data is attached to the @p cell, this function will not do anything
    * and returns false.
    *
+   * @param cell The cell on which the operation is performed.
    * @note This function will also check that there are no
    * outstanding references to the data stored on this cell. That is to say,
    * that the only references to the stored data are that made by this class.
@@ -140,6 +146,7 @@ public:
    * This allows flexibility if class @p T is not the same as @p DataType on a
    * cell-by-cell basis.
    *
+   * @param cell The cell on which the operation is performed.
    * @pre The type @p T needs to match the class provided to initialize() .
    *
    * @pre @p cell must be from the same Triangulation that is used to
@@ -158,6 +165,7 @@ public:
    * This allows flexibility if class @p T is not the same as @p DataType on a
    * cell-by-cell basis.
    *
+   * @param cell The cell on which the operation is performed.
    * @pre The type @p T needs to match the class provided to initialize() .
    *
    * @pre @p cell must be from the same Triangulation that is used to
@@ -179,6 +187,7 @@ public:
    * This allows flexibility if class @p T is not the same as @p DataType on a
    * cell-by-cell basis.
    *
+   * @param cell The cell on which the operation is performed.
    * @pre The type @p T needs to match the class provided to initialize().
    * @pre @p cell must be from the same Triangulation that is used to
    * initialize() the cell data.
@@ -199,6 +208,7 @@ public:
    * This allows flexibility if class @p T is not the same as @p DataType on a
    * cell-by-cell basis.
    *
+   * @param cell The cell on which the operation is performed.
    * @pre The type @p T needs to match the class provided to initialize().
    * @pre @p cell must be from the same Triangulation that is used to
    * initialize() the cell data.
@@ -299,6 +309,7 @@ public:
    * This vector will contain all scalar and/or Tensorial data local to each
    * quadrature point.
    *
+   * @param values The object in which to store the computed values.
    * @note  The function will be called with @p values of size number_of_values().
    * The implementation may still have an assert to check that it is indeed the
    * case.
@@ -310,6 +321,7 @@ public:
    * The opposite of the above, namely
    * unpack a vector @p values into the data stored in this class.
    *
+   * @param values The values associated with the function.
    * @note  The function will be called with @p values of size number_of_values().
    * The implementation may still have an assert to check that it is indeed the
    * case.
@@ -452,6 +464,9 @@ namespace parallel
        * rule @p mass_quadrature used to integrate its local @ref GlossMassMatrix "mass matrix" and
        * finally the quadrature rule @p data_quadrature which is used to store @p DataType.
        *
+       * @param projection_fe The projection fe.
+       * @param mass_quadrature The mass quadrature.
+       * @param data_quadrature The data quadrature.
        * @pre @p projection_fe has to be scalar-valued.
        *
        * @note Since this class does projection on cell-by-cell basis,
@@ -466,6 +481,8 @@ namespace parallel
        * @p data_storage represents the cell data which should be transferred
        * and it should be initialized for each locally owned active cell.
        *
+       * @param tria The tria used by this operation.
+       * @param data_storage The object in which to store the data storage.
        * @note Although CellDataStorage class allows storing on different cells
        * different objects derived from the base class, here we assume that
        * @p data_storage contains objects of the same type, more specifically

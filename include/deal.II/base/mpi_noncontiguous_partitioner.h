@@ -56,6 +56,9 @@ namespace Utilities
        * Constructor. Set up point-to-point communication pattern based on the
        * IndexSets arguments @p indexset_locally_owned and @p indexset_ghost for the MPI
        * communicator @p communicator.
+       * @param indexset_locally_owned The indexset locally owned.
+       * @param indexset_ghost The indexset ghost.
+       * @param communicator The MPI communicator.
        */
       NoncontiguousPartitioner(const IndexSet &indexset_locally_owned,
                                const IndexSet &indexset_ghost,
@@ -69,6 +72,9 @@ namespace Utilities
        * update_values_finish(). It is allowed to include entries with the
        * value numbers::invalid_dof_index which do not take part of the index
        * exchange but are present in the data vectors as padding.
+       * @param indices_locally_owned The indices locally owned.
+       * @param indices_ghost The indices ghost.
+       * @param communicator The MPI communicator.
        */
       NoncontiguousPartitioner(
         const std::vector<types::global_dof_index> &indices_locally_owned,
@@ -87,6 +93,9 @@ namespace Utilities
        * @p n_components_templated has to be set to `0` in this case. Either
        * @p n_components_templated or @p n_components can be set.
        *
+       * @param locally_owned_array The locally owned array.
+       * @param ghost_array The ghost array.
+       * @param n_components The number of components.
        * @pre The vectors only have to provide a method begin(), which allows
        *   to access their raw data.
        *
@@ -113,6 +122,12 @@ namespace Utilities
        * function, the user can provide the temporary data structures to be
        * used.
        *
+       * @param communication_channel The communication channel.
+       * @param locally_owned_array The locally owned array.
+       * @param temporary_storage The temporary storage.
+       * @param ghost_array The ghost array.
+       * @param requests The requests used by this operation.
+       * @param n_components The number of components.
        * @pre The size of the @p temporary_storage vector has to be at least
        *   temporary_storage_size. The reason for this is that this vector is
        *   used as buffer for both sending and receiving data.
@@ -134,6 +149,11 @@ namespace Utilities
        * Start update: Data is packed, non-blocking send and receives
        * are started.
        *
+       * @param communication_channel The communication channel.
+       * @param locally_owned_array The locally owned array.
+       * @param temporary_storage The temporary storage.
+       * @param requests The requests used by this operation.
+       * @param n_components The number of components.
        * @note In contrast to the function
        *   Utilities::MPI::Partitioner::export_to_ghosted_array_start, the user
        *   does not pass a reference to the destination vector, since the data
@@ -160,6 +180,10 @@ namespace Utilities
        * received. Once data from any process is received it is processed and
        * placed at the right position of the vector @p dst.
        *
+       * @param temporary_storage The temporary storage.
+       * @param ghost_array The ghost array.
+       * @param requests The requests used by this operation.
+       * @param n_components The number of components.
        * @note In contrast to the function
        *   Utilities::MPI::Partitioner::export_to_ghosted_array_finish, the user
        *   also has to pass a reference to the buffer @p temporary_storage,
@@ -181,6 +205,9 @@ namespace Utilities
        * Similar to the above functions but for importing vector entries
        * from @p ghost_array to @p locally_owned_storage.
        *
+       * @param vector_operation The vector operation.
+       * @param ghost_array The ghost array.
+       * @param locally_owned_storage The locally owned storage.
        * @note In contrast to the functions in
        *   Utilities::MPI::Partitioner, this function expects that
        *   locally_owned_storage is empty.
@@ -197,6 +224,12 @@ namespace Utilities
        * users can provide temporaty arrays. This function calls
        * import_from_ghosted_array_start() and
        * import_from_ghosted_array_finish() in sequence.
+       * @param vector_operation The vector operation.
+       * @param communication_channel The communication channel.
+       * @param ghost_array The ghost array.
+       * @param temporary_storage The temporary storage.
+       * @param locally_owned_storage The locally owned storage.
+       * @param requests The requests used by this operation.
        */
       template <typename Number>
       void
@@ -210,6 +243,11 @@ namespace Utilities
       /**
        * Start update for importig values: Data is packed, non-blocking send
        * and receives are started.
+       * @param vector_operation The vector operation.
+       * @param communication_channel The communication channel.
+       * @param ghost_array The ghost array.
+       * @param temporary_storage The temporary storage.
+       * @param requests The requests used by this operation.
        */
       template <typename Number>
       void
@@ -225,6 +263,10 @@ namespace Utilities
        * been sent and received. Once data from any process is received it is
        * processed and placed at the right position of the vector
        * @p locally_owned_storage.
+       * @param vector_operation The vector operation.
+       * @param temporary_storage The temporary storage.
+       * @param locally_owned_storage The locally owned storage.
+       * @param requests The requests used by this operation.
        */
       template <typename Number>
       void
@@ -270,6 +312,9 @@ namespace Utilities
        * Initialize the inner data structures using explicit sets of
        * indices. See the documentation of the other reinit() function for
        * what the function does.
+       * @param locally_owned_indices The locally owned indices.
+       * @param ghost_indices The ghost indices.
+       * @param communicator The MPI communicator.
        */
       void
       reinit(const std::vector<types::global_dof_index> &locally_owned_indices,

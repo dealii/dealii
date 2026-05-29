@@ -50,6 +50,8 @@ namespace Algorithms
      * This function registers a new event type and assigns a unique
      * identifier to it. The result of this function should be stored for
      * later use.
+     * @param name The name associated with the object being created or
+     * queried.
      */
     static Event
     assign(const std::string &name);
@@ -79,12 +81,14 @@ namespace Algorithms
 
     /**
      * Add the flags of the other event
+     * @param event The event used by this operation.
      */
     Event &
     operator+=(const Event &event);
 
     /**
      * Clear the flags of the other event
+     * @param event The event used by this operation.
      */
     Event &
     operator-=(const Event &event);
@@ -92,6 +96,7 @@ namespace Algorithms
     /**
      * Test whether all the flags set in the other Event are also set in this
      * one.
+     * @param event The event used by this operation.
      */
     bool
     test(const Event &event) const;

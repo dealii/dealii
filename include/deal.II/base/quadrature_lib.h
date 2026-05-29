@@ -40,6 +40,7 @@ public:
   /**
    * Generate a formula with <tt>n</tt> quadrature points (in each space
    * direction), exact for polynomials of degree <tt>2n-1</tt>.
+   * @param n The n used by this operation.
    */
   QGauss(const unsigned int n);
 };
@@ -97,6 +98,8 @@ public:
    * direction).
    * <tt>ep</tt> defines whether the left/lower/front endpoint(s) (default)
    * or the right/upper/back endpoint(s) are part of the quadrature points.
+   * @param n The n used by this operation.
+   * @param end_point The end point.
    */
   QGaussRadau(const unsigned int n,
               const EndPoint     end_point = QGaussRadau::EndPoint::left);
@@ -140,6 +143,7 @@ public:
   /**
    * Generate a formula with <tt>n</tt> quadrature points (in each space
    * direction).
+   * @param n The n used by this operation.
    */
   QGaussLobatto(const unsigned int n);
 };
@@ -240,6 +244,8 @@ class QGaussLog : public Quadrature<dim>
 public:
   /**
    * Generate a formula with <tt>n</tt> quadrature points
+   * @param n The n used by this operation.
+   * @param revert Whether to revert.
    */
   QGaussLog(const unsigned int n, const bool revert = false);
 
@@ -305,6 +311,10 @@ public:
    * singularity, the scale factor inside the logarithmic function and a flag
    * that decides whether the singularity is left inside the quadrature
    * formula or it is factored out, to be included in the integrand.
+   * @param n The n used by this operation.
+   * @param x0 The point associated with this operation.
+   * @param alpha The alpha used by this operation.
+   * @param factor_out_singular_weight The factor out singular weight.
    */
   QGaussLogR(const unsigned int n,
              const Point<dim>  &x0                         = Point<dim>(),
@@ -385,6 +395,9 @@ public:
    *   integral += f(singular_quad_noR.point(i))*singular_quad_noR.weight(i)/R;
    * }
    * @endcode
+   * @param n The n used by this operation.
+   * @param singularity The point associated with this operation.
+   * @param factor_out_singular_weight The factor out singular weight.
    */
   QGaussOneOverR(const unsigned int n,
                  const Point<dim>  &singularity,
@@ -422,6 +435,9 @@ public:
    *   integral += f(singular_quad_noR.point(i))*singular_quad_noR.weight(i)/R;
    * }
    * @endcode
+   * @param n The n used by this operation.
+   * @param vertex_index The vertex index.
+   * @param factor_out_singular_weight The factor out singular weight.
    */
   QGaussOneOverR(const unsigned int n,
                  const unsigned int vertex_index,
@@ -455,6 +471,7 @@ public:
   /**
    * The constructor takes an arbitrary quadrature formula @p quad and sorts
    * its points and weights according to ascending weights.
+   * @param quad The quad used by this operation.
    */
   QSorted(const Quadrature<dim> &quad);
 
@@ -531,12 +548,16 @@ public:
    * argument. The quadrature formula will be mapped using Telles' rule. Make
    * sure that the order of the quadrature rule is appropriate for the
    * singularity in question.
+   * @param base_quad The base quad.
+   * @param singularity The point associated with this operation.
    */
   QTelles(const Quadrature<1> &base_quad, const Point<dim> &singularity);
   /**
    * A variant of above constructor that takes as parameters the order @p n
    * and location of a singularity. A Gauss Legendre quadrature of order n
    * will be used
+   * @param n The n used by this operation.
+   * @param singularity The point associated with this operation.
    */
   QTelles(const unsigned int n, const Point<dim> &singularity);
 };
@@ -905,6 +926,7 @@ public:
   /**
    * Constructor taking the number of quadrature points in 1d direction
    * @p n_points_1d.
+   * @param n_points_1D The number of points 1d.
    */
   explicit QGaussSimplex(const unsigned int n_points_1D);
 };
@@ -949,6 +971,8 @@ public:
    * @p n_points_1d and boolean indicating whether the rule should be order
    * $2 n - 1$ or $2 n$: see the general documentation of this class for more
    * information.
+   * @param n_points_1D The number of points 1d.
+   * @param use_odd_order The use odd order.
    */
   explicit QWitherdenVincentSimplex(const unsigned int n_points_1D,
                                     const bool         use_odd_order = true);
@@ -980,6 +1004,7 @@ public:
    * Users specify a number `n_points_1d` as an indication of what polynomial
    * degree to be integrated exactly. For details, see the comments of
    * QGaussSimplex.
+   * @param n_points_1D The number of points 1d.
    */
   explicit QGaussWedge(const unsigned int n_points_1D);
 };
@@ -995,6 +1020,7 @@ public:
    * Users specify a number `n_points_1d` as an indication of what polynomial
    * degree to be integrated exactly. For details, see the comments of
    * QGaussSimplex.
+   * @param n_points_1D The number of points 1d.
    */
   explicit QGaussPyramid(const unsigned int n_points_1D);
 };

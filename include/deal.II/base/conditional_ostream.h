@@ -81,6 +81,8 @@ public:
    * Constructor. Set the stream to which we want to write, and the condition
    * based on which writes are actually forwarded. Per default the condition
    * of an object is active.
+   * @param stream The output stream to which data is written.
+   * @param active Whether to active.
    */
   explicit ConditionalOStream(std::ostream &stream, const bool active = true);
 
@@ -88,6 +90,7 @@ public:
    * Depending on the <tt>active</tt> flag set the condition of this stream to
    * active (true) or non-active (false). An object of this class prints to
    * <tt>cout</tt> if and only if its condition is active.
+   * @param active Whether to active.
    */
   void
   set_condition(const bool active);

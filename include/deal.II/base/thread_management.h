@@ -73,6 +73,9 @@ namespace Threads
    * A list of subintervals is returned as a vector of pairs of iterators,
    * where each pair denotes the range <code>[begin[i],end[i])</code>.
    *
+   * @param begin The begin of the range.
+   * @param end The end of the range.
+   * @param n_intervals The number of intervals.
    * @ingroup threads
    */
   template <typename ForwardIterator>
@@ -87,6 +90,9 @@ namespace Threads
    * difference that instead of iterators, now values are taken that define
    * the whole interval.
    *
+   * @param begin The begin of the range.
+   * @param end The end of the range.
+   * @param n_intervals The number of intervals.
    * @ingroup threads
    */
   std::vector<std::pair<unsigned int, unsigned int>>
@@ -119,6 +125,7 @@ namespace Threads
      * install a try-catch block, and if an exception of type
      * <code>std::exception</code> is caught, it passes over control to this
      * function, which will then provide some output.
+     * @param exc The exception object that is stored, rethrown, or reported.
      */
     [[noreturn]] void
     handle_std_exception(const std::exception &exc);
@@ -253,6 +260,7 @@ namespace Threads
        * Set the value from the given `std::future` object. If the future
        * object holds an exception, the set will not happen and this function
        * instead throws the exception stored in the future object.
+       * @param v The value on which this function operates.
        */
       inline void
       set_from(std::future<RT> &v)
@@ -323,6 +331,7 @@ namespace Threads
        *  Set the value from the given `std::future` object. If the future
        * object holds an exception, the set will not happen and this function
        * instead throws the exception stored in the future object.
+       * @param v The value on which this function operates.
        */
       inline void
       set_from(std::future<RT &> &v)
@@ -424,6 +433,8 @@ namespace Threads
      *
      * @dealiiConceptRequires{(std::invocable<Function> &&
      *    std::convertible_to<std::invoke_result_t<Function>, RT>)}
+     * @param function The function object.
+     * @param promise The promise used by this operation.
      */
     template <typename RT, typename Function>
     DEAL_II_CXX20_REQUIRES(
@@ -443,6 +454,8 @@ namespace Threads
      * call `std::promise::set_value()` without argument.
      *
      * @dealiiConceptRequires{(std::invocable<Function>)}
+     * @param function The function object.
+     * @param promise The promise used by this operation.
      */
     template <typename Function>
     DEAL_II_CXX20_REQUIRES((std::invocable<Function>))
@@ -495,6 +508,7 @@ namespace Threads
      * only use one thread, then just execute the given function
      * object.
      *
+     * @param function_object The function object.
      * @post Using this constructor automatically makes the task object
      * joinable().
      */
@@ -672,6 +686,7 @@ namespace Threads
      * then calling `t2.return_value()` will return the same object (not just an
      * object with the same value, but in fact the same address!) as
      * calling `t1.return_value()`.
+     * @param other The object to copy or move from.
      */
     Task(const Task &other) = default;
 
@@ -687,6 +702,7 @@ namespace Threads
      * the task, and `t1.return_value()` will result in an error because `t1`
      * no longer refers to a task and consequently does not know anything
      * about a return value.
+     * @param other The object to copy or move from.
      */
     Task(Task &&other) noexcept = default;
 
@@ -702,6 +718,7 @@ namespace Threads
      * then calling `t2.return_value()` will return the same object (not just an
      * object with the same value, but in fact the same address!) as
      * calling `t1.return_value()`.
+     * @param other The object to copy or move from.
      */
     Task &
     operator=(const Task &other) = default;
@@ -719,6 +736,7 @@ namespace Threads
      * the task, and `t1.return_value()` will result in an error because `t1`
      * no longer refers to a task and consequently does not know anything
      * about a return value.
+     * @param other The object to copy or move from.
      */
     Task &
     operator=(Task &&other) noexcept = default;
@@ -850,6 +868,7 @@ namespace Threads
 
     /**
      * Exception
+     * @param ExcNoTask The exc no task used by this operation.
      */
     DeclExceptionMsg(ExcNoTask,
                      "The current object is not associated with a task that "
@@ -1155,6 +1174,7 @@ namespace Threads
    * function object without arguments and returning an object of type RT (or
    * void).
    *
+   * @param function The function object.
    * @note When MultithreadInfo::n_threads() returns 1, i.e., if the
    *   deal.II runtime system has been configured to only use one
    *   thread, then this function just executes the given function
@@ -1200,6 +1220,7 @@ namespace Threads
    * can later retrieve via <code>task.return_value()</code> once the
    * task (i.e., the body of the lambda function) has completed.
    *
+   * @param function_object The function object.
    * @note When MultithreadInfo::n_threads() returns 1, i.e., if the
    *   deal.II runtime system has been configured to only use one
    *   thread, then this function just executes the given function
@@ -1270,6 +1291,8 @@ namespace Threads
    * Overload of the new_task function for non-member or static member
    * functions. See the other functions of same name for more information.
    *
+   * @param fun_ptr The fun ptr.
+   * @param args The args used by this operation.
    * @ingroup threads
    */
   template <typename RT, typename... Args>
@@ -1308,6 +1331,8 @@ namespace Threads
    *
    * See the other functions of same name for more information.
    *
+   * @param fun The fun used by this operation.
+   * @param args The args used by this operation.
    * @note This overload is disabled if the first argument is a
    * pointer or reference to a function, as there is another overload
    * for that case. (Strictly speaking, this overload is disabled if the
@@ -1345,6 +1370,8 @@ namespace Threads
    * Overload of the non-const new_task function. See the other functions of
    * same name for more information.
    *
+   * @param c The value on which this function operates.
+   * @param args The args used by this operation.
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
@@ -1362,6 +1389,8 @@ namespace Threads
    * Overload of the new_task function. See the other functions of same name for
    * more information.
    *
+   * @param c The value on which this function operates.
+   * @param args The args used by this operation.
    * @ingroup threads
    */
   template <typename RT, typename C, typename... Args>
@@ -1394,6 +1423,7 @@ namespace Threads
   public:
     /**
      * Add another task object to the collection.
+     * @param t The time associated with the evaluation.
      */
     TaskGroup &
     operator+=(const Task<RT> &t)
