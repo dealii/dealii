@@ -170,7 +170,8 @@ public:
   DeclException2(ExcNoSubscriber,
                  std::string,
                  std::string,
-                 << "No subscriber with identifier <" << arg2
+                 << "No subscriber with identifier <"
+                 << (arg2.empty() ? "unknown subscriber" : arg2.c_str())
                  << "> subscribes to this object of class " << arg1
                  << ". Consequently, it cannot be unsubscribed.");
   /** @} */
