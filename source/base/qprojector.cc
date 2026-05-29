@@ -428,8 +428,15 @@ QProjector<dim>::project_to_all_faces(
   const ReferenceCell<dim>       &reference_cell,
   const hp::QCollection<dim - 1> &quadrature)
 {
+  std::size_t n_points = 0;
+  for (const unsigned int face_no : reference_cell.face_indices())
+    n_points += quadrature[quadrature.size() == 1 ? 0 : face_no].size() *
+                reference_cell.n_face_orientations(face_no);
+
   std::vector<Point<dim>> points;
   std::vector<double>     weights;
+  points.reserve(n_points);
+  weights.reserve(n_points);
 
   for (const unsigned int face_no : reference_cell.face_indices())
     {
@@ -470,8 +477,24 @@ QProjector<dim>::project_to_all_subfaces(
   if (dim == 1)
     AssertDimension(quadrature.size(), 1);
 
+  std::size_t n_points = 0;
+  for (const unsigned int face_no : reference_cell.face_indices())
+    {
+      const auto n_orientations = reference_cell.n_face_orientations(face_no);
+      const auto face_reference_cell =
+        reference_cell.face_reference_cell(face_no);
+      for (const auto &refinement_case : face_reference_cell.refinement_cases())
+        {
+          const auto n_children =
+            dim > 1 ? face_reference_cell.n_children(refinement_case) : 1;
+          n_points += n_children * n_orientations * quadrature.size();
+        }
+    }
+
   std::vector<Point<dim>> points;
   std::vector<double>     weights;
+  points.reserve(n_points);
+  weights.reserve(n_points);
 
   // project to each face and copy results
   for (unsigned int face_no = 0; face_no < reference_cell.n_faces(); ++face_no)
