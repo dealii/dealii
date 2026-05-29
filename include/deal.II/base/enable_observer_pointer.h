@@ -170,7 +170,8 @@ public:
   DeclException2(ExcNoSubscriber,
                  std::string,
                  std::string,
-                 << "No subscriber with identifier <" << arg2
+                 << "No subscriber with identifier <"
+                 << (arg2.empty() ? "unknown subscriber" : arg2.c_str())
                  << "> subscribes to this object of class " << arg1
                  << ". Consequently, it cannot be unsubscribed.");
   /** @} */
@@ -215,16 +216,6 @@ private:
    * string supplied to subscribe().
    */
   mutable std::map<std::string, unsigned int> counter_map;
-
-  /**
-   * The data type used in #counter_map.
-   */
-  using map_value_type = decltype(counter_map)::value_type;
-
-  /**
-   * The iterator type used in #counter_map.
-   */
-  using map_iterator = decltype(counter_map)::iterator;
 
   /**
    * In this vector, we store pointers to the validity bool in the

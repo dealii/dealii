@@ -31,9 +31,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-static const char *unknown_subscriber = "unknown subscriber";
-
-
 std::mutex EnableObserverPointer::mutex;
 
 
@@ -145,9 +142,7 @@ EnableObserverPointer::subscribe(std::atomic<bool> *const validity,
     object_info = &typeid(*this);
   ++counter;
 
-  const std::string &name = id.empty() ? unknown_subscriber : id;
-
-  ++counter_map[name];
+  ++counter_map[id];
 
   *validity = true;
   validity_pointers.push_back(validity);
@@ -159,28 +154,26 @@ void
 EnableObserverPointer::unsubscribe(std::atomic<bool> *const validity,
                                    const std::string       &id) const
 {
-  const std::string &name = id.empty() ? unknown_subscriber : id;
-
   if (counter == 0)
     {
-      AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), name));
+      AssertNothrow(counter > 0, ExcNoSubscriber(object_info->name(), id));
       // This is for the case that we do not abort after the exception
       return;
     }
 
   std::lock_guard<std::mutex> lock(mutex);
 
-  map_iterator it = counter_map.find(name);
+  auto it = counter_map.find(id);
   if (it == counter_map.end())
     {
       AssertNothrow(it != counter_map.end(),
-                    ExcNoSubscriber(object_info->name(), name));
+                    ExcNoSubscriber(object_info->name(), id));
       // This is for the case that we do not abort after the exception
       return;
     }
   if (it->second == 0)
     {
-      AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), name));
+      AssertNothrow(it->second > 0, ExcNoSubscriber(object_info->name(), id));
       // This is for the case that we do not abort after the exception
       return;
     }
