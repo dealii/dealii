@@ -59,6 +59,7 @@ namespace TimeStepping
    * ode45 in MATLAB)
    *   - FEHLBERG (fifth order)
    *   - CASH_KARP (fifth order)
+   *   - TSit5 (Tsitouras, fifth order)
    */
   enum runge_kutta_method
   {
@@ -148,6 +149,10 @@ namespace TimeStepping
      * Cash–Karp method, fifth order.
      */
     CASH_KARP,
+    /**
+     * Tsitouras method, fifth order.
+     */
+    TSITOURAS5,
     /**
      * Invalid.
      */

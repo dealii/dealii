@@ -1,2 +1,7 @@
 
+DEAL::HEUN_EULER steps:
+DEAL::7
+DEAL::Fehlberg steps:
+DEAL::7
+DEAL::Tsitouras5 steps:
 DEAL::7

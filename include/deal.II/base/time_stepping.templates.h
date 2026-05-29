@@ -304,6 +304,67 @@ namespace TimeStepping
 
             break;
           }
+        case (TSITOURAS5):
+          {
+            /**
+             * Runge–Kutta pairs of order 5(4) satisfying only the first column simplifying assumption
+             * C. Tsitouras, CMA 62 (2011) 770-775
+             */
+            this->n_stages = 7;
+            this->c.reserve(this->n_stages);
+            this->b.reserve(this->n_stages);
+            std::vector<double> tmp;
+            this->a.push_back(std::vector<double>());
+            tmp.resize(1);
+            tmp[0] = 0.161;
+            this->a.push_back(tmp);
+            tmp.resize(2);
+            tmp[0] = -0.008480655492356989;
+            tmp[1] = 0.3354806554923570;
+            this->a.push_back(tmp);    
+            tmp.resize(3);
+            tmp[0] = 2.8971530571054935;
+            tmp[1] = -6.359448489975075;
+            tmp[2] = 4.3622954328695815;
+            this->a.push_back(tmp);
+            tmp.resize(4);  
+            tmp[0] = 5.325864828439257;
+            tmp[1] = -11.748883564062828;
+            tmp[2] = 7.4955393428898365;
+            tmp[3] = -0.09249506636175525;
+            this->a.push_back(tmp);
+            tmp.resize(5);
+            tmp[0] =  5.86145544294642;
+            tmp[1] =-12.92096931784711;
+            tmp[2] =  8.159367898576159;
+            tmp[3] = -0.07158497328140100;
+            tmp[4] = -0.028269050394068383;
+            this->a.push_back(tmp);
+            tmp.resize(6);
+            tmp[0] = 0.09646076681806523;
+            tmp[1] = 0.01;               
+            tmp[2] = 0.4798896504144996; 
+            tmp[3] = 1.379008574103742;  
+            tmp[4] = -3.290069515436081; 
+            tmp[5] = 2.324710524099774;  
+            this->a.push_back(tmp);
+            this->c.push_back(0.0);               
+            this->c.push_back(0.161);             
+            this->c.push_back(0.327);             
+            this->c.push_back(0.9);               
+            this->c.push_back(0.9800255409045097);
+            this->c.push_back(1.0);               
+            this->c.push_back(1.0);                             
+            this->b.push_back(0.09646076681806523);
+            this->b.push_back(0.01);               
+            this->b.push_back(0.4798896504144996); 
+            this->b.push_back(1.379008574103742);  
+            this->b.push_back(-3.290069515436081); 
+            this->b.push_back(2.324710524099774);  
+            this->b.push_back(0.0);                
+
+            break;
+          }
         default:
           {
             AssertThrow(
@@ -706,6 +767,7 @@ namespace TimeStepping
 
             break;
           }
+
         default:
           {
             AssertThrow(
@@ -900,7 +962,7 @@ namespace TimeStepping
             b1.push_back(0.5);
             b2.push_back(1.0);
             b2.push_back(0.0);
-
+            
             break;
           }
         case (BOGACKI_SHAMPINE):
@@ -1113,6 +1175,77 @@ namespace TimeStepping
 
             break;
           }
+          case (TSITOURAS5):
+          {
+            /**
+             * Runge–Kutta pairs of order 5(4) satisfying only the first column simplifying assumption
+             * C. Tsitouras, CMA 62 (2011) 770-775
+             */
+
+            last_same_as_first = true;
+            this->n_stages = 7;
+            this->c.reserve(this->n_stages);
+            this->b1.reserve(this->n_stages);
+            this->b2.reserve(this->n_stages);
+            std::vector<double> tmp;
+            this->a.push_back(std::vector<double>()); 
+            tmp.resize(1);
+            tmp[0] = 0.161;
+            this->a.push_back(tmp);
+            tmp.resize(2);
+            tmp[0] = -0.008480655492356989;
+            tmp[1] = 0.3354806554923570;
+            this->a.push_back(tmp);
+            tmp.resize(3);
+            tmp[0] = 2.8971530571054935;
+            tmp[1] = -6.359448489975075;
+            tmp[2] = 4.3622954328695815;
+            this->a.push_back(tmp);
+            tmp.resize(4);  
+            tmp[0] = 5.325864828439257;
+            tmp[1] = -11.748883564062828; 
+            tmp[2] = 7.4955393428898365;  
+            tmp[3] = -0.09249506636175525;
+            this->a.push_back(tmp);
+            tmp.resize(5);
+            tmp[0] = 5.86145544294642;
+            tmp[1] = -12.92096931784711; 
+            tmp[2] = 8.159367898576159;
+            tmp[3] = -0.07158497328140100;
+            tmp[4] = -0.028269050394068383;
+            this->a.push_back(tmp); 
+            tmp.resize(6);
+            tmp[0] = 0.09646076681806523;
+            tmp[1] = 0.01;
+            tmp[2] = 0.4798896504144996;
+            tmp[3] = 1.379008574103742;
+            tmp[4] = -3.290069515436081;
+            tmp[5] = 2.324710524099774;
+            this->a.push_back(tmp);
+            this->c.push_back(0.0);
+            this->c.push_back(0.161);
+            this->c.push_back(0.327);
+            this->c.push_back(0.9);
+            this->c.push_back(0.9800255409045097);
+            this->c.push_back(1.0);         
+            this->c.push_back(1.0);
+            this->b1.push_back(0.09646076681806523);
+            this->b1.push_back(0.01);
+            this->b1.push_back(0.4798896504144996);
+            this->b1.push_back(1.379008574103742);
+            this->b1.push_back(-3.290069515436081);
+            this->b1.push_back(2.324710524099774);
+            this->b1.push_back(0.0);
+            this->b2.push_back(this->b1[0] -  0.00178001105222577714);
+            this->b2.push_back(this->b1[1] -  0.0008164344596567469);
+            this->b2.push_back(this->b1[2] - (-0.007880878010261995));
+            this->b2.push_back(this->b1[3] -  0.1447110071732629);
+            this->b2.push_back(this->b1[4] - (-0.5823571654525552));
+            this->b2.push_back(this->b1[5] -  0.45808210592918697);
+            this->b2.push_back(this->b1[6] - (-1.0 / 66.0)); 
+
+            break;
+          }
         default:
           {
             AssertThrow(
@@ -1224,6 +1357,9 @@ namespace TimeStepping
                 if (delta_t < min_delta_t)
                   delta_t = min_delta_t;
               }
+              
+              // Not to loop infinitely if step is not rejected
+              this->free_memory();
           }
 
         ++count;
