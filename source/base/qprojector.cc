@@ -513,19 +513,23 @@ QProjector<dim>::project_to_all_subfaces(
             for (unsigned int subface_no = 0; subface_no < n_children;
                  ++subface_no)
               {
-                const auto sub_quadrature =
-                  project_to_subface(reference_cell,
-                                     quadrature,
-                                     face_no,
-                                     subface_no,
-                                     combined_orientation,
-                                     refinement_case);
-                points.insert(points.end(),
-                              sub_quadrature.get_points().begin(),
-                              sub_quadrature.get_points().end());
-                weights.insert(weights.end(),
-                               sub_quadrature.get_weights().begin(),
-                               sub_quadrature.get_weights().end());
+                std_cxx26::inplace_vector<
+                  Point<dim>,
+                  ReferenceCells::max_n_vertices<dim - 1>()>
+                  vertices;
+                for (const unsigned int subface_vertex_no :
+                     reference_cell.face_reference_cell(face_no)
+                       .vertex_indices())
+                  vertices.push_back(reference_cell.subface_vertex_location(
+                    face_no, subface_no, subface_vertex_no, refinement_case));
+                internal::QProjector::append_subobject_rule(
+                  reference_cell.face_reference_cell(face_no),
+                  quadrature,
+                  vertices,
+                  reference_cell.face_measure(face_no),
+                  combined_orientation,
+                  points,
+                  weights);
               }
         }
     }
