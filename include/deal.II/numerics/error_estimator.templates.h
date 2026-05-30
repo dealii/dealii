@@ -152,12 +152,6 @@ namespace internal
     std::vector<dealii::Vector<double>> coefficient_values;
 
     /**
-     * Array for the products of Jacobian determinants and weights of
-     * quadraturs points.
-     */
-    std::vector<double> JxW_values;
-
-    /**
      * The subdomain id we are to care for.
      */
     const types::subdomain_id subdomain_id;
@@ -250,7 +244,6 @@ namespace internal
     , coefficient_values1(face_quadratures.max_n_quadrature_points())
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
                          dealii::Vector<double>(fe.n_components()))
-    , JxW_values(face_quadratures.max_n_quadrature_points())
     , subdomain_id(subdomain_id)
     , material_id(material_id)
     , neumann_bc(neumann_bc)
@@ -272,7 +265,6 @@ namespace internal
     neighbor_normal_vectors.resize(n_q_points);
     coefficient_values1.resize(n_q_points);
     coefficient_values.resize(n_q_points);
-    JxW_values.resize(n_q_points);
 
     for (unsigned int i = 0; i < phi.size(); ++i)
       {
@@ -451,11 +443,10 @@ namespace internal
     // each component being the mentioned value at one of the quadrature
     // points
 
-    parallel_data.JxW_values =
-      fe_face_values_cell.get_present_fe_values().get_JxW_values();
-
     // take the square of the phi[i] for integration, and sum up
     Assert(face->index() >= 0, ExcInternalError());
+    const auto &JxW_values =
+      fe_face_values_cell.get_present_fe_values().get_JxW_values();
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       {
         double value = 0.0;
@@ -464,7 +455,7 @@ namespace internal
             for (unsigned int p = 0; p < n_q_points; ++p)
               value += numbers::NumberTraits<number>::abs_square(
                          parallel_data.phi[n][p][component]) *
-                       parallel_data.JxW_values[p];
+                       JxW_values[p];
         local_face_integrals.emplace_back(face->index(), n, value * factor);
       }
   }
