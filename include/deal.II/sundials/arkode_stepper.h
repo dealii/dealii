@@ -1267,13 +1267,12 @@ namespace SUNDIALS
      */
     std::function<void(void *arkode_mem)> custom_setup;
 
-  protected:
+  private:
     using CallbackContext = typename ARKodeStepper<
       VectorType>::template CallbackContext<ERKStepper<VectorType>>;
 
     using ARKodeMemoryPtr = typename ARKodeStepper<VectorType>::ARKodeMemoryPtr;
 
-  private:
     /**
      * Rebuild the stepper at a given time instance and for a given state
      * vector. Required by the ARKodeStepper interface.
