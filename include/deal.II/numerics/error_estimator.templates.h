@@ -116,7 +116,7 @@ namespace internal
      * presence of multiple threads where synchronization makes things even
      * slower.
      */
-    std::vector<std::vector<std::vector<number>>> phi;
+    Table<3, double> phi;
 
     /**
      * A vector for the gradients of the finite element function on one cell
@@ -226,10 +226,7 @@ namespace internal
                         finite_element,
                         face_quadratures,
                         update_gradients | update_normal_vectors)
-    , phi(n_solution_vectors,
-          std::vector<std::vector<number>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<number>(fe.n_components())))
+    , phi(n_solution_vectors, face_quadratures.max_n_quadrature_points(), fe.n_components())
     , psi(n_solution_vectors,
           std::vector<std::vector<Tensor<1, spacedim, number>>>(
             face_quadratures.max_n_quadrature_points(),
@@ -266,15 +263,14 @@ namespace internal
     coefficient_values1.resize(n_q_points);
     coefficient_values.resize(n_q_points);
 
-    for (unsigned int i = 0; i < phi.size(); ++i)
+    phi.reinit(phi.size(0), n_q_points, n_components);
+    for (unsigned int i = 0; i < psi.size(); ++i)
       {
-        phi[i].resize(n_q_points);
         psi[i].resize(n_q_points);
         neighbor_psi[i].resize(n_q_points);
 
         for (unsigned int qp = 0; qp < n_q_points; ++qp)
           {
-            phi[i][qp].resize(n_components);
             psi[i][qp].resize(n_components);
             neighbor_psi[i][qp].resize(n_components);
           }
@@ -343,7 +339,7 @@ namespace internal
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
         for (unsigned int point = 0; point < n_q_points; ++point)
-          parallel_data.phi[n][point][component] =
+          parallel_data.phi(n, point, component) =
             (parallel_data.psi[n][point][component] *
              parallel_data.normal_vectors[point]);
 
@@ -355,7 +351,7 @@ namespace internal
           for (unsigned int component = 0; component < n_components;
                ++component)
             for (unsigned int p = 0; p < n_q_points; ++p)
-              parallel_data.phi[n][p][component] +=
+              parallel_data.phi(n, p, component) +=
                 (parallel_data.neighbor_psi[n][p][component] *
                  parallel_data.neighbor_normal_vectors[p]);
       }
@@ -375,7 +371,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] *=
+                  parallel_data.phi(n, point, component) *=
                     parallel_data.coefficient_values1[point];
           }
         else
@@ -389,7 +385,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] *=
+                  parallel_data.phi(n, point, component) *=
                     parallel_data.coefficient_values[point](component);
           }
       }
@@ -415,7 +411,7 @@ namespace internal
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int point = 0; point < n_q_points; ++point)
-                parallel_data.phi[n][point][0] -= g[point];
+                parallel_data.phi(n, point, 0) -= g[point];
           }
         else
           {
@@ -431,7 +427,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] -= g[point](component);
+                  parallel_data.phi(n, point, component) -= g[point](component);
           }
       }
 
@@ -454,7 +450,7 @@ namespace internal
           if (parallel_data.component_mask[component] == true)
             for (unsigned int p = 0; p < n_q_points; ++p)
               value += numbers::NumberTraits<number>::abs_square(
-                         parallel_data.phi[n][p][component]) *
+                         parallel_data.phi(n, p, component)) *
                        JxW_values[p];
         local_face_integrals.emplace_back(face->index(), n, value * factor);
       }
