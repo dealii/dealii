@@ -47,6 +47,8 @@
 
 #include <deal.II/numerics/error_estimator.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -836,8 +838,11 @@ namespace internal
       }
 
     // finally loop over all subfaces to collect the contributions of the
-    // subfaces and store them with the parent face
-    std::vector<double> sum(n_solution_vectors, 0);
+    // subfaces and store them with the parent face.
+    //
+    // Rather than the usual 200, since this function is usually called with a
+    // single or O(1) input vectors, just use 20 as the default size
+    boost::container::small_vector<double, 20> sum(n_solution_vectors);
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
       for (unsigned int n = 0; n < n_solution_vectors; ++n)
