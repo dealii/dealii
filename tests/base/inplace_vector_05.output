@@ -7,21 +7,7 @@ DEAL:A::A::A(const A&)
 DEAL:A::A::A(const A&)
 DEAL:A::A::A(const A&)
 DEAL:A::size : 3
-DEAL:A::A::A(A&&)
-DEAL:A::A::operator=(A&&)
-DEAL:A::A::~A()
-DEAL:A::A::A(A&&)
-DEAL:A::A::operator=(A&&)
-DEAL:A::A::~A()
-DEAL:A::size : 3
-DEAL:A::A::A(A&&)
-DEAL:A::A::operator=(A&&)
-DEAL:A::A::~A()
-DEAL:A::A::A(A&&)
-DEAL:A::A::operator=(A&&)
-DEAL:A::A::~A()
-DEAL:A::size : 3
-DEAL:A::ctors = 10 dtors = 4
+DEAL:A::ctors = 6 dtors = 0
 DEAL:A::
 DEAL:A::A::~A()
 DEAL:A::A::~A()
