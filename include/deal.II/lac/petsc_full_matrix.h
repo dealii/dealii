@@ -73,6 +73,17 @@ namespace PETScWrappers
     void
     reinit(const size_type m, const size_type n);
 
+    /**
+     * This operator assigns a scalar to a matrix. Since this does usually not
+     * make much sense (should we set all matrix entries to this value?),
+     * this operation is only
+     * allowed if the actual value to be assigned is zero. This operator only
+     * exists to allow for the obvious notation <tt>matrix=0</tt>, which sets
+     * all elements of the matrix to zero.
+     */
+    FullMatrix &
+    operator=(const value_type d);
+
 
   private:
     /**
@@ -130,6 +141,17 @@ namespace PETScWrappers
        * Destructor to free the PETSc object.
        */
       ~FullMatrix() override;
+
+      /**
+       * This operator assigns a scalar to a matrix. Since this does usually not
+       * make much sense (should we set all matrix entries to this value?),
+       * this operation is only
+       * allowed if the actual value to be assigned is zero. This operator only
+       * exists to allow for the obvious notation <tt>matrix=0</tt>, which sets
+       * all elements of the matrix to zero.
+       */
+      FullMatrix &
+      operator=(const value_type d);
 
       void
       reinit(const MPI_Comm  communicator,

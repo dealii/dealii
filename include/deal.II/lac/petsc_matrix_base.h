@@ -365,12 +365,13 @@ namespace PETScWrappers
 
     /**
      * This operator assigns a scalar to a matrix. Since this does usually not
-     * make much sense (should we set all matrix entries to this value? Only
-     * the nonzero entries of the sparsity pattern?), this operation is only
+     * make much sense (should we set all matrix entries to this value?),
+     * this operation is only
      * allowed if the actual value to be assigned is zero. This operator only
      * exists to allow for the obvious notation <tt>matrix=0</tt>, which sets
-     * all elements of the matrix to zero, but keeps the sparsity pattern
-     * previously used.
+     * all elements of the matrix to zero. For full matrices, all values are set
+     * to zero while for sparse matrices the sparsity pattern is still used, so
+     * only the non-zero entries of the sparsity pattern are set to zero.
      */
     MatrixBase &
     operator=(const value_type d);

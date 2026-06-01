@@ -58,6 +58,13 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
+  FullMatrix &
+  FullMatrix::operator=(const value_type d)
+  {
+    MatrixBase::operator=(d);
+    return *this;
+  }
+
 } // namespace PETScWrappers
 
 

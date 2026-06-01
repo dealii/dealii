@@ -87,6 +87,15 @@ namespace PETScWrappers
 
 
 
+    FullMatrix &
+    FullMatrix::operator=(const value_type d)
+    {
+      MatrixBase::operator=(d);
+      return *this;
+    }
+
+
+
     void
     FullMatrix::do_reinit(const MPI_Comm  communicator,
                           const size_type m,
