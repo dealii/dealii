@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -66,12 +66,9 @@ class CellId
 public:
   /**
    * A type that is used to encode the CellId data in a compact and fast way
-   * (e.g. for MPI transfer to other processes). Note that it limits the
-   * number of children that can be transferred to 20 in 3d and 30 in 2d
-   * (using 2 times 32 bit for storage), a limitation that is identical to
-   * the one used by p4est.
+   * (e.g. for MPI transfer to other processes).
    */
-  using binary_type = std::array<unsigned int, 4>;
+  using binary_type = std::array<std::uint64_t, 3>;
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and vector of
@@ -268,7 +265,7 @@ CellId::serialize(Archive &ar, const unsigned int /*version*/)
 inline std::istream &
 operator>>(std::istream &is, CellId &cid)
 {
-  unsigned int cellid;
+  types::coarse_cell_id cellid = numbers::invalid_coarse_cell_id;
   is >> cellid;
   if (is.eof())
     return is;
