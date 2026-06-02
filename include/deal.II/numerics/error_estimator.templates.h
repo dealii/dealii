@@ -47,6 +47,8 @@
 
 #include <deal.II/numerics/error_estimator.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -150,12 +152,6 @@ namespace internal
     std::vector<dealii::Vector<double>> coefficient_values;
 
     /**
-     * Array for the products of Jacobian determinants and weights of
-     * quadraturs points.
-     */
-    std::vector<double> JxW_values;
-
-    /**
      * The subdomain id we are to care for.
      */
     const types::subdomain_id subdomain_id;
@@ -248,7 +244,6 @@ namespace internal
     , coefficient_values1(face_quadratures.max_n_quadrature_points())
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
                          dealii::Vector<double>(fe.n_components()))
-    , JxW_values(face_quadratures.max_n_quadrature_points())
     , subdomain_id(subdomain_id)
     , material_id(material_id)
     , neumann_bc(neumann_bc)
@@ -270,7 +265,6 @@ namespace internal
     neighbor_normal_vectors.resize(n_q_points);
     coefficient_values1.resize(n_q_points);
     coefficient_values.resize(n_q_points);
-    JxW_values.resize(n_q_points);
 
     for (unsigned int i = 0; i < phi.size(); ++i)
       {
@@ -293,37 +287,22 @@ namespace internal
 
 
   /**
-   * Copy data from the local_face_integrals map of a single ParallelData
-   * object into a global such map. This is the copier stage of a WorkStream
-   * pipeline.
+   * Copy data from local_face_integrals (from one ParallelData object) into a
+   * global Table. This is the copier stage of a WorkStream pipeline.
    */
   template <int dim, int spacedim>
   void
   copy_local_to_global(
-    const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-                   std::vector<double>> &local_face_integrals,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>       &face_integrals)
+    const std::vector<std::tuple<unsigned int, unsigned int, double>>
+                     &local_face_integrals,
+    Table<2, double> &face_integrals)
   {
-    // now copy locally computed elements into the global map
-    for (typename std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-                           std::vector<double>>::const_iterator p =
-           local_face_integrals.begin();
-         p != local_face_integrals.end();
-         ++p)
+    for (const auto &[face_index, n, value] : local_face_integrals)
       {
-        // double check that the element does not already exists in the
-        // global map
-        Assert(face_integrals.find(p->first) == face_integrals.end(),
-               ExcInternalError());
-
-        for (unsigned int i = 0; i < p->second.size(); ++i)
-          {
-            Assert(numbers::is_finite(p->second[i]), ExcInternalError());
-            Assert(p->second[i] >= 0, ExcInternalError());
-          }
-
-        face_integrals[p->first] = p->second;
+        AssertIsFinite(value);
+        Assert(value >= 0, ExcInternalError());
+        Assert(std::isnan(face_integrals(face_index, n)), ExcInternalError());
+        face_integrals(face_index, n) = value;
       }
   }
 
@@ -333,11 +312,14 @@ namespace internal
    * ParallelData.
    */
   template <int dim, int spacedim, typename number>
-  std::vector<double>
+  void
   integrate_over_face(
     ParallelData<dim, spacedim, number>                     &parallel_data,
     const typename DoFHandler<dim, spacedim>::face_iterator &face,
-    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell)
+    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
+    const double                             factor,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      &local_face_integrals)
   {
     const unsigned int n_q_points = parallel_data.psi[0].size(),
                        n_components =
@@ -461,20 +443,21 @@ namespace internal
     // each component being the mentioned value at one of the quadrature
     // points
 
-    parallel_data.JxW_values =
-      fe_face_values_cell.get_present_fe_values().get_JxW_values();
-
     // take the square of the phi[i] for integration, and sum up
-    std::vector<double> face_integral(n_solution_vectors, 0);
+    Assert(face->index() >= 0, ExcInternalError());
+    const auto &JxW_values =
+      fe_face_values_cell.get_present_fe_values().get_JxW_values();
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
-      for (unsigned int component = 0; component < n_components; ++component)
-        if (parallel_data.component_mask[component] == true)
-          for (unsigned int p = 0; p < n_q_points; ++p)
-            face_integral[n] += numbers::NumberTraits<number>::abs_square(
-                                  parallel_data.phi[n][p][component]) *
-                                parallel_data.JxW_values[p];
-
-    return face_integral;
+      {
+        double value = 0.0;
+        for (unsigned int component = 0; component < n_components; ++component)
+          if (parallel_data.component_mask[component] == true)
+            for (unsigned int p = 0; p < n_q_points; ++p)
+              value += numbers::NumberTraits<number>::abs_square(
+                         parallel_data.phi[n][p][component]) *
+                       JxW_values[p];
+        local_face_integrals.emplace_back(face->index(), n, value * factor);
+      }
   }
 
   /**
@@ -653,8 +636,8 @@ namespace internal
   integrate_over_regular_face(
     const ArrayView<const ReadVector<Number> *> &solutions,
     ParallelData<dim, spacedim, Number>         &parallel_data,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>               &local_face_integrals,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      &local_face_integrals,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
@@ -676,7 +659,7 @@ namespace internal
       fe_face_values_cell.get_present_fe_values().get_function_gradients(
         *solutions[n], parallel_data.psi[n]);
 
-    double factor;
+    double factor = std::numeric_limits<double>::signaling_NaN();
     // now compute over the other side of the face
     if (face->at_boundary() == false)
       // internal face; integrate jump of gradient across this face
@@ -727,11 +710,8 @@ namespace internal
       }
 
     // now go to the generic function that does all the other things
-    local_face_integrals[face] =
-      integrate_over_face(parallel_data, face, fe_face_values_cell);
-
-    for (unsigned int i = 0; i < local_face_integrals[face].size(); ++i)
-      local_face_integrals[face][i] *= factor;
+    integrate_over_face(
+      parallel_data, face, fe_face_values_cell, factor, local_face_integrals);
   }
 
 
@@ -746,8 +726,8 @@ namespace internal
   integrate_over_irregular_face(
     const ArrayView<const ReadVector<Number> *> &solutions,
     ParallelData<dim, spacedim, Number>         &parallel_data,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>               &local_face_integrals,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      &local_face_integrals,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     dealii::hp::FEFaceValues<dim, spacedim>    &fe_face_values,
@@ -774,7 +754,9 @@ namespace internal
     Assert(neighbor_neighbor < GeometryInfo<dim>::faces_per_cell,
            ExcInternalError());
 
-    // loop over all subfaces
+    // loop over all subfaces.
+    std::remove_reference_t<decltype(local_face_integrals)>
+      local_subface_integrals;
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
       {
@@ -818,33 +800,66 @@ namespace internal
         parallel_data.neighbor_normal_vectors =
           fe_subface_values.get_present_fe_values().get_normal_vectors();
 
-        local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
-          integrate_over_face(parallel_data, face, fe_face_values);
-        for (unsigned int i = 0;
-             i < local_face_integrals[neighbor_child->face(neighbor_neighbor)]
-                   .size();
-             i++)
-          local_face_integrals[neighbor_child->face(neighbor_neighbor)][i] *=
-            factor;
+        integrate_over_face(parallel_data,
+                            neighbor_child->face(neighbor_neighbor),
+                            fe_face_values,
+                            factor,
+                            local_subface_integrals);
+      }
+    // We need to sort by the row and column (face and vector indices) for
+    // sorted access in the next loop
+    auto index_less = [](const auto &a, const auto &b) {
+      return std::make_tuple(std::get<0>(a), std::get<1>(a)) <
+             std::make_tuple(std::get<0>(b), std::get<1>(b));
+    };
+    std::sort(local_subface_integrals.begin(),
+              local_subface_integrals.end(),
+              index_less);
+    if constexpr (running_in_debug_mode())
+      {
+        auto index_equal = [](const auto &a, const auto &b) {
+          return std::make_tuple(std::get<0>(a), std::get<1>(a)) ==
+                 std::make_tuple(std::get<0>(b), std::get<1>(b));
+        };
+        // We should not have two entries for the same subface
+        Assert(std::adjacent_find(local_subface_integrals.begin(),
+                                  local_subface_integrals.end(),
+                                  index_equal) == local_subface_integrals.end(),
+               ExcInternalError());
       }
 
     // finally loop over all subfaces to collect the contributions of the
-    // subfaces and store them with the parent face
-    std::vector<double> sum(n_solution_vectors, 0);
+    // subfaces and store them with the parent face.
+    //
+    // Rather than the usual 200, since this function is usually called with a
+    // single or O(1) input vectors, just use 20 as the default size
+    boost::container::small_vector<double, 20> sum(n_solution_vectors);
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
-      {
-        Assert(local_face_integrals.find(face->child(subface_no)) !=
-                 local_face_integrals.end(),
-               ExcInternalError());
-        Assert(local_face_integrals[face->child(subface_no)][0] >= 0,
-               ExcInternalError());
+      for (unsigned int n = 0; n < n_solution_vectors; ++n)
+        {
+          const auto subface_index = face->child(subface_no)->index();
+          const auto it =
+            std::lower_bound(local_subface_integrals.begin(),
+                             local_subface_integrals.end(),
+                             std::make_tuple(subface_index, n),
+                             [](const auto &a, const auto &b) {
+                               return std::make_tuple(std::get<0>(a),
+                                                      std::get<1>(a)) < b;
+                             });
+          Assert(it != local_subface_integrals.end() &&
+                   int(std::get<0>(*it)) == subface_index &&
+                   std::get<1>(*it) == n,
+                 ExcInternalError());
+          sum[n] += std::get<2>(*it);
+        }
 
-        for (unsigned int n = 0; n < n_solution_vectors; ++n)
-          sum[n] += local_face_integrals[face->child(subface_no)][n];
-      }
+    for (unsigned int n = 0; n < n_solution_vectors; ++n)
+      local_face_integrals.emplace_back(face->index(), n, sum[n]);
 
-    local_face_integrals[face] = sum;
+    local_face_integrals.insert(local_face_integrals.end(),
+                                local_subface_integrals.begin(),
+                                local_subface_integrals.end());
   }
 
 
@@ -858,9 +873,9 @@ namespace internal
   void
   estimate_one_cell(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-    ParallelData<dim, spacedim, Number>         &parallel_data,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>               &local_face_integrals,
+    ParallelData<dim, spacedim, Number> &parallel_data,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+                                                &local_face_integrals,
     const ArrayView<const ReadVector<Number> *> &solutions,
     const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
@@ -905,8 +920,8 @@ namespace internal
             (parallel_data.neumann_bc->find(face->boundary_id()) ==
              parallel_data.neumann_bc->end()))
           {
-            local_face_integrals[face] =
-              std::vector<double>(n_solution_vectors, 0.);
+            for (unsigned int n = 0; n < n_solution_vectors; ++n)
+              local_face_integrals.emplace_back(face->index(), n, 0.0);
             continue;
           }
 
@@ -1239,14 +1254,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
            ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
 
   const unsigned int n_solution_vectors = solutions.size();
-
-  // Map of integrals indexed by the corresponding face. In this map we store
-  // the integrated jump of the gradient for each face.  At the end of the
-  // function, we again loop over the cells and collect the contributions of
-  // the different faces of the cell.
-  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-           std::vector<double>>
-    face_integrals;
+  Table<2, double> face_integrals(dof_handler.get_triangulation().n_raw_faces(),
+                                  n_solution_vectors);
+  face_integrals.fill(std::numeric_limits<double>::quiet_NaN());
 
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
@@ -1261,8 +1271,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     &neumann_bc,
     component_mask,
     coefficients);
-  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-           std::vector<double>>
+  std::vector<std::tuple<unsigned int, unsigned int, double>>
     sample_local_face_integrals;
 
   // now let's work on all those cells:
@@ -1273,14 +1282,14 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     [&solutions, strategy](
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       internal::ParallelData<dim, spacedim, Number> &parallel_data,
-      std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-               std::vector<double>>                 &local_face_integrals) {
+      std::vector<std::tuple<unsigned int, unsigned int, double>>
+        &local_face_integrals) {
       internal::estimate_one_cell(
         cell, parallel_data, local_face_integrals, solutions, strategy);
     },
     [&face_integrals](
-      const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-                     std::vector<double>> &local_face_integrals) {
+      const std::vector<std::tuple<unsigned int, unsigned int, double>>
+        &local_face_integrals) {
       internal::copy_local_to_global<dim, spacedim>(local_face_integrals,
                                                     face_integrals);
     },
@@ -1312,21 +1321,17 @@ KellyErrorEstimator<dim, spacedim>::estimate(
         // loop over all faces of this cell
         for (const unsigned int face_no : cell->face_indices())
           {
-            Assert(face_integrals.find(cell->face(face_no)) !=
-                     face_integrals.end(),
-                   ExcInternalError());
             const double factor = internal::cell_factor<dim, spacedim>(
               cell, face_no, dof_handler, strategy);
 
+            const auto face_index = cell->face(face_no)->index();
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               {
-                // make sure that we have written a meaningful value into this
-                // slot
-                Assert(face_integrals[cell->face(face_no)][n] >= 0,
-                       ExcInternalError());
+                AssertIsFinite(face_integrals(face_index, n));
+                Assert(face_integrals(face_index, n) >= 0, ExcInternalError());
 
                 (*errors[n])(present_cell) +=
-                  (face_integrals[cell->face(face_no)][n] * factor);
+                  (face_integrals(face_index, n) * factor);
               }
           }
 
