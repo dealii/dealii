@@ -777,9 +777,6 @@ BlockSchurPreconditioner<AInvOperator, SInvOperator, BTOperator, VectorType>::
 
   // first apply the Schur Complement inverse operator.
   {
-    // Zero out output vector, because the Chebychev smoother otherwise
-    // incorrectly uses existing values:
-    dst.block(1) = 0.0;
     S_inverse_operator.vmult(dst.block(1), src.block(1));
     dst.block(1) *= -1.0;
   }
