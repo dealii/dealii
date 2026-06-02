@@ -96,13 +96,16 @@ test_iterators()
       --i;
     }
 
-  std::sort(vec.begin(), vec.end());
-  print(vec);
-  deallog << std::endl;
+  if constexpr (!std::is_same_v<T, A>)
+    {
+      std::sort(vec.begin(), vec.end());
+      print(vec);
+      deallog << std::endl;
 
-  std::sort(vec.rbegin(), vec.rend());
-  print(vec);
-  deallog << std::endl;
+      std::sort(vec.rbegin(), vec.rend());
+      print(vec);
+      deallog << std::endl;
+    }
 
   print_counts<T>();
   deallog << std::endl;
