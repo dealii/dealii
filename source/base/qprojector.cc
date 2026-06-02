@@ -13,6 +13,7 @@
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/std_cxx26/inplace_vector.h>
 
 #include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria_orientation.h>
@@ -127,13 +128,15 @@ namespace internal
       template <int dim>
       void
       append_subobject_rule(
-        const ReferenceCell<dim - 1>      &face_reference_cell,
-        const Quadrature<dim - 1>         &quadrature,
-        const std::vector<Point<dim>>     &vertices,
-        const double                       measure,
-        const types::geometric_orientation combined_orientation,
-        std::vector<Point<dim>>           &points,
-        std::vector<double>               &weights)
+        const ReferenceCell<dim - 1> &face_reference_cell,
+        const Quadrature<dim - 1>    &quadrature,
+        const std_cxx26::inplace_vector<
+          Point<dim>,
+          ReferenceCells::max_n_vertices<dim - 1>()> &vertices,
+        const double                                  measure,
+        const types::geometric_orientation            combined_orientation,
+        std::vector<Point<dim>>                      &points,
+        std::vector<double>                          &weights)
       {
         AssertDimension(points.size(), weights.size());
         points.reserve(points.size() + quadrature.size());
@@ -141,7 +144,7 @@ namespace internal
 
         const auto support_points =
           face_reference_cell.permute_by_combined_orientation(
-            make_const_array_view(vertices),
+            ArrayView<const Point<dim>>(vertices),
             face_reference_cell.get_inverse_combined_orientation(
               combined_orientation));
         for (unsigned int j = 0; j < quadrature.size(); ++j)
@@ -266,7 +269,9 @@ QProjector<dim>::project_to_face(
 
   const ReferenceCell face_reference_cell =
     reference_cell.face_reference_cell(face_no);
-  std::vector<Point<dim>> face_vertices(face_reference_cell.n_vertices());
+  std_cxx26::inplace_vector<Point<dim>,
+                            ReferenceCells::max_n_vertices<dim - 1>()>
+    face_vertices(face_reference_cell.n_vertices());
   for (const unsigned int vertex_no : face_reference_cell.vertex_indices())
     face_vertices[vertex_no] =
       reference_cell.face_vertex_location(face_no, vertex_no);
@@ -396,7 +401,9 @@ QProjector<dim>::project_to_subface(
 
   std::vector<Point<dim>> points;
   std::vector<double>     weights;
-  std::vector<Point<dim>> vertices;
+  std_cxx26::inplace_vector<Point<dim>,
+                            ReferenceCells::max_n_vertices<dim - 1>()>
+    vertices;
   for (const unsigned int subface_vertex_no :
        reference_cell.face_reference_cell(face_no).vertex_indices())
     vertices.push_back(reference_cell.subface_vertex_location(
@@ -421,14 +428,23 @@ QProjector<dim>::project_to_all_faces(
   const ReferenceCell<dim>       &reference_cell,
   const hp::QCollection<dim - 1> &quadrature)
 {
+  std::size_t n_points = 0;
+  for (const unsigned int face_no : reference_cell.face_indices())
+    n_points += quadrature[quadrature.size() == 1 ? 0 : face_no].size() *
+                reference_cell.n_face_orientations(face_no);
+
   std::vector<Point<dim>> points;
   std::vector<double>     weights;
+  points.reserve(n_points);
+  weights.reserve(n_points);
 
   for (const unsigned int face_no : reference_cell.face_indices())
     {
       const ReferenceCell face_reference_cell =
         reference_cell.face_reference_cell(face_no);
-      std::vector<Point<dim>> face_vertices(face_reference_cell.n_vertices());
+      std_cxx26::inplace_vector<Point<dim>,
+                                ReferenceCells::max_n_vertices<dim - 1>()>
+        face_vertices(face_reference_cell.n_vertices());
       for (const unsigned int vertex_no : face_reference_cell.vertex_indices())
         face_vertices[vertex_no] =
           reference_cell.face_vertex_location(face_no, vertex_no);
@@ -461,8 +477,24 @@ QProjector<dim>::project_to_all_subfaces(
   if (dim == 1)
     AssertDimension(quadrature.size(), 1);
 
+  std::size_t n_points = 0;
+  for (const unsigned int face_no : reference_cell.face_indices())
+    {
+      const auto n_orientations = reference_cell.n_face_orientations(face_no);
+      const auto face_reference_cell =
+        reference_cell.face_reference_cell(face_no);
+      for (const auto &refinement_case : face_reference_cell.refinement_cases())
+        {
+          const auto n_children =
+            dim > 1 ? face_reference_cell.n_children(refinement_case) : 1;
+          n_points += n_children * n_orientations * quadrature.size();
+        }
+    }
+
   std::vector<Point<dim>> points;
   std::vector<double>     weights;
+  points.reserve(n_points);
+  weights.reserve(n_points);
 
   // project to each face and copy results
   for (unsigned int face_no = 0; face_no < reference_cell.n_faces(); ++face_no)
@@ -481,19 +513,23 @@ QProjector<dim>::project_to_all_subfaces(
             for (unsigned int subface_no = 0; subface_no < n_children;
                  ++subface_no)
               {
-                const auto sub_quadrature =
-                  project_to_subface(reference_cell,
-                                     quadrature,
-                                     face_no,
-                                     subface_no,
-                                     combined_orientation,
-                                     refinement_case);
-                points.insert(points.end(),
-                              sub_quadrature.get_points().begin(),
-                              sub_quadrature.get_points().end());
-                weights.insert(weights.end(),
-                               sub_quadrature.get_weights().begin(),
-                               sub_quadrature.get_weights().end());
+                std_cxx26::inplace_vector<
+                  Point<dim>,
+                  ReferenceCells::max_n_vertices<dim - 1>()>
+                  vertices;
+                for (const unsigned int subface_vertex_no :
+                     reference_cell.face_reference_cell(face_no)
+                       .vertex_indices())
+                  vertices.push_back(reference_cell.subface_vertex_location(
+                    face_no, subface_no, subface_vertex_no, refinement_case));
+                internal::QProjector::append_subobject_rule(
+                  reference_cell.face_reference_cell(face_no),
+                  quadrature,
+                  vertices,
+                  reference_cell.face_measure(face_no),
+                  combined_orientation,
+                  points,
+                  weights);
               }
         }
     }

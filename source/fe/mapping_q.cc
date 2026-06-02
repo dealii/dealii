@@ -816,7 +816,7 @@ MappingQ<dim, spacedim>::get_face_data(
   auto &data = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_faces(
-                         ReferenceCells::get_hypercube<dim>(), quadrature[0]),
+                         ReferenceCells::get_hypercube<dim>(), quadrature),
                        quadrature[0].size());
 
   return data_ptr;
