@@ -20,8 +20,6 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
 
-#include <random>
-
 #include "../tests.h"
 
 
@@ -56,12 +54,14 @@ check(const double (&array)[N])
   deallog << "packed array without compression: " << array_uncompressed.size()
           << std::endl;
 
-  // compression ratio might change depending on architecture and zlib
-  // library used, so set the lowest digit to 0 to make this test more
-  // robust:
+  // The compression ratio might change depending on architecture and zlib
+  // library used, so set the lowest three digits to 0 to make this test more
+  // robust. Since the the output sizes are 75k and 80k this still shows a
+  // sufficient difference between them (and, in practice, sizes vary by about
+  // +/- 50)
 #ifdef DEAL_II_WITH_ZLIB
   deallog << "packed array with compression: "
-          << (array_compressed.size() / 10) * 10 << std::endl;
+          << (array_compressed.size() / 1000) * 1000 << std::endl;
 #endif
 }
 
@@ -74,9 +74,6 @@ test()
   const unsigned int N = 10000;
   double             x2[N];
 
-  std::default_random_engine             generator(0);
-  std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
   // Test easily compressible data.
   // Default compression is much faster than best compression.
   for (unsigned int i = 0; i < N; ++i)
@@ -86,11 +83,10 @@ test()
 
   check(x2);
 
-  // Test random data, which is nearly incompressible.
-  // Default compression is equally fast as best compression.
+  // Test random data
   for (unsigned int i = 0; i < N; ++i)
     {
-      x2[i] = distribution(generator);
+      x2[i] = random_value();
     }
 
   check(x2);
