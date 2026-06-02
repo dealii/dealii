@@ -1076,6 +1076,40 @@ namespace LinearAlgebra
 
 
     template <typename Number, typename MemorySpace>
+    Number
+    Vector<Number, MemorySpace>::min() const
+    {
+      Assert(numbers::NumberTraits<Number>::is_complex == false,
+             ExcMessage(
+               "Not implemented for complex number types at the moment."));
+
+      Number min_value = std::numeric_limits<Number>::max();
+
+      const size_t this_local_length = vector->getLocalLength();
+
+      for (size_type i = 0; i < this_local_length; ++i)
+        if (vector_1d_view(i) < min_value)
+          min_value = vector_1d_view(i);
+
+      return Utilities::MPI::min(min_value, get_mpi_communicator());
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    Number
+    Vector<Number, MemorySpace>::max() const
+    {
+      Assert(numbers::NumberTraits<Number>::is_complex == false,
+             ExcMessage(
+               "Not implemented for complex number types at the moment."));
+
+      return vector->normInf();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
     typename Vector<Number, MemorySpace>::real_type
     Vector<Number, MemorySpace>::l1_norm() const
     {

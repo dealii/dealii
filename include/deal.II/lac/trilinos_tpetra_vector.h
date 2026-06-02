@@ -728,6 +728,18 @@ namespace LinearAlgebra
       mean_value() const;
 
       /**
+       * Compute the minimal value of the elements of this vector.
+       */
+      Number
+      min() const;
+
+      /**
+       * Compute the maximal value of the elements of this vector.
+       */
+      Number
+      max() const;
+
+      /**
        * Return the l<sub>1</sub> norm of the vector (i.e., the sum of the
        * absolute values of all entries among all processors).
        */
