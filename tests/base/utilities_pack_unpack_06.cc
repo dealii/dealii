@@ -123,11 +123,12 @@ check(const double (&array)[N], const Point<dim>(&point))
                                       point_compressed.cend(),
                                       false);
     }
-  catch (const boost::archive::archive_exception &)
+  catch (...)
     {
       deallog << "unpacking compressed point without decompression failed!"
               << std::endl;
     }
+
   try
     {
       double forbidden[N];
@@ -136,7 +137,7 @@ check(const double (&array)[N], const Point<dim>(&point))
                         forbidden,
                         false);
     }
-  catch (const boost::archive::archive_exception &)
+  catch (...)
     {
       deallog << "unpacking compressed array without decompression failed!"
               << std::endl;
@@ -149,11 +150,12 @@ check(const double (&array)[N], const Point<dim>(&point))
                                       point_uncompressed.cend(),
                                       true);
     }
-  catch (const boost::iostreams::gzip_error &)
+  catch (...)
     {
       deallog << "unpacking uncompressed point with decompression failed!"
               << std::endl;
     }
+
   try
     {
       double forbidden[N];
@@ -162,7 +164,7 @@ check(const double (&array)[N], const Point<dim>(&point))
                         forbidden,
                         true);
     }
-  catch (const boost::iostreams::gzip_error &)
+  catch (...)
     {
       deallog << "unpacking uncompressed array with decompression failed!"
               << std::endl;
