@@ -109,6 +109,28 @@ namespace internal
     dealii::hp::FESubfaceValues<dim, spacedim> fe_subface_values;
 
     /**
+     * DoFs of the current cell.
+     *
+     * @note Since some of the functions below call each-other, be sure to
+     * repopulate this array immediately before it is used (e.g., in
+     * get_function_gradients()).
+     */
+    std::vector<types::global_dof_index> cell_dofs;
+
+    /**
+     * DoFs of the neighbor cell.
+     *
+     * @note Since some of the functions below call each-other, be sure to
+     * repopulate this array immediately before it is used (e.g., in
+     * get_function_gradients()).
+     *
+     * @note Since the neighbor and present cell may have different
+     * FiniteElement​s, this vector (and, for consistency, also `cell_dofs`)
+     * cannot be resized inside resize().
+     */
+    std::vector<types::global_dof_index> neighbor_cell_dofs;
+
+    /**
      * A vector to store the jump of the normal vectors in the quadrature
      * points for each of the solution vectors (i.e. a temporary value).
      * This vector is not allocated inside the functions that use it, but
@@ -116,7 +138,7 @@ namespace internal
      * presence of multiple threads where synchronization makes things even
      * slower.
      */
-    std::vector<std::vector<std::vector<number>>> phi;
+    Table<3, double> phi;
 
     /**
      * A vector for the gradients of the finite element function on one cell
@@ -126,13 +148,12 @@ namespace internal
      * the number of the quadrature point. The first index denotes the index
      * of the solution vector.
      */
-    std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>> psi;
+    Table<2, std::vector<Tensor<1, spacedim, number>>> psi;
 
     /**
      * The same vector for a neighbor cell
      */
-    std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
-      neighbor_psi;
+    Table<2, std::vector<Tensor<1, spacedim, number>>> neighbor_psi;
 
     /**
      * The normal vectors of the finite element function on one face
@@ -148,8 +169,14 @@ namespace internal
      * Two arrays needed for the values of coefficients in the jumps, if
      * they are given.
      */
-    std::vector<double>                 coefficient_values1;
-    std::vector<dealii::Vector<double>> coefficient_values;
+    std::vector<double>         coefficient_values1;
+    std::vector<Vector<double>> coefficient_values;
+
+    /**
+     * Arrays for the Neumann boundary values (scalar and multicomponent).
+     */
+    std::vector<number>         neumann_values1;
+    std::vector<Vector<number>> neumann_values;
 
     /**
      * The subdomain id we are to care for.
@@ -227,29 +254,30 @@ namespace internal
                         face_quadratures,
                         update_gradients | update_normal_vectors)
     , phi(n_solution_vectors,
-          std::vector<std::vector<number>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<number>(fe.n_components())))
-    , psi(n_solution_vectors,
-          std::vector<std::vector<Tensor<1, spacedim, number>>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<Tensor<1, spacedim, number>>(fe.n_components())))
+          face_quadratures.max_n_quadrature_points(),
+          fe.n_components())
+    , psi(n_solution_vectors, face_quadratures.max_n_quadrature_points())
     , neighbor_psi(n_solution_vectors,
-                   std::vector<std::vector<Tensor<1, spacedim, number>>>(
-                     face_quadratures.max_n_quadrature_points(),
-                     std::vector<Tensor<1, spacedim, number>>(
-                       fe.n_components())))
+                   face_quadratures.max_n_quadrature_points())
     , normal_vectors(face_quadratures.max_n_quadrature_points())
     , neighbor_normal_vectors(face_quadratures.max_n_quadrature_points())
     , coefficient_values1(face_quadratures.max_n_quadrature_points())
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
-                         dealii::Vector<double>(fe.n_components()))
+                         Vector<double>(fe.n_components()))
+    , neumann_values1(face_quadratures.max_n_quadrature_points())
+    , neumann_values(face_quadratures.max_n_quadrature_points(),
+                     Vector<number>(fe.n_components()))
     , subdomain_id(subdomain_id)
     , material_id(material_id)
     , neumann_bc(neumann_bc)
     , component_mask(component_mask)
     , coefficients(coefficients)
-  {}
+  {
+    for (auto &v : psi)
+      v = std::vector<Tensor<1, spacedim, number>>(fe.n_components());
+    for (auto &v : neighbor_psi)
+      v = std::vector<Tensor<1, spacedim, number>>(fe.n_components());
+  }
 
 
 
@@ -258,30 +286,34 @@ namespace internal
   ParallelData<dim, spacedim, number>::resize(
     const unsigned int active_fe_index)
   {
-    const unsigned int n_q_points   = face_quadratures[active_fe_index].size();
+    const unsigned int n_q_points = face_quadratures[active_fe_index].size();
+    if (n_q_points == phi.size(1))
+      return;
+
     const unsigned int n_components = finite_element.n_components();
 
     normal_vectors.resize(n_q_points);
     neighbor_normal_vectors.resize(n_q_points);
     coefficient_values1.resize(n_q_points);
     coefficient_values.resize(n_q_points);
+    neumann_values1.resize(n_q_points);
+    neumann_values.resize(n_q_points);
 
-    for (unsigned int i = 0; i < phi.size(); ++i)
-      {
-        phi[i].resize(n_q_points);
-        psi[i].resize(n_q_points);
-        neighbor_psi[i].resize(n_q_points);
-
-        for (unsigned int qp = 0; qp < n_q_points; ++qp)
-          {
-            phi[i][qp].resize(n_components);
-            psi[i][qp].resize(n_components);
-            neighbor_psi[i][qp].resize(n_components);
-          }
-      }
+    phi.reinit(phi.size(0), n_q_points, n_components);
+    psi.reinit(phi.size(0), n_q_points);
+    neighbor_psi.reinit(phi.size(0), n_q_points);
+    for (unsigned int i = 0; i < psi.size(0); ++i)
+      for (unsigned int qp = 0; qp < psi.size(1); ++qp)
+        {
+          psi(i, qp).resize(n_components);
+          neighbor_psi(i, qp).resize(n_components);
+        }
 
     for (unsigned int qp = 0; qp < n_q_points; ++qp)
-      coefficient_values[qp].reinit(n_components);
+      {
+        coefficient_values[qp].reinit(n_components);
+        neumann_values[qp].reinit(n_components);
+      }
   }
 
 
@@ -321,10 +353,11 @@ namespace internal
     std::vector<std::tuple<unsigned int, unsigned int, double>>
       &local_face_integrals)
   {
-    const unsigned int n_q_points = parallel_data.psi[0].size(),
-                       n_components =
-                         parallel_data.finite_element.n_components(),
-                       n_solution_vectors = parallel_data.psi.size();
+    const unsigned int n_solution_vectors = parallel_data.phi.size(0),
+                       n_q_points         = parallel_data.phi.size(1),
+                       n_components       = parallel_data.phi.size(2);
+    Assert(n_components == parallel_data.finite_element.n_components(),
+           ExcInternalError());
 
     // now psi contains the following:
     // - for an internal face, psi=[grad u]
@@ -343,8 +376,8 @@ namespace internal
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
         for (unsigned int point = 0; point < n_q_points; ++point)
-          parallel_data.phi[n][point][component] =
-            (parallel_data.psi[n][point][component] *
+          parallel_data.phi(n, point, component) =
+            (parallel_data.psi(n, point)[component] *
              parallel_data.normal_vectors[point]);
 
     if (face->at_boundary() == false)
@@ -355,8 +388,8 @@ namespace internal
           for (unsigned int component = 0; component < n_components;
                ++component)
             for (unsigned int p = 0; p < n_q_points; ++p)
-              parallel_data.phi[n][p][component] +=
-                (parallel_data.neighbor_psi[n][p][component] *
+              parallel_data.phi(n, p, component) +=
+                (parallel_data.neighbor_psi(n, p)[component] *
                  parallel_data.neighbor_normal_vectors[p]);
       }
 
@@ -375,7 +408,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] *=
+                  parallel_data.phi(n, point, component) *=
                     parallel_data.coefficient_values1[point];
           }
         else
@@ -389,7 +422,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] *=
+                  parallel_data.phi(n, point, component) *=
                     parallel_data.coefficient_values[point](component);
           }
       }
@@ -407,31 +440,30 @@ namespace internal
         // get the values of the boundary function at the quadrature points
         if (n_components == 1)
           {
-            std::vector<number> g(n_q_points);
             parallel_data.neumann_bc->find(boundary_id)
               ->second->value_list(fe_face_values_cell.get_present_fe_values()
                                      .get_quadrature_points(),
-                                   g);
+                                   parallel_data.neumann_values1);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int point = 0; point < n_q_points; ++point)
-                parallel_data.phi[n][point][0] -= g[point];
+                parallel_data.phi(n, point, 0) -=
+                  parallel_data.neumann_values1[point];
           }
         else
           {
-            std::vector<dealii::Vector<number>> g(
-              n_q_points, dealii::Vector<number>(n_components));
             parallel_data.neumann_bc->find(boundary_id)
               ->second->vector_value_list(fe_face_values_cell
                                             .get_present_fe_values()
                                             .get_quadrature_points(),
-                                          g);
+                                          parallel_data.neumann_values);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] -= g[point](component);
+                  parallel_data.phi(n, point, component) -=
+                    parallel_data.neumann_values[point](component);
           }
       }
 
@@ -454,7 +486,7 @@ namespace internal
           if (parallel_data.component_mask[component] == true)
             for (unsigned int p = 0; p < n_q_points; ++p)
               value += numbers::NumberTraits<number>::abs_square(
-                         parallel_data.phi[n][p][component]) *
+                         parallel_data.phi(n, p, component)) *
                        JxW_values[p];
         local_face_integrals.emplace_back(face->index(), n, value * factor);
       }
@@ -655,9 +687,13 @@ namespace internal
 
     // get gradients of the finite element
     // function on this cell
+    parallel_data.cell_dofs.resize(cell->get_fe().n_dofs_per_cell());
+    cell->get_dof_indices(parallel_data.cell_dofs);
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       fe_face_values_cell.get_present_fe_values().get_function_gradients(
-        *solutions[n], parallel_data.psi[n]);
+        *solutions[n],
+        parallel_data.cell_dofs,
+        make_array_view(parallel_data.psi, n));
 
     double factor = std::numeric_limits<double>::signaling_NaN();
     // now compute over the other side of the face
@@ -690,12 +726,17 @@ namespace internal
                                                     fe_face_values_neighbor,
                                                     strategy);
 
+        parallel_data.neighbor_cell_dofs.resize(
+          neighbor->get_fe().n_dofs_per_cell());
+        neighbor->get_dof_indices(parallel_data.neighbor_cell_dofs);
         // get gradients on neighbor cell
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           {
             fe_face_values_neighbor.get_present_fe_values()
-              .get_function_gradients(*solutions[n],
-                                      parallel_data.neighbor_psi[n]);
+              .get_function_gradients(
+                *solutions[n],
+                parallel_data.neighbor_cell_dofs,
+                make_array_view(parallel_data.neighbor_psi, n));
           }
 
         parallel_data.neighbor_normal_vectors =
@@ -787,14 +828,23 @@ namespace internal
                                                strategy);
 
         // store the gradient of the solution in psi
+        parallel_data.cell_dofs.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_dof_indices(parallel_data.cell_dofs);
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           fe_subface_values.get_present_fe_values().get_function_gradients(
-            *solutions[n], parallel_data.psi[n]);
+            *solutions[n],
+            parallel_data.cell_dofs,
+            make_array_view(parallel_data.psi, n));
 
         // store the gradient from the neighbor's side in @p{neighbor_psi}
+        parallel_data.neighbor_cell_dofs.resize(
+          neighbor_child->get_fe().n_dofs_per_cell());
+        neighbor_child->get_dof_indices(parallel_data.neighbor_cell_dofs);
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           fe_face_values.get_present_fe_values().get_function_gradients(
-            *solutions[n], parallel_data.neighbor_psi[n]);
+            *solutions[n],
+            parallel_data.neighbor_cell_dofs,
+            make_array_view(parallel_data.neighbor_psi, n));
 
         // call generic evaluate function
         parallel_data.neighbor_normal_vectors =
