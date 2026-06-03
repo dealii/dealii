@@ -173,6 +173,12 @@ namespace internal
     std::vector<dealii::Vector<double>> coefficient_values;
 
     /**
+     * Arrays for the Neumann boundary values (scalar and multicomponent).
+     */
+    std::vector<number>         neumann_values1;
+    std::vector<Vector<number>> neumann_values;
+
+    /**
      * The subdomain id we are to care for.
      */
     const types::subdomain_id subdomain_id;
@@ -258,6 +264,9 @@ namespace internal
     , coefficient_values1(face_quadratures.max_n_quadrature_points())
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
                          dealii::Vector<double>(fe.n_components()))
+    , neumann_values1(face_quadratures.max_n_quadrature_points())
+    , neumann_values(face_quadratures.max_n_quadrature_points(),
+                     Vector<number>(fe.n_components()))
     , subdomain_id(subdomain_id)
     , material_id(material_id)
     , neumann_bc(neumann_bc)
@@ -287,6 +296,8 @@ namespace internal
     neighbor_normal_vectors.resize(n_q_points);
     coefficient_values1.resize(n_q_points);
     coefficient_values.resize(n_q_points);
+    neumann_values1.resize(n_q_points);
+    neumann_values.resize(n_q_points);
 
     phi.reinit(phi.size(0), n_q_points, n_components);
     psi.reinit(phi.size(0), n_q_points);
@@ -299,7 +310,10 @@ namespace internal
         }
 
     for (unsigned int qp = 0; qp < n_q_points; ++qp)
-      coefficient_values[qp].reinit(n_components);
+      {
+        coefficient_values[qp].reinit(n_components);
+        neumann_values[qp].reinit(n_components);
+      }
   }
 
 
@@ -426,31 +440,30 @@ namespace internal
         // get the values of the boundary function at the quadrature points
         if (n_components == 1)
           {
-            std::vector<number> g(n_q_points);
             parallel_data.neumann_bc->find(boundary_id)
               ->second->value_list(fe_face_values_cell.get_present_fe_values()
                                      .get_quadrature_points(),
-                                   g);
+                                   parallel_data.neumann_values1);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int point = 0; point < n_q_points; ++point)
-                parallel_data.phi(n, point, 0) -= g[point];
+                parallel_data.phi(n, point, 0) -=
+                  parallel_data.neumann_values1[point];
           }
         else
           {
-            std::vector<dealii::Vector<number>> g(
-              n_q_points, dealii::Vector<number>(n_components));
             parallel_data.neumann_bc->find(boundary_id)
               ->second->vector_value_list(fe_face_values_cell
                                             .get_present_fe_values()
                                             .get_quadrature_points(),
-                                          g);
+                                          parallel_data.neumann_values);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi(n, point, component) -= g[point](component);
+                  parallel_data.phi(n, point, component) -=
+                    parallel_data.neumann_values[point](component);
           }
       }
 
