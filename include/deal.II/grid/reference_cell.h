@@ -3485,6 +3485,23 @@ namespace ReferenceCells
 
 
   template <int dim>
+  inline constexpr unsigned int
+  n_reference_cells_in_dim()
+  {
+    if constexpr (dim == 0 || dim == 1)
+      return 1; // Vertex or Line
+    else if (dim == 2)
+      return 2; // Quad and Tri
+    else if (dim == 3)
+      return 4; // Tet, Pyramid, Wedge and Hex
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+    return 0;
+  }
+
+
+
+  template <int dim>
   inline ReferenceCell<dim>
   n_vertices_to_reference_cell(const unsigned int n_vertices)
   {
@@ -4041,25 +4058,6 @@ ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
   DEAL_II_NOT_IMPLEMENTED();
 
   return {};
-}
-
-
-
-template <int dim>
-constexpr unsigned int
-n_reference_cells_in_dim()
-{
-  // alternative approach via std::pow(2, std::max(0,dim-1)) but std::pow
-  // isn't constexpr until C++26.
-  if constexpr (dim == 0 || dim == 1)
-    return 1; // Vertex or Line
-  else if (dim == 2)
-    return 2; // Quad and Tri
-  else if (dim == 3)
-    return 4; // Tet, Pyramid, Wedge and Hex
-  else
-    DEAL_II_NOT_IMPLEMENTED();
-  return 0;
 }
 
 
