@@ -402,8 +402,8 @@ main()
     TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> ck(
       TimeStepping::CASH_KARP);
     test2(ck, f5, id_minus_tau_J_inv5, my5);
-    
-   // Tsitouras5 Adaptive Embedded Test
+
+    // Tsitouras5 Adaptive Embedded Test
     deallog << "Tsitouras5" << std::endl;
     TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> tsit5_embedded(
       TimeStepping::TSITOURAS5);
@@ -414,7 +414,7 @@ main()
     deallog << "Explicit Tsitouras5" << std::endl;
     TimeStepping::ExplicitRungeKutta<Vector<double>> tsit5_explicit(
       TimeStepping::TSITOURAS5);
-    test(tsit5_explicit, f5, id_minus_tau_J_inv5, my5);    
+    test(tsit5_explicit, f5, id_minus_tau_J_inv5, my5);
   }
 
   {
@@ -554,8 +554,8 @@ main()
                      my_rhs_function,
                      id_minus_tau_J_inv2,
                      my_exact_solution);
-                     
-     // Tsitouras 5th order explicit convergence test
+
+    // Tsitouras 5th order explicit convergence test
     deallog << "Embedded Tsitouras5 5th order" << std::endl;
     TimeStepping::ExplicitRungeKutta<Vector<double>> embedded_tsit5(
       TimeStepping::TSITOURAS5);
@@ -563,7 +563,7 @@ main()
                      my_rhs_function,
                      id_minus_tau_J_inv5,
                      my_exact_solution);
-                      
+
     deallog << "Explicit Tsitouras5 5th order" << std::endl;
     TimeStepping::ExplicitRungeKutta<Vector<double>> explicit_tsit5(
       TimeStepping::TSITOURAS5);
@@ -571,7 +571,6 @@ main()
                      my_rhs_function,
                      id_minus_tau_J_inv5,
                      my_exact_solution);
-
   }
 
   return 0;

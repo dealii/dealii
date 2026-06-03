@@ -71,8 +71,8 @@ main()
   TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> he(
     TimeStepping::HEUN_EULER);
   test(he, f, my);
-  
-    deallog << "Fehlberg steps:" << std::endl;
+
+  deallog << "Fehlberg steps:" << std::endl;
   TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> fehl(
     TimeStepping::FEHLBERG);
   test(fehl, f, my);

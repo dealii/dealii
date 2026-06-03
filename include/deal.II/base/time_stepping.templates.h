@@ -31,7 +31,7 @@ namespace TimeStepping
   namespace internal
   {
     /**
-     * Centralized utility to populate the core Butcher matrix rows (a) and 
+     * Centralized utility to populate the core Butcher matrix rows (a) and
      * stage time nodes (c) for the Tsitouras 5(4) pair. Concentrate coefficient
      * definitions to one place.
      */
@@ -42,7 +42,7 @@ namespace TimeStepping
       a.clear();
       c.clear();
 
-      a.push_back(std::vector<double>()); 
+      a.emplace_back();
 
       std::vector<double> tmp;
       tmp.resize(1);
@@ -53,28 +53,28 @@ namespace TimeStepping
       tmp[0] = -0.008480655492356989;
       tmp[1] = 0.3354806554923570;
       a.push_back(tmp);
-      
+
       tmp.resize(3);
       tmp[0] = 2.8971530571054935;
       tmp[1] = -6.359448489975075;
       tmp[2] = 4.3622954328695815;
       a.push_back(tmp);
 
-      tmp.resize(4);  
+      tmp.resize(4);
       tmp[0] = 5.325864828439257;
-      tmp[1] = -11.748883564062828; 
-      tmp[2] = 7.4955393428898365;  
+      tmp[1] = -11.748883564062828;
+      tmp[2] = 7.4955393428898365;
       tmp[3] = -0.09249506636175525;
       a.push_back(tmp);
 
       tmp.resize(5);
       tmp[0] = 5.86145544294642;
-      tmp[1] = -12.92096931784711; 
+      tmp[1] = -12.92096931784711;
       tmp[2] = 8.159367898576159;
       tmp[3] = -0.07158497328140100;
       tmp[4] = -0.028269050394068383;
-      a.push_back(tmp); 
-      
+      a.push_back(tmp);
+
       tmp.resize(6);
       tmp[0] = 0.09646076681806523;
       tmp[1] = 0.01;
@@ -86,7 +86,7 @@ namespace TimeStepping
 
       c = {0.0, 0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
     }
-  }
+  } // namespace internal
 
 
   // ----------------------------------------------------------------------
@@ -244,7 +244,7 @@ namespace TimeStepping
           }
         case (RK_FIFTH_ORDER):
           {
-                        /**
+            /**
              * Rabiei, F. and Ismail, F., 2012. Fifth-order improved
              * Runge-Kutta method with reduced number of function evaluations.
              * Australian Journal of Basic and Applied Sciences, 6(3),
@@ -368,8 +368,8 @@ namespace TimeStepping
         case (TSITOURAS5):
           {
             /**
-             * Runge–Kutta pairs of order 5(4) satisfying only the first column simplifying assumption
-             * C. Tsitouras, CMA 62 (2011) 770-775
+             * Runge–Kutta pairs of order 5(4) satisfying only the first column
+             * simplifying assumption C. Tsitouras, CMA 62 (2011) 770-775
              */
             this->n_stages = 7;
             this->c.reserve(this->n_stages);
@@ -377,7 +377,8 @@ namespace TimeStepping
 
             internal::get_tsitouras5_tableau(this->a, this->c);
 
-            // FSAL Optimization: assign primary weights directly from matrix back
+            // FSAL Optimization: assign primary weights directly from matrix
+            // back
             this->b = this->a.back();
             this->b.push_back(0.0); // b_7 = 0 for FSAL
 
@@ -980,7 +981,7 @@ namespace TimeStepping
             b1.push_back(0.5);
             b2.push_back(1.0);
             b2.push_back(0.0);
-            
+
             break;
           }
         case (BOGACKI_SHAMPINE):
@@ -1196,28 +1197,29 @@ namespace TimeStepping
         case (TSITOURAS5):
           {
             /**
-             * Runge–Kutta pairs of order 5(4) satisfying only the first column simplifying assumption
-             * C. Tsitouras, CMA 62 (2011) 770-775
+             * Runge–Kutta pairs of order 5(4) satisfying only the first column
+             * simplifying assumption C. Tsitouras, CMA 62 (2011) 770-775
              */
 
             last_same_as_first = true;
-            this->n_stages = 7;
+            this->n_stages     = 7;
             this->c.reserve(this->n_stages);
             this->b1.reserve(this->n_stages);
             this->b2.reserve(this->n_stages);
 
             internal::get_tsitouras5_tableau(this->a, this->c);
 
-            // FSAL Optimization: assign primary weights directly from matrix back
+            // FSAL Optimization: assign primary weights directly from matrix
+            // back
             this->b1 = this->a.back();
             this->b1.push_back(0.0); // b1_7 = 0 for FSAL
-            this->b2.push_back(this->b1[0] -  0.00178001105222577714);
-            this->b2.push_back(this->b1[1] -  0.0008164344596567469);
+            this->b2.push_back(this->b1[0] - 0.00178001105222577714);
+            this->b2.push_back(this->b1[1] - 0.0008164344596567469);
             this->b2.push_back(this->b1[2] - (-0.007880878010261995));
-            this->b2.push_back(this->b1[3] -  0.1447110071732629);
+            this->b2.push_back(this->b1[3] - 0.1447110071732629);
             this->b2.push_back(this->b1[4] - (-0.5823571654525552));
-            this->b2.push_back(this->b1[5] -  0.45808210592918697);
-            this->b2.push_back(this->b1[6] - (-1.0 / 66.0)); 
+            this->b2.push_back(this->b1[5] - 0.45808210592918697);
+            this->b2.push_back(this->b1[6] - (-1.0 / 66.0));
 
             break;
           }
@@ -1332,9 +1334,9 @@ namespace TimeStepping
                 if (delta_t < min_delta_t)
                   delta_t = min_delta_t;
               }
-              
-              // Not to loop infinitely if step is not rejected
-              this->free_memory();
+
+            // Not to loop infinitely if step is not rejected
+            this->free_memory();
           }
 
         ++count;
