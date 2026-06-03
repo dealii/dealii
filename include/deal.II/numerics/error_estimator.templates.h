@@ -169,8 +169,8 @@ namespace internal
      * Two arrays needed for the values of coefficients in the jumps, if
      * they are given.
      */
-    std::vector<double>                 coefficient_values1;
-    std::vector<dealii::Vector<double>> coefficient_values;
+    std::vector<double>         coefficient_values1;
+    std::vector<Vector<double>> coefficient_values;
 
     /**
      * Arrays for the Neumann boundary values (scalar and multicomponent).
@@ -263,7 +263,7 @@ namespace internal
     , neighbor_normal_vectors(face_quadratures.max_n_quadrature_points())
     , coefficient_values1(face_quadratures.max_n_quadrature_points())
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
-                         dealii::Vector<double>(fe.n_components()))
+                         Vector<double>(fe.n_components()))
     , neumann_values1(face_quadratures.max_n_quadrature_points())
     , neumann_values(face_quadratures.max_n_quadrature_points(),
                      Vector<number>(fe.n_components()))
