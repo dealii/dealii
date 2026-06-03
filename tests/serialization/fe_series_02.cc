@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2020 by the deal.II authors
+// Copyright (C) 2020 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -53,9 +53,14 @@ test()
   std::ostringstream            oss;
   boost::archive::text_oarchive oa(oss, boost::archive::no_header);
   legendre_save.save_transformation_matrices(oa, 0);
-  deallog << oss.str() << std::endl;
 
-  // load series expansion object
+  // In other tests, we would here output the string representation of
+  // the object as verification. However, these are floating point objects,
+  // and the string representation may differ across platforms because
+  // they are output in a way that preserves individual bits. Instead,
+  // we will just compare the original and loaded objects directly.
+
+  // load expansion object
   std::istringstream            iss(oss.str());
   boost::archive::text_iarchive ia(iss, boost::archive::no_header);
   legendre_load.load_transformation_matrices(ia, 0);

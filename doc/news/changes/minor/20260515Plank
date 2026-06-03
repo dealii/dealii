@@ -1,0 +1,4 @@
+New: Extended the PETScWrappers::MPI namespace by a full matrix
+(PETScWrappers::MPI::FullMatrix).
+<br>
+(Jonas Plank, 2026/05/15)

@@ -1,46 +1,113 @@
-1205c1205
-<         final_time = prm.get_double("final time");
----
->         final_time = 0.04;//prm.get_double("final time");
-2373c2373,2374
-<       std::ifstream input_file(parameters.mesh_filename);
----
->       //std::ifstream input_file(parameters.mesh_filename);
->       std::ifstream input_file("../../../source/step-33/slide.inp");
-2471c2472
-<                 std::printf("   %-16.3e (converged)\n\n", res_norm);
----
->                 std::printf("   %-16.1e (converged)\n\n", res_norm);
-2483c2484,2488
-<                 std::printf("   %-16.3e %04d        %-5.2e\n",
----
->                 std::string output;
->                 if( (convergence.first < 10)&&(convergence.first > 6))
->                   output="within";
->                 else output="outside";
->                 std::printf("   %-16.1e %s        %-5.1e\n",
-2485c2490
-<                             convergence.first,
----
->                             output.c_str(),
-2486a2492,2495
->   //                std::printf("   %-16.3e %04d        %-5.2e\n",
-> //                            res_norm,
-> //                            convergence.first,
-> //                            convergence.second);
-2550,2554c2559,2563
-<       if (argc != 2)
-<         {
-<           std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
-<           std::exit(1);
-<         }
----
->       //{
->       //  std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
->         //std::exit(1);
->       //}
->       const char *input_file="../../../source/step-33/input.prm";
-2559c2568
-<       ConservationLaw<2> cons(argv[1]);
----
->       ConservationLaw<2> cons(input_file);
+*** step-33.cc	2026-05-25 20:47:28.698333377 -0700
+--- step-33.mod	2026-05-25 20:55:39.304638977 -0700
+***************
+*** 1202,1208 ****
+          else
+            is_stationary = false;
+  
+!         final_time = prm.get_double("final time");
+          theta      = prm.get_double("theta scheme value");
+        }
+        prm.leave_subsection();
+--- 1202,1208 ----
+          else
+            is_stationary = false;
+  
+!         final_time = 0.04;
+          theta      = prm.get_double("theta scheme value");
+        }
+        prm.leave_subsection();
+***************
+*** 2370,2376 ****
+        GridIn<dim> grid_in;
+        grid_in.attach_triangulation(triangulation);
+  
+!       std::ifstream input_file(parameters.mesh_filename);
+        Assert(input_file, ExcFileNotOpen(parameters.mesh_filename));
+  
+        grid_in.read_ucd(input_file);
+--- 2370,2376 ----
+        GridIn<dim> grid_in;
+        grid_in.attach_triangulation(triangulation);
+  
+!       std::ifstream input_file("../../../source/step-33/slide.inp");
+        Assert(input_file, ExcFileNotOpen(parameters.mesh_filename));
+  
+        grid_in.read_ucd(input_file);
+***************
+*** 2468,2475 ****
+              const double res_norm = right_hand_side.l2_norm();
+              if (std::fabs(res_norm) < 1e-10)
+                {
+!                 std::cout << "   " << std::setw(12) << std::left
+!                           << std::scientific << res_norm << "  (converged)\n\n"
+                            << std::defaultfloat << std::endl
+                            << std::endl;
+                  break;
+--- 2468,2475 ----
+              const double res_norm = right_hand_side.l2_norm();
+              if (std::fabs(res_norm) < 1e-10)
+                {
+!                 std::cout << "   " << std::setw(15) << std::left
+!                           << std::scientific << std::setprecision(1) << res_norm << "  (converged)\n\n"
+                            << std::defaultfloat << std::endl
+                            << std::endl;
+                  break;
+***************
+*** 2483,2493 ****
+  
+                  current_solution += newton_update;
+  
+!                 std::cout << "   " << std::setw(12) << std::left
+!                           << std::scientific << res_norm << std::setw(8)
+!                           << std::right << convergence.first << "     "
+!                           << std::setw(12) << std::left << std::scientific
+!                           << convergence.second << std::defaultfloat
+                            << std::endl;
+                }
+  
+--- 2483,2494 ----
+  
+                  current_solution += newton_update;
+  
+!                 std::cout << "   " << std::setw(15) << std::left
+!                           << std::scientific << std::setprecision(1) << res_norm << std::setw(8)
+!                           << std::right
+!                           << ((convergence.first >= 8 && convergence.first <=10) ? "within" : "outside") << "     "
+!                           << std::setw(15) << std::left << std::scientific
+!                           << std::setprecision(1) << convergence.second << std::defaultfloat
+                            << std::endl;
+                }
+  
+***************
+*** 2552,2563 ****
+        using namespace dealii;
+        using namespace Step33;
+  
+-       if (argc != 2)
+-         {
+-           std::cout << "Usage:" << argv[0] << " input_file" << std::endl;
+-           std::exit(1);
+-         }
+- 
+        Utilities::MPI::MPI_InitFinalize mpi_initialization(
+          argc, argv, numbers::invalid_unsigned_int);
+  
+--- 2553,2558 ----
+***************
+*** 2566,2572 ****
+          ExcMessage(
+            "This program does not support parallel computing via MPI."));
+  
+!       ConservationLaw<2> cons(argv[1]);
+        cons.run();
+      }
+    catch (std::exception &exc)
+--- 2561,2567 ----
+          ExcMessage(
+            "This program does not support parallel computing via MPI."));
+  
+!       ConservationLaw<2> cons("../../../source/step-33/input.prm");
+        cons.run();
+      }
+    catch (std::exception &exc)

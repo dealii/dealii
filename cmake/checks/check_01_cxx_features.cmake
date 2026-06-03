@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2012 - 2025 by the deal.II authors
+## Copyright (C) 2012 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,6 +18,7 @@
 #   DEAL_II_HAVE_CXX17
 #   DEAL_II_HAVE_CXX20
 #   DEAL_II_HAVE_CXX23
+#   DEAL_II_HAVE_CXX26
 #
 #   DEAL_II_HAVE_FP_EXCEPTIONS
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
@@ -46,10 +47,39 @@ macro(_set_up_cmake_required)
   add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED}")
 endmacro()
 
-
 #
 # Wrap the following checks into a macro to make it easier to rerun them.
 #
+macro(_test_cxx26_support)
+  unset_if_changed(CHECK_CXX26_FEATURES_FLAGS_SAVED
+    "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
+    DEAL_II_HAVE_CXX26_FEATURES
+    )
+
+  add_flags(CMAKE_REQUIRED_FLAGS "-Werror")
+  CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <inplace_vector>
+
+    int main()
+    {
+      std::inplace_vector<int, 16> v;
+      (void)v;
+    }
+    "
+    DEAL_II_HAVE_CXX26_FEATURES)
+  reset_cmake_required()
+
+  if(DEAL_II_HAVE_CXX26_FEATURES)
+    message(STATUS "C++26 support is enabled.")
+    set(DEAL_II_HAVE_CXX26 TRUE)
+    set(_cxx_standard 26)
+  else()
+    message(STATUS "C++26 support is disabled.")
+    set(DEAL_II_HAVE_CXX26 FALSE)
+  endif()
+endmacro()
+
 macro(_test_cxx23_support)
   unset_if_changed(CHECK_CXX23_FEATURES_FLAGS_SAVED
     "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
@@ -376,6 +406,8 @@ _test_cxx20_support()
 
 _test_cxx23_support()
 
+_test_cxx26_support()
+
 set_if_empty(CMAKE_CXX_STANDARD "${_cxx_standard}")
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -522,10 +554,12 @@ CHECK_CXX_SOURCE_COMPILES(
       default:
         break;
       }
-   }
-   "
-   DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-   )
+
+    return i + j;
+  }
+  "
+  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
+  )
 
 #
 # see if the current compiler configuration supports the GCC extension
@@ -548,6 +582,8 @@ CHECK_CXX_SOURCE_COMPILES(
       default:
         break;
       }
+
+    return i + j;
   }
   "
   DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH

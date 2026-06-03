@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2001 - 2024 by the deal.II authors
+// Copyright (C) 2001 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -606,9 +606,10 @@ protected:
    * interpolation, or if dim<spacedim, it asks the underlying manifold for
    * the locations of interior points.
    */
-  virtual std::vector<Point<spacedim>>
+  virtual void
   compute_mapping_support_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    boost::container::small_vector<Point<spacedim>, 200>       &points) const;
 
   /**
    * Transform the point @p p on the real cell to the corresponding point on
@@ -636,7 +637,7 @@ protected:
   virtual void
   add_line_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim>>                               &a) const;
+    boost::container::small_vector<Point<spacedim>, 200>       &points) const;
 
   /**
    * Append the support points of all shape functions located on bounding
@@ -655,7 +656,7 @@ protected:
   virtual void
   add_quad_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim>>                               &a) const;
+    boost::container::small_vector<Point<spacedim>, 200>       &points) const;
 
   // Make MappingQCache a friend since it needs to call the
   // compute_mapping_support_points() function.

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2012 - 2025 by the deal.II authors
+// Copyright (C) 2012 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -587,10 +587,9 @@ namespace LinearAlgebra
        *
        * In case this function is called for more than one vector before @p
        * compress_finish() is invoked, it is mandatory to specify a unique
-       * communication channel to each such call, in order to avoid several
-       * messages with the same ID that will corrupt this operation. Any
-       * communication channel less than 100 is a valid value (in particular,
-       * the range $[100, 200)$ is reserved for
+       * communication channel to each such call. Otherwise, data corruption
+       * can occur. Any communication channel less than 100 is a valid value
+       * (in particular, the range $[100, 200)$ is reserved for
        * LinearAlgebra::distributed::BlockVector).
        */
       void
@@ -627,12 +626,11 @@ namespace LinearAlgebra
        * Before the data is actually exchanged, the function must be followed
        * by a call to @p update_ghost_values_finish().
        *
-       * In case this function is called for more than one vector before @p
-       * update_ghost_values_finish() is invoked, it is mandatory to specify a
-       * unique communication channel to each such call, in order to avoid
-       * several messages with the same ID that will corrupt this operation.
-       * Any communication channel less than 100 is a valid value (in
-       * particular, the range $[100, 200)$ is reserved for
+       * In case this function is called for more than one vector before
+       * @p update_ghost_values_finish() is invoked, it is mandatory to specify
+       * a unique communication channel to each such call. Otherwise, data
+       * corruption can occur. Any communication channel less than 100 is a
+       * valid value (in particular, the range $[100, 200)$ is reserved for
        * LinearAlgebra::distributed::BlockVector).
        */
       void

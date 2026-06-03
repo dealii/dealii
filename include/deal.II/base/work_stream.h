@@ -1379,8 +1379,8 @@ namespace WorkStream
                 typename CopyData>
       void
       run(const std::vector<std::vector<Iterator>> &colored_iterators,
-          Worker                                    worker,
-          Copier                                    copier,
+          const Worker                             &worker,
+          const Copier                             &copier,
           const ScratchData                        &sample_scratch_data,
           const CopyData                           &sample_copy_data,
           const unsigned int                        chunk_size)

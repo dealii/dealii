@@ -1,0 +1,71 @@
+
+DEAL::
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::empty    = 1
+DEAL:A::size     = 0
+DEAL:A::max_size = 4
+DEAL:A::capacity = 4
+DEAL:A::size : 0
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::empty    = 0
+DEAL:A::size     = 2
+DEAL:A::max_size = 4
+DEAL:A::capacity = 4
+DEAL:A::size : 2
+DEAL:A::A::A(const A&)
+DEAL:A::empty    = 0
+DEAL:A::size     = 3
+DEAL:A::max_size = 4
+DEAL:A::capacity = 4
+DEAL:A::size : 3
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::ctors = 9 dtors = 0
+DEAL:A::
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL::
+DEAL:int::empty    = 1
+DEAL:int::size     = 0
+DEAL:int::max_size = 4
+DEAL:int::capacity = 4
+DEAL:int::
+DEAL:int::empty    = 0
+DEAL:int::size     = 2
+DEAL:int::max_size = 4
+DEAL:int::capacity = 4
+DEAL:int::0, 0
+DEAL:int::empty    = 0
+DEAL:int::size     = 3
+DEAL:int::max_size = 4
+DEAL:int::capacity = 4
+DEAL:int::0, 0, -11
+DEAL:int::
+DEAL::
+DEAL:vector<int>::empty    = 1
+DEAL:vector<int>::size     = 0
+DEAL:vector<int>::max_size = 4
+DEAL:vector<int>::capacity = 4
+DEAL:vector<int>::
+DEAL:vector<int>::empty    = 0
+DEAL:vector<int>::size     = 2
+DEAL:vector<int>::max_size = 4
+DEAL:vector<int>::capacity = 4
+DEAL:vector<int>::{}, {}
+DEAL:vector<int>::empty    = 0
+DEAL:vector<int>::size     = 3
+DEAL:vector<int>::max_size = 4
+DEAL:vector<int>::capacity = 4
+DEAL:vector<int>::{}, {}, {1, 1, 2}
+DEAL:vector<int>::

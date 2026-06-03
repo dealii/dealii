@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2025 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -84,7 +84,7 @@ namespace internal
     LinearAlgebra::EpetraWrappers::Vector &V)
   {
     // Extract local indices in the vector.
-    Epetra_FEVector                   vector = V.trilinos_vector();
+    Epetra_FEVector                  &vector = V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.Map().LID(static_cast<TrilinosWrappers::types::int_type>(i));
 
@@ -101,7 +101,7 @@ namespace internal
     LinearAlgebra::EpetraWrappers::Vector &V)
   {
     // Extract local indices in the vector.
-    Epetra_FEVector                   vector = V.trilinos_vector();
+    Epetra_FEVector                  &vector = V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.Map().LID(static_cast<TrilinosWrappers::types::int_type>(i));
 
@@ -115,7 +115,7 @@ namespace internal
     const types::global_dof_index                i)
   {
     // Extract local indices in the vector.
-    Epetra_FEVector                   vector = V.trilinos_vector();
+    const Epetra_FEVector            &vector = V.trilinos_vector();
     TrilinosWrappers::types::int_type trilinos_i =
       vector.Map().LID(static_cast<TrilinosWrappers::types::int_type>(i));
 

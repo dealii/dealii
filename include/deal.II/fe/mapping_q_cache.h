@@ -215,10 +215,10 @@ protected:
   /**
    * This is the main function overridden from the base class MappingQ.
    */
-  virtual std::vector<Point<spacedim>>
+  virtual void
   compute_mapping_support_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
-    const override;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    boost::container::small_vector<Point<spacedim>, 200> &a) const override;
 
 private:
   /**

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2012 - 2025 by the deal.II authors
+// Copyright (C) 2012 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3940,8 +3940,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto src_data = internal::get_vector_data<n_components_>(
     src,
     first_index,
-    this->dof_access_index ==
-      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->dof_info != nullptr &&
+      this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
     this->dof_info);
 
@@ -3979,8 +3980,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto dst_data = internal::get_vector_data<n_components_>(
     dst,
     first_index,
-    this->dof_access_index ==
-      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->dof_info != nullptr &&
+      this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
     this->dof_info);
 
@@ -4012,8 +4014,9 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   const auto dst_data = internal::get_vector_data<n_components_>(
     dst,
     first_index,
-    this->dof_access_index ==
-      internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
+    this->dof_info != nullptr &&
+      this->dof_access_index ==
+        internal::MatrixFreeFunctions::DoFInfo::dof_access_cell,
     this->active_fe_index,
     this->dof_info);
 

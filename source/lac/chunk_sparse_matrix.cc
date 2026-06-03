@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2008 - 2025 by the deal.II authors
+// Copyright (C) 2008 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,8 @@
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/chunk_sparse_matrix.templates.h>
+
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 #include "lac/chunk_sparse_matrix.inst"

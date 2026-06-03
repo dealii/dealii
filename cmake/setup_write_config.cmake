@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2014 - 2025 by the deal.II authors
+## Copyright (C) 2014 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -73,7 +73,9 @@ if(CMAKE_Fortran_COMPILER_WORKS)
 endif()
 _detailed("#        CMAKE_GENERATOR:        ${CMAKE_GENERATOR}\n")
 
-if(DEAL_II_HAVE_CXX23)
+if(DEAL_II_HAVE_CXX26)
+  _both("#        C++ language standard:  C++26\n")
+elseif(DEAL_II_HAVE_CXX23)
   _both("#        C++ language standard:  C++23\n")
 elseif(DEAL_II_HAVE_CXX20)
   _both("#        C++ language standard:  C++20\n")
@@ -81,12 +83,10 @@ elseif(DEAL_II_HAVE_CXX17)
   _both("#        C++ language standard:  C++17\n")
 endif()
 
-if(DEAL_II_HAVE_CXX23 OR DEAL_II_HAVE_CXX20)
-  if(DEAL_II_WITH_CXX20_MODULE)
-    _both("#        Building C++20 module:  ON\n")
-  else()
-    _both("#        Building C++20 module:  OFF\n")
-  endif()
+if(DEAL_II_WITH_CXX20_MODULE)
+  _both("#        Building C++20 module:  ON\n")
+else()
+  _both("#        Building C++20 module:  OFF\n")
 endif()
 
 _both("#        Vectorization level:    ${DEAL_II_VECTORIZATION_WIDTH_IN_BITS} bit")

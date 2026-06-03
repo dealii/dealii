@@ -514,7 +514,7 @@ namespace LinearAlgebra
       SparseMatrix<Number, MemorySpace> &&other) noexcept
       : column_space_map(std::move(other.column_space_map))
       , matrix(std::move(other.matrix))
-      , compressed(std::move(other.compressed))
+      , compressed(other.compressed)
     {
       other.compressed = false;
     }
@@ -528,7 +528,7 @@ namespace LinearAlgebra
     {
       column_space_map = std::move(other.column_space_map);
       matrix           = std::move(other.matrix);
-      compressed       = std::move(other.compressed);
+      compressed       = other.compressed;
 
       return *this;
     }
@@ -574,6 +574,31 @@ namespace LinearAlgebra
 
       compressed = false;
       compress(VectorOperation::add);
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    SparseMatrix<Number, MemorySpace>::reinit(
+      const SparseMatrix<Number, MemorySpace> &sparse_matrix)
+    {
+      if (this == &sparse_matrix)
+        return;
+
+      Assert(sparse_matrix.is_compressed(),
+             ExcMessage(
+               "This matrix can only be reinitialized to the structure of "
+               "another matrix, if the other matrix is compressed. Call "
+               "SparseMatrix::compress() before calling reinit()."));
+
+      // Create a new matrix of the correct size
+      matrix = Utilities::Trilinos::internal::make_rcp<
+        TpetraTypes::MatrixType<Number, MemorySpace>>(
+        sparse_matrix.matrix->getCrsGraph());
+
+      column_space_map = sparse_matrix.column_space_map;
+      compress(VectorOperation::insert);
     }
 
 
@@ -1531,11 +1556,15 @@ namespace LinearAlgebra
     void
     SparseMatrix<Number, MemorySpace>::compress(VectorOperation::values)
     {
-      // We can't use fillComplete multiple times in a row, so we need to know
-      // if any process has changed matrix entries
-      if (!dealii::Utilities::MPI::logical_or(compressed,
-                                              this->get_mpi_communicator()))
+      // fillComplete() has to be called by all processes if at least one
+      // process needs to compress. However, it cannot be called if there are
+      // processes which have not called resumeFill() first. So first check if
+      // any process has changed matrix entries, if so, first call resumeFill(),
+      // then fillComplete() on all processes.
+      if (!dealii::Utilities::MPI::logical_and(compressed,
+                                               this->get_mpi_communicator()))
         {
+          matrix->resumeFill();
           matrix->fillComplete(column_space_map, matrix->getRowMap());
           compressed = true;
         }

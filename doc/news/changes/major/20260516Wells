@@ -1,0 +1,4 @@
+New: deal.II has a C++17-compliant version of most of C++26's new inplace_vector
+class template.
+<br>
+(David Wells, 2026/05/16)

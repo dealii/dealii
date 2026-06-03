@@ -20,8 +20,9 @@
 #  include <deal.II/lac/petsc_compatibility.h>
 #  include <deal.II/lac/petsc_vector.h>
 
-#  include <cmath>
+#  include <boost/container/small_vector.hpp>
 
+#  include <cmath>
 
 #endif // DEAL_II_WITH_PETSC
 
@@ -1061,7 +1062,7 @@ namespace PETScWrappers
     // missing swap for IndexSet
     IndexSet t(this->ghost_indices);
     this->ghost_indices = v.ghost_indices;
-    v.ghost_indices     = t;
+    v.ghost_indices     = std::move(t);
     std::swap(this->ghost_vector, v.ghost_vector);
     std::swap(this->ghost_vector_array, v.ghost_vector_array);
   }
@@ -1114,7 +1115,7 @@ namespace PETScWrappers
            internal::VectorReference::ExcWrongMode(action, last_action));
     Assert(!has_ghost_elements(), ExcGhostsPresent());
 
-    std::vector<PetscInt> petsc_indices(n_elements);
+    boost::container::small_vector<PetscInt, 200> petsc_indices(n_elements);
     for (size_type i = 0; i < n_elements; ++i)
       {
         const auto petsc_index = static_cast<PetscInt>(indices[i]);

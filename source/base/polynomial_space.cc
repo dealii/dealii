@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2002 - 2024 by the deal.II authors
+// Copyright (C) 2002 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,6 +24,8 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
+
+#include <boost/container/small_vector.hpp>
 
 #include <Kokkos_Macros.hpp>
 
@@ -270,13 +272,23 @@ PolynomialSpace<dim>::evaluate(
   //  d: coordinate direction
   //  n: number of 1d polynomial
   //  o: order of derivative
-  Table<2, std::vector<double>> v(dim, n_1d);
-  for (unsigned int d = 0; d < v.size()[0]; ++d)
-    for (unsigned int i = 0; i < v.size()[1]; ++i)
-      {
-        v(d, i).resize(v_size, 0.);
-        polynomials[i].value(p[d], v(d, i));
-      }
+  //
+  // Our rule-of-thumb for stack arrays is 200 elements in a small_vector. Here,
+  // we have (in 3d) 3 * 14 * 5 = 210 elements, in which 5 is the maximum number
+  // derivatives (4) plus one value.
+  std::array<boost::container::small_vector<std::array<double, 5>, 14>, dim> v;
+  for (unsigned int d = 0; d < dim; ++d)
+    {
+      v[d].resize(n_1d);
+      for (unsigned int i = 0; i < n_1d; ++i)
+        {
+          Assert(v_size > 0, ExcInternalError());
+          Assert(v_size <= v[d][i].size(), ExcInternalError());
+          if constexpr (running_in_debug_mode())
+            v[d][i].fill(std::numeric_limits<double>::signaling_NaN());
+          polynomials[i].value(p[d], v_size - 1, v[d][i].data());
+        }
+    }
 
   if (update_values)
     {
@@ -351,7 +363,7 @@ PolynomialSpace<dim>::evaluate(
                       // Derivative
                       // order for each
                       // direction
-                      std::vector<unsigned int> deriv_order(dim, 0);
+                      std::array<unsigned int, dim> deriv_order{};
                       for (unsigned int x = 0; x < dim; ++x)
                         {
                           if (d1 == x)
@@ -387,7 +399,7 @@ PolynomialSpace<dim>::evaluate(
                         // Derivative
                         // order for each
                         // direction
-                        std::vector<unsigned int> deriv_order(dim, 0);
+                        std::array<unsigned int, dim> deriv_order{};
                         for (unsigned int x = 0; x < dim; ++x)
                           {
                             if (d1 == x)

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2006 - 2024 by the deal.II authors
+// Copyright (C) 2006 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -56,7 +56,8 @@ namespace internal
         MemoryConsumption::memory_consumption(active_cell_indices) +
         MemoryConsumption::memory_consumption(global_active_cell_indices) +
         MemoryConsumption::memory_consumption(global_level_cell_indices) +
-        MemoryConsumption::memory_consumption(neighbors) +
+        MemoryConsumption::memory_consumption(neighbor_levels) +
+        MemoryConsumption::memory_consumption(neighbor_indices) +
         MemoryConsumption::memory_consumption(subdomain_ids) +
         MemoryConsumption::memory_consumption(level_subdomain_ids) +
         MemoryConsumption::memory_consumption(parents) +
@@ -97,7 +98,8 @@ namespace internal
       face_orientations.reinit(orientation_needed ? n_cells : 0u,
                                faces_per_object);
 
-      neighbors.assign(n_cells * faces_per_object, {-1, -1});
+      neighbor_levels.assign(n_cells * faces_per_object, -1);
+      neighbor_indices.assign(n_cells * faces_per_object, -1);
       cell_vertex_indices_cache.assign(n_cells * vertices_per_object,
                                        numbers::invalid_unsigned_int);
 
@@ -190,10 +192,16 @@ namespace internal
                                          cell_vertex_indices_cache.size(),
                                        numbers::invalid_unsigned_int);
 
-      neighbors.reserve(total_cells * faces_per_object);
-      neighbors.insert(neighbors.end(),
-                       total_cells * faces_per_object - neighbors.size(),
-                       std::make_pair(-1, -1));
+      neighbor_levels.reserve(total_cells * faces_per_object);
+      neighbor_levels.insert(neighbor_levels.end(),
+                             total_cells * faces_per_object -
+                               neighbor_levels.size(),
+                             -1);
+      neighbor_indices.reserve(total_cells * faces_per_object);
+      neighbor_indices.insert(neighbor_indices.end(),
+                              total_cells * faces_per_object -
+                                neighbor_indices.size(),
+                              -1);
 
       if (dim > 1)
         {

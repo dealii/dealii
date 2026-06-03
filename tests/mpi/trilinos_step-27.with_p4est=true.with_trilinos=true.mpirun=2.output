@@ -1,25 +1,25 @@
 Cycle 0:
-   Number of active cells      : 768
-   Number of degrees of freedom: 3264
-   Number of constraints       : 404
-   Solved in 16 iterations.
+   Number of active cells      : 700
+   Number of degrees of freedom: 3200
+   Number of constraints       : 400
+   Solved in 10 iterations.
 Cycle 1:
-   Number of active cells      : 966
-   Number of degrees of freedom: 5237
-   Number of constraints       : 952
-   Solved in 25 iterations.
+   Number of active cells      : 800
+   Number of degrees of freedom: 4300
+   Number of constraints       : 700
+   Solved in 10 iterations.
 Cycle 2:
-   Number of active cells      : 1149
-   Number of degrees of freedom: 8545
-   Number of constraints       : 1992
-   Solved in 34 iterations.
+   Number of active cells      : 800
+   Number of degrees of freedom: 6300
+   Number of constraints       : 1300
+   Solved in 10 iterations.
 Cycle 3:
-   Number of active cells      : 1365
-   Number of degrees of freedom: 12515
-   Number of constraints       : 3201
-   Solved in 45 iterations.
+   Number of active cells      : 900
+   Number of degrees of freedom: 8400
+   Number of constraints       : 2000
+   Solved in 10 iterations.
 Cycle 4:
-   Number of active cells      : 1665
-   Number of degrees of freedom: 18523
-   Number of constraints       : 4924
-   Solved in 65 iterations.
+   Number of active cells      : 1000
+   Number of degrees of freedom: 11100
+   Number of constraints       : 2700
+   Solved in 10 iterations.

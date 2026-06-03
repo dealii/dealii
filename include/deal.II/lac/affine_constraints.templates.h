@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 1999 - 2025 by the deal.II authors
+// Copyright (C) 1999 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1820,10 +1820,8 @@ AffineConstraints<number>::condense(BlockDynamicSparsityPattern &sparsity) const
   for (size_type row = 0; row < n_rows; ++row)
     {
       // get index of this row within the blocks
-      const std::pair<size_type, size_type> block_index =
-        index_mapping.global_to_local(row);
-      const size_type block_row = block_index.first;
-      const size_type local_row = block_index.second;
+      const auto [block_row, local_row] = index_mapping.global_to_local(row);
+
 
       if (distribute[row] == numbers::invalid_size_type)
         // regular line. loop over all columns and see whether this column

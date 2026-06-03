@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2021 - 2025 by the deal.II authors
+// Copyright (C) 2021 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,15 +12,13 @@
 
 #include <deal.II/arborx/access_traits.h>
 
-#ifdef DEAL_II_WITH_ARBORX
-
-#  include <ArborX.hpp>
+#include <ArborX.hpp>
 
 DEAL_II_NAMESPACE_OPEN
 
 namespace ArborXWrappers
 {
-#  if ARBORX_VERSION_MAJOR < 2
+#if ARBORX_VERSION_MAJOR < 2
 
   namespace
   {
@@ -215,7 +213,7 @@ namespace ArborXWrappers
   {
     return n_nearest_neighbors;
   }
-#  else
+#else
   template <int dim, typename Number>
   PointIntersectPredicate<dim, Number>::PointIntersectPredicate(
     const std::vector<dealii::Point<dim, Number>> &points)
@@ -400,7 +398,7 @@ namespace ArborXWrappers
   {
     return spheres[i];
   }
-#  endif
+#endif
 } // namespace ArborXWrappers
 
 
@@ -408,7 +406,7 @@ DEAL_II_NAMESPACE_CLOSE
 
 namespace ArborX
 {
-#  if ARBORX_VERSION_MAJOR < 2
+#if ARBORX_VERSION_MAJOR < 2
   namespace
   {
     template <int dim, typename Number>
@@ -501,7 +499,7 @@ namespace ArborX
     return {to_arborx_point(v[i].first), static_cast<float>(v[i].second)};
   }
 
-#  else
+#else
   template <typename T>
   std::size_t
   AccessTraits<
@@ -537,10 +535,8 @@ namespace ArborX
   {
     return v[i];
   }
-#  endif
+#endif
 } // namespace ArborX
 
 // ----------------------- Instantiations --------------------//
-#  include "arborx/access_traits.inst"
-
-#endif
+#include "arborx/access_traits.inst"

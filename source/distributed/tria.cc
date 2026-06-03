@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2010 - 2025 by the deal.II authors
+// Copyright (C) 2010 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -4076,11 +4076,8 @@ namespace parallel
       // Note that we need to follow the p4est ordering
       // instead of the deal.II ordering to get the weights
       // in the same order p4est will encounter them during repartitioning.
-      for (const auto &cell_rel : this->local_cell_relations)
+      for (const auto &[cell_it, cell_status] : this->local_cell_relations)
         {
-          const auto &cell_it     = cell_rel.first;
-          const auto &cell_status = cell_rel.second;
-
           weights.push_back(this->signals.weight(cell_it, cell_status));
         }
 
@@ -4247,11 +4244,9 @@ namespace parallel
           distributed_tria->save_coarsen_flags(saved_coarsen_flags);
           distributed_tria->save_refine_flags(saved_refine_flags);
 
-          for (const auto &pair : distributed_tria->local_cell_relations)
+          for (const auto &[cell, status] :
+               distributed_tria->local_cell_relations)
             {
-              const auto &cell   = pair.first;
-              const auto &status = pair.second;
-
               switch (status)
                 {
                   case CellStatus::cell_will_persist:

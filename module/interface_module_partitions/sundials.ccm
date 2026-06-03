@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2025 by the deal.II authors
+// Copyright (C) 2025 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -88,6 +88,9 @@ export
   using ::ARKStepSetOrder;
   using ::ARKStepSetPreconditioner;
   using ::ARKStepSetStopTime;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
+  using ::ARKStepSetTableName;
+#  endif
   using ::ARKStepSetUserData;
   using ::ARKStepSStolerances;
   using ::ARKStepSVtolerances;
@@ -264,9 +267,15 @@ export
     }
 
 
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PREC_NONE)
-#  undef PREC_NONE
+#    undef PREC_NONE
 EXPORT_PREPROCESSOR_SYMBOL(PREC_NONE)
+#  else
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(SUN_PREC_NONE)
+#    undef SUN_PREC_NONE
+EXPORT_PREPROCESSOR_SYMBOL(SUN_PREC_NONE)
+#  endif
 
 
 #endif

@@ -1,0 +1,107 @@
+
+DEAL:ctors::
+DEAL:ctors:A::default ctor
+DEAL:ctors:A::size : 0
+DEAL:ctors:A::ctors = 0 dtors = 0
+DEAL:ctors:A::
+DEAL:ctors:A::count default ctor
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::ctors = 2 dtors = 2
+DEAL:ctors:A::
+DEAL:ctors:A::count copy ctor
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::ctors = 5 dtors = 5
+DEAL:ctors:A::
+DEAL:ctors:A::iterator range, copy, and move ctor
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::copy ctor
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::and move ctor
+DEAL:ctors:A::A::A(A&&)
+DEAL:ctors:A::A::A(A&&)
+DEAL:ctors:A::moved-from:
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::moved-to:
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::ctors = 13 dtors = 13
+DEAL:ctors:A::initializer_list ctor
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::A::A()
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::A(const A&)
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::size : 2
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::A::~A()
+DEAL:ctors:A::ctors = 19 dtors = 19
+DEAL:ctors::
+DEAL:ctors:int::default ctor
+DEAL:ctors:int::
+DEAL:ctors:int::
+DEAL:ctors:int::count default ctor
+DEAL:ctors:int::0, 0
+DEAL:ctors:int::
+DEAL:ctors:int::count copy ctor
+DEAL:ctors:int::42, 42
+DEAL:ctors:int::
+DEAL:ctors:int::iterator range, copy, and move ctor
+DEAL:ctors:int::-11, -10
+DEAL:ctors:int::copy ctor
+DEAL:ctors:int::-11, -10
+DEAL:ctors:int::and move ctor
+DEAL:ctors:int::moved-from:
+DEAL:ctors:int::-11, -10
+DEAL:ctors:int::moved-to:
+DEAL:ctors:int::-11, -10
+DEAL:ctors:int::initializer_list ctor
+DEAL:ctors:int::-11, -10
+DEAL:ctors::
+DEAL:ctors:vector<int>::default ctor
+DEAL:ctors:vector<int>::
+DEAL:ctors:vector<int>::
+DEAL:ctors:vector<int>::count default ctor
+DEAL:ctors:vector<int>::{}, {}
+DEAL:ctors:vector<int>::
+DEAL:ctors:vector<int>::count copy ctor
+DEAL:ctors:vector<int>::{3, 5}, {3, 5}
+DEAL:ctors:vector<int>::
+DEAL:ctors:vector<int>::iterator range, copy, and move ctor
+DEAL:ctors:vector<int>::{1, 1, 2}, {3, 5}
+DEAL:ctors:vector<int>::copy ctor
+DEAL:ctors:vector<int>::{1, 1, 2}, {3, 5}
+DEAL:ctors:vector<int>::and move ctor
+DEAL:ctors:vector<int>::moved-from:
+DEAL:ctors:vector<int>::{}, {}
+DEAL:ctors:vector<int>::moved-to:
+DEAL:ctors:vector<int>::{1, 1, 2}, {3, 5}
+DEAL:ctors:vector<int>::initializer_list ctor
+DEAL:ctors:vector<int>::{1, 1, 2}, {3, 5}

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -46,7 +46,7 @@ test()
   deallog << "Test in " << dim << "d" << std::endl;
   auto triangulations =
     MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(tria);
-  for (const auto tr : triangulations)
+  for (const auto &tr : triangulations)
     deallog << "Active cells in level triangulation: "
             << tr->n_global_active_cells() << std::endl;
   deallog << std::endl;

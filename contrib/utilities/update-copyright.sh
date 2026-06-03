@@ -179,4 +179,4 @@ process()
 }
 
 process "."  "CMakeLists.txt|CTestConfig.cmake" update_copyright
-process "cmake contrib doc examples include source tests" ".*" update_copyright
+process "cmake contrib doc examples include source module tests" ".*" update_copyright

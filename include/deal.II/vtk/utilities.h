@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2023 - 2025 by the deal.II authors
+// Copyright (C) 2023 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -251,7 +251,7 @@ namespace VTKWrappers
    * - The DoFHandler must have been initialized with the finite element
    *   obtained through the vtk_to_finite_element() method, and degrees of
    *   freedom must have been already distributed.
-   * - The triangulation associated with the DoFHandler doest not need to be
+   * - The triangulation associated with the DoFHandler does not need to be
    *   same as the input triangulation, but it must be obtained from it. It may
    *   be, for example, a parallel::fullydistributed::Triangulation obtained by
    *   distributing the serial triangulation.

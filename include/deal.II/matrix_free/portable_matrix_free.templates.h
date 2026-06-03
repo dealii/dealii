@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2025 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -273,7 +273,7 @@ namespace Portable
         std::vector<types::global_dof_index> &lexicographic_dof_indices =
           scratch_data.lexicographic_dof_indices;
 
-        auto triacell = graph[cell_id];
+        const auto &triacell = graph[cell_id];
 
         typename DoFHandler<dim>::cell_iterator cell(
           &(dof_data.dof_handler->get_triangulation()),
@@ -731,10 +731,14 @@ namespace Portable
     const unsigned int size = internal::VectorLocalSize<VectorType>::get(dst);
     const Number      *src_ptr = src.get_values();
     Number            *dst_ptr = dst.get_values();
+
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
     Kokkos::parallel_for(
       "dealii::copy_constrained_values",
-      Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
-        0, dof_handler_data[dof_handler_index].n_constrained_dofs),
+      Kokkos::RangePolicy<
+        typename MemorySpace::Default::kokkos_space::execution_space>(
+        exec, 0, dof_handler_data[dof_handler_index].n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         // When working with distributed vectors, the constrained dofs are
         // computed for ghosted vectors but we want to copy the values of the
@@ -743,6 +747,7 @@ namespace Portable
         if (constrained_dof < size)
           dst_ptr[constrained_dof] = src_ptr[constrained_dof];
       });
+    exec.fence();
   }
 
 
@@ -797,14 +802,18 @@ namespace Portable
                                 dst.locally_owned_size() :
                                 dst.size();
 
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
     Kokkos::parallel_for(
       "dealii::set_constrained_values",
-      Kokkos::RangePolicy<MemorySpace::Default::kokkos_space::execution_space>(
-        0, dof_handler_data[dof_handler_index].n_constrained_dofs),
+      Kokkos::RangePolicy<
+        typename MemorySpace::Default::kokkos_space::execution_space>(
+        exec, 0, dof_handler_data[dof_handler_index].n_constrained_dofs),
       KOKKOS_LAMBDA(int dof) {
         if (constr_dofs[dof] < size)
           dst_ptr[constr_dofs[dof]] = value;
       });
+    exec.fence();
   }
 
 
@@ -915,6 +924,7 @@ namespace Portable
                   func(&data, cell_index, q_point);
                 });
             });
+          exec.fence();
         }
   }
 
@@ -1508,6 +1518,8 @@ namespace Portable
                 team_policy,
                 apply_kernel);
             }
+
+        exec.fence();
         dst.compress(VectorOperation::add);
       }
 
@@ -1583,7 +1595,10 @@ namespace Portable
           // In parallel, it's possible that some processors do not own any
           // cells.
           if (n_cells[0] > 0)
-            do_color(0);
+            {
+              do_color(0);
+              // No fence() is necessary here.
+            }
 
           src.update_ghost_values_finish();
 
@@ -1633,6 +1648,8 @@ namespace Portable
                   team_policy,
                   apply_kernel);
               }
+
+          exec.fence();
           dst.compress(VectorOperation::add);
         }
 

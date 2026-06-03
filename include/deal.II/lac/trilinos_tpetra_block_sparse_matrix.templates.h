@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2024 - 2025 by the deal.II authors
+// Copyright (C) 2024 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -101,6 +101,7 @@ namespace LinearAlgebra
       if constexpr (running_in_debug_mode())
         {
           std::vector<typename TpetraTypes::MapType<MemorySpace>> tpetra_maps;
+          tpetra_maps.reserve(block_sparsity_pattern.n_block_rows());
           for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
             tpetra_maps.push_back(
               parallel_partitioning[i]
@@ -155,6 +156,7 @@ namespace LinearAlgebra
       const BlockSparsityPatternType &block_sparsity_pattern)
     {
       std::vector<IndexSet> parallel_partitioning;
+      parallel_partitioning.reserve(block_sparsity_pattern.n_block_rows());
       for (size_type i = 0; i < block_sparsity_pattern.n_block_rows(); ++i)
         parallel_partitioning.emplace_back(
           complete_index_set(block_sparsity_pattern.block(i, 0).n_rows()));
@@ -217,6 +219,7 @@ namespace LinearAlgebra
                                   dealii_block_sparse_matrix.n()));
 
       std::vector<IndexSet> parallel_partitioning;
+      parallel_partitioning.reserve(dealii_block_sparse_matrix.n_block_rows());
       for (size_type i = 0; i < dealii_block_sparse_matrix.n_block_rows(); ++i)
         parallel_partitioning.emplace_back(
           complete_index_set(dealii_block_sparse_matrix.block(i, 0).m()));
@@ -290,6 +293,7 @@ namespace LinearAlgebra
       Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
       std::vector<IndexSet> domain_indices;
+      domain_indices.reserve(this->n_block_cols());
       for (size_type c = 0; c < this->n_block_cols(); ++c)
         domain_indices.push_back(
           this->sub_objects[0][c]->locally_owned_domain_indices());
@@ -307,6 +311,7 @@ namespace LinearAlgebra
       Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
       std::vector<IndexSet> range_indices;
+      range_indices.reserve(this->n_block_rows());
       for (size_type r = 0; r < this->n_block_rows(); ++r)
         range_indices.push_back(
           this->sub_objects[r][0]->locally_owned_range_indices());

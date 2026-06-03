@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2000 - 2025 by the deal.II authors
+// Copyright (C) 2000 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -239,7 +239,7 @@ namespace Polynomials
     for (unsigned int i = 0; i < q->coefficients.size(); ++i)
       for (unsigned int j = 0; j < this->coefficients.size(); ++j)
         new_coefficients[i + j] += this->coefficients[j] * q->coefficients[i];
-    this->coefficients = new_coefficients;
+    this->coefficients = std::move(new_coefficients);
 
     return *this;
   }

@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------------
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
- * Copyright (C) 2009 - 2024 by the deal.II authors
+ * Copyright (C) 2009 - 2026 by the deal.II authors
  *
  * This file is part of the deal.II library.
  *
@@ -987,11 +987,12 @@ namespace Step35
         if (n % vel_update_prec == 0)
           verbose_cout << "    With reinitialization of the preconditioner"
                        << std::endl;
-        diffusion_step((n % vel_update_prec == 0) || (n == 2));
+        diffusion_step(
+          /* reinit_prec= */ ((n % vel_update_prec == 0) || (n == 2)));
         verbose_cout << "  Projection Step" << std::endl;
-        projection_step((n == 2));
+        projection_step(/* reinit_prec= */ (n == 2));
         verbose_cout << "  Updating the Pressure" << std::endl;
-        update_pressure((n == 2));
+        update_pressure(/* reinit_prec= */ (n == 2));
         vel_exact.advance_time(dt);
       }
     output_results(n_steps);

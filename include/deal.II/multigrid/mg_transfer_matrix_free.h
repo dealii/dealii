@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2016 - 2025 by the deal.II authors
+// Copyright (C) 2016 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1524,12 +1524,6 @@ public:
     BlockVectorType2                           &dst,
     const MGLevelObject<LinearAlgebra::distributed::BlockVector<Number>> &src)
     const;
-
-  /**
-   * This class can both be used with a single DoFHandler
-   * or a separate DoFHandler for each block.
-   */
-  static const bool supports_dof_handler_vector = true;
 
 protected:
   /**

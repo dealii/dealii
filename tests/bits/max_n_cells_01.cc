@@ -36,7 +36,10 @@ test()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
 
-  for (unsigned int cycle = 0; cycle < 7 * (4 - dim) * (4 - dim); ++cycle)
+  const unsigned int n_cycles = dim == 1 ?
+                                  numbers::max_n_levels - tria.n_levels() :
+                                  7 * (4 - dim) * (4 - dim);
+  for (unsigned int cycle = 0; cycle < n_cycles; ++cycle)
     {
       deallog << "cycle=" << cycle << ", n_cells=" << tria.n_active_cells()
               << std::endl;

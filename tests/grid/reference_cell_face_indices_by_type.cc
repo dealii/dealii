@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2025 by the deal.II authors
+// Copyright (C) 2025 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -24,8 +24,8 @@
 // general test case
 template <int dim>
 void
-execute_test(const std::initializer_list<ReferenceCell<dim>>     &cell_types,
-             const std::initializer_list<ReferenceCell<dim - 1>> &face_types)
+execute_test(const std::vector<ReferenceCell<dim>>     &cell_types,
+             const std::vector<ReferenceCell<dim - 1>> &face_types)
 {
   Triangulation<dim> triangulation;
 
@@ -114,40 +114,12 @@ execute_test(const std::initializer_list<ReferenceCell<dim>>     &cell_types,
     }
 }
 
+template <unsigned int dim>
 void
-test_1d()
+test()
 {
-  // All known 1d cell types
-  auto cell_types = {ReferenceCells::Line};
-  // All known face types of 1d cells
-  auto face_types = {ReferenceCells::Vertex};
-
-  execute_test<1>(cell_types, face_types);
-}
-
-void
-test_2d()
-{
-  // All known 2d cell types
-  auto cell_types = {ReferenceCells::Triangle, ReferenceCells::Quadrilateral};
-  // All known face types of 2d cells
-  auto face_types = {ReferenceCells::Line};
-
-  execute_test<2>(cell_types, face_types);
-}
-
-void
-test_3d()
-{
-  // All known 3d cell types
-  auto cell_types = {ReferenceCells::Tetrahedron,
-                     ReferenceCells::Pyramid,
-                     ReferenceCells::Wedge,
-                     ReferenceCells::Hexahedron};
-  // All known face types of 3d cells
-  auto face_types = {ReferenceCells::Triangle, ReferenceCells::Quadrilateral};
-
-  execute_test<3>(cell_types, face_types);
+  execute_test<dim>(ReferenceCells::get_reference_cells_in_dim<dim>(),
+                    ReferenceCells::get_reference_cells_in_dim<dim - 1>());
 }
 
 int
@@ -156,7 +128,7 @@ main()
   initlog();
 
   // TODO: Add test for 0D (or skip it...)
-  test_1d();
-  test_2d();
-  test_3d();
+  test<1>();
+  test<2>();
+  test<3>();
 }

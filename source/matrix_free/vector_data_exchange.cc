@@ -627,21 +627,21 @@ namespace internal
 
         // store data structures and, if needed, compress them
         this->n_ghost_indices_in_larger_set_by_remote_rank =
-          n_ghost_indices_in_larger_set_by_remote_rank;
+          std::move(n_ghost_indices_in_larger_set_by_remote_rank);
 
         this->ghost_indices_subset_data =
           internal::compress_to_contiguous_ranges(
             ghost_indices_subset_data_ptr, ghost_indices_subset_data_indices);
 
-        this->ghost_targets_data = ghost_targets_data;
+        this->ghost_targets_data = std::move(ghost_targets_data);
 
-        this->import_targets_data = import_targets_data;
+        this->import_targets_data = std::move(import_targets_data);
 
         this->import_indices_data =
           internal::compress_to_contiguous_ranges(import_indices_data_ptr,
                                                   import_indices_data_indices);
 
-        this->sm_ghost_ranks = sm_ghost_ranks;
+        this->sm_ghost_ranks = std::move(sm_ghost_ranks);
 
         this->sm_export_data =
           internal::compress_to_contiguous_ranges(sm_export_data_ptr,
@@ -651,7 +651,7 @@ namespace internal
           internal::compress_to_contiguous_ranges(sm_export_data_this_ptr,
                                                   sm_export_data_this_indices);
 
-        this->sm_import_ranks = sm_import_ranks;
+        this->sm_import_ranks = std::move(sm_import_ranks);
 
         this->sm_import_data =
           internal::compress_to_contiguous_ranges(sm_import_data_ptr,

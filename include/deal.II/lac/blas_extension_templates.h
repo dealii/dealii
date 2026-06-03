@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2018 - 2024 by the deal.II authors
+// Copyright (C) 2018 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -18,10 +18,6 @@
 
 #include <deal.II/lac/lapack_support.h>
 
-#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
-#  include <cfenv>
-#endif
-
 // Intel-MKL specific functions
 #ifdef DEAL_II_LAPACK_WITH_MKL
 // see
@@ -31,6 +27,11 @@
 #  include <mkl_trans.h>
 #endif
 
+#ifdef DEAL_II_HAVE_FP_EXCEPTIONS
+#  include <cfenv>
+#endif
+
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 

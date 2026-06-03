@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2020 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -36,7 +36,7 @@ test(int n_refinements, MPI_Comm comm)
   GridGenerator::hyper_cube(tria);
   tria.refine_global(n_refinements);
 
-  for (const auto cell : tria.active_cell_iterators())
+  for (const auto &cell : tria.active_cell_iterators())
     if (!cell->is_artificial())
       deallog << cell->id() << " -> " << cell->subdomain_id() << ' '
               << cell->global_active_cell_index() << std::endl;

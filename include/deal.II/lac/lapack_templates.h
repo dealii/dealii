@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2012 - 2025 by the deal.II authors
+// Copyright (C) 2012 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -23,6 +23,8 @@
 #ifdef DEAL_II_HAVE_FP_EXCEPTIONS
 #  include <cfenv>
 #endif
+
+#include <complex>
 
 DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes

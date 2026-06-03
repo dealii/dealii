@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2023 - 2025 by the deal.II authors
+// Copyright (C) 2023 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -193,14 +193,14 @@ namespace Portable
      * EvaluationFlags::values set.
      */
     DEAL_II_HOST_DEVICE value_type
-    get_value(int q_point) const;
+    get_value(const int q_point) const;
 
     /**
      * Return the value stored for the local degree of freedom with index
      * @p dof_index. This accesses the data loaded by read_dof_values().
      */
     DEAL_II_HOST_DEVICE value_type
-    get_dof_value(int dof_index) const;
+    get_dof_value(const int dof_index) const;
 
     /**
      * Submit the value @p val_in at quadrature point @p q_point for
@@ -208,7 +208,7 @@ namespace Portable
      * set.
      */
     DEAL_II_HOST_DEVICE void
-    submit_value(const value_type &val_in, int q_point);
+    submit_value(const value_type &val_in, const int q_point);
 
     /**
      * Submit the value @p value for the local degree of freedom with index
@@ -216,7 +216,7 @@ namespace Portable
      * distribute_local_to_global().
      */
     DEAL_II_HOST_DEVICE void
-    submit_dof_value(const value_type &value, int dof_index);
+    submit_dof_value(const value_type &value, const int dof_index);
 
     /**
      * Return the gradient of the finite element function at the quadrature
@@ -224,7 +224,7 @@ namespace Portable
      * EvaluationFlags::gradients set.
      */
     DEAL_II_HOST_DEVICE gradient_type
-    get_gradient(int q_point) const;
+    get_gradient(const int q_point) const;
 
     /**
      * Submit the gradient @p gradient at quadrature point @p q_point for
@@ -232,7 +232,7 @@ namespace Portable
      * set.
      */
     DEAL_II_HOST_DEVICE void
-    submit_gradient(const gradient_type &gradient, int q_point);
+    submit_gradient(const gradient_type &gradient, const int q_point);
 
     /**
      * Return the symmetric gradient of the finite element function at
@@ -242,7 +242,7 @@ namespace Portable
      */
     DEAL_II_HOST_DEVICE
     SymmetricTensor<2, dim, Number>
-    get_symmetric_gradient(int q_point) const;
+    get_symmetric_gradient(const int q_point) const;
 
     /**
      * Submit the symmetric gradient @p sym_grad at quadrature point @p q_point
@@ -252,7 +252,7 @@ namespace Portable
      */
     DEAL_II_HOST_DEVICE void
     submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &sym_grad,
-                              int                                    q_point);
+                              const int                              q_point);
 
     // clang-format off
     /**
@@ -535,9 +535,9 @@ namespace Portable
                                             n_components_,
                                             Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::get_value(
-    int q_point) const
+    const int q_point) const
   {
-    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    AssertIndexRange(q_point, n_q_points);
     if constexpr (n_components_ == 1)
       {
         return shared_data->values(q_point, 0);
@@ -564,11 +564,9 @@ namespace Portable
                                             n_components_,
                                             Number>::value_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_dof_value(int dof_index) const
+    get_dof_value(const int dof_index) const
   {
-    Assert(dof_index >= 0 &&
-             dof_index < static_cast<int>(tensor_dofs_per_component),
-           ExcInternalError());
+    AssertIndexRange(dof_index, tensor_dofs_per_component);
     if constexpr (n_components_ == 1)
       {
         return shared_data->values(dof_index, 0);
@@ -591,9 +589,9 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_value(const value_type &value, int q_point)
+    submit_value(const value_type &value, const int q_point)
   {
-    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    AssertIndexRange(q_point, n_q_points);
     if constexpr (n_components_ == 1)
       {
         shared_data->values(q_point, 0) =
@@ -616,10 +614,9 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_dof_value(const value_type &value, int dof_index)
+    submit_dof_value(const value_type &value, const int dof_index)
   {
-    Assert(dof_index >= 0 && dof_index < tensor_dofs_per_component,
-           ExcInternalError());
+    AssertIndexRange(dof_index, tensor_dofs_per_component);
     if constexpr (n_components_ == 1)
       {
         shared_data->values(dof_index, 0) = value;
@@ -644,9 +641,9 @@ namespace Portable
                                             n_components_,
                                             Number>::gradient_type
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_gradient(int q_point) const
+    get_gradient(const int q_point) const
   {
-    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    AssertIndexRange(q_point, n_q_points);
     gradient_type grad;
 
     if constexpr (n_components_ == 1)
@@ -687,9 +684,9 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    submit_gradient(const gradient_type &gradient, int q_point)
+    submit_gradient(const gradient_type &gradient, const int q_point)
   {
-    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    AssertIndexRange(q_point, n_q_points);
     if constexpr (n_components_ == 1)
       {
         for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
@@ -728,9 +725,9 @@ namespace Portable
             typename Number>
   DEAL_II_HOST_DEVICE SymmetricTensor<2, dim, Number>
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    get_symmetric_gradient(int q_point) const
+    get_symmetric_gradient(const int q_point) const
   {
-    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    AssertIndexRange(q_point, n_q_points);
     Assert(n_components_ == dim,
            ExcMessage("Function get_symmetric_gradient() only works when the "
                       "number of components and the number of dimensions are "
@@ -749,9 +746,9 @@ namespace Portable
   DEAL_II_HOST_DEVICE void
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &sym_grad,
-                              int                                    q_point)
+                              const int                              q_point)
   {
-    Assert(q_point >= 0 && q_point < n_q_points, ExcInternalError());
+    AssertIndexRange(q_point, n_q_points);
     Assert(n_components_ == dim,
            ExcMessage("Function submit_symmetric_gradient() only works when "
                       "the number of components and the number of dimensions "

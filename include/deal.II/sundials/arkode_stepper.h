@@ -146,6 +146,15 @@ namespace SUNDIALS
       Stepper            *stepper           = nullptr;
       std::exception_ptr *pending_exception = nullptr;
     };
+
+    /**
+     * Alias for the memory management of the ARKODE memory block introduced to
+     * avoid repeating the long type. This smart pointer is created and
+     * destroyed by the corresponding stepper specific functions: for example,
+     * for ARKStep these are ARKStepCreate and ARKStepFree, respectively. The
+     * underlying object is supplied to the native ARKODE functions.
+     */
+    using ARKodeMemoryPtr = std::unique_ptr<void, void (*)(void *)>;
   };
 
   /**
@@ -545,11 +554,6 @@ namespace SUNDIALS
      * @param data ARKStep configuration data
      */
     ARKStepper(const AdditionalData &data = AdditionalData());
-
-    /**
-     * Destructor. Cleans up the internal ARKODE memory block.
-     */
-    ~ARKStepper();
 
     void *
     get_arkode_memory() const override;
@@ -956,6 +960,8 @@ namespace SUNDIALS
     using CallbackContext = typename ARKodeStepper<
       VectorType>::template CallbackContext<ARKStepper<VectorType>>;
 
+    using ARKodeMemoryPtr = typename ARKodeStepper<VectorType>::ARKodeMemoryPtr;
+
     /**
      * Rebuild the stepper at a given time instance and for a given state
      * vector. Required by the ARKodeStepper interface.
@@ -999,17 +1005,30 @@ namespace SUNDIALS
                       internal::InvocationContext inv_ctx);
 
     /**
-     * ARKode memory object.
-     */
-    void *arkode_mem;
-
-    /**
      * ARKStepper configuration data.
      */
     AdditionalData data;
 
+    /**
+     * Linear solver for applying the Jacobian of the implicit function in the
+     * nonlinear solver. This is used if the user provides both
+     * jacobian_times_vector() and solve_linearized_system().
+     */
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
+
+    /**
+     * Linear solver for applying the mass matrix. This is used if the user
+     * provides both mass_times_vector() and solve_mass().
+     */
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
+
+    /**
+     * ARKODE memory object. Declared after linear_solver and mass_solver so
+     * that it is destroyed first (C++ destroys members in reverse declaration
+     * order), ensuring ARKStepFree is called before the solver wrappers free
+     * their SUNLinearSolver objects.
+     */
+    ARKodeMemoryPtr arkode_mem;
 
     /**
      * ARKStepper callback context.

@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2009 - 2025 by the deal.II authors
+## Copyright (C) 2009 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,7 +32,6 @@ my %colors = (
  "fluids"         => 'yellow2',
  "solids"         => 'coral',
  "time dependent" => 'darkolivegreen1',
- "unfinished"     => 'white',
  "code-gallery"   => 'white',
     );
 
@@ -42,7 +41,6 @@ my %style = (
  "fluids"         => ',height=.25,width=.25',
  "solids"         => ',height=.25,width=.25',
  "time dependent" => ',height=.25,width=.25',
- "unfinished"     => ',height=.25,width=.25,style="dashed"',
  "code-gallery"   => ',height=.08,width=.125,shape="circle"',
     );
 
@@ -319,7 +317,6 @@ my %kind_descriptions = (
  "fluids"         => 'Fluid dynamics',
  "solids"         => 'Solid mechanics',
  "time dependent" => 'Time dependent problems',
- "unfinished"     => 'Unfinished codes',
  "code-gallery"   => 'Code gallery',
     );
 
@@ -341,13 +338,12 @@ print "  basic -- techniques [style=invis];\n";
 print "  techniques -- fluids [style=invis];\n";
 print "  fluids -- solids [style=invis];\n";
 print "  solids -- time_dependent [style=invis];\n";
-print "  time_dependent -- unfinished [style=invis];\n";
-print "  unfinished -- code_gallery [style=invis];\n";
+print "  time_dependent -- code_gallery [style=invis];\n";
 
 # we need to tell 'dot' that all of these are at the same
 # rank to ensure they appear next to (as opposed to atop)
 # each other
-print "  {rank=same; basic, techniques, fluids, solids, time_dependent, unfinished, code_gallery}";
+print "  {rank=same; basic, techniques, fluids, solids, time_dependent, code_gallery}";
 
 # end the graph
 print "}\n";

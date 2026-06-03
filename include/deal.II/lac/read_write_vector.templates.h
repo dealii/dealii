@@ -43,6 +43,8 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 #include <boost/io/ios_state.hpp>
 
+#include <complex>
+
 DEAL_II_NAMESPACE_OPEN
 
 

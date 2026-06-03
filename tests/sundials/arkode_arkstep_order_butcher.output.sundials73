@@ -1,0 +1,23 @@
+
+DEAL::=== Order 3 ===
+DEAL::final = -0.958924 0.283662
+DEAL::work stats:
+DEAL::  steps = 2635
+DEAL::  step attempts = 2635
+DEAL::  error test failures = 0
+DEAL::  explicit rhs evals = 10540
+DEAL::  implicit rhs evals = 26350
+DEAL::  nonlinear iterations = 15810
+DEAL::  nonlinear convergence failures = 0
+DEAL::  rejection rate = 0.000000
+DEAL::=== Butcher tables order 5 ===
+DEAL::final = -0.958924 0.283662
+DEAL::work stats:
+DEAL::  steps = 214
+DEAL::  step attempts = 214
+DEAL::  error test failures = 0
+DEAL::  explicit rhs evals = 1712
+DEAL::  implicit rhs evals = 4708
+DEAL::  nonlinear iterations = 2996
+DEAL::  nonlinear convergence failures = 0
+DEAL::  rejection rate = 0.000000

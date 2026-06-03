@@ -12,13 +12,11 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_WITH_HDF5
+#include <deal.II/base/hdf5.h>
 
-#  include <deal.II/base/hdf5.h>
+#include <hdf5.h>
 
-#  include <hdf5.h>
-
-#  include <iostream>
+#include <iostream>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,7 +33,7 @@ namespace HDF5
       void
       check_exception(const std::string &type, const std::string &name)
       {
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
         if (std::uncaught_exceptions() > 0)
           {
             std::cerr
@@ -53,10 +51,10 @@ namespace HDF5
 
             MPI_Abort(MPI_COMM_WORLD, 1);
           }
-#  else
+#else
         (void)type;
         (void)name;
-#  endif
+#endif
       }
     } // namespace HDF5ObjectImplementation
   }   // namespace internal
@@ -384,11 +382,11 @@ namespace HDF5
     : File(name,
            mode,
            false,
-#  ifdef DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
            MPI_COMM_NULL
-#  else
+#else
            0
-#  endif
+#endif
       )
   {}
 
@@ -421,20 +419,20 @@ namespace HDF5
 
     if (mpi)
       {
-#  ifdef DEAL_II_WITH_MPI
-#    ifdef H5_HAVE_PARALLEL
+#ifdef DEAL_II_WITH_MPI
+#  ifdef H5_HAVE_PARALLEL
         const MPI_Info info = MPI_INFO_NULL;
 
         plist = H5Pcreate(H5P_FILE_ACCESS);
         Assert(plist >= 0, ExcMessage("Error at H5Pcreate"));
         ret = H5Pset_fapl_mpio(plist, mpi_communicator, info);
         Assert(ret >= 0, ExcMessage("Error at H5Pset_fapl_mpio"));
-#    else
-        AssertThrow(false, ExcMessage("HDF5 parallel support is disabled."));
-#    endif // H5_HAVE_PARALLEL
 #  else
+        AssertThrow(false, ExcMessage("HDF5 parallel support is disabled."));
+#  endif // H5_HAVE_PARALLEL
+#else
         AssertThrow(false, ExcMessage("MPI support is disabled."));
-#  endif // DEAL_II_WITH_MPI
+#endif // DEAL_II_WITH_MPI
       }
     else
       {
@@ -470,5 +468,3 @@ namespace HDF5
 } // namespace HDF5
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif // DEAL_II_WITH_HDF5

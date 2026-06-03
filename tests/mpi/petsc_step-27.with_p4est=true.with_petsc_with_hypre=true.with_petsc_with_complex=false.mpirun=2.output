@@ -1,26 +1,26 @@
 
 DEAL::Cycle 0:
-DEAL::   Number of active cells      : 768
-DEAL::   Number of degrees of freedom: 3264
-DEAL::   Number of constraints       : 404
-DEAL::   Solved in 8 iterations.
+DEAL::   Number of active cells      : 700
+DEAL::   Number of degrees of freedom: 3200
+DEAL::   Number of constraints       : 400
+DEAL::   Solved in 10 iterations.
 DEAL::Cycle 1:
-DEAL::   Number of active cells      : 966
-DEAL::   Number of degrees of freedom: 5245
-DEAL::   Number of constraints       : 956
-DEAL::   Solved in 9 iterations.
+DEAL::   Number of active cells      : 800
+DEAL::   Number of degrees of freedom: 4300
+DEAL::   Number of constraints       : 700
+DEAL::   Solved in 10 iterations.
 DEAL::Cycle 2:
-DEAL::   Number of active cells      : 1149
-DEAL::   Number of degrees of freedom: 8556
-DEAL::   Number of constraints       : 1998
+DEAL::   Number of active cells      : 800
+DEAL::   Number of degrees of freedom: 6300
+DEAL::   Number of constraints       : 1300
 DEAL::   Solved in 10 iterations.
 DEAL::Cycle 3:
-DEAL::   Number of active cells      : 1365
-DEAL::   Number of degrees of freedom: 12537
-DEAL::   Number of constraints       : 3218
-DEAL::   Solved in 17 iterations.
+DEAL::   Number of active cells      : 900
+DEAL::   Number of degrees of freedom: 8600
+DEAL::   Number of constraints       : 2000
+DEAL::   Solved in 10 iterations.
 DEAL::Cycle 4:
-DEAL::   Number of active cells      : 1659
-DEAL::   Number of degrees of freedom: 18547
-DEAL::   Number of constraints       : 4909
-DEAL::   Solved in 26 iterations.
+DEAL::   Number of active cells      : 1000
+DEAL::   Number of degrees of freedom: 10800
+DEAL::   Number of constraints       : 2700
+DEAL::   Solved in 10 iterations.

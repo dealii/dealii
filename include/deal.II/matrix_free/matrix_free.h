@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2012 - 2025 by the deal.II authors
+// Copyright (C) 2012 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -3975,82 +3975,65 @@ namespace internal
      * exchange on a subset of DoFs <==> begin() + ind == local_element(ind),
      * i.e. LinearAlgebra::distributed::Vector
      */
-    template <typename VectorType,
-              std::enable_if_t<has_exchange_on_subset<VectorType>, VectorType>
-                * = nullptr>
+    template <typename VectorType>
     void
     zero_vector_region(const unsigned int range_index, VectorType &vec) const
     {
-      static_assert(std::is_same_v<Number, typename VectorType::value_type>,
-                    "Type mismatch between VectorType and VectorDataExchange");
-      if (range_index == numbers::invalid_unsigned_int)
-        vec = Number();
+      if constexpr (has_exchange_on_subset<VectorType>)
+        {
+          static_assert(
+            std::is_same_v<Number, typename VectorType::value_type>,
+            "Type mismatch between VectorType and VectorDataExchange");
+          if (range_index == numbers::invalid_unsigned_int)
+            vec = Number();
+          else
+            {
+              const unsigned int mf_component = find_vector_in_mf(vec, false);
+              const internal::MatrixFreeFunctions::DoFInfo &dof_info =
+                matrix_free.get_dof_info(mf_component);
+              Assert(dof_info.vector_zero_range_list_index.empty() == false,
+                     ExcNotInitialized());
+
+              Assert(vec.partitioners_are_compatible(
+                       *dof_info.vector_partitioner),
+                     ExcInternalError());
+              AssertIndexRange(range_index,
+                               dof_info.vector_zero_range_list_index.size() -
+                                 1);
+              for (unsigned int id =
+                     dof_info.vector_zero_range_list_index[range_index];
+                   id != dof_info.vector_zero_range_list_index[range_index + 1];
+                   ++id)
+                std::memset(vec.begin() +
+                              dof_info.vector_zero_range_list[id].first,
+                            0,
+                            (dof_info.vector_zero_range_list[id].second -
+                             dof_info.vector_zero_range_list[id].first) *
+                              sizeof(Number));
+            }
+        }
+      else if constexpr (has_assignment_operator<VectorType>)
+        {
+          if (range_index == numbers::invalid_unsigned_int || range_index == 0)
+            {
+              if constexpr (std::is_same_v<
+                              ArrayView<typename VectorType::value_type>,
+                              VectorType>)
+                {
+                  for (unsigned int i = 0; i < vec.size(); ++i)
+                    vec[i] = typename VectorType::value_type();
+                }
+              else
+                vec = typename VectorType::value_type();
+            }
+        }
       else
         {
-          const unsigned int mf_component = find_vector_in_mf(vec, false);
-          const internal::MatrixFreeFunctions::DoFInfo &dof_info =
-            matrix_free.get_dof_info(mf_component);
-          Assert(dof_info.vector_zero_range_list_index.empty() == false,
-                 ExcNotInitialized());
-
-          Assert(vec.partitioners_are_compatible(*dof_info.vector_partitioner),
-                 ExcInternalError());
-          AssertIndexRange(range_index,
-                           dof_info.vector_zero_range_list_index.size() - 1);
-          for (unsigned int id =
-                 dof_info.vector_zero_range_list_index[range_index];
-               id != dof_info.vector_zero_range_list_index[range_index + 1];
-               ++id)
-            std::memset(vec.begin() + dof_info.vector_zero_range_list[id].first,
-                        0,
-                        (dof_info.vector_zero_range_list[id].second -
-                         dof_info.vector_zero_range_list[id].first) *
-                          sizeof(Number));
+          Assert(false,
+                 ExcNotImplemented(
+                   "Zeroing is only implemented for vector types "
+                   "which provide operator=(const VectorType::value_type)"));
         }
-    }
-
-
-
-    /**
-     * Zero out vector region for vector that do _not_ support exchange on a
-     * subset of DoFs <==> begin() + ind == local_element(ind) but are still a
-     * vector type
-     */
-    template <typename VectorType,
-              std::enable_if_t<!has_exchange_on_subset<VectorType>, VectorType>
-                * = nullptr,
-              std::enable_if_t<has_assignment_operator<VectorType>, VectorType>
-                * = nullptr>
-    void
-    zero_vector_region(const unsigned int range_index, VectorType &vec) const
-    {
-      if (range_index == numbers::invalid_unsigned_int || range_index == 0)
-        {
-          if constexpr (std::is_same_v<
-                          ArrayView<typename VectorType::value_type>,
-                          VectorType>)
-            {
-              for (unsigned int i = 0; i < vec.size(); ++i)
-                vec[i] = typename VectorType::value_type();
-            }
-          else
-            vec = typename VectorType::value_type();
-        }
-    }
-
-
-
-    /**
-     * Zero out vector region for non-vector types, i.e., classes that do not
-     * have operator=(const VectorType::value_type)
-     */
-    void
-    zero_vector_region(const unsigned int, ...) const
-    {
-      Assert(false,
-             ExcNotImplemented(
-               "Zeroing is only implemented for vector types "
-               "which provide operator=(const VectorType::value_type)"));
     }
 
 

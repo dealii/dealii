@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2023 - 2024 by the deal.II authors
+// Copyright (C) 2023 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -38,6 +38,10 @@ for (S : TRILINOS_SCALARS)
         template void
         SparseMatrix<S, MemorySpace::Host>::reinit(
           const dealii::DynamicSparsityPattern &);
+
+        template void
+        SparseMatrix<S, MemorySpace::Host>::reinit(
+          const dealii::SparsityPattern &);
 
         template void
         SparseMatrix<S, MemorySpace::Host>::vmult(
@@ -106,6 +110,10 @@ for (S : TRILINOS_SCALARS)
         template void
         SparseMatrix<S, MemorySpace::Default>::reinit(
           const dealii::DynamicSparsityPattern &);
+
+        template void
+        SparseMatrix<S, MemorySpace::Default>::reinit(
+          const dealii::SparsityPattern &);
 
         template void
         SparseMatrix<S, MemorySpace::Default>::vmult(

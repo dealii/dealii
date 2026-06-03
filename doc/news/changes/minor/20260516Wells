@@ -1,0 +1,7 @@
+Improved: The arrays inside a Triangulation now use strides which depend on the
+present ReferenceCell objects, rather than the maximum values over all possible
+ReferenceCell objects. For example, a Triangulation containing only tetrahedra
+now only stores four face orientations per cell instead of six. This lowers
+memory consumption for tetrahedral Triangulations by about 20\%.
+<br>
+(David Wells, 2026/05/16)

@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2001 - 2024 by the deal.II authors
+// Copyright (C) 2001 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -58,6 +58,7 @@ public:
   virtual std::unique_ptr<Mapping<dim, spacedim>>
   clone() const override;
 
+protected:
   /**
    * For <tt>dim=2,3</tt>. Append the support points of all shape functions
    * located on bounding lines to the vector @p a. Points located on the
@@ -70,7 +71,8 @@ public:
   virtual void
   add_line_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim>> &a) const override;
+    boost::container::small_vector<Point<spacedim>, 200>       &points)
+    const override;
 
   /**
    * For <tt>dim=3</tt>. Append the support points of all shape functions
@@ -84,7 +86,8 @@ public:
   virtual void
   add_quad_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    std::vector<Point<spacedim>> &a) const override;
+    boost::container::small_vector<Point<spacedim>, 200>       &points)
+    const override;
 };
 
 /** @} */
@@ -95,22 +98,25 @@ public:
 
 template <>
 void
-MappingC1<1>::add_line_support_points(const Triangulation<1>::cell_iterator &,
-                                      std::vector<Point<1>> &) const;
+MappingC1<1>::add_line_support_points(
+  const Triangulation<1>::cell_iterator &,
+  boost::container::small_vector<Point<1>, 200> &) const;
 template <>
 void
 MappingC1<2>::add_line_support_points(
   const Triangulation<2>::cell_iterator &cell,
-  std::vector<Point<2>>                 &a) const;
+  boost::container::small_vector<Point<2>, 200> &) const;
 
 template <>
 void
-MappingC1<1>::add_quad_support_points(const Triangulation<1>::cell_iterator &,
-                                      std::vector<Point<1>> &) const;
+MappingC1<1>::add_quad_support_points(
+  const Triangulation<1>::cell_iterator &,
+  boost::container::small_vector<Point<1>, 200> &) const;
 template <>
 void
-MappingC1<2>::add_quad_support_points(const Triangulation<2>::cell_iterator &,
-                                      std::vector<Point<2>> &) const;
+MappingC1<2>::add_quad_support_points(
+  const Triangulation<2>::cell_iterator &,
+  boost::container::small_vector<Point<2>, 200> &) const;
 
 
 #endif // DOXYGEN

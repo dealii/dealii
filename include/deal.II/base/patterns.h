@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2025 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <array>
+#include <complex>
 #include <deque>
 #include <limits>
 #include <list>
@@ -2349,22 +2350,22 @@ namespace Patterns
 
     private:
       template <std::size_t... U>
-      static std::array<std::string, std::tuple_size<T>::value>
+      static std::array<std::string, std::tuple_size_v<T>>
       to_string_internal_1(const T               &t,
                            const Patterns::Tuple &pattern,
                            std::index_sequence<U...>)
       {
-        std::array<std::string, std::tuple_size<T>::value> a = {
-          {Convert<typename std::tuple_element<U, T>::type>::to_string(
+        std::array<std::string, std::tuple_size_v<T>> a = {
+          {Convert<std::tuple_element_t<U, T>>::to_string(
             std::get<U>(t), pattern.get_pattern(U))...}};
         return a;
       }
 
-      static std::array<std::string, std::tuple_size<T>::value>
+      static std::array<std::string, std::tuple_size_v<T>>
       to_string_internal_2(const T &t, const Patterns::Tuple &pattern)
       {
         return Convert<T>::to_string_internal_1(
-          t, pattern, std::make_index_sequence<std::tuple_size<T>::value>{});
+          t, pattern, std::make_index_sequence<std::tuple_size_v<T>>{});
       }
 
       template <std::size_t... U>
@@ -2373,9 +2374,8 @@ namespace Patterns
                           const Patterns::Tuple          &pattern,
                           std::index_sequence<U...>)
       {
-        return std::make_tuple(
-          Convert<typename std::tuple_element<U, T>::type>::to_value(
-            s[U], pattern.get_pattern(U))...);
+        return std::make_tuple(Convert<std::tuple_element_t<U, T>>::to_value(
+          s[U], pattern.get_pattern(U))...);
       }
 
       static T
@@ -2383,7 +2383,7 @@ namespace Patterns
                           const Patterns::Tuple          &pattern)
       {
         return Convert<T>::to_value_internal_1(
-          s, pattern, std::make_index_sequence<std::tuple_size<T>::value>{});
+          s, pattern, std::make_index_sequence<std::tuple_size_v<T>>{});
       }
     };
 

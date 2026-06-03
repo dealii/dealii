@@ -2468,7 +2468,10 @@ namespace Step33
             const double res_norm = right_hand_side.l2_norm();
             if (std::fabs(res_norm) < 1e-10)
               {
-                std::printf("   %-16.3e (converged)\n\n", res_norm);
+                std::cout << "   " << std::setw(12) << std::left
+                          << std::scientific << res_norm << "  (converged)\n\n"
+                          << std::defaultfloat << std::endl
+                          << std::endl;
                 break;
               }
             else
@@ -2480,10 +2483,12 @@ namespace Step33
 
                 current_solution += newton_update;
 
-                std::printf("   %-16.3e %04d        %-5.2e\n",
-                            res_norm,
-                            convergence.first,
-                            convergence.second);
+                std::cout << "   " << std::setw(12) << std::left
+                          << std::scientific << res_norm << std::setw(8)
+                          << std::right << convergence.first << "     "
+                          << std::setw(12) << std::left << std::scientific
+                          << convergence.second << std::defaultfloat
+                          << std::endl;
               }
 
             ++nonlin_iter;

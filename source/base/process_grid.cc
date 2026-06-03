@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2025 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,9 +12,7 @@
 
 #include <deal.II/base/process_grid.h>
 
-#ifdef DEAL_II_WITH_SCALAPACK
-
-#  include <deal.II/lac/scalapack.templates.h>
+#include <deal.II/lac/scalapack.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -268,5 +266,3 @@ template void
 Utilities::MPI::ProcessGrid::send_to_inactive<int>(int *, const int) const;
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif // DEAL_II_WITH_SCALAPACK

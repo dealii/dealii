@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2008 - 2024 by the deal.II authors
+// Copyright (C) 2008 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -542,6 +542,7 @@ namespace TrilinosWrappers
     Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<IndexSet> domain_indices;
+    domain_indices.reserve(this->n_block_cols());
     for (size_type c = 0; c < this->n_block_cols(); ++c)
       domain_indices.push_back(
         this->sub_objects[0][c]->locally_owned_domain_indices());
@@ -558,6 +559,7 @@ namespace TrilinosWrappers
     Assert(this->n_block_rows() != 0, ExcNotInitialized());
 
     std::vector<IndexSet> range_indices;
+    range_indices.reserve(this->n_block_rows());
     for (size_type r = 0; r < this->n_block_rows(); ++r)
       range_indices.push_back(
         this->sub_objects[r][0]->locally_owned_range_indices());

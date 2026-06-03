@@ -47,6 +47,8 @@
 
 #include <deal.II/numerics/error_estimator.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -107,6 +109,28 @@ namespace internal
     dealii::hp::FESubfaceValues<dim, spacedim> fe_subface_values;
 
     /**
+     * DoFs of the current cell.
+     *
+     * @note Since some of the functions below call each-other, be sure to
+     * repopulate this array immediately before it is used (e.g., in
+     * get_function_gradients()).
+     */
+    std::vector<types::global_dof_index> cell_dofs;
+
+    /**
+     * DoFs of the neighbor cell.
+     *
+     * @note Since some of the functions below call each-other, be sure to
+     * repopulate this array immediately before it is used (e.g., in
+     * get_function_gradients()).
+     *
+     * @note Since the neighbor and present cell may have different
+     * FiniteElement​s, this vector (and, for consistency, also `cell_dofs`)
+     * cannot be resized inside resize().
+     */
+    std::vector<types::global_dof_index> neighbor_cell_dofs;
+
+    /**
      * A vector to store the jump of the normal vectors in the quadrature
      * points for each of the solution vectors (i.e. a temporary value).
      * This vector is not allocated inside the functions that use it, but
@@ -114,7 +138,7 @@ namespace internal
      * presence of multiple threads where synchronization makes things even
      * slower.
      */
-    std::vector<std::vector<std::vector<number>>> phi;
+    Table<3, double> phi;
 
     /**
      * A vector for the gradients of the finite element function on one cell
@@ -124,13 +148,12 @@ namespace internal
      * the number of the quadrature point. The first index denotes the index
      * of the solution vector.
      */
-    std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>> psi;
+    Table<2, std::vector<Tensor<1, spacedim, number>>> psi;
 
     /**
      * The same vector for a neighbor cell
      */
-    std::vector<std::vector<std::vector<Tensor<1, spacedim, number>>>>
-      neighbor_psi;
+    Table<2, std::vector<Tensor<1, spacedim, number>>> neighbor_psi;
 
     /**
      * The normal vectors of the finite element function on one face
@@ -146,14 +169,14 @@ namespace internal
      * Two arrays needed for the values of coefficients in the jumps, if
      * they are given.
      */
-    std::vector<double>                 coefficient_values1;
-    std::vector<dealii::Vector<double>> coefficient_values;
+    std::vector<double>         coefficient_values1;
+    std::vector<Vector<double>> coefficient_values;
 
     /**
-     * Array for the products of Jacobian determinants and weights of
-     * quadraturs points.
+     * Arrays for the Neumann boundary values (scalar and multicomponent).
      */
-    std::vector<double> JxW_values;
+    std::vector<number>         neumann_values1;
+    std::vector<Vector<number>> neumann_values;
 
     /**
      * The subdomain id we are to care for.
@@ -231,30 +254,30 @@ namespace internal
                         face_quadratures,
                         update_gradients | update_normal_vectors)
     , phi(n_solution_vectors,
-          std::vector<std::vector<number>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<number>(fe.n_components())))
-    , psi(n_solution_vectors,
-          std::vector<std::vector<Tensor<1, spacedim, number>>>(
-            face_quadratures.max_n_quadrature_points(),
-            std::vector<Tensor<1, spacedim, number>>(fe.n_components())))
+          face_quadratures.max_n_quadrature_points(),
+          fe.n_components())
+    , psi(n_solution_vectors, face_quadratures.max_n_quadrature_points())
     , neighbor_psi(n_solution_vectors,
-                   std::vector<std::vector<Tensor<1, spacedim, number>>>(
-                     face_quadratures.max_n_quadrature_points(),
-                     std::vector<Tensor<1, spacedim, number>>(
-                       fe.n_components())))
+                   face_quadratures.max_n_quadrature_points())
     , normal_vectors(face_quadratures.max_n_quadrature_points())
     , neighbor_normal_vectors(face_quadratures.max_n_quadrature_points())
     , coefficient_values1(face_quadratures.max_n_quadrature_points())
     , coefficient_values(face_quadratures.max_n_quadrature_points(),
-                         dealii::Vector<double>(fe.n_components()))
-    , JxW_values(face_quadratures.max_n_quadrature_points())
+                         Vector<double>(fe.n_components()))
+    , neumann_values1(face_quadratures.max_n_quadrature_points())
+    , neumann_values(face_quadratures.max_n_quadrature_points(),
+                     Vector<number>(fe.n_components()))
     , subdomain_id(subdomain_id)
     , material_id(material_id)
     , neumann_bc(neumann_bc)
     , component_mask(component_mask)
     , coefficients(coefficients)
-  {}
+  {
+    for (auto &v : psi)
+      v = std::vector<Tensor<1, spacedim, number>>(fe.n_components());
+    for (auto &v : neighbor_psi)
+      v = std::vector<Tensor<1, spacedim, number>>(fe.n_components());
+  }
 
 
 
@@ -263,67 +286,55 @@ namespace internal
   ParallelData<dim, spacedim, number>::resize(
     const unsigned int active_fe_index)
   {
-    const unsigned int n_q_points   = face_quadratures[active_fe_index].size();
+    const unsigned int n_q_points = face_quadratures[active_fe_index].size();
+    if (n_q_points == phi.size(1))
+      return;
+
     const unsigned int n_components = finite_element.n_components();
 
     normal_vectors.resize(n_q_points);
     neighbor_normal_vectors.resize(n_q_points);
     coefficient_values1.resize(n_q_points);
     coefficient_values.resize(n_q_points);
-    JxW_values.resize(n_q_points);
+    neumann_values1.resize(n_q_points);
+    neumann_values.resize(n_q_points);
 
-    for (unsigned int i = 0; i < phi.size(); ++i)
-      {
-        phi[i].resize(n_q_points);
-        psi[i].resize(n_q_points);
-        neighbor_psi[i].resize(n_q_points);
-
-        for (unsigned int qp = 0; qp < n_q_points; ++qp)
-          {
-            phi[i][qp].resize(n_components);
-            psi[i][qp].resize(n_components);
-            neighbor_psi[i][qp].resize(n_components);
-          }
-      }
+    phi.reinit(phi.size(0), n_q_points, n_components);
+    psi.reinit(phi.size(0), n_q_points);
+    neighbor_psi.reinit(phi.size(0), n_q_points);
+    for (unsigned int i = 0; i < psi.size(0); ++i)
+      for (unsigned int qp = 0; qp < psi.size(1); ++qp)
+        {
+          psi(i, qp).resize(n_components);
+          neighbor_psi(i, qp).resize(n_components);
+        }
 
     for (unsigned int qp = 0; qp < n_q_points; ++qp)
-      coefficient_values[qp].reinit(n_components);
+      {
+        coefficient_values[qp].reinit(n_components);
+        neumann_values[qp].reinit(n_components);
+      }
   }
 
 
 
   /**
-   * Copy data from the local_face_integrals map of a single ParallelData
-   * object into a global such map. This is the copier stage of a WorkStream
-   * pipeline.
+   * Copy data from local_face_integrals (from one ParallelData object) into a
+   * global Table. This is the copier stage of a WorkStream pipeline.
    */
   template <int dim, int spacedim>
   void
   copy_local_to_global(
-    const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-                   std::vector<double>> &local_face_integrals,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>       &face_integrals)
+    const std::vector<std::tuple<unsigned int, unsigned int, double>>
+                     &local_face_integrals,
+    Table<2, double> &face_integrals)
   {
-    // now copy locally computed elements into the global map
-    for (typename std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-                           std::vector<double>>::const_iterator p =
-           local_face_integrals.begin();
-         p != local_face_integrals.end();
-         ++p)
+    for (const auto &[face_index, n, value] : local_face_integrals)
       {
-        // double check that the element does not already exists in the
-        // global map
-        Assert(face_integrals.find(p->first) == face_integrals.end(),
-               ExcInternalError());
-
-        for (unsigned int i = 0; i < p->second.size(); ++i)
-          {
-            Assert(numbers::is_finite(p->second[i]), ExcInternalError());
-            Assert(p->second[i] >= 0, ExcInternalError());
-          }
-
-        face_integrals[p->first] = p->second;
+        AssertIsFinite(value);
+        Assert(value >= 0, ExcInternalError());
+        Assert(std::isnan(face_integrals(face_index, n)), ExcInternalError());
+        face_integrals(face_index, n) = value;
       }
   }
 
@@ -333,16 +344,20 @@ namespace internal
    * ParallelData.
    */
   template <int dim, int spacedim, typename number>
-  std::vector<double>
+  void
   integrate_over_face(
     ParallelData<dim, spacedim, number>                     &parallel_data,
     const typename DoFHandler<dim, spacedim>::face_iterator &face,
-    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell)
+    dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
+    const double                             factor,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      &local_face_integrals)
   {
-    const unsigned int n_q_points = parallel_data.psi[0].size(),
-                       n_components =
-                         parallel_data.finite_element.n_components(),
-                       n_solution_vectors = parallel_data.psi.size();
+    const unsigned int n_solution_vectors = parallel_data.phi.size(0),
+                       n_q_points         = parallel_data.phi.size(1),
+                       n_components       = parallel_data.phi.size(2);
+    Assert(n_components == parallel_data.finite_element.n_components(),
+           ExcInternalError());
 
     // now psi contains the following:
     // - for an internal face, psi=[grad u]
@@ -361,8 +376,8 @@ namespace internal
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       for (unsigned int component = 0; component < n_components; ++component)
         for (unsigned int point = 0; point < n_q_points; ++point)
-          parallel_data.phi[n][point][component] =
-            (parallel_data.psi[n][point][component] *
+          parallel_data.phi(n, point, component) =
+            (parallel_data.psi(n, point)[component] *
              parallel_data.normal_vectors[point]);
 
     if (face->at_boundary() == false)
@@ -373,8 +388,8 @@ namespace internal
           for (unsigned int component = 0; component < n_components;
                ++component)
             for (unsigned int p = 0; p < n_q_points; ++p)
-              parallel_data.phi[n][p][component] +=
-                (parallel_data.neighbor_psi[n][p][component] *
+              parallel_data.phi(n, p, component) +=
+                (parallel_data.neighbor_psi(n, p)[component] *
                  parallel_data.neighbor_normal_vectors[p]);
       }
 
@@ -393,7 +408,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] *=
+                  parallel_data.phi(n, point, component) *=
                     parallel_data.coefficient_values1[point];
           }
         else
@@ -407,7 +422,7 @@ namespace internal
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] *=
+                  parallel_data.phi(n, point, component) *=
                     parallel_data.coefficient_values[point](component);
           }
       }
@@ -425,31 +440,30 @@ namespace internal
         // get the values of the boundary function at the quadrature points
         if (n_components == 1)
           {
-            std::vector<number> g(n_q_points);
             parallel_data.neumann_bc->find(boundary_id)
               ->second->value_list(fe_face_values_cell.get_present_fe_values()
                                      .get_quadrature_points(),
-                                   g);
+                                   parallel_data.neumann_values1);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int point = 0; point < n_q_points; ++point)
-                parallel_data.phi[n][point][0] -= g[point];
+                parallel_data.phi(n, point, 0) -=
+                  parallel_data.neumann_values1[point];
           }
         else
           {
-            std::vector<dealii::Vector<number>> g(
-              n_q_points, dealii::Vector<number>(n_components));
             parallel_data.neumann_bc->find(boundary_id)
               ->second->vector_value_list(fe_face_values_cell
                                             .get_present_fe_values()
                                             .get_quadrature_points(),
-                                          g);
+                                          parallel_data.neumann_values);
 
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               for (unsigned int component = 0; component < n_components;
                    ++component)
                 for (unsigned int point = 0; point < n_q_points; ++point)
-                  parallel_data.phi[n][point][component] -= g[point](component);
+                  parallel_data.phi(n, point, component) -=
+                    parallel_data.neumann_values[point](component);
           }
       }
 
@@ -461,20 +475,21 @@ namespace internal
     // each component being the mentioned value at one of the quadrature
     // points
 
-    parallel_data.JxW_values =
-      fe_face_values_cell.get_present_fe_values().get_JxW_values();
-
     // take the square of the phi[i] for integration, and sum up
-    std::vector<double> face_integral(n_solution_vectors, 0);
+    Assert(face->index() >= 0, ExcInternalError());
+    const auto &JxW_values =
+      fe_face_values_cell.get_present_fe_values().get_JxW_values();
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
-      for (unsigned int component = 0; component < n_components; ++component)
-        if (parallel_data.component_mask[component] == true)
-          for (unsigned int p = 0; p < n_q_points; ++p)
-            face_integral[n] += numbers::NumberTraits<number>::abs_square(
-                                  parallel_data.phi[n][p][component]) *
-                                parallel_data.JxW_values[p];
-
-    return face_integral;
+      {
+        double value = 0.0;
+        for (unsigned int component = 0; component < n_components; ++component)
+          if (parallel_data.component_mask[component] == true)
+            for (unsigned int p = 0; p < n_q_points; ++p)
+              value += numbers::NumberTraits<number>::abs_square(
+                         parallel_data.phi(n, p, component)) *
+                       JxW_values[p];
+        local_face_integrals.emplace_back(face->index(), n, value * factor);
+      }
   }
 
   /**
@@ -653,8 +668,8 @@ namespace internal
   integrate_over_regular_face(
     const ArrayView<const ReadVector<Number> *> &solutions,
     ParallelData<dim, spacedim, Number>         &parallel_data,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>               &local_face_integrals,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      &local_face_integrals,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     dealii::hp::FEFaceValues<dim, spacedim> &fe_face_values_cell,
@@ -672,11 +687,15 @@ namespace internal
 
     // get gradients of the finite element
     // function on this cell
+    parallel_data.cell_dofs.resize(cell->get_fe().n_dofs_per_cell());
+    cell->get_dof_indices(parallel_data.cell_dofs);
     for (unsigned int n = 0; n < n_solution_vectors; ++n)
       fe_face_values_cell.get_present_fe_values().get_function_gradients(
-        *solutions[n], parallel_data.psi[n]);
+        *solutions[n],
+        parallel_data.cell_dofs,
+        make_array_view(parallel_data.psi, n));
 
-    double factor;
+    double factor = std::numeric_limits<double>::signaling_NaN();
     // now compute over the other side of the face
     if (face->at_boundary() == false)
       // internal face; integrate jump of gradient across this face
@@ -707,12 +726,17 @@ namespace internal
                                                     fe_face_values_neighbor,
                                                     strategy);
 
+        parallel_data.neighbor_cell_dofs.resize(
+          neighbor->get_fe().n_dofs_per_cell());
+        neighbor->get_dof_indices(parallel_data.neighbor_cell_dofs);
         // get gradients on neighbor cell
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           {
             fe_face_values_neighbor.get_present_fe_values()
-              .get_function_gradients(*solutions[n],
-                                      parallel_data.neighbor_psi[n]);
+              .get_function_gradients(
+                *solutions[n],
+                parallel_data.neighbor_cell_dofs,
+                make_array_view(parallel_data.neighbor_psi, n));
           }
 
         parallel_data.neighbor_normal_vectors =
@@ -727,11 +751,8 @@ namespace internal
       }
 
     // now go to the generic function that does all the other things
-    local_face_integrals[face] =
-      integrate_over_face(parallel_data, face, fe_face_values_cell);
-
-    for (unsigned int i = 0; i < local_face_integrals[face].size(); ++i)
-      local_face_integrals[face][i] *= factor;
+    integrate_over_face(
+      parallel_data, face, fe_face_values_cell, factor, local_face_integrals);
   }
 
 
@@ -746,8 +767,8 @@ namespace internal
   integrate_over_irregular_face(
     const ArrayView<const ReadVector<Number> *> &solutions,
     ParallelData<dim, spacedim, Number>         &parallel_data,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>               &local_face_integrals,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      &local_face_integrals,
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
     const unsigned int                                              face_no,
     dealii::hp::FEFaceValues<dim, spacedim>    &fe_face_values,
@@ -774,7 +795,9 @@ namespace internal
     Assert(neighbor_neighbor < GeometryInfo<dim>::faces_per_cell,
            ExcInternalError());
 
-    // loop over all subfaces
+    // loop over all subfaces.
+    std::remove_reference_t<decltype(local_face_integrals)>
+      local_subface_integrals;
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
       {
@@ -805,46 +828,88 @@ namespace internal
                                                strategy);
 
         // store the gradient of the solution in psi
+        parallel_data.cell_dofs.resize(cell->get_fe().n_dofs_per_cell());
+        cell->get_dof_indices(parallel_data.cell_dofs);
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           fe_subface_values.get_present_fe_values().get_function_gradients(
-            *solutions[n], parallel_data.psi[n]);
+            *solutions[n],
+            parallel_data.cell_dofs,
+            make_array_view(parallel_data.psi, n));
 
         // store the gradient from the neighbor's side in @p{neighbor_psi}
+        parallel_data.neighbor_cell_dofs.resize(
+          neighbor_child->get_fe().n_dofs_per_cell());
+        neighbor_child->get_dof_indices(parallel_data.neighbor_cell_dofs);
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           fe_face_values.get_present_fe_values().get_function_gradients(
-            *solutions[n], parallel_data.neighbor_psi[n]);
+            *solutions[n],
+            parallel_data.neighbor_cell_dofs,
+            make_array_view(parallel_data.neighbor_psi, n));
 
         // call generic evaluate function
         parallel_data.neighbor_normal_vectors =
           fe_subface_values.get_present_fe_values().get_normal_vectors();
 
-        local_face_integrals[neighbor_child->face(neighbor_neighbor)] =
-          integrate_over_face(parallel_data, face, fe_face_values);
-        for (unsigned int i = 0;
-             i < local_face_integrals[neighbor_child->face(neighbor_neighbor)]
-                   .size();
-             i++)
-          local_face_integrals[neighbor_child->face(neighbor_neighbor)][i] *=
-            factor;
+        integrate_over_face(parallel_data,
+                            neighbor_child->face(neighbor_neighbor),
+                            fe_face_values,
+                            factor,
+                            local_subface_integrals);
+      }
+    // We need to sort by the row and column (face and vector indices) for
+    // sorted access in the next loop
+    auto index_less = [](const auto &a, const auto &b) {
+      return std::make_tuple(std::get<0>(a), std::get<1>(a)) <
+             std::make_tuple(std::get<0>(b), std::get<1>(b));
+    };
+    std::sort(local_subface_integrals.begin(),
+              local_subface_integrals.end(),
+              index_less);
+    if constexpr (running_in_debug_mode())
+      {
+        auto index_equal = [](const auto &a, const auto &b) {
+          return std::make_tuple(std::get<0>(a), std::get<1>(a)) ==
+                 std::make_tuple(std::get<0>(b), std::get<1>(b));
+        };
+        // We should not have two entries for the same subface
+        Assert(std::adjacent_find(local_subface_integrals.begin(),
+                                  local_subface_integrals.end(),
+                                  index_equal) == local_subface_integrals.end(),
+               ExcInternalError());
       }
 
     // finally loop over all subfaces to collect the contributions of the
-    // subfaces and store them with the parent face
-    std::vector<double> sum(n_solution_vectors, 0);
+    // subfaces and store them with the parent face.
+    //
+    // Rather than the usual 200, since this function is usually called with a
+    // single or O(1) input vectors, just use 20 as the default size
+    boost::container::small_vector<double, 20> sum(n_solution_vectors);
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
-      {
-        Assert(local_face_integrals.find(face->child(subface_no)) !=
-                 local_face_integrals.end(),
-               ExcInternalError());
-        Assert(local_face_integrals[face->child(subface_no)][0] >= 0,
-               ExcInternalError());
+      for (unsigned int n = 0; n < n_solution_vectors; ++n)
+        {
+          const auto subface_index = face->child(subface_no)->index();
+          const auto it =
+            std::lower_bound(local_subface_integrals.begin(),
+                             local_subface_integrals.end(),
+                             std::make_tuple(subface_index, n),
+                             [](const auto &a, const auto &b) {
+                               return std::make_tuple(std::get<0>(a),
+                                                      std::get<1>(a)) < b;
+                             });
+          Assert(it != local_subface_integrals.end() &&
+                   int(std::get<0>(*it)) == subface_index &&
+                   std::get<1>(*it) == n,
+                 ExcInternalError());
+          sum[n] += std::get<2>(*it);
+        }
 
-        for (unsigned int n = 0; n < n_solution_vectors; ++n)
-          sum[n] += local_face_integrals[face->child(subface_no)][n];
-      }
+    for (unsigned int n = 0; n < n_solution_vectors; ++n)
+      local_face_integrals.emplace_back(face->index(), n, sum[n]);
 
-    local_face_integrals[face] = sum;
+    local_face_integrals.insert(local_face_integrals.end(),
+                                local_subface_integrals.begin(),
+                                local_subface_integrals.end());
   }
 
 
@@ -858,9 +923,9 @@ namespace internal
   void
   estimate_one_cell(
     const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-    ParallelData<dim, spacedim, Number>         &parallel_data,
-    std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-             std::vector<double>>               &local_face_integrals,
+    ParallelData<dim, spacedim, Number> &parallel_data,
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+                                                &local_face_integrals,
     const ArrayView<const ReadVector<Number> *> &solutions,
     const typename KellyErrorEstimator<dim, spacedim>::Strategy strategy)
   {
@@ -905,8 +970,8 @@ namespace internal
             (parallel_data.neumann_bc->find(face->boundary_id()) ==
              parallel_data.neumann_bc->end()))
           {
-            local_face_integrals[face] =
-              std::vector<double>(n_solution_vectors, 0.);
+            for (unsigned int n = 0; n < n_solution_vectors; ++n)
+              local_face_integrals.emplace_back(face->index(), n, 0.0);
             continue;
           }
 
@@ -1239,14 +1304,9 @@ KellyErrorEstimator<dim, spacedim>::estimate(
            ExcDimensionMismatch(solutions[n]->size(), dof_handler.n_dofs()));
 
   const unsigned int n_solution_vectors = solutions.size();
-
-  // Map of integrals indexed by the corresponding face. In this map we store
-  // the integrated jump of the gradient for each face.  At the end of the
-  // function, we again loop over the cells and collect the contributions of
-  // the different faces of the cell.
-  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-           std::vector<double>>
-    face_integrals;
+  Table<2, double> face_integrals(dof_handler.get_triangulation().n_raw_faces(),
+                                  n_solution_vectors);
+  face_integrals.fill(std::numeric_limits<double>::quiet_NaN());
 
   // all the data needed in the error estimator by each of the threads is
   // gathered in the following structures
@@ -1261,8 +1321,7 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     &neumann_bc,
     component_mask,
     coefficients);
-  std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-           std::vector<double>>
+  std::vector<std::tuple<unsigned int, unsigned int, double>>
     sample_local_face_integrals;
 
   // now let's work on all those cells:
@@ -1273,14 +1332,14 @@ KellyErrorEstimator<dim, spacedim>::estimate(
     [&solutions, strategy](
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       internal::ParallelData<dim, spacedim, Number> &parallel_data,
-      std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-               std::vector<double>>                 &local_face_integrals) {
+      std::vector<std::tuple<unsigned int, unsigned int, double>>
+        &local_face_integrals) {
       internal::estimate_one_cell(
         cell, parallel_data, local_face_integrals, solutions, strategy);
     },
     [&face_integrals](
-      const std::map<typename DoFHandler<dim, spacedim>::face_iterator,
-                     std::vector<double>> &local_face_integrals) {
+      const std::vector<std::tuple<unsigned int, unsigned int, double>>
+        &local_face_integrals) {
       internal::copy_local_to_global<dim, spacedim>(local_face_integrals,
                                                     face_integrals);
     },
@@ -1312,21 +1371,17 @@ KellyErrorEstimator<dim, spacedim>::estimate(
         // loop over all faces of this cell
         for (const unsigned int face_no : cell->face_indices())
           {
-            Assert(face_integrals.find(cell->face(face_no)) !=
-                     face_integrals.end(),
-                   ExcInternalError());
             const double factor = internal::cell_factor<dim, spacedim>(
               cell, face_no, dof_handler, strategy);
 
+            const auto face_index = cell->face(face_no)->index();
             for (unsigned int n = 0; n < n_solution_vectors; ++n)
               {
-                // make sure that we have written a meaningful value into this
-                // slot
-                Assert(face_integrals[cell->face(face_no)][n] >= 0,
-                       ExcInternalError());
+                AssertIsFinite(face_integrals(face_index, n));
+                Assert(face_integrals(face_index, n) >= 0, ExcInternalError());
 
                 (*errors[n])(present_cell) +=
-                  (face_integrals[cell->face(face_no)][n] * factor);
+                  (face_integrals(face_index, n) * factor);
               }
           }
 

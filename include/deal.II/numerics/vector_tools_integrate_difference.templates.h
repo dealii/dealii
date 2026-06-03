@@ -65,6 +65,13 @@ namespace VectorTools
         tmp_vector_gradients;
 
       dealii::hp::FEValues<dim, spacedim> x_fe_values;
+
+      unsigned int n_q_points;
+      unsigned int n_components;
+
+      Vector<double>                           weights_exemplar;
+      Vector<Number>                           values_exemplar;
+      std::vector<Tensor<1, spacedim, Number>> values_exemplar_vector;
     };
 
 
@@ -75,6 +82,8 @@ namespace VectorTools
       const dealii::hp::QCollection<dim>                 &q,
       const UpdateFlags                                   update_flags)
       : x_fe_values(mapping, fe, q, update_flags)
+      , n_q_points(0)
+      , n_components(0)
     {}
 
     template <int dim, int spacedim, typename Number>
@@ -92,23 +101,32 @@ namespace VectorTools
       const unsigned int n_q_points,
       const unsigned int n_components)
     {
-      function_values.resize(n_q_points, Vector<Number>(n_components));
-      function_grads.resize(
-        n_q_points, std::vector<Tensor<1, spacedim, Number>>(n_components));
+      if (this->n_q_points == n_q_points && this->n_components == n_components)
+        return;
+
+      this->n_q_points = n_q_points;
+      if (this->n_components != n_components)
+        {
+          this->n_components = n_components;
+          weights_exemplar.reinit(n_components);
+          values_exemplar.reinit(n_components);
+          values_exemplar_vector.resize(n_components);
+        }
+
+      function_values.resize(n_q_points, values_exemplar);
+      function_grads.resize(n_q_points, values_exemplar_vector);
 
       weight_values.resize(n_q_points);
-      weight_vectors.resize(n_q_points, Vector<double>(n_components));
+      weight_vectors.resize(n_q_points, weights_exemplar);
 
-      psi_values.resize(n_q_points, Vector<Number>(n_components));
-      psi_grads.resize(n_q_points,
-                       std::vector<Tensor<1, spacedim, Number>>(n_components));
+      psi_values.resize(n_q_points, values_exemplar);
+      psi_grads.resize(n_q_points, values_exemplar_vector);
       psi_scalar.resize(n_q_points);
 
       tmp_values.resize(n_q_points);
-      tmp_vector_values.resize(n_q_points, Vector<Number>(n_components));
+      tmp_vector_values.resize(n_q_points, values_exemplar);
       tmp_gradients.resize(n_q_points);
-      tmp_vector_gradients.resize(
-        n_q_points, std::vector<Tensor<1, spacedim, Number>>(n_components));
+      tmp_vector_gradients.resize(n_q_points, values_exemplar_vector);
     }
 
     namespace internal

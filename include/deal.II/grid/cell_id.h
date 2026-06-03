@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2013 - 2023 by the deal.II authors
+// Copyright (C) 2013 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -22,10 +22,6 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
-
-#ifdef DEAL_II_WITH_P4EST
-#  include <deal.II/distributed/p4est_wrappers.h>
-#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -70,12 +66,9 @@ class CellId
 public:
   /**
    * A type that is used to encode the CellId data in a compact and fast way
-   * (e.g. for MPI transfer to other processes). Note that it limits the
-   * number of children that can be transferred to 20 in 3d and 30 in 2d
-   * (using 2 times 32 bit for storage), a limitation that is identical to
-   * the one used by p4est.
+   * (e.g. for MPI transfer to other processes).
    */
-  using binary_type = std::array<unsigned int, 4>;
+  using binary_type = std::array<std::uint64_t, 3>;
 
   /**
    * Construct a CellId object with a given @p coarse_cell_id and vector of
@@ -213,23 +206,20 @@ private:
    * The number of child indices stored in the child_indices array. This is
    * equivalent to (level-1) of the current cell.
    */
-  unsigned int n_child_indices;
+  std::uint8_t n_child_indices;
 
   /**
-   * An array of integers that denotes which child to pick from one
-   * refinement level to the next, starting with the coarse cell,
-   * until we get to the cell represented by the current object.
-   * Only the first n_child_indices entries are used, but we use a statically
-   * allocated array instead of a vector of size n_child_indices to speed up
-   * creation of this object. If the given dimensions ever become a limitation
-   * the array can be extended.
+   * An array of integers that denotes which child to pick from one refinement
+   * level to the next, starting with the coarse cell, until we get to the cell
+   * represented by the current object. Only the first n_child_indices entries
+   * are used, but we use a statically allocated array instead of a vector of
+   * size n_child_indices to speed up creation of this object. If the given
+   * dimensions ever become a limitation the array can be extended.
+   *
+   * @note Since this array stores child indices, it does not need to store a
+   * child index on the finest level, so its size is decremented by 1.
    */
-#ifdef DEAL_II_WITH_P4EST
-  std::array<std::uint8_t, internal::p4est::functions<2>::max_level>
-    child_indices;
-#else
-  std::array<std::uint8_t, 30> child_indices;
-#endif
+  std::array<std::uint8_t, numbers::max_n_levels - 1> child_indices;
 
   friend std::istream &
   operator>>(std::istream &is, CellId &cid);
@@ -245,8 +235,8 @@ private:
 inline std::ostream &
 operator<<(std::ostream &os, const CellId &cid)
 {
-  os << cid.coarse_cell_id << '_' << cid.n_child_indices << ':';
-  for (unsigned int i = 0; i < cid.n_child_indices; ++i)
+  os << cid.coarse_cell_id << '_' << int(cid.n_child_indices) << ':';
+  for (std::uint8_t i = 0; i < cid.n_child_indices; ++i)
     // write the child indices. because they are between 0 and 2^dim-1, they all
     // just have one digit, so we could write them as one character
     // objects. it's probably clearer to write them as one-digit characters
@@ -275,7 +265,7 @@ CellId::serialize(Archive &ar, const unsigned int /*version*/)
 inline std::istream &
 operator>>(std::istream &is, CellId &cid)
 {
-  unsigned int cellid;
+  types::coarse_cell_id cellid = numbers::invalid_coarse_cell_id;
   is >> cellid;
   if (is.eof())
     return is;
@@ -284,12 +274,16 @@ operator>>(std::istream &is, CellId &cid)
   char dummy;
   is >> dummy;
   Assert(dummy == '_', ExcMessage("invalid CellId"));
-  is >> cid.n_child_indices;
+  unsigned int n_child_indices;
+  is >> n_child_indices;
+  Assert(n_child_indices < cid.child_indices.size(),
+         ExcMessage("invalid CellId"));
+  cid.n_child_indices = static_cast<std::uint8_t>(n_child_indices);
   is >> dummy;
   Assert(dummy == ':', ExcMessage("invalid CellId"));
 
   unsigned char value;
-  for (unsigned int i = 0; i < cid.n_child_indices; ++i)
+  for (std::uint8_t i = 0; i < cid.n_child_indices; ++i)
     {
       // read the one-digit child index (as an integer number) and
       // convert it back into unsigned integer type
@@ -309,7 +303,7 @@ CellId::operator==(const CellId &other) const
   if (n_child_indices != other.n_child_indices)
     return false;
 
-  for (unsigned int i = 0; i < n_child_indices; ++i)
+  for (std::uint8_t i = 0; i < n_child_indices; ++i)
     if (child_indices[i] != other.child_indices[i])
       return false;
 
@@ -332,7 +326,7 @@ CellId::operator<(const CellId &other) const
   if (this->coarse_cell_id != other.coarse_cell_id)
     return this->coarse_cell_id < other.coarse_cell_id;
 
-  unsigned int idx = 0;
+  std::uint8_t idx = 0;
   while (idx < n_child_indices)
     {
       if (idx >= other.n_child_indices)
@@ -378,7 +372,7 @@ CellId::is_ancestor_of(const CellId &other) const
   if (n_child_indices >= other.n_child_indices)
     return false;
 
-  for (unsigned int idx = 0; idx < n_child_indices; ++idx)
+  for (std::uint8_t idx = 0; idx < n_child_indices; ++idx)
     if (child_indices[idx] != other.child_indices[idx])
       return false;
 
@@ -398,7 +392,7 @@ CellId::get_coarse_cell_id() const
 inline ArrayView<const std::uint8_t>
 CellId::get_child_indices() const
 {
-  return {child_indices.data(), n_child_indices};
+  return {child_indices.data(), std::size_t(n_child_indices)};
 }
 
 

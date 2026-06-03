@@ -585,7 +585,7 @@ namespace internal
         }
 
       if (t < 1.0)
-        u = t;
+        u = std::move(t);
       else
         u = t * t;
 

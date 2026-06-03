@@ -1,0 +1,47 @@
+
+DEAL::
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A()
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::A::A(const A&)
+DEAL:A::vec[0] = {}
+DEAL:A::vec[1] = {}
+DEAL:A::vec[2] = {}
+DEAL:A::caught correct exception
+DEAL:A::const versions:
+DEAL:A::vec[0] = {}
+DEAL:A::vec[1] = {}
+DEAL:A::vec[2] = {}
+DEAL:A::caught correct exception
+DEAL:A::ctors = 6 dtors = 0
+DEAL:A::
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL:A::A::~A()
+DEAL::
+DEAL:int::vec[0] = -11
+DEAL:int::vec[1] = -10
+DEAL:int::vec[2] = -9
+DEAL:int::caught correct exception
+DEAL:int::const versions:
+DEAL:int::vec[0] = -11
+DEAL:int::vec[1] = -10
+DEAL:int::vec[2] = -9
+DEAL:int::caught correct exception
+DEAL:int::
+DEAL::
+DEAL:vector<int>::vec[0] = 1 1 2
+DEAL:vector<int>::vec[1] = 42
+DEAL:vector<int>::vec[2] = 3 5
+DEAL:vector<int>::caught correct exception
+DEAL:vector<int>::const versions:
+DEAL:vector<int>::vec[0] = 1 1 2
+DEAL:vector<int>::vec[1] = 42
+DEAL:vector<int>::vec[2] = 3 5
+DEAL:vector<int>::caught correct exception
+DEAL:vector<int>::

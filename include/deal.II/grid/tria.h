@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 1998 - 2025 by the deal.II authors
+// Copyright (C) 1998 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -326,6 +326,70 @@ namespace internal
       template <class Archive>
       void
       serialize(Archive &ar, const unsigned int version);
+    };
+
+    /**
+     * @brief Strides of various arrays in a Triangulation.
+     *
+     * The implementation of a Triangulation contains many arrays of subcell
+     * data, such as face orientations, neighbors, and the vertex index cache.
+     * For simplicity, we index those arrays by the largest stride required by
+     * all present ReferenceCell objects: e.g., if the only ReferenceCell is
+     * ReferenceCells::Tetrahedron then we only need to store 4 face
+     * orientations per cell (and thus the stride is 4), whereas if the
+     * Triangulation contains a Hexahedron then we store 6 per cell (and, for
+     * all cells, the stride is 6).
+     *
+     * @note Since refining a ReferenceCell produces the same ReferenceCell
+     * (except for ReferenceCells::Pyramid, which produces
+     * ReferenceCells::Tetrahedron and ReferenceCells::Pyramid), these strides
+     * only need to be set on level 0 and do not need to be updated during
+     * refinement (as a ReferenceCells::Tetrahedron has fewer vertices, lines,
+     * and faces then a ReferenceCells::Pyramid).
+     */
+    template <int dim>
+    struct Strides
+    {
+      /**
+       * Default constructor. Sets all fields to invalid values.
+       */
+      Strides();
+
+      /**
+       * Constructor. Sets all fields to the maximum values over all
+       * ReferenceCell objects.
+       */
+      Strides(const std::vector<ReferenceCell<dim>> &reference_cells);
+
+      /**
+       * Maximum number of children per cell.
+       */
+      unsigned int max_children_per_cell;
+
+      /**
+       * Maximum number of faces per cell.
+       */
+      unsigned int max_faces_per_cell;
+
+      /**
+       * Maximum number of lines per cell.
+       */
+      unsigned int max_lines_per_cell;
+
+      /**
+       * Maximum number of vertices per cell.
+       */
+      unsigned int max_vertices_per_cell;
+
+      /**
+       * Maximum number of vertices per cell.
+       */
+      unsigned int max_children_per_face;
+
+      /**
+       * Maximum number of vertices per cell.
+       */
+      unsigned int max_lines_per_face;
     };
   } // namespace TriangulationImplementation
 
@@ -3990,6 +4054,11 @@ public:
    *
    * @ingroup Exceptions
    */
+  DeclExceptionMsg(ExcTooManyLevels,
+                   "The provided refinement pattern requires creating a level "
+                   "in the Triangulation. However, the maximum number of "
+                   "levels has already been reached, so that is not allowed.");
+
   DeclException2(ExcInvalidLevel,
                  int,
                  int,
@@ -4058,6 +4127,11 @@ protected:
    * (also in the distributed case).
    */
   std::vector<ReferenceCell<dim>> reference_cells;
+
+  /**
+   * Strides of non-cell arrays stored by TriaLevel, TriaFaces, etc.
+   */
+  internal::TriangulationImplementation::Strides<dim> strides;
 
   /**
    * Write a bool vector to the given stream, writing a pre- and a postfix
@@ -4648,7 +4722,6 @@ namespace internal
       ar &n_hexes        &n_hexes_level;
       ar &n_active_hexes &n_active_hexes_level;
     }
-
   } // namespace TriangulationImplementation
 } // namespace internal
 
@@ -4710,6 +4783,7 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 
   unsigned int n_levels = levels.size();
   ar          &n_levels;
+  Assert(n_levels <= numbers::max_n_levels, ExcInternalError());
   for (const auto &level : levels)
     ar &level;
 
@@ -4751,10 +4825,13 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   ar &smooth_grid;
 
   ar &reference_cells;
+  strides =
+    internal::TriangulationImplementation::Strides<dim>(reference_cells);
 
-  unsigned int size;
-  ar          &size;
-  levels.resize(size);
+  unsigned int n_levels;
+  ar          &n_levels;
+  Assert(n_levels <= numbers::max_n_levels, ExcInternalError());
+  levels.resize(n_levels);
   for (auto &level_ : levels)
     {
       std::unique_ptr<

@@ -103,7 +103,7 @@ main(int argc, char *argv[])
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   MPILogInitAll                    all;
 
-  const int      n_refinements = 3;
+  const int      n_refinements = 2;
   const MPI_Comm comm          = MPI_COMM_WORLD;
 
   {

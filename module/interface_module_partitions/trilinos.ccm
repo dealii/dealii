@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2025 by the deal.II authors
+// Copyright (C) 2025 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -121,11 +121,13 @@ module;
 #    include <Tpetra_Vector_fwd.hpp>
 #    include <Tpetra_Version.hpp>
 
-#    ifdef DEAL_II_TRILINOS_WITH_AMESOS2
+#    if defined(DEAL_II_TRILINOS_WITH_AMESOS2) && \
+      defined(DEAL_II_TRILINOS_WITH_TPETRA)
 #      include <Amesos2.hpp>
 #    endif
 
-#    ifdef DEAL_II_TRILINOS_WITH_IFPACK2
+#    if defined(DEAL_II_TRILINOS_WITH_IFPACK2) && \
+      defined(DEAL_II_TRILINOS_WITH_TPETRA)
 #      include <Ifpack2_Factory.hpp>
 #      include <Ifpack2_IdentitySolver.hpp>
 #      include <Ifpack2_IdentitySolver_decl.hpp>
@@ -182,7 +184,8 @@ export
   using ::operator<<;
 
 #  if defined(DEAL_II_TRILINOS_WITH_AMESOS2) && \
-    DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+    DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0) &&   \
+    defined(DEAL_II_TRILINOS_WITH_TPETRA)
   namespace Amesos2
   {
     using ::Amesos2::create;
@@ -208,7 +211,8 @@ export
   {
     using ::EpetraExt::MatrixMatrix;
   }
-#  ifdef DEAL_II_TRILINOS_WITH_IFPACK2
+#  if defined(DEAL_II_TRILINOS_WITH_IFPACK2) && \
+    defined(DEAL_II_TRILINOS_WITH_TPETRA)
   namespace Ifpack2
   {
     using ::Ifpack2::Factory;

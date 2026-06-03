@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 1999 - 2025 by the deal.II authors
+// Copyright (C) 1999 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -1895,9 +1895,12 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
       // elements onto the back.
       //
       // In any case, we adjust vertex indices right after reading them based on
-      // the starting index read above
-      std::vector<unsigned int> vertices_for_this_element(
-        n_vertices_per_element);
+      // the starting index read above. As ReferenceCells::max_n_vertices<dim>()
+      // > ReferenceCells::max_n_vertices<dim - 1>(), we can use this vector for
+      // cell, face, and line vertices.
+      std_cxx26::inplace_vector<unsigned int,
+                                ReferenceCells::max_n_vertices<dim>()>
+        vertices_for_this_element(n_vertices_per_element);
       for (unsigned int e = 0; e < n_elements; ++e)
         {
           AssertThrow(whole_file.fail() == false, ExcIO());
@@ -1929,8 +1932,9 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               else
                 {
                   subcelldata.boundary_quads.emplace_back();
-                  subcelldata.boundary_quads.back().vertices =
-                    vertices_for_this_element;
+                  subcelldata.boundary_quads.back().vertices.assign(
+                    vertices_for_this_element.begin(),
+                    vertices_for_this_element.end());
                 }
             }
           else if (object_name == "edg")
@@ -1943,8 +1947,9 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               else
                 {
                   subcelldata.boundary_lines.emplace_back();
-                  subcelldata.boundary_lines.back().vertices =
-                    vertices_for_this_element;
+                  subcelldata.boundary_lines.back().vertices.assign(
+                    vertices_for_this_element.begin(),
+                    vertices_for_this_element.end());
                 }
             }
           else if (object_name == "vtx")
@@ -2116,27 +2121,27 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                   // In 3d, we need to look things up in the boundary_quads
                   // structure (which also stores boundary triangles) as well as
                   // for the edges
-                  std::vector<unsigned int> face_vertex_indices(
-                    face->n_vertices());
+                  std_cxx26::inplace_vector<unsigned int,
+                                            ReferenceCells::max_n_vertices<2>()>
+                    face_vertex_indices(face->n_vertices());
                   for (unsigned int v = 0; v < face->n_vertices(); ++v)
                     face_vertex_indices[v] = face->vertex_index(v);
                   std::sort(face_vertex_indices.begin(),
                             face_vertex_indices.end());
 
                   // See if we can find a face with these indices:
-                  const auto p =
-                    std::lower_bound(subcelldata.boundary_quads.begin(),
-                                     subcelldata.boundary_quads.end(),
-                                     face_vertex_indices,
-                                     [](const CellData<2> &a,
-                                        const std::vector<unsigned int>
-                                          &face_vertex_indices) -> bool {
-                                       return std::lexicographical_compare(
-                                         a.vertices.begin(),
-                                         a.vertices.end(),
-                                         face_vertex_indices.begin(),
-                                         face_vertex_indices.end());
-                                     });
+                  const auto p = std::lower_bound(
+                    subcelldata.boundary_quads.begin(),
+                    subcelldata.boundary_quads.end(),
+                    face_vertex_indices,
+                    [](const CellData<2> &a,
+                       const auto        &face_vertex_indices) -> bool {
+                      return std::lexicographical_compare(
+                        a.vertices.begin(),
+                        a.vertices.end(),
+                        face_vertex_indices.begin(),
+                        face_vertex_indices.end());
+                    });
 
                   if ((p != subcelldata.boundary_quads.end()) &&
                       (p->vertices == face_vertex_indices))
@@ -2984,11 +2989,10 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
   std::vector<std::pair<int, int>> entities;
   gmsh::model::getEntities(entities);
 
-  for (const auto &e : entities)
+  for (const auto &[entity_dim, entity_tag] : entities)
     {
       // Dimension and tag of the entity:
-      const int &entity_dim = e.first;
-      const int &entity_tag = e.second;
+
 
       types::manifold_id manifold_id = numbers::flat_manifold_id;
       types::boundary_id boundary_id = 0;
@@ -3017,10 +3021,8 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
                     bool found_boundary_id      = false;
                     // If the above did not throw, we keep going, and retrieve
                     // all the information that we know how to translate.
-                    for (const auto &it : id_names)
+                    for (const auto &[name, id] : id_names)
                       {
-                        const auto &name = it.first;
-                        const auto &id   = it.second;
                         if (entity_dim == dim && name == "MaterialID")
                           {
                             boundary_id = static_cast<types::boundary_id>(id);
@@ -3345,8 +3347,8 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                                          entity_dim,
                                          entity_tag);
 
-          for (unsigned int i = 0; i < count_element_ids.size(); ++i)
-            total_volume_elements += count_element_ids[i].size();
+          for (const auto &count_element_id : count_element_ids)
+            total_volume_elements += count_element_id.size();
         }
     }
 

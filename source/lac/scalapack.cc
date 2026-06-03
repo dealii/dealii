@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2017 - 2025 by the deal.II authors
+// Copyright (C) 2017 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -11,26 +11,23 @@
 // -----------------------------------------------------------------------------
 
 
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
+
 #include <deal.II/lac/scalapack.h>
+#include <deal.II/lac/scalapack.templates.h>
 
-#ifdef DEAL_II_WITH_SCALAPACK
+#ifdef DEAL_II_WITH_HDF5
+#  include <hdf5.h>
+#endif
 
-#  include <deal.II/base/array_view.h>
-#  include <deal.II/base/mpi.h>
-#  include <deal.II/base/mpi.templates.h>
-
-#  include <deal.II/lac/scalapack.templates.h>
-
-#  ifdef DEAL_II_WITH_HDF5
-#    include <hdf5.h>
-#  endif
-
-#  include <limits>
-#  include <memory>
+#include <limits>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
-#  ifdef DEAL_II_WITH_HDF5
+#ifdef DEAL_II_WITH_HDF5
 
 template <typename number>
 inline hid_t
@@ -70,7 +67,7 @@ hdf5_type_id(const char *)
 {
   return H5T_NATIVE_CHAR;
 }
-#  endif // DEAL_II_WITH_HDF5
+#endif // DEAL_II_WITH_HDF5
 
 
 
@@ -128,7 +125,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
   , submatrix_row(1)
   , submatrix_column(1)
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)process_grid;
   (void)row_block_size;
@@ -137,7 +134,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
     false,
     ExcMessage(
       "This function is only available when deal.II is configured with HDF5"));
-#  else
+#else
 
   const unsigned int this_mpi_process(
     Utilities::MPI::this_mpi_process(process_grid->mpi_communicator));
@@ -204,7 +201,7 @@ ScaLAPACKMatrix<NumberType>::ScaLAPACKMatrix(
 
   load(filename.c_str());
 
-#  endif // DEAL_II_WITH_HDF5
+#endif // DEAL_II_WITH_HDF5
 }
 
 
@@ -2547,7 +2544,7 @@ ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
 
 
 
-#  ifdef DEAL_II_WITH_HDF5
+#ifdef DEAL_II_WITH_HDF5
 namespace internal
 {
   namespace
@@ -2610,7 +2607,7 @@ namespace internal
     }
   } // namespace
 } // namespace internal
-#  endif
+#endif
 
 
 
@@ -2620,11 +2617,11 @@ ScaLAPACKMatrix<NumberType>::save(
   const std::string                           &filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)chunk_size;
   AssertThrow(false, ExcNeedsHDF5());
-#  else
+#else
 
   std::pair<unsigned int, unsigned int> chunks_size_ = chunk_size;
 
@@ -2642,16 +2639,16 @@ ScaLAPACKMatrix<NumberType>::save(
          ExcMessage("The column chunk size must be larger than 0."));
   AssertIndexRange(chunks_size_.second, n_columns + 1);
 
-#    ifdef H5_HAVE_PARALLEL
+#  ifdef H5_HAVE_PARALLEL
   // implementation for configurations equipped with a parallel file system
   save_parallel(filename, chunks_size_);
 
-#    else
+#  else
   // implementation for configurations with no parallel file system
   save_serial(filename, chunks_size_);
 
-#    endif
 #  endif
+#endif
 }
 
 
@@ -2662,11 +2659,11 @@ ScaLAPACKMatrix<NumberType>::save_serial(
   const std::string                           &filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)chunk_size;
   DEAL_II_ASSERT_UNREACHABLE();
-#  else
+#else
 
   /*
    * The content of the distributed matrix is copied to a matrix using a 1x1
@@ -2808,7 +2805,7 @@ ScaLAPACKMatrix<NumberType>::save_serial(
       status = H5Fclose(file_id);
       AssertThrow(status >= 0, ExcIO());
     }
-#  endif
+#endif
 }
 
 
@@ -2819,11 +2816,11 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
   const std::string                           &filename,
   const std::pair<unsigned int, unsigned int> &chunk_size) const
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
   (void)filename;
   (void)chunk_size;
   DEAL_II_ASSERT_UNREACHABLE();
-#  else
+#else
 
   const unsigned int n_mpi_processes(
     Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator));
@@ -3044,7 +3041,7 @@ ScaLAPACKMatrix<NumberType>::save_parallel(
       AssertThrow(status >= 0, ExcIO());
     }
 
-#  endif
+#endif
 }
 
 
@@ -3053,19 +3050,19 @@ template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::load(const std::string &filename)
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
   (void)filename;
   AssertThrow(false, ExcNeedsHDF5());
-#  else
-#    ifdef H5_HAVE_PARALLEL
+#else
+#  ifdef H5_HAVE_PARALLEL
   // implementation for configurations equipped with a parallel file system
   load_parallel(filename);
 
-#    else
+#  else
   // implementation for configurations with no parallel file system
   load_serial(filename);
-#    endif
 #  endif
+#endif
 }
 
 
@@ -3074,10 +3071,10 @@ template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
   (void)filename;
   DEAL_II_ASSERT_UNREACHABLE();
-#  else
+#else
 
   /*
    * The content of the distributed matrix is copied to a matrix using a 1x1
@@ -3243,7 +3240,7 @@ ScaLAPACKMatrix<NumberType>::load_serial(const std::string &filename)
 
   tmp.copy_to(*this);
 
-#  endif // DEAL_II_WITH_HDF5
+#endif // DEAL_II_WITH_HDF5
 }
 
 
@@ -3252,14 +3249,14 @@ template <typename NumberType>
 void
 ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
 {
-#  ifndef DEAL_II_WITH_HDF5
+#ifndef DEAL_II_WITH_HDF5
+  (void)filename;
+  DEAL_II_ASSERT_UNREACHABLE();
+#else
+#  ifndef H5_HAVE_PARALLEL
   (void)filename;
   DEAL_II_ASSERT_UNREACHABLE();
 #  else
-#    ifndef H5_HAVE_PARALLEL
-  (void)filename;
-  DEAL_II_ASSERT_UNREACHABLE();
-#    else
 
   const unsigned int n_mpi_processes(
     Utilities::MPI::n_mpi_processes(this->grid->mpi_communicator));
@@ -3453,8 +3450,8 @@ ScaLAPACKMatrix<NumberType>::load_parallel(const std::string &filename)
   // copying the distributed matrices
   tmp.copy_to(*this);
 
-#    endif // H5_HAVE_PARALLEL
-#  endif   // DEAL_II_WITH_HDF5
+#  endif // H5_HAVE_PARALLEL
+#endif   // DEAL_II_WITH_HDF5
 }
 
 
@@ -3525,9 +3522,7 @@ ScaLAPACKMatrix<NumberType>::scale_rows(const InputVector &factors)
 
 
 // instantiations
-#  include "lac/scalapack.inst"
+#include "lac/scalapack.inst"
 
 
 DEAL_II_NAMESPACE_CLOSE
-
-#endif // DEAL_II_WITH_SCALAPACK

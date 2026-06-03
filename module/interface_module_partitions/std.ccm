@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2025 by the deal.II authors
+// Copyright (C) 2025 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -316,8 +316,14 @@ export
     using std::reverse_iterator;
 
 #ifdef DEAL_II_HAVE_CXX23
+    // When using clang++-23 with the GCC 12 standard library, one can
+    // compile modules but because the GCC standard library is so
+    // old, it doesn't yet have a full complement of C++23 ranges
+    // functionality. Check for that with the requisite feature macro.
+#  if __cpp_lib_containers_ranges >= 202202L
     using std::from_range;
     using std::from_range_t;
+#  endif
 #endif
 
     namespace ranges
@@ -406,12 +412,10 @@ export
     using std::isalnum;
     using std::isdigit;
     using std::match_results;
-    using std::printf;
     using std::regex;
     using std::regex_match;
     using std::regex_replace;
     using std::regex_search;
-    using std::snprintf;
     using std::sscanf;
     using std::stod;
     using std::stoi;

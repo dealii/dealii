@@ -1411,6 +1411,14 @@ namespace ReferenceCells
       std::numeric_limits<std::uint8_t>::max());
 
   /**
+   * Returns a vector containing all available reference cells of dimension
+   * `dim`.
+   */
+  template <int dim>
+  constexpr const std::vector<ReferenceCell<dim>>
+  get_reference_cells_in_dim();
+
+  /**
    * Return the correct simplex reference cell type for the given dimension
    * `dim`. Depending on the template argument `dim`, this function returns a
    * reference to either Vertex, Line, Triangle, or Tetrahedron.
@@ -1429,6 +1437,14 @@ namespace ReferenceCells
   get_hypercube();
 
   /**
+   * Return the number of different Reference Cells that are available for
+   * dimension `dim`.
+   */
+  template <int dim>
+  constexpr unsigned int
+  n_reference_cells_in_dim();
+
+  /**
    * Given the number of vertices a reference cell has (provided as
    * a function argument), and the dimension the reference cell lives in
    * (provided as a template argument), return the ReferenceCell object
@@ -1443,7 +1459,6 @@ namespace ReferenceCells
   template <int dim>
   ReferenceCell<dim>
   n_vertices_to_reference_cell(const unsigned int n_vertices);
-
 
   /**
    * Return the maximum number of vertices an object of dimension `structdim`
@@ -3408,6 +3423,29 @@ ReferenceCell<dim>::standard_to_real_face_line(
 namespace ReferenceCells
 {
   template <int dim>
+  constexpr const std::vector<ReferenceCell<dim>>
+  get_reference_cells_in_dim()
+  {
+    if constexpr (dim == 0)
+      return {{ReferenceCells::Vertex}};
+    else if constexpr (dim == 1)
+      return {{ReferenceCells::Line}};
+    else if constexpr (dim == 2)
+      return {{ReferenceCells::Triangle, ReferenceCells::Quadrilateral}};
+    else if constexpr (dim == 3)
+      return {{ReferenceCells::Tetrahedron,
+               ReferenceCells::Pyramid,
+               ReferenceCells::Wedge,
+               ReferenceCells::Hexahedron}};
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+
+    return {};
+  }
+
+
+
+  template <int dim>
   inline constexpr const ReferenceCell<dim> &
   get_simplex()
   {
@@ -3442,6 +3480,23 @@ namespace ReferenceCells
     else
       DEAL_II_NOT_IMPLEMENTED();
     return ReferenceCells::Invalid<dim>;
+  }
+
+
+
+  template <int dim>
+  inline constexpr unsigned int
+  n_reference_cells_in_dim()
+  {
+    if constexpr (dim == 0 || dim == 1)
+      return 1; // Vertex or Line
+    else if (dim == 2)
+      return 2; // Quad and Tri
+    else if (dim == 3)
+      return 4; // Tet, Pyramid, Wedge and Hex
+    else
+      DEAL_II_NOT_IMPLEMENTED();
+    return 0;
   }
 
 
