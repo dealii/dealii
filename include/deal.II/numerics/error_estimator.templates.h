@@ -138,7 +138,7 @@ namespace internal
      * presence of multiple threads where synchronization makes things even
      * slower.
      */
-    Table<3, double> phi;
+    Table<3, number> phi;
 
     /**
      * A vector for the gradients of the finite element function on one cell
