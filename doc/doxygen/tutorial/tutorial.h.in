@@ -731,6 +731,12 @@
  *       <td> Application of the Discontinuous Petrov-Galerkin method to the solution of the time-harmonic Helholtz equation.
  *       <br/> Keywords: FE_FaceQ, FE_TraceQ, FE_RaviartThomas, FE_DGQ
  *       </td></tr>
+ *
+ *   <tr valign="top">
+ *       <td>step-104</td>
+ *       <td> Portable matrix-free Stokes solver on the GPUs.
+ *       <br/> Keywords: Portable::MatrixFree, Kokkos, GPUs
+ *       </td></tr>
  * </table>
  *
  *
@@ -820,7 +826,8 @@
  *       step-56,
  *       step-57,
  *       step-60,
- *       step-70
+ *       step-70,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -881,7 +888,8 @@
  *     <td> Parallelization via Kokkos and MPI
  *     </td>
  *     <td>
- *       step-64
+ *       step-64,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -901,7 +909,8 @@
  *       step-69,
  *       step-70,
  *       step-75,
- *       step-86
+ *       step-86,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -1059,7 +1068,8 @@
  *       step-75,
  *       step-76,
  *       step-89,
- *       step-95
+ *       step-95,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -1161,7 +1171,8 @@
  *       step-59,
  *       step-63,
  *       step-66,
- *       step-75
+ *       step-75,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -1198,7 +1209,8 @@
  *       step-56,
  *       step-57,
  *       step-60,
- *       step-70
+ *       step-70,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -1335,7 +1347,8 @@
  *       step-55,
  *       step-56,
  *       step-57,
- *       step-70
+ *       step-70,
+ *       step-104
  *     </td>
  *   </tr>
  *
@@ -1455,7 +1468,8 @@
  *         step-55,
  *         step-56,
  *         step-57,
- *         step-70
+ *         step-70,
+ *         step-104
  *    </td>
  *   </tr>
  *
