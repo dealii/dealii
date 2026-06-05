@@ -746,10 +746,8 @@ namespace WorkStream
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
         tf::Taskflow  taskflow;
 
-        using ScratchDataList = std::list<ScratchDataObject<ScratchData>>;
-
-        Threads::ThreadLocalStorage<ScratchDataList>
-          thread_safe_scratch_data_list;
+        Threads::ThreadLocalStorage<std::deque<ScratchDataObject<ScratchData>>>
+          thread_safe_scratch_datas;
 
         tf::Task last_copier;
 
@@ -800,21 +798,20 @@ namespace WorkStream
                 .emplace([chunk,
                           idx,
                           chunk_counter,
-                          &thread_safe_scratch_data_list,
+                          &thread_safe_scratch_datas,
                           &sample_scratch_data,
                           &sample_copy_data,
                           &copy_chunks,
                           &worker]() {
                   ScratchData *scratch_data = nullptr;
 
-                  ScratchDataList &scratch_data_list =
-                    thread_safe_scratch_data_list.get();
+                  auto &scratch_datas = thread_safe_scratch_datas.get();
                   // We need to find an unused scratch data object in the list
                   // that corresponds to the current thread and then mark it as
                   // used. if we can't find one, create one. There is no need to
                   // synchronize access to this variable using a mutex since
                   // each object is local to its own thread.
-                  for (auto &p : scratch_data_list)
+                  for (auto &p : scratch_datas)
                     {
                       if (p.currently_in_use == false)
                         {
@@ -827,11 +824,10 @@ namespace WorkStream
                   // one and mark it as used.
                   if (scratch_data == nullptr)
                     {
-                      scratch_data_list.emplace_back(
-                        std::make_unique<ScratchData>(sample_scratch_data),
-                        true);
-                      scratch_data =
-                        scratch_data_list.back().scratch_data.get();
+                      scratch_datas.emplace_back(std::make_unique<ScratchData>(
+                                                   sample_scratch_data),
+                                                 true);
+                      scratch_data = scratch_datas.back().scratch_data.get();
                     }
 
                   // Create a unique copy chunk object where this
@@ -849,7 +845,7 @@ namespace WorkStream
 
                   // Find our currently used scratch data and
                   // mark it as unused.
-                  for (auto &p : scratch_data_list)
+                  for (auto &p : scratch_datas)
                     {
                       if (p.scratch_data.get() == scratch_data)
                         {
