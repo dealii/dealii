@@ -30,7 +30,11 @@ void
 test()
 {
   const MPI_Comm                       mpi_communicator = MPI_COMM_WORLD;
-  parallel::shared::Triangulation<dim> triangulation(mpi_communicator);
+  parallel::shared::Triangulation<dim> triangulation(
+    mpi_communicator,
+    {},
+    false,
+    parallel::shared::Triangulation<dim>::Settings::partition_zorder);
 
   GridGenerator::hyper_cube(triangulation, 0, 1);
   triangulation.refine_global(4);
