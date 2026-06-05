@@ -81,15 +81,6 @@ main()
                                       const VectorType &y,
                                       const VectorType &fy) { K.vmult(Jv, v); };
 
-  [&](SUNDIALS::SundialsOperator<VectorType> &,
-      SUNDIALS::SundialsPreconditioner<VectorType> &,
-      VectorType &,
-      const VectorType &,
-      double) {
-    deallog << "Reporting recoverable failure." << std::endl;
-    throw RecoverableUserCallbackError();
-  };
-
   stepper.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType> &,
                            SUNDIALS::SundialsPreconditioner<VectorType> &,
                            VectorType &,
