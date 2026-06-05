@@ -1078,6 +1078,251 @@ namespace SUNDIALS
     prm.add_parameter("Explicit Butcher table", explicit_butcher_table);
   }
 
+
+  /**
+   * The class provides a wrapper to ERKStep time-stepping module.
+   *
+   * ERKStep solves ODE initial value problems (IVPs) in $R^N$ using explicit
+   * Runge-Kutta methods. These problems should be posed as
+   *
+   * \f[
+   *   \dot y = f(t, y), \qquad y(t_0) = y_0.
+   * \f]
+   *
+   * Here, $t$ is the independent variable (e.g. time), $y \in R^N$ are the
+   * dependent variables, and $\dot y$ denotes $dy/dt$.
+   *
+   * ERKStep is intended for non-stiff problems. For stiff or multi-rate
+   * problems consider using @ref ARKStepper instead.
+   *
+   * ERKStep allows orders of accuracy $q = \{2, 3, 4, 5, 6, 8\}$, with
+   * embeddings of orders $p = \{1, 2, 3, 4, 5, 7\}$. These default to the
+   * Heun-Euler-2-1-2, Bogacki-Shampine-4-2-3, Zonneveld-5-3-4,
+   * Cash-Karp-6-4-5, Verner-8-5-6 and Fehlberg-13-7-8 methods, respectively.
+   *
+   * The user has to provide the implementation of the following
+   *`std::function`:
+   *  - explicit_function()
+   *
+   * Any other custom settings of the ERKStep object can be specified in
+   *  - custom_setup()
+   *
+   * To provide a simple example, consider the harmonic oscillator problem:
+   * \f[
+   * \begin{split}
+   *   u'' & = -k^2 u \\
+   *   u (0) & = 0 \\
+   *   u'(0) & = k
+   * \end{split}
+   * \f]
+   *
+   * We write it in terms of a first order ode:
+   *\f[
+   * \begin{matrix}
+   *   y_0' & =  y_1 \\
+   *   y_1' & = - k^2 y_0
+   * \end{matrix}
+   * \f]
+   *
+   * A minimal implementation is given by the following code snippet:
+   *
+   * @code
+   * using VectorType = Vector<double>;
+   *
+   * SUNDIALS::ERKStepper<VectorType> stepper;
+   * SUNDIALS::ARKode<VectorType> ode(stepper);
+   *
+   * const double k = 1.0;
+   *
+   * stepper.explicit_function = [k](const double / * time * /,
+   *                                 const VectorType &y,
+   *                                 VectorType &ydot)
+   * {
+   *   ydot[0] = y[1];
+   *   ydot[1] = -k*k*y[0];
+   * };
+   *
+   * Vector<double> y(2);
+   * y[1] = k;
+   *
+   * ode.solve_ode(y);
+   * @endcode
+   */
+  template <typename VectorType = Vector<double>>
+  class ERKStepper : public ARKodeStepper<VectorType>
+  {
+  public:
+    /**
+     * Additional parameters that can be passed to the ERKStepper class.
+     *
+     * ERKStep uses purely explicit Runge-Kutta methods and therefore does not
+     * require any parameters related to implicit solvers, nonlinear iterations,
+     * or mass matrices.
+     */
+    class AdditionalData
+    {
+    public:
+      /**
+       * Initialization parameters for ERKStepper.
+       *
+       * @param order Desired order of accuracy for the time integration.
+       *   If set to 0 the default order for the chosen method is used. This
+       *   parameter is mutually exclusive with @p explicit_butcher_table.
+       * @param explicit_butcher_table Name of the explicit (ERK) Butcher
+       *   table. An empty string leaves the table unset (SUNDIALS default).
+       *   Must be a name recognised by ERKStep (e.g.,
+       *   `"ARKODE_BOGACKI_SHAMPINE_4_2_3"`, `"ARKODE_FEHLBERG_13_7_8"`).
+       *   This parameter is mutually exclusive with @p order.
+       */
+      AdditionalData(const unsigned int order                  = 0,
+                     const std::string &explicit_butcher_table = "");
+
+      /**
+       * Add all AdditionalData() parameters to the given ParameterHandler
+       * object. When the parameters are parsed from a file, the internal
+       * parameters are automatically updated.
+       *
+       * The options you pass at construction time are set as default values in
+       * the ParameterHandler object `prm`. You can later modify them by parsing
+       * a parameter file using `prm`. The values of the parameter will be
+       * updated whenever the content of `prm` is updated.
+       *
+       * Make sure that this class lives longer than `prm`. Undefined behavior
+       * will occur if you destroy this class, and then parse a parameter file
+       * using `prm`.
+       */
+      void
+      add_parameters(ParameterHandler &prm);
+
+      /**
+       * Desired order of accuracy for the time integration. If set to 0
+       * the default order for the chosen method is used.
+       *
+       * This option is mutually exclusive with explicit_butcher_table: either
+       * the order is specified, or a specific Butcher table is chosen, but
+       * not both.
+       */
+      unsigned int order;
+
+      /**
+       * Name of the explicit (ERK) Butcher table to use. An empty string
+       * leaves the table unset (SUNDIALS default).
+       *
+       * Must be a name recognised by ERKStep (e.g.,
+       * `"ARKODE_BOGACKI_SHAMPINE_4_2_3"`, `"ARKODE_FEHLBERG_13_7_8"`). This
+       * option is mutually exclusive with order.
+       */
+      std::string explicit_butcher_table;
+    };
+
+    /**
+     * Constructor, with class parameters set by the AdditionalData object.
+     *
+     * @param data ERKStep configuration data
+     */
+    ERKStepper(const AdditionalData &data = AdditionalData());
+
+    void *
+    get_arkode_memory() const override;
+
+    /**
+     * A function object that users must supply and that is intended to compute
+     * the IVP right hand side. Sets $explicit\_f = f(t, y)$.
+     *
+     * @note This variable represents a
+     * @ref GlossUserProvidedCallBack "user provided callback".
+     * See there for a description of how to deal with errors and other
+     * requirements and conventions. In particular, ARKode can deal
+     * with "recoverable" errors in some circumstances, so callbacks
+     * can throw exceptions of type RecoverableUserCallbackError.
+     */
+    std::function<
+      void(const double t, const VectorType &y, VectorType &explicit_f)>
+      explicit_function;
+
+    /**
+     * A function object that users may supply and which is intended to perform
+     * custom settings on the supplied @p arkode_mem object. Refer to the
+     * SUNDIALS documentation for valid options.
+     *
+     * For instance, the following code selects a specific built-in Butcher
+     * table for the ERK method:
+     *
+     * @code
+     *      stepper.custom_setup = [&](void *arkode_mem) {
+     *        const int status = ERKStepSetTableName(
+     *          arkode_mem, explicit_method_name);
+     *        AssertARKode(status);
+     *      };
+     * @endcode
+     *
+     * @note This function will be called at the end of all other set up right
+     *   before the actual time evolution is started or continued with
+     *   solve_ode(). This function is also called when the solver is restarted,
+     *   see solver_should_restart(). Consult the SUNDIALS manual to see which
+     *   options are still available at this point.
+     *
+     * @param arkode_mem pointer to the ARKODE memory block which can be used
+     *   for custom calls to `ERKStepSet...` methods.
+     */
+    std::function<void(void *arkode_mem)> custom_setup;
+
+  private:
+    using CallbackContext = typename ARKodeStepper<
+      VectorType>::template CallbackContext<ERKStepper<VectorType>>;
+
+    using ARKodeMemoryPtr = typename ARKodeStepper<VectorType>::ARKodeMemoryPtr;
+
+    /**
+     * Rebuild the stepper at a given time instance and for a given state
+     * vector. Required by the ARKodeStepper interface.
+     *
+     * @param t0 Time instance that serves as starting time
+     * @param y0 Initial state vector whose layout is used for initialization of
+     *   the internal ARKODE vectors
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    void
+    reinit(double                      t0,
+           const VectorType           &y0,
+           internal::InvocationContext inv_ctx) override;
+
+    /**
+     * ERKStepper configuration data.
+     */
+    AdditionalData data;
+
+    /**
+     * ARKODE memory object.
+     */
+    ARKodeMemoryPtr arkode_mem;
+
+    /**
+     * ERKStepper callback context.
+     */
+    CallbackContext callback_ctx;
+  };
+
+
+  template <typename VectorType>
+  ERKStepper<VectorType>::AdditionalData::AdditionalData(
+    const unsigned int order,
+    const std::string &explicit_butcher_table)
+    : order(order)
+    , explicit_butcher_table(explicit_butcher_table)
+  {}
+
+
+
+  template <typename VectorType>
+  void
+  ERKStepper<VectorType>::AdditionalData::add_parameters(ParameterHandler &prm)
+  {
+    prm.add_parameter("Integration accuracy order", order);
+    prm.add_parameter("Explicit Butcher table", explicit_butcher_table);
+  }
+
 } // namespace SUNDIALS
 
 #endif // DEAL_II_WITH_SUNDIALS

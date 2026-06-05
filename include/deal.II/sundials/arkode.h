@@ -71,12 +71,14 @@ namespace SUNDIALS
    * output, reinitializaiton, exception handling. The class ARKode does not
    * implement any time integration strategies itself. Instead, it employs one
    * of the available stepper classes, which are basically wrappers around the
-   * corresponding ARKODE steppers. Currently, only ARKStepper is available,
-   * which provides interfaces to ARKode's additive Runge-Kutta steppers.
-   * The documentation of the ARKStepper class also shows examples of how
-   * this class in conjunction with ARKStepper can be used.
+   * corresponding ARKODE steppers. Currently, ARKStepper and ERKStepper are
+   * available: ARKStepper provides interfaces to ARKODE's additive Runge-Kutta
+   * steppers (supporting implicit, explicit, and mixed methods), while
+   * ERKStepper wraps the explicit-only ERKStep module for non-stiff problems.
+   * The documentation of the ARKStepper and ERKStepper classes also shows
+   * examples of how these classes are used together with ARKode.
    * Users can also provide their own steppers or implement wrappers around,
-   * e.g., ERKStepper, SPRKStep, LSRKStepper, or MRIStep modules of ARKode.
+   * e.g., SPRKStep, LSRKStepper, or MRIStep modules of ARKODE.
    *
    * The integrator settings are primarily customized by setting up fields of
    * ARKode::AdditionalData passed to the constructors. For most of the cases,

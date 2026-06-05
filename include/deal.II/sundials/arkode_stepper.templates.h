@@ -31,6 +31,7 @@
 #  include <deal.II/sundials/utilities.h>
 
 #  include <arkode/arkode_arkstep.h>
+#  include <arkode/arkode_erkstep.h>
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
 
@@ -537,6 +538,118 @@ namespace SUNDIALS
   template <typename VectorType>
   void *
   ARKStepper<VectorType>::get_arkode_memory() const
+  {
+    return arkode_mem.get();
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // ERKStepper implementation
+  // ---------------------------------------------------------------------------
+
+  template <typename VectorType>
+  ERKStepper<VectorType>::ERKStepper(const AdditionalData &data)
+    : data(data)
+    , arkode_mem(nullptr, [](void *mem) {
+      if (mem)
+        ERKStepFree(&mem);
+    })
+  {
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 4, 0)
+    AssertThrow(
+      data.explicit_butcher_table.empty(),
+      ExcMessage(
+        "Setting a ERK Butcher table by name requires SUNDIALS version 6.4.0 "
+        "or later. Set the order of accuracy instead or use custom_setup "
+        "callback to set the Butcher tables manually using "
+        "function ERKStepSetTableNum()."));
+#  endif
+
+    AssertThrow(
+      data.order == 0 || data.explicit_butcher_table.empty(),
+      ExcMessage(
+        "Either the order of accuracy or the Butcher table name may be "
+        "specified, but not both."));
+  }
+
+
+
+  template <typename VectorType>
+  void
+  ERKStepper<VectorType>::reinit(double                      t0,
+                                 const VectorType           &y0,
+                                 internal::InvocationContext inv_ctx)
+  {
+    arkode_mem.reset();
+
+    Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
+
+    auto explicit_function_callback = [](SUNDIALS::realtype tt,
+                                         N_Vector           yy,
+                                         N_Vector           yp,
+                                         void              *user_data) -> int {
+      Assert(user_data != nullptr, ExcInternalError());
+      auto &callback_ctx = *static_cast<CallbackContext *>(user_data);
+
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *dst_yp = internal::unwrap_nvector<VectorType>(yp);
+
+      return Utilities::call_and_possibly_capture_exception(
+        callback_ctx.stepper->explicit_function,
+        *callback_ctx.pending_exception,
+        tt,
+        *src_yy,
+        *dst_yp);
+    };
+
+    auto initial_condition_nvector =
+      internal::make_nvector_view(y0
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                  ,
+                                  inv_ctx.arkode_ctx
+#  endif
+      );
+
+    arkode_mem.reset(ERKStepCreate(explicit_function_callback,
+                                   t0,
+                                   initial_condition_nvector
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                   ,
+                                   inv_ctx.arkode_ctx
+#  endif
+                                   ));
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    callback_ctx = {this, &inv_ctx.pending_exception};
+    int status   = ERKStepSetUserData(arkode_mem.get(), &callback_ctx);
+    AssertARKode(status);
+
+    if (data.order != 0)
+      {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
+        status = ARKodeSetOrder(arkode_mem.get(), data.order);
+#  else
+        status = ERKStepSetOrder(arkode_mem.get(), data.order);
+#  endif
+        AssertARKode(status);
+      }
+    else if (!data.explicit_butcher_table.empty())
+      {
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 4, 0)
+        status = ERKStepSetTableName(arkode_mem.get(),
+                                     data.explicit_butcher_table.c_str());
+        AssertARKode(status);
+#  endif
+      }
+
+    if (custom_setup)
+      custom_setup(arkode_mem.get());
+  }
+
+
+  template <typename VectorType>
+  void *
+  ERKStepper<VectorType>::get_arkode_memory() const
   {
     return arkode_mem.get();
   }
