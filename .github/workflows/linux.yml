@@ -135,6 +135,7 @@ jobs:
               -D DEAL_II_CXX_FLAGS='-Werror -std=c++20 ${{ matrix.flags }}' \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_COMPONENT_PYTHON_BINDINGS=ON \
+              -D DEAL_II_WITH_COMPLEX_VALUES="ON" \
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_CGAL="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
