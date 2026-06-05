@@ -1,0 +1,128 @@
+<h1>Results</h1>
+
+<h3>Validation</h3>
+
+When running the program on a single GPU (here an H100) and computing the L2 error norms
+between the finite element solution and the analytical solution discussed above,
+we can produce the following table of results:
+
+| Refinement |       DoFs | Iterations |    Time (s) | Velocity Error | Pressure Error |
+|-----------:|-----------:|-----------:|------------:|---------------:|---------------:|
+|          0 |      2,312 |         14 |     6.5e-02 |       4.5e-02  |       1.5e-01  |
+|          1 |     15,468 |         32 |     1.6e-01 |       6.0e-03  |       1.2e-02  |
+|          2 |    112,724 |         37 |     4.9e-01 |       7.6e-04  |       1.2e-03  |
+|          3 |    859,812 |         38 |     2.9e+00 |       9.6e-05  |       2.3e-04  |
+|          4 |  6,714,692 |         39 |     2.5e+01 |       1.2e-05  |       5.5e-05  |
+|          5 | 53,070,468 |         39 |     2.1e+02 |       1.5e-06  |       1.4e-05  |
+
+We see optimal convergence rates for L2 errors of velocity and pressure (3 and 2, respectively,
+which corresponds to best-approximation of the Q2 and Q1 spaces)
+and decent linear scaling with problem size: A factor 8 in increase in unknowns leads to
+a factor of 8 in solve time, at least on the finer refinement levels.
+
+<h3>Performance Portability</h3>
+
+The advantage of using Kokkos instead of writing a code in one of the vendor
+languages like CUDA, is that we can run on AMD, NVIDIA, Intel or other
+future GPU devices without any porting required. Furthermore, there are multiple
+host-parallel backends available in Kokkos and thus this tutorial also
+runs with the CPU-only configurations. This is perfect for
+code development and debugging, but of course significantly slower. By default,
+the Kokkos Serial backend does not use multiple cores or explicit SIMD instructions. As such,
+the CPU-based matrix free deal.II code as in step-37 will be significantly faster.
+
+As an example, here is a quick comparison between different workstation and
+server GPUs and the time to solution for the 53 million DoF problem size:
+
+| Name               | FP64 [TFLOPS] |  VRAM [GB] | Bandwidth [TB/s] | Operator [MDoFs/s] | Solve Time [s] |
+| ------------------ | ------------: | ---------: | ---------------: | -----------------: | -------------: |
+| AMD W7800          |          1.41 |         32 |              0.6 |               24.0 |           1400 |
+| NVIDIA RTX 6000    |          1.97 |         96 |              1.8 |               99.9 |            420 |
+| NVIDIA H100        |          25.6 |         80 |              3.4 |              299.7 |            210 |
+| 32 core 5975WX CPU |           1.4 |          - |             0.05 |               71.5 |            382 |
+
+The last line highlights the advantage of building on Kokkos over implementing CUDA or HIP code directly:
+Even without further optimization for CPUs (for example no SIMD vectorization is currently used) we can
+achieve decent performance even when running without a GPU. Here we are using the serial Kokkos backend and
+32 MPI ranks. This is certainly fast enough for debugging and code development.
+
+<h3>Multiple GPUs</h3>
+
+This example program can also be run on more than one GPU, which allows us to
+solve larger problems before running out of VRAM and to, at least ideally,
+achieve a faster time to solution.
+
+The way one can use more than one GPU involves running with more than one MPI
+rank, like in step-40. This can be done by allocating one MPI rank per GPU.
+As an example, if you have single node or a workstation with 4 GPUs, you would
+run
+@code
+  mpirun -n 4 ./step-104
+@endcode
+This is typically enough for Kokkos to automatically pick a different GPU for
+each MPI rank. Kokkos has an API and command line options to control job
+placement manually, but this should not be necessary. Note that you can
+also oversubscribe a GPU cluster by running more MPI ranks than GPUs on a
+system. This will result in more than one rank sharing a GPU, which will typically
+degrade performance due to scheduling overhead and workload imbalance.
+
+Note that because of this performance degradation
+the typical rule of using one MPI rank per physical CPU core is
+not applicable for a GPU enabled code. Part of the code that runs on the CPU
+(matrix-free setup, error estimation, etc.) can make use of multiple threads.
+This means for optimal performance you will need to allocate several threads per MPI rank if you are
+running on a GPU cluster. For example, on the
+<a href="https://docs.rcd.clemson.edu/palmetto/">Clemson Palmetto Cluster</a> a
+job submission of
+@code
+  salloc --gpus h100:8 --ntasks 8 --cpus-per-task 10  --mem-per-cpu 2gb --time 4:00:00
+@endcode
+would allocate a node with 8 H100 GPUs, 8 MPI ranks, and 10 threads per rank.
+
+As an example, here is a table with solve times running one of these nodes
+with up to 8 H100 GPUs:
+
+| Refinement | DoFs        | 1 GPU (s) | 2 GPU (s) | 4 GPU (s) | 8 GPU (s) |
+|----------: |-----------: |---------: |---------: |---------: |---------: |
+| 0          | 2,312       | .065      | .074      | .078      | .077      |
+| 1          | 15,468      | .16       | .21       | .21       | .21       |
+| 2          | 112,724     | .49       | 1.10      | .98       | .81       |
+| 3          | 859,812     | 2.9       | 4.1       | 3.4       | 3.3       |
+| 4          | 6,714,692   | 25        | 30        | 18        | 14        |
+| 5          | 53,070,468  | 210       | 280       | 160       | 100       |
+| 6          | 421,991,684 | -         | -         | 1500      | 970       |
+
+Notice that we can solve larger problems with 4 or more GPUs compared to a single GPU. On
+the one hand, we also have some reduction in time to solution, at least for the larger problem sizes.
+On the other hand, notice that time to solution does not scale linearly. This is likely
+due to additional communication overhead and something we will investigate and improve
+in the future.
+
+<h3> Possibilities for extensions </h3>
+
+You might have noticed that we used `Number` instead of `double` throughout the tutorial
+program. This is on purpose. Try changing the template argument to `float` in `main()`. With this change,
+all computations are now done in single instead of double precision. Especially on workstation GPUs, single
+precision computations are significantly faster (up to 64x). Even when the computations
+are memory-bound and not compute-bound, which is the case for most of the kernels in this
+example, memory usage is reduced by a factor of 2. Check what speedup you can observe and
+see whether you can solve bigger problems with the same amount of GPU memory.
+
+Solving with lower precision comes with a trade-off, though. The integration of the operator and
+right-hand side is less accurate, which can lead to a degradation in accuracy of the solution,
+especially on finer meshes. By comparing the errors, determine the refinement level where floating-point
+error is larger than the error introduced by the discretization and linear solver tolerance.
+
+Furthermore, be aware that our error computation using VectorTools::integrate_difference is also less precise
+when performed in single precision. It would be better to convert the solution to double precision
+and compute the error in double precision. The function LinearAlgebra::distributed::Vector::copy_locally_owned_data_from
+can do this conversion for you. Does that make a difference?
+
+Finally, a more advanced strategy involves solving the linear system in double precision while running
+the multigrid preconditioner in single precision. This approach is called "mixed precision preconditioning".
+The method is very attractive on GPUs as it combines the accuracy of the double precision approach with
+the performance of the single precision approach. Considering we spent most of the computational effort
+inside the velocity block multigrid preconditioner, which does not need to be very accurate, this
+seems promising. The implementation is not difficult apart from having to carefully choose the correct number
+type in all GMG-related objects. For clarity, the mixed precision approach is not included in this tutorial,
+but it makes for a great exercise!
