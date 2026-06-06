@@ -645,13 +645,13 @@ namespace GridTools
    *
    * The elements of the output tuple are:
    * - cells : a vector of all cells containing at least one point.
-   * - qpoints : a vector of vector of points; containing in @p qpoints[i]
+   * - qpoints : a vector of vectors of points; containing in @p qpoints[i]
    *   the reference positions of all points that fall within the cell @p cells[i] .
-   * - maps : a vector of vector of integers, containing the mapping between
+   * - maps : a vector of vectors of integers, containing the mapping between
    *  the numbering in qpoints (previous element of the tuple), and the vector
    *  of local points of the process owning the points.
-   * - points : a vector of vector of points. @p points[i][j] is the point in the
-   *  real space corresponding.
+   * - points : a vector of vectors of points. @p points[i][j] is the point in the
+   *  real space corresponding
    *  to @p qpoints[i][j] . Notice @p points are the points lying on the locally
    *  owned part of the mesh; thus these can be either copies of @p local_points
    *  or points received from other processes i.e. local_points for other

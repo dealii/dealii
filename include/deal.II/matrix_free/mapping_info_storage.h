@@ -227,7 +227,7 @@ namespace internal
        *
        * If the cell is Cartesian/affine then the Jacobian is stored at index 1
        * of the AlignedVector. For faces on hypercube elements, the derivatives
-       * are reorder s.t the derivative orthogonal to the face is stored last,
+       * are ordered s.t. the derivative orthogonal to the face is stored last,
        * i.e for dim = 3 and face_no = 0 or 1, the derivatives are ordered as
        * [dy, dz, dx], face_no = 2 or 3: [dz, dx, dy], and face_no = 5 or 6:
        * [dx, dy, dz]. If the Jacobian also is stored, the components are
