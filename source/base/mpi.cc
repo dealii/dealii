@@ -256,6 +256,23 @@ namespace Utilities
     }
 
 
+    // Have a little function that checks if destinations provided
+    // to the current process are unique. The way it does this is
+    // to create a sorted list of destinations and then walk through
+    // the list and look at successive elements -- if we find the
+    // same number twice, we know that the destinations were not
+    // unique
+    bool
+    destinations_are_unique(const std::vector<unsigned int> &destinations)
+    {
+      std::vector<unsigned int> my_destinations = destinations;
+      std::sort(my_destinations.begin(), my_destinations.end());
+      return (
+        std::adjacent_find(my_destinations.begin(), my_destinations.end()) ==
+        my_destinations.end());
+    }
+
+
 
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern(
@@ -271,29 +288,11 @@ namespace Utilities
             AssertIndexRange(destination, n_procs);
         }
 
-      // Have a little function that checks if destinations provided
-      // to the current process are unique. The way it does this is
-      // to create a sorted list of destinations and then walk through
-      // the list and look at successive elements -- if we find the
-      // same number twice, we know that the destinations were not
-      // unique
-      const bool my_destinations_are_unique = [destinations]() {
-        if (destinations.empty())
-          return true;
-        else
-          {
-            std::vector<unsigned int> my_destinations = destinations;
-            std::sort(my_destinations.begin(), my_destinations.end());
-            return (std::adjacent_find(my_destinations.begin(),
-                                       my_destinations.end()) ==
-                    my_destinations.end());
-          }
-      }();
-
       // If all processes report that they have unique destinations,
       // then we can short-cut the process using a consensus algorithm (which
       // is implemented only for the case of unique destinations):
-      if (Utilities::MPI::logical_and(my_destinations_are_unique, mpi_comm))
+      if (Utilities::MPI::logical_and(destinations_are_unique(destinations),
+                                      mpi_comm))
         {
           return ConsensusAlgorithms::nbx<char, char>(
             destinations, {}, {}, {}, mpi_comm);
@@ -373,21 +372,10 @@ namespace Utilities
       const MPI_Comm                   mpi_comm,
       const std::vector<unsigned int> &destinations)
     {
-      // Have a little function that checks if destinations provided
-      // to the current process are unique:
-      const bool my_destinations_are_unique = [destinations]() {
-        std::vector<unsigned int> my_destinations = destinations;
-        const unsigned int        n_destinations  = my_destinations.size();
-        std::sort(my_destinations.begin(), my_destinations.end());
-        my_destinations.erase(std::unique(my_destinations.begin(),
-                                          my_destinations.end()),
-                              my_destinations.end());
-        return (my_destinations.size() == n_destinations);
-      }();
-
       // If all processes report that they have unique destinations,
       // then we can short-cut the process using a consensus algorithm:
-      if (Utilities::MPI::logical_and(my_destinations_are_unique, mpi_comm))
+      if (Utilities::MPI::logical_and(destinations_are_unique(destinations),
+                                      mpi_comm))
         {
           return ConsensusAlgorithms::nbx<char, char>(
                    destinations, {}, {}, {}, mpi_comm)
@@ -1401,16 +1389,13 @@ namespace Utilities
               using RequestType = std::vector<
                 std::pair<types::global_dof_index, types::global_dof_index>>;
 
-              ConsensusAlgorithms::selector<RequestType>(
-                /* targets = */
-                [&buffers]() {
-                  std::vector<unsigned int> targets;
-                  targets.reserve(buffers.size());
-                  for (const auto &rank_pair : buffers)
-                    targets.emplace_back(rank_pair.first);
+              std::vector<unsigned int> targets;
+              targets.reserve(buffers.size());
+              for (const auto &rank_pair : buffers)
+                targets.emplace_back(rank_pair.first);
 
-                  return targets;
-                }(),
+              ConsensusAlgorithms::selector<RequestType>(
+                targets,
 
                 /* create_request = */
                 [&buffers](const unsigned int target_rank) -> RequestType {
