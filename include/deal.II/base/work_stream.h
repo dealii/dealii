@@ -766,11 +766,9 @@ namespace WorkStream
           {}
         };
 
-        // idx is used to connect each worker to its copier as communication
-        // between tasks is not supported. It does this by providing a unique
-        // index in the vector of pointers copy_datas at which the copy data
-        // object where the work done by work task #idx is stored
-        unsigned int idx = 0;
+        // CopyData objects are processed in the order they are created: record
+        // that with a unique chunk_no for each one
+        std::size_t chunk_no = 0;
 
         // A collection of handles to a CopyChunk object for each chunk. The
         // actual data will be allocated only when a worker arrives at this
@@ -796,7 +794,7 @@ namespace WorkStream
             auto worker_task =
               taskflow
                 .emplace([chunk,
-                          idx,
+                          chunk_no,
                           chunk_counter,
                           &thread_safe_scratch_datas,
                           &sample_scratch_data,
@@ -832,10 +830,10 @@ namespace WorkStream
 
                   // Create a unique copy chunk object where this
                   // worker's work will be stored.
-                  copy_chunks[idx] =
+                  copy_chunks[chunk_no] =
                     std::make_unique<CopyChunk>(chunk_counter,
                                                 sample_copy_data);
-                  auto         copy_chunk = copy_chunks[idx].get();
+                  auto         copy_chunk = copy_chunks[chunk_no].get();
                   unsigned int i          = 0;
                   for (auto &it : chunk)
                     {
@@ -861,14 +859,14 @@ namespace WorkStream
             // worker task.
             tf::Task copier_task =
               taskflow
-                .emplace([idx, &copy_chunks, &copier]() {
-                  auto copy_chunk = copy_chunks[idx].get();
+                .emplace([chunk_no, &copy_chunks, &copier]() {
+                  auto copy_chunk = copy_chunks[chunk_no].get();
                   for (auto &copy_data : copy_chunk->copy_datas)
                     {
                       copier(copy_data);
                     }
                   // Finally free the memory.
-                  copy_chunks[idx].reset();
+                  copy_chunks[chunk_no].reset();
                 })
                 .name("copy");
 
@@ -885,7 +883,7 @@ namespace WorkStream
             // basically handles to internally stored data, so this does not
             // perform a copy:
             last_copier = copier_task;
-            ++idx;
+            ++chunk_no;
             chunk_counter = 0;
             chunk.clear();
           }
