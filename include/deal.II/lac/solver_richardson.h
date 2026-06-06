@@ -231,10 +231,10 @@ void SolverRichardson<VectorType>::solve(
   // Main loop
   while (conv == SolverControl::iterate)
     {
-      // Do not use residual,
-      // but do it in 2 steps
+      // Compute the residual:
       A.vmult(r, x);
       r.sadd(-1., 1., b);
+
       preconditioner.vmult(d, r);
 
       // get the required norm of the (possibly preconditioned)
@@ -244,7 +244,14 @@ void SolverRichardson<VectorType>::solve(
       if (conv != SolverControl::iterate)
         break;
 
-      x.add(additional_data.omega, d);
+      // Add the correction to the current iterate. In many cases, one runs
+      // Richardson's iteration with a step length (damping factor) of one,
+      // in which case we can optimize the addition.
+      if (additional_data.omega != 1.0)
+        x.add(additional_data.omega, d);
+      else
+        x += d;
+
       print_vectors(iter, x, r, d);
 
       ++iter;
