@@ -69,7 +69,7 @@ do_test(const unsigned int n_quad_points)
     {
       Triangulation<dim> tria_other;
       // in this test we have to ensure quadrature points on intersections can
-      // not found in different cells. This would lead to quadrature points
+      // not be found in different cells. This would lead to quadrature points
       // found twice in the intersections. Since we fetch the quadrature
       // points from found intersections an additional (not expected)
       // duplication takes place in RPE setup with these points.
