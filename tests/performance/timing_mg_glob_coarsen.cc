@@ -529,7 +529,8 @@ void
 LaplaceProblem<dim>::setup_matrix_free()
 {
   AffineConstraints<double> constraints_fine;
-  constraints_fine.reinit(level_constraints.back().get_local_lines());
+  constraints_fine.reinit(dof_handlers.back().locally_owned_dofs(),
+                          level_constraints.back().get_local_lines());
   constraints_fine.copy_from(level_constraints.back());
   system_matrix.initialize(mapping,
                            dof_handlers.back(),
