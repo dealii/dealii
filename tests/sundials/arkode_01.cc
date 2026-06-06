@@ -85,9 +85,12 @@ main()
       ++n_rhs_evaluations;
     };
 
+  // Reduce the output precision to make the test robust against minor changes
+  // in ARKode versions.
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int step_number) {
-      deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
+      deallog << t << ' ' << std::setprecision(4) << sol[0] << ' ' << sol[1]
+              << std::endl;
     };
 
   Vector<double> y(2);
@@ -96,6 +99,9 @@ main()
 
   const unsigned int n_timesteps = ode.solve_ode(y);
 
-  deallog << "n_rhs_evaluations=" << n_rhs_evaluations << std::endl;
-  deallog << "n_timesteps=" << n_timesteps << std::endl;
+  // At this time the number of timesteps taken is 20-21, but it
+  // varies between ARKode versions, so accept a wide range of
+  // values.
+  Assert(n_timesteps < 25, ExcInternalError());
+  Assert(n_timesteps > 15, ExcInternalError());
 }
