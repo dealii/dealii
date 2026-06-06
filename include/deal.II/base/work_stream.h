@@ -766,38 +766,36 @@ namespace WorkStream
           {}
         };
 
-        // idx is used to connect each worker to its copier as communication
-        // between tasks is not supported. It does this by providing a unique
-        // index in the vector of pointers copy_datas at which the copy data
-        // object where the work done by work task #idx is stored
-        unsigned int idx = 0;
+        // CopyData objects are processed in the order they are created: record
+        // that with a unique chunk_no for each one
+        std::size_t chunk_no = 0;
 
         // A collection of handles to a CopyChunk object for each chunk. The
         // actual data will be allocated only when a worker arrives at this
         // chunk and will be freed as soon as the result has been copied.
         std::vector<std::unique_ptr<CopyChunk>> copy_chunks;
 
-        std::vector<Iterator> chunk;
-        chunk.reserve(chunk_size);
-
-        unsigned int total_chunks  = 0;
-        unsigned int chunk_counter = 0;
-
         // Generate a static task graph. Here we generate a task for each cell
         // that will be worked on. The tasks are not executed until all of them
         // are created, this code runs sequentially.
         for (Iterator it = begin; it != end;)
           {
-            for (; (chunk_counter < chunk_size) && (it != end);
-                 ++it, ++chunk_counter)
-              chunk.emplace_back(it);
-            ++total_chunks;
+            // Since Iterator can be an iterator, or an int, etc. (anything
+            // incrementable) we can't rely on anything but operator++ being
+            // defined (and it being copyable). We can also assume that it isn't
+            // an input iterator since we can run workers in an arbitrary order.
+            // Hence, we can't use std::distance(), so instead just calculate
+            // each chunk size directly.
+            std::size_t current_chunk_size  = 0;
+            Iterator    current_chunk_start = it;
+            for (unsigned int i = 0; (i < chunk_size) && (it != end); ++it, ++i)
+              ++current_chunk_size;
             // Create a worker task.
             auto worker_task =
               taskflow
-                .emplace([chunk,
-                          idx,
-                          chunk_counter,
+                .emplace([current_chunk_start,
+                          current_chunk_size,
+                          chunk_no,
                           &thread_safe_scratch_datas,
                           &sample_scratch_data,
                           &sample_copy_data,
@@ -832,15 +830,15 @@ namespace WorkStream
 
                   // Create a unique copy chunk object where this
                   // worker's work will be stored.
-                  copy_chunks[idx] =
-                    std::make_unique<CopyChunk>(chunk_counter,
+                  copy_chunks[chunk_no] =
+                    std::make_unique<CopyChunk>(current_chunk_size,
                                                 sample_copy_data);
-                  auto         copy_chunk = copy_chunks[idx].get();
-                  unsigned int i          = 0;
-                  for (auto &it : chunk)
+                  auto &copy_chunk = copy_chunks[chunk_no];
+                  auto  it         = current_chunk_start;
+                  for (std::size_t i = 0; i < current_chunk_size; ++i)
                     {
-                      worker(it, *scratch_data, copy_chunk->copy_datas[i]);
-                      ++i;
+                      worker(it, *scratch_data, (copy_chunk->copy_datas)[i]);
+                      ++it;
                     }
 
                   // Find our currently used scratch data and
@@ -861,14 +859,14 @@ namespace WorkStream
             // worker task.
             tf::Task copier_task =
               taskflow
-                .emplace([idx, &copy_chunks, &copier]() {
-                  auto copy_chunk = copy_chunks[idx].get();
+                .emplace([chunk_no, &copy_chunks, &copier]() {
+                  auto copy_chunk = copy_chunks[chunk_no].get();
                   for (auto &copy_data : copy_chunk->copy_datas)
                     {
                       copier(copy_data);
                     }
                   // Finally free the memory.
-                  copy_chunks[idx].reset();
+                  copy_chunks[chunk_no].reset();
                 })
                 .name("copy");
 
@@ -885,11 +883,9 @@ namespace WorkStream
             // basically handles to internally stored data, so this does not
             // perform a copy:
             last_copier = copier_task;
-            ++idx;
-            chunk_counter = 0;
-            chunk.clear();
+            ++chunk_no;
           }
-        copy_chunks.resize(total_chunks);
+        copy_chunks.resize(chunk_no);
         // Now we run all the tasks in the task graph. They will be run in
         // parallel and are eligible to run when their dependencies established
         // above are met.
