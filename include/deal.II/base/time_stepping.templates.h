@@ -1334,9 +1334,6 @@ namespace TimeStepping
                 if (delta_t < min_delta_t)
                   delta_t = min_delta_t;
               }
-
-            // Not to loop infinitely if step is not rejected
-            this->free_memory();
           }
 
         ++count;

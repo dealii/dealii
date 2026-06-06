@@ -1,0 +1,3 @@
+New: Extended the TimeStepping namespace by the adaptive Tsitouras 5(4) explicit Runge-Kutta method (TimeStepping::TSITOURAS5).
+<br>
+(Jalil Khan, 2026/06/06)
