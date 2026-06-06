@@ -409,9 +409,14 @@ namespace internal
       VectorizedArrayType                                      *dof_values,
       std::bool_constant<true>) const
     {
-      dealii::vectorized_load_and_transpose(dofs_per_cell,
-                                            global_ptr,
-                                            dof_values);
+      // The API of the vectorized_load_and_transpose function requires us to
+      // provide const pointers
+      dealii::vectorized_load_and_transpose(
+        dofs_per_cell,
+        reinterpret_cast<
+          const std::array<const Number2 *, VectorizedArrayType::size()> &>(
+          global_ptr),
+        dof_values);
     }
 
 
