@@ -139,6 +139,8 @@ jobs:
               -D DEAL_II_WITH_MPI="ON" \
               -D DEAL_II_WITH_CGAL="ON" \
               -D DEAL_II_WITH_HDF5="ON" \
+              -D DEAL_II_WITH_NETCDF="ON" \
+              -D netCDF_DIR="/usr/lib/$(arch)-linux-gnu/cmake/netCDF_mpi" \
               -D DEAL_II_WITH_METIS="ON" \
               -D DEAL_II_WITH_PETSC="ON" \
               -D DEAL_II_WITH_TRILINOS="ON" \
