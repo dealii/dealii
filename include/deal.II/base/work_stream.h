@@ -740,7 +740,7 @@ namespace WorkStream
           const CopyData                             &sample_copy_data,
           const unsigned int /*queue_length*/ = 2 *
                                                 MultithreadInfo::n_threads(),
-          const unsigned int chunk_size = 8)
+          const unsigned int chunk_size = 32)
 
       {
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
@@ -1485,7 +1485,7 @@ namespace WorkStream
       const ScratchData                        &sample_scratch_data,
       const CopyData                           &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8);
+      const unsigned int chunk_size   = 32);
 
 
   /**
@@ -1550,7 +1550,7 @@ namespace WorkStream
       const ScratchData                          &sample_scratch_data,
       const CopyData                             &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+      const unsigned int chunk_size   = 32)
   {
     Assert(queue_length > 0,
            ExcMessage("The queue length must be at least one, and preferably "
@@ -1655,7 +1655,7 @@ namespace WorkStream
       const ScratchData &sample_scratch_data,
       const CopyData    &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+      const unsigned int chunk_size   = 32)
   {
     // Call the function above
     run(iterator_range.begin(),
@@ -1685,7 +1685,7 @@ namespace WorkStream
       const ScratchData             &sample_scratch_data,
       const CopyData                &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+      const unsigned int chunk_size   = 32)
   {
     // Call the function above
     run(iterator_range.begin(),
@@ -1813,7 +1813,7 @@ namespace WorkStream
       const ScratchData &sample_scratch_data,
       const CopyData    &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+      const unsigned int chunk_size   = 32)
   {
     // forward to the other function
     run(
@@ -1847,7 +1847,7 @@ namespace WorkStream
       const ScratchData &sample_scratch_data,
       const CopyData    &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+      const unsigned int chunk_size   = 32)
   {
     // forward to the other function
     run(
@@ -1897,7 +1897,7 @@ namespace WorkStream
     const ScratchData &sample_scratch_data,
     const CopyData    &sample_copy_data,
     const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-    const unsigned int chunk_size   = 8)
+    const unsigned int chunk_size   = 32)
   {
     // Call the function above
     run(std::begin(iterator_range),
@@ -1928,7 +1928,7 @@ namespace WorkStream
       const ScratchData &sample_scratch_data,
       const CopyData    &sample_copy_data,
       const unsigned int queue_length = 2 * MultithreadInfo::n_threads(),
-      const unsigned int chunk_size   = 8)
+      const unsigned int chunk_size   = 32)
   {
     // Call the function above
     run(std::begin(iterator_range),
