@@ -749,9 +749,6 @@ namespace WorkStream
         Threads::ThreadLocalStorage<std::deque<ScratchDataObject<ScratchData>>>
           thread_safe_scratch_datas;
 
-        tf::Task last_copier;
-
-
         // A collection of chunk_size copy objects which each represent the
         // contribution of a single worker. Chunk_size workers are thus chunked
         // together by having their outputs stored in this object in a single
@@ -775,9 +772,20 @@ namespace WorkStream
         // chunk and will be freed as soon as the result has been copied.
         std::vector<std::unique_ptr<CopyChunk>> copy_chunks;
 
-        // Generate a static task graph. Here we generate a task for each cell
-        // that will be worked on. The tasks are not executed until all of them
-        // are created, this code runs sequentially.
+        // Here we generate a task for each cell that will be worked on. As
+        // tasks are not executed until all of them are created, this code runs
+        // sequentially.
+        //
+        // One valid execution order is all workers first and then all copiers
+        // at the end. We want to avoid that ordering so that we do not create
+        // n_chunks CopyChunk objects: instead, we want to reuse CopyChunks to
+        // conserve memory. Hence, below we prevent new workers from running
+        // unless the copier from 2 * n_threads() chunks ago is completed (the
+        // factor of 2 is intended to give taskflow some leeway in scheduling).
+        // To impose that constraint we have to hold on to old copiers. Tasks in
+        // taskflow are basically handles to internally stored data, so queueing
+        // them here is cheap (i.e., it does not create a deep copy).
+        std::deque<tf::Task> old_copiers;
         for (Iterator it = begin; it != end;)
           {
             // Since Iterator can be an iterator, or an int, etc. (anything
@@ -876,13 +884,18 @@ namespace WorkStream
             // Ensure that only one copy task can run at a time. The code
             // below makes each copy task wait until the previous one has
             // finished before it can start
-            if (!last_copier.empty())
-              last_copier.precede(copier_task);
+            if (!old_copiers.empty())
+              old_copiers.back().precede(copier_task);
 
-            // Keep a handle to the last copier. Tasks in taskflow are
-            // basically handles to internally stored data, so this does not
-            // perform a copy:
-            last_copier = copier_task;
+            old_copiers.push_back(copier_task);
+            if (old_copiers.size() > 2 * MultithreadInfo::n_threads())
+            {
+              // As described at the top of the loop, prevent a backlog of copy
+              // tasks by making the new worker run after an old copier:
+              old_copiers.front().precede(worker_task);
+              old_copiers.pop_front();
+            }
+
             ++chunk_no;
           }
         copy_chunks.resize(chunk_no);
