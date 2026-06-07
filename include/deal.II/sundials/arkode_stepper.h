@@ -50,6 +50,7 @@
 #  include <sundials/sundials_linearsolver.h>
 #  include <sundials/sundials_math.h>
 
+#  include <complex>
 #  include <exception>
 #  include <memory>
 #  include <string>
@@ -1327,13 +1328,21 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 
   /**
-   * Wrapper for the LSRKStep STS (Stabilized explicit Runge-Kutta) family.
+   * Wrapper for the LSRKStep (Low-Storage Runge-Kutta) STS
+   * (Super Time-Stepping) family.
    *
    * STS methods are designed for mildly stiff problems whose Jacobian
    * eigenvalues lie on or near the negative real axis, such as the
    * semidiscretization of parabolic PDEs. The stability region grows as
    * $O(s^2)$ with the number of stages $s$, allowing much larger time steps
-   * than standard explicit Runge-Kutta methods for the same problem.
+   * than standard explicit Runge-Kutta methods for the same problem,
+   * alleviating to a degree the usual issue that one should not solve parabolic
+   * problems with explicit methods (see the discussion in step-26 for example).
+   *
+   * LSRKStep also provides the SSP (Strong Stability Preserving) family of the
+   * Low-Storage Runge-Kutta methods, which are designed for hyperbolic problems
+   * such as advection-dominated fluid flow. These methods are available through
+   * LSRKStepperSSP.
    *
    * Available methods (passed as @p method_name):
    *   - `ARKODE_LSRK_RKC_2`: Runge-Kutta-Chebyshev of order 2 (default).
@@ -1341,7 +1350,8 @@ namespace SUNDIALS
    *
    * Because the number of stages is chosen adaptively based on the spectral
    * radius of the Jacobian, STS methods require a user-supplied dominant
-   * eigenvalue function. This must be set via dominant_eigenvalue_function().
+   * eigenvalue function. This must be set via `dominant_eigenvalue_function`
+   * callback.
    *
    * The user has to provide the implementations of the following
    * `std::function`s:
@@ -1446,14 +1456,15 @@ namespace SUNDIALS
 
     /**
      * A function object that users must supply and that is intended to return
-     * an estimate of the dominant (largest-magnitude) real and imaginary parts
-     * of the Jacobian eigenvalue. This information is used by SUNDIALS to
-     * determine the number of polynomial stages needed for stability.
+     * an estimate of the dominant (largest-magnitude) eigenvalue of the
+     * Jacobian. This information is used by SUNDIALS to determine the number
+     * of polynomial stages needed for stability.
      *
      * The callback receives the current time @p t, the current state @p y,
-     * the already-evaluated right-hand side @p f (i.e., $f(t,y)$), and
-     * should write the estimates into @p lambda_real and @p lambda_imag.
-     * For purely diffusive problems @p lambda_imag is typically zero.
+     * and the already-evaluated right-hand side @p f (i.e., $f(t,y)$), and
+     * returns the estimate of the dominant eigenvalue as
+     * `std::complex<double>`. For purely diffusive problems the imaginary part
+     * is typically zero.
      *
      * @note This variable represents a
      * @ref GlossUserProvidedCallBack "user provided callback".
@@ -1462,11 +1473,9 @@ namespace SUNDIALS
      * with "recoverable" errors in some circumstances, so callbacks
      * can throw exceptions of type RecoverableUserCallbackError.
      */
-    std::function<void(const double      t,
-                       const VectorType &y,
-                       const VectorType &f,
-                       double           &lambda_real,
-                       double           &lambda_imag)>
+    std::function<std::complex<double>(const double      t,
+                                       const VectorType &y,
+                                       const VectorType &f)>
       dominant_eigenvalue_function;
 
     /**
@@ -1548,12 +1557,16 @@ namespace SUNDIALS
 
 
   /**
-   * Wrapper for the LSRKStep SSP (Strong-Stability-Preserving) family.
+   * Wrapper for the LSRKStep (Low-Storage Runge-Kutta) SSP
+   * (Strong-Stability-Preserving) family.
    *
    * SSP methods are designed for advection-dominated or hyperbolic problems
    * where strong-stability (monotonicity) of the time integrator is required.
-   * Unlike the STS family, SSP methods use a fixed number of stages and do not
-   * require a dominant eigenvalue estimate.
+   * Such problems typically have Jacobian eigenvalues that lie on or near the
+   * imaginary axis, in contrast to the (near) negative-real-axis spectrum
+   * targeted by the STS family in LSRKStepperSTS. Unlike the STS family, SSP
+   * methods use a fixed number of stages and do not require a dominant
+   * eigenvalue estimate.
    *
    * Available methods (passed as @p method_name):
    *   - `ARKODE_LSRK_SSP_S_2`: optimal SSP of order 2 with $s$ stages.

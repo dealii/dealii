@@ -20,6 +20,7 @@
 #include <deal.II/sundials/arkode_stepper.h>
 
 #include <cmath>
+#include <complex>
 #include <iomanip>
 
 #include "../tests.h"
@@ -96,14 +97,10 @@ run(const SUNDIALS::LSRKStepperSTS<VectorType>::AdditionalData &data)
 
   // Provide the dominant eigenvalue of the discrete Laplacian analytically.
   // The largest-magnitude eigenvalue is -4/h^2 (purely real).
-  stepper.dominant_eigenvalue_function = [](double /*t*/,
-                                            const VectorType & /*y*/,
-                                            const VectorType & /*f*/,
-                                            double &lambda_real,
-                                            double &lambda_imag) {
-    lambda_real = -4.0 / (h * h);
-    lambda_imag = 0.0;
-  };
+  stepper.dominant_eigenvalue_function =
+    [](double /*t*/, const VectorType & /*y*/, const VectorType & /*f*/) {
+      return std::complex<double>(-4.0 / (h * h), 0.0);
+    };
 
   SUNDIALS::ARKode<VectorType> ode(stepper, make_arkode_data());
 

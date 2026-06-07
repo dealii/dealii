@@ -1,0 +1,8 @@
+New: The new time-steppers have been added for SUNDIALS::ARKode:
+SUNDIALS::ERKStepper wrapping the ERKStep (Explicit Runge-Kutta)
+module of ARKODE, SUNDIALS::LSKRStepperSSP and SUNDIALS::LSKRStepperSTS
+providing access to the SSP (Strong-Stability-Preserving) and STS
+(Super Time-Stepping) time integration methods within the LSRKStep
+(Low-Storage Runge-Kutta) module of ARKODE, respectively.
+<br>
+(Vladimir Ivannikov, 2026/04/21)

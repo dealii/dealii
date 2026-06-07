@@ -712,20 +712,21 @@ namespace SUNDIALS
                                N_Vector /*temp2*/,
                                N_Vector /*temp3*/) -> int {
       Assert(user_data != nullptr, ExcInternalError());
-      auto     &ctx    = *static_cast<CallbackContext *>(user_data);
-      auto     *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
-      auto     *src_fn = internal::unwrap_nvector_const<VectorType>(fn);
-      double    lR = 0.0, lI = 0.0;
+      auto &ctx    = *static_cast<CallbackContext *>(user_data);
+      auto *src_yy = internal::unwrap_nvector_const<VectorType>(yy);
+      auto *src_fn = internal::unwrap_nvector_const<VectorType>(fn);
+
+      std::complex<double> lambda;
+
       const int ret = Utilities::call_and_possibly_capture_exception(
-        ctx.stepper->dominant_eigenvalue_function,
-        *ctx.pending_exception,
-        tt,
-        *src_yy,
-        *src_fn,
-        lR,
-        lI);
-      *lambdaR = static_cast<SUNDIALS::realtype>(lR);
-      *lambdaI = static_cast<SUNDIALS::realtype>(lI);
+        [&]() {
+          lambda =
+            ctx.stepper->dominant_eigenvalue_function(tt, *src_yy, *src_fn);
+        },
+        *ctx.pending_exception);
+
+      *lambdaR = static_cast<SUNDIALS::realtype>(lambda.real());
+      *lambdaI = static_cast<SUNDIALS::realtype>(lambda.imag());
       return ret;
     };
 
