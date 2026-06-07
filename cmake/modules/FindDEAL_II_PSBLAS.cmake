@@ -84,6 +84,7 @@ process_feature(PSBLAS
       ${_psblas_library_variables}
       ${_additional_libraries}
       LAPACK_LIBRARIES
+    OPTIONAL
       MPI_CXX_LIBRARIES
       MPI_Fortran_LIBRARIES
   INCLUDE_DIRS 

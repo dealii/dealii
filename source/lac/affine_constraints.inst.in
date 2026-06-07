@@ -442,6 +442,38 @@ for (V : EXTERNAL_PARALLEL_VECTORS)
     template void AffineConstraints<V::value_type>::distribute<V>(V &) const;
   }
 
+// PSCToolkit
+for (M : PSCTOOLKIT_MATRICES)
+  {
+    template void AffineConstraints<double>::
+      distribute_local_to_global<M, PSCToolkitWrappers::Vector>(
+        const FullMatrix<double> &,
+        const Vector<double> &,
+        const std::vector<AffineConstraints<double>::size_type> &,
+        M &,
+        PSCToolkitWrappers::Vector &,
+        bool,
+        std::bool_constant<false>) const;
+
+    template void AffineConstraints<double>::distribute_local_to_global<M>(
+      const FullMatrix<double> &,
+      const std::vector<AffineConstraints<double>::size_type> &,
+      M &) const;
+
+    template void AffineConstraints<double>::distribute_local_to_global<M>(
+      const FullMatrix<double> &,
+      const std::vector<AffineConstraints<double>::size_type> &,
+      const std::vector<AffineConstraints<double>::size_type> &,
+      M &) const;
+
+    template void AffineConstraints<double>::distribute_local_to_global<M>(
+      const FullMatrix<double> &,
+      const std::vector<AffineConstraints<double>::size_type> &,
+      const AffineConstraints<double> &,
+      const std::vector<AffineConstraints<double>::size_type> &,
+      M &) const;
+  }
+
 
 //
 // FIXME: These mixed variants are needed for multigrid and matrix free.

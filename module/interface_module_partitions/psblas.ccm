@@ -43,6 +43,7 @@ export
 {
   using ::psb_c_ctxt;
   using ::psb_c_descriptor;
+  using ::psb_c_dspmat;
   using ::psb_c_dvector;
   using ::psb_d_t;
   using ::psb_i_t;

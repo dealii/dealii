@@ -1,0 +1,7 @@
+
+DEAL:0::Testing PSBLAS matrix with dim=2
+DEAL:0::Local range: 0 - 2153
+
+DEAL:1::Testing PSBLAS matrix with dim=2
+DEAL:1::Local range: 2153 - 4225
+
