@@ -75,10 +75,12 @@ namespace SUNDIALS
    * available: ARKStepper provides interfaces to ARKODE's additive Runge-Kutta
    * steppers (supporting implicit, explicit, and mixed methods), while
    * ERKStepper wraps the explicit-only ERKStep module for non-stiff problems.
-   * The documentation of the ARKStepper and ERKStepper classes also shows
-   * examples of how these classes are used together with ARKode.
+   * LSRKStepper provides access to the LSRKStep STS (Stabilized explicit
+   * Runge-Kutta) and SSP (Strong-Stability-Preserving) family of low-storage
+   * Runge-Kutta methods. The documentation of the ARKStepper, ERKStepper, and
+   * LSRKStepper classes also shows examples of how this class can be used.
    * Users can also provide their own steppers or implement wrappers around,
-   * e.g., SPRKStep, LSRKStepper, or MRIStep modules of ARKODE.
+   * e.g., SPRKStep or MRIStep modules of ARKODE.
    *
    * The integrator settings are primarily customized by setting up fields of
    * ARKode::AdditionalData passed to the constructors. For most of the cases,
