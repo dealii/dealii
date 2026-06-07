@@ -746,6 +746,17 @@ namespace WorkStream
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
         tf::Taskflow  taskflow;
 
+        // Keep a queue of scratch data objects for each thread. We may need
+        // more than one per thread to permit the following situation:
+        //
+        // 1. A worker thread obtains a ScratchData object.
+        //
+        // 2. That worker thread creates its own taskflow and waits upon its
+        //    completion.
+        //
+        // 3. While waiting, the executor re-assigns that thread to a second
+        //    task in the outer taskflow (which will require a second
+        //    ScratchData).
         Threads::ThreadLocalStorage<std::deque<ScratchDataObject<ScratchData>>>
           thread_safe_scratch_datas;
 
