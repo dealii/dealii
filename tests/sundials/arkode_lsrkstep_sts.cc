@@ -20,6 +20,7 @@
 #include <deal.II/sundials/arkode_stepper.h>
 
 #include <cmath>
+#include <iomanip>
 
 #include "../tests.h"
 
@@ -41,7 +42,13 @@
 // (h = 1/11):  y_i' = (y_{i-1} - 2*y_i + y_{i+1}) / h^2
 //
 // Largest eigenvalue magnitude: ~4/h^2 = 484.
-// Exact solution:  u(x,t) = sin(pi*x) * exp(-pi^2 * t)
+// Exact PDE solution:  u(x,t) = sin(pi*x) * exp(-pi^2 * t)
+//
+// Because the initial data sin(pi*x_i) is exactly the first eigenvector of the
+// discrete Laplacian, the semidiscretized ODE system also has a closed-form
+// solution y_i(t) = sin(pi*x_i) * exp(lambda*t) with the discrete eigenvalue
+// lambda = -(4/h^2) * sin^2(pi*h/2). This semidiscrete solution is used below
+// to compute the time-integration error.
 //
 // The dominant eigenvalue is supplied exactly via
 // LSRKStepperSTS::dominant_eigenvalue_function so that SUNDIALS can
@@ -100,10 +107,25 @@ run(const SUNDIALS::LSRKStepperSTS<VectorType>::AdditionalData &data)
 
   SUNDIALS::ARKode<VectorType> ode(stepper, make_arkode_data());
 
-  // Output t and the midpoint value y[N/2] (i = 4, x = 5/11).
+  // Output t, the midpoint value y[N/2] (i = 5, x = 6/11), the analytical
+  // value there, and the discrete L2 error norm.
+  //
+  // The initial condition sin(pi*x_i) is exactly the first eigenvector of the
+  // discrete Laplacian, so the semidiscrete ODE system y' = A*y has the exact
+  // solution y_i(t) = sin(pi*x_i) * exp(lambda*t), where the eigenvalue is
+  // lambda = -(4/h^2) * sin^2(pi*h/2). The error norm therefore measures the
+  // time-integration error of the LSRK-STS method alone.
   ode.output_step =
     [](const double t, const VectorType &sol, const unsigned int /*step*/) {
-      deallog << t << ' ' << sol[N / 2] << std::endl;
+      const double s      = std::sin(M_PI * h / 2.0);
+      const double lambda = -4.0 / (h * h) * s * s;
+      VectorType   exact(N);
+      for (unsigned int i = 0; i < N; ++i)
+        exact[i] = std::sin(M_PI * (i + 1) * h) * std::exp(lambda * t);
+      VectorType diff(exact);
+      diff -= sol;
+      deallog << std::fixed << std::setprecision(4) << t << ' ' << sol[N / 2]
+              << ' ' << exact[N / 2] << ' ' << diff.l2_norm() << std::endl;
     };
 
   VectorType y(N);

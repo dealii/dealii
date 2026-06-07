@@ -20,27 +20,41 @@
 #include <deal.II/sundials/arkode_stepper.h>
 
 #include <cmath>
+#include <iomanip>
 
 #include "../tests.h"
 
-// Test LSRKStepperSSP (Strong-Stability-Preserving) on the nonlinear
-// Burgers equation semidiscretized with upwind differences.
+// Test LSRKStepperSSP (Strong-Stability-Preserving) on the linear advection
+// equation semidiscretized with first-order upwind differences.
 //
-// SSP methods preserve the strong-stability (monotonicity) of the spatial
-// discretization in time, making them suitable for advection-dominated or
-// hyperbolic problems. Unlike STS methods, SSP methods use a fixed number
-// of stages and do not require a dominant eigenvalue estimate.
+// SSP methods preserve the strong-stability (monotonicity / TVD) of the
+// spatial discretization in time, making them the natural choice for
+// advection-dominated or hyperbolic problems. Unlike STS methods, SSP methods
+// use a fixed number of stages and do not require a dominant eigenvalue
+// estimate.
 //
-// Problem (inviscid Burgers, periodic boundary, one full period [0, 1]):
-//   u_t + (u^2/2)_x = 0,  x in [0, 1) periodic,  t in [0, 0.4]
-//   u(x, 0) = 0.5 + sin(2*pi*x)
+// Problem (linear advection, periodic boundary on [0, 1)):
+//   u_t + a*u_x = 0,  a = 1,  x in [0, 1) periodic,  t in [0, 0.3]
+//   u(x, 0) = sin(2*pi*x)
 //
-// Semidiscretized with N cells, upwind flux (Godunov):
-//   y_i' = -(F_{i+1/2} - F_{i-1/2}) / dx
-//   F_{i+1/2} = max(y_i, 0)^2/2 + min(y_{i+1}, 0)^2/2  (upwind)
+// Semidiscretized at the N nodes x_j = j*dx, dx = 1/N, with first-order
+// upwind differencing (a > 0):
+//   y_j' = -a * (y_j - y_{j-1}) / dx          (indices taken modulo N)
 //
-// For smooth initial data the exact solution before shock formation is
-// u(x,t) = 0.5 + sin(2*pi*(x - (0.5 + sin(2*pi*x))*t)) (implicitly defined).
+// This is the canonical hyperbolic test problem for SSP time integrators: the
+// upwind operator is strong-stability-preserving (total-variation diminishing)
+// and the SSP Runge-Kutta method maintains that property in time.
+//
+// Because the initial datum sin(2*pi*x) is a single Fourier mode, it is an
+// eigenvector of the circulant upwind operator, whose eigenvalue for this mode
+// is  lambda = -(a/dx) * (1 - exp(-i*k*dx)),  k = 2*pi. The semidiscretized ODE
+// system therefore has the closed-form solution
+//   y_j(t) = exp(alpha*t) * sin(k*x_j + beta*t)
+// with
+//   alpha = -(a/dx) * (1 - cos(k*dx))   (numerical diffusion, amplitude decay)
+//   beta  = -(a/dx) * sin(k*dx)         (numerical propagation, phase shift).
+// This exact semidiscrete solution is used below to compute the
+// time-integration error of the SSP method.
 //
 // Two sub-tests:
 //   1. Default SSP method (SUNDIALS default: SSP(10,4)).
@@ -53,6 +67,7 @@ using VectorType = Vector<double>;
 
 static constexpr unsigned int N  = 20;
 static constexpr double       dx = 1.0 / N;
+static constexpr double       a  = 1.0; // advection speed (a > 0)
 
 static SUNDIALS::ARKode<VectorType>::AdditionalData
 make_arkode_data()
@@ -66,50 +81,47 @@ make_arkode_data()
           1e-6 /*relative_tolerance*/};
 }
 
-// Godunov (upwind) flux for Burgers: F(u) = u^2/2
-static double
-godunov_flux(const double ul, const double ur)
-{
-  // Roe flux: f(ul, ur) = max(ul,0)^2/2 + min(ur,0)^2/2
-  const double fl = (ul > 0.0 ? 0.5 * ul * ul : 0.0);
-  const double fr = (ur < 0.0 ? 0.5 * ur * ur : 0.0);
-  return fl + fr;
-}
-
 static void
 run(const SUNDIALS::LSRKStepperSSP<VectorType>::AdditionalData &data)
 {
   SUNDIALS::LSRKStepperSSP<VectorType> stepper(data);
 
+  // First-order upwind discretization of -a*u_x for a > 0.
   stepper.explicit_function =
     [](double, const VectorType &y, VectorType &ydot) {
       const double inv_dx = 1.0 / dx;
       for (unsigned int i = 0; i < N; ++i)
         {
-          const double ul    = y[i];
-          const double ur    = y[(i + 1) % N];
-          const double ul_m1 = y[(i + N - 1) % N];
-          ydot[i] = -inv_dx * (godunov_flux(ul, ur) - godunov_flux(ul_m1, ul));
+          const double yi   = y[i];
+          const double yim1 = y[(i + N - 1) % N];
+          ydot[i]           = -a * inv_dx * (yi - yim1);
         }
     };
 
   SUNDIALS::ARKode<VectorType> ode(stepper, make_arkode_data());
 
+  // Output t, the value at x = 1/4 (the initial peak of sin(2*pi*x)), the
+  // analytical value there, and the discrete L2 error norm of the whole
+  // solution. The exact semidiscrete solution is
+  //   y_j(t) = exp(alpha*t) * sin(k*x_j + beta*t),  k = 2*pi,
+  // so the error norm measures the time-integration error of the SSP method.
   ode.output_step =
     [](const double t, const VectorType &sol, const unsigned int /*step*/) {
-      // Print minimum and maximum to a concise summary line.
-      double vmin = sol[0], vmax = sol[0];
-      for (unsigned int i = 1; i < N; ++i)
-        {
-          vmin = std::min(vmin, sol[i]);
-          vmax = std::max(vmax, sol[i]);
-        }
-      deallog << t << ' ' << vmin << ' ' << vmax << std::endl;
+      const double k     = 2.0 * M_PI;
+      const double alpha = -a / dx * (1.0 - std::cos(k * dx));
+      const double beta  = -a / dx * std::sin(k * dx);
+      VectorType   exact(N);
+      for (unsigned int i = 0; i < N; ++i)
+        exact[i] = std::exp(alpha * t) * std::sin(k * i * dx + beta * t);
+      VectorType diff(exact);
+      diff -= sol;
+      deallog << std::fixed << std::setprecision(4) << t << ' ' << sol[N / 4]
+              << ' ' << exact[N / 4] << ' ' << diff.l2_norm() << std::endl;
     };
 
   VectorType y(N);
   for (unsigned int i = 0; i < N; ++i)
-    y[i] = 0.5 + std::sin(2.0 * M_PI * (i + 0.5) * dx);
+    y[i] = std::sin(2.0 * M_PI * i * dx);
 
   ode.solve_ode(y);
 }
