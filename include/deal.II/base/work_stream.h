@@ -761,41 +761,78 @@ namespace WorkStream
           thread_safe_scratch_datas;
 
         // A collection of chunk_size copy objects which each represent the
-        // contribution of a single worker. Chunk_size workers are thus chunked
-        // together by having their outputs stored in this object in a single
-        // task.
+        // contribution of a single worker.
         struct CopyChunk
         {
           std::vector<CopyData> copy_datas;
+
+          // Each worker-copier pair needs to share a single CopyChunk object.
+          // Since tasks can't message each-other, instead store a shared index
+          // in @p chunk_no. Each chunk_no corresponds to exactly one worker and
+          // exactly one copier (and the copiers are run in ascending order).
+          //
+          // Since we re-use CopyChunk objects, after running the copier we mark
+          // the CopyChunk as unused by setting chunk_no to std::nullopt (i.e.,
+          // it no longer has a chunk number).
+          std::optional<std::size_t> chunk_no;
+
+          CopyChunk() = default;
 
           CopyChunk(const unsigned int chunk_size,
                     const CopyData    &sample_copy_data)
             : copy_datas(chunk_size, sample_copy_data)
           {}
+
+          // Ensure that these objects are always moved and never copied.
+          CopyChunk(CopyChunk &) = delete;
+
+          CopyChunk &
+          operator=(CopyChunk &) = delete;
+
+          CopyChunk(CopyChunk &&) = default;
+
+          CopyChunk &
+          operator=(CopyChunk &&) = default;
         };
+
+        // Keep free (i.e., ready to be used by a Worker) allocated objects in
+        // separate queues from used (i.e., ready to be used by a Copier) ones
+        // so we may recycle CopyChunks.
+        //
+        // Furthermore: decrease contention (compared to using one mutex for all
+        // free chunks and a second mutex for all used chunks) by splitting
+        // chunk indices into separate queues via modular arithmetic. This
+        // pattern is sometimes called 'lock striping' since we have n_queues
+        // stripes which do not interact with each-other. There is no guarantee
+        // that thread ids and chunk ids will be equal (modulo n_threads) but
+        // there are enough mutexes and access is fast enough that it isn't a
+        // bottleneck.
+        const auto n_threads = MultithreadInfo::n_threads();
+        const auto n_queues  = n_threads;
+        std::vector<std::deque<CopyChunk>> free_chunks(n_queues);
+        std::vector<std::mutex>            free_chunks_mutex(n_queues);
+        std::vector<std::deque<CopyChunk>> used_chunks(n_queues);
+        std::vector<std::mutex>            used_chunks_mutex(n_queues);
 
         // CopyData objects are processed in the order they are created: record
         // that with a unique chunk_no for each one
         std::size_t chunk_no = 0;
 
-        // A collection of handles to a CopyChunk object for each chunk. The
-        // actual data will be allocated only when a worker arrives at this
-        // chunk and will be freed as soon as the result has been copied.
-        std::vector<std::unique_ptr<CopyChunk>> copy_chunks;
-
-        // Here we generate a task for each cell that will be worked on. As
-        // tasks are not executed until all of them are created, this code runs
+        // Here we generate one worker task and one copier task for every
+        // chunk_size number of cells (or less, for the final task). As tasks
+        // are not executed until all of them are created, this code runs
         // sequentially.
         //
         // One valid execution order is all workers first and then all copiers
         // at the end. We want to avoid that ordering so that we do not create
-        // n_chunks CopyChunk objects: instead, we want to reuse CopyChunks to
-        // conserve memory. Hence, below we prevent new workers from running
-        // unless the copier from 2 * n_threads() chunks ago is completed (the
-        // factor of 2 is intended to give taskflow some leeway in scheduling).
-        // To impose that constraint we have to hold on to old copiers. Tasks in
-        // taskflow are basically handles to internally stored data, so queueing
-        // them here is cheap (i.e., it does not create a deep copy).
+        // n_cells / chunk_size CopyChunk objects: instead, we want to reuse
+        // CopyChunks to conserve memory. Hence, below we prevent new workers
+        // from running unless the copier from 2 * n_threads() chunks ago is
+        // completed (the factor of 2 is intended to give taskflow some leeway
+        // in scheduling). To impose that constraint we have to hold on to old
+        // copiers. Tasks in taskflow are basically handles to internally stored
+        // data, so queueing them here is cheap (i.e., it does not create a deep
+        // copy).
         std::deque<tf::Task> old_copiers;
         for (Iterator it = begin; it != end;)
           {
@@ -815,62 +852,77 @@ namespace WorkStream
                 .emplace([current_chunk_start,
                           current_chunk_size,
                           chunk_no,
-                          &thread_safe_scratch_datas,
-                          &sample_scratch_data,
+                          chunk_size,
+                          &free_chunks,
+                          &free_chunks_mutex,
+                          n_queues,
                           &sample_copy_data,
-                          &copy_chunks,
+                          &sample_scratch_data,
+                          &thread_safe_scratch_datas,
+                          &used_chunks,
+                          &used_chunks_mutex,
                           &worker]() {
-                  ScratchData *scratch_data = nullptr;
+                  const auto index = chunk_no % n_queues;
+                  // Get a free CopyChunk:
+                  CopyChunk copy_chunk;
+                  {
+                    std::lock_guard<std::mutex> lock(free_chunks_mutex[index]);
+                    auto                       &chunks = free_chunks[index];
+                    if (chunks.size() == 0)
+                      copy_chunk = CopyChunk(chunk_size, sample_copy_data);
+                    else
+                      {
+                        copy_chunk = std::move(chunks.back());
+                        chunks.pop_back();
+                      }
+                    Assert(copy_chunk.chunk_no == std::nullopt,
+                           ExcInternalError());
+                    copy_chunk.chunk_no = std::make_optional(chunk_no);
+                  }
 
-                  auto &scratch_datas = thread_safe_scratch_datas.get();
-                  // We need to find an unused scratch data object in the list
-                  // that corresponds to the current thread and then mark it as
-                  // used. if we can't find one, create one. There is no need to
-                  // synchronize access to this variable using a mutex since
-                  // each object is local to its own thread.
-                  for (auto &p : scratch_datas)
+                  auto &this_thread_scratch_datas =
+                    thread_safe_scratch_datas.get();
+                  // Get a scratch data object (see the note above
+                  // thread_safe_scratch_datas for why there may be more than
+                  // one). We can't reuse iterators after calling worker() for
+                  // the same reason (calling emplace_front() invalidates
+                  // iterators but not references)
+                  auto this_thread_scratch_data_it =
+                    std::find_if(this_thread_scratch_datas.begin(),
+                                 this_thread_scratch_datas.end(),
+                                 [](const auto &a) {
+                                   return a.currently_in_use == false;
+                                 });
+                  if (this_thread_scratch_data_it ==
+                      this_thread_scratch_datas.end())
                     {
-                      if (p.currently_in_use == false)
-                        {
-                          scratch_data       = p.scratch_data.get();
-                          p.currently_in_use = true;
-                          break;
-                        }
+                      this_thread_scratch_datas.emplace_front(
+                        std::make_unique<ScratchData>(sample_scratch_data),
+                        true);
+                      this_thread_scratch_data_it =
+                        this_thread_scratch_datas.begin();
                     }
-                  // If no element in the list was found, create
-                  // one and mark it as used.
-                  if (scratch_data == nullptr)
-                    {
-                      scratch_datas.emplace_back(std::make_unique<ScratchData>(
-                                                   sample_scratch_data),
-                                                 true);
-                      scratch_data = scratch_datas.back().scratch_data.get();
-                    }
+                  auto &this_thread_scratch_data_object =
+                    *this_thread_scratch_data_it;
+                  this_thread_scratch_data_object.currently_in_use = true;
 
-                  // Create a unique copy chunk object where this
-                  // worker's work will be stored.
-                  copy_chunks[chunk_no] =
-                    std::make_unique<CopyChunk>(current_chunk_size,
-                                                sample_copy_data);
-                  auto &copy_chunk = copy_chunks[chunk_no];
-                  auto  it         = current_chunk_start;
+                  copy_chunk.copy_datas.resize(current_chunk_size,
+                                               sample_copy_data);
+                  auto it = current_chunk_start;
                   for (std::size_t i = 0; i < current_chunk_size; ++i)
                     {
-                      worker(it, *scratch_data, (copy_chunk->copy_datas)[i]);
+                      worker(it,
+                             *this_thread_scratch_data_object.scratch_data,
+                             copy_chunk.copy_datas[i]);
                       ++it;
                     }
 
-                  // Find our currently used scratch data and
-                  // mark it as unused.
-                  for (auto &p : scratch_datas)
-                    {
-                      if (p.scratch_data.get() == scratch_data)
-                        {
-                          Assert(p.currently_in_use == true,
-                                 ExcInternalError());
-                          p.currently_in_use = false;
-                        }
-                    }
+                  this_thread_scratch_data_object.currently_in_use = false;
+                  // Push the used CopyChunk:
+                  {
+                    std::lock_guard<std::mutex> lock(used_chunks_mutex[index]);
+                    used_chunks[index].emplace_back(std::move(copy_chunk));
+                  }
                 })
                 .name("worker");
 
@@ -878,14 +930,38 @@ namespace WorkStream
             // worker task.
             tf::Task copier_task =
               taskflow
-                .emplace([chunk_no, &copy_chunks, &copier]() {
-                  auto copy_chunk = copy_chunks[chunk_no].get();
-                  for (auto &copy_data : copy_chunk->copy_datas)
-                    {
-                      copier(copy_data);
-                    }
-                  // Finally free the memory.
-                  copy_chunks[chunk_no].reset();
+                .emplace([chunk_no,
+                          &free_chunks,
+                          &free_chunks_mutex,
+                          n_queues,
+                          &used_chunks_mutex,
+                          &used_chunks,
+                          &copier]() {
+                  const auto index = chunk_no % n_queues;
+                  // Get a used CopyChunk:
+                  CopyChunk copy_chunk;
+                  {
+                    std::lock_guard<std::mutex> lock(used_chunks_mutex[index]);
+                    auto                       &chunks = used_chunks[index];
+
+                    auto it = std::find_if(
+                      chunks.begin(), chunks.end(), [&](const auto &a) {
+                        return a.chunk_no == std::make_optional(chunk_no);
+                      });
+                    Assert(it != chunks.end(), ExcInternalError());
+                    copy_chunk = std::move(*it);
+                  }
+
+                  // Do the copy reduction:
+                  for (auto &copy_data : copy_chunk.copy_datas)
+                    copier(copy_data);
+
+                  // Push the free CopyChunk:
+                  {
+                    copy_chunk.chunk_no.reset();
+                    std::lock_guard<std::mutex> lock(free_chunks_mutex[index]);
+                    free_chunks[index].emplace_back(std::move(copy_chunk));
+                  }
                 })
                 .name("copy");
 
@@ -899,17 +975,16 @@ namespace WorkStream
               old_copiers.back().precede(copier_task);
 
             old_copiers.push_back(copier_task);
-            if (old_copiers.size() > 2 * MultithreadInfo::n_threads())
-            {
-              // As described at the top of the loop, prevent a backlog of copy
-              // tasks by making the new worker run after an old copier:
-              old_copiers.front().precede(worker_task);
-              old_copiers.pop_front();
-            }
+            if (old_copiers.size() > 2 * n_threads)
+              {
+                // As described at the top of the loop, prevent a backlog of
+                // copy tasks by making the new worker run after an old copier:
+                old_copiers.front().precede(worker_task);
+                old_copiers.pop_front();
+              }
 
             ++chunk_no;
           }
-        copy_chunks.resize(chunk_no);
         // Now we run all the tasks in the task graph. They will be run in
         // parallel and are eligible to run when their dependencies established
         // above are met.
