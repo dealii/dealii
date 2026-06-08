@@ -50,7 +50,6 @@ MappingQ<dim, spacedim>::InternalData::InternalData(
   : polynomial_degree(polynomial_degree)
   , fe_dgq_1d(std::make_shared<const FE_DGQ<1, 1>>(polynomial_degree))
   , n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1))
-  , line_support_points(QGaussLobatto<1>(polynomial_degree + 1))
   , tensor_product_quadrature(false)
   , output_data(nullptr)
 {}
@@ -63,7 +62,6 @@ MappingQ<dim, spacedim>::InternalData::InternalData(
   : polynomial_degree(fe_dgq_1d->tensor_degree())
   , fe_dgq_1d(fe_dgq_1d)
   , n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1))
-  , line_support_points(QGaussLobatto<1>(polynomial_degree + 1))
   , tensor_product_quadrature(false)
   , output_data(nullptr)
 {}
@@ -227,15 +225,13 @@ template <int dim, int spacedim>
 MappingQ<dim, spacedim>::MappingQ(const unsigned int p)
   : polynomial_degree(p)
   , fe_dgq_1d(std::make_shared<const FE_DGQ<1, 1>>(polynomial_degree))
-  , line_support_points(
-      QGaussLobatto<1>(this->polynomial_degree + 1).get_points())
-  , polynomials_1d(
-      Polynomials::generate_complete_Lagrange_basis(line_support_points))
+  , polynomials_1d(Polynomials::generate_complete_Lagrange_basis(
+      fe_dgq_1d->get_unit_support_points()))
   , renumber_lexicographic_to_hierarchic(
       FETools::lexicographic_to_hierarchic_numbering<dim>(p))
   , unit_cell_support_points(
       internal::MappingQImplementation::unit_support_points<dim>(
-        line_support_points,
+        fe_dgq_1d->get_unit_support_points(),
         renumber_lexicographic_to_hierarchic))
   , support_point_weights_perimeter_to_interior(
       internal::MappingQImplementation::
@@ -257,7 +253,6 @@ template <int dim, int spacedim>
 MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
   : polynomial_degree(mapping.polynomial_degree)
   , fe_dgq_1d(mapping.fe_dgq_1d)
-  , line_support_points(mapping.line_support_points)
   , polynomials_1d(mapping.polynomials_1d)
   , renumber_lexicographic_to_hierarchic(
       mapping.renumber_lexicographic_to_hierarchic)
@@ -1709,6 +1704,8 @@ MappingQ<2, 3>::add_quad_support_points(
 
   Table<2, double> weights(Utilities::fixed_power<2>(polynomial_degree - 1),
                            GeometryInfo<2>::vertices_per_cell);
+  const std::vector<Point<1>> &line_support_points =
+    fe_dgq_1d->get_unit_support_points();
   for (unsigned int q = 0, q2 = 0; q2 < polynomial_degree - 1; ++q2)
     for (unsigned int q1 = 0; q1 < polynomial_degree - 1; ++q1, ++q)
       {

@@ -18,7 +18,6 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
 
@@ -375,16 +374,6 @@ public:
      */
     const unsigned int n_shape_functions;
 
-    /*
-     * The default line support points. Is used in when the shape function
-     * values are computed.
-     *
-     * The number of quadrature points depends on the degree of this
-     * class, and it matches the number of degrees of freedom of an
-     * FE_Q<1>(this->degree).
-     */
-    QGaussLobatto<1> line_support_points;
-
     /**
      * For the fast tensor-product path of the MappingQ class, we choose SIMD
      * vectors that are as wide as possible to minimize the number of
@@ -525,16 +514,6 @@ protected:
    * lexicographic to hierarchic numbering.
    */
   const std::shared_ptr<const FE_DGQ<1, 1>> fe_dgq_1d;
-
-  /*
-   * The default line support points. These are used when computing the
-   * location in real space of the support points on lines and quads, which
-   * are needed by the Manifold<dim,spacedim> class.
-   *
-   * The number of points depends on the degree of this class, and it matches
-   * the number of degrees of freedom of an FE_Q<1>(this->degree).
-   */
-  const std::vector<Point<1>> line_support_points;
 
   /*
    * The one-dimensional polynomials defined as Lagrange polynomials from the
