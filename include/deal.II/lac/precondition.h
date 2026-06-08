@@ -2340,20 +2340,25 @@ namespace internal
       vector(0) = 0.;
   }
 
+
+
   template <typename Number>
   void
   set_initial_guess(::dealii::Vector<Number> &vector)
   {
-    // Choose a high-frequency mode consisting of numbers between 0 and 1
+    // Choose a high-frequency mode consisting of numbers between 0 and 10
     // that is cheap to compute (cheaper than random numbers) but avoids
     // obviously re-occurring numbers in multi-component systems by choosing
     // a period of 11
     for (unsigned int i = 0; i < vector.size(); ++i)
       vector(i) = i % 11;
 
+    // Then make sure the vector has mean value zero:
     const Number mean_value = vector.mean_value();
     vector.add(-mean_value);
   }
+
+
 
   template <typename Number, typename MemorySpace>
   void
@@ -2365,12 +2370,14 @@ namespace internal
       set_initial_guess(vector.block(block));
   }
 
+
+
   template <typename Number, typename MemorySpace>
   void
   set_initial_guess(
     ::dealii::LinearAlgebra::distributed::Vector<Number, MemorySpace> &vector)
   {
-    // Choose a high-frequency mode consisting of numbers between 0 and 1
+    // Choose a high-frequency mode consisting of numbers between 0 and 10
     // that is cheap to compute (cheaper than random numbers) but avoids
     // obviously re-occurring numbers in multi-component systems by choosing
     // a period of 11.
@@ -2395,9 +2402,12 @@ namespace internal
       });
     exec.fence();
 
+    // Then make sure the vector has mean value zero:
     const Number mean_value = vector.mean_value();
     vector.add(-mean_value);
   }
+
+
 
   struct EigenvalueTracker
   {
