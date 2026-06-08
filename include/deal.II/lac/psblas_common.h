@@ -20,13 +20,15 @@
 
 
 #ifdef DEAL_II_WITH_PSBLAS
-
 #  include <psb_base_cbind.h>
 #  include <psb_c_base.h>
 #  include <psb_c_dbase.h>
+#endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_PSBLAS
 namespace PSCToolkitWrappers
 {
 
@@ -271,13 +273,8 @@ namespace PSCToolkitWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#else
+#endif // DEAL_II_WITH_PSBLAS
 
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_PSBLAS
 #endif
