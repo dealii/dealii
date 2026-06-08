@@ -270,7 +270,7 @@ SYM_RANKS := { 2; 4 }
 // Flags that are allowed in DataOutInterface::set_flags
 OUTPUT_FLAG_TYPES := { DXFlags; UcdFlags; GnuplotFlags; PovrayFlags; EpsFlags;
                        GmvFlags; Hdf5Flags; TecplotFlags; VtkFlags; SvgFlags;
-                       Deal_II_IntermediateFlags }
+                       CFFlags; Deal_II_IntermediateFlags }
 
 // CGAL Kernels
 CGAL_KERNELS := {CGAL::Simple_cartesian<double>; CGAL::Exact_predicates_exact_constructions_kernel; 

@@ -17,53 +17,45 @@
 #
 # This module exports 
 #     target netCDF::netcdf
-#     NETCDF_HAS_PARALLEL
+#     NETCDF_FOUND
+#     NETCDF_HAS_PARALLEL4
 #
 
-find_package(netCDF 4.0.0 CONFIG QUIET)
+# not all distributions provide cmake config, and some (ubuntu 22) are broken
+# so we just search for headers the old school way
+find_path(_nc_include_dir
+  NAMES netcdf_meta.h
+  HINTS ${netCDF_DIR} ${NETCDF_DIR} ENV NETCDF_DIR ENV netCDF_DIR
+  PATH_SUFFIXES netcdf include
+  )
+deal_ii_find_library(_nc_library
+  NAMES netcdf
+  HINTS ${netCDF_DIR} ${NETCDF_DIR} ENV NETCDF_DIR ENV netCDF_DIR
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
 
-if(NOT TARGET netCDF::netcdf)
-  # not all distributions provide cmake config, so we fall back to searching files  
-  find_path(_nc_include_dir
-    NAMES netcdf_meta.h
-    HINTS ${netCDF_DIR} ${NETCDF_DIR} ENV NETCDF_DIR ENV netCDF_DIR
-    PATH_SUFFIXES netcdf include
+if(_nc_include_dir AND _nc_library)
+  # netcdf found, define interface target
+  set(netCDF_FOUND True)
+  add_library(_netcdf INTERFACE)
+  target_link_libraries(_netcdf INTERFACE ${_nc_library})
+  target_include_directories(_netcdf INTERFACE ${_nc_include_dir})
+  add_library(netCDF::netcdf ALIAS _netcdf)
+  set(NETCDF_TARGETS "netCDF::netcdf")
+
+  # scan features
+  file(STRINGS "${_nc_include_dir}/netcdf_meta.h" 
+    _nc_def_has_par 
+    REGEX "#define[ \t]+NC_HAS_PARALLEL4[ \t]+1"
     )
-  deal_ii_find_library(_nc_library
-    NAMES netcdf
-    HINTS ${netCDF_DIR} ${NETCDF_DIR} ENV NETCDF_DIR ENV netCDF_DIR
-    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-    )
-
-  if(_nc_include_dir AND _nc_library)
-    # netcdf found, define interface target
-    set(netCDF_FOUND True)
-    add_library(_netcdf INTERFACE)
-    target_link_libraries(_netcdf INTERFACE ${_nc_library})
-    target_include_directories(_netcdf INTERFACE ${_nc_include_dir})
-    add_library(netCDF::netcdf ALIAS _netcdf)
-
-    # scan features
-    file(STRINGS "${_nc_include_dir}/netcdf_meta.h" 
-      _nc_def_has_par 
-      REGEX "#define[ \t]+NC_HAS_PARALLEL[ \t]+1"
-      )
-    if(_nc_def_has_par)
-      set(netCDF_HAS_PARALLEL TRUE) # same variable as netcdf cmake config would define 
-    else()
-      set(netCDF_HAS_PARALLEL FALSE)
-    endif()
+  if(_nc_def_has_par)
+    set(NETCDF_HAS_PARALLEL4 TRUE) # same variable as netcdf cmake config would define 
+  else()
+    set(NETCDF_HAS_PARALLEL4 FALSE)
   endif()
-endif()
-
-if (TARGET netCDF::netcdf)
-  set(netCDF_TARGETS "netCDF::netcdf")
-else()
-  unset(netCDF_TARGETS)
 endif()
 
 process_feature(NETCDF
   TARGETS
-    REQUIRED netCDF_TARGETS
+    REQUIRED NETCDF_TARGETS
   )
-set(NETCDF_HAS_PARALLEL ${netCDF_HAS_PARALLEL}) # uppercase for consistency with other features
