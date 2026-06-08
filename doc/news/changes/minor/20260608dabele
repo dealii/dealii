@@ -1,0 +1,3 @@
+New: Add NetCDF as an optional dependency (to be used for output in an upcoming feature).
+<br>
+(Daniel Abele, 2026/06/08)
