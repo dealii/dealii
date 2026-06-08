@@ -355,6 +355,89 @@ namespace NonMatching
         quadrature, rhs_function, penalty_term, rhs, constraints, true);
     }
 
+    /**
+     * Apply the penalty-type Nitsche restriction operator to a field
+     * represented on @p dh1 and add the result to @p dst_dh1.
+     *
+     * This function computes
+     * \f[
+     * (\mathrm{dst\_dh1})_i += \gamma\int_{\Gamma_h} u_h\,\varphi_i\,d\Gamma,
+     * \f]
+     * where $u_h$ is represented by @p src_dh1 and $\varphi_i$ are basis
+     * functions of @p dh1.
+     */
+    template <class VectorType, typename number = double>
+    void
+    apply_nitsche_restriction(
+      const Quadrature<dim>           &quadrature,
+      const VectorType                &src_dh1,
+      const double                    &penalty_term,
+      VectorType                      &dst_dh1,
+      const AffineConstraints<number> &constraints =
+        AffineConstraints<number>(),
+      const bool reuse_internal_data_structures = false) const
+    {
+      if (penalty_term == 0.0)
+        return;
+      possibly_generate_particle_handler(reuse_internal_data_structures,
+                                         quadrature);
+
+      AssertDimension(src_dh1.size(), dh1->n_dofs());
+      AssertDimension(dst_dh1.size(), dh1->n_dofs());
+
+      std::vector<types::global_dof_index> dof_indices1(fe1->dofs_per_cell);
+
+      auto particle = quadrature_particle_handler->begin();
+      while (particle != quadrature_particle_handler->end())
+        {
+          Vector<double> local_rhs_dh1(fe1->dofs_per_cell);
+          local_rhs_dh1 = 0.;
+
+          const auto &cell = particle->get_surrounding_cell();
+          const auto &dh1_cell =
+            typename DoFHandler<spacedim>::cell_iterator(*cell, dh1);
+          dh1_cell->get_dof_indices(dof_indices1);
+
+          const auto pic = quadrature_particle_handler->particles_in_cell(cell);
+
+          for (; particle != pic.end(); ++particle)
+            {
+              const auto &properties = particle->get_properties();
+              const auto  JxW        = unpack_quadrature_jxw(properties);
+              const auto &ref_q1     = particle->get_reference_location();
+
+              Vector<double> coupled_values(n_comps);
+              coupled_values = 0.;
+
+              for (unsigned int j = 0; j < fe1->dofs_per_cell; ++j)
+                {
+                  const auto comp_j =
+                    gtl1[fe1->system_to_component_index(j).first];
+                  if (comp_j != numbers::invalid_unsigned_int &&
+                      comp_j < n_comps)
+                    coupled_values(comp_j) +=
+                      src_dh1[dof_indices1[j]] * fe1->shape_value(j, ref_q1);
+                }
+
+              for (unsigned int i = 0; i < fe1->dofs_per_cell; ++i)
+                {
+                  const auto comp_i =
+                    gtl1[fe1->system_to_component_index(i).first];
+                  if (comp_i != numbers::invalid_unsigned_int &&
+                      comp_i < n_comps)
+                    local_rhs_dh1(i) += penalty_term * coupled_values(comp_i) *
+                                        fe1->shape_value(i, ref_q1) * JxW;
+                }
+            }
+
+          constraints.distribute_local_to_global(local_rhs_dh1,
+                                                 dof_indices1,
+                                                 dst_dh1);
+        }
+
+      dst_dh1.compress(VectorOperation::add);
+    }
+
 
 
     /**
@@ -1422,11 +1505,10 @@ namespace NonMatching
                 }
 
             std::map<types::global_dof_index, Point<spacedim>>
-              support_points_map;
-            DoFTools::map_dofs_to_support_points(*mapping2,
-                                                 *dh2,
-                                                 support_points_map,
-                                                 temp_mask);
+              support_points_map =
+                DoFTools::map_dofs_to_support_points(*mapping2,
+                                                     *dh2,
+                                                     temp_mask);
 
             const auto dh2_selected_indices =
               DoFTools::locally_owned_dofs_per_component(*dh2, comps2);
