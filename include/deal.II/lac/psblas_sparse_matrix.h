@@ -25,12 +25,13 @@
 
 
 #ifdef DEAL_II_WITH_PSBLAS
-
 #  include <deal.II/lac/psblas_sparsity_pattern.h>
 #  include <deal.II/lac/psblas_vector.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_PSBLAS
 namespace PSCToolkitWrappers
 {
 
@@ -411,13 +412,7 @@ namespace PSCToolkitWrappers
 
 
 DEAL_II_NAMESPACE_CLOSE
-#else
-
-// Make sure the scripts that create the C++20 module input files have
-// something to latch on if the preprocessor #ifdef above would
-// otherwise lead to an empty content of the file.
-DEAL_II_NAMESPACE_OPEN
+#endif // DEAL_II_WITH_PSBLAS
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_WITH_PSBLAS
 #endif
