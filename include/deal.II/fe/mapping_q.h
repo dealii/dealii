@@ -36,6 +36,8 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 template <int, int>
 class MappingQCache;
+template <int, int>
+class FE_DGQ;
 #endif
 
 /**
@@ -298,6 +300,13 @@ public:
      */
     InternalData(const unsigned int polynomial_degree);
 
+    /**
+     * Constructor. Re-uses an FE_DGQ (typically the same one owned by a
+     * MappingQ) which defines the one-dimensional polynomial space used by this
+     * mapping.
+     */
+    InternalData(const std::shared_ptr<const FE_DGQ<1, 1>> &fe_dgq_1d);
+
     // Documentation see Mapping::InternalDataBase.
     virtual void
     reinit(const UpdateFlags      update_flags,
@@ -348,6 +357,12 @@ public:
      * used (with minor adjustments) by MappingQ, we need to store this.
      */
     const unsigned int polynomial_degree;
+
+    /**
+     * FiniteElement which defines the one-dimensional polynomial space used by
+     * the mapping.
+     */
+    const std::shared_ptr<const FE_DGQ<1, 1>> fe_dgq_1d;
 
     /**
      * Number of shape functions. If this is a Q1 mapping, then it is simply
@@ -504,6 +519,12 @@ protected:
    * cells.
    */
   const unsigned int polynomial_degree;
+
+  /**
+   * FiniteElement used for some internal setup, such as computing the
+   * lexicographic to hierarchic numbering.
+   */
+  const std::shared_ptr<const FE_DGQ<1, 1>> fe_dgq_1d;
 
   /*
    * The default line support points. These are used when computing the
