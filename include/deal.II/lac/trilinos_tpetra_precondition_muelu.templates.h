@@ -47,19 +47,21 @@ namespace LinearAlgebra
     /* ---------------------- PreconditionAMGMueLu ------------------------ */
     template <typename Number, typename MemorySpace>
     PreconditionAMGMueLu<Number, MemorySpace>::AdditionalData::AdditionalData(
-      const bool         elliptic,
-      const bool         symmetric,
-      const bool         w_cycle,
-      const double       aggregation_threshold,
-      const int          smoother_sweeps,
-      const int          smoother_overlap,
-      const bool         output_details,
-      const std::string &smoother_type,
-      const std::string &coarse_type)
+      const bool                            elliptic,
+      const bool                            symmetric,
+      const bool                            w_cycle,
+      const double                          aggregation_threshold,
+      const std::vector<std::vector<bool>> &constant_modes,
+      const int                             smoother_sweeps,
+      const int                             smoother_overlap,
+      const bool                            output_details,
+      const std::string                    &smoother_type,
+      const std::string                    &coarse_type)
       : elliptic(elliptic)
       , symmetric(symmetric)
       , w_cycle(w_cycle)
       , aggregation_threshold(aggregation_threshold)
+      , constant_modes(constant_modes)
       , smoother_sweeps(smoother_sweeps)
       , smoother_overlap(smoother_overlap)
       , output_details(output_details)
@@ -230,6 +232,65 @@ namespace LinearAlgebra
       parameter_list.set("aggregation: drop tol", ad.aggregation_threshold);
 
       parameter_list.set("coarse: max size", 2000);
+
+      using size_type = typename SparseMatrix<Number, MemorySpace>::size_type;
+      const auto domain_map               = A.trilinos_rcp()->getDomainMap();
+      const auto constant_modes_dimension = ad.constant_modes.size();
+
+      // Create the nullspace vector
+      Teuchos::RCP<TpetraTypes::MultiVectorType<Number, MemorySpace>>
+        distributed_constant_modes = Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::MultiVectorType<Number, MemorySpace>>(
+          domain_map,
+          constant_modes_dimension > 0 ? constant_modes_dimension : 1);
+
+      if (constant_modes_dimension > 0)
+        {
+          // MueLu benefits from knowing how many solution components
+          // a vector-valued problem has. We do not have this information
+          // readily available, except if the constant modes are given by
+          // the user. In that case one constant mode corresponds to each
+          // solution component. Provide a good guess if possible, otherwise use
+          // the default of 1.
+          parameter_list.set("number of equations",
+                             static_cast<int>(constant_modes_dimension));
+
+          const size_type n_rows = A.trilinos_rcp()->getGlobalNumRows();
+          const bool      constant_modes_are_global =
+            ad.constant_modes[0].size() == n_rows;
+          const size_type n_relevant_rows =
+            constant_modes_are_global ? n_rows : ad.constant_modes[0].size();
+          const size_type my_size = domain_map->getLocalNumElements();
+          if (constant_modes_are_global == false)
+            Assert(n_relevant_rows == my_size,
+                   ExcDimensionMismatch(n_relevant_rows, my_size));
+          Assert(n_rows == static_cast<size_type>(
+                             distributed_constant_modes->getGlobalLength()),
+                 ExcDimensionMismatch(
+                   n_rows, distributed_constant_modes->getGlobalLength()));
+
+          auto vector_2d = distributed_constant_modes
+                             ->template getLocalView<Kokkos::HostSpace>(
+                               Tpetra::Access::ReadWriteStruct{});
+
+          // Convert the given constant modes into a Tpetra multi-vector
+          for (size_type d = 0; d < constant_modes_dimension; ++d)
+            {
+              for (size_type row = 0; row < my_size; ++row)
+                {
+                  const auto global_row_id =
+                    constant_modes_are_global ?
+                      domain_map->getGlobalElement(row) :
+                      row;
+                  vector_2d(row, d) =
+                    static_cast<Number>(ad.constant_modes[d][global_row_id]);
+                }
+            }
+
+          Teuchos::ParameterList &userParams =
+            parameter_list.sublist("user data");
+          userParams.set("Nullspace", distributed_constant_modes);
+        }
 
       if (ad.output_details == true)
         parameter_list.set("verbosity", "high");
