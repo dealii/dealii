@@ -15,6 +15,8 @@
 // Test different versions of hp::FEFaceValues::reinit().
 
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>

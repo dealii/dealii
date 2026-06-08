@@ -16,6 +16,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/vectorization.h>
 
@@ -37,10 +38,6 @@ template <int dim, int spacedim>
 class Mapping;
 template <int dim, typename number, typename VectorizedArrayType>
 class MatrixFree;
-template <int dim>
-class Quadrature;
-template <int dim>
-class QGauss;
 template <typename Number, std::size_t width>
 class VectorizedArray;
 namespace hp

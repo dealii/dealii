@@ -14,6 +14,8 @@
 // Test TensorProductMatrixSymmetricSum for zero (constrained) rows and columns.
 // We consider a single cell with DBC applied to face 2*(dim-1).
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>

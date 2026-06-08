@@ -14,6 +14,8 @@
 
 // Test the basic member variables of FEEvaluation
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgp.h>

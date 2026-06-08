@@ -17,6 +17,8 @@
 // implementation, we used to miss to exchange some ghost entries upon the
 // compress() functionality within the matrix-free loop
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>

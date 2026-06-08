@@ -15,6 +15,8 @@
 // test Portable::FEEvaluation for assembling the system matrix of elasticity
 // problems
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>

@@ -19,6 +19,7 @@
 // is computed to the function that extracts all data at the same time (the
 // correctness of that must be tested elsewhere). No constraints.
 
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>

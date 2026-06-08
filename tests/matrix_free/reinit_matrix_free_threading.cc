@@ -13,6 +13,7 @@
 // Verify that MatrixFree::reinit() works without errors if run with
 // multithreadingf and multiple ranks.
 
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>
 

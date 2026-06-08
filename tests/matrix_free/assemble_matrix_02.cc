@@ -14,6 +14,8 @@
 
 // test FEEvaluation for assembling the Stokes matrix with Q2-Q1 finite elements
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>

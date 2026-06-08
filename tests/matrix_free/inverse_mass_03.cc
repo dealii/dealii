@@ -16,6 +16,8 @@
 // inverse_mass_02 but using different coefficients on different components
 
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_dgq.h>

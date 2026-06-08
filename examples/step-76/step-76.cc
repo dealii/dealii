@@ -23,6 +23,7 @@
 #include <deal.II/base/time_stepping.h>
 #include <deal.II/base/timer.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/vectorization.h>
 
 #include <deal.II/distributed/tria.h>

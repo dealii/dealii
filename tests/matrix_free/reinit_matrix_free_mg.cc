@@ -14,6 +14,7 @@
 // processes without any cells on a larger mesh (we need 17 processes to have
 // a 8x8 mesh with one process not having a cell on level 1).
 
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>
 

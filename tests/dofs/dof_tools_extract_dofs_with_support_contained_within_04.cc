@@ -16,6 +16,7 @@
 
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/distributed/tria.h>
 

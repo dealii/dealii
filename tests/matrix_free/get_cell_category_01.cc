@@ -15,6 +15,8 @@
 // tests MatrixFree::get_cell_category() and
 // MatrixFree::get_cell_range_category()
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
