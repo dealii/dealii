@@ -4117,8 +4117,7 @@ namespace parallel
       &Triangulation<1, spacedim>::get_p4est_tree_to_coarse_cell_permutation()
         const
     {
-      static std::vector<types::global_dof_index> a;
-      return a;
+      return p4est_tree_to_coarse_cell_permutation;
     }
 
 
