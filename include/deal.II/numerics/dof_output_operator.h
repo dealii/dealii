@@ -39,9 +39,13 @@ namespace Algorithms
   /**
    * An output operator writing a separate file in each step and writing the
    * vectors as finite element functions with respect to a given DoFHandler.
+   *
+   * @deprecated The caller should set up and manage a DataOut object instead.
    */
   template <typename VectorType, int dim, int spacedim = dim>
-  class DoFOutputOperator : public OutputOperator<VectorType>
+  class DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "The caller should set up and manage a DataOut object instead.")
+    DoFOutputOperator : public OutputOperator<VectorType>
   {
   public:
     /*
