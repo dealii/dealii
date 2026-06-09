@@ -4019,60 +4019,75 @@ ReferenceCell<dim>::face_tangent_vector(const unsigned int face_no,
         AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
         return GeometryInfo<dim>::unit_tangential_vectors[face_no][i];
       case ReferenceCells::Triangle:
-        {
-          AssertIndexRange(face_no, 3);
-          static const std::array<Tensor<1, dim>, 3> table = {
-            {Point<dim>(1, 0),
-             Point<dim>(-std::sqrt(0.5), +std::sqrt(0.5)),
-             Point<dim>(0, -1)}};
+        if constexpr (dim == 2)
+          {
+            AssertIndexRange(face_no, 3);
+            constexpr std::array<Tensor<1, dim>, 3> table = {
+              {Point<dim>(1, 0),
+               Point<dim>(-numbers::SQRT1_2, +numbers::SQRT1_2),
+               Point<dim>(0, -1)}};
 
-          return table[face_no];
-        }
+            return table[face_no];
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
       case ReferenceCells::Tetrahedron:
-        {
-          AssertIndexRange(face_no, 4);
-          static const ndarray<Tensor<1, dim>, 4, 2> table = {
-            {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-             {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
-             {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
-             {{Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
-                          +std::pow(1.0 / 3.0, 1.0 / 4.0),
-                          0),
-               Point<dim>(-std::pow(1.0 / 3.0, 1.0 / 4.0),
-                          0,
-                          +std::pow(1.0 / 3.0, 1.0 / 4.0))}}}};
+        if constexpr (dim == 3)
+          {
+            AssertIndexRange(face_no, 4);
+            // We need std::pow(1.0/3.0, 0.25) in a constexpr context, but that
+            // function isn't constexpr yet so hard-code the value and assert
+            // that it is close
+            constexpr double third_r4 = 0.7598356856515925473311877;
+            Assert(std::abs((third_r4 * third_r4) * (third_r4 * third_r4) -
+                            1.0 / 3.0) < 1e-14,
+                   ExcInternalError());
+            constexpr ndarray<Tensor<1, dim>, 4, 2> table = {
+              {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+               {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
+               {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}},
+               {{Point<dim>(-third_r4, +third_r4, 0),
+                 Point<dim>(-third_r4, 0, +third_r4)}}}};
 
-          return table[face_no][i];
-        }
+            return table[face_no][i];
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
       case ReferenceCells::Pyramid:
-        {
-          AssertIndexRange(face_no, 5);
-          static const ndarray<Tensor<1, dim>, 5, 2> table = {
-            {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-             {{Point<dim>(+1.0 / std::sqrt(2.0), 0, +1.0 / std::sqrt(2.0)),
-               Point<dim>(0, 1, 0)}},
-             {{Point<dim>(+1.0 / std::sqrt(2.0), 0, -1.0 / std::sqrt(2.0)),
-               Point<dim>(0, 1, 0)}},
-             {{Point<dim>(1, 0, 0),
-               Point<dim>(0, +1.0 / std::sqrt(2.0), +1.0 / std::sqrt(2.0))}},
-             {{Point<dim>(1, 0, 0),
-               Point<dim>(0, +1.0 / std::sqrt(2.0), -1.0 / std::sqrt(2.0))}}}};
+        if constexpr (dim == 3)
+          {
+            AssertIndexRange(face_no, 5);
+            constexpr ndarray<Tensor<1, dim>, 5, 2> table = {
+              {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+               {{Point<dim>(+numbers::SQRT1_2, 0, +numbers::SQRT1_2),
+                 Point<dim>(0, 1, 0)}},
+               {{Point<dim>(+numbers::SQRT1_2, 0, -numbers::SQRT1_2),
+                 Point<dim>(0, 1, 0)}},
+               {{Point<dim>(1, 0, 0),
+                 Point<dim>(0, +numbers::SQRT1_2, +numbers::SQRT1_2)}},
+               {{Point<dim>(1, 0, 0),
+                 Point<dim>(0, +numbers::SQRT1_2, -numbers::SQRT1_2)}}}};
 
-          return table[face_no][i];
-        }
+            return table[face_no][i];
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
       case ReferenceCells::Wedge:
-        {
-          AssertIndexRange(face_no, 5);
-          static const ndarray<Tensor<1, dim>, 5, 2> table = {
-            {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
-             {{Point<dim>(1, 0, 0), Point<dim>(0, 1, 0)}},
-             {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
-             {{Point<dim>(-1 / std::sqrt(2.0), +1 / std::sqrt(2.0), 0),
-               Point<dim>(0, 0, 1)}},
-             {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}}}};
+        if constexpr (dim == 3)
+          {
+            AssertIndexRange(face_no, 5);
+            constexpr ndarray<Tensor<1, dim>, 5, 2> table = {
+              {{{Point<dim>(0, 1, 0), Point<dim>(1, 0, 0)}},
+               {{Point<dim>(1, 0, 0), Point<dim>(0, 1, 0)}},
+               {{Point<dim>(1, 0, 0), Point<dim>(0, 0, 1)}},
+               {{Point<dim>(-numbers::SQRT1_2, +numbers::SQRT1_2, 0),
+                 Point<dim>(0, 0, 1)}},
+               {{Point<dim>(0, 0, 1), Point<dim>(0, 1, 0)}}}};
 
-          return table[face_no][i];
-        }
+            return table[face_no][i];
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
       default:
         DEAL_II_NOT_IMPLEMENTED();
     }
