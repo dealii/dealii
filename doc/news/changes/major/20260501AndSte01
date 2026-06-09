@@ -1,0 +1,4 @@
+Reworked `execute_refinement_isotropic` to handle cells producing children of
+different reference cells and added support for isotropic pyramid refinement.
+<br>
+(Andreas Steger, 2026/05/01)
