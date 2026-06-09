@@ -2491,9 +2491,7 @@ ReferenceCell<dim>::n_isotropic_children() const
       case ReferenceCells::Tetrahedron:
         return 8;
       case ReferenceCells::Pyramid:
-        // We haven't yet decided how to refine pyramids. Update this when we
-        // have
-        return 0;
+        return 10;
       case ReferenceCells::Wedge:
         return 8;
       case ReferenceCells::Hexahedron:
@@ -3575,7 +3573,8 @@ namespace ReferenceCells
   inline constexpr unsigned int
   max_n_children()
   {
-    return GeometryInfo<structdim>::max_children_per_cell;
+    // Pyramids (3D) have 10 children.
+    return structdim == 3 ? 10 : GeometryInfo<structdim>::max_children_per_cell;
   }
 } // namespace ReferenceCells
 

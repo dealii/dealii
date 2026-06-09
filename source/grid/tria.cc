@@ -157,16 +157,6 @@ namespace internal
     {
       for (const ReferenceCell<dim> &reference_cell : reference_cells)
         {
-          // TODO: remove this once we support Pyramid refinement
-          if (reference_cell == ReferenceCells::Pyramid)
-            {
-              Assert(reference_cell.n_isotropic_children() == 0,
-                     ExcMessage("This function must be updated once we support "
-                                "Pyramid refinement."));
-              // for now, use the standard 3d value
-              max_children_per_cell = 8;
-            }
-
           max_children_per_cell =
             std::max(max_children_per_cell,
                      reference_cell.n_isotropic_children());
@@ -5218,7 +5208,7 @@ namespace internal
         // Now add the four (two)
         // new cells!
         typename Triangulation<dim, spacedim>::raw_cell_iterator
-          subcells[GeometryInfo<dim>::max_children_per_cell];
+          subcells[ReferenceCells::max_n_children<dim>()];
         while (next_unused_cell->used() == true)
           ++next_unused_cell;
 
