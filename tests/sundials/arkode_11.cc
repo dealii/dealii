@@ -24,17 +24,27 @@
 #include "../tests.h"
 
 
-// Like _08, but throw a recoverable exception when solving with the mass
-// matrix.
+// Like _08, but optionally report a recoverable error at a few, well-separated
+// attempts to solve with the mass matrix before performing the actual solve.
+// This exercises the recoverable-error code path while still allowing the
+// integrator to reduce the step size, retry, and complete the time
+// integration.
+//
+// The problem is run twice: first without any artificial exceptions
+// (sub-test 1, the reference run) and then with the recoverable exceptions
+// enabled (sub-test 2). Both runs write to the same output stream, and at the
+// end the number of time steps taken in the two cases is compared: the
+// recoverable failures force additional step-size reductions and retries, so
+// the second run is expected to take at least as many steps as the first.
 
+using VectorType = Vector<double>;
 
-int
-main()
+// Run the problem once. If @p throw_recoverable_errors is true, report a
+// recoverable error at a few, well-separated mass-matrix solve attempts.
+// Returns the number of time steps taken (0 if an exception was caught).
+unsigned int
+run_problem(const bool throw_recoverable_errors)
 {
-  initlog();
-
-  using VectorType = Vector<double>;
-
   ParameterHandler                             prm;
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
@@ -42,14 +52,7 @@ main()
   SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
   stepper_data.add_parameters(prm);
 
-  if (false)
-    {
-      std::ofstream ofile(SOURCE_DIR "/arkode_11_in.prm");
-      prm.print_parameters(ofile, ParameterHandler::ShortPRM);
-      ofile.close();
-    }
-
-  std::ifstream ifile(SOURCE_DIR "/arkode_08_in.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_11_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
@@ -81,15 +84,36 @@ main()
                                       const VectorType &y,
                                       const VectorType &fy) { K.vmult(Jv, v); };
 
-  stepper.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType> &,
-                           SUNDIALS::SundialsPreconditioner<VectorType> &,
-                           VectorType &,
-                           const VectorType &,
-                           double) {
-    deallog
-      << "Reporting recoverable failure when solving with the mass matrix."
-      << std::endl;
-    throw RecoverableUserCallbackError();
+  // Occasionally report a recoverable failure when solving with the mass
+  // matrix to exercise ARKODE's recovery path.
+  //
+  // SUNDIALS "recovers" from a recoverable mass-solve failure by reducing the
+  // step size and re-attempting the whole step (which calls solve_mass again).
+  // The failures must therefore be sparse: they are triggered at a few fixed,
+  // well-separated solve counts so that no single step accumulates more than
+  // MAXNCF (=10) convergence failures (which would abort the integration).
+  unsigned int n_mass_solve_runs = 0;
+
+  stepper.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType>       &op,
+                           SUNDIALS::SundialsPreconditioner<VectorType> &prec,
+                           VectorType                                   &x,
+                           const VectorType                             &b,
+                           double                                        tol) {
+    ++n_mass_solve_runs;
+
+    if (throw_recoverable_errors &&
+        (n_mass_solve_runs == 30 || n_mass_solve_runs == 55 ||
+         n_mass_solve_runs == 85))
+      {
+        deallog << "Reporting recoverable failure when solving with the "
+                   "mass matrix."
+                << std::endl;
+        throw RecoverableUserCallbackError();
+      }
+
+    SolverControl        control(100, tol);
+    SolverCG<VectorType> solver_cg(control);
+    solver_cg.solve(op, x, b, prec);
   };
 
 
@@ -99,24 +123,25 @@ main()
         VectorType                                   &x,
         const VectorType                             &b,
         double                                        tol) {
-      ReductionControl     control;
+      SolverControl        control(100, tol);
       SolverCG<VectorType> solver_cg(control);
       solver_cg.solve(op, x, b, prec);
     };
 
   FullMatrix<double> M_inv(2, 2);
 
+  bool mass_preconditioner_solve_called = false;
+  bool mass_preconditioner_setup_called = false;
+
   stepper.mass_preconditioner_solve =
     [&](double t, const VectorType &r, VectorType &z, double gamma, int lr) {
-      LogStream::Prefix prefix("mass_preconditioner_solve");
-      deallog << "applied" << std::endl;
       M_inv.vmult(z, r);
+      mass_preconditioner_solve_called = true;
     };
 
   stepper.mass_preconditioner_setup = [&](double t) {
-    LogStream::Prefix prefix("mass_preconditioner_setup");
-    deallog << "applied" << std::endl;
     M_inv.invert(M);
+    mass_preconditioner_setup_called = true;
   };
 
   stepper.mass_times_vector = [&](const double      t,
@@ -135,10 +160,60 @@ main()
 
   try
     {
-      ode.solve_ode(y);
+      const unsigned int n_timesteps = ode.solve_ode(y);
+
+      deallog << std::boolalpha;
+      deallog << "mass_preconditioner_setup_called: "
+              << mass_preconditioner_setup_called << std::endl;
+      deallog << "mass_preconditioner_solve_called: "
+              << mass_preconditioner_solve_called << std::endl;
+
+      return n_timesteps;
     }
   catch (const std::exception &exc)
     {
       deallog << "Caught exception:" << std::endl << exc.what() << std::endl;
+      return 0;
     }
+}
+
+
+int
+main()
+{
+  initlog();
+
+  // Optionally regenerate the input parameter file.
+  if (false)
+    {
+      ParameterHandler                             prm;
+      SUNDIALS::ARKode<VectorType>::AdditionalData data;
+      data.add_parameters(prm);
+
+      SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+      stepper_data.add_parameters(prm);
+
+      std::ofstream ofile(SOURCE_DIR "/arkode_11_in.prm");
+      prm.print_parameters(ofile, ParameterHandler::ShortPRM);
+      ofile.close();
+    }
+
+  // Sub-test 1: run the problem without any artificial exceptions. This is the
+  // reference run.
+  deallog << "Sub-test 1: no artificial recoverable errors" << std::endl;
+  const unsigned int n_timesteps_reference =
+    run_problem(/* throw_recoverable_errors = */ false);
+
+  // Sub-test 2: run the same problem but report recoverable errors at a few
+  // mass-matrix solves, forcing ARKODE to reduce the step size and retry.
+  deallog << "Sub-test 2: with artificial recoverable errors" << std::endl;
+  const unsigned int n_timesteps_with_errors =
+    run_problem(/* throw_recoverable_errors = */ true);
+
+  // Compare the number of time steps taken in the two cases. The recoverable
+  // failures force additional step-size reductions and retries, so the second
+  // run takes more steps than the reference run.
+  deallog << std::boolalpha;
+  deallog << "Sub-test 2 required more timesteps: "
+          << (n_timesteps_with_errors - n_timesteps_reference > 2) << std::endl;
 }

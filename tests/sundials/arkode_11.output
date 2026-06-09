@@ -1,128 +1,17 @@
 
+DEAL::Sub-test 1: no artificial recoverable errors
 DEAL::0.00000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
+DEAL::0.500000 1.75000 0.750000
+DEAL::1.00000 2.50000 1.50000
+DEAL::mass_preconditioner_setup_called: true
+DEAL::mass_preconditioner_solve_called: true
+DEAL::Sub-test 2: with artificial recoverable errors
+DEAL::0.00000 1.00000 0.00000
 DEAL::Reporting recoverable failure when solving with the mass matrix.
 DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
 DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.100000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.200000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.300000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.400000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.500000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.600000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.700000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.800000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::0.900000 1.00000 0.00000
-DEAL:mass_preconditioner_setup::applied
-DEAL::Reporting recoverable failure when solving with the mass matrix.
-DEAL::Caught exception:
-DEAL::
---------------------------------------------------------
-An error occurred in line <0> of file <> in function
-    
-The violated condition was: 
-    
-Additional information: 
-    A user call-back function encountered a recoverable error, but the
-    underlying library that called the call-back did not manage to recover
-    from the error and aborted its operation.
-    
-    See the glossary entry on user call-back functions for more
-    information.
---------------------------------------------------------
-
+DEAL::0.500000 1.75000 0.750000
+DEAL::1.00000 2.50000 1.50000
+DEAL::mass_preconditioner_setup_called: true
+DEAL::mass_preconditioner_solve_called: true
+DEAL::Sub-test 2 required more timesteps: true
