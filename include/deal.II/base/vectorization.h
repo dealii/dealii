@@ -2948,8 +2948,41 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
       out[4 * i + 3].data = _mm256_unpackhi_pd(t2, t3);
     }
 
-  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    gather(out[i], in, i);
+  // Specialized remainder code
+  const unsigned int i         = 4 * n_chunks;
+  const unsigned int remainder = n_entries - i;
+  if (remainder == 3)
+    {
+      // Use masked load of 3 doubles (this avoids accessing in[x][3], which
+      // might be an invalid address)
+      __m256i mask{-1, -1, -1, 0};
+      __m256d u0      = _mm256_maskload_pd(in[0] + i, mask);
+      __m256d u1      = _mm256_maskload_pd(in[1] + i, mask);
+      __m256d u2      = _mm256_maskload_pd(in[2] + i, mask);
+      __m256d u3      = _mm256_maskload_pd(in[3] + i, mask);
+      __m256d t0      = _mm256_permute2f128_pd(u0, u2, 0x20);
+      __m256d t1      = _mm256_permute2f128_pd(u1, u3, 0x20);
+      __m256d t2      = _mm256_permute2f128_pd(u0, u2, 0x31);
+      __m256d t3      = _mm256_permute2f128_pd(u1, u3, 0x31);
+      out[i + 0].data = _mm256_unpacklo_pd(t0, t1);
+      out[i + 1].data = _mm256_unpackhi_pd(t0, t1);
+      out[i + 2].data = _mm256_unpacklo_pd(t2, t3);
+    }
+  else if (remainder == 2)
+    {
+      // Use 128 bit loads
+      __m256d t0, t1 = {};
+      t0 = _mm256_insertf128_pd(t1, _mm_loadu_pd(in[0] + i), 0);
+      t0 = _mm256_insertf128_pd(t0, _mm_loadu_pd(in[2] + i), 1);
+      t1 = _mm256_insertf128_pd(t1, _mm_loadu_pd(in[1] + i), 0);
+      t1 = _mm256_insertf128_pd(t1, _mm_loadu_pd(in[3] + i), 1);
+
+      out[i + 0].data = _mm256_unpacklo_pd(t0, t1);
+      out[i + 1].data = _mm256_unpackhi_pd(t0, t1);
+    }
+  else if (remainder == 1)
+    for (unsigned int v = 0; v < 4; ++v)
+      out[i][v] = in[v][i];
 }
 
 
@@ -3460,8 +3493,53 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
       out[4 * i + 3].data = _mm256_shuffle_ps(v1, v3, 0xdd);
     }
 
-  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    gather(out[i], in, i);
+  // Specialized remainder code
+  const unsigned int i         = 4 * n_chunks;
+  const unsigned int remainder = n_entries - i;
+  if (remainder == 3)
+    {
+      // Use masked load of 3 floats (this avoids accessing in[x][3], which
+      // might be an invalid address)
+      __m128i mask = _mm_setr_epi32(-1, -1, -1, 0);
+      __m256  t0, t1, t2, t3 = {};
+      t0        = _mm256_insertf128_ps(t3, _mm_maskload_ps(in[0] + i, mask), 0);
+      t0        = _mm256_insertf128_ps(t0, _mm_maskload_ps(in[4] + i, mask), 1);
+      t1        = _mm256_insertf128_ps(t3, _mm_maskload_ps(in[1] + i, mask), 0);
+      t1        = _mm256_insertf128_ps(t1, _mm_maskload_ps(in[5] + i, mask), 1);
+      t2        = _mm256_insertf128_ps(t3, _mm_maskload_ps(in[2] + i, mask), 0);
+      t2        = _mm256_insertf128_ps(t2, _mm_maskload_ps(in[6] + i, mask), 1);
+      t3        = _mm256_insertf128_ps(t3, _mm_maskload_ps(in[3] + i, mask), 0);
+      t3        = _mm256_insertf128_ps(t3, _mm_maskload_ps(in[7] + i, mask), 1);
+      __m256 v0 = _mm256_shuffle_ps(t0, t1, 0x44);
+      __m256 v1 = _mm256_shuffle_ps(t0, t1, 0xee);
+      __m256 v2 = _mm256_shuffle_ps(t2, t3, 0x44);
+      __m256 v3 = _mm256_shuffle_ps(t2, t3, 0xee);
+      out[i + 0].data = _mm256_shuffle_ps(v0, v2, 0x88);
+      out[i + 1].data = _mm256_shuffle_ps(v0, v2, 0xdd);
+      out[i + 2].data = _mm256_shuffle_ps(v1, v3, 0x88);
+    }
+  else if (remainder == 2)
+    {
+      // Use 64-bit integer loads
+      __m128i t0, t1;
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[0] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[1] + i));
+      __m256i v0 = _mm256_castsi128_si256(_mm_unpacklo_epi64(t0, t1));
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[4] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[5] + i));
+      v0 = _mm256_inserti128_si256(v0, _mm_unpacklo_epi64(t0, t1), 1);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[2] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[3] + i));
+      __m256i v1 = _mm256_castsi128_si256(_mm_unpacklo_epi64(t0, t1));
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[6] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[7] + i));
+      v1 = _mm256_inserti128_si256(v1, _mm_unpacklo_epi64(t0, t1), 1);
+      out[i + 0].data = _mm256_shuffle_ps(v0, v1, 0x88);
+      out[i + 1].data = _mm256_shuffle_ps(v0, v1, 0xdd);
+    }
+  else if (remainder == 1)
+    for (unsigned int v = 0; v < 8; ++v)
+      out[i][v] = in[v][i];
 }
 
 
@@ -4042,8 +4120,57 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
       out[4 * i + 3].data = _mm512_unpackhi_pd(v1, v3);
     }
 
-  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    gather(out[i], in, i);
+  // Specialized remainder code
+  const unsigned int i         = 4 * n_chunks;
+  const unsigned int remainder = n_entries - i;
+  if (remainder == 3)
+    {
+      // Use masked loads to access the first 3 doubles along each pointer
+      // without touching the possibly invalid addressed at in[x][3].
+      __m256i mask{-1, -1, -1, 0};
+      __m512d t0, t1, t2, t3 = {};
+
+      t0 = _mm512_insertf64x4(t3, _mm256_maskload_pd(in[0] + i, mask), 0);
+      t0 = _mm512_insertf64x4(t0, _mm256_maskload_pd(in[2] + i, mask), 1);
+      t1 = _mm512_insertf64x4(t3, _mm256_maskload_pd(in[1] + i, mask), 0);
+      t1 = _mm512_insertf64x4(t1, _mm256_maskload_pd(in[3] + i, mask), 1);
+      t2 = _mm512_insertf64x4(t3, _mm256_maskload_pd(in[4] + i, mask), 0);
+      t2 = _mm512_insertf64x4(t2, _mm256_maskload_pd(in[6] + i, mask), 1);
+      t3 = _mm512_insertf64x4(t3, _mm256_maskload_pd(in[5] + i, mask), 0);
+      t3 = _mm512_insertf64x4(t3, _mm256_maskload_pd(in[7] + i, mask), 1);
+
+      __m512d v0      = _mm512_shuffle_f64x2(t0, t2, 0x88);
+      __m512d v1      = _mm512_shuffle_f64x2(t0, t2, 0xdd);
+      __m512d v2      = _mm512_shuffle_f64x2(t1, t3, 0x88);
+      __m512d v3      = _mm512_shuffle_f64x2(t1, t3, 0xdd);
+      out[i + 0].data = _mm512_unpacklo_pd(v0, v2);
+      out[i + 1].data = _mm512_unpackhi_pd(v0, v2);
+      out[i + 2].data = _mm512_unpacklo_pd(v1, v3);
+    }
+  else if (remainder == 2)
+    {
+      // Use 128-bit loads of 2 doubles
+      __m256d t0, t1, t2, t3 = {};
+      t0 = _mm256_insertf128_pd(t3, _mm_loadu_pd(in[0] + i), 0);
+      t0 = _mm256_insertf128_pd(t0, _mm_loadu_pd(in[2] + i), 1);
+      t1 = _mm256_insertf128_pd(t3, _mm_loadu_pd(in[1] + i), 0);
+      t1 = _mm256_insertf128_pd(t1, _mm_loadu_pd(in[3] + i), 1);
+      t2 = _mm256_insertf128_pd(t3, _mm_loadu_pd(in[4] + i), 0);
+      t2 = _mm256_insertf128_pd(t2, _mm_loadu_pd(in[6] + i), 1);
+      t3 = _mm256_insertf128_pd(t3, _mm_loadu_pd(in[5] + i), 0);
+      t3 = _mm256_insertf128_pd(t3, _mm_loadu_pd(in[7] + i), 1);
+
+      __m512d v0, v1 = {};
+      v0              = _mm512_insertf64x4(v1, t0, 0);
+      v0              = _mm512_insertf64x4(v0, t2, 1);
+      v1              = _mm512_insertf64x4(v1, t1, 0);
+      v1              = _mm512_insertf64x4(v1, t3, 1);
+      out[i + 0].data = _mm512_unpacklo_pd(v0, v1);
+      out[i + 1].data = _mm512_unpackhi_pd(v0, v1);
+    }
+  else if (remainder == 1)
+    for (unsigned int v = 0; v < 8; ++v)
+      out[i][v] = in[v][i];
 }
 
 
@@ -4614,8 +4741,76 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
       out[4 * i + 3].data = _mm512_shuffle_ps(v1, v3, 0xdd);
     }
 
-  for (unsigned int i = 4 * n_chunks; i < n_entries; ++i)
-    gather(out[i], in, i);
+  // Specialized remainder code
+  const unsigned int i         = 4 * n_chunks;
+  const unsigned int remainder = n_entries - i;
+  if (remainder == 3)
+    {
+      __m512 t0, t1, t2, t3 = {};
+
+      // Use masked load of 3 floats (this avoids accessing in[x][3], which
+      // might be an invalid address)
+      __m128i mask = _mm_setr_epi32(-1, -1, -1, 0);
+      t0        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[0] + i, mask), 0);
+      t0        = _mm512_insertf32x4(t0, _mm_maskload_ps(in[4] + i, mask), 1);
+      t0        = _mm512_insertf32x4(t0, _mm_maskload_ps(in[8] + i, mask), 2);
+      t0        = _mm512_insertf32x4(t0, _mm_maskload_ps(in[12] + i, mask), 3);
+      t1        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[1] + i, mask), 0);
+      t1        = _mm512_insertf32x4(t1, _mm_maskload_ps(in[5] + i, mask), 1);
+      t1        = _mm512_insertf32x4(t1, _mm_maskload_ps(in[9] + i, mask), 2);
+      t1        = _mm512_insertf32x4(t1, _mm_maskload_ps(in[13] + i, mask), 3);
+      t2        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[2] + i, mask), 0);
+      t2        = _mm512_insertf32x4(t2, _mm_maskload_ps(in[6] + i, mask), 1);
+      t2        = _mm512_insertf32x4(t2, _mm_maskload_ps(in[10] + i, mask), 2);
+      t2        = _mm512_insertf32x4(t2, _mm_maskload_ps(in[14] + i, mask), 3);
+      t3        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[3] + i, mask), 0);
+      t3        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[7] + i, mask), 1);
+      t3        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[11] + i, mask), 2);
+      t3        = _mm512_insertf32x4(t3, _mm_maskload_ps(in[15] + i, mask), 3);
+      __m512 v0 = _mm512_shuffle_ps(t0, t1, 0x44);
+      __m512 v1 = _mm512_shuffle_ps(t0, t1, 0xee);
+      __m512 v2 = _mm512_shuffle_ps(t2, t3, 0x44);
+      __m512 v3 = _mm512_shuffle_ps(t2, t3, 0xee);
+      out[i + 0].data = _mm512_shuffle_ps(v0, v2, 0x88);
+      out[i + 1].data = _mm512_shuffle_ps(v0, v2, 0xdd);
+      out[i + 2].data = _mm512_shuffle_ps(v1, v3, 0x88);
+    }
+  else if (remainder == 2)
+    {
+      __m512 v0, v1 = {};
+
+      // Use 64-bit integer loads
+      __m128i t0, t1;
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[0] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[1] + i));
+      v0 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 0);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[4] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[5] + i));
+      v0 = _mm512_insertf32x4(v0, _mm_unpacklo_epi64(t0, t1), 1);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[8] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[9] + i));
+      v0 = _mm512_insertf32x4(v0, _mm_unpacklo_epi64(t0, t1), 2);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[12] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[13] + i));
+      v0 = _mm512_insertf32x4(v0, _mm_unpacklo_epi64(t0, t1), 3);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[2] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[3] + i));
+      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 0);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[6] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[7] + i));
+      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 1);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[10] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[11] + i));
+      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 2);
+      t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[14] + i));
+      t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[15] + i));
+      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 3);
+      out[i + 0].data = _mm512_shuffle_ps(v0, v1, 0x88);
+      out[i + 1].data = _mm512_shuffle_ps(v0, v1, 0xdd);
+    }
+  else if (remainder == 1)
+    for (unsigned int v = 0; v < 16; ++v)
+      out[i][v] = in[v][i];
 }
 
 
