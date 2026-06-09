@@ -23,6 +23,8 @@
 #  include <arkode/arkode_butcher_erk.h>
 #endif
 
+#include <cmath>
+
 #include "../tests.h"
 
 
@@ -84,7 +86,18 @@ run(const SUNDIALS::ERKStepper<VectorType>::AdditionalData &data,
 
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int /*step*/) {
-      deallog << t << ' ' << sol[0] << ' ' << sol[1] << std::endl;
+      // Exact solution of the harmonic oscillator: y[0] = sin(k t),
+      // y[1] = k cos(k t).
+      VectorType exact(2);
+      exact[0] = std::sin(kappa * t);
+      exact[1] = kappa * std::cos(kappa * t);
+
+      VectorType diff(exact);
+      diff -= sol;
+
+      deallog << t << ' ' << std::fixed << std::setprecision(4) << sol[0] << ' '
+              << sol[1] << ' ' << exact[0] << ' ' << exact[1] << ' '
+              << diff.l2_norm() << std::endl;
     };
 
   VectorType y(2);
