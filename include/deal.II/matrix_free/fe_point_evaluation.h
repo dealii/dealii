@@ -18,6 +18,7 @@
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomial.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/signaling_nan.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/vectorization.h>

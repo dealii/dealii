@@ -16,6 +16,7 @@
 // random vector to a CG solver. Same as inverse_mass_01, but using
 // FE_DGQHermite instead of FE_DGQ
 
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

@@ -15,6 +15,8 @@
 // like faces_value_optimization but mixed types
 
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_generator.h>

@@ -15,6 +15,7 @@
 // based on MatrixFreeOperators::Base by comparing with a matrix version.
 
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>

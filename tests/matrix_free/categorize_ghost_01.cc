@@ -14,6 +14,8 @@
 
 // tests categorization of ghost cells
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>

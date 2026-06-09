@@ -16,6 +16,7 @@
 // facilities with the alternative reinit(cell_index, face_number) approach
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/tria.h>

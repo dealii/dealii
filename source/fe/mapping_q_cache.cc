@@ -11,6 +11,7 @@
 // -----------------------------------------------------------------------------
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/work_stream.h>
 

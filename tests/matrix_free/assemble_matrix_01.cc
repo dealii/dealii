@@ -15,6 +15,8 @@
 // test FEEvaluation for assembling the Laplace matrix. It is enough to just
 // consider the resulting element matrices element by element
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>

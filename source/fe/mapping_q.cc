@@ -48,8 +48,20 @@ template <int dim, int spacedim>
 MappingQ<dim, spacedim>::InternalData::InternalData(
   const unsigned int polynomial_degree)
   : polynomial_degree(polynomial_degree)
+  , fe_dgq_1d(std::make_shared<const FE_DGQ<1, 1>>(polynomial_degree))
   , n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1))
-  , line_support_points(QGaussLobatto<1>(polynomial_degree + 1))
+  , tensor_product_quadrature(false)
+  , output_data(nullptr)
+{}
+
+
+
+template <int dim, int spacedim>
+MappingQ<dim, spacedim>::InternalData::InternalData(
+  const std::shared_ptr<const FE_DGQ<1, 1>> &fe_dgq_1d)
+  : polynomial_degree(fe_dgq_1d->tensor_degree())
+  , fe_dgq_1d(fe_dgq_1d)
+  , n_shape_functions(Utilities::fixed_power<dim>(polynomial_degree + 1))
   , tensor_product_quadrature(false)
   , output_data(nullptr)
 {}
@@ -61,6 +73,8 @@ std::size_t
 MappingQ<dim, spacedim>::InternalData::memory_consumption() const
 {
   return (Mapping<dim, spacedim>::InternalDataBase::memory_consumption() +
+          MemoryConsumption::memory_consumption(fe_dgq_1d) +
+          fe_dgq_1d->memory_consumption() +
           MemoryConsumption::memory_consumption(quadrature_points) +
           MemoryConsumption::memory_consumption(unit_tangentials) +
           MemoryConsumption::memory_consumption(aux) +
@@ -135,8 +149,7 @@ MappingQ<dim, spacedim>::InternalData::reinit(const UpdateFlags update_flags,
               // use a 1d FE_DGQ and adjust the hierarchic -> lexicographic
               // numbering manually (building an FE_Q<dim> is relatively
               // expensive due to constraints)
-              const FE_DGQ<1> fe(polynomial_degree);
-              shape_info.reinit(quadrature.get_tensor_basis()[0], fe);
+              shape_info.reinit(quadrature.get_tensor_basis()[0], *fe_dgq_1d);
               shape_info.lexicographic_numbering =
                 FETools::lexicographic_to_hierarchic_numbering<dim>(
                   polynomial_degree);
@@ -164,8 +177,7 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
   if (dim > 1 && tensor_product_quadrature)
     {
       constexpr unsigned int facedim = dim - 1;
-      const FE_DGQ<1>        fe(polynomial_degree);
-      shape_info.reinit(quadrature.get_tensor_basis()[0], fe);
+      shape_info.reinit(quadrature.get_tensor_basis()[0], *fe_dgq_1d);
       shape_info.lexicographic_numbering =
         FETools::lexicographic_to_hierarchic_numbering<facedim>(
           polynomial_degree);
@@ -212,15 +224,14 @@ MappingQ<dim, spacedim>::InternalData::initialize_face(
 template <int dim, int spacedim>
 MappingQ<dim, spacedim>::MappingQ(const unsigned int p)
   : polynomial_degree(p)
-  , line_support_points(
-      QGaussLobatto<1>(this->polynomial_degree + 1).get_points())
-  , polynomials_1d(
-      Polynomials::generate_complete_Lagrange_basis(line_support_points))
+  , fe_dgq_1d(std::make_shared<const FE_DGQ<1, 1>>(polynomial_degree))
+  , polynomials_1d(Polynomials::generate_complete_Lagrange_basis(
+      fe_dgq_1d->get_unit_support_points()))
   , renumber_lexicographic_to_hierarchic(
       FETools::lexicographic_to_hierarchic_numbering<dim>(p))
   , unit_cell_support_points(
       internal::MappingQImplementation::unit_support_points<dim>(
-        line_support_points,
+        fe_dgq_1d->get_unit_support_points(),
         renumber_lexicographic_to_hierarchic))
   , support_point_weights_perimeter_to_interior(
       internal::MappingQImplementation::
@@ -241,7 +252,7 @@ MappingQ<dim, spacedim>::MappingQ(const unsigned int p)
 template <int dim, int spacedim>
 MappingQ<dim, spacedim>::MappingQ(const MappingQ<dim, spacedim> &mapping)
   : polynomial_degree(mapping.polynomial_degree)
-  , line_support_points(mapping.line_support_points)
+  , fe_dgq_1d(mapping.fe_dgq_1d)
   , polynomials_1d(mapping.polynomials_1d)
   , renumber_lexicographic_to_hierarchic(
       mapping.renumber_lexicographic_to_hierarchic)
@@ -795,8 +806,7 @@ std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase>
 MappingQ<dim, spacedim>::get_data(const UpdateFlags      update_flags,
                                   const Quadrature<dim> &q) const
 {
-  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(polynomial_degree);
+  auto data_ptr = std::make_unique<InternalData>(fe_dgq_1d);
   data_ptr->reinit(update_flags, q);
   return data_ptr;
 }
@@ -811,9 +821,8 @@ MappingQ<dim, spacedim>::get_face_data(
 {
   AssertDimension(quadrature.size(), 1);
 
-  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(polynomial_degree);
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  auto  data_ptr = std::make_unique<InternalData>(fe_dgq_1d);
+  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_faces(
                          ReferenceCells::get_hypercube<dim>(), quadrature),
@@ -830,9 +839,8 @@ MappingQ<dim, spacedim>::get_subface_data(
   const UpdateFlags          update_flags,
   const Quadrature<dim - 1> &quadrature) const
 {
-  std::unique_ptr<typename Mapping<dim, spacedim>::InternalDataBase> data_ptr =
-    std::make_unique<InternalData>(polynomial_degree);
-  auto &data = dynamic_cast<InternalData &>(*data_ptr);
+  auto  data_ptr = std::make_unique<InternalData>(fe_dgq_1d);
+  auto &data     = dynamic_cast<InternalData &>(*data_ptr);
   data.initialize_face(this->requires_update_flags(update_flags),
                        QProjector<dim>::project_to_all_subfaces(
                          ReferenceCells::get_hypercube<dim>(), quadrature),
@@ -1696,6 +1704,8 @@ MappingQ<2, 3>::add_quad_support_points(
 
   Table<2, double> weights(Utilities::fixed_power<2>(polynomial_degree - 1),
                            GeometryInfo<2>::vertices_per_cell);
+  const std::vector<Point<1>> &line_support_points =
+    fe_dgq_1d->get_unit_support_points();
   for (unsigned int q = 0, q2 = 0; q2 < polynomial_degree - 1; ++q2)
     for (unsigned int q1 = 0; q1 < polynomial_degree - 1; ++q1, ++q)
       {

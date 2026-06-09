@@ -16,7 +16,7 @@
 
 #include <deal.II/base/config.h>
 
-#include <deal.II/base/quadrature.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/dofs/dof_handler.h>
 

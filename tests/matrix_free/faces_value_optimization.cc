@@ -15,6 +15,8 @@
 // tests matrix-free face evaluation with the option to compress
 
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgq.h>
 
 #include <deal.II/grid/grid_generator.h>

@@ -12,6 +12,8 @@
 
 // Check if initialization of FEFaceEvaluation works for hp + DG in 3D.
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1.h>
 

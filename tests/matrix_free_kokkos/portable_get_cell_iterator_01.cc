@@ -13,6 +13,8 @@
 
 // test Portable::MatrixFree::get_cell_iterator()
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/fe_q.h>

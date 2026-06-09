@@ -16,6 +16,8 @@
 // a separate category for each cell, using a lexicographic order of cells
 
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/mapping_q1.h>
 

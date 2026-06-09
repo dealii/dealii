@@ -14,6 +14,7 @@
 
 // check the diagonal of LaplaceOperator for the scalar and vector-valued case
 
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>

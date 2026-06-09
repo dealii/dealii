@@ -17,6 +17,8 @@
 //   (2) compute with multiple FEEvaluation instances
 //
 
+#include <deal.II/base/quadrature_lib.h>
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_renumbering.h>
 

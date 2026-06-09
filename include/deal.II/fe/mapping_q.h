@@ -18,7 +18,6 @@
 
 #include <deal.II/base/derivative_form.h>
 #include <deal.II/base/polynomial.h>
-#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/vectorization.h>
 
@@ -36,6 +35,8 @@ DEAL_II_NAMESPACE_OPEN
 #ifndef DOXYGEN
 template <int, int>
 class MappingQCache;
+template <int, int>
+class FE_DGQ;
 #endif
 
 /**
@@ -298,6 +299,13 @@ public:
      */
     InternalData(const unsigned int polynomial_degree);
 
+    /**
+     * Constructor. Re-uses an FE_DGQ (typically the same one owned by a
+     * MappingQ) which defines the one-dimensional polynomial space used by this
+     * mapping.
+     */
+    InternalData(const std::shared_ptr<const FE_DGQ<1, 1>> &fe_dgq_1d);
+
     // Documentation see Mapping::InternalDataBase.
     virtual void
     reinit(const UpdateFlags      update_flags,
@@ -350,6 +358,12 @@ public:
     const unsigned int polynomial_degree;
 
     /**
+     * FiniteElement which defines the one-dimensional polynomial space used by
+     * the mapping.
+     */
+    const std::shared_ptr<const FE_DGQ<1, 1>> fe_dgq_1d;
+
+    /**
      * Number of shape functions. If this is a Q1 mapping, then it is simply
      * the number of vertices per cell. However, since also derived classes
      * use this class (e.g. the Mapping_Q() class), the number of shape
@@ -359,16 +373,6 @@ public:
      * degree of the mapping.
      */
     const unsigned int n_shape_functions;
-
-    /*
-     * The default line support points. Is used in when the shape function
-     * values are computed.
-     *
-     * The number of quadrature points depends on the degree of this
-     * class, and it matches the number of degrees of freedom of an
-     * FE_Q<1>(this->degree).
-     */
-    QGaussLobatto<1> line_support_points;
 
     /**
      * For the fast tensor-product path of the MappingQ class, we choose SIMD
@@ -505,15 +509,11 @@ protected:
    */
   const unsigned int polynomial_degree;
 
-  /*
-   * The default line support points. These are used when computing the
-   * location in real space of the support points on lines and quads, which
-   * are needed by the Manifold<dim,spacedim> class.
-   *
-   * The number of points depends on the degree of this class, and it matches
-   * the number of degrees of freedom of an FE_Q<1>(this->degree).
+  /**
+   * FiniteElement used for some internal setup, such as computing the
+   * lexicographic to hierarchic numbering.
    */
-  const std::vector<Point<1>> line_support_points;
+  const std::shared_ptr<const FE_DGQ<1, 1>> fe_dgq_1d;
 
   /*
    * The one-dimensional polynomials defined as Lagrange polynomials from the
