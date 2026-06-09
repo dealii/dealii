@@ -12918,6 +12918,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , vertex_to_manifold_id_map_1d(std::move(tria.vertex_to_manifold_id_map_1d))
 {
   tria.number_cache = internal::TriangulationImplementation::NumberCache<dim>();
+  tria.strides      = {};
 
   if (tria.policy)
     this->policy = tria.policy->clone();
@@ -12948,6 +12949,7 @@ Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
   vertex_to_manifold_id_map_1d = std::move(tria.vertex_to_manifold_id_map_1d);
 
   tria.number_cache = internal::TriangulationImplementation::NumberCache<dim>();
+  tria.strides      = {};
 
   if (tria.policy)
     this->policy = tria.policy->clone();
