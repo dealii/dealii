@@ -1525,6 +1525,9 @@ namespace LinearAlgebra
           }
         }
 
+      nonlocal_vector_1d_view.reset();
+      vector_1d_view.reset();
+
       // Handle vector additions
       // If the nonlocal vector is permanent (=fixed-size) we cannot guarantee
       // that all processes that store an entry have written into it. Therefore
@@ -1555,8 +1558,6 @@ namespace LinearAlgebra
       else
         nonlocal_vector->putScalar(Number(0));
 
-      nonlocal_vector_1d_view.reset();
-      vector_1d_view.reset();
       compressed  = true;
       last_action = VectorOperation::unknown;
     }
