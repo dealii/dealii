@@ -55,7 +55,7 @@ namespace Algorithms
    * with a more modern interface and better programming guarantees. Consider
    * using DiscreteTime instead of TimestepControl.
    */
-  class TimestepControl : public EnableObserverPointer
+  class DEAL_II_DEPRECATED_EARLY TimestepControl : public EnableObserverPointer
   {
   public:
     /**

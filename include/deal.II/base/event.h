@@ -43,7 +43,7 @@ namespace Algorithms
    * Event A::event = Event::assign("Event for A");
    * @endcode
    */
-  class Event
+  class DEAL_II_DEPRECATED_EARLY Event
   {
   public:
     /**

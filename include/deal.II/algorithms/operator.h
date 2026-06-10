@@ -61,7 +61,7 @@ namespace Algorithms
    * providing additional information and forwarded to the inner Operator
    * objects of the nested iteration.
    */
-  class OperatorBase : public EnableObserverPointer
+  class DEAL_II_DEPRECATED_EARLY OperatorBase : public EnableObserverPointer
   {
   public:
     /**
@@ -100,7 +100,7 @@ namespace Algorithms
    * in each step of an iteration.
    */
   template <typename VectorType>
-  class OutputOperator : public EnableObserverPointer
+  class DEAL_II_DEPRECATED_EARLY OutputOperator : public EnableObserverPointer
   {
   public:
     /**
