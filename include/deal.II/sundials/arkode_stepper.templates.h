@@ -32,11 +32,9 @@
 
 #  include <arkode/arkode_arkstep.h>
 #  include <arkode/arkode_erkstep.h>
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-#    include <arkode/arkode_splittingstep.h>
-#  endif
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 #    include <arkode/arkode_lsrkstep.h>
+#    include <arkode/arkode_splittingstep.h>
 #  endif
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
 #    include <sundomeigest/sundomeigest_power.h>
@@ -917,14 +915,10 @@ namespace SUNDIALS
     return arkode_mem.get();
   }
 
-#  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
-
 
   // ---------------------------------------------------------------------------
   // SplittingStepper implementation
   // ---------------------------------------------------------------------------
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
 
   template <typename VectorType>
   SplittingStepper<VectorType>::SplittingStepper(
@@ -1025,7 +1019,7 @@ namespace SUNDIALS
     return arkode_mem.get();
   }
 
-#  endif // DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+#  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 
 } // namespace SUNDIALS
 
