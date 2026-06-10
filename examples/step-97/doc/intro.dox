@@ -65,9 +65,7 @@ On this page we adopt the nomenclature from @cite griffiths2017b. Consequently,
 we call a magnetic field the vector quantity $\vec{B}$ such that the Ampere's
 law in free space in static approximation reads
 \f[
-\begin{equation}
 \vec{\nabla} \times\vec{B} = \mu_0\vec{J},
-\end{equation}
 \f]
 where $\vec{J}$ is the total current density, free plus bound.
 

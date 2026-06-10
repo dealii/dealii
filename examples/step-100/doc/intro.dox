@@ -412,28 +412,22 @@ our problem:
   \mathbf{v})_{\Omega_h} + (i\omega\mathbf{v}, i\omega \mathbf{v})_{\Omega_h}
   + \langle \mathbf{v} \cdot \mathbf{n}, \mathbf{v} \cdot \mathbf{n}
   \rangle_{\Gamma_1 \cup \Gamma_3}
-
   &   (i\omega \mathbf{v}, \nabla q)_{\Omega_h} + (\nabla \cdot
   \mathbf{v}, i\omega q)_{\Omega_h} + \langle \mathbf{v} \cdot \mathbf{n},
   \frac{k_n}{\omega}q \rangle_{\Gamma_1 \cup \Gamma_3} & ( \mathbf{v}, i\omega
   \mathbf{u})_{\Omega_h} & -( \nabla \cdot \mathbf{v}, p^*)_{\Omega_h} & 0 &
   \langle \mathbf{v} \cdot \mathbf{n}, \hat{p}^* \rangle_{\partial \Omega_h} \\
-
 (\nabla q, i\omega \mathbf{v})_{\Omega_h} + (
   i\omega q, \nabla \cdot \mathbf{v})_{\Omega_h} + \langle \frac{k_n}{\omega}q,
   \mathbf{v} \cdot \mathbf{n} \rangle_{\Gamma_1 \cup \Gamma_3}
-
-
   & (q, q)_{\Omega_h} + (\nabla q, \nabla q)_{\Omega_h} + ( i\omega q,
   i\omega q)_{\Omega_h} + \langle \frac{k_n}{\omega}q, \frac{k_n}{\omega}q
   \rangle_{\Gamma_1 \cup \Gamma_3} & - (\nabla q,\mathbf{u})_{\Omega_h} & (q,
   i\omega p^*)_{\Omega_h}&  \langle q, \hat{u}_n \rangle_{\partial \Omega_h}
   & 0 \\
-
   (i\omega \mathbf{u}, \mathbf{v})_{\Omega_h} & -(\mathbf{u},
    \nabla q )_{\Omega_h} & 0 & 0 & 0 & 0 \\ -(p^*, \nabla \cdot
   \mathbf{v} )_{\Omega_h} & ( i\omega p^*, q)_{\Omega_h} & 0 & 0 & 0 & 0 \\
-
   0 & \langle \hat{u}_n, q \rangle_{\partial \Omega_h} & 0 & 0 & - \langle
   \hat{u}_n, \hat{u}_n \rangle_{\Gamma_1 \cup \Gamma_3} & \langle \hat{u}_n,
   \frac{k_n}{\omega} \hat{p}^* \rangle_{\Gamma_1 \cup \Gamma_3} \\ \langle
@@ -442,7 +436,6 @@ our problem:
   \cup \Gamma_3} & - \langle \frac{k_n}{\omega} \hat{p}^*, \frac{k_n}{\omega}
   \hat{p}^* \rangle_{\Gamma_1 \cup \Gamma_3}
 \end{pmatrix}
-
 \begin{pmatrix} \mathbf{v} \\ q \\ \mathbf{u} \\ p^* \\ \hat{u}_n \\ \hat{p}^*
 \end{pmatrix} = \begin{pmatrix} (\mathbf{v}, l)_{\Omega_h} \\ (q,l)_{\Omega_h}
 \\ 0 \\ 0 \\ - \langle \hat{u}_n, g_R \rangle_{\Gamma_1 \cup \Gamma_3} \\

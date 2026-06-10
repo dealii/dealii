@@ -888,9 +888,9 @@ namespace LinearAlgebra
          * @brief Constructor.
          *
          * Before factorization each diagonal entry will be modified by the
-         * following formula \f[a_{ii}^{new} = \alpha\sign(a_{ii})+\beta a_{ii}
-         * \f] with \f[\alpha\f] given by ilu_atol and \f[\beta\f] given by
-         * ilu_rtol.
+         * following formula \f[a_{ii}^{new} =
+         * \alpha\operatorname{sign}(a_{ii})+\beta a_{ii} \f] with \f[\alpha\f]
+         * given by ilu_atol and \f[\beta\f] given by ilu_rtol.
          *
          * @param ilu_fill Amount of additional fill-in.
          * @param ilu_atol Constant to be to each diagonal entry before factorization.
@@ -967,9 +967,9 @@ namespace LinearAlgebra
          * @brief Constructor.
          *
          * Before factorization each diagonal entry will be modified by the
-         * following formula \f[a_{ii}^{new} = \alpha\sign(a_{ii})+\beta a_{ii}
-         * \f] with \f[\alpha\f] given by ilut_atol and \f[\beta\f] given by
-         * ilut_rtol.
+         * following formula \f[a_{ii}^{new} =
+         * \alpha\operatorname{sign}(a_{ii})+\beta a_{ii} \f] with \f[\alpha\f]
+         * given by ilut_atol and \f[\beta\f] given by ilut_rtol.
          *
          * @param ilut_drop Threshold for dropping entries.
          * @param ilut_fill Amount of additional fill-in.
