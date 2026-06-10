@@ -453,6 +453,11 @@ namespace LinearAlgebra
                              "been compressed. Please call compress() on the "
                              "source vector before using operator=()."));
 
+      // Reset our cached vector views so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+      nonlocal_vector_1d_view.reset();
+
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
           // Make sure we have a view available to access the vector entries.
@@ -520,10 +525,8 @@ namespace LinearAlgebra
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
                                                           Teuchos::Copy);
-          vector_1d_view.reset();
 
           nonlocal_vector.reset();
-          nonlocal_vector_1d_view.reset();
 
           if (!V.nonlocal_vector.is_null())
             {
@@ -538,6 +541,11 @@ namespace LinearAlgebra
           tpetra_comm_pattern    = V.tpetra_comm_pattern;
           local_entries          = V.local_entries;
         }
+
+      // Reset our cached vector views so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+      nonlocal_vector_1d_view.reset();
 
       // Because V is compressed and has no pending changes
       // clear our local cache as well.
@@ -596,6 +604,11 @@ namespace LinearAlgebra
         Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(s);
 
+      // Reset our cached vector views so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+      nonlocal_vector_1d_view.reset();
+
       // First set the elements of the locally owned part of
       // the vector to 's':
       vector->putScalar(s);
@@ -622,6 +635,10 @@ namespace LinearAlgebra
       const Teuchos::RCP<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern)
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.
       if (communication_pattern.is_null())
@@ -702,7 +719,17 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator*=(const Number factor)
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+      Assert(is_compressed(),
+             ExcMessage(
+               "You are trying an operation on a vector that is only "
+               "allowed if the vector is compressed, but the vector you "
+               "are operating on reports compress() has not been called "
+               "since the last relevant operation."));
       AssertIsFinite(factor);
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       vector->scale(factor);
 
@@ -716,8 +743,18 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator/=(const Number factor)
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+      Assert(is_compressed(),
+             ExcMessage(
+               "You are trying an operation on a vector that is only "
+               "allowed if the vector is compressed, but the vector you "
+               "are operating on reports compress() has not been called "
+               "since the last relevant operation."));
       AssertIsFinite(factor);
       Assert(factor != Number(0.), ExcZero());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       *this *= Number(1.) / factor;
 
@@ -731,7 +768,19 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator+=(
       const Vector<Number, MemorySpace> &V)
     {
+      Assert(this->size() == V.size(),
+             ExcDimensionMismatch(this->size(), V.size()));
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+      Assert(is_compressed(),
+             ExcMessage(
+               "You are trying an operation on a vector that is only "
+               "allowed if the vector is compressed, but the vector you "
+               "are operating on reports compress() has not been called "
+               "since the last relevant operation."));
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       // If the maps are the same we can update right away.
       if (vector->getMap()->isSameAs(*(V.trilinos_vector().getMap())))
@@ -740,9 +789,6 @@ namespace LinearAlgebra
         }
       else
         {
-          Assert(this->size() == V.size(),
-                 ExcDimensionMismatch(this->size(), V.size()));
-
           // TODO: Tpetra doesn't have a combine mode that also updates local
           // elements, maybe there is a better workaround.
           Tpetra::Vector<Number,
@@ -767,7 +813,21 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator-=(
       const Vector<Number, MemorySpace> &V)
     {
+      Assert(this->size() == V.size(),
+             ExcDimensionMismatch(this->size(), V.size()));
+      Assert(vector->getMap()->isSameAs(*V.trilinos_vector().getMap()),
+             ExcDifferentParallelPartitioning());
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+      Assert(is_compressed(),
+             ExcMessage(
+               "You are trying an operation on a vector that is only "
+               "allowed if the vector is compressed, but the vector you "
+               "are operating on reports compress() has not been called "
+               "since the last relevant operation."));
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       this->add(-1., V);
 
@@ -786,6 +846,16 @@ namespace LinearAlgebra
       Assert(vector->getMap()->isSameAs(*V.trilinos_vector().getMap()),
              ExcDifferentParallelPartitioning());
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+      Assert(is_compressed(),
+             ExcMessage(
+               "You are trying an operation on a vector that is only "
+               "allowed if the vector is compressed, but the vector you "
+               "are operating on reports compress() has not been called "
+               "since the last relevant operation."));
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->dot(V.trilinos_vector());
     }
@@ -875,6 +945,10 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       vector->update(a, V.trilinos_vector(), 1.);
     }
 
@@ -898,6 +972,10 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       vector->update(a, V.trilinos_vector(), b, W.trilinos_vector(), 1.);
     }
@@ -926,6 +1004,10 @@ namespace LinearAlgebra
       AssertDimension(size(), V.size());
       AssertIsFinite(s);
       AssertIsFinite(a);
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       // We assume that the vectors have the same Map
       // if the local size is the same and if the vectors are not ghosted
@@ -967,6 +1049,10 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       vector->elementWiseMultiply(1., *scaling_factors.vector, *vector, 0.);
     }
 
@@ -982,6 +1068,10 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       // If we don't have the same map, copy.
       if (vector->getMap()->isSameAs(*V.trilinos_vector().getMap()) == false)
@@ -999,6 +1089,9 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::all_zero() const
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
       Teuchos::ArrayRCP<const Number> data = vector->getData();
 
       const bool local_all_zero =
@@ -1015,6 +1108,10 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::is_non_negative() const
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       if constexpr (!std::is_same_v<Number, std::complex<double>> &&
                     !std::is_same_v<Number, std::complex<float>>)
         {
@@ -1052,6 +1149,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::mean_value() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->meanValue();
     }
@@ -1097,6 +1198,10 @@ namespace LinearAlgebra
              ExcMessage(
                "Not implemented for complex number types at the moment."));
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       return vector->normInf();
     }
 
@@ -1107,6 +1212,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::l1_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->norm1();
     }
@@ -1119,6 +1228,10 @@ namespace LinearAlgebra
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       return vector->norm2();
     }
 
@@ -1129,6 +1242,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::linfty_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->normInf();
     }
@@ -1153,6 +1270,10 @@ namespace LinearAlgebra
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       this->add(a, V);
 
