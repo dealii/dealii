@@ -21,6 +21,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -429,6 +430,13 @@ private:
    * copy over from the old to the new mesh.
    */
   std::vector<const VectorType *> input_vectors;
+
+  /**
+   * Scratch per-cell values used during data packing.
+   */
+  mutable Threads::ThreadLocalStorage<
+    std::vector<Vector<typename VectorType::value_type>>>
+    cell_dof_values;
 
   /**
    * The handle that the Triangulation has assigned to this object

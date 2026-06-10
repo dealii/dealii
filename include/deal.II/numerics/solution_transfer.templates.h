@@ -360,8 +360,9 @@ SolutionTransfer<dim, VectorType, spacedim>::pack_callback(
   typename DoFHandler<dim, spacedim>::cell_iterator cell(*cell_, dof_handler);
 
   // create buffer for each individual object
-  std::vector<::dealii::Vector<typename VectorType::value_type>> dof_values(
-    input_vectors.size());
+  std::vector<Vector<typename VectorType::value_type>> &dof_values =
+    cell_dof_values.get();
+  dof_values.resize(input_vectors.size());
 
   unsigned int fe_index = 0;
   if (dof_handler->has_hp_capabilities())
