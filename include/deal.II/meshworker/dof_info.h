@@ -423,6 +423,38 @@ namespace MeshWorker
 
   //----------------------------------------------------------------------//
 
+  template <int dim, int spacedim, typename number>
+  inline DoFInfo<dim, spacedim, number>::DoFInfo(const BlockInfo &info)
+    : face_number(numbers::invalid_unsigned_int)
+    , sub_number(numbers::invalid_unsigned_int)
+    , block_info(&info, typeid(*this).name())
+    , level_cell(false)
+  {
+    indices_by_block.resize(info.local().size());
+    for (unsigned int i = 0; i < indices_by_block.size(); ++i)
+      indices_by_block[i].resize(info.local().block_size(i));
+  }
+
+
+
+  template <int dim, int spacedim, typename number>
+  inline void
+  DoFInfo<dim, spacedim, number>::set_block_indices()
+  {
+    for (unsigned int i = 0; i < indices.size(); ++i)
+      {
+        const std::pair<unsigned int, unsigned int> bi =
+          block_info->local().global_to_local(this->block_info->renumber(i));
+        indices_by_block[bi.first][bi.second] = indices_org[i];
+      }
+    // Remove this after
+    // changing block codes
+    for (unsigned int i = 0; i < indices.size(); ++i)
+      indices[this->block_info->renumber(i)] = indices_org[i];
+  }
+
+
+
   template <int dim, class DOFINFO>
   inline DoFInfoBox<dim, DOFINFO>::DoFInfoBox(const DOFINFO &seed)
     : cell(seed)
@@ -436,6 +468,7 @@ namespace MeshWorker
         exterior_face_available[i] = false;
       }
   }
+
 
 
   template <int dim, class DOFINFO>
@@ -452,6 +485,7 @@ namespace MeshWorker
         exterior_face_available[i] = false;
       }
   }
+
 
 
   template <int dim, class DOFINFO>
@@ -471,6 +505,7 @@ namespace MeshWorker
   }
 
 
+
   template <int dim, class DOFINFO>
   inline void
   DoFInfoBox<dim, DOFINFO>::reset()
@@ -482,6 +517,7 @@ namespace MeshWorker
         exterior_face_available[i] = false;
       }
   }
+
 
 
   template <int dim, class DOFINFO>
