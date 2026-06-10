@@ -1971,10 +1971,6 @@ namespace SUNDIALS
                       "0 means SUNDIALS default.");
   }
 
-#  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
-
-
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
 
   /**
    * Wrapper for SUNDIALS' SplittingStep operator-splitting time-stepping
@@ -2021,7 +2017,7 @@ namespace SUNDIALS
    * @endcode
    *
    * @note This class is only available when deal.II is compiled against
-   *   SUNDIALS 6.2.0 or newer.
+   *   SUNDIALS 7.2.0 or newer.
    */
   template <typename VectorType = Vector<double>>
   class SplittingStepper : public ARKodeStepper<VectorType>
@@ -2182,7 +2178,7 @@ namespace SUNDIALS
                       "If empty, SUNDIALS uses the default (Lie-Trotter)");
   }
 
-#  endif // DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+#  endif // DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 
 } // namespace SUNDIALS
 
