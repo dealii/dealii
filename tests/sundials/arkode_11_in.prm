@@ -1,6 +1,6 @@
 set Final time                        = 1.
 set Initial time                      = 0.
-set Time interval between each output = 0.1
+set Time interval between each output = 0.5
 
 set Integration accuracy order             = 5
 set Maximum number of nonlinear iterations = 10

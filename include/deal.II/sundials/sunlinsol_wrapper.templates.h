@@ -211,13 +211,36 @@ namespace SUNDIALS
 #  endif
         tol);
 
-      return call_and_possibly_capture_exception(content->lsolve,
-                                                 content->pending_exception,
-                                                 op,
-                                                 preconditioner,
-                                                 *dst_x,
-                                                 *src_b,
-                                                 tol);
+      const int result =
+        call_and_possibly_capture_exception(content->lsolve,
+                                            content->pending_exception,
+                                            op,
+                                            preconditioner,
+                                            *dst_x,
+                                            *src_b,
+                                            tol);
+
+      // A user-provided linear solver may signal a recoverable failure by
+      // throwing a RecoverableUserCallbackError, in which case
+      // call_and_possibly_capture_exception() returns +1. However, the
+      // ARKODE interface functions arkLsSolve()/arkLsMassSolve() only treat
+      // the dedicated SUNLS_*_FAIL_REC return codes as a recoverable linear
+      // solver failure: their switch over the return value has no case for a
+      // bare +1, so it falls through to "return 0", i.e. the solve is silently
+      // treated as successful (ARKODE neither reduces the step nor retries,
+      // and continues with an unsolved vector). Translate our recoverable
+      // indicator into a recognized recoverable code so that the integrator
+      // can actually reduce the step size and re-attempt the solve. We do the
+      // same also for an unrecoverable exception, but in this case
+      // call_and_possibly_capture_exception() returns -1 and we then return
+      // the corresponding SUNLS_*_FAIL_UNREC code here.
+
+      if (result == -1)
+        return SUNLS_PSOLVE_FAIL_UNREC;
+      else if (result == 1)
+        return SUNLS_PSOLVE_FAIL_REC;
+      else
+        return result;
     }
 
 
