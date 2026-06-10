@@ -22,6 +22,18 @@
 #if defined(DEAL_II_WITH_MPI)
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
+// Avoid a macro collision between mpc.h and MPICH's C++ headers by
+// undefining DOUBLE_COMPLEX and LONG_DOUBLE_COMPLEX before including <mpi.h>
+// On some macOS setups mpc.h (from libmpc) defines macros
+// DOUBLE_COMPLEX/LONG_DOUBLE_COMPLEX that expand into C keywords
+// (e.g. double _Complex). These break MPICH's mpicxx.h declarations
+// (e.g. extern Datatype DOUBLE_COMPLEX;), causing compile errors.
+#  ifdef DOUBLE_COMPLEX
+#    undef DOUBLE_COMPLEX
+#  endif
+#  ifdef LONG_DOUBLE_COMPLEX
+#    undef LONG_DOUBLE_COMPLEX
+#  endif
 #  include <mpi.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
