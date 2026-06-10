@@ -49,7 +49,7 @@
 //   1. Lie-Trotter splitting (1st order, SUNDIALS default).
 //   2. Strang splitting (2nd order, "ARKODE_SPLITTING_STRANG_2_2_2").
 
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+#if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 
 using VectorType = Vector<double>;
 
@@ -106,7 +106,8 @@ run(const SUNDIALS::SplittingStepper<VectorType>::AdditionalData &split_data,
   ode.output_step =
     [](const double t, const VectorType &y, const unsigned int /*step*/) {
       const double y_ex = exact_solution(t);
-      deallog << "t=" << t << "  y=" << y[0] << "  exact=" << y_ex
+      deallog << std::fixed << std::setprecision(4) << "t=" << t
+              << "  y=" << y[0] << "  exact=" << y_ex
               << "  err=" << std::abs(y[0] - y_ex) << std::endl;
     };
 

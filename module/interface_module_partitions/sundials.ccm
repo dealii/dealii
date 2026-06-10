@@ -77,6 +77,9 @@ export
   using ::ARKLsPrecSetupFn;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
   using ::ARKodeFree;
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+  using ::ARKodeSetFixedStep;
+#    endif
   using ::ARKodeSetOrder;
   using ::ARKodeSetUserData;
 #  else
@@ -172,6 +175,13 @@ export
   using ::N_Vector_ID;
   using ::N_VFreeEmpty;
   using ::N_VNewEmpty;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
+  using ::SplittingStepCoefficients;
+  using ::SplittingStepCoefficients_Destroy;
+  using ::SplittingStepCoefficients_LoadCoefficientsByName;
+  using ::SplittingStepCreate;
+  using ::SplittingStepSetCoefficients;
+#  endif
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   using ::SUNATimesFn;
 #  else
