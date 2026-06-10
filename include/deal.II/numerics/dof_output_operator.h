@@ -20,27 +20,32 @@
 #include <deal.II/algorithms/operator.h>
 
 #include <deal.II/base/event.h>
+#include <deal.II/base/observer_pointer.h>
+#include <deal.II/base/parameter_handler.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/numerics/data_out.h>
 
 #include <fstream>
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
-
-#ifndef DOXYGEN
-class ParameterHandler;
-#endif
 
 namespace Algorithms
 {
   /**
    * An output operator writing a separate file in each step and writing the
    * vectors as finite element functions with respect to a given DoFHandler.
+   *
+   * @deprecated The caller should set up and manage a DataOut object instead.
    */
   template <typename VectorType, int dim, int spacedim = dim>
-  class DoFOutputOperator : public OutputOperator<VectorType>
+  class DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "The caller should set up and manage a DataOut object instead.")
+    DoFOutputOperator : public OutputOperator<VectorType>
   {
   public:
     /*
@@ -73,12 +78,63 @@ namespace Algorithms
     DataOut<dim> out;
   };
 
+  /*-------------------- Functions: DoFOutputOperator ------------------------*/
+
+
   template <typename VectorType, int dim, int spacedim>
   inline void
   DoFOutputOperator<VectorType, dim, spacedim>::initialize(
     const DoFHandler<dim, spacedim> &dof_handler)
   {
     dof = &dof_handler;
+  }
+
+
+
+  template <typename VectorType, int dim, int spacedim>
+  DoFOutputOperator<VectorType, dim, spacedim>::DoFOutputOperator(
+    const std::string &filename_base,
+    const unsigned int digits)
+    : filename_base(filename_base)
+    , digits(digits)
+  {
+    out.set_default_format(DataOutBase::gnuplot);
+  }
+
+
+
+  template <typename VectorType, int dim, int spacedim>
+  inline void
+  DoFOutputOperator<VectorType, dim, spacedim>::parse_parameters(
+    ParameterHandler &param)
+  {
+    out.parse_parameters(param);
+  }
+
+
+
+  template <typename VectorType, int dim, int spacedim>
+  inline OutputOperator<VectorType> &
+  DoFOutputOperator<VectorType, dim, spacedim>::operator<<(const AnyData &data)
+  {
+    Assert((dof != nullptr), ExcNotInitialized());
+    out.attach_dof_handler(*dof);
+    for (unsigned int i = 0; i < data.size(); ++i)
+      {
+        const VectorType *p = data.try_read_ptr<VectorType>(i);
+        if (p != nullptr)
+          {
+            out.add_data_vector(*p, data.name(i));
+          }
+      }
+    std::ostringstream streamOut;
+    streamOut << filename_base << std::setw(digits) << std::setfill('0')
+              << this->step << out.default_suffix();
+    std::ofstream out_filename(streamOut.str());
+    out.build_patches();
+    out.write(out_filename);
+    out.clear();
+    return *this;
   }
 } // namespace Algorithms
 

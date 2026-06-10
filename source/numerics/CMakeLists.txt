@@ -17,7 +17,6 @@ set(_unity_include_src
   data_out_rotation.cc
   data_out_stack.cc
   data_postprocessor.cc
-  dof_output_operator.cc
   histogram.cc
   matrix_tools_once.cc
   matrix_tools.cc
@@ -80,7 +79,6 @@ set(_inst
   data_out_stack.inst.in
   data_postprocessor.inst.in
   derivative_approximation.inst.in
-  dof_output_operator.inst.in
   error_estimator_1d.inst.in
   error_estimator.inst.in
   fe_field_function.inst.in
