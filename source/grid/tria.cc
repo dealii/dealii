@@ -157,16 +157,6 @@ namespace internal
     {
       for (const ReferenceCell<dim> &reference_cell : reference_cells)
         {
-          // TODO: remove this once we support Pyramid refinement
-          if (reference_cell == ReferenceCells::Pyramid)
-            {
-              Assert(reference_cell.n_isotropic_children() == 0,
-                     ExcMessage("This function must be updated once we support "
-                                "Pyramid refinement."));
-              // for now, use the standard 3d value
-              max_children_per_cell = 8;
-            }
-
           max_children_per_cell =
             std::max(max_children_per_cell,
                      reference_cell.n_isotropic_children());
@@ -5218,7 +5208,7 @@ namespace internal
         // Now add the four (two)
         // new cells!
         typename Triangulation<dim, spacedim>::raw_cell_iterator
-          subcells[GeometryInfo<dim>::max_children_per_cell];
+          subcells[ReferenceCells::max_n_children<dim>()];
         while (next_unused_cell->used() == true)
           ++next_unused_cell;
 
@@ -6483,7 +6473,11 @@ namespace internal
 
                         case ReferenceCells::Pyramid:
                           // TODO: Pyramid
-                          DEAL_II_NOT_IMPLEMENTED();
+                          // - No vertices (all provided by face refinement)
+                          // - 5 faces for center pyramid
+                          // - 4 times 2 for the remaining tets
+                          needed_lines_single += 4;
+                          needed_faces_single += 13;
                           break;
 
                         case ReferenceCells::Wedge:
@@ -7064,8 +7058,8 @@ namespace internal
                       break;
 
                     case ReferenceCells::Pyramid:
-                      DEAL_II_NOT_IMPLEMENTED();
-                      // TODO: Pyramid
+                      n_new_lines = 4;
+                      n_new_faces = 13;
                       break;
 
                     case ReferenceCells::Wedge:
@@ -7317,8 +7311,21 @@ namespace internal
                         break;
 
                       case ReferenceCells::Pyramid:
-                        // TODO: Pyramid
-                        DEAL_II_NOT_IMPLEMENTED();
+                        {
+                          // Directions so that middle bottom pyramids all have
+                          // lines with default orientation. Order as children
+                          // of refined bottom quad.
+                          static constexpr dealii::ndarray<unsigned int, 4, 2>
+                            new_line_vertices = {{{{13, 9}},  //
+                                                  {{13, 10}}, //
+                                                  {{13, 11}}, //
+                                                  {{13, 12}}}};
+
+                          for (unsigned int i = 0; i < n_new_lines; ++i)
+                            new_lines[i]->set_bounding_object_indices(
+                              {vertex_indices[new_line_vertices[i][0]],
+                               vertex_indices[new_line_vertices[i][1]]});
+                        }
                         break;
 
                       case ReferenceCells::Wedge:
@@ -7806,8 +7813,6 @@ namespace internal
 
                             // Pyramids and Wedges share same number of faces
                             case ReferenceCells::Pyramid:
-                              // TODO: Pyramid, just remove
-                              DEAL_II_NOT_IMPLEMENTED();
                             case ReferenceCells::Wedge:
                               new_cell->set_bounding_object_indices(
                                 {face_indices[cell_faces[c][0]],

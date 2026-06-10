@@ -1,0 +1,5 @@
+Changed: Increased the maximum number of children after refinement
+(`ReferenceCells::max_n_children()`) from 8 to 10 to accommodate the isotropic
+refinement of pyramids.
+<br>
+(Andreas Steger, 2026/05/01)
