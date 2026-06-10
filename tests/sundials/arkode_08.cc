@@ -102,7 +102,7 @@ main()
         VectorType                                   &x,
         const VectorType                             &b,
         double                                        tol) {
-      ReductionControl     control;
+      SolverControl        control(100, tol);
       SolverCG<VectorType> solver_cg(control);
       solver_cg.solve(op, x, b, prec);
     };
@@ -113,16 +113,17 @@ main()
 
   FullMatrix<double> M_inv(2, 2);
 
+  bool mass_preconditioner_solve_called = false;
+  bool mass_preconditioner_setup_called = false;
+
   stepper.mass_preconditioner_solve =
     [&](double t, const VectorType &r, VectorType &z, double gamma, int lr) {
-      LogStream::Prefix prefix("mass_preconditioner_solve");
-      deallog << "applied" << std::endl;
+      mass_preconditioner_solve_called = true;
       M_inv.vmult(z, r);
     };
 
   stepper.mass_preconditioner_setup = [&](double t) {
-    LogStream::Prefix prefix("mass_preconditioner_setup");
-    deallog << "applied" << std::endl;
+    mass_preconditioner_setup_called = true;
     M_inv.invert(M);
   };
 
@@ -140,4 +141,10 @@ main()
   y[0] = 1;
   y[1] = 0;
   ode.solve_ode(y);
+
+  deallog << std::boolalpha;
+  deallog << "mass_preconditioner_setup_called : "
+          << mass_preconditioner_setup_called << std::endl;
+  deallog << "mass_preconditioner_solve_called : "
+          << mass_preconditioner_solve_called << std::endl;
 }

@@ -116,10 +116,13 @@ main()
         VectorType                                   &x,
         const VectorType                             &b,
         double                                        tol) {
-      ReductionControl     control(100, 1e-10, 1e-2, false, true);
+      SolverControl        control(100, tol);
       SolverCG<VectorType> solver_cg(control);
       solver_cg.solve(op, x, b, prec);
     };
+
+  bool jacobian_preconditioner_setup_called = false;
+  bool jacobian_preconditioner_solve_called = false;
 
   stepper.jacobian_preconditioner_setup = [&](double            t,
                                               const VectorType &y,
@@ -127,7 +130,7 @@ main()
                                               int               jok,
                                               int              &jcur,
                                               double            gamma) {
-    deallog << "jacobian_preconditioner_setup called\n";
+    jacobian_preconditioner_setup_called = true;
   };
 
   stepper.jacobian_preconditioner_solve = [&](double            t,
@@ -138,7 +141,8 @@ main()
                                               double            gamma,
                                               double            delta,
                                               int               lr) {
-    deallog << "jacobian_preconditioner_solve called\n";
+    jacobian_preconditioner_solve_called = true;
+
     z = r;
   };
 
@@ -161,4 +165,10 @@ main()
   y[1] = v0;
   y[2] = w0;
   ode.solve_ode(y);
+
+  deallog << std::boolalpha;
+  deallog << "jacobian_preconditioner_setup_called : "
+          << jacobian_preconditioner_setup_called << std::endl;
+  deallog << "jacobian_preconditioner_solve_called : "
+          << jacobian_preconditioner_solve_called << std::endl;
 }

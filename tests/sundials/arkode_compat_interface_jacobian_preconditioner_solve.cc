@@ -66,8 +66,8 @@ main()
         SUNDIALS::SundialsPreconditioner<VectorType> &prec,
         VectorType                                   &x,
         const VectorType                             &b,
-        double /*tol*/) {
-      ReductionControl     control;
+        double                                        tol) {
+      SolverControl        control(100, tol);
       SolverCG<VectorType> solver_cg(control);
       solver_cg.solve(op, x, b, prec);
     };

@@ -49,7 +49,7 @@ main()
       ofile.close();
     }
 
-  std::ifstream ifile(SOURCE_DIR "/arkode_08_in.prm");
+  std::ifstream ifile(SOURCE_DIR "/arkode_10_in.prm");
   prm.parse_input(ifile);
 
   SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
@@ -75,6 +75,9 @@ main()
       ydot[1] = 2;
     };
 
+  bool jacobian_times_vector_called   = false;
+  bool solve_linearized_system_called = false;
+
   stepper.jacobian_times_vector = [&](const VectorType &v,
                                       VectorType       &Jv,
                                       double            t,
@@ -86,7 +89,10 @@ main()
       VectorType &,
       const VectorType &,
       double) {
-    deallog << "Reporting recoverable failure." << std::endl;
+    // This should not be called at all since solve_linearized_system() always
+    // throws an exception, so we will check at the end that
+    // jacobian_times_vector_called remains false
+    jacobian_times_vector_called = true;
     throw RecoverableUserCallbackError();
   };
 
@@ -96,8 +102,7 @@ main()
         VectorType &,
         const VectorType &,
         double) {
-      deallog << "Reporting recoverable failure when solving linearized system."
-              << std::endl;
+      solve_linearized_system_called = true;
       throw RecoverableUserCallbackError();
     };
 
@@ -107,23 +112,24 @@ main()
                            VectorType                                   &x,
                            const VectorType                             &b,
                            double                                        tol) {
-    ReductionControl     control;
+    SolverControl        control(100, tol);
     SolverCG<VectorType> solver_cg(control);
     solver_cg.solve(op, x, b, prec);
   };
 
   FullMatrix<double> M_inv(2, 2);
 
+  bool mass_preconditioner_solve_called = false;
+  bool mass_preconditioner_setup_called = false;
+
   stepper.mass_preconditioner_solve =
     [&](double t, const VectorType &r, VectorType &z, double gamma, int lr) {
-      LogStream::Prefix prefix("mass_preconditioner_solve");
-      deallog << "applied" << std::endl;
+      mass_preconditioner_solve_called = true;
       M_inv.vmult(z, r);
     };
 
   stepper.mass_preconditioner_setup = [&](double t) {
-    LogStream::Prefix prefix("mass_preconditioner_setup");
-    deallog << "applied" << std::endl;
+    mass_preconditioner_setup_called = true;
     M_inv.invert(M);
   };
 
@@ -149,4 +155,13 @@ main()
     {
       deallog << "Caught exception:" << std::endl << exc.what() << std::endl;
     }
+  deallog << std::boolalpha;
+  deallog << "jacobian_times_vector_called : " << jacobian_times_vector_called
+          << std::endl;
+  deallog << "solve_linearized_system_called : "
+          << solve_linearized_system_called << std::endl;
+  deallog << "mass_preconditioner_setup_called : "
+          << mass_preconditioner_setup_called << std::endl;
+  deallog << "mass_preconditioner_solve_called : "
+          << mass_preconditioner_solve_called << std::endl;
 }

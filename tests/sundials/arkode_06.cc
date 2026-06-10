@@ -116,7 +116,7 @@ main()
         VectorType       &x,
         const VectorType &b,
         double            tol) {
-      ReductionControl     control;
+      SolverControl        control(100, tol);
       SolverCG<VectorType> solver_cg(control);
       solver_cg.solve(op, x, b, PreconditionIdentity());
     };

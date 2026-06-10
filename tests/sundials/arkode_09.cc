@@ -55,10 +55,15 @@ main()
 
   double kappa = 1.0;
 
+  bool explicit_function_called = false;
+
   stepper.explicit_function =
     [&](const double t, const VectorType &y, VectorType &ydot) {
-      deallog << "Evaluating right hand side at t=" << t << " with y=" << y[0]
-              << std::endl;
+      if (!explicit_function_called)
+        {
+          deallog << "Right hand side callback has been called." << std::endl;
+          explicit_function_called = true;
+        }
 
       // Error out in a recoverable way if asked to evaluate at a
       // point where y<0. This can happen with explicit methods if the
