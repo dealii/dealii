@@ -61,7 +61,7 @@ main()
     [&](const double t, const VectorType &y, VectorType &ydot) {
       if (!explicit_function_called)
         {
-          deallog << "Right hand side callback in functioning" << std::endl;
+          deallog << "Right hand side callback has been called." << std::endl;
           explicit_function_called = true;
         }
 

@@ -1,6 +1,6 @@
 
 DEAL::Monitor called at t=0.00000 1.00000
-DEAL::Right hand side callback in functioning
+DEAL::Right hand side callback has been called.
 DEAL::Reporting a recoverable error.
 DEAL::ARKODE did not succeed with the following error message:
 DEAL::
