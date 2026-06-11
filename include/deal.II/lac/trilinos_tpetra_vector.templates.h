@@ -460,7 +460,7 @@ namespace LinearAlgebra
 
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
-          // Create a writeable view of this vector
+          // Create a writable view of this vector
           auto vector_2d_view =
             vector->template getLocalView<Kokkos::HostSpace>(
               Tpetra::Access::ReadWriteStruct{});
