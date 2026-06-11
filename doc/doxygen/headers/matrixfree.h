@@ -628,7 +628,7 @@ digraph G
  * that there holds for all test functions $\varphi_i,\ i \in \mathcal N
  * \setminus \mathcal N_D$
  * @f{eqnarray*}{
- * b(\varphi_i, u_h) &=& f(\varphi_i) \quad \Rightarrow \                \
+ * b(\varphi_i, u_h) &=& f(\varphi_i) \quad \Rightarrow \\
  * \sum_{j\in \mathcal N \setminus \mathcal N_D}b(\varphi_i, \varphi_j) \, U_j &=&
  * f(\varphi_i) -\sum_{j\in \mathcal N_D} b(\varphi_i,\varphi_j)\, g_j.
  * @f}

@@ -335,7 +335,7 @@ namespace Functions
      * This function has gradient:
      *
      * @f[
-     * $\partial_i \psi(x) = \frac{q_i^\perp}{\|\boldsymbol{q}^\perp\|}$
+     * \partial_i \psi(x) = \frac{q_i^\perp}{\|\boldsymbol{q}^\perp\|}
      * @f]
      *
      * @note The gradient is singular on the cylinder axis

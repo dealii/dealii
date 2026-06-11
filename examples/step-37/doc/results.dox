@@ -471,7 +471,7 @@ N_D$. We then insert this solution
 representation into the weak form, e.g. the Laplacian shown above, and move
 the known quantities to the right hand side:
 @f{eqnarray*}{
-(\nabla \varphi_i, \nabla u_h)_\Omega &=& (\varphi_i, f)_\Omega \quad \Rightarrow \\
+(\nabla \varphi_i, \nabla u_h)_\Omega &=& (\varphi_i, f)_\Omega \quad \Rightarrow\\
 \sum_{j\in \mathcal N \setminus \mathcal N_D}(\nabla \varphi_i,\nabla \varphi_j)_\Omega \, u_j &=&
 (\varphi_i, f)_\Omega
 -\sum_{j\in \mathcal N_D} (\nabla \varphi_i,\nabla\varphi_j)_\Omega\, g_j.
