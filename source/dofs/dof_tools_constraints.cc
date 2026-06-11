@@ -2426,25 +2426,27 @@ namespace DoFTools
                 // and its subfaces. This knowledge will be needed in hp-case
                 // with neither_element_dominates.
                 std::set<unsigned int> fe_ind_face_subface;
-                fe_ind_face_subface.insert(cell->active_fe_index());
 
                 if (dof_handler.has_hp_capabilities())
-                  for (unsigned int c = 0;
-                       c < cell->face(face)->n_active_descendants();
-                       ++c)
-                    {
-                      const auto subcell =
-                        cell->neighbor_child_on_subface(face, c);
-                      if (!subcell->is_artificial())
-                        {
-                          mother_face_dominates =
-                            mother_face_dominates &
-                            (cell->get_fe().compare_for_domination(
-                              subcell->get_fe(), /*codim=*/1));
-                          fe_ind_face_subface.insert(
-                            subcell->active_fe_index());
-                        }
-                    }
+                  {
+                    fe_ind_face_subface.insert(cell->active_fe_index());
+                    for (unsigned int c = 0;
+                         c < cell->face(face)->n_active_descendants();
+                         ++c)
+                      {
+                        const auto subcell =
+                          cell->neighbor_child_on_subface(face, c);
+                        if (!subcell->is_artificial())
+                          {
+                            mother_face_dominates =
+                              mother_face_dominates &
+                              (cell->get_fe().compare_for_domination(
+                                subcell->get_fe(), /*codim=*/1));
+                            fe_ind_face_subface.insert(
+                              subcell->active_fe_index());
+                          }
+                      }
+                  }
 
                 switch (mother_face_dominates)
                   {
@@ -2600,7 +2602,10 @@ namespace DoFTools
                         // Note that the last solution covers the first two
                         // scenarios, thus we stick with it assuming that we
                         // won't lose much time/efficiency.
-                        // TODO: Change set to types::fe_index
+
+                        // If we got here then the set must be nonempty
+                        Assert(fe_ind_face_subface.size() > 0,
+                               ExcInternalError());
                         const types::fe_index dominating_fe_index =
                           fe_collection.find_dominating_fe_extended(
                             fe_ind_face_subface,
