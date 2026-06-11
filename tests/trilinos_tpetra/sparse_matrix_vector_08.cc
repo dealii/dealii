@@ -37,6 +37,7 @@ test(Vector<double> &v, Vector<double> &w)
   for (unsigned int i = 0; i < v.size(); ++i)
     v(i) = i;
 
+  v.compress(VectorOperation::insert);
   m.compress(VectorOperation::insert);
 
   // w:=Mv

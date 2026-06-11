@@ -98,20 +98,11 @@ namespace LinearAlgebra
                TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
                                                              Teuchos::Copy))
     {
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-
       if (!V.nonlocal_vector.is_null())
         {
           nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.nonlocal_vector,
                                                           Teuchos::Copy);
-          auto nonlocal_vector_2d =
-            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
-          nonlocal_vector_1d_view =
-            Kokkos::subview(nonlocal_vector_2d, Kokkos::ALL(), 0);
         }
       source_stored_elements  = V.source_stored_elements;
       local_entries           = V.local_entries;
@@ -130,10 +121,6 @@ namespace LinearAlgebra
       , last_action(VectorOperation::unknown)
       , vector(V)
     {
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-
       // If there are ghost entries, we do not know which process owns which
       // entries. Assume no one owns any entries, which will allow read access,
       // but no write access.
@@ -156,11 +143,7 @@ namespace LinearAlgebra
           parallel_partitioner.make_tpetra_map_rcp<
             TpetraTypes::NodeType<MemorySpace>>(communicator, true)))
       , local_entries(parallel_partitioner)
-    {
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
-    }
+    {}
 
 
 
@@ -184,9 +167,6 @@ namespace LinearAlgebra
             parallel_partitioner
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-          auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-            Tpetra::Access::ReadWriteStruct{});
-          vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
         }
       else
         {
@@ -196,9 +176,6 @@ namespace LinearAlgebra
                 communicator, false);
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(map);
-          auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-            Tpetra::Access::ReadWriteStruct{});
-          vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
           IndexSet nonlocal_entries = ghost_entries;
           nonlocal_entries.subtract_set(locally_owned_entries);
@@ -207,12 +184,6 @@ namespace LinearAlgebra
             nonlocal_entries
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-
-          auto nonlocal_vector_2d =
-            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
-          nonlocal_vector_1d_view =
-            Kokkos::subview(nonlocal_vector_2d, Kokkos::ALL(), 0);
         }
 
       has_ghost = (vector->getMap()->isOneToOne() == false);
@@ -238,16 +209,14 @@ namespace LinearAlgebra
         Utilities::Trilinos::internal::make_rcp<
           TpetraTypes::MapType<MemorySpace>>(
           0, 0, Utilities::Trilinos::tpetra_comm_self()));
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
+      vector_1d_view.reset();
 
       has_ghost   = false;
       compressed  = true;
       last_action = VectorOperation::unknown;
 
       nonlocal_vector.reset();
-      nonlocal_vector_1d_view = array_view_type();
+      nonlocal_vector_1d_view.reset();
 
       source_stored_elements.clear();
       local_entries.clear();
@@ -266,9 +235,9 @@ namespace LinearAlgebra
                                         const bool /*omit_zeroing_entries*/)
     {
       vector.reset();
-      vector_1d_view = array_view_type();
+      vector_1d_view.reset();
       nonlocal_vector.reset();
-      nonlocal_vector_1d_view = array_view_type();
+      nonlocal_vector_1d_view.reset();
       source_stored_elements.clear();
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
@@ -283,9 +252,6 @@ namespace LinearAlgebra
         parallel_partitioner
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
             communicator, true));
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
     }
 
 
@@ -298,8 +264,9 @@ namespace LinearAlgebra
                                         const bool      vector_writable)
     {
       // release memory before reallocation
+      vector_1d_view.reset();
       nonlocal_vector.reset();
-      nonlocal_vector_1d_view = array_view_type();
+      nonlocal_vector_1d_view.reset();
       source_stored_elements.clear();
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
@@ -319,9 +286,6 @@ namespace LinearAlgebra
             parallel_partitioner
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-          auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-            Tpetra::Access::ReadWriteStruct{});
-          vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
         }
       else
         {
@@ -335,9 +299,6 @@ namespace LinearAlgebra
               vector.reset();
               vector = Utilities::Trilinos::internal::make_rcp<
                 TpetraTypes::VectorType<Number, MemorySpace>>(map);
-              auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-                Tpetra::Access::ReadWriteStruct{});
-              vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
             }
           else
             vector->putScalar(0);
@@ -350,11 +311,6 @@ namespace LinearAlgebra
             nonlocal_entries
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true));
-          auto nonlocal_vector_2d =
-            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
-          nonlocal_vector_1d_view =
-            Kokkos::subview(nonlocal_vector_2d, Kokkos::ALL(), 0);
         }
 
       has_ghost   = (vector->getMap()->isOneToOne() == false);
@@ -376,15 +332,17 @@ namespace LinearAlgebra
         vector.get() != nullptr && V.vector.get() != nullptr &&
         vector->getMap()->isSameAs(*V.vector->getMap());
 
+      // Reset the cached views, because the vector should be in a state
+      // just like after calling compress()
+      vector_1d_view.reset();
+      nonlocal_vector_1d_view.reset();
+
       // If V has a different distribution, construct a new vector,
       // otherwise just zero out this vector if so requested.
       if (!same_vector_map)
         {
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(V.vector->getMap());
-          auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-            Tpetra::Access::ReadWriteStruct{});
-          vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
         }
       else if (vector.get() != nullptr && omit_zeroing_entries == false)
         vector->putScalar(Number(0));
@@ -406,16 +364,10 @@ namespace LinearAlgebra
               nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
                 TpetraTypes::VectorType<Number, MemorySpace>>(
                 V.nonlocal_vector->getMap());
-              auto nonlocal_vector_2d_view =
-                nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-                  Tpetra::Access::ReadWriteStruct{});
-              nonlocal_vector_1d_view =
-                Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
             }
           else
             {
               nonlocal_vector.reset();
-              nonlocal_vector_1d_view = array_view_type();
             }
         }
       else if (nonlocal_vector.get() != nullptr &&
@@ -445,6 +397,16 @@ namespace LinearAlgebra
     {
       AssertDimension(indices.size(), elements.size());
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       for (unsigned int i = 0; i < indices.size(); ++i)
         {
           AssertIndexRange(indices[i], size());
@@ -471,7 +433,7 @@ namespace LinearAlgebra
 #  endif
 
           if (local_row != Teuchos::OrdinalTraits<int>::invalid())
-            elements[i] = vector_1d_view(local_row);
+            elements[i] = (*vector_1d_view)(local_row);
         }
     }
 
@@ -491,9 +453,21 @@ namespace LinearAlgebra
                              "been compressed. Please call compress() on the "
                              "source vector before using operator=()."));
 
+      // Reset our cached vector views so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+      nonlocal_vector_1d_view.reset();
+
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
-          // Create a read-only Kokkos view from the source vector
+          // Create a writable view of this vector
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+
+          // Create a read-only Kokkos view of the source vector
           auto source_vector_2d =
             V.vector->template getLocalView<Kokkos::HostSpace>(
               Tpetra::Access::ReadOnlyStruct{});
@@ -502,7 +476,10 @@ namespace LinearAlgebra
             Kokkos::subview(source_vector_2d, Kokkos::ALL(), 0);
 
           // Copy the data
-          Kokkos::deep_copy(vector_1d_view, source_vector_1d_view);
+          Kokkos::deep_copy((*vector_1d_view), source_vector_1d_view);
+
+          // Reset the local view again as if we had called compress()
+          vector_1d_view.reset();
         }
       else if (size() == V.size())
         {
@@ -547,24 +524,14 @@ namespace LinearAlgebra
           vector = Utilities::Trilinos::internal::make_rcp<
             TpetraTypes::VectorType<Number, MemorySpace>>(*V.vector,
                                                           Teuchos::Copy);
-          auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-            Tpetra::Access::ReadWriteStruct{});
-          vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
           nonlocal_vector.reset();
-          nonlocal_vector_1d_view = array_view_type();
 
           if (!V.nonlocal_vector.is_null())
             {
               nonlocal_vector = Utilities::Trilinos::internal::make_rcp<
                 TpetraTypes::VectorType<Number, MemorySpace>>(
                 *V.nonlocal_vector, Teuchos::Copy);
-
-              auto nonlocal_vector_2d =
-                nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-                  Tpetra::Access::ReadWriteStruct{});
-              nonlocal_vector_1d_view =
-                Kokkos::subview(nonlocal_vector_2d, Kokkos::ALL(), 0);
             }
 
           compressed             = V.compressed;
@@ -596,9 +563,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator=(const dealii::Vector<OtherNumber> &V)
     {
       vector.reset();
-      vector_1d_view = array_view_type();
+      vector_1d_view.reset();
 
       nonlocal_vector.reset();
+      nonlocal_vector_1d_view.reset();
       nonlocal_cached_indices.clear();
       nonlocal_cached_values.clear();
 
@@ -608,9 +576,6 @@ namespace LinearAlgebra
         V.locally_owned_elements()
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(),
         vector_data);
-      auto vector_2d = vector->template getLocalView<Kokkos::HostSpace>(
-        Tpetra::Access::ReadWriteStruct{});
-      vector_1d_view = Kokkos::subview(vector_2d, Kokkos::ALL(), 0);
 
       local_entries = V.locally_owned_elements();
 
@@ -632,6 +597,11 @@ namespace LinearAlgebra
       if (s != Number(0))
         Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(s);
+
+      // Reset our cached vector views so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+      nonlocal_vector_1d_view.reset();
 
       // First set the elements of the locally owned part of
       // the vector to 's':
@@ -659,6 +629,10 @@ namespace LinearAlgebra
       const Teuchos::RCP<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern)
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       // If no communication pattern is given, create one. Otherwise, use the
       // one given.
       if (communication_pattern.is_null())
@@ -741,6 +715,10 @@ namespace LinearAlgebra
       Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(factor);
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       vector->scale(factor);
 
       return *this;
@@ -756,6 +734,10 @@ namespace LinearAlgebra
       AssertIsFinite(factor);
       Assert(factor != Number(0.), ExcZero());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       *this *= Number(1.) / factor;
 
       return *this;
@@ -768,7 +750,13 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator+=(
       const Vector<Number, MemorySpace> &V)
     {
+      Assert(this->size() == V.size(),
+             ExcDimensionMismatch(this->size(), V.size()));
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       // If the maps are the same we can update right away.
       if (vector->getMap()->isSameAs(*(V.trilinos_vector().getMap())))
@@ -777,9 +765,6 @@ namespace LinearAlgebra
         }
       else
         {
-          Assert(this->size() == V.size(),
-                 ExcDimensionMismatch(this->size(), V.size()));
-
           // TODO: Tpetra doesn't have a combine mode that also updates local
           // elements, maybe there is a better workaround.
           Tpetra::Vector<Number,
@@ -806,6 +791,10 @@ namespace LinearAlgebra
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       this->add(-1., V);
 
       return *this;
@@ -823,6 +812,10 @@ namespace LinearAlgebra
       Assert(vector->getMap()->isSameAs(*V.trilinos_vector().getMap()),
              ExcDifferentParallelPartitioning());
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->dot(V.trilinos_vector());
     }
@@ -854,7 +847,17 @@ namespace LinearAlgebra
                                         vector->getMap()->getMaxLocalIndex()));
 #  endif
 
-      return vector_1d_view[local_index];
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
+      return (*vector_1d_view)[local_index];
     }
 
 
@@ -869,10 +872,20 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       const size_t localLength = vector->getLocalLength();
       for (size_t k = 0; k < localLength; ++k)
         {
-          vector_1d_view(k) += a;
+          (*vector_1d_view)(k) += a;
         }
     }
 
@@ -891,6 +904,10 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       vector->update(a, V.trilinos_vector(), 1.);
     }
@@ -915,6 +932,10 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       vector->update(a, V.trilinos_vector(), b, W.trilinos_vector(), 1.);
     }
@@ -943,6 +964,10 @@ namespace LinearAlgebra
       AssertDimension(size(), V.size());
       AssertIsFinite(s);
       AssertIsFinite(a);
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       // We assume that the vectors have the same Map
       // if the local size is the same and if the vectors are not ghosted
@@ -984,6 +1009,10 @@ namespace LinearAlgebra
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       vector->elementWiseMultiply(1., *scaling_factors.vector, *vector, 0.);
     }
 
@@ -999,6 +1028,10 @@ namespace LinearAlgebra
       // if we have ghost values, do not allow
       // writing to this vector at all.
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       // If we don't have the same map, copy.
       if (vector->getMap()->isSameAs(*V.trilinos_vector().getMap()) == false)
@@ -1016,6 +1049,9 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::all_zero() const
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
       Teuchos::ArrayRCP<const Number> data = vector->getData();
 
       const bool local_all_zero =
@@ -1032,6 +1068,10 @@ namespace LinearAlgebra
     bool
     Vector<Number, MemorySpace>::is_non_negative() const
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       if constexpr (!std::is_same_v<Number, std::complex<double>> &&
                     !std::is_same_v<Number, std::complex<float>>)
         {
@@ -1070,6 +1110,10 @@ namespace LinearAlgebra
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       return vector->meanValue();
     }
 
@@ -1083,13 +1127,23 @@ namespace LinearAlgebra
              ExcMessage(
                "Not implemented for complex number types at the moment."));
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       Number min_value = std::numeric_limits<Number>::max();
 
       const size_t this_local_length = vector->getLocalLength();
 
       for (size_type i = 0; i < this_local_length; ++i)
-        if (vector_1d_view(i) < min_value)
-          min_value = vector_1d_view(i);
+        if ((*vector_1d_view)(i) < min_value)
+          min_value = (*vector_1d_view)(i);
 
       return Utilities::MPI::min(min_value, get_mpi_communicator());
     }
@@ -1104,6 +1158,10 @@ namespace LinearAlgebra
              ExcMessage(
                "Not implemented for complex number types at the moment."));
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       return vector->normInf();
     }
 
@@ -1114,6 +1172,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::l1_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->norm1();
     }
@@ -1126,6 +1188,10 @@ namespace LinearAlgebra
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       return vector->norm2();
     }
 
@@ -1136,6 +1202,10 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::linfty_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
 
       return vector->normInf();
     }
@@ -1161,6 +1231,10 @@ namespace LinearAlgebra
       Assert(!has_ghost_elements(), ExcGhostsPresent());
       AssertIsFinite(a);
 
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
+
       this->add(a, V);
 
       return *this * W;
@@ -1180,6 +1254,16 @@ namespace LinearAlgebra
       if (this_local_length != other_local_length)
         return false;
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       auto other_vector_2d_view =
         v.vector->template getLocalView<Kokkos::HostSpace>(
           Tpetra::Access::ReadOnlyStruct{});
@@ -1188,7 +1272,7 @@ namespace LinearAlgebra
         Kokkos::subview(other_vector_2d_view, Kokkos::ALL(), 0);
 
       for (size_type i = 0; i < this_local_length; ++i)
-        if (vector_1d_view(i) != other_vector_1d_view(i))
+        if ((*vector_1d_view)(i) != other_vector_1d_view(i))
           return false;
 
       return true;
@@ -1390,16 +1474,21 @@ namespace LinearAlgebra
                        ExcInternalError());
 
                 if (operation == VectorOperation::insert)
-                  nonlocal_vector_1d_view(local_row) =
+                  (*nonlocal_vector_1d_view)(local_row) =
                     nonlocal_cached_values[i];
                 else if (operation == VectorOperation::add)
-                  nonlocal_vector_1d_view(local_row) +=
+                  (*nonlocal_vector_1d_view)(local_row) +=
                     nonlocal_cached_values[i];
                 else
                   DEAL_II_NOT_IMPLEMENTED();
               }
           }
         }
+
+      // Destroy the views already here, because we are calling doExport() or
+      // putScalar() below.
+      nonlocal_vector_1d_view.reset();
+      vector_1d_view.reset();
 
       // Handle vector additions
       // If the nonlocal vector is permanent (=fixed-size) we cannot guarantee
@@ -1425,7 +1514,6 @@ namespace LinearAlgebra
       if (nonlocal_vector_is_temporary)
         {
           nonlocal_vector.reset();
-          nonlocal_vector_1d_view = array_view_type();
           nonlocal_cached_values.clear();
           nonlocal_cached_indices.clear();
         }
@@ -1499,6 +1587,16 @@ namespace LinearAlgebra
       else
         out.setf(std::ios::fixed, std::ios::floatfield);
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       const size_t local_length = vector->getLocalLength();
 
       if (size() != local_length)
@@ -1509,7 +1607,7 @@ namespace LinearAlgebra
             {
               const TrilinosWrappers::types::int_type global_row =
                 vector->getMap()->getGlobalElement(i);
-              out << "[" << global_row << "]: " << vector_1d_view(i)
+              out << "[" << global_row << "]: " << (*vector_1d_view)(i)
                   << std::endl;
             }
         }
@@ -1517,10 +1615,10 @@ namespace LinearAlgebra
         {
           if (across)
             for (unsigned int i = 0; i < local_length; ++i)
-              out << vector_1d_view(i) << ' ';
+              out << (*vector_1d_view)(i) << ' ';
           else
             for (unsigned int i = 0; i < local_length; ++i)
-              out << vector_1d_view(i) << std::endl;
+              out << (*vector_1d_view)(i) << std::endl;
           out << std::endl;
         }
 

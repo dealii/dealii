@@ -1150,13 +1150,13 @@ namespace LinearAlgebra
        * To avoid creating new views during element-wise access, store
        * a view to the vector.
        */
-      array_view_type vector_1d_view;
+      mutable std::optional<array_view_type> vector_1d_view;
 
       /**
        * To avoid creating new views during element-wise access, store
        * a view to the nonlocal vector.
        */
-      array_view_type nonlocal_vector_1d_view;
+      mutable std::optional<array_view_type> nonlocal_vector_1d_view;
 
       /**
        * CommunicationPattern for the communication between the
@@ -1264,6 +1264,26 @@ namespace LinearAlgebra
 
       last_action = VectorOperation::add;
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
+      if (!nonlocal_vector_1d_view && !nonlocal_vector.is_null())
+        {
+          auto nonlocal_vector_2d_view =
+            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          nonlocal_vector_1d_view =
+            Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       for (size_type i = 0; i < n_elements; ++i)
         {
           const size_type row = indices[i];
@@ -1275,7 +1295,7 @@ namespace LinearAlgebra
                 vector->getMap()->getLocalElement(row);
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
-              vector_1d_view(local_row) += values[i];
+              (*vector_1d_view)(local_row) += values[i];
 
               // Set the compressed state to false only if there is nonlocal
               // part in this distributed vector, otherwise it's always
@@ -1319,7 +1339,7 @@ namespace LinearAlgebra
 
 #  endif
 
-              nonlocal_vector_1d_view(nonlocal_row) += values[i];
+              (*nonlocal_vector_1d_view)(nonlocal_row) += values[i];
               compressed = false;
             }
         }
@@ -1358,6 +1378,26 @@ namespace LinearAlgebra
 
       last_action = VectorOperation::insert;
 
+      // Make sure we have a view available to access the vector entries.
+      if (!vector_1d_view)
+        {
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+        }
+
+      if (!nonlocal_vector_1d_view && !nonlocal_vector.is_null())
+        {
+          auto nonlocal_vector_2d_view =
+            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
+
+          nonlocal_vector_1d_view =
+            Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
+        }
+
       for (size_type i = 0; i < n_elements; ++i)
         {
           const size_type row = indices[i];
@@ -1369,7 +1409,7 @@ namespace LinearAlgebra
                 vector->getMap()->getLocalElement(row);
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
-              vector_1d_view(local_row) = values[i];
+              (*vector_1d_view)(local_row) = values[i];
 
               // Set the compressed state to false only if there is nonlocal
               // part in this distributed vector, otherwise it's always
@@ -1413,8 +1453,8 @@ namespace LinearAlgebra
 
 #  endif
 
-              nonlocal_vector_1d_view(nonlocal_row) = values[i];
-              compressed                            = false;
+              (*nonlocal_vector_1d_view)(nonlocal_row) = values[i];
+              compressed                               = false;
             }
         }
     }

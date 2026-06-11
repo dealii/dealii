@@ -76,6 +76,7 @@ test()
   v2.reinit(complete_index_set(N * N), MPI_COMM_WORLD);
   for (unsigned int i = 0; i < N * N; ++i)
     v1(i) = i;
+  v1.compress(VectorOperation::insert);
   matrix.vmult(v2, v1);
 
   deallog << v1 * v2 << std::endl;
