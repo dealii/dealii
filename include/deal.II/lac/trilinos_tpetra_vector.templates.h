@@ -397,38 +397,48 @@ namespace LinearAlgebra
     {
       AssertDimension(indices.size(), elements.size());
 
-      // Make sure we have a view available to access the vector entries.
-      if (!vector_1d_view)
-        {
-          auto vector_2d_view =
-            vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
+      // Create a non-owning pointer to the vector map. This way we avoid thread
+      // safety problems with owning pointers.
+      Teuchos::Ptr<
+        const typename TpetraTypes::VectorType<Number, MemorySpace>::map_type>
+        vector_map;
+      {
+        // Make this part of the function thread safe
+        std::lock_guard<std::mutex> lock(mutex);
 
-          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
-        }
+        vector_map = vector->getMap().ptr();
+
+        // Make sure we have a view available to access the vector entries.
+        if (!vector_1d_view)
+          {
+            auto vector_2d_view =
+              vector->template getLocalView<Kokkos::HostSpace>(
+                Tpetra::Access::ReadWriteStruct{});
+
+            vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+          }
+      }
 
       for (unsigned int i = 0; i < indices.size(); ++i)
         {
-          AssertIndexRange(indices[i], size());
+          AssertIndexRange(indices[i], vector_map->getGlobalNumElements());
           const size_type                   row = indices[i];
           TrilinosWrappers::types::int_type local_row =
-            vector->getMap()->getLocalElement(row);
+            vector_map->getLocalElement(row);
 
 
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-          Assert(
-            local_row != Teuchos::OrdinalTraits<int>::invalid(),
-            ExcAccessToNonLocalElement(row,
-                                       vector->getMap()->getLocalNumElements(),
-                                       vector->getMap()->getMinLocalIndex(),
-                                       vector->getMap()->getMaxLocalIndex()));
+          Assert(local_row != Teuchos::OrdinalTraits<int>::invalid(),
+                 ExcAccessToNonLocalElement(row,
+                                            vector_map->getLocalNumElements(),
+                                            vector_map->getMinLocalIndex(),
+                                            vector_map->getMaxLocalIndex()));
 #  else
-          Assert(
-            local_row != Teuchos::OrdinalTraits<int>::invalid(),
-            ExcAccessToNonLocalElement(row,
-                                       vector->getMap()->getNodeNumElements(),
-                                       vector->getMap()->getMinLocalIndex(),
-                                       vector->getMap()->getMaxLocalIndex()));
+          Assert(local_row != Teuchos::OrdinalTraits<int>::invalid(),
+                 ExcAccessToNonLocalElement(row,
+                                            vector_map->getNodeNumElements(),
+                                            vector_map->getMinLocalIndex(),
+                                            vector_map->getMaxLocalIndex()));
 
 #  endif
 
@@ -826,6 +836,9 @@ namespace LinearAlgebra
     Number
     Vector<Number, MemorySpace>::operator()(const size_type index) const
     {
+      // make this function thread safe
+      std::lock_guard<std::mutex> lock(mutex);
+
       // Get the local index
       const TrilinosWrappers::types::int_type local_index =
         vector->getMap()->getLocalElement(
@@ -1294,6 +1307,9 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::size() const
     {
+      // make this function thread safe
+      std::lock_guard<std::mutex> lock(mutex);
+
       return vector->getGlobalLength();
     }
 
@@ -1313,6 +1329,9 @@ namespace LinearAlgebra
               typename Vector<Number, MemorySpace>::size_type>
     Vector<Number, MemorySpace>::local_range() const
     {
+      // make this function thread safe
+      std::lock_guard<std::mutex> lock(mutex);
+
       const size_type begin = vector->getMap()->getMinGlobalIndex();
       const size_type end   = vector->getMap()->getMaxGlobalIndex() + 1;
 

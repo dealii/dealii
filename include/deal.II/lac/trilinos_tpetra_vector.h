@@ -1159,6 +1159,15 @@ namespace LinearAlgebra
       mutable std::optional<array_view_type> nonlocal_vector_1d_view;
 
       /**
+       * A lock that ensures thread-safety for relevant
+       * functions. In particular, any functions accessing
+       * reference counted pointers of the trilinos vector
+       * needs to be guarded unless Trilinos is compiled
+       * using -D Trilinos_ENABLE_THREAD_SAFE=ON.
+       */
+      mutable std::mutex mutex;
+
+      /**
        * CommunicationPattern for the communication between the
        * source_stored_elements IndexSet and the current vector.
        */
@@ -1264,25 +1273,37 @@ namespace LinearAlgebra
 
       last_action = VectorOperation::add;
 
-      // Make sure we have a view available to access the vector entries.
-      if (!vector_1d_view)
-        {
-          auto vector_2d_view =
-            vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
+      // Create a non-owning pointer to the vector map. This way we avoid thread
+      // safety problems with owning pointers.
+      Teuchos::Ptr<
+        const typename TpetraTypes::VectorType<Number, MemorySpace>::map_type>
+        vector_map;
+      {
+        // Make this part of the function thread safe
+        std::lock_guard<std::mutex> lock(mutex);
 
-          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
-        }
+        vector_map = vector->getMap().ptr();
 
-      if (!nonlocal_vector_1d_view && !nonlocal_vector.is_null())
-        {
-          auto nonlocal_vector_2d_view =
-            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
+        // Make sure we have a view available to access the vector entries.
+        if (!vector_1d_view)
+          {
+            auto vector_2d_view =
+              vector->template getLocalView<Kokkos::HostSpace>(
+                Tpetra::Access::ReadWriteStruct{});
 
-          nonlocal_vector_1d_view =
-            Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
-        }
+            vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+          }
+
+        if (!nonlocal_vector_1d_view && !nonlocal_vector.is_null())
+          {
+            auto nonlocal_vector_2d_view =
+              nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
+                Tpetra::Access::ReadWriteStruct{});
+
+            nonlocal_vector_1d_view =
+              Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
+          }
+      }
 
       for (size_type i = 0; i < n_elements; ++i)
         {
@@ -1292,7 +1313,7 @@ namespace LinearAlgebra
           // If so, we can write right into the locally owned
           // part of the vector.
           if (TrilinosWrappers::types::int_type local_row =
-                vector->getMap()->getLocalElement(row);
+                vector_map->getLocalElement(row);
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
               (*vector_1d_view)(local_row) += values[i];
@@ -1305,6 +1326,9 @@ namespace LinearAlgebra
             }
           else if (nonlocal_vector.get() == nullptr)
             {
+              // Make this part of the function thread safe
+              std::lock_guard<std::mutex> lock(mutex);
+
               // The element is not in the locally owned part, and
               // there is no specified nonlocal_vector, i.e. this is
               // a fully distributed vector with a nonlocal cache.
@@ -1315,6 +1339,9 @@ namespace LinearAlgebra
             }
           else
             {
+              // Make this part of the function thread safe
+              std::lock_guard<std::mutex> lock(mutex);
+
               // If the element was not in the locally owned part,
               // and we have a predetermined nonlocal buffer, we need
               // to figure out whether it is in the nonlocal
@@ -1378,25 +1405,37 @@ namespace LinearAlgebra
 
       last_action = VectorOperation::insert;
 
-      // Make sure we have a view available to access the vector entries.
-      if (!vector_1d_view)
-        {
-          auto vector_2d_view =
-            vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
+      // Create a non-owning pointer to the vector map. This way we avoid thread
+      // safety problems with owning pointers.
+      Teuchos::Ptr<
+        const typename TpetraTypes::VectorType<Number, MemorySpace>::map_type>
+        vector_map;
+      {
+        // Make this part of the function thread safe
+        std::lock_guard<std::mutex> lock(mutex);
 
-          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
-        }
+        vector_map = vector->getMap().ptr();
 
-      if (!nonlocal_vector_1d_view && !nonlocal_vector.is_null())
-        {
-          auto nonlocal_vector_2d_view =
-            nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
+        // Make sure we have a view available to access the vector entries.
+        if (!vector_1d_view)
+          {
+            auto vector_2d_view =
+              vector->template getLocalView<Kokkos::HostSpace>(
+                Tpetra::Access::ReadWriteStruct{});
 
-          nonlocal_vector_1d_view =
-            Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
-        }
+            vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+          }
+
+        if (!nonlocal_vector_1d_view && !nonlocal_vector.is_null())
+          {
+            auto nonlocal_vector_2d_view =
+              nonlocal_vector->template getLocalView<Kokkos::HostSpace>(
+                Tpetra::Access::ReadWriteStruct{});
+
+            nonlocal_vector_1d_view =
+              Kokkos::subview(nonlocal_vector_2d_view, Kokkos::ALL(), 0);
+          }
+      }
 
       for (size_type i = 0; i < n_elements; ++i)
         {
@@ -1406,7 +1445,7 @@ namespace LinearAlgebra
           // If so, we can write right into the locally owned
           // part of the vector.
           if (TrilinosWrappers::types::int_type local_row =
-                vector->getMap()->getLocalElement(row);
+                vector_map->getLocalElement(row);
               local_row != Teuchos::OrdinalTraits<int>::invalid())
             {
               (*vector_1d_view)(local_row) = values[i];
@@ -1419,6 +1458,9 @@ namespace LinearAlgebra
             }
           else if (nonlocal_vector.get() == nullptr)
             {
+              // Make this part of the function thread safe
+              std::lock_guard<std::mutex> lock(mutex);
+
               // The element is not in the locally owned part, and
               // there is no specified nonlocal_vector, i.e. this is
               // a fully distributed vector with a nonlocal cache.
@@ -1429,6 +1471,9 @@ namespace LinearAlgebra
             }
           else
             {
+              // Make this part of the function thread safe
+              std::lock_guard<std::mutex> lock(mutex);
+
               // If the element was not in the locally owned part,
               // and we have a predetermined nonlocal buffer, we need
               // to figure out whether it is in the nonlocal
