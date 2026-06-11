@@ -1,0 +1,8 @@
+Changed: `MeshWorker::Assembler::CellsAndFaces` now stores cell contributions
+by `cell->active_cell_index()` instead of `cell->user_index()`. As a result,
+user code no longer needs to assign cell user indices before using this
+assembler for cell-based output vectors, but any code that relied on custom
+cell `user_index()` values to choose storage locations must be updated.
+Face-only storage with `separate_faces=true` still uses `face->user_index()`.
+<br>
+(Wolfgang Bangerth, 2026/06/10)
