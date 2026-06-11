@@ -374,6 +374,7 @@ namespace LinearAlgebra
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Whether or not to enlarge entries below a threshold
          *
@@ -383,6 +384,7 @@ namespace LinearAlgebra
          * computational work during initialization.
          */
         bool fix_diagonal;
+
         /**
          * @brief Threshold below which entries will be fixed.
          *
@@ -390,6 +392,7 @@ namespace LinearAlgebra
          * zero will be replaced will small nonzero values.
          */
         double min_diagonal;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -454,6 +457,7 @@ namespace LinearAlgebra
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Whether or not to enlarge entries below a threshold
          *
@@ -463,6 +467,7 @@ namespace LinearAlgebra
          * computational work during initialization.
          */
         bool fix_diagonal;
+
         /**
          * @brief Threshold below which entries will be fixed.
          *
@@ -470,6 +475,7 @@ namespace LinearAlgebra
          * zero will be replaced will small nonzero values.
          */
         double min_diagonal;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -546,6 +552,7 @@ namespace LinearAlgebra
          * eta times larger than the original diagonal entry.
          */
         double eta;
+
         /**
          * @brief Whether or not to enlarge entries below a threshold
          *
@@ -555,6 +562,7 @@ namespace LinearAlgebra
          * computational work during initialization.
          */
         bool fix_diagonal;
+
         /**
          * @brief Threshold below which entries will be fixed.
          *
@@ -562,6 +570,7 @@ namespace LinearAlgebra
          * zero will be replaced will small nonzero values.
          */
         double min_diagonal;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -626,6 +635,7 @@ namespace LinearAlgebra
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Overlap between processor local matrices.
          *
@@ -636,6 +646,7 @@ namespace LinearAlgebra
          * processor forming its own local block.
          */
         int overlap;
+
         /**
          * @brief Whether or not to enlarge entries below a threshold
          *
@@ -645,6 +656,7 @@ namespace LinearAlgebra
          * computational work during initialization.
          */
         bool fix_diagonal;
+
         /**
          * @brief Threshold below which entries will be fixed.
          *
@@ -652,6 +664,7 @@ namespace LinearAlgebra
          * zero will be replaced will small nonzero values.
          */
         double min_diagonal;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -713,6 +726,7 @@ namespace LinearAlgebra
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Overlap between processor local matrices.
          *
@@ -723,6 +737,7 @@ namespace LinearAlgebra
          * processor forming its own local block.
          */
         int overlap;
+
         /**
          * @brief Whether or not to enlarge entries below a threshold
          *
@@ -732,6 +747,7 @@ namespace LinearAlgebra
          * computational work during initialization.
          */
         bool fix_diagonal;
+
         /**
          * @brief Threshold below which entries will be fixed.
          *
@@ -739,6 +755,7 @@ namespace LinearAlgebra
          * zero will be replaced will small nonzero values.
          */
         double min_diagonal;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -804,6 +821,7 @@ namespace LinearAlgebra
          * vmult() and Tvmult() operations.
          */
         int degree;
+
         /*
          * @brief Upper bound for the maximum eigenvalue of the matrix.
          *
@@ -811,14 +829,17 @@ namespace LinearAlgebra
          * preconditioner.
          */
         double max_eigenvalue;
+
         /*
          * @brief Lower bound for the minimum eigenvalue of the matrix.
          */
         double min_eigenvalue;
+
         /**
          * @brief Estimated ratio between maximum and minimum eigenvalue.
          */
         double eigenvalue_ratio;
+
         /**
          * @brief Threshold below which entries will be fixed.
          *
@@ -826,6 +847,7 @@ namespace LinearAlgebra
          * zero will be replaced will small nonzero values.
          */
         double min_diagonal;
+
         /**
          * @brief Do not zero starting entries of solution vector.
          *
@@ -909,14 +931,17 @@ namespace LinearAlgebra
          * A large enough value will result in a complete LU factorization.
          */
         int ilu_fill;
+
         /**
          * @brief Constant to be added to each diagonal entry before factorization.
          */
         double ilu_atol;
+
         /**
          * @brief Factor to scale all diagonal entries by before factorization.
          */
         double ilu_rtol;
+
         /**
          * @brief Overlap between processor local matrices.
          *
@@ -990,6 +1015,7 @@ namespace LinearAlgebra
          * and the actual values to be used or dropped.
          */
         double ilut_drop;
+
         /**
          * @brief Amount of additional fill-in.
          *
@@ -999,14 +1025,17 @@ namespace LinearAlgebra
          * requirement, especially for 3d simulations.
          */
         double ilut_fill;
+
         /**
          * @brief Constant to be added to each diagonal entry before factorization.
          */
         double ilut_atol;
+
         /**
          * @brief Factor to scale all diagonal entries by before factorization.
          */
         double ilut_rtol;
+
         /**
          * @brief Overlap between processor local matrices.
          *
@@ -1085,14 +1114,17 @@ namespace LinearAlgebra
          * which corresponds to Preconditioner from PreconditionJacobi
          */
         int n_local_parts;
+
         /**
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Amount of overlap between blocks
          */
         int block_overlap;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -1159,10 +1191,12 @@ namespace LinearAlgebra
          * which corresponds to Preconditioner from PreconditionJacobi
          */
         int n_local_parts;
+
         /**
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Overlap between processor local matrices.
          *
@@ -1173,6 +1207,7 @@ namespace LinearAlgebra
          * processor forming its own local block.
          */
         int overlap;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -1221,6 +1256,7 @@ namespace LinearAlgebra
                        const double omega         = 1,
                        const int    overlap       = 1,
                        const int    n_sweeps      = 1);
+
         /**
          * @brief Number of blocks per processor.
          *
@@ -1228,10 +1264,12 @@ namespace LinearAlgebra
          * which corresponds to Preconditioner from PreconditionJacobi
          */
         int n_local_parts;
+
         /**
          * @brief Relaxation damping factor.
          */
         double omega;
+
         /**
          * @brief Overlap between processor local matrices.
          *
@@ -1242,6 +1280,7 @@ namespace LinearAlgebra
          * processor forming its own local block.
          */
         int overlap;
+
         /**
          * @brief Set how often the preconditioner should be applied during vmult() or Tvmult().
          */
@@ -1330,6 +1369,7 @@ namespace LinearAlgebra
                        const bool         output_details        = false,
                        const std::string &smoother_type         = "Chebyshev",
                        const std::string &coarse_type           = "KLU2");
+
         /**
          * @brief Optimize for elliptic problems.
          *
@@ -1338,6 +1378,7 @@ namespace LinearAlgebra
          * and unsmoothed for non-elliptic problems.
          */
         bool elliptic;
+
         /**
          * @brief Assume A is symmetric.
          *
@@ -1345,12 +1386,14 @@ namespace LinearAlgebra
          * transposes of each other.
          */
         bool symmetric;
+
         /**
          * @brief Use W cycle instead of V cycle.
          *
          * Use W-cycle instead of the default V-cycle.
          */
         bool w_cycle;
+
         /**
          * @brief Threshold for coarsening.
          *
@@ -1362,6 +1405,7 @@ namespace LinearAlgebra
          * times the diagonal element couple strongly.
          */
         double aggregation_threshold;
+
         /**
          * @brief Number of times pre- and post-smoothing are applied.
          *
@@ -1370,14 +1414,17 @@ namespace LinearAlgebra
          * smoother is applied.
          */
         int smoother_sweeps;
+
         /**
          * @brief Determine the overlap in the smoother when run in parallel.
          */
         int smoother_overlap;
+
         /**
          * @brief Print internal information details of MueLu to screen.
          */
         bool output_details;
+
         /**
          * @brief Determines which smoother to use for the AMG cycle
          * The following possibilities are implemented in this interface.
@@ -1394,6 +1441,7 @@ namespace LinearAlgebra
          * </ul>
          */
         std::string smoother_type;
+
         /**
          * @brief Type of smoother to use on the finer levels.
          *
