@@ -67,10 +67,20 @@ int
 main()
 {
   initlog();
-
+  deallog << "HEUN_EULER steps:" << std::endl;
   TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> he(
     TimeStepping::HEUN_EULER);
   test(he, f, my);
+
+  deallog << "Fehlberg steps:" << std::endl;
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> fehl(
+    TimeStepping::FEHLBERG);
+  test(fehl, f, my);
+
+  deallog << "Tsitouras5 steps:" << std::endl;
+  TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> tsit5_embedded(
+    TimeStepping::TSITOURAS5);
+  test(tsit5_embedded, f, my);
 
   return 0;
 }
