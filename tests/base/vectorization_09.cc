@@ -22,21 +22,21 @@ template <typename Number>
 void
 test()
 {
-  const unsigned int  n_chunks  = 50000;
-  const unsigned int  n_vectors = VectorizedArray<Number>::size();
-  std::vector<Number> values(n_vectors * n_chunks);
+  const unsigned int  n_chunks = 50000;
+  const unsigned int  n_lanes  = VectorizedArray<Number>::size();
+  std::vector<Number> values(n_lanes * n_chunks);
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = i;
 
   // test store operation
-  AlignedVector<Number> stored(n_vectors * n_chunks);
+  AlignedVector<Number> stored(n_lanes * n_chunks);
   for (unsigned int i = 0; i < n_chunks; ++i)
     {
       VectorizedArray<Number> tmp;
-      tmp.load(&values[i * n_vectors]);
-      tmp.streaming_store(&stored[i * n_vectors]);
+      tmp.load(&values[i * n_lanes]);
+      tmp.streaming_store(&stored[i * n_lanes]);
     }
-  for (unsigned int i = 0; i < n_chunks * n_vectors; ++i)
+  for (unsigned int i = 0; i < n_chunks * n_lanes; ++i)
     AssertThrow(stored[i] == i, ExcInternalError());
   deallog << "streaming store OK" << std::endl;
 }

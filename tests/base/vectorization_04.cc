@@ -22,35 +22,35 @@ template <typename Number, typename VectorizedArrayType>
 void
 test()
 {
-  const unsigned int  n_vectors = VectorizedArrayType::size();
-  std::vector<Number> values(n_vectors * 5);
+  const unsigned int  n_lanes = VectorizedArrayType::size();
+  std::vector<Number> values(n_lanes * 5);
   for (unsigned int i = 0; i < values.size(); ++i)
     values[i] = i;
   AlignedVector<VectorizedArrayType> copied(4);
 
   // test load operation for all possible values of alignment
-  for (unsigned int shift = 0; shift < n_vectors; ++shift)
+  for (unsigned int shift = 0; shift < n_lanes; ++shift)
     {
       for (unsigned int i = 0; i < 4; ++i)
-        copied[i].load(&values[i * n_vectors + shift]);
+        copied[i].load(&values[i * n_lanes + shift]);
       for (unsigned int i = 0; i < 4; ++i)
-        for (unsigned int v = 0; v < n_vectors; ++v)
-          AssertThrow(copied[i][v] == values[i * n_vectors + v + shift],
+        for (unsigned int v = 0; v < n_lanes; ++v)
+          AssertThrow(copied[i][v] == values[i * n_lanes + v + shift],
                       ExcInternalError());
     }
   deallog << "load OK" << std::endl;
 
   // test store operation
-  std::vector<Number> stored(n_vectors * 5);
-  for (unsigned int shift = 0; shift < n_vectors; ++shift)
+  std::vector<Number> stored(n_lanes * 5);
+  for (unsigned int shift = 0; shift < n_lanes; ++shift)
     {
       for (unsigned int i = 0; i < 4; ++i)
         {
           VectorizedArrayType tmp;
-          tmp.load(&values[i * n_vectors]);
-          tmp.store(&stored[i * n_vectors + shift]);
+          tmp.load(&values[i * n_lanes]);
+          tmp.store(&stored[i * n_lanes + shift]);
         }
-      for (unsigned int i = 0; i < 4 * n_vectors; ++i)
+      for (unsigned int i = 0; i < 4 * n_lanes; ++i)
         AssertThrow(stored[i + shift] == i, ExcInternalError());
     }
   deallog << "store OK" << std::endl;
