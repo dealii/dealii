@@ -856,26 +856,12 @@ namespace Step39
 
   // Another clone of the assemble function. The big difference to the
   // previous ones is here that we also have an input vector.
+  // The results of the estimator are stored in a vector with one entry per
+  // cell.
   template <int dim>
   double InteriorPenaltyProblem<dim>::estimate()
   {
-    // The results of the estimator are stored in a vector with one entry per
-    // cell. Since cells in deal.II are not numbered, we have to create our
-    // own numbering in order to use this vector. For the assembler used below
-    // the information in which component of a vector the result is stored is
-    // transmitted by the user_index variable for each cell. We need to set this
-    // numbering up here.
-    //
-    // On the other hand, somebody might have used the user indices
-    // already. So, let's be good citizens and save them before tampering with
-    // them.
-    std::vector<unsigned int> old_user_indices;
-    triangulation.save_user_indices(old_user_indices);
-
     estimates.block(0).reinit(triangulation.n_active_cells());
-    unsigned int i = 0;
-    for (const auto &cell : triangulation.active_cell_iterators())
-      cell->set_user_index(i++);
 
     // This starts like before,
     MeshWorker::IntegrationInfoBox<dim> info_box;
@@ -926,9 +912,6 @@ namespace Step39
                                &Estimator::face<dim>,
                                assembler);
 
-    // Right before we return the result of the error estimate, we restore the
-    // old user indices.
-    triangulation.load_user_indices(old_user_indices);
     return estimates.block(0).l2_norm();
   }
 
@@ -946,12 +929,6 @@ namespace Step39
     BlockVector<double> errors(2);
     errors.block(0).reinit(triangulation.n_active_cells());
     errors.block(1).reinit(triangulation.n_active_cells());
-
-    std::vector<unsigned int> old_user_indices;
-    triangulation.save_user_indices(old_user_indices);
-    unsigned int i = 0;
-    for (const auto &cell : triangulation.active_cell_iterators())
-      cell->set_user_index(i++);
 
     MeshWorker::IntegrationInfoBox<dim> info_box;
     const unsigned int                  n_gauss_points =
@@ -986,7 +963,6 @@ namespace Step39
                                &ErrorIntegrator::boundary<dim>,
                                &ErrorIntegrator::face<dim>,
                                assembler);
-    triangulation.load_user_indices(old_user_indices);
 
     std::cout << "energy-error: " << errors.block(0).l2_norm() << std::endl;
     std::cout << "L2-error:     " << errors.block(1).l2_norm() << std::endl;

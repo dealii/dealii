@@ -93,9 +93,14 @@ namespace MeshWorker
     /**
      * Compute cell and face contributions of one or several functionals,
      * typically for error estimates. The information in which component the
-     * result is stored for a given cell or face is transmitted by its
-     * user_index variable. Hence, you need to make sure to set these variables
-     * appropriately before using this class.
+     * result is stored for a given cell or face is given by whatever
+     * `cell->active_cell_iterator` returns. For cases where face
+     * integrals are computed and stored separately into values for the
+     * two adjacent cells (i.e., if `separate_faces` is set to `true`
+     * in the call to initialize()), the code queries
+     * `cell->face(f)->user_index()` for what vector entry the value
+     * should be written into; user code must therefore set the user index
+     * appropriately for the faces on which integrals shall be computed.
      *
      * @ingroup MeshWorker
      */
@@ -261,7 +266,7 @@ namespace MeshWorker
         v = results.entry<BlockVector<double> *>(0);
 
       for (unsigned int i = 0; i < info.n_values(); ++i)
-        v->block(i)(info.cell->user_index()) += info.value(i);
+        v->block(i)(info.cell->active_cell_index()) += info.value(i);
     }
 
 
@@ -283,8 +288,10 @@ namespace MeshWorker
           else
             {
               BlockVector<double> *v0 = results.entry<BlockVector<double> *>(0);
-              v0->block(i)(info1.cell->user_index()) += .5 * info1.value(i);
-              v0->block(i)(info2.cell->user_index()) += .5 * info2.value(i);
+              v0->block(i)(info1.cell->active_cell_index()) +=
+                .5 * info1.value(i);
+              v0->block(i)(info2.cell->active_cell_index()) +=
+                .5 * info2.value(i);
             }
         }
     }
