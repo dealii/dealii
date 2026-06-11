@@ -1349,13 +1349,25 @@ namespace SUNDIALS
    *   - `ARKODE_LSRK_RKL_2`: Runge-Kutta-Legendre of order 2.
    *
    * Because the number of stages is chosen adaptively based on the spectral
-   * radius of the Jacobian, STS methods require a user-supplied dominant
-   * eigenvalue function. This must be set via `dominant_eigenvalue_function`
-   * callback.
+   * radius of the Jacobian, STS methods need an estimate of the dominant
+   * (largest-magnitude) eigenvalue of the Jacobian. This estimate can be
+   * provided in one of two ways:
+   *  - By supplying dominant_eigenvalue_function(), in which case SUNDIALS
+   *    calls back into the user code to obtain the estimate.
+   *  - By leaving dominant_eigenvalue_function() unset. In that case a
+   *    SUNDIALS built-in power-iteration dominant-eigenvalue estimator
+   *    (SUNDomEigEstimator) is created and attached automatically. The
+   *    estimator obtains the dominant eigenvalue internally from
+   *    explicit_function() and requires no further input. This default is
+   *    only available when deal.II is compiled against SUNDIALS 7.5.0 or
+   *    newer; with older versions dominant_eigenvalue_function() must be
+   *    provided.
    *
-   * The user has to provide the implementations of the following
-   * `std::function`s:
+   * The user has to provide the implementation of the following
+   * `std::function`:
    *  - explicit_function()
+   *
+   * Optionally, the user may also provide:
    *  - dominant_eigenvalue_function()
    *
    * Any other custom settings of the LSRKStep object can be specified in
@@ -1390,13 +1402,37 @@ namespace SUNDIALS
        * @param max_num_stages Maximum number of stages allowed within a single
        *   time step. A value of 0 means no limit is imposed (SUNDIALS default
        *   of 200). Forwarded to LSRKStepSetMaxNumStages.
+       * @param dom_eig_estimator_max_iters Maximum number of power iterations
+       *   performed by the built-in dominant-eigenvalue estimator. Only used
+       *   when dominant_eigenvalue_function() is not provided (so that the
+       *   default SUNDomEigEstimator is created). A negative value (the
+       *   default, -1) leaves this option unset, so SUNDIALS uses its built-in
+       *   default. Forwarded to SUNDomEigEstimator_Power.
+       * @param dom_eig_estimator_rel_tol Relative convergence tolerance of the
+       *   power iteration used by the built-in dominant-eigenvalue estimator.
+       *   Only used when dominant_eigenvalue_function() is not provided. A
+       *   negative value (the default, -1) leaves this option unset, so
+       *   SUNDIALS uses its built-in default. Forwarded to
+       *   SUNDomEigEstimator_Power.
+       * @param dom_eig_estimator_num_warmups Number of preprocessing warmup
+       *   iterations performed once when the built-in dominant-eigenvalue
+       *   estimator is first initialized. Only used when
+       *   dominant_eigenvalue_function() is not provided. A negative value (the
+       *   default, -1) leaves this option unset, so SUNDIALS uses its built-in
+       *   default. Forwarded to LSRKStepSetNumDomEigEstInitPreprocessIters.
        */
-      AdditionalData(const std::string &method_name       = "",
-                     const int          dom_eig_frequency = -1,
-                     const unsigned int max_num_stages    = 0)
+      AdditionalData(const std::string &method_name                   = "",
+                     const int          dom_eig_frequency             = -1,
+                     const unsigned int max_num_stages                = 0,
+                     const long int     dom_eig_estimator_max_iters   = -1,
+                     const double       dom_eig_estimator_rel_tol     = -1.,
+                     const int          dom_eig_estimator_num_warmups = -1)
         : method_name(method_name)
         , dom_eig_frequency(dom_eig_frequency)
         , max_num_stages(max_num_stages)
+        , dom_eig_estimator_max_iters(dom_eig_estimator_max_iters)
+        , dom_eig_estimator_rel_tol(dom_eig_estimator_rel_tol)
+        , dom_eig_estimator_num_warmups(dom_eig_estimator_num_warmups)
       {}
 
       /**
@@ -1427,6 +1463,31 @@ namespace SUNDIALS
        * (SUNDIALS default of 200). Forwarded to LSRKStepSetMaxNumStages.
        */
       unsigned int max_num_stages;
+
+      /**
+       * Maximum number of power iterations performed by the built-in
+       * dominant-eigenvalue estimator. Only used when
+       * dominant_eigenvalue_function() is not provided, in which case a
+       * default SUNDomEigEstimator (power iteration) is created and attached.
+       * Forwarded to SUNDomEigEstimator_Power.
+       */
+      long int dom_eig_estimator_max_iters;
+
+      /**
+       * Relative convergence tolerance of the power iteration used by the
+       * built-in dominant-eigenvalue estimator. Only used when
+       * dominant_eigenvalue_function() is not provided. Forwarded to
+       * SUNDomEigEstimator_Power.
+       */
+      double dom_eig_estimator_rel_tol;
+
+      /**
+       * Number of preprocessing warmup iterations performed once when the
+       * built-in dominant-eigenvalue estimator is first initialized. Only used
+       * when dominant_eigenvalue_function() is not provided. Forwarded to
+       * LSRKStepSetNumDomEigEstInitPreprocessIters.
+       */
+      int dom_eig_estimator_num_warmups;
     };
 
     /**
@@ -1455,10 +1516,18 @@ namespace SUNDIALS
       explicit_function;
 
     /**
-     * A function object that users must supply and that is intended to return
-     * an estimate of the dominant (largest-magnitude) eigenvalue of the
-     * Jacobian. This information is used by SUNDIALS to determine the number
-     * of polynomial stages needed for stability.
+     * A function object that users may optionally supply and that is intended
+     * to return an estimate of the dominant (largest-magnitude) eigenvalue of
+     * the Jacobian. This information is used by SUNDIALS to determine the
+     * number of polynomial stages needed for stability.
+     *
+     * If this callback is left unset, deal.II instead creates a SUNDIALS
+     * built-in power-iteration dominant-eigenvalue estimator
+     * (SUNDomEigEstimator) and attaches it automatically. The estimator
+     * derives the dominant eigenvalue internally from explicit_function() and
+     * requires no further input from the user. This automatic default is only
+     * available when deal.II is compiled against SUNDIALS 7.5.0 or newer; with
+     * older versions this callback must be provided.
      *
      * The callback receives the current time @p t, the current state @p y,
      * and the already-evaluated right-hand side @p f (i.e., $f(t,y)$), and
@@ -1520,6 +1589,18 @@ namespace SUNDIALS
      */
     AdditionalData data;
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+    /**
+     * SUNDIALS built-in dominant-eigenvalue estimator. This object is only
+     * created (and owned) when dominant_eigenvalue_function is not provided,
+     * in which case it is attached to the LSRKStep module to estimate the
+     * dominant eigenvalue automatically. Stored as an opaque pointer with a
+     * custom deleter that calls SUNDomEigEstimator_Destroy. Declared before
+     * arkode_mem so that it is destroyed after the ARKODE memory object.
+     */
+    std::unique_ptr<void, void (*)(void *)> dom_eig_estimator;
+#    endif
+
     /**
      * ARKODE memory object.
      */
@@ -1553,6 +1634,24 @@ namespace SUNDIALS
                       max_num_stages,
                       "Maximum number of polynomial stages per time step. "
                       "0 means no limit.");
+    prm.add_parameter(
+      "Dominant eigenvalue estimator maximum iterations",
+      dom_eig_estimator_max_iters,
+      "Maximum number of power iterations performed by the built-in "
+      "dominant-eigenvalue estimator. Only used when no dominant eigenvalue "
+      "function is provided.");
+    prm.add_parameter(
+      "Dominant eigenvalue estimator relative tolerance",
+      dom_eig_estimator_rel_tol,
+      "Relative convergence tolerance of the power iteration used by the "
+      "built-in dominant-eigenvalue estimator. Only used when no dominant "
+      "eigenvalue function is provided.");
+    prm.add_parameter(
+      "Dominant eigenvalue estimator warmup iterations",
+      dom_eig_estimator_num_warmups,
+      "Number of preprocessing warmup iterations performed once when the "
+      "built-in dominant-eigenvalue estimator is first initialized. Only used "
+      "when no dominant eigenvalue function is provided.");
   }
 
 
