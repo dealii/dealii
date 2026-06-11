@@ -59,6 +59,11 @@ namespace Utilities
        * Create a contiguous type of (possibly large) @p count.
        *
        * See the MPI 4.x standard for details.
+       * @param count The number of entries described by @p datatype.
+       * @param oldtype The MPI datatype that describes one entry of the
+       * original buffer.
+       * @param newtype The MPI datatype object that stores the newly created
+       * derived type.
        */
       inline int
       Type_contiguous_c(MPI_Count     count,
@@ -146,6 +151,14 @@ namespace Utilities
        * Send a package to rank @p dest with a (possibly large) @p count.
        *
        * See the MPI 4.x standard for details.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param dest The destination MPI rank.
+       * @param tag The MPI message tag.
+       * @param comm The MPI communicator.
        */
       inline int
       Send_c(const void  *buf,
@@ -185,6 +198,16 @@ namespace Utilities
        * Receive a package from rank @p source with a (possibly large) @p count.
        *
        * See the MPI 4.x standard for details.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param source The source MPI rank from which data is received.
+       * @param tag The MPI message tag.
+       * @param comm The MPI communicator.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       inline int
       Recv_c(void        *buf,
@@ -227,6 +250,13 @@ namespace Utilities
        * the process with rank "root" to all other processes.
        *
        * See the MPI 4.x standard for details.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param root_mpi_rank The root mpi rank.
+       * @param comm The MPI communicator.
        */
       inline int
       Bcast_c(void        *buf,
@@ -265,6 +295,16 @@ namespace Utilities
        * Write a possibly large @p count of data at the location @p offset.
        *
        * See the MPI 4.x standard for details.
+       * @param fh The MPI file handle on which the operation acts.
+       * @param offset The offset into the underlying storage or file at which
+       * the operation starts.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       inline int
       File_write_at_c(MPI_File     fh,
@@ -301,6 +341,16 @@ namespace Utilities
        * location @p offset.
        *
        * See the MPI 4.x standard for details.
+       * @param fh The MPI file handle on which the operation acts.
+       * @param offset The offset into the underlying storage or file at which
+       * the operation starts.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       inline int
       File_write_at_all_c(MPI_File     fh,
@@ -337,6 +387,14 @@ namespace Utilities
        * Collectively write a possibly large @p count of data in order.
        *
        * See the MPI 4.x standard for details.
+       * @param fh The MPI file handle on which the operation acts.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       inline int
       File_write_ordered_c(MPI_File     fh,
@@ -372,6 +430,16 @@ namespace Utilities
        * location @p offset.
        *
        * See the MPI 4.x standard for details.
+       * @param fh The MPI file handle on which the operation acts.
+       * @param offset The offset into the underlying storage or file at which
+       * the operation starts.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       inline int
       File_read_at_c(MPI_File     fh,
@@ -408,6 +476,16 @@ namespace Utilities
        * location @p offset.
        *
        * See the MPI 4.x standard for details.
+       * @param fh The MPI file handle on which the operation acts.
+       * @param offset The offset into the underlying storage or file at which
+       * the operation starts.
+       * @param buf The address of the buffer that is sent, received, read, or
+       * written.
+       * @param count The number of entries described by @p datatype.
+       * @param datatype The MPI datatype that describes one entry of the
+       * buffer.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       inline int
       File_read_at_all_c(MPI_File     fh,

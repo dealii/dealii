@@ -11,25 +11,25 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_function_parser_h
-#define dealii_function_parser_h
+#  define dealii_function_parser_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#include <deal.II/base/auto_derivative_function.h>
-#include <deal.II/base/mu_parser_internal.h>
-#include <deal.II/base/point.h>
+#  include <deal.II/base/auto_derivative_function.h>
+#  include <deal.II/base/mu_parser_internal.h>
+#  include <deal.II/base/point.h>
 
-#include <map>
-#include <vector>
+#  include <map>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
 // Forward declaration
-#ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <typename>
 class Vector;
-#endif
+#  endif
 
 /**
  * This class implements a function object that gets its value by parsing a
@@ -229,6 +229,9 @@ public:
    * initialize() method before you can use it. If an attempt to use this
    * function is made before the initialize() method has been called, then an
    * exception is thrown.
+   * @param n_components The number of components.
+   * @param initial_time The initial time.
+   * @param h The h used by this operation.
    */
   FunctionParser(const unsigned int n_components = 1,
                  const double       initial_time = 0.0,
@@ -239,6 +242,10 @@ public:
    * list of expressions (one for each component of the function), an optional
    * comma-separated list of constants, variable names and step size for the
    * computation of first order derivatives by finite differences.
+   * @param expression The expression used by this operation.
+   * @param constants The constants used by this operation.
+   * @param variable_names The variable names.
+   * @param h The h used by this operation.
    */
   FunctionParser(const std::string &expression,
                  const std::string &constants      = "",
@@ -323,6 +330,10 @@ public:
    * are expected to be separated by a semicolon. An exception is thrown if
    * this method is called and the number of components successfully parsed
    * does not match the number of components of the base function.
+   * @param vars The vars used by this operation.
+   * @param expression The expression used by this operation.
+   * @param constants The constants used by this operation.
+   * @param time_dependent The time dependent.
    */
   void
   initialize(const std::string &vars,
@@ -343,6 +354,8 @@ public:
    * one component (i.e., the function is scalar), you should state the
    * component you want to have evaluated; it defaults to zero, i.e., the first
    * component.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -371,30 +384,20 @@ public:
                  << ") is not equal to the number of expressions (" << arg2
                  << ").");
 
-  /** @} */
-};
-
-
-template <int dim>
-std::string
-FunctionParser<dim>::default_variable_names()
-{
-  switch (dim)
-    {
-      case 1:
-        return "x";
-      case 2:
-        return "x,y";
-      case 3:
-        return "x,y,z";
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
-  return "";
-}
-
-
-
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
+  /**
+   *  @} */
+  ****mplate<int dim> *d::string                   *
+     nctionParser<dim>::default_variable_names() *
+    *switch (dim) *
+  {
+  *case 1:
+    *return "x";
+  *case 2:
+    *return "x,y";
+  *case 3:
+    *return "x,y,z";
+    *default : *DEAL_II_NOT_IMPLEMENTED();
+    *
+  }
+  *return "";
+  *****AL_II_NAMESPACE_CLOSE **ndif * /

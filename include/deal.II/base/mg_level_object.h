@@ -75,12 +75,15 @@ public:
   /**
    * Constructor. Same as above but without arguments to be forwarded to the
    * constructor of the underlying object.
+   * @param minlevel The minlevel used by this operation.
+   * @param maxlevel The maxlevel used by this operation.
    */
   MGLevelObject(const unsigned int minlevel = 0,
                 const unsigned int maxlevel = 0);
 
   /**
    * Access object on level @p level.
+   * @param level The level used by this operation.
    */
   Object &
   operator[](const unsigned int level);
@@ -90,6 +93,7 @@ public:
    *
    * This function can be called on a @p const object, and
    * consequently returns a @p const reference.
+   * @param level The level used by this operation.
    */
   const Object &
   operator[](const unsigned int level) const;
@@ -124,6 +128,7 @@ public:
    * This clearly requires that the objects stored on each level allow for
    * this operation. This is, in particular, true for vectors and matrices
    * if @p d is zero, thereby zeroing out all vector or matrix entries.
+   * @param d The scalar value to assign.
    */
   MGLevelObject<Object> &
   operator=(const double d);
@@ -173,6 +178,7 @@ public:
    * </code>
    * This means this function can accept a lambda, a std::function, or a plain
    * function pointer.
+   * @param action The action used by this operation.
    */
   template <typename ActionFunctionObjectType>
   void

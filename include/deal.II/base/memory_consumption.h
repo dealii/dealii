@@ -87,6 +87,7 @@ namespace MemoryConsumption
    * Calculate the memory consumption of a fundamental type. See
    * EnableIfScalar for a discussion on how this restriction (SFINAE) is
    * implemented.
+   * @param t The time associated with the evaluation.
    */
   template <typename T>
   inline std::enable_if_t<std::is_fundamental_v<T>, std::size_t>
@@ -97,6 +98,7 @@ namespace MemoryConsumption
    * specialization (past this one) is available for the type <tt>T</tt>, then
    * this function returns the member function
    * <tt>t.memory_consumption()</tt>'s value.
+   * @param t The time associated with the evaluation.
    */
   template <typename T>
   inline std::enable_if_t<!(std::is_fundamental_v<T> || std::is_pointer_v<T>),
@@ -108,6 +110,7 @@ namespace MemoryConsumption
    * value does not include the size of the pointer. This function only
    * measures up to (and including) the NUL byte; the underlying buffer may be
    * larger.
+   * @param string The string used by this operation.
    */
   inline std::size_t
   memory_consumption(const char *string);
@@ -131,6 +134,7 @@ namespace MemoryConsumption
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
    * <tt>std::string</tt> variable.
+   * @param s The value on which this function operates.
    */
   inline std::size_t
   memory_consumption(const std::string &s);
@@ -161,6 +165,7 @@ namespace MemoryConsumption
    * For the most commonly used vectors, there are special functions that
    * compute the size without a loop. This also applies for the special case
    * of vectors of bools.
+   * @param v The value on which this function operates.
    */
   template <typename T>
   inline std::size_t
@@ -185,6 +190,7 @@ namespace MemoryConsumption
    * possible to also compute the memory consumption of arrays of vectors,
    * arrays of strings, etc, where the individual elements may have vastly
    * different sizes.
+   * @param v The value on which this function operates.
    */
   template <typename T, std::size_t N>
   inline std::size_t
@@ -208,6 +214,7 @@ namespace MemoryConsumption
    *
    * This is a special case, as the bools are not stored one-by-one, but as a
    * bit field.
+   * @param v The value on which this function operates.
    */
   inline std::size_t
   memory_consumption(const std::vector<bool> &v);
@@ -215,6 +222,7 @@ namespace MemoryConsumption
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a pair
    * of values.
+   * @param p The point at which to evaluate the function.
    */
   template <typename A, typename B>
   inline std::size_t
@@ -223,6 +231,7 @@ namespace MemoryConsumption
   /**
    * Determine an estimate of the amount of memory in bytes consumed by a
    * value wrapped in a std::optional.
+   * @param o The value on which this function operates.
    */
   template <typename A>
   inline std::size_t

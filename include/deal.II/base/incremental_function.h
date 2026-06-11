@@ -63,6 +63,7 @@ namespace Functions
     /**
      * Constructor which wraps a given function @p base.
      *
+     * @param base The base used by this operation.
      * @note This class stores a non-constant reference to @p base
      * and will call <code>base.set_time()</code> during evaluation
      * in order to evaluate the @p base class at any arbitrary time.
@@ -78,6 +79,8 @@ namespace Functions
      * Unless there is only one component (i.e. the function is scalar), you
      * should state the component you want to have evaluated. By default, the
      * value of the first component is computed.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual RangeNumberType
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -87,6 +90,8 @@ namespace Functions
      *
      * It is required that the @p values vector have the correct size before
      * this function is called.
+     * @param p The point at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value(const Point<dim>        &p,
@@ -96,6 +101,7 @@ namespace Functions
      * Set the time decrement.
      *
      * It is expected that this value be positive.
+     * @param delta_t The delta t.
      */
     void
     set_decrement(const time_type delta_t);

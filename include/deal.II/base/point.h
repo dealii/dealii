@@ -131,6 +131,7 @@ public:
    * <tt>dim!=1</tt> as it would leave some components of the point
    * coordinates uninitialized.
    *
+   * @param x The value on which this function operates.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr explicit DEAL_II_HOST_DEVICE
@@ -143,6 +144,8 @@ public:
    * coordinates uninitialized (if dim>2) or would not use some arguments (if
    * dim<2).
    *
+   * @param x The value on which this function operates.
+   * @param y The value on which this function operates.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
@@ -155,6 +158,9 @@ public:
    * point coordinates uninitialized (if dim>3) or would not use some
    * arguments (if dim<3).
    *
+   * @param x The value on which this function operates.
+   * @param y The value on which this function operates.
+   * @param z The value on which this function operates.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
@@ -162,6 +168,7 @@ public:
 
   /**
    * Convert a boost::geometry::point to a dealii::Point.
+   * @param boost_pt The boost pt.
    */
   template <std::size_t dummy_dim,
             std::enable_if_t<(dim == dummy_dim) && (dummy_dim != 0), int> = 0>
@@ -174,6 +181,7 @@ public:
    * that is zero in all coordinates except for a single 1 in the <tt>i</tt>th
    * coordinate.
    *
+   * @param i The index of the entry.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   static constexpr DEAL_II_HOST_DEVICE Point<dim, Number>
@@ -182,6 +190,7 @@ public:
   /**
    * Read access to the <tt>index</tt>th coordinate.
    *
+   * @param index The index of the entry.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Number
@@ -190,6 +199,7 @@ public:
   /**
    * Read and write access to the <tt>index</tt>th coordinate.
    *
+   * @param index The index of the entry.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Number &
@@ -199,6 +209,7 @@ public:
    * Assignment operator from Tensor<1, dim, Number> with different underlying
    * scalar type. This obviously requires that the @p OtherNumber type is
    * convertible to @p Number.
+   * @param p The point at which to evaluate the function.
    */
   template <typename OtherNumber>
   constexpr Point<dim, Number> &
@@ -260,6 +271,7 @@ public:
   /**
    * Multiply the current point by a factor.
    *
+   * @param OtherNumber The other number used by this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    *
    * @relatesalso EnableIfScalar
@@ -274,6 +286,7 @@ public:
   /**
    * Divide the current point by a factor.
    *
+   * @param OtherNumber The other number used by this operation.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   template <typename OtherNumber>
@@ -286,6 +299,7 @@ public:
   /**
    * Return the scalar product of the vectors representing two points.
    *
+   * @param p The point at which to evaluate the function.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE Number
@@ -312,6 +326,7 @@ public:
    * <tt>p</tt>, i.e. the $l_2$ norm of the difference between the
    * vectors representing the two points.
    *
+   * @param p The point at which to evaluate the function.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   DEAL_II_HOST_DEVICE typename numbers::NumberTraits<Number>::real_type
@@ -321,6 +336,7 @@ public:
    * Return the squared Euclidean distance of <tt>this</tt> point to the point
    * <tt>p</tt>.
    *
+   * @param p The point at which to evaluate the function.
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
   constexpr DEAL_II_HOST_DEVICE
@@ -653,6 +669,8 @@ inline void Point<dim, Number>::serialize(Archive &ar, const unsigned int)
 /**
  * Global operator scaling a point vector by a scalar.
  *
+ * @param factor The scalar factor by which all entries are scaled.
+ * @param p The point at which to evaluate the function.
  * @note This function can also be used in @ref GlossDevice "device" code.
  *
  * @relates Point
@@ -695,6 +713,8 @@ operator<<(std::ostream &out, const Point<dim, Number> &p)
  * @relatesalso Point
  *
  * @dealiiConceptRequires{dim >= 0}
+ * @param in The input data or stream from which values are read.
+ * @param p The point at which to evaluate the function.
  */
 template <int dim, typename Number>
 DEAL_II_CXX20_REQUIRES(dim >= 0)

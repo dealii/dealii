@@ -111,6 +111,7 @@ namespace Utilities
      * communicators identifies the communication in question, not their
      * relative timing as is the case in a sequential program that just uses a
      * single communicator.
+     * @param communicator The MPI communicator.
      */
     Epetra_Comm *
     duplicate_communicator(const Epetra_Comm &communicator);
@@ -133,6 +134,7 @@ namespace Utilities
      * Epetra_Comm object is still around, it first resets the latter and then
      * destroys the communicator object.
      *
+     * @param communicator The MPI communicator.
      * @note If you call this function on an Epetra_Comm object that is not
      * created by duplicate_communicator(), you are likely doing something
      * quite wrong. Don't do this.
@@ -147,6 +149,7 @@ namespace Utilities
      * is not using MPI at all, or is using MPI but has been started with
      * only one MPI process), then the communicator necessarily involves
      * only one process and the function returns 1.
+     * @param mpi_communicator The MPI communicator.
      */
     unsigned int
     get_n_mpi_processes(const Epetra_Comm &mpi_communicator);
@@ -156,6 +159,7 @@ namespace Utilities
      * described by the given communicator. This will be a unique value for
      * each process between zero and (less than) the number of all processes
      * (given by get_n_mpi_processes()).
+     * @param mpi_communicator The MPI communicator.
      */
     unsigned int
     get_this_mpi_process(const Epetra_Comm &mpi_communicator);
@@ -169,6 +173,8 @@ namespace Utilities
      *
      * This function is typically used with a communicator that has been
      * obtained by the duplicate_communicator() function.
+     * @param map The map used by this operation.
+     * @param comm The MPI communicator.
      */
     Epetra_Map
     duplicate_map(const Epetra_BlockMap &map, const Epetra_Comm &comm);
@@ -195,6 +201,7 @@ namespace Utilities
      * <a
      * href="https://docs.trilinos.org/dev/packages/teuchos/doc/html/classTeuchos_1_1Comm.html">Teuchos::Comm</a>
      * communicator.
+     * @param teuchos_comm The teuchos comm.
      */
     MPI_Comm
     teuchos_comm_to_mpi_comm(

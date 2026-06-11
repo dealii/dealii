@@ -200,6 +200,11 @@ namespace TimeStepping
      * to the implicit problems. The input parameters are the time, $ \tau $,
      * and a vector. The output is the value of function at this point. This
      * function returns the time at the end of the time step.
+     * @param F The function object.
+     * @param J_inverse The j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     virtual double
     evolve_one_time_step(
@@ -240,6 +245,7 @@ namespace TimeStepping
 
     /**
      * Purely virtual method used to initialize the Runge-Kutta method.
+     * @param method The numerical method to use.
      */
     virtual void
     initialize(const runge_kutta_method method) = 0;
@@ -254,6 +260,11 @@ namespace TimeStepping
      * The output is the value of function at this point. This function
      * returns the time at the end of the time step. When using Runge-Kutta
      * methods, @p F and @p J_inverse can only contain one element.
+     * @param F The function object.
+     * @param J_inverse The j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     double
     evolve_one_time_step(
@@ -275,6 +286,11 @@ namespace TimeStepping
      * f}{\partial y} $. The input parameters are the time, $ \tau $, and a
      * vector. The output is the value of function at this point.
      * evolve_one_time_step returns the time at the end of the time step.
+     * @param f The function object.
+     * @param id_minus_tau_J_inverse The id minus tau j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     virtual double
     evolve_one_time_step(
@@ -329,11 +345,13 @@ namespace TimeStepping
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method).
+     * @param method The numerical method to use.
      */
     ExplicitRungeKutta(const runge_kutta_method method);
 
     /**
      * Initialize the explicit Runge-Kutta method.
+     * @param method The numerical method to use.
      */
     void
     initialize(const runge_kutta_method method) override;
@@ -349,6 +367,11 @@ namespace TimeStepping
      * of function at this point. evolve_one_time_step returns the time at the
      * end of the time step.
      *
+     * @param f The function object.
+     * @param id_minus_tau_J_inverse The id minus tau j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      * @note @p id_minus_tau_J_inverse is ignored since the method is explicit.
      */
     double
@@ -367,6 +390,10 @@ namespace TimeStepping
      * required id_minus_tau_J_inverse because it is not used for explicit
      * methods. evolve_one_time_step returns the time at the end of the time
      * step.
+     * @param f The function object.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     double
     evolve_one_time_step(
@@ -433,11 +460,13 @@ namespace TimeStepping
 
     /**
      * Constructor. This function calls initialize(runge_kutta_method).
+     * @param method The numerical method to use.
      */
     LowStorageRungeKutta(const runge_kutta_method method);
 
     /**
      * Initialize the explicit Runge-Kutta method.
+     * @param method The numerical method to use.
      */
     void
     initialize(const runge_kutta_method method) override;
@@ -452,6 +481,11 @@ namespace TimeStepping
      * parameters are the time, $ \tau $, and a vector. The output is the value
      * of function at this point. evolve_one_time_step returns the time at the
      * end of the time step.
+     * @param f The function object.
+     * @param id_minus_tau_J_inverse The id minus tau j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     double
     evolve_one_time_step(
@@ -471,6 +505,12 @@ namespace TimeStepping
      * step. Note that vec_ki holds the evaluation of the differential operator,
      * and vec_ri holds the right-hand side for the differential operator
      * application.
+     * @param f The function object.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param solution The solution used by this operation.
+     * @param vec_ri The object in which to store the vec ri.
+     * @param vec_ki The object in which to store the vec ki.
      */
     double
     evolve_one_time_step(
@@ -486,6 +526,9 @@ namespace TimeStepping
      * Note that here vector @p a is not the conventional definition in terms of a
      * Butcher tableau but merely one of the sub-diagonals. More details can be
      * found in step-67 and the references therein.
+     * @param a The value on which this function operates.
+     * @param b The value on which this function operates.
+     * @param c The value on which this function operates.
      */
     void
     get_coefficients(std::vector<double> &a,
@@ -554,6 +597,9 @@ namespace TimeStepping
      * Constructor. This function calls initialize(runge_kutta_method) and
      * initialize the maximum number of iterations and the tolerance of the
      * Newton solver.
+     * @param method The numerical method to use.
+     * @param max_it The max it.
+     * @param tolerance The tolerance used by this operation.
      */
     ImplicitRungeKutta(const runge_kutta_method method,
                        const unsigned int       max_it    = 100,
@@ -561,6 +607,7 @@ namespace TimeStepping
 
     /**
      * Initialize the implicit Runge-Kutta method.
+     * @param method The numerical method to use.
      */
     void
     initialize(const runge_kutta_method method) override;
@@ -575,6 +622,11 @@ namespace TimeStepping
      * parameters this function receives are the time, $ \tau $, and a vector.
      * The output is the value of function at this point. evolve_one_time_step
      * returns the time at the end of the time step.
+     * @param f The function object.
+     * @param id_minus_tau_J_inverse The id minus tau j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     double
     evolve_one_time_step(
@@ -589,6 +641,8 @@ namespace TimeStepping
     /**
      * Set the maximum number of iterations and the tolerance used by the
      * Newton solver.
+     * @param max_it The max it.
+     * @param tolerance The tolerance used by this operation.
      */
     void
     set_newton_solver_parameters(const unsigned int max_it,
@@ -693,6 +747,13 @@ namespace TimeStepping
     /**
      * Constructor. This function calls initialize(runge_kutta_method) and
      * initialize the parameters needed for time adaptation.
+     * @param method The numerical method to use.
+     * @param coarsen_param The coarsen param.
+     * @param refine_param The refine param.
+     * @param min_delta The min delta.
+     * @param max_delta The max delta.
+     * @param refine_tol The refine tol.
+     * @param coarsen_tol The coarsen tol.
      */
     EmbeddedExplicitRungeKutta(const runge_kutta_method method,
                                const double             coarsen_param = 1.2,
@@ -718,6 +779,7 @@ namespace TimeStepping
 
     /**
      * Initialize the embedded explicit Runge-Kutta method.
+     * @param method The numerical method to use.
      */
     void
     initialize(const runge_kutta_method method) override;
@@ -733,6 +795,11 @@ namespace TimeStepping
      * value of function at this point. evolve_one_time_step returns the time
      * at the end of the time step.
      *
+     * @param f The function object.
+     * @param id_minus_tau_J_inverse The id minus tau j inverse.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      * @note @p id_minus_tau_J_inverse is ignored since the method is explicit.
      */
     double
@@ -751,6 +818,10 @@ namespace TimeStepping
      * required id_minus_tau_J_inverse because it is not used for explicit
      * methods. evolve_one_time_step returns the time at the end of the time
      * step.
+     * @param f The function object.
+     * @param t The time associated with the evaluation.
+     * @param delta_t The delta t.
+     * @param y The value on which this function operates.
      */
     double
     evolve_one_time_step(
@@ -761,6 +832,12 @@ namespace TimeStepping
 
     /**
      * Set the parameters necessary for the time adaptation.
+     * @param coarsen_param The coarsen param.
+     * @param refine_param The refine param.
+     * @param min_delta The min delta.
+     * @param max_delta The max delta.
+     * @param refine_tol The refine tol.
+     * @param coarsen_tol The coarsen tol.
      */
     void
     set_time_adaptation_parameters(const double coarsen_param,

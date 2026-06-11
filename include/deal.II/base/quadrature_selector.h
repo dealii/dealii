@@ -42,6 +42,8 @@ public:
    * Constructor. Takes the name of the quadrature rule (one of "gauss",
    * "milne", "weddle", etc) and, if it is "gauss", the number of quadrature
    * points in each coordinate direction.
+   * @param s The value on which this function operates.
+   * @param order The order used by this operation.
    */
   QuadratureSelector(const std::string &s, const unsigned int order = 0);
 
@@ -85,11 +87,15 @@ public:
                  std::string,
                  << arg1 << " is not a valid name for a quadrature rule.");
   /** @} */
+
 private:
   /**
    * This static function creates a quadrature object according to the name
    * given as a string, and the appropriate order (if the name is "gauss"). It
    * is called from the constructor.
+   *
+   * @param s The quadrature selector string.
+   * @param order The quadrature order.
    */
   static Quadrature<dim>
   create_quadrature(const std::string &s, const unsigned int order);

@@ -362,6 +362,7 @@ public:
    * a section name is specified, then this is used to scope the
    * parameters in the given section, otherwise a pretty printed
    * version of the derived class is used.
+   * @param section_name The section name.
    */
   ParameterAcceptor(const std::string &section_name = "");
 
@@ -445,6 +446,7 @@ public:
    * Derived classes can use this method to declare their parameters.
    * ParameterAcceptor::initialize() calls it for each derived class. The
    * default implementation is empty.
+   * @param prm The prm used by this operation.
    */
   virtual void
   declare_parameters(ParameterHandler &prm);
@@ -461,6 +463,7 @@ public:
    * Derived classes can use this method to parse their parameters.
    * ParameterAcceptor::initialize() calls it for each derived class. The
    * default implementation is empty.
+   * @param prm The prm used by this operation.
    */
   virtual void
   parse_parameters(ParameterHandler &prm);
@@ -480,6 +483,7 @@ public:
    * Parse the given ParameterHandler. This function enters the
    * subsection returned by get_section_name() for each derived class,
    * and parses all parameters that were added using add_parameter().
+   * @param prm The prm used by this operation.
    */
   static void
   parse_all_parameters(ParameterHandler &prm = ParameterAcceptor::prm);
@@ -489,6 +493,7 @@ public:
    * parameters.This function enters the subsection returned by
    * get_section_name() for each derived class, and declares all parameters
    * that were added using add_parameter().
+   * @param prm The prm used by this operation.
    */
   static void
   declare_all_parameters(ParameterHandler &prm = ParameterAcceptor::prm);
@@ -516,6 +521,12 @@ public:
    *
    * See the documentation of ParameterHandler::add_parameter() for more
    * information.
+   * @param entry The parameter entry that is declared, queried, or
+   * documented.
+   * @param parameter The parameter used by this operation.
+   * @param documentation The text used to document the parameter or object.
+   * @param prm_ The object in which to store the prm .
+   * @param pattern The pattern that valid parameter values must satisfy.
    */
   template <typename ParameterType>
   void
@@ -581,6 +592,7 @@ public:
    *   end
    * end
    * @endcode
+   * @param subsection The subsection used by this operation.
    */
   void
   enter_subsection(const std::string &subsection);
@@ -594,6 +606,7 @@ public:
 
   /**
    * Make sure we enter the right subsection of the given parameter.
+   * @param prm The prm used by this operation.
    */
   void
   enter_my_subsection(ParameterHandler &prm);
@@ -601,6 +614,7 @@ public:
   /**
    * This function undoes what the enter_my_subsection() function did. It only
    * makes sense if enter_my_subsection() was called on `prm` before this one.
+   * @param prm The prm used by this operation.
    */
   void
   leave_my_subsection(ParameterHandler &prm);
@@ -624,13 +638,10 @@ private:
   static std::set<ParameterAcceptor *, internal::ParameterAcceptorCompare>
     class_list;
 
-  /** The id of this specific class instance. */
-  const unsigned int acceptor_id;
-
   /**
-   * Separator between sections.
-   */
-  static const char sep = '/';
+   *  The id of this specific class instance. */
+  *const unsigned int acceptor_id;
+  **Separator between sections.*/ static const char sep = '/';
 
 protected:
   /** The subsection name for this class. */
@@ -699,6 +710,8 @@ public:
    * Default constructor. The argument `section_name` is forwarded to the
    * constructor of the ParameterAcceptor class, while all other arguments
    * are passed to the SourceClass constructor.
+   * @param section_name The section name.
+   * @param args The args used by this operation.
    */
   template <typename... Args>
   ParameterAcceptorProxy(const std::string &section_name, Args... args);
@@ -706,6 +719,7 @@ public:
   /**
    * Overloads the ParameterAcceptor::declare_parameters function, by calling
    * @p SourceClass::declare_parameters with @p prm as an argument.
+   * @param prm The prm used by this operation.
    */
   virtual void
   declare_parameters(ParameterHandler &prm) override;
@@ -713,6 +727,7 @@ public:
   /**
    * Overloads the ParameterAcceptor::parse_parameters function, by calling
    * @p SourceClass::parse_parameters with @p prm as an argument.
+   * @param prm The prm used by this operation.
    */
   virtual void
   parse_parameters(ParameterHandler &prm) override;

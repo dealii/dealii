@@ -115,6 +115,8 @@ namespace Functions
 
     /**
      * Laplacian of the function at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -122,6 +124,9 @@ namespace Functions
 
     /**
      * Laplacian of the function at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     laplacian_list(const std::vector<Point<dim>> &points,
@@ -152,17 +157,24 @@ namespace Functions
     /**
      * Constructor. Provide a constant that will be added to each function
      * value.
+     * @param offset The offset into the underlying storage or file at which
+     * the operation starts.
      */
     PillowFunction(const double offset = 0.);
 
     /**
      * The value at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -171,6 +183,8 @@ namespace Functions
 
     /**
      * Gradient at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -178,6 +192,9 @@ namespace Functions
 
     /**
      * Gradients at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param gradients The object in which to store the computed gradients.
+     * @param component The component to evaluate.
      */
     virtual void
     gradient_list(const std::vector<Point<dim>> &points,
@@ -186,6 +203,8 @@ namespace Functions
 
     /**
      * Laplacian at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -193,6 +212,9 @@ namespace Functions
 
     /**
      * Laplacian at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     laplacian_list(const std::vector<Point<dim>> &points,
@@ -219,6 +241,7 @@ namespace Functions
     /**
      * Constructor which allows to optionally generate a vector valued cosine
      * function with the same value in each component.
+     * @param n_components The number of components.
      */
     CosineFunction(const unsigned int n_components = 1);
 
@@ -254,6 +277,8 @@ namespace Functions
 
     /**
      * Second derivatives at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual SymmetricTensor<2, dim>
     hessian(const Point<dim>  &p,
@@ -261,6 +286,9 @@ namespace Functions
 
     /**
      * Second derivatives at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param hessians The object in which to store the computed hessians.
+     * @param component The component to evaluate.
      */
     virtual void
     hessian_list(const std::vector<Point<dim>>        &points,
@@ -332,12 +360,17 @@ namespace Functions
   public:
     /**
      * The value at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -346,6 +379,8 @@ namespace Functions
 
     /**
      * Gradient at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -353,6 +388,9 @@ namespace Functions
 
     /**
      * Gradients at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param gradients The object in which to store the computed gradients.
+     * @param component The component to evaluate.
      */
     virtual void
     gradient_list(const std::vector<Point<dim>> &points,
@@ -361,6 +399,8 @@ namespace Functions
 
     /**
      * Laplacian at a single point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -368,6 +408,9 @@ namespace Functions
 
     /**
      * Laplacian at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     laplacian_list(const std::vector<Point<dim>> &points,
@@ -609,17 +652,25 @@ namespace Functions
     /**
      * Constructor. Provide the advection direction here and the steepness of
      * the slope.
+     * @param direction The coordinate direction to which this operation
+     * refers.
+     * @param steepness The steepness used by this operation.
      */
     JumpFunction(const Point<dim> &direction, const double steepness);
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -628,6 +679,8 @@ namespace Functions
 
     /**
      * Gradient at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -635,6 +688,9 @@ namespace Functions
 
     /**
      * Gradients at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param gradients The object in which to store the computed gradients.
+     * @param component The component to evaluate.
      */
     virtual void
     gradient_list(const std::vector<Point<dim>> &points,
@@ -643,6 +699,8 @@ namespace Functions
 
     /**
      * Laplacian of the function at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -650,6 +708,9 @@ namespace Functions
 
     /**
      * Laplacian of the function at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     laplacian_list(const std::vector<Point<dim>> &points,
@@ -712,6 +773,7 @@ namespace Functions
     /**
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
+     * @param fourier_coefficients The fourier coefficients.
      */
     FourierCosineFunction(const Tensor<1, dim> &fourier_coefficients);
 
@@ -720,6 +782,8 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -727,6 +791,8 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -734,6 +800,8 @@ namespace Functions
 
     /**
      * Compute the Laplacian of a given component at point <tt>p</tt>.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -766,6 +834,7 @@ namespace Functions
     /**
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
+     * @param fourier_coefficients The fourier coefficients.
      */
     FourierSineFunction(const Tensor<1, dim> &fourier_coefficients);
 
@@ -774,6 +843,8 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -781,6 +852,8 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -788,6 +861,8 @@ namespace Functions
 
     /**
      * Compute the Laplacian of a given component at point <tt>p</tt>.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -816,6 +891,9 @@ namespace Functions
     /**
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
+     * @param fourier_coefficients The fourier coefficients.
+     * @param weights The weights used in the quadrature rule or linear
+     * combination.
      */
     FourierSineSum(const std::vector<Point<dim>> &fourier_coefficients,
                    const std::vector<double>     &weights);
@@ -825,6 +903,8 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -832,6 +912,8 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -839,6 +921,8 @@ namespace Functions
 
     /**
      * Compute the Laplacian of a given component at point <tt>p</tt>.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -870,6 +954,9 @@ namespace Functions
     /**
      * Constructor. Take the Fourier coefficients in each space direction as
      * argument.
+     * @param fourier_coefficients The fourier coefficients.
+     * @param weights The weights used in the quadrature rule or linear
+     * combination.
      */
     FourierCosineSum(const std::vector<Point<dim>> &fourier_coefficients,
                      const std::vector<double>     &weights);
@@ -879,6 +966,8 @@ namespace Functions
      * only one component (i.e. the function is scalar), you should state the
      * component you want to have evaluated; it defaults to zero, i.e. the
      * first component.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -886,6 +975,8 @@ namespace Functions
     /**
      * Return the gradient of the specified component of the function at the
      * given point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -893,6 +984,8 @@ namespace Functions
 
     /**
      * Compute the Laplacian of a given component at point <tt>p</tt>.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     laplacian(const Point<dim>  &p,
@@ -958,12 +1051,14 @@ namespace Functions
 
     /**
      * Set the center of the ball to the point @p p.
+     * @param p The point at which to evaluate the function.
      */
     virtual void
     set_center(const Point<dim> &p);
 
     /**
      * Set the radius of the ball to @p r
+     * @param r The value on which this function operates.
      */
     virtual void
     set_radius(const double r);
@@ -1042,6 +1137,11 @@ namespace Functions
      *
      * If you try to use this class before you call the set_base() method,
      * and exception will be triggered.
+     * @param radius The radius used by this operation.
+     * @param center The point associated with this operation.
+     * @param n_components The number of components.
+     * @param select The select used by this operation.
+     * @param integrate_to_one The integrate to one.
      */
     CutOffFunctionTensorProduct(
       double             radius       = 1.0,
@@ -1060,24 +1160,30 @@ namespace Functions
 
     /**
      * Set the new center.
+     * @param center The point associated with this operation.
      */
     virtual void
     set_center(const Point<dim> &center) override;
 
     /**
      * Set the new radius.
+     * @param radius The radius used by this operation.
      */
     virtual void
     set_radius(const double radius) override;
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Function gradient at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -1108,6 +1214,10 @@ namespace Functions
      *
      * If an argument <tt>select</tt> is given and not -1, the cut-off
      * function will be non-zero for this component only.
+     * @param radius The radius used by this operation.
+     * @param n_components The number of components.
+     * @param select The select used by this operation.
+     * @param integrate_to_one The integrate to one.
      */
     CutOffFunctionLinfty(
       const double radius             = 1.,
@@ -1118,12 +1228,17 @@ namespace Functions
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -1132,6 +1247,8 @@ namespace Functions
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
@@ -1156,6 +1273,10 @@ namespace Functions
      *
      * If an argument <tt>select</tt> is given, the cut-off function will be
      * non-zero for this component only.
+     * @param radius The radius used by this operation.
+     * @param n_components The number of components.
+     * @param select The select used by this operation.
+     * @param integrate_to_one The integrate to one.
      */
     CutOffFunctionW1(
       const double radius             = 1.,
@@ -1166,12 +1287,17 @@ namespace Functions
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -1180,6 +1306,8 @@ namespace Functions
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
@@ -1205,6 +1333,10 @@ namespace Functions
   public:
     /**
      * Constructor.
+     * @param radius The radius used by this operation.
+     * @param n_components The number of components.
+     * @param select The select used by this operation.
+     * @param integrate_to_one The integrate to one.
      */
     CutOffFunctionC1(
       const double radius             = 1.,
@@ -1215,12 +1347,17 @@ namespace Functions
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -1229,6 +1366,8 @@ namespace Functions
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
@@ -1236,6 +1375,8 @@ namespace Functions
 
     /**
      * Function gradient at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -1261,6 +1402,10 @@ namespace Functions
      *
      * If an argument <tt>select</tt> is given, the cut-off function will be
      * non-zero for this component only.
+     * @param radius The radius used by this operation.
+     * @param n_components The number of components.
+     * @param select The select used by this operation.
+     * @param integrate_to_one The integrate to one.
      */
     CutOffFunctionCinfty(
       const double radius             = 1.,
@@ -1271,12 +1416,17 @@ namespace Functions
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -1285,6 +1435,8 @@ namespace Functions
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value_list(const std::vector<Point<dim>> &points,
@@ -1292,6 +1444,8 @@ namespace Functions
 
     /**
      * Function gradient at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -1322,12 +1476,16 @@ namespace Functions
      * of the class. The second argument denotes the number of vector
      * components this object shall represent. All vector components will have
      * the same value.
+     * @param exponents The tensor argument supplied to this operation.
+     * @param n_components The number of components.
      */
     Monomial(const Tensor<1, dim, Number> &exponents,
              const unsigned int            n_components = 1);
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Number
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -1337,12 +1495,17 @@ namespace Functions
      *
      * <tt>values</tt> shall have the right size beforehand, i.e.
      * #n_components.
+     * @param p The point at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value(const Point<dim> &p, Vector<Number> &values) const override;
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -1351,6 +1514,8 @@ namespace Functions
 
     /**
      * Function gradient at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim, Number>
     gradient(const Point<dim>  &p,
@@ -1486,6 +1651,8 @@ namespace Functions
      * InterpolatedTensorProductGridData object. See the
      * TableBase::replicate_across_communicator() function on how to share a
      * data set between multiple processes.
+     * @param coordinate_values The object in which to store the coordinate values.
+     * @param data_values The object in which to store the data values.
      */
     InterpolatedTensorProductGridData(
       std::array<std::vector<double>, dim> &&coordinate_values,
@@ -1631,6 +1798,9 @@ namespace Functions
      * InterpolatedUniformGridData object. See the
      * TableBase::replicate_across_communicator() function on how to share a
      * data set between multiple processes.
+     * @param interval_endpoints The object in which to store the interval endpoints.
+     * @param n_subintervals The number of subintervals.
+     * @param data_values The object in which to store the data values.
      */
     InterpolatedUniformGridData(
       std::array<std::pair<double, double>, dim> &&interval_endpoints,
@@ -1725,12 +1895,16 @@ namespace Functions
      * ${\alpha_{i,d}}$ exponents of the i-th monomial $a_{i}\prod_{d=1}^{dim}
      * x_{d}^{\alpha_{i,d}}$. The i-th element of the coefficients vector
      * contains the coefficient $a_{i}$ for the i-th monomial.
+     * @param exponents The exponents used by this operation.
+     * @param coefficients The coefficients used by this operation.
      */
     Polynomial(const Table<2, double>    &exponents,
                const std::vector<double> &coefficients);
 
     /**
      * Function value at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual double
     value(const Point<dim> &p, const unsigned int component = 0) const override;
@@ -1738,6 +1912,9 @@ namespace Functions
 
     /**
      * Function values at multiple points.
+     * @param points The points at which to evaluate the function.
+     * @param values The object in which to store the computed values.
+     * @param component The component to evaluate.
      */
     virtual void
     value_list(const std::vector<Point<dim>> &points,
@@ -1746,6 +1923,8 @@ namespace Functions
 
     /**
      * Function gradient at one point.
+     * @param p The point at which to evaluate the function.
+     * @param component The component to evaluate.
      */
     virtual Tensor<1, dim>
     gradient(const Point<dim>  &p,
@@ -1818,11 +1997,14 @@ namespace Functions
   public:
     /**
      * Constructor.
+     * @param T The time associated with the evaluation.
      */
     RayleighKotheVortex(const double T = 1.0);
 
     /**
      * Return all components of a vector-valued function at a given point.
+     * @param point The point at which to evaluate the function.
+     * @param values The object in which to store the computed values.
      */
     virtual void
     vector_value(const Point<dim> &point,

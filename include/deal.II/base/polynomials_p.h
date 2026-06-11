@@ -11,19 +11,19 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_polynomials_P_h
-#define dealii_polynomials_P_h
+#  define dealii_polynomials_P_h
 
 
-#include <deal.II/base/config.h>
+#  include <deal.II/base/config.h>
 
-#include <deal.II/base/exceptions.h>
-#include <deal.II/base/point.h>
-#include <deal.II/base/polynomial.h>
-#include <deal.II/base/polynomial_space.h>
-#include <deal.II/base/tensor.h>
+#  include <deal.II/base/exceptions.h>
+#  include <deal.II/base/point.h>
+#  include <deal.II/base/polynomial.h>
+#  include <deal.II/base/polynomial_space.h>
+#  include <deal.II/base/tensor.h>
 
-#include <memory>
-#include <vector>
+#  include <memory>
+#  include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 /**
@@ -70,6 +70,7 @@ public:
    * gives the degrees i,j,k in the x,y,z directions.
    *
    * In 1d and 2d, obviously only i and i,j are returned.
+   * @param n The n used by this operation.
    */
   std::array<unsigned int, dim>
   directional_degrees(unsigned int n) const;
@@ -94,23 +95,20 @@ private:
   const unsigned int p;
 };
 
-/** @} */
-
-template <int dim>
-inline unsigned int
-PolynomialsP<dim>::degree() const
+/**
+ *  @} */
+**template <int dim>
+ *inline unsigned int *
+ PolynomialsP<dim>::degree() const *
 {
-  return p;
+  *return p;
+  *
 }
-
-
-template <int dim>
-inline std::array<unsigned int, dim>
-PolynomialsP<dim>::directional_degrees(unsigned int n) const
+***template <int dim>
+  *inline std::array<unsigned int, dim> *
+  PolynomialsP<dim>::directional_degrees(unsigned int n) const *
 {
-  return this->compute_index(n);
+  *return this->compute_index(n);
+  *
 }
-
-DEAL_II_NAMESPACE_CLOSE
-
-#endif
+**DEAL_II_NAMESPACE_CLOSE **#endif * /

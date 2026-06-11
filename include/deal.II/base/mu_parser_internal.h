@@ -163,6 +163,10 @@ namespace internal
        * Initialize the internal state of the object. This is the same as the
        * inheriting class method - see FunctionParser::initialize() for more
        * information.
+       * @param vars The vars used by this operation.
+       * @param expressions The expressions used by this operation.
+       * @param constants The constants used by this operation.
+       * @param time_dependent The time dependent.
        */
       virtual void
       initialize(const std::string                   &vars,
@@ -179,6 +183,9 @@ namespace internal
 
       /**
        * Compute the value of a single component.
+       * @param p The point at which to evaluate the function.
+       * @param time The time associated with the evaluation.
+       * @param component The component to evaluate.
        */
       Number
       do_value(const Point<dim> &p,
@@ -187,6 +194,9 @@ namespace internal
 
       /**
        * Compute the values of all components.
+       * @param p The point at which to evaluate the function.
+       * @param time The time associated with the evaluation.
+       * @param values The object in which to store the computed values.
        */
       void
       do_all_values(const Point<dim>  &p,

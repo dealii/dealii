@@ -246,6 +246,7 @@ public:
    * Attach all the parameters in this class to entries of the parameter
    * handler @p prm. Whenever the content of @p prm changes, the parameters
    * of this class will be updated.
+   * @param prm The prm used by this operation.
    */
   void
   add_parameters(ParameterHandler &prm);
@@ -260,6 +261,11 @@ public:
    * When it is a vector function, an assertion is triggered if the number of
    * components does not coincide with the number of components of the
    * underlying finite element space.
+   * @param vspace The vspace used by this operation.
+   * @param solution The solution used by this operation.
+   * @param exact The exact used by this operation.
+   * @param weight The weights used in the quadrature rule or linear
+   * combination.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -270,6 +276,12 @@ public:
 
   /**
    * Same as above, with a different mapping.
+   * @param mapping The mapping used by this operation.
+   * @param vspace The vspace used by this operation.
+   * @param solution The solution used by this operation.
+   * @param exact The exact used by this operation.
+   * @param weight The weights used in the quadrature rule or linear
+   * combination.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -352,6 +364,8 @@ public:
 
   /**
    * Difference between two solutions in the same vector space.
+   * @param weight The weights used in the quadrature rule or linear
+   * combination.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -362,6 +376,9 @@ public:
 
   /**
    * Same as above, with a non default mapping.
+   * @param mapping The mapping used by this operation.
+   * @param weight The weights used in the quadrature rule or linear
+   * combination.
    */
   template <int dim, int spacedim, typename VectorType>
   void
@@ -375,6 +392,7 @@ public:
    * Write the error table to the @p out stream (in text format), and
    * (possibly) to the file stream specified in the parameters (with the format
    * deduced from the file name extension).
+   * @param out The output stream to which data is written.
    */
   void
   output_table(std::ostream &out);

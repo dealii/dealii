@@ -58,30 +58,36 @@ public:
    * the number of arguments given is different from the number of the
    * indices this class stores (i.e., the template argument `N` of
    * this class), or if any of the arguments is not of some integer type.
+   * @param indices The multi-index that identifies the tensor entry to
+   * access.
    */
   template <typename... T>
   constexpr TableIndices(const T... indices);
 
   /**
    * Read-only access the value of the <tt>i</tt>th index.
+   * @param i The index of the entry.
    */
   constexpr std::size_t
   operator[](const unsigned int i) const;
 
   /**
    * Write access the value of the <tt>i</tt>th index.
+   * @param i The index of the entry.
    */
   constexpr std::size_t &
   operator[](const unsigned int i);
 
   /**
    * Compare two index fields for equality.
+   * @param other The object to copy or move from.
    */
   constexpr bool
   operator==(const TableIndices<N> &other) const;
 
   /**
    * Compare two index fields for inequality.
+   * @param other The object to copy or move from.
    */
   constexpr bool
   operator!=(const TableIndices<N> &other) const;

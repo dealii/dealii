@@ -365,9 +365,12 @@
  *
  * @ingroup Exceptions
  */
-#  define DeclException1(Exception1, type1, outsequence) \
-    /** @ingroup Exceptions */                           \
-    /** @dealiiExceptionMessage{outsequence} */          \
+#  define DeclException1(Exception1, type1, outsequence)                      \
+    /**                                                                       \
+     * @ingroup Exceptions                                                    \
+     * @param arg1 The run-time value substituted into the exception message. \
+     * @dealiiExceptionMessage{outsequence}                                   \
+     */                                                                       \
     static dealii::ExceptionBase &Exception1(type1 arg1)
 
 
@@ -388,9 +391,15 @@
  *
  * @ingroup Exceptions
  */
-#  define DeclException2(Exception2, type1, type2, outsequence) \
-    /** @ingroup Exceptions */                                  \
-    /** @dealiiExceptionMessage{outsequence} */                 \
+#  define DeclException2(Exception2, type1, type2, outsequence)             \
+    /**                                                                     \
+     * @ingroup Exceptions                                                  \
+     * @param arg1 The first run-time value substituted into the exception  \
+     * message.                                                             \
+     * @param arg2 The second run-time value substituted into the exception \
+     * message.                                                             \
+     * @dealiiExceptionMessage{outsequence}                                 \
+     */                                                                     \
     static dealii::ExceptionBase &Exception2(type1 arg1, type2 arg2)
 
 
@@ -411,9 +420,17 @@
  *
  * @ingroup Exceptions
  */
-#  define DeclException3(Exception3, type1, type2, type3, outsequence) \
-    /** @ingroup Exceptions */                                         \
-    /** @dealiiExceptionMessage{outsequence} */                        \
+#  define DeclException3(Exception3, type1, type2, type3, outsequence)      \
+    /**                                                                     \
+     * @ingroup Exceptions                                                  \
+     * @param arg1 The first run-time value substituted into the exception  \
+     * message.                                                             \
+     * @param arg2 The second run-time value substituted into the exception \
+     * message.                                                             \
+     * @param arg3 The third run-time value substituted into the exception  \
+     * message.                                                             \
+     * @dealiiExceptionMessage{outsequence}                                 \
+     */                                                                     \
     static dealii::ExceptionBase &Exception3(type1 arg1, type2 arg2, type3 arg3)
 
 
@@ -435,8 +452,18 @@
  * @ingroup Exceptions
  */
 #  define DeclException4(Exception4, type1, type2, type3, type4, outsequence) \
-    /** @ingroup Exceptions */                                                \
-    /** @dealiiExceptionMessage{outsequence} */                               \
+    /**                                                                       \
+     * @ingroup Exceptions                                                    \
+     * @param arg1 The first run-time value substituted into the exception    \
+     * message.                                                               \
+     * @param arg2 The second run-time value substituted into the exception   \
+     * message.                                                               \
+     * @param arg3 The third run-time value substituted into the exception    \
+     * message.                                                               \
+     * @param arg4 The fourth run-time value substituted into the exception   \
+     * message.                                                               \
+     * @dealiiExceptionMessage{outsequence}                                   \
+     */                                                                       \
     static dealii::ExceptionBase &Exception4(type1 arg1,                      \
                                              type2 arg2,                      \
                                              type3 arg3,                      \
@@ -460,11 +487,23 @@
  *
  * @ingroup Exceptions
  */
-#  define DeclException5(                                       \
-    Exception5, type1, type2, type3, type4, type5, outsequence) \
-    /** @ingroup Exceptions */                                  \
-    /** @dealiiExceptionMessage{outsequence} */                 \
-    static dealii::ExceptionBase &Exception5(                   \
+#  define DeclException5(                                                   \
+    Exception5, type1, type2, type3, type4, type5, outsequence)             \
+    /**                                                                     \
+     * @ingroup Exceptions                                                  \
+     * @param arg1 The first run-time value substituted into the exception  \
+     * message.                                                             \
+     * @param arg2 The second run-time value substituted into the exception \
+     * message.                                                             \
+     * @param arg3 The third run-time value substituted into the exception  \
+     * message.                                                             \
+     * @param arg4 The fourth run-time value substituted into the exception \
+     * message.                                                             \
+     * @param arg5 The fifth run-time value substituted into the exception  \
+     * message.                                                             \
+     * @dealiiExceptionMessage{outsequence}                                 \
+     */                                                                     \
+    static dealii::ExceptionBase &Exception5(                               \
       type1 arg1, type2 arg2, type3 arg3, type4 arg4, type5 arg5)
 
 #endif /*ifndef DOXYGEN*/

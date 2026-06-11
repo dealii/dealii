@@ -65,6 +65,9 @@ namespace Utilities
        * The product of rows and columns should be less or equal to the total
        * number of cores
        * in the @p mpi_communicator.
+       * @param mpi_communicator The MPI communicator.
+       * @param n_rows The number of rows.
+       * @param n_columns The number of columns.
        */
       ProcessGrid(const MPI_Comm     mpi_communicator,
                   const unsigned int n_rows,
@@ -86,6 +89,11 @@ namespace Utilities
        * For example, a square matrix $640x640$ with the block size $32$
        * and the @p mpi_communicator with 11 cores will result in the $3x3$
        * process grid.
+       * @param mpi_communicator The MPI communicator.
+       * @param n_rows_matrix The number of rows matrix.
+       * @param n_columns_matrix The number of columns matrix.
+       * @param row_block_size The row block size.
+       * @param column_block_size The column block size.
        */
       ProcessGrid(const MPI_Comm     mpi_communicator,
                   const unsigned int n_rows_matrix,
@@ -130,6 +138,8 @@ namespace Utilities
        * Send @p count values stored consequently starting at @p value from
        * the process with rank zero to processes which
        * are not in the process grid.
+       * @param value The value associated with the function.
+       * @param count The number of elements to process.
        */
       template <typename NumberType>
       void

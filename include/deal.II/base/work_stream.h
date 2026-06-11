@@ -364,6 +364,7 @@ namespace WorkStream
          * Constructor. Take an iterator range, the size of a buffer that can
          * hold items, and the sample additional data object that will be
          * passed to each worker and copier function invocation.
+         * @param chunk_size The chunk size.
          */
         IteratorRangeToItemStream(const Iterator    &begin,
                                   const Iterator    &end,
@@ -725,6 +726,15 @@ namespace WorkStream
        * length is relevant to the parallel pipeline implementation using TBB
        * but not used by taskflow. The parameter is kept here to maintain
        * support for calls to workstream written for TBB.
+       * @param begin The begin of the range.
+       * @param end The end of the range.
+       * @param worker The worker function that computes the per-item or per-
+       * chunk result.
+       * @param copier The copier function that merges a computed result into
+       * the destination object.
+       * @param sample_scratch_data The sample scratch data.
+       * @param sample_copy_data The sample copy data.
+       * @param chunk_size The chunk size.
        */
       template <typename Worker,
                 typename Copier,
@@ -911,6 +921,14 @@ namespace WorkStream
     {
       /**
        * Sequential version without colors.
+       * @param begin The begin of the range.
+       * @param end The end of the range.
+       * @param worker The worker function that computes the per-item or per-
+       * chunk result.
+       * @param copier The copier function that merges a computed result into
+       * the destination object.
+       * @param sample_scratch_data The sample scratch data.
+       * @param sample_copy_data The sample copy data.
        */
       template <typename Worker,
                 typename Copier,
@@ -953,6 +971,13 @@ namespace WorkStream
 
       /**
        * Sequential version with colors
+       * @param colored_iterators The colored iterators.
+       * @param worker The worker function that computes the per-item or per-
+       * chunk result.
+       * @param copier The copier function that merges a computed result into
+       * the destination object.
+       * @param sample_scratch_data The sample scratch data.
+       * @param sample_copy_data The sample copy data.
        */
       template <typename Worker,
                 typename Copier,
@@ -1017,6 +1042,7 @@ namespace WorkStream
       public:
         /**
          * Constructor.
+         * @param sample_copy_data The sample copy data.
          */
         WorkerAndCopier(
           const std::function<void(const Iterator &, ScratchData &, CopyData &)>
@@ -1034,6 +1060,8 @@ namespace WorkStream
         /**
          * The function that calls the worker and the copier functions on a
          * range of items denoted by the two arguments.
+         * @param range The blocked range of iterators to process on this
+         * worker thread.
          */
         void
         operator()(const tbb::blocked_range<
@@ -1159,6 +1187,14 @@ namespace WorkStream
 
       /**
        * The colored run function using TBB.
+       * @param colored_iterators The colored iterators.
+       * @param worker The worker function that computes the per-item or per-
+       * chunk result.
+       * @param copier The copier function that merges a computed result into
+       * the destination object.
+       * @param sample_scratch_data The sample scratch data.
+       * @param sample_copy_data The sample copy data.
+       * @param chunk_size The chunk size.
        */
       template <typename Worker,
                 typename Copier,
@@ -1221,6 +1257,7 @@ namespace WorkStream
       public:
         /**
          * Constructor.
+         * @param sample_copy_data The sample copy data.
          */
         WorkerAndCopier(
           const std::function<void(const Iterator &, ScratchData &, CopyData &)>
@@ -1238,6 +1275,8 @@ namespace WorkStream
         /**
          * The function that calls the worker and the copier functions on a
          * range of items denoted by the two arguments.
+         * @param range The contiguous subrange of iterators to process on this
+         * worker thread.
          */
         void
         operator()(const ArrayView<const Iterator> &range)
@@ -1363,6 +1402,14 @@ namespace WorkStream
 
       /**
        * The colored run function using taskflow.
+       * @param colored_iterators The colored iterators.
+       * @param worker The worker function that computes the per-item or per-
+       * chunk result.
+       * @param copier The copier function that merges a computed result into
+       * the destination object.
+       * @param sample_scratch_data The sample scratch data.
+       * @param sample_copy_data The sample copy data.
+       * @param chunk_size The chunk size.
        */
       template <typename Worker,
                 typename Copier,
@@ -1455,6 +1502,15 @@ namespace WorkStream
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
    *
+   * @param colored_iterators The colored iterators.
+   * @param worker The worker function that computes the per-item or per-chunk
+   * result.
+   * @param copier The copier function that merges a computed result into the
+   * destination object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
    * copies of the <tt>ScratchData</tt> object and
@@ -1519,6 +1575,16 @@ namespace WorkStream
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
    *
+   * @param begin The begin of the range.
+   * @param end The end of the range.
+   * @param worker The worker function that computes the per-item or per-chunk
+   * result.
+   * @param copier The copier function that merges a computed result into the
+   * destination object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
    * copies of the <tt>ScratchData</tt> object and
@@ -1637,6 +1703,15 @@ namespace WorkStream
    * functions `IteratorRangeType::begin()` and `IteratorRangeType::end()`,
    * both of which return iterators to elements that form the bounds of the
    * range.
+   * @param iterator_range The iterator range.
+   * @param worker The worker function that computes the per-item or per-chunk
+   * result.
+   * @param copier The copier function that merges a computed result into the
+   * destination object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    */
   template <
     typename Worker,
@@ -1672,6 +1747,15 @@ namespace WorkStream
 
   /**
    * Same as the function above, but for deal.II's IteratorRange.
+   * @param iterator_range The iterator range.
+   * @param worker The worker function that computes the per-item or per-chunk
+   * result.
+   * @param copier The copier function that merges a computed result into the
+   * destination object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    */
   template <typename Worker,
             typename Copier,
@@ -1782,6 +1866,13 @@ namespace WorkStream
    * the input stream that will be worked on by the worker and copier
    * functions one after the other on the same thread.
    *
+   * @param begin The begin of the range.
+   * @param end The end of the range.
+   * @param main_object The object in which to store the main object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    * @note If your data objects are large, or their constructors are
    * expensive, it is helpful to keep in mind that <tt>queue_length</tt>
    * copies of the <tt>ScratchData</tt> object and
@@ -1875,6 +1966,12 @@ namespace WorkStream
    * functions `IteratorRangeType::begin()` and `IteratorRangeType::end()`,
    * both of which return iterators to elements that form the bounds of the
    * range.
+   * @param iterator_range The iterator range.
+   * @param main_object The object in which to store the main object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    */
   template <
     typename MainClass,
@@ -1915,6 +2012,12 @@ namespace WorkStream
 
   /**
    * Same as the function above, but for deal.II's IteratorRange.
+   * @param iterator_range The iterator range.
+   * @param main_object The object in which to store the main object.
+   * @param sample_scratch_data The sample scratch data.
+   * @param sample_copy_data The sample copy data.
+   * @param queue_length The queue length.
+   * @param chunk_size The chunk size.
    */
   template <typename MainClass,
             typename Iterator,

@@ -85,6 +85,9 @@ namespace Utilities
    * For example, a @p total_size of 11 with 3 processes will result
    * in the IndexSets { [0,4), [4,8), [8,11)] }, and this function will
    * return the @p my_partition_id 's IndexSet.
+   * @param my_partition_id The my partition id.
+   * @param n_partitions The number of partitions.
+   * @param total_size The total size.
    */
   IndexSet
   create_evenly_distributed_partitioning(
@@ -138,6 +141,7 @@ namespace Utilities
      * is not using MPI at all, or is using MPI but has been started with
      * only one MPI process), then the communicator necessarily involves
      * only one process and the function returns 1.
+     * @param mpi_communicator The MPI communicator.
      */
     unsigned int
     n_mpi_processes(const MPI_Comm mpi_communicator);
@@ -149,6 +153,7 @@ namespace Utilities
      * @ref GlossMPICommunicator "communicator".
      * This will be a unique value for each process between zero and (less
      * than) the number of all processes (given by get_n_mpi_processes()).
+     * @param mpi_communicator The MPI communicator.
      */
     unsigned int
     this_mpi_process(const MPI_Comm mpi_communicator);
@@ -156,6 +161,8 @@ namespace Utilities
     /**
      * Return a vector of the ranks (within @p comm_large) of a subset of
      * processes specified by @p comm_small.
+     * @param comm_large The comm large.
+     * @param comm_small The comm small.
      */
     std::vector<unsigned int>
     mpi_processes_within_communicator(const MPI_Comm comm_large,
@@ -226,6 +233,7 @@ namespace Utilities
      *
      * This function is equivalent to calling
      * <code>MPI_Comm_dup(mpi_communicator, &return_value);</code>.
+     * @param mpi_communicator The MPI communicator.
      */
     MPI_Comm
     duplicate_communicator(const MPI_Comm mpi_communicator);
@@ -238,6 +246,7 @@ namespace Utilities
      * The argument is passed by reference and will be invalidated and set to
      * the MPI null handle. This function is equivalent to calling
      * <code>MPI_Comm_free(&mpi_communicator);</code>.
+     * @param mpi_communicator The MPI communicator.
      */
     void
     free_communicator(MPI_Comm mpi_communicator);
@@ -259,6 +268,7 @@ namespace Utilities
     public:
       /**
        * Create a duplicate of the given @p communicator.
+       * @param communicator The MPI communicator.
        */
       explicit DuplicatedCommunicator(const MPI_Comm communicator)
         : comm(duplicate_communicator(communicator))
@@ -344,6 +354,7 @@ namespace Utilities
       public:
         /**
          * Constructor. Blocks until it can acquire the lock.
+         * @param comm The MPI communicator.
          */
         explicit ScopedLock(CollectiveMutex &mutex, const MPI_Comm comm)
           : mutex(mutex)
@@ -386,6 +397,7 @@ namespace Utilities
        *
        * This is a collective call that needs to be executed by all processors
        * in the communicator.
+       * @param comm The MPI communicator.
        */
       void
       lock(const MPI_Comm comm);
@@ -395,6 +407,7 @@ namespace Utilities
        *
        * This is a collective call that needs to be executed by all processors
        * in the communicator.
+       * @param comm The MPI communicator.
        */
       void
       unlock(const MPI_Comm comm);
@@ -466,6 +479,8 @@ namespace Utilities
       /**
        * Constructor. Take both the wait and clean-up functions mentioned
        * in the class documentation as arguments.
+       * @param wait_operation The object in which to store the wait operation.
+       * @param get_and_cleanup_operation The object in which to store the get and cleanup operation.
        */
       template <typename W, typename G>
       Future(W &&wait_operation, G &&get_and_cleanup_operation);
@@ -578,6 +593,8 @@ namespace Utilities
      * @p locally_owned_size across the MPI communicator.  Each process will
      * store contiguous subset of indices, and the index set on process p+1
      * starts at the index one larger than the last one stored on process p.
+     * @param comm The MPI communicator.
+     * @param locally_owned_size The locally owned size.
      */
     std::vector<IndexSet>
     create_ascending_partitioning(
@@ -590,6 +607,8 @@ namespace Utilities
      * MPI communicator @p comm.
      * Uses @p comm to determine number of partitions and processor ID to call the
      * @p create_evenly_distributed_partitioning() function above.
+     * @param comm The MPI communicator.
+     * @param total_size The total size.
      */
     IndexSet
     create_evenly_distributed_partitioning(
@@ -632,6 +651,7 @@ namespace Utilities
      * by passing
      * 1 as the @p count.
      *
+     * @param n_bytes The number of bytes.
      * @note The function does not just return an object of type `MPI_Datatype`
      *   because such objects need to be destroyed by a call to `MPI_Type_free`
      *   and it is easy to forget to do so (thereby creating a resource leak).
@@ -679,6 +699,8 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
      * result of this operation.
      *
+     * @param t The time associated with the evaluation.
+     * @param mpi_communicator The MPI communicator.
      * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
@@ -701,6 +723,9 @@ namespace Utilities
      * one of them having a const type qualifier and the other not.
      *
      * Input and output arrays may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param sums The sums used by this operation.
      */
     template <typename T, typename U>
     void
@@ -714,6 +739,9 @@ namespace Utilities
      * processor.
      *
      * Input and output arrays may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param sums The sums used by this operation.
      */
     template <typename T>
     void
@@ -725,6 +753,8 @@ namespace Utilities
      * Perform an MPI sum of the entries of a symmetric tensor.
      *
      * @relatesalso SymmetricTensor
+     * @param local The tensor argument supplied to this operation.
+     * @param mpi_communicator The MPI communicator.
      */
     template <int rank, int dim, typename Number>
     SymmetricTensor<rank, dim, Number>
@@ -735,6 +765,8 @@ namespace Utilities
      * Perform an MPI sum of the entries of a tensor.
      *
      * @relatesalso Tensor
+     * @param local The tensor argument supplied to this operation.
+     * @param mpi_communicator The MPI communicator.
      */
     template <int rank, int dim, typename Number>
     Tensor<rank, dim, Number>
@@ -744,6 +776,9 @@ namespace Utilities
     /**
      * Perform an MPI sum of the entries of a SparseMatrix.
      *
+     * @param local The local used by this operation.
+     * @param mpi_communicator The MPI communicator.
+     * @param global The global used by this operation.
      * @note @p local and @p global should have the same sparsity
      * pattern and it should be the same for all MPI processes.
      *
@@ -764,6 +799,8 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
      * result of this operation.
      *
+     * @param t The time associated with the evaluation.
+     * @param mpi_communicator The MPI communicator.
      * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
@@ -786,6 +823,9 @@ namespace Utilities
      * one of them having a const type qualifier and the other not.
      *
      * Input and output vectors may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param maxima The maxima used by this operation.
      */
     template <typename T, typename U>
     void
@@ -799,6 +839,9 @@ namespace Utilities
      * processor.
      *
      * Input and output arrays may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param maxima The maxima used by this operation.
      */
     template <typename T>
     void
@@ -815,6 +858,8 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive the
      * result of this operation.
      *
+     * @param t The time associated with the evaluation.
+     * @param mpi_communicator The MPI communicator.
      * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
@@ -837,6 +882,9 @@ namespace Utilities
      * one of them having a const type qualifier and the other not.
      *
      * Input and output arrays may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param minima The minima used by this operation.
      */
     template <typename T, typename U>
     void
@@ -850,6 +898,9 @@ namespace Utilities
      * processor.
      *
      * Input and output arrays may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param minima The minima used by this operation.
      */
     template <typename T>
     void
@@ -873,6 +924,8 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e., all processors receive the
      * result of this operation.
      *
+     * @param t The time associated with the evaluation.
+     * @param mpi_communicator The MPI communicator.
      * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
@@ -894,6 +947,9 @@ namespace Utilities
      *
      * Input and output arrays may be the same.
      *
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param results The results used by this operation.
      * @note Depending on your standard library, this function may not work with
      *   specializations of `std::vector` for the data type `bool`. In that
      *   case, use a different container or data type.
@@ -910,6 +966,9 @@ namespace Utilities
      * arrays from each processor.
      *
      * Input and output arrays may be the same.
+     * @param values The values associated with the function.
+     * @param mpi_communicator The MPI communicator.
+     * @param results The results used by this operation.
      */
     template <typename T>
     void
@@ -929,6 +988,8 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e., all processors receive the
      * result of this operation.
      *
+     * @param t The time associated with the evaluation.
+     * @param mpi_communicator The MPI communicator.
      * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
@@ -1007,6 +1068,8 @@ namespace Utilities
      * @p mpi_communicator. Each processor's value is given in @p my_value and
      * the result will be returned. The result is available on all machines.
      *
+     * @param my_value The my value.
+     * @param mpi_communicator The MPI communicator.
      * @note Sometimes, not all processors need a result and in that case one
      * would call the <code>MPI_Reduce</code> function instead of the
      * <code>MPI_Allreduce</code> function. The latter is at most twice as
@@ -1024,6 +1087,8 @@ namespace Utilities
      * @ref GlossMPICommunicator "communicator"
      * @p mpi_communicator for each entry of the vector.
      *
+     * @param my_value The my value.
+     * @param mpi_communicator The MPI communicator.
      * @note This function performs a single reduction sweep.
      *
      * @pre Size of the input vector has to be the same on all processes.
@@ -1040,6 +1105,9 @@ namespace Utilities
      * @ref GlossMPICommunicator "communicator"
      * @p mpi_communicator for each entry of the ArrayView.
      *
+     * @param my_values The my values.
+     * @param result The result used by this operation.
+     * @param mpi_communicator The MPI communicator.
      * @note This function performs a single reduction sweep.
      *
      * @pre Size of the input ArrayView has to be the same on all processes
@@ -1326,6 +1394,10 @@ namespace Utilities
      *
      * In contrast to all_reduce, the result will be only available on a
      * single rank. On all other processes, the returned value is undefined.
+     * @param local_value The local value.
+     * @param comm The MPI communicator.
+     * @param combiner The combiner used by this operation.
+     * @param root_process The root process.
      */
     template <typename T>
     [[nodiscard]] T
@@ -1345,6 +1417,8 @@ namespace Utilities
      *
      * This function is only available if `T` is a type natively supported
      * by MPI.
+     * @param value The value associated with the function.
+     * @param comm The MPI communicator.
      */
     template <typename T, typename = std::enable_if_t<is_mpi_type<T> == true>>
     [[nodiscard]] std::pair<T, T>
@@ -1359,6 +1433,9 @@ namespace Utilities
      * by a broadcast step) but due to the user-specified binary operation also
      * general object types, including ones that store variable amounts of data,
      * can be handled.
+     * @param local_value The local value.
+     * @param comm The MPI communicator.
+     * @param combiner The combiner used by this operation.
      */
     template <typename T>
     [[nodiscard]] T
@@ -1386,6 +1463,10 @@ namespace Utilities
      * not just those natively supported by MPI. The only restriction
      * on the type is that it needs to be possible to call
      * Utilities::pack() and Utilities::unpack() on the object.
+     * @param object The object used by this operation.
+     * @param communicator The MPI communicator.
+     * @param target_rank The target rank.
+     * @param mpi_tag The mpi tag.
      */
     template <typename T>
     Future<void>
@@ -1410,6 +1491,9 @@ namespace Utilities
      * Unlike `MPI_Irecv`, the object to be received may be of any
      * type on which one can call Utilities::pack() and Utilities::unpack(),
      * not just those natively supported by MPI.
+     * @param communicator The MPI communicator.
+     * @param source_rank The source rank.
+     * @param mpi_tag The mpi tag.
      */
     template <typename T>
     Future<T>
@@ -1475,6 +1559,9 @@ namespace Utilities
      * for each rank that has requested indices owned by the current rank
      * those indices that have been queried. The values of the map are
      * therefore all index sets describing subsets of the owned set of indices.
+     * @param owned_indices The owned indices.
+     * @param indices_to_look_up The indices to look up.
+     * @param comm The MPI communicator.
      */
     std::pair<std::vector<unsigned int>, std::map<unsigned int, IndexSet>>
     compute_index_owner_and_requesters(const IndexSet &owned_indices,
@@ -1485,6 +1572,9 @@ namespace Utilities
      * Compute the union of the input vectors @p vec of all processes in the
      *   MPI communicator @p comm.
      *
+     * @param vec The vectorized operand whose entries are combined element-
+     * wise with the current object.
+     * @param comm The MPI communicator.
      * @note This is a @ref GlossCollectiveOperation "collective operation". The result will available on all
      *   processes.
      */
@@ -1494,6 +1584,8 @@ namespace Utilities
 
     /**
      * The same as above but for std::set.
+     * @param set The set used by this operation.
+     * @param comm The MPI communicator.
      */
     template <typename T>
     std::set<T>
@@ -1677,6 +1769,7 @@ namespace Utilities
      * objects of such a type, or a pointer to an object of such a
      * type. The compiler will produce an error if this requirement is
      * not satisfied.
+     * @param nullptr The nullptr used by this operation.
      */
     template <typename T>
     inline const MPI_Datatype mpi_type_id_for_type =

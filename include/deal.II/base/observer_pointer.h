@@ -120,11 +120,13 @@ public:
   /**
    * Copy constructor for ObserverPointer. We do not copy the object subscribed
    * to from <tt>tt</tt>, but subscribe ourselves to it again.
+   * @param other The object to copy or move from.
    */
   ObserverPointer(const ObserverPointer<T, P> &other);
 
   /**
    * Move constructor for ObserverPointer.
+   * @param other The object to copy or move from.
    */
   ObserverPointer(ObserverPointer<T, P> &&other) noexcept;
 
@@ -136,6 +138,8 @@ public:
    * The <tt>id</tt> is used in the call to
    * EnableObserverPointer::subscribe(id) and by ~ObserverPointer()
    * in the call to EnableObserverPointer::unsubscribe().
+   * @param t The time associated with the evaluation.
+   * @param id The id used by this operation.
    */
   ObserverPointer(T *t, const std::string &id);
 
@@ -144,6 +148,7 @@ public:
    * not a null pointer, the constructor subscribes to the given object to
    * lock it, i.e. to prevent its destruction before the end of its use. The
    * id of this pointer is set to the name of the class P.
+   * @param t The time associated with the evaluation.
    */
   ObserverPointer(T *t);
 
@@ -157,6 +162,7 @@ public:
    * new object automatically and unsubscribes to an old one if it exists. It
    * will not try to subscribe to a null-pointer, but still delete the old
    * subscription.
+   * @param tt The tt used by this operation.
    */
   ObserverPointer<T, P> &
   operator=(T *tt);
@@ -172,12 +178,14 @@ public:
   /**
    * Assignment operator for ObserverPointer. The pointer subscribes to the new
    * object automatically and unsubscribes to an old one if it exists.
+   * @param other The object to copy or move from.
    */
   ObserverPointer<T, P> &
   operator=(const ObserverPointer<T, P> &other);
 
   /**
    * Move assignment operator for ObserverPointer.
+   * @param other The object to copy or move from.
    */
   ObserverPointer<T, P> &
   operator=(ObserverPointer<T, P> &&other) noexcept;
@@ -242,6 +250,8 @@ public:
    *
    * Note that we indeed need a reference of a pointer, as we want to change
    * the pointer variable which we are given.
+   * @param ptr A pointer to the first element of the memory region on which
+   * this operation acts.
    */
   void
   swap(T *&ptr);
@@ -677,6 +687,8 @@ swap(ObserverPointer<T, P> &t1, ObserverPointer<T, Q> &t2)
  *
  * Note that we indeed need a reference of a pointer, as we want to change the
  * pointer variable which we are given.
+ * @param t1 The first object to compare.
+ * @param t2 The second object to compare.
  */
 template <typename T, typename P>
 inline void
@@ -693,6 +705,8 @@ swap(ObserverPointer<T, P> &t1, T *&t2)
  *
  * Note that we indeed need a reference of a pointer, as we want to change the
  * pointer variable which we are given.
+ * @param t1 The first object to compare.
+ * @param t2 The second object to compare.
  */
 template <typename T, typename P>
 inline void

@@ -80,6 +80,8 @@ public:
   /**
    * Range constructor.
    *
+   * @param begin The begin of the range.
+   * @param end The end of the range.
    * @note Unlike std::vector, this constructor uses random-access iterators so
    * that the copy may be parallelized.
    *
@@ -97,6 +99,8 @@ public:
    * T().
    *
    * @dealiiOperationIsMultithreaded
+   * @param size The number of elements to allocate.
+   * @param init The value used to initialize each newly created entry.
    */
   explicit AlignedVector(const size_type size, const T &init = T());
 
@@ -109,12 +113,15 @@ public:
    * Copy constructor.
    *
    * @dealiiOperationIsMultithreaded
+   * @param vec The vector with which to initialize, copy, or exchange the
+   * current contents.
    */
   AlignedVector(const AlignedVector<T> &vec);
 
   /**
    * Move constructor. Create a new aligned vector by stealing the contents of
    * @p vec.
+   * @param vec The vector to move from.
    */
   AlignedVector(AlignedVector<T> &&vec) noexcept;
 
@@ -122,12 +129,15 @@ public:
    * Assignment to the input vector @p vec.
    *
    * @dealiiOperationIsMultithreaded
+   * @param vec The vector with which to initialize, copy, or exchange the
+   * current contents.
    */
   AlignedVector &
   operator=(const AlignedVector<T> &vec);
 
   /**
    * Move assignment operator.
+   * @param vec The vector to move from.
    */
   AlignedVector &
   operator=(AlignedVector<T> &&vec) noexcept;
@@ -148,6 +158,7 @@ public:
    * refers to the fact that for trivially default constructible types `T`, this
    * function omits the initialization of new elements.
    *
+   * @param new_size The new size.
    * @note This method can only be invoked for classes @p T that define a
    * default constructor, @p T(). Otherwise, compilation will fail.
    */
@@ -165,6 +176,7 @@ public:
    * value. The destructors of released elements are also called.
    *
    * @dealiiOperationIsMultithreaded
+   * @param new_size The new size.
    */
   void
   resize(const size_type new_size);
@@ -179,6 +191,8 @@ public:
    * the size of the current object is of course set to the requested
    * value.
    *
+   * @param new_size The new size.
+   * @param init The value used to initialize each newly created entry.
    * @note This method can only be invoked for classes that define the copy
    * assignment operator. Otherwise, compilation will fail.
    *
@@ -206,6 +220,7 @@ public:
    * are run, though the existing elements may be moved to a new location (which
    * involves running the move constructor at the new location and the
    * destructor at the old location).
+   * @param new_allocated_size The new allocated size.
    */
   void
   reserve(const size_type new_allocated_size);
@@ -227,6 +242,7 @@ public:
    * Inserts an element at the end of the vector, increasing the vector size
    * by one. Note that the allocated size will double whenever the previous
    * space is not enough to hold the new element.
+   * @param in_data The in data.
    */
   void
   push_back(const T in_data);
@@ -246,6 +262,8 @@ public:
   /**
    * Inserts several elements at the end of the vector given by a range of
    * elements.
+   * @param begin The begin of the range.
+   * @param end The end of the range.
    */
   template <typename ForwardIterator>
   void
@@ -254,6 +272,9 @@ public:
   /**
    * Insert the range specified by @p begin and @p end after the element @p position.
    *
+   * @param position The position at which the range is inserted.
+   * @param begin The begin of the range.
+   * @param end The end of the range.
    * @note Unlike std::vector, this function uses random-access iterators so
    * that the copy may be parallelized.
    *
@@ -284,6 +305,8 @@ public:
   /**
    * Fills the vector with size() copies of the given input.
    *
+   * @param element The value assigned to each entry that is initialized by
+   * this operation.
    * @note This method can only be invoked for classes that define the copy
    * assignment operator. Otherwise, compilation will fail.
    *
@@ -334,6 +357,8 @@ public:
    * process may also result in a modification of elements visible on other
    * processes, assuming they are located within one shared memory node.
    *
+   * @param communicator The MPI communicator.
+   * @param root_process The root process.
    * @note The use of shared memory between MPI processes requires
    *   that the detected MPI installation supports the necessary operations.
    *   This is the case for MPI 3.0 and higher.
@@ -385,6 +410,8 @@ public:
 
   /**
    * Swaps the given vector with the calling vector.
+   * @param vec The vector with which to initialize, copy, or exchange the
+   * current contents.
    */
   void
   swap(AlignedVector<T> &vec) noexcept;
@@ -410,12 +437,14 @@ public:
 
   /**
    * Read-write access to entry @p index in the vector.
+   * @param index The index of the entry.
    */
   reference
   operator[](const size_type index);
 
   /**
    * Read-only access to entry @p index in the vector.
+   * @param index The index of the entry.
    */
   const_reference
   operator[](const size_type index) const;
@@ -501,6 +530,8 @@ public:
    * Exception message for changing the vector after a call to
    * replicate_across_communicator().
    *
+   * @param ExcAlignedVectorChangeAfterReplication The exc aligned vector
+   * change after replication used by this operation.
    * @ingroup Exceptions
    */
   DeclExceptionMsg(ExcAlignedVectorChangeAfterReplication,
@@ -615,6 +646,7 @@ private:
      * Constructor. When this constructor is called, it installs an
      * action that corresponds to "regular" memory allocation that
      * needs to be handled by using `std::free()`.
+     * @param owning_object The owning object.
      */
     Deleter(AlignedVector<T> *owning_object);
 
@@ -625,6 +657,11 @@ private:
      * needs to be handled by letting MPI de-allocate the shared memory
      * window, plus destroying the MPI communicator, and doing other
      * clean-up work.
+     * @param owning_object The owning object.
+     * @param is_shmem_root The is shmem root.
+     * @param aligned_shmem_pointer The aligned shmem pointer.
+     * @param shmem_group_communicator The shmem group communicator.
+     * @param shmem_window The shmem window.
      */
     Deleter(AlignedVector<T> *owning_object,
             const bool        is_shmem_root,
@@ -637,6 +674,8 @@ private:
      * The operator called by `std::unique_ptr` to destroy the data it
      * is storing. This function dispatches to the different actions that
      * this class implements.
+     * @param ptr The pointer to the first element of the memory region to
+     * destroy or release.
      */
     void
     operator()(T *ptr);
@@ -647,6 +686,7 @@ private:
      * from one AlignedVector object -- i.e., the pointer itself remains
      * unchanged, but the deleter object needs to be updated to know who
      * the new owner now is.
+     * @param new_aligned_vector_ptr The new aligned vector ptr.
      */
     void
     reset_owning_object(const AlignedVector<T> *new_aligned_vector_ptr);
@@ -667,6 +707,9 @@ private:
        * The function that implements the action of de-allocating memory.
        * It receives as arguments a pointer to the owning AlignedVector object
        * as well as a pointer to the memory being de-allocated.
+       * @param owning_aligned_vector The owning aligned vector.
+       * @param ptr A pointer to the first element of the memory region on
+       * which this operation acts.
        */
       virtual void
       delete_array(const AlignedVector<T> *owning_aligned_vector, T *ptr) = 0;
@@ -684,6 +727,10 @@ private:
       /**
        * Constructor. Store the various pieces of information necessary to
        * identify the MPI window in which the data resides.
+       * @param is_shmem_root The is shmem root.
+       * @param aligned_shmem_pointer The aligned shmem pointer.
+       * @param shmem_group_communicator The shmem group communicator.
+       * @param shmem_window The shmem window.
        */
       MPISharedMemDeleterAction(const bool is_shmem_root,
                                 T         *aligned_shmem_pointer,
@@ -694,6 +741,9 @@ private:
        * The function that implements the action of de-allocating memory.
        * It receives as arguments a pointer to the owning AlignedVector object
        * as well as a pointer to the memory being de-allocated.
+       * @param aligned_vector The aligned vector.
+       * @param ptr A pointer to the first element of the memory region on
+       * which this operation acts.
        */
       virtual void
       delete_array(const AlignedVector<T> *aligned_vector, T *ptr) override;
@@ -788,6 +838,8 @@ namespace internal
      *
      * The elements from the source array are simply copied via the placement
      * new copy constructor.
+     * @param destination The destination memory range into which objects are
+     * constructed.
      */
     AlignedVectorCopyConstruct(RandomAccessIterator source_begin,
                                RandomAccessIterator source_end,
@@ -808,6 +860,8 @@ namespace internal
     /**
      * This method moves elements from the source to the destination given in
      * the constructor on a subrange given by two integers.
+     * @param begin The begin of the range.
+     * @param end The end of the range.
      */
     virtual void
     apply_to_subrange(const std::size_t begin,
@@ -856,6 +910,8 @@ namespace internal
      *
      * The data is moved between the two arrays by invoking the destructor on
      * the source range (preparing for a subsequent call to free).
+     * @param destination The destination memory range into which objects are
+     * constructed.
      */
     AlignedVectorMoveConstruct(RandomAccessIterator source_begin,
                                RandomAccessIterator source_end,
@@ -876,6 +932,8 @@ namespace internal
     /**
      * This method moves elements from the source to the destination given in
      * the constructor on a subrange given by two integers.
+     * @param begin The begin of the range.
+     * @param end The end of the range.
      */
     virtual void
     apply_to_subrange(const std::size_t begin,
@@ -961,6 +1019,8 @@ namespace internal
 
     /**
      * This sets elements on a subrange given by two integers.
+     * @param begin The begin of the range.
+     * @param end The end of the range.
      */
     virtual void
     apply_to_subrange(const std::size_t begin,
@@ -1031,6 +1091,8 @@ namespace internal
     /**
      * Constructor. Issues a parallel call if there are sufficiently many
      * elements, otherwise work in serial.
+     * @param destination The destination memory range into which objects are
+     * constructed.
      */
     AlignedVectorDefaultInitialize(const std::size_t size, T *const destination)
       : destination_(destination)
@@ -1047,6 +1109,8 @@ namespace internal
 
     /**
      * This initializes elements on a subrange given by two integers.
+     * @param begin The begin of the range.
+     * @param end The end of the range.
      */
     virtual void
     apply_to_subrange(const std::size_t begin,

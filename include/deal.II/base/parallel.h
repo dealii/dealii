@@ -82,6 +82,11 @@ namespace parallel
 #ifdef DEAL_II_WITH_TASKFLOW
     /**
      * Internal function to do a parallel_for using taskflow
+     * @param x_begin The x begin.
+     * @param x_end The x end.
+     * @param functor The callable object to apply to each item or subrange.
+     * @param grainsize The minimum number of items assigned to one chunk of
+     * work.
      */
     template <typename Iterator, typename Functor>
     void
@@ -121,6 +126,11 @@ namespace parallel
 #ifdef DEAL_II_WITH_TBB
     /**
      * Encapsulate tbb::parallel_for.
+     * @param x_begin The x begin.
+     * @param x_end The x end.
+     * @param functor The callable object to apply to each item or subrange.
+     * @param grainsize The minimum number of items assigned to one chunk of
+     * work.
      */
     template <typename Iterator, typename Functor>
     void
@@ -138,6 +148,13 @@ namespace parallel
 
     /**
      * Encapsulate tbb::parallel_for when an affinite_partitioner is provided.
+     * @param x_begin The x begin.
+     * @param x_end The x end.
+     * @param functor The callable object to apply to each item or subrange.
+     * @param grainsize The minimum number of items assigned to one chunk of
+     * work.
+     * @param partitioner The TBB affinity partitioner used to preserve
+     * thread-to-data affinity across repeated calls.
      */
     template <typename Iterator, typename Functor>
     void
@@ -156,6 +173,9 @@ namespace parallel
 
     /**
      * Just execute things sequentially.
+     * @param x_begin The x begin.
+     * @param x_end The x end.
+     * @param functor The callable object to apply to each item or subrange.
      */
     template <typename Iterator, typename Functor>
     void
@@ -198,6 +218,13 @@ namespace parallel
    *    std::assignable_from<decltype(*std::declval<OutputIterator>()),
    *    std::invoke_result_t<Function,
    * decltype(*std::declval<InputIterator>())>>)}
+   * @param begin_in The begin in.
+   * @param end_in The end in.
+   * @param out The output iterator or object that receives the computed
+   * results.
+   * @param function The function object.
+   * @param grainsize The minimum number of items assigned to one chunk of
+   * work.
    */
   template <typename InputIterator, typename OutputIterator, typename Function>
   DEAL_II_CXX20_REQUIRES(
@@ -281,6 +308,15 @@ namespace parallel
    *    std::invoke_result_t<Function,
    * decltype(*std::declval<InputIterator1>()),
    *    decltype(*std::declval<InputIterator2>())>>)}
+   * @param begin_in1 The begin in1.
+   * @param end_in1 The end in1.
+   * @param in2 The beginning of the additional input range processed together
+   * with the first range.
+   * @param out The output iterator or object that receives the computed
+   * results.
+   * @param function The function object.
+   * @param grainsize The minimum number of items assigned to one chunk of
+   * work.
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -376,6 +412,17 @@ namespace parallel
    * decltype(*std::declval<InputIterator1>()),
    *    decltype(*std::declval<InputIterator2>()),
    *    decltype(*std::declval<InputIterator3>())>>)}
+   * @param begin_in1 The begin in1.
+   * @param end_in1 The end in1.
+   * @param in2 The beginning of the additional input range processed together
+   * with the first range.
+   * @param in3 The beginning of the additional input range processed together
+   * with the first range.
+   * @param out The output iterator or object that receives the computed
+   * results.
+   * @param function The function object.
+   * @param grainsize The minimum number of items assigned to one chunk of
+   * work.
    */
   template <typename InputIterator1,
             typename InputIterator2,
@@ -457,6 +504,8 @@ namespace parallel
      * end.
      *
      * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
+     * @param range The range of iterators processed by this operation.
+     * @param f The function object.
      */
     template <typename Iterator, typename Function>
     DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
@@ -539,6 +588,11 @@ namespace parallel
    * topic.
    *
    * @dealiiConceptRequires{(std::invocable<Function, Iterator, Iterator>)}
+   * @param begin The begin of the range.
+   * @param end The end of the range.
+   * @param f The function object.
+   * @param grainsize The minimum number of items assigned to one chunk of
+   * work.
    */
   template <typename Iterator, typename Function>
   DEAL_II_CXX20_REQUIRES((std::invocable<Function, Iterator, Iterator>))
@@ -687,6 +741,9 @@ namespace parallel
      * because it any operation that changes the data of a derived class will
      * inherently not be thread-safe when several threads work with the same
      * data simultaneously.
+     * @param begin The begin of the range.
+     * @param end The end of the range.
+     * @param minimum_parallel_grain_size The minimum parallel grain size.
      */
     void
     apply_parallel(const std::size_t begin,
@@ -752,6 +809,11 @@ namespace parallel
    * multithreading. Otherwise, it may be called on subsets of the given
    * range, with results from the individual subranges accumulated internally.
    *
+   * @param f The function object.
+   * @param begin The begin of the range.
+   * @param end The end of the range.
+   * @param grainsize The minimum number of items assigned to one chunk of
+   * work.
    * @warning If ResultType is a floating point type, then accumulation is not
    * an associative operation. In other words, if the given function object is
    * called three times on three subranges, returning values $a,b,c$, then the
@@ -844,6 +906,7 @@ namespace parallel
        * After using the partitioner in a tbb loop through
        * acquire_one_partitioner(), this call makes the partitioner available
        * again.
+       * @param p The point at which to evaluate the function.
        */
       void
       release_one_partitioner(

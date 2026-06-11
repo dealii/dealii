@@ -287,6 +287,8 @@ private:
 /**
  * Create an object of type IteratorRange given the beginning and
  * end iterator.
+ * @param begin The begin of the range.
+ * @param end The end of the range.
  */
 template <typename BaseIterator>
 IteratorRange<BaseIterator>

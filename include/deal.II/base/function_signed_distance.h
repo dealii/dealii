@@ -48,6 +48,8 @@ namespace Functions
     public:
       /**
        * Constructor, takes the center and radius of the sphere.
+       * @param center The point associated with this operation.
+       * @param radius The radius used by this operation.
        */
       Sphere(const Point<dim> &center = Point<dim>(), const double radius = 1);
 
@@ -58,6 +60,8 @@ namespace Functions
       /**
        * @copydoc Function::gradient()
        *
+       * @param point The point at which to evaluate the function.
+       * @param component The component to evaluate.
        * @note The gradient is singular at the center of the sphere. If the
        * incoming @p point is too close to the center, a floating-point
        * exception may be thrown or entries in the gradient may be +inf/-inf
@@ -71,6 +75,8 @@ namespace Functions
       /**
        * @copydoc Function::hessian()
        *
+       * @param point The point at which to evaluate the function.
+       * @param component The component to evaluate.
        * @note The Hessian is singular at the center of the sphere. If the
        * incoming @p point is too close to the center, a floating-point
        * exception may be thrown or entries in the Hessian may be +inf/-inf
@@ -104,6 +110,8 @@ namespace Functions
     public:
       /**
        * Constructor, takes a point in the plane and the plane normal.
+       * @param point The point at which to evaluate the function.
+       * @param normal The tensor argument supplied to this operation.
        */
       Plane(const Point<dim> &point, const Tensor<1, dim> &normal);
 
@@ -162,6 +170,7 @@ namespace Functions
       /**
        * Calculates the gradient of the signed distance function via the normal
        * of the closest point on the ellipsoid.
+       * @param component The component to evaluate.
        */
       Tensor<1, dim>
       gradient(const Point<dim> &,
@@ -249,6 +258,8 @@ namespace Functions
        * The signed distance is negative for points inside the rectangle, zero
        * for points on the rectangle and positive for points outside the
        * rectangle.
+       * @param p The point at which to evaluate the function.
+       * @param component The component to evaluate.
        */
       double
       value(const Point<dim>  &p,
@@ -298,6 +309,8 @@ namespace Functions
        * The signed distance is negative for points inside the disk, zero
        * for points on the disk and positive for points outside the
        * disk.
+       * @param p The point at which to evaluate the function.
+       * @param component The component to evaluate.
        */
       double
       value(const Point<dim>  &p,
@@ -372,6 +385,8 @@ namespace Functions
       /**
        * @copydoc Function::gradient()
        *
+       * @param point The point at which to evaluate the function.
+       * @param component The component to evaluate.
        * @note The gradient is singular on the cylinder axis.
        */
       Tensor<1, dim>

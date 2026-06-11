@@ -90,6 +90,10 @@ namespace Utilities
       public:
         /**
          *  Constructor.
+         * @param tolerance The tolerance used by this operation.
+         * @param enforce_unique_mapping The enforce unique mapping.
+         * @param rtree_level The rtree level.
+         * @param marked_vertices The marked vertices.
          */
         AdditionalData(
           const double       tolerance                              = 1e-6,
@@ -169,6 +173,9 @@ namespace Utilities
        * a list of points @p points and mesh description (@p tria and @p
        * mapping).
        *
+       * @param points The points at which to evaluate the function.
+       * @param tria The tria used by this operation.
+       * @param mapping The mapping used by this operation.
        * @warning This is a collective call that needs to be executed by all
        *   processors in the communicator.
        *
@@ -184,6 +191,8 @@ namespace Utilities
        * Set up internal data structures and communication pattern based on
        * an existing Cache and a list of points @p points.
        *
+       * @param cache The cache used by this operation.
+       * @param points The points at which to evaluate the function.
        * @warning This is a collective call that needs to be executed by all
        *   processors in the communicator.
        *
@@ -202,6 +211,10 @@ namespace Utilities
        * Having it as a separate function makes it possible to set up the class
        * if it is known in which cells corresponding reference points are
        * located (e.g. if intersections of cells are known).
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param tria The tria used by this operation.
+       * @param mapping The mapping used by this operation.
        */
       void
       reinit(const GridTools::internal::
@@ -253,12 +266,14 @@ namespace Utilities
 
         /**
          * Return active cell iterator of the processed cell @p cell.
+         * @param cell The cell on which the operation is performed.
          */
         typename Triangulation<dim, spacedim>::active_cell_iterator
         get_active_cell_iterator(const unsigned int cell) const;
 
         /**
          * Return unit points of the processed cell @p cell.
+         * @param cell The cell on which the operation is performed.
          */
         ArrayView<const Point<dim>>
         get_unit_points(const unsigned int cell) const;
@@ -272,6 +287,9 @@ namespace Utilities
          * For more than one component, the returned ArrayView has one entry for
          * each component for each data point and all components for each point
          * are stored consecutively.
+         * @param cell The cell on which the operation is performed.
+         * @param values The values associated with the function.
+         * @param n_components The number of components.
          */
         template <typename DataType>
         ArrayView<DataType>
@@ -317,6 +335,11 @@ namespace Utilities
        * @p buffer is a temporary buffer than can be used to avoid extra
        * allocations.
        *
+       * @param output The output iterator or object that receives the
+       * computed results.
+       * @param buffer The buffer used by this operation.
+       * @param evaluation_function The evaluation function.
+       * @param sort_data The sort data.
        * @note If the map of points to cells is not a
        *   one-to-one relation (is_map_unique()==false), the result needs to be
        *   processed with the help of get_point_ptrs(). This
@@ -348,6 +371,8 @@ namespace Utilities
       /**
        * Same as above but with the result provided as return value and
        * without external allocation of a user-provided buffer.
+       * @param evaluation_function The evaluation function.
+       * @param sort_data The sort data.
        */
       template <typename DataType, unsigned int n_components = 1>
       std::vector<DataType>
@@ -361,6 +386,10 @@ namespace Utilities
        * makes the data at the points, provided by @p input, available in the
        * function @p evaluation_function.
        *
+       * @param input The input data or stream from which values are read.
+       * @param buffer The buffer used by this operation.
+       * @param evaluation_function The evaluation function.
+       * @param sort_data The sort data.
        * @warning This is a collective call that needs to be executed by all
        *   processors in the communicator.
        *
@@ -385,6 +414,9 @@ namespace Utilities
       /**
        * Same as above but without external allocation of a user-provided
        * buffer.
+       * @param input The input data or stream from which values are read.
+       * @param evaluation_function The evaluation function.
+       * @param sort_data The sort data.
        */
       template <typename DataType, unsigned int n_components = 1>
       void
@@ -418,6 +450,7 @@ namespace Utilities
 
       /**
        * Return if point @p i could be found in the domain.
+       * @param i The index of the entry.
        */
       bool
       point_found(const unsigned int i) const;
@@ -580,6 +613,13 @@ namespace Utilities
 #ifdef DEAL_II_WITH_MPI
       /**
        * Pack @p data and send it via MPI_Isend.
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param rank The rank used by this operation.
+       * @param tag The MPI message tag.
+       * @param comm The MPI communicator.
+       * @param buffers The buffers used by this operation.
+       * @param requests The requests used by this operation.
        */
       template <typename T>
       std::enable_if_t<Utilities::MPI::is_mpi_type<T> == false, void>
@@ -610,6 +650,12 @@ namespace Utilities
       /**
        * Above function specialized for data types supported by MPI
        * so that one can skip packing.
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param rank The rank used by this operation.
+       * @param tag The MPI message tag.
+       * @param comm The MPI communicator.
+       * @param requests The requests used by this operation.
        */
       template <typename T>
       std::enable_if_t<Utilities::MPI::is_mpi_type<T> == true, void>
@@ -637,6 +683,13 @@ namespace Utilities
       /**
        * Above function specialized for Tenors objects. The underlying data type
        * might be supported by MPI so that one can skip packing.
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param rank The rank used by this operation.
+       * @param tag The MPI message tag.
+       * @param comm The MPI communicator.
+       * @param buffers The buffers used by this operation.
+       * @param requests The requests used by this operation.
        */
       template <int rank_, int dim, typename T>
       std::enable_if_t<Utilities::MPI::is_mpi_type<T> == true, void>
@@ -656,6 +709,12 @@ namespace Utilities
 
       /**
        * Receive message, unpack it, and store the result in @p data.
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param comm The MPI communicator.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
+       * @param buffer The buffer used by this operation.
        */
       template <typename T>
       std::enable_if_t<Utilities::MPI::is_mpi_type<T> == false, void>
@@ -691,6 +750,11 @@ namespace Utilities
       /**
        * Above function specialized for data types supported by MPI
        * so that one can skip unpacking.
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param comm The MPI communicator.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
        */
       template <typename T>
       std::enable_if_t<Utilities::MPI::is_mpi_type<T> == true, void>
@@ -714,6 +778,12 @@ namespace Utilities
       /**
        * Above function specialized for Tensor objects. The underlying data type
        * might be supported by MPI so that one can skip unpacking.
+       * @param data The data values to read from or write to the current
+       * object.
+       * @param comm The MPI communicator.
+       * @param status The MPI status object that receives information about
+       * the completed operation.
+       * @param buffer The buffer used by this operation.
        */
       template <int rank_, int dim, typename T>
       std::enable_if_t<Utilities::MPI::is_mpi_type<T> == true, void>

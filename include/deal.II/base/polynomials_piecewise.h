@@ -71,6 +71,10 @@ namespace Polynomials
      *
      * If the number of intervals is one, the piecewise polynomial behaves
      * exactly like a usual polynomial.
+     * @param coefficients_on_interval The coefficients on interval.
+     * @param n_intervals The number of intervals.
+     * @param interval The interval used by this operation.
+     * @param spans_next_interval The spans next interval.
      */
     PiecewisePolynomial(const Polynomial<number> &coefficients_on_interval,
                         const unsigned int        n_intervals,
@@ -82,6 +86,8 @@ namespace Polynomials
      * subset of the unit interval. It uses a polynomial description that is
      * scaled to the size of the subinterval compared to the unit interval.
      * The subintervals are bounded by the adjacent points in @p points.
+     * @param points The points at which to evaluate the function.
+     * @param index The index of the entry.
      */
     PiecewisePolynomial(const std::vector<Point<1, number>> &points,
                         const unsigned int                   index);
@@ -91,6 +97,7 @@ namespace Polynomials
      * underlying polynomial. The polynomial evaluates to zero when outside of
      * the given interval (and possible the next one to the right when it
      * spans over that range).
+     * @param x The value on which this function operates.
      */
     number
     value(const number x) const;
@@ -108,6 +115,8 @@ namespace Polynomials
      * jumps of gradients on the element boundary), but it is the user's
      * responsibility to avoid evaluation at these points when it does not
      * make sense.
+     * @param x The value on which this function operates.
+     * @param values The object in which to store the computed values.
      */
     void
     value(const number x, std::vector<number> &values) const;
@@ -126,6 +135,9 @@ namespace Polynomials
      * jumps of gradients on the element boundary), but it is the user's
      * responsibility to avoid evaluation at these points when it does not
      * make sense.
+     * @param x The value on which this function operates.
+     * @param n_derivatives The number of derivatives.
+     * @param values The values associated with the function.
      */
     void
     value(const number       x,
@@ -204,6 +216,8 @@ namespace Polynomials
    * Generates a complete Lagrange basis on a subdivision of the unit interval
    * in smaller intervals for a given degree on the subintervals and number of
    * intervals.
+   * @param n_subdivisions The number of subdivisions.
+   * @param base_degree The base degree.
    */
   std::vector<PiecewisePolynomial<double>>
   generate_complete_Lagrange_basis_on_subdivisions(
@@ -213,6 +227,7 @@ namespace Polynomials
   /**
    * Generates a complete linear basis on a subdivision of the unit interval
    * in smaller intervals for a given vector of points.
+   * @param points The points at which to evaluate the function.
    */
   std::vector<PiecewisePolynomial<double>>
   generate_complete_linear_basis_on_subdivisions(

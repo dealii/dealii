@@ -47,6 +47,9 @@ public:
    * Constructor. Provided are the functions to compute derivatives of, the
    * direction vector of the differentiation and the step size <tt>h</tt> of
    * the difference formula.
+   * @param f The function object.
+   * @param direction The coordinate direction to which this operation refers.
+   * @param h The h used by this operation.
    */
   FunctionDerivative(const Function<dim> &f,
                      const Point<dim>    &direction,
@@ -63,6 +66,9 @@ public:
    *
    * The number of quadrature point must still be the same, when values are
    * accessed.
+   * @param f The function object.
+   * @param direction The coordinate direction to which this operation refers.
+   * @param h The h used by this operation.
    */
   FunctionDerivative(const Function<dim>           &f,
                      const std::vector<Point<dim>> &direction,
@@ -75,12 +81,14 @@ public:
    * Formulas implemented right now are first order backward Euler
    * (<tt>UpwindEuler</tt>), second order symmetric Euler (<tt>Euler</tt>) and
    * a symmetric fourth order formula (<tt>FourthOrder</tt>).
+   * @param formula The formula used by this operation.
    */
   void
   set_formula(typename AutoDerivativeFunction<dim>::DifferenceFormula formula =
                 AutoDerivativeFunction<dim>::Euler);
   /**
    * Change the base step size of the difference formula
+   * @param h The h used by this operation.
    */
   void
   set_h(const double h);

@@ -46,12 +46,14 @@ class IntegratedLegendreSZ : public Polynomials::Polynomial<double>
 public:
   /**
    * Constructor generating the coefficients of the polynomials at degree p.
+   * @param p The point at which to evaluate the function.
    */
   IntegratedLegendreSZ(const unsigned int p);
 
   /**
    * Return the complete set of Integrated Legendre polynomials up to the
    * given degree.
+   * @param degree The polynomial degree.
    */
   static std::vector<Polynomials::Polynomial<double>>
   generate_complete_basis(const unsigned int degree);

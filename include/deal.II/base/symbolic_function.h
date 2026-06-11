@@ -212,6 +212,7 @@ namespace Functions
      * by calling update_user_substitution_map(), and that you provide all the
      * additional function arguments of your function using the method
      * set_additional_function_arguments().
+     * @param expressions The expressions used by this operation.
      */
     SymbolicFunction(const std::string &expressions);
 
@@ -221,6 +222,7 @@ namespace Functions
      *
      * Notice that this method will trigger a recomputation of the
      * gradients, Hessians, and Laplacians of each component.
+     * @param substitutions The substitutions used by this operation.
      */
     void
     update_user_substitution_map(
@@ -240,6 +242,7 @@ namespace Functions
      * arguments than simply the coordinates and time. If you want to compute
      * the total derivative w.r.t. to complicated symbolic expressions, you
      * should call update_user_substitution_map() instead.
+     * @param arguments The arguments used by this operation.
      */
     void
     set_additional_function_arguments(
@@ -311,6 +314,7 @@ namespace Functions
     /**
      * Print the stored arguments and function expression, as it would be
      * evaluated when calling the method value().
+     * @param out The output stream to which data is written.
      */
     template <typename StreamType>
     StreamType &

@@ -62,6 +62,8 @@ public:
   /**
    * Constructor. This takes the degree of the space, @p deg from the finite element
    * class, and @p n, the number of polynomials for the space.
+   * @param deg The deg used by this operation.
+   * @param n_polynomials The number of polynomials.
    */
   TensorPolynomialsBase(const unsigned int deg,
                         const unsigned int n_polynomials);
@@ -88,6 +90,12 @@ public:
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   virtual void
   evaluate(const Point<dim>            &unit_point,

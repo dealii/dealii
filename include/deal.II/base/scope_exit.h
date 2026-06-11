@@ -134,6 +134,7 @@ public:
   /**
    * Constructor. Takes a function object that is to be executed at the
    * place where the current object goes out of scope as argument.
+   * @param exit_function The exit function.
    */
   explicit ScopeExit(const std::function<void()> &exit_function);
 

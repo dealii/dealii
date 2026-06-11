@@ -181,11 +181,13 @@ namespace internal
        *
        * Using this constructor is risky if accessors are stored longer than
        * the table it points to. Don't do this.
+       * @param a The value on which this function operates.
        */
       Accessor(const Accessor &a);
 
       /**
        * Index operator. Performs a range check.
+       * @param i The index of the entry.
        */
       Accessor<N, T, C, P - 1>
       operator[](const size_type i) const;
@@ -278,11 +280,13 @@ namespace internal
        *
        * Using this constructor is risky if accessors are stored longer than
        * the table it points to. Don't do this.
+       * @param a The value on which this function operates.
        */
       Accessor(const Accessor &a);
 
       /**
        * Index operator. Performs a range check.
+       * @param size_type The size type.
        */
       reference
       operator[](const size_type) const;
@@ -454,6 +458,7 @@ public:
   /**
    * Constructor. Initialize the array with the given dimensions in each index
    * component.
+   * @param sizes The sizes used by this operation.
    */
   explicit TableBase(const TableIndices<N> &sizes);
 
@@ -461,6 +466,10 @@ public:
    * Constructor. Initialize the array with the given dimensions in each index
    * component, and then initialize the elements of the table using the second
    * and third argument by calling fill(entries,C_style_indexing).
+   * @param sizes The sizes used by this operation.
+   * @param entries The iterator associated with the range processed by this
+   * operation.
+   * @param C_style_indexing The c style indexing.
    */
   template <typename InputIterator>
   TableBase(const TableIndices<N> &sizes,
@@ -469,18 +478,21 @@ public:
 
   /**
    * Copy constructor. Performs a deep copy.
+   * @param src The src used by this operation.
    */
   TableBase(const TableBase<N, T> &src);
 
   /**
    * Copy constructor. Performs a deep copy from a table object storing some
    * other data type.
+   * @param src The src used by this operation.
    */
   template <typename T2>
   TableBase(const TableBase<N, T2> &src);
 
   /**
    * Move constructor. Transfers the contents of another Table.
+   * @param src The src used by this operation.
    */
   TableBase(TableBase<N, T> &&src) noexcept;
 
@@ -496,6 +508,7 @@ public:
    * We can't use the other, templatized version since if we don't declare
    * this one, the compiler will happily generate a predefined copy operator
    * which is not what we want.
+   * @param src The src used by this operation.
    */
   TableBase<N, T> &
   operator=(const TableBase<N, T> &src);
@@ -506,6 +519,7 @@ public:
    *
    * This function requires that the type <tt>T2</tt> is convertible to
    * <tt>T</tt>.
+   * @param src The src used by this operation.
    */
   template <typename T2>
   TableBase<N, T> &
@@ -514,12 +528,14 @@ public:
   /**
    * Move assignment operator. Transfer all elements of <tt>src</tt> into the
    * table.
+   * @param src The src used by this operation.
    */
   TableBase<N, T> &
   operator=(TableBase<N, T> &&src) noexcept;
 
   /**
    * Test for equality of two tables.
+   * @param T2 The second object to compare.
    */
   bool
   operator==(const TableBase<N, T> &T2) const;
@@ -538,6 +554,8 @@ public:
    * is set to @p false, all elements of the table are set to a
    * default constructed object for the element type. Otherwise the
    * memory is left in an uninitialized or otherwise undefined state.
+   * @param new_size The new size.
+   * @param omit_default_initialization The omit default initialization.
    */
   void
   reinit(const TableIndices<N> &new_size,
@@ -551,6 +569,7 @@ public:
 
   /**
    * Size of the table in direction <tt>i</tt>.
+   * @param i The index of the entry.
    */
   size_type
   size(const unsigned int i) const;
@@ -617,12 +636,14 @@ public:
 
   /**
    * Fill all table entries with the same value.
+   * @param value The value associated with the function.
    */
   void
   fill(const T &value);
 
   /**
    * Return a read-write reference to the indicated element.
+   * @param indices The multi-index that identifies the table entry to access.
    */
   typename AlignedVector<T>::reference
   operator()(const TableIndices<N> &indices);
@@ -633,6 +654,7 @@ public:
    * We return the requested value as a constant reference rather than by
    * value since this object may hold data types that may be large, and we
    * don't know here whether copying is expensive or not.
+   * @param indices The multi-index that identifies the table entry to access.
    */
   typename AlignedVector<T>::const_reference
   operator()(const TableIndices<N> &indices) const;
@@ -676,6 +698,8 @@ public:
    * process may also result in a modification of elements visible on other
    * processes, assuming they are located within one shared memory node.
    *
+   * @param communicator The MPI communicator.
+   * @param root_process The root process.
    * @note The use of shared memory between MPI processes requires
    *   that the detected MPI installation supports the necessary operations.
    *   This is the case for MPI 3.0 and higher.
@@ -736,6 +760,7 @@ public:
    * standard containers. Also, there is a global function <tt>swap(u,v)</tt>
    * that simply calls <tt>u.swap(v)</tt>, again in analogy to standard
    * functions.
+   * @param v The value on which this function operates.
    */
   void
   swap(TableBase<N, T> &v) noexcept;
@@ -843,6 +868,7 @@ public:
 
   /**
    * Constructor. Pass down the given dimension to the base class.
+   * @param size The number of entries in the object to create or resize.
    */
   explicit Table(const size_type size);
 
@@ -891,6 +917,7 @@ public:
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-only reference.
+   * @param i The index of the entry.
    */
   typename AlignedVector<T>::const_reference
   operator[](const size_type i) const;
@@ -898,6 +925,7 @@ public:
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-write reference.
+   * @param i The index of the entry.
    */
   typename AlignedVector<T>::reference
   operator[](const size_type i);
@@ -905,6 +933,7 @@ public:
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-only reference.
+   * @param i The index of the entry.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i) const;
@@ -912,6 +941,7 @@ public:
   /**
    * Access operator. Since this is a one-dimensional object, this simply
    * accesses the requested data element. Returns a read-write reference.
+   * @param i The index of the entry.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i);
@@ -1004,6 +1034,7 @@ namespace MatrixTableIterators
 
     /**
      * Constructor setting up the end iterator.
+     * @param table The table used by this operation.
      */
     AccessorBase(const container_pointer_type table);
 
@@ -1014,6 +1045,8 @@ namespace MatrixTableIterators
 
     /**
      * Constructor taking an array index.
+     * @param table The table used by this operation.
+     * @param linear_index The linear index.
      */
     AccessorBase(const container_pointer_type table,
                  const std::ptrdiff_t         linear_index);
@@ -1201,16 +1234,21 @@ namespace MatrixTableIterators
 
     /**
      * Constructor from an accessor.
+     * @param accessor The accessor used by this operation.
      */
     Iterator(const Accessor<TableType, Constness, storage_order> &accessor);
 
     /**
      * Constructor. Create the end iterator for a table.
+     * @param object The object used by this operation.
      */
     Iterator(const container_pointer_type object);
 
     /**
      * Constructor for a particular table entry.
+     * @param object The object used by this operation.
+     * @param row The row index to access.
+     * @param column The column used by this operation.
      */
     Iterator(const container_pointer_type object,
              const size_type              row,
@@ -1218,11 +1256,14 @@ namespace MatrixTableIterators
 
     /**
      * Copy constructor from a non-const iterator.
+     * @param i The index of the entry.
      */
     Iterator(const Iterator<TableType, false, storage_order> &i);
 
     /**
      * Constructor for an entry with a particular linear index.
+     * @param container The container used by this operation.
+     * @param linear_index The linear index.
      */
     Iterator(const container_pointer_type container,
              const std::ptrdiff_t         linear_index);
@@ -1288,6 +1329,8 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
    */
   Table(const size_type size1, const size_type size2);
 
@@ -1339,6 +1382,9 @@ public:
    * Reinitialize the object. This function is mostly here for compatibility
    * with the earlier <tt>vector2d</tt> class. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param omit_default_initialization The omit default initialization.
    */
   void
   reinit(const size_type size1,
@@ -1352,6 +1398,7 @@ public:
    * this two-dimensional table. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<2, T, true, 1>
   operator[](const size_type i) const;
@@ -1361,6 +1408,7 @@ public:
    * this two-dimensional table. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<2, T, false, 1>
   operator[](const size_type i);
@@ -1370,6 +1418,8 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i, const size_type j) const;
@@ -1379,6 +1429,8 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i, const size_type j);
@@ -1497,6 +1549,9 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param size3 The size of the table in the third dimension.
    */
   Table(const size_type size1, const size_type size2, const size_type size3);
 
@@ -1550,6 +1605,10 @@ public:
   /**
    * Reinitialize the object. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param size3 The size of the table in the third dimension.
+   * @param omit_default_initialization The omit default initialization.
    */
   void
   reinit(const size_type size1,
@@ -1565,6 +1624,7 @@ public:
    * performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<3, T, true, 2>
   operator[](const size_type i) const;
@@ -1575,6 +1635,7 @@ public:
    * checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<3, T, false, 2>
   operator[](const size_type i);
@@ -1584,6 +1645,9 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i, const size_type j, const size_type k) const;
@@ -1594,6 +1658,9 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i, const size_type j, const size_type k);
@@ -1631,6 +1698,10 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param size3 The size of the table in the third dimension.
+   * @param size4 The size of the table in the fourth dimension.
    */
   Table(const size_type size1,
         const size_type size2,
@@ -1643,6 +1714,7 @@ public:
    * are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<4, T, true, 3>
   operator[](const size_type i) const;
@@ -1653,6 +1725,7 @@ public:
    * are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<4, T, false, 3>
   operator[](const size_type i);
@@ -1662,6 +1735,10 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i,
@@ -1675,6 +1752,10 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i,
@@ -1716,6 +1797,11 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param size3 The size of the table in the third dimension.
+   * @param size4 The size of the table in the fourth dimension.
+   * @param size5 The size of the table in the fifth dimension.
    */
   Table(const size_type size1,
         const size_type size2,
@@ -1729,6 +1815,7 @@ public:
    * performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<5, T, true, 4>
   operator[](const size_type i) const;
@@ -1739,6 +1826,7 @@ public:
    * performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<5, T, false, 4>
   operator[](const size_type i);
@@ -1748,6 +1836,11 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
+   * @param m The index in the fifth dimension.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i,
@@ -1761,6 +1854,11 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
+   * @param m The index in the fifth dimension.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i,
@@ -1802,6 +1900,12 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param size3 The size of the table in the third dimension.
+   * @param size4 The size of the table in the fourth dimension.
+   * @param size5 The size of the table in the fifth dimension.
+   * @param size6 The size of the table in the sixth dimension.
    */
   Table(const size_type size1,
         const size_type size2,
@@ -1816,6 +1920,7 @@ public:
    * performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<6, T, true, 5>
   operator[](const size_type i) const;
@@ -1826,6 +1931,7 @@ public:
    * performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<6, T, false, 5>
   operator[](const size_type i);
@@ -1835,6 +1941,12 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
+   * @param m The index in the fifth dimension.
+   * @param n The index in the sixth dimension.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i,
@@ -1849,6 +1961,12 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
+   * @param m The index in the fifth dimension.
+   * @param n The index in the sixth dimension.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i,
@@ -1890,6 +2008,13 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param size3 The size of the table in the third dimension.
+   * @param size4 The size of the table in the fourth dimension.
+   * @param size5 The size of the table in the fifth dimension.
+   * @param size6 The size of the table in the sixth dimension.
+   * @param size7 The size of the table in the seventh dimension.
    */
   Table(const size_type size1,
         const size_type size2,
@@ -1905,6 +2030,7 @@ public:
    * performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<7, T, true, 6>
   operator[](const size_type i) const;
@@ -1915,6 +2041,7 @@ public:
    * performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
    */
   dealii::internal::TableBaseAccessors::Accessor<7, T, false, 6>
   operator[](const size_type i);
@@ -1924,6 +2051,13 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
+   * @param m The index in the fifth dimension.
+   * @param n The index in the sixth dimension.
+   * @param o The index in the seventh dimension.
    */
   typename AlignedVector<T>::const_reference
   operator()(const size_type i,
@@ -1939,6 +2073,13 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
+   * @param k The index of the entry.
+   * @param l The index in the fourth dimension.
+   * @param m The index in the fifth dimension.
+   * @param n The index in the sixth dimension.
+   * @param o The index in the seventh dimension.
    */
   typename AlignedVector<T>::reference
   operator()(const size_type i,
@@ -2016,6 +2157,8 @@ public:
 
   /**
    * Constructor. Pass down the given dimensions to the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
    */
   TransposeTable(const size_type size1, const size_type size2);
 
@@ -2023,6 +2166,9 @@ public:
    * Reinitialize the object. This function is mostly here for compatibility
    * with the earlier <tt>vector2d</tt> class. Passes down to the base class
    * by converting the arguments to the data type requested by the base class.
+   * @param size1 The size of the table in the first dimension.
+   * @param size2 The size of the table in the second dimension.
+   * @param omit_default_initialization The omit default initialization.
    */
   void
   reinit(const size_type size1,
@@ -2034,6 +2180,8 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function only allows read access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
    */
   const_reference
   operator()(const size_type i, const size_type j) const;
@@ -2043,6 +2191,8 @@ public:
    * the same time. Range checks are performed.
    *
    * This version of the function allows read-write access.
+   * @param i The index of the entry.
+   * @param j The index of the entry.
    */
   reference
   operator()(const size_type i, const size_type j);
@@ -3708,6 +3858,8 @@ Table<7, T>::operator()(const size_type i,
  * Global function @p swap which overloads the default implementation of the
  * C++ standard library which uses a temporary object. The function simply
  * exchanges the data of the two tables.
+ * @param u The value on which this function operates.
+ * @param v The value on which this function operates.
  */
 template <int N, typename T>
 inline void

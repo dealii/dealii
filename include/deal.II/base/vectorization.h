@@ -111,6 +111,7 @@ public:
 
   /**
    * Compare for equality.
+   * @param other The object to copy or move from.
    */
   constexpr bool
   operator==(const VectorizedArrayIterator<T> &other) const
@@ -123,6 +124,7 @@ public:
 
   /**
    * Compare for inequality.
+   * @param other The object to copy or move from.
    */
   constexpr bool
   operator!=(const VectorizedArrayIterator<T> &other) const
@@ -174,6 +176,8 @@ public:
   /**
    * This operator advances the iterator by @p offset lanes and returns a
    * reference to <tt>*this</tt>.
+   * @param offset The offset into the underlying storage or file at which the
+   * operation starts.
    */
   constexpr VectorizedArrayIterator<T> &
   operator+=(const std::size_t offset)
@@ -201,6 +205,8 @@ public:
 
   /**
    * Create new iterator, which is shifted by @p offset.
+   * @param offset The offset into the underlying storage or file at which the
+   * operation starts.
    */
   constexpr VectorizedArrayIterator<T>
   operator+(const std::size_t &offset) const
@@ -211,6 +217,7 @@ public:
 
   /**
    * Compute distance between this iterator and iterator @p other.
+   * @param other The object to copy or move from.
    */
   constexpr std::ptrdiff_t
   operator-(const VectorizedArrayIterator<T> &other) const
@@ -260,6 +267,7 @@ public:
    * The initializer list must have at most as many elements as the
    * vector length. Elements not listed in the initializer list are
    * zero-initialized.
+   * @param list The list used by this operation.
    */
   template <typename U>
   constexpr VectorizedArrayBase(const std::initializer_list<U> &list)
@@ -338,6 +346,7 @@ public:
    * This function is inherited by all derived classes and provides
    * the dot product to them unless they override it with their own
    * implementation (presumably using a more efficient approach).
+   * @param v The value on which this function operates.
    */
   auto
   dot_product(const VectorizedArrayType &v) const
@@ -466,6 +475,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const Number scalar)
   {
@@ -488,6 +498,7 @@ public:
 
   /**
    * This function assigns a scalar to the current object.
+   * @param scalar The scalar value to assign to every entry.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -501,6 +512,7 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const Number scalar) && = delete;
@@ -508,6 +520,7 @@ public:
   /**
    * Access operator (only valid with component 0 in the base class without
    * specialization).
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   Number &
@@ -521,6 +534,7 @@ public:
   /**
    * Constant access operator (only valid with component 0 in the base class
    * without specialization).
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const Number &
@@ -533,6 +547,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -544,6 +560,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -555,6 +573,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -566,6 +586,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -580,6 +602,7 @@ public:
    * the given address. The pointer `ptr` needs not be aligned by the amount
    * of bytes in the vectorized array, as opposed to casting a double address
    * to VectorizedArray<double>*.
+   * @param ptr The address of the first value to load from memory.
    */
   template <typename OtherNumber>
   DEAL_II_ALWAYS_INLINE void
@@ -593,6 +616,7 @@ public:
    * size() data items to the given address. The pointer `ptr` needs not be
    * aligned by the amount of bytes in the vectorized array, as opposed to
    * casting a double address to VectorizedArray<double>*.
+   * @param ptr The address of the first value to write to memory.
    */
   template <typename OtherNumber>
   DEAL_II_ALWAYS_INLINE void
@@ -646,6 +670,7 @@ public:
    * Note that streaming stores are only available in the specialized SSE/AVX
    * classes of VectorizedArray of type @p double or @p float, not in the
    * generic base class.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -665,6 +690,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -684,6 +712,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -803,6 +834,7 @@ private:
  * scalar, i.e., broadcasts the scalar to all array elements.
  *
  * @relatesalso VectorizedArray
+ * @param u The value on which this function operates.
  */
 template <typename Number,
           std::size_t width =
@@ -821,6 +853,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * to all array elements.
  *
  * @relatesalso VectorizedArray
+ * @param u The value on which this function operates.
  */
 template <typename VectorizedArrayType>
 inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
@@ -848,6 +881,11 @@ make_vectorized_array(const typename VectorizedArrayType::value_type &u)
  * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
  *   out.data[v] = ptrs[v][offset];
  * @endcode
+ * @param out The output iterator or object that receives the computed
+ * results.
+ * @param ptrs The ptrs used by this operation.
+ * @param offset The offset into the underlying storage or file at which the
+ * operation starts.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
@@ -885,6 +923,12 @@ gather(VectorizedArray<Number, width>    &out,
  * This is the inverse operation to vectorized_transpose_and_store().
  *
  * @relatesalso VectorizedArray
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
@@ -909,6 +953,10 @@ vectorized_load_and_transpose(const unsigned int              n_entries,
  * However, this function can also be used if some function returns an array
  * of pointers and no assumption can be made that they belong to the same array,
  * i.e., they can have their origin in different memory allocations.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
@@ -960,6 +1008,13 @@ vectorized_load_and_transpose(const unsigned int                 n_entries,
  * This is the inverse operation to vectorized_load_and_transpose().
  *
  * @relatesalso VectorizedArray
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
@@ -990,6 +1045,11 @@ vectorized_transpose_and_store(const bool                            add_into,
  * However, this function can also be used if some function returns an array
  * of pointers and no assumption can be made that they belong to the same array,
  * i.e., they can have their origin in different memory allocations.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE void
@@ -1042,6 +1102,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const double scalar)
   {
@@ -1058,6 +1119,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   VectorizedArray &
   operator=(const double x) &
@@ -1070,12 +1132,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   double &
   operator[](const unsigned int comp)
@@ -1085,6 +1149,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   const double &
   operator[](const unsigned int comp) const
@@ -1094,6 +1159,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
@@ -1104,6 +1171,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator-=(const VectorizedArray &vec)
@@ -1114,6 +1183,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator*=(const VectorizedArray &vec)
@@ -1124,6 +1195,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator/=(const VectorizedArray &vec)
@@ -1136,6 +1209,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
+   * @param ptr The address of the first value to load from memory.
    */
   void
   load(const double *ptr)
@@ -1157,6 +1231,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
+   * @param ptr The address of the first value to write to memory.
    */
   void
   store(double *ptr) const
@@ -1175,6 +1250,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1197,6 +1273,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   void
   gather(const double *base_ptr, const unsigned int *offsets)
@@ -1216,6 +1295,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   void
   scatter(const unsigned int *offsets, double *base_ptr) const
@@ -1345,6 +1427,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const float scalar)
   {
@@ -1361,6 +1444,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   VectorizedArray &
   operator=(const float x) &
@@ -1373,12 +1457,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   value_type &
   operator[](const unsigned int comp)
@@ -1388,6 +1474,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   const value_type &
   operator[](const unsigned int comp) const
@@ -1397,6 +1484,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator+=(const VectorizedArray &vec)
@@ -1407,6 +1496,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator-=(const VectorizedArray &vec)
@@ -1417,6 +1508,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator*=(const VectorizedArray &vec)
@@ -1427,6 +1520,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   VectorizedArray &
   operator/=(const VectorizedArray &vec)
@@ -1439,6 +1534,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
+   * @param ptr The address of the first value to load from memory.
    */
   void
   load(const float *ptr)
@@ -1451,6 +1547,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
+   * @param ptr The address of the first value to write to memory.
    */
   void
   store(float *ptr) const
@@ -1460,6 +1557,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1482,6 +1580,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   void
   gather(const float *base_ptr, const unsigned int *offsets)
@@ -1501,6 +1602,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   void
   scatter(const unsigned int *offsets, float *base_ptr) const
@@ -1636,6 +1740,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const double scalar)
   {
@@ -1652,6 +1757,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1665,12 +1771,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   double &
@@ -1682,6 +1790,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const double &
@@ -1693,6 +1802,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1708,6 +1819,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1723,6 +1836,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1738,6 +1853,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -1755,6 +1872,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -1777,6 +1895,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -1796,6 +1915,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -1818,6 +1938,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -1838,6 +1961,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -1957,6 +2083,12 @@ private:
 
 /**
  * Specialization for double and SSE2.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -1984,6 +2116,10 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
 
 /**
  * Specialization for double and SSE2.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2011,6 +2147,13 @@ vectorized_load_and_transpose(const unsigned int             n_entries,
 
 /**
  * Specialization for double and SSE2.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2063,6 +2206,11 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 /**
  * Specialization for double and SSE2.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2139,6 +2287,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const float scalar)
   {
@@ -2155,6 +2304,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2168,12 +2318,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   float &
@@ -2185,6 +2337,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const float &
@@ -2196,6 +2349,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2211,6 +2366,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2226,6 +2383,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2241,6 +2400,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2258,6 +2419,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2271,6 +2433,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2281,6 +2444,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 16 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2303,6 +2467,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2323,6 +2490,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2443,6 +2613,12 @@ private:
 
 /**
  * Specialization for float and SSE2.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2478,6 +2654,10 @@ vectorized_load_and_transpose(const unsigned int         n_entries,
 
 /**
  * Specialization for float and SSE2.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2513,6 +2693,13 @@ vectorized_load_and_transpose(const unsigned int            n_entries,
 
 /**
  * Specialization for float and SSE2.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2576,6 +2763,11 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 /**
  * Specialization for float and SSE2.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -2665,6 +2857,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const double scalar)
   {
@@ -2681,6 +2874,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2694,12 +2888,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   double &
@@ -2711,6 +2907,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const double &
@@ -2722,6 +2919,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2742,6 +2941,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2756,6 +2957,8 @@ public:
   }
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2771,6 +2974,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -2788,6 +2993,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2808,6 +3014,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 32 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2825,6 +3032,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 32 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -2847,6 +3055,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2884,6 +3095,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3022,6 +3236,12 @@ private:
 
 /**
  * Specialization for double and AVX.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3061,6 +3281,10 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
 
 /**
  * Specialization for double and AVX.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3100,6 +3324,13 @@ vectorized_load_and_transpose(const unsigned int             n_entries,
 
 /**
  * Specialization for double and AVX.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3167,6 +3398,11 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 /**
  * Specialization for double and AVX.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3260,6 +3496,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const float scalar)
   {
@@ -3276,6 +3513,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3289,12 +3527,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   float &
@@ -3306,6 +3546,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const float &
@@ -3317,6 +3558,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3337,6 +3580,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3351,6 +3596,8 @@ public:
   }
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3366,6 +3613,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3383,6 +3632,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3396,6 +3646,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 32 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3406,6 +3657,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 32 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -3428,6 +3680,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3465,6 +3720,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3603,6 +3861,12 @@ private:
 
 /**
  * Specialization for float and AVX.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3645,6 +3909,10 @@ vectorized_load_and_transpose(const unsigned int         n_entries,
 
 /**
  * Specialization for float and AVX.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3685,6 +3953,13 @@ vectorized_load_and_transpose(const unsigned int            n_entries,
 
 /**
  * Specialization for float and AVX.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3768,6 +4043,11 @@ vectorized_transpose_and_store(const bool                       add_into,
 
 /**
  * Specialization for float and AVX.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -3878,6 +4158,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const double scalar)
   {
@@ -3894,6 +4175,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3908,12 +4190,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const double scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   double &
@@ -3925,6 +4209,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const double &
@@ -3936,6 +4221,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3956,6 +4243,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3970,6 +4259,8 @@ public:
   }
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -3985,6 +4276,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4002,6 +4295,7 @@ public:
    * Load size() data items from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4022,6 +4316,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 64 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4039,6 +4334,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 64 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -4061,6 +4357,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4098,6 +4397,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4255,6 +4557,12 @@ private:
 
 /**
  * Specialization for double and AVX-512.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -4300,6 +4608,10 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
 
 /**
  * Specialization for double and AVX-512.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -4339,6 +4651,13 @@ vectorized_load_and_transpose(const unsigned int             n_entries,
 
 /**
  * Specialization for double and AVX-512.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -4422,6 +4741,11 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 /**
  * Specialization for double and AVX-512.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -4525,6 +4849,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const float scalar)
   {
@@ -4541,6 +4866,7 @@ public:
 
   /**
    * This function can be used to set all data fields to a given scalar.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4554,12 +4880,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const float scalar) && = delete;
 
   /**
    * Access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   float &
@@ -4571,6 +4899,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const float &
@@ -4582,6 +4911,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4602,6 +4933,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4616,6 +4949,8 @@ public:
   }
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4631,6 +4966,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -4648,6 +4985,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4661,6 +4999,7 @@ public:
    * size() to the given address. The memory need not be aligned by
    * 64 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4671,6 +5010,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    * @note Memory must be aligned by 64 bytes.
    */
   DEAL_II_ALWAYS_INLINE
@@ -4693,6 +5033,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4730,6 +5073,9 @@ public:
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4888,6 +5234,12 @@ private:
 
 /**
  * Specialization for float and AVX-512.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -4943,6 +5295,10 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
 
 /**
  * Specialization for float and AVX-512.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -4994,6 +5350,13 @@ vectorized_load_and_transpose(const unsigned int             n_entries,
 
 /**
  * Specialization for float and AVX-512.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param offsets The offsets that map local entries to positions in the
+ * underlying storage.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -5108,6 +5471,11 @@ vectorized_transpose_and_store(const bool                        add_into,
 
 /**
  * Specialization for float and AVX-512.
+ * @param add_into The add into.
+ * @param n_entries The number of entries.
+ * @param in The input data or stream from which values are read.
+ * @param out The output iterator or object that receives the computed
+ * results.
  */
 template <>
 inline DEAL_II_ALWAYS_INLINE void
@@ -5244,6 +5612,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const double scalar)
   {
@@ -5260,6 +5629,7 @@ public:
 
   /**
    * This function assigns a scalar to the current object.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5278,12 +5648,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const double scalar) && = delete;
 
   /**
    * Access operator. The component must be either 0 or 1.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   double &
@@ -5295,6 +5667,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const double &
@@ -5306,6 +5679,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5317,6 +5692,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5328,6 +5705,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5339,6 +5718,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5351,6 +5732,7 @@ public:
   /**
    * Load @p size() from memory into the calling class, starting at
    * the given address.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5362,6 +5744,7 @@ public:
   /**
    * Write the content of the calling class into memory in form of @p
    * size() to the given address.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5372,6 +5755,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5382,6 +5766,9 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::gather()
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5393,6 +5780,9 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::scatter
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5505,6 +5895,7 @@ public:
 
   /**
    * Construct an array with the given scalar broadcast to all lanes.
+   * @param scalar The scalar factor applied to every entry.
    */
   VectorizedArray(const float scalar)
   {
@@ -5521,6 +5912,7 @@ public:
 
   /**
    * This function assigns a scalar to the current object.
+   * @param x The value on which this function operates.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5539,12 +5931,14 @@ public:
    * Assign a scalar to the current object. This overload is used for
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
+   * @param scalar The scalar value to assign to every entry.
    */
   VectorizedArray &
   operator=(const float scalar) && = delete;
 
   /**
    * Access operator. The component must be between 0 and 3.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   float &
@@ -5556,6 +5950,7 @@ public:
 
   /**
    * Constant access operator.
+   * @param comp The component or SIMD lane index to access.
    */
   DEAL_II_ALWAYS_INLINE
   const float &
@@ -5567,6 +5962,8 @@ public:
 
   /**
    * Element-wise addition of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5578,6 +5975,8 @@ public:
 
   /**
    * Element-wise subtraction of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5589,6 +5988,8 @@ public:
 
   /**
    * Element-wise multiplication of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5600,6 +6001,8 @@ public:
 
   /**
    * Element-wise division of two arrays of numbers.
+   * @param vec The vectorized operand whose entries are combined element-wise
+   * with the current object.
    */
   DEAL_II_ALWAYS_INLINE
   VectorizedArray &
@@ -5612,6 +6015,7 @@ public:
   /**
    * Load @p size() from memory into the calling class, starting at
    * the given address.
+   * @param ptr The address of the first value to load from memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5623,6 +6027,7 @@ public:
   /**
    * Write the content of the calling class into memory in form of @p
    * size() to the given address.
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5633,6 +6038,7 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
+   * @param ptr The address of the first value to write to memory.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5643,6 +6049,9 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::gather()
+   * @param base_ptr The base ptr.
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5654,6 +6063,9 @@ public:
 
   /**
    * @copydoc VectorizedArray<Number>::scatter
+   * @param offsets The per-lane offsets, measured from @p base_ptr, used in
+   * the gather or scatter operation.
+   * @param base_ptr The base ptr.
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -5757,6 +6169,8 @@ private:
  * Relational operator == for VectorizedArray
  *
  * @relatesalso VectorizedArray
+ * @param lhs The lhs used by this operation.
+ * @param rhs The right-hand-side operand.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE bool
@@ -5775,6 +6189,8 @@ operator==(const VectorizedArray<Number, width> &lhs,
  * Addition of two vectorized arrays with operator +.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5789,6 +6205,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * Subtraction of two vectorized arrays with operator -.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5803,6 +6221,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * Multiplication of two vectorized arrays with operator *.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5817,6 +6237,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * Division of two vectorized arrays with operator /.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5832,6 +6254,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * size() equal entries) and a vectorized array.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5848,6 +6272,8 @@ operator+(const Number &u, const VectorizedArray<Number, width> &v)
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -5862,6 +6288,8 @@ operator+(const double u, const VectorizedArray<float, width> &v)
  * with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5877,6 +6305,8 @@ operator+(const VectorizedArray<Number, width> &v, const Number &u)
  * usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -5890,6 +6320,8 @@ operator+(const VectorizedArray<float, width> &v, const double u)
  * array with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5906,6 +6338,8 @@ operator-(const Number &u, const VectorizedArray<Number, width> &v)
  * are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -5920,6 +6354,8 @@ operator-(const double u, const VectorizedArray<float, width> &v)
  * size() equal entries) from a vectorized array.
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5936,6 +6372,8 @@ operator-(const VectorizedArray<Number, width> &v, const Number &u)
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -5950,6 +6388,8 @@ operator-(const VectorizedArray<float, width> &v, const double u)
  * size() equal entries) and a vectorized array.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5966,6 +6406,8 @@ operator*(const Number &u, const VectorizedArray<Number, width> &v)
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -5980,6 +6422,8 @@ operator*(const double u, const VectorizedArray<float, width> &v)
  * array with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -5995,6 +6439,8 @@ operator*(const VectorizedArray<Number, width> &v, const Number &u)
  * are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -6008,6 +6454,8 @@ operator*(const VectorizedArray<float, width> &v, const double u)
  * size() equal entries) and a vectorized array.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -6024,6 +6472,8 @@ operator/(const Number &u, const VectorizedArray<Number, width> &v)
  * that are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
+ * @param v The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -6038,6 +6488,8 @@ operator/(const double u, const VectorizedArray<float, width> &v)
  * array with @p size() equal entries).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -6054,6 +6506,8 @@ operator/(const VectorizedArray<Number, width> &v, const Number &u)
  * are usually double numbers).
  *
  * @relatesalso VectorizedArray
+ * @param v The operand supplied to this operation.
+ * @param u The operand supplied to this operation.
  */
 template <std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
@@ -6067,6 +6521,7 @@ operator/(const VectorizedArray<float, width> &v, const double u)
  * Unary operator + on a vectorized array.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -6079,6 +6534,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * Unary operator - on a vectorized array.
  *
  * @relatesalso VectorizedArray
+ * @param u The operand supplied to this operation.
  */
 template <typename Number, std::size_t width>
 inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
@@ -6195,6 +6651,10 @@ enum class SIMDComparison : int
  * provides overloads for all VectorizedArray<Number> variants as well as
  * generic POD types such as double and float.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
+ * @param true_value The true value.
+ * @param false_value The false value.
  * @note For this function to work the binary operation has to be encoded
  * via a SIMDComparison template argument @p predicate. Depending on it
  * appropriate low-level machine instructions are generated replacing the
@@ -6240,6 +6700,10 @@ compare_and_apply_mask(const Number &left,
 /**
  * Specialization of above function for the non-vectorized
  * VectorizedArray<Number, 1> variant.
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
+ * @param true_value The true value.
+ * @param false_value The false value.
  */
 template <SIMDComparison predicate, typename Number>
 DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, 1>

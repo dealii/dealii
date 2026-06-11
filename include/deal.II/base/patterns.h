@@ -88,6 +88,7 @@ namespace Patterns
 
     /**
      * Return <tt>true</tt> if the given string matches the pattern.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const = 0;
@@ -119,6 +120,7 @@ namespace Patterns
 
     /**
      * Return a string describing the pattern.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const = 0;
@@ -156,6 +158,7 @@ namespace Patterns
 
   /**
    * Return pointer to the correct derived class based on description.
+   * @param description The text used to document the parameter or object.
    */
   std::unique_ptr<PatternBase>
   pattern_factory(const std::string &description);
@@ -166,6 +169,8 @@ namespace Patterns
      * Escape the string @p input for the specified @p style so that characters
      * will appear as intended. For example, characters like _ can not be
      * written as is in LateX and have to be escaped as \_.
+     * @param input The input data or stream from which values are read.
+     * @param style The style in which parameter information is formatted.
      */
     std::string
     escape(const std::string &input, const PatternBase::OutputStyle style);
@@ -216,6 +221,8 @@ namespace Patterns
      * is inclusive of both bounds values, i.e., the @p upper_bound is
      * an allowed value, rather than indicating a half-open value as
      * is often done in other contexts.
+     * @param lower_bound The lower bound.
+     * @param upper_bound The upper bound.
      */
     Integer(const int lower_bound = min_int_value,
             const int upper_bound = max_int_value);
@@ -223,6 +230,7 @@ namespace Patterns
     /**
      * Return <tt>true</tt> if the string is an integer and its value is
      * within the specified range.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -231,6 +239,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. If bounds were specified to the constructor, then include them
      * into this description.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -247,6 +256,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Integer>
     create(const std::string &description);
@@ -312,6 +322,8 @@ namespace Patterns
      * lower bound, then the entire set of double precision numbers is
      * implied. The default values are chosen such that no bounds are
      * enforced on parameters.
+     * @param lower_bound The lower bound.
+     * @param upper_bound The upper bound.
      */
     Double(const double lower_bound = min_double_value,
            const double upper_bound = max_double_value);
@@ -319,6 +331,7 @@ namespace Patterns
     /**
      * Return <tt>true</tt> if the string is a number and its value is within
      * the specified range.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -327,6 +340,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. If bounds were specified to the constructor, then include them
      * into this description.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -345,6 +359,7 @@ namespace Patterns
      * description() on an existing object), or @p nullptr otherwise. Ownership
      * of the returned object is transferred to the caller of this function,
      * which should be freed using @p delete.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Double>
     create(const std::string &description);
@@ -387,12 +402,14 @@ namespace Patterns
     /**
      * Constructor. Take the given parameter as the specification of valid
      * strings.
+     * @param seq The seq used by this operation.
      */
     Selection(const std::string &seq);
 
     /**
      * Return <tt>true</tt> if the string is an element of the description
      * list passed to the constructor.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -401,6 +418,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the list of valid strings passed to the
      * constructor.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -424,6 +442,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Selection>
     create(const std::string &description);
@@ -466,6 +485,10 @@ namespace Patterns
      * The three other arguments can be used to denote minimal and maximal
      * allowable lengths of the list, and the string that is used as a
      * separator between elements of the list.
+     * @param base_pattern The base pattern.
+     * @param min_elements The min elements.
+     * @param max_elements The max elements.
+     * @param separator The separator used by this operation.
      */
     List(const PatternBase &base_pattern,
          const unsigned int min_elements = 0,
@@ -487,12 +510,14 @@ namespace Patterns
 
     /**
      * Copy constructor.
+     * @param other The object to copy or move from.
      */
     List(const List &other);
 
     /**
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -500,6 +525,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -516,6 +542,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<List>
     create(const std::string &description);
@@ -600,6 +627,12 @@ namespace Patterns
      * The four other arguments can be used to denote minimal and maximal
      * allowable lengths of the list as well as the separators used to delimit
      * pairs of the map and the symbol used to separate keys and values.
+     * @param key_pattern The key pattern.
+     * @param value_pattern The value pattern.
+     * @param min_elements The min elements.
+     * @param max_elements The max elements.
+     * @param separator The separator used by this operation.
+     * @param key_value_separator The key value separator.
      */
     Map(const PatternBase &key_pattern,
         const PatternBase &value_pattern,
@@ -610,12 +643,14 @@ namespace Patterns
 
     /**
      * Copy constructor.
+     * @param other The object to copy or move from.
      */
     Map(const Map &other);
 
     /**
      * Return <tt>true</tt> if the string is a comma-separated list of strings
      * each of which match the pattern given to the constructor.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -623,6 +658,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -639,6 +675,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Map>
     create(const std::string &description);
@@ -788,6 +825,8 @@ namespace Patterns
      * Constructor. Same as above, specialized for const char *. This is
      * necessary to avoid compilers errors due to the variadic constructors
      * provided below.
+     * @param patterns The patterns used by this operation.
+     * @param separator The separator used by this operation.
      */
     Tuple(const std::vector<std::unique_ptr<PatternBase>> &patterns,
           const char                                      *separator);
@@ -809,6 +848,8 @@ namespace Patterns
      *
      * Since we support a pure variadic templates version, without this
      * specialization, the compiler will fail with cryptic errors.
+     * @param separator The separator used by this operation.
+     * @param patterns The patterns used by this operation.
      */
     template <class... PatternTypes>
     Tuple(const char *separator, const PatternTypes &...patterns);
@@ -823,12 +864,14 @@ namespace Patterns
 
     /**
      * Copy constructor.
+     * @param other The object to copy or move from.
      */
     Tuple(const Tuple &other);
 
     /**
      * Return <tt>true</tt> if the string is a list of strings
      * each of which matches the patterns given to the constructor.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -836,6 +879,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -852,6 +896,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Tuple>
     create(const std::string &description);
@@ -865,6 +910,7 @@ namespace Patterns
 
     /**
      * Return a reference to the i-th pattern in the tuple.
+     * @param i The index of the entry.
      */
     const PatternBase &
     get_pattern(const unsigned int i) const;
@@ -908,12 +954,14 @@ namespace Patterns
   public:
     /**
      * Constructor. @p seq is a list of valid options separated by "|".
+     * @param seq The seq used by this operation.
      */
     MultipleSelection(const std::string &seq);
 
     /**
      * Return <tt>true</tt> if the string is an element of the description
      * list passed to the constructor.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -922,6 +970,7 @@ namespace Patterns
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the list of valid strings passed to the
      * constructor.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -938,6 +987,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<MultipleSelection>
     create(const std::string &description);
@@ -991,6 +1041,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -1007,6 +1058,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Bool>
     create(const std::string &description);
@@ -1033,6 +1085,7 @@ namespace Patterns
     /**
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -1040,6 +1093,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Anything]"</tt>.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -1056,6 +1110,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<Anything>
     create(const std::string &description);
@@ -1104,12 +1159,14 @@ namespace Patterns
     /**
      * Constructor.  The type of the file can be specified by choosing the
      * flag.
+     * @param type The type used by this operation.
      */
     FileName(const FileType type = input);
 
     /**
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -1117,6 +1174,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -1138,6 +1196,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<FileName>
     create(const std::string &description);
@@ -1173,6 +1232,7 @@ namespace Patterns
     /**
      * Return <tt>true</tt> if the string matches its constraints, i.e.
      * always.
+     * @param test_string The test string.
      */
     virtual bool
     match(const std::string &test_string) const override;
@@ -1180,6 +1240,7 @@ namespace Patterns
     /**
      * Return a description of the pattern that valid strings are expected to
      * match. Here, this is the string <tt>"[Filename]"</tt>.
+     * @param style The style in which parameter information is formatted.
      */
     virtual std::string
     description(const OutputStyle style = Machine) const override;
@@ -1196,6 +1257,7 @@ namespace Patterns
      * Create a new object if the start of description matches
      * description_init.  Ownership of that object is transferred to the
      * caller of this function.
+     * @param description The text used to document the parameter or object.
      */
     static std::unique_ptr<DirectoryName>
     create(const std::string &description);
@@ -1321,6 +1383,8 @@ namespace Patterns
        * deleted, it is implemented and available in the specializations of the
        * Convert
        * class template for particular kinds of template arguments @p T.
+       * @param s The value on which this function operates.
+       * @param p The point at which to evaluate the function.
        */
       static std::string
       to_string(const T                     &s,
@@ -1335,6 +1399,8 @@ namespace Patterns
        * deleted, it is implemented and available in the specializations of the
        * Convert
        * class template for particular kinds of template arguments @p T.
+       * @param s The value on which this function operates.
+       * @param p The point at which to evaluate the function.
        */
       static T
       to_value(const std::string           &s,
@@ -1359,6 +1425,7 @@ namespace Patterns
      * See the documentation of the class Patterns::Tools::Convert, and of the
      * helper class Patterns::Tools::RankInfo for details on the way separators
      * are selected when outputting STL container types.
+     * @param t The time associated with the evaluation.
      */
     template <typename T>
     std::string
@@ -1388,6 +1455,8 @@ namespace Patterns
      * Notice that the current content of variable @p t is ignored. Its type is
      * used to infer how to interpret the string. If the string is successfully
      * parsed, then @p t will be set to the parsed content of @p s.
+     * @param s The value on which this function operates.
+     * @param t The time associated with the evaluation.
      */
     template <typename T>
     void
@@ -1406,76 +1475,70 @@ namespace Patterns
                    std::string,
                    << "The string \"" << arg1
                    << "\" does not match the pattern \"" << arg2 << "\"");
-    /** @} */
-  } // namespace Tools
-} // namespace Patterns
-
-
-// ---------------------- inline and template functions --------------------
-namespace Patterns
-{
-  template <class... PatternTypes>
-  Tuple::Tuple(const char *separator, const PatternTypes &...ps)
-    : // forward to the version with std::string argument
-    Tuple(std::string(separator), ps...)
-  {}
-
-
-
-  template <class... PatternTypes>
-  Tuple::Tuple(const std::string &separator, const PatternTypes &...ps)
-    : separator(separator)
-  {
-    static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
-                  "Not all of the input arguments of this function "
-                  "are derived from PatternBase");
-    static_assert(sizeof...(ps) > 0,
-                  "The number of PatternTypes must be greater than zero!");
-    const auto pattern_pointers = {(static_cast<const PatternBase *>(&ps))...};
-    for (const auto p : pattern_pointers)
-      patterns.push_back(p->clone());
-  }
-
-
-
-  template <class... PatternTypes>
-  Tuple::Tuple(const PatternTypes &...ps)
-    : // forward to the version with the separator argument
-    Tuple(":", ps...)
-  {}
-
-
-
-  namespace Tools
-  {
-    namespace internal
+    /**
+     *  @} */
+    * // namespace Tools
+      *namespace Patterns ** *
+      -- -- -- -- -- -- -- -- -- -- -inline
+                                      and template functions-- -- -- -- -- -- -- -- -- --*space
+                                        Patterns **
+                                          mplate<class... PatternTypes> *
+                                          ple::Tuple(
+                                            const char *separator,
+                                            const PatternTypes &...ps) *
+      : // forward to the version with std::string argument
+        *Tuple(std::string(separator), ps...) *
+        ****mplate<class... PatternTypes> *ple::Tuple(
+          const std::string &separator,
+          const PatternTypes &...ps) *
+      : separator(separator) *
+        *static_assert(is_base_of_all<PatternBase, PatternTypes...>::value,
+                       *"Not all of the input arguments of this function " *
+                         "are derived from PatternBase");
+    *static_assert(sizeof...(ps) > 0,
+                   *"The number of PatternTypes must be greater than zero!");
+    *const auto pattern_pointers = {(static_cast<const PatternBase *>(&ps))...};
+    *for (const auto p : pattern_pointers) * patterns.push_back(p->clone());
+    *****mplate<class... PatternTypes> *
+        ple::Tuple(const PatternTypes &...ps) *
+      : // forward to the version with the separator argument
+        *Tuple(":", ps...) *
+        ****mespace Tools **namespace internal *
     {
-      /**
-       * Store information about the rank types of the given class.
-       *
-       * A class has Rank equal to the number of different separators
-       * that are required to uniquely identify its element(s) in a string.
-       *
-       * This class is used to detect whether the class T is compatible
-       * with a Patterns::List pattern or with a Patterns::Map pattern.
-       *
-       * Objects like Point() or std::complex<double> are vector-likes, and
-       * have vector_rank 1. Elementary types, like `int`, `unsigned int`,
-       * `double`, etc. have vector_rank 0. `std::vector`, `std::list` and in
-       * general containers have rank equal to 1 + vector_rank of the contained
-       * type. Similarly for map types.
-       *
-       * A class with list_rank::value = 0 is either elementary or a
-       * map. A class with map_rank::value = 0 is either a List compatible
-       * class, or an elementary type.
-       *
-       * Elementary types are not compatible with Patterns::List, but non
-       * elementary types, like Point(), or std::complex<double>, are compatible
-       * with the List type. Adding more compatible types is a matter of adding
-       * a specialization of this struct for the given type.
-       */
-      template <class T, class Enable = void>
-      struct RankInfo
+      * /**
+         *    * Store information about the rank types of the given class.
+         *    *
+         *    * A class has Rank equal to the number of different separators
+         *    * that are required to uniquely identify its element(s) in a
+         * string.
+         *    *
+         *    * This class is used to detect whether the class T is compatible
+         *    * with a Patterns::List pattern or with a Patterns::Map pattern.
+         *    *
+         *    * Objects like Point() or std::complex<double> are vector-likes,
+         * and
+         *    * have vector_rank 1. Elementary types, like `int`, `unsigned
+         * int`,
+         *    * `double`, etc. have vector_rank 0. `std::vector`, `std::list`
+         * and in
+         *    * general containers have rank equal to 1 + vector_rank of the
+         * contained
+         *    * type. Similarly for map types.
+         *    *
+         *    * A class with list_rank::value = 0 is either elementary or a
+         *    * map. A class with map_rank::value = 0 is either a List
+         * compatible
+         *    * class, or an elementary type.
+         *    *
+         *    * Elementary types are not compatible with Patterns::List, but non
+         *    * elementary types, like Point(), or std::complex<double>, are
+         * compatible
+         *    * with the List type. Adding more compatible types is a matter of
+         * adding
+         *    * a specialization of this struct for the given type.
+         */
+        template <class T, class Enable = void>
+        struct RankInfo
       {
         static constexpr int list_rank = 0;
         static constexpr int map_rank  = 0;
@@ -2207,6 +2270,8 @@ namespace Patterns
 
       /**
        * Convert a string to a value, using the given pattern, or a default one.
+       * @param s The value on which this function operates.
+       * @param pattern The pattern that valid parameter values must satisfy.
        */
       static T
       to_value(const std::string           &s,

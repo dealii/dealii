@@ -261,6 +261,8 @@ namespace Utilities
          *   providing a corresponding object to this function,
          *   use the other run() function in this class that takes function
          *   objects as arguments.
+         * @param process The process used by this operation.
+         * @param comm The MPI communicator.
          */
         DEAL_II_DEPRECATED
         std::vector<unsigned int>
@@ -338,6 +340,11 @@ namespace Utilities
 
         /**
          * @copydoc Interface::run()
+         * @param targets The targets used by this operation.
+         * @param create_request The create request.
+         * @param answer_request The answer request.
+         * @param process_answer The process answer.
+         * @param comm The MPI communicator.
          */
         virtual std::vector<unsigned int>
         run(
@@ -592,6 +599,11 @@ namespace Utilities
 
         /**
          * @copydoc Interface::run()
+         * @param targets The targets used by this operation.
+         * @param create_request The create request.
+         * @param answer_request The answer request.
+         * @param process_answer The process answer.
+         * @param comm The MPI communicator.
          */
         virtual std::vector<unsigned int>
         run(
@@ -811,6 +823,11 @@ namespace Utilities
 
         /**
          * @copydoc Interface::run()
+         * @param targets The targets used by this operation.
+         * @param create_request The create request.
+         * @param answer_request The answer request.
+         * @param process_answer The process answer.
+         * @param comm The MPI communicator.
          */
         virtual std::vector<unsigned int>
         run(
@@ -944,6 +961,11 @@ namespace Utilities
         /**
          * @copydoc Interface::run()
          *
+         * @param targets The targets used by this operation.
+         * @param create_request The create request.
+         * @param answer_request The answer request.
+         * @param process_answer The process answer.
+         * @param comm The MPI communicator.
          * @note The function call is delegated to another ConsensusAlgorithms::Interface implementation.
          */
         virtual std::vector<unsigned int>
@@ -1303,6 +1325,7 @@ namespace Utilities
         /**
          * Return whether a vector of targets (MPI ranks) has only unique
          * elements.
+         * @param targets The targets used by this operation.
          */
         inline bool
         has_unique_elements(const std::vector<unsigned int> &targets)
@@ -1318,6 +1341,8 @@ namespace Utilities
 
         /**
          * Handle exceptions inside the ConsensusAlgorithm::run() functions.
+         * @param exception The exception used by this operation.
+         * @param comm The MPI communicator.
          */
         inline void
         handle_exception(std::exception_ptr &&exception, const MPI_Comm comm)

@@ -91,6 +91,7 @@ public:
   /**
    * Constructor. Creates all basis functions for RT_bubbles polynomials of
    * given degree using the lexicographic order from FE_RaviartThomas.
+   * @param k The index of the entry.
    */
   PolynomialsRT_Bubbles(const unsigned int k);
 
@@ -100,6 +101,12 @@ public:
    *
    * The size of the vectors must either be zero or equal <tt>n()</tt>.  In
    * the first case, the function will not compute these values.
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   void
   evaluate(const Point<dim>            &unit_point,
@@ -119,6 +126,7 @@ public:
    * Return the number of polynomials in the space <tt>RT_Bubbles(degree)</tt>
    * without requiring to build an object of PolynomialsRT-Bubbles. This is
    * required by the FiniteElement classes.
+   * @param degree The polynomial degree.
    */
   static unsigned int
   n_polynomials(const unsigned int degree);

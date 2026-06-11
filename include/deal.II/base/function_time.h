@@ -71,6 +71,7 @@ public:
   /**
    * Constructor. May take an initial value for the time variable, which
    * defaults to zero.
+   * @param initial_time The initial time.
    */
   FunctionTime(const Number initial_time = Number(0.0));
 
@@ -87,12 +88,14 @@ public:
 
   /**
    * Set the time to <tt>new_time</tt>, overwriting the old value.
+   * @param new_time The new time.
    */
   virtual void
   set_time(const Number new_time);
 
   /**
    * Advance the time by the given time step <tt>delta_t</tt>.
+   * @param delta_t The delta t.
    */
   virtual void
   advance_time(const Number delta_t);

@@ -37,6 +37,9 @@ namespace Functions
   public:
     /**
      * Constructor. @p wave_number must be nonnegative.
+     * @param order The order used by this operation.
+     * @param wave_number The wave number.
+     * @param center The point associated with this operation.
      */
     Bessel1(const unsigned int order,
             const double       wave_number,

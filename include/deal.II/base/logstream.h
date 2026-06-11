@@ -101,12 +101,15 @@ public:
     /**
      * Set a new prefix for @p deallog, which will be removed when the
      * variable is destroyed.
+     * @param text The text used by this operation.
      */
     Prefix(const std::string &text);
 
     /**
      * Set a new prefix for the given stream, which will be removed when the
      * variable is destroyed.
+     * @param text The text used by this operation.
+     * @param stream The stream used by this operation.
      */
     Prefix(const std::string &text, LogStream &stream);
 
@@ -203,6 +206,7 @@ public:
    * the end of the code block, at the nearest @p return statement, or
    * because an intermediate function call results in an exception that
    * is not immediately caught.
+   * @param text The text used by this operation.
    */
   void
   push(const std::string &text);
@@ -224,6 +228,7 @@ public:
    * example usage of this method.
    *
    * The previous value of this parameter is returned.
+   * @param n The n used by this operation.
    */
   unsigned int
   depth_console(const unsigned int n);
@@ -236,6 +241,7 @@ public:
    * file.
    *
    * The previous value of this parameter is returned.
+   * @param n The n used by this operation.
    */
   unsigned int
   depth_file(const unsigned int n);
@@ -243,6 +249,7 @@ public:
 
   /**
    * Log the thread id.
+   * @param flag Whether to flag.
    */
   bool
   log_thread_id(const bool flag);
@@ -252,6 +259,7 @@ public:
    * Set the precision for the underlying stream and returns the previous
    * stream precision. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/precision/
+   * @param prec The prec used by this operation.
    */
   std::streamsize
   precision(const std::streamsize prec);
@@ -261,6 +269,7 @@ public:
    * Set the width for the underlying stream and returns the previous stream
    * width. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/width/
+   * @param wide The wide used by this operation.
    */
   std::streamsize
   width(const std::streamsize wide);
@@ -270,6 +279,7 @@ public:
    * set the flags for the underlying stream and returns the previous stream
    * flags. This function mimics
    * http://www.cplusplus.com/reference/ios/ios_base/flags/
+   * @param f The function object.
    */
   std::ios::fmtflags
   flags(const std::ios::fmtflags f);

@@ -122,6 +122,7 @@ namespace Threads
     /**
      * Move constructor. The constructor moves all internal data structures
      * from the argument.
+     * @param t The time associated with the evaluation.
      */
     ThreadLocalStorage(ThreadLocalStorage &&t) noexcept;
 
@@ -129,6 +130,7 @@ namespace Threads
      * A kind of copy constructor. Initializes an internal exemplar by the
      * given object. The exemplar is in turn used to initialize each thread
      * local object instead of invoking the default constructor.
+     * @param t The time associated with the evaluation.
      */
     explicit ThreadLocalStorage(const T &t);
 
@@ -136,17 +138,20 @@ namespace Threads
      * A kind of move constructor. Moves the given object into an internal
      * exemplar. The exemplar is in turn used to initialize each thread
      * local object instead of invoking the default constructor.
+     * @param t The time associated with the evaluation.
      */
     explicit ThreadLocalStorage(T &&t);
 
     /**
      * Copy assignment operator.
+     * @param t The time associated with the evaluation.
      */
     ThreadLocalStorage &
     operator=(const ThreadLocalStorage &t);
 
     /**
      * Move assignment operator.
+     * @param t The time associated with the evaluation.
      */
     ThreadLocalStorage &
     operator=(ThreadLocalStorage &&t) noexcept;
@@ -170,6 +175,7 @@ namespace Threads
     /**
      * Same as above, except that @p exists is set to true if an element was
      * already present for the current thread; false otherwise.
+     * @param exists Whether to exists.
      */
     T &
     get(bool &exists);
@@ -187,6 +193,7 @@ namespace Threads
      * about the object owned by a different thread, that other thread might
      * concurrently be accessing it and that might cause race conditions.
      * To avoid these, the function here returns a copy.
+     * @param id The id used by this operation.
      */
     std::optional<T>
     get_for_thread(const std::thread::id &id) const;

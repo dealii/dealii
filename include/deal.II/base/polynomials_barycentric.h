@@ -102,12 +102,15 @@ public:
 
   /**
    * Constructor for a monomial.
+   * @param powers The powers used by this operation.
+   * @param coefficient The coefficient used by this operation.
    */
   BarycentricPolynomial(const TableIndices<dim + 1> &powers,
                         const Number                 coefficient);
 
   /**
    * Return the specified monomial.
+   * @param d The value on which this function operates.
    */
   static BarycentricPolynomial<dim, Number>
   monomial(const unsigned int d);
@@ -117,6 +120,7 @@ public:
    * For example, the first P6 basis function is printed as
    * <code>-1 * t0^1 + 2 * t0^2</code>, where <code>t0</code> is the first
    * barycentric variable, <code>t1</code> is the second, etc.
+   * @param out The output stream to which data is written.
    */
   void
   print(std::ostream &out) const;
@@ -135,6 +139,7 @@ public:
 
   /**
    * Add a scalar.
+   * @param a The operand supplied to this operation.
    */
   template <typename Number2>
   BarycentricPolynomial<dim, Number>
@@ -142,6 +147,7 @@ public:
 
   /**
    * Subtract a scalar.
+   * @param a The operand supplied to this operation.
    */
   template <typename Number2>
   BarycentricPolynomial<dim, Number>
@@ -149,6 +155,7 @@ public:
 
   /**
    * Multiply by a scalar.
+   * @param a The operand supplied to this operation.
    */
   template <typename Number2>
   BarycentricPolynomial<dim, Number>
@@ -156,6 +163,7 @@ public:
 
   /**
    * Divide by a scalar.
+   * @param a The operand supplied to this operation.
    */
   template <typename Number2>
   BarycentricPolynomial<dim, Number>
@@ -163,36 +171,42 @@ public:
 
   /**
    * Add another barycentric polynomial.
+   * @param augend The augend used by this operation.
    */
   BarycentricPolynomial<dim, Number>
   operator+(const BarycentricPolynomial<dim, Number> &augend) const;
 
   /**
    * Subtract another barycentric polynomial.
+   * @param augend The augend used by this operation.
    */
   BarycentricPolynomial<dim, Number>
   operator-(const BarycentricPolynomial<dim, Number> &augend) const;
 
   /**
    * Multiply by another barycentric polynomial.
+   * @param multiplicand The multiplicand used by this operation.
    */
   BarycentricPolynomial<dim, Number>
   operator*(const BarycentricPolynomial<dim, Number> &multiplicand) const;
 
   /**
    * Differentiate in barycentric coordinates.
+   * @param coordinate The coordinate used by this operation.
    */
   BarycentricPolynomial<dim, Number>
   barycentric_derivative(const unsigned int coordinate) const;
 
   /**
    * Differentiate in Cartesian coordinates.
+   * @param coordinate The coordinate used by this operation.
    */
   BarycentricPolynomial<dim, Number>
   derivative(const unsigned int coordinate) const;
 
   /**
    * Evaluate the polynomial.
+   * @param point The point at which to evaluate the function.
    */
   Number
   value(const Point<dim> &point) const;
@@ -261,12 +275,14 @@ public:
 
   /**
    * Get the standard Lagrange basis for a specified degree.
+   * @param degree The polynomial degree.
    */
   static BarycentricPolynomials<dim>
   get_fe_p_basis(const unsigned int degree);
 
   /**
    * Constructor taking the polynomial @p degree as input.
+   * @param polynomials The polynomials used by this operation.
    */
   BarycentricPolynomials(
     const std::vector<BarycentricPolynomial<dim>> &polynomials);
@@ -281,12 +297,19 @@ public:
 
   /**
    * Access operator.
+   * @param i The index of the entry.
    */
   const BarycentricPolynomial<dim> &
   operator[](const std::size_t i) const;
 
   /**
    * @copydoc ScalarPolynomialsBase::evaluate()
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   void
   evaluate(const Point<dim>            &unit_point,
@@ -298,12 +321,16 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_value()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
@@ -311,6 +338,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
@@ -318,6 +347,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
@@ -325,6 +356,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
@@ -332,12 +365,16 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad_grad()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -372,6 +409,8 @@ protected:
 
 /**
  * Multiply a BarycentricPolynomial by a constant.
+ * @param a The operand supplied to this operation.
+ * @param bp The bp used by this operation.
  */
 template <int dim, typename Number1, typename Number2>
 BarycentricPolynomial<dim, Number1>
@@ -382,6 +421,8 @@ operator*(const Number2 &a, const BarycentricPolynomial<dim, Number1> &bp)
 
 /**
  * Add a constant to a BarycentricPolynomial.
+ * @param a The operand supplied to this operation.
+ * @param bp The bp used by this operation.
  */
 template <int dim, typename Number1, typename Number2>
 BarycentricPolynomial<dim, Number1>
@@ -392,6 +433,8 @@ operator+(const Number2 &a, const BarycentricPolynomial<dim, Number1> &bp)
 
 /**
  * Subtract a BarycentricPolynomial from a constant.
+ * @param a The operand supplied to this operation.
+ * @param bp The bp used by this operation.
  */
 template <int dim, typename Number1, typename Number2>
 BarycentricPolynomial<dim, Number1>

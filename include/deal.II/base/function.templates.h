@@ -775,6 +775,7 @@ VectorFunctionFromScalarFunctionObject<dim, RangeNumberType>::vector_value(
 /**
  * The constructor for <tt>VectorFunctionFromTensorFunction</tt> which
  * initiates the return vector to be size <tt>n_components</tt>.
+ * @param selected_component The selected component.
  */
 template <int dim, typename RangeNumberType>
 VectorFunctionFromTensorFunction<dim, RangeNumberType>::
@@ -848,6 +849,8 @@ VectorFunctionFromTensorFunction<dim, RangeNumberType>::vector_value(
  * using the <tt>vector_value</tt> member function.  Again, this function is
  * written so as to not replicate the function definition but passes each
  * point on to <tt>vector_value</tt> to be evaluated.
+ * @param points The points at which to evaluate the function.
+ * @param value_list The object in which to store the computed values.
  */
 template <int dim, typename RangeNumberType>
 void
@@ -1142,6 +1145,8 @@ VectorFunctionFromTensorFunctionObject<dim, RangeNumberType>::vector_value(
  * using the <tt>vector_value</tt> member function.  Again, this function is
  * written so as to not replicate the function definition but passes each
  * point on to <tt>vector_value</tt> to be evaluated.
+ * @param points The points at which to evaluate the function.
+ * @param value_list The object in which to store the computed values.
  */
 template <int dim, typename RangeNumberType>
 void

@@ -59,6 +59,7 @@ public:
 
   /**
    * Print the list of <tt>tensor_polys</tt> indices to <tt>out</tt>.
+   * @param out The output stream to which data is written.
    */
   void
   output_indices(std::ostream &out) const;
@@ -67,6 +68,7 @@ public:
    * Set the ordering of the polynomials. Requires
    * <tt>renumber.size()==tensor_polys.n()</tt>.  Stores a copy of
    * <tt>renumber</tt>.
+   * @param renumber The renumber used by this operation.
    */
   void
   set_numbering(const std::vector<unsigned int> &renumber);
@@ -94,6 +96,12 @@ public:
    * use this function, rather than using any of the compute_value(),
    * compute_grad() or compute_grad_grad() functions, see below, in a loop
    * over all tensor product polynomials.
+   * @param unit_point The point at which to evaluate the function.
+   * @param values The object in which to store the computed values.
+   * @param grads The object in which to store the computed gradients.
+   * @param grad_grads The object in which to store the computed gradients.
+   * @param third_derivatives The object in which to store the computed third derivatives.
+   * @param fourth_derivatives The object in which to store the computed fourth derivatives.
    */
   void
   evaluate(const Point<dim>            &unit_point,
@@ -114,6 +122,8 @@ public:
    * several times.  Instead use the evaluate() function with
    * <tt>values.size()==</tt>n() to get the point values of all tensor
    * polynomials all at once and in a much more efficient way.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   double
   compute_value(const unsigned int i, const Point<dim> &p) const override;
@@ -130,6 +140,8 @@ public:
    * size of the appropriate parameter set to n() to get the point value of
    * all tensor polynomials all at once and in a much more efficient way.
    *
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    * @tparam order The derivative order.
    */
   template <int order>
@@ -138,6 +150,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<1, dim>
   compute_1st_derivative(const unsigned int i,
@@ -145,6 +159,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
@@ -152,6 +168,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
@@ -159,6 +177,8 @@ public:
 
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   virtual Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
@@ -175,6 +195,8 @@ public:
    * several times.  Instead use the evaluate() function, see above, with
    * <tt>grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<1, dim>
   compute_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -190,6 +212,8 @@ public:
    * several times.  Instead use the evaluate() function, see above, with
    * <tt>grad_grads.size()==</tt>n() to get the point value of all tensor
    * polynomials all at once and in a much more efficient way.
+   * @param i The index of the entry.
+   * @param p The point at which to evaluate the function.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -231,21 +255,21 @@ private:
   std::vector<unsigned int> index_map_inverse;
 };
 
-/** @} */
-
-
+/**
+ *  @} */
+*
 /* ---------------- template and inline functions ---------- */
 
 #ifndef DOXYGEN
 
-template <int dim>
-template <class Pol>
-inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
-  const std::vector<Pol> &pols)
+  template <int dim>
+  template <class Pol>
+  inline TensorProductPolynomialsConst<dim>::TensorProductPolynomialsConst(
+    const std::vector<Pol> &pols)
   : ScalarPolynomialsBase<dim>(1, Utilities::fixed_power<dim>(pols.size()) + 1)
-  , tensor_polys(pols)
-  , index_map(tensor_polys.n() + 1)
-  , index_map_inverse(tensor_polys.n() + 1)
+, tensor_polys(pols)
+, index_map(tensor_polys.n() + 1)
+, index_map_inverse(tensor_polys.n() + 1)
 {}
 
 

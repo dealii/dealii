@@ -62,6 +62,7 @@ public:
 
   /**
    * Copy constructor.
+   * @param exc The exception object that is stored, rethrown, or reported.
    */
   ExceptionBase(const ExceptionBase &exc);
 
@@ -81,6 +82,11 @@ public:
    * Set the file name and line of where the exception appeared as well as the
    * violated condition and the name of the exception as a char pointer. This
    * function also populates the stacktrace.
+   * @param file The file name or path associated with the operation.
+   * @param line The source line number at which the error was detected.
+   * @param function The function object.
+   * @param cond The textual representation of the condition that failed.
+   * @param exc_name The exc name.
    */
   void
   set_fields(const char *file,
@@ -104,6 +110,7 @@ public:
 
   /**
    * Print out the general part of the error information.
+   * @param out The output stream to which data is written.
    */
   void
   print_exc_data(std::ostream &out) const;
@@ -111,6 +118,7 @@ public:
   /**
    * Print more specific information about the exception which occurred.
    * Overload this function in your own exception classes.
+   * @param out The output stream to which data is written.
    */
   virtual void
   print_info(std::ostream &out) const;
@@ -118,6 +126,7 @@ public:
   /**
    * Print a stacktrace, if one has been recorded previously, to the given
    * stream.
+   * @param out The output stream to which data is written.
    */
   void
   print_stack_trace(std::ostream &out) const;
@@ -196,6 +205,7 @@ namespace StandardExceptions
 
   /**
    * Exception denoting a division by zero.
+   * @param ExcDivideByZero The exc divide by zero used by this operation.
    */
   DeclExceptionMsg(ExcDivideByZero,
                    "A piece of code is attempting a division by zero. This is "
@@ -268,6 +278,7 @@ namespace StandardExceptions
 
   /**
    * An error occurred reading or writing a file.
+   * @param ExcIO The exc io used by this operation.
    */
   DeclExceptionMsg(ExcIO,
                    "An input/output error has occurred. There are a number of "
@@ -321,6 +332,7 @@ namespace StandardExceptions
    * implement. It is therefore quite worth the effort to take a look at the
    * corresponding place and see whether it can be implemented without too
    * much effort.
+   * @param ExcNotImplemented The exc not implemented used by this operation.
    */
   DeclExceptionMsg(ExcNotImplemented,
                    "You are trying to use functionality in deal.II that is "
@@ -353,6 +365,7 @@ namespace StandardExceptions
    * sometimes happens that an algorithm does not work in very rare corner
    * cases. These cases will then be trapped sooner or later by the exception,
    * so that the algorithm can then be fixed for these cases as well.
+   * @param ExcInternalError The exc internal error used by this operation.
    */
   DeclExceptionMsg(ExcInternalError,
                    "This exception -- which is used in many places in the "
@@ -439,11 +452,13 @@ namespace StandardExceptions
 
   /**
    * This exception is used if some object is found uninitialized.
+   * @param ExcNotInitialized The exc not initialized used by this operation.
    */
   DeclException0(ExcNotInitialized);
 
   /**
    * The object is in a state not suitable for this operation.
+   * @param ExcInvalidState The exc invalid state used by this operation.
    */
   DeclException0(ExcInvalidState);
 
@@ -476,6 +491,7 @@ namespace StandardExceptions
 
   /**
    * A number is zero, but it should not be here.
+   * @param ExcZero The exc zero used by this operation.
    */
   DeclExceptionMsg(ExcZero,
                    "In a check in the code, deal.II encountered a zero in "
@@ -487,6 +503,7 @@ namespace StandardExceptions
   /**
    * The object should have been filled with something before this member
    * function is called.
+   * @param ExcEmptyObject The exc empty object used by this operation.
    */
   DeclExceptionMsg(ExcEmptyObject,
                    "The object you are trying to access is empty but it makes "
@@ -625,6 +642,8 @@ namespace StandardExceptions
    *
    * Typically, this will be an internal error of deal.II, because the
    * increment and decrement operators should never yield an invalid iterator.
+   * @param ExcInvalidIterator The iterator associated with the range
+   * processed by this operation.
    */
   DeclExceptionMsg(ExcInvalidIterator,
                    "You are trying to use an iterator, but the iterator is "
@@ -635,6 +654,8 @@ namespace StandardExceptions
   /**
    * This exception is thrown if the iterator you incremented or decremented
    * was already at its final state.
+   * @param ExcIteratorPastEnd The iterator associated with the range
+   * processed by this operation.
    */
   DeclExceptionMsg(ExcIteratorPastEnd,
                    "You are trying to use an iterator, but the iterator is "
@@ -659,6 +680,7 @@ namespace StandardExceptions
 
   /**
    * Parallel vectors with ghost elements are read-only vectors.
+   * @param ExcGhostsPresent The exc ghosts present used by this operation.
    */
   DeclExceptionMsg(ExcGhostsPresent,
                    "You are trying an operation on a vector that is only "
@@ -696,6 +718,8 @@ namespace StandardExceptions
    * presumably because the user has not yet called
    * Triangulation::prepare_coarsening_and_refinement() after flagging
    * some cells for refinement and/or coarsening.
+   * @param ExcInconsistentCoarseningFlags The exc inconsistent coarsening
+   * flags used by this operation.
    */
   DeclExceptionMsg(
     ExcInconsistentCoarseningFlags,
@@ -710,6 +734,8 @@ namespace StandardExceptions
    *
    * In many cases, this assignment operator makes sense <b>only</b> for the
    * argument zero. In other cases, this exception is thrown.
+   * @param ExcScalarAssignmentOnlyForZeroValue The exc scalar assignment only
+   * for zero value used by this operation.
    */
   DeclExceptionMsg(ExcScalarAssignmentOnlyForZeroValue,
                    "You are trying an operation of the form 'vector = C', "
@@ -725,6 +751,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the LAPACK library.
+   * @param ExcNeedsLAPACK The exc needs lapack used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsLAPACK,
@@ -740,6 +767,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the HDF5 library.
+   * @param ExcNeedsHDF5 The exc needs hdf5 used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsHDF5,
@@ -755,6 +783,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the MPI library.
+   * @param ExcNeedsMPI The exc needs mpi used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsMPI,
@@ -769,6 +798,8 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the FunctionParser library.
+   * @param ExcNeedsFunctionparser The exc needs functionparser used by this
+   * operation.
    */
   DeclExceptionMsg(
     ExcNeedsFunctionparser,
@@ -787,6 +818,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the Assimp library.
+   * @param ExcNeedsAssimp The exc needs assimp used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsAssimp,
@@ -802,6 +834,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the Exodus II library.
+   * @param ExcNeedsExodusII The exc needs exodus ii used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsExodusII,
@@ -817,6 +850,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the CGAL library.
+   * @param ExcNeedsCGAL The exc needs cgal used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsCGAL,
@@ -832,6 +866,7 @@ namespace StandardExceptions
 
   /**
    * This function requires support for the GMSH API.
+   * @param ExcNeedsGMSHAPI The exc needs gmshapi used by this operation.
    */
   DeclExceptionMsg(
     ExcNeedsGMSHAPI,
@@ -902,6 +937,7 @@ namespace StandardExceptions
 
     /**
      * Print a description of the error to the given stream.
+     * @param out The output stream to which data is written.
      */
     virtual void
     print_info(std::ostream &out) const override;
@@ -916,6 +952,8 @@ namespace StandardExceptions
   /**
    * An exception to be thrown in user call-backs. See the glossary entry
    * on user call-back functions for more information.
+   * @param RecoverableUserCallbackError The recoverable user callback error
+   * used by this operation.
    */
   DeclExceptionMsg(
     RecoverableUserCallbackError,
@@ -928,7 +966,7 @@ namespace StandardExceptions
 
   /** @} */
 
-} /*namespace StandardExceptions*/
+} /* namespace StandardExceptions */
 
 
 
@@ -943,11 +981,11 @@ namespace deal_II_exceptions
   namespace internals
   {
     /**
-     * Setting this variable to false will disable deal.II's exception mechanism
-     * to abort the problem. The Assert() macro will throw the exception instead
-     * and the AssertNothrow() macro will just print the error message. This
-     * variable should not be changed directly. Use disable_abort_on_exception()
-     * instead.
+     * Setting this variable to false will disable deal.II's exception
+     * mechanism to abort the problem. The Assert() macro will throw the
+     * exception instead and the AssertNothrow() macro will just print the
+     * error message. This variable should not be changed directly. Use
+     * disable_abort_on_exception() instead.
      */
     extern bool allow_abort_on_exception;
   } // namespace internals
@@ -968,6 +1006,7 @@ namespace deal_II_exceptions
    * Previously set additional output is replaced by the argument given to
    * this function.
    *
+   * @param p The point at which to evaluate the function.
    * @see Exceptions
    */
   void
@@ -1026,6 +1065,7 @@ namespace deal_II_exceptions
     /**
      * Abort the program by printing the
      * error message provided by @p exc and calling <tt>std::abort()</tt>.
+     * @param exc The exception object that is stored, rethrown, or reported.
      */
     [[noreturn]] void
     abort(const ExceptionBase &exc) noexcept;
@@ -1063,6 +1103,13 @@ namespace deal_II_exceptions
      * -- the performance implications are pretty minimal anyway.
      *
      * @ref ExceptionBase
+     * @param handling The handling used by this operation.
+     * @param file The file name or path associated with the operation.
+     * @param line The source line number at which the error was detected.
+     * @param function The function object.
+     * @param cond The textual representation of the condition that failed.
+     * @param exc_name The exc name.
+     * @param e The exception object that is stored, rethrown, or reported.
      */
     template <typename ExceptionType>
     [[noreturn]] void
@@ -1105,6 +1152,10 @@ namespace deal_II_exceptions
     /**
      * Internal function that performs the error handling when
      * DEAL_II_ASSERT_UNREACHABLE is triggered.
+     * @param file The file name or path associated with the operation.
+     * @param line The source line number at which the error was detected.
+     * @param function The function object.
+     * @param msg The message text that describes the error.
      */
     [[noreturn]] DEAL_II_HOST_DEVICE inline void
     do_unreachable(const char *file,
@@ -1140,8 +1191,8 @@ namespace deal_II_exceptions
                            ::dealii::StandardExceptions::ExcMessage(msg));
 #endif
       // This workaround is necessary, otherwise nvcc will complain that we
-      // might return from this function, even though we will never get here (we
-      // will throw or abort above).
+      // might return from this function, even though we will never get here
+      // (we will throw or abort above).
       while (true)
         {
         }
@@ -1152,6 +1203,9 @@ namespace deal_II_exceptions
     /**
      * Internal function that performs the error handling when
      * DEAL_II_NOT_IMPLEMENTED is triggered.
+     * @param file The file name or path associated with the operation.
+     * @param line The source line number at which the error was detected.
+     * @param function The function object.
      */
     [[noreturn]] DEAL_II_HOST_DEVICE inline void
     do_not_implemented(const char *file, int line, const char *function)
@@ -1185,8 +1239,8 @@ namespace deal_II_exceptions
                            ::dealii::StandardExceptions::ExcNotImplemented());
 #endif
       // This workaround is necessary, otherwise nvcc will complain that we
-      // might return from this function, even though we will never get here (we
-      // will throw or abort above).
+      // might return from this function, even though we will never get here
+      // (we will throw or abort above).
       while (true)
         {
         }
@@ -1196,6 +1250,7 @@ namespace deal_II_exceptions
 
     /**
      * Internal function that does the work of issue_error_nothrow.
+     * @param e The exception object that is stored, rethrown, or reported.
      */
     void
     do_issue_error_nothrow(const ExceptionBase &e) noexcept;
@@ -1205,6 +1260,12 @@ namespace deal_II_exceptions
      *
      * @ref ExceptionBase
      *
+     * @param file The file name or path associated with the operation.
+     * @param line The source line number at which the error was detected.
+     * @param function The function object.
+     * @param cond The textual representation of the condition that failed.
+     * @param exc_name The exc name.
+     * @param e The exception object that is stored, rethrown, or reported.
      * @note This function is defined with a template for the same reasons as
      * issue_error_noreturn().
      */
@@ -1248,6 +1309,8 @@ namespace deal_II_exceptions
      * a device that has a separate memory space. The copy this implies
      * is generally not problematic because we apply this function to
      * scalar values with integer types.
+     * @param t The time associated with the evaluation.
+     * @param u The value on which this function operates.
      */
     template <typename T, typename U>
     inline DEAL_II_HOST_DEVICE constexpr bool
@@ -1259,8 +1322,8 @@ namespace deal_II_exceptions
 
 
     /**
-     * A function that compares two values with `operator<`, after converting to
-     * a common type to avoid compiler warnings when comparing objects of
+     * A function that compares two values with `operator<`, after converting
+     * to a common type to avoid compiler warnings when comparing objects of
      * different types (e.g., unsigned and signed variables).
      *
      * This function takes its arguments by value, rather than reference,
@@ -1271,6 +1334,8 @@ namespace deal_II_exceptions
      * a device that has a separate memory space. The copy this implies
      * is generally not problematic because we apply this function to
      * scalar values with integer types.
+     * @param t The time associated with the evaluation.
+     * @param u The value on which this function operates.
      */
     template <typename T, typename U>
     inline DEAL_II_HOST_DEVICE constexpr bool

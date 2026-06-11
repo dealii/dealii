@@ -125,6 +125,9 @@ public:
    * Sets DifferenceFormula <tt>formula</tt> to the default <tt>Euler</tt>
    * formula of the set_formula() function. Change this preset formula by
    * calling the set_formula() function.
+   * @param h The h used by this operation.
+   * @param n_components The number of components.
+   * @param initial_time The initial time.
    */
   AutoDerivativeFunction(const double       h,
                          const unsigned int n_components = 1,
@@ -138,6 +141,7 @@ public:
   /**
    * Choose the difference formula. See the enum #DifferenceFormula for
    * available choices.
+   * @param formula The formula used by this operation.
    */
   void
   set_formula(const DifferenceFormula formula = Euler);
@@ -149,6 +153,7 @@ public:
    * local variation of the function. Setting <tt>h=1e-6</tt> might be a good
    * choice for functions with an absolute value of about 1, that furthermore
    * does not vary to much.
+   * @param h The h used by this operation.
    */
   void
   set_h(const double h);
@@ -159,6 +164,8 @@ public:
    *
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
+   * @param p The point at which to evaluate the function.
+   * @param component The component to evaluate.
    */
   virtual Tensor<1, dim>
   gradient(const Point<dim>  &p,
@@ -169,6 +176,8 @@ public:
    *
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
+   * @param p The point at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradient(const Point<dim>            &p,
@@ -182,6 +191,9 @@ public:
    *
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
+   * @param component The component to evaluate.
    */
   virtual void
   gradient_list(const std::vector<Point<dim>> &points,
@@ -199,6 +211,8 @@ public:
    *
    * Compute numerical difference quotients using the preset
    * #DifferenceFormula.
+   * @param points The points at which to evaluate the function.
+   * @param gradients The object in which to store the computed gradients.
    */
   virtual void
   vector_gradient_list(
@@ -207,6 +221,7 @@ public:
 
   /**
    * Return a #DifferenceFormula of the order <tt>ord</tt> at minimum.
+   * @param ord The ord used by this operation.
    */
   static DifferenceFormula
   get_formula_of_order(const unsigned int ord);

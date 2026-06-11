@@ -1009,6 +1009,10 @@ public:
    * function was called. No further processing of the input stream
    * occurs, that is everything that comes after the parameter whose
    * value does not satisfy its pattern is ignored.
+   * @param input The input data or stream from which values are read.
+   * @param filename The file name.
+   * @param last_line The last line.
+   * @param skip_undefined The skip undefined.
    */
   virtual void
   parse_input(std::istream      &input,
@@ -1036,6 +1040,10 @@ public:
    * also set `assert_mandatory_entries_are_found=true`. For example, this
    * ensures that parameters with typos in the input file will not be skipped,
    * while such mistakes would otherwise remain unrecognized.
+   * @param filename The file name.
+   * @param last_line The last line.
+   * @param skip_undefined The skip undefined.
+   * @param assert_mandatory_entries_are_found The assert mandatory entries are found.
    */
   virtual void
   parse_input(const std::string &filename,
@@ -1050,6 +1058,9 @@ public:
    * The function in essence reads the entire file into a stream and
    * then calls the other parse_input() function with that stream. See
    * there for more information.
+   * @param s The value on which this function operates.
+   * @param last_line The last line.
+   * @param skip_undefined The skip undefined.
    */
   virtual void
   parse_input_from_string(const std::string &s,
@@ -1062,6 +1073,8 @@ public:
    * using the XML output style and then modified by hand as necessary, or from
    * a file written using this method and then modified by the graphical
    * parameter GUI (see the general documentation of this class).
+   * @param input The input data or stream from which values are read.
+   * @param skip_undefined The skip undefined.
    */
   virtual void
   parse_input_from_xml(std::istream &input, const bool skip_undefined = false);
@@ -1072,6 +1085,8 @@ public:
    * using the JSON output style and then modified by hand as necessary, or from
    * a separate program that knows how to write JSON format for ParameterHandler
    * input.
+   * @param input The input data or stream from which values are read.
+   * @param skip_undefined The skip undefined.
    */
   virtual void
   parse_input_from_json(std::istream &input, const bool skip_undefined = false);
@@ -1105,6 +1120,12 @@ public:
    * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
    *
+   * @param entry The parameter entry that is declared, queried, or
+   * documented.
+   * @param default_value The default value.
+   * @param pattern The pattern that valid parameter values must satisfy.
+   * @param documentation The text used to document the parameter or object.
+   * @param has_to_be_set The has to be set.
    * @note An entry can be declared more than once without generating an
    * error, for example to override an earlier default value.
    */
@@ -1164,6 +1185,9 @@ public:
    * It is valid to add multiple actions to the same parameter. They will
    * in that case be executed in the same order in which they were added.
    *
+   * @param entry The parameter entry that is declared, queried, or
+   * documented.
+   * @param execute_action The execute action.
    * @note Actions may modify all sorts of variables in their scope. The
    *  only thing an action should not modify is the ParameterHandler object
    *  it is attached to. In other words, it is not allowed to enter or
@@ -1201,6 +1225,12 @@ public:
    * one of the methods provided by this class. Whether a parameter has been set
    * successfully can be queried by the functions get_entries_wrongly_not_set()
    * and assert_that_entries_have_been_set().
+   * @param entry The parameter entry that is declared, queried, or
+   * documented.
+   * @param parameter The parameter used by this operation.
+   * @param documentation The text used to document the parameter or object.
+   * @param pattern The pattern that valid parameter values must satisfy.
+   * @param has_to_be_set The has to be set.
    */
   template <typename ParameterType>
   void
@@ -1261,6 +1291,8 @@ public:
 
   /**
    * Enter a subsection. If it does not yet exist, create it if requested.
+   * @param subsection The subsection used by this operation.
+   * @param create_path_if_needed The create path if needed.
    */
   void
   enter_subsection(const std::string &subsection,
@@ -1276,6 +1308,7 @@ public:
    * Check whether a subsection or a subsection path exists in current tree.
    * The input parameter @p sub_path is assumed to be relative to the
    * currently selected path.
+   * @param sub_path The sub path.
    */
   bool
   subsection_path_exists(const std::vector<std::string> &sub_path) const;
@@ -1296,6 +1329,7 @@ public:
    * Given the name of an entry as argument, the function computes a full path
    * into the parameter tree using the current subsection. The path elements are
    * separated by the path_separator, which is a '.'.
+   * @param name The name under which the parameter is declared.
    */
   std::string
   get_current_full_path(const std::string &name) const;
@@ -1304,6 +1338,8 @@ public:
    * This function computes a full path into the parameter tree given a path
    * from the current subsection and the name of an entry. The path elements are
    * separated by the path_separator, which is a '.'.
+   * @param sub_path The sub path.
+   * @param name The name under which the parameter is declared.
    */
   std::string
   get_current_full_path(const std::vector<std::string> &sub_path,
@@ -1313,6 +1349,7 @@ public:
    * Return value of entry @p entry_string.  If the entry was changed,
    * then the changed value is returned, otherwise the default value. If the
    * value of an undeclared entry is required, an @p Assert will fail.
+   * @param entry_string The entry string.
    */
   std::string
   get(const std::string &entry_string) const;
@@ -1326,6 +1363,8 @@ public:
    * subsection. The first string in @p entry_subsection_path must be the name
    * of a subsection of the current section, and each next string must be the
    * name of a subsection of the one before it.
+   * @param entry_subsection_path The entry subsection path.
+   * @param entry_string The entry string.
    */
   std::string
   get(const std::vector<std::string> &entry_subsection_path,
@@ -1335,6 +1374,7 @@ public:
    * Return value of entry @p entry_string as <code>long int</code>. (A long
    * int is chosen so that even very large unsigned values can be returned by
    * this function).
+   * @param entry_string The entry string.
    */
   long int
   get_integer(const std::string &entry_string) const;
@@ -1346,6 +1386,8 @@ public:
    * If @p entry_subsection_path is non-empty, the value will be gotten
    * from the subsection represented by that path instead of the current
    * subsection.
+   * @param entry_subsection_path The entry subsection path.
+   * @param entry_string The entry string.
    */
   long int
   get_integer(const std::vector<std::string> &entry_subsection_path,
@@ -1353,6 +1395,7 @@ public:
 
   /**
    * Return value of entry @p entry_name as @p double.
+   * @param entry_name The entry name.
    */
   double
   get_double(const std::string &entry_name) const;
@@ -1362,6 +1405,8 @@ public:
    * If @p entry_subsection_path is non-empty, the value will be gotten
    * from the subsection represented by that path instead of the current
    * subsection.
+   * @param entry_subsection_path The entry subsection path.
+   * @param entry_string The entry string.
    */
   double
   get_double(const std::vector<std::string> &entry_subsection_path,
@@ -1370,6 +1415,7 @@ public:
    * Return value of entry @p entry_name as @p bool. The entry may
    * be "true" or "yes" for @p true, "false" or "no" for @p false
    * respectively.
+   * @param entry_name The entry name.
    */
   bool
   get_bool(const std::string &entry_name) const;
@@ -1381,6 +1427,8 @@ public:
    * If @p entry_subsection_path is non-empty, the value will be gotten
    * from the subsection represented by that path instead of the current
    * subsection.
+   * @param entry_subsection_path The entry subsection path.
+   * @param entry_string The entry string.
    */
   bool
   get_bool(const std::vector<std::string> &entry_subsection_path,
@@ -1394,6 +1442,8 @@ public:
    *
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
+   * @param entry_name The entry name.
+   * @param new_value The new value.
    */
   void
   set(const std::string &entry_name, const std::string &new_value);
@@ -1407,6 +1457,8 @@ public:
    *
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
+   * @param entry_name The entry name.
+   * @param new_value The new value.
    */
   void
   set(const std::string &entry_name, const char *new_value);
@@ -1419,6 +1471,8 @@ public:
    *
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
+   * @param entry_name The entry name.
+   * @param new_value The new value.
    */
   void
   set(const std::string &entry_name, const long int new_value);
@@ -1435,6 +1489,8 @@ public:
    *
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
+   * @param entry_name The entry name.
+   * @param new_value The new value.
    */
   void
   set(const std::string &entry_name, const double new_value);
@@ -1447,6 +1503,8 @@ public:
    *
    * The function throws an exception of type ExcValueDoesNotMatchPattern if
    * the new value does not conform to the pattern for this entry.
+   * @param entry_name The entry name.
+   * @param new_value The new value.
    */
   void
   set(const std::string &entry_name, const bool new_value);
@@ -1522,6 +1580,8 @@ public:
    * \printindex[prmindex]
    * \printindex[prmindexfull]
    * @endcode
+   * @param out The output stream to which data is written.
+   * @param style The style in which parameter information is formatted.
    */
   std::ostream &
   print_parameters(std::ostream &out, const OutputStyle style) const;
@@ -1563,6 +1623,8 @@ public:
    * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
    * same order as they have been declared.
    *
+   * @param out The output stream to which data is written.
+   * @param style The style in which parameter information is formatted.
    * @note All style settings in @p style not related to the ordering are
    *   ignored.
    */
@@ -1581,6 +1643,8 @@ public:
    * to <tt>KeepDeclarationOrder</tt>: in this case entries are printed in the
    * same order as they have been declared.
    *
+   * @param out The output stream to which data is written.
+   * @param style The style in which parameter information is formatted.
    * @note All style settings in @p style not related to the ordering are
    *   ignored.
    *
@@ -1633,6 +1697,7 @@ public:
 
   /**
    * Test for equality.
+   * @param prm2 The prm2 used by this operation.
    */
   bool
   operator==(const ParameterHandler &prm2) const;
@@ -1696,6 +1761,8 @@ public:
                  << "> does not match the given pattern <" << arg2 << ">.");
   /**
    * Exception
+   * @param ExcAlreadyAtTopLevel The exc already at top level used by this
+   * operation.
    */
   DeclExceptionMsg(
     ExcAlreadyAtTopLevel,
@@ -1774,6 +1841,8 @@ public:
    * Exception for when an XML file cannot be read at all. This happens when
    * there is no top-level XML element called "ParameterHandler" or when there
    * are multiple top level elements.
+   * @param ExcInvalidXMLParameterFile The exc invalid xmlparameter file used
+   * by this operation.
    */
   DeclExceptionMsg(ExcInvalidXMLParameterFile,
                    "The provided file could not be parsed as a "
@@ -1863,6 +1932,10 @@ private:
    * parsing a parameter file, for example to obtain only the spatial dimension
    * of the problem. By default all entries and subsections are expected to be
    * declared.
+   * @param line The local line index to which the query refers.
+   * @param input_filename The input filename.
+   * @param current_line_n The current line n.
+   * @param skip_undefined The skip undefined.
    */
   void
   scan_line(std::string        line,
@@ -1880,6 +1953,11 @@ private:
    * argument indicates how many spaces the output should be indented,
    * so that subsections properly nest inside the output of higher
    * sections.
+   * @param tree The tree used by this operation.
+   * @param target_subsection_path The target subsection path.
+   * @param style The style in which parameter information is formatted.
+   * @param indent_level The indent level.
+   * @param out The output stream to which data is written.
    */
   void
   recursively_print_parameters(
@@ -1898,6 +1976,8 @@ private:
  * if it did not then the result of the bit-or <tt>operator |</tt> would be an
  * integer which would in turn trigger a compiler warning when we tried to
  * assign it to an object of type ParameterHandler::OutputStyle.
+ * @param f1 The first callback to combine.
+ * @param f2 The second callback to combine.
  */
 inline ParameterHandler::OutputStyle
 operator|(const ParameterHandler::OutputStyle f1,
@@ -2141,12 +2221,14 @@ public:
     /**
      * <tt>create_new</tt> must provide a clean object, either by creating a
      * new one or by cleaning an old one.
+     * @param run_no The run no.
      */
     virtual void
     create_new(const unsigned int run_no) = 0;
 
     /**
      * Get the parameters and run any necessary action.
+     * @param prm The prm used by this operation.
      */
     virtual void
     run(ParameterHandler &prm) = 0;
@@ -2179,6 +2261,10 @@ public:
    * of the problem. By default all entries and subsections are expected to be
    * declared.
    *
+   * @param input The input data or stream from which values are read.
+   * @param filename The file name.
+   * @param last_line The last line.
+   * @param skip_undefined The skip undefined.
    * @note This is the only overload of the three <tt>parse_input</tt>
    * functions implemented by ParameterHandler overridden with new behavior by
    * this class. This is because the other two <tt>parse_input</tt> functions
@@ -2201,6 +2287,7 @@ public:
 
   /**
    * run the central loop.
+   * @param uc The uc used by this operation.
    */
   void
   loop(UserClass &uc);
@@ -2247,6 +2334,10 @@ private:
      * Construct an object with given subsection path, name and value. The
      * splitting up into the different variants is done later by
      * <tt>split_different_values</tt>.
+     * @param Path The file name.
+     * @param Name The name associated with the object being created or
+     * queried.
+     * @param Value The value associated with the function.
      */
     Entry(const std::vector<std::string> &Path,
           const std::string              &Name,

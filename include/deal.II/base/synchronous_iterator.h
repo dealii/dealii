@@ -48,6 +48,7 @@ struct SynchronousIterators
 {
   /**
    * Constructor.
+   * @param i The index of the entry.
    */
   SynchronousIterators(const Iterators &i);
 
@@ -133,6 +134,8 @@ operator<(const SynchronousIterators<Iterators> &a,
  * the first element is sufficient.
  *
  * @relatesalso SynchronousIterators
+ * @param a The operand supplied to this operation.
+ * @param b The operand supplied to this operation.
  */
 template <typename Iterators>
 inline std::size_t
@@ -149,6 +152,8 @@ operator-(const SynchronousIterators<Iterators> &a,
  * Advance a tuple of iterators by $n$.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
+ * @param n The n used by this operation.
  */
 template <typename I1, typename I2>
 inline void
@@ -162,6 +167,8 @@ advance(std::tuple<I1, I2> &t, const unsigned int n)
  * Advance a tuple of iterators by $n$.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
+ * @param n The n used by this operation.
  */
 template <typename I1, typename I2, typename I3>
 inline void
@@ -176,6 +183,8 @@ advance(std::tuple<I1, I2, I3> &t, const unsigned int n)
  * Advance a tuple of iterators by $n$.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
+ * @param n The n used by this operation.
  */
 template <typename I1, typename I2, typename I3, typename I4>
 inline void
@@ -191,6 +200,7 @@ advance(std::tuple<I1, I2, I3, I4> &t, const unsigned int n)
  * Reverse a tuple of iterators by 1.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
  */
 template <typename I1, typename I2>
 inline void
@@ -204,6 +214,7 @@ prev(std::tuple<I1, I2> &t)
  * Reverse a tuple of iterators by 1.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
  */
 template <typename I1, typename I2, typename I3>
 inline void
@@ -218,6 +229,7 @@ prev(std::tuple<I1, I2, I3> &t)
  * Reverse a tuple of iterators by 1.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
  */
 template <typename I1, typename I2, typename I3, typename I4>
 inline void
@@ -233,6 +245,7 @@ prev(std::tuple<I1, I2, I3, I4> &t)
  * Advance a tuple of iterators by 1.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
  */
 template <typename I1, typename I2>
 inline void
@@ -246,6 +259,7 @@ advance_by_one(std::tuple<I1, I2> &t)
  * Advance a tuple of iterators by 1.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
  */
 template <typename I1, typename I2, typename I3>
 inline void
@@ -260,6 +274,7 @@ advance_by_one(std::tuple<I1, I2, I3> &t)
  * Advance a tuple of iterators by 1.
  *
  * @relatesalso SynchronousIterators
+ * @param t The time associated with the evaluation.
  */
 template <typename I1, typename I2, typename I3, typename I4>
 inline void
@@ -275,6 +290,8 @@ advance_by_one(std::tuple<I1, I2, I3, I4> &t)
  * Advance the elements of this iterator by $n$.
  *
  * @relatesalso SynchronousIterators
+ * @param a The operand supplied to this operation.
+ * @param n The n used by this operation.
  */
 template <typename Iterators>
 inline SynchronousIterators<Iterators>
@@ -289,6 +306,7 @@ operator+(const SynchronousIterators<Iterators> &a, const std::size_t n)
  * Advance the elements of this iterator by 1 (pre-increment).
  *
  * @relatesalso SynchronousIterators
+ * @param a The operand supplied to this operation.
  */
 template <typename Iterators>
 inline SynchronousIterators<Iterators> &
@@ -302,6 +320,7 @@ operator++(SynchronousIterators<Iterators> &a)
  * Reverse the elements of this iterator by 1 (pre-decrement).
  *
  * @relatesalso SynchronousIterators
+ * @param a The operand supplied to this operation.
  */
 template <typename Iterators>
 inline SynchronousIterators<Iterators> &
@@ -315,6 +334,7 @@ operator--(SynchronousIterators<Iterators> &a)
  * Advance the elements of this iterator by 1 (post-increment).
  *
  * @relatesalso SynchronousIterators
+ * @param a The operand supplied to this operation.
  */
 template <typename Iterators>
 inline SynchronousIterators<Iterators>
@@ -330,6 +350,8 @@ operator++(SynchronousIterators<Iterators> &a, int)
  * comparing only the first element is sufficient.
  *
  * @relatesalso SynchronousIterators
+ * @param a The operand supplied to this operation.
+ * @param b The operand supplied to this operation.
  */
 template <typename Iterators>
 inline bool

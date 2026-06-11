@@ -267,18 +267,21 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * other words, if you give a very large number of type <code>long
    * double</code>, this function may return <code>false</code> even if the
    * number is finite with respect to type <code>long double</code>.
+   * @param x The value whose finiteness is to be tested.
    */
   bool is_finite(const double x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
+   * @param x The value whose finiteness is to be tested.
    */
   bool is_finite(const std::complex<double> &x);
 
   /**
    * Return @p true if real and imaginary parts of the given complex number
    * are finite.
+   * @param x The value whose finiteness is to be tested.
    */
   bool is_finite(const std::complex<float> &x);
 
@@ -289,6 +292,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * Again may not work correctly if real or imaginary parts are very large
    * numbers that are infinite in terms of <code>double</code>, but finite
    * with respect to <code>long double</code>.
+   * @param x The value whose finiteness is to be tested.
    */
   bool is_finite(const std::complex<long double> &x);
 
@@ -299,6 +303,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
    */
@@ -313,6 +319,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
    */
@@ -326,6 +334,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * For intricate data types (e.g. some automatically differentiable numbers),
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
+   * @param value The value associated with the function.
    */
   template <typename Number>
   constexpr DEAL_II_HOST_DEVICE bool value_is_zero(const Number &value);
@@ -337,6 +346,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
    */
@@ -350,6 +361,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
    */
@@ -366,6 +379,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
    */
@@ -379,6 +394,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note This function expects that @p value_2 is castable to the type
    * of @p value_1.
    */
@@ -422,6 +439,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * template is selected if number is not a complex data type, this
      * function simply returns the given number.
      *
+     * @param x The value on which this function operates.
      * @note This function can also be used in @ref GlossDevice "device" code.
      */
     static constexpr DEAL_II_HOST_DEVICE const number &
@@ -432,6 +450,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * general template is chosen for types not equal to std::complex, this
      * function simply returns the square of the given number.
      *
+     * @param x The value on which this function operates.
      * @note If the template type can be used in @ref GlossDevice "device" code, the same holds true
      * for this function.
      */
@@ -440,6 +459,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
     /**
      * Return the absolute value of a number.
+     * @param x The value on which this function operates.
      */
     static DEAL_II_HOST_DEVICE real_type
     abs(const number &x);
@@ -475,6 +495,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
     /**
      * Return the complex-conjugate of the given number.
+     * @param x The value on which this function operates.
      */
     static constexpr std::complex<number>
     conjugate(const std::complex<number> &x);
@@ -484,6 +505,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
      * specialization of the general template is chosen for types equal to
      * std::complex, this function returns the product of a number and its
      * complex conjugate.
+     * @param x The value on which this function operates.
      */
     static constexpr real_type
     abs_square(const std::complex<number> &x);
@@ -491,6 +513,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
     /**
      * Return the absolute value of a complex number.
+     * @param x The complex value whose finiteness is to be tested.
      */
     static real_type
     abs(const std::complex<number> &x);
@@ -761,6 +784,8 @@ namespace numbers
    * returns only whether the scalar values stored by the input values are
    * equal.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
@@ -781,6 +806,8 @@ namespace numbers
    * returns only whether the scalar values stored by the input values are
    * equal.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
@@ -816,6 +843,8 @@ namespace numbers
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.
@@ -837,6 +866,8 @@ namespace numbers
    * this function returns the result of the comparison of scalar values stored
    * by the input arguments.
    *
+   * @param value_1 The value 1.
+   * @param value_2 The value 2.
    * @note When ADOL-C is compiled with the "advanced branching" feature, then
    * this specialization is only intended for use in assertions and
    * other code paths that do not affect the end result of a computation.

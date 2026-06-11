@@ -88,6 +88,7 @@ namespace Polynomials
 
     /**
      * Constructor creating a zero polynomial of degree @p n.
+     * @param n The n used by this operation.
      */
     Polynomial(const unsigned int n);
 
@@ -104,6 +105,8 @@ namespace Polynomials
      * where $j=0,\ldots,n-1$ where $n$ is the number of support points and the
      * degree of the polynomials is $n-1$. The second argument of this
      * constructor, $j$, then selects which of these polynomials you want.
+     * @param lagrange_support_points The lagrange support points.
+     * @param j The index of the entry.
      */
     Polynomial(const std::vector<Point<1>> &lagrange_support_points,
                const unsigned int           j);
@@ -121,6 +124,7 @@ namespace Polynomials
      * polynomial is in the product form of roots, the evaluation is
      * based on products of the form (x - x_i), whereas the Horner
      * scheme is used for polynomials in the coefficient form.
+     * @param x The value on which this function operates.
      */
     number
     value(const number x) const;
@@ -134,6 +138,8 @@ namespace Polynomials
      * This function uses the Horner scheme for numerical stability of the
      * evaluation for polynomials in the coefficient form or the product of
      * terms involving the roots if that representation is used.
+     * @param x The value on which this function operates.
+     * @param values The object in which to store the computed values.
      */
     void
     value(const number x, std::vector<number> &values) const;
@@ -155,6 +161,9 @@ namespace Polynomials
      * operations such as additions or multiplication with the type
      * `number` of the polynomial, and must be convertible from
      * `number` by `operator=`.
+     * @param x The value on which this function operates.
+     * @param n_derivatives The number of derivatives.
+     * @param values The values associated with the function.
      */
     template <typename Number2>
     void
@@ -197,6 +206,7 @@ namespace Polynomials
      * polynomial <i>q</i>, such that <i>q(x) = p(t)</i>.
      *
      * The operation is performed in place.
+     * @param factor The scalar factor by which all entries are scaled.
      */
     void
     scale(const number factor);
@@ -215,6 +225,8 @@ namespace Polynomials
      *
      * The operation is performed in place, i.e. the coefficients of the
      * present object are changed.
+     * @param offset The offset into the underlying storage or file at which
+     * the operation starts.
      */
     template <typename number2>
     void
@@ -235,36 +247,42 @@ namespace Polynomials
 
     /**
      * Multiply with a scalar.
+     * @param s The operand supplied to this operation.
      */
     Polynomial<number> &
     operator*=(const double s);
 
     /**
      * Multiply with another polynomial.
+     * @param p The point at which to evaluate the function.
      */
     Polynomial<number> &
     operator*=(const Polynomial<number> &p);
 
     /**
      * Add a second polynomial.
+     * @param p The point at which to evaluate the function.
      */
     Polynomial<number> &
     operator+=(const Polynomial<number> &p);
 
     /**
      * Subtract a second polynomial.
+     * @param p The point at which to evaluate the function.
      */
     Polynomial<number> &
     operator-=(const Polynomial<number> &p);
 
     /**
      * Test for equality of two polynomials.
+     * @param p The point at which to evaluate the function.
      */
     bool
     operator==(const Polynomial<number> &p) const;
 
     /**
      * Print coefficients.
+     * @param out The output stream to which data is written.
      */
     void
     print(std::ostream &out) const;
@@ -353,6 +371,8 @@ namespace Polynomials
     /**
      * Constructor, taking the degree of the monomial and an optional
      * coefficient as arguments.
+     * @param n The n used by this operation.
+     * @param coefficient The coefficient used by this operation.
      */
     Monomial(const unsigned int n, const double coefficient = 1.);
 
@@ -361,6 +381,7 @@ namespace Polynomials
      * <tt>degree</tt>, which then spans the full space of polynomials up to
      * the given degree. This function may be used to initialize the
      * TensorProductPolynomials and PolynomialSpace classes.
+     * @param degree The polynomial degree.
      */
     static std::vector<Polynomial<number>>
     generate_complete_basis(const unsigned int degree);
@@ -400,6 +421,8 @@ namespace Polynomials
      * Constructor. Takes the degree <tt>n</tt> of the Lagrangian polynomial
      * and the index <tt>support_point</tt> of the support point. Fills the
      * <tt>coefficients</tt> of the base class Polynomial.
+     * @param n The n used by this operation.
+     * @param support_point The support point.
      */
     LagrangeEquidistant(const unsigned int n, const unsigned int support_point);
 
@@ -410,6 +433,7 @@ namespace Polynomials
      * the same degree but support point running from zero to <tt>degree</tt>.
      * This function may be used to initialize the TensorProductPolynomials
      * and PolynomialSpace classes.
+     * @param degree The polynomial degree.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int degree);
@@ -432,6 +456,7 @@ namespace Polynomials
    * Lagrange polynomials for interpolation of these points. The number of
    * polynomials is equal to the number of points and the maximum degree is
    * one less.
+   * @param points The points at which to evaluate the function.
    */
   std::vector<Polynomial<double>>
   generate_complete_Lagrange_basis(const std::vector<Point<1>> &points);
@@ -456,6 +481,7 @@ namespace Polynomials
   public:
     /**
      * Constructor for polynomial of degree <tt>p</tt>.
+     * @param p The point at which to evaluate the function.
      */
     Legendre(const unsigned int p);
 
@@ -464,6 +490,7 @@ namespace Polynomials
      * <tt>degree</tt>, which then spans the full space of polynomials up to
      * the given degree. This function may be used to initialize the
      * TensorProductPolynomials and PolynomialSpace classes.
+     * @param degree The polynomial degree.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int degree);
@@ -494,12 +521,14 @@ namespace Polynomials
     /**
      * Constructor for polynomial of degree <tt>p</tt>. There is an exception
      * for <tt>p==0</tt>, see the general documentation.
+     * @param p The point at which to evaluate the function.
      */
     Lobatto(const unsigned int p = 0);
 
     /**
      * Return the polynomials with index <tt>0</tt> up to <tt>degree</tt>.
      * There is an exception for <tt>p==0</tt>, see the general documentation.
+     * @param p The point at which to evaluate the function.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int p);
@@ -557,6 +586,7 @@ namespace Polynomials
     /**
      * Constructor for polynomial of degree <tt>p</tt>. There is an exception
      * for <tt>p==0</tt>, see the general documentation.
+     * @param p The point at which to evaluate the function.
      */
     Hierarchical(const unsigned int p);
 
@@ -569,6 +599,7 @@ namespace Polynomials
      *
      * This function may be used to initialize the TensorProductPolynomials,
      * AnisotropicPolynomials, and PolynomialSpace classes.
+     * @param degree The polynomial degree.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int degree);
@@ -640,6 +671,7 @@ namespace Polynomials
     /**
      * Constructor for polynomial with index <tt>p</tt>. See the class
      * documentation on the definition of the sequence of polynomials.
+     * @param p The point at which to evaluate the function.
      */
     HermiteInterpolation(const unsigned int p);
 
@@ -647,6 +679,7 @@ namespace Polynomials
      * Return the polynomials with index <tt>0</tt> up to <tt>p+1</tt> in a
      * space of degree up to <tt>p</tt>. Here, <tt>p</tt> has to be at least
      * 3.
+     * @param p The point at which to evaluate the function.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int p);
@@ -761,6 +794,8 @@ namespace Polynomials
     /**
      * Constructor for the polynomial with index <tt>index</tt> within the set
      * up polynomials of degree @p degree.
+     * @param degree The polynomial degree.
+     * @param index The index of the entry.
      */
     HermiteLikeInterpolation(const unsigned int degree,
                              const unsigned int index);
@@ -768,6 +803,7 @@ namespace Polynomials
     /**
      * Return the polynomials with index <tt>0</tt> up to <tt>degree+1</tt> in
      * a space of degree up to <tt>degree</tt>.
+     * @param degree The polynomial degree.
      */
     static std::vector<Polynomial<double>>
     generate_complete_basis(const unsigned int degree);
@@ -826,6 +862,9 @@ namespace Polynomials
    * beta equal to zero (Legendre case), one (Gauss-Lobatto case) as well as
    * two, so be careful when using it for other values as the Newton iteration
    * might or might not converge.
+   * @param degree The polynomial degree.
+   * @param alpha The alpha used by this operation.
+   * @param beta The beta used by this operation.
    */
   template <typename Number>
   std::vector<Number>

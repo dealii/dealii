@@ -80,6 +80,10 @@ public:
    *
    * @deprecated Use the version of this function which takes a
    * combined_orientation argument instead.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param q_points The object in which to store the q points.
    */
   DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a combined_orientation "
@@ -97,6 +101,9 @@ public:
    *
    * @deprecated Use the version of this function which takes a
    * combined_orientation argument instead.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
    */
   DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of this function which takes a combined_orientation "
@@ -114,6 +121,12 @@ public:
    *
    * @deprecated Use the version of project_to_face() which takes a
    * combined_orientation argument instead.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
    */
   DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use the version of project_to_face() which takes a combined_orientation "
@@ -130,6 +143,10 @@ public:
    * Compute the cell quadrature formula corresponding to using
    * <tt>quadrature</tt> on face <tt>face_no</tt>. For further details, see
    * the general doc for this class.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param combined_orientation The combined orientation.
    */
   static Quadrature<dim>
   project_to_face(const ReferenceCell<dim>          &reference_cell,
@@ -143,6 +160,12 @@ public:
    * corresponding to RefineCase::Type <tt>ref_case</tt>. The last argument is
    * only used in 3d.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param subface_no The subface no.
+   * @param q_points The object in which to store the q points.
+   * @param ref_case The ref case.
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
@@ -167,6 +190,11 @@ public:
    * <tt>face_no</tt> with RefinementCase<dim-1> <tt>ref_case</tt>. The last
    * argument is only used in 3d.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param subface_no The subface no.
+   * @param ref_case The ref case.
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
@@ -194,6 +222,14 @@ public:
    * <tt>face_no</tt> with SubfaceCase<dim> <tt>ref_case</tt>. The last
    * argument is only used in 3d.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param subface_no The subface no.
+   * @param face_orientation The face orientation.
+   * @param face_flip The face flip.
+   * @param face_rotation The face rotation.
+   * @param ref_case The ref case.
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    *
@@ -219,6 +255,12 @@ public:
    * <tt>face_no</tt> with RefinementCase<dim-1> <tt>ref_case</tt>. The last
    * argument is only used in 3d.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param face_no The face no.
+   * @param subface_no The subface no.
+   * @param combined_orientation The combined orientation.
+   * @param ref_case The ref case.
    * @note Only the points are transformed. The quadrature weights are the
    * same as those of the original rule.
    */
@@ -243,6 +285,8 @@ public:
    * to a single face and use it as a quadrature on this face, as is done in
    * FEFaceValues.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
    * @note This function creates ReferenceCell::n_face_orientations() sets of
    * quadrature points for each face which are indexed (by combined orientation
    * and face number) by a DataSetDescriptor.
@@ -254,6 +298,8 @@ public:
   /**
    * Like the above function, applying the same face quadrature
    * formula on all faces.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
    */
   static Quadrature<dim>
   project_to_all_faces(const ReferenceCell<dim>  &reference_cell,
@@ -271,6 +317,8 @@ public:
    * This in particular allows us to extract a subset of points corresponding
    * to a single subface and use it as a quadrature on this face, as is done
    * in FESubfaceValues.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
    */
   static Quadrature<dim>
   project_to_all_subfaces(const ReferenceCell<dim> &reference_cell,
@@ -286,6 +334,9 @@ public:
    * fraction of the cell, the weights of the resulting object are divided by
    * GeometryInfo<dim>::children_per_cell.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param child_no The child no.
    * @warning This function is only implemented for hypercube elements.
    */
   static Quadrature<dim>
@@ -302,6 +353,8 @@ public:
    * The child numbering is the same as the children would be numbered upon
    * refinement of the cell.
    *
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
    * @warning This function is only implemented for hypercube elements.
    */
   static Quadrature<dim>
@@ -311,6 +364,10 @@ public:
   /**
    * Project the one dimensional rule <tt>quadrature</tt> to the straight line
    * connecting the points <tt>p1</tt> and <tt>p2</tt>.
+   * @param reference_cell The reference cell.
+   * @param quadrature The quadrature formula used by this operation.
+   * @param p1 The point associated with this operation.
+   * @param p2 The point associated with this operation.
    */
   static Quadrature<dim>
   project_to_line(const ReferenceCell<dim> &reference_cell,
@@ -360,6 +417,12 @@ public:
      *
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
+     * @param reference_cell The reference cell.
+     * @param face_no The face no.
+     * @param face_orientation The face orientation.
+     * @param face_flip The face flip.
+     * @param face_rotation The face rotation.
+     * @param n_quadrature_points The number of quadrature points.
      */
     DEAL_II_DEPRECATED_WITH_COMMENT(
       "Use the version of this function which takes a combined_orientation "
@@ -379,6 +442,10 @@ public:
      * @p n_quadrature_points is the number of quadrature points the
      * lower-dimensional face quadrature formula (the one that has been
      * projected onto the faces) has.
+     * @param reference_cell The reference cell.
+     * @param face_no The face no.
+     * @param combined_orientation The combined orientation.
+     * @param n_quadrature_points The number of quadrature points.
      */
     static DataSetDescriptor
     face(const ReferenceCell<dim>          &reference_cell,
@@ -393,6 +460,12 @@ public:
      *
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
+     * @param reference_cell The reference cell.
+     * @param face_no The face no.
+     * @param face_orientation The face orientation.
+     * @param face_flip The face flip.
+     * @param face_rotation The face rotation.
+     * @param quadrature The quadrature formula used by this operation.
      */
     DEAL_II_DEPRECATED_WITH_COMMENT(
       "Use the version of this function which takes a combined_orientation "
@@ -410,6 +483,10 @@ public:
      * taking into account the possibility of different quadrature rules being
      * used on each face.
      *
+     * @param reference_cell The reference cell.
+     * @param face_no The face no.
+     * @param combined_orientation The combined orientation.
+     * @param quadrature The quadrature formula used by this operation.
      */
     static DataSetDescriptor
     face(const ReferenceCell<dim>          &reference_cell,
@@ -431,6 +508,14 @@ public:
      *
      * @deprecated Use the version of this function which takes a
      * combined_orientation argument instead.
+     * @param reference_cell The reference cell.
+     * @param face_no The face no.
+     * @param subface_no The subface no.
+     * @param face_orientation The face orientation.
+     * @param face_flip The face flip.
+     * @param face_rotation The face rotation.
+     * @param n_quadrature_points The number of quadrature points.
+     * @param ref_case The ref case.
      */
     DEAL_II_DEPRECATED_WITH_COMMENT(
       "Use the version of this function which takes a combined_orientation "
@@ -457,6 +542,12 @@ public:
      * projected onto the faces) has.
      *
      * Through the last argument anisotropic refinement can be respected.
+     * @param reference_cell The reference cell.
+     * @param face_no The face no.
+     * @param subface_no The subface no.
+     * @param combined_orientation The combined orientation.
+     * @param n_quadrature_points The number of quadrature points.
+     * @param ref_case The ref case.
      */
     static DataSetDescriptor
     subface(const ReferenceCell<dim>          &reference_cell,
@@ -489,65 +580,51 @@ public:
   };
 };
 
-/** @} */
-
-
-// -------------------  inline and template functions ----------------
-
-
-
-template <int dim>
-inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor(
-  const unsigned int dataset_offset)
-  : dataset_offset(dataset_offset)
-{}
-
-
-template <int dim>
-inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor()
-  : dataset_offset(numbers::invalid_unsigned_int)
-{}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::cell()
+/**
+ *  @} */
+*** // -------------------  inline and template functions ----------------
+  ****template <int dim>
+     *inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor(
+         *const unsigned int dataset_offset) *
+  : dataset_offset(dataset_offset) * {} *
+    **template <int dim>
+     *inline QProjector<dim>::DataSetDescriptor::DataSetDescriptor() *
+  : dataset_offset(numbers::invalid_unsigned_int) *
+    {} *
+    ***template <int dim>
+      *typename QProjector<dim>::DataSetDescriptor
+        *QProjector<dim>::DataSetDescriptor::cell() *
 {
-  return 0;
+  *return 0;
+  *
 }
-
-
-
-template <int dim>
-inline QProjector<dim>::DataSetDescriptor::operator unsigned int() const
+****template <int dim>
+   *inline QProjector<dim>::DataSetDescriptor::operator unsigned int() const *
 {
-  return dataset_offset;
+  *return dataset_offset;
+  *
 }
-
-
-
-template <int dim>
-Quadrature<dim> inline QProjector<dim>::project_to_all_faces(
-  const ReferenceCell<dim>  &reference_cell,
-  const Quadrature<dim - 1> &quadrature)
+****template <int dim>
+   *Quadrature<dim> inline QProjector<dim>::project_to_all_faces(
+       *const ReferenceCell<dim> &reference_cell,
+         *const Quadrature<dim - 1> &quadrature) *
 {
-  return project_to_all_faces(reference_cell,
-                              hp::QCollection<dim - 1>(quadrature));
+  *return project_to_all_faces(reference_cell,
+                               *hp::QCollection<dim - 1>(quadrature));
+  *
 }
-
-
+*
 /* -------------- declaration of explicit specializations ------------- */
 
 #ifndef DOXYGEN
 
 
-template <>
-void
-QProjector<1>::project_to_face(const ReferenceCell<1> &reference_cell,
-                               const Quadrature<0> &,
-                               const unsigned int,
-                               std::vector<Point<1>> &);
+  template <>
+  void
+  QProjector<1>::project_to_face(const ReferenceCell<1> &reference_cell,
+                                 const Quadrature<0> &,
+                                 const unsigned int,
+                                 std::vector<Point<1>> &);
 template <>
 void
 QProjector<2>::project_to_face(const ReferenceCell<2> &reference_cell,

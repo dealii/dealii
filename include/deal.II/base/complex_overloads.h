@@ -36,6 +36,8 @@ struct ProductType;
  * types. Annoyingly, the standard library does not provide such an
  * operator.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  * @note Because the C++ standard does not provide for mixed-precision complex
  *   operators, code such as the following does not compile:
  *   @code
@@ -77,6 +79,8 @@ operator*(const std::complex<T> &left, const std::complex<U> &right)
  * types. Annoyingly, the standard library does not provide such an
  * operator.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  * @note Because the C++ standard does not provide for mixed-precision complex
  *   operators, code such as the following does not compile:
  *   @code
@@ -118,6 +122,8 @@ operator/(const std::complex<T> &left, const std::complex<U> &right)
  * floating point type with a different real floating point type. Annoyingly,
  * the standard library does not provide such an operator.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  * @note Because the C++ standard does not provide for mixed-precision complex
  *   operators, code such as the following does not compile:
  *   @code
@@ -157,6 +163,8 @@ operator*(const std::complex<T> &left, const U &right)
  * floating point type with a different real floating point type. Annoyingly,
  * the standard library does not provide such an operator.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  * @note Because the C++ standard does not provide for mixed-precision complex
  *   operators, code such as the following does not compile:
  *   @code
@@ -196,6 +204,8 @@ operator/(const std::complex<T> &left, const U &right)
  * floating point type with a different complex floating point type.
  * Annoyingly, the standard library does not provide such an operator.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  * @note Because the C++ standard does not provide for mixed-precision complex
  *   operators, code such as the following does not compile:
  *   @code
@@ -235,6 +245,8 @@ operator*(const T &left, const std::complex<U> &right)
  * floating point type with a different complex floating point type.
  * Annoyingly, the standard library does not provide such an operator.
  *
+ * @param left The left-hand operand.
+ * @param right The right-hand operand.
  * @note Because the C++ standard does not provide for mixed-precision complex
  *   operators, code such as the following does not compile:
  *   @code

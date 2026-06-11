@@ -128,6 +128,7 @@ public:
 
   /**
    * List the subscribers to the input @p stream.
+   * @param stream The stream used by this operation.
    */
   template <typename StreamType>
   void
@@ -250,6 +251,8 @@ private:
   /**
    * Subscribes a user of the object by storing the pointer @p validity. The
    * subscriber may be identified by text supplied as @p identifier.
+   * @param validity The validity used by this operation.
+   * @param identifier The identifier used by this operation.
    */
   void
   subscribe(std::atomic<bool> *const validity,
@@ -258,6 +261,8 @@ private:
   /**
    * Unsubscribes a user from the object.
    *
+   * @param validity The validity used by this operation.
+   * @param identifier The identifier used by this operation.
    * @note The @p identifier and the @p validity pointer must be the same as
    * the one supplied to subscribe().
    */
@@ -284,74 +289,74 @@ private:
   template <typename, typename>
   friend class ObserverPointer;
 
-  /** @} */
-};
+  /**
+   *  @}
+   */
+
+  /**
+   *  A type alias for the EnableObserverPointer class that makes sure
+   *  the previous name of the class, Subscriptor, continues to be available.
+   *
+   *  @deprecated Use the new name of the class, ObserverPointer, instead.
+   */
+  using Subscriptor DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use the new name of the class, EnableObserverPointer.") =
+    EnableObserverPointer;
 
 
-/**
- * A type alias for the EnableObserverPointer class that makes sure
- * the previous name of the class, Subscriptor, continues to be available.
- *
- * @deprecated Use the new name of the class, ObserverPointer, instead.
- */
-using Subscriptor DEAL_II_DEPRECATED_WITH_COMMENT(
-  "Use the new name of the class, EnableObserverPointer.") =
-  EnableObserverPointer;
+  //---------------------------------------------------------------------------
 
-
-//---------------------------------------------------------------------------
-
-inline EnableObserverPointer::EnableObserverPointer()
-  : counter(0)
-  , object_info(nullptr)
-{}
-
-
-
-inline EnableObserverPointer::EnableObserverPointer(
-  const EnableObserverPointer &)
-  : counter(0)
-  , object_info(nullptr)
-{}
+  inline EnableObserverPointer::EnableObserverPointer()
+    : counter(0)
+    , object_info(nullptr)
+  {}
 
 
 
-inline EnableObserverPointer &
-EnableObserverPointer::operator=(const EnableObserverPointer &s)
-{
-  object_info = s.object_info;
-  return *this;
-}
+  inline EnableObserverPointer::EnableObserverPointer(
+    const EnableObserverPointer &)
+    : counter(0)
+    , object_info(nullptr)
+  {}
 
 
 
-inline unsigned int
-EnableObserverPointer::n_subscriptions() const
-{
-  return counter;
-}
+  inline EnableObserverPointer &
+  EnableObserverPointer::operator=(const EnableObserverPointer &s)
+  {
+    object_info = s.object_info;
+    return *this;
+  }
 
 
 
-template <class Archive>
-inline void
-EnableObserverPointer::serialize(Archive &, const unsigned int)
-{
-  // do nothing, as explained in the
-  // documentation of this function
-}
+  inline unsigned int
+  EnableObserverPointer::n_subscriptions() const
+  {
+    return counter;
+  }
 
-template <typename StreamType>
-inline void
-EnableObserverPointer::list_subscribers(StreamType &stream) const
-{
-  std::lock_guard<std::mutex> lock(mutex);
 
-  for (const auto &it : counter_map)
-    stream << it.second << '/' << counter << " subscriptions from \""
-           << it.first << '\"' << std::endl;
-}
 
-DEAL_II_NAMESPACE_CLOSE
+  template <class Archive>
+  inline void
+  EnableObserverPointer::serialize(Archive &, const unsigned int)
+  {
+    // do nothing, as explained in the
+    // documentation of this function
+  }
+
+  template <typename StreamType>
+  inline void
+  EnableObserverPointer::list_subscribers(StreamType &stream) const
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+
+    for (const auto &it : counter_map)
+      stream << it.second << '/' << counter << " subscriptions from \""
+             << it.first << '\"' << std::endl;
+  }
+
+  DEAL_II_NAMESPACE_CLOSE
 
 #endif

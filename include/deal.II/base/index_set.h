@@ -111,6 +111,7 @@ public:
 
   /**
    * Constructor that also sets the overall size of the index range.
+   * @param size The number of entries in the object to create or resize.
    */
   explicit IndexSet(const size_type size);
 
@@ -128,12 +129,14 @@ public:
   /**
    * Move constructor. Create a new IndexSet by transferring the internal data
    * of the input set.
+   * @param is The is used by this operation.
    */
   IndexSet(IndexSet &&is) noexcept;
 
   /**
    * Move assignment operator. Transfer the internal data of the input set into
    * the current one.
+   * @param is The is used by this operation.
    */
   IndexSet &
   operator=(IndexSet &&is) noexcept;
@@ -141,6 +144,7 @@ public:
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
   /**
    * Constructor from a Trilinos Teuchos::RCP<Tpetra::Map>.
+   * @param map The map used by this operation.
    */
   template <typename NodeType>
   explicit IndexSet(
@@ -151,6 +155,7 @@ public:
 #ifdef DEAL_II_TRILINOS_WITH_EPETRA
   /**
    * Constructor from a Trilinos Epetra_BlockMap.
+   * @param map The map used by this operation.
    */
   explicit IndexSet(const Epetra_BlockMap &map);
 #endif // DEAL_II_WITH_TRILINOS
@@ -167,6 +172,7 @@ public:
    *
    * This function can only be called if the index set does not yet contain
    * any elements.  This can be achieved by calling clear(), for example.
+   * @param size The number of entries in the object to create or resize.
    */
   void
   set_size(const size_type size);
@@ -197,6 +203,7 @@ public:
    * add_indices() function below. It is considerably more efficient,
    * particularly if the indices to be added are stored in an array
    * that is already sorted.
+   * @param index The index of the entry.
    */
   void
   add_index(const size_type index);
@@ -243,12 +250,16 @@ public:
    * This function will generate an exception if any of the (possibly shifted)
    * indices of the @p other index set lie outside the range
    * <code>[0,size())</code> represented by the current object.
+   * @param other The object to copy or move from.
+   * @param offset The offset into the underlying storage or file at which the
+   * operation starts.
    */
   void
   add_indices(const IndexSet &other, const size_type offset = 0);
 
   /**
    * Return whether the specified index is an element of the index set.
+   * @param index The index of the entry.
    */
   bool
   is_element(const size_type index) const;
@@ -280,6 +291,7 @@ public:
    * at the index one larger than the last one stored on process $p$.
    * In case there is only one MPI process, this just means that the IndexSet
    * is complete.
+   * @param communicator The MPI communicator.
    */
   bool
   is_ascending_and_one_to_one(const MPI_Comm communicator) const;
@@ -294,6 +306,7 @@ public:
    * Return the global index of the local index with number @p local_index
    * stored in this index set. @p local_index obviously needs to be less than
    * n_elements().
+   * @param local_index The local index.
    */
   size_type
   nth_index_in_set(const size_type local_index) const;
@@ -303,6 +316,7 @@ public:
    * global_index is. @p global_index needs to be less than the size(). This
    * function returns numbers::invalid_dof_index if the index @p global_index is not actually
    * a member of this index set, i.e. if `is_element(global_index)` is false.
+   * @param global_index The global index.
    */
   size_type
   index_within_set(const size_type global_index) const;
@@ -352,6 +366,7 @@ public:
    * On the other hand, the comparison against an empty object makes
    * sense to ensure, for example, that an IndexSet object has been
    * initialized.
+   * @param is The is used by this operation.
    */
   bool
   operator==(const IndexSet &is) const;
@@ -369,6 +384,7 @@ public:
    * On the other hand, the comparison against an empty object makes
    * sense to ensure, for example, that an IndexSet object has been
    * initialized.
+   * @param is The is used by this operation.
    */
   bool
   operator!=(const IndexSet &is) const;
@@ -378,6 +394,7 @@ public:
    * i.e. a set of indices that are elements of both index sets. The two index
    * sets must have the same size (though of course they do not have to have
    * the same number of indices).
+   * @param is The is used by this operation.
    */
   IndexSet
   operator&(const IndexSet &is) const;
@@ -397,6 +414,8 @@ public:
    *
    * A more general function of the same name, taking a mask instead
    * of just an interval to define the view, is below.
+   * @param begin The begin of the range.
+   * @param end The end of the range.
    */
   IndexSet
   get_view(const size_type begin, const size_type end) const;
@@ -445,6 +464,7 @@ public:
    * freedom as well as all indices of $T$ degrees of freedom. The
    * resulting view is an index set of size $N_u+N_T$ that contains
    * the indices of the locally owned $u$ and $T$ degrees of freedom.
+   * @param mask The mask used by this operation.
    */
   IndexSet
   get_view(const IndexSet &mask) const;
@@ -453,6 +473,7 @@ public:
    * Split the set indices represented by this object into blocks given by the
    * @p n_indices_per_block structure. The sum of its entries must match the
    * global size of the current object.
+   * @param n_indices_per_block The number of indices per block.
    */
   std::vector<IndexSet>
   split_by_block(
@@ -463,6 +484,7 @@ public:
    * if $x$ is the current object and $o$ the argument, then we compute $x
    * \leftarrow x \backslash o$.
    *
+   * @param other The object to copy or move from.
    * @pre The sizes of the two index spaces need to be equal, i.e., the
    *   condition `this->size() == other.size()` has to be true.
    */
@@ -484,6 +506,7 @@ public:
    * each row one by one and reindexing the entries of the matrix in consecutive
    * order. A one in the matrix then corresponds to an entry in the reindexed
    * IndexSet that is returned by this function.
+   * @param other The object to copy or move from.
    */
   IndexSet
   tensor_product(const IndexSet &other) const;
@@ -534,6 +557,7 @@ public:
    * one to elements of the vector. Specifically, this is the case for classes
    * Vector, BlockVector, but also std::vector@<bool@>, std::vector@<int@>,
    * and std::vector@<double@>.
+   * @param vector The vector used by this operation.
    */
   template <typename VectorType>
   void
@@ -545,6 +569,7 @@ public:
    * function returns `true` if the two sets are the same, that is, it
    * considers the "subset" comparison typically used in set theory,
    * rather than the "strict subset" comparison.
+   * @param other The object to copy or move from.
    */
   bool
   is_subset_of(const IndexSet &other) const;
@@ -552,6 +577,7 @@ public:
   /**
    * Output a text representation of this IndexSet to the given stream. Used
    * for testing.
+   * @param out The output stream to which data is written.
    */
   template <typename StreamType>
   void
@@ -560,6 +586,7 @@ public:
   /**
    * Write the IndexSet into a text based file format, that can be read in
    * again using the read() function.
+   * @param out The output stream to which data is written.
    */
   void
   write(std::ostream &out) const;
@@ -567,6 +594,7 @@ public:
   /**
    * Construct the IndexSet from a text based representation given by the
    * stream @p in written by the write() function.
+   * @param in The input data or stream from which values are read.
    */
   void
   read(std::istream &in);
@@ -574,6 +602,7 @@ public:
   /**
    * Write the IndexSet into a binary, compact representation, that can be
    * read in again using the block_read() function.
+   * @param out The output stream to which data is written.
    */
   void
   block_write(std::ostream &out) const;
@@ -581,6 +610,7 @@ public:
   /**
    * Construct the IndexSet from a binary representation given by the stream
    * @p in written by the write_block() function.
+   * @param in The input data or stream from which values are read.
    */
   void
   block_read(std::istream &in);
@@ -613,6 +643,8 @@ public:
    * that correspond to degrees of freedom located on ghost cells. Another
    * application of this method is to select a subset of the elements of a
    * vector, e.g. for extracting only certain solution components.
+   * @param communicator The MPI communicator.
+   * @param overlapping Whether to overlapping.
    */
   Epetra_Map
   make_trilinos_map(const MPI_Comm communicator = MPI_COMM_WORLD,
@@ -679,11 +711,14 @@ public:
     /**
      * Construct a valid accessor given an IndexSet and the index @p range_idx
      * of the range to point to.
+     * @param idxset The idxset used by this operation.
+     * @param range_idx The range idx.
      */
     IntervalAccessor(const IndexSet *idxset, const size_type range_idx);
 
     /**
      * Construct an invalid accessor for the IndexSet.
+     * @param idxset The idxset used by this operation.
      */
     explicit IntervalAccessor(const IndexSet *idxset);
 
@@ -769,11 +804,14 @@ public:
     /**
      * Construct a valid iterator pointing to the interval with index @p
      * range_idx.
+     * @param idxset The idxset used by this operation.
+     * @param range_idx The range idx.
      */
     IntervalIterator(const IndexSet *idxset, const size_type range_idx);
 
     /**
      * Construct an invalid iterator (used as end()).
+     * @param idxset The idxset used by this operation.
      */
     explicit IntervalIterator(const IndexSet *idxset);
 
@@ -784,11 +822,13 @@ public:
 
     /**
      * Copy constructor from @p other iterator.
+     * @param other The object to copy or move from.
      */
     IntervalIterator(const IntervalIterator &other) = default;
 
     /**
      * Assignment of another iterator.
+     * @param other The object to copy or move from.
      */
     IntervalIterator &
     operator=(const IntervalIterator &other) = default;
@@ -840,6 +880,7 @@ public:
      * distance is given by how many times one has to apply operator++ to the
      * current iterator to get the argument (for a positive return value), or
      * operator-- (for a negative return value).
+     * @param p The point at which to evaluate the function.
      */
     int
     operator-(const IntervalIterator &p) const;
@@ -872,6 +913,9 @@ public:
     /**
      * Construct an iterator pointing to the global index @p index in the
      * interval @p range_idx
+     * @param idxset The idxset used by this operation.
+     * @param range_idx The range idx.
+     * @param index The index of the entry.
      */
     ElementIterator(const IndexSet *idxset,
                     const size_type range_idx,
@@ -879,6 +923,7 @@ public:
 
     /**
      * Construct an iterator pointing to the end of the IndexSet.
+     * @param idxset The idxset used by this operation.
      */
     explicit ElementIterator(const IndexSet *idxset);
 
@@ -932,6 +977,7 @@ public:
      * it_right to get the left operand @p it_left (for a positive return
      * value), or to @p it_left to get the @p it_right (for a negative return
      * value).
+     * @param p The point at which to evaluate the function.
      */
     std::ptrdiff_t
     operator-(const ElementIterator &p) const;
@@ -988,6 +1034,7 @@ public:
    *
    * If there is no element in this IndexSet at or behind @p global_index,
    * this method will return end().
+   * @param global_index The global index.
    */
   ElementIterator
   at(const size_type global_index) const;
@@ -1206,6 +1253,7 @@ private:
  * @endcode
  *
  * @relatesalso IndexSet
+ * @param N The n used by this operation.
  */
 inline IndexSet
 complete_index_set(const IndexSet::size_type N)

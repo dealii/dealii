@@ -347,6 +347,7 @@ public:
    * approximates the end time (but falls just slightly short of it), the step
    * size is adjusted such that the next simulation time exactly matches the
    * end time.
+   * @param time_step_size The time step size.
    */
   void
   set_desired_next_step_size(const double time_step_size);
@@ -356,6 +357,7 @@ public:
    * method, we are indicating the next time advance_time() is called,
    * @p time_step_size is to be used to advance the simulation time.
    *
+   * @param time_step_size The time step size.
    * @note The difference between set_next_step_size() and
    * set_desired_next_step_size() is that the former uses the provided $dt$
    * exactly without any adjustment, but produces an
