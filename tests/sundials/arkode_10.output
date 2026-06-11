@@ -1,16 +1,25 @@
 
+DEAL::Sub-test 1: no artificial recoverable errors
 DEAL::0.00000 1.00000 0.00000
-DEAL::0.100000 1.15000 0.150000
-DEAL::0.200000 1.30000 0.300000
-DEAL::0.300000 1.45000 0.450000
-DEAL::0.400000 1.60000 0.600000
 DEAL::0.500000 1.75000 0.750000
-DEAL::0.600000 1.90000 0.900000
-DEAL::0.700000 2.05000 1.05000
-DEAL::0.800000 2.20000 1.20000
-DEAL::0.900000 2.35000 1.35000
 DEAL::1.00000 2.50000 1.50000
-DEAL::jacobian_times_vector_called : false
-DEAL::solve_linearized_system_called : true
-DEAL::mass_preconditioner_setup_called : true
-DEAL::mass_preconditioner_solve_called : true
+DEAL::mass_preconditioner_setup_called: true
+DEAL::mass_preconditioner_solve_called: true
+DEAL::Sub-test 2: recoverable errors from solve_linearized_system
+DEAL::0.00000 1.00000 0.00000
+DEAL::Reporting recoverable failure from solve_linearized_system.
+DEAL::Reporting recoverable failure from solve_linearized_system.
+DEAL::0.500000 1.75000 0.750000
+DEAL::1.00000 2.50000 1.50000
+DEAL::mass_preconditioner_setup_called: true
+DEAL::mass_preconditioner_solve_called: true
+DEAL::Sub-test 3: recoverable errors from jacobian_times_vector
+DEAL::0.00000 1.00000 0.00000
+DEAL:cg::Reporting recoverable failure from jacobian_times_vector.
+DEAL:cg::Reporting recoverable failure from jacobian_times_vector.
+DEAL::0.500000 1.75000 0.750000
+DEAL::1.00000 2.50000 1.50000
+DEAL::mass_preconditioner_setup_called: true
+DEAL::mass_preconditioner_solve_called: true
+DEAL::Sub-test 2 required more timesteps: true
+DEAL::Sub-test 3 required more timesteps: true

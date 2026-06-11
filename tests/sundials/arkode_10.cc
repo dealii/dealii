@@ -24,30 +24,46 @@
 #include "../tests.h"
 
 
-// Like _08, but throw a recoverable exception when solving with the linearized
-// system.
+// Like _08, but optionally report a recoverable error at a few, well-separated
+// calls to solve_linearized_system or jacobian_times_vector before performing
+// the actual operation. This exercises the recoverable-error code path in
+// ARKODE's linear-solver interface: each throw forces a step-size reduction and
+// a retry, so the integration still completes.
+//
+// The problem is run three times:
+//   Sub-test 1: no artificial exceptions (reference run).
+//   Sub-test 2: recoverable exceptions from solve_linearized_system.
+//   Sub-test 3: recoverable exceptions thrown directly from
+//               jacobian_times_vector.
+//               With SundialsOperator::vmult now re-throwing the positive
+//               return from the ATimes callback as
+//               RecoverableUserCallbackError, the exception propagates through
+//               the linear solver out of solve_linearized_system, where it is
+//               mapped to a recognized recoverable error code.
+//
+// At the end, the step counts from sub-tests 2 and 3 are compared with the
+// reference: forced step-size reductions must larger number of timesteps.
 
+using VectorType = Vector<double>;
 
-int
-main()
+enum class ThrowMode
 {
-  initlog();
+  None,
+  FromLinearSolve,
+  FromJacTimesVec
+};
 
-  using VectorType = Vector<double>;
-
+// Run the problem once. Returns the number of time steps taken
+// (0 if an exception was caught).
+unsigned int
+run_problem(const ThrowMode throw_mode)
+{
   ParameterHandler                             prm;
   SUNDIALS::ARKode<VectorType>::AdditionalData data;
   data.add_parameters(prm);
 
   SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
   stepper_data.add_parameters(prm);
-
-  if (false)
-    {
-      std::ofstream ofile(SOURCE_DIR "/arkode_10_in.prm");
-      prm.print_parameters(ofile, ParameterHandler::ShortPRM);
-      ofile.close();
-    }
 
   std::ifstream ifile(SOURCE_DIR "/arkode_10_in.prm");
   prm.parse_input(ifile);
@@ -75,37 +91,50 @@ main()
       ydot[1] = 2;
     };
 
-  bool jacobian_times_vector_called   = false;
-  bool solve_linearized_system_called = false;
+  unsigned int n_jac_times_vec_runs = 0;
 
   stepper.jacobian_times_vector = [&](const VectorType &v,
                                       VectorType       &Jv,
                                       double            t,
                                       const VectorType &y,
-                                      const VectorType &fy) { K.vmult(Jv, v); };
+                                      const VectorType &fy) {
+    ++n_jac_times_vec_runs;
 
-  [&](SUNDIALS::SundialsOperator<VectorType> &,
-      SUNDIALS::SundialsPreconditioner<VectorType> &,
-      VectorType &,
-      const VectorType &,
-      double) {
-    // This should not be called at all since solve_linearized_system() always
-    // throws an exception, so we will check at the end that
-    // jacobian_times_vector_called remains false
-    jacobian_times_vector_called = true;
-    throw RecoverableUserCallbackError();
+    if (throw_mode == ThrowMode::FromJacTimesVec &&
+        (n_jac_times_vec_runs == 3 || n_jac_times_vec_runs == 12))
+      {
+        deallog << "Reporting recoverable failure from jacobian_times_vector."
+                << std::endl;
+
+        throw RecoverableUserCallbackError();
+      }
+
+    K.vmult(Jv, v);
   };
 
-  stepper.solve_linearized_system =
-    [&](SUNDIALS::SundialsOperator<VectorType> &,
-        SUNDIALS::SundialsPreconditioner<VectorType> &,
-        VectorType &,
-        const VectorType &,
-        double) {
-      solve_linearized_system_called = true;
-      throw RecoverableUserCallbackError();
-    };
+  unsigned int n_linear_solve_runs = 0;
 
+  stepper.solve_linearized_system =
+    [&](SUNDIALS::SundialsOperator<VectorType>       &op,
+        SUNDIALS::SundialsPreconditioner<VectorType> &prec,
+        VectorType                                   &x,
+        const VectorType                             &b,
+        double                                        tol) {
+      ++n_linear_solve_runs;
+
+      if (throw_mode == ThrowMode::FromLinearSolve &&
+          (n_linear_solve_runs == 3 || n_linear_solve_runs == 12))
+        {
+          deallog << "Reporting recoverable failure from "
+                     "solve_linearized_system."
+                  << std::endl;
+          throw RecoverableUserCallbackError();
+        }
+
+      SolverControl        control(100, tol);
+      SolverCG<VectorType> solver_cg(control);
+      solver_cg.solve(op, x, b, prec);
+    };
 
   stepper.solve_mass = [&](SUNDIALS::SundialsOperator<VectorType>       &op,
                            SUNDIALS::SundialsPreconditioner<VectorType> &prec,
@@ -149,19 +178,66 @@ main()
 
   try
     {
-      ode.solve_ode(y);
+      const unsigned int n_timesteps = ode.solve_ode(y);
+
+      deallog << std::boolalpha;
+      deallog << "mass_preconditioner_setup_called: "
+              << mass_preconditioner_setup_called << std::endl;
+      deallog << "mass_preconditioner_solve_called: "
+              << mass_preconditioner_solve_called << std::endl;
+
+      return n_timesteps;
     }
   catch (const std::exception &exc)
     {
       deallog << "Caught exception:" << std::endl << exc.what() << std::endl;
+      return 0;
     }
-  deallog << std::boolalpha;
-  deallog << "jacobian_times_vector_called : " << jacobian_times_vector_called
+}
+
+
+int
+main()
+{
+  initlog();
+
+  // Optionally regenerate the input parameter file.
+  if (false)
+    {
+      ParameterHandler                             prm;
+      SUNDIALS::ARKode<VectorType>::AdditionalData data;
+      data.add_parameters(prm);
+
+      SUNDIALS::ARKStepper<VectorType>::AdditionalData stepper_data;
+      stepper_data.add_parameters(prm);
+
+      std::ofstream ofile(SOURCE_DIR "/arkode_10_in.prm");
+      prm.print_parameters(ofile, ParameterHandler::ShortPRM);
+      ofile.close();
+    }
+
+  // Sub-test 1: run the problem without any artificial exceptions.
+  deallog << "Sub-test 1: no artificial recoverable errors" << std::endl;
+  const unsigned int n_steps_ref = run_problem(ThrowMode::None);
+
+  // Sub-test 2: run the same problem but report recoverable errors from
+  // solve_linearized_system at a few well-separated call counts, forcing
+  // ARKODE to reduce the step size and retry.
+  deallog << "Sub-test 2: recoverable errors from solve_linearized_system"
           << std::endl;
-  deallog << "solve_linearized_system_called : "
-          << solve_linearized_system_called << std::endl;
-  deallog << "mass_preconditioner_setup_called : "
-          << mass_preconditioner_setup_called << std::endl;
-  deallog << "mass_preconditioner_solve_called : "
-          << mass_preconditioner_solve_called << std::endl;
+  const unsigned int n_steps_linear_solve =
+    run_problem(ThrowMode::FromLinearSolve);
+
+  // Sub-test 3: same, but the exception is thrown from jacobian_times_vector
+  // and propagates through the linear solver.
+  deallog << "Sub-test 3: recoverable errors from jacobian_times_vector"
+          << std::endl;
+  const unsigned int n_steps_jac_times_vec =
+    run_problem(ThrowMode::FromJacTimesVec);
+
+  deallog << std::boolalpha;
+  deallog << "Sub-test 2 required more timesteps: "
+          << (n_steps_linear_solve - n_steps_ref > 0) << std::endl;
+  deallog << "Sub-test 3 required more timesteps: "
+          << (n_steps_jac_times_vec - n_steps_ref > 0) << std::endl;
 }
