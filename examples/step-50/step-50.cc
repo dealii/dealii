@@ -1133,7 +1133,9 @@ namespace Step50
 #else
             Amg_data.elliptic              = true;
             Amg_data.smoother_type         = "Jacobi";
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
             Amg_data.higher_order_elements = true;
+#  endif
             Amg_data.smoother_sweeps       = settings.smoother_steps;
             Amg_data.aggregation_threshold = 0.02;
 #endif

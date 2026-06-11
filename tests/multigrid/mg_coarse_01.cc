@@ -574,10 +574,12 @@ namespace Step50
     {
       deallog << "AMG:" << std::endl;
       LA::MPI::PreconditionAMG::AdditionalData Amg_data;
-      Amg_data.elliptic              = true;
+      Amg_data.elliptic = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
       Amg_data.higher_order_elements = true;
       Amg_data.n_cycles              = 1;
-      Amg_data.smoother_sweeps       = 1;
+#endif
+      Amg_data.smoother_sweeps = 1;
       MGCoarseAMG<LA::MPI::Vector> coarse_grid_solver(coarse_matrix, Amg_data);
 
       vcycle(coarse_grid_solver);

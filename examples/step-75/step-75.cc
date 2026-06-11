@@ -608,8 +608,10 @@ namespace Step75
     TrilinosWrappers::PreconditionAMG                 precondition_amg;
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
     amg_data.smoother_sweeps = mg_data.coarse_solver.smoother_sweeps;
-    amg_data.n_cycles        = mg_data.coarse_solver.n_cycles;
-    amg_data.smoother_type   = mg_data.coarse_solver.smoother_type.c_str();
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    amg_data.n_cycles = mg_data.coarse_solver.n_cycles;
+#endif
+    amg_data.smoother_type = mg_data.coarse_solver.smoother_type.c_str();
 
     precondition_amg.initialize(mg_matrices[min_level]->get_system_matrix(),
                                 amg_data);

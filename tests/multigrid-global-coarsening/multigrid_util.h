@@ -411,8 +411,10 @@ mg_solve(SolverControl                        &solver_control,
 #ifdef DEAL_II_WITH_TRILINOS
       TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
       amg_data.smoother_sweeps = mg_data.coarse_solver.smoother_sweeps;
-      amg_data.n_cycles        = mg_data.coarse_solver.n_cycles;
-      amg_data.smoother_type   = mg_data.coarse_solver.smoother_type.c_str();
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+      amg_data.n_cycles = mg_data.coarse_solver.n_cycles;
+#  endif
+      amg_data.smoother_type = mg_data.coarse_solver.smoother_type.c_str();
 
       // CG with AMG as preconditioner
       precondition_amg.initialize(mg_matrices[min_level].get_system_matrix(),

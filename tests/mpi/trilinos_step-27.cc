@@ -338,8 +338,10 @@ namespace Step27
 
     LA::MPI::PreconditionAMG                 preconditioner;
     LA::MPI::PreconditionAMG::AdditionalData data;
-    data.elliptic              = true;
+    data.elliptic = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     data.higher_order_elements = true;
+#endif
     preconditioner.initialize(system_matrix, data);
 
     cg.solve(system_matrix,
