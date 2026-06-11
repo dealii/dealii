@@ -460,18 +460,14 @@ namespace LinearAlgebra
 
       if (vector->getMap()->isSameAs(*V.vector->getMap()))
         {
-          // Make sure we have a view available to access the vector entries.
-          if (!vector_1d_view)
-            {
-              auto vector_2d_view =
-                vector->template getLocalView<Kokkos::HostSpace>(
-                  Tpetra::Access::ReadWriteStruct{});
+          // Create a writeable view of this vector
+          auto vector_2d_view =
+            vector->template getLocalView<Kokkos::HostSpace>(
+              Tpetra::Access::ReadWriteStruct{});
 
-              vector_1d_view =
-                Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
-            }
+          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
 
-          // Create a read-only Kokkos view from the source vector
+          // Create a read-only Kokkos view of the source vector
           auto source_vector_2d =
             V.vector->template getLocalView<Kokkos::HostSpace>(
               Tpetra::Access::ReadOnlyStruct{});
@@ -481,6 +477,9 @@ namespace LinearAlgebra
 
           // Copy the data
           Kokkos::deep_copy((*vector_1d_view), source_vector_1d_view);
+
+          // Reset the local view again as if we had called compress()
+          vector_1d_view.reset();
         }
       else if (size() == V.size())
         {
@@ -541,11 +540,6 @@ namespace LinearAlgebra
           tpetra_comm_pattern    = V.tpetra_comm_pattern;
           local_entries          = V.local_entries;
         }
-
-      // Reset our cached vector views so that trilinos operations on device do
-      // not detect an existing host view.
-      vector_1d_view.reset();
-      nonlocal_vector_1d_view.reset();
 
       // Because V is compressed and has no pending changes
       // clear our local cache as well.
@@ -719,12 +713,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator*=(const Number factor)
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(is_compressed(),
-             ExcMessage(
-               "You are trying an operation on a vector that is only "
-               "allowed if the vector is compressed, but the vector you "
-               "are operating on reports compress() has not been called "
-               "since the last relevant operation."));
       AssertIsFinite(factor);
 
       // Reset our cached vector view so that trilinos operations on device do
@@ -743,12 +731,6 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator/=(const Number factor)
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(is_compressed(),
-             ExcMessage(
-               "You are trying an operation on a vector that is only "
-               "allowed if the vector is compressed, but the vector you "
-               "are operating on reports compress() has not been called "
-               "since the last relevant operation."));
       AssertIsFinite(factor);
       Assert(factor != Number(0.), ExcZero());
 
@@ -771,12 +753,6 @@ namespace LinearAlgebra
       Assert(this->size() == V.size(),
              ExcDimensionMismatch(this->size(), V.size()));
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(is_compressed(),
-             ExcMessage(
-               "You are trying an operation on a vector that is only "
-               "allowed if the vector is compressed, but the vector you "
-               "are operating on reports compress() has not been called "
-               "since the last relevant operation."));
 
       // Reset our cached vector view so that trilinos operations on device do
       // not detect an existing host view.
@@ -813,17 +789,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::operator-=(
       const Vector<Number, MemorySpace> &V)
     {
-      Assert(this->size() == V.size(),
-             ExcDimensionMismatch(this->size(), V.size()));
-      Assert(vector->getMap()->isSameAs(*V.trilinos_vector().getMap()),
-             ExcDifferentParallelPartitioning());
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(is_compressed(),
-             ExcMessage(
-               "You are trying an operation on a vector that is only "
-               "allowed if the vector is compressed, but the vector you "
-               "are operating on reports compress() has not been called "
-               "since the last relevant operation."));
 
       // Reset our cached vector view so that trilinos operations on device do
       // not detect an existing host view.
@@ -846,12 +812,6 @@ namespace LinearAlgebra
       Assert(vector->getMap()->isSameAs(*V.trilinos_vector().getMap()),
              ExcDifferentParallelPartitioning());
       Assert(!has_ghost_elements(), ExcGhostsPresent());
-      Assert(is_compressed(),
-             ExcMessage(
-               "You are trying an operation on a vector that is only "
-               "allowed if the vector is compressed, but the vector you "
-               "are operating on reports compress() has not been called "
-               "since the last relevant operation."));
 
       // Reset our cached vector view so that trilinos operations on device do
       // not detect an existing host view.
@@ -1525,6 +1485,8 @@ namespace LinearAlgebra
           }
         }
 
+      // Destroy the views already here, because we are calling doExport() or
+      // putScalar() below.
       nonlocal_vector_1d_view.reset();
       vector_1d_view.reset();
 
