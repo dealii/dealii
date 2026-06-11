@@ -38,12 +38,12 @@ namespace MeshWorker
      * The class assembling local contributions to a functional into global
      * functionals.
      *
-     *
+     * @deprecated This class is deprecated and will be removed in a future release.
      *
      * @ingroup MeshWorker
      */
     template <typename number = double>
-    class Functional
+    class DEAL_II_DEPRECATED_EARLY Functional
     {
     public:
       /**
