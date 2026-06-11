@@ -1083,6 +1083,8 @@ namespace Step31
         stokes_constraints.distribute_local_to_global(
           local_matrix, local_dof_indices, stokes_preconditioner_matrix);
       }
+
+    stokes_preconditioner_matrix.compress(VectorOperation::add);
   }
 
 
@@ -1359,6 +1361,9 @@ namespace Step31
                                                         stokes_rhs);
       }
 
+    stokes_matrix.compress(VectorOperation::add);
+    stokes_rhs.compress(VectorOperation::add);
+
     rebuild_stokes_matrix = false;
 
     std::cout << std::endl;
@@ -1456,6 +1461,8 @@ namespace Step31
           temperature_stiffness_matrix);
       }
 
+    temperature_mass_matrix.compress(VectorOperation::add);
+    temperature_stiffness_matrix.compress(VectorOperation::add);
     rebuild_temperature_matrices = false;
   }
 
