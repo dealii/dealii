@@ -35,10 +35,36 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
+  /**
+   * Helper enum to specify the type of vectorization: scalar) process
+   * one or more lanes with the SAME subface/subedge index and vectorized)
+   * process all lanes together independent of the subface/subedge index.
+   */
   enum class FEEvaluationImplHangingNodesRunnerTypes
   {
     scalar,
     vectorized
+  };
+
+
+
+  /**
+   * Helper enum to specify which
+   * FEEvaluationImplHangingNodesScalarEntityInterpolation implementation
+   * should be used for FEEvaluationImplHangingNodesRunnerTypes::scalar.
+   */
+  enum class HelperType
+  {
+    /**
+     * Compute the start indices of faces and edges based on the template
+     * argument fe_degree.
+     */
+    constant,
+    /**
+     * Compute the start indices of faces and edges based on the fe_degree
+     * passed to the constructor (to be used if the template argument is -1).
+     */
+    dynamic
   };
 
 
@@ -70,6 +96,10 @@ namespace internal
 
 
 
+  /**
+   * Helper class that loops over edges/faces/refinement configurations in
+   * different ways. See specializations.
+   */
   template <FEEvaluationImplHangingNodesRunnerTypes,
             int dim,
             int fe_degree,
@@ -78,6 +108,11 @@ namespace internal
 
 
 
+  /**
+   * Helper class that loops over all edges and faces (in vectorized way).
+   * Based on the refinement configuration of a lane, different interpolation
+   * matrices are used.
+   */
   template <int dim, int fe_degree, typename Number>
   class FEEvaluationImplHangingNodesRunner<
     FEEvaluationImplHangingNodesRunnerTypes::vectorized,
@@ -749,16 +784,26 @@ namespace internal
 
 
 
+  /**
+   * Helper class for interpolating to a subedge/-face for the scalar case.
+   *
+   * @tparam T We are using the
+   *   Curiously Recurring Template Pattern (see
+   *   https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in
+   * this class to avoid having to resort to `virtual` member functions.
+   * Children classes provide index offsets of subedges and -faces for the case
+   * that the polynomial degree is known at runtime or not.
+   */
   template <typename T,
             typename Number,
             VectorizationTypes VectorizationType,
             int                fe_degree,
             bool               transpose>
-  class HelperBase
+  class FEEvaluationImplHangingNodesScalarEntityInterpolation
   {
   public:
     inline DEAL_II_ALWAYS_INLINE_RELEASE
-    HelperBase(
+    FEEvaluationImplHangingNodesScalarEntityInterpolation(
       const T                                                     &t,
       const unsigned int                                          &given_degree,
       const bool                                                  &type_x,
@@ -1104,46 +1149,46 @@ namespace internal
   };
 
   /**
-   * Helper enum to specify which Helper implementation should be used.
+   * Helper class to interpolate data to subedges or subfaces.
+   * See specializations.
    */
-  enum class HelperType
-  {
-    /**
-     * Compute the start indices of faces and edges based on the template
-     * argument fe_degree.
-     */
-    constant,
-    /**
-     * Compute the start indices of faces and edges based on the fe_degree
-     * passed to the constructor (to be used if the template argument is -1).
-     */
-    dynamic
-  };
-
   template <HelperType helper_type,
             typename Number,
             VectorizationTypes VectorizationType,
             int                fe_degree,
             bool               transpose>
-  class Helper;
+  class FEEvaluationImplHangingNodesScalarEntityInterpolationImpl;
 
+  /**
+   * Helper class to interpolate data to subedges or subfaces.
+   * The class is used for the case that fe_degree is not known at
+   * compile time.
+   *
+   * The relevant interpolation routines are in
+   * FEEvaluationImplHangingNodesScalarEntityInterpolation. This class only adds
+   * index offset tables (at runtimes).
+   */
   template <typename Number,
             VectorizationTypes VectorizationType,
             int                fe_degree,
             bool               transpose>
-  class Helper<HelperType::dynamic,
-               Number,
-               VectorizationType,
-               fe_degree,
-               transpose> : public HelperBase<Helper<HelperType::dynamic,
-                                                     Number,
-                                                     VectorizationType,
-                                                     fe_degree,
-                                                     transpose>,
-                                              Number,
-                                              VectorizationType,
-                                              fe_degree,
-                                              transpose>
+  class FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+    HelperType::dynamic,
+    Number,
+    VectorizationType,
+    fe_degree,
+    transpose>
+    : public FEEvaluationImplHangingNodesScalarEntityInterpolation<
+        FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+          HelperType::dynamic,
+          Number,
+          VectorizationType,
+          fe_degree,
+          transpose>,
+        Number,
+        VectorizationType,
+        fe_degree,
+        transpose>
   {
   public:
     // Compiling with gcc 16.1.1 results in an annoying warning for the
@@ -1152,32 +1197,35 @@ namespace internal
     // We disable this warning.
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     inline DEAL_II_ALWAYS_INLINE_RELEASE
-    Helper(const unsigned int &given_degree,
-           const bool         &type_x,
-           const bool         &type_y,
-           const bool         &type_z,
-           const typename Trait<Number, VectorizationType>::index_type &v,
-           const std::array<
-             AlignedVector<
-               typename Trait<Number, VectorizationType>::interpolation_type>,
-             2>   &interpolation_matrices,
-           Number *values)
-      : HelperBase<Helper<HelperType::dynamic,
-                          Number,
-                          VectorizationType,
-                          fe_degree,
-                          transpose>,
-                   Number,
-                   VectorizationType,
-                   fe_degree,
-                   transpose>(*this,
-                              given_degree,
-                              type_x,
-                              type_y,
-                              type_z,
-                              v,
-                              interpolation_matrices,
-                              values)
+    FEEvaluationImplHangingNodesScalarEntityInterpolationImpl(
+      const unsigned int                                          &given_degree,
+      const bool                                                  &type_x,
+      const bool                                                  &type_y,
+      const bool                                                  &type_z,
+      const typename Trait<Number, VectorizationType>::index_type &v,
+      const std::array<
+        AlignedVector<
+          typename Trait<Number, VectorizationType>::interpolation_type>,
+        2>   &interpolation_matrices,
+      Number *values)
+      : FEEvaluationImplHangingNodesScalarEntityInterpolation<
+          FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+            HelperType::dynamic,
+            Number,
+            VectorizationType,
+            fe_degree,
+            transpose>,
+          Number,
+          VectorizationType,
+          fe_degree,
+          transpose>(*this,
+                     given_degree,
+                     type_x,
+                     type_y,
+                     type_z,
+                     v,
+                     interpolation_matrices,
+                     values)
       , points(given_degree + 1)
     {
       static_assert(fe_degree == -1, "Only working for fe_degree = -1.");
@@ -1293,23 +1341,36 @@ namespace internal
            {{0, points - 1, points *points - points}}}}}}}};
   };
 
+  /**
+   * Helper class to interpolate data to subedges or subfaces.
+   * The class is also used for the case that fe_degree is known at
+   * compile time.
+   *
+   * The relevant interpolation routines are in
+   * FEEvaluationImplHangingNodesScalarEntityInterpolation. This class only adds
+   * index offset tables (at compiletime).
+   */
   template <typename Number,
             VectorizationTypes VectorizationType,
             int                fe_degree,
             bool               transpose>
-  class Helper<HelperType::constant,
-               Number,
-               VectorizationType,
-               fe_degree,
-               transpose> : public HelperBase<Helper<HelperType::constant,
-                                                     Number,
-                                                     VectorizationType,
-                                                     fe_degree,
-                                                     transpose>,
-                                              Number,
-                                              VectorizationType,
-                                              fe_degree,
-                                              transpose>
+  class FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+    HelperType::constant,
+    Number,
+    VectorizationType,
+    fe_degree,
+    transpose>
+    : public FEEvaluationImplHangingNodesScalarEntityInterpolation<
+        FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+          HelperType::constant,
+          Number,
+          VectorizationType,
+          fe_degree,
+          transpose>,
+        Number,
+        VectorizationType,
+        fe_degree,
+        transpose>
   {
   public:
     // Compiling with gcc 16.1.1 results in an annoying warning for the
@@ -1318,32 +1379,35 @@ namespace internal
     // We disable this warning.
     DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
     inline DEAL_II_ALWAYS_INLINE_RELEASE
-    Helper(const unsigned int &given_degree,
-           const bool         &type_x,
-           const bool         &type_y,
-           const bool         &type_z,
-           const typename Trait<Number, VectorizationType>::index_type &v,
-           const std::array<
-             AlignedVector<
-               typename Trait<Number, VectorizationType>::interpolation_type>,
-             2>   &interpolation_matrices,
-           Number *values)
-      : HelperBase<Helper<HelperType::constant,
-                          Number,
-                          VectorizationType,
-                          fe_degree,
-                          transpose>,
-                   Number,
-                   VectorizationType,
-                   fe_degree,
-                   transpose>(*this,
-                              given_degree,
-                              type_x,
-                              type_y,
-                              type_z,
-                              v,
-                              interpolation_matrices,
-                              values)
+    FEEvaluationImplHangingNodesScalarEntityInterpolationImpl(
+      const unsigned int                                          &given_degree,
+      const bool                                                  &type_x,
+      const bool                                                  &type_y,
+      const bool                                                  &type_z,
+      const typename Trait<Number, VectorizationType>::index_type &v,
+      const std::array<
+        AlignedVector<
+          typename Trait<Number, VectorizationType>::interpolation_type>,
+        2>   &interpolation_matrices,
+      Number *values)
+      : FEEvaluationImplHangingNodesScalarEntityInterpolation<
+          FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+            HelperType::constant,
+            Number,
+            VectorizationType,
+            fe_degree,
+            transpose>,
+          Number,
+          VectorizationType,
+          fe_degree,
+          transpose>(*this,
+                     given_degree,
+                     type_x,
+                     type_y,
+                     type_z,
+                     v,
+                     interpolation_matrices,
+                     values)
     {
       static_assert(fe_degree != -1, "Only working for fe_degree != -1.");
     }
@@ -1474,6 +1538,11 @@ namespace internal
   };
 
 
+  /**
+   * Helper class that loops over sets of lanes (in a scalar way). Based on the
+   * refinement configuration of the set, different interpolation steps are
+   * performed.
+   */
   template <int dim, int fe_degree, typename Number>
   class FEEvaluationImplHangingNodesRunner<
     FEEvaluationImplHangingNodesRunnerTypes::scalar,
@@ -1628,12 +1697,13 @@ namespace internal
                   const auto faces  = (flag_0 & 0b01) ? flag_1 : 0;
                   const auto edges  = (flag_0 & 0b10) ? flag_1 : 0;
 
-                  Helper<fe_degree == -1 ? HelperType::dynamic :
-                                           HelperType::constant,
-                         Number,
-                         VectorizationType,
-                         fe_degree,
-                         transpose>
+                  FEEvaluationImplHangingNodesScalarEntityInterpolationImpl<
+                    fe_degree == -1 ? HelperType::dynamic :
+                                      HelperType::constant,
+                    Number,
+                    VectorizationType,
+                    fe_degree,
+                    transpose>
                     helper(given_degree,
                            type_x,
                            type_y,
