@@ -35,16 +35,20 @@ do_test()
   for (unsigned int v = 0; v < n_vectors; ++v)
     offsets[v] = v * n_numbers;
 
-  std::array<Number *, width> other_and_offset;
+  std::array<const Number *, width> other_and_offset_const;
   for (unsigned int v = 0; v < width; ++v)
-    other_and_offset[v] = other + offsets[v];
+    other_and_offset_const[v] = other + offsets[v];
+
+  std::array<Number *, width> other_and_offset_nonconst;
+  for (unsigned int v = 0; v < width; ++v)
+    other_and_offset_nonconst[v] = other + offsets[v];
 
   for (unsigned int i = 0; i < n_vectors; ++i)
     for (unsigned int j = 0; j < n_numbers; ++j)
       other[i * n_numbers + j] = i * n_numbers + j;
 
   vectorized_load_and_transpose<Number, width>(n_numbers,
-                                               other_and_offset,
+                                               other_and_offset_const,
                                                arr);
   unsigned int n_errors = 0;
   for (unsigned int j = 0; j < n_numbers; ++j)
@@ -67,7 +71,7 @@ do_test()
   vectorized_transpose_and_store<Number, width>(true,
                                                 n_numbers,
                                                 arr,
-                                                other_and_offset);
+                                                other_and_offset_nonconst);
   n_errors = 0;
   for (unsigned int i = 0; i < n_vectors; ++i)
     for (unsigned int j = 0; j < n_numbers; ++j)
@@ -89,7 +93,7 @@ do_test()
   vectorized_transpose_and_store<Number, width>(false,
                                                 n_numbers,
                                                 arr,
-                                                other_and_offset);
+                                                other_and_offset_nonconst);
   n_errors = 0;
   for (unsigned int i = 0; i < n_vectors; ++i)
     for (unsigned int j = 0; j < n_numbers; ++j)
