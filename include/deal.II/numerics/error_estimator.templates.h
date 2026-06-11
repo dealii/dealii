@@ -109,6 +109,21 @@ namespace internal
     dealii::hp::FESubfaceValues<dim, spacedim> fe_subface_values;
 
     /**
+     * Integrals on each subface. This has the same type as CopyData.
+     *
+     * @note Since integrate_over_irregular_face() calls
+     * integrate_over_regular_face(), this vector is present in two places at
+     * once in the second function: it is in parallel_data and
+     * local_face_integrals. Hence, one must exercise caution when accessing it
+     * to be sure it isn't aliased to something else in these internal
+     * functions.
+     *
+     * @note The caller should clear() this array before using it.
+     */
+    std::vector<std::tuple<unsigned int, unsigned int, double>>
+      subface_integrals;
+
+    /**
      * DoFs of the current cell.
      *
      * @note Since some of the functions below call each-other, be sure to
@@ -796,8 +811,9 @@ namespace internal
            ExcInternalError());
 
     // loop over all subfaces.
-    std::remove_reference_t<decltype(local_face_integrals)>
-      local_subface_integrals;
+    Assert(&local_face_integrals != &parallel_data.subface_integrals,
+           ExcInternalError());
+    parallel_data.subface_integrals.clear();
     for (unsigned int subface_no = 0; subface_no < face->n_children();
          ++subface_no)
       {
@@ -854,7 +870,7 @@ namespace internal
                             neighbor_child->face(neighbor_neighbor),
                             fe_face_values,
                             factor,
-                            local_subface_integrals);
+                            parallel_data.subface_integrals);
       }
     // We need to sort by the row and column (face and vector indices) for
     // sorted access in the next loop
@@ -862,8 +878,8 @@ namespace internal
       return std::make_tuple(std::get<0>(a), std::get<1>(a)) <
              std::make_tuple(std::get<0>(b), std::get<1>(b));
     };
-    std::sort(local_subface_integrals.begin(),
-              local_subface_integrals.end(),
+    std::sort(parallel_data.subface_integrals.begin(),
+              parallel_data.subface_integrals.end(),
               index_less);
     if constexpr (running_in_debug_mode())
       {
@@ -872,9 +888,10 @@ namespace internal
                  std::make_tuple(std::get<0>(b), std::get<1>(b));
         };
         // We should not have two entries for the same subface
-        Assert(std::adjacent_find(local_subface_integrals.begin(),
-                                  local_subface_integrals.end(),
-                                  index_equal) == local_subface_integrals.end(),
+        Assert(std::adjacent_find(parallel_data.subface_integrals.begin(),
+                                  parallel_data.subface_integrals.end(),
+                                  index_equal) ==
+                 parallel_data.subface_integrals.end(),
                ExcInternalError());
       }
 
@@ -890,14 +907,14 @@ namespace internal
         {
           const auto subface_index = face->child(subface_no)->index();
           const auto it =
-            std::lower_bound(local_subface_integrals.begin(),
-                             local_subface_integrals.end(),
+            std::lower_bound(parallel_data.subface_integrals.begin(),
+                             parallel_data.subface_integrals.end(),
                              std::make_tuple(subface_index, n),
                              [](const auto &a, const auto &b) {
                                return std::make_tuple(std::get<0>(a),
                                                       std::get<1>(a)) < b;
                              });
-          Assert(it != local_subface_integrals.end() &&
+          Assert(it != parallel_data.subface_integrals.end() &&
                    int(std::get<0>(*it)) == subface_index &&
                    std::get<1>(*it) == n,
                  ExcInternalError());
@@ -908,8 +925,8 @@ namespace internal
       local_face_integrals.emplace_back(face->index(), n, sum[n]);
 
     local_face_integrals.insert(local_face_integrals.end(),
-                                local_subface_integrals.begin(),
-                                local_subface_integrals.end());
+                                parallel_data.subface_integrals.begin(),
+                                parallel_data.subface_integrals.end());
   }
 
 
