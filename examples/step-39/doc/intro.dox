@@ -4,7 +4,8 @@ In this program, we use the interior penalty method and Nitsche's weak
 boundary conditions to solve Poisson's equation. We use multigrid
 methods on locally refined meshes, which are generated using a bulk
 criterion and a standard error estimator based on cell and face
-residuals. All operators are implemented using the MeshWorker interface.
+residuals. All operators are implemented using MeshWorker::mesh_loop() with
+scratch and copy objects.
 
 Like in step-12, the discretization relies on finite element spaces,
 which are polynomial inside the mesh cells $K\in \mathbb T_h$, but
@@ -56,11 +57,12 @@ For an interior face, we take the average of the two values at this face.
 
 In our finite element program, we distinguish three different
 integrals, corresponding to the sums over cells, interior faces and
-boundary faces above. Since the MeshWorker::loop organizes the sums
-for us, we only need to implement the integrals over each mesh
-element. The class MatrixIntegrator below has these three functions
-for the left hand side of the formula, the class RHSIntegrator for the
-right.
+boundary faces above. Since MeshWorker::mesh_loop() organizes these
+traversals for us, we only need to implement the integrals over each
+mesh element and store the local results in copy objects before they
+are transferred to the global data structures. The class
+MatrixIntegrator below has these three functions for the left hand
+side of the formula, the class RHSIntegrator for the right.
 
 As we will see below, even the error estimate is of the same
 structure, since it can be written as
@@ -79,11 +81,11 @@ Thus, the functions for assembling matrices, right hand side and error
 estimates below exhibit that these loops are all generic and can be
 programmed in the same way.
 
-This program is related to step-12, in that it uses MeshWorker and
-discontinuous Galerkin methods. There we solved an advection
-problem, while here it is a diffusion problem. Here, we also use multigrid
-preconditioning and a theoretically justified error estimator, see
-Karakashian and Pascal (2003). The multilevel scheme was discussed in
-detail in Kanschat (2004). The adaptive iteration and its convergence
-have been discussed (for triangular meshes) in Hoppe, Kanschat, and
-Warburton (2009).
+This program is related to step-12, in that it uses the MeshWorker
+framework together with discontinuous Galerkin methods. There we solved
+an advection problem, while here it is a diffusion problem. Here, we
+also use multigrid preconditioning and a theoretically justified error
+estimator, see Karakashian and Pascal (2003). The multilevel scheme was
+discussed in detail in Kanschat (2004). The adaptive iteration and its
+convergence have been discussed (for triangular meshes) in Hoppe,
+Kanschat, and Warburton (2009).
