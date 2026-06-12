@@ -385,13 +385,11 @@ main()
     TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> bs(
       TimeStepping::BOGACKI_SHAMPINE);
     test2(bs, f3, id_minus_tau_J_inv3, my3);
-    bs.free_memory();
 
     deallog << "DOPRI" << std::endl;
     TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> dopri(
       TimeStepping::DOPRI);
     test2(dopri, f5, id_minus_tau_J_inv5, my5);
-    dopri.free_memory();
 
     deallog << "Fehlberg" << std::endl;
     TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> fehlberg(
@@ -408,7 +406,6 @@ main()
     TimeStepping::EmbeddedExplicitRungeKutta<Vector<double>> tsit5_embedded(
       TimeStepping::TSITOURAS5);
     test2(tsit5_embedded, f5, id_minus_tau_J_inv5, my5);
-    tsit5_embedded.free_memory();
 
     // Tsitouras5 Fixed-Step Explicit Test
     deallog << "Explicit Tsitouras5" << std::endl;

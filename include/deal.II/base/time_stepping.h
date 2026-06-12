@@ -19,6 +19,7 @@
 #include <deal.II/base/signaling_nan.h>
 
 #include <functional>
+#include <memory>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -714,16 +715,7 @@ namespace TimeStepping
     /**
      * Destructor.
      */
-    ~EmbeddedExplicitRungeKutta() override
-    {
-      free_memory();
-    }
-
-    /**
-     * If necessary, deallocate memory allocated by the object.
-     */
-    void
-    free_memory();
+    ~EmbeddedExplicitRungeKutta() override = default;
 
     /**
      * Initialize the embedded explicit Runge-Kutta method.
@@ -870,7 +862,7 @@ namespace TimeStepping
      * If the last_same_as_first flag is set to true, the last stage is saved
      * and reused as the first stage of the next time step.
      */
-    VectorType *last_stage = nullptr;
+    std::unique_ptr<VectorType> last_stage;
 
     /**
      * Status structure of the object.
