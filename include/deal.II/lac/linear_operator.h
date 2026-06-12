@@ -953,6 +953,71 @@ null_operator(const LinearOperator<Range, Domain, Payload> &op)
   return return_op;
 }
 
+/**
+ * @relatesalso LinearOperator
+ *
+ * Return a LinearOperator that represents the action of a diagonal matrix,
+ * where the diagonal elements of this matrix are provided
+ * in the form of a vector. An argument "exemplar" is used a reference
+ * for the reinit_domain_vector and reinit_range_vector function objects.
+ * Note that VectorType must have a scale() function for this to work.
+ * @ingroup LAOperators
+ */
+template <typename Range,
+          typename Domain,
+          typename Payload,
+          typename VectorType>
+LinearOperator<Range, Domain, Payload>
+diagonal_operator(const LinearOperator<Range, Domain, Payload> &exemplar,
+                  const VectorType                             &diagonal)
+{
+  LinearOperator<Range, Domain, Payload> return_op;
+  return_op.reinit_range_vector  = exemplar.reinit_range_vector;
+  return_op.reinit_domain_vector = exemplar.reinit_domain_vector;
+
+  return_op.vmult = [&diagonal](Range &dst, const Domain &src) {
+    Assert(src.size() == diagonal.size(),
+           ExcDimensionMismatch(src.size(), diagonal.size()));
+    Assert(dst.size() == diagonal.size(),
+           ExcDimensionMismatch(dst.size(), diagonal.size()));
+    dst = src;
+    dst.scale(diagonal);
+  };
+
+  return_op.vmult_add = [&diagonal](Range &dst, const Domain &src) {
+    Assert(src.size() == diagonal.size(),
+           ExcDimensionMismatch(src.size(), diagonal.size()));
+    Assert(dst.size() == diagonal.size(),
+           ExcDimensionMismatch(dst.size(), diagonal.size()));
+    Range tmp;
+    tmp = src;
+    tmp.scale(diagonal);
+    dst += tmp;
+  };
+
+  return_op.Tvmult = [&diagonal](Domain &dst, const Range &src) {
+    Assert(src.size() == diagonal.size(),
+           ExcDimensionMismatch(src.size(), diagonal.size()));
+    Assert(dst.size() == diagonal.size(),
+           ExcDimensionMismatch(dst.size(), diagonal.size()));
+    dst = src;
+    dst.scale(diagonal);
+  };
+
+  return_op.Tvmult_add = [&diagonal](Domain &dst, const Range &src) {
+    Assert(src.size() == diagonal.size(),
+           ExcDimensionMismatch(src.size(), diagonal.size()));
+    Assert(dst.size() == diagonal.size(),
+           ExcDimensionMismatch(dst.size(), diagonal.size()));
+    Domain tmp;
+    tmp = src;
+    tmp.scale(diagonal);
+    dst += tmp;
+  };
+  return return_op;
+}
+
+
 
 /**
  * @relatesalso LinearOperator
