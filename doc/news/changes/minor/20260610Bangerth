@@ -1,0 +1,6 @@
+Deprecated: The classes Algorithms::Event, Algorithms::OperatorBase,
+Algorithms::OutputOperator, Algorithms::Newton,
+Algorithms::ThetaTimestepping, Algorithms::TimestepControl, and
+Algorithms::DoFOutputOperator have been marked as deprecated.
+<br>
+(Wolfgang Bangerth, 2026/06/10)

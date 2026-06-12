@@ -281,7 +281,7 @@ namespace Algorithms
    * @endcode
    */
   template <typename VectorType>
-  class ThetaTimestepping : public OperatorBase
+  class DEAL_II_DEPRECATED_EARLY ThetaTimestepping : public OperatorBase
   {
   public:
     /**
