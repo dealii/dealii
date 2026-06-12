@@ -15,6 +15,7 @@
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/sundials/arkode.h>
+#include <deal.II/sundials/arkode_exception.h>
 #include <deal.II/sundials/arkode_stepper.h>
 
 #include <arkode/arkode_erkstep.h>
@@ -31,8 +32,11 @@
 // Test ERKStepper functionality on the harmonic oscillator problem (cf.
 // arkode_01). Three sub-tests are run:
 //   1. Default ERKStepper settings.
-//   2. ERKStepper with the order of accuracy set to 4 via
-//      AdditionalData::order.
+//   2. ERKStepper with the order of accuracy set to 3 via
+//      AdditionalData::order. Order 3 is used here because it is the only
+//      order whose default Butcher table (BOGACKI_SHAMPINE_4_2_3) is
+//      unchanged across all supported SUNDIALS versions (5.8.0 through 7.7.0).
+//      All other orders map to different default tables in SUNDIALS 7.x.
 //   3. ERKStepper with an explicit Butcher table selected by name via
 //      AdditionalData::explicit_butcher_table (ARKODE_DORMAND_PRINCE_7_4_5,
 //      a classical order-5 explicit Runge-Kutta method).
@@ -60,8 +64,8 @@ make_arkode_data()
           0.01 /*initial_step_size*/,
           0.05 /*output_period*/,
           1e-6 /*minimum_step_size*/,
-          1e-6 /*absolute_tolerance*/,
-          1e-5 /*relative_tolerance*/};
+          1e-9 /*absolute_tolerance*/,
+          1e-8 /*relative_tolerance*/};
 }
 
 
@@ -120,11 +124,14 @@ main()
     run(data);
   }
 
-  // Sub-test 2: explicitly request order 6.
+  // Sub-test 2: explicitly request order 3.
+  // BOGACKI_SHAMPINE_4_2_3 is the default table for order 3 in all supported
+  // SUNDIALS versions (5.8.0 through 7.7.0), making this sub-test stable
+  // across versions without pinning a specific table by name.
   {
-    deallog << "=== Order 6 ===" << std::endl;
+    deallog << "=== Order 3 ===" << std::endl;
     SUNDIALS::ERKStepper<VectorType>::AdditionalData data;
-    data.order = 6;
+    data.order = 3;
     run(data);
   }
 
