@@ -1870,10 +1870,10 @@ namespace Utilities
         for (const auto &rank_obj : objects_to_send)
           if (rank_obj.first != my_proc)
             {
-              const auto &rank   = rank_obj.first;
-              buffers_to_send[i] = Utilities::pack(rank_obj.second,
-                                                   /*allow_compression=*/false);
-              const int ierr     = MPI_Isend(buffers_to_send[i].data(),
+              const auto &rank = rank_obj.first;
+              buffers_to_send[i] =
+                Utilities::pack(rank_obj.second, /*compress=*/false);
+              const int ierr = MPI_Isend(buffers_to_send[i].data(),
                                          buffers_to_send[i].size(),
                                          MPI_CHAR,
                                          rank,
@@ -1918,8 +1918,7 @@ namespace Utilities
                    ExcInternalError(
                      "I should not receive again from this rank"));
             received_objects[rank] =
-              Utilities::unpack<T>(buffer,
-                                   /*allow_compression=*/false);
+              Utilities::unpack<T>(buffer, /*compress=*/false);
           }
       }
 
@@ -1987,7 +1986,7 @@ namespace Utilities
 #  else
       const auto n_procs = dealii::Utilities::MPI::n_mpi_processes(comm);
 
-      std::vector<char> buffer = Utilities::pack(object);
+      std::vector<char> buffer = Utilities::pack(object, /*compress=*/false);
 
       int n_local_data = buffer.size();
 
@@ -2027,7 +2026,8 @@ namespace Utilities
                                            rdispls[i],
                                          received_unrolled_buffer.begin() +
                                            rdispls[i] + size_all_data[i]);
-          received_objects[i] = Utilities::unpack<T>(local_buffer);
+          received_objects[i] =
+            Utilities::unpack<T>(local_buffer, /*compress=*/false);
         }
 
       return received_objects;
@@ -2053,8 +2053,9 @@ namespace Utilities
 
       AssertIndexRange(root_process, n_procs);
 
-      std::vector<char> buffer       = Utilities::pack(object_to_send);
-      int               n_local_data = buffer.size();
+      std::vector<char> buffer =
+        Utilities::pack(object_to_send, /*compress=*/false);
+      int n_local_data = buffer.size();
 
       // Vector to store the size of loc_data_array for every process
       // only the root process needs to allocate memory for that purpose
@@ -2105,13 +2106,10 @@ namespace Utilities
           received_objects.resize(n_procs);
 
           for (unsigned int i = 0; i < n_procs; ++i)
-            {
-              const std::vector<char> local_buffer(
-                received_unrolled_buffer.begin() + rdispls[i],
-                received_unrolled_buffer.begin() + rdispls[i] +
-                  size_all_data[i]);
-              received_objects[i] = Utilities::unpack<T>(local_buffer);
-            }
+            received_objects[i] = Utilities::unpack<T>(
+              received_unrolled_buffer.cbegin() + rdispls[i],
+              received_unrolled_buffer.cbegin() + rdispls[i] + size_all_data[i],
+              /*compress=*/false);
         }
       return received_objects;
 #  endif
@@ -2154,7 +2152,8 @@ namespace Utilities
 
           for (unsigned int i = 0; i < n_procs; ++i)
             {
-              const auto packed_data = Utilities::pack(objects_to_send[i]);
+              const auto packed_data =
+                Utilities::pack(objects_to_send[i], /*compress=*/false);
               send_buffer.insert(send_buffer.end(),
                                  packed_data.begin(),
                                  packed_data.end());
@@ -2189,7 +2188,7 @@ namespace Utilities
                           comm);
       AssertThrowMPI(ierr);
 
-      return Utilities::unpack<T>(recv_buffer);
+      return Utilities::unpack<T>(recv_buffer, /*compress=*/false);
 #  endif
     }
 
@@ -2270,7 +2269,7 @@ namespace Utilities
           // buffer size needs to be.
           if (this_mpi_process(comm) == root_process)
             {
-              buffer      = Utilities::pack(object_to_send, false);
+              buffer      = Utilities::pack(object_to_send, /*compress=*/false);
               buffer_size = buffer.size();
             }
 
@@ -2292,7 +2291,7 @@ namespace Utilities
           if (Utilities::MPI::this_mpi_process(comm) == root_process)
             return object_to_send;
           else
-            return Utilities::unpack<T>(buffer, false);
+            return Utilities::unpack<T>(buffer, /*compress=*/false);
         }
 #  endif
     }
@@ -2328,7 +2327,8 @@ namespace Utilities
       // at any given time, though the latter is not an important
       // optimization.
       std::shared_ptr<std::vector<char>> send_buffer =
-        std::make_unique<std::vector<char>>(Utilities::pack(object, false));
+        std::make_unique<std::vector<char>>(
+          Utilities::pack(object, /*compress=*/false));
 
       // Now start the send, and store the result in a request object that
       // we can then wait for later:
@@ -2425,7 +2425,7 @@ namespace Utilities
         AssertThrowMPI(ierr);
 
         // Return the unpacked object:
-        return Utilities::unpack<T>(receive_buffer, false);
+        return Utilities::unpack<T>(receive_buffer, /*compress=*/false);
       };
 
       return Future<T>(wait, get);
