@@ -308,6 +308,26 @@ namespace SUNDIALS
       content->preconditioner_solve = p_solve;
       return 0;
     }
+
+
+
+    /**
+     * Check the return value of a SUNDIALS ATimes or PSolve function pointer
+     * (the @p a_times_fn and @p p_solve_fn fields of LinearSolverContent) and
+     * propagate errors appropriately.
+     *
+     * Return-value semantics (SUNDIALS SUNLinearSolver API convention):
+     * = 0: success;
+     * > 0: recoverable error, rethrow as RecoverableUserCallbackError;
+     * < 0: unrecoverable error, AssertSundialsSolver fires.
+     */
+    inline void
+    check_vmult_status(const int status)
+    {
+      if (status > 0)
+        throw RecoverableUserCallbackError();
+      AssertSundialsSolver(status);
+    }
   } // namespace internal
 
 
@@ -410,9 +430,7 @@ namespace SUNDIALS
                                                linsol_ctx
 #  endif
     );
-    int status = a_times_fn(A_data, sun_src, sun_dst);
-    (void)status;
-    AssertSundialsSolver(status);
+    internal::check_vmult_status(a_times_fn(A_data, sun_src, sun_dst));
   }
 
 
@@ -469,10 +487,8 @@ namespace SUNDIALS
     );
     // for custom preconditioners no distinction between left and right
     // preconditioning is made
-    int status =
-      p_solve_fn(P_data, sun_src, sun_dst, tol, 0 /*precondition_type*/);
-    (void)status;
-    AssertSundialsSolver(status);
+    internal::check_vmult_status(
+      p_solve_fn(P_data, sun_src, sun_dst, tol, 0 /*precondition_type*/));
   }
 
 } // namespace SUNDIALS
