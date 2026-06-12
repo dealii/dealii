@@ -79,9 +79,6 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest
 {
 public:
-  using vector_t                     = VectorizedArray<Number>;
-  static const std::size_t n_vectors = VectorizedArray<Number>::size();
-
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : data(data_in){};
 

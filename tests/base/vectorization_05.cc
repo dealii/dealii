@@ -28,21 +28,21 @@ test()
 {
   // since the number of array elements is system dependent, it is not a good
   // idea to print them to an output file. Instead, check the values manually
-  const unsigned int      n_vectors = VectorizedArray<Number>::size();
+  const unsigned int      n_lanes = VectorizedArray<Number>::size();
   VectorizedArray<Number> arr[n_numbers];
-  Number                  other[n_vectors * n_numbers];
-  unsigned int            offsets[n_vectors];
-  for (unsigned int v = 0; v < n_vectors; ++v)
+  Number                  other[n_lanes * n_numbers];
+  unsigned int            offsets[n_lanes];
+  for (unsigned int v = 0; v < n_lanes; ++v)
     offsets[v] = v * n_numbers;
 
-  for (unsigned int i = 0; i < n_vectors; ++i)
+  for (unsigned int i = 0; i < n_lanes; ++i)
     for (unsigned int j = 0; j < n_numbers; ++j)
       other[i * n_numbers + j] = i * n_numbers + j + 13;
 
   vectorized_load_and_transpose(n_numbers, other, offsets, arr);
   unsigned int n_errors = 0;
   for (unsigned int j = 0; j < n_numbers; ++j)
-    for (unsigned int i = 0; i < n_vectors; ++i)
+    for (unsigned int i = 0; i < n_lanes; ++i)
       if (arr[j][i] != i * n_numbers + j + 13)
         ++n_errors;
   deallog << "load_and_transpose at          n=" << n_numbers
@@ -50,21 +50,21 @@ test()
   if (n_errors > 0)
     for (unsigned int i = 0; i < n_numbers; ++i)
       {
-        for (unsigned int j = 0; j < n_vectors; ++j)
+        for (unsigned int j = 0; j < n_lanes; ++j)
           deallog << arr[i][j] << ' ';
         deallog << std::endl;
       }
 
   vectorized_transpose_and_store(true, n_numbers, arr, offsets, other);
   n_errors = 0;
-  for (unsigned int i = 0; i < n_vectors; ++i)
+  for (unsigned int i = 0; i < n_lanes; ++i)
     for (unsigned int j = 0; j < n_numbers; ++j)
       if (other[i * n_numbers + j] != 2. * (i * n_numbers + j + 13))
         ++n_errors;
   deallog << "transpose_and_store (  add) at n=" << n_numbers
           << ": #errors: " << n_errors << std::endl;
   if (n_errors > 0)
-    for (unsigned int i = 0; i < n_vectors; ++i)
+    for (unsigned int i = 0; i < n_lanes; ++i)
       {
         for (unsigned int j = 0; j < n_numbers; ++j)
           deallog << other[i * n_numbers + j] << ' ';
@@ -73,14 +73,14 @@ test()
 
   vectorized_transpose_and_store(false, n_numbers, arr, offsets, other);
   n_errors = 0;
-  for (unsigned int i = 0; i < n_vectors; ++i)
+  for (unsigned int i = 0; i < n_lanes; ++i)
     for (unsigned int j = 0; j < n_numbers; ++j)
       if (other[i * n_numbers + j] != (i * n_numbers + j + 13))
         ++n_errors;
   deallog << "transpose_and_store (noadd) at n=" << n_numbers
           << ": #errors: " << n_errors << std::endl;
   if (n_errors > 0)
-    for (unsigned int i = 0; i < n_vectors; ++i)
+    for (unsigned int i = 0; i < n_lanes; ++i)
       {
         for (unsigned int j = 0; j < n_numbers; ++j)
           deallog << other[i * n_numbers + j] << ' ';
