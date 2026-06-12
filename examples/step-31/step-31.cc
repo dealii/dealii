@@ -515,7 +515,17 @@ namespace Step31
     unsigned int timestep_number;
 
     std::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditioner;
-    std::shared_ptr<TrilinosWrappers::PreconditionIC>  Mp_preconditioner;
+
+    // Next, we select the type used for the preconditioner. For older versions
+    // of Trilinos, which have the historical Epetra sub-package, we can use an
+    // incomplete Cholesky (IC) preconditioner. For newer Trilinos versions that
+    // no longer have Epetra, we use a Jacobi preconditioner.
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    using MpPreconditionType = TrilinosWrappers::PreconditionIC;
+#else
+    using MpPreconditionType = TrilinosWrappers::PreconditionJacobi;
+#endif
+    std::shared_ptr<MpPreconditionType> Mp_preconditioner;
 
     bool rebuild_stokes_matrix;
     bool rebuild_temperature_matrices;
@@ -1167,7 +1177,7 @@ namespace Step31
     Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0, 0),
                                    amg_data);
 
-    Mp_preconditioner = std::make_shared<TrilinosWrappers::PreconditionIC>();
+    Mp_preconditioner = std::make_shared<MpPreconditionType>();
     Mp_preconditioner->initialize(stokes_preconditioner_matrix.block(1, 1));
 
     std::cout << std::endl;
@@ -1698,13 +1708,13 @@ namespace Step31
 
     {
       const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                         TrilinosWrappers::PreconditionIC>
+                                         MpPreconditionType>
         mp_inverse(stokes_preconditioner_matrix.block(1, 1),
                    *Mp_preconditioner);
 
       const LinearSolvers::BlockSchurPreconditioner<
         TrilinosWrappers::PreconditionAMG,
-        TrilinosWrappers::PreconditionIC>
+        MpPreconditionType>
         preconditioner(stokes_matrix, mp_inverse, *Amg_preconditioner);
 
       SolverControl solver_control(stokes_matrix.m(),
@@ -1785,7 +1795,7 @@ namespace Step31
                                    1e-8 * temperature_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
-      TrilinosWrappers::PreconditionIC preconditioner;
+      MpPreconditionType preconditioner;
       preconditioner.initialize(temperature_matrix);
 
       cg.solve(temperature_matrix,
