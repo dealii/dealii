@@ -775,13 +775,10 @@ namespace SUNDIALS
         // explicit right-hand side), so no further user input is required.
         // The state vector y0 is only used to determine the vector layout for
         // the initial guess; the estimator clones it internally.
-        dom_eig_estimator.reset();
-
         SUNDomEigEstimator estimator =
           SUNDomEigEstimator_Power(initial_condition_nvector,
                                    data.dom_eig_estimator_max_iters,
-                                   static_cast<SUNDIALS::realtype>(
-                                     data.dom_eig_estimator_rel_tol),
+                                   data.dom_eig_estimator_rel_tol,
                                    inv_ctx.arkode_ctx);
         Assert(estimator != nullptr, ExcInternalError());
         dom_eig_estimator.reset(static_cast<void *>(estimator));
@@ -789,7 +786,7 @@ namespace SUNDIALS
         status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
         AssertARKode(status);
 
-        if (data.dom_eig_estimator_num_warmups > 0)
+        if (data.dom_eig_estimator_num_warmups != numbers::invalid_unsigned_int)
           {
             status = LSRKStepSetNumDomEigEstInitPreprocessIters(
               arkode_mem.get(), data.dom_eig_estimator_num_warmups);
@@ -804,7 +801,7 @@ namespace SUNDIALS
 #    endif
       }
 
-    if (data.dom_eig_frequency >= 0)
+    if (data.dom_eig_frequency != numbers::invalid_unsigned_int)
       {
         status =
           LSRKStepSetDomEigFrequency(arkode_mem.get(), data.dom_eig_frequency);

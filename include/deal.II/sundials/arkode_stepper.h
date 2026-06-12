@@ -1405,9 +1405,9 @@ namespace SUNDIALS
        * @param dom_eig_estimator_max_iters Maximum number of power iterations
        *   performed by the built-in dominant-eigenvalue estimator. Only used
        *   when dominant_eigenvalue_function() is not provided (so that the
-       *   default SUNDomEigEstimator is created). A negative value (the
-       *   default, -1) leaves this option unset, so SUNDIALS uses its built-in
-       *   default. Forwarded to SUNDomEigEstimator_Power.
+       *   default SUNDomEigEstimator is created). A zero value (the default)
+       *   leaves this option unset, so SUNDIALS uses its built-in default.
+       *   Forwarded to SUNDomEigEstimator_Power.
        * @param dom_eig_estimator_rel_tol Relative convergence tolerance of the
        *   power iteration used by the built-in dominant-eigenvalue estimator.
        *   Only used when dominant_eigenvalue_function() is not provided. A
@@ -1421,12 +1421,14 @@ namespace SUNDIALS
        *   default, -1) leaves this option unset, so SUNDIALS uses its built-in
        *   default. Forwarded to LSRKStepSetNumDomEigEstInitPreprocessIters.
        */
-      AdditionalData(const std::string &method_name                   = "",
-                     const int          dom_eig_frequency             = -1,
-                     const unsigned int max_num_stages                = 0,
-                     const long int     dom_eig_estimator_max_iters   = -1,
-                     const double       dom_eig_estimator_rel_tol     = -1.,
-                     const int          dom_eig_estimator_num_warmups = -1)
+      AdditionalData(
+        const std::string &method_name       = "",
+        const unsigned int dom_eig_frequency = numbers::invalid_unsigned_int,
+        const unsigned int max_num_stages    = 0,
+        const unsigned int dom_eig_estimator_max_iters = 0,
+        const double       dom_eig_estimator_rel_tol   = 0,
+        const unsigned int dom_eig_estimator_num_warmups =
+          numbers::invalid_unsigned_int)
         : method_name(method_name)
         , dom_eig_frequency(dom_eig_frequency)
         , max_num_stages(max_num_stages)
@@ -1452,11 +1454,12 @@ namespace SUNDIALS
       /**
        * Number of successful time steps after which the dominant eigenvalue
        * estimate is recomputed. A value of 0 means the dominant eigenvalue
-       * will not change throughout the simulation. Any negative value (the
-       * default, -1) leaves this option unset so that SUNDIALS uses its
-       * built-in default of 25. Forwarded to LSRKStepSetDomEigFrequency.
+       * will not change throughout the simulation. The default value
+       * (numbers::invalid_unsigned_int) leaves this option unset so that
+       * SUNDIALS uses its built-in default of 25. Forwarded to
+       * LSRKStepSetDomEigFrequency.
        */
-      int dom_eig_frequency;
+      unsigned int dom_eig_frequency;
 
       /**
        * Maximum number of stages allowed per time step. 0 means no limit
@@ -1471,23 +1474,26 @@ namespace SUNDIALS
        * default SUNDomEigEstimator (power iteration) is created and attached.
        * Forwarded to SUNDomEigEstimator_Power.
        */
-      long int dom_eig_estimator_max_iters;
+      unsigned int dom_eig_estimator_max_iters;
 
       /**
        * Relative convergence tolerance of the power iteration used by the
        * built-in dominant-eigenvalue estimator. Only used when
-       * dominant_eigenvalue_function() is not provided. Forwarded to
-       * SUNDomEigEstimator_Power.
+       * dominant_eigenvalue_function() is not provided. Any non-positive value
+       * (default 0) lets SUNDIALS to use its default tolerance (default 0.005).
+       * Forwarded to SUNDomEigEstimator_Power.
        */
       double dom_eig_estimator_rel_tol;
 
       /**
        * Number of preprocessing warmup iterations performed once when the
        * built-in dominant-eigenvalue estimator is first initialized. Only used
-       * when dominant_eigenvalue_function() is not provided. Forwarded to
+       * when dominant_eigenvalue_function() is not provided. The default value
+       * (numbers::invalid_unsigned_int) leaves this option unset so that
+       * SUNDIALS uses its built-in default of 100. Forwarded to
        * LSRKStepSetNumDomEigEstInitPreprocessIters.
        */
-      int dom_eig_estimator_num_warmups;
+      unsigned int dom_eig_estimator_num_warmups;
     };
 
     /**

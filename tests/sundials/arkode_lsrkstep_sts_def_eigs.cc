@@ -62,13 +62,13 @@
 // reproduces the analytical-eigenvalue results. Here we additionally observe
 // the effect of tuning the estimator:
 //
-// The number of *time steps* taken is governed by ARKODE's error-based time
+// The number of time steps taken is governed by ARKODE's error-based time
 // step adaptivity, not by the eigenvalue estimate, which only controls how
 // many polynomial stages each step needs in order to be stable. As long as the
 // estimate is accurate enough to keep the method stable, the number of time
 // steps and the achieved accuracy are therefore identical regardless of how
-// the estimator is tuned. What does change with the tuning is the *amount of
-// work*: every power iteration (including the one-time warmup iterations)
+// the estimator is tuned. What does change with the tuning is the amount of
+// work: every power iteration (including the one-time warmup iterations)
 // costs an evaluation of the right-hand side. Tuning the estimator more
 // aggressively (more warmup iterations) increases the right-hand-side
 // evaluation count while leaving the time step count and the solution accuracy
@@ -175,14 +175,9 @@ main()
   // effect of tuning the estimator.
   {
     deallog << "=== Default STS, estimator with extra warmups ===" << std::endl;
-    SUNDIALS::LSRKStepperSTS<VectorType>::AdditionalData data(
-      /*method_name=*/"",
-      /*dom_eig_frequency=*/-1,
-      /*max_num_stages=*/0,
-      /*dom_eig_estimator_max_iters=*/-1,
-      /*dom_eig_estimator_rel_tol=*/-1.,
-      /*dom_eig_estimator_num_warmups=*/200);
-    n_rhs_evals_warmup = run(data);
+    SUNDIALS::LSRKStepperSTS<VectorType>::AdditionalData data;
+    data.dom_eig_estimator_num_warmups = 200;
+    n_rhs_evals_warmup                 = run(data);
   }
 
   deallog << std::boolalpha
