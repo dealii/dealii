@@ -616,7 +616,9 @@ namespace Step31
     TrilinosWrappers::PreconditionAMG::AdditionalData amg_data;
     amg_data.constant_modes_values = constant_modes_values;
     amg_data.elliptic              = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     amg_data.higher_order_elements = true;
+#endif
     amg_data.smoother_sweeps       = 2;
     amg_data.aggregation_threshold = 0.02;
     Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0, 0),

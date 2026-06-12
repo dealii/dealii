@@ -1162,8 +1162,10 @@ namespace Step31
     // pointer, which makes it easier to recreate the preconditioner next time
     // around since we do not have to care about destroying the previously
     // used object.
-    amg_data.elliptic              = true;
+    amg_data.elliptic = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     amg_data.higher_order_elements = true;
+#endif
     amg_data.smoother_sweeps       = 2;
     amg_data.aggregation_threshold = 0.02;
     Amg_preconditioner->initialize(stokes_preconditioner_matrix.block(0, 0),

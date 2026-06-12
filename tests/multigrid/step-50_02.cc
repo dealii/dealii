@@ -481,7 +481,9 @@ namespace Step50
 
          TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
          Amg_data.elliptic = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
          Amg_data.higher_order_elements = true;
+#endif
          Amg_data.smoother_sweeps = 2;
          Amg_data.aggregation_threshold = 0.02;
 

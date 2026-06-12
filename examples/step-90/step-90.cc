@@ -958,9 +958,11 @@ namespace Step90
           DoFTools::extract_constant_modes(dof_handler);
         TrilinosWrappers::PreconditionAMG preconditioner_stiffness;
         TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
-        Amg_data.constant_modes        = constant_modes;
-        Amg_data.elliptic              = true;
+        Amg_data.constant_modes = constant_modes;
+        Amg_data.elliptic       = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
         Amg_data.higher_order_elements = false;
+#endif
         Amg_data.smoother_sweeps       = 2;
         Amg_data.aggregation_threshold = 0.02;
         Amg_data.output_details        = true;

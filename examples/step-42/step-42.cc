@@ -1642,9 +1642,11 @@ namespace Step42
         DoFTools::extract_constant_modes(dof_handler);
 
       TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
-      additional_data.constant_modes        = constant_modes;
-      additional_data.elliptic              = true;
-      additional_data.n_cycles              = 1;
+      additional_data.constant_modes = constant_modes;
+      additional_data.elliptic       = true;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+      additional_data.n_cycles = 1;
+#endif
       additional_data.w_cycle               = false;
       additional_data.output_details        = false;
       additional_data.smoother_sweeps       = 2;
