@@ -37,7 +37,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 
-// The include file for using the MeshWorker framework
+// The include file for using MeshWorker::mesh_loop()
 #include <deal.II/meshworker/mesh_loop.h>
 
 // The include file for local integrators associated with the Laplacian
@@ -154,6 +154,7 @@ namespace Step39
                              const Quadrature<dim - 1> &face_quadrature,
                              const UpdateFlags          face_update_flags)
       : boundary_fe_values(mapping, fe, face_quadrature, face_update_flags)
+      , boundary_values(face_quadrature.size())
     {}
 
 
@@ -162,10 +163,12 @@ namespace Step39
                            scratch_data.boundary_fe_values.get_fe(),
                            scratch_data.boundary_fe_values.get_quadrature(),
                            scratch_data.boundary_fe_values.get_update_flags())
+      , boundary_values(scratch_data.boundary_values.size())
     {}
 
 
-    FEFaceValues<dim> boundary_fe_values;
+    FEFaceValues<dim>   boundary_fe_values;
+    std::vector<double> boundary_values;
   };
 
 
@@ -191,6 +194,7 @@ namespace Step39
       , neighbor_subface_values(mapping, fe, face_quadrature, face_update_flags)
       , cell_hessians(cell_quadrature.size())
       , boundary_solution_values(boundary_quadrature.size())
+      , boundary_exact_values(boundary_quadrature.size())
       , face_solution_values(face_quadrature.size())
       , neighbor_face_solution_values(face_quadrature.size())
       , face_solution_gradients(face_quadrature.size())
@@ -227,6 +231,7 @@ namespace Step39
           scratch_data.neighbor_subface_values.get_update_flags())
       , cell_hessians(scratch_data.cell_hessians.size())
       , boundary_solution_values(scratch_data.boundary_solution_values.size())
+      , boundary_exact_values(scratch_data.boundary_exact_values.size())
       , face_solution_values(scratch_data.face_solution_values.size())
       , neighbor_face_solution_values(
           scratch_data.neighbor_face_solution_values.size())
@@ -244,6 +249,7 @@ namespace Step39
     FESubfaceValues<dim>        neighbor_subface_values;
     std::vector<Tensor<2, dim>> cell_hessians;
     std::vector<double>         boundary_solution_values;
+    std::vector<double>         boundary_exact_values;
     std::vector<double>         face_solution_values;
     std::vector<double>         neighbor_face_solution_values;
     std::vector<Tensor<1, dim>> face_solution_gradients;
@@ -273,7 +279,10 @@ namespace Step39
       , neighbor_subface_values(mapping, fe, face_quadrature, face_update_flags)
       , cell_solution_values(cell_quadrature.size())
       , cell_solution_gradients(cell_quadrature.size())
+      , cell_exact_values(cell_quadrature.size())
+      , cell_exact_gradients(cell_quadrature.size())
       , boundary_solution_values(boundary_quadrature.size())
+      , boundary_exact_values(boundary_quadrature.size())
       , face_solution_values(face_quadrature.size())
       , neighbor_face_solution_values(face_quadrature.size())
     {}
@@ -308,7 +317,10 @@ namespace Step39
           scratch_data.neighbor_subface_values.get_update_flags())
       , cell_solution_values(scratch_data.cell_solution_values.size())
       , cell_solution_gradients(scratch_data.cell_solution_gradients.size())
+      , cell_exact_values(scratch_data.cell_exact_values.size())
+      , cell_exact_gradients(scratch_data.cell_exact_gradients.size())
       , boundary_solution_values(scratch_data.boundary_solution_values.size())
+      , boundary_exact_values(scratch_data.boundary_exact_values.size())
       , face_solution_values(scratch_data.face_solution_values.size())
       , neighbor_face_solution_values(
           scratch_data.neighbor_face_solution_values.size())
@@ -323,7 +335,10 @@ namespace Step39
     FESubfaceValues<dim>        neighbor_subface_values;
     std::vector<double>         cell_solution_values;
     std::vector<Tensor<1, dim>> cell_solution_gradients;
+    std::vector<double>         cell_exact_values;
+    std::vector<Tensor<1, dim>> cell_exact_gradients;
     std::vector<double>         boundary_solution_values;
+    std::vector<double>         boundary_exact_values;
     std::vector<double>         face_solution_values;
     std::vector<double>         neighbor_face_solution_values;
   };
@@ -670,14 +685,12 @@ namespace Step39
   namespace RHSIntegrator
   {
     template <int dim, typename CellIterator>
-    void boundary(const CellIterator      &cell,
-                  const unsigned int       face_no,
-                  const FEFaceValues<dim> &fe,
-                  Vector<double>          &local_vector)
+    void boundary(const CellIterator        &cell,
+                  const unsigned int         face_no,
+                  const FEFaceValues<dim>   &fe,
+                  const std::vector<double> &boundary_values,
+                  Vector<double>            &local_vector)
     {
-      std::vector<double> boundary_values(fe.n_quadrature_points);
-      exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
-
       const unsigned int degree  = fe.get_fe().tensor_degree();
       const double       penalty = 2. * degree * (degree + 1) *
                              cell->face(face_no)->measure() / cell->measure();
@@ -722,11 +735,9 @@ namespace Step39
     double boundary(const CellIterator        &cell,
                     const unsigned int         face_no,
                     const FEFaceValues<dim>   &fe,
-                    const std::vector<double> &uh)
+                    const std::vector<double> &uh,
+                    const std::vector<double> &boundary_values)
     {
-      std::vector<double> boundary_values(fe.n_quadrature_points);
-      exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
-
       const unsigned int degree  = fe.get_fe().tensor_degree();
       const double       penalty = 2. * degree * (degree + 1) *
                              cell->face(face_no)->measure() / cell->measure();
@@ -781,7 +792,7 @@ namespace Step39
   // discontinuous Galerkin problems not only involves the difference of the
   // gradient inside the cells, but also the jump terms across faces and at
   // the boundary, we cannot just use VectorTools::integrate_difference().
-  // Instead, we use the MeshWorker interface to compute the error ourselves.
+  // Instead, we use MeshWorker::mesh_loop() to compute the error ourselves.
 
   // There are several different ways to define this energy norm, but all of
   // them are equivalent to each other uniformly with mesh size (some not
@@ -801,16 +812,13 @@ namespace Step39
   namespace ErrorIntegrator
   {
     template <int dim>
-    std::array<double, 2> cell(const FEValues<dim>               &fe,
-                               const std::vector<double>         &uh,
-                               const std::vector<Tensor<1, dim>> &Duh)
+    std::array<double, 2>
+    cell(const FEValues<dim>               &fe,
+         const std::vector<double>         &uh,
+         const std::vector<Tensor<1, dim>> &Duh,
+         const std::vector<double>         &exact_values,
+         const std::vector<Tensor<1, dim>> &exact_gradients)
     {
-      std::vector<Tensor<1, dim>> exact_gradients(fe.n_quadrature_points);
-      std::vector<double>         exact_values(fe.n_quadrature_points);
-
-      exact_solution.gradient_list(fe.get_quadrature_points(), exact_gradients);
-      exact_solution.value_list(fe.get_quadrature_points(), exact_values);
-
       std::array<double, 2> values = {};
 
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
@@ -835,11 +843,9 @@ namespace Step39
     double boundary(const CellIterator        &cell,
                     const unsigned int         face_no,
                     const FEFaceValues<dim>   &fe,
-                    const std::vector<double> &uh)
+                    const std::vector<double> &uh,
+                    const std::vector<double> &exact_values)
     {
-      std::vector<double> exact_values(fe.n_quadrature_points);
-      exact_solution.value_list(fe.get_quadrature_points(), exact_values);
-
       const unsigned int degree  = fe.get_fe().tensor_degree();
       const double       penalty = 2. * degree * (degree + 1) *
                              cell->face(face_no)->measure() / cell->measure();
@@ -1376,9 +1382,13 @@ namespace Step39
           RightHandSideScratchData<dim> &scratch_data,
           RightHandSideCopyData         &copy) {
         scratch_data.boundary_fe_values.reinit(cell, face_no);
+        exact_solution.value_list(
+          scratch_data.boundary_fe_values.get_quadrature_points(),
+          scratch_data.boundary_values);
         RHSIntegrator::boundary<dim>(cell,
                                      face_no,
                                      scratch_data.boundary_fe_values,
+                                     scratch_data.boundary_values,
                                      copy.cell_rhs);
       });
 
@@ -1518,8 +1528,14 @@ namespace Step39
           scratch_data.boundary_fe_values;
         fe_face_values.get_function_values(
           solution, scratch_data.boundary_solution_values);
-        copy.cell_values[0] += Estimator::boundary<dim>(
-          cell, face_no, fe_face_values, scratch_data.boundary_solution_values);
+        exact_solution.value_list(fe_face_values.get_quadrature_points(),
+                                  scratch_data.boundary_exact_values);
+        copy.cell_values[0] +=
+          Estimator::boundary<dim>(cell,
+                                   face_no,
+                                   fe_face_values,
+                                   scratch_data.boundary_solution_values,
+                                   scratch_data.boundary_exact_values);
       },
       /* interior face worker: */
       [&](const CellIterator        &cell,
@@ -1704,10 +1720,16 @@ namespace Step39
                                       scratch_data.cell_solution_values);
         fe_values.get_function_gradients(solution,
                                          scratch_data.cell_solution_gradients);
+        exact_solution.value_list(fe_values.get_quadrature_points(),
+                                  scratch_data.cell_exact_values);
+        exact_solution.gradient_list(fe_values.get_quadrature_points(),
+                                     scratch_data.cell_exact_gradients);
         copy.cell_values =
           ErrorIntegrator::cell<dim>(fe_values,
                                      scratch_data.cell_solution_values,
-                                     scratch_data.cell_solution_gradients);
+                                     scratch_data.cell_solution_gradients,
+                                     scratch_data.cell_exact_values,
+                                     scratch_data.cell_exact_gradients);
       },
       /* copier: */
       [&](const ErrorCopyData<2> &copy) {
@@ -1735,8 +1757,14 @@ namespace Step39
           scratch_data.boundary_fe_values;
         fe_face_values.get_function_values(
           solution, scratch_data.boundary_solution_values);
-        copy.cell_values[0] += ErrorIntegrator::boundary<dim>(
-          cell, face_no, fe_face_values, scratch_data.boundary_solution_values);
+        exact_solution.value_list(fe_face_values.get_quadrature_points(),
+                                  scratch_data.boundary_exact_values);
+        copy.cell_values[0] +=
+          ErrorIntegrator::boundary<dim>(cell,
+                                         face_no,
+                                         fe_face_values,
+                                         scratch_data.boundary_solution_values,
+                                         scratch_data.boundary_exact_values);
       },
       /* interior face worker: */
       [&](const CellIterator    &cell,

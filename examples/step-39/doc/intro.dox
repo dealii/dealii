@@ -63,6 +63,10 @@ mesh element and store the local results in copy objects before they
 are transferred to the global data structures. The class
 MatrixIntegrator below has these three functions for the left hand
 side of the formula, the class RHSIntegrator for the right.
+This mirrors the WorkStream scratch/copy pattern already introduced in
+step-9, except that MeshWorker::mesh_loop() also manages the boundary
+and interior-face traversals needed by this discontinuous Galerkin
+formulation.
 
 As we will see below, even the error estimate is of the same
 structure, since it can be written as
@@ -81,11 +85,11 @@ Thus, the functions for assembling matrices, right hand side and error
 estimates below exhibit that these loops are all generic and can be
 programmed in the same way.
 
-This program is related to step-12, in that it uses the MeshWorker
-framework together with discontinuous Galerkin methods. There we solved
-an advection problem, while here it is a diffusion problem. Here, we
-also use multigrid preconditioning and a theoretically justified error
-estimator, see Karakashian and Pascal (2003). The multilevel scheme was
-discussed in detail in Kanschat (2004). The adaptive iteration and its
-convergence have been discussed (for triangular meshes) in Hoppe,
-Kanschat, and Warburton (2009).
+This program is related to step-12, in that both use
+MeshWorker::mesh_loop() together with discontinuous Galerkin methods.
+There we solved an advection problem, while here it is a diffusion
+problem. Here, we also use multigrid preconditioning and a theoretically
+justified error estimator, see Karakashian and Pascal (2003). The
+multilevel scheme was discussed in detail in Kanschat (2004). The
+adaptive iteration and its convergence have been discussed (for
+triangular meshes) in Hoppe, Kanschat, and Warburton (2009).
