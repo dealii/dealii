@@ -1,0 +1,5 @@
+New: diagonal_operator() function returns a LinearOperator
+representing the action of a diagonal matrix
+with entries given by a vector.
+<br>
+(Quang Hoang, 2026/06/12)
