@@ -41,7 +41,7 @@ test()
     }
 
   // construct the complete set of fe indices
-  std::set<unsigned int> fe_indices;
+  std::set<types::fe_index> fe_indices;
   for (unsigned int i = 0; i < fe_collection.size(); ++i)
     fe_indices.emplace(i);
 

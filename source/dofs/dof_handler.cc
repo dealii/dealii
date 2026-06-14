@@ -1603,8 +1603,7 @@ namespace internal
           Assert(!children_fe_indices.empty(), ExcInternalError());
 
           // convert vector to set
-          // TODO: Change set to types::fe_index
-          const std::set<unsigned int> children_fe_indices_set(
+          const std::set<types::fe_index> children_fe_indices_set(
             children_fe_indices.begin(), children_fe_indices.end());
 
           const types::fe_index dominated_fe_index =
@@ -1641,8 +1640,7 @@ namespace internal
             dof_handler.has_hp_capabilities(),
             (typename DoFHandler<dim, spacedim>::ExcOnlyAvailableWithHP()));
 
-          // TODO: Change set to types::fe_index
-          std::set<unsigned int> future_fe_indices_children;
+          std::set<types::fe_index> future_fe_indices_children;
           for (const auto &child : parent->child_iterators())
             {
               Assert(

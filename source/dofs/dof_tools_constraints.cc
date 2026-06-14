@@ -2425,7 +2425,7 @@ namespace DoFTools
                 // auxiliary variable which holds FE indices of the mother face
                 // and its subfaces. This knowledge will be needed in hp-case
                 // with neither_element_dominates.
-                std::set<unsigned int> fe_ind_face_subface;
+                std::set<types::fe_index> fe_ind_face_subface;
 
                 if (dof_handler.has_hp_capabilities())
                   {

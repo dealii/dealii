@@ -97,40 +97,30 @@ namespace internal
           // exists
           if (identities.get() == nullptr)
             {
-              // TODO: Change to
-              // std::vector<std::map<types::fe_index, unsigned int>>
-              std::vector<std::map<unsigned int, unsigned int>>
+              std::vector<std::map<types::fe_index, unsigned int>>
                 complete_identities;
 
               switch (structdim)
                 {
                   case 0:
                     {
-                      // TODO: Change set to types::fe_index
-                      complete_identities = fes.hp_vertex_dof_identities(
-                        std::set<unsigned int>{fe_index_1, fe_index_2});
+                      complete_identities =
+                        fes.hp_vertex_dof_identities({fe_index_1, fe_index_2});
                       break;
                     }
 
                   case 1:
                     {
-                      // TODO: Change set to types::fe_index
-                      complete_identities = fes.hp_line_dof_identities(
-                        std::set<unsigned int>{fe_index_1, fe_index_2});
+                      complete_identities =
+                        fes.hp_line_dof_identities({fe_index_1, fe_index_2});
                       break;
                     }
 
                   case 2:
                     {
-                      // TODO: Change set to types::fe_index
-                      std::pair<unsigned int, unsigned int> p1{fe_index_1,
-                                                               face_no};
-                      std::pair<unsigned int, unsigned int> p2{
-                        fe_index_2, face_no_neighbor};
-
                       complete_identities = fes.hp_quad_dof_identities(
-                        std::set<std::pair<unsigned int, unsigned int>>{p1,
-                                                                        p2});
+                        {{fe_index_1, face_no},
+                         {fe_index_2, face_no_neighbor}});
                       break;
                     }
 

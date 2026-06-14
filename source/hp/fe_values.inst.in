@@ -92,7 +92,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
           DoFCellAccessor<deal_II_dimension, deal_II_space_dimension, lda>> &,
         unsigned int,
         unsigned int,
-        unsigned int);
+        types::fe_index);
       template void
       FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
         const TriaIterator<
@@ -100,7 +100,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         unsigned int,
         unsigned int,
         unsigned int,
-        unsigned int);
+        types::fe_index);
       template void
       FEFaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
         const TriaIterator<
@@ -109,7 +109,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
                             deal_II_space_dimension>::face_iterator &,
         unsigned int,
         unsigned int,
-        unsigned int);
+        types::fe_index);
       template void
       FESubfaceValues<deal_II_dimension, deal_II_space_dimension>::reinit(
         const TriaIterator<
@@ -118,7 +118,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         unsigned int,
         unsigned int,
         unsigned int,
-        unsigned int);
+        types::fe_index);
 #endif
     \}
   }

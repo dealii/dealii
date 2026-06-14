@@ -262,9 +262,9 @@ namespace NonMatching
      */
     void
     reinit(const TriaIterator<CellAccessor<dim, dim>> &cell,
-           const unsigned int q_index       = numbers::invalid_unsigned_int,
-           const unsigned int mapping_index = numbers::invalid_unsigned_int,
-           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+           const unsigned int    q_index       = numbers::invalid_unsigned_int,
+           const unsigned int    mapping_index = numbers::invalid_unsigned_int,
+           const types::fe_index fe_index      = numbers::invalid_fe_index);
 
     /**
      * Return an dealii::FEValues object reinitialized with a quadrature for the
@@ -307,7 +307,7 @@ namespace NonMatching
     reinit_internal(const CellIteratorType &cell,
                     const unsigned int      q_index,
                     const unsigned int      mapping_index,
-                    const unsigned int      fe_index);
+                    const types::fe_index   fe_index);
 
     /**
      * Do work common to the constructors. The incoming QCollection should be
@@ -341,7 +341,7 @@ namespace NonMatching
     /**
      * Active fe index of the last cell that reinit was called with.
      */
-    unsigned int active_fe_index;
+    types::fe_index active_fe_index;
 
     /**
      * The update flags passed to the constructor.
@@ -577,9 +577,9 @@ namespace NonMatching
            const CellNeighborIteratorType &cell_neighbor,
            const unsigned int              face_no_neighbor,
            const unsigned int              sub_face_no_neighbor,
-           const unsigned int q_index       = numbers::invalid_unsigned_int,
-           const unsigned int mapping_index = numbers::invalid_unsigned_int,
-           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+           const unsigned int    q_index       = numbers::invalid_unsigned_int,
+           const unsigned int    mapping_index = numbers::invalid_unsigned_int,
+           const types::fe_index fe_index      = numbers::invalid_fe_index);
 
 
     /**
@@ -593,9 +593,9 @@ namespace NonMatching
     void
     reinit(const CellIteratorType &cell,
            const unsigned int      face_no,
-           const unsigned int      q_index  = numbers::invalid_unsigned_int,
-           const unsigned int mapping_index = numbers::invalid_unsigned_int,
-           const unsigned int fe_index      = numbers::invalid_unsigned_int);
+           const unsigned int      q_index     = numbers::invalid_unsigned_int,
+           const unsigned int    mapping_index = numbers::invalid_unsigned_int,
+           const types::fe_index fe_index      = numbers::invalid_fe_index);
 
     /**
      * Return an dealii::FEInterfaceValues object reinitialized with a
@@ -641,7 +641,7 @@ namespace NonMatching
     do_reinit(const TriaIterator<CellAccessorType>          &cell,
               const unsigned int                             face_no,
               const unsigned int                             q_index,
-              const unsigned int                             active_fe_index,
+              const types::fe_index                          active_fe_index,
               const std::function<void(dealii::FEInterfaceValues<dim> &,
                                        const unsigned int)> &call_reinit);
 
@@ -726,7 +726,7 @@ namespace NonMatching
                                  const unsigned int      face_no,
                                  const unsigned int      q_index,
                                  const unsigned int      mapping_index,
-                                 const unsigned int      active_fe_index)
+                                 const types::fe_index   active_fe_index)
   {
     // Lambda describing how we should call reinit on a single
     // dealii::FEInterfaceValues object.
@@ -749,11 +749,11 @@ namespace NonMatching
                                  const unsigned int              face_no,
                                  const unsigned int              sub_face_no,
                                  const CellNeighborIteratorType &cell_neighbor,
-                                 const unsigned int face_no_neighbor,
-                                 const unsigned int sub_face_no_neighbor,
-                                 const unsigned int q_index,
-                                 const unsigned int mapping_index,
-                                 const unsigned int active_fe_index)
+                                 const unsigned int    face_no_neighbor,
+                                 const unsigned int    sub_face_no_neighbor,
+                                 const unsigned int    q_index,
+                                 const unsigned int    mapping_index,
+                                 const types::fe_index active_fe_index)
   {
     Assert(sub_face_no == numbers::invalid_unsigned_int, ExcNotImplemented());
     Assert(sub_face_no_neighbor == numbers::invalid_unsigned_int,
