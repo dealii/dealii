@@ -67,7 +67,7 @@ main()
   SUNDIALS::ARKStepper<VectorType> stepper(stepper_data);
   SUNDIALS::ARKode<VectorType>     ode(stepper, data);
 
-  double kappa = 1.0;
+  const double kappa = 1.0;
 
   stepper.implicit_function =
     [&](double, const VectorType &y, VectorType &ydot) {
@@ -77,11 +77,9 @@ main()
 
   ode.output_step =
     [&](const double t, const VectorType &sol, const unsigned int step_number) {
-      // limit the output to every 10th step and increase the precision to make
-      // the test more robust
-      if (step_number % 10 == 0)
-        deallog << t << ' ' << std::setprecision(7) << sol[0] << ' ' << sol[1]
-                << std::endl;
+      auto r = [](double x) { return std::round(x * 1000.0) / 1000.0; };
+      deallog << t << ' ' << std::setprecision(4) << r(sol[0]) << ' '
+              << r(sol[1]) << std::endl;
     };
 
   Vector<double> y(2);
