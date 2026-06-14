@@ -905,7 +905,9 @@ namespace internal
          ++subface_no)
       for (unsigned int n = 0; n < n_solution_vectors; ++n)
         {
-          const auto subface_index = face->child(subface_no)->index();
+          Assert(face->child(subface_no)->index() >= 0, ExcInternalError());
+          const auto subface_index =
+            static_cast<unsigned int>(face->child(subface_no)->index());
           const auto it =
             std::lower_bound(parallel_data.subface_integrals.begin(),
                              parallel_data.subface_integrals.end(),
@@ -915,8 +917,7 @@ namespace internal
                                                       std::get<1>(a)) < b;
                              });
           Assert(it != parallel_data.subface_integrals.end() &&
-                   int(std::get<0>(*it)) == subface_index &&
-                   std::get<1>(*it) == n,
+                   std::get<0>(*it) == subface_index && std::get<1>(*it) == n,
                  ExcInternalError());
           sum[n] += std::get<2>(*it);
         }
