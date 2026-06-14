@@ -19,6 +19,7 @@
 #include <deal.II/base/time_stepping.h>
 
 #include <functional>
+#include <memory>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -30,61 +31,420 @@ namespace TimeStepping
 
   namespace internal
   {
-    /**
-     * Centralized utility to populate the core Butcher matrix rows (a) and
-     * stage time nodes (c) for the Tsitouras 5(4) pair. Concentrate coefficient
-     * definitions to one place.
-     */
+    // ----------------------------------------------------------------------
+    // Explicit Tableaus
+    // ----------------------------------------------------------------------
     inline void
-    get_tsitouras5_tableau(std::vector<std::vector<double>> &a,
+    fill_exp_forward_euler_tableau(std::vector<std::vector<double>> &a,
+                                   std::vector<double>              &b,
+                                   std::vector<double>              &c)
+    {
+      a = {{}};
+      b = {1.0};
+      c = {0.0};
+    }
+
+    inline void
+    fill_exp_heun_euler_tableau(std::vector<std::vector<double>> &a,
+                                std::vector<double>              &b,
+                                std::vector<double>              &c)
+    {
+      a = {{}, {1.0}};
+      b = {1.0 / 2.0, 1.0 / 2.0};
+      c = {0.0, 1.0};
+    }
+
+    inline void
+    fill_exp_rk_third_order_tableau(std::vector<std::vector<double>> &a,
+                                    std::vector<double>              &b,
+                                    std::vector<double>              &c)
+    {
+      a = {{}, {0.5}, {-1.0, 2.0}};
+      b = {1.0 / 6.0, 2.0 / 3.0, 1.0 / 6.0};
+      c = {0.0, 0.5, 1.0};
+    }
+
+    inline void
+    fill_exp_ssp_third_order_tableau(std::vector<std::vector<double>> &a,
+                                     std::vector<double>              &b,
+                                     std::vector<double>              &c)
+    {
+      a = {{}, {1.0}, {1.0 / 4.0, 1.0 / 4.0}};
+      b = {1.0 / 6.0, 1.0 / 6.0, 2.0 / 3.0};
+      c = {0.0, 1.0, 0.5};
+    }
+
+    inline void
+    fill_exp_rk_classic_fourth_order_tableau(
+      std::vector<std::vector<double>> &a,
+      std::vector<double>              &b,
+      std::vector<double>              &c)
+    {
+      a = {{}, {0.5}, {0.0, 0.5}, {0.0, 0.0, 1.0}};
+      b = {1.0 / 6.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 6.0};
+      c = {0.0, 0.5, 0.5, 1.0};
+    }
+
+    inline void
+    fill_exp_rk_fifth_order_tableau(std::vector<std::vector<double>> &a,
+                                    std::vector<double>              &b,
+                                    std::vector<double>              &c)
+    {
+      /**
+       * Rabiei, F. and Ismail, F., 2012. Fifth-order improved
+       * Runge-Kutta method with reduced number of function evaluations.
+       * Australian Journal of Basic and Applied Sciences, 6(3),
+       * pp.97-105.
+       *
+       * Hossain, M.B., Hossain, M.J., Miah, M.M. and Alam, M.S., 2017.
+       * A comparative study on fourth order and butcher’s fifth order
+       * runge-kutta methods with third order initial value problem (IVP).
+       * Appl. Comput. Math, 6(6), p.243.
+       */
+      a = {{},
+           {1.0 / 4.0},
+           {1.0 / 8.0, 1.0 / 8.0},
+           {0.0, -1.0 / 2.0, 1.0},
+           {3.0 / 16.0, 0.0, 0.0, 9.0 / 16.0},
+           {-3.0 / 7.0, 2.0 / 7.0, 12.0 / 7.0, -12.0 / 7.0, 8.0 / 7.0}};
+      b = {7.0 / 90.0, 0.0, 32.0 / 90.0, 12.0 / 90.0, 32.0 / 90.0, 7.0 / 90.0};
+      c = {0.0, 1.0 / 4.0, 1.0 / 4.0, 1.0 / 2.0, 3.0 / 4.0, 1.0};
+    }
+
+    inline void
+    fill_exp_rk_sixth_order_tableau(std::vector<std::vector<double>> &a,
+                                    std::vector<double>              &b,
+                                    std::vector<double>              &c)
+    {
+      /**
+       * Butcher, J.C., 1964. On Runge-Kutta processes of high order.
+       * Journal of the Australian Mathematical Society, 4(2), pp.179-194.
+       */
+      a = {
+        {},
+        {1.0 / 3.0},
+        {0.0, 2.0 / 3.0},
+        {1.0 / 12.0, 1.0 / 3.0, -1.0 / 12.0},
+        {-1.0 / 16.0, 9.0 / 8.0, -3.0 / 16.0, -3.0 / 8.0},
+        {0.0, 9.0 / 8.0, -3.0 / 8.0, -3.0 / 4.0, 1.0 / 2.0},
+        {9.0 / 44.0, -9.0 / 11.0, 63.0 / 44.0, 18.0 / 11.0, 0.0, -16.0 / 11.0}};
+      b = {11.0 / 120.0,
+           0.0,
+           27.0 / 40.0,
+           27.0 / 40.0,
+           -4.0 / 15.0,
+           -4.0 / 15.0,
+           11.0 / 120.0};
+      c = {0.0, 1.0 / 3.0, 2.0 / 3.0, 1.0 / 3.0, 1.0 / 2.0, 1.0 / 2.0, 1.0};
+    }
+
+    inline void
+    fill_exp_tsitouras5_tableau(std::vector<std::vector<double>> &a,
+                                std::vector<double>              &b,
+                                std::vector<double>              &c)
+    {
+      /**
+       * Runge–Kutta pairs of order 5(4) satisfying only the first column
+       * simplifying assumption C. Tsitouras, CMA 62 (2011) 770-775
+       */
+      a = {{},
+           {0.161},
+           {-0.008480655492356989, 0.3354806554923570},
+           {2.8971530571054935, -6.359448489975075, 4.3622954328695815},
+           {5.325864828439257,
+            -11.748883564062828,
+            7.4955393428898365,
+            -0.09249506636175525},
+           {5.86145544294642,
+            -12.92096931784711,
+            8.159367898576159,
+            -0.07158497328140100,
+            -0.028269050394068383},
+           {0.09646076681806523,
+            0.01,
+            0.4798896504144996,
+            1.379008574103742,
+            -3.290069515436081,
+            2.324710524099774}};
+      c = {0.0, 0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
+      b = a.back();
+      b.push_back(0.0);
+    }
+
+    // ----------------------------------------------------------------------
+    // Low Storage Tableaus
+    // ----------------------------------------------------------------------
+    inline void
+    fill_ls_forward_euler_tableau(std::vector<std::vector<double>> &a,
+                                  std::vector<double>              &b)
+    {
+      a = {{}};
+      b = {1.0};
+    }
+
+    inline void
+    fill_ls_heun_euler_tableau(std::vector<std::vector<double>> &a,
+                               std::vector<double>              &b)
+    {
+      a = {{1.0}};
+      b = {0.5, 0.5};
+    }
+
+    inline void
+    fill_ls_stage3_order3_tableau(std::vector<std::vector<double>> &a,
+                                  std::vector<double>              &b)
+    {
+      a = {{0.755726351946097, 0.386954477304099}};
+      b = {0.245170287303492, 0.184896052186740, 0.569933660509768};
+    }
+
+    inline void
+    fill_ls_stage5_order4_tableau(std::vector<std::vector<double>> &a,
+                                  std::vector<double>              &b)
+    {
+      a = {{970286171893. / 4311952581923.,
+            6584761158862. / 12103376702013.,
+            2251764453980. / 15575788980749.,
+            26877169314380. / 34165994151039.}};
+      b = {1153189308089. / 22510343858157.,
+           1772645290293. / 4653164025191.,
+           -1672844663538. / 4480602732383.,
+           2114624349019. / 3568978502595.,
+           5198255086312. / 14908931495163.};
+    }
+
+    inline void
+    fill_ls_stage7_order4_tableau(std::vector<std::vector<double>> &a,
+                                  std::vector<double>              &b)
+    {
+      b = {0.0941840925477795334,
+           0.149683694803496998,
+           0.285204742060440058,
+           -0.122201846148053668,
+           0.0605151571191401122,
+           0.345986987898399296,
+           0.186627171718797670};
+      a = {{0.241566650129646868 + b[0],
+            0.0423866513027719953 + b[1],
+            0.215602732678803776 + b[2],
+            0.232328007537583987 + b[3],
+            0.256223412574146438 + b[4],
+            0.0978694102142697230 + b[5]}};
+    }
+
+    inline void
+    fill_ls_stage9_order5_tableau(std::vector<std::vector<double>> &a,
+                                  std::vector<double>              &b)
+    {
+      a = {{1107026461565. / 5417078080134.,
+            38141181049399. / 41724347789894.,
+            493273079041. / 11940823631197.,
+            1851571280403. / 6147804934346.,
+            11782306865191. / 62590030070788.,
+            9452544825720. / 13648368537481.,
+            4435885630781. / 26285702406235.,
+            2357909744247. / 11371140753790.}};
+      b = {2274579626619. / 23610510767302.,
+           693987741272. / 12394497460941.,
+           -347131529483. / 15096185902911.,
+           1144057200723. / 32081666971178.,
+           1562491064753. / 11797114684756.,
+           13113619727965. / 44346030145118.,
+           393957816125. / 7825732611452.,
+           720647959663. / 6565743875477.,
+           3559252274877. / 14424734981077.};
+    }
+
+    // ----------------------------------------------------------------------
+    // Implicit Tableaus
+    // ----------------------------------------------------------------------
+    inline void
+    fill_imp_backward_euler_tableau(std::vector<std::vector<double>> &a,
+                                    std::vector<double>              &b,
+                                    std::vector<double>              &c)
+    {
+      a = {{1.0}};
+      b = {1.0};
+      c = {1.0};
+    }
+
+    inline void
+    fill_imp_midpoint_tableau(std::vector<std::vector<double>> &a,
+                              std::vector<double>              &b,
+                              std::vector<double>              &c)
+    {
+      a = {{0.5}};
+      b = {1.0};
+      c = {0.5};
+    }
+
+    inline void
+    fill_imp_crank_nicolson_tableau(std::vector<std::vector<double>> &a,
+                                    std::vector<double>              &b,
+                                    std::vector<double>              &c)
+    {
+      a = {{0.0, 0.0}, {0.5, 0.5}};
+      b = {0.5, 0.5};
+      c = {0.0, 1.0};
+    }
+
+    inline void
+    fill_imp_sdirk_two_stages_tableau(std::vector<std::vector<double>> &a,
+                                      std::vector<double>              &b,
+                                      std::vector<double>              &c)
+    {
+      const double gamma = 1.0 - 1.0 / std::sqrt(2.0);
+      a                  = {{gamma, 0.0}, {1.0 - gamma, gamma}};
+      b                  = {1.0 - gamma, gamma};
+      c                  = {gamma, 1.0};
+    }
+
+    // ----------------------------------------------------------------------
+    // Embedded Explicit Tableaus
+    // ----------------------------------------------------------------------
+    inline void
+    fill_emb_heun_euler_tableau(std::vector<std::vector<double>> &a,
+                                std::vector<double>              &b1,
+                                std::vector<double>              &b2,
+                                std::vector<double>              &c)
+    {
+      a  = {{}, {1.0}};
+      c  = {0.0, 1.0};
+      b1 = {0.5, 0.5};
+      b2 = {1.0, 0.0};
+    }
+
+    inline void
+    fill_emb_bogacki_shampine_tableau(std::vector<std::vector<double>> &a,
+                                      std::vector<double>              &b1,
+                                      std::vector<double>              &b2,
+                                      std::vector<double>              &c)
+    {
+      a  = {{}, {0.5}, {0.0, 0.75}, {2.0 / 9.0, 1.0 / 3.0, 4.0 / 9.0}};
+      c  = {0.0, 0.5, 0.75, 1.0};
+      b1 = {2.0 / 9.0, 1.0 / 3.0, 4.0 / 9.0, 0.0};
+      b2 = {7.0 / 24.0, 0.25, 1.0 / 3.0, 0.125};
+    }
+
+    inline void
+    fill_emb_dopri_tableau(std::vector<std::vector<double>> &a,
+                           std::vector<double>              &b1,
+                           std::vector<double>              &b2,
                            std::vector<double>              &c)
     {
-      a.clear();
-      c.clear();
+      a = {
+        {},
+        {1. / 5.},
+        {3. / 40., 9. / 40.},
+        {44. / 45., -56. / 15., 32. / 9.},
+        {19372. / 6561., -25360. / 2187., 64448. / 6561., -212. / 729.},
+        {9017. / 3168.,
+         -355. / 33.,
+         46732. / 5247.,
+         49. / 176.,
+         -5103. / 18656.},
+        {35. / 384., 0., 500. / 1113., 125. / 192., -2187. / 6784., 11. / 84.}};
+      c  = {0., 1. / 5., 3. / 10., 4. / 5., 8. / 9., 1., 1.};
+      b1 = {35. / 384.,
+            0.,
+            500. / 1113.,
+            125. / 192.,
+            -2187. / 6784.,
+            11. / 84.,
+            0.};
+      b2 = {5179. / 57600.,
+            0.,
+            7571. / 16695.,
+            393. / 640.,
+            -92097. / 339200.,
+            187. / 2100.,
+            1. / 40.};
+    }
 
-      a.emplace_back();
+    inline void
+    fill_emb_fehlberg_tableau(std::vector<std::vector<double>> &a,
+                              std::vector<double>              &b1,
+                              std::vector<double>              &b2,
+                              std::vector<double>              &c)
+    {
+      a  = {{},
+            {0.25},
+            {0.09375, 0.28125},
+            {1932.0 / 2197.0, -7200.0 / 2197.0, 7296.0 / 2197.0},
+            {439.0 / 216.0, -8.0, 3680.0 / 513.0, -845.0 / 4104.0},
+            {-8.0 / 27.0, 2.0, -3544.0 / 2565.0, 1859.0 / 4104.0, -0.275}};
+      c  = {0.0, 0.25, 0.375, 12.0 / 13.0, 1.0, 0.5};
+      b1 = {16.0 / 135.0,
+            0.0,
+            6656.0 / 12825.0,
+            28561.0 / 56430.0,
+            -0.18,
+            2.0 / 55.0};
+      b2 = {25.0 / 216.0, 0.0, 1408.0 / 2565.0, 2197.0 / 4104.0, -0.2, 0.0};
+    }
 
-      std::vector<double> tmp;
-      tmp.resize(1);
-      tmp[0] = 0.161;
-      a.push_back(tmp);
+    inline void
+    fill_emb_cash_karp_tableau(std::vector<std::vector<double>> &a,
+                               std::vector<double>              &b1,
+                               std::vector<double>              &b2,
+                               std::vector<double>              &c)
+    {
+      a  = {{},
+            {0.2},
+            {0.075, 0.225},
+            {0.3, -0.9, 1.2},
+            {-11.0 / 54.0, 2.5, -70.0 / 27.0, 35.0 / 27.0},
+            {1631.0 / 55296.0,
+             175.0 / 512.0,
+             575.0 / 13824.0,
+             44275.0 / 110592.0,
+             253.0 / 4096.0}};
+      c  = {0.0, 0.2, 0.3, 0.6, 1.0, 0.875};
+      b1 = {
+        37.0 / 378.0, 0.0, 250.0 / 621.0, 125.0 / 594.0, 0.0, 512.0 / 1771.0};
+      b2 = {2825.0 / 27648.0,
+            0.0,
+            18575.0 / 48384.0,
+            13525.0 / 55296.0,
+            277.0 / 14336.0,
+            0.25};
+    }
 
-      tmp.resize(2);
-      tmp[0] = -0.008480655492356989;
-      tmp[1] = 0.3354806554923570;
-      a.push_back(tmp);
-
-      tmp.resize(3);
-      tmp[0] = 2.8971530571054935;
-      tmp[1] = -6.359448489975075;
-      tmp[2] = 4.3622954328695815;
-      a.push_back(tmp);
-
-      tmp.resize(4);
-      tmp[0] = 5.325864828439257;
-      tmp[1] = -11.748883564062828;
-      tmp[2] = 7.4955393428898365;
-      tmp[3] = -0.09249506636175525;
-      a.push_back(tmp);
-
-      tmp.resize(5);
-      tmp[0] = 5.86145544294642;
-      tmp[1] = -12.92096931784711;
-      tmp[2] = 8.159367898576159;
-      tmp[3] = -0.07158497328140100;
-      tmp[4] = -0.028269050394068383;
-      a.push_back(tmp);
-
-      tmp.resize(6);
-      tmp[0] = 0.09646076681806523;
-      tmp[1] = 0.01;
-      tmp[2] = 0.4798896504144996;
-      tmp[3] = 1.379008574103742;
-      tmp[4] = -3.290069515436081;
-      tmp[5] = 2.324710524099774;
-      a.push_back(tmp);
-
-      c = {0.0, 0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
+    inline void
+    fill_emb_tsitouras5_tableau(std::vector<std::vector<double>> &a,
+                                std::vector<double>              &b1,
+                                std::vector<double>              &b2,
+                                std::vector<double>              &c)
+    {
+      a  = {{},
+            {0.161},
+            {-0.008480655492356989, 0.3354806554923570},
+            {2.8971530571054935, -6.359448489975075, 4.3622954328695815},
+            {5.325864828439257,
+             -11.748883564062828,
+             7.4955393428898365,
+             -0.09249506636175525},
+            {5.86145544294642,
+             -12.92096931784711,
+             8.159367898576159,
+             -0.07158497328140100,
+             -0.028269050394068383},
+            {0.09646076681806523,
+             0.01,
+             0.4798896504144996,
+             1.379008574103742,
+             -3.290069515436081,
+             2.324710524099774}};
+      c  = {0.0, 0.161, 0.327, 0.9, 0.9800255409045097, 1.0, 1.0};
+      b1 = a.back();
+      b1.push_back(0.0);
+      b2 = {b1[0] - 0.00178001105222577714,
+            b1[1] - 0.0008164344596567469,
+            b1[2] - (-0.007880878010261995),
+            b1[3] - 0.1447110071732629,
+            b1[4] - (-0.5823571654525552),
+            b1[5] - 0.45808210592918697,
+            b1[6] - (-1.0 / 66.0)};
     }
   } // namespace internal
 
@@ -146,242 +506,59 @@ namespace TimeStepping
         case (FORWARD_EULER):
           {
             this->n_stages = 1;
-            this->b.push_back(1.0);
-            this->c.push_back(0.0);
-
+            internal::fill_exp_forward_euler_tableau(this->a, this->b, this->c);
             break;
           }
         case (HEUN_EULER):
           {
             this->n_stages = 2;
-            this->b.push_back(1.0 / 2.0);
-            this->b.push_back(1.0 / 2.0);
-            this->c.push_back(0.0);
-            this->c.push_back(1.0);
-
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 1.0;
-            this->a.push_back(tmp);
-
+            internal::fill_exp_heun_euler_tableau(this->a, this->b, this->c);
             break;
           }
         case (RK_THIRD_ORDER):
           {
             this->n_stages = 3;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            this->b.push_back(1.0 / 6.0);
-            this->b.push_back(2.0 / 3.0);
-            this->b.push_back(1.0 / 6.0);
-            this->c.push_back(0.0);
-            this->c.push_back(0.5);
-            this->c.push_back(1.0);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 0.5;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = -1.0;
-            tmp[1] = 2.0;
-            this->a.push_back(tmp);
-
+            internal::fill_exp_rk_third_order_tableau(this->a,
+                                                      this->b,
+                                                      this->c);
             break;
           }
         case (SSP_THIRD_ORDER):
           {
             this->n_stages = 3;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            this->b.push_back(1.0 / 6.0);
-            this->b.push_back(1.0 / 6.0);
-            this->b.push_back(2.0 / 3.0);
-            this->c.push_back(0.0);
-            this->c.push_back(1.0);
-            this->c.push_back(0.5);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 1.0;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = 1.0 / 4.0;
-            tmp[1] = 1.0 / 4.0;
-            this->a.push_back(tmp);
-
+            internal::fill_exp_ssp_third_order_tableau(this->a,
+                                                       this->b,
+                                                       this->c);
             break;
           }
         case (RK_CLASSIC_FOURTH_ORDER):
           {
             this->n_stages = 4;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 0.5;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = 0.0;
-            tmp[1] = 0.5;
-            this->a.push_back(tmp);
-            tmp.resize(3);
-            tmp[1] = 0.0;
-            tmp[2] = 1.0;
-            this->a.push_back(tmp);
-            this->b.push_back(1.0 / 6.0);
-            this->b.push_back(1.0 / 3.0);
-            this->b.push_back(1.0 / 3.0);
-            this->b.push_back(1.0 / 6.0);
-            this->c.push_back(0.0);
-            this->c.push_back(0.5);
-            this->c.push_back(0.5);
-            this->c.push_back(1.0);
-
+            internal::fill_exp_rk_classic_fourth_order_tableau(this->a,
+                                                               this->b,
+                                                               this->c);
             break;
           }
         case (RK_FIFTH_ORDER):
           {
-            /**
-             * Rabiei, F. and Ismail, F., 2012. Fifth-order improved
-             * Runge-Kutta method with reduced number of function evaluations.
-             * Australian Journal of Basic and Applied Sciences, 6(3),
-             * pp.97-105.
-             *
-             * Hossain, M.B., Hossain, M.J., Miah, M.M. and Alam, M.S., 2017.
-             * A comparative study on fourth order and butcher’s fifth order
-             * runge-kutta methods with third order initial value problem (IVP).
-             * Appl. Comput. Math, 6(6), p.243.
-             */
             this->n_stages = 6;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.assign(5, 0.0);
-            tmp[0] = 1.0 / 4.0;
-            this->a.push_back(tmp);
-            tmp.assign(5, 0.0);
-            tmp[0] = 1.0 / 8.0;
-            tmp[1] = 1.0 / 8.0;
-            this->a.push_back(tmp);
-            tmp.assign(5, 0.0);
-            tmp[0] = 0.0;
-            tmp[1] = -1.0 / 2.0;
-            tmp[2] = 1.0;
-            this->a.push_back(tmp);
-            tmp.assign(5, 0.0);
-            tmp[0] = 3.0 / 16.0;
-            tmp[1] = 0.0;
-            tmp[2] = 0.0;
-            tmp[3] = 9.0 / 16.0;
-            this->a.push_back(tmp);
-            tmp.assign(5, 0.0);
-            tmp[0] = -3.0 / 7.0;
-            tmp[1] = 2.0 / 7.0;
-            tmp[2] = 12.0 / 7.0;
-            tmp[3] = -12.0 / 7.0;
-            tmp[4] = 8.0 / 7.0;
-            this->a.push_back(tmp);
-
-            this->b.push_back(7.0 / 90.0);
-            this->b.push_back(0.0);
-            this->b.push_back(32.0 / 90.0);
-            this->b.push_back(12.0 / 90.0);
-            this->b.push_back(32.0 / 90.0);
-            this->b.push_back(7.0 / 90.0);
-
-            this->c.push_back(0.0);
-            this->c.push_back(1.0 / 4.0);
-            this->c.push_back(1.0 / 4.0);
-            this->c.push_back(1.0 / 2.0);
-            this->c.push_back(3.0 / 4.0);
-            this->c.push_back(1.0);
-
+            internal::fill_exp_rk_fifth_order_tableau(this->a,
+                                                      this->b,
+                                                      this->c);
             break;
           }
         case (RK_SIXTH_ORDER):
           {
-            /**
-             * Butcher, J.C., 1964. On Runge-Kutta processes of high order.
-             * Journal of the Australian Mathematical Society, 4(2), pp.179-194.
-             */
             this->n_stages = 7;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.assign(6, 0.0);
-            tmp[0] = 1.0 / 3.0;
-            this->a.push_back(tmp);
-            tmp.assign(6, 0.0);
-            tmp[0] = 0.0;
-            tmp[1] = 2.0 / 3.0;
-            this->a.push_back(tmp);
-            tmp.assign(6, 0.0);
-            tmp[0] = 1.0 / 12.0;
-            tmp[1] = 1.0 / 3.0;
-            tmp[2] = -1.0 / 12.0;
-            this->a.push_back(tmp);
-            tmp.assign(6, 0.0);
-            tmp[0] = -1.0 / 16.0;
-            tmp[1] = 9.0 / 8.0;
-            tmp[2] = -3.0 / 16.0;
-            tmp[3] = -3.0 / 8.0;
-            this->a.push_back(tmp);
-            tmp.assign(6, 0.0);
-            tmp[0] = 0.0;
-            tmp[1] = 9.0 / 8.0;
-            tmp[2] = -3.0 / 8.0;
-            tmp[3] = -3.0 / 4.0;
-            tmp[4] = 1.0 / 2.0;
-            this->a.push_back(tmp);
-            tmp.assign(6, 0.0);
-            tmp[0] = 9.0 / 44.0;
-            tmp[1] = -9.0 / 11.0;
-            tmp[2] = 63.0 / 44.0;
-            tmp[3] = 18.0 / 11.0;
-            tmp[4] = 0.0;
-            tmp[5] = -16.0 / 11.0;
-            this->a.push_back(tmp);
-
-            this->b.push_back(11.0 / 120.0);
-            this->b.push_back(0.0);
-            this->b.push_back(27.0 / 40.0);
-            this->b.push_back(27.0 / 40.0);
-            this->b.push_back(-4.0 / 15.0);
-            this->b.push_back(-4.0 / 15.0);
-            this->b.push_back(11.0 / 120.0);
-
-            this->c.push_back(0.0);
-            this->c.push_back(1.0 / 3.0);
-            this->c.push_back(2.0 / 3.0);
-            this->c.push_back(1.0 / 3.0);
-            this->c.push_back(1.0 / 2.0);
-            this->c.push_back(1.0 / 2.0);
-            this->c.push_back(1.0);
-
+            internal::fill_exp_rk_sixth_order_tableau(this->a,
+                                                      this->b,
+                                                      this->c);
             break;
           }
         case (TSITOURAS5):
           {
-            /**
-             * Runge–Kutta pairs of order 5(4) satisfying only the first column
-             * simplifying assumption C. Tsitouras, CMA 62 (2011) 770-775
-             */
             this->n_stages = 7;
-            this->c.reserve(this->n_stages);
-            this->b.reserve(this->n_stages);
-
-            internal::get_tsitouras5_tableau(this->a, this->c);
-
-            // FSAL Optimization: assign primary weights directly from matrix
-            // back
-            this->b = this->a.back();
-            this->b.push_back(0.0); // b_7 = 0 for FSAL
-
+            internal::fill_exp_tsitouras5_tableau(this->a, this->b, this->c);
             break;
           }
         default:
@@ -490,88 +667,37 @@ namespace TimeStepping
         case (FORWARD_EULER):
           {
             this->n_stages = 1;
-            this->b.reserve(this->n_stages);
-            this->b.push_back(1.0);
-
-            this->a = {{}};
+            internal::fill_ls_forward_euler_tableau(this->a, this->b);
             break;
           }
         case (HEUN_EULER):
           {
             this->n_stages = 2;
-            this->b.reserve(this->n_stages);
-            this->b.push_back(0.5);
-            this->b.push_back(0.5);
-
-            this->a = {{1.0}};
+            internal::fill_ls_heun_euler_tableau(this->a, this->b);
             break;
           }
         case (LOW_STORAGE_RK_STAGE3_ORDER3):
           {
             this->n_stages = 3;
-            this->b.reserve(this->n_stages);
-            this->b.push_back(0.245170287303492);
-            this->b.push_back(0.184896052186740);
-            this->b.push_back(0.569933660509768);
-
-            this->a = {{0.755726351946097, 0.386954477304099}};
+            internal::fill_ls_stage3_order3_tableau(this->a, this->b);
             break;
           }
         case (LOW_STORAGE_RK_STAGE5_ORDER4):
           {
             this->n_stages = 5;
-            this->b        = {{1153189308089. / 22510343858157.,
-                               1772645290293. / 4653164025191.,
-                               -1672844663538. / 4480602732383.,
-                               2114624349019. / 3568978502595.,
-                               5198255086312. / 14908931495163.}};
-
-            this->a = {{970286171893. / 4311952581923.,
-                        6584761158862. / 12103376702013.,
-                        2251764453980. / 15575788980749.,
-                        26877169314380. / 34165994151039.}};
+            internal::fill_ls_stage5_order4_tableau(this->a, this->b);
             break;
           }
         case (LOW_STORAGE_RK_STAGE7_ORDER4):
           {
             this->n_stages = 7;
-            this->b        = {{0.0941840925477795334,
-                               0.149683694803496998,
-                               0.285204742060440058,
-                               -0.122201846148053668,
-                               0.0605151571191401122,
-                               0.345986987898399296,
-                               0.186627171718797670}};
-
-            this->a = {{0.241566650129646868 + this->b[0],
-                        0.0423866513027719953 + this->b[1],
-                        0.215602732678803776 + this->b[2],
-                        0.232328007537583987 + this->b[3],
-                        0.256223412574146438 + this->b[4],
-                        0.0978694102142697230 + this->b[5]}};
+            internal::fill_ls_stage7_order4_tableau(this->a, this->b);
             break;
           }
         case (LOW_STORAGE_RK_STAGE9_ORDER5):
           {
             this->n_stages = 9;
-            this->b        = {{2274579626619. / 23610510767302.,
-                               693987741272. / 12394497460941.,
-                               -347131529483. / 15096185902911.,
-                               1144057200723. / 32081666971178.,
-                               1562491064753. / 11797114684756.,
-                               13113619727965. / 44346030145118.,
-                               393957816125. / 7825732611452.,
-                               720647959663. / 6565743875477.,
-                               3559252274877. / 14424734981077.}};
-
-            this->a = {{1107026461565. / 5417078080134.,
-                        38141181049399. / 41724347789894.,
-                        493273079041. / 11940823631197.,
-                        1851571280403. / 6147804934346.,
-                        11782306865191. / 62590030070788.,
-                        9452544825720. / 13648368537481.,
-                        4435885630781. / 26285702406235.,
-                        2357909744247. / 11371140753790.}};
+            internal::fill_ls_stage9_order5_tableau(this->a, this->b);
             break;
           }
         default:
@@ -742,48 +868,31 @@ namespace TimeStepping
         case (BACKWARD_EULER):
           {
             this->n_stages = 1;
-            this->a.push_back(std::vector<double>(1, 1.0));
-            this->b.push_back(1.0);
-            this->c.push_back(1.0);
-
+            internal::fill_imp_backward_euler_tableau(this->a,
+                                                      this->b,
+                                                      this->c);
             break;
           }
         case (IMPLICIT_MIDPOINT):
           {
-            this->a.push_back(std::vector<double>(1, 0.5));
-            this->b.push_back(1.0);
-            this->c.push_back(0.5);
             this->n_stages = 1;
-
+            internal::fill_imp_midpoint_tableau(this->a, this->b, this->c);
             break;
           }
         case (CRANK_NICOLSON):
           {
             this->n_stages = 2;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            this->a.push_back(std::vector<double>(1, 0.0));
-            this->a.push_back(std::vector<double>(2, 0.5));
-            this->b.push_back(0.5);
-            this->b.push_back(0.5);
-            this->c.push_back(0.0);
-            this->c.push_back(1.0);
-
+            internal::fill_imp_crank_nicolson_tableau(this->a,
+                                                      this->b,
+                                                      this->c);
             break;
           }
         case (SDIRK_TWO_STAGES):
           {
             this->n_stages = 2;
-            this->b.reserve(this->n_stages);
-            this->c.reserve(this->n_stages);
-            const double gamma = 1.0 - 1.0 / std::sqrt(2.0);
-            this->b.push_back(1.0 - gamma);
-            this->b.push_back(gamma);
-            this->a.push_back(std::vector<double>(1, gamma));
-            this->a.push_back(this->b);
-            this->c.push_back(gamma);
-            this->c.push_back(1.0);
-
+            internal::fill_imp_sdirk_two_stages_tableau(this->a,
+                                                        this->b,
+                                                        this->c);
             break;
           }
 
@@ -950,7 +1059,6 @@ namespace TimeStepping
     , refine_tol(refine_tol)
     , coarsen_tol(coarsen_tol)
     , last_same_as_first(false)
-    , last_stage(nullptr)
     , status{}
   {
     // virtual functions called in constructors and destructors never use the
@@ -973,254 +1081,58 @@ namespace TimeStepping
         case (HEUN_EULER):
           {
             this->n_stages = 2;
-            this->a.push_back(std::vector<double>());
-            this->a.push_back(std::vector<double>(1, 1.0));
-            this->c.push_back(0.0);
-            this->c.push_back(1.0);
-            b1.push_back(0.5);
-            b1.push_back(0.5);
-            b2.push_back(1.0);
-            b2.push_back(0.0);
-
+            internal::fill_emb_heun_euler_tableau(this->a,
+                                                  this->b1,
+                                                  this->b2,
+                                                  this->c);
             break;
           }
         case (BOGACKI_SHAMPINE):
           {
             last_same_as_first = true;
             this->n_stages     = 4;
-            this->c.reserve(this->n_stages);
-            this->b1.reserve(this->n_stages);
-            this->b2.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 0.5;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = 0.0;
-            tmp[1] = 0.75;
-            this->a.push_back(tmp);
-            tmp.resize(3);
-            tmp[0] = 2.0 / 9.0;
-            tmp[1] = 1.0 / 3.0;
-            tmp[2] = 4.0 / 9.0;
-            this->a.push_back(tmp);
-            this->c.push_back(0.0);
-            this->c.push_back(0.5);
-            this->c.push_back(0.75);
-            this->c.push_back(1.0);
-            this->b1.push_back(2.0 / 9.0);
-            this->b1.push_back(1.0 / 3.0);
-            this->b1.push_back(4.0 / 9.0);
-            this->b1.push_back(0.0);
-            this->b2.push_back(7.0 / 24.0);
-            this->b2.push_back(0.25);
-            this->b2.push_back(1.0 / 3.0);
-            this->b2.push_back(0.125);
-
+            internal::fill_emb_bogacki_shampine_tableau(this->a,
+                                                        this->b1,
+                                                        this->b2,
+                                                        this->c);
             break;
           }
         case (DOPRI):
           {
             last_same_as_first = true;
             this->n_stages     = 7;
-            this->c.reserve(this->n_stages);
-            this->b1.reserve(this->n_stages);
-            this->b2.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 1. / 5.;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = 3. / 40.;
-            tmp[1] = 9. / 40.;
-            this->a.push_back(tmp);
-            tmp.resize(3);
-            tmp[0] = 44. / 45.;
-            tmp[1] = -56. / 15.;
-            tmp[2] = 32. / 9.;
-            this->a.push_back(tmp);
-            tmp.resize(4);
-            tmp[0] = 19372. / 6561.;
-            tmp[1] = -25360. / 2187.;
-            tmp[2] = 64448. / 6561.;
-            tmp[3] = -212. / 729.;
-            this->a.push_back(tmp);
-            tmp.resize(5);
-            tmp[0] = 9017. / 3168.;
-            tmp[1] = -355. / 33.;
-            tmp[2] = 46732. / 5247.;
-            tmp[3] = 49. / 176.;
-            tmp[4] = -5103. / 18656;
-            this->a.push_back(tmp);
-            tmp.resize(6);
-            tmp[0] = 35. / 384.;
-            tmp[1] = 0.;
-            tmp[2] = 500. / 1113.;
-            tmp[3] = 125. / 192.;
-            tmp[4] = -2187. / 6784.;
-            tmp[5] = 11. / 84.;
-            this->a.push_back(tmp);
-            this->c.push_back(0.);
-            this->c.push_back(1. / 5.);
-            this->c.push_back(3. / 10.);
-            this->c.push_back(4. / 5.);
-            this->c.push_back(8. / 9.);
-            this->c.push_back(1.);
-            this->c.push_back(1.);
-            this->b1.push_back(35. / 384.);
-            this->b1.push_back(0.);
-            this->b1.push_back(500. / 1113.);
-            this->b1.push_back(125. / 192.);
-            this->b1.push_back(-2187. / 6784.);
-            this->b1.push_back(11. / 84.);
-            this->b1.push_back(0.);
-            this->b2.push_back(5179. / 57600.);
-            this->b2.push_back(0.);
-            this->b2.push_back(7571. / 16695.);
-            this->b2.push_back(393. / 640.);
-            this->b2.push_back(-92097. / 339200.);
-            this->b2.push_back(187. / 2100.);
-            this->b2.push_back(1. / 40.);
-
+            internal::fill_emb_dopri_tableau(this->a,
+                                             this->b1,
+                                             this->b2,
+                                             this->c);
             break;
           }
         case (FEHLBERG):
           {
             this->n_stages = 6;
-            this->c.reserve(this->n_stages);
-            this->b1.reserve(this->n_stages);
-            this->b2.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 0.25;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = 0.09375;
-            tmp[1] = 0.28125;
-            this->a.push_back(tmp);
-            tmp.resize(3);
-            tmp[0] = 1932.0 / 2197.0;
-            tmp[1] = -7200.0 / 2197.0;
-            tmp[2] = 7296.0 / 2197.0;
-            this->a.push_back(tmp);
-            tmp.resize(4);
-            tmp[0] = 439.0 / 216.0;
-            tmp[1] = -8.0;
-            tmp[2] = 3680.0 / 513.0;
-            tmp[3] = -845.0 / 4104.0;
-            this->a.push_back(tmp);
-            tmp.resize(5);
-            tmp[0] = -8.0 / 27.0;
-            tmp[1] = 2.0;
-            tmp[2] = -3544.0 / 2565.0;
-            tmp[3] = 1859.0 / 4104.0;
-            tmp[4] = -0.275;
-            this->a.push_back(tmp);
-            this->c.push_back(0.0);
-            this->c.push_back(0.25);
-            this->c.push_back(0.375);
-            this->c.push_back(12.0 / 13.0);
-            this->c.push_back(1.0);
-            this->c.push_back(0.5);
-            this->b1.push_back(16.0 / 135.0);
-            this->b1.push_back(0.0);
-            this->b1.push_back(6656.0 / 12825.0);
-            this->b1.push_back(28561.0 / 56430.0);
-            this->b1.push_back(-0.18);
-            this->b1.push_back(2.0 / 55.0);
-            this->b2.push_back(25.0 / 216.0);
-            this->b2.push_back(0.0);
-            this->b2.push_back(1408.0 / 2565.0);
-            this->b2.push_back(2197.0 / 4104.0);
-            this->b2.push_back(-0.2);
-            this->b2.push_back(0.0);
-
+            internal::fill_emb_fehlberg_tableau(this->a,
+                                                this->b1,
+                                                this->b2,
+                                                this->c);
             break;
           }
         case (CASH_KARP):
           {
             this->n_stages = 6;
-            this->c.reserve(this->n_stages);
-            this->b1.reserve(this->n_stages);
-            this->b2.reserve(this->n_stages);
-            std::vector<double> tmp;
-            this->a.push_back(tmp);
-            tmp.resize(1);
-            tmp[0] = 0.2;
-            this->a.push_back(tmp);
-            tmp.resize(2);
-            tmp[0] = 0.075;
-            tmp[1] = 0.225;
-            this->a.push_back(tmp);
-            tmp.resize(3);
-            tmp[0] = 0.3;
-            tmp[1] = -0.9;
-            tmp[2] = 1.2;
-            this->a.push_back(tmp);
-            tmp.resize(4);
-            tmp[0] = -11.0 / 54.0;
-            tmp[1] = 2.5;
-            tmp[2] = -70.0 / 27.0;
-            tmp[3] = 35.0 / 27.0;
-            this->a.push_back(tmp);
-            tmp.resize(5);
-            tmp[0] = 1631.0 / 55296.0;
-            tmp[1] = 175.0 / 512.0;
-            tmp[2] = 575.0 / 13824.0;
-            tmp[3] = 44275.0 / 110592.0;
-            tmp[4] = 253.0 / 4096.0;
-            this->a.push_back(tmp);
-            this->c.push_back(0.0);
-            this->c.push_back(0.2);
-            this->c.push_back(0.3);
-            this->c.push_back(0.6);
-            this->c.push_back(1.0);
-            this->c.push_back(0.875);
-            this->b1.push_back(37.0 / 378.0);
-            this->b1.push_back(0.0);
-            this->b1.push_back(250.0 / 621.0);
-            this->b1.push_back(125.0 / 594.0);
-            this->b1.push_back(0.0);
-            this->b1.push_back(512.0 / 1771.0);
-            this->b2.push_back(2825.0 / 27648.0);
-            this->b2.push_back(0.0);
-            this->b2.push_back(18575.0 / 48384.0);
-            this->b2.push_back(13525.0 / 55296.0);
-            this->b2.push_back(277.0 / 14336.0);
-            this->b2.push_back(0.25);
-
+            internal::fill_emb_cash_karp_tableau(this->a,
+                                                 this->b1,
+                                                 this->b2,
+                                                 this->c);
             break;
           }
         case (TSITOURAS5):
           {
-            /**
-             * Runge–Kutta pairs of order 5(4) satisfying only the first column
-             * simplifying assumption C. Tsitouras, CMA 62 (2011) 770-775
-             */
-
             last_same_as_first = true;
             this->n_stages     = 7;
-            this->c.reserve(this->n_stages);
-            this->b1.reserve(this->n_stages);
-            this->b2.reserve(this->n_stages);
-
-            internal::get_tsitouras5_tableau(this->a, this->c);
-
-            // FSAL Optimization: assign primary weights directly from matrix
-            // back
-            this->b1 = this->a.back();
-            this->b1.push_back(0.0); // b1_7 = 0 for FSAL
-            this->b2.push_back(this->b1[0] - 0.00178001105222577714);
-            this->b2.push_back(this->b1[1] - 0.0008164344596567469);
-            this->b2.push_back(this->b1[2] - (-0.007880878010261995));
-            this->b2.push_back(this->b1[3] - 0.1447110071732629);
-            this->b2.push_back(this->b1[4] - (-0.5823571654525552));
-            this->b2.push_back(this->b1[5] - 0.45808210592918697);
-            this->b2.push_back(this->b1[6] - (-1.0 / 66.0));
-
+            internal::fill_emb_tsitouras5_tableau(this->a,
+                                                  this->b1,
+                                                  this->b2,
+                                                  this->c);
             break;
           }
         default:
@@ -1229,18 +1141,6 @@ namespace TimeStepping
               false, ExcMessage("Unimplemented Embedded Runge-Kutta method."));
           }
       }
-  }
-
-
-
-  template <typename VectorType>
-  void
-  EmbeddedExplicitRungeKutta<VectorType>::free_memory()
-  {
-    if (last_stage != nullptr)
-      delete last_stage;
-
-    last_stage = nullptr;
   }
 
 
@@ -1343,7 +1243,7 @@ namespace TimeStepping
     if (last_same_as_first == true)
       {
         if (last_stage == nullptr)
-          last_stage = new VectorType(f_stages.back());
+          last_stage = std::make_unique<VectorType>(f_stages.back());
         else
           *last_stage = f_stages.back();
       }
