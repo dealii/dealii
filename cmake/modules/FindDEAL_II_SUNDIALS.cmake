@@ -67,6 +67,16 @@ deal_ii_find_library(SUNDIALS_LIB_SER NAMES sundials_nvecserial
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
+#
+# The dominant eigenvalue estimator (power iteration) is provided in a
+# separate library as of SUNDIALS 7.5.0. It is used as the default dominant
+# eigenvalue estimator for the LSRKStep STS family. Link it when available.
+#
+deal_ii_find_library(SUNDIALS_LIB_DOMEIGESTPOWER NAMES sundials_sundomeigestpower
+  HINTS ${SUNDIALS_DIR}
+  PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
+  )
+
 deal_ii_find_path(SUNDIALS_INCLUDE_DIR sundials/sundials_version.h
   HINTS ${SUNDIALS_DIR}
   PATH_SUFFIXES include
@@ -144,6 +154,15 @@ if(SUNDIALS_VERSION VERSION_GREATER_EQUAL 7)
   set(_sundials_lib_core "SUNDIALS_LIB_CORE")
 endif()
 
+#
+# The dominant eigenvalue estimator (power iteration) library exists only as
+# of SUNDIALS 7.5.0. Only add it to the link interface when it was found.
+#
+set(_sundials_lib_domeig)
+if(NOT SUNDIALS_LIB_DOMEIGESTPOWER MATCHES "-NOTFOUND")
+  set(_sundials_lib_domeig "SUNDIALS_LIB_DOMEIGESTPOWER")
+endif()
+
 process_feature(SUNDIALS
   LIBRARIES REQUIRED
     ${_sundials_lib_core}
@@ -152,6 +171,7 @@ process_feature(SUNDIALS
     SUNDIALS_LIB_KINSOL
     SUNDIALS_LIB_SER
     ${_sundials_lib_par}
+    ${_sundials_lib_domeig}
   INCLUDE_DIRS REQUIRED
     SUNDIALS_INCLUDE_DIR
   CLEAR
@@ -162,6 +182,7 @@ process_feature(SUNDIALS
     SUNDIALS_LIB_KINSOL
     SUNDIALS_LIB_SER
     ${_sundials_lib_par}
+    SUNDIALS_LIB_DOMEIGESTPOWER
     SUNDIALS_INCLUDE_DIR
     SUNDIALS_CONFIG_H
   )

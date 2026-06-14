@@ -35,6 +35,9 @@
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 #    include <arkode/arkode_lsrkstep.h>
 #  endif
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+#    include <sundomeigest/sundomeigest_power.h>
+#  endif
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
 
@@ -667,6 +670,17 @@ namespace SUNDIALS
   template <typename VectorType>
   LSRKStepperSTS<VectorType>::LSRKStepperSTS(const AdditionalData &data)
     : data(data)
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+    , dom_eig_estimator(nullptr,
+                        [](void *estimator) {
+                          if (estimator)
+                            {
+                              SUNDomEigEstimator e =
+                                static_cast<SUNDomEigEstimator>(estimator);
+                              SUNDomEigEstimator_Destroy(&e);
+                            }
+                        })
+#    endif
     , arkode_mem(nullptr, [](void *mem) {
       if (mem)
         ARKodeFree(&mem);
@@ -683,8 +697,10 @@ namespace SUNDIALS
     arkode_mem.reset();
 
     Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
+#    if !DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
     Assert(dominant_eigenvalue_function,
            ExcFunctionNotProvided("dominant_eigenvalue_function"));
+#    endif
 
     auto explicit_function_callback = [](SUNDIALS::realtype tt,
                                          N_Vector           yy,
@@ -743,10 +759,49 @@ namespace SUNDIALS
     int status   = ARKodeSetUserData(arkode_mem.get(), &callback_ctx);
     AssertARKode(status);
 
-    status = LSRKStepSetDomEigFn(arkode_mem.get(), dom_eig_callback);
-    AssertARKode(status);
+    if (dominant_eigenvalue_function)
+      {
+        // The user supplied an explicit dominant-eigenvalue callback, so
+        // register it with the LSRKStep module.
+        status = LSRKStepSetDomEigFn(arkode_mem.get(), dom_eig_callback);
+        AssertARKode(status);
+      }
+    else
+      {
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+        // No callback was provided. Create a SUNDIALS built-in power-iteration
+        // dominant-eigenvalue estimator and attach it. The estimator obtains
+        // the dominant eigenvalue internally (via a difference quotient of the
+        // explicit right-hand side), so no further user input is required.
+        // The state vector y0 is only used to determine the vector layout for
+        // the initial guess; the estimator clones it internally.
+        SUNDomEigEstimator estimator =
+          SUNDomEigEstimator_Power(initial_condition_nvector,
+                                   data.dom_eig_estimator_max_iters,
+                                   data.dom_eig_estimator_rel_tol,
+                                   inv_ctx.arkode_ctx);
+        Assert(estimator != nullptr, ExcInternalError());
+        dom_eig_estimator.reset(static_cast<void *>(estimator));
 
-    if (data.dom_eig_frequency >= 0)
+        status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
+        AssertARKode(status);
+
+        if (data.dom_eig_estimator_num_warmups != numbers::invalid_unsigned_int)
+          {
+            status = LSRKStepSetNumDomEigEstInitPreprocessIters(
+              arkode_mem.get(), data.dom_eig_estimator_num_warmups);
+            AssertARKode(status);
+          }
+#    else
+        // Older SUNDIALS versions do not provide a built-in estimator, so a
+        // dominant-eigenvalue callback is mandatory. This is also guarded by
+        // the Assert at the top of this function.
+        Assert(dominant_eigenvalue_function,
+               ExcFunctionNotProvided("dominant_eigenvalue_function"));
+#    endif
+      }
+
+    if (data.dom_eig_frequency != numbers::invalid_unsigned_int)
       {
         status =
           LSRKStepSetDomEigFrequency(arkode_mem.get(), data.dom_eig_frequency);

@@ -155,6 +155,10 @@ export
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
   using ::LSRKStepCreateSSP;
   using ::LSRKStepCreateSTS;
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+  using ::LSRKStepSetDomEigEstimator;
+  using ::LSRKStepSetNumDomEigEstInitPreprocessIters;
+#    endif
   using ::LSRKStepSetDomEigFn;
   using ::LSRKStepSetDomEigFrequency;
   using ::LSRKStepSetMaxNumStages;
@@ -179,6 +183,11 @@ export
   using ::SUNContext_Free;
 #  endif
   using ::SUNDIALS_NVEC_CUSTOM;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+  using ::SUNDomEigEstimator;
+  using ::SUNDomEigEstimator_Destroy;
+  using ::SUNDomEigEstimator_Power;
+#  endif
   using ::sunindextype;
   using ::SUNLinearSolver;
   using ::SUNLINEARSOLVER_ITERATIVE;
