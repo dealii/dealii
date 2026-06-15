@@ -17,6 +17,7 @@
 
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/mpi_stub.h>
+#include <deal.II/base/std_cxx26/inplace_vector.h>
 
 #include <deal.II/grid/cell_data.h>
 #include <deal.II/grid/cell_id.h>
@@ -153,7 +154,9 @@ namespace TriangulationDescription
      * List of face number and boundary id of all non-internal faces of the
      * cell.
      */
-    std::vector<std::pair<unsigned int, types::boundary_id>> boundary_ids;
+    std_cxx26::inplace_vector<std::pair<unsigned int, types::boundary_id>,
+                              ReferenceCells::max_n_faces<dim>()>
+      boundary_ids;
   };
 
 
