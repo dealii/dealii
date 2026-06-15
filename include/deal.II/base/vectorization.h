@@ -3534,8 +3534,12 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[6] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[7] + i));
       v1 = _mm256_inserti128_si256(v1, _mm_unpacklo_epi64(t0, t1), 1);
-      out[i + 0].data = _mm256_shuffle_ps(v0, v1, 0x88);
-      out[i + 1].data = _mm256_shuffle_ps(v0, v1, 0xdd);
+      out[i + 0].data = _mm256_shuffle_ps(_mm256_castsi256_ps(v0),
+                                          _mm256_castsi256_ps(v1),
+                                          0x88);
+      out[i + 1].data = _mm256_shuffle_ps(_mm256_castsi256_ps(v0),
+                                          _mm256_castsi256_ps(v1),
+                                          0xdd);
     }
   else if (remainder == 1)
     for (unsigned int v = 0; v < 8; ++v)
@@ -4783,28 +4787,36 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
       __m128i t0, t1;
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[0] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[1] + i));
-      v0 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 0);
+      v0 =
+        _mm512_insertf32x4(v1, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 0);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[4] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[5] + i));
-      v0 = _mm512_insertf32x4(v0, _mm_unpacklo_epi64(t0, t1), 1);
+      v0 =
+        _mm512_insertf32x4(v0, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 1);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[8] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[9] + i));
-      v0 = _mm512_insertf32x4(v0, _mm_unpacklo_epi64(t0, t1), 2);
+      v0 =
+        _mm512_insertf32x4(v0, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 2);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[12] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[13] + i));
-      v0 = _mm512_insertf32x4(v0, _mm_unpacklo_epi64(t0, t1), 3);
+      v0 =
+        _mm512_insertf32x4(v0, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 3);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[2] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[3] + i));
-      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 0);
+      v1 =
+        _mm512_insertf32x4(v1, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 0);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[6] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[7] + i));
-      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 1);
+      v1 =
+        _mm512_insertf32x4(v1, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 1);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[10] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[11] + i));
-      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 2);
+      v1 =
+        _mm512_insertf32x4(v1, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 2);
       t0 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[14] + i));
       t1 = _mm_loadl_epi64(reinterpret_cast<const __m128i *>(in[15] + i));
-      v1 = _mm512_insertf32x4(v1, _mm_unpacklo_epi64(t0, t1), 3);
+      v1 =
+        _mm512_insertf32x4(v1, _mm_castsi128_ps(_mm_unpacklo_epi64(t0, t1)), 3);
       out[i + 0].data = _mm512_shuffle_ps(v0, v1, 0x88);
       out[i + 1].data = _mm512_shuffle_ps(v0, v1, 0xdd);
     }
