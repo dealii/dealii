@@ -338,14 +338,6 @@ namespace SUNDIALS
    * and, optionally,
    * - jacobian_preconditioner_setup() and/or mass_preconditioner_setup()
    *
-   * Also the following functions could be rewritten. By default
-   * they do nothing, or are not required.
-   *  - solver_should_restart()
-   *  - get_local_tolerances()
-   *
-   * To produce output at fixed steps, set the function
-   *  - output_step()
-   *
    * Any other custom settings of the ARKStep object can be specified in
    *  - custom_setup()
    *
