@@ -143,6 +143,7 @@ namespace LinearAlgebra
           kokkos_dual_view_src);
 
         M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
+        Kokkos::deep_copy(kokkos_view_dst, mirror_view_dst);
       }
 
 
