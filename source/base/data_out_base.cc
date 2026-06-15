@@ -10,13 +10,14 @@
 //
 // -----------------------------------------------------------------------------
 
-
 #include <deal.II/base/data_out_base.h>
+#include <deal.II/base/exception_macros.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/mpi_large_count.h>
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/parameter_handler.h>
+#include <deal.II/base/scope_exit.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
@@ -27,6 +28,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 #include <fstream>
 #include <future>
 #include <iomanip>
@@ -35,6 +37,8 @@
 #include <numeric>
 #include <set>
 #include <sstream>
+#include <type_traits>
+#include <variant>
 #include <vector>
 
 #ifdef DEAL_II_WITH_ZLIB
@@ -43,6 +47,12 @@
 
 #ifdef DEAL_II_WITH_HDF5
 #  include <hdf5.h>
+#endif
+
+#ifdef DEAL_II_WITH_NETCDF
+#  include <netcdf.h>
+#  include <netcdf_meta.h>
+#  include <netcdf_par.h>
 #endif
 
 #include <boost/archive/iterators/base64_from_binary.hpp>
@@ -2448,6 +2458,16 @@ namespace DataOutBase
       DEAL_II_ASSERT_UNREACHABLE();
   }
 
+  CFFlags::CFFlags(
+    const double time,
+    const bool   keep_existing_file,
+    const std::map<std::string,
+                   std::vector<std::pair<std::string, AttributeValue>>>
+      &attributes)
+    : time(time)
+    , keep_existing_file(keep_existing_file)
+    , attributes(attributes)
+  {}
 
   Hdf5Flags::Hdf5Flags(const CompressionLevel compression_level)
     : compression_level(compression_level)
@@ -8245,6 +8265,64 @@ DataOutInterface<dim, spacedim>::write_filtered_data(
 
 namespace
 {
+#if defined(DEAL_II_WITH_HDF5) || defined(DEAL_II_WITH_NETCDF)
+  /**
+   * Holds local and global numbers of mesh cells and nodes.
+   */
+  struct DistributedMeshSizes
+  {
+    uint64_t n_nodes_local;
+    uint64_t n_cells_local;
+    uint64_t n_nodes_global;
+    uint64_t n_cells_global;
+    uint64_t offset_nodes; // global index of first local node
+    uint64_t offset_cells; // global index of first local cell
+  };
+
+
+
+  /**
+   * Compute global numbers of cells and nodes of a distributed mesh.
+   */
+  DistributedMeshSizes
+  compute_global_mesh_size(const uint64_t n_nodes_local,
+                           const uint64_t n_cells_local,
+                           const MPI_Comm comm)
+  {
+    const uint64_t n_local[2] = {n_nodes_local, n_cells_local};
+    uint64_t       n_global[2];
+    uint64_t       offsets[2] = {0, 0};
+
+#  ifdef DEAL_II_WITH_MPI
+    int ierr =
+      MPI_Allreduce(n_local,
+                    n_global,
+                    2,
+                    Utilities::MPI::mpi_type_id_for_type<decltype(n_local[0])>,
+                    MPI_SUM,
+                    comm);
+    AssertThrowMPI(ierr);
+    ierr =
+      MPI_Exscan(n_local,
+                 offsets,
+                 2,
+                 Utilities::MPI::mpi_type_id_for_type<decltype(n_local[0])>,
+                 MPI_SUM,
+                 comm);
+    AssertThrowMPI(ierr);
+#  else
+    n_global[0] = n_local[0];
+    n_global[1] = n_local[1];
+    offsets[0]  = 0;
+    offsets[1]  = 0;
+#  endif
+
+    return {
+      n_local[0], n_local[1], n_global[0], n_global[1], offsets[0], offsets[1]};
+  }
+#endif
+
+
 #ifdef DEAL_II_WITH_HDF5
   /**
    * Helper function to actually perform the HDF5 output.
@@ -8267,15 +8345,9 @@ namespace
     hid_t pt_data_dataspace, pt_data_dataset, pt_data_file_dataspace,
       pt_data_memory_dataspace;
     herr_t              status;
-    std::uint64_t       local_node_cell_count[2];
     hsize_t             count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
     std::vector<double> node_data_vec;
     std::vector<unsigned int> cell_data_vec;
-
-
-
-    local_node_cell_count[0] = data_filter.n_nodes();
-    local_node_cell_count[1] = data_filter.n_cells();
 
     // Create file access properties
     file_plist_id = H5Pcreate(H5P_FILE_ACCESS);
@@ -8295,31 +8367,10 @@ namespace
 
     // Compute the global total number of nodes/cells and determine the offset
     // of the data for this process
-
-    std::uint64_t global_node_cell_count[2]   = {0, 0};
-    std::uint64_t global_node_cell_offsets[2] = {0, 0};
-
-#  ifdef DEAL_II_WITH_MPI
-    int ierr =
-      MPI_Allreduce(local_node_cell_count,
-                    global_node_cell_count,
-                    2,
-                    Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
-                    MPI_SUM,
-                    comm);
-    AssertThrowMPI(ierr);
-    ierr = MPI_Exscan(local_node_cell_count,
-                      global_node_cell_offsets,
-                      2,
-                      Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
-                      MPI_SUM,
-                      comm);
-    AssertThrowMPI(ierr);
-#  else
-    global_node_cell_count[0]   = local_node_cell_count[0];
-    global_node_cell_count[1]   = local_node_cell_count[1];
-    global_node_cell_offsets[0] = global_node_cell_offsets[1] = 0;
-#  endif
+    const DistributedMeshSizes mesh_sizes =
+      compute_global_mesh_size(data_filter.n_nodes(),
+                               data_filter.n_cells(),
+                               comm);
 
     // Create the property list for a collective write
     plist_id = H5Pcreate(H5P_DATASET_XFER);
@@ -8342,12 +8393,12 @@ namespace
 
         // Create the dataspace for the nodes and cells. HDF5 only supports 2-
         // or 3-dimensional coordinates
-        node_ds_dim[0] = global_node_cell_count[0];
+        node_ds_dim[0] = mesh_sizes.n_nodes_global;
         node_ds_dim[1] = (spacedim < 2) ? 2 : spacedim;
         node_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
         AssertThrow(node_dataspace >= 0, ExcIO());
 
-        cell_ds_dim[0] = global_node_cell_count[1];
+        cell_ds_dim[0] = mesh_sizes.n_cells_global;
         cell_ds_dim[1] = patches[0].reference_cell.n_vertices();
         cell_dataspace = H5Screate_simple(2, cell_ds_dim, nullptr);
         AssertThrow(cell_dataspace >= 0, ExcIO());
@@ -8408,10 +8459,10 @@ namespace
 
         // Create the data subset we'll use to read from memory. HDF5 only
         // supports 2- or 3-dimensional coordinates
-        count[0] = local_node_cell_count[0];
+        count[0] = mesh_sizes.n_nodes_local;
         count[1] = (spacedim < 2) ? 2 : spacedim;
 
-        offset[0] = global_node_cell_offsets[0];
+        offset[0] = mesh_sizes.offset_nodes;
         offset[1] = 0;
 
         node_memory_dataspace = H5Screate_simple(2, count, nullptr);
@@ -8425,9 +8476,9 @@ namespace
         AssertThrow(status >= 0, ExcIO());
 
         // And repeat for cells
-        count[0]              = local_node_cell_count[1];
+        count[0]              = mesh_sizes.n_cells_local;
         count[1]              = patches[0].reference_cell.n_vertices();
-        offset[0]             = global_node_cell_offsets[1];
+        offset[0]             = mesh_sizes.offset_cells;
         offset[1]             = 0;
         cell_memory_dataspace = H5Screate_simple(2, count, nullptr);
         AssertThrow(cell_memory_dataspace >= 0, ExcIO());
@@ -8450,7 +8501,7 @@ namespace
         node_data_vec.clear();
 
         // And the cell data
-        data_filter.fill_cell_data(global_node_cell_offsets[0], cell_data_vec);
+        data_filter.fill_cell_data(mesh_sizes.offset_nodes, cell_data_vec);
         status = H5Dwrite(cell_dataset,
                           H5T_NATIVE_UINT,
                           cell_memory_dataspace,
@@ -8513,7 +8564,7 @@ namespace
         vector_name = data_filter.get_data_set_name(i);
 
         // Create the dataspace for the point data
-        node_ds_dim[0]    = global_node_cell_count[0];
+        node_ds_dim[0]    = mesh_sizes.n_nodes_global;
         node_ds_dim[1]    = pt_data_vector_dim;
         pt_data_dataspace = H5Screate_simple(2, node_ds_dim, nullptr);
         AssertThrow(pt_data_dataspace >= 0, ExcIO());
@@ -8543,9 +8594,9 @@ namespace
         AssertThrow(pt_data_dataset >= 0, ExcIO());
 
         // Create the data subset we'll use to read from memory
-        count[0]                 = local_node_cell_count[0];
+        count[0]                 = mesh_sizes.n_nodes_local;
         count[1]                 = pt_data_vector_dim;
-        offset[0]                = global_node_cell_offsets[0];
+        offset[0]                = mesh_sizes.offset_nodes;
         offset[1]                = 0;
         pt_data_memory_dataspace = H5Screate_simple(2, count, nullptr);
         AssertThrow(pt_data_memory_dataspace >= 0, ExcIO());
@@ -8853,6 +8904,584 @@ DataOutBase::write_hdf5_parallel(
 
 
 
+#ifdef DEAL_II_WITH_NETCDF
+namespace
+{
+  /**
+   * Minimalist RAII wrapper for NetCDF files.
+   */
+  struct NcFile
+  {
+  public:
+    /**
+     * Create a NetCDF file.
+     */
+    static NcFile
+    create(const std::string &filename,
+           const int          open_mode,
+           const MPI_Comm     comm)
+    {
+      NcFile ncfile;
+      auto   ncerr = nc_create_par(
+        filename.c_str(), open_mode, comm, MPI_INFO_NULL, &ncfile.ncid);
+      AssertThrowNC(ncerr);
+      return ncfile;
+    }
+
+
+
+    /**
+     * Open an existing NetCDF file for reading and/or writing.
+     */
+    static NcFile
+    open(const std::string &filename, const int open_mode, const MPI_Comm comm)
+    {
+      NcFile ncfile;
+      auto   ncerr = nc_open_par(
+        filename.c_str(), open_mode, comm, MPI_INFO_NULL, &ncfile.ncid);
+      AssertThrowNC(ncerr);
+      return ncfile;
+    }
+
+
+
+    /**
+     * Convert to the native NetCDF handle.
+     */
+    operator int() const
+    {
+      return ncid;
+    }
+
+
+
+    /**
+     * Close the NetCDF file.
+     */
+    ~NcFile()
+    {
+      // after checking that nc_create/open succeeded, there shouldn't
+      // be any errors closing it unless something went very bad.
+      int ncerr = nc_close(ncid);
+      AssertNothrow(ncerr == NC_NOERR,
+                    ExcIO("Unexpected error when closing a NetCDF file."));
+    }
+
+
+  private:
+    /**
+     * Native handle of NetCDF file.
+     */
+    int ncid{};
+
+    /**
+     * Private constructor.
+     * Use static factory functions to safely create or open a NetCDF file.
+     */
+    NcFile() = default;
+  };
+
+
+
+  /**
+   * Helper function to create a NetCDF attribute for different data types.
+   */
+  int
+  nc_put_att_var(const int                                   ncid,
+                 const int                                   varid,
+                 const char                                 *name,
+                 const DataOutBase::CFFlags::AttributeValue &value)
+  {
+    return std::visit(
+      [&](const auto &v) {
+        using T = std::remove_cv_t<std::remove_reference_t<decltype(v)>>;
+        if constexpr (std::is_same_v<T, std::string>)
+          {
+            return nc_put_att_text(ncid, varid, name, v.size(), v.c_str());
+          }
+        else if constexpr (std::is_same_v<T, double>)
+          {
+            return nc_put_att_double(ncid, varid, name, NC_DOUBLE, 1, &v);
+          }
+        else if constexpr (std::is_same_v<T, int>)
+          {
+            return nc_put_att_int(ncid, varid, name, NC_INT, 1, &v);
+          }
+        else
+          {
+            DEAL_II_ASSERT_UNREACHABLE();
+          }
+      },
+      value);
+  }
+
+
+
+  /**
+   * Write all attributes in a map for the CF variable.
+   */
+  template <class AttrMap = std::initializer_list<
+              std::pair<std::string, DataOutBase::CFFlags::AttributeValue>>>
+  void
+  write_cf_attributes(int ncid, int varid, const AttrMap &attrs)
+  {
+    for (const auto &[att_name, att_value] : attrs)
+      {
+        ncerr = nc_put_att_var(ncid, varid, att_name.c_str(), att_value);
+        AssertThrowNC(ncerr);
+      }
+  }
+
+
+
+  /**
+   * Write all user defined attributes for the CF variable.
+   */
+  void
+  write_cf_user_defined_attributes(int                         ncid,
+                                   const DataOutBase::CFFlags &flags,
+                                   const std::string          &var_name,
+                                   int                         varid)
+  {
+    if (auto it_atts = flags.attributes.find(var_name);
+        it_atts != flags.attributes.end())
+      {
+        write_cf_attributes(ncid, varid, it_atts->second);
+      }
+  }
+
+
+
+  /**
+   * Get x and y node coordinates from DataOutFilter.
+   */
+  template <int spacedim>
+  void
+  get_node_coordinates(const DataOutBase::DataOutFilter &data_filter,
+                       std::vector<double>              &x,
+                       std::vector<double>              &y)
+  {
+    std::vector<double> coords;
+    data_filter.fill_node_data(coords);
+    x.resize(data_filter.n_nodes());
+    y.resize(data_filter.n_nodes());
+    for (unsigned int i = 0; i < data_filter.n_nodes(); ++i)
+      {
+        x[i] = coords[i * spacedim];
+        y[i] = coords[i * spacedim + 1];
+      }
+  }
+
+
+
+  /**
+   * Helper function to write the mesh according to CF conventions.
+   */
+  template <int dim, int spacedim>
+  void
+  write_cf_mesh(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
+                const DataOutBase::DataOutFilter &data_filter,
+                const DataOutBase::CFFlags       &flags,
+                const std::string                &filename,
+                const DistributedMeshSizes       &mesh_sizes,
+                const MPI_Comm                    comm)
+  {
+    int ncerr;
+    // Create file, overwriting any existing file
+    const auto ncid =
+      NcFile::create(filename, NC_WRITE | NC_CLOBBER | NC_NETCDF4, comm);
+
+    // global attributes
+    write_cf_attributes(
+      ncid,
+      NC_GLOBAL,
+      {
+        {"Conventions", "CF-1.12"},
+        {"comment",
+         "Created by the deal.II finite element library (https://dealii.org)."},
+      });
+    write_cf_user_defined_attributes(ncid, flags, "global", NC_GLOBAL);
+
+    // check for empty patches
+    // already checked in `write_cf_parallel`, so if this fails
+    // there is an internal bug.
+    Assert(patches.size() > 0,
+           ExcInternalError("Must not be called without patches."));
+    // check for mixed mesh, may be expensive
+    // actually requires MPI communication to be certain
+    Assert(std::all_of(patches.begin(),
+                       patches.end(),
+                       [ref = patches[0].reference_cell](const auto &patch) {
+                         return patch.reference_cell == ref;
+                       }),
+           ExcNotImplemented(
+             "Mixed meshes are currently not supported in CF output."));
+
+    // create dimensions for the mesh topology
+    // assume no mixed mesh, fixed number of nodes per cell
+    int dim_node, dim_cell, dim_cell_node;
+    ncerr = nc_def_dim(ncid, "node", mesh_sizes.n_nodes_global, &dim_node);
+    AssertThrowNC(ncerr);
+    ncerr = nc_def_dim(ncid, "face", mesh_sizes.n_cells_global, &dim_cell);
+    AssertThrowNC(ncerr);
+    int n_nodes_per_cell = patches[0].reference_cell.n_vertices();
+    ncerr = nc_def_dim(ncid, "face_node", n_nodes_per_cell, &dim_cell_node);
+    AssertThrowNC(ncerr);
+
+    // create the mesh variable that holds the mesh meta data
+    // as attributes. Only include the required topology attributes,
+    // edges would require parsing of the vertices and filtering duplicates.
+    int var_mesh, var_cell, var_x, var_y;
+    ncerr = nc_def_var(ncid, "mesh", NC_INT, 0, nullptr, &var_mesh);
+    AssertThrowNC(ncerr);
+    write_cf_attributes(ncid,
+                        var_mesh,
+                        {
+                          {"cf_role", "mesh_topology"},
+                          {"long_name", "Topology of a 2-d unstructured mesh"},
+                          {"topology_dimension", 2}, // other dims NYI
+                          {"node_coordinates", "mesh_node_x mesh_node_y"},
+                          {"face_node_connectivity", "mesh_face_nodes"},
+                          {"face_dimension", "face"},
+                        });
+    // not sure if the mesh variable is required to have a value,
+    // but to be safe:
+    int dummy_mesh_value = 0;
+    ncerr                = nc_put_var_int(ncid, var_mesh, &dummy_mesh_value);
+    AssertThrowNC(ncerr);
+
+    // create the variable that holds the node indices that define each cell
+    const int dims_cells[2] = {dim_cell, dim_cell_node};
+    ncerr =
+      nc_def_var(ncid, "mesh_face_nodes", NC_INT, 2, dims_cells, &var_cell);
+    AssertThrowNC(ncerr);
+    write_cf_attributes(ncid,
+                        var_cell,
+                        {
+                          {"cf_role", "face_node_connectivity"},
+                          {"long_name", "Corner nodes that make up each face."},
+                          {"start_index", 0}, // use 0-based indexing
+                          {"_FillValue",
+                           -1}, // if mixed mesh (currently unused)
+                        });
+
+    // create the variables that hold the node coordinates
+    // variable names must be the same as listed in the mesh attributes above
+    ncerr = nc_def_var(ncid, "mesh_node_x", NC_DOUBLE, 1, &dim_node, &var_x);
+    AssertThrowNC(ncerr);
+    write_cf_attributes(ncid, var_x, {{"axis", "X"}});
+    write_cf_user_defined_attributes(ncid, flags, "x", var_x);
+    ncerr = nc_def_var(ncid, "mesh_node_y", NC_DOUBLE, 1, &dim_node, &var_y);
+    AssertThrowNC(ncerr);
+    write_cf_attributes(ncid, var_y, {{"axis", "Y"}});
+    write_cf_user_defined_attributes(ncid, flags, "y", var_y);
+
+    // Create the unlimited time dimension if requested
+    int dim_time, var_time;
+    if (flags.time > -std::numeric_limits<double>::infinity())
+      {
+        ncerr = nc_def_dim(ncid, "time", NC_UNLIMITED, &dim_time);
+        AssertThrowNC(ncerr);
+        ncerr = nc_def_var(ncid, "time", NC_DOUBLE, 1, &dim_time, &var_time);
+        AssertThrowNC(ncerr);
+        write_cf_attributes(ncid,
+                            var_time,
+                            {
+                              {"standard_name", "time"},
+                              {"axis", "T"},
+                              {"long_name", "Time dimension"},
+                            });
+        write_cf_user_defined_attributes(ncid, flags, "time", var_time);
+      }
+
+    // write the coordinate values
+    std::vector<double> x, y;
+    get_node_coordinates<spacedim>(data_filter, x, y);
+    const size_t coord_write_start[1] = {(size_t)mesh_sizes.offset_nodes};
+    const size_t coord_write_count[1] = {(size_t)data_filter.n_nodes()};
+    ncerr                             = nc_put_vara_double(
+      ncid, var_x, coord_write_start, coord_write_count, x.data());
+    AssertThrowNC(ncerr);
+    ncerr = nc_put_vara_double(
+      ncid, var_y, coord_write_start, coord_write_count, y.data());
+    AssertThrowNC(ncerr);
+
+    // write the cell node indices
+    std::vector<unsigned int> ucells;
+    data_filter.fill_cell_data(mesh_sizes.offset_nodes, ucells);
+    const size_t cell_write_start[2] = {(size_t)mesh_sizes.offset_cells,
+                                        size_t(0)};
+    const size_t cell_write_count[2] = {(size_t)data_filter.n_cells(),
+                                        (size_t)n_nodes_per_cell};
+    ncerr                            = nc_put_vara_uint(
+      ncid, var_cell, cell_write_start, cell_write_count, ucells.data());
+    AssertThrowNC(ncerr);
+  }
+
+
+
+  /**
+   * Add a new time point to the CF file and return the index.
+   */
+  size_t
+  write_cf_time_point(int ncid, int dim_time, int var_time, double time)
+  {
+    size_t index_t;
+
+    // Assume time points are strictly increasing to find the correct index
+    // to write at. This may not be the end of the time dimension
+    // if the simulation was interrupted and restarted at a checkpoint.
+    // variable with unlimited dimension must be written collectively
+    ncerr = nc_var_par_access(ncid, var_time, NC_COLLECTIVE);
+    AssertThrowNC(ncerr);
+
+    size_t n_time;
+    ncerr = nc_inq_dimlen(ncid, dim_time, &n_time);
+    AssertThrowNC(ncerr);
+    auto times = std::vector<double>(n_time);
+    ncerr      = nc_get_var_double(ncid, var_time, times.data());
+    AssertThrowNC(ncerr);
+    const auto it_lb     = std::lower_bound(times.begin(), times.end(), time);
+    index_t              = std::distance(times.begin(), it_lb);
+    const size_t count_t = 1;
+    ncerr = nc_put_vara_double(ncid, var_time, &index_t, &count_t, &time);
+    AssertThrowNC(ncerr);
+
+    ncerr = nc_var_par_access(ncid, var_time, NC_INDEPENDENT);
+    AssertThrowNC(ncerr);
+
+    return index_t;
+  }
+
+
+
+  /**
+   * Write data sets to existing NetCDF file in CF conventions.
+   */
+  void
+  write_cf_data(const DataOutBase::DataOutFilter &data_filter,
+                const DataOutBase::CFFlags       &flags,
+                const std::string                &filename,
+                const DistributedMeshSizes       &mesh_sizes,
+                const MPI_Comm                    comm)
+  {
+    int ncerr;
+
+    // open file
+    const auto ncid = NcFile::open(filename, NC_WRITE | NC_NETCDF4, comm);
+
+    // find mesh dimensions for data sets
+    int dim_node;
+    ncerr = nc_inq_dimid(ncid, "node", &dim_node);
+    AssertThrowNC(ncerr);
+
+    // find time dimension if requested
+    int        dim_time = -1, var_time = -1;
+    size_t     index_t = numbers::invalid_size_type; // unused if no time series
+    const bool has_time = flags.time > -std::numeric_limits<double>::infinity();
+    if (has_time)
+      {
+        int inq_dim_time = nc_inq_dimid(ncid, "time", &dim_time);
+        int inq_var_time = nc_inq_varid(ncid, "time", &var_time);
+        // trying to add a time point to a file without time is a common
+        // error so we check it first with a helpful message
+        const bool has_time_dimension = inq_dim_time != NC_EBADDIM;
+        const bool has_time_variable  = inq_var_time != NC_ENOTVAR;
+        AssertThrow(has_time_dimension && has_time_variable,
+                    ExcIO(
+                      "You are trying to add a time point to an existing file "
+                      "that does not have a time dimension or variable. "
+                      "Check the options in DataOutBase::cf_flags."));
+        // now we still need to check other (unexpected) netcdf errors
+        AssertThrowNC(inq_dim_time);
+        AssertThrowNC(inq_var_time);
+
+        index_t = write_cf_time_point(ncid, dim_time, var_time, flags.time);
+      }
+
+    // write data sets
+    for (auto dataset_index = 0u; dataset_index < data_filter.n_data_sets();
+         ++dataset_index)
+      {
+        AssertThrow(data_filter.get_data_set_dim(dataset_index) == 1,
+                    ExcNotImplemented(
+                      "Can only write scalar data in CF files."));
+
+        const std::string &key = data_filter.get_data_set_name(dataset_index);
+        const double      *values = data_filter.get_data_set(dataset_index);
+
+        // find existing variable for dataset or create new
+        int       varid;
+        const int inq_var = nc_inq_varid(ncid, key.c_str(), &varid);
+        if (inq_var == NC_ENOTVAR)
+          {
+            // data set doesn't exist yet, create new
+            const int var_dims[2] = {dim_time, dim_node};
+            ncerr                 = nc_def_var(ncid,
+                               key.c_str(),
+                               NC_DOUBLE,
+                               has_time ? 2 : 1, // skip time if not available
+                               &var_dims[has_time ? 0 : 1],
+                               &varid);
+            AssertThrowNC(ncerr);
+            write_cf_attributes(
+              ncid,
+              varid,
+              {
+                {"mesh", "mesh"},
+                {"location", "node"}, // no cell data (yet)
+                {"_FillValue",
+                 std::numeric_limits<double>::quiet_NaN()}, // skipped time
+                                                            // points
+              });
+            write_cf_user_defined_attributes(ncid, flags, key, varid);
+          }
+        else
+          {
+            // data set already exists or other error
+            AssertThrowNC(inq_var);
+          }
+
+        // write data
+        ncerr = nc_var_par_access(ncid, varid, NC_COLLECTIVE);
+        AssertThrowNC(ncerr);
+        const size_t var_write_start[2] = {index_t,
+                                           (size_t)mesh_sizes.offset_nodes};
+        const size_t var_write_count[2] = {1, (size_t)data_filter.n_nodes()};
+        ncerr                           = nc_put_vara_double(
+          ncid,
+          varid,
+          &var_write_start[has_time ? 0 : 1], // skip time if not available
+          &var_write_count[has_time ? 0 : 1],
+          values);
+        AssertThrowNC(ncerr);
+        ncerr = nc_var_par_access(ncid, varid, NC_INDEPENDENT);
+        AssertThrowNC(ncerr);
+      }
+  }
+
+} // namespace
+#endif // DEAL_II_WITH_NETCDF
+
+
+
+template <int dim, int spacedim>
+void
+DataOutInterface<dim, spacedim>::write_cf_parallel(
+  const DataOutBase::DataOutFilter &data_filter,
+  const std::string                &filename,
+  const MPI_Comm                    comm) const
+{
+  DataOutBase::write_cf_parallel(
+    get_patches(), data_filter, cf_flags, filename, comm);
+}
+
+
+
+template <int dim, int spacedim>
+void
+DataOutBase::write_cf_parallel(const std::vector<Patch<dim, spacedim>> &patches,
+                               const DataOutBase::DataOutFilter &data_filter,
+                               const DataOutBase::CFFlags       &flags,
+                               const std::string                &filename,
+                               const MPI_Comm                    comm)
+{
+  // Support for 3D could be added when CF adds fully unstructured 3D grids
+  // from UGRID conventions.
+  AssertThrow(spacedim == 2,
+              ExcNotImplemented(
+                "DataOutBase can only write CF output in 2 dimensions."));
+  AssertThrow(dim == spacedim,
+              ExcMessage(
+                "Mesh must have codimension 0 for writing CF output."));
+
+#ifndef DEAL_II_WITH_NETCDF
+  // throw an exception, but first make sure the compiler does not warn about
+  // the now unused function arguments
+  (void)patches;
+  (void)data_filter;
+  (void)flags;
+  (void)filename;
+  (void)comm;
+  AssertThrow(false, ExcNeedsNetCDF());
+#else
+  // Ensure that this function is always collective even if some
+  // processes do not participate in writing data.
+  ScopeExit barrier_on_exit{[&comm] {
+    int ierr = MPI_Barrier(comm);
+    AssertThrowMPI(ierr);
+  }};
+
+  // Verify that there are indeed patches to be written out. most of
+  // the times, people just forget to call build_patches when there
+  // are no patches, so a warning is in order. That said, the
+  // assertion is disabled if we run with more than one MPI rank,
+  // since then it can happen that, on coarse meshes, a processor
+  // simply has no cells it actually owns, and in that case it is
+  // legit if there are no patches.
+  const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
+  Assert((patches.size() > 0) || (n_ranks > 1), ExcNoPatches());
+
+  // The Netcdf routines perform a bunch of collective calls that expect all
+  // ranks to participate. On ranks without any patches we are missing
+  // critical information, so rather than broadcasting that information, just
+  // create a new communicator that only contains ranks with cells and
+  // use that to perform the write operations:
+  const bool have_patches = (patches.size() > 0);
+  MPI_Comm   split_comm;
+  {
+    const int key   = Utilities::MPI::this_mpi_process(comm);
+    const int color = (have_patches ? 1 : 0);
+    const int ierr  = MPI_Comm_split(comm, color, key, &split_comm);
+    AssertThrowMPI(ierr);
+  }
+  ScopeExit cleanup_on_exit{[&split_comm] {
+    int ierr = MPI_Comm_free(&split_comm);
+    AssertThrowMPI(ierr);
+  }};
+
+  if (have_patches)
+    {
+      const DistributedMeshSizes mesh_sizes =
+        compute_global_mesh_size(data_filter.n_nodes(),
+                                 data_filter.n_cells(),
+                                 split_comm);
+      // CF does not explicitly state that node indices are of type int,
+      // but all examples in the conventions doc use it and at least
+      // some CF file readers expect it. Maybe this restriction can
+      // be lifted, maybe add a flag "use_64bit_indices" to CFFlags?
+      AssertThrow(
+        mesh_sizes.n_nodes_global < uint64_t(std::numeric_limits<int>::max()),
+        ExcMessage("The mesh has too many vertices to store in CF format."));
+
+      if (!flags.keep_existing_file)
+        {
+          // Create new file with mesh definition
+          write_cf_mesh(
+            patches, data_filter, flags, filename, mesh_sizes, split_comm);
+        }
+      else
+        {
+          // Existing file with mesh definition will be reused.
+          // Explicitly checking that the mesh in the file is correct
+          // could be expensive. But NetCDF will complain if the dimensions
+          // don't match. So we only check that the file exists.
+          AssertThrow(std::filesystem::is_regular_file(filename),
+                      ExcIO("You are trying to write data to an existing file "
+                            "but no file of the given name exists. "
+                            "Create the file with a mesh by setting "
+                            "CFFlags::keep_existing_file = false."));
+        }
+
+      // write the data sets to the file that contains the mesh definition
+      // (either just created or preexisting)
+      write_cf_data(data_filter, flags, filename, mesh_sizes, split_comm);
+    }
+#endif // DEAL_II_WITH_NETCDF
+}
+
+
+
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write(
@@ -8945,6 +9574,8 @@ DataOutInterface<dim, spacedim>::set_flags(const FlagType &flags)
     gmv_flags = flags;
   else if constexpr (std::is_same_v<FlagType, DataOutBase::Hdf5Flags>)
     hdf5_flags = flags;
+  else if constexpr (std::is_same_v<FlagType, DataOutBase::CFFlags>)
+    cf_flags = flags;
   else if constexpr (std::is_same_v<FlagType, DataOutBase::TecplotFlags>)
     tecplot_flags = flags;
   else if constexpr (std::is_same_v<FlagType, DataOutBase::VtkFlags>)

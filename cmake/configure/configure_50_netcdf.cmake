@@ -24,14 +24,14 @@ macro(feature_netcdf_find_external var)
   if(NETCDF_FOUND)
     set(${var} TRUE)
     
-    if(NOT NETCDF_HAS_PARALLEL)
+    if(NOT NETCDF_HAS_PARALLEL4)
       set(${var} FALSE)
       message(STATUS "Insufficient netCDF installation found: "
-        "netCDF has to be configured with MPI support."
+        "netCDF has to be configured with NetCDF-4 and MPI support."
         )
       set(NETCDF_ADDITIONAL_ERROR_STRING
         "Insufficient netCDF installation found!\n"
-        "netCDF has to be configured with MPI support.\n"
+        "netCDF has to be configured with NetCDF-4 and MPI support.\n"
         )
     endif()
   
