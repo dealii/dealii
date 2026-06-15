@@ -12848,15 +12848,6 @@ namespace internal
         return false;
       }
     };
-
-
-    template <int dim, int spacedim>
-    const Manifold<dim, spacedim> &
-    get_default_flat_manifold()
-    {
-      static const FlatManifold<dim, spacedim> flat_manifold;
-      return flat_manifold;
-    }
   } // namespace TriangulationImplementation
 } // namespace internal
 
@@ -12875,6 +12866,7 @@ Triangulation<dim, spacedim>::Triangulation(
   const bool          check_for_distorted_cells)
   : cell_attached_data({0, 0, {}, {}})
   , smooth_grid(smooth_grid)
+  , default_flat_manifold(std::make_unique<const FlatManifold<dim, spacedim>>())
   , anisotropic_refinement(false)
   , check_for_distorted_cells(check_for_distorted_cells)
 {
@@ -12911,6 +12903,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , vertices(std::move(tria.vertices))
   , vertices_used(std::move(tria.vertices_used))
   , manifolds(std::move(tria.manifolds))
+  , default_flat_manifold(std::make_unique<const FlatManifold<dim, spacedim>>())
   , anisotropic_refinement(tria.anisotropic_refinement)
   , check_for_distorted_cells(tria.check_for_distorted_cells)
   , number_cache(std::move(tria.number_cache))
@@ -12918,6 +12911,7 @@ Triangulation<dim, spacedim>::Triangulation(
   , vertex_to_manifold_id_map_1d(std::move(tria.vertex_to_manifold_id_map_1d))
 {
   tria.number_cache = internal::TriangulationImplementation::NumberCache<dim>();
+  tria.strides      = {};
 
   if (tria.policy)
     this->policy = tria.policy->clone();
@@ -12948,6 +12942,7 @@ Triangulation<dim, spacedim> &Triangulation<dim, spacedim>::operator=(
   vertex_to_manifold_id_map_1d = std::move(tria.vertex_to_manifold_id_map_1d);
 
   tria.number_cache = internal::TriangulationImplementation::NumberCache<dim>();
+  tria.strides      = {};
 
   if (tria.policy)
     this->policy = tria.policy->clone();
@@ -13084,10 +13079,7 @@ void Triangulation<dim, spacedim>::reset_manifold(
   AssertIndexRange(m_number, numbers::flat_manifold_id);
 
   // delete the entry located at number.
-  manifolds[m_number] =
-    internal::TriangulationImplementation::get_default_flat_manifold<dim,
-                                                                     spacedim>()
-      .clone();
+  manifolds[m_number] = default_flat_manifold->clone();
 }
 
 
@@ -13096,9 +13088,7 @@ DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::reset_all_manifolds()
 {
   for (auto &m : manifolds)
-    m.second = internal::TriangulationImplementation::
-                 get_default_flat_manifold<dim, spacedim>()
-                   .clone();
+    m.second = default_flat_manifold->clone();
 }
 
 
@@ -13180,8 +13170,7 @@ const Manifold<dim, spacedim> &Triangulation<dim, spacedim>::get_manifold(
 {
   // check if flat manifold has been queried
   if (m_number == numbers::flat_manifold_id)
-    return internal::TriangulationImplementation::
-      get_default_flat_manifold<dim, spacedim>();
+    return *default_flat_manifold;
 
   // look, if there is a manifold stored at
   // manifold_id number.
@@ -13200,8 +13189,7 @@ const Manifold<dim, spacedim> &Triangulation<dim, spacedim>::get_manifold(
       " has been attached to the triangulation. "
       "Please attach the right manifold with Triangulation::set_manifold()."));
 
-  return internal::TriangulationImplementation::
-    get_default_flat_manifold<dim, spacedim>(); // never reached
+  return *default_flat_manifold; // never reached
 }
 
 
@@ -18583,6 +18571,7 @@ std::size_t Triangulation<dim, spacedim>::memory_consumption() const
     mem += MemoryConsumption::memory_consumption(*level);
   mem += MemoryConsumption::memory_consumption(vertices);
   mem += MemoryConsumption::memory_consumption(vertices_used);
+  mem += sizeof(default_flat_manifold) + sizeof(*default_flat_manifold);
   mem += sizeof(manifolds);
   mem += sizeof(smooth_grid);
   mem += MemoryConsumption::memory_consumption(number_cache);

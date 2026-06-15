@@ -56,6 +56,8 @@ and using the 'signals' keyword. You can either #include the Qt headers (or any 
 
 // Forward declarations
 #ifndef DOXYGEN
+// We need to forward-declare Manifold here since Manifold depends on
+// Triangulation (e.g., it has functions which take face iterators as inputs).
 template <int dim, int spacedim>
 class Manifold;
 
@@ -4593,6 +4595,14 @@ private:
    */
   std::map<types::manifold_id, std::unique_ptr<const Manifold<dim, spacedim>>>
     manifolds;
+
+  /**
+   * The default FlatManifold.
+   *
+   * @note Since this header must forward-declare Manifold this must be a
+   * pointer: see the note in the forward declarations for more information.
+   */
+  const std::unique_ptr<const Manifold<dim, spacedim>> default_flat_manifold;
 
   /**
    * Flag indicating whether anisotropic refinement took place.

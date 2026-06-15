@@ -1518,7 +1518,7 @@ GridIn<dim, spacedim>::read_dbmesh(std::istream &in)
   getline(in, line);
   AssertThrow(line == "Quadrilaterals", ExcInvalidDBMESHInput(line));
 
-  static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+  constexpr std::array<unsigned int, 8> local_vertex_numbering = {
     {0, 1, 5, 4, 2, 3, 7, 6}};
   std::vector<CellData<dim>> cells;
   SubCellData                subcelldata;
@@ -2502,13 +2502,13 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
 
   // Assert we reached the end of the block
   in >> line;
-  static const std::string end_nodes_marker[] = {"$ENDNOD", "$EndNodes"};
+  const std::array<std::string, 2> end_nodes_marker{{"$ENDNOD", "$EndNodes"}};
   AssertThrow(line == end_nodes_marker[gmsh_file_format == 10 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
   // Now read in next bit
   in >> line;
-  static const std::string begin_elements_marker[] = {"$ELM", "$Elements"};
+  const std::array<std::string, 2> begin_elements_marker{{"$ELM", "$Elements"}};
   AssertThrow(line == begin_elements_marker[gmsh_file_format == 10 ? 0 : 1],
               ExcInvalidGMSHInput(line));
 
@@ -2543,7 +2543,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
   std::map<unsigned int, unsigned int> vertex_counts;
 
   {
-    static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+    constexpr std::array<unsigned int, 8> local_vertex_numbering = {
       {0, 1, 5, 4, 2, 3, 7, 6}};
     unsigned int global_cell = 0;
     for (int entity_block = 0; entity_block < n_entity_blocks; ++entity_block)
@@ -2879,7 +2879,8 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
   }
   // Assert that we reached the end of the block
   in >> line;
-  static const std::string end_elements_marker[] = {"$ENDELM", "$EndElements"};
+  const std::array<std::string, 2> end_elements_marker{
+    {"$ENDELM", "$EndElements"}};
   AssertThrow(line == end_elements_marker[gmsh_file_format == 10 ? 0 : 1],
               ExcInvalidGMSHInput(line));
   AssertThrow(in.fail() == false, ExcIO());
@@ -4045,7 +4046,7 @@ GridIn<dim, spacedim>::read_assimp(const std::string &filename,
   unsigned int v_offset = 0;
   unsigned int c_offset = 0;
 
-  static constexpr std::array<unsigned int, 8> local_vertex_numbering = {
+  constexpr std::array<unsigned int, 8> local_vertex_numbering = {
     {0, 1, 5, 4, 2, 3, 7, 6}};
   // The index of the mesh will be used as a material index.
   for (unsigned int m = start_mesh; m < end_mesh; ++m)
