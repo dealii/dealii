@@ -155,8 +155,9 @@ namespace Particles
     /**
      * Given a DoFHandler and a ParticleHandler, interpolate a vector field
      * at the position of the particles. The result is stored in an output
-     * vector whose size corresponds to the number of locally owned particles *
-     * number of active components
+     * vector that is indexed by the global particle id (see the
+     * @p interpolated_field documentation below for the exact layout and
+     * size).
      *
      * @param[in] field_dh The DOF Handler which was used to generate the
      * field vector that is to be interpolated.
@@ -168,8 +169,17 @@ namespace Particles
      * vector must be coherent with the dof_handler provided
      *
      * @param[in,out] interpolated_field The interpolated value of the field at
-     * the position of the particles. The size of the vector must be
-     * n_locally_owned_particles times the n_components
+     * the position of the particles. The vector is indexed by the *global*
+     * particle id: the value of selected component `k` for the particle with
+     * id `i` is stored at entry `i * n_components + k`. Consequently the
+     * vector must have size `particle_handler.get_next_free_particle_index() *
+     * n_components` (equal to `n_global_particles * n_components` when no
+     * particles have been removed), not merely the number of locally owned
+     * particles, and the entries are *not* ordered following the loop over
+     * particles. In parallel, this must be a distributed vector whose locally
+     * owned rows include the entries for all locally owned particles; the
+     * function adds into these entries and calls compress(VectorOperation::add)
+     * before returning.
      *
      * @param[in] field_comps An optional component mask that decides which
      * subset of the vector fields are interpolated
@@ -250,8 +260,9 @@ namespace Particles
     /**
      * Given a DoFHandler and a ParticleHandler, interpolate a vector field
      * at the position of the particles. The result is stored in an output
-     * vector whose size corresponds to the number of locally owned particles *
-     * number of active components. This version relies on FePointEvaluator
+     * vector that is indexed by the global particle id (see the
+     * @p interpolated_field documentation below for the exact layout and
+     * size). This version relies on FePointEvaluation
      * to interpolate the field at the particle location efficiently. The
      * drawback is that this requires knowledge of the number of components at
      * compile time.
@@ -263,14 +274,26 @@ namespace Particles
      * the interpolation points.
      *
      * @param[in] field_vector The vector of the field to be interpolated. This
-     * vector must be coherent with the dof_handler provided
+     * vector must be a valid solution vector for the dof_handler provided
      *
      * @param[in,out] interpolated_field The interpolated value of the field at
-     * the position of the particles. The size of the vector must be
-     * n_locally_owned_particles times the n_components
+     * the position of the particles. The vector is indexed by the *global*
+     * particle id: the value of selected component `k` for the particle with
+     * id `i` is stored at entry `i * n_components + k`. Consequently the
+     * vector must have size `particle_handler.get_next_free_particle_index() *
+     * n_components` (equal to `n_global_particles * n_components` when no
+     * particles have been removed), not merely the number of locally owned
+     * particles, and the entries are *not* ordered following the loop over
+     * particles. In parallel, this must be a distributed vector spanning the
+     * global particle ids; the function writes the entries belonging to the
+     * locally owned particles and calls compress(VectorOperation::insert)
+     * before returning.
      *
      * @param[in] field_comps An optional component mask that decides which
-     * subset of the vector fields are interpolated
+     * subset of the vector fields are interpolated. If a component mask
+     * selects (dim) component of a (dim+2) component mask, then the solution
+     * vector is required to have at least (dim) components to store the
+     * interpolation.
      *
      * @param[in] mapping The mapping used to transform the reference cell to
      *            the real cell. Defaults to the default mapping of the
@@ -287,7 +310,7 @@ namespace Particles
               typename InputVectorType,
               typename OutputVectorType>
     void
-    interpolate_field_on_particles_fast(
+    interpolate_field_on_particles(
       const DoFHandler<dim, spacedim>                 &field_dh,
       const Particles::ParticleHandler<dim, spacedim> &particle_handler,
       const InputVectorType                           &field_vector,
@@ -304,7 +327,10 @@ namespace Particles
     {
       if (particle_handler.n_locally_owned_particles() == 0)
         {
-          interpolated_field.compress(VectorOperation::add);
+          // This is a collective operation that must be matched by the
+          // compress() at the end of the function on all other processes. The
+          // values are written with operator=, hence we use insert here.
+          interpolated_field.compress(VectorOperation::insert);
           return; // nothing else to do here
         }
 
@@ -352,7 +378,7 @@ namespace Particles
 
           Assert(pic.begin() == particle, ExcInternalError());
 
-          // Gather the reference location  and ids of all particles
+          // Gather the reference location and ids of all particles
           particle_reference_locations.clear();
           particle_indices.clear();
           for (auto &p : pic)
@@ -389,6 +415,12 @@ namespace Particles
                 }
             }
         }
+
+      // The entries are written using operator=, possibly for particles whose
+      // global id is owned by another process. Ship those values to their
+      // owner and finalize the vector. This is collective and matches the
+      // compress() in the early-return branch above.
+      interpolated_field.compress(VectorOperation::insert);
     }
 
   } // namespace Utilities

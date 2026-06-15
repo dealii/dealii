@@ -121,7 +121,7 @@ test()
   VectorTools::interpolate(space_dh, linear, field_owned);
   field_relevant = field_owned;
   Particles::Utilities::
-    interpolate_field_on_particles_fast<n_components, dim, spacedim>(
+    interpolate_field_on_particles<n_components, dim, spacedim>(
       space_dh,
       particle_handler,
       field_relevant,
