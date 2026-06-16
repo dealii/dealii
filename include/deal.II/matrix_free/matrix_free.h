@@ -3407,13 +3407,22 @@ namespace internal
     find_vector_in_mf(const VectorType &vec,
                       const bool        check_global_compatibility = true) const
     {
-      // case 1: vector was set up with MatrixFree::initialize_dof_vector()
+      // case 1: if there is only one component we don't have anything to do
+      if (matrix_free.n_components() == 1)
+        {
+          Assert(matrix_free.get_dof_info(0).vector_partitioner->is_compatible(
+                   *vec.get_partitioner()),
+                 ExcMessage("Could not find partitioner that fits vector"));
+          return 0;
+        }
+
+      // case 2: vector was set up with MatrixFree::initialize_dof_vector()
       for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
         if (vec.get_partitioner().get() ==
             matrix_free.get_dof_info(c).vector_partitioner.get())
           return c;
 
-      // case 2: user provided own partitioner (compatibility mode)
+      // case 3: user provided own partitioner (compatibility mode)
       for (unsigned int c = 0; c < matrix_free.n_components(); ++c)
         if (check_global_compatibility ?
               vec.get_partitioner()->is_globally_compatible(
