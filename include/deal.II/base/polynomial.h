@@ -826,6 +826,12 @@ namespace Polynomials
    * beta equal to zero (Legendre case), one (Gauss-Lobatto case) as well as
    * two, so be careful when using it for other values as the Newton iteration
    * might or might not converge.
+   *
+   * For the definition of the Jacobi polynomials, see
+   * https://en.wikipedia.org/wiki/Gauss%E2%80%93Jacobi_quadrature,
+   * though that page uses the interval $[-1,1]$ instead, and so the weights
+   * associated with $\beta$ are there given as $(1+x)^\beta$ whereas in
+   * our implementation the weights are $(1-x)^\alpha$ and $x^\beta$.
    */
   template <typename Number>
   std::vector<Number>
