@@ -883,6 +883,8 @@ public:
  * following number of quadrature points for 2d and 3d:
  * - 2d: 1, 4, 7, 15
  * - 3d: 1, 6, 14, 35
+ * If n_points_1d is chosen to be greater as four, the rule falls back to the
+ * `QStroudSimplex` quadrature.
  *
  * For 1d, the quadrature rule degenerates to a
  * `dealii::QGauss<1>(n_points_1d)`.
@@ -952,6 +954,54 @@ public:
    */
   explicit QWitherdenVincentSimplex(const unsigned int n_points_1D,
                                     const bool         use_odd_order = true);
+};
+
+/**
+ * Stroud quadrature rules for simplex entities.
+ *
+ * Like QGauss, users should specify a number `n_points_1d` as an indication
+ * of what polynomial degree to be integrated exactly. The quadrature rule
+ * returns $n^d$ quadrature points.
+ *
+ * For 1d, the quadrature rule degenerates to a
+ * `dealii::QGauss<1>(n_points_1d)`.
+ *
+ * The integral over the reference triangle
+ * $\int_{0}^{1} \int_{0}^{1-y} f(x,y) dx dy$
+ * is transformed using the Duffy transformation
+ * \f[
+ * \begin{pmatrix}
+ * x\\
+ * y
+ * \end{pmatrix}
+ * =
+ * \begin{pmatrix}
+ * \hat \xi (1- \nu)\\
+ * \hat \nu
+ * \end{pmatrix}
+ * \f]
+ *
+ * to the integral over the reference quadrilateral
+ * $\int_{0}^{1} \int_{0}^{1} f(x(\xi, \nu),y(\xi, \nu)) (1-\nu) d\xi d\nu$.
+ * The integral can be calculated using standard Gauss integration rules.
+ * By choosing a Gauss-Jacobi quadrautre rule in y-direction with alpha = 1 and
+ * beta = 0, the additional factor $1-\nu$ is absorbed into the quadrature
+ * weights.
+ *
+ * The quadrature points on the quadrilateral are transformed back to the
+ * triangle using the Duffy transformation. Thus, the function returns
+ * quadrature points and weights on the reference simplex. A similar approach is
+ * used in 3d.
+ */
+template <int dim>
+class QStroudSimplex : public QSimplex<dim>
+{
+public:
+  /**
+   * Constructor taking the equivalent number of quadrature points in 1d
+   * @p n_points_1d.
+   */
+  explicit QStroudSimplex(const unsigned int n_points_1D);
 };
 
 /**
