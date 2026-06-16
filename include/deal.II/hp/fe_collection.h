@@ -352,11 +352,14 @@ namespace hp
     /**
      * Same as hp_vertex_dof_indices(), except that the function treats degrees
      * of freedom on quads.
+     *
+     * The function takes the set of pairs `fes_and_faces` as an argument,
+     * where the first entry in each pair identifies the `fe_index` and
+     * the second entry is the corresponding `face_no`.
      */
     std::vector<std::map<unsigned int, unsigned int>>
-    hp_quad_dof_identities(const std::set<unsigned int> &fes,
-                           const unsigned int            face_no = 0) const;
-
+    hp_quad_dof_identities(const std::set<std::pair<unsigned int, unsigned int>>
+                             &fes_and_faces) const;
 
     /**
      * Return the indices of finite elements in this FECollection that dominate
