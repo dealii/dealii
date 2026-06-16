@@ -83,7 +83,9 @@ namespace internal
           const unsigned int face_no          = numbers::invalid_unsigned_int,
           const unsigned int face_no_neighbor = numbers::invalid_unsigned_int)
         {
-          Assert(structdim == 2 || face_no == numbers::invalid_unsigned_int,
+          Assert(structdim == 2 ||
+                   (face_no == numbers::invalid_unsigned_int &&
+                    face_no_neighbor == numbers::invalid_unsigned_int),
                  ExcInternalError());
           Assert((face_no == numbers::invalid_unsigned_int &&
                   face_no_neighbor == numbers::invalid_unsigned_int) ||
@@ -121,9 +123,14 @@ namespace internal
                   case 2:
                     {
                       // TODO: Change set to types::fe_index
+                      std::pair<unsigned int, unsigned int> p1{fe_index_1,
+                                                               face_no};
+                      std::pair<unsigned int, unsigned int> p2{
+                        fe_index_2, face_no_neighbor};
+
                       complete_identities = fes.hp_quad_dof_identities(
-                        std::set<unsigned int>{fe_index_1, fe_index_2},
-                        face_no);
+                        std::set<std::pair<unsigned int, unsigned int>>{p1,
+                                                                        p2});
                       break;
                     }
 
