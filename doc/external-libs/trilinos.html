@@ -50,27 +50,32 @@
 
     <p style="color: red">
       Note: The current version of deal.II requires at least Trilinos 13.2.
-      Deal.II is known to work with Trilinos up to 16.0.0. Other versions of
+      Deal.II is known to work with Trilinos up to 16.2.0. Other versions of
       Trilinos should work too but have not been tested prior to the
       release.
     </p>
 
     <p>
-      deal.II uses the following libraries from Trilinos:
+      deal.II uses the following libraries from Trilinos and requires that at
+      least all libraries related to the Epetra stack or the Tpetra stack have
+      been configured:
       <ul>
-        <li> Amesos,
-        <li> AztecOO,
-        <li> Epetra,
-        <li> EpetraExt (optional),
-        <li> Ifpack,
-        <li> ML,
-        <li> MueLu (optional, required for TrilinosWrappers::PreconditionAMGMueLu),
+        <li> Amesos (Epetra stack),
+        <li> Amesos2 (Tpetra stack),
+        <li> AztecOO (Epetra stack),
+        <li> Belos (Tpetra stack),
+        <li> Epetra (Epetra stack),
+        <li> EpetraExt (Epetra stack, optional),
+        <li> Ifpack (Epetra stack),
+        <li> Ifpack2 (Tpetra stack),
+        <li> ML (Epetra stack),
+        <li> MueLu (optional, required for TrilinosWrappers::PreconditionAMGMueLu and TpetraWrappers::PreconditionAMGMueLu),
         <li> NOX (optional, required for TrilinosWrappers::NOXSolver),
         <li> ROL (optional),
         <li> Sacado (optional),
         <li> SEACAS (optional, required for GridIn::read_exodusii()),
         <li> Teuchos,
-        <li> Tpetra (optional),
+        <li> Tpetra (Tpetra stack),
         <li> Zoltan (optional).
       </ul>
 
@@ -102,6 +107,7 @@
     -DTrilinos_ENABLE_COMPLEX=ON                     \
     -DTrilinos_ENABLE_FLOAT=ON                       \
     -DTrilinos_ENABLE_Zoltan=ON                      \
+    -DTrilinos_ENABLE_THREAD_SAFE=ON                 \
     -DTrilinos_VERBOSE_CONFIGURE=OFF                 \
     -DTPL_ENABLE_MPI=ON                              \
     -DBUILD_SHARED_LIBS=ON                           \
