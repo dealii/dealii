@@ -563,6 +563,11 @@ namespace hp
     const std::set<unsigned int> &fes,
     const unsigned int            face_no) const
   {
+    // Whereas the interface allows for more than two finite elements coming
+    // together at a quad, this could only happen in >3 dimensions.
+    // We shouldn't ever get there.
+    Assert(fes.size() == 2, ExcInternalError());
+
     auto query_quad_dof_identities = [this,
                                       face_no](const unsigned int fe_index_1,
                                                const unsigned int fe_index_2) {
