@@ -57,6 +57,7 @@ set(_unity_include_src
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
+  mapping_box.cc
   mapping_fe.cc
   mapping_p1.cc
   mapping_q1.cc
@@ -136,6 +137,7 @@ set(_inst
   mapping_c1.inst.in
   mapping_cartesian.inst.in
   mapping.inst.in
+  mapping_box.inst.in
   mapping_fe.inst.in
   mapping_fe_field.inst.in
   mapping_p1.inst.in
