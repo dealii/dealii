@@ -36,6 +36,7 @@
 #include <deal.II/lac/matrix_block.h>
 #include <deal.II/lac/petsc_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/petsc_full_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/psblas_sparse_matrix.h>
