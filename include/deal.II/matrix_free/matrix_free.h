@@ -44,6 +44,8 @@
 #include <deal.II/matrix_free/type_traits.h>
 #include <deal.II/matrix_free/vector_data_exchange.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <cstdlib>
 #include <limits>
 #include <list>
@@ -4043,8 +4045,10 @@ namespace internal
       DataAccessOnFaces vector_face_access;
     bool                ghosts_were_set;
 #  ifdef DEAL_II_WITH_MPI
-    std::vector<AlignedVector<Number> *>  tmp_data;
-    std::vector<std::vector<MPI_Request>> requests;
+    // Users typically do not attach many DoFHandlers to a MatrixFree object,
+    // so make the default buffer size 16 to cover most cases
+    boost::container::small_vector<AlignedVector<Number> *, 16>  tmp_data;
+    boost::container::small_vector<std::vector<MPI_Request>, 16> requests;
 #  endif
   }; // VectorDataExchange
 
