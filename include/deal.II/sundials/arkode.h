@@ -85,8 +85,15 @@ namespace SUNDIALS
    * The integrator settings are primarily customized by setting up fields of
    * ARKode::AdditionalData passed to the constructors. For most of the cases,
    * it is advised to set at least the end time up to which the time integrator
-   * should run and the initial time step size. The ARKode behavior can be
-   * further tuned via function object custom_setup().
+   * should run and the initial time step size.
+   *
+   * The following functions can be provided to tune the behavior of ARKode:
+   *  - custom_setup() to set up additional ARKODE settings,
+   *  - solver_should_restart() to control whether the solver has to be
+   * reconstructed at the current time step,
+   *  - get_local_tolerances() to set up individual tolerances for the vector
+   * components being integrated by ARKODE,
+   *  - output_step() to produce output at fixed steps.
    */
   template <typename VectorType = Vector<double>>
   class ARKode
