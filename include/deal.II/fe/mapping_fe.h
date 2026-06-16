@@ -453,10 +453,9 @@ protected:
   /**
    * Return the locations of support points for the mapping.
    */
-  virtual void
+  virtual boost::container::small_vector<Point<spacedim>, 200>
   compute_mapping_support_points(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-    boost::container::small_vector<Point<spacedim>, 200>       &points) const;
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
 private:
   Table<2, double> mapping_support_point_weights;

@@ -899,8 +899,7 @@ MappingFE<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim>                                           &p) const
 {
-  boost::container::small_vector<Point<spacedim>, 200> support_points;
-  this->compute_mapping_support_points(cell, support_points);
+  const auto support_points = this->compute_mapping_support_points(cell);
 
   Point<spacedim> mapped_point;
 
@@ -918,8 +917,7 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim>                                      &p) const
 {
-  boost::container::small_vector<Point<spacedim>, 200> support_points;
-  this->compute_mapping_support_points(cell, support_points);
+  const auto support_points = this->compute_mapping_support_points(cell);
 
   const double       eps        = 1.e-12 * cell->diameter();
   const unsigned int loop_limit = 10;
@@ -1127,8 +1125,7 @@ MappingFE<dim, spacedim>::fill_fe_values(
   // object attached to the cell and all of its bounding faces/edges,
   // etc. to reliably test that the "cell" we are on is, therefore,
   // not easily done
-  boost::container::small_vector<Point<spacedim>, 200> support_points;
-  this->compute_mapping_support_points(cell, support_points);
+  const auto support_points = this->compute_mapping_support_points(cell);
   data.mapping_support_points.assign(support_points.begin(),
                                      support_points.end());
 
@@ -1595,8 +1592,7 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  boost::container::small_vector<Point<spacedim>, 200> support_points;
-  this->compute_mapping_support_points(cell, support_points);
+  const auto support_points = this->compute_mapping_support_points(cell);
   data.mapping_support_points.assign(support_points.begin(),
                                      support_points.end());
 
@@ -1633,8 +1629,7 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  boost::container::small_vector<Point<spacedim>, 200> support_points;
-  this->compute_mapping_support_points(cell, support_points);
+  const auto support_points = this->compute_mapping_support_points(cell);
   data.mapping_support_points.assign(support_points.begin(),
                                      support_points.end());
 
@@ -2151,11 +2146,11 @@ namespace
 
 
 template <int dim, int spacedim>
-void
+boost::container::small_vector<Point<spacedim>, 200>
 MappingFE<dim, spacedim>::compute_mapping_support_points(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell,
-  boost::container::small_vector<Point<spacedim>, 200>       &points) const
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
+  boost::container::small_vector<Point<spacedim>, 200> points;
   std_cxx26::inplace_vector<Point<spacedim>,
                             ReferenceCells::max_n_vertices<dim>()>
     vertices(cell->n_vertices());
@@ -2256,6 +2251,8 @@ MappingFE<dim, spacedim>::compute_mapping_support_points(
                   (dim == 2) ? fe.n_dofs_per_quad() : fe.n_dofs_per_hex());
         }
     }
+
+  return points;
 }
 
 
@@ -2265,9 +2262,7 @@ BoundingBox<spacedim>
 MappingFE<dim, spacedim>::get_bounding_box(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  boost::container::small_vector<Point<spacedim>, 200> support_points;
-  this->compute_mapping_support_points(cell, support_points);
-  return BoundingBox<spacedim>(support_points);
+  return BoundingBox<spacedim>(this->compute_mapping_support_points(cell));
 }
 
 
