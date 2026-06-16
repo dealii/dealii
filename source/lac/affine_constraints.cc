@@ -94,8 +94,12 @@ INSTANTIATE_DLTG_VECTOR(PETScWrappers::MPI::BlockVector);
 INSTANTIATE_DLTG_VECTORMATRIX(PETScWrappers::SparseMatrix, Vector<PetscScalar>);
 INSTANTIATE_DLTG_VECTORMATRIX(PETScWrappers::SparseMatrix,
                               PETScWrappers::MPI::Vector);
+INSTANTIATE_DLTG_VECTORMATRIX(PETScWrappers::MPI::FullMatrix,
+                              Vector<PetscScalar>);
 INSTANTIATE_DLTG_VECTORMATRIX(PETScWrappers::MPI::SparseMatrix,
                               Vector<PetscScalar>);
+INSTANTIATE_DLTG_VECTORMATRIX(PETScWrappers::MPI::FullMatrix,
+                              PETScWrappers::MPI::Vector);
 INSTANTIATE_DLTG_VECTORMATRIX(PETScWrappers::MPI::SparseMatrix,
                               PETScWrappers::MPI::Vector);
 
@@ -105,6 +109,7 @@ INSTANTIATE_DLTG_BLOCK_VECTORMATRIX(PETScWrappers::MPI::BlockSparseMatrix,
                                     PETScWrappers::MPI::BlockVector);
 
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::SparseMatrix);
+INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::FullMatrix);
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::SparseMatrix);
 INSTANTIATE_DLTG_MATRIX(PETScWrappers::MPI::BlockSparseMatrix);
 #  ifndef DOXYGEN
