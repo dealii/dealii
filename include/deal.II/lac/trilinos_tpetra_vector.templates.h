@@ -403,8 +403,10 @@ namespace LinearAlgebra
         const typename TpetraTypes::VectorType<Number, MemorySpace>::map_type>
         vector_map;
       {
+#  ifndef HAVE_TEUCHOS_THREAD_SAFE
         // Make this part of the function thread safe
         std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
         vector_map = vector->getMap().ptr();
 
@@ -836,8 +838,10 @@ namespace LinearAlgebra
     Number
     Vector<Number, MemorySpace>::operator()(const size_type index) const
     {
-      // make this function thread safe
+#  ifndef HAVE_TEUCHOS_THREAD_SAFE
+      // Make this part of the function thread safe
       std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
       // Get the local index
       const TrilinosWrappers::types::int_type local_index =
@@ -1307,8 +1311,10 @@ namespace LinearAlgebra
     typename Vector<Number, MemorySpace>::size_type
     Vector<Number, MemorySpace>::size() const
     {
-      // make this function thread safe
+#  ifndef HAVE_TEUCHOS_THREAD_SAFE
+      // Make this part of the function thread safe
       std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
       return vector->getGlobalLength();
     }
@@ -1329,8 +1335,10 @@ namespace LinearAlgebra
               typename Vector<Number, MemorySpace>::size_type>
     Vector<Number, MemorySpace>::local_range() const
     {
-      // make this function thread safe
+#  ifndef HAVE_TEUCHOS_THREAD_SAFE
+      // Make this part of the function thread safe
       std::lock_guard<std::mutex> lock(mutex);
+#  endif
 
       const size_type begin = vector->getMap()->getMinGlobalIndex();
       const size_type end   = vector->getMap()->getMaxGlobalIndex() + 1;
