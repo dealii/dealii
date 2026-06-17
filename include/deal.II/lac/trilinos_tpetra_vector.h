@@ -1160,10 +1160,11 @@ namespace LinearAlgebra
 
       /**
        * A lock that ensures thread-safety for relevant
-       * functions. In particular, any functions accessing
+       * functions. In particular, any function accessing
        * reference counted pointers of the trilinos vector
        * needs to be guarded unless Trilinos is compiled
-       * using -D Trilinos_ENABLE_THREAD_SAFE=ON.
+       * using -D Trilinos_ENABLE_THREAD_SAFE=ON or
+       * -D Teuchos_ENABLE_THREAD_SAFE=ON.
        */
       mutable std::mutex mutex;
 
