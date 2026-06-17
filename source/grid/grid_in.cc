@@ -5151,9 +5151,8 @@ GridIn<dim, spacedim>::parse_format(const std::string &format_name)
   if (format_name == "vtu")
     return vtu;
 
-  // This is also the typical extension of Abaqus input files.
   if (format_name == "inp")
-    return ucd;
+    return abaqus;
 
   if (format_name == "ucd")
     return ucd;
