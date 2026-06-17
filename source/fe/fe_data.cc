@@ -196,6 +196,20 @@ FiniteElementData<dim>::operator==(const FiniteElementData<dim> &f) const
 }
 
 
+
+namespace internal
+{
+  template internal::GenericDoFsPerObject
+  expand<1>(const std::vector<unsigned int> &dofs_per_object,
+            const ReferenceCell<1>           cell_type);
+  template internal::GenericDoFsPerObject
+  expand<2>(const std::vector<unsigned int> &dofs_per_object,
+            const ReferenceCell<2>           cell_type);
+  template internal::GenericDoFsPerObject
+  expand<3>(const std::vector<unsigned int> &dofs_per_object,
+            const ReferenceCell<3>           cell_type);
+} // namespace internal
+
 template class FiniteElementData<1>;
 template class FiniteElementData<2>;
 template class FiniteElementData<3>;
