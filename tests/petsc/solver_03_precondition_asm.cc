@@ -11,8 +11,7 @@
 // -----------------------------------------------------------------------------
 
 
-// test the PETSc GMRES solver with the PreconditionASM
-// (Additive Schwarz Method) preconditioner
+// test PreconditionASM from PETSc
 
 
 #include <deal.II/lac/petsc_precondition.h>
