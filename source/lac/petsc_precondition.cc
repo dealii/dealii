@@ -1080,6 +1080,79 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
+
+
+  /* ----------------- PreconditionASM -------------------- */
+
+  PreconditionASM::AdditionalData::AdditionalData(const unsigned int overlap,
+                                                  const Type         type)
+    : overlap(overlap)
+    , type(type)
+  {}
+
+
+
+  PreconditionASM::PreconditionASM()
+    : PreconditionBase()
+  {}
+
+
+
+  PreconditionASM::PreconditionASM(const MatrixBase     &matrix,
+                                   const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
+  {
+    initialize(matrix, additional_data);
+  }
+
+
+  void
+  PreconditionASM::initialize(const MatrixBase     &matrix_,
+                              const AdditionalData &additional_data_)
+  {
+    clear();
+
+    additional_data = additional_data_;
+
+    create_pc_with_mat(matrix_);
+
+    PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCASM));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // set the amount of overlap between the subdomains
+    ierr = PCASMSetOverlap(pc, additional_data.overlap);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // set the variant of the additive Schwarz method
+    PCASMType asm_type = PC_ASM_RESTRICT;
+    switch (additional_data.type)
+      {
+        case Type::basic:
+          asm_type = PC_ASM_BASIC;
+          break;
+        case Type::restrict:
+          asm_type = PC_ASM_RESTRICT;
+          break;
+        case Type::interpolate:
+          asm_type = PC_ASM_INTERPOLATE;
+          break;
+        case Type::none:
+          asm_type = PC_ASM_NONE;
+          break;
+        default:
+          DEAL_II_NOT_IMPLEMENTED();
+      }
+
+    ierr = PCASMSetType(pc, asm_type);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+  }
+
   /* ----------------- PreconditionShell -------------------- */
 
   PreconditionShell::PreconditionShell(const MatrixBase &matrix)

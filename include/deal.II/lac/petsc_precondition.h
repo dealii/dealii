@@ -1094,6 +1094,112 @@ namespace PETScWrappers
     initialize();
   };
 
+
+
+  /**
+   * A class that implements the interface to use the PETSc Additive Schwarz
+   * Method (ASM) preconditioner (<a
+   * href="https://petsc.org/release/manualpages/PC/PCASM/">PCASM</a>). The
+   * domain is decomposed into (possibly overlapping) blocks, and each block is
+   * inverted with its own sub-solver.
+   *
+   *
+   * @ingroup PETScWrappers
+   */
+  class PreconditionASM : public PreconditionBase
+  {
+  public:
+    /**
+     * Defines the available variants of the Additive Schwarz Method. This
+     * corresponds to PETSc's
+     * <a
+     * href="https://petsc.org/release/manualpages/PC/PCASMType/">PCASMType</a>.
+     */
+    enum class Type
+    {
+      /**
+       * Full additive Schwarz, including the contributions of the residual in
+       * the overlap region during the restriction and the contributions of the
+       * solution in the overlap region during the prolongation.
+       */
+      basic,
+      /**
+       * Restricted additive Schwarz. The contributions in the overlap region
+       * are dropped during the prolongation.
+       */
+      restrict,
+      /**
+       * Interpolated additive Schwarz. The contributions in the overlap region
+       * are dropped during the restriction.
+       */
+      interpolate,
+      /**
+       * Neither the restriction nor the prolongation drop contributions in the
+       * overlap region.
+       */
+      none
+    };
+
+    /**
+     * Standardized data struct to pipe additional flags to the
+     * preconditioner.
+     */
+    struct AdditionalData
+    {
+      /**
+       * Constructor.
+       */
+      AdditionalData(const unsigned int overlap = 1,
+                     const Type         type    = Type::restrict);
+
+      /**
+       * The amount of overlap between the subdomains. See
+       * <a
+       * href="https://petsc.org/release/manualpages/PC/PCASMSetOverlap/">PCASMSetOverlap</a>.
+       */
+      unsigned int overlap;
+
+      /**
+       * The variant of the Additive Schwarz Method to use. See
+       * <a
+       * href="https://petsc.org/release/manualpages/PC/PCASMSetType/">PCASMSetType</a>.
+       */
+      Type type;
+    };
+
+    /**
+     * Empty Constructor. You need to call initialize() before using this
+     * object.
+     */
+    PreconditionASM();
+
+    /**
+     * Constructor. Take the matrix which is used to form the preconditioner,
+     * and additional flags if there are any.
+     */
+    PreconditionASM(const MatrixBase     &matrix,
+                    const AdditionalData &additional_data = AdditionalData());
+
+    /**
+     * Initialize the preconditioner object and calculate all data that is
+     * necessary for applying it in a solver. This function is automatically
+     * called when calling the constructor with the same arguments and is only
+     * used if you create the preconditioner without arguments.
+     */
+    void
+    initialize(const MatrixBase     &matrix,
+               const AdditionalData &additional_data = AdditionalData());
+
+
+  protected:
+    /**
+     * Store a copy of the flags for this particular preconditioner.
+     */
+    AdditionalData additional_data;
+  };
+
+
+
   class PreconditionShell : public PreconditionBase
   {
   public:
