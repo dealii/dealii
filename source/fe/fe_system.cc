@@ -503,6 +503,11 @@ FESystem<dim, spacedim>::get_sub_fe(
   Assert(first_component + n_selected_components <= this->n_components(),
          ExcMessage("Invalid arguments (not a part of this FiniteElement)."));
 
+  // If we are asked to select all components, just return the current element:
+  if ((first_component == 0) && (n_selected_components == this->n_components()))
+    return *this;
+
+  // Otherwise, it should be a sub-element:
   const unsigned int base_index =
     this->component_to_base_table[first_component].first.first;
   const unsigned int component_in_base =
@@ -510,15 +515,22 @@ FESystem<dim, spacedim>::get_sub_fe(
   const unsigned int base_components =
     this->base_element(base_index).n_components();
 
-  // Only select our child base_index if that is all the user wanted. Error
-  // handling will be done inside the recursion.
   if (n_selected_components <= base_components)
     return this->base_element(base_index)
       .get_sub_fe(component_in_base, n_selected_components);
-
-  Assert(n_selected_components == this->n_components(),
-         ExcMessage("You can not select a part of a FiniteElement."));
-  return *this;
+  else
+    {
+      Assert(false,
+             ExcMessage("You can not select " +
+                        std::to_string(n_selected_components) +
+                        " components starting at component " +
+                        std::to_string(first_component) +
+                        " because these components are not jointly a "
+                        "sub-element of the current element. Sub-elements "
+                        "are the elements provided to the constructor "
+                        "of FESystem."));
+      DEAL_II_ASSERT_UNREACHABLE();
+    }
 }
 
 
