@@ -1341,7 +1341,11 @@ public:
 
   /**
    * Same as hp_vertex_dof_indices(), except that the function treats degrees
-   * of freedom on quads.
+   * of freedom on quads. For historical reasons, "quad" in the current context
+   * means "face of a three-dimensional cell", which might be a quadrilateral,
+   * but could also be a triangle if the finite element object describes a
+   * finite element space posed on tetrahedral, wedge-shaped, or pyramidal
+   * cells.
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
