@@ -96,50 +96,52 @@ namespace VectorTools
       if (dim == 1)
         {
           for (const auto &cell : dof.active_cell_iterators())
-            for (const unsigned int direction : cell->face_indices())
-              if (cell->at_boundary(direction) &&
-                  (function_map.find(cell->face(direction)->boundary_id()) !=
-                   function_map.end()))
-                {
-                  const Function<spacedim, number> &boundary_function =
-                    *function_map.find(cell->face(direction)->boundary_id())
-                       ->second;
+            if (!cell->is_artificial())
+              for (const unsigned int direction : cell->face_indices())
+                if (cell->at_boundary(direction) &&
+                    (function_map.find(cell->face(direction)->boundary_id()) !=
+                     function_map.end()))
+                  {
+                    const Function<spacedim, number> &boundary_function =
+                      *function_map.find(cell->face(direction)->boundary_id())
+                         ->second;
 
-                  // get the FE corresponding to this cell
-                  const FiniteElement<dim, spacedim> &fe = cell->get_fe();
-                  Assert(fe.n_components() == boundary_function.n_components,
-                         ExcDimensionMismatch(fe.n_components(),
-                                              boundary_function.n_components));
+                    // get the FE corresponding to this cell
+                    const FiniteElement<dim, spacedim> &fe = cell->get_fe();
+                    Assert(
+                      fe.n_components() == boundary_function.n_components,
+                      ExcDimensionMismatch(fe.n_components(),
+                                           boundary_function.n_components));
 
-                  Assert(component_mask.n_selected_components(
-                           fe.n_components()) > 0,
-                         ComponentMask::ExcNoComponentSelected());
+                    Assert(component_mask.n_selected_components(
+                             fe.n_components()) > 0,
+                           ComponentMask::ExcNoComponentSelected());
 
-                  // now set the value of the vertex degree of
-                  // freedom. setting also creates the entry in the
-                  // map if it did not exist beforehand
-                  //
-                  // save some time by requesting values only once for
-                  // each point, irrespective of the number of
-                  // components of the function
-                  Vector<number> function_values(fe.n_components());
-                  if (fe.n_components() == 1)
-                    function_values(0) =
-                      boundary_function.value(cell->vertex(direction));
-                  else
-                    boundary_function.vector_value(cell->vertex(direction),
-                                                   function_values);
+                    // now set the value of the vertex degree of
+                    // freedom. setting also creates the entry in the
+                    // map if it did not exist beforehand
+                    //
+                    // save some time by requesting values only once for
+                    // each point, irrespective of the number of
+                    // components of the function
+                    Vector<number> function_values(fe.n_components());
+                    if (fe.n_components() == 1)
+                      function_values(0) =
+                        boundary_function.value(cell->vertex(direction));
+                    else
+                      boundary_function.vector_value(cell->vertex(direction),
+                                                     function_values);
 
-                  for (unsigned int i = 0; i < fe.n_dofs_per_vertex(); ++i)
-                    if (component_mask[fe.face_system_to_component_index(
-                                           i, direction)
-                                         .first])
-                      boundary_values[cell->vertex_dof_index(
-                        direction, i, cell->active_fe_index())] =
-                        function_values(
-                          fe.face_system_to_component_index(i, direction)
-                            .first);
-                }
+                    for (unsigned int i = 0; i < fe.n_dofs_per_vertex(); ++i)
+                      if (component_mask[fe.face_system_to_component_index(
+                                             i, direction)
+                                           .first])
+                        boundary_values[cell->vertex_dof_index(
+                          direction, i, cell->active_fe_index())] =
+                          function_values(
+                            fe.face_system_to_component_index(i, direction)
+                              .first);
+                  }
         }
       else // dim > 1
         {
