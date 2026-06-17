@@ -1299,27 +1299,40 @@ namespace DoFTools
    * contained within the cells for which the @p predicate is <code>true</code>.
    * The result is returned as an IndexSet.
    *
-   * Consider the following FE space where predicate returns <code>true</code>
-   * for all cells on the left half of the domain:
+   * Consider the following $Q_2$ FE space where predicate returns
+   * <code>true</code> for all cells on the left half of the domain:
    *
    * @image html extract_dofs_with_support_contained_within.png
    *
    * This functions will return the union of all DoF indices on those cells
-   * minus DoF 11, 13, 2 and 0; the result will be <code>[9,10], 12,
-   * [14,38]</code>. In the image above the returned DoFs are separated from the
-   * rest by the red line
+   * except DoF 11, 13, 2 and 0; i.e., the result will be the index set
+   * corresponding to $[9,10] \cup \{12\} \cup [14,38]$. In the image
+   * above the returned DoFs are separated from the rest by the red line. Note
+   * in particular that DoFs such as 4 and 13 are not part of the set because
+   * their support is not completely enclosed *within* the cells on the left:
+   * After identification of DoFs 13 and 40 (and 4 and 26), given that these
+   * DoFs are the same to ensure that the finite element function is continuous,
+   * their support also extends into the cells on the right. (The picture does
+   * not reflect the actual numbering of DoFs produced by DoFHandler: That class
+   * will *initially* produce this numbering, and then throw away one of the two
+   * DoFs of each of these pairs knowing that they need to have the same value;
+   * see the @ref hp_paper for the details of this process.)
    *
    * Essentially, the question this functions answers is the following:
-   * Given a subdomain with associated DoFs, what is the largest subset of
+   * Given a subdomain (identified by evaluating the predicate on each
+   * cell) with associated DoFs, what is the largest subset of
    * these DoFs that are allowed to be non-zero such that after calling
    * AffineConstraints::distribute() the resulting solution vector will have
    * support only within the given domain. Here, @p constraints is the
-   * AffineConstraints container containing hanging nodes constraints.
+   * AffineConstraints container containing hanging nodes constraints. (If
+   * DoFHandler had not already identified DoFs 13 and 40, and 4 and 26, then
+   * AffineConstraints would contain constraints $U_{13}=U_{40}$ and
+   * $U_{4}=U_{26}$, leading to the same result as mentioned above.)
    *
    * In case of parallel::distributed::Triangulation @p predicate will be called
    * only for locally owned and ghost cells. The resulting index set may contain
    * DoFs that are associated with the locally owned or ghost cells, but are not
-   * owned by the current MPI core.
+   * owned by the current MPI process.
    */
   template <int dim, int spacedim, typename number = double>
   IndexSet
