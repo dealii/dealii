@@ -1098,6 +1098,7 @@ inline FEEvaluationData<dim, Number, is_face>::FEEvaluationData(
   , hessians_quad_initialized(false)
   , values_quad_submitted(false)
   , gradients_quad_submitted(false)
+  , hessians_quad_submitted(false)
 #  endif
   , cell(numbers::invalid_unsigned_int)
   , interior_face(is_interior_face)
@@ -1187,6 +1188,7 @@ FEEvaluationData<dim, Number, is_face>::operator=(const FEEvaluationData &other)
       values_quad_initialized    = false;
       gradients_quad_initialized = false;
       hessians_quad_initialized  = false;
+      hessians_quad_submitted    = false;
       values_quad_submitted      = false;
       gradients_quad_submitted   = false;
     }
