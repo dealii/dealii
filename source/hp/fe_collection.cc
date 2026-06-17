@@ -560,29 +560,16 @@ namespace hp
   template <int dim, int spacedim>
   std::vector<std::map<unsigned int, unsigned int>>
   FECollection<dim, spacedim>::hp_quad_dof_identities(
-    const std::set<std::pair<unsigned int, unsigned int>> &fes_and_faces) const
+    const std::set<unsigned int> &fes,
+    const unsigned int            face_no) const
   {
-    // first entry in the pair is the fe_index, the second entry is the face_no
-    std::pair<unsigned int, unsigned int> fe_and_face_1 =
-      *fes_and_faces.begin();
-    std::pair<unsigned int, unsigned int> fe_and_face_2 =
-      *(++fes_and_faces.begin());
-
-    auto query_quad_dof_identities =
-      [this, &fe_and_face_1, &fe_and_face_2](const unsigned int fe_index_1,
-                                             const unsigned int fe_index_2) {
-        // check if fe_index_1 is the same fe index as in fe_and_face_1
-        // then use the corresponding face
-        const unsigned int face_no = fe_index_1 == fe_and_face_1.first ?
-                                       fe_and_face_1.second :
-                                       fe_and_face_2.second;
-        return (*this)[fe_index_1].hp_quad_dof_identities((*this)[fe_index_2],
-                                                          face_no);
-      };
-
-    return compute_hp_dof_identities(
-      std::set<unsigned int>{fe_and_face_1.first, fe_and_face_2.first},
-      query_quad_dof_identities);
+    auto query_quad_dof_identities = [this,
+                                      face_no](const unsigned int fe_index_1,
+                                               const unsigned int fe_index_2) {
+      return (*this)[fe_index_1].hp_quad_dof_identities((*this)[fe_index_2],
+                                                        face_no);
+    };
+    return compute_hp_dof_identities(fes, query_quad_dof_identities);
   }
 
 
