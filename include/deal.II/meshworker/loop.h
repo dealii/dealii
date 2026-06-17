@@ -558,7 +558,7 @@ namespace MeshWorker
             class INFOBOX,
             typename AssemblerType,
             typename IteratorType>
-  void
+  DEAL_II_DEPRECATED_EARLY void
   loop(IteratorType                                             begin,
        std_cxx20::type_identity_t<IteratorType>                 end,
        DOFINFO                                                 &dinfo,
