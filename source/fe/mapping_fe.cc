@@ -17,6 +17,7 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/std_cxx26/inplace_vector.h>
 #include <deal.II/base/table.h>
 #include <deal.II/base/tensor_product_polynomials.h>
 
@@ -898,8 +899,7 @@ MappingFE<dim, spacedim>::transform_unit_to_real_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<dim>                                           &p) const
 {
-  const std::vector<Point<spacedim>> support_points =
-    this->compute_mapping_support_points(cell);
+  const auto support_points = this->compute_mapping_support_points(cell);
 
   Point<spacedim> mapped_point;
 
@@ -917,8 +917,7 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const Point<spacedim>                                      &p) const
 {
-  const std::vector<Point<spacedim>> support_points =
-    this->compute_mapping_support_points(cell);
+  const auto support_points = this->compute_mapping_support_points(cell);
 
   const double       eps        = 1.e-12 * cell->diameter();
   const unsigned int loop_limit = 10;
@@ -1126,7 +1125,9 @@ MappingFE<dim, spacedim>::fill_fe_values(
   // object attached to the cell and all of its bounding faces/edges,
   // etc. to reliably test that the "cell" we are on is, therefore,
   // not easily done
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  const auto support_points = this->compute_mapping_support_points(cell);
+  data.mapping_support_points.assign(support_points.begin(),
+                                     support_points.end());
 
   // if the order of the mapping is greater than 1, then do not reuse any cell
   // similarity information. This is necessary because the cell similarity
@@ -1591,7 +1592,9 @@ MappingFE<dim, spacedim>::fill_fe_face_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  const auto support_points = this->compute_mapping_support_points(cell);
+  data.mapping_support_points.assign(support_points.begin(),
+                                     support_points.end());
 
   internal::MappingFEImplementation::do_fill_fe_face_values(
     *this,
@@ -1626,7 +1629,9 @@ MappingFE<dim, spacedim>::fill_fe_subface_values(
          ExcInternalError());
   const InternalData &data = static_cast<const InternalData &>(internal_data);
 
-  data.mapping_support_points = this->compute_mapping_support_points(cell);
+  const auto support_points = this->compute_mapping_support_points(cell);
+  data.mapping_support_points.assign(support_points.begin(),
+                                     support_points.end());
 
   internal::MappingFEImplementation::do_fill_fe_face_values(
     *this,
@@ -2141,24 +2146,25 @@ namespace
 
 
 template <int dim, int spacedim>
-std::vector<Point<spacedim>>
+boost::container::small_vector<Point<spacedim>, 200>
 MappingFE<dim, spacedim>::compute_mapping_support_points(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
 {
-  std::vector<Point<spacedim>> mapping_support_points(
-    fe->get_unit_support_points().size());
-
-  std::vector<Point<spacedim>> vertices(cell->n_vertices());
+  boost::container::small_vector<Point<spacedim>, 200> points;
+  std_cxx26::inplace_vector<Point<spacedim>,
+                            ReferenceCells::max_n_vertices<dim>()>
+    vertices(cell->n_vertices());
   for (const unsigned int i : cell->vertex_indices())
     vertices[i] = cell->vertex(i);
 
+  points.resize(mapping_support_point_weights.size(0));
   if (check_all_manifold_ids_identical(cell))
     {
       // version 1) all geometric entities have the same manifold:
-
-      cell->get_manifold().get_new_points(vertices,
+      cell->get_manifold().get_new_points(ArrayView<const Point<spacedim>>(
+                                            vertices),
                                           mapping_support_point_weights,
-                                          mapping_support_points);
+                                          ArrayView<Point<spacedim>>(points));
     }
   else
     {
@@ -2188,12 +2194,13 @@ MappingFE<dim, spacedim>::compute_mapping_support_points(
               mapping_support_point_weights(
                 indices[p + (indices.size() - n_points)], i);
 
-        manifold.get_new_points(vertices,
+        manifold.get_new_points(ArrayView<const Point<spacedim>>(vertices),
                                 mapping_support_point_weights_local,
-                                mapping_support_points_local);
+                                ArrayView<Point<spacedim>>(
+                                  mapping_support_points_local));
 
         for (unsigned int p = 0; p < n_points; ++p)
-          mapping_support_points[indices[p + (indices.size() - n_points)]] =
+          points[indices[p + (indices.size() - n_points)]] =
             mapping_support_points_local[p];
       };
 
@@ -2209,7 +2216,7 @@ MappingFE<dim, spacedim>::compute_mapping_support_points(
 
       // add vertices
       for (const unsigned int i : cell->vertex_indices())
-        mapping_support_points[i] = cell->vertex(i);
+        points[i] = vertices[i];
 
       // process and add line support points
       for (unsigned int l = 0; l < cell_ref->n_lines(); ++l)
@@ -2245,7 +2252,7 @@ MappingFE<dim, spacedim>::compute_mapping_support_points(
         }
     }
 
-  return mapping_support_points;
+  return points;
 }
 
 

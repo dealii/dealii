@@ -25,6 +25,8 @@
 
 #include <deal.II/grid/tria_iterator.h>
 
+#include <boost/container/small_vector.hpp>
+
 #include <array>
 #include <cmath>
 
@@ -451,7 +453,7 @@ protected:
   /**
    * Return the locations of support points for the mapping.
    */
-  virtual std::vector<Point<spacedim>>
+  virtual boost::container::small_vector<Point<spacedim>, 200>
   compute_mapping_support_points(
     const typename Triangulation<dim, spacedim>::cell_iterator &cell) const;
 
