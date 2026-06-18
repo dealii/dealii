@@ -415,8 +415,7 @@ namespace MatrixCreator
             }
           else
             {
-              data.rhs_vector_values.resize(
-                n_q_points, dealii::Vector<Number>(n_components));
+              data.rhs_vector_values.resize(n_q_points, data.exemplar_vector);
               data.rhs_function->vector_value_list(
                 fe_values.get_quadrature_points(), data.rhs_vector_values);
             }
@@ -433,8 +432,8 @@ namespace MatrixCreator
             }
           else
             {
-              data.coefficient_vector_values.resize(
-                n_q_points, dealii::Vector<Number>(n_components));
+              data.coefficient_vector_values.resize(n_q_points,
+                                                    data.exemplar_vector);
               data.coefficient->vector_value_list(
                 fe_values.get_quadrature_points(),
                 data.coefficient_vector_values);
