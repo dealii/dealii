@@ -190,7 +190,6 @@ namespace MatrixCreator
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
       copy_data.cell_rhs.reinit(dofs_per_cell);
-
       copy_data.dof_indices.resize(dofs_per_cell);
       cell->get_dof_indices(copy_data.dof_indices);
 
@@ -239,7 +238,7 @@ namespace MatrixCreator
               fe.system_to_component_index(i).first;
             const double *phi_i = &fe_values.shape_value(i, 0);
 
-            // use symmetry in the mass matrix here:
+            // use symmetry in the matrix here:
             // just need to calculate the diagonal
             // and half of the elements above the
             // diagonal
@@ -403,7 +402,6 @@ namespace MatrixCreator
       copy_data.dof_indices.resize(dofs_per_cell);
       cell->get_dof_indices(copy_data.dof_indices);
 
-
       const bool use_rhs_function = data.rhs_function != nullptr;
       if (use_rhs_function)
         {
@@ -450,7 +448,10 @@ namespace MatrixCreator
               fe.system_to_component_index(i).first;
             const Tensor<1, spacedim> *grad_phi_i = &fe_values.shape_grad(i, 0);
 
-            // can use symmetry
+            // use symmetry in the matrix here:
+            // just need to calculate the diagonal
+            // and half of the elements above the
+            // diagonal
             for (unsigned int j = i; j < dofs_per_cell; ++j)
               if ((n_components == 1) ||
                   (fe.system_to_component_index(j).first == component_i))
@@ -500,7 +501,8 @@ namespace MatrixCreator
           }
         else
           {
-            // non-primitive vector-valued FE
+            // non-primitive vector-valued FE, using
+            // symmetry again
             for (unsigned int j = i; j < dofs_per_cell; ++j)
               {
                 add_data = 0;
