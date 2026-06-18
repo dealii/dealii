@@ -17,12 +17,10 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<V<S>>;
     template class SUNDIALS::ERKStepper<V<S>>;
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-    template class SUNDIALS::SplittingStepper<V<S>>;
-#endif
 #if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
     template class SUNDIALS::LSRKStepperSTS<V<S>>;
     template class SUNDIALS::LSRKStepperSSP<V<S>>;
+    template class SUNDIALS::SplittingStepper<V<S>>;
 #endif
   }
 
@@ -31,12 +29,10 @@ for (S : REAL_SCALARS; V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<LinearAlgebra::distributed::V<S>>;
     template class SUNDIALS::ERKStepper<LinearAlgebra::distributed::V<S>>;
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-    template class SUNDIALS::SplittingStepper<LinearAlgebra::distributed::V<S>>;
-#endif
 #if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
     template class SUNDIALS::LSRKStepperSTS<LinearAlgebra::distributed::V<S>>;
     template class SUNDIALS::LSRKStepperSSP<LinearAlgebra::distributed::V<S>>;
+    template class SUNDIALS::SplittingStepper<LinearAlgebra::distributed::V<S>>;
 #endif
   }
 
@@ -46,12 +42,10 @@ for (V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<TrilinosWrappers::MPI::V>;
     template class SUNDIALS::ERKStepper<TrilinosWrappers::MPI::V>;
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-    template class SUNDIALS::SplittingStepper<TrilinosWrappers::MPI::V>;
-#  endif
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
     template class SUNDIALS::LSRKStepperSTS<TrilinosWrappers::MPI::V>;
     template class SUNDIALS::LSRKStepperSSP<TrilinosWrappers::MPI::V>;
+    template class SUNDIALS::SplittingStepper<TrilinosWrappers::MPI::V>;
 #  endif
   }
 #endif
@@ -63,12 +57,10 @@ for (V : DEAL_II_VEC_TEMPLATES)
   {
     template class SUNDIALS::ARKStepper<PETScWrappers::MPI::V>;
     template class SUNDIALS::ERKStepper<PETScWrappers::MPI::V>;
-#    if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-    template class SUNDIALS::SplittingStepper<PETScWrappers::MPI::V>;
-#    endif
 #    if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
     template class SUNDIALS::LSRKStepperSTS<PETScWrappers::MPI::V>;
     template class SUNDIALS::LSRKStepperSSP<PETScWrappers::MPI::V>;
+    template class SUNDIALS::SplittingStepper<PETScWrappers::MPI::V>;
 #    endif
   }
 #  endif

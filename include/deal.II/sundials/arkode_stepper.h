@@ -69,7 +69,7 @@ namespace SUNDIALS
   template <typename VectorType>
   class ARKode;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
   /**
    * Forward declare SplittingStepper.
    */
@@ -97,7 +97,7 @@ namespace SUNDIALS
      */
     friend class ARKode<VectorType>;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
     /**
      * Make SplittingStepper a friend so that it can call reinit() on its
      * sub-steppers.
