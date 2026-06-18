@@ -158,13 +158,13 @@ namespace MatrixCreator
     } // namespace AssemblerData
 
 
-    template <int dim, int spacedim, typename CellIterator, typename number>
+    template <int dim, int spacedim, typename CellIterator, typename Number>
     void
     mass_assembler(
       const CellIterator &cell,
-      MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
+      MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, Number>
                                                                &data,
-      MatrixCreator::internal::AssemblerData::CopyData<number> &copy_data)
+      MatrixCreator::internal::AssemblerData::CopyData<Number> &copy_data)
     {
       copy_data.is_locally_owned = cell->is_locally_owned();
       if (copy_data.is_locally_owned == false)
@@ -248,7 +248,7 @@ namespace MatrixCreator
                   (fe.system_to_component_index(j).first == component_i))
                 {
                   const double *phi_j    = &fe_values.shape_value(j, 0);
-                  number        add_data = 0;
+                  Number        add_data = 0;
                   if (use_coefficient)
                     {
                       if (data.coefficient->n_components == 1)
@@ -277,7 +277,7 @@ namespace MatrixCreator
 
             if (use_rhs_function)
               {
-                number add_data = 0;
+                Number add_data = 0;
                 if (data.rhs_function->n_components == 1)
                   for (unsigned int point = 0; point < n_q_points; ++point)
                     add_data +=
@@ -295,7 +295,7 @@ namespace MatrixCreator
             // symmetry again
             for (unsigned int j = i; j < dofs_per_cell; ++j)
               {
-                number add_data = 0;
+                Number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i] &&
                       fe.get_nonzero_components(j)[comp_i])
@@ -342,7 +342,7 @@ namespace MatrixCreator
 
             if (use_rhs_function)
               {
-                number add_data = 0;
+                Number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i])
                     {
