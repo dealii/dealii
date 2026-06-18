@@ -39,9 +39,7 @@ set(_separate_src
   error_estimator_inst1.cc
   error_estimator_inst2.cc
   fe_field_function.cc
-  matrix_creator_inst1.cc
-  matrix_creator_inst2.cc
-  matrix_creator_inst3.cc
+  matrix_creator.cc
   point_value_history.cc
   smoothness_estimator.cc
   solution_transfer_inst1.cc
