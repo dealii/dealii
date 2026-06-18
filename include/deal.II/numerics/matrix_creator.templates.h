@@ -236,7 +236,9 @@ namespace MatrixCreator
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
-            const double *phi_i = &fe_values.shape_value(i, 0);
+            const Tensor<1, spacedim> *grad_phi_i = nullptr;
+            const double              *phi_i = &fe_values.shape_value(i, 0);
+            (void)grad_phi_i;
 
             // use symmetry in the matrix here:
             // just need to calculate the diagonal
@@ -246,8 +248,10 @@ namespace MatrixCreator
               if ((n_components == 1) ||
                   (fe.system_to_component_index(j).first == component_i))
                 {
-                  const double *phi_j    = &fe_values.shape_value(j, 0);
-                  Number        add_data = 0;
+                  const Tensor<1, spacedim> *grad_phi_j = nullptr;
+                  const double *phi_j = &fe_values.shape_value(j, 0);
+                  (void)grad_phi_j;
+                  Number add_data = 0;
                   if (use_coefficient)
                     {
                       if (data.coefficient->n_components == 1)
@@ -440,13 +444,14 @@ namespace MatrixCreator
 
 
       const std::vector<double> &JxW = fe_values.get_JxW_values();
-      Number                     add_data;
       for (unsigned int i = 0; i < dofs_per_cell; ++i)
         if (fe.is_primitive())
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
             const Tensor<1, spacedim> *grad_phi_i = &fe_values.shape_grad(i, 0);
+            const double              *phi_i      = nullptr;
+            (void)phi_i;
 
             // use symmetry in the matrix here:
             // just need to calculate the diagonal
@@ -458,7 +463,9 @@ namespace MatrixCreator
                 {
                   const Tensor<1, spacedim> *grad_phi_j =
                     &fe_values.shape_grad(j, 0);
-                  add_data = 0;
+                  const double *phi_j = nullptr;
+                  (void)phi_j;
+                  Number add_data = 0;
                   if (use_coefficient)
                     {
                       if (data.coefficient->n_components == 1)
@@ -486,8 +493,8 @@ namespace MatrixCreator
 
             if (use_rhs_function)
               {
-                const double *phi_i = &fe_values.shape_value(i, 0);
-                add_data            = 0;
+                const double *phi_i    = &fe_values.shape_value(i, 0);
+                Number        add_data = 0;
                 if (data.rhs_function->n_components == 1)
                   for (unsigned int point = 0; point < n_q_points; ++point)
                     add_data +=
@@ -505,7 +512,7 @@ namespace MatrixCreator
             // symmetry again
             for (unsigned int j = i; j < dofs_per_cell; ++j)
               {
-                add_data = 0;
+                Number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i] &&
                       fe.get_nonzero_components(j)[comp_i])
@@ -551,7 +558,7 @@ namespace MatrixCreator
 
             if (use_rhs_function)
               {
-                add_data = 0;
+                Number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i])
                     {
