@@ -408,11 +408,10 @@ namespace MatrixCreator
 
 
 
-    template <typename number, typename MatrixType, typename VectorType>
+    template <typename number, typename MatrixType>
     void
     copy_local_to_global(const AssemblerData::CopyData<number> &data,
-                         MatrixType                            *matrix,
-                         VectorType                            *right_hand_side)
+                         MatrixType                            &matrix)
     {
       if (data.is_locally_owned == false)
         return;
@@ -420,20 +419,33 @@ namespace MatrixCreator
       const unsigned int dofs_per_cell = data.dof_indices.size();
       Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
       Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
-      Assert((right_hand_side == nullptr) ||
-               (data.cell_rhs.size() == dofs_per_cell),
-             ExcInternalError());
 
-      if (right_hand_side != nullptr)
-        data.constraints->distribute_local_to_global(data.cell_matrix,
-                                                     data.cell_rhs,
-                                                     data.dof_indices,
-                                                     *matrix,
-                                                     *right_hand_side);
-      else
-        data.constraints->distribute_local_to_global(data.cell_matrix,
-                                                     data.dof_indices,
-                                                     *matrix);
+      data.constraints->distribute_local_to_global(data.cell_matrix,
+                                                   data.dof_indices,
+                                                   matrix);
+    }
+
+
+
+    template <typename number, typename MatrixType, typename VectorType>
+    void
+    copy_local_to_global(const AssemblerData::CopyData<number> &data,
+                         MatrixType                            &matrix,
+                         VectorType                            &right_hand_side)
+    {
+      if (data.is_locally_owned == false)
+        return;
+
+      const unsigned int dofs_per_cell = data.dof_indices.size();
+      Assert(data.cell_matrix.m() == dofs_per_cell, ExcInternalError());
+      Assert(data.cell_matrix.n() == dofs_per_cell, ExcInternalError());
+      Assert(data.cell_rhs.size() == dofs_per_cell, ExcInternalError());
+
+      data.constraints->distribute_local_to_global(data.cell_matrix,
+                                                   data.cell_rhs,
+                                                   data.dof_indices,
+                                                   matrix,
+                                                   right_hand_side);
     }
 
 
@@ -514,6 +526,15 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // We use std::function here to hide the matrix type from WorkStream (which
+    // reduces the total number of instantiations)
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix](const internal::AssemblerData::CopyData<
+                         typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -523,14 +544,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(
-          data,
-          &matrix,
-          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -601,6 +615,14 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // Same trick with std::function
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
+                                      typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -610,13 +632,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix, &rhs_vector](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(data,
-                                                      &matrix,
-                                                      &rhs_vector);
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -687,6 +703,14 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // Same trick with std::function
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix](const internal::AssemblerData::CopyData<
+                         typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -696,14 +720,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(
-          data,
-          &matrix,
-          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -771,6 +788,14 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // Same trick with std::function
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
+                                      typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -780,13 +805,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix, &rhs_vector](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(data,
-                                                      &matrix,
-                                                      &rhs_vector);
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -1227,6 +1246,20 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerBoundary::CopyData<dim, spacedim, number>
       copy_data;
 
+    // Same trick with std::function
+    std::function<void(const MatrixCreator::internal::AssemblerBoundary::
+                         CopyData<dim, spacedim, number> &copy_data)>
+      copier =
+        [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
+          const MatrixCreator::internal::AssemblerBoundary::
+            CopyData<dim, spacedim, number> &copy_data) {
+          internal::copy_boundary_mass_matrix_1(copy_data,
+                                                boundary_functions,
+                                                dof_to_boundary_mapping,
+                                                matrix,
+                                                rhs_vector);
+        };
+
     WorkStream::run(
       dof.begin_active(),
       dof.end(),
@@ -1245,15 +1278,7 @@ namespace MatrixCreator
                                                 coefficient,
                                                 component_mapping);
       },
-      [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
-        const MatrixCreator::internal::AssemblerBoundary::
-          CopyData<dim, spacedim, number> &copy_data) {
-        internal::copy_boundary_mass_matrix_1(copy_data,
-                                              boundary_functions,
-                                              dof_to_boundary_mapping,
-                                              matrix,
-                                              rhs_vector);
-      },
+      copier,
       scratch,
       copy_data);
   }
@@ -1703,6 +1728,20 @@ namespace MatrixCreator
     MatrixCreator::internal::AssemblerBoundary::CopyData<dim, spacedim, number>
       copy_data;
 
+    // Same trick with std::function
+    std::function<void(const MatrixCreator::internal::AssemblerBoundary ::
+                         CopyData<dim, spacedim, number> &copy_data)>
+      copier =
+        [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
+          const MatrixCreator::internal::AssemblerBoundary ::
+            CopyData<dim, spacedim, number> &copy_data) {
+          internal::copy_hp_boundary_mass_matrix_1(copy_data,
+                                                   boundary_functions,
+                                                   dof_to_boundary_mapping,
+                                                   matrix,
+                                                   rhs_vector);
+        };
+
     WorkStream::run(
       dof.begin_active(),
       dof.end(),
@@ -1726,15 +1765,7 @@ namespace MatrixCreator
                                                    coefficient,
                                                    component_mapping);
       },
-      [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
-        const MatrixCreator::internal::AssemblerBoundary ::
-          CopyData<dim, spacedim, number> &copy_data) {
-        internal::copy_hp_boundary_mass_matrix_1(copy_data,
-                                                 boundary_functions,
-                                                 dof_to_boundary_mapping,
-                                                 matrix,
-                                                 rhs_vector);
-      },
+      copier,
       scratch,
       copy_data);
   }
@@ -1809,6 +1840,14 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // Same trick with std::function
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix](const internal::AssemblerData::CopyData<
+                         typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -1818,14 +1857,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(
-          data,
-          &matrix,
-          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -1897,6 +1929,14 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // Same trick with std::function
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
+                                      typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -1906,13 +1946,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix, &rhs_vector](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(data,
-                                                      &matrix,
-                                                      &rhs_vector);
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -1984,6 +2018,14 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // Same trick with std::function
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix](const internal::AssemblerData::CopyData<
+                         typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -1993,14 +2035,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(
-          data,
-          &matrix,
-          static_cast<Vector<typename MatrixType::value_type> *>(nullptr));
-      },
+      copier,
       assembler_data,
       copy_data);
 
@@ -2070,6 +2105,15 @@ namespace MatrixCreator
       assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.constraints = &constraints;
 
+    // We use std::function here to hide the matrix type from WorkStream (which
+    // reduces the total number of instantiations)
+    std::function<void(const internal::AssemblerData::CopyData<
+                       typename MatrixType::value_type> &)>
+      copier = [&matrix, &rhs_vector](const internal::AssemblerData::CopyData<
+                                      typename MatrixType::value_type> &data) {
+        MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
+      };
+
     WorkStream::run(
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
@@ -2079,13 +2123,7 @@ namespace MatrixCreator
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
         typename MatrixType::value_type>,
-      [&matrix, &rhs_vector](
-        const internal::AssemblerData::CopyData<typename MatrixType::value_type>
-          &data) {
-        MatrixCreator::internal::copy_local_to_global(data,
-                                                      &matrix,
-                                                      &rhs_vector);
-      },
+      copier,
       assembler_data,
       copy_data);
 
