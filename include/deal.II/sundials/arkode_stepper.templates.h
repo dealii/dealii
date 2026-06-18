@@ -931,7 +931,14 @@ namespace SUNDIALS
                      ARKodeFree(&mem);
                  })
     , data(data)
-  {}
+  {
+    AssertThrow(data.step_size > 0,
+                ExcMessage("SplittingStepper requires a positive step size."));
+
+    AssertThrow(sub_steppers.size() > 1,
+                ExcMessage(
+                  "SplittingStepper requires at least two sub-steppers."));
+  }
 
 
   template <typename VectorType>
@@ -943,10 +950,6 @@ namespace SUNDIALS
     arkode_mem.reset();
     sun_steppers.clear();
 
-    Assert(sub_steppers.size() > 1,
-           ExcMessage(
-             "SplittingStepper requires at least two sub-steppers (P > 1)."));
-
     // Initialize each partition sub-stepper.
     for (const auto &sub : sub_steppers)
       {
@@ -955,12 +958,11 @@ namespace SUNDIALS
       }
 
     // Wrap each sub-stepper's ARKODE memory block in a SUNStepper object.
-    sun_steppers.reserve(sub_steppers.size());
-    for (std::size_t i = 0; i < sub_steppers.size(); ++i)
+    for (const auto &sub : sub_steppers)
       {
         SUNStepper raw = nullptr;
         const int  status =
-          ARKodeCreateSUNStepper(sub_steppers[i]->get_arkode_memory(), &raw);
+          ARKodeCreateSUNStepper(sub->get_arkode_memory(), &raw);
         AssertARKode(status);
         sun_steppers.emplace_back(raw, [](SUNStepper s) {
           if (s)
@@ -970,18 +972,19 @@ namespace SUNDIALS
 
     // Collect raw handles for the C API call.
     std::vector<SUNStepper> raw_sun_steppers(sun_steppers.size());
-    for (std::size_t i = 0; i < sun_steppers.size(); ++i)
-      raw_sun_steppers[i] = sun_steppers[i].get();
+    std::transform(sun_steppers.begin(),
+                   sun_steppers.end(),
+                   raw_sun_steppers.begin(),
+                   [](const auto &ptr) { return ptr.get(); });
 
     auto initial_condition_nvector =
       internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
 
-    arkode_mem.reset(
-      SplittingStepCreate(raw_sun_steppers.data(),
-                          static_cast<int>(raw_sun_steppers.size()),
-                          t0,
-                          initial_condition_nvector,
-                          inv_ctx.arkode_ctx));
+    arkode_mem.reset(SplittingStepCreate(raw_sun_steppers.data(),
+                                         raw_sun_steppers.size(),
+                                         t0,
+                                         initial_condition_nvector,
+                                         inv_ctx.arkode_ctx));
     Assert(arkode_mem != nullptr, ExcInternalError());
 
     if (data.step_size > 0.0)

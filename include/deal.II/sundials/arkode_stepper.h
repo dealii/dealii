@@ -1903,11 +1903,10 @@ namespace SUNDIALS
       /**
        * Constructor.
        *
-       * @param step_size Fixed outer step size. When positive,
-       *   ARKodeSetFixedStep() is called with this value during reinit().
-       *   SplittingStep does not support adaptive outer time-stepping, so
-       *   this must be set to a positive value (or ARKodeSetFixedStep()
-       *   called manually via custom_setup()).
+       * @param step_size Fixed outer step size. SplittingStep does not
+       *   support adaptive outer time-stepping, so this must be set to a
+       *   positive value. The step size can still be redefined later if needed
+       *   via custom_setup().
        * @param method_name Name of the operator-splitting coefficients to use.
        *   If empty, SUNDIALS selects the default (Lie--Trotter, first order).
        *   Must be a name recognised by
@@ -1917,7 +1916,7 @@ namespace SUNDIALS
        *   designed for two-partition problems; for other counts use
        *   custom_setup().
        */
-      AdditionalData(const double       step_size   = 0.0,
+      AdditionalData(const double       step_size,
                      const std::string &method_name = "")
         : step_size(step_size)
         , method_name(method_name)
@@ -1932,11 +1931,8 @@ namespace SUNDIALS
       add_parameters(ParameterHandler &prm);
 
       /**
-       * Fixed outer step size. When positive, ARKodeSetFixedStep() is
-       * called with this value during reinit(). SplittingStep does not
-       * support adaptive outer time-stepping, so this must be set to a
-       * positive value (or ARKodeSetFixedStep() called manually in
-       * custom_setup()).
+       * Fixed outer step size. SplittingStep does not support adaptive
+       * outer time-stepping, so this must be set to a positive value.
        */
       double step_size;
 
@@ -1951,8 +1947,8 @@ namespace SUNDIALS
      * Constructor.
      *
      * @param sub_steppers Shared pointers to the sub-stepper objects, one
-     *   per IVP partition. Must contain at least two entries (SUNDIALS
-     *   requires $P > 1$).
+     *   per IVP partition. Must contain at least two entries (required by
+     *   ARKODE).
      * @param data SplittingStepper configuration data.
      */
     SplittingStepper(
