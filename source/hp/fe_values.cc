@@ -174,9 +174,9 @@ namespace hp
   template <int dim, int q_dim, typename FEValuesType>
   FEValuesType &
   FEValuesBase<dim, q_dim, FEValuesType>::select_fe_values(
-    const unsigned int fe_index,
-    const unsigned int mapping_index,
-    const unsigned int q_index)
+    const types::fe_index fe_index,
+    const unsigned int    mapping_index,
+    const unsigned int    q_index)
   {
     AssertIndexRange(fe_index, fe_collection->size());
     AssertIndexRange(mapping_index, mapping_collection->size());
@@ -295,7 +295,7 @@ namespace hp
     const TriaIterator<DoFCellAccessor<dim, spacedim, lda>> &cell,
     const unsigned int                                       q_index,
     const unsigned int                                       mapping_index,
-    const unsigned int                                       fe_index)
+    const types::fe_index                                    fe_index)
   {
     // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
@@ -317,7 +317,7 @@ namespace hp
           real_mapping_index = 0;
       }
 
-    if (real_fe_index == numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_fe_index)
       real_fe_index = cell->active_fe_index();
 
     // some checks
@@ -338,7 +338,7 @@ namespace hp
     const typename Triangulation<dim, spacedim>::cell_iterator &cell,
     const unsigned int                                          q_index,
     const unsigned int                                          mapping_index,
-    const unsigned int                                          fe_index)
+    const types::fe_index                                       fe_index)
   {
     // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
@@ -350,7 +350,7 @@ namespace hp
     if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_fe_index)
       real_fe_index = 0;
 
     // some checks
@@ -426,7 +426,7 @@ namespace hp
     const unsigned int                                       face_no,
     const unsigned int                                       q_index,
     const unsigned int                                       mapping_index,
-    const unsigned int                                       fe_index)
+    const types::fe_index                                    fe_index)
   {
     // determine which indices we
     // should actually use
@@ -449,7 +449,7 @@ namespace hp
           real_mapping_index = 0;
       }
 
-    if (real_fe_index == numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_fe_index)
       real_fe_index = cell->active_fe_index();
 
     // some checks
@@ -472,7 +472,7 @@ namespace hp
     const typename Triangulation<dim, spacedim>::face_iterator &face,
     const unsigned int                                          q_index,
     const unsigned int                                          mapping_index,
-    const unsigned int                                          fe_index)
+    const types::fe_index                                       fe_index)
   {
     const auto face_n = cell->face_iterator_to_index(face);
     reinit(cell, face_n, q_index, mapping_index, fe_index);
@@ -487,7 +487,7 @@ namespace hp
     const unsigned int                                          face_no,
     const unsigned int                                          q_index,
     const unsigned int                                          mapping_index,
-    const unsigned int                                          fe_index)
+    const types::fe_index                                       fe_index)
   {
     // determine which indices we
     // should actually use
@@ -500,7 +500,7 @@ namespace hp
     if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_fe_index)
       real_fe_index = 0;
 
     // some checks
@@ -522,7 +522,7 @@ namespace hp
     const typename Triangulation<dim, spacedim>::face_iterator &face,
     const unsigned int                                          q_index,
     const unsigned int                                          mapping_index,
-    const unsigned int                                          fe_index)
+    const types::fe_index                                       fe_index)
   {
     const auto face_n = cell->face_iterator_to_index(face);
     reinit(cell, face_n, q_index, mapping_index, fe_index);
@@ -567,7 +567,7 @@ namespace hp
     const unsigned int                                       subface_no,
     const unsigned int                                       q_index,
     const unsigned int                                       mapping_index,
-    const unsigned int                                       fe_index)
+    const types::fe_index                                    fe_index)
   {
     // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
@@ -589,7 +589,7 @@ namespace hp
           real_mapping_index = 0;
       }
 
-    if (real_fe_index == numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_fe_index)
       real_fe_index = cell->active_fe_index();
 
     // some checks
@@ -612,7 +612,7 @@ namespace hp
     const unsigned int                                          subface_no,
     const unsigned int                                          q_index,
     const unsigned int                                          mapping_index,
-    const unsigned int                                          fe_index)
+    const types::fe_index                                       fe_index)
   {
     // determine which indices we should actually use
     unsigned int real_q_index = q_index, real_mapping_index = mapping_index,
@@ -624,7 +624,7 @@ namespace hp
     if (real_mapping_index == numbers::invalid_unsigned_int)
       real_mapping_index = 0;
 
-    if (real_fe_index == numbers::invalid_unsigned_int)
+    if (real_fe_index == numbers::invalid_fe_index)
       real_fe_index = 0;
 
     // some checks

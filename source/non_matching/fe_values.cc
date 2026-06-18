@@ -100,7 +100,7 @@ namespace NonMatching
   FEValues<dim>::initialize(const hp::QCollection<dim> &q_collection)
   {
     current_cell_location = LocationToLevelSet::unassigned;
-    active_fe_index       = numbers::invalid_unsigned_int;
+    active_fe_index       = numbers::invalid_fe_index;
 
     Assert(fe_collection->size() > 0,
            ExcMessage("Incoming hp::FECollection can not be empty."));
@@ -121,7 +121,7 @@ namespace NonMatching
     // on the non-intersected cells.
     fe_values_inside_full_quadrature.resize(fe_collection->size());
     fe_values_outside_full_quadrature.resize(fe_collection->size());
-    for (unsigned int fe_index = 0; fe_index < fe_collection->size();
+    for (types::fe_index fe_index = 0; fe_index < fe_collection->size();
          ++fe_index)
       {
         const unsigned int mapping_index =
@@ -163,8 +163,8 @@ namespace NonMatching
   void
   FEValues<dim>::reinit(const TriaIterator<CellAccessor<dim, dim>> &cell,
                         const unsigned int                          q_index,
-                        const unsigned int mapping_index,
-                        const unsigned int fe_index)
+                        const unsigned int    mapping_index,
+                        const types::fe_index fe_index)
   {
     this->reinit_internal(cell, q_index, mapping_index, fe_index);
   }
@@ -177,11 +177,11 @@ namespace NonMatching
   FEValues<dim>::reinit_internal(const CellIteratorType &cell,
                                  const unsigned int      q_index_in,
                                  const unsigned int      mapping_index_in,
-                                 const unsigned int      fe_index_in)
+                                 const types::fe_index   fe_index_in)
   {
     current_cell_location = mesh_classifier->location_to_level_set(cell);
 
-    if (fe_index_in == numbers::invalid_unsigned_int)
+    if (fe_index_in == numbers::invalid_fe_index)
       this->active_fe_index = 0;
     else
       this->active_fe_index = fe_index_in;
@@ -434,7 +434,7 @@ namespace NonMatching
     const TriaIterator<CellAccessorType>          &cell,
     const unsigned int                             face_no,
     const unsigned int                             q_index_in,
-    const unsigned int                             active_fe_index_in,
+    const types::fe_index                          active_fe_index_in,
     const std::function<void(dealii::FEInterfaceValues<dim> &,
                              const unsigned int)> &call_reinit)
   {
@@ -464,9 +464,9 @@ namespace NonMatching
 
             if (q_index == numbers::invalid_unsigned_int)
               {
-                unsigned int active_fe_index = active_fe_index_in;
+                types::fe_index active_fe_index = active_fe_index_in;
 
-                if (active_fe_index == numbers::invalid_unsigned_int)
+                if (active_fe_index == numbers::invalid_fe_index)
                   {
                     if constexpr (std::is_same_v<
                                     DoFCellAccessor<dim, dim, true>,

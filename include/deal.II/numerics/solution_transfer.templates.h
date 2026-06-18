@@ -875,7 +875,7 @@ namespace Legacy
             // to since that is not implied by the global FE as in the non-hp-
             // case. we choose the 'least dominant fe' on all children from
             // the associated FECollection.
-            std::set<unsigned int> fe_indices_children;
+            std::set<types::fe_index> fe_indices_children;
             for (const auto &child : cell->child_iterators())
               {
                 Assert(child->is_active() && child->coarsen_flag_set(),

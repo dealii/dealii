@@ -1344,12 +1344,12 @@ public:
     unsigned int sub_face_no_neighbor;
 
     // optional
-    unsigned int fe_index               = numbers::invalid_unsigned_int;
-    unsigned int q_index                = numbers::invalid_unsigned_int;
-    unsigned int mapping_index          = numbers::invalid_unsigned_int;
-    unsigned int fe_index_neighbor      = numbers::invalid_unsigned_int;
-    unsigned int q_index_neighbor       = numbers::invalid_unsigned_int;
-    unsigned int mapping_index_neighbor = numbers::invalid_unsigned_int;
+    types::fe_index fe_index               = numbers::invalid_fe_index;
+    unsigned int    q_index                = numbers::invalid_unsigned_int;
+    unsigned int    mapping_index          = numbers::invalid_unsigned_int;
+    types::fe_index fe_index_neighbor      = numbers::invalid_fe_index;
+    unsigned int    q_index_neighbor       = numbers::invalid_unsigned_int;
+    unsigned int    mapping_index_neighbor = numbers::invalid_unsigned_int;
   };
   /**
    * Number of quadrature points.
@@ -1527,10 +1527,10 @@ public:
          const CellNeighborIteratorType &cell_neighbor,
          const unsigned int              face_no_neighbor,
          const unsigned int              sub_face_no_neighbor,
-         const unsigned int q_index           = numbers::invalid_unsigned_int,
-         const unsigned int mapping_index     = numbers::invalid_unsigned_int,
-         const unsigned int fe_index          = numbers::invalid_unsigned_int,
-         const unsigned int fe_index_neighbor = numbers::invalid_unsigned_int);
+         const unsigned int    q_index       = numbers::invalid_unsigned_int,
+         const unsigned int    mapping_index = numbers::invalid_unsigned_int,
+         const types::fe_index fe_index      = numbers::invalid_fe_index,
+         const types::fe_index fe_index_neighbor = numbers::invalid_fe_index);
 
   /**
    * Same as above, takes additional interface data to identify hp indices
@@ -1584,7 +1584,7 @@ public:
          const unsigned int      face_no,
          const unsigned int      q_index       = numbers::invalid_unsigned_int,
          const unsigned int      mapping_index = numbers::invalid_unsigned_int,
-         const unsigned int      fe_index      = numbers::invalid_unsigned_int);
+         const types::fe_index   fe_index      = numbers::invalid_fe_index);
 
   /**
    * Return a reference to the FEFaceValues or FESubfaceValues object
@@ -2452,8 +2452,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
   const unsigned int              sub_face_no_neighbor,
   const unsigned int              q_index,
   const unsigned int              mapping_index,
-  const unsigned int              fe_index_in,
-  const unsigned int              fe_index_neighbor_in)
+  const types::fe_index           fe_index_in,
+  const types::fe_index           fe_index_neighbor_in)
 {
   InterfaceData data(face_no,
                      sub_face_no,
@@ -2497,8 +2497,8 @@ FEInterfaceValues<dim, spacedim>::reinit(
   const unsigned int face_no_neighbor     = interface_data.face_no_neighbor;
   const unsigned int sub_face_no_neighbor = interface_data.sub_face_no_neighbor;
 
-  unsigned int active_fe_index          = 0;
-  unsigned int active_fe_index_neighbor = 0;
+  types::fe_index active_fe_index          = 0;
+  types::fe_index active_fe_index_neighbor = 0;
 
   if (internal_fe_face_values)
     {
@@ -2536,11 +2536,11 @@ FEInterfaceValues<dim, spacedim>::reinit(
     {
       active_fe_index = interface_data.fe_index;
       active_fe_index_neighbor =
-        (interface_data.fe_index_neighbor == numbers::invalid_unsigned_int) ?
+        (interface_data.fe_index_neighbor == numbers::invalid_fe_index) ?
           interface_data.fe_index :
           interface_data.fe_index_neighbor;
 
-      if (active_fe_index == numbers::invalid_unsigned_int)
+      if (active_fe_index == numbers::invalid_fe_index)
         {
           if constexpr (is_dof_cell_accessor)
             active_fe_index = cell->active_fe_index();
@@ -2548,7 +2548,7 @@ FEInterfaceValues<dim, spacedim>::reinit(
             active_fe_index = 0;
         }
 
-      if (active_fe_index_neighbor == numbers::invalid_unsigned_int)
+      if (active_fe_index_neighbor == numbers::invalid_fe_index)
         {
           if constexpr (is_dof_cell_accessor_neighbor)
             active_fe_index_neighbor = cell_neighbor->active_fe_index();
@@ -2585,13 +2585,13 @@ FEInterfaceValues<dim, spacedim>::reinit(
       if ((used_q_index == numbers::invalid_unsigned_int) ||
           (used_mapping_index == numbers::invalid_unsigned_int))
         {
-          const unsigned int dominated_fe_index =
+          const types::fe_index dominated_fe_index =
             ((used_q_index == numbers::invalid_unsigned_int) ||
                  (used_mapping_index == numbers::invalid_unsigned_int) ?
                internal_hp_fe_face_values->get_fe_collection()
                  .find_dominated_fe(
                    {active_fe_index, active_fe_index_neighbor}) :
-               numbers::invalid_unsigned_int);
+               numbers::invalid_fe_index);
 
           if (used_q_index == numbers::invalid_unsigned_int)
             {
@@ -2799,7 +2799,7 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
                                          const unsigned int      face_no,
                                          const unsigned int      q_index,
                                          const unsigned int      mapping_index,
-                                         const unsigned int      fe_index)
+                                         const types::fe_index   fe_index)
 {
   Assert(internal_fe_face_values || internal_hp_fe_face_values,
          ExcNotInitialized());
@@ -2811,7 +2811,7 @@ FEInterfaceValues<dim, spacedim>::reinit(const CellIteratorType &cell,
       Assert((mapping_index == 0 ||
               mapping_index == numbers::invalid_unsigned_int),
              ExcNotImplemented());
-      Assert((fe_index == 0 || fe_index == numbers::invalid_unsigned_int),
+      Assert((fe_index == 0 || fe_index == numbers::invalid_fe_index),
              ExcNotImplemented());
 
       internal_fe_face_values->reinit(cell, face_no);

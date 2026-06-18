@@ -339,15 +339,15 @@ namespace hp
      * from `fe_index` to `dof_index`, which is conceptually of course
      * equivalent to a `std::set` of pairs, but in practice is easier to query.
      */
-    std::vector<std::map<unsigned int, unsigned int>>
-    hp_vertex_dof_identities(const std::set<unsigned int> &fes) const;
+    std::vector<std::map<types::fe_index, unsigned int>>
+    hp_vertex_dof_identities(const std::set<types::fe_index> &fes) const;
 
     /**
      * Same as hp_vertex_dof_indices(), except that the function treats degrees
      * of freedom on lines.
      */
-    std::vector<std::map<unsigned int, unsigned int>>
-    hp_line_dof_identities(const std::set<unsigned int> &fes) const;
+    std::vector<std::map<types::fe_index, unsigned int>>
+    hp_line_dof_identities(const std::set<types::fe_index> &fes) const;
 
     /**
      * Same as hp_vertex_dof_indices(), except that the function treats degrees
@@ -357,9 +357,10 @@ namespace hp
      * where the first entry in each pair identifies the `fe_index` and
      * the second entry is the corresponding `face_no`.
      */
-    std::vector<std::map<unsigned int, unsigned int>>
-    hp_quad_dof_identities(const std::set<std::pair<unsigned int, unsigned int>>
-                             &fes_and_faces) const;
+    std::vector<std::map<types::fe_index, unsigned int>>
+    hp_quad_dof_identities(
+      const std::set<std::pair<types::fe_index, unsigned int>> &fes_and_faces)
+      const;
 
     /**
      * Return the indices of finite elements in this FECollection that dominate
@@ -382,9 +383,9 @@ namespace hp
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
-    std::set<unsigned int>
-    find_common_fes(const std::set<unsigned int> &fes,
-                    const unsigned int            codim = 0) const;
+    std::set<types::fe_index>
+    find_common_fes(const std::set<types::fe_index> &fes,
+                    const unsigned int               codim = 0) const;
 
     /**
      * Return the indices of finite elements in this FECollection that are
@@ -407,9 +408,9 @@ namespace hp
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
-    std::set<unsigned int>
-    find_enclosing_fes(const std::set<unsigned int> &fes,
-                       const unsigned int            codim = 0) const;
+    std::set<types::fe_index>
+    find_enclosing_fes(const std::set<types::fe_index> &fes,
+                       const unsigned int               codim = 0) const;
 
     /**
      * Return the index of a finite element from the provided set of indices @p fes
@@ -443,9 +444,9 @@ namespace hp
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
-    unsigned int
-    find_dominating_fe(const std::set<unsigned int> &fes,
-                       const unsigned int            codim = 0) const;
+    types::fe_index
+    find_dominating_fe(const std::set<types::fe_index> &fes,
+                       const unsigned int               codim = 0) const;
 
     /**
      * Return the index of a finite element from the provided set of indices @p fes
@@ -479,9 +480,9 @@ namespace hp
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
-    unsigned int
-    find_dominated_fe(const std::set<unsigned int> &fes,
-                      const unsigned int            codim = 0) const;
+    types::fe_index
+    find_dominated_fe(const std::set<types::fe_index> &fes,
+                      const unsigned int               codim = 0) const;
 
     /**
      * Return the index of a finite element from the provided set of indices @p fes
@@ -506,9 +507,9 @@ namespace hp
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
-    unsigned int
-    find_dominating_fe_extended(const std::set<unsigned int> &fes,
-                                const unsigned int            codim = 0) const;
+    types::fe_index
+    find_dominating_fe_extended(const std::set<types::fe_index> &fes,
+                                const unsigned int codim = 0) const;
 
     /**
      * Return the index of a finite element from the provided set of indices @p fes
@@ -532,9 +533,9 @@ namespace hp
      * subspace and specifies that it is subject to this comparison. See
      * FiniteElement::compare_for_domination() for more information.
      */
-    unsigned int
-    find_dominated_fe_extended(const std::set<unsigned int> &fes,
-                               const unsigned int            codim = 0) const;
+    types::fe_index
+    find_dominated_fe_extended(const std::set<types::fe_index> &fes,
+                               const unsigned int codim = 0) const;
 
     /**
      * @}

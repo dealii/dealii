@@ -1,0 +1,12 @@
+Changed: Many of the functions in hp::FECollection that are used to
+resolve how finite elements interact with each other have historically
+used `unsigned int` to denote the index of an element within the
+collection. However, in other contexts, we have switched to using
+types::fe_index to make the type descriptive of what it actually
+represents.
+
+Several of the functions in hp::FECollection have been switched to use
+the latter type. This is an incompatible change, but most of these
+functions are not widely used in user programs.
+<br>
+(Wolfgang Bangerth, 2026/06/13)

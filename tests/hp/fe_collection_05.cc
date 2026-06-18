@@ -43,7 +43,7 @@ template <int dim>
 void
 test()
 {
-  std::set<unsigned int> fes;
+  std::set<types::fe_index> fes;
   fes.insert(2);
   fes.insert(3);
 
@@ -75,7 +75,7 @@ test()
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(1), 2));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(3), 1, FE_Q<dim>(4), 1));
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(4), 1, FE_Q<dim>(3), 1));
-    std::set<unsigned int> fes;
+    std::set<types::fe_index> fes;
     fes.insert(1);
     fes.insert(2);
     deallog << fe_collection.find_dominating_fe_extended(fes, /*codim=*/1)
@@ -147,7 +147,7 @@ test()
     fe_collection.push_back(FE_Q<dim>(2));
     fe_collection.push_back(FE_Q<dim>(4));
     fe_collection.push_back(FE_Q<dim>(3));
-    std::set<unsigned int> fes;
+    std::set<types::fe_index> fes;
     fes.insert(3);
     deallog << fe_collection.find_dominating_fe_extended(fes, /*codim=*/1)
             << std::endl;
