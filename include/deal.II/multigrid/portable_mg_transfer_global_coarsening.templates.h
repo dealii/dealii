@@ -48,7 +48,7 @@ namespace Portable
     class CellTransferFactory
     {
     public:
-      static const unsigned int max_degree = 9;
+      static const unsigned int max_degree = 4;
 
       CellTransferFactory(const unsigned int degree_fine,
                           const unsigned int degree_coarse)
