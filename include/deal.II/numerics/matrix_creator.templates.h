@@ -535,18 +535,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -623,18 +621,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -711,18 +707,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -796,18 +790,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -1848,18 +1840,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -1937,18 +1927,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -2026,18 +2014,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
@@ -2114,18 +2100,16 @@ namespace MatrixCreator
         MatrixCreator::internal::copy_local_to_global(data, matrix, rhs_vector);
       };
 
-    WorkStream::run(
-      dof.begin_active(),
-      static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
-        dof.end()),
-      &MatrixCreator::internal::assembler<
-        dim,
-        spacedim,
-        typename DoFHandler<dim, spacedim>::active_cell_iterator,
-        typename MatrixType::value_type>,
-      copier,
-      assembler_data,
-      copy_data);
+    WorkStream::run(dof.begin_active(),
+                    dof.end(),
+                    &MatrixCreator::internal::assembler<
+                      dim,
+                      spacedim,
+                      typename DoFHandler<dim, spacedim>::active_cell_iterator,
+                      typename MatrixType::value_type>,
+                    copier,
+                    assembler_data,
+                    copy_data);
 
     matrix.compress(VectorOperation::add);
   }
