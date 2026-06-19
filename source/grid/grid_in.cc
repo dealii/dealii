@@ -27,8 +27,6 @@
 #include <boost/serialization/serialization.hpp>
 
 #ifdef DEAL_II_GMSH_WITH_API
-#  include <deal.II/base/config.h>
-
 #  include <deal.II/grid/cell_id.h>
 #  include <deal.II/grid/tria_description.h>
 
@@ -2943,8 +2941,15 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
   // 1 or codim 2.
   std::map<unsigned int, unsigned int> vertex_counts;
 
-  gmsh::initialize();
+#  if DEAL_II_GMSH_WITH_API_VERSION_GTE(4, 9, 4)
+  AssertThrow(gmsh::isInitialized() == 1,
+              ExcMessage("The GMSH API may only be called after GMSH is "
+                         "initialized, e.g., via the InitFinalize or "
+                         "MPI_InitFinalize classes or the gmsh::initialize() "
+                         "function."));
+#  endif
   gmsh::option::setNumber("General.Verbosity", 0);
+  gmsh::clear();
   gmsh::open(fname);
 
   AssertThrow(gmsh::model::getDimension() == dim,
@@ -3139,7 +3144,6 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
     assign_1d_boundary_ids(boundary_id_pairs, *tria);
 
   gmsh::clear();
-  gmsh::finalize();
 #else
   (void)fname;
   AssertThrow(false, ExcNeedsGMSHAPI());
@@ -3209,9 +3213,15 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
      {0, 1, 2, 3, 4, 5},
      {0, 1, 3, 2, 4, 5, 7, 6}}};
 
-
-  gmsh::initialize();
+#  if DEAL_II_GMSH_WITH_API_VERSION_GTE(4, 9, 4)
+  AssertThrow(gmsh::isInitialized() == 1,
+              ExcMessage("The GMSH API may only be called after GMSH is "
+                         "initialized, e.g., via the InitFinalize or "
+                         "MPI_InitFinalize classes or the gmsh::initialize() "
+                         "function."));
+#  endif
   gmsh::option::setNumber("General.Verbosity", 0);
+  gmsh::clear();
   gmsh::open(fname);
 
   std::map<unsigned long, unsigned int> ghost_map;
@@ -3512,7 +3522,6 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
 #  endif
 
   gmsh::clear();
-  gmsh::finalize();
 #else
   (void)file_prefix;
   (void)file_suffix;

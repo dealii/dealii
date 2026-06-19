@@ -1,0 +1,7 @@
+Changed: GridIn::read_partitioned_msh(), the overload of GridIn::read_msh()
+which uses the GMSH API, and the overload of GridOut::write_msh() which uses the
+GMSH API now require that gmsh::initialize() is run prior to calling those
+functions. This change was made to ensure consistent initialization and
+finalization of gmsh as well as its dependencies (such as MPI).
+<br>
+(David Wells, 2026/06/19)

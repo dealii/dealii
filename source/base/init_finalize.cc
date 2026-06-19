@@ -23,6 +23,10 @@
 
 #include <Kokkos_Core.hpp>
 
+#ifdef DEAL_II_GMSH_WITH_API
+#  include <gmsh.h>
+#endif
+
 #ifdef DEAL_II_WITH_TRILINOS
 #  ifdef DEAL_II_WITH_MPI
 #    include <deal.II/lac/trilinos_parallel_block_vector.h>
@@ -208,6 +212,12 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
       psb_c_init(cctxt);
       psb_c_set_index_base(0); // Set index base to 0 (PSBLAS default is 1)
     }
+#endif
+
+    // initialize GMSH
+#ifdef DEAL_II_GMSH_WITH_API
+  if (static_cast<bool>(libraries & InitializeLibrary::GMSH))
+    gmsh::initialize();
 #endif
 
   constructor_has_already_run = true;
@@ -473,7 +483,6 @@ InitFinalize::finalize()
         }
 #endif
 
-
       // Finalize Kokkos
       if (static_cast<bool>(libraries & InitializeLibrary::Kokkos))
         Kokkos::finalize();
@@ -501,6 +510,12 @@ InitFinalize::finalize()
 #endif
       is_finalized = true;
     }
+
+    // GMSH may attempt to finalize MPI so ensure this is run last:
+#ifdef DEAL_II_GMSH_WITH_API
+  if (static_cast<bool>(libraries & InitializeLibrary::GMSH))
+    gmsh::finalize();
+#endif
 }
 
 

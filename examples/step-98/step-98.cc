@@ -15,6 +15,7 @@
  * This program was contributed by Siarhei Uzunbajakau, www.cembooks.nl, 2026.
  */
 
+#include <deal.II/base/init_finalize.h>
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/convergence_table.h>
@@ -1724,10 +1725,12 @@ public:
   }
 };
 
-int main()
+int main(int argc, char **argv)
 {
   try
     {
+      // gmsh has global state, so set that up in the normal way:
+      InitFinalize     init_finalize(argc, argv, InitializeLibrary::GMSH);
       ParameterHandler parameters;
 
       MagneticProblem problem;
