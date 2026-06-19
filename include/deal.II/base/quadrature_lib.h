@@ -44,6 +44,8 @@ public:
   QGauss(const unsigned int n);
 };
 
+
+
 /**
  * The Gauss-Radau family of quadrature rules for numerical integration.
  *
@@ -111,6 +113,7 @@ private:
 };
 
 
+
 /**
  * The Gauss-Lobatto family of quadrature rules for numerical integration.
  *
@@ -163,6 +166,7 @@ public:
 };
 
 
+
 /**
  * The Simpson rule for numerical quadrature. This formula with 3 quadrature
  * points is exact for polynomials of degree 3.
@@ -192,6 +196,7 @@ public:
 };
 
 
+
 /**
  * The Milne rule for numerical quadrature formula. The Milne rule is a closed
  * Newton-Cotes formula and is exact for polynomials of degree 5.
@@ -204,6 +209,7 @@ class QMilne : public Quadrature<dim>
 public:
   QMilne();
 };
+
 
 
 /**
@@ -325,6 +331,7 @@ protected:
    */
   const double fraction;
 };
+
 
 
 /**
@@ -468,6 +475,8 @@ private:
   compare_weights(const unsigned int a, const unsigned int b) const;
 };
 
+
+
 /**
  * Telles quadrature of arbitrary order.
  *
@@ -541,6 +550,8 @@ public:
   QTelles(const unsigned int n, const Point<dim> &singularity);
 };
 
+
+
 /**
  * Gauss-Chebyshev quadrature rules integrate the weighted product
  * $\int_{-1}^1 f(x) w(x) dx$ with weight given by: $w(x) = 1/\sqrt{1-x^2}$.
@@ -559,6 +570,7 @@ public:
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussChebyshev(const unsigned int n);
 };
+
 
 
 /**
@@ -608,6 +620,8 @@ private:
   const EndPoint end_point;
 };
 
+
+
 /**
  * Gauss-Lobatto-Chebyshev quadrature rules integrate the weighted product
  * $\int_{-1}^1 f(x) w(x) dx$ with weight given by: $w(x) = 1/\sqrt{1-x^2}$,
@@ -628,6 +642,8 @@ public:
   /// Generate a formula with <tt>n</tt> quadrature points
   QGaussLobattoChebyshev(const unsigned int n);
 };
+
+
 
 /**
  * Given an arbitrary quadrature formula, return one that chops the quadrature
@@ -725,6 +741,8 @@ public:
     const std::vector<std::array<Point<spacedim>, dim + 1>> &simplices) const;
 };
 
+
+
 /**
  * A quadrature that implements a polar transformation from a square to a
  * triangle to integrate singularities in the origin of the reference simplex.
@@ -764,6 +782,8 @@ public:
    */
   QTrianglePolar(const unsigned int n);
 };
+
+
 
 /**
  * A quadrature that implements the Duffy transformation from a square to a
@@ -828,6 +848,8 @@ public:
   QDuffy(const unsigned int n, const double beta);
 };
 
+
+
 /**
  * A quadrature to use when the cell should be split into subregions to
  * integrate using one or more base quadratures.
@@ -873,6 +895,8 @@ public:
   QSplit(const QSimplex<dim> &base, const Point<dim> &split_point);
 };
 
+
+
 /**
  * Integration rule for simplex entities.
  *
@@ -910,6 +934,8 @@ public:
    */
   explicit QGaussSimplex(const unsigned int n_points_1D);
 };
+
+
 
 /**
  * Witherden-Vincent rules for simplex entities.
@@ -956,6 +982,8 @@ public:
                                     const bool         use_odd_order = true);
 };
 
+
+
 /**
  * Stroud quadrature rules for simplex entities.
  *
@@ -984,9 +1012,11 @@ public:
  * to the integral over the reference quadrilateral
  * $\int_{0}^{1} \int_{0}^{1} f(x(\xi, \nu),y(\xi, \nu)) (1-\nu) d\xi d\nu$.
  * The integral can be calculated using standard Gauss integration rules.
- * By choosing a Gauss-Jacobi quadrautre rule in y-direction with alpha = 1 and
- * beta = 0, the additional factor $1-\nu$ is absorbed into the quadrature
- * weights.
+ * By choosing a
+ * [Gauss-Jacobi quadrature
+ * rule](https://en.wikipedia.org/wiki/Gauss%E2%80%93Jacobi_quadrature) in
+ * $y$-direction with $\alpha = 1$ and $\beta = 0$, the additional factor
+ * $1-\nu$ is absorbed into the quadrature weights.
  *
  * The quadrature points on the quadrilateral are transformed back to the
  * triangle using the Duffy transformation. Thus, the function returns
@@ -1004,6 +1034,8 @@ public:
   explicit QStroudSimplex(const unsigned int n_points_1D);
 };
 
+
+
 /**
  * Iterated quadrature for simplices. Since simplex cannot be described as
  * tensor products the base quadrature has equal dimension.
@@ -1018,6 +1050,8 @@ public:
   QIteratedSimplex(const Quadrature<dim> &base_quadrature,
                    const unsigned int     n_copies);
 };
+
+
 
 /**
  * Integration rule for wedge entities.
@@ -1034,12 +1068,19 @@ public:
   explicit QGaussWedge(const unsigned int n_points_1D);
 };
 
+
+
 /**
  * Integration rule for pyramid entities.
- * Taken from @cite Bergot2010, the integration rules generate @p (n_points_1d)^3
+ * Taken from @cite Bergot2010, the integration rules generate `(n_points_1d)^3`
  * integration points with all positive weights. The integration rule is the
  * product of two QGauss objects in the first two coordinate directions and a
- * Gauss-Jacobi integration in the third direction.
+ * [Gauss-Jacobi
+ * integration](https://en.wikipedia.org/wiki/Gauss%E2%80%93Jacobi_quadrature)
+ * with $\alpha=2,\beta=0$ in the third direction. This choice of exponents
+ * $\alpha,\beta$ ensures that the decrease of cross-sectional area
+ * as $(1-z)^2$ is compensated in the construction of quadrature
+ * point locations in $z$ direction.
  */
 template <int dim>
 class QGaussPyramid : public Quadrature<dim>
