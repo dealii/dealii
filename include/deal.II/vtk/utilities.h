@@ -29,6 +29,7 @@
 
 #ifdef DEAL_II_WITH_VTK
 
+#  include <vtkDataObject.h>
 #  include <vtkDoubleArray.h>
 #  include <vtkSmartPointer.h>
 #  include <vtkUnstructuredGrid.h>
@@ -75,6 +76,58 @@ namespace VTKWrappers
     load_vtk_file(const std::string &vtk_filename,
                   const bool         cleanup            = true,
                   const double       relative_tolerance = 0.0);
+
+    /**
+     * Convert a VTK data object to a @p vtkUnstructuredGrid if the smart
+     * pointer points to one of the supported VTK dataset types listed below.
+     *
+     * Supported input types:
+     * - @p vtkUnstructuredGrid -> returned as-is (shallow copy)
+     * - @p vtkStructuredGrid -> hexahedral cells extracted from the structured
+     *   connectivity
+     * - @p vtkRectilinearGrid / @p vtkStructuredPoints -> hexahedral cells
+     *   reconstructed from grid dimensions
+     * - @p vtkPolyData -> triangles, lines, and polygons converted to their
+     *   unstructured grid equivalents
+     *
+     * If the input is not a supported dataset type, an exception is thrown.
+     * Point and cell data are copied to the output.
+     *
+     * This function is used internally by @p load_vtk_file and @p write_vtk
+     * to normalize all VTK data to a single unstructured grid representation.
+     *
+     * @param data_object The VTK data object to convert.
+     * @return A smart pointer to a newly created @p vtkUnstructuredGrid.
+     */
+    vtkSmartPointer<vtkUnstructuredGrid>
+    convert_to_unstructured_grid(
+      const vtkSmartPointer<vtkDataObject> &data_object);
+
+    /**
+     * Write a VTK file to disk from any VTK dataset that can be converted to
+     * an unstructured grid.
+     *
+     * The output format is determined by the file extension:
+     * - `.vtu` -> VTK XML UnstructuredGrid format
+     * - `.vtk` -> legacy VTK UnstructuredGrid format
+     *
+     * Supported input types are the same as those handled by
+     * @p convert_to_unstructured_grid: unstructured grids, structured grids,
+     * rectilinear grids, structured points, and polydata. Each type is
+     * converted to an unstructured grid internally before writing.
+     *
+     * If the write operation fails, an exception is thrown.
+     *
+     * @param[in] vtk_filename Path to the output file. The extension
+     *         determines the format: `.vtu` for XML format, `.vtk` for legacy
+     *         format.
+     * @param[in] data_object  The VTK data object to write. Must
+     *         point to a valid dataset that can be converted to an
+     *         unstructured grid.
+     */
+    void
+    write_vtk(const std::string                    &vtk_filename,
+              const vtkSmartPointer<vtkDataObject> &data_object);
   } // namespace internal
 
   /**
@@ -93,23 +146,93 @@ namespace VTKWrappers
    *
    * This function translates the points and cells in @p unstructured_grid into
    * a serial deal.II Triangulation.
+   *
+   * The optional string parameters specify names of VTK cell-data arrays
+   * to read and how they are interpreted. Empty names disable reading of the
+   * corresponding id data; no default VTK array names are used.
+   * - @p material_id_field: when non-empty, the named VTK cell-data scalar
+   *   array is read and used to set per-codim-0-cell
+   *   @ref GlossMaterialId "material_id" values in the resulting
+   *   Triangulation.
+   * - @p boundary_id_field: when non-empty, the named VTK cell-data scalar
+   *   array is read and used to set @ref GlossBoundaryIndicator "boundary_id"s
+   *   for codim-1 subcells reconstructed from VTK cells whose dimension is
+   *   smaller than @p dim.
+   * - @p manifold_id_field: when non-empty, the named VTK cell-data scalar
+   *   array is read and used to set @ref GlossManifoldIndicator "manifold_id"
+   *   for both codim-0 cells and appended subcells.
+   *
+   * Negative values read from VTK for any of these three fields are interpreted
+   * as deal.II defaults to avoid unsigned wrap when mapping onto deal.II
+   * types.
    */
   template <int dim, int spacedim>
   void
   unstructured_grid_to_dealii_triangulation(
     const vtkUnstructuredGrid    &unstructured_grid,
-    Triangulation<dim, spacedim> &tria);
+    Triangulation<dim, spacedim> &tria,
+    const std::string            &material_id_field = "",
+    const std::string            &boundary_id_field = "",
+    const std::string            &manifold_id_field = "");
 
   /**
    * Convert a serial deal.II triangulation to a VTK unstructured grid.
    *
    * This function exports the active cells of @p tria to a newly allocated
    * VTK unstructured grid and returns it.
+   *
+   * The optional string parameters specify names of VTK cell-data arrays to
+   * create and the export behavior. Empty names disable writing of the
+   * corresponding id data; no default VTK array names are used.
+   * - @p material_id_field: when non-empty, a VTK cell-data scalar array with
+   *   this name is created and filled with per-codim-0-cell `material_id`
+   *   values. Appended subcells receive the material id of the owning
+   *   codim-0 cell.
+   * - @p boundary_id_field: when non-empty, a VTK cell-data scalar array with
+   *   this name is created. Appended codim-1 subcells carry meaningful
+   *   boundary id values; codim-0 cells receive 0 because boundary ids live on
+   *   subcells.
+   * - @p manifold_id_field: when non-empty, a VTK cell-data scalar array with
+   *   this name is created. Codim-0 cells are written with
+   *   `numbers::flat_manifold_id` (i.e. -1) when they have the default
+   *   manifold; non-flat manifold ids for appended subcells are written
+   *   alongside boundary ids.
    */
   template <int dim, int spacedim>
   vtkSmartPointer<vtkUnstructuredGrid>
   dealii_triangulation_to_unstructured_grid(
-    const Triangulation<dim, spacedim> &tria);
+    const Triangulation<dim, spacedim> &tria,
+    const std::string                  &material_id_field = "",
+    const std::string                  &boundary_id_field = "",
+    const std::string                  &manifold_id_field = "");
+
+  /**
+   * Write a serial deal.II triangulation to a VTK file.
+   *
+   * This function first converts @p tria to a VTK unstructured grid through
+   * dealii_triangulation_to_unstructured_grid() and then writes it to disk.
+   *
+   * The optional string parameters specify names of VTK cell-data arrays to
+   * create and fill with deal.II ids. Empty names disable writing of the
+   * corresponding id data; no default VTK array names are used:
+   * - @p material_id_field: when non-empty, write per-codim-0-cell
+   *   `material_id` values;
+   * - @p boundary_id_field: when non-empty, write `boundary_id` values on
+   *   appended codim-1 subcells;
+   * - @p manifold_id_field: when non-empty, write `manifold_id` values on
+   *   appended codim-1 subcells and `numbers::flat_manifold_id` on codim-0
+   *   cells.
+   *
+   * The output format is selected from the file extension: `.vtk` for legacy
+   * VTK and `.vtu` for VTK XML.
+   */
+  template <int dim, int spacedim>
+  void
+  write_vtk(const std::string                  &vtk_filename,
+            const Triangulation<dim, spacedim> &tria,
+            const std::string                  &material_id_field = "",
+            const std::string                  &boundary_id_field = "",
+            const std::string                  &manifold_id_field = "");
 
   /**
    * Read a VTK mesh file and populate a deal.II Triangulation.
@@ -118,8 +241,21 @@ namespace VTKWrappers
    * given Triangulation object. If cleanup is true, overlapping points in the
    * VTK file are merged using VTK's cleaning utilities.
    *
+   * The optional string parameters are forwarded to
+   * unstructured_grid_to_dealii_triangulation() and control whether VTK
+   * cell-data arrays are interpreted as deal.II ids:
+   * - @p material_id_field: per-cell material ids for codim-0 cells;
+   * - @p boundary_id_field: per-subcell boundary ids for codim-1 cells;
+   * - @p manifold_id_field: manifold ids for both codim-0 and codim-1 cells.
+   *
    * @param vtk_filename The name of the input VTK file.
    * @param tria The Triangulation object to populate.
+   * @param material_id_field Optional VTK cell-data scalar array name to read
+   * for material ids. The default empty string disables reading material ids.
+   * @param boundary_id_field Optional VTK cell-data scalar array name to read
+   * for boundary ids. The default empty string disables reading boundary ids.
+   * @param manifold_id_field Optional VTK cell-data scalar array name to read
+   * for manifold ids. The default empty string disables reading manifold ids.
    * @param cleanup If true, merge overlapping points in the VTK file (default: true).
    * @param relative_tolerance Relative tolerance used when merging points via
    * VTK's cleaning utilities (default: 0).
@@ -129,7 +265,10 @@ namespace VTKWrappers
   read_tria(const std::string            &vtk_filename,
             Triangulation<dim, spacedim> &tria,
             const bool                    cleanup            = true,
-            const double                  relative_tolerance = 0.0);
+            const double                  relative_tolerance = 0.0,
+            const std::string            &material_id_field  = "",
+            const std::string            &boundary_id_field  = "",
+            const std::string            &manifold_id_field  = "");
 
   /**
    * Read cell data (scalar or vector) from a VTK file and store it in the
@@ -320,6 +459,15 @@ namespace VTKWrappers
    * @param output_vector The vector to store all data field values.
    * @param data_names The vector to store the names of all data fields found in
    * the VTK file.
+   * @param material_id_field Optional VTK cell-data scalar array name to read
+   * for material ids when reconstructing the Triangulation. The default empty
+   * string disables reading material ids.
+   * @param boundary_id_field Optional VTK cell-data scalar array name to read
+   * for boundary ids when reconstructing the Triangulation. The default empty
+   * string disables reading boundary ids.
+   * @param manifold_id_field Optional VTK cell-data scalar array name to read
+   * for manifold ids when reconstructing the Triangulation. The default empty
+   * string disables reading manifold ids.
    * @param cleanup If true, merge overlapping points in the VTK file (default:
    * true).
    * @param relative_tolerance Relative tolerance used when merging points via
@@ -332,7 +480,10 @@ namespace VTKWrappers
            Vector<double>            &output_vector,
            std::vector<std::string>  &data_names,
            const bool                 cleanup            = true,
-           const double               relative_tolerance = 0.0);
+           const double               relative_tolerance = 0.0,
+           const std::string         &material_id_field  = "",
+           const std::string         &boundary_id_field  = "",
+           const std::string         &manifold_id_field  = "");
 
 #  ifndef DOXYGEN
   // Template implementations

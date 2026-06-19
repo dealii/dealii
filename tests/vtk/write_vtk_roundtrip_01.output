@@ -1,0 +1,28 @@
+
+DEAL::=== Legacy .vtk ===
+DEAL::Writing polydata
+DEAL::  Loaded: 5 points, 3 cells
+DEAL::  Original -> unstructured: 5 points, 3 cells
+DEAL::  Point count match: 1
+DEAL::  Cell count match: 1
+DEAL::  Converted point array 'temperature': 1
+DEAL::  Triangulation cell count match: 1
+DEAL::  Triangulation vertex count match: 1
+DEAL::  Round-trip OK: 3 cells, 5 vertices
+DEAL::Writing StructuredGrid
+DEAL::  Loaded: 9 points, 4 cells
+DEAL::  Original -> unstructured: 9 points, 4 cells
+DEAL::  Point count match: 1
+DEAL::  Cell count match: 1
+DEAL::  Converted cell array 'region': 1
+DEAL::  Triangulation cell count match: 1
+DEAL::  Triangulation vertex count match: 1
+DEAL::  Round-trip OK: 4 cells, 9 vertices
+DEAL::Writing UnstructuredGrid
+DEAL::  Loaded: 5 points, 2 cells
+DEAL::  Original -> unstructured: 5 points, 2 cells
+DEAL::  Point count match: 1
+DEAL::  Cell count match: 1
+DEAL::  Triangulation cell count match: 1
+DEAL::  Triangulation vertex count match: 1
+DEAL::  Round-trip OK: 2 cells, 5 vertices

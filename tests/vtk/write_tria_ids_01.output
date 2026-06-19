@@ -1,0 +1,41 @@
+
+DEAL::Reading file: write_tria_ids_01_2d.vtk
+DEAL::  Triangulation: 1 cells, 4 vertices
+DEAL::  Material ids:
+DEAL::    id 7: 1
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 1
+DEAL::  Boundary ids:
+DEAL::    id 13: 4
+DEAL::  Boundary manifold ids:
+DEAL::    id -1: 4
+DEAL::Reading file: write_tria_ids_01_2d.vtu
+DEAL::  Triangulation: 1 cells, 4 vertices
+DEAL::  Material ids:
+DEAL::    id 7: 1
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 1
+DEAL::  Boundary ids:
+DEAL::    id 13: 4
+DEAL::  Boundary manifold ids:
+DEAL::    id -1: 4
+DEAL::Reading file: write_tria_ids_01_3d.vtk
+DEAL::  Triangulation: 1 cells, 8 vertices
+DEAL::  Material ids:
+DEAL::    id 11: 1
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 1
+DEAL::  Boundary ids:
+DEAL::    id 0: 6
+DEAL::  Boundary manifold ids:
+DEAL::    id 5: 6
+DEAL::Reading file: write_tria_ids_01_3d.vtu
+DEAL::  Triangulation: 1 cells, 8 vertices
+DEAL::  Material ids:
+DEAL::    id 11: 1
+DEAL::  Cell manifold ids:
+DEAL::    id -1: 1
+DEAL::  Boundary ids:
+DEAL::    id 0: 6
+DEAL::  Boundary manifold ids:
+DEAL::    id 5: 6

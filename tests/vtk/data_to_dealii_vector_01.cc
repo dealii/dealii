@@ -46,7 +46,12 @@ test(const std::string &filename)
   Vector<double>               dealii_data;
 
   VTKWrappers::read_tria(std::string(SOURCE_DIR) + "/" + filename,
-                         triangulation);
+                         triangulation,
+                         true,
+                         0.0,
+                         "",
+                         "",
+                         "");
 
   VTKWrappers::read_all_data(std::string(SOURCE_DIR) + "/" + filename,
                              vtk_data);
