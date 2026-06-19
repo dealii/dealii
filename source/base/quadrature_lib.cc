@@ -1707,6 +1707,10 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
           Quadrature<dim>::operator=(
             QWitherdenVincentSimplex<dim>(n_points_1D));
         }
+      else
+        {
+          Quadrature<dim>::operator=(QStroudSimplex<dim>(n_points_1D));
+        }
     }
   else if (dim == 3)
     {
@@ -1764,15 +1768,15 @@ QGaussSimplex<dim>::QGaussSimplex(const unsigned int n_points_1D)
           Quadrature<dim>::operator=(
             QWitherdenVincentSimplex<dim>(n_points_1D));
         }
+      else
+        {
+          Quadrature<dim>::operator=(QStroudSimplex<dim>(n_points_1D));
+        }
     }
 
   AssertDimension(this->quadrature_points.size(), this->weights.size());
   Assert(this->quadrature_points.size() > 0,
-         ExcNotImplemented(
-           "QGaussSimplex is currently only implemented for "
-           "n_points_1D = 1, 2, 3, and 4 while you are asking for "
-           "n_points_1D = " +
-           Utilities::to_string(n_points_1D)));
+         ExcMessage("No valid quadrature points!"));
 }
 
 namespace
@@ -2268,7 +2272,104 @@ QWitherdenVincentSimplex<dim>::QWitherdenVincentSimplex(
     }
 }
 
+template <int dim>
+QStroudSimplex<dim>::QStroudSimplex(const unsigned int n_points_1D)
+  : QSimplex<dim>(Quadrature<dim>())
+{
+  Assert(1 <= dim && dim <= 3, ExcNotImplemented());
+  Assert(n_points_1D > 0, ExcNotImplemented());
 
+  // use QGauss in 1d
+  if constexpr (dim == 1)
+    {
+      Quadrature<dim>::operator=(QGauss<dim>(n_points_1D));
+    }
+  if constexpr (dim == 2)
+    {
+      // Generate higher order rules by collapsed coordinates
+      // therefore use the coordinate x,y on the unit triangle
+      // and the coordinates xi, nu on the unit square
+      // transform with xi = x / (1 - nu); y = nu
+      // then int_{0}^{1} int_{0}^{1-y} f(x,y) dx dy
+      // transforms to int_{0}^{1} int_{0}^{1} f(xi,nu) (1-nu) d(xi) d(nu)
+
+      // use standard integration in x-direction
+      QGauss<1> q_gauss(n_points_1D);
+
+      // use Gauss-Jacobi in y-direction with alpha = 1, beta = 0
+      std::vector<long double> points_y =
+        Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 1, 0);
+
+      for (unsigned int i = 0; i < n_points_1D; ++i)
+        for (unsigned int j = 0; j < n_points_1D; ++j)
+          {
+            // rescale x according to x = xi * (1 - nu)
+            const double x = q_gauss.point(i)[0] * (1.0 - points_y[j]);
+
+            this->quadrature_points.emplace_back(x, points_y[j]);
+
+            const double w_y =
+              4.0 / (1.0 - std::pow(2.0 * points_y[j] - 1.0, 2)) /
+              std::pow(Polynomials::jacobi_polynomial_derivative(
+                         n_points_1D, 1, 0, points_y[j]),
+                       2);
+
+            this->weights.emplace_back(w_y * q_gauss.weight(i));
+          }
+    }
+  if constexpr (dim == 3)
+    {
+      // Generate higher order rules by collapsed coordinates
+      // therefore use the coordinate x,y,z on the unit tet
+      // and the coordinates xi, nu, mu on the unit square
+      // transform with xi = x / (1 - y - z); nu = y / (1 - z); z = mu
+      // then int_{0}^{1} int_{0}^{1-z} int_{0}^{1-y-z} f(x,y,z) dx dy dz
+      // transforms to
+      // int_{0}^{1} int_{0}^{1} int_{0}^{1} f(xi,nu,mu) (1-nu) (1-mu)^2
+      // d(xi) d(nu) d(mu)
+
+      // use standard integration in x-direction
+      QGauss<1> q_gauss(n_points_1D);
+
+      // use Gauss-Jacobi in y-direction with alpha = 1, beta = 0
+      std::vector<long double> points_y =
+        Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 1, 0);
+
+      // use Gauss-Jacobi in z-direction with alpha = 2, beta = 0
+      std::vector<long double> points_z =
+        Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 2, 0);
+
+      for (unsigned int i = 0; i < n_points_1D; ++i)
+        for (unsigned int j = 0; j < n_points_1D; ++j)
+          for (unsigned int k = 0; k < n_points_1D; ++k)
+            {
+              // rescale y according to y = nu * (1 - z)
+              const double y = points_y[j] * (1.0 - points_z[k]);
+
+              // rescale x = xi * (1 - y - z)
+              const double x = q_gauss.point(i)[0] * (1.0 - y - points_z[k]);
+
+              this->quadrature_points.emplace_back(x, y, points_z[k]);
+
+              const double w_y =
+                4.0 / (1.0 - std::pow(2.0 * points_y[j] - 1.0, 2)) /
+                std::pow(Polynomials::jacobi_polynomial_derivative(
+                           n_points_1D, 1, 0, points_y[j]),
+                         2);
+
+              const double w_z =
+                4.0 / (1.0 - std::pow(2.0 * points_z[k] - 1.0, 2)) /
+                std::pow(Polynomials::jacobi_polynomial_derivative(
+                           n_points_1D, 2, 0, points_z[k]),
+                         2);
+
+              this->weights.emplace_back(w_y * w_z * q_gauss.weight(i));
+            }
+    }
+  AssertDimension(this->quadrature_points.size(), this->weights.size());
+  Assert(this->quadrature_points.size() > 0,
+         ExcMessage("No valid quadrature points!"));
+}
 
 namespace
 {
@@ -2483,6 +2584,9 @@ template class QGaussPyramid<3>;
 template class QWitherdenVincentSimplex<1>;
 template class QWitherdenVincentSimplex<2>;
 template class QWitherdenVincentSimplex<3>;
+template class QStroudSimplex<1>;
+template class QStroudSimplex<2>;
+template class QStroudSimplex<3>;
 
 #ifndef DOXYGEN
 template Quadrature<1>
