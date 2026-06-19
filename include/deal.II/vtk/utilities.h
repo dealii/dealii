@@ -78,16 +78,16 @@ namespace VTKWrappers
                   const double       relative_tolerance = 0.0);
 
     /**
-     * Convert any VTK dataset that can be represented as an unstructured grid
-     * into a @p vtkUnstructuredGrid.
+     * Convert a VTK data object to a @p vtkUnstructuredGrid if the smart
+     * pointer points to one of the supported VTK dataset types listed below.
      *
      * Supported input types:
-     * - @p vtkUnstructuredGrid → returned as-is (shallow copy)
-     * - @p vtkStructuredGrid → hexahedral cells extracted from the structured
+     * - @p vtkUnstructuredGrid -> returned as-is (shallow copy)
+     * - @p vtkStructuredGrid -> hexahedral cells extracted from the structured
      *   connectivity
-     * - @p vtkRectilinearGrid / @p vtkStructuredPoints → hexahedral cells
+     * - @p vtkRectilinearGrid / @p vtkStructuredPoints -> hexahedral cells
      *   reconstructed from grid dimensions
-     * - @p vtkPolyData → triangles, lines, and polygons converted to their
+     * - @p vtkPolyData -> triangles, lines, and polygons converted to their
      *   unstructured grid equivalents
      *
      * If the input is not a supported dataset type, an exception is thrown.
@@ -108,8 +108,8 @@ namespace VTKWrappers
      * an unstructured grid.
      *
      * The output format is determined by the file extension:
-     * - `.vtu` → VTK XML UnstructuredGrid format
-     * - `.vtk` → legacy VTK UnstructuredGrid format
+     * - `.vtu` -> VTK XML UnstructuredGrid format
+     * - `.vtk` -> legacy VTK UnstructuredGrid format
      *
      * Supported input types are the same as those handled by
      * @p convert_to_unstructured_grid: unstructured grids, structured grids,
@@ -148,20 +148,23 @@ namespace VTKWrappers
    * a serial deal.II Triangulation.
    *
    * The optional string parameters specify names of VTK cell-data arrays
-   * to read and how they are interpreted:
+   * to read and how they are interpreted. Empty names disable reading of the
+   * corresponding id data; no default VTK array names are used.
    * - @p material_id_field: when non-empty, the named VTK cell-data scalar
-   *   array is read and used to set per-codim-0-cell `material_id` values in
-   *   the resulting Triangulation.
+   *   array is read and used to set per-codim-0-cell
+   *   @ref GlossMaterialId "material_id" values in the resulting
+   *   Triangulation.
    * - @p boundary_id_field: when non-empty, the named VTK cell-data scalar
-   *   array is read and used to set `boundary_id`s for codim-1 subcells (faces)
-   *   reconstructed from VTK cells whose dimension is smaller than @p dim.
+   *   array is read and used to set @ref GlossBoundaryIndicator "boundary_id"s
+   *   for codim-1 subcells reconstructed from VTK cells whose dimension is
+   *   smaller than @p dim.
    * - @p manifold_id_field: when non-empty, the named VTK cell-data scalar
-   *   array is read and used to set `manifold_id` for both codim-0 cells and
-   *   appended subcells.
+   *   array is read and used to set @ref GlossManifoldIndicator "manifold_id"
+   *   for both codim-0 cells and appended subcells.
    *
-   * Negative values read from VTK are interpreted as deal.II defaults
-   * (e.g. `numbers::flat_manifold_id`) to avoid unsigned wrap when mapping
-   * into deal.II types.
+   * Negative values read from VTK for any of these three fields are interpreted
+   * as deal.II defaults to avoid unsigned wrap when mapping onto deal.II
+   * types.
    */
   template <int dim, int spacedim>
   void
@@ -179,13 +182,16 @@ namespace VTKWrappers
    * VTK unstructured grid and returns it.
    *
    * The optional string parameters specify names of VTK cell-data arrays to
-   * create and the export behaviour:
+   * create and the export behavior. Empty names disable writing of the
+   * corresponding id data; no default VTK array names are used.
    * - @p material_id_field: when non-empty, a VTK cell-data scalar array with
    *   this name is created and filled with per-codim-0-cell `material_id`
-   *   values. Appended subcells (boundary faces) receive a value of 0.
+   *   values. Appended subcells receive the material id of the owning
+   *   codim-0 cell.
    * - @p boundary_id_field: when non-empty, a VTK cell-data scalar array with
-   *   this name is created. Only appended codim-1 subcells carry meaningful
-   *   boundary id values; codim-0 cells receive 0.
+   *   this name is created. Appended codim-1 subcells carry meaningful
+   *   boundary id values; codim-0 cells receive 0 because boundary ids live on
+   *   subcells.
    * - @p manifold_id_field: when non-empty, a VTK cell-data scalar array with
    *   this name is created. Codim-0 cells are written with
    *   `numbers::flat_manifold_id` (i.e. -1) when they have the default
@@ -207,7 +213,8 @@ namespace VTKWrappers
    * dealii_triangulation_to_unstructured_grid() and then writes it to disk.
    *
    * The optional string parameters specify names of VTK cell-data arrays to
-   * create and fill with deal.II ids:
+   * create and fill with deal.II ids. Empty names disable writing of the
+   * corresponding id data; no default VTK array names are used:
    * - @p material_id_field: when non-empty, write per-codim-0-cell
    *   `material_id` values;
    * - @p boundary_id_field: when non-empty, write `boundary_id` values on
@@ -243,12 +250,12 @@ namespace VTKWrappers
    *
    * @param vtk_filename The name of the input VTK file.
    * @param tria The Triangulation object to populate.
-   * @param material_id_field Optional VTK cell-data scalar array name to use
-   * for material ids (default: empty string, disabled).
-   * @param boundary_id_field Optional VTK cell-data scalar array name to use
-   * for boundary ids (default: empty string, disabled).
-   * @param manifold_id_field Optional VTK cell-data scalar array name to use
-   * for manifold ids (default: empty string, disabled).
+   * @param material_id_field Optional VTK cell-data scalar array name to read
+   * for material ids. The default empty string disables reading material ids.
+   * @param boundary_id_field Optional VTK cell-data scalar array name to read
+   * for boundary ids. The default empty string disables reading boundary ids.
+   * @param manifold_id_field Optional VTK cell-data scalar array name to read
+   * for manifold ids. The default empty string disables reading manifold ids.
    * @param cleanup If true, merge overlapping points in the VTK file (default: true).
    * @param relative_tolerance Relative tolerance used when merging points via
    * VTK's cleaning utilities (default: 0).
@@ -452,15 +459,15 @@ namespace VTKWrappers
    * @param output_vector The vector to store all data field values.
    * @param data_names The vector to store the names of all data fields found in
    * the VTK file.
-   * @param material_id_field Optional VTK cell-data scalar array name to use
-   * for material ids when reconstructing the Triangulation (default: empty
-   * string, disabled).
-   * @param boundary_id_field Optional VTK cell-data scalar array name to use
-   * for boundary ids when reconstructing the Triangulation (default: empty
-   * string, disabled).
-   * @param manifold_id_field Optional VTK cell-data scalar array name to use
-   * for manifold ids when reconstructing the Triangulation (default: empty
-   * string, disabled).
+   * @param material_id_field Optional VTK cell-data scalar array name to read
+   * for material ids when reconstructing the Triangulation. The default empty
+   * string disables reading material ids.
+   * @param boundary_id_field Optional VTK cell-data scalar array name to read
+   * for boundary ids when reconstructing the Triangulation. The default empty
+   * string disables reading boundary ids.
+   * @param manifold_id_field Optional VTK cell-data scalar array name to read
+   * for manifold ids when reconstructing the Triangulation. The default empty
+   * string disables reading manifold ids.
    * @param cleanup If true, merge overlapping points in the VTK file (default:
    * true).
    * @param relative_tolerance Relative tolerance used when merging points via

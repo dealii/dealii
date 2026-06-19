@@ -35,11 +35,18 @@ test_roundtrip_ids()
   for (auto cell = tria_in.begin_active(); cell != tria_in.end();
        ++cell, ++cell_index)
     {
-      cell->set_material_id(100 + static_cast<types::material_id>(cell_index));
+      if constexpr (dim > 1)
+        cell->set_material_id(100 +
+                              static_cast<types::material_id>(cell_index));
       for (unsigned int f = 0; f < cell->n_faces(); ++f)
         if (cell->face(f)->at_boundary())
           {
-            if constexpr (dim == 2)
+            if constexpr (dim == 1)
+              {
+                cell->face(f)->set_boundary_id(17);
+                cell->face(f)->set_manifold_id(3);
+              }
+            else if constexpr (dim == 2)
               cell->face(f)->set_boundary_id(13);
             else if constexpr (dim == 3)
               cell->face(f)->set_manifold_id(5);
@@ -95,6 +102,7 @@ main()
 {
   initlog();
 
+  test_roundtrip_ids<1, 1>();
   test_roundtrip_ids<2, 2>();
   test_roundtrip_ids<3, 3>();
 

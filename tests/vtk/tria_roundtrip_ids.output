@@ -1,4 +1,10 @@
 
+DEAL::cell material in/out: 0 0
+DEAL::face 0 boundary in/out: 17 17
+DEAL::face 0 manifold in/out: 3 3
+DEAL::face 1 boundary in/out: 17 17
+DEAL::face 1 manifold in/out: 3 3
+DEAL::Round-trip-ID OK for Triangulation<1, 1>: 1 cells, 2 vertices
 DEAL::cell material in/out: 100 100
 DEAL::face 0 boundary in/out: 13 13
 DEAL::face 0 manifold in/out: -1 -1

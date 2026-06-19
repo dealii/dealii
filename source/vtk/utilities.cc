@@ -158,14 +158,25 @@ namespace VTKWrappers
           reader->Update();
           data_object = reader->GetOutput();
         }
-      else
+      else if (ext == "vtk")
         {
+          // Read the legacy VTK format without assuming a specific dataset
+          // type; the result is normalized to an unstructured grid below.
           auto reader = vtkSmartPointer<vtkGenericDataObjectReader>::New();
           reader->SetFileName(vtk_filename.c_str());
           reader->Update();
           data_object = reader->GetOutput();
         }
+      else
+        AssertThrow(false,
+                    ExcMessage("Unsupported file extension '" + ext +
+                               "'. Use '.vtu' for VTK XML format or '.vtk' "
+                               "for legacy VTK format."));
 #  else
+      AssertThrow(ext == "vtk",
+                  ExcMessage("Unsupported file extension '" + ext +
+                             "'. With VTK < 9.3 only '.vtk' legacy files can "
+                             "be read."));
       {
         auto reader = vtkSmartPointer<vtkDataSetReader>::New();
         reader->SetFileName(vtk_filename.c_str());
@@ -207,7 +218,7 @@ namespace VTKWrappers
 
       // Determine output format from file extension
       const auto dot_pos = vtk_filename.find_last_of('.');
-      Assert(dot_pos != std::string::npos && dot_pos + 1 < vtk_filename.size(),
+      Assert(dot_pos != std::string::npos,
              ExcMessage("Cannot determine output format: no file extension "
                         "found in filename '" +
                         vtk_filename + "'."));
@@ -251,13 +262,14 @@ namespace VTKWrappers
   {
     auto &grid = const_cast<vtkUnstructuredGrid &>(unstructured_grid);
 
-    auto get_cell_data_array = [&grid](const std::string &name) {
+    auto get_cell_data_array =
+      [&grid](const std::string &name) -> vtkDataArray * {
       if (name.empty())
-        return static_cast<vtkDataArray *>(nullptr);
+        return nullptr;
 
       vtkCellData *cell_data = grid.GetCellData();
       if (cell_data == nullptr)
-        return static_cast<vtkDataArray *>(nullptr);
+        return nullptr;
 
       vtkDataArray *data_array = cell_data->GetArray(name.c_str());
       if (data_array != nullptr)
@@ -268,9 +280,20 @@ namespace VTKWrappers
       return data_array;
     };
 
+    // Get observing pointers to the arrays that store
+    // material/boundary/manifold ids.
     vtkDataArray *material_ids = get_cell_data_array(material_id_field);
     vtkDataArray *boundary_ids = get_cell_data_array(boundary_id_field);
     vtkDataArray *manifold_ids = get_cell_data_array(manifold_id_field);
+
+    auto material_id_from_vtk = [](vtkDataArray   &material_ids,
+                                   const vtkIdType vtk_id) {
+      const double material_value = material_ids.GetComponent(vtk_id, 0);
+      if (material_value < 0)
+        return types::material_id(0);
+
+      return static_cast<types::material_id>(material_value);
+    };
 
     // Read points
     vtkPoints                   *vtk_points = grid.GetPoints();
@@ -293,19 +316,25 @@ namespace VTKWrappers
     std::vector<CellData<dim>> cells;
     SubCellData                subcell_data;
     const vtkIdType            n_cells = grid.GetNumberOfCells();
-    for (vtkIdType i = 0; i < n_cells; ++i)
+    std::vector<bool>          boundary_vertex_ids_present(n_points, false);
+    std::vector<bool>          manifold_vertex_ids_present(n_points, false);
+    std::vector<types::boundary_id> boundary_vertex_ids(
+      n_points, numbers::internal_face_boundary_id);
+    std::vector<types::manifold_id> manifold_vertex_ids(
+      n_points, numbers::flat_manifold_id);
+    for (vtkIdType vtk_id = 0; vtk_id < n_cells; ++vtk_id)
       {
-        vtkCell *cell = grid.GetCell(i);
+        vtkCell *cell = grid.GetCell(vtk_id);
         if (cell->GetCellDimension() < dim)
           {
             if (boundary_ids == nullptr && manifold_ids == nullptr)
               continue;
 
-            auto set_subcell_ids = [i, boundary_ids, manifold_ids](
+            auto set_subcell_ids = [vtk_id, boundary_ids, manifold_ids](
                                      auto &cell_data) {
               if (boundary_ids != nullptr)
                 {
-                  double bval = boundary_ids->GetComponent(i, 0);
+                  double bval = boundary_ids->GetComponent(vtk_id, 0);
                   if (bval < 0)
                     cell_data.boundary_id = numbers::internal_face_boundary_id;
                   else
@@ -317,7 +346,7 @@ namespace VTKWrappers
 
               if (manifold_ids != nullptr)
                 {
-                  double mval = manifold_ids->GetComponent(i, 0);
+                  double mval = manifold_ids->GetComponent(vtk_id, 0);
                   if (mval < 0)
                     cell_data.manifold_id = numbers::flat_manifold_id;
                   else
@@ -326,7 +355,43 @@ namespace VTKWrappers
                 }
             };
 
-            if constexpr (dim == 2)
+            if constexpr (dim == 1)
+              {
+                if (cell->GetCellType() == VTK_VERTEX)
+                  {
+                    AssertThrow(
+                      cell->GetNumberOfPoints() == 1,
+                      ExcMessage(
+                        "Only vertex subcells with 1 point are supported."));
+
+                    const vtkIdType vertex_index = cell->GetPointId(0);
+                    AssertIndexRange(vertex_index, n_points);
+
+                    if (boundary_ids != nullptr)
+                      {
+                        const double boundary_value =
+                          boundary_ids->GetComponent(vtk_id, 0);
+                        if (boundary_value >= 0)
+                          {
+                            boundary_vertex_ids_present[vertex_index] = true;
+                            boundary_vertex_ids[vertex_index] =
+                              static_cast<types::boundary_id>(boundary_value);
+                          }
+                      }
+
+                    if (manifold_ids != nullptr)
+                      {
+                        const double manifold_value =
+                          manifold_ids->GetComponent(vtk_id, 0);
+                        manifold_vertex_ids_present[vertex_index] = true;
+                        manifold_vertex_ids[vertex_index] =
+                          (manifold_value < 0 ?
+                             numbers::flat_manifold_id :
+                             static_cast<types::manifold_id>(manifold_value));
+                      }
+                  }
+              }
+            else if constexpr (dim == 2)
               {
                 if (cell->GetCellType() == VTK_LINE)
                   {
@@ -405,11 +470,19 @@ namespace VTKWrappers
               cell_data.vertices[j] = cell->GetPointId(j);
             cell_data.material_id = 0;
             if (material_ids != nullptr)
-              cell_data.material_id = static_cast<types::material_id>(
-                material_ids->GetComponent(i, 0));
+              cell_data.material_id =
+                material_id_from_vtk(*material_ids, vtk_id);
+            if (boundary_ids != nullptr)
+              {
+                const double boundary_value =
+                  boundary_ids->GetComponent(vtk_id, 0);
+                if (boundary_value >= 0)
+                  cell_data.boundary_id =
+                    static_cast<types::boundary_id>(boundary_value);
+              }
             if (manifold_ids != nullptr)
               {
-                double mval = manifold_ids->GetComponent(i, 0);
+                double mval = manifold_ids->GetComponent(vtk_id, 0);
                 if (mval < 0)
                   cell_data.manifold_id = numbers::flat_manifold_id;
                 else
@@ -430,11 +503,11 @@ namespace VTKWrappers
                 std::swap(cell_data.vertices[2], cell_data.vertices[3]);
                 cell_data.material_id = 0;
                 if (material_ids != nullptr)
-                  cell_data.material_id = static_cast<types::material_id>(
-                    material_ids->GetComponent(i, 0));
+                  cell_data.material_id =
+                    material_id_from_vtk(*material_ids, vtk_id);
                 if (manifold_ids != nullptr)
                   {
-                    double mval = manifold_ids->GetComponent(i, 0);
+                    double mval = manifold_ids->GetComponent(vtk_id, 0);
                     if (mval < 0)
                       cell_data.manifold_id = numbers::flat_manifold_id;
                     else
@@ -454,11 +527,11 @@ namespace VTKWrappers
                   cell_data.vertices[j] = cell->GetPointId(j);
                 cell_data.material_id = 0;
                 if (material_ids != nullptr)
-                  cell_data.material_id = static_cast<types::material_id>(
-                    material_ids->GetComponent(i, 0));
+                  cell_data.material_id =
+                    material_id_from_vtk(*material_ids, vtk_id);
                 if (manifold_ids != nullptr)
                   {
-                    double mval = manifold_ids->GetComponent(i, 0);
+                    double mval = manifold_ids->GetComponent(vtk_id, 0);
                     if (mval < 0)
                       cell_data.manifold_id = numbers::flat_manifold_id;
                     else
@@ -489,11 +562,11 @@ namespace VTKWrappers
                 std::swap(cell_data.vertices[2], cell_data.vertices[3]);
                 std::swap(cell_data.vertices[6], cell_data.vertices[7]);
                 if (material_ids != nullptr)
-                  cell_data.material_id = static_cast<types::material_id>(
-                    material_ids->GetComponent(i, 0));
+                  cell_data.material_id =
+                    material_id_from_vtk(*material_ids, vtk_id);
                 if (manifold_ids != nullptr)
                   {
-                    double mval = manifold_ids->GetComponent(i, 0);
+                    double mval = manifold_ids->GetComponent(vtk_id, 0);
                     if (mval < 0)
                       cell_data.manifold_id = numbers::flat_manifold_id;
                     else
@@ -513,11 +586,17 @@ namespace VTKWrappers
                   cell_data.vertices[j] = cell->GetPointId(j);
                 cell_data.material_id = 0;
                 if (material_ids != nullptr)
-                  cell_data.material_id = static_cast<types::material_id>(
-                    material_ids->GetComponent(i, 0));
+                  cell_data.material_id =
+                    material_id_from_vtk(*material_ids, vtk_id);
                 if (manifold_ids != nullptr)
-                  cell_data.manifold_id = static_cast<types::manifold_id>(
-                    manifold_ids->GetComponent(i, 0));
+                  {
+                    double mval = manifold_ids->GetComponent(vtk_id, 0);
+                    if (mval < 0)
+                      cell_data.manifold_id = numbers::flat_manifold_id;
+                    else
+                      cell_data.manifold_id =
+                        static_cast<types::manifold_id>(mval);
+                  }
                 cells.push_back(cell_data);
               }
             else if (cell->GetCellType() == VTKCellType::VTK_WEDGE)
@@ -530,11 +609,17 @@ namespace VTKWrappers
                   cell_data.vertices[j] = cell->GetPointId(j);
                 cell_data.material_id = 0;
                 if (material_ids != nullptr)
-                  cell_data.material_id = static_cast<types::material_id>(
-                    material_ids->GetComponent(i, 0));
+                  cell_data.material_id =
+                    material_id_from_vtk(*material_ids, vtk_id);
                 if (manifold_ids != nullptr)
-                  cell_data.manifold_id = static_cast<types::manifold_id>(
-                    manifold_ids->GetComponent(i, 0));
+                  {
+                    double mval = manifold_ids->GetComponent(vtk_id, 0);
+                    if (mval < 0)
+                      cell_data.manifold_id = numbers::flat_manifold_id;
+                    else
+                      cell_data.manifold_id =
+                        static_cast<types::manifold_id>(mval);
+                  }
                 cells.push_back(cell_data);
               }
             else if (cell->GetCellType() == VTKCellType::VTK_PYRAMID)
@@ -548,11 +633,17 @@ namespace VTKWrappers
                   cell_data.vertices[j] = cell->GetPointId(j);
                 cell_data.material_id = 0;
                 if (material_ids != nullptr)
-                  cell_data.material_id = static_cast<types::material_id>(
-                    material_ids->GetComponent(i, 0));
+                  cell_data.material_id =
+                    material_id_from_vtk(*material_ids, vtk_id);
                 if (manifold_ids != nullptr)
-                  cell_data.manifold_id = static_cast<types::manifold_id>(
-                    manifold_ids->GetComponent(i, 0));
+                  {
+                    double mval = manifold_ids->GetComponent(vtk_id, 0);
+                    if (mval < 0)
+                      cell_data.manifold_id = numbers::flat_manifold_id;
+                    else
+                      cell_data.manifold_id =
+                        static_cast<types::manifold_id>(mval);
+                  }
                 cells.push_back(cell_data);
               }
             else
@@ -570,6 +661,21 @@ namespace VTKWrappers
 
     // Create triangulation
     tria.create_triangulation(points, cells, subcell_data);
+
+    if constexpr (dim == 1)
+      for (const auto &cell : tria.active_cell_iterators())
+        for (unsigned int f = 0; f < cell->n_faces(); ++f)
+          if (cell->face(f)->at_boundary())
+            {
+              const unsigned int vertex_index = cell->face(f)->vertex_index(0);
+
+              if (boundary_vertex_ids_present[vertex_index])
+                cell->face(f)->set_boundary_id(
+                  boundary_vertex_ids[vertex_index]);
+              if (manifold_vertex_ids_present[vertex_index])
+                cell->face(f)->set_manifold_id(
+                  manifold_vertex_ids[vertex_index]);
+            }
   }
 
 
@@ -678,8 +784,9 @@ namespace VTKWrappers
 
         grid->InsertNextCell(vtk_cell_type, n_vertices, point_ids.data());
 
-        // For codim-0 cells write material/manifold values and zeros for
-        // boundary id (boundary ids are stored on subcells only).
+        // For codim-0 cells write material/manifold values and zero for
+        // boundary id, since boundary ids live on codim-1 subcells (vertices
+        // in 1d, edges in 2d, and faces in 3d).
         if (output_material)
           material_array->InsertNextValue(
             static_cast<int>(cell->material_id()));
@@ -715,7 +822,12 @@ namespace VTKWrappers
                 static_cast<vtkIdType>(cell->face(f)->vertex_index(v));
 
             int vtk_face_type = -1;
-            if constexpr (dim == 2)
+            if constexpr (dim == 1)
+              {
+                Assert(nfv == 1, ExcInternalError());
+                vtk_face_type = VTK_VERTEX;
+              }
+            else if constexpr (dim == 2)
               vtk_face_type = VTK_LINE;
             else if constexpr (dim == 3)
               {
@@ -727,14 +839,14 @@ namespace VTKWrappers
                     std::swap(face_point_ids[2], face_point_ids[3]);
                   }
                 else
-                  AssertThrow(
-                    false, ExcMessage("Unsupported face with !=3/4 vertices."));
+                  DEAL_II_ASSERT_UNREACHABLE();
               }
 
             grid->InsertNextCell(vtk_face_type, nfv, face_point_ids.data());
 
             if (output_material)
-              material_array->InsertNextValue(0);
+              material_array->InsertNextValue(
+                static_cast<int>(cell->material_id()));
             if (output_boundary)
               boundary_array->InsertNextValue(static_cast<int>(face_bid));
             if (output_manifold)
