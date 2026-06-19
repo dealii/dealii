@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2016 - 2026 by the deal.II authors
+// Copyright (C) 1998 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,12 +14,7 @@
 
 #include <complex>
 
-
 DEAL_II_NAMESPACE_OPEN
-
-// explicit instantiations
-#define SPLIT_INSTANTIATIONS_COUNT 3
-#define SPLIT_INSTANTIATIONS_INDEX 1
 
 #include "numerics/matrix_creator.inst"
 
