@@ -67,16 +67,29 @@ namespace MatrixCreator
   {
     namespace AssemblerData
     {
+      /**
+       *  Enum for the kind of matrix we have. Since the assemblers for the mass
+       *  and Laplace matrices are nearly identical we re-use the same functions
+       *  and classes for both.
+       */
+      enum class MatrixKind
+      {
+        Mass,
+        Laplace
+      };
+
       template <int dim, int spacedim, typename number>
       struct Scratch
       {
-        Scratch(const ::dealii::hp::FECollection<dim, spacedim> &fe,
+        Scratch(const MatrixKind                                 matrix_kind,
+                const ::dealii::hp::FECollection<dim, spacedim> &fe,
                 const UpdateFlags                                update_flags,
                 const Function<spacedim, number>                *coefficient,
                 const Function<spacedim, number>                *rhs_function,
                 const ::dealii::hp::QCollection<dim>            &quadrature,
                 const ::dealii::hp::MappingCollection<dim, spacedim> &mapping)
-          : fe_collection(fe)
+          : matrix_kind(matrix_kind)
+          , fe_collection(fe)
           , quadrature_collection(quadrature)
           , mapping_collection(mapping)
           , x_fe_values(mapping_collection,
@@ -97,7 +110,8 @@ namespace MatrixCreator
         {}
 
         Scratch(const Scratch &data)
-          : fe_collection(data.fe_collection)
+          : matrix_kind(data.matrix_kind)
+          , fe_collection(data.fe_collection)
           , quadrature_collection(data.quadrature_collection)
           , mapping_collection(data.mapping_collection)
           , x_fe_values(mapping_collection,
@@ -124,6 +138,7 @@ namespace MatrixCreator
           return *this;
         }
 
+        MatrixKind matrix_kind;
 
         const ::dealii::hp::FECollection<dim, spacedim> &fe_collection;
         const ::dealii::hp::QCollection<dim>            &quadrature_collection;
@@ -158,17 +173,21 @@ namespace MatrixCreator
     } // namespace AssemblerData
 
 
-    template <int dim, int spacedim, typename CellIterator, typename number>
+    template <int dim, int spacedim, typename CellIterator, typename Number>
     void
-    mass_assembler(
+    assembler(
       const CellIterator &cell,
-      MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, number>
+      MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, Number>
                                                                &data,
-      MatrixCreator::internal::AssemblerData::CopyData<number> &copy_data)
+      MatrixCreator::internal::AssemblerData::CopyData<Number> &copy_data)
     {
       copy_data.is_locally_owned = cell->is_locally_owned();
       if (copy_data.is_locally_owned == false)
         return;
+
+      const bool is_mass =
+        data.matrix_kind ==
+        MatrixCreator::internal::AssemblerData::MatrixKind::Mass;
 
       data.x_fe_values.reinit(cell);
       const FEValues<dim, spacedim> &fe_values =
@@ -190,7 +209,6 @@ namespace MatrixCreator
 
       copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
       copy_data.cell_rhs.reinit(dofs_per_cell);
-
       copy_data.dof_indices.resize(dofs_per_cell);
       cell->get_dof_indices(copy_data.dof_indices);
 
@@ -237,9 +255,13 @@ namespace MatrixCreator
           {
             const unsigned int component_i =
               fe.system_to_component_index(i).first;
-            const double *phi_i = &fe_values.shape_value(i, 0);
+            const Tensor<1, spacedim> *grad_phi_i =
+              is_mass ? nullptr : &fe_values.shape_grad(i, 0);
+            const double *phi_i = is_mass || use_rhs_function ?
+                                    &fe_values.shape_value(i, 0) :
+                                    nullptr;
 
-            // use symmetry in the mass matrix here:
+            // use symmetry in the matrix here:
             // just need to calculate the diagonal
             // and half of the elements above the
             // diagonal
@@ -247,27 +269,38 @@ namespace MatrixCreator
               if ((n_components == 1) ||
                   (fe.system_to_component_index(j).first == component_i))
                 {
-                  const double *phi_j    = &fe_values.shape_value(j, 0);
-                  number        add_data = 0;
+                  const Tensor<1, spacedim> *grad_phi_j =
+                    is_mass ? nullptr : &fe_values.shape_grad(j, 0);
+                  const double *phi_j =
+                    is_mass ? &fe_values.shape_value(j, 0) : nullptr;
+                  Number add_data = 0;
                   if (use_coefficient)
                     {
                       if (data.coefficient->n_components == 1)
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
-                            (data.coefficient_values[point] * phi_i[point] *
-                             phi_j[point] * JxW[point]);
+                            (is_mass ?
+                               (phi_i[point] * phi_j[point]) :
+                               Number(grad_phi_i[point] * grad_phi_j[point])) *
+                            data.coefficient_values[point] * JxW[point];
                       else
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
-                            (data.coefficient_vector_values[point](
-                               component_i) *
-                             phi_i[point] * phi_j[point] * JxW[point]);
+                            (is_mass ?
+                               (phi_i[point] * phi_j[point]) :
+                               Number(grad_phi_i[point] * grad_phi_j[point])) *
+                            data.coefficient_vector_values[point](component_i) *
+                            JxW[point];
                     }
                   else
                     for (unsigned int point = 0; point < n_q_points; ++point)
-                      add_data += phi_i[point] * phi_j[point] * JxW[point];
+                      add_data +=
+                        (is_mass ?
+                           (phi_i[point] * phi_j[point]) :
+                           Number(grad_phi_i[point] * grad_phi_j[point])) *
+                        JxW[point];
 
                   // this is even ok for i==j, since then
                   // we just write the same value twice.
@@ -277,7 +310,7 @@ namespace MatrixCreator
 
             if (use_rhs_function)
               {
-                number add_data = 0;
+                Number add_data = 0;
                 if (data.rhs_function->n_components == 1)
                   for (unsigned int point = 0; point < n_q_points; ++point)
                     add_data +=
@@ -295,7 +328,7 @@ namespace MatrixCreator
             // symmetry again
             for (unsigned int j = i; j < dofs_per_cell; ++j)
               {
-                number add_data = 0;
+                Number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i] &&
                       fe.get_nonzero_components(j)[comp_i])
@@ -306,26 +339,35 @@ namespace MatrixCreator
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
-                                (data.coefficient_values[point] *
-                                 fe_values.shape_value_component(i,
-                                                                 point,
-                                                                 comp_i) *
-                                 fe_values.shape_value_component(j,
-                                                                 point,
-                                                                 comp_i) *
-                                 JxW[point]);
+                                (is_mass ?
+                                   fe_values.shape_value_component(i,
+                                                                   point,
+                                                                   comp_i) *
+                                     fe_values.shape_value_component(j,
+                                                                     point,
+                                                                     comp_i) :
+                                   Number(fe_values.shape_grad_component(
+                                            i, point, comp_i) *
+                                          fe_values.shape_grad_component(
+                                            j, point, comp_i))) *
+                                data.coefficient_values[point] * JxW[point];
                           else
                             for (unsigned int point = 0; point < n_q_points;
                                  ++point)
                               add_data +=
-                                (data.coefficient_vector_values[point](comp_i) *
-                                 fe_values.shape_value_component(i,
-                                                                 point,
-                                                                 comp_i) *
-                                 fe_values.shape_value_component(j,
-                                                                 point,
-                                                                 comp_i) *
-                                 JxW[point]);
+                                (is_mass ?
+                                   fe_values.shape_value_component(i,
+                                                                   point,
+                                                                   comp_i) *
+                                     fe_values.shape_value_component(j,
+                                                                     point,
+                                                                     comp_i) :
+                                   Number(fe_values.shape_grad_component(
+                                            i, point, comp_i) *
+                                          fe_values.shape_grad_component(
+                                            j, point, comp_i))) *
+                                data.coefficient_vector_values[point](comp_i) *
+                                JxW[point];
                         }
                       else
                         for (unsigned int point = 0; point < n_q_points;
@@ -342,215 +384,7 @@ namespace MatrixCreator
 
             if (use_rhs_function)
               {
-                number add_data = 0;
-                for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-                  if (fe.get_nonzero_components(i)[comp_i])
-                    {
-                      if (data.rhs_function->n_components == 1)
-                        for (unsigned int point = 0; point < n_q_points;
-                             ++point)
-                          add_data +=
-                            data.rhs_values[point] *
-                            fe_values.shape_value_component(i, point, comp_i) *
-                            JxW[point];
-                      else
-                        for (unsigned int point = 0; point < n_q_points;
-                             ++point)
-                          add_data +=
-                            data.rhs_vector_values[point](comp_i) *
-                            fe_values.shape_value_component(i, point, comp_i) *
-                            JxW[point];
-                    }
-                copy_data.cell_rhs(i) = add_data;
-              }
-          }
-    }
-
-
-
-    template <int dim, int spacedim, typename CellIterator, typename Number>
-    void
-    laplace_assembler(
-      const CellIterator &cell,
-      MatrixCreator::internal::AssemblerData::Scratch<dim, spacedim, Number>
-                                                               &data,
-      MatrixCreator::internal::AssemblerData::CopyData<Number> &copy_data)
-    {
-      copy_data.is_locally_owned = cell->is_locally_owned();
-      if (copy_data.is_locally_owned == false)
-        return;
-
-      data.x_fe_values.reinit(cell);
-      const FEValues<dim, spacedim> &fe_values =
-        data.x_fe_values.get_present_fe_values();
-
-      const unsigned int dofs_per_cell       = fe_values.dofs_per_cell,
-                         n_q_points          = fe_values.n_quadrature_points;
-      const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
-      const unsigned int                  n_components = fe.n_components();
-
-      Assert(data.rhs_function == nullptr ||
-               data.rhs_function->n_components == 1 ||
-               data.rhs_function->n_components == n_components,
-             ::dealii::MatrixCreator::ExcComponentMismatch());
-      Assert(data.coefficient == nullptr ||
-               data.coefficient->n_components == 1 ||
-               data.coefficient->n_components == n_components,
-             ::dealii::MatrixCreator::ExcComponentMismatch());
-
-      copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
-      copy_data.cell_rhs.reinit(dofs_per_cell);
-      copy_data.dof_indices.resize(dofs_per_cell);
-      cell->get_dof_indices(copy_data.dof_indices);
-
-
-      const bool use_rhs_function = data.rhs_function != nullptr;
-      if (use_rhs_function)
-        {
-          if (data.rhs_function->n_components == 1)
-            {
-              data.rhs_values.resize(n_q_points);
-              data.rhs_function->value_list(fe_values.get_quadrature_points(),
-                                            data.rhs_values);
-            }
-          else
-            {
-              data.rhs_vector_values.resize(
-                n_q_points, dealii::Vector<Number>(n_components));
-              data.rhs_function->vector_value_list(
-                fe_values.get_quadrature_points(), data.rhs_vector_values);
-            }
-        }
-
-      const bool use_coefficient = data.coefficient != nullptr;
-      if (use_coefficient)
-        {
-          if (data.coefficient->n_components == 1)
-            {
-              data.coefficient_values.resize(n_q_points);
-              data.coefficient->value_list(fe_values.get_quadrature_points(),
-                                           data.coefficient_values);
-            }
-          else
-            {
-              data.coefficient_vector_values.resize(
-                n_q_points, dealii::Vector<Number>(n_components));
-              data.coefficient->vector_value_list(
-                fe_values.get_quadrature_points(),
-                data.coefficient_vector_values);
-            }
-        }
-
-
-      const std::vector<double> &JxW = fe_values.get_JxW_values();
-      Number                     add_data;
-      for (unsigned int i = 0; i < dofs_per_cell; ++i)
-        if (fe.is_primitive())
-          {
-            const unsigned int component_i =
-              fe.system_to_component_index(i).first;
-            const Tensor<1, spacedim> *grad_phi_i = &fe_values.shape_grad(i, 0);
-
-            // can use symmetry
-            for (unsigned int j = i; j < dofs_per_cell; ++j)
-              if ((n_components == 1) ||
-                  (fe.system_to_component_index(j).first == component_i))
-                {
-                  const Tensor<1, spacedim> *grad_phi_j =
-                    &fe_values.shape_grad(j, 0);
-                  add_data = 0;
-                  if (use_coefficient)
-                    {
-                      if (data.coefficient->n_components == 1)
-                        for (unsigned int point = 0; point < n_q_points;
-                             ++point)
-                          add_data +=
-                            ((grad_phi_i[point] * grad_phi_j[point]) *
-                             JxW[point] * data.coefficient_values[point]);
-                      else
-                        for (unsigned int point = 0; point < n_q_points;
-                             ++point)
-                          add_data += ((grad_phi_i[point] * grad_phi_j[point]) *
-                                       JxW[point] *
-                                       data.coefficient_vector_values[point](
-                                         component_i));
-                    }
-                  else
-                    for (unsigned int point = 0; point < n_q_points; ++point)
-                      add_data +=
-                        (grad_phi_i[point] * grad_phi_j[point]) * JxW[point];
-
-                  copy_data.cell_matrix(i, j) = add_data;
-                  copy_data.cell_matrix(j, i) = add_data;
-                }
-
-            if (use_rhs_function)
-              {
-                const double *phi_i = &fe_values.shape_value(i, 0);
-                add_data            = 0;
-                if (data.rhs_function->n_components == 1)
-                  for (unsigned int point = 0; point < n_q_points; ++point)
-                    add_data +=
-                      phi_i[point] * JxW[point] * data.rhs_values[point];
-                else
-                  for (unsigned int point = 0; point < n_q_points; ++point)
-                    add_data += phi_i[point] * JxW[point] *
-                                data.rhs_vector_values[point](component_i);
-                copy_data.cell_rhs(i) = add_data;
-              }
-          }
-        else
-          {
-            // non-primitive vector-valued FE
-            for (unsigned int j = i; j < dofs_per_cell; ++j)
-              {
-                add_data = 0;
-                for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
-                  if (fe.get_nonzero_components(i)[comp_i] &&
-                      fe.get_nonzero_components(j)[comp_i])
-                    {
-                      if (use_coefficient)
-                        {
-                          if (data.coefficient->n_components == 1)
-                            for (unsigned int point = 0; point < n_q_points;
-                                 ++point)
-                              add_data +=
-                                ((fe_values.shape_grad_component(i,
-                                                                 point,
-                                                                 comp_i) *
-                                  fe_values.shape_grad_component(j,
-                                                                 point,
-                                                                 comp_i)) *
-                                 JxW[point] * data.coefficient_values[point]);
-                          else
-                            for (unsigned int point = 0; point < n_q_points;
-                                 ++point)
-                              add_data +=
-                                ((fe_values.shape_grad_component(i,
-                                                                 point,
-                                                                 comp_i) *
-                                  fe_values.shape_grad_component(j,
-                                                                 point,
-                                                                 comp_i)) *
-                                 JxW[point] *
-                                 data.coefficient_vector_values[point](comp_i));
-                        }
-                      else
-                        for (unsigned int point = 0; point < n_q_points;
-                             ++point)
-                          add_data +=
-                            (fe_values.shape_grad_component(i, point, comp_i) *
-                             fe_values.shape_grad_component(j, point, comp_i)) *
-                            JxW[point];
-                    }
-
-                copy_data.cell_matrix(i, j) = add_data;
-                copy_data.cell_matrix(j, i) = add_data;
-              }
-
-            if (use_rhs_function)
-              {
-                add_data = 0;
+                Number add_data = 0;
                 for (unsigned int comp_i = 0; comp_i < n_components; ++comp_i)
                   if (fe.get_nonzero_components(i)[comp_i])
                     {
@@ -559,13 +393,13 @@ namespace MatrixCreator
                              ++point)
                           add_data +=
                             fe_values.shape_value_component(i, point, comp_i) *
-                            JxW[point] * data.rhs_values[point];
+                            data.rhs_values[point] * JxW[point];
                       else
                         for (unsigned int point = 0; point < n_q_points;
                              ++point)
                           add_data +=
                             fe_values.shape_value_component(i, point, comp_i) *
-                            JxW[point] * data.rhs_vector_values[point](comp_i);
+                            data.rhs_vector_values[point](comp_i) * JxW[point];
                     }
                 copy_data.cell_rhs(i) = add_data;
               }
@@ -659,7 +493,8 @@ namespace MatrixCreator
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(fe_collection,
+        assembler_data(MatrixCreator::internal::AssemblerData::MatrixKind::Mass,
+                       fe_collection,
                        update_values | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
                                                    UpdateFlags(0)),
@@ -683,7 +518,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::mass_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -747,7 +582,8 @@ namespace MatrixCreator
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(fe_collection,
+        assembler_data(MatrixCreator::internal::AssemblerData::MatrixKind::Mass,
+                       fe_collection,
                        update_values | update_JxW_values |
                          update_quadrature_points,
                        coefficient,
@@ -769,7 +605,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::mass_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -831,7 +667,8 @@ namespace MatrixCreator
 
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(dof.get_fe_collection(),
+        assembler_data(MatrixCreator::internal::AssemblerData::MatrixKind::Mass,
+                       dof.get_fe_collection(),
                        update_values | update_JxW_values |
                          (coefficient != nullptr ? update_quadrature_points :
                                                    UpdateFlags(0)),
@@ -854,7 +691,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::mass_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -915,7 +752,8 @@ namespace MatrixCreator
 
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(dof.get_fe_collection(),
+        assembler_data(MatrixCreator::internal::AssemblerData::MatrixKind::Mass,
+                       dof.get_fe_collection(),
                        update_values | update_JxW_values |
                          update_quadrature_points,
                        coefficient,
@@ -937,7 +775,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::mass_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -1950,14 +1788,16 @@ namespace MatrixCreator
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(fe_collection,
-                       update_gradients | update_JxW_values |
-                         (coefficient != nullptr ? update_quadrature_points :
-                                                   UpdateFlags(0)),
-                       coefficient,
-                       /*rhs_function=*/nullptr,
-                       q_collection,
-                       mapping_collection);
+        assembler_data(
+          MatrixCreator::internal::AssemblerData::MatrixKind::Laplace,
+          fe_collection,
+          update_gradients | update_JxW_values |
+            (coefficient != nullptr ? update_quadrature_points :
+                                      UpdateFlags(0)),
+          coefficient,
+          /*rhs_function=*/nullptr,
+          q_collection,
+          mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<
       typename MatrixType::value_type>
       copy_data;
@@ -1973,7 +1813,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::laplace_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -2037,13 +1877,15 @@ namespace MatrixCreator
     hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(fe_collection,
-                       update_gradients | update_values | update_JxW_values |
-                         update_quadrature_points,
-                       coefficient,
-                       &rhs,
-                       q_collection,
-                       mapping_collection);
+        assembler_data(
+          MatrixCreator::internal::AssemblerData::MatrixKind::Laplace,
+          fe_collection,
+          update_gradients | update_values | update_JxW_values |
+            update_quadrature_points,
+          coefficient,
+          &rhs,
+          q_collection,
+          mapping_collection);
     MatrixCreator::internal::AssemblerData::CopyData<
       typename MatrixType::value_type>
       copy_data;
@@ -2059,7 +1901,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::laplace_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -2121,14 +1963,16 @@ namespace MatrixCreator
 
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(dof.get_fe_collection(),
-                       update_gradients | update_JxW_values |
-                         (coefficient != nullptr ? update_quadrature_points :
-                                                   UpdateFlags(0)),
-                       coefficient,
-                       /*rhs_function=*/nullptr,
-                       q,
-                       mapping);
+        assembler_data(
+          MatrixCreator::internal::AssemblerData::MatrixKind::Laplace,
+          dof.get_fe_collection(),
+          update_gradients | update_JxW_values |
+            (coefficient != nullptr ? update_quadrature_points :
+                                      UpdateFlags(0)),
+          coefficient,
+          /*rhs_function=*/nullptr,
+          q,
+          mapping);
     MatrixCreator::internal::AssemblerData::CopyData<
       typename MatrixType::value_type>
       copy_data;
@@ -2144,7 +1988,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::laplace_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
@@ -2206,13 +2050,15 @@ namespace MatrixCreator
 
     MatrixCreator::internal::AssemblerData::
       Scratch<dim, spacedim, typename MatrixType::value_type>
-        assembler_data(dof.get_fe_collection(),
-                       update_gradients | update_values | update_JxW_values |
-                         update_quadrature_points,
-                       coefficient,
-                       &rhs,
-                       q,
-                       mapping);
+        assembler_data(
+          MatrixCreator::internal::AssemblerData::MatrixKind::Laplace,
+          dof.get_fe_collection(),
+          update_gradients | update_values | update_JxW_values |
+            update_quadrature_points,
+          coefficient,
+          &rhs,
+          q,
+          mapping);
     MatrixCreator::internal::AssemblerData::CopyData<
       typename MatrixType::value_type>
       copy_data;
@@ -2228,7 +2074,7 @@ namespace MatrixCreator
       dof.begin_active(),
       static_cast<typename DoFHandler<dim, spacedim>::active_cell_iterator>(
         dof.end()),
-      &MatrixCreator::internal::laplace_assembler<
+      &MatrixCreator::internal::assembler<
         dim,
         spacedim,
         typename DoFHandler<dim, spacedim>::active_cell_iterator,
