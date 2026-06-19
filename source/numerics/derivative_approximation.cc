@@ -983,19 +983,29 @@ namespace DerivativeApproximation
         Iterators(dof_handler.begin_active(), derivative_norm.begin())),
         end(Iterators(dof_handler.end(), derivative_norm.end()));
 
+      // Use type erasure to prevent workstream from seeing this function's type
+      // (which in turn prevents it from instantiating for every possible
+      // InputVector type)
+      std::function<void(const SynchronousIterators<Iterators> &cell,
+                         const Assembler::Scratch &,
+                         Assembler::CopyData &)>
+        worker = [&mapping,
+                  &dof_handler,
+                  &solution,
+                  component](const SynchronousIterators<Iterators> &cell,
+                             const Assembler::Scratch &,
+                             Assembler::CopyData &) {
+          approximate<DerivativeDescription, dim, InputVector, spacedim>(
+            cell, mapping, dof_handler, solution, component);
+        };
+
       // There is no need for a copier because there is no conflict between
       // threads to write in derivative_norm. Scratch and CopyData are also
       // useless.
       WorkStream::run(
         begin,
         end,
-        [&mapping, &dof_handler, &solution, component](
-          const SynchronousIterators<Iterators> &cell,
-          const Assembler::Scratch &,
-          Assembler::CopyData &) {
-          approximate<DerivativeDescription, dim, InputVector, spacedim>(
-            cell, mapping, dof_handler, solution, component);
-        },
+        worker,
         std::function<void(const internal::Assembler::CopyData &)>(),
         internal::Assembler::Scratch(),
         internal::Assembler::CopyData());
