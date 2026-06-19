@@ -37,11 +37,8 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 
-// The include files for using the MeshWorker framework
-#include <deal.II/meshworker/dof_info.h>
-#include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/assembler.h>
-#include <deal.II/meshworker/loop.h>
+// The include file for using MeshWorker::mesh_loop()
+#include <deal.II/meshworker/mesh_loop.h>
 
 // The include file for local integrators associated with the Laplacian
 #include <deal.II/integrators/laplace.h>
@@ -61,8 +58,9 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <iostream>
+#include <array>
 #include <fstream>
+#include <iostream>
 
 // All classes of the deal.II library are in the namespace dealii. In order to
 // save typing, we tell the compiler to search names in there as well.
@@ -74,25 +72,432 @@ namespace Step39
   // solution we compare to.
   Functions::SlitSingularityFunction<2> exact_solution;
 
+  // To begin with, let us declare the scratch and copy data objects that are
+  // used in the calls to MeshWorker::mesh_loop() below. Their role follows the
+  // same pattern as in the WorkStream framework already discussed in the step-9
+  // tutorial program: each worker operates on one cell or face at a time, gets
+  // its own scratch object with expensive temporary data such as FEValues-like
+  // objects, and writes the local result into a copy object. Because every
+  // worker has its own scratch and copy data, many such local computations can
+  // run in parallel without interfering with each other.
+  //
+  // Once a local contribution has been computed, a separate copier stage moves
+  // it into the global matrix, right hand side, or error vector. This split
+  // between local work and global accumulation is the key idea behind
+  // WorkStream, and MeshWorker::mesh_loop() uses exactly the same organization
+  // while extending it from cell integrals to boundary and interior face
+  // integrals, including the subface terms that appear on adaptively refined
+  // meshes.
+
+  template <int dim>
+  struct MatrixScratchData
+  {
+    MatrixScratchData(const Mapping<dim>        &mapping,
+                      const FiniteElement<dim>  &fe,
+                      const Quadrature<dim>     &cell_quadrature,
+                      const Quadrature<dim - 1> &face_quadrature,
+                      const UpdateFlags          cell_update_flags,
+                      const UpdateFlags          face_update_flags)
+      : fe_values(mapping, fe, cell_quadrature, cell_update_flags)
+      , boundary_fe_values(mapping, fe, face_quadrature, face_update_flags)
+      , face_fe_values(mapping, fe, face_quadrature, face_update_flags)
+      , subface_values(mapping, fe, face_quadrature, face_update_flags)
+      , neighbor_face_values(mapping, fe, face_quadrature, face_update_flags)
+      , neighbor_subface_values(mapping, fe, face_quadrature, face_update_flags)
+    {}
+
+
+    MatrixScratchData(const MatrixScratchData<dim> &scratch_data)
+      : fe_values(scratch_data.fe_values.get_mapping(),
+                  scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  scratch_data.fe_values.get_update_flags())
+      , boundary_fe_values(scratch_data.boundary_fe_values.get_mapping(),
+                           scratch_data.boundary_fe_values.get_fe(),
+                           scratch_data.boundary_fe_values.get_quadrature(),
+                           scratch_data.boundary_fe_values.get_update_flags())
+      , face_fe_values(scratch_data.face_fe_values.get_mapping(),
+                       scratch_data.face_fe_values.get_fe(),
+                       scratch_data.face_fe_values.get_quadrature(),
+                       scratch_data.face_fe_values.get_update_flags())
+      , subface_values(scratch_data.subface_values.get_mapping(),
+                       scratch_data.subface_values.get_fe(),
+                       scratch_data.subface_values.get_quadrature(),
+                       scratch_data.subface_values.get_update_flags())
+      , neighbor_face_values(
+          scratch_data.neighbor_face_values.get_mapping(),
+          scratch_data.neighbor_face_values.get_fe(),
+          scratch_data.neighbor_face_values.get_quadrature(),
+          scratch_data.neighbor_face_values.get_update_flags())
+      , neighbor_subface_values(
+          scratch_data.neighbor_subface_values.get_mapping(),
+          scratch_data.neighbor_subface_values.get_fe(),
+          scratch_data.neighbor_subface_values.get_quadrature(),
+          scratch_data.neighbor_subface_values.get_update_flags())
+    {}
+
+
+    FEValues<dim>        fe_values;
+    FEFaceValues<dim>    boundary_fe_values;
+    FEFaceValues<dim>    face_fe_values;
+    FESubfaceValues<dim> subface_values;
+    FEFaceValues<dim>    neighbor_face_values;
+    FESubfaceValues<dim> neighbor_subface_values;
+  };
+
+
+  template <int dim>
+  struct RightHandSideScratchData
+  {
+    RightHandSideScratchData(const Mapping<dim>        &mapping,
+                             const FiniteElement<dim>  &fe,
+                             const Quadrature<dim - 1> &face_quadrature,
+                             const UpdateFlags          face_update_flags)
+      : boundary_fe_values(mapping, fe, face_quadrature, face_update_flags)
+      , boundary_values(face_quadrature.size())
+    {}
+
+
+    RightHandSideScratchData(const RightHandSideScratchData<dim> &scratch_data)
+      : boundary_fe_values(scratch_data.boundary_fe_values.get_mapping(),
+                           scratch_data.boundary_fe_values.get_fe(),
+                           scratch_data.boundary_fe_values.get_quadrature(),
+                           scratch_data.boundary_fe_values.get_update_flags())
+      , boundary_values(scratch_data.boundary_values.size())
+    {}
+
+
+    FEFaceValues<dim>   boundary_fe_values;
+    std::vector<double> boundary_values;
+  };
+
+
+  template <int dim>
+  struct EstimatorScratchData
+  {
+    EstimatorScratchData(const Mapping<dim>        &mapping,
+                         const FiniteElement<dim>  &fe,
+                         const Quadrature<dim>     &cell_quadrature,
+                         const Quadrature<dim - 1> &boundary_quadrature,
+                         const Quadrature<dim - 1> &face_quadrature,
+                         const UpdateFlags          cell_update_flags,
+                         const UpdateFlags          boundary_update_flags,
+                         const UpdateFlags          face_update_flags)
+      : fe_values(mapping, fe, cell_quadrature, cell_update_flags)
+      , boundary_fe_values(mapping,
+                           fe,
+                           boundary_quadrature,
+                           boundary_update_flags)
+      , face_fe_values(mapping, fe, face_quadrature, face_update_flags)
+      , subface_values(mapping, fe, face_quadrature, face_update_flags)
+      , neighbor_face_values(mapping, fe, face_quadrature, face_update_flags)
+      , neighbor_subface_values(mapping, fe, face_quadrature, face_update_flags)
+      , cell_hessians(cell_quadrature.size())
+      , boundary_solution_values(boundary_quadrature.size())
+      , boundary_exact_values(boundary_quadrature.size())
+      , face_solution_values(face_quadrature.size())
+      , neighbor_face_solution_values(face_quadrature.size())
+      , face_solution_gradients(face_quadrature.size())
+      , neighbor_face_solution_gradients(face_quadrature.size())
+    {}
+
+
+    EstimatorScratchData(const EstimatorScratchData<dim> &scratch_data)
+      : fe_values(scratch_data.fe_values.get_mapping(),
+                  scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  scratch_data.fe_values.get_update_flags())
+      , boundary_fe_values(scratch_data.boundary_fe_values.get_mapping(),
+                           scratch_data.boundary_fe_values.get_fe(),
+                           scratch_data.boundary_fe_values.get_quadrature(),
+                           scratch_data.boundary_fe_values.get_update_flags())
+      , face_fe_values(scratch_data.face_fe_values.get_mapping(),
+                       scratch_data.face_fe_values.get_fe(),
+                       scratch_data.face_fe_values.get_quadrature(),
+                       scratch_data.face_fe_values.get_update_flags())
+      , subface_values(scratch_data.subface_values.get_mapping(),
+                       scratch_data.subface_values.get_fe(),
+                       scratch_data.subface_values.get_quadrature(),
+                       scratch_data.subface_values.get_update_flags())
+      , neighbor_face_values(
+          scratch_data.neighbor_face_values.get_mapping(),
+          scratch_data.neighbor_face_values.get_fe(),
+          scratch_data.neighbor_face_values.get_quadrature(),
+          scratch_data.neighbor_face_values.get_update_flags())
+      , neighbor_subface_values(
+          scratch_data.neighbor_subface_values.get_mapping(),
+          scratch_data.neighbor_subface_values.get_fe(),
+          scratch_data.neighbor_subface_values.get_quadrature(),
+          scratch_data.neighbor_subface_values.get_update_flags())
+      , cell_hessians(scratch_data.cell_hessians.size())
+      , boundary_solution_values(scratch_data.boundary_solution_values.size())
+      , boundary_exact_values(scratch_data.boundary_exact_values.size())
+      , face_solution_values(scratch_data.face_solution_values.size())
+      , neighbor_face_solution_values(
+          scratch_data.neighbor_face_solution_values.size())
+      , face_solution_gradients(scratch_data.face_solution_gradients.size())
+      , neighbor_face_solution_gradients(
+          scratch_data.neighbor_face_solution_gradients.size())
+    {}
+
+
+    FEValues<dim>               fe_values;
+    FEFaceValues<dim>           boundary_fe_values;
+    FEFaceValues<dim>           face_fe_values;
+    FESubfaceValues<dim>        subface_values;
+    FEFaceValues<dim>           neighbor_face_values;
+    FESubfaceValues<dim>        neighbor_subface_values;
+    std::vector<Tensor<2, dim>> cell_hessians;
+    std::vector<double>         boundary_solution_values;
+    std::vector<double>         boundary_exact_values;
+    std::vector<double>         face_solution_values;
+    std::vector<double>         neighbor_face_solution_values;
+    std::vector<Tensor<1, dim>> face_solution_gradients;
+    std::vector<Tensor<1, dim>> neighbor_face_solution_gradients;
+  };
+
+
+  template <int dim>
+  struct ErrorScratchData
+  {
+    ErrorScratchData(const Mapping<dim>        &mapping,
+                     const FiniteElement<dim>  &fe,
+                     const Quadrature<dim>     &cell_quadrature,
+                     const Quadrature<dim - 1> &boundary_quadrature,
+                     const Quadrature<dim - 1> &face_quadrature,
+                     const UpdateFlags          cell_update_flags,
+                     const UpdateFlags          boundary_update_flags,
+                     const UpdateFlags          face_update_flags)
+      : fe_values(mapping, fe, cell_quadrature, cell_update_flags)
+      , boundary_fe_values(mapping,
+                           fe,
+                           boundary_quadrature,
+                           boundary_update_flags)
+      , face_fe_values(mapping, fe, face_quadrature, face_update_flags)
+      , subface_values(mapping, fe, face_quadrature, face_update_flags)
+      , neighbor_face_values(mapping, fe, face_quadrature, face_update_flags)
+      , neighbor_subface_values(mapping, fe, face_quadrature, face_update_flags)
+      , cell_solution_values(cell_quadrature.size())
+      , cell_solution_gradients(cell_quadrature.size())
+      , cell_exact_values(cell_quadrature.size())
+      , cell_exact_gradients(cell_quadrature.size())
+      , boundary_solution_values(boundary_quadrature.size())
+      , boundary_exact_values(boundary_quadrature.size())
+      , face_solution_values(face_quadrature.size())
+      , neighbor_face_solution_values(face_quadrature.size())
+    {}
+
+
+    ErrorScratchData(const ErrorScratchData<dim> &scratch_data)
+      : fe_values(scratch_data.fe_values.get_mapping(),
+                  scratch_data.fe_values.get_fe(),
+                  scratch_data.fe_values.get_quadrature(),
+                  scratch_data.fe_values.get_update_flags())
+      , boundary_fe_values(scratch_data.boundary_fe_values.get_mapping(),
+                           scratch_data.boundary_fe_values.get_fe(),
+                           scratch_data.boundary_fe_values.get_quadrature(),
+                           scratch_data.boundary_fe_values.get_update_flags())
+      , face_fe_values(scratch_data.face_fe_values.get_mapping(),
+                       scratch_data.face_fe_values.get_fe(),
+                       scratch_data.face_fe_values.get_quadrature(),
+                       scratch_data.face_fe_values.get_update_flags())
+      , subface_values(scratch_data.subface_values.get_mapping(),
+                       scratch_data.subface_values.get_fe(),
+                       scratch_data.subface_values.get_quadrature(),
+                       scratch_data.subface_values.get_update_flags())
+      , neighbor_face_values(
+          scratch_data.neighbor_face_values.get_mapping(),
+          scratch_data.neighbor_face_values.get_fe(),
+          scratch_data.neighbor_face_values.get_quadrature(),
+          scratch_data.neighbor_face_values.get_update_flags())
+      , neighbor_subface_values(
+          scratch_data.neighbor_subface_values.get_mapping(),
+          scratch_data.neighbor_subface_values.get_fe(),
+          scratch_data.neighbor_subface_values.get_quadrature(),
+          scratch_data.neighbor_subface_values.get_update_flags())
+      , cell_solution_values(scratch_data.cell_solution_values.size())
+      , cell_solution_gradients(scratch_data.cell_solution_gradients.size())
+      , cell_exact_values(scratch_data.cell_exact_values.size())
+      , cell_exact_gradients(scratch_data.cell_exact_gradients.size())
+      , boundary_solution_values(scratch_data.boundary_solution_values.size())
+      , boundary_exact_values(scratch_data.boundary_exact_values.size())
+      , face_solution_values(scratch_data.face_solution_values.size())
+      , neighbor_face_solution_values(
+          scratch_data.neighbor_face_solution_values.size())
+    {}
+
+
+    FEValues<dim>               fe_values;
+    FEFaceValues<dim>           boundary_fe_values;
+    FEFaceValues<dim>           face_fe_values;
+    FESubfaceValues<dim>        subface_values;
+    FEFaceValues<dim>           neighbor_face_values;
+    FESubfaceValues<dim>        neighbor_subface_values;
+    std::vector<double>         cell_solution_values;
+    std::vector<Tensor<1, dim>> cell_solution_gradients;
+    std::vector<double>         cell_exact_values;
+    std::vector<Tensor<1, dim>> cell_exact_gradients;
+    std::vector<double>         boundary_solution_values;
+    std::vector<double>         boundary_exact_values;
+    std::vector<double>         face_solution_values;
+    std::vector<double>         neighbor_face_solution_values;
+  };
+
+
+  struct FaceCopyData
+  {
+    unsigned int level_1 = numbers::invalid_unsigned_int;
+    unsigned int level_2 = numbers::invalid_unsigned_int;
+
+    FullMatrix<double> matrix_11;
+    FullMatrix<double> matrix_12;
+    FullMatrix<double> matrix_21;
+    FullMatrix<double> matrix_22;
+
+    std::vector<types::global_dof_index> dof_indices_1;
+    std::vector<types::global_dof_index> dof_indices_2;
+  };
+
+
+  template <int dim>
+  struct MatrixCopyData
+  {
+    MatrixCopyData(const unsigned int dofs_per_cell = 0)
+      : cell_matrix(dofs_per_cell, dofs_per_cell)
+      , local_dof_indices(dofs_per_cell)
+    {}
+
+
+    template <typename CellIterator>
+    void reinit(const CellIterator &cell, const bool use_level_dofs = false)
+    {
+      const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
+
+      level = cell->level();
+      cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
+      local_dof_indices.resize(dofs_per_cell);
+      if (use_level_dofs)
+        cell->get_mg_dof_indices(local_dof_indices);
+      else
+        cell->get_dof_indices(local_dof_indices);
+
+      face_data.clear();
+    }
+
+
+    template <typename CellIterator>
+    FaceCopyData &emplace_face_data(const CellIterator &cell_1,
+                                    const CellIterator &cell_2,
+                                    const bool          use_level_dofs = false)
+    {
+      const unsigned int dofs_per_cell_1 = cell_1->get_fe().n_dofs_per_cell();
+      const unsigned int dofs_per_cell_2 = cell_2->get_fe().n_dofs_per_cell();
+
+      face_data.emplace_back();
+      FaceCopyData &face_copy = face_data.back();
+
+      face_copy.level_1 = cell_1->level();
+      face_copy.level_2 = cell_2->level();
+      face_copy.matrix_11.reinit(dofs_per_cell_1, dofs_per_cell_1);
+      face_copy.matrix_12.reinit(dofs_per_cell_1, dofs_per_cell_2);
+      face_copy.matrix_21.reinit(dofs_per_cell_2, dofs_per_cell_1);
+      face_copy.matrix_22.reinit(dofs_per_cell_2, dofs_per_cell_2);
+      face_copy.dof_indices_1.resize(dofs_per_cell_1);
+      face_copy.dof_indices_2.resize(dofs_per_cell_2);
+
+      if (use_level_dofs)
+        {
+          cell_1->get_mg_dof_indices(face_copy.dof_indices_1);
+          cell_2->get_mg_dof_indices(face_copy.dof_indices_2);
+        }
+      else
+        {
+          cell_1->get_dof_indices(face_copy.dof_indices_1);
+          cell_2->get_dof_indices(face_copy.dof_indices_2);
+        }
+
+      return face_copy;
+    }
+
+
+    unsigned int level = numbers::invalid_unsigned_int;
+
+    FullMatrix<double>                   cell_matrix;
+    std::vector<types::global_dof_index> local_dof_indices;
+    std::vector<FaceCopyData>            face_data;
+  };
+
+
+  struct RightHandSideCopyData
+  {
+    RightHandSideCopyData(const unsigned int dofs_per_cell = 0)
+      : cell_rhs(dofs_per_cell)
+      , local_dof_indices(dofs_per_cell)
+    {}
+
+
+    template <typename CellIterator>
+    void reinit(const CellIterator &cell)
+    {
+      const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
+
+      cell_rhs.reinit(dofs_per_cell);
+      local_dof_indices.resize(dofs_per_cell);
+      cell->get_dof_indices(local_dof_indices);
+    }
+
+
+    Vector<double>                       cell_rhs;
+    std::vector<types::global_dof_index> local_dof_indices;
+  };
+
+
+  template <unsigned int n_values>
+  struct ErrorCopyData
+  {
+    struct FaceContribution
+    {
+      unsigned int                 cell_index_1 = numbers::invalid_unsigned_int;
+      unsigned int                 cell_index_2 = numbers::invalid_unsigned_int;
+      std::array<double, n_values> values       = {};
+    };
+
+
+    template <typename CellIterator>
+    void reinit(const CellIterator &cell)
+    {
+      cell_index = cell->active_cell_index();
+      cell_values.fill(0.);
+      face_data.clear();
+    }
+
+
+    template <typename CellIterator>
+    FaceContribution &emplace_face_data(const CellIterator &cell_1,
+                                        const CellIterator &cell_2)
+    {
+      face_data.emplace_back();
+      FaceContribution &face_contribution = face_data.back();
+      face_contribution.cell_index_1      = cell_1->active_cell_index();
+      face_contribution.cell_index_2      = cell_2->active_cell_index();
+      face_contribution.values.fill(0.);
+      return face_contribution;
+    }
+
+
+    unsigned int                  cell_index  = numbers::invalid_unsigned_int;
+    std::array<double, n_values>  cell_values = {};
+    std::vector<FaceContribution> face_data;
+  };
+
   // @sect3{The local integrators}
 
-  // The MeshWorker::loop() function separates what needs to be done for
-  // local integration, from the loops over cells and
-  // faces. It does this by calling functions that integrate over a cell,
-  // a boundary face, or an interior face, and letting them create the
-  // local contributions and then in a separate step calling a function
-  // that moves these local contributions into the global objects.
-  // We will use this approach for computing the
-  // matrices, the right hand side, the error estimator, and the actual
-  // error computation in the functions below. For each of these operations,
-  // we provide a namespace that contains a set of functions for cell, boundary,
-  // and interior face contributions.
-  //
-  // All the information needed for these local integration is provided by
-  // MeshWorker::DoFInfo<dim> and MeshWorker::IntegrationInfo<dim>. In each
-  // case, the functions' signatures is fixed: MeshWorker::loop() wants to call
-  // functions with a specific set of arguments, so the signature of the
-  // functions cannot be changed.
+  // The MeshWorker::mesh_loop() function separates the local integration on
+  // cells and faces from the traversal of the mesh. In the functions below, we
+  // therefore use a scratch object holding the FEValues-like data needed on
+  // the current cell or face, together with copy objects that store local
+  // matrices, vectors, or per-cell indicators before they are transferred to
+  // the global objects by a copier.
 
   // The first namespace defining local integrators is responsible for
   // assembling the global matrix as well as the level matrices.
@@ -114,14 +519,13 @@ namespace Step39
   // of the two penalty values.
   namespace MatrixIntegrator
   {
-    template <int dim>
-    double
-    ip_penalty_factor(const typename Triangulation<dim>::cell_iterator &cell1,
-                      const unsigned int                                face1,
-                      const unsigned int                                deg1,
-                      const typename Triangulation<dim>::cell_iterator &cell2,
-                      const unsigned int                                face2,
-                      const unsigned int                                deg2)
+    template <int dim, typename CellIterator>
+    double ip_penalty_factor(const CellIterator &cell1,
+                             const unsigned int  face1,
+                             const unsigned int  deg1,
+                             const CellIterator &cell2,
+                             const unsigned int  face2,
+                             const unsigned int  deg2)
     {
       const unsigned int normal1 =
         GeometryInfo<dim>::unit_normal_direction[face1];
@@ -143,27 +547,23 @@ namespace Step39
 
 
     template <int dim>
-    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
-              MeshWorker::IntegrationInfo<dim> &info)
+    void cell(const FEValues<dim> &fe_values, FullMatrix<double> &M)
     {
-      FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
-
-      for (unsigned int k = 0; k < info.fe_values().n_quadrature_points; ++k)
+      for (unsigned int k = 0; k < fe_values.n_quadrature_points; ++k)
         {
-          const double dx = info.fe_values().JxW(k);
+          const double dx = fe_values.JxW(k);
 
-          for (unsigned int i = 0; i < info.fe_values().dofs_per_cell; ++i)
+          for (unsigned int i = 0; i < fe_values.dofs_per_cell; ++i)
             {
-              const double Mii = (info.fe_values().shape_grad(i, k) *
-                                  info.fe_values().shape_grad(i, k) * dx);
+              const double Mii =
+                fe_values.shape_grad(i, k) * fe_values.shape_grad(i, k) * dx;
 
               M(i, i) += Mii;
 
-              for (unsigned int j = i + 1; j < info.fe_values().dofs_per_cell;
-                   ++j)
+              for (unsigned int j = i + 1; j < fe_values.dofs_per_cell; ++j)
                 {
-                  const double Mij = info.fe_values().shape_grad(j, k) *
-                                     info.fe_values().shape_grad(i, k) * dx;
+                  const double Mij = fe_values.shape_grad(j, k) *
+                                     fe_values.shape_grad(i, k) * dx;
 
                   M(i, j) += Mij;
                   M(j, i) += Mij;
@@ -174,25 +574,20 @@ namespace Step39
 
 
     // Boundary faces use the Nitsche method to impose boundary values:
-    template <int dim>
-    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
-                  MeshWorker::IntegrationInfo<dim> &info)
+    template <int dim, typename CellIterator>
+    void boundary(const CellIterator      &cell,
+                  const unsigned int       face_no,
+                  const FEFaceValues<dim> &fe_face_values,
+                  FullMatrix<double>      &M)
     {
-      const FEValuesBase<dim> &fe_face_values = info.fe_values(0);
-
-      FullMatrix<double> &M = dinfo.matrix(0, false).matrix;
       AssertDimension(M.n(), fe_face_values.dofs_per_cell);
       AssertDimension(M.m(), fe_face_values.dofs_per_cell);
 
       const unsigned int polynomial_degree =
-        info.fe_values(0).get_fe().tensor_degree();
+        fe_face_values.get_fe().tensor_degree();
 
-      const double ip_penalty = ip_penalty_factor<dim>(dinfo.cell,
-                                                       dinfo.face_number,
-                                                       polynomial_degree,
-                                                       dinfo.cell,
-                                                       dinfo.face_number,
-                                                       polynomial_degree);
+      const double ip_penalty = ip_penalty_factor<dim>(
+        cell, face_no, polynomial_degree, cell, face_no, polynomial_degree);
 
       for (unsigned int k = 0; k < fe_face_values.n_quadrature_points; ++k)
         {
@@ -212,36 +607,36 @@ namespace Step39
     }
 
     // Interior faces use the interior penalty method:
-    template <int dim>
-    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
-              MeshWorker::DoFInfo<dim>         &dinfo2,
-              MeshWorker::IntegrationInfo<dim> &info1,
-              MeshWorker::IntegrationInfo<dim> &info2)
+    template <int dim, typename CellIterator>
+    void face(const CellIterator &cell_1,
+              const unsigned int  face_no_1,
+              const FEFaceValuesBase<dim>
+                &fe_face_values_1, // These can be FEFaceValues or
+                                   // FESubfaceValues objects.
+              const CellIterator          &cell_2,
+              const unsigned int           face_no_2,
+              const FEFaceValuesBase<dim> &fe_face_values_2, // Same here
+              FullMatrix<double>          &M11,
+              FullMatrix<double>          &M12,
+              FullMatrix<double>          &M21,
+              FullMatrix<double>          &M22)
     {
-      const FEValuesBase<dim> &fe_face_values_1 = info1.fe_values(0);
-      const FEValuesBase<dim> &fe_face_values_2 = info2.fe_values(0);
-
-      FullMatrix<double> &M11 = dinfo1.matrix(0, false).matrix;
-      FullMatrix<double> &M12 = dinfo1.matrix(0, true).matrix;
-      FullMatrix<double> &M21 = dinfo2.matrix(0, true).matrix;
-      FullMatrix<double> &M22 = dinfo2.matrix(0, false).matrix;
-
       AssertDimension(M11.n(), fe_face_values_1.dofs_per_cell);
       AssertDimension(M11.m(), fe_face_values_1.dofs_per_cell);
       AssertDimension(M12.n(), fe_face_values_1.dofs_per_cell);
-      AssertDimension(M12.m(), fe_face_values_1.dofs_per_cell);
-      AssertDimension(M21.n(), fe_face_values_1.dofs_per_cell);
+      AssertDimension(M12.m(), fe_face_values_2.dofs_per_cell);
+      AssertDimension(M21.n(), fe_face_values_2.dofs_per_cell);
       AssertDimension(M21.m(), fe_face_values_1.dofs_per_cell);
-      AssertDimension(M22.n(), fe_face_values_1.dofs_per_cell);
-      AssertDimension(M22.m(), fe_face_values_1.dofs_per_cell);
+      AssertDimension(M22.n(), fe_face_values_2.dofs_per_cell);
+      AssertDimension(M22.m(), fe_face_values_2.dofs_per_cell);
 
       const unsigned int polynomial_degree =
-        info1.fe_values(0).get_fe().tensor_degree();
-      const double ip_penalty = ip_penalty_factor<dim>(dinfo1.cell,
-                                                       dinfo1.face_number,
+        fe_face_values_1.get_fe().tensor_degree();
+      const double ip_penalty = ip_penalty_factor<dim>(cell_1,
+                                                       face_no_1,
                                                        polynomial_degree,
-                                                       dinfo2.cell,
-                                                       dinfo2.face_number,
+                                                       cell_2,
+                                                       face_no_2,
                                                        polynomial_degree);
 
       const double nui = 1.;
@@ -289,24 +684,16 @@ namespace Step39
   // condition is set here in weak form.
   namespace RHSIntegrator
   {
-    template <int dim>
-    void cell(MeshWorker::DoFInfo<dim> &, MeshWorker::IntegrationInfo<dim> &)
-    {}
-
-
-    template <int dim>
-    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
-                  MeshWorker::IntegrationInfo<dim> &info)
+    template <int dim, typename CellIterator>
+    void boundary(const CellIterator        &cell,
+                  const unsigned int         face_no,
+                  const FEFaceValues<dim>   &fe,
+                  const std::vector<double> &boundary_values,
+                  Vector<double>            &local_vector)
     {
-      const FEValuesBase<dim> &fe           = info.fe_values();
-      Vector<double>          &local_vector = dinfo.vector(0).block(0);
-
-      std::vector<double> boundary_values(fe.n_quadrature_points);
-      exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
-
       const unsigned int degree  = fe.get_fe().tensor_degree();
       const double       penalty = 2. * degree * (degree + 1) *
-                             dinfo.face->measure() / dinfo.cell->measure();
+                             cell->face(face_no)->measure() / cell->measure();
 
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)
@@ -318,12 +705,6 @@ namespace Step39
     }
 
 
-    template <int dim>
-    void face(MeshWorker::DoFInfo<dim> &,
-              MeshWorker::DoFInfo<dim> &,
-              MeshWorker::IntegrationInfo<dim> &,
-              MeshWorker::IntegrationInfo<dim> &)
-    {}
   } // namespace RHSIntegrator
 
   // The third local integrator is responsible for the contributions to the
@@ -333,80 +714,77 @@ namespace Step39
   // the right hand side is zero.
   namespace Estimator
   {
-    template <int dim>
-    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
-              MeshWorker::IntegrationInfo<dim> &info)
+    template <int dim, typename CellIterator>
+    double cell(const CellIterator                &cell,
+                const FEValues<dim>               &fe,
+                const std::vector<Tensor<2, dim>> &DDuh)
     {
-      const FEValuesBase<dim> &fe = info.fe_values();
-
-      const std::vector<Tensor<2, dim>> &DDuh = info.hessians[0][0];
+      double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
-          const double t = dinfo.cell->diameter() * trace(DDuh[k]);
-          dinfo.value(0) += t * t * fe.JxW(k);
+          const double t = cell->diameter() * trace(DDuh[k]);
+          value += t * t * fe.JxW(k);
         }
-      dinfo.value(0) = std::sqrt(dinfo.value(0));
+      return std::sqrt(value);
     }
 
     // At the boundary, we use simply a weighted form of the boundary residual,
     // namely the norm of the difference between the finite element solution and
     // the correct boundary condition.
-    template <int dim>
-    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
-                  MeshWorker::IntegrationInfo<dim> &info)
+    template <int dim, typename CellIterator>
+    double boundary(const CellIterator        &cell,
+                    const unsigned int         face_no,
+                    const FEFaceValues<dim>   &fe,
+                    const std::vector<double> &uh,
+                    const std::vector<double> &boundary_values)
     {
-      const FEValuesBase<dim> &fe = info.fe_values();
-
-      std::vector<double> boundary_values(fe.n_quadrature_points);
-      exact_solution.value_list(fe.get_quadrature_points(), boundary_values);
-
-      const std::vector<double> &uh = info.values[0][0];
-
       const unsigned int degree  = fe.get_fe().tensor_degree();
       const double       penalty = 2. * degree * (degree + 1) *
-                             dinfo.face->measure() / dinfo.cell->measure();
+                             cell->face(face_no)->measure() / cell->measure();
 
+      double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
           const double diff = boundary_values[k] - uh[k];
-          dinfo.value(0) += penalty * diff * diff * fe.JxW(k);
+          value += penalty * diff * diff * fe.JxW(k);
         }
-      dinfo.value(0) = std::sqrt(dinfo.value(0));
+      return std::sqrt(value);
     }
 
 
     // Finally, on interior faces, the estimator consists of the jumps of the
     // solution and its normal derivative, weighted appropriately.
-    template <int dim>
-    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
-              MeshWorker::DoFInfo<dim>         &dinfo2,
-              MeshWorker::IntegrationInfo<dim> &info1,
-              MeshWorker::IntegrationInfo<dim> &info2)
+    template <int dim, typename CellIterator>
+    double face(const CellIterator &cell_1,
+                const unsigned int  face_no_1,
+                const FEFaceValuesBase<dim>
+                  &fe, // This can be an FEFaceValues or FESubfaceValues object.
+                const std::vector<double>         &uh1,
+                const std::vector<Tensor<1, dim>> &Duh1,
+                const CellIterator                &cell_2,
+                const unsigned int                 face_no_2,
+                const std::vector<double>         &uh2,
+                const std::vector<Tensor<1, dim>> &Duh2)
     {
-      const FEValuesBase<dim>           &fe   = info1.fe_values();
-      const std::vector<double>         &uh1  = info1.values[0][0];
-      const std::vector<double>         &uh2  = info2.values[0][0];
-      const std::vector<Tensor<1, dim>> &Duh1 = info1.gradients[0][0];
-      const std::vector<Tensor<1, dim>> &Duh2 = info2.gradients[0][0];
-
-      const unsigned int degree = fe.get_fe().tensor_degree();
-      const double       penalty1 =
-        degree * (degree + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
-      const double penalty2 =
-        degree * (degree + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
+      const unsigned int degree   = fe.get_fe().tensor_degree();
+      const double       penalty1 = degree * (degree + 1) *
+                              cell_1->face(face_no_1)->measure() /
+                              cell_1->measure();
+      const double penalty2 = degree * (degree + 1) *
+                              cell_2->face(face_no_2)->measure() /
+                              cell_2->measure();
       const double penalty = penalty1 + penalty2;
-      const double h       = dinfo1.face->measure();
+      const double h       = cell_1->face(face_no_1)->measure();
 
+      double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
           const double diff1 = uh1[k] - uh2[k];
           const double diff2 =
             fe.normal_vector(k) * Duh1[k] - fe.normal_vector(k) * Duh2[k];
-          dinfo1.value(0) +=
-            (penalty * diff1 * diff1 + h * diff2 * diff2) * fe.JxW(k);
+          value += (penalty * diff1 * diff1 + h * diff2 * diff2) * fe.JxW(k);
         }
-      dinfo1.value(0) = std::sqrt(dinfo1.value(0));
-      dinfo2.value(0) = dinfo1.value(0);
+      return std::sqrt(value);
     }
   } // namespace Estimator
 
@@ -414,7 +792,7 @@ namespace Step39
   // discontinuous Galerkin problems not only involves the difference of the
   // gradient inside the cells, but also the jump terms across faces and at
   // the boundary, we cannot just use VectorTools::integrate_difference().
-  // Instead, we use the MeshWorker interface to compute the error ourselves.
+  // Instead, we use MeshWorker::mesh_loop() to compute the error ourselves.
 
   // There are several different ways to define this energy norm, but all of
   // them are equivalent to each other uniformly with mesh size (some not
@@ -423,35 +801,25 @@ namespace Step39
   // 4\sigma_F\|\average{ u \mathbf n}\|^2_F + \sum_{F \in F_h^b}
   // 2\sigma_F\|u\|^2_F @f]
   //
-  // Below, the first function is, as always, the integration
-  // on cells. There is currently no good
-  // interface in MeshWorker that would allow us to access values of regular
-  // functions in the quadrature points. Thus, we have to create the vectors
-  // for the exact function's values and gradients inside the cell
-  // integrator. After that, everything is as before and we just add up the
-  // squares of the differences.
+  // Below, the first function is, as always, the integration on cells. The
+  // exact solution is evaluated directly in the quadrature points and then
+  // compared against the discrete solution.
 
-  // Additionally to computing the error in the energy norm, we use the
-  // capability of the mesh worker to compute two functionals at the same time
-  // and compute the <i>L<sup>2</sup></i>-error in the same loop. Obviously,
-  // this one does not have any jump terms and only appears in the integration
-  // on cells.
+  // Additionally to computing the error in the energy norm, we also compute
+  // the <i>L<sup>2</sup></i>-error in the same loop. Obviously, this one does
+  // not have any jump terms and only appears in the integration on cells.
 
   namespace ErrorIntegrator
   {
     template <int dim>
-    void cell(MeshWorker::DoFInfo<dim>         &dinfo,
-              MeshWorker::IntegrationInfo<dim> &info)
+    std::array<double, 2>
+    cell(const FEValues<dim>               &fe,
+         const std::vector<double>         &uh,
+         const std::vector<Tensor<1, dim>> &Duh,
+         const std::vector<double>         &exact_values,
+         const std::vector<Tensor<1, dim>> &exact_gradients)
     {
-      const FEValuesBase<dim>    &fe = info.fe_values();
-      std::vector<Tensor<1, dim>> exact_gradients(fe.n_quadrature_points);
-      std::vector<double>         exact_values(fe.n_quadrature_points);
-
-      exact_solution.gradient_list(fe.get_quadrature_points(), exact_gradients);
-      exact_solution.value_list(fe.get_quadrature_points(), exact_values);
-
-      const std::vector<Tensor<1, dim>> &Duh = info.gradients[0][0];
-      const std::vector<double>         &uh  = info.values[0][0];
+      std::array<double, 2> values = {};
 
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
@@ -462,62 +830,62 @@ namespace Step39
               sum += diff * diff;
             }
           const double diff = exact_values[k] - uh[k];
-          dinfo.value(0) += sum * fe.JxW(k);
-          dinfo.value(1) += diff * diff * fe.JxW(k);
+          values[0] += sum * fe.JxW(k);
+          values[1] += diff * diff * fe.JxW(k);
         }
-      dinfo.value(0) = std::sqrt(dinfo.value(0));
-      dinfo.value(1) = std::sqrt(dinfo.value(1));
+      values[0] = std::sqrt(values[0]);
+      values[1] = std::sqrt(values[1]);
+      return values;
     }
 
 
-    template <int dim>
-    void boundary(MeshWorker::DoFInfo<dim>         &dinfo,
-                  MeshWorker::IntegrationInfo<dim> &info)
+    template <int dim, typename CellIterator>
+    double boundary(const CellIterator        &cell,
+                    const unsigned int         face_no,
+                    const FEFaceValues<dim>   &fe,
+                    const std::vector<double> &uh,
+                    const std::vector<double> &exact_values)
     {
-      const FEValuesBase<dim> &fe = info.fe_values();
-
-      std::vector<double> exact_values(fe.n_quadrature_points);
-      exact_solution.value_list(fe.get_quadrature_points(), exact_values);
-
-      const std::vector<double> &uh = info.values[0][0];
-
       const unsigned int degree  = fe.get_fe().tensor_degree();
       const double       penalty = 2. * degree * (degree + 1) *
-                             dinfo.face->measure() / dinfo.cell->measure();
+                             cell->face(face_no)->measure() / cell->measure();
 
+      double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
           const double diff = exact_values[k] - uh[k];
-          dinfo.value(0) += penalty * diff * diff * fe.JxW(k);
+          value += penalty * diff * diff * fe.JxW(k);
         }
-      dinfo.value(0) = std::sqrt(dinfo.value(0));
+      return std::sqrt(value);
     }
 
 
-    template <int dim>
-    void face(MeshWorker::DoFInfo<dim>         &dinfo1,
-              MeshWorker::DoFInfo<dim>         &dinfo2,
-              MeshWorker::IntegrationInfo<dim> &info1,
-              MeshWorker::IntegrationInfo<dim> &info2)
+    template <int dim, typename CellIterator>
+    double face(const CellIterator &cell_1,
+                const unsigned int  face_no_1,
+                const FEFaceValuesBase<dim>
+                  &fe, // This can be an FEFaceValues or FESubfaceValues object.
+                const std::vector<double> &uh1,
+                const CellIterator        &cell_2,
+                const unsigned int         face_no_2,
+                const std::vector<double> &uh2)
     {
-      const FEValuesBase<dim>   &fe  = info1.fe_values();
-      const std::vector<double> &uh1 = info1.values[0][0];
-      const std::vector<double> &uh2 = info2.values[0][0];
-
-      const unsigned int degree = fe.get_fe().tensor_degree();
-      const double       penalty1 =
-        degree * (degree + 1) * dinfo1.face->measure() / dinfo1.cell->measure();
-      const double penalty2 =
-        degree * (degree + 1) * dinfo2.face->measure() / dinfo2.cell->measure();
+      const unsigned int degree   = fe.get_fe().tensor_degree();
+      const double       penalty1 = degree * (degree + 1) *
+                              cell_1->face(face_no_1)->measure() /
+                              cell_1->measure();
+      const double penalty2 = degree * (degree + 1) *
+                              cell_2->face(face_no_2)->measure() /
+                              cell_2->measure();
       const double penalty = penalty1 + penalty2;
 
+      double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
         {
           const double diff = uh1[k] - uh2[k];
-          dinfo1.value(0) += (penalty * diff * diff) * fe.JxW(k);
+          value += penalty * diff * diff * fe.JxW(k);
         }
-      dinfo1.value(0) = std::sqrt(dinfo1.value(0));
-      dinfo2.value(0) = dinfo1.value(0);
+      return std::sqrt(value);
     }
   } // namespace ErrorIntegrator
 
@@ -531,8 +899,6 @@ namespace Step39
   class InteriorPenaltyProblem
   {
   public:
-    using CellInfo = MeshWorker::IntegrationInfo<dim>;
-
     InteriorPenaltyProblem();
 
     void run(unsigned int n_steps);
@@ -571,8 +937,7 @@ namespace Step39
     // meshes, additional matrices are required; see Kanschat (2004). Here is
     // the sparsity pattern for these edge matrices. We only need one, because
     // the pattern of the up matrix is the transpose of that of the down
-    // matrix. Actually, we do not care too much about these details, since
-    // the MeshWorker is filling these matrices.
+    // matrix. These matrices are filled in the multigrid mesh loop below.
     MGLevelObject<SparsityPattern> mg_sparsity_dg_interface;
     // The flux matrix at the refinement edge, coupling fine level degrees of
     // freedom to coarse level.
@@ -673,48 +1038,138 @@ namespace Step39
   template <int dim>
   void InteriorPenaltyProblem<dim>::assemble_matrix()
   {
-    // First, we need t set up the object providing the values we
-    // integrate. This object contains all FEValues and FEFaceValues objects
-    // needed and also maintains them automatically such that they always
-    // point to the current cell. To this end, we need to tell it first, where
-    // and what to compute. Since we are not doing anything fancy, we can rely
-    // on their standard choice for quadrature rules.
-    //
-    // Since their default update flags are minimal, we add what we need
-    // additionally, namely the values and gradients of shape functions on all
-    // objects (cells, boundary and interior faces). Afterwards, we are ready
-    // to initialize the container, which will create all necessary
-    // FEValuesBase objects for integration.
-    MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags update_flags = update_values | update_gradients;
-    info_box.add_update_flags_all(update_flags);
-    info_box.initialize(fe, mapping);
+    using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    // This is the object into which we integrate local data. It is filled by
-    // the local integration routines in `MatrixIntegrator` and then used by the
-    // assembler to distribute the information into the global matrix.
-    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+    const MatrixScratchData<dim> scratch(mapping,
+                                         fe,
+                                         QGauss<dim>(fe.degree + 1),
+                                         QGauss<dim - 1>(fe.degree + 1),
+                                         update_gradients | update_JxW_values,
+                                         update_values | update_gradients |
+                                           update_JxW_values |
+                                           update_normal_vectors);
+    const MatrixCopyData<dim>    copy_data(fe.n_dofs_per_cell());
 
-    // Furthermore, we need an object that assembles the local matrix into the
-    // global matrix. These assembler objects have all the knowledge
-    // of the structures of the target object, in this case a
-    // SparseMatrix, possible constraints and the mesh structure.
-    MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assembler;
-    assembler.initialize(matrix);
-
-    // Now, we throw everything into a MeshWorker::loop<dim, dim>(), which here
-    // traverses all active cells of the mesh, computes cell and face matrices
-    // and assembles them into the global matrix. We use the variable
-    // <tt>dof_handler</tt> here in order to use the global numbering of
-    // degrees of freedom.
-    MeshWorker::loop<dim, dim>(dof_handler.begin_active(),
-                               dof_handler.end(),
-                               dof_info,
-                               info_box,
-                               &MatrixIntegrator::cell<dim>,
-                               &MatrixIntegrator::boundary<dim>,
-                               &MatrixIntegrator::face<dim>,
-                               assembler);
+    MeshWorker::mesh_loop(
+      dof_handler.begin_active(),
+      dof_handler.end(),
+      /* cell worker: */
+      [&](const CellIterator     &cell,
+          MatrixScratchData<dim> &scratch_data,
+          MatrixCopyData<dim>    &copy) {
+        copy.reinit(cell);
+        scratch_data.fe_values.reinit(cell);
+        MatrixIntegrator::cell<dim>(scratch_data.fe_values, copy.cell_matrix);
+      },
+      /* copier: */
+      [&](const MatrixCopyData<dim> &copy) {
+        matrix.add(copy.local_dof_indices, copy.cell_matrix);
+        for (const auto &face : copy.face_data)
+          {
+            matrix.add(face.dof_indices_1, face.dof_indices_1, face.matrix_11);
+            matrix.add(face.dof_indices_1, face.dof_indices_2, face.matrix_12);
+            matrix.add(face.dof_indices_2, face.dof_indices_1, face.matrix_21);
+            matrix.add(face.dof_indices_2, face.dof_indices_2, face.matrix_22);
+          }
+      },
+      /* scratch and copy objects: */
+      scratch,
+      copy_data,
+      /* where and how we want to integrate: */
+      MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces |
+        MeshWorker::assemble_own_interior_faces_once,
+      /* boundary face worker: */
+      [&](const CellIterator     &cell,
+          const unsigned int      face_no,
+          MatrixScratchData<dim> &scratch_data,
+          MatrixCopyData<dim>    &copy) {
+        scratch_data.boundary_fe_values.reinit(cell, face_no);
+        MatrixIntegrator::boundary<dim>(cell,
+                                        face_no,
+                                        scratch_data.boundary_fe_values,
+                                        copy.cell_matrix);
+      },
+      /* interior face worker: */
+      [&](const CellIterator     &cell,
+          const unsigned int      face_no,
+          const unsigned int      subface_no,
+          const CellIterator     &neighbor,
+          const unsigned int      neighbor_face_no,
+          const unsigned int      neighbor_subface_no,
+          MatrixScratchData<dim> &scratch_data,
+          MatrixCopyData<dim>    &copy) {
+        FaceCopyData &face_copy = copy.emplace_face_data(cell, neighbor);
+        if (subface_no == numbers::invalid_unsigned_int)
+          {
+            scratch_data.face_fe_values.reinit(cell, face_no);
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                MatrixIntegrator::face<dim>(cell,
+                                            face_no,
+                                            scratch_data.face_fe_values,
+                                            neighbor,
+                                            neighbor_face_no,
+                                            scratch_data.neighbor_face_values,
+                                            face_copy.matrix_11,
+                                            face_copy.matrix_12,
+                                            face_copy.matrix_21,
+                                            face_copy.matrix_22);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                MatrixIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  scratch_data.face_fe_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_subface_values,
+                  face_copy.matrix_11,
+                  face_copy.matrix_12,
+                  face_copy.matrix_21,
+                  face_copy.matrix_22);
+              }
+          }
+        else
+          {
+            scratch_data.subface_values.reinit(cell, face_no, subface_no);
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                MatrixIntegrator::face<dim>(cell,
+                                            face_no,
+                                            scratch_data.subface_values,
+                                            neighbor,
+                                            neighbor_face_no,
+                                            scratch_data.neighbor_face_values,
+                                            face_copy.matrix_11,
+                                            face_copy.matrix_12,
+                                            face_copy.matrix_21,
+                                            face_copy.matrix_22);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                MatrixIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  scratch_data.subface_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_subface_values,
+                  face_copy.matrix_11,
+                  face_copy.matrix_12,
+                  face_copy.matrix_21,
+                  face_copy.matrix_22);
+              }
+          }
+      });
   }
 
 
@@ -724,31 +1179,167 @@ namespace Step39
   template <int dim>
   void InteriorPenaltyProblem<dim>::assemble_mg_matrix()
   {
-    MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags update_flags = update_values | update_gradients;
-    info_box.add_update_flags_all(update_flags);
-    info_box.initialize(fe, mapping);
+    using CellIterator = typename DoFHandler<dim>::level_cell_iterator;
 
-    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+    const MatrixScratchData<dim> scratch(mapping,
+                                         fe,
+                                         QGauss<dim>(fe.degree + 1),
+                                         QGauss<dim - 1>(fe.degree + 1),
+                                         update_gradients | update_JxW_values,
+                                         update_values | update_gradients |
+                                           update_JxW_values |
+                                           update_normal_vectors);
+    const MatrixCopyData<dim>    copy_data(fe.n_dofs_per_cell());
 
-    // Obviously, the assembler needs to be replaced by one filling level
-    // matrices. Note that it automatically fills the edge matrices as well.
-    MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double>> assembler;
-    assembler.initialize(mg_matrix);
-    assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
+    MeshWorker::mesh_loop(
+      dof_handler.begin_mg(),
+      dof_handler.end_mg(),
+      /* cell worker: */
+      [&](const CellIterator     &cell,
+          MatrixScratchData<dim> &scratch_data,
+          MatrixCopyData<dim>    &copy) {
+        copy.reinit(cell, true);
+        scratch_data.fe_values.reinit(cell);
+        MatrixIntegrator::cell<dim>(scratch_data.fe_values, copy.cell_matrix);
+      },
+      /* copier: */
+      [&](const MatrixCopyData<dim> &copy) {
+        mg_matrix[copy.level].add(copy.local_dof_indices, copy.cell_matrix);
 
-    // Here is the other difference to the previous function: we run
-    // over all cells, not only the active ones. And we use functions
-    // ending on <code>_mg</code> since we need the degrees of freedom
-    // on each level, not the global numbering.
-    MeshWorker::loop<dim, dim>(dof_handler.begin_mg(),
-                               dof_handler.end_mg(),
-                               dof_info,
-                               info_box,
-                               &MatrixIntegrator::cell<dim>,
-                               &MatrixIntegrator::boundary<dim>,
-                               &MatrixIntegrator::face<dim>,
-                               assembler);
+        for (const auto &face : copy.face_data)
+          if (face.level_1 == face.level_2)
+            {
+              mg_matrix[face.level_1].add(face.dof_indices_1,
+                                          face.dof_indices_1,
+                                          face.matrix_11);
+              mg_matrix[face.level_1].add(face.dof_indices_1,
+                                          face.dof_indices_2,
+                                          face.matrix_12);
+              mg_matrix[face.level_1].add(face.dof_indices_2,
+                                          face.dof_indices_1,
+                                          face.matrix_21);
+              mg_matrix[face.level_1].add(face.dof_indices_2,
+                                          face.dof_indices_2,
+                                          face.matrix_22);
+            }
+          else
+            {
+              Assert(face.level_1 > face.level_2, ExcInternalError());
+
+              mg_matrix[face.level_1].add(face.dof_indices_1,
+                                          face.dof_indices_1,
+                                          face.matrix_11);
+
+              for (unsigned int j = 0; j < face.dof_indices_2.size(); ++j)
+                for (unsigned int k = 0; k < face.dof_indices_1.size(); ++k)
+                  {
+                    mg_matrix_dg_up[face.level_1].add(face.dof_indices_2[j],
+                                                      face.dof_indices_1[k],
+                                                      face.matrix_12(k, j));
+                    mg_matrix_dg_down[face.level_1].add(face.dof_indices_2[j],
+                                                        face.dof_indices_1[k],
+                                                        face.matrix_21(j, k));
+                  }
+            }
+      },
+      /* scratch and copy objects: */
+      scratch,
+      copy_data,
+      /* where and how we want to integrate: */
+      MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces |
+        MeshWorker::assemble_own_interior_faces_once,
+      /* boundary face worker: */
+      [&](const CellIterator     &cell,
+          const unsigned int      face_no,
+          MatrixScratchData<dim> &scratch_data,
+          MatrixCopyData<dim>    &copy) {
+        scratch_data.boundary_fe_values.reinit(cell, face_no);
+        MatrixIntegrator::boundary<dim>(cell,
+                                        face_no,
+                                        scratch_data.boundary_fe_values,
+                                        copy.cell_matrix);
+      },
+      /* interior face worker: */
+      [&](const CellIterator     &cell,
+          const unsigned int      face_no,
+          const unsigned int      subface_no,
+          const CellIterator     &neighbor,
+          const unsigned int      neighbor_face_no,
+          const unsigned int      neighbor_subface_no,
+          MatrixScratchData<dim> &scratch_data,
+          MatrixCopyData<dim>    &copy) {
+        FaceCopyData &face_copy = copy.emplace_face_data(cell, neighbor, true);
+        if (subface_no == numbers::invalid_unsigned_int)
+          {
+            scratch_data.face_fe_values.reinit(cell, face_no);
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                MatrixIntegrator::face<dim>(cell,
+                                            face_no,
+                                            scratch_data.face_fe_values,
+                                            neighbor,
+                                            neighbor_face_no,
+                                            scratch_data.neighbor_face_values,
+                                            face_copy.matrix_11,
+                                            face_copy.matrix_12,
+                                            face_copy.matrix_21,
+                                            face_copy.matrix_22);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                MatrixIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  scratch_data.face_fe_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_subface_values,
+                  face_copy.matrix_11,
+                  face_copy.matrix_12,
+                  face_copy.matrix_21,
+                  face_copy.matrix_22);
+              }
+          }
+        else
+          {
+            scratch_data.subface_values.reinit(cell, face_no, subface_no);
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                MatrixIntegrator::face<dim>(cell,
+                                            face_no,
+                                            scratch_data.subface_values,
+                                            neighbor,
+                                            neighbor_face_no,
+                                            scratch_data.neighbor_face_values,
+                                            face_copy.matrix_11,
+                                            face_copy.matrix_12,
+                                            face_copy.matrix_21,
+                                            face_copy.matrix_22);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                MatrixIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  scratch_data.subface_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_subface_values,
+                  face_copy.matrix_11,
+                  face_copy.matrix_12,
+                  face_copy.matrix_21,
+                  face_copy.matrix_22);
+              }
+          }
+      });
   }
 
 
@@ -757,32 +1348,49 @@ namespace Step39
   template <int dim>
   void InteriorPenaltyProblem<dim>::assemble_right_hand_side()
   {
-    MeshWorker::IntegrationInfoBox<dim> info_box;
-    UpdateFlags                         update_flags =
-      update_quadrature_points | update_values | update_gradients;
-    info_box.add_update_flags_all(update_flags);
-    info_box.initialize(fe, mapping);
+    using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+    const RightHandSideScratchData<dim> scratch(mapping,
+                                                fe,
+                                                QGauss<dim - 1>(fe.degree + 1),
+                                                update_quadrature_points |
+                                                  update_values |
+                                                  update_gradients |
+                                                  update_JxW_values |
+                                                  update_normal_vectors);
+    const RightHandSideCopyData         copy_data(fe.n_dofs_per_cell());
 
-    // Since this assembler allows us to fill several vectors, the interface is
-    // a little more complicated as above. The pointers to the vectors have to
-    // be stored in an AnyData object. While this seems to cause two extra
-    // lines of code here, it actually comes handy in more complex
-    // applications.
-    MeshWorker::Assembler::ResidualSimple<Vector<double>> assembler;
-    AnyData                                               data;
-    data.add<Vector<double> *>(&right_hand_side, "RHS");
-    assembler.initialize(data);
-
-    MeshWorker::loop<dim, dim>(dof_handler.begin_active(),
-                               dof_handler.end(),
-                               dof_info,
-                               info_box,
-                               &RHSIntegrator::cell<dim>,
-                               &RHSIntegrator::boundary<dim>,
-                               &RHSIntegrator::face<dim>,
-                               assembler);
+    MeshWorker::mesh_loop(
+      dof_handler.begin_active(),
+      dof_handler.end(),
+      /* cell worker: */
+      [&](const CellIterator &cell,
+          RightHandSideScratchData<dim> &,
+          RightHandSideCopyData &copy) { copy.reinit(cell); },
+      /* copier: */
+      [&](const RightHandSideCopyData &copy) {
+        right_hand_side.add(copy.local_dof_indices, copy.cell_rhs);
+      },
+      /* scratch and copy objects: */
+      scratch,
+      copy_data,
+      /* where and how we want to integrate: */
+      MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces,
+      /* boundary face worker: */
+      [&](const CellIterator            &cell,
+          const unsigned int             face_no,
+          RightHandSideScratchData<dim> &scratch_data,
+          RightHandSideCopyData         &copy) {
+        scratch_data.boundary_fe_values.reinit(cell, face_no);
+        exact_solution.value_list(
+          scratch_data.boundary_fe_values.get_quadrature_points(),
+          scratch_data.boundary_values);
+        RHSIntegrator::boundary<dim>(cell,
+                                     face_no,
+                                     scratch_data.boundary_fe_values,
+                                     scratch_data.boundary_values,
+                                     copy.cell_rhs);
+      });
 
     right_hand_side *= -1.;
   }
@@ -856,79 +1464,214 @@ namespace Step39
 
   // Another clone of the assemble function. The big difference to the
   // previous ones is here that we also have an input vector.
+  // The results of the estimator are stored in a vector with one entry per
+  // cell.
   template <int dim>
   double InteriorPenaltyProblem<dim>::estimate()
   {
-    // The results of the estimator are stored in a vector with one entry per
-    // cell. Since cells in deal.II are not numbered, we have to create our
-    // own numbering in order to use this vector. For the assembler used below
-    // the information in which component of a vector the result is stored is
-    // transmitted by the user_index variable for each cell. We need to set this
-    // numbering up here.
-    //
-    // On the other hand, somebody might have used the user indices
-    // already. So, let's be good citizens and save them before tampering with
-    // them.
-    std::vector<unsigned int> old_user_indices;
-    triangulation.save_user_indices(old_user_indices);
-
     estimates.block(0).reinit(triangulation.n_active_cells());
-    unsigned int i = 0;
-    for (const auto &cell : triangulation.active_cell_iterators())
-      cell->set_user_index(i++);
+    using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    // This starts like before,
-    MeshWorker::IntegrationInfoBox<dim> info_box;
-    const unsigned int                  n_gauss_points =
+    const unsigned int n_gauss_points =
       dof_handler.get_fe().tensor_degree() + 1;
-    info_box.initialize_gauss_quadrature(n_gauss_points,
-                                         n_gauss_points + 1,
-                                         n_gauss_points);
+    const EstimatorScratchData<dim> scratch(mapping,
+                                            fe,
+                                            QGauss<dim>(n_gauss_points),
+                                            QGauss<dim - 1>(n_gauss_points + 1),
+                                            QGauss<dim - 1>(n_gauss_points),
+                                            update_hessians | update_JxW_values,
+                                            update_quadrature_points |
+                                              update_values | update_gradients |
+                                              update_JxW_values |
+                                              update_normal_vectors,
+                                            update_values | update_gradients |
+                                              update_JxW_values |
+                                              update_normal_vectors);
+    const ErrorCopyData<1>          copy_data;
 
-    // but now we need to notify the info box of the finite element function we
-    // want to evaluate in the quadrature points. First, we create an AnyData
-    // object with this vector, which is the solution we just computed.
-    AnyData solution_data;
-    solution_data.add<const Vector<double> *>(&solution, "solution");
+    MeshWorker::mesh_loop(
+      dof_handler.begin_active(),
+      dof_handler.end(),
+      /* cell worker: */
+      [&](const CellIterator        &cell,
+          EstimatorScratchData<dim> &scratch_data,
+          ErrorCopyData<1>          &copy) {
+        copy.reinit(cell);
+        scratch_data.fe_values.reinit(cell);
+        const FEValues<dim> &fe_values = scratch_data.fe_values;
+        fe_values.get_function_hessians(solution, scratch_data.cell_hessians);
+        copy.cell_values[0] =
+          Estimator::cell<dim>(cell, fe_values, scratch_data.cell_hessians);
+      },
+      /* copier: */
+      [&](const ErrorCopyData<1> &copy) {
+        estimates.block(0)(copy.cell_index) += copy.cell_values[0];
+        for (const auto &face : copy.face_data)
+          {
+            estimates.block(0)(face.cell_index_1) += 0.5 * face.values[0];
+            estimates.block(0)(face.cell_index_2) += 0.5 * face.values[0];
+          }
+      },
+      /* scratch and copy objects: */
+      scratch,
+      copy_data,
+      /* where and how we want to integrate: */
+      MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces |
+        MeshWorker::assemble_own_interior_faces_once,
+      /* boundary face worker: */
+      [&](const CellIterator        &cell,
+          const unsigned int         face_no,
+          EstimatorScratchData<dim> &scratch_data,
+          ErrorCopyData<1>          &copy) {
+        scratch_data.boundary_fe_values.reinit(cell, face_no);
+        const FEFaceValues<dim> &fe_face_values =
+          scratch_data.boundary_fe_values;
+        fe_face_values.get_function_values(
+          solution, scratch_data.boundary_solution_values);
+        exact_solution.value_list(fe_face_values.get_quadrature_points(),
+                                  scratch_data.boundary_exact_values);
+        copy.cell_values[0] +=
+          Estimator::boundary<dim>(cell,
+                                   face_no,
+                                   fe_face_values,
+                                   scratch_data.boundary_solution_values,
+                                   scratch_data.boundary_exact_values);
+      },
+      /* interior face worker: */
+      [&](const CellIterator        &cell,
+          const unsigned int         face_no,
+          const unsigned int         subface_no,
+          const CellIterator        &neighbor,
+          const unsigned int         neighbor_face_no,
+          const unsigned int         neighbor_subface_no,
+          EstimatorScratchData<dim> &scratch_data,
+          ErrorCopyData<1>          &copy) {
+        auto &face_data = copy.emplace_face_data(cell, neighbor);
 
-    // Then, we tell the Meshworker::VectorSelector for cells, that we need
-    // the second derivatives of this solution (to compute the
-    // Laplacian). Therefore, the Boolean arguments selecting function values
-    // and first derivatives a false, only the last one selecting second
-    // derivatives is true.
-    info_box.cell_selector.add("solution", false, false, true);
-    // On interior and boundary faces, we need the function values and the
-    // first derivatives, but not second derivatives.
-    info_box.boundary_selector.add("solution", true, true, false);
-    info_box.face_selector.add("solution", true, true, false);
+        if (subface_no == numbers::invalid_unsigned_int)
+          {
+            scratch_data.face_fe_values.reinit(cell, face_no);
+            const FEFaceValuesBase<dim> &fe_face_values =
+              scratch_data.face_fe_values;
 
-    // And we continue as before, with the exception that the default update
-    // flags are already adjusted to the values and derivatives we requested
-    // above.
-    info_box.add_update_flags_boundary(update_quadrature_points);
-    info_box.initialize(fe, mapping, solution_data, solution);
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_face_values;
 
-    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+                fe_face_values.get_function_gradients(
+                  solution, scratch_data.face_solution_gradients);
+                neighbor_fe_face_values.get_function_gradients(
+                  solution, scratch_data.neighbor_face_solution_gradients);
 
-    // The assembler stores one number per cell, but else this is the same as
-    // in the computation of the right hand side.
-    MeshWorker::Assembler::CellsAndFaces<double> assembler;
-    AnyData                                      out_data;
-    out_data.add<BlockVector<double> *>(&estimates, "cells");
-    assembler.initialize(out_data, false);
+                face_data.values[0] = Estimator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  scratch_data.face_solution_gradients,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values,
+                  scratch_data.neighbor_face_solution_gradients);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_subface_values;
 
-    MeshWorker::loop<dim, dim>(dof_handler.begin_active(),
-                               dof_handler.end(),
-                               dof_info,
-                               info_box,
-                               &Estimator::cell<dim>,
-                               &Estimator::boundary<dim>,
-                               &Estimator::face<dim>,
-                               assembler);
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+                fe_face_values.get_function_gradients(
+                  solution, scratch_data.face_solution_gradients);
+                neighbor_fe_face_values.get_function_gradients(
+                  solution, scratch_data.neighbor_face_solution_gradients);
 
-    // Right before we return the result of the error estimate, we restore the
-    // old user indices.
-    triangulation.load_user_indices(old_user_indices);
+                face_data.values[0] = Estimator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  scratch_data.face_solution_gradients,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values,
+                  scratch_data.neighbor_face_solution_gradients);
+              }
+          }
+        else
+          {
+            scratch_data.subface_values.reinit(cell, face_no, subface_no);
+            const FEFaceValuesBase<dim> &fe_face_values =
+              scratch_data.subface_values;
+
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_face_values;
+
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+                fe_face_values.get_function_gradients(
+                  solution, scratch_data.face_solution_gradients);
+                neighbor_fe_face_values.get_function_gradients(
+                  solution, scratch_data.neighbor_face_solution_gradients);
+
+                face_data.values[0] = Estimator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  scratch_data.face_solution_gradients,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values,
+                  scratch_data.neighbor_face_solution_gradients);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_subface_values;
+
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+                fe_face_values.get_function_gradients(
+                  solution, scratch_data.face_solution_gradients);
+                neighbor_fe_face_values.get_function_gradients(
+                  solution, scratch_data.neighbor_face_solution_gradients);
+
+                face_data.values[0] = Estimator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  scratch_data.face_solution_gradients,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values,
+                  scratch_data.neighbor_face_solution_gradients);
+              }
+          }
+      });
+
     return estimates.block(0).l2_norm();
   }
 
@@ -946,47 +1689,193 @@ namespace Step39
     BlockVector<double> errors(2);
     errors.block(0).reinit(triangulation.n_active_cells());
     errors.block(1).reinit(triangulation.n_active_cells());
+    using CellIterator = typename DoFHandler<dim>::active_cell_iterator;
 
-    std::vector<unsigned int> old_user_indices;
-    triangulation.save_user_indices(old_user_indices);
-    unsigned int i = 0;
-    for (const auto &cell : triangulation.active_cell_iterators())
-      cell->set_user_index(i++);
-
-    MeshWorker::IntegrationInfoBox<dim> info_box;
-    const unsigned int                  n_gauss_points =
+    const unsigned int n_gauss_points =
       dof_handler.get_fe().tensor_degree() + 1;
-    info_box.initialize_gauss_quadrature(n_gauss_points,
-                                         n_gauss_points + 1,
-                                         n_gauss_points);
+    const ErrorScratchData<dim> scratch(mapping,
+                                        fe,
+                                        QGauss<dim>(n_gauss_points),
+                                        QGauss<dim - 1>(n_gauss_points + 1),
+                                        QGauss<dim - 1>(n_gauss_points),
+                                        update_quadrature_points |
+                                          update_values | update_gradients |
+                                          update_JxW_values,
+                                        update_quadrature_points |
+                                          update_values | update_JxW_values,
+                                        update_values | update_JxW_values);
+    const ErrorCopyData<2>      copy_data;
 
-    AnyData solution_data;
-    solution_data.add<Vector<double> *>(&solution, "solution");
+    MeshWorker::mesh_loop(
+      dof_handler.begin_active(),
+      dof_handler.end(),
+      /* cell worker: */
+      [&](const CellIterator    &cell,
+          ErrorScratchData<dim> &scratch_data,
+          ErrorCopyData<2>      &copy) {
+        copy.reinit(cell);
+        scratch_data.fe_values.reinit(cell);
+        const FEValues<dim> &fe_values = scratch_data.fe_values;
+        fe_values.get_function_values(solution,
+                                      scratch_data.cell_solution_values);
+        fe_values.get_function_gradients(solution,
+                                         scratch_data.cell_solution_gradients);
+        exact_solution.value_list(fe_values.get_quadrature_points(),
+                                  scratch_data.cell_exact_values);
+        exact_solution.gradient_list(fe_values.get_quadrature_points(),
+                                     scratch_data.cell_exact_gradients);
+        copy.cell_values =
+          ErrorIntegrator::cell<dim>(fe_values,
+                                     scratch_data.cell_solution_values,
+                                     scratch_data.cell_solution_gradients,
+                                     scratch_data.cell_exact_values,
+                                     scratch_data.cell_exact_gradients);
+      },
+      /* copier: */
+      [&](const ErrorCopyData<2> &copy) {
+        errors.block(0)(copy.cell_index) += copy.cell_values[0];
+        errors.block(1)(copy.cell_index) += copy.cell_values[1];
+        for (const auto &face : copy.face_data)
+          {
+            errors.block(0)(face.cell_index_1) += 0.5 * face.values[0];
+            errors.block(0)(face.cell_index_2) += 0.5 * face.values[0];
+          }
+      },
+      /* scratch and copy objects: */
+      scratch,
+      copy_data,
+      /* where and how we want to integrate: */
+      MeshWorker::assemble_own_cells | MeshWorker::assemble_boundary_faces |
+        MeshWorker::assemble_own_interior_faces_once,
+      /* boundary face worker: */
+      [&](const CellIterator    &cell,
+          const unsigned int     face_no,
+          ErrorScratchData<dim> &scratch_data,
+          ErrorCopyData<2>      &copy) {
+        scratch_data.boundary_fe_values.reinit(cell, face_no);
+        const FEFaceValues<dim> &fe_face_values =
+          scratch_data.boundary_fe_values;
+        fe_face_values.get_function_values(
+          solution, scratch_data.boundary_solution_values);
+        exact_solution.value_list(fe_face_values.get_quadrature_points(),
+                                  scratch_data.boundary_exact_values);
+        copy.cell_values[0] +=
+          ErrorIntegrator::boundary<dim>(cell,
+                                         face_no,
+                                         fe_face_values,
+                                         scratch_data.boundary_solution_values,
+                                         scratch_data.boundary_exact_values);
+      },
+      /* interior face worker: */
+      [&](const CellIterator    &cell,
+          const unsigned int     face_no,
+          const unsigned int     subface_no,
+          const CellIterator    &neighbor,
+          const unsigned int     neighbor_face_no,
+          const unsigned int     neighbor_subface_no,
+          ErrorScratchData<dim> &scratch_data,
+          ErrorCopyData<2>      &copy) {
+        auto &face_data = copy.emplace_face_data(cell, neighbor);
 
-    info_box.cell_selector.add("solution", true, true, false);
-    info_box.boundary_selector.add("solution", true, false, false);
-    info_box.face_selector.add("solution", true, false, false);
+        if (subface_no == numbers::invalid_unsigned_int)
+          {
+            scratch_data.face_fe_values.reinit(cell, face_no);
+            const FEFaceValuesBase<dim> &fe_face_values =
+              scratch_data.face_fe_values;
 
-    info_box.add_update_flags_cell(update_quadrature_points);
-    info_box.add_update_flags_boundary(update_quadrature_points);
-    info_box.initialize(fe, mapping, solution_data, solution);
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_face_values;
 
-    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
 
-    MeshWorker::Assembler::CellsAndFaces<double> assembler;
-    AnyData                                      out_data;
-    out_data.add<BlockVector<double> *>(&errors, "cells");
-    assembler.initialize(out_data, false);
+                face_data.values[0] = ErrorIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_subface_values;
 
-    MeshWorker::loop<dim, dim>(dof_handler.begin_active(),
-                               dof_handler.end(),
-                               dof_info,
-                               info_box,
-                               &ErrorIntegrator::cell<dim>,
-                               &ErrorIntegrator::boundary<dim>,
-                               &ErrorIntegrator::face<dim>,
-                               assembler);
-    triangulation.load_user_indices(old_user_indices);
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+
+                face_data.values[0] = ErrorIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values);
+              }
+          }
+        else
+          {
+            scratch_data.subface_values.reinit(cell, face_no, subface_no);
+            const FEFaceValuesBase<dim> &fe_face_values =
+              scratch_data.subface_values;
+
+            if (neighbor_subface_no == numbers::invalid_unsigned_int)
+              {
+                scratch_data.neighbor_face_values.reinit(neighbor,
+                                                         neighbor_face_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_face_values;
+
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+
+                face_data.values[0] = ErrorIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values);
+              }
+            else
+              {
+                scratch_data.neighbor_subface_values.reinit(
+                  neighbor, neighbor_face_no, neighbor_subface_no);
+                const FEFaceValuesBase<dim> &neighbor_fe_face_values =
+                  scratch_data.neighbor_subface_values;
+
+                fe_face_values.get_function_values(
+                  solution, scratch_data.face_solution_values);
+                neighbor_fe_face_values.get_function_values(
+                  solution, scratch_data.neighbor_face_solution_values);
+
+                face_data.values[0] = ErrorIntegrator::face<dim>(
+                  cell,
+                  face_no,
+                  fe_face_values,
+                  scratch_data.face_solution_values,
+                  neighbor,
+                  neighbor_face_no,
+                  scratch_data.neighbor_face_solution_values);
+              }
+          }
+      });
 
     std::cout << "energy-error: " << errors.block(0).l2_norm() << std::endl;
     std::cout << "L2-error:     " << errors.block(1).l2_norm() << std::endl;

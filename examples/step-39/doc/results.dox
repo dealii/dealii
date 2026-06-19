@@ -62,6 +62,9 @@ Writing solution to <sol-11.gnuplot>...
 
 This log for instance shows that the number of conjugate gradient
 iteration steps is constant at approximately 15.
+This is the key qualitative result of the example: despite adaptive mesh
+refinement and the discontinuous Galerkin discretization, the multigrid
+preconditioner keeps the iteration count essentially mesh-independent.
 
 
 <h3>Postprocessing of the logfile</h3>
