@@ -27,7 +27,7 @@ set(_deal_ii_trilinos_optional_modules
   Amesos2 Ifpack2 MueLu
 
   # Independent:
-  Belos Kokkos NOX ROL Sacado SEACAS Teuchos Zoltan
+  Belos Kokkos NOX ROL Sacado ShyLU_DDFROSch SEACAS Teuchos Xpetra Zoltan
 )
 
 #
@@ -464,6 +464,124 @@ macro(feature_trilinos_find_external var)
         reset_cmake_required()
       endif()
 
+    endif()
+
+    if(TRILINOS_WITH_SHYLU_DDFROSCH)
+      #
+      # Check if FROSch is actually usable.
+      #
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
+
+      # For the case of Trilinos being compiled with openmp support the
+      # following Tpetra test needs -fopenmp to succeed. Make sure that we
+      # supply the correct compiler and linker flags:
+      add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
+
+      if(DEAL_II_WITH_64BIT_INDICES)
+        set(_global_index_type "long long")
+      else()
+        set(_global_index_type "int")
+      endif()
+
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <Teuchos_RCP.hpp>
+        #include <Xpetra_DefaultPlatform.hpp>
+        #include <Xpetra_MapFactory_decl.hpp>
+        
+        #include <FROSch_Tools_decl.hpp>
+        #include <FROSch_Tools_def.hpp>
+        
+        int main()
+        {
+          FROSch::OverlappingData<int, ${_global_index_type}> overlapping_data(0,1,1);
+          (void)overlapping_data;
+        
+          return 0;
+        }
+        "
+        TRILINOS_SHYLU_DDFROSCH_IS_FUNCTIONAL
+      )
+
+      reset_cmake_required()
+
+      if(NOT TRILINOS_SHYLU_DDFROSCH_IS_FUNCTIONAL)
+        message(
+          STATUS
+          "FROSch was found but is not usable! Disabling FROSch support."
+        )
+        set(TRILINOS_WITH_SHYLU_DDFROSCH OFF)
+      endif()
+    endif()
+
+    if(TRILINOS_WITH_XPETRA)
+      #
+      # Check if Xpetra is usable in fact.
+      #
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${Trilinos_INCLUDE_DIRS})
+      list(APPEND CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH})
+
+      list(APPEND CMAKE_REQUIRED_LIBRARIES ${Trilinos_LIBRARIES} ${MPI_LIBRARIES})
+      list(APPEND CMAKE_REQUIRED_FLAGS ${TRILINOS_CXX_FLAGS})
+
+      # For the case of Trilinos being compiled with openmp support the
+      # following Tpetra test needs -fopenmp to succeed. Make sure that we
+      # supply the correct compiler and linker flags:
+      add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS} ${DEAL_II_LINKER_FLAGS}")
+
+      if(DEAL_II_WITH_64BIT_INDICES)
+        set(_global_index_type "long long")
+      else()
+        set(_global_index_type "int")
+      endif()
+
+      if(TRILINOS_VERSION VERSION_GREATER 14.2)
+        set(_node_type "Tpetra::KokkosClassic::DefaultNode::DefaultNodeType")
+      else()
+        set(_node_type "KokkosClassic::DefaultNode::DefaultNodeType")
+      endif()
+
+      CHECK_CXX_SOURCE_COMPILES(
+        "
+        #include <Xpetra_MapFactory.hpp>
+        #include <Xpetra_VectorFactory.hpp>
+        
+        int
+        main()
+        {
+          using SC = double;
+          using LO = int;
+          using GO = ${_global_index_type};
+          using NO = ${_node_type};
+        
+          Teuchos::RCP<const Teuchos::Comm<int>> comm =
+            Teuchos::rcp(new Teuchos::SerialComm<int>());
+        
+          Teuchos::RCP<const Xpetra::Map<LO, GO, NO>> dummy_map =
+            Xpetra::MapFactory<LO, GO, NO>::Build(Xpetra::UseTpetra, 10, 0, comm);
+          Teuchos::RCP<Xpetra::Vector<SC, LO, GO, NO>> dummy_vector =
+            Xpetra::VectorFactory<SC, LO, GO, NO>::Build(dummy_map);
+          (void)dummy_vector;
+        
+          return 0;
+        }
+        "
+        TRILINOS_XPETRA_IS_FUNCTIONAL
+      )
+
+      reset_cmake_required()
+
+      if(NOT TRILINOS_XPETRA_IS_FUNCTIONAL)
+        message(
+          STATUS
+          "Xpetra was found but is not usable with Tpetra as backend! Disabling Xpetra support."
+        )
+        set(TRILINOS_WITH_XPETRA OFF)
+      endif()
     endif()
 
     if(NOT ${var})

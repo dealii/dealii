@@ -178,6 +178,13 @@ if(DEAL_II_TRILINOS_WITH_TPETRA)
   endif()
 endif()
 
+if(DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH)
+  set(_separate_src
+    ${_separate_src}
+    trilinos_tpetra_precondition_frosch.cc
+  )
+endif()
+
 if(DEAL_II_WITH_SCALAPACK)
   set(_unity_include_src
     ${_unity_include_src}
