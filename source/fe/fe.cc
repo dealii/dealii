@@ -1214,7 +1214,10 @@ FiniteElement<dim, spacedim>::get_sub_fe(const ComponentMask &mask) const
                  (c >= first_selected && c < first_selected + n_selected &&
                   mask[c]) ||
                  (c >= first_selected + n_selected && !mask[c]),
-               ExcMessage("Error: the given ComponentMask is not contiguous!"));
+               ExcMessage(
+                 "The given ComponentMask is not contiguous, but "
+                 "any sub-element of the current element must "
+                 "necessarily occupy a contiguous set of components."));
     }
 
   return get_sub_fe(first_selected, n_selected);

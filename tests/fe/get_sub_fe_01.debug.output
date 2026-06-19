@@ -12,9 +12,9 @@ DEAL::  failed as expected
 DEAL::FE: FE_BDM<2>(1) mask: [true,false]
 DEAL::  failed as expected
 DEAL::FE: FESystem<2>[FE_Q<2>(2)] mask: [true]
-DEAL::  worked: FE_Q<2>(2)
+DEAL::  worked: FESystem<2>[FE_Q<2>(2)]
 DEAL::FE: FESystem<2>[FESystem<2>[FE_Q<2>(2)]] mask: [true]
-DEAL::  worked: FE_Q<2>(2)
+DEAL::  worked: FESystem<2>[FESystem<2>[FE_Q<2>(2)]]
 DEAL::FE: FESystem<2>[FE_Q<2>(2)^3] mask: [true,true,true]
 DEAL::  worked: FESystem<2>[FE_Q<2>(2)^3]
 DEAL::FE: FESystem<2>[FE_Q<2>(2)^3] mask: [false,true,false]
@@ -44,10 +44,10 @@ DEAL::  worked: FE_BDM<2>(1)
 DEAL::FE: FESystem<2>[FE_Q<2>(2)^2-FE_BDM<2>(1)^2-FE_DGP<2>(2)] mask: [false,false,false,false,true,true,false]
 DEAL::  worked: FE_BDM<2>(1)
 DEAL::FE: FESystem<2>[FE_BDM<2>(1)-FESystem<2>[FE_DGP<2>(2)]^2] mask: [false,false,true,false]
-DEAL::  worked: FE_DGP<2>(2)
+DEAL::  worked: FESystem<2>[FE_DGP<2>(2)]
 DEAL::FE: FESystem<2>[FE_BDM<2>(1)-FESystem<2>[FE_DGP<2>(2)]^2] mask: [false,false,false,true]
-DEAL::  worked: FE_DGP<2>(2)
+DEAL::  worked: FESystem<2>[FE_DGP<2>(2)]
 DEAL::FE: FESystem<2>[FESystem<2>[FE_BDM<2>(1)-FESystem<2>[FE_DGP<2>(2)]^2]^2] mask: [false,false,true,false,false,false,false,false]
-DEAL::  worked: FE_DGP<2>(2)
+DEAL::  worked: FESystem<2>[FE_DGP<2>(2)]
 DEAL::FE: FESystem<2>[FESystem<2>[FESystem<2>[FE_BDM<2>(1)-FESystem<2>[FE_DGP<2>(2)]^2]^2]] mask: [false,false,true,false,false,false,false,false]
-DEAL::  worked: FE_DGP<2>(2)
+DEAL::  worked: FESystem<2>[FE_DGP<2>(2)]
