@@ -580,9 +580,16 @@ namespace hp
                                                           face_no);
       };
 
-    return compute_hp_dof_identities(
-      std::set<unsigned int>{fe_and_face_1.first, fe_and_face_2.first},
-      query_quad_dof_identities);
+    // Extract only the FE indices from the pairs we got as inputs
+    std::set<unsigned int> fe_indices_only;
+    for (const auto &[fe_index, face_index] : fes_and_faces)
+      {
+        fe_indices_only.insert(fe_index);
+        (void)face_index;
+      }
+
+    return compute_hp_dof_identities(fe_indices_only,
+                                     query_quad_dof_identities);
   }
 
 
