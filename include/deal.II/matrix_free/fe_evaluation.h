@@ -2916,28 +2916,11 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       if (mask[v] == false)
         cells[v] = numbers::invalid_unsigned_int;
 
-  bool has_hn_constraints = false;
-
-  if (is_face == false)
-    {
-      if (!dof_info.hanging_node_constraint_masks.empty() &&
-          !dof_info.hanging_node_constraint_masks_comp.empty() &&
-          dof_info
-            .hanging_node_constraint_masks_comp[this->active_fe_index]
-                                               [this->first_selected_component])
-        for (unsigned int v = 0; v < n_lanes; ++v)
-          if (cells[v] != numbers::invalid_unsigned_int &&
-              dof_info.hanging_node_constraint_masks[cells[v]] !=
-                internal::MatrixFreeFunctions::
-                  unconstrained_compressed_constraint_kind)
-            has_hn_constraints = true;
-    }
-
   std::bool_constant<internal::is_vectorizable<VectorType, Number>::value>
     vector_selector;
 
   const bool use_vectorized_path =
-    !(masking_is_active || has_hn_constraints || accesses_exterior_dofs);
+    !(masking_is_active || accesses_exterior_dofs);
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
 
@@ -3045,15 +3028,6 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           if (my_index_start[n_components_read].second !=
               my_index_start[0].second)
             has_constraints = true;
-
-          if (dof_info.hanging_node_constraint_masks.size() > 0 &&
-              dof_info.hanging_node_constraint_masks_comp.size() > 0 &&
-              dof_info.hanging_node_constraint_masks[cells[v]] !=
-                internal::MatrixFreeFunctions::
-                  unconstrained_compressed_constraint_kind &&
-              dof_info.hanging_node_constraint_masks_comp
-                [this->active_fe_index][this->first_selected_component])
-            has_hn_constraints = true;
 
           Assert(my_index_start[n_components_read].first ==
                      my_index_start[0].first ||

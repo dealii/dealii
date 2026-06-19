@@ -693,50 +693,12 @@ namespace internal
                     }
                   else
                     {
-                      const unsigned int *dof_indices =
-                        this->dof_indices.data() +
-                        row_starts[i * vectorization_length * n_components]
-                          .first;
                       if (n_lanes_filled == vectorization_length)
                         index_storage_variants[dof_access_cell][i] =
                           IndexStorageVariants::interleaved;
                       else
                         index_storage_variants[dof_access_cell][i] =
                           IndexStorageVariants::full;
-
-                      // do not use interleaved storage if two entries within
-                      // vectorized array point to the same index (scatter not
-                      // possible due to race condition)
-                      for (const unsigned int *indices = dof_indices;
-                           indices != dof_indices + ndofs;
-                           ++indices)
-                        {
-                          bool         is_sorted = true;
-                          unsigned int previous  = indices[0];
-                          for (unsigned int l = 1; l < n_lanes_filled; ++l)
-                            {
-                              const unsigned int current = indices[l * ndofs];
-                              if (current == numbers::invalid_unsigned_int)
-                                continue;
-
-                              if (current <= previous)
-                                is_sorted = false;
-
-                              // the simple check failed, must compare all
-                              // indices manually - due to short sizes this
-                              // O(n^2) algorithm is better than sorting
-                              if (!is_sorted)
-                                for (unsigned int j = 0; j < l; ++j)
-                                  if (indices[j * ndofs] == current)
-                                    {
-                                      index_storage_variants
-                                        [dof_access_cell][i] =
-                                          IndexStorageVariants::full;
-                                      break;
-                                    }
-                              previous = current;
-                            }
-                        }
                     }
                 }
               else // ndofs == 0
