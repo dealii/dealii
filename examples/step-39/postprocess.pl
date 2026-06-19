@@ -17,12 +17,12 @@ my $l2_order = 0.;
 
 while(<>)
 {
-    $step = $1 if m/DEAL::Step\s*(\d+)/;
-    $dofs[$step] = $1 if m/DEAL::DoFHandler\s*(\d+)/;
-    $error[$step] = $1 if m/DEAL::energy-error:\s*(\S+)/;
-    $l2error[$step] = $1 if m/DEAL::L2-error:\s*(\S+)/;
-    $estimate[$step] = $1 if m/DEAL::Estimate\s*(\S+)/;
-    $steps[$step] = $1 if m/DEAL:\w+::Convergence step\s*(\S+)/;
+    $step = $1 if m/Step\s*(\d+)/;
+    $dofs[$step] = $1 if m/DoFHandler\s*(\d+)/;
+    $error[$step] = $1 if m/energy-error:\s*(\S+)/;
+    $l2error[$step] = $1 if m/L2-error:\s*(\S+)/;
+    $estimate[$step] = $1 if m/Estimate\s*(\S+)/;
+    $steps[$step] = $1 if m/Converged in\s*(\S+) iterations/;
 }
 
 print '#step dofs error estimate l2error iterations efficiency order l2order', "\n";
