@@ -37,9 +37,9 @@ test()
     fe_collection.push_back(FESystem<dim>(FE_Q<dim>(i), 2));
 
   // construct the complete set of fe indices
-  std::set<unsigned int> fe_indices;
+  std::set<std::pair<unsigned int, unsigned int>> fe_indices;
   for (unsigned int i = 0; i < fe_collection.size(); ++i)
-    fe_indices.emplace(i);
+    fe_indices.emplace(i, 0u);
 
   const auto identities = fe_collection.hp_quad_dof_identities(fe_indices);
 
