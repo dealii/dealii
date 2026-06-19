@@ -67,6 +67,14 @@ jobs:
       run: |
         cmake --build build --target setup_tests_a-framework setup_tests_examples setup_tests_quick_tests
         ctest --test-dir build --build-config Debug --extra-verbose -E "step-100.debug|step-100.release"
+    - name: show largest files
+      # we are nearly at the limit (4 GB) for what a .lib can contain on Windows. Monitor the size by printing out the largest
+      # files in the build directory
+      run: |
+        Get-ChildItem -Path build -Recurse -File -ErrorAction SilentlyContinue |
+        Sort-Object Length -Descending |
+        Select-Object -First 200 |
+        Format-Table @{Name="Size(MB)"; Expression={[math]::Round($_.Length / 1MB, 2)}}, FullName -AutoSize
     - name: upload library
       # run only if a PR is merged into master
       if: ${{ github.ref == 'refs/heads/master' && matrix.os == 'windows-2025' }}
