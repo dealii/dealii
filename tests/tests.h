@@ -880,14 +880,17 @@ struct EnableFPE
   EnableFPE()
   {
 #if defined(DEBUG) && defined(DEAL_II_HAVE_FP_EXCEPTIONS)
+    // Some versions of HDF5 detect the floating-point environment by
+    // performing several operations which trigger floating-point
+    // exceptions.  Hence we need to set up HDF5's global state before
+    // calling feenableexcept(). This is fixed in HDF5 1.14.4, so we
+    // only need this work-around for versions before.
 #  if defined(DEAL_II_WITH_HDF5)
-    // Modern versions of HDF5 detect the floating-point environment by
-    // performing several operations which trigger floating-point exceptions.
-    // Hence we need to set up HDF5's global state before calling
-    // feenableexcept().
+#    if !H5_VERSION_GE(1, 14, 4)
     const int ierr = H5open();
     AssertThrow(ierr == 0, ExcInternalError());
     feclearexcept(FE_ALL_EXCEPT);
+#    endif
 #  endif
     // enable floating point exceptions
     feenableexcept(FE_DIVBYZERO | FE_INVALID);
