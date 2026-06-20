@@ -1672,16 +1672,28 @@ public:
    * useful if the current object is an FESystem, as the return value can
    * only be @p this in all other cases.
    *
-   * Note that the returned object can be an FESystem if the
-   * mask matches it but not any of the contained objects.
+   * Note that the returned object can be an FESystem itself if either (i) the
+   * current element is an FESystem and the given mask selects all components,
+   * or (ii) the current element is an FESystem that is composed of sub-elements
+   * of which the components selected by the mask are themselves an FESystem.
    *
    * Let us illustrate the function with the an FESystem @p fe with 7 components:
    * @code
    * FESystem<2> fe_velocity(FE_Q<2>(2), 2);
-   * FE_Q<2> fe_pressure(1);
-   * FE_DGP<2> fe_dg(0);
-   * FE_BDM<2> fe_nonprim(1);
+   * FE_Q<2>     fe_pressure(1);
+   * FE_DGP<2>   fe_dg(0);
+   * FE_BDM<2>   fe_nonprim(1);
+   *
    * FESystem<2> fe(fe_velocity, 1, fe_pressure, 1, fe_dg, 2, fe_nonprim, 1);
+   * @endcode
+   * An alternative way of creating this element would be
+   * @code
+   * FESystem<2> fe_velocity(FE_Q<2>(2)^2);
+   * FE_Q<2>     fe_pressure(1);
+   * FE_DGP<2>   fe_dg(0);
+   * FE_BDM<2>   fe_nonprim(1);
+   *
+   * FESystem<2> fe(fe_velocity, fe_pressure, fe_dg^2, fe_nonprim);
    * @endcode
    *
    * The following table lists all possible component masks you can use:
@@ -1732,6 +1744,15 @@ public:
    * <td>both components of @p fe_nonprim</td>
    * </tr>
    * </table>
+   *
+   * For any other mask you might give, the element you would want is not one of
+   * the sub-elements of the combined `fe` and so it is not possible to return
+   * a reference to an already constructed element. For example, if you had
+   * provided <code>[true,true,true,false,false,false,false]</code>, you might
+   * hope that you'd get an FESystem that combines `fe_velocity` and
+   * `fe_pressure`, but this combination is not an already formed sub-element of
+   * `fe` and so no reference can be returned. As a consequence, for this mask
+   * (or any other mask not listed above), you will receive an exception.
    */
   const FiniteElement<dim, spacedim> &
   get_sub_fe(const ComponentMask &mask) const;
