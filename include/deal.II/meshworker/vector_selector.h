@@ -44,7 +44,7 @@ namespace MeshWorker
    *
    * @ingroup MeshWorker
    */
-  class VectorSelector : public EnableObserverPointer
+  class DEAL_II_DEPRECATED_EARLY VectorSelector : public EnableObserverPointer
   {
   public:
     /**
@@ -187,7 +187,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim, typename Number = double>
-  class VectorDataBase : public VectorSelector
+  class DEAL_II_DEPRECATED_EARLY VectorDataBase : public VectorSelector
   {
   public:
     /**
@@ -299,7 +299,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <typename VectorType, int dim, int spacedim = dim>
-  class VectorData
+  class DEAL_II_DEPRECATED_EARLY VectorData
     : public VectorDataBase<dim, spacedim, typename VectorType::value_type>
   {
   public:
@@ -379,7 +379,8 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <typename VectorType, int dim, int spacedim = dim>
-  class MGVectorData : public VectorData<VectorType, dim, spacedim>
+  class DEAL_II_DEPRECATED_EARLY MGVectorData
+    : public VectorData<VectorType, dim, spacedim>
   {
   public:
     /**

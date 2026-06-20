@@ -100,7 +100,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename number = double>
-    class CellsAndFaces
+    class DEAL_II_DEPRECATED_EARLY CellsAndFaces
     {
     public:
       /**

@@ -1,0 +1,53 @@
+Deprecated: deal.II has had a long list of classes in namespace
+MeshWorker that were developed decades ago when we had a different
+programming style and that were intended to hide some of the
+complexity of assembling linear systems as well as evaluating and
+postprocessing solutions. Many parts of the MeshWorker framework
+worked well for a specific purpose, but turned out to be very
+difficult to adapt to other tasks -- say, converting the assembly of a
+term to a term that nonlinearly depends on coefficients that
+themselves depend on the current solution. The framework also dates
+back to a time when deal.II had substantially poorer test coverage and
+documentation, and as a consequence corner cases were often found to
+not actually work as expected, and/or not well documented.
+
+As a consequence, we have over time developed other, better, better
+documented, and better tested tools for all of these tasks. The only
+remaining hold-out that used the old MeshWorker framework was step-39,
+and with the conversion of step-39 from the old MeshWorker::loop()
+function to the newer MeshWorker::mesh_loop() function, many of the
+old classes have become unused in the tutorial and have been
+deprecated (and will consequently be removed in the second-next
+release). Specifically, these classes and functions are:
+
+- MeshWorker::DoFInfo
+- MeshWorker::IntegrationInfo
+- MeshWorker::IntegrationInfoBox
+- MeshWorker::loop().
+
+This has also led to many other classes that were previously only used
+within the classes and functions mentioned above, and that are now
+also deprecated:
+
+- MeshWorker::Assembler::Functional
+- MeshWorker::Assembler::ResidualLocalBlocksToGlobalBlocks
+- MeshWorker::Assembler::MatrixLocalBlocksToGlobalBlocks
+- MeshWorker::Assembler::MGMatrixLocalBlocksToGlobalBlocks
+- MeshWorker::Assembler::ResidualSimple
+- MeshWorker::Assembler::MatrixSimple
+- MeshWorker::Assembler::MGMatrixSimple
+- MeshWorker::Assembler::SystemSimple
+- MeshWorker::Assembler::CellsAndFaces
+- MeshWorker::Assembler::GnuplotPatch
+- MeshWorker::VectorSelector
+- MeshWorker::VectorDataBase
+- MeshWorker::VectorData
+- MeshWorker::MGVectorData
+- MeshWorker::LocalResults
+- MeshWorker::LoopControl
+- MeshWorker::cell_action()
+
+All of these classes will disappear in a future release.
+
+<br>
+(Wolfgang Bangerth, 2026/06/16)
