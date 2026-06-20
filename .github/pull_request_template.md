@@ -4,7 +4,7 @@ By submitting this pull request, we, the authors of this pull request, confirm t
 
 - [ ] We have read and agree to abide by the [Code of Conduct](../CODE_OF_CONDUCT.md).
 - [ ] We have read the [contributing guidelines](../CONTRIBUTING.md) and our contribution is made under the terms of the [deal.II license](../LICENSE.md).
-- [ ] **Use of AI tools:** 
+- **Use of AI tools:** 
   - [ ] No generative AI tools were used in preparing this contribution.
   - [ ] Generative AI tools were used. In this case, please ensure that you complete the AI declaration statement.
 
