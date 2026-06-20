@@ -10,4 +10,4 @@ By submitting this pull request, we, the authors of this pull request, confirm t
 
 ### AI Declaration Statement
 
-<!-- If you have used generative AI tools while writing this pull request. Please explain what these generative AI tools were used for and which model was used. Feel free to provide examples the prompts that were used while writing this pull request. -->
+<!-- If you have used generative AI tools while writing this pull request. Please explain what these generative AI tools were used for and which model was used. Feel free to provide the prompts that were used while writing this pull request. -->
