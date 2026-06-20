@@ -69,7 +69,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim, typename number = double>
-  class DoFInfo : public LocalResults<number>
+  class DEAL_II_DEPRECATED_EARLY DoFInfo : public LocalResults<number>
   {
   public:
     /// The current cell
@@ -215,7 +215,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, class DOFINFO>
-  class DoFInfoBox
+  class DEAL_II_DEPRECATED_EARLY DoFInfoBox
   {
   public:
     /**
