@@ -5,7 +5,6 @@ As a contributor to this project, you agree that all of your contributions to de
  - Your contribution is made under the terms of the [deal.II license](https://github.com/dealii/dealii/blob/master/LICENSE.md).
 
  Furthermore, by submitting this pull request, you confirm that:
-
 - You have read and agree to abide by the [Code of Conduct](https://github.com/dealii/dealii/blob/master/CODE_OF_CONDUCT.md).
 - You have read the [contributing guidelines](https://github.com/dealii/dealii/blob/master/CONTRIBUTING.md). 
 - **Use of AI tools:** 
