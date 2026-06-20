@@ -79,8 +79,19 @@ namespace parallel
    *   hp_dof_handler.get_triangulation().signals.weight.connect(
    *     parallel::CellWeights<dim, spacedim>::make_weighting_callback(
    *       hp_dof_handler,
-   *       parallel::CellWeights<dim, spacedim>::ndofs_weighting({1, 1}));
+   *       parallel::CellWeights<dim, spacedim>::ndofs_weighting({1, 1})));
    * @endcode
+   *
+   * Oftentimes, the weighting function only requires information about the
+   * finite element (for example about the number of degrees of freedom per
+   * cell), but not the cell we are currently considering (even though the
+   * weighting function takes a cell iterator as argument). In this case, it is
+   * wasteful to re-compute the weight on every cell we visit; instead, the
+   * weights can be computed in advance for each finite element in use on the
+   * DoFHandler with precompute_weights(). The returned container can then be
+   * either passed to the corresponding constructor, reinit() or
+   * make_weighting_callback() function. Of course, in this case no other
+   * cell-specific information can be used in the computation of the weights.
    *
    * The use of this class is demonstrated in step-75.
    *
@@ -126,6 +137,68 @@ namespace parallel
                    const FiniteElement<dim, spacedim> &)>;
 
     /**
+     * @name Selection of weighting functions
+     * @{
+     */
+
+    /**
+     * This function returns a WeightingFunction which determines the weight to
+     * be applied on each cell. It is used to initialize a CellWeights object.
+     *
+     * Chooses a constant weight @p factor on each cell.
+     */
+    static WeightingFunction
+    constant_weighting(const unsigned int factor = 1);
+
+    /**
+     * This function returns a WeightingFunction which determines the weight to
+     * be applied on each cell. It is used to initialize a CellWeights object.
+     *
+     * The pair of floating point numbers $(a,b)$ provided via
+     * @p coefficients determines the weight $w_K$ of each cell $K$ with
+     * $n_K$ degrees of freedom in the following way: $w_K =
+     * a \, n_K^b$.
+     *
+     * The right hand side will be rounded to the nearest integer since cell
+     * weights are required to be integers.
+     */
+    static WeightingFunction
+    ndofs_weighting(const std::pair<float, float> &coefficients);
+
+    /**
+     * This function returns a WeightingFunction which determines the weight to
+     * be applied on each cell. It is used to initialize a CellWeights object.
+     *
+     * The container @p coefficients provides pairs of floating point numbers
+     * $(a_i, b_i)$ that determine the weight $w_K$ of each cell
+     * $K$ with $n_K$ degrees of freedom in the following way: $w_K =
+     * \sum_i a_i \, n_K^{b_i}$.
+     *
+     * The right hand side will be rounded to the nearest integer since cell
+     * weights are required to be integers.
+     */
+    static WeightingFunction
+    ndofs_weighting(const std::vector<std::pair<float, float>> &coefficients);
+
+    /**
+     * For a given WeightingFunction, this function returns pre-computed weights
+     * for each finite element in @p fe_collection. Pass the container to the
+     * corresponding constructor, reinit() or make_weighting_callback()
+     * functions.
+     *
+     * If your weights only require information about the finite element on each
+     * cell, consider pre-computing them with this function. All other
+     * cell-specific characteristics in determining weights will be omitted.
+     */
+    static std::vector<unsigned int>
+    precompute_weights(const hp::FECollection<dim, spacedim> &fe_collection,
+                       const WeightingFunction &weighting_function);
+
+    /**
+     * @}
+     */
+
+    /**
      * Constructor.
      *
      * No weighting function will be connected yet. Please call reinit().
@@ -142,6 +215,19 @@ namespace parallel
      */
     CellWeights(const DoFHandler<dim, spacedim> &dof_handler,
                 const WeightingFunction         &weighting_function);
+
+    /**
+     * Constructor.
+     *
+     * @param[in] dof_handler The DoFHandler which will be used to
+     *    determine each cell's finite element.
+     * @param[in] precomputed_weights Weights for each finite element of the
+     *    hp::FECollection used by @p dof_handler. On each cell, we query its
+     *    active finite element index and use this index to look up its weight
+     *    during load balancing.
+     */
+    CellWeights(const DoFHandler<dim, spacedim> &dof_handler,
+                const std::vector<unsigned int> &precomputed_weights);
 
     /**
      * Destructor.
@@ -161,6 +247,19 @@ namespace parallel
            const WeightingFunction         &weighting_function);
 
     /**
+     * Connect a different weighting mechanism to the Triangulation
+     * associated with the @p dof_handler. Values in @p precomputed_weights will
+     * be used as weights for each finite element. On each cell, we query its
+     * active finite element index and use this index to look up its weight
+     * during load balancing.
+     *
+     * Disconnects the function previously connected to the weighting signal.
+     */
+    void
+    reinit(const DoFHandler<dim, spacedim> &dof_handler,
+           const std::vector<unsigned int> &precomputed_weights);
+
+    /**
      * Converts a @p weighting_function to a different type that qualifies as
      * a callback function, which can be connected to a weighting signal of a
      * Triangulation.
@@ -175,43 +274,19 @@ namespace parallel
                             const WeightingFunction &weighting_function);
 
     /**
-     * @name Selection of weighting functions
-     * @{
-     */
-
-    /**
-     * Choose a constant weight @p factor on each cell.
-     */
-    static WeightingFunction
-    constant_weighting(const unsigned int factor = 1);
-
-    /**
-     * The pair of floating point numbers $(a,b)$ provided via
-     * @p coefficients determines the weight $w_K$ of each cell $K$ with
-     * $n_K$ degrees of freedom in the following way: \f[ w_K =
-     * a \, n_K^b \f]
+     * Use @p precomputed_weights as weights for each finite element of
+     * @p dof_handler. Returns a callback function, which can be connected to a
+     * weighting signal of a Triangulation.
      *
-     * The right hand side will be rounded to the nearest integer since cell
-     * weights are required to be integers.
+     * This function does <b>not</b> connect the callback function to the
+     * Triangulation associated with the @p dof_handler.
      */
-    static WeightingFunction
-    ndofs_weighting(const std::pair<float, float> &coefficients);
-
-    /**
-     * The container @p coefficients provides pairs of floating point numbers
-     * $(a_i, b_i)$ that determine the weight $w_K$ of each cell
-     * $K$ with $n_K$ degrees of freedom in the following way: \f[ w_K =
-     * \sum_i a_i \, n_K^{b_i} \f]
-     *
-     * The right hand side will be rounded to the nearest integer since cell
-     * weights are required to be integers.
-     */
-    static WeightingFunction
-    ndofs_weighting(const std::vector<std::pair<float, float>> &coefficients);
-
-    /**
-     * @}
-     */
+    static std::function<unsigned int(
+      const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
+      const CellStatus status)>
+    make_weighting_callback(
+      const DoFHandler<dim, spacedim> &dof_handler,
+      const std::vector<unsigned int> &precomputed_weights);
 
   private:
     /**
@@ -221,7 +296,7 @@ namespace parallel
     boost::signals2::connection connection;
 
     /**
-     * A callback function that will be connected to the `weight` signal of
+     * A callback function that can be connected to the `weight` signal of
      * the @p triangulation, to which the @p dof_handler is attached. Ultimately
      * returns the weight for each cell, determined by the @p weighting_function
      * provided as a parameter. Returns zero if @p dof_handler has not been
@@ -234,6 +309,21 @@ namespace parallel
       const DoFHandler<dim, spacedim>                  &dof_handler,
       const parallel::TriangulationBase<dim, spacedim> &triangulation,
       const WeightingFunction                          &weighting_function);
+
+    /**
+     * A callback function that can be connected to the `weight` signal of
+     * the @p triangulation, to which the @p dof_handler is attached. Ultimately
+     * returns the weight for each cell, determined by the @p precomputed_weights
+     * provided as a parameter. Returns zero if @p dof_handler has not been
+     * initialized yet.
+     */
+    static unsigned int
+    weighting_callback(
+      const typename dealii::Triangulation<dim, spacedim>::cell_iterator &cell,
+      const CellStatus                                  status,
+      const DoFHandler<dim, spacedim>                  &dof_handler,
+      const parallel::TriangulationBase<dim, spacedim> &triangulation,
+      const std::vector<unsigned int>                  &precomputed_weights);
   };
 } // namespace parallel
 
