@@ -32,7 +32,7 @@
 
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 
-#include "mg_transfer_copy_to_host_util.h"
+#include "mg_transfer_util.h"
 
 using namespace dealii;
 

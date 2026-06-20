@@ -25,6 +25,7 @@ set(_separate_src
   mg_tools.cc
   mg_transfer_global_coarsening.cc
   mg_transfer_matrix_free.cc
+  portable_mg_transfer_global_coarsening.cc
   )
 
 # concatenate all unity inclusion files in one file
@@ -48,6 +49,7 @@ set(_inst
   mg_transfer_matrix_free.inst.in
   mg_transfer_prebuilt.inst.in
   multigrid.inst.in
+  portable_mg_transfer_global_coarsening.inst.in
   )
 
 file(GLOB _header CONFIGURE_DEPENDS

@@ -45,12 +45,22 @@ namespace internal
   class MGTwoLevelTransferImplementation;
 } // namespace internal
 
+namespace Portable
+{
+  template <int dim, typename VectorType>
+  class MGTwoLevelTransfer;
+
+  namespace internal
+  {
+    class MGTwoLevelTransferImplementation;
+  } // namespace internal
+} // namespace Portable
+
 template <int dim,
           typename Number,
           typename MemorySpace = ::dealii::MemorySpace::Host>
 class MGTransferMatrixFree;
 #endif
-
 
 /**
  * @addtogroup mg
@@ -666,6 +676,12 @@ private:
   friend class MGTransferMatrixFree<dim, Number, MemorySpace::Host>;
 
   friend class MGTransferMatrixFree<dim, Number, MemorySpace::Default>;
+
+  friend class Portable::MGTwoLevelTransfer<
+    dim,
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>;
+
+  friend class Portable::internal::MGTwoLevelTransferImplementation;
 };
 
 
