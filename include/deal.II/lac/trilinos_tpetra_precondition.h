@@ -1432,7 +1432,7 @@ namespace LinearAlgebra
         /**
          * Specifies the constant modes (forming the near null space) of the
          * matrix. This parameter helps MueLu consider that null space
-         * when building the preconditoner. Additionaly, it also tells
+         * when building the preconditioner. Additionally, it also tells
          * MueLu whether we work on a scalar equation (with a single
          * constant mode) or on a vector-valued
          * equation (with as many constant modes as solution components).
