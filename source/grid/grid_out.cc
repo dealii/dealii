@@ -1578,9 +1578,16 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
           maybe_add_element(cell->line(l), cell->line(l)->boundary_id());
     }
 
-  // Now that we collected everything, plug them into gmsh
-  gmsh::initialize();
+    // Now that we collected everything, plug them into gmsh
+#  if DEAL_II_GMSH_WITH_API_VERSION_GTE(4, 9, 4)
+  AssertThrow(gmsh::isInitialized() == 1,
+              ExcMessage("The GMSH API may only be called after GMSH is "
+                         "initialized, e.g., via the InitFinalize or "
+                         "MPI_InitFinalize classes or the gmsh::initialize() "
+                         "function."));
+#  endif
   gmsh::option::setNumber("General.Verbosity", 0);
+  gmsh::clear();
   gmsh::model::add("Grid generated in deal.II");
   for (const auto &p : dim_entity_tag)
     {
@@ -1633,7 +1640,6 @@ GridOut::write_msh(const Triangulation<dim, spacedim> &tria,
 
   gmsh::write(filename);
   gmsh::clear();
-  gmsh::finalize();
 #else
   (void)tria;
   (void)filename;

@@ -54,7 +54,7 @@ test(const std::uint8_t kind, const std::string out = "")
 int
 main(int argc, char **argv)
 {
-  // gmsh might be build with mpi support enabled.
+  // gmsh has global state, so set that up in the normal way:
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   initlog();
 

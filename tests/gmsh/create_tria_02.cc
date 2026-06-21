@@ -14,6 +14,8 @@
 // Create a hyper ball, refine it, extract an iges of the boundary,
 // and create a new mesh using gmsh from that iges file.
 
+#include <deal.II/base/init_finalize.h>
+
 #include <deal.II/gmsh/utilities.h>
 
 #include <deal.II/grid/grid_generator.h>
@@ -26,8 +28,11 @@
 #include "../tests.h"
 
 int
-main()
+main(int argc, char **argv)
 {
+  // gmsh has global state, so set that up in the normal way:
+  InitFinalize init_finalize(argc, argv, InitializeLibrary::GMSH);
+
   initlog();
 
   Triangulation<2> tria(Triangulation<2>::MeshSmoothing::none,
