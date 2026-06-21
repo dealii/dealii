@@ -64,9 +64,13 @@ enum class InitializeLibrary
    */
   P4EST = 32,
   /**
-   * Initialize/finalize P4EST and SC.
+   * Initialize/finalize PSBLAS.
    */
-  PSBLAS = 64
+  PSBLAS = 64,
+  /**
+   * Initialize/finalize T8CODE and SC.
+   */
+  T8CODE = 128
 };
 
 
