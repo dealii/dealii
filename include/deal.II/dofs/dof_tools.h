@@ -1331,8 +1331,9 @@ namespace DoFTools
    *
    * In case of parallel::distributed::Triangulation @p predicate will be called
    * only for locally owned and ghost cells. The resulting index set may contain
-   * DoFs that are associated with the locally owned or ghost cells, but are not
-   * owned by the current MPI process.
+   * DoFs associated with locally owned cells, as well as DoFs by which a
+   * locally active DoF is constrained but which may not themselves be locally
+   * active.
    */
   template <int dim, int spacedim, typename number = double>
   IndexSet

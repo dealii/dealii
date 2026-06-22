@@ -1,10 +1,13 @@
 
-DEAL:0:0::16
-DEAL:0:0::accumulated: 
-DEAL:0:0::16
-DEAL:0:0::76
-DEAL:0:0::accumulated: 
-DEAL:0:0::76
-DEAL:0:0::16
-DEAL:0:0::accumulated: 
-DEAL:0:0::16
+DEAL:0:0::Number of locally active dofs: 81
+DEAL:0:0::Number of dofs with contained support: 16
+DEAL:0:0::Number of owned dofs with contained support: 16
+DEAL:0:0::Total number of dofs with contained support: 16
+DEAL:0:0::Number of locally active dofs: 141
+DEAL:0:0::Number of dofs with contained support: 76
+DEAL:0:0::Number of owned dofs with contained support: 76
+DEAL:0:0::Total number of dofs with contained support: 76
+DEAL:0:0::Number of locally active dofs: 245
+DEAL:0:0::Number of dofs with contained support: 16
+DEAL:0:0::Number of owned dofs with contained support: 16
+DEAL:0:0::Total number of dofs with contained support: 16

@@ -1,0 +1,19 @@
+
+DEAL:0:0::Refined cell: none
+DEAL:0:0::Number of locally active dofs: 6
+DEAL:0:0::Number of dofs with contained support: 2
+DEAL:0:0::Number of owned dofs with contained support: 2
+DEAL:0:0::Total number of dofs with contained support: 2
+DEAL:0:0::
+DEAL:0:0::Refined cell: left_cell
+DEAL:0:0::Number of locally active dofs: 11
+DEAL:0:0::Number of dofs with contained support: 2
+DEAL:0:0::Number of owned dofs with contained support: 2
+DEAL:0:0::Total number of dofs with contained support: 2
+DEAL:0:0::
+DEAL:0:0::Refined cell: right_cell
+DEAL:0:0::Number of locally active dofs: 11
+DEAL:0:0::Number of dofs with contained support: 7
+DEAL:0:0::Number of owned dofs with contained support: 7
+DEAL:0:0::Total number of dofs with contained support: 7
+DEAL:0:0::
