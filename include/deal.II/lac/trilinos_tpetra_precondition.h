@@ -1349,26 +1349,49 @@ namespace LinearAlgebra
          *
          * By default, we pretend to work on elliptic problems with linear
          * finite elements on a scalar equation.
+
+         * Making use of the DoFTools::extract_constant_modes() function, the
+         * @p constant_modes vector can be initialized for a given field in the
+         * following manner:
+         *
+         * @code
+         *   #include <deal.II/dofs/dof_tools.h>
+         *   ...
+         *
+         *   DoFHandler<...> dof_handler;
+         *   FEValuesExtractors::Type... field_extractor;
+         *   ...
+         *
+         *   LinearAlgebra::TpetraWrappers::PreconditionAMGMueLu::AdditionalData
+         *     data;
+         *   DoFTools::extract_constant_modes(
+         *     dof_handler,
+         *     dof_handler.get_fe_collection().component_mask(field_extractor),
+         *     data.constant_modes);
+         * @endcode
          *
          * @param elliptic Optimize MueLu for elliptic problems.
          * @param symmetric Assume for A to be symmetric.
          * @param w_cycle Use W-cycle instead of V-cycle.
          * @param aggregation_threshold Threshold for coarsening.
+         * @param constant_modes Determine the nullspace of the equation.
          * @param smoother_sweeps Number of times to apply the smoother.
          * @param smoother_overlap Overlap of smoother if run in parallel.
          * @param output_details Print additional info to screen.
          * @param smoother_type Determine the smoother to use.
          * @param coarse_type Determine the coarse solver.
          */
-        AdditionalData(const bool         elliptic              = true,
-                       const bool         symmetric             = true,
-                       const bool         w_cycle               = false,
-                       const double       aggregation_threshold = 1e-4,
-                       const int          smoother_sweeps       = 2,
-                       const int          smoother_overlap      = 0,
-                       const bool         output_details        = false,
-                       const std::string &smoother_type         = "Chebyshev",
-                       const std::string &coarse_type           = "KLU2");
+        AdditionalData(const bool   elliptic              = true,
+                       const bool   symmetric             = true,
+                       const bool   w_cycle               = false,
+                       const double aggregation_threshold = 1e-4,
+                       const std::vector<std::vector<bool>> &constant_modes =
+                         std::vector<std::vector<bool>>(0),
+                       const int          smoother_sweeps  = 2,
+                       const int          smoother_overlap = 0,
+                       const bool         output_details   = false,
+                       const std::string &smoother_type    = "Chebyshev",
+                       const std::string &coarse_type      = "KLU2");
 
         /**
          * @brief Optimize for elliptic problems.
@@ -1405,6 +1428,19 @@ namespace LinearAlgebra
          * times the diagonal element couple strongly.
          */
         double aggregation_threshold;
+
+        /**
+         * Specifies the constant modes (forming the near null space) of the
+         * matrix. This parameter helps MueLu consider that null space
+         * when building the preconditioner. Additionally, it also tells
+         * MueLu whether we work on a scalar equation (with a single
+         * constant mode) or on a vector-valued
+         * equation (with as many constant modes as solution components).
+         * Providing the correct constant modes, provided by
+         * DoFTools::extract_constant_modes() can significantly increase
+         * the performance of the preconditioner.
+         */
+        std::vector<std::vector<bool>> constant_modes;
 
         /**
          * @brief Number of times pre- and post-smoothing are applied.

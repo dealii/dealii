@@ -197,6 +197,8 @@ Step4<dim>::solve()
   LinearAlgebra::TpetraWrappers::PreconditionAMGMueLu<double> preconditioner;
   LinearAlgebra::TpetraWrappers::PreconditionAMGMueLu<double>::AdditionalData
     data;
+  data.constant_modes =
+    DoFTools::extract_constant_modes(dof_handler, std::vector<bool>(1, true));
   data.smoother_sweeps = 2;
   {
     solution = 0;
@@ -208,8 +210,8 @@ Step4<dim>::solve()
     check_solver_within_range(
       solver.solve(system_matrix, solution, system_rhs, preconditioner),
       solver_control.last_step(),
-      40,
-      100);
+      18,
+      32);
   }
   deallog.pop();
 }
