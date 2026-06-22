@@ -276,7 +276,7 @@ namespace DoFTools
     // triangulation then the output array is index by
     // dof.locally_owned_dofs().index_within_set(indices[i])
     template <int dim, int spacedim>
-    inline void
+    void
     get_block_association(const DoFHandler<dim, spacedim> &dof,
                           std::vector<unsigned char>      &dofs_by_block)
     {

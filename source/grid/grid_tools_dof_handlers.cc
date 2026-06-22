@@ -2379,7 +2379,7 @@ namespace GridTools
    * is parallel to the unit vector in <direction>
    */
   template <int spacedim>
-  inline bool
+  bool
   orthogonal_equality(const Point<spacedim>     &point1,
                       const Point<spacedim>     &point2,
                       const unsigned int         direction,

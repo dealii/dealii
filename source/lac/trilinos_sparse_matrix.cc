@@ -1957,13 +1957,13 @@ namespace TrilinosWrappers
     namespace SparseMatrixImplementation
     {
       template <typename VectorType>
-      inline void
+      void
       check_vector_map_equality(const Epetra_CrsMatrix &,
                                 const VectorType &,
                                 const VectorType &)
       {}
 
-      inline void
+      void
       check_vector_map_equality(const Epetra_CrsMatrix              &m,
                                 const TrilinosWrappers::MPI::Vector &in,
                                 const TrilinosWrappers::MPI::Vector &out)

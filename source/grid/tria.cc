@@ -2861,7 +2861,7 @@ namespace internal
      * Furthermore, the type of the quad is determined.
      */
     template <int dim>
-    inline void
+    void
     build_intersection(
       const std::vector<ReferenceCell<dim>>           &cell_types,
       const ArrayOfArrays                             &cells_to_vertices,
@@ -15744,14 +15744,14 @@ namespace internal
 {
   namespace TriangulationImplementation
   {
-    inline unsigned int
+    unsigned int
     n_cells(const internal::TriangulationImplementation::NumberCache<1> &c)
     {
       return c.n_lines;
     }
 
 
-    inline unsigned int
+    unsigned int
     n_active_cells(
       const internal::TriangulationImplementation::NumberCache<1> &c)
     {
@@ -15759,14 +15759,14 @@ namespace internal
     }
 
 
-    inline unsigned int
+    unsigned int
     n_cells(const internal::TriangulationImplementation::NumberCache<2> &c)
     {
       return c.n_quads;
     }
 
 
-    inline unsigned int
+    unsigned int
     n_active_cells(
       const internal::TriangulationImplementation::NumberCache<2> &c)
     {
@@ -15774,14 +15774,14 @@ namespace internal
     }
 
 
-    inline unsigned int
+    unsigned int
     n_cells(const internal::TriangulationImplementation::NumberCache<3> &c)
     {
       return c.n_hexes;
     }
 
 
-    inline unsigned int
+    unsigned int
     n_active_cells(
       const internal::TriangulationImplementation::NumberCache<3> &c)
     {
