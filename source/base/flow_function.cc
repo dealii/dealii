@@ -511,7 +511,7 @@ namespace Functions
   {}
 
 
-  inline double
+  double
   StokesLSingularity::Psi(double phi) const
   {
     return coslo * (std::sin(lp * phi) / lp - std::sin(lm * phi) / lm) -
@@ -519,7 +519,7 @@ namespace Functions
   }
 
 
-  inline double
+  double
   StokesLSingularity::Psi_1(double phi) const
   {
     return coslo * (std::cos(lp * phi) - std::cos(lm * phi)) +
@@ -527,7 +527,7 @@ namespace Functions
   }
 
 
-  inline double
+  double
   StokesLSingularity::Psi_2(double phi) const
   {
     return coslo * (lm * std::sin(lm * phi) - lp * std::sin(lp * phi)) +
@@ -535,7 +535,7 @@ namespace Functions
   }
 
 
-  inline double
+  double
   StokesLSingularity::Psi_3(double phi) const
   {
     return coslo *
@@ -545,7 +545,7 @@ namespace Functions
   }
 
 
-  inline double
+  double
   StokesLSingularity::Psi_4(double phi) const
   {
     return coslo * (lp * lp * lp * std::sin(lp * phi) -

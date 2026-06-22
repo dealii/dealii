@@ -1348,7 +1348,7 @@ FiniteElement<dim, spacedim>::get_face_data(
 
 
 template <int dim, int spacedim>
-inline void
+void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell,
   const unsigned int                                          face_no,
@@ -1377,7 +1377,7 @@ FiniteElement<dim, spacedim>::fill_fe_face_values(
 
 
 template <int dim, int spacedim>
-inline void
+void
 FiniteElement<dim, spacedim>::fill_fe_face_values(
   const typename Triangulation<dim, spacedim>::cell_iterator & /* cell */,
   const unsigned int /* face_no */,

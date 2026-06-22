@@ -73,7 +73,7 @@ namespace PSCToolkitWrappers
 
 
   template <typename ForwardIterator>
-  inline void
+  void
   SparsityPattern::add_entries(
     const PSCToolkitWrappers::SparsityPattern::size_type row,
     ForwardIterator                                      begin,

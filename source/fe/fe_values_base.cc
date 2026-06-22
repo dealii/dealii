@@ -1411,7 +1411,7 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
 
 
 template <int dim, int spacedim>
-inline void
+void
 FEValuesBase<dim, spacedim>::check_cell_similarity(
   const typename Triangulation<dim, spacedim>::cell_iterator &cell)
 {

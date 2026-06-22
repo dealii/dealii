@@ -223,7 +223,7 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
-  inline bool
+  bool
   Fourier<dim, spacedim>::operator==(
     const Fourier<dim, spacedim> &fourier) const
   {

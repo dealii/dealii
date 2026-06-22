@@ -644,7 +644,7 @@ namespace NonMatching
 
 
       template <int dim>
-      inline void
+      void
       ExtendableQuadrature<dim>::clear()
       {
         this->quadrature_points.clear();

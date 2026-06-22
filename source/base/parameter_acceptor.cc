@@ -283,7 +283,7 @@ ParameterAcceptor::leave_my_subsection(
 
 
 
-inline unsigned int
+unsigned int
 ParameterAcceptor::get_acceptor_id() const
 {
   return acceptor_id;

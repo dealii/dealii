@@ -170,7 +170,7 @@ namespace NonMatching
 
 
   template <int dim>
-  inline void
+  void
   FEImmersedSurfaceValues<dim>::initialize(const UpdateFlags update_flags)
   {
     UpdateFlags flags = this->compute_update_flags(update_flags);
