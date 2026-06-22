@@ -725,7 +725,7 @@ namespace Utilities
           index_type
           operator[](const std::size_t index) const;
 
-          bool
+          [[maybe_unused]] bool
           entry_has_been_set(const std::size_t index) const;
 
         private:
@@ -1177,7 +1177,7 @@ namespace Utilities
 
 
 
-        inline bool
+        inline [[maybe_unused]] bool
         FlexibleIndexStorage::entry_has_been_set(const std::size_t index) const
         {
           AssertIndexRange(index, size);
