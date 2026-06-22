@@ -51,7 +51,7 @@ namespace
   }
 
   template <typename number>
-  inline number
+  number
   max_element(const dealii::Vector<number> &criteria)
   {
     return (criteria.size() > 0) ?
@@ -62,7 +62,7 @@ namespace
 
 
   template <typename number>
-  inline number
+  number
   min_element(const dealii::Vector<number> &criteria)
   {
     return (criteria.size() > 0) ?

@@ -33,7 +33,7 @@ namespace internal
   namespace
   {
     template <std::size_t dim>
-    inline void
+    void
     compute_tensor_index(const unsigned int,
                          const unsigned int,
                          const unsigned int,
@@ -42,7 +42,7 @@ namespace internal
       DEAL_II_NOT_IMPLEMENTED();
     }
 
-    inline void
+    void
     compute_tensor_index(const unsigned int n,
                          const unsigned int,
                          const unsigned int,
@@ -51,7 +51,7 @@ namespace internal
       indices[0] = n;
     }
 
-    inline void
+    void
     compute_tensor_index(const unsigned int n,
                          const unsigned int n_pols_0,
                          const unsigned int,
@@ -61,7 +61,7 @@ namespace internal
       indices[1] = n / n_pols_0;
     }
 
-    inline void
+    void
     compute_tensor_index(const unsigned int           n,
                          const unsigned int           n_pols_0,
                          const unsigned int           n_pols_1,

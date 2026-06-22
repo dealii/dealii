@@ -55,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   template <typename T>
-  inline T
+  T
   sqr(const T t)
   {
     return t * t;

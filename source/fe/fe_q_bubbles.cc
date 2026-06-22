@@ -41,7 +41,7 @@ namespace internal
     namespace
     {
       template <int dim, int spacedim>
-      inline void
+      void
       compute_embedding_matrices(
         const dealii::FE_Q_Bubbles<dim, spacedim>    &fe,
         std::vector<std::vector<FullMatrix<double>>> &matrices,

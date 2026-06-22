@@ -35,7 +35,7 @@ namespace internal
       /**
        * A function which maps  in[i] to i,i.e. output[in[i]] = i;
        */
-      inline std::vector<unsigned int>
+      std::vector<unsigned int>
       invert_numbering(const std::vector<unsigned int> &in)
       {
         std::vector<unsigned int> out(in.size());

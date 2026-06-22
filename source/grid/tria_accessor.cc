@@ -40,7 +40,7 @@ namespace
   // (subface_no), return the number of the
   // subface concerning the FaceRefineCase of
   // the face
-  inline unsigned int
+  unsigned int
   translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3>> &face,
                        const unsigned int                         subface_no)
   {
@@ -82,7 +82,7 @@ namespace
   // (subsubface_no), return the number of the
   // subface concerning the FaceRefineCase of
   // the face
-  inline unsigned int
+  unsigned int
   translate_subface_no(const TriaIterator<TriaAccessor<2, 3, 3>> &face,
                        const unsigned int                         subface_no,
                        const unsigned int                         subsubface_no)

@@ -49,7 +49,7 @@ namespace internal
       // tensorization on inner loops for performance reasons. this clears a
       // dim-array
       template <int dim>
-      inline void
+      void
       zero_indices(unsigned int (&indices)[dim])
       {
         for (unsigned int d = 0; d < dim; ++d)
@@ -62,7 +62,7 @@ namespace internal
       // tensorization on inner loops for performance reasons. this increments
       // tensor product indices
       template <int dim>
-      inline void
+      void
       increment_indices(unsigned int (&indices)[dim], const unsigned int dofs1d)
       {
         ++indices[0];
