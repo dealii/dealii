@@ -12,19 +12,6 @@
 
 
 
-for (deal_II_dimension : DIMENSIONS)
-  {
-    template std::vector<unsigned int>
-    internal::hermite_lexicographic_to_hierarchic_numbering<deal_II_dimension>(
-      const unsigned int regularity);
-
-    template std::vector<unsigned int> internal::
-      hermite_face_lexicographic_to_hierarchic_numbering<deal_II_dimension>(
-        const unsigned int regularity);
-  }
-
-
-
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #if deal_II_dimension <= deal_II_space_dimension

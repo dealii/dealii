@@ -59,403 +59,401 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  inline unsigned int
-  get_regularity_from_degree(const unsigned int fe_degree)
+  namespace
   {
-    Assert(fe_degree % 2 == 1,
-           ExcMessage("FE_Hermite only supports odd polynomial degrees."));
-    return (fe_degree == 0) ? 0 : (fe_degree - 1) / 2;
-  }
+    unsigned int
+    get_regularity_from_degree(const unsigned int fe_degree)
+    {
+      Assert(fe_degree % 2 == 1,
+             ExcMessage("FE_Hermite only supports odd polynomial degrees."));
+      return (fe_degree == 0) ? 0 : (fe_degree - 1) / 2;
+    }
 
 
 
-  inline std::vector<unsigned int>
-  get_hermite_dpo_vector(const unsigned int dim, const unsigned int regularity)
-  {
-    std::vector<unsigned int> result(dim + 1, 0);
-    result[0] = Utilities::pow(regularity + 1, dim);
+    std::vector<unsigned int>
+    get_hermite_dpo_vector(const unsigned int dim,
+                           const unsigned int regularity)
+    {
+      std::vector<unsigned int> result(dim + 1, 0);
+      result[0] = Utilities::pow(regularity + 1, dim);
 
-    return result;
-  }
-
-
-
-  /*
-   * Renumbering function. Function needs different levels of for loop nesting
-   * for different values of dim, so different definitions are used for
-   * simplicity.
-   */
-  template <int dim>
-  void
-  hermite_hierarchic_to_lexicographic_numbering(const unsigned int regularity,
-                                                std::vector<unsigned int> &h2l);
+      return result;
+    }
 
 
 
-  template <>
-  void
-  hermite_hierarchic_to_lexicographic_numbering<1>(
-    const unsigned int         regularity,
-    std::vector<unsigned int> &h2l)
-  {
-    const unsigned int node_dofs_1d = regularity + 1;
-
-    AssertDimension(h2l.size(), 2 * node_dofs_1d);
-
-    // Assign DOFs at vertices
-    for (unsigned int di = 0; di < 2; ++di)
-      for (unsigned int i = 0; i < node_dofs_1d; ++i)
-        h2l[i + di * node_dofs_1d] = i + di * node_dofs_1d;
-  }
+    /*
+     * Renumbering function. Function needs different levels of for loop nesting
+     * for different values of dim, so different definitions are used for
+     * simplicity.
+     */
+    template <int dim>
+    void
+    hermite_hierarchic_to_lexicographic_numbering(
+      const unsigned int         regularity,
+      std::vector<unsigned int> &h2l);
 
 
 
-  template <>
-  void
-  hermite_hierarchic_to_lexicographic_numbering<2>(
-    const unsigned int         regularity,
-    std::vector<unsigned int> &h2l)
-  {
-    const unsigned int node_dofs_1d = regularity + 1;
-    const unsigned int dim_dofs_1d  = 2 * node_dofs_1d;
-    unsigned int       offset       = 0;
+    template <>
+    void
+    hermite_hierarchic_to_lexicographic_numbering<1>(
+      const unsigned int         regularity,
+      std::vector<unsigned int> &h2l)
+    {
+      const unsigned int node_dofs_1d = regularity + 1;
 
-    AssertDimension(h2l.size(), dim_dofs_1d * dim_dofs_1d);
+      AssertDimension(h2l.size(), 2 * node_dofs_1d);
 
-    // Assign DOFs at vertices
-    for (unsigned int di = 0; di < 2; ++di)
-      for (unsigned int dj = 0; dj < 2; ++dj)
-        {
-          for (unsigned int i = 0; i < node_dofs_1d; ++i)
-            for (unsigned int j = 0; j < node_dofs_1d; ++j)
-              h2l[j + i * node_dofs_1d + offset] =
-                j + i * dim_dofs_1d + (dj + di * dim_dofs_1d) * node_dofs_1d;
-
-          offset += node_dofs_1d * node_dofs_1d;
-        }
-  }
+      // Assign DOFs at vertices
+      for (unsigned int di = 0; di < 2; ++di)
+        for (unsigned int i = 0; i < node_dofs_1d; ++i)
+          h2l[i + di * node_dofs_1d] = i + di * node_dofs_1d;
+    }
 
 
 
-  template <>
-  void
-  hermite_hierarchic_to_lexicographic_numbering<3>(
-    const unsigned int         regularity,
-    std::vector<unsigned int> &h2l)
-  {
-    const unsigned int node_dofs_1d = regularity + 1;
-    const unsigned int node_dofs_2d = node_dofs_1d * node_dofs_1d;
+    template <>
+    void
+    hermite_hierarchic_to_lexicographic_numbering<2>(
+      const unsigned int         regularity,
+      std::vector<unsigned int> &h2l)
+    {
+      const unsigned int node_dofs_1d = regularity + 1;
+      const unsigned int dim_dofs_1d  = 2 * node_dofs_1d;
+      unsigned int       offset       = 0;
 
-    const unsigned int dim_dofs_1d = 2 * node_dofs_1d;
-    const unsigned int dim_dofs_2d = dim_dofs_1d * dim_dofs_1d;
+      AssertDimension(h2l.size(), dim_dofs_1d * dim_dofs_1d);
 
-    unsigned int offset = 0;
-
-    AssertDimension(h2l.size(), dim_dofs_2d * dim_dofs_1d);
-
-    // Assign DOFs at nodes
-    for (unsigned int di = 0; di < 2; ++di)
-      for (unsigned int dj = 0; dj < 2; ++dj)
-        for (unsigned int dk = 0; dk < 2; ++dk)
+      // Assign DOFs at vertices
+      for (unsigned int di = 0; di < 2; ++di)
+        for (unsigned int dj = 0; dj < 2; ++dj)
           {
             for (unsigned int i = 0; i < node_dofs_1d; ++i)
               for (unsigned int j = 0; j < node_dofs_1d; ++j)
-                for (unsigned int k = 0; k < node_dofs_1d; ++k)
-                  h2l[k + j * node_dofs_1d + i * node_dofs_2d + offset] =
-                    k + j * dim_dofs_1d + i * dim_dofs_2d +
-                    node_dofs_1d * (dk + dj * dim_dofs_1d + di * dim_dofs_2d);
+                h2l[j + i * node_dofs_1d + offset] =
+                  j + i * dim_dofs_1d + (dj + di * dim_dofs_1d) * node_dofs_1d;
 
-            offset += node_dofs_1d * node_dofs_2d;
+            offset += node_dofs_1d * node_dofs_1d;
           }
-  }
-
-
-
-  template <int dim>
-  inline std::vector<unsigned int>
-  hermite_hierarchic_to_lexicographic_numbering(const unsigned int regularity)
-  {
-    const std::vector<unsigned int> dpo =
-      get_hermite_dpo_vector(dim, regularity);
-    const dealii::FiniteElementData<dim> face_data(dpo, 1, 2 * regularity + 1);
-    std::vector<unsigned int>            renumbering(face_data.dofs_per_cell);
-
-    hermite_hierarchic_to_lexicographic_numbering<dim>(regularity, renumbering);
-
-    return renumbering;
-  }
-
-
-
-  template <int dim>
-  std::vector<unsigned int>
-  hermite_lexicographic_to_hierarchic_numbering(const unsigned int regularity)
-  {
-    return Utilities::invert_permutation(
-      hermite_hierarchic_to_lexicographic_numbering<dim>(regularity));
-  }
-
-
-
-  template <int dim>
-  inline std::vector<unsigned int>
-  hermite_face_lexicographic_to_hierarchic_numbering(
-    const unsigned int regularity)
-  {
-    (void)regularity;
-    if constexpr (dim > 1)
-      return hermite_lexicographic_to_hierarchic_numbering<dim - 1>(regularity);
-    else
-      return std::vector<unsigned int>();
-  }
-
-
-
-  template <int dim>
-  TensorProductPolynomials<dim>
-  get_hermite_polynomials(const unsigned int fe_degree)
-  {
-    const unsigned int regularity = get_regularity_from_degree(fe_degree);
-
-    TensorProductPolynomials<dim> polynomial_basis(
-      Polynomials::PolynomialsHermite::generate_complete_basis(regularity));
-
-    std::vector<unsigned int> renumber =
-      internal::hermite_hierarchic_to_lexicographic_numbering<dim>(regularity);
-    polynomial_basis.set_numbering(renumber);
-
-    return polynomial_basis;
-  }
-
-
-
-  /**
-   * The @p Rescaler class implements the re-scaling of individual shape
-   * functions required by Hermite bases on non-uniform meshes. The three
-   * cases for different element dimensions are all defined separately
-   * due to the requirement for different levels of nesting of for loops.
-   */
-  class Rescaler
-  {
-  public:
-    template <int spacedim, typename Number>
-    void
-    rescale_fe_hermite_values(
-      const FE_Hermite<1, spacedim>                         &fe_herm,
-      const typename Mapping<1, spacedim>::InternalDataBase &mapping_data,
-      Table<2, Number>                                      &value_list)
-    {
-      double cell_extent = 1.0;
-
-      // Check mapping_data is associated with a compatible mapping class
-      if (dynamic_cast<const typename MappingCartesian<1>::InternalData *>(
-            &mapping_data) != nullptr)
-        {
-          const typename MappingCartesian<1>::InternalData *data =
-            dynamic_cast<const typename MappingCartesian<1>::InternalData *>(
-              &mapping_data);
-          cell_extent = data->cell_extents[0];
-        }
-      else
-        DEAL_II_ASSERT_UNREACHABLE();
-
-      const unsigned int regularity      = fe_herm.get_regularity();
-      const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
-      const unsigned int n_q_points_out  = value_list.size(1);
-      (void)n_dofs_per_cell;
-
-      AssertDimension(value_list.size(0), n_dofs_per_cell);
-      AssertDimension(n_dofs_per_cell, 2 * regularity + 2);
-
-      std::vector<unsigned int> l2h =
-        hermite_lexicographic_to_hierarchic_numbering<1>(regularity);
-
-      for (unsigned int q = 0; q < n_q_points_out; ++q)
-        {
-          double factor_1 = 1.0;
-
-          for (unsigned int d1 = 0, d2 = regularity + 1; d2 < n_dofs_per_cell;
-               ++d1, ++d2)
-            {
-              /*
-               * d1 is used to count over indices on the left and d2 counts
-               * over indices on the right. These variables are used
-               * to avoid the need to loop over vertices.
-               */
-              value_list(l2h[d1], q) *= factor_1;
-              value_list(l2h[d2], q) *= factor_1;
-
-              factor_1 *= cell_extent;
-            }
-        }
     }
 
 
 
-    template <int spacedim, typename Number>
+    template <>
     void
-    rescale_fe_hermite_values(
-      const FE_Hermite<2, spacedim>                         &fe_herm,
-      const typename Mapping<2, spacedim>::InternalDataBase &mapping_data,
-      Table<2, Number>                                      &value_list)
+    hermite_hierarchic_to_lexicographic_numbering<3>(
+      const unsigned int         regularity,
+      std::vector<unsigned int> &h2l)
     {
-      Tensor<1, 2> cell_extents;
+      const unsigned int node_dofs_1d = regularity + 1;
+      const unsigned int node_dofs_2d = node_dofs_1d * node_dofs_1d;
 
-      // Check mapping_data is associated with a compatible mapping class
-      if (dynamic_cast<const typename MappingCartesian<2>::InternalData *>(
-            &mapping_data) != nullptr)
-        {
-          const typename MappingCartesian<2>::InternalData *data =
-            dynamic_cast<const typename MappingCartesian<2>::InternalData *>(
-              &mapping_data);
-          cell_extents = data->cell_extents;
-        }
-      else
-        DEAL_II_ASSERT_UNREACHABLE();
+      const unsigned int dim_dofs_1d = 2 * node_dofs_1d;
+      const unsigned int dim_dofs_2d = dim_dofs_1d * dim_dofs_1d;
 
-      const unsigned int regularity      = fe_herm.get_regularity();
-      const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
-      const unsigned int n_dofs_per_dim  = 2 * regularity + 2;
-      const unsigned int n_q_points_out  = value_list.size(1);
-      (void)n_dofs_per_cell;
+      unsigned int offset = 0;
 
-      AssertDimension(value_list.size(0), n_dofs_per_cell);
-      AssertDimension(n_dofs_per_dim * n_dofs_per_dim, n_dofs_per_cell);
+      AssertDimension(h2l.size(), dim_dofs_2d * dim_dofs_1d);
 
-      std::vector<unsigned int> l2h =
-        hermite_lexicographic_to_hierarchic_numbering<2>(regularity);
-
-      AssertDimension(l2h.size(), n_dofs_per_cell);
-
-      for (unsigned int q = 0; q < n_q_points_out; ++q)
-        {
-          double factor_2 = 1.0;
-
-          for (unsigned int d3 = 0, d4 = regularity + 1; d4 < n_dofs_per_dim;
-               ++d3, ++d4)
+      // Assign DOFs at nodes
+      for (unsigned int di = 0; di < 2; ++di)
+        for (unsigned int dj = 0; dj < 2; ++dj)
+          for (unsigned int dk = 0; dk < 2; ++dk)
             {
-              double factor_1 = factor_2;
+              for (unsigned int i = 0; i < node_dofs_1d; ++i)
+                for (unsigned int j = 0; j < node_dofs_1d; ++j)
+                  for (unsigned int k = 0; k < node_dofs_1d; ++k)
+                    h2l[k + j * node_dofs_1d + i * node_dofs_2d + offset] =
+                      k + j * dim_dofs_1d + i * dim_dofs_2d +
+                      node_dofs_1d * (dk + dj * dim_dofs_1d + di * dim_dofs_2d);
 
-              for (unsigned int d1 = 0, d2 = regularity + 1;
-                   d2 < n_dofs_per_dim;
-                   ++d1, ++d2)
-                {
-                  /*
-                   * d1 and d2 represent "left" and "right" in the
-                   * x-direction, d3 and d4 represent "bottom" and "top"
-                   * in the y-direction. As before, this is to avoid looping
-                   * over vertices.
-                   */
-                  value_list(l2h[d1 + d3 * n_dofs_per_dim], q) *= factor_1;
-                  value_list(l2h[d2 + d3 * n_dofs_per_dim], q) *= factor_1;
-                  value_list(l2h[d1 + d4 * n_dofs_per_dim], q) *= factor_1;
-                  value_list(l2h[d2 + d4 * n_dofs_per_dim], q) *= factor_1;
-
-                  factor_1 *= cell_extents[0];
-                }
-
-              factor_2 *= cell_extents[1];
+              offset += node_dofs_1d * node_dofs_2d;
             }
-        }
     }
 
 
 
-    template <int spacedim, typename Number>
-    void
-    rescale_fe_hermite_values(
-      const FE_Hermite<3, spacedim>                         &fe_herm,
-      const typename Mapping<3, spacedim>::InternalDataBase &mapping_data,
-      Table<2, Number>                                      &value_list)
+    template <int dim>
+    std::vector<unsigned int>
+    hermite_hierarchic_to_lexicographic_numbering(const unsigned int regularity)
     {
-      Tensor<1, 3> cell_extents;
+      const std::vector<unsigned int> dpo =
+        get_hermite_dpo_vector(dim, regularity);
+      const dealii::FiniteElementData<dim> face_data(dpo,
+                                                     1,
+                                                     2 * regularity + 1);
+      std::vector<unsigned int>            renumbering(face_data.dofs_per_cell);
 
-      // Check mapping_data is associated with a compatible mapping class
-      if (dynamic_cast<const typename MappingCartesian<3>::InternalData *>(
-            &mapping_data) != nullptr)
-        {
-          const typename MappingCartesian<3>::InternalData *data =
-            dynamic_cast<const typename MappingCartesian<3>::InternalData *>(
-              &mapping_data);
-          cell_extents = data->cell_extents;
-        }
-      else
-        DEAL_II_ASSERT_UNREACHABLE();
+      hermite_hierarchic_to_lexicographic_numbering<dim>(regularity,
+                                                         renumbering);
 
-      const unsigned int regularity      = fe_herm.get_regularity();
-      const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
-      const unsigned int n_dofs_per_dim  = 2 * regularity + 2;
-      const unsigned int n_dofs_per_quad = n_dofs_per_dim * n_dofs_per_dim;
-      const unsigned int n_q_points_out  = value_list.size(1);
-      (void)n_dofs_per_cell;
-
-      AssertDimension(value_list.size(0), n_dofs_per_cell);
-      AssertDimension(Utilities::pow(n_dofs_per_dim, 3), n_dofs_per_cell);
-
-      std::vector<unsigned int> l2h =
-        hermite_lexicographic_to_hierarchic_numbering<3>(regularity);
-
-      for (unsigned int q = 0; q < n_q_points_out; ++q)
-        {
-          double factor_3 = 1.0;
-
-          for (unsigned int d5 = 0, d6 = regularity + 1; d6 < n_dofs_per_dim;
-               ++d5, ++d6)
-            {
-              double factor_2 = factor_3;
-
-              for (unsigned int d3 = 0, d4 = regularity + 1;
-                   d4 < n_dofs_per_dim;
-                   ++d3, ++d4)
-                {
-                  double factor_1 = factor_2;
-
-                  for (unsigned int d1 = 0, d2 = regularity + 1;
-                       d2 < n_dofs_per_dim;
-                       ++d1, ++d2)
-                    {
-                      /*
-                       * d1, d2: "left" and "right" (x-direction)
-                       * d3, d4: "bottom" and "top" (y-direction)
-                       * d5, d6: "down" and "up"    (z-direction)
-                       * This avoids looping over vertices
-                       */
-                      value_list(
-                        l2h[d1 + d3 * n_dofs_per_dim + d5 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d2 + d3 * n_dofs_per_dim + d5 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d1 + d4 * n_dofs_per_dim + d5 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d2 + d4 * n_dofs_per_dim + d5 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d1 + d3 * n_dofs_per_dim + d6 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d2 + d3 * n_dofs_per_dim + d6 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d1 + d4 * n_dofs_per_dim + d6 * n_dofs_per_quad],
-                        q) *= factor_1;
-                      value_list(
-                        l2h[d2 + d4 * n_dofs_per_dim + d6 * n_dofs_per_quad],
-                        q) *= factor_1;
-
-                      factor_1 *= cell_extents[0];
-                    }
-
-                  factor_2 *= cell_extents[1];
-                }
-
-              factor_3 *= cell_extents[2];
-            }
-        }
+      return renumbering;
     }
-  }; // class Rescaler
+
+
+
+    template <int dim>
+    std::vector<unsigned int>
+    hermite_lexicographic_to_hierarchic_numbering(const unsigned int regularity)
+    {
+      return Utilities::invert_permutation(
+        hermite_hierarchic_to_lexicographic_numbering<dim>(regularity));
+    }
+
+
+
+    template <int dim>
+    TensorProductPolynomials<dim>
+    get_hermite_polynomials(const unsigned int fe_degree)
+    {
+      const unsigned int regularity = get_regularity_from_degree(fe_degree);
+
+      TensorProductPolynomials<dim> polynomial_basis(
+        Polynomials::PolynomialsHermite::generate_complete_basis(regularity));
+
+      std::vector<unsigned int> renumber =
+        internal::hermite_hierarchic_to_lexicographic_numbering<dim>(
+          regularity);
+      polynomial_basis.set_numbering(renumber);
+
+      return polynomial_basis;
+    }
+
+
+
+    /**
+     * The @p Rescaler class implements the re-scaling of individual shape
+     * functions required by Hermite bases on non-uniform meshes. The three
+     * cases for different element dimensions are all defined separately
+     * due to the requirement for different levels of nesting of for loops.
+     */
+    class Rescaler
+    {
+    public:
+      template <int spacedim, typename Number>
+      void
+      rescale_fe_hermite_values(
+        const FE_Hermite<1, spacedim>                         &fe_herm,
+        const typename Mapping<1, spacedim>::InternalDataBase &mapping_data,
+        Table<2, Number>                                      &value_list)
+      {
+        double cell_extent = 1.0;
+
+        // Check mapping_data is associated with a compatible mapping class
+        if (dynamic_cast<const typename MappingCartesian<1>::InternalData *>(
+              &mapping_data) != nullptr)
+          {
+            const typename MappingCartesian<1>::InternalData *data =
+              dynamic_cast<const typename MappingCartesian<1>::InternalData *>(
+                &mapping_data);
+            cell_extent = data->cell_extents[0];
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+
+        const unsigned int regularity      = fe_herm.get_regularity();
+        const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
+        const unsigned int n_q_points_out  = value_list.size(1);
+        (void)n_dofs_per_cell;
+
+        AssertDimension(value_list.size(0), n_dofs_per_cell);
+        AssertDimension(n_dofs_per_cell, 2 * regularity + 2);
+
+        std::vector<unsigned int> l2h =
+          internal::hermite_lexicographic_to_hierarchic_numbering<1>(
+            regularity);
+
+        for (unsigned int q = 0; q < n_q_points_out; ++q)
+          {
+            double factor_1 = 1.0;
+
+            for (unsigned int d1 = 0, d2 = regularity + 1; d2 < n_dofs_per_cell;
+                 ++d1, ++d2)
+              {
+                /*
+                 * d1 is used to count over indices on the left and d2 counts
+                 * over indices on the right. These variables are used
+                 * to avoid the need to loop over vertices.
+                 */
+                value_list(l2h[d1], q) *= factor_1;
+                value_list(l2h[d2], q) *= factor_1;
+
+                factor_1 *= cell_extent;
+              }
+          }
+      }
+
+
+
+      template <int spacedim, typename Number>
+      void
+      rescale_fe_hermite_values(
+        const FE_Hermite<2, spacedim>                         &fe_herm,
+        const typename Mapping<2, spacedim>::InternalDataBase &mapping_data,
+        Table<2, Number>                                      &value_list)
+      {
+        Tensor<1, 2> cell_extents;
+
+        // Check mapping_data is associated with a compatible mapping class
+        if (dynamic_cast<const typename MappingCartesian<2>::InternalData *>(
+              &mapping_data) != nullptr)
+          {
+            const typename MappingCartesian<2>::InternalData *data =
+              dynamic_cast<const typename MappingCartesian<2>::InternalData *>(
+                &mapping_data);
+            cell_extents = data->cell_extents;
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+
+        const unsigned int regularity      = fe_herm.get_regularity();
+        const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
+        const unsigned int n_dofs_per_dim  = 2 * regularity + 2;
+        const unsigned int n_q_points_out  = value_list.size(1);
+        (void)n_dofs_per_cell;
+
+        AssertDimension(value_list.size(0), n_dofs_per_cell);
+        AssertDimension(n_dofs_per_dim * n_dofs_per_dim, n_dofs_per_cell);
+
+        std::vector<unsigned int> l2h =
+          internal::hermite_lexicographic_to_hierarchic_numbering<2>(
+            regularity);
+
+        AssertDimension(l2h.size(), n_dofs_per_cell);
+
+        for (unsigned int q = 0; q < n_q_points_out; ++q)
+          {
+            double factor_2 = 1.0;
+
+            for (unsigned int d3 = 0, d4 = regularity + 1; d4 < n_dofs_per_dim;
+                 ++d3, ++d4)
+              {
+                double factor_1 = factor_2;
+
+                for (unsigned int d1 = 0, d2 = regularity + 1;
+                     d2 < n_dofs_per_dim;
+                     ++d1, ++d2)
+                  {
+                    /*
+                     * d1 and d2 represent "left" and "right" in the
+                     * x-direction, d3 and d4 represent "bottom" and "top"
+                     * in the y-direction. As before, this is to avoid looping
+                     * over vertices.
+                     */
+                    value_list(l2h[d1 + d3 * n_dofs_per_dim], q) *= factor_1;
+                    value_list(l2h[d2 + d3 * n_dofs_per_dim], q) *= factor_1;
+                    value_list(l2h[d1 + d4 * n_dofs_per_dim], q) *= factor_1;
+                    value_list(l2h[d2 + d4 * n_dofs_per_dim], q) *= factor_1;
+
+                    factor_1 *= cell_extents[0];
+                  }
+
+                factor_2 *= cell_extents[1];
+              }
+          }
+      }
+
+
+
+      template <int spacedim, typename Number>
+      void
+      rescale_fe_hermite_values(
+        const FE_Hermite<3, spacedim>                         &fe_herm,
+        const typename Mapping<3, spacedim>::InternalDataBase &mapping_data,
+        Table<2, Number>                                      &value_list)
+      {
+        Tensor<1, 3> cell_extents;
+
+        // Check mapping_data is associated with a compatible mapping class
+        if (dynamic_cast<const typename MappingCartesian<3>::InternalData *>(
+              &mapping_data) != nullptr)
+          {
+            const typename MappingCartesian<3>::InternalData *data =
+              dynamic_cast<const typename MappingCartesian<3>::InternalData *>(
+                &mapping_data);
+            cell_extents = data->cell_extents;
+          }
+        else
+          DEAL_II_ASSERT_UNREACHABLE();
+
+        const unsigned int regularity      = fe_herm.get_regularity();
+        const unsigned int n_dofs_per_cell = fe_herm.n_dofs_per_cell();
+        const unsigned int n_dofs_per_dim  = 2 * regularity + 2;
+        const unsigned int n_dofs_per_quad = n_dofs_per_dim * n_dofs_per_dim;
+        const unsigned int n_q_points_out  = value_list.size(1);
+        (void)n_dofs_per_cell;
+
+        AssertDimension(value_list.size(0), n_dofs_per_cell);
+        AssertDimension(Utilities::pow(n_dofs_per_dim, 3), n_dofs_per_cell);
+
+        std::vector<unsigned int> l2h =
+          internal::hermite_lexicographic_to_hierarchic_numbering<3>(
+            regularity);
+
+        for (unsigned int q = 0; q < n_q_points_out; ++q)
+          {
+            double factor_3 = 1.0;
+
+            for (unsigned int d5 = 0, d6 = regularity + 1; d6 < n_dofs_per_dim;
+                 ++d5, ++d6)
+              {
+                double factor_2 = factor_3;
+
+                for (unsigned int d3 = 0, d4 = regularity + 1;
+                     d4 < n_dofs_per_dim;
+                     ++d3, ++d4)
+                  {
+                    double factor_1 = factor_2;
+
+                    for (unsigned int d1 = 0, d2 = regularity + 1;
+                         d2 < n_dofs_per_dim;
+                         ++d1, ++d2)
+                      {
+                        /*
+                         * d1, d2: "left" and "right" (x-direction)
+                         * d3, d4: "bottom" and "top" (y-direction)
+                         * d5, d6: "down" and "up"    (z-direction)
+                         * This avoids looping over vertices
+                         */
+                        value_list(
+                          l2h[d1 + d3 * n_dofs_per_dim + d5 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d2 + d3 * n_dofs_per_dim + d5 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d1 + d4 * n_dofs_per_dim + d5 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d2 + d4 * n_dofs_per_dim + d5 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d1 + d3 * n_dofs_per_dim + d6 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d2 + d3 * n_dofs_per_dim + d6 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d1 + d4 * n_dofs_per_dim + d6 * n_dofs_per_quad],
+                          q) *= factor_1;
+                        value_list(
+                          l2h[d2 + d4 * n_dofs_per_dim + d6 * n_dofs_per_quad],
+                          q) *= factor_1;
+
+                        factor_1 *= cell_extents[0];
+                      }
+
+                    factor_2 *= cell_extents[1];
+                  }
+
+                factor_3 *= cell_extents[2];
+              }
+          }
+      }
+    }; // class Rescaler
+  }    // namespace
 } // namespace internal
 
 
