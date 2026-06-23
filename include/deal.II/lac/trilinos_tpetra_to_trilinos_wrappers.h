@@ -86,6 +86,9 @@ namespace LinearAlgebra::TpetraWrappers
 
   template <typename Number, typename MemorySpace>
   class PreconditionAMGMueLu;
+
+  template <typename Number, typename MemorySpace>
+  class SolverDirect;
 } // namespace LinearAlgebra::TpetraWrappers
 #  endif
 
@@ -177,6 +180,13 @@ namespace TrilinosWrappers
   class PreconditionBlockSOR;
   class PreconditionBlockSSOR;
   class PreconditionAMG;
+#  endif
+
+#  ifndef DEAL_II_TRILINOS_WITH_EPETRA
+  using SolverDirect = ::dealii::LinearAlgebra::TpetraWrappers::
+    SolverDirect<double, ::dealii::MemorySpace::Host>;
+#  else
+  class SolverDirect;
 #  endif
 } // namespace TrilinosWrappers
 

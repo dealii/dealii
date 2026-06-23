@@ -16,14 +16,17 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifndef DEAL_II_TRILINOS_WITH_EPETRA
+#  include <deal.II/lac/trilinos_tpetra_solver_direct.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
+#endif
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 #  include <deal.II/base/template_constraints.h>
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/solver_control.h>
-#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #  include <deal.II/lac/vector.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
