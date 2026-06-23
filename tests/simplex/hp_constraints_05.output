@@ -1,0 +1,109 @@
+
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_Q<3>(1)
+DEAL::10 compared to 10 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_Q<3>(1)
+DEAL::10 compared to 10 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(1) vs. FE_SimplexP<3>(1)
+DEAL::10 compared to 10 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(1) vs. FE_SimplexP<3>(1)
+DEAL::10 compared to 10 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_Q<3>(2)
+DEAL::29 compared to 29 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_Q<3>(2)
+DEAL::29 compared to 29 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(2) vs. FE_SimplexP<3>(1)
+DEAL::29 compared to 29 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(2) vs. FE_SimplexP<3>(1)
+DEAL::29 compared to 29 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_Q<3>(3)
+DEAL::66 compared to 66 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(1) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
+DEAL::66 compared to 66 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(3) vs. FE_SimplexP<3>(1)
+DEAL::66 compared to 66 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_SimplexP<3>(1)
+DEAL::66 compared to 66 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_Q<3>(1)
+DEAL::16 compared to 16 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_Q<3>(1)
+DEAL::16 compared to 16 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(1) vs. FE_SimplexP<3>(2)
+DEAL::16 compared to 16 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(1) vs. FE_SimplexP<3>(2)
+DEAL::16 compared to 16 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_Q<3>(2)
+DEAL::34 compared to 34 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_Q<3>(2)
+DEAL::34 compared to 34 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(2) vs. FE_SimplexP<3>(2)
+DEAL::34 compared to 34 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(2) vs. FE_SimplexP<3>(2)
+DEAL::34 compared to 34 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_Q<3>(3)
+DEAL::72 compared to 72 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(2) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
+DEAL::72 compared to 72 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(3) vs. FE_SimplexP<3>(2)
+DEAL::72 compared to 72 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_SimplexP<3>(2)
+DEAL::72 compared to 72 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_Q<3>(1)
+DEAL::26 compared to 26 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_Q<3>(1)
+DEAL::26 compared to 26 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(1) vs. FE_SimplexP<3>(3)
+DEAL::26 compared to 26 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(1) vs. FE_SimplexP<3>(3)
+DEAL::26 compared to 26 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_Q<3>(2)
+DEAL::45 compared to 45 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_Q<3>(2)
+DEAL::45 compared to 45 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(2) vs. FE_SimplexP<3>(3)
+DEAL::45 compared to 45 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(2) vs. FE_SimplexP<3>(3)
+DEAL::45 compared to 45 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_Q<3>(3)
+DEAL::82 compared to 82 dofs
+DEAL::
+DEAL::Testing number of dofs FE_SimplexP<3>(3) vs. FE_Q<3>(QIterated(QTrapezoid(),3))
+DEAL::80 compared to 80 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(3) vs. FE_SimplexP<3>(3)
+DEAL::82 compared to 82 dofs
+DEAL::
+DEAL::Testing number of dofs FE_Q<3>(QIterated(QTrapezoid(),3)) vs. FE_SimplexP<3>(3)
+DEAL::80 compared to 80 dofs
+DEAL::
