@@ -1551,7 +1551,7 @@ namespace
    * the @p tree by @p idx.
    */
   template <int dim, int spacedim>
-  inline void
+  void
   add_single_cell_relation(
     std::vector<cell_relation_t<dim, spacedim>>                &cell_rel,
     const typename dealii::internal::p4est::types<dim>::tree   &tree,

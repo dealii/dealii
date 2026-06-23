@@ -50,7 +50,7 @@ namespace
      * Calculate the height of a pipe segment, depending on the location in the
      * x-y plane.
      */
-    inline double
+    double
     compute_z_expansion(const double          x,
                         const double          y,
                         const AdditionalData &data)

@@ -1601,7 +1601,7 @@ namespace
    * manifold with a twist.
    */
   template <class TRIANGULATION>
-  inline typename TRIANGULATION::DistortedCellList
+  typename TRIANGULATION::DistortedCellList
   collect_distorted_coarse_cells(const TRIANGULATION &)
   {
     return typename TRIANGULATION::DistortedCellList();
@@ -1618,7 +1618,7 @@ namespace
    * for the case dim==spacedim.
    */
   template <int dim>
-  inline typename Triangulation<dim, dim>::DistortedCellList
+  typename Triangulation<dim, dim>::DistortedCellList
   collect_distorted_coarse_cells(const Triangulation<dim, dim> &triangulation)
   {
     typename Triangulation<dim, dim>::DistortedCellList distorted_cells;

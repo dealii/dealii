@@ -28,7 +28,7 @@ namespace
    * Elemental default grid: El::Grid::Grid(mpi_comm,...)
    * https://github.com/elemental/Elemental/blob/master/src/core/Grid.cpp#L67-L91
    */
-  inline std::pair<int, int>
+  std::pair<int, int>
   compute_processor_grid_sizes(const MPI_Comm     mpi_comm,
                                const unsigned int m,
                                const unsigned int n,

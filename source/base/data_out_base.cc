@@ -827,7 +827,7 @@ namespace
   // is a dim-dimensional integer vector. If the points are
   // saved in the patch.data member, return the saved point instead.
   template <int dim, int spacedim>
-  inline Point<spacedim>
+  Point<spacedim>
   get_equispaced_location(
     const DataOutBase::Patch<dim, spacedim>   &patch,
     const std::initializer_list<unsigned int> &lattice_location,
@@ -918,7 +918,7 @@ namespace
   // If the points are saved in the patch.data member, return the saved point
   // instead.
   template <int dim, int spacedim>
-  inline Point<spacedim>
+  Point<spacedim>
   get_node_location(const DataOutBase::Patch<dim, spacedim> &patch,
                     const unsigned int                       node_index)
   {
@@ -1484,7 +1484,7 @@ namespace
 
 
   template <typename data>
-  inline void
+  void
   DXStream::write_dataset(const unsigned int, const std::vector<data> &values)
   {
     if (flags.data_binary)
@@ -1689,7 +1689,7 @@ namespace
 
 
   template <typename data>
-  inline void
+  void
   UcdStream::write_dataset(const unsigned int       index,
                            const std::vector<data> &values)
   {

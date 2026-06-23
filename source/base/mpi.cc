@@ -725,7 +725,7 @@ namespace Utilities
           index_type
           operator[](const std::size_t index) const;
 
-          bool
+          [[maybe_unused]] bool
           entry_has_been_set(const std::size_t index) const;
 
         private:
@@ -1037,9 +1037,9 @@ namespace Utilities
             unsigned int                 &owner_index_guess);
         };
 
-        /* ------------------------- inline functions ----------------------- */
 
-        inline unsigned int
+
+        unsigned int
         Dictionary::dof_to_dict_rank(const types::global_dof_index i)
         {
           // note: this formula is also explicitly used in
@@ -1048,7 +1048,7 @@ namespace Utilities
         }
 
 
-        inline types::global_dof_index
+        types::global_dof_index
         Dictionary::get_index_offset(const unsigned int rank)
         {
           return std::min(dofs_per_process *
@@ -1060,7 +1060,7 @@ namespace Utilities
 
 
 
-        inline unsigned int
+        unsigned int
         Dictionary::get_owning_rank_index(
           const unsigned int rank_in_owned_indices,
           const unsigned int guess)
@@ -1177,7 +1177,7 @@ namespace Utilities
 
 
 
-        inline bool
+        [[maybe_unused]] bool
         FlexibleIndexStorage::entry_has_been_set(const std::size_t index) const
         {
           AssertIndexRange(index, size);
