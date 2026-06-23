@@ -1,0 +1,4 @@
+New: Added Portable::MGTwoLevelTransfer class supporting geometric multigrid transfer operators on GPUs.
+At the moment, only globally refined meshes and FE_Q are supported.
+<br>
+(Ivan Prusak, Martin Kronbichler 2026/06/23)
