@@ -892,6 +892,67 @@ namespace DoFTools
                                              local_dof_indices.end());
       }
 
+    /*
+     Handle the special case of a locally active Dof (DoF marked with an x)
+     that constrains a DoF (DoF marked with an o), which is supported on
+     predicate ghost cells (marked by #g#) of the current process and on a
+     artificial cell the current process has no information about.
+
+     +---+---+---+---+
+     |###|###|#g#| a1|
+     +---+---+---+---+
+     |###|###|#g#| a2|
+     +---+---x---o---+
+     |#######|###g###|
+     |#######|###g###|
+     +-------+-------+
+     current |neighboring
+     process |process
+
+             ##### = predicate region
+             #g#   = predicate ghost cell
+            a1,a2  = artificial cell
+
+     To handle this case the neighboring process needs to send its
+     non_predicate_dofs_halo_cells that are locally relevant to the current
+     process. If the received set contains the DoF marked with an o the
+     artificial cell a2 does not fulfill the predicate and the constraining dof
+     marked with an x is removed from the support_set below.
+     */
+    if (const auto parallel_triangulation =
+          dynamic_cast<const dealii::parallel::TriangulationBase<dim> *>(
+            &dof_handler.get_triangulation()))
+      {
+        // Step 1: Send all non_predicate_dofs_halo_cells to ghost cell owners
+        const std::set<dealii::types::subdomain_id> ghost_owners =
+          parallel_triangulation->ghost_owners();
+
+        std::map<unsigned, std::set<dealii::types::global_dof_index>>
+          data_to_send;
+        for (const auto rank : ghost_owners)
+          {
+            data_to_send[rank] = non_predicate_dofs_halo_cells;
+          }
+
+        const auto additional_non_predicate_halo_dofs =
+          dealii::Utilities::MPI::some_to_some(
+            dof_handler.get_mpi_communicator(), data_to_send);
+
+        // Step 2: Add all received indices that are locally relevant.
+        const IndexSet &locally_stored_constraints = cm.get_local_lines();
+
+        for (const auto &[rank, indices] : additional_non_predicate_halo_dofs)
+          {
+            for (const auto index : indices)
+              {
+                if (locally_stored_constraints.is_element(index))
+                  {
+                    non_predicate_dofs_halo_cells.insert(index);
+                  }
+              }
+          }
+      }
+
     IndexSet non_predicate_halo_set(dof_handler.n_dofs());
     non_predicate_halo_set.add_indices(non_predicate_dofs_halo_cells.begin(),
                                        non_predicate_dofs_halo_cells.end());
