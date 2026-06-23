@@ -957,7 +957,7 @@ namespace LinearAlgebra
        * that sets the parallel partitioning of the vector.
        */
       const TpetraTypes::MapType<MemorySpace> &
-      trilinos_partitioner();
+      trilinos_partitioner() const;
 
       /**
        * Return a const Teuchos::RCP to the underlying Trilinos
