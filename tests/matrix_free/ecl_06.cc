@@ -111,7 +111,7 @@ test(const unsigned int geometry,
     {
       AssertDimension(VectorizedArrayType::size(), 1);
 
-      // note: catergorization and hp is not working together, i.e., we
+      // note: categorization and hp is not working together, i.e., we
       // cannot categorize the cells according to the boundary conditions
       // needed for ECL (TODO)
 
