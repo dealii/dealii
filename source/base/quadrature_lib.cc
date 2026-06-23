@@ -2294,10 +2294,10 @@ QStroudSimplex<dim>::QStroudSimplex(const unsigned int n_points_1D)
       // transforms to int_{0}^{1} int_{0}^{1} f(xi,nu) (1-nu) d(xi) d(nu)
 
       // use standard integration in x-direction
-      QGauss<1> q_gauss(n_points_1D);
+      const QGauss<1> q_gauss(n_points_1D);
 
       // use Gauss-Jacobi in y-direction with alpha = 1, beta = 0
-      std::vector<long double> points_y =
+      const std::vector<long double> points_y =
         Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 1, 0);
 
       for (unsigned int i = 0; i < n_points_1D; ++i)
@@ -2329,14 +2329,14 @@ QStroudSimplex<dim>::QStroudSimplex(const unsigned int n_points_1D)
       // d(xi) d(nu) d(mu)
 
       // use standard integration in x-direction
-      QGauss<1> q_gauss(n_points_1D);
+      const QGauss<1> q_gauss(n_points_1D);
 
       // use Gauss-Jacobi in y-direction with alpha = 1, beta = 0
-      std::vector<long double> points_y =
+      const std::vector<long double> points_y =
         Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 1, 0);
 
       // use Gauss-Jacobi in z-direction with alpha = 2, beta = 0
-      std::vector<long double> points_z =
+      const std::vector<long double> points_z =
         Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 2, 0);
 
       for (unsigned int i = 0; i < n_points_1D; ++i)
@@ -2480,7 +2480,7 @@ QGaussPyramid<dim>::QGaussPyramid(const unsigned int n_points_1D)
   // Gauss-Legendre in x and y direction and Gauss-Jacobi in z direction
   const QGauss<1> q_gauss(n_points_1D);
 
-  std::vector<long double> points_z =
+  const std::vector<long double> points_z =
     Polynomials::jacobi_polynomial_roots<long double>(n_points_1D, 2, 0);
 
   const long double factor = 8.0; // with alpha = 2 and beta = 0 only pow(2,
