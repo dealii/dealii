@@ -800,7 +800,7 @@ namespace TrilinosWrappers
 
 
   template <typename SparsityPatternType>
-  inline std::enable_if_t<
+  std::enable_if_t<
     !std::is_same_v<SparsityPatternType, dealii::SparseMatrix<double>>>
   SparseMatrix::reinit(const IndexSet            &row_parallel_partitioning,
                        const IndexSet            &col_parallel_partitioning,
@@ -877,7 +877,7 @@ namespace TrilinosWrappers
 
 
   template <typename number>
-  inline void
+  void
   SparseMatrix::reinit(
     const IndexSet                       &row_parallel_partitioning,
     const IndexSet                       &col_parallel_partitioning,

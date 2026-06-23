@@ -229,7 +229,7 @@ namespace FESeries
 
 
   template <int dim, int spacedim>
-  inline bool
+  bool
   Legendre<dim, spacedim>::operator==(
     const Legendre<dim, spacedim> &legendre) const
   {

@@ -2383,13 +2383,13 @@ namespace internal
                    ExcInternalError());
       }
 
-      inline const std::set<ReferenceCell<dim>> &
+      const std::set<ReferenceCell<dim>> &
       all_reference_cells() const
       {
         return all_reference_cells_;
       }
 
-      inline std::vector<types::geometric_orientation> &
+      std::vector<types::geometric_orientation> &
       entity_orientations(const unsigned int structdim)
       {
         if (structdim == 1)
@@ -2400,7 +2400,7 @@ namespace internal
         return quad_orientation;
       }
 
-      inline const std::vector<types::geometric_orientation> &
+      const std::vector<types::geometric_orientation> &
       entity_orientations(const unsigned int structdim) const
       {
         if (structdim == 1)
@@ -2412,7 +2412,7 @@ namespace internal
       }
 
       template <int structdim>
-      inline std::vector<ReferenceCell<structdim>> &
+      std::vector<ReferenceCell<structdim>> &
       entity_types()
       {
         if constexpr (structdim == dim)
@@ -2428,7 +2428,7 @@ namespace internal
       }
 
       template <int structdim>
-      inline const std::vector<ReferenceCell<structdim>> &
+      const std::vector<ReferenceCell<structdim>> &
       entity_types() const
       {
         if constexpr (structdim == dim)
@@ -2443,7 +2443,7 @@ namespace internal
           DEAL_II_ASSERT_UNREACHABLE();
       }
 
-      inline ArrayOfArrays &
+      ArrayOfArrays &
       entity_to_entities(const unsigned int from, const unsigned int to)
       {
         if (from == dim && to == dim)
@@ -2462,7 +2462,7 @@ namespace internal
         return cell_entities;
       }
 
-      inline const ArrayOfArrays &
+      const ArrayOfArrays &
       entity_to_entities(const unsigned int from, const unsigned int to) const
       {
         if (from == dim && to == dim)

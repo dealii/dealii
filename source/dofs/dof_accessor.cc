@@ -148,7 +148,7 @@ DoFCellAccessor<dim, spacedim, lda>::periodic_neighbor_child_on_subface(
 
 
 template <int dim, int spacedim, bool lda>
-inline TriaIterator<DoFCellAccessor<dim, spacedim, lda>>
+TriaIterator<DoFCellAccessor<dim, spacedim, lda>>
 DoFCellAccessor<dim, spacedim, lda>::periodic_neighbor(
   const unsigned int face) const
 {
@@ -161,7 +161,7 @@ DoFCellAccessor<dim, spacedim, lda>::periodic_neighbor(
 
 
 template <int dim, int spacedim, bool lda>
-inline TriaIterator<DoFCellAccessor<dim, spacedim, lda>>
+TriaIterator<DoFCellAccessor<dim, spacedim, lda>>
 DoFCellAccessor<dim, spacedim, lda>::neighbor_or_periodic_neighbor(
   const unsigned int face) const
 {
@@ -174,7 +174,7 @@ DoFCellAccessor<dim, spacedim, lda>::neighbor_or_periodic_neighbor(
 
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
-inline void
+void
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
   std::vector<types::global_dof_index> &dof_indices,
   const types::fe_index                 fe_index_) const
@@ -211,7 +211,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_dof_indices(
 
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
-inline void
+void
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
   const int                             level,
   std::vector<types::global_dof_index> &dof_indices,
@@ -233,7 +233,7 @@ DoFAccessor<structdim, dim, spacedim, level_dof_access>::get_mg_dof_indices(
 
 
 template <int structdim, int dim, int spacedim, bool level_dof_access>
-inline void
+void
 DoFAccessor<structdim, dim, spacedim, level_dof_access>::set_mg_dof_indices(
   const int                                   level,
   const std::vector<types::global_dof_index> &dof_indices,
@@ -276,7 +276,7 @@ namespace internal
 
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
-inline void
+void
 DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   get_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
 {
@@ -293,7 +293,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
-inline void
+void
 DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   get_mg_dof_indices(std::vector<types::global_dof_index> &dof_indices) const
 {
@@ -307,7 +307,7 @@ DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
 
 
 template <int dimension_, int space_dimension_, bool level_dof_access>
-inline void
+void
 DoFCellAccessor<dimension_, space_dimension_, level_dof_access>::
   set_mg_dof_indices(const std::vector<types::global_dof_index> &dof_indices)
 {

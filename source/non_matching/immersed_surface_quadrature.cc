@@ -51,7 +51,7 @@ namespace NonMatching
 
 
   template <int dim, int spacedim>
-  inline void
+  void
   ImmersedSurfaceQuadrature<dim, spacedim>::clear()
   {
     this->quadrature_points.clear();

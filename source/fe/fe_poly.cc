@@ -517,7 +517,7 @@ FE_Poly<dim, spacedim>::fill_fe_subface_values(
 
 
 template <int dim, int spacedim>
-inline void
+void
 FE_Poly<dim, spacedim>::correct_hessians(
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data,
@@ -536,7 +536,7 @@ FE_Poly<dim, spacedim>::correct_hessians(
 
 
 template <int dim, int spacedim>
-inline void
+void
 FE_Poly<dim, spacedim>::correct_third_derivatives(
   internal::FEValuesImplementation::FiniteElementRelatedData<dim, spacedim>
     &output_data,
@@ -567,7 +567,7 @@ FE_Poly<dim, spacedim>::correct_third_derivatives(
 
 
 template <int dim, int spacedim>
-inline const ScalarPolynomialsBase<dim> &
+const ScalarPolynomialsBase<dim> &
 FE_Poly<dim, spacedim>::get_poly_space() const
 {
   return *poly_space;
