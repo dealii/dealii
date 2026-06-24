@@ -155,7 +155,7 @@ namespace LinearAlgebra
       const std::vector<IndexSet> &parallel_partitioning,
       const BlockSparsityPattern  &block_sparsity_pattern,
       const MPI_Comm               communicator,
-      const bool                   exchange_data)
+      const bool /*exchange_data*/)
     {
       if constexpr (running_in_debug_mode())
         {

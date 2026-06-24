@@ -1075,15 +1075,14 @@ namespace LinearAlgebra
 
         // If at end of line: do one step, then cycle until we find a row with a
         // nonzero number of entries that is stored locally.
-        if (accessor.a_index >=
-            static_cast<dealii::types::signed_global_dof_index>(
-              accessor.colnum_cache->size()))
+        if (accessor.a_index >= static_cast<dealii::types::global_dof_index>(
+                                  accessor.colnum_cache->size()))
           {
             accessor.a_index = 0;
             ++accessor.a_row;
 
             while (accessor.a_row <
-                   static_cast<dealii::types::signed_global_dof_index>(
+                   static_cast<dealii::types::global_dof_index>(
                      accessor.sparsity_pattern->n_rows()))
               {
                 const auto row_length =
