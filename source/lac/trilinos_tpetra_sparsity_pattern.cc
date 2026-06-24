@@ -293,10 +293,14 @@ namespace LinearAlgebra
         // columns as well. If we use a recent Trilinos version, we can also
         // require building a non-local graph which gives us thread-safe
         // initialization.
-        graph = Utilities::Trilinos::internal::make_rcp<
-          TpetraTypes::GraphType<MemorySpace>>(row_map,
-                                               row_map,
-                                               n_entries_per_row);
+        if (row_map->getComm()->getSize() > 1)
+          graph = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(row_map, n_entries_per_row);
+        else
+          graph = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(row_map,
+                                                 col_map,
+                                                 n_entries_per_row);
       }
 
 
@@ -356,10 +360,15 @@ namespace LinearAlgebra
           ExcMessage(
             "You are requesting to store more elements than global ordinal type allows."));
 
-        graph = Utilities::Trilinos::internal::make_rcp<
-          TpetraTypes::GraphType<MemorySpace>>(row_map,
-                                               col_map,
-                                               local_entries_per_row);
+        if (row_map->getComm()->getSize() > 1)
+          graph = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(row_map,
+                                                 local_entries_per_row);
+        else
+          graph = Utilities::Trilinos::internal::make_rcp<
+            TpetraTypes::GraphType<MemorySpace>>(row_map,
+                                                 col_map,
+                                                 local_entries_per_row);
       }
 
 
@@ -593,7 +602,7 @@ namespace LinearAlgebra
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true);
           nonlocal_graph = Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(nonlocal_map, col_map, 0);
+            TpetraTypes::GraphType<MemorySpace>>(nonlocal_map, 0);
         }
       else
         Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
