@@ -33,6 +33,8 @@ namespace LinearAlgebra::TpetraWrappers
   template <typename MemorySpace>
   class SparsityPattern;
 
+  class BlockSparsityPattern;
+
   template <typename Number, typename MemorySpace>
   class BlockVector;
 
@@ -122,10 +124,13 @@ namespace TrilinosWrappers
   using SparsityPattern =
     ::dealii::LinearAlgebra::TpetraWrappers::SparsityPattern<
       ::dealii::MemorySpace::Host>;
+  using BlockSparsityPattern =
+    ::dealii::LinearAlgebra::TpetraWrappers::BlockSparsityPattern;
 #  else
   class BlockSparseMatrix;
   class SparseMatrix;
   class SparsityPattern;
+  class BlockSparsityPattern;
 #  endif
 
 #  ifndef DEAL_II_TRILINOS_WITH_EPETRA
