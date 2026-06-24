@@ -64,8 +64,14 @@ test_incorrect_no_of_ind_vars()
                                              true /*overwrite_tape*/,
                                              true /*keep*/);
 
-      ad_helper.register_independent_variable(s1, s1_dof);
-      ad_helper.register_independent_variable(s2, s2_dof);
+      // Here, we would typically call
+      // ad_helper.register_independent_variable(), but that triggers an array
+      // bounds check failure (since we have 1 independent variable, not 2)
+      // which aborts the program. Instead, call
+      // ad_helper.set_independent_variable() since that throws an exception
+      // which we may catch.
+      ad_helper.set_independent_variable(s1, s1_dof);
+      ad_helper.set_independent_variable(s2, s2_dof);
 
       const ADNumberType s1_ad = ad_helper.get_sensitive_variables(s1_dof);
       const ADNumberType s2_ad = ad_helper.get_sensitive_variables(
