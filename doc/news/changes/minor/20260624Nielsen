@@ -1,0 +1,7 @@
+Fixed: FEValuesViews::Vector now correctly returns all spacedim components of
+the value, gradient, divergence, Hessian, third derivative and symmetric
+gradient for non-primitive vector elements on codimension-one meshes (dim &lt;
+spacedim). The non-primitive branch previously only looped over the first dim
+components and dropped the remaining ones.
+<br>
+(Jakob Tore Kammeyer Nielsen, 2026/06/24)
