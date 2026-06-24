@@ -193,7 +193,7 @@ namespace LinearAlgebra
        */
       struct AdditionalData
       {
-        AdditionalData(const std::string &solver_name);
+        AdditionalData(const std::string &solver_name = "KLU2");
 
 
         /**
