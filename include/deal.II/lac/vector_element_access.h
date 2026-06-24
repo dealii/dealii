@@ -121,10 +121,11 @@ namespace internal
 
     return vector[0][trilinos_i];
   }
+#endif
 
 
 
-#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
   template <typename NumberType, typename MemorySpace>
   struct ElementAccess<
     LinearAlgebra::TpetraWrappers::Vector<NumberType, MemorySpace>>
@@ -148,7 +149,7 @@ namespace internal
 
 
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   template <typename NumberType, typename MemorySpace>
   inline void
   ElementAccess<
@@ -212,7 +213,6 @@ namespace internal
         static_cast<TrilinosWrappers::types::int_type>(i));
     return vector_1d(trilinos_i);
   }
-#    endif
 #  endif
 #endif
 } // namespace internal
