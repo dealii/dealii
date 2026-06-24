@@ -55,7 +55,7 @@ jobs:
             os: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: info
       run: |
         g++ -v
@@ -119,7 +119,7 @@ jobs:
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: info
       run: |
         python --version
@@ -194,7 +194,7 @@ jobs:
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: info
       run: |
         mpicc -v
@@ -250,7 +250,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: rscohn2/setup-oneapi@v0
       with:
         components: |
@@ -320,7 +320,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
@@ -366,7 +366,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         repository: kokkos/kokkos
         ref: 4.0.01
@@ -434,7 +434,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: modules
       run: |
         wget https://apt.llvm.org/llvm.sh
@@ -462,7 +462,7 @@ jobs:
         mpicc -v
         clang++-19 -v
         cmake --version
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         repository: kokkos/kokkos
         ref: 4.0.01
@@ -536,7 +536,7 @@ jobs:
         sudo apt-get install -yq --no-install-recommends \
             ninja-build wget lsb-release gnupg g++-15
         sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 23
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         repository: kokkos/kokkos
         ref: 5.0.1
@@ -553,7 +553,7 @@ jobs:
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
         ninja install
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: configure deal.II
       run: |
         mkdir build
