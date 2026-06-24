@@ -244,6 +244,16 @@ FE_WedgeP<dim, spacedim>::compare_for_domination(
       else
         return FiniteElementDomination::other_element_dominates;
     }
+  else if (const FE_PyramidP<dim, spacedim> *fe_p_other =
+             dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other))
+    {
+      if (this->degree < fe_p_other->degree)
+        return FiniteElementDomination::this_element_dominates;
+      else if (this->degree == fe_p_other->degree)
+        return FiniteElementDomination::either_element_can_dominate;
+      else
+        return FiniteElementDomination::other_element_dominates;
+    }
   else if (const FE_Nothing<dim> *fe_nothing =
              dynamic_cast<const FE_Nothing<dim> *>(&fe_other))
     {
@@ -270,7 +280,9 @@ FE_WedgeP<dim, spacedim>::hp_vertex_dof_identities(
   (void)fe_other;
 
   Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
-           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
          ExcNotImplemented());
 
   return {{0, 0}};
@@ -283,19 +295,41 @@ std::vector<std::pair<unsigned int, unsigned int>>
 FE_WedgeP<dim, spacedim>::hp_line_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other) const
 {
-  (void)fe_other;
-
   Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
-           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+           (dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+           (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
          ExcNotImplemented());
 
-  std::vector<std::pair<unsigned int, unsigned int>> result;
+  std::vector<std::pair<unsigned int, unsigned int>> identities;
+  // check if the support points are the same location on the line
+  // to avoid rescaling for pyramids use the support points on the faces
+  const auto face_support_points = this->get_unit_face_support_points(0);
+  const auto face_support_points_other =
+    fe_other.get_unit_face_support_points(0);
 
-  result.reserve(this->degree - 1);
-  for (unsigned int i = 0; i < this->degree - 1; ++i)
-    result.emplace_back(i, i);
+  // now just compare the DoFs on the line going from [0,0] to [1,0]
+  // for a triangular face that is the first line
+  // for a quad face that is the third line
+  // adjust the offsets accordingly
+  // face number 0 of the wedge is a triangle
+  const unsigned int offset =
+    this->reference_cell().face_reference_cell(0).n_vertices();
 
-  return result;
+  const unsigned int offset_other =
+    fe_other.reference_cell().face_reference_cell(0).is_hyper_cube() ?
+      fe_other.reference_cell().face_reference_cell(0).n_vertices() +
+        2 * fe_other.n_dofs_per_line() :
+      fe_other.reference_cell().face_reference_cell(0).n_vertices();
+
+  // now get the identities
+  for (unsigned int i = 0; i < this->n_dofs_per_line(); ++i)
+    for (unsigned int j = 0; j < fe_other.n_dofs_per_line(); ++j)
+      if (face_support_points[i + offset].distance(
+            face_support_points_other[j + offset_other]) < 1e-14)
+        identities.emplace_back(i, j);
+
+  return identities;
 }
 
 
@@ -306,27 +340,62 @@ FE_WedgeP<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
   const unsigned int                  face_no) const
 {
-  (void)fe_other;
-
   AssertIndexRange(face_no, 5);
+
+  std::vector<std::pair<unsigned int, unsigned int>> result;
+  unsigned int                                       face_no_neighbor;
 
   if (face_no < 2)
     {
-      Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)),
+      // triangular face
+      Assert((dynamic_cast<const FE_SimplexP<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
              ExcNotImplemented());
+      if ((dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)))
+        face_no_neighbor = 1;
+      else
+        face_no_neighbor = 0;
     }
   else
     {
-      Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)),
+      // quad face
+      Assert((dynamic_cast<const FE_Q<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_PyramidP<dim, spacedim> *>(&fe_other)) ||
+               (dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)),
              ExcNotImplemented());
+      if ((dynamic_cast<const FE_WedgeP<dim, spacedim> *>(&fe_other)))
+        face_no_neighbor = 2;
+      else
+        face_no_neighbor = 0;
     }
 
-  std::vector<std::pair<unsigned int, unsigned int>> result;
+  // compare the face support points
+  const auto face_support_points = this->get_unit_face_support_points(face_no);
+  const auto face_support_points_other =
+    fe_other.get_unit_face_support_points(face_no_neighbor);
 
-  result.reserve(this->n_dofs_per_quad(face_no));
+  // get the offsets to skip vertices and lines
+  const auto face_reference_cell =
+    this->reference_cell().face_reference_cell(face_no);
+  Assert(face_reference_cell ==
+           fe_other.reference_cell().face_reference_cell(face_no_neighbor),
+         ExcInternalError());
+
+  const auto offset = face_reference_cell.n_vertices() +
+                      face_reference_cell.n_lines() * this->n_dofs_per_line();
+
+  const auto offset_other =
+    face_reference_cell.n_vertices() +
+    face_reference_cell.n_lines() * fe_other.n_dofs_per_line();
+
+  // now compare the points
   for (unsigned int i = 0; i < this->n_dofs_per_quad(face_no); ++i)
-    result.emplace_back(i, i);
-
+    for (unsigned int j = 0; j < fe_other.n_dofs_per_quad(face_no_neighbor);
+         ++j)
+      if (face_support_points[i + offset].distance(
+            face_support_points_other[j + offset_other]) < 1e-14)
+        result.emplace_back(i, j);
   return result;
 }
 
