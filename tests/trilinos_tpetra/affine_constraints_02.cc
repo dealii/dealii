@@ -222,11 +222,4 @@ main(int argc, char **argv)
     3,
     LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Host>,
     LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>>();
-
-  // test<2,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
-  // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
-  // MemorySpace::Default>>();
-  // test<3,LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double,
-  // MemorySpace::Default>, LinearAlgebra::TpetraWrappers::BlockVector<double,
-  // MemorySpace::Default>>();
 }

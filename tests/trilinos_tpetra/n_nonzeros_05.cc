@@ -73,6 +73,7 @@ test()
   A.reinit(sparsity);
 
   // see how many nonzero elements it reports
+  // we expect 4x4 (block 0,0) + 9x9 (block 1,1) = 97
   deallog << A.n_nonzero_elements() << std::endl;
 }
 
