@@ -1421,7 +1421,7 @@ namespace LinearAlgebra
                                                       Teuchos::Copy);
 
       column_space_map = source.column_space_map;
-      compressed = source.compressed;
+      compressed       = source.compressed;
     }
 
 

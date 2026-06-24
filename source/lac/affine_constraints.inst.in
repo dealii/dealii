@@ -254,7 +254,7 @@ for (S : TRILINOS_SCALARS)
       const Vector<S> &,
       const std::vector<AffineConstraints<S>::size_type> &,
       LinearAlgebra::TpetraWrappers::Vector<S, MemorySpace::Host> &,
-            const FullMatrix<S> &) const;
+      const FullMatrix<S> &) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
       LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Host>,

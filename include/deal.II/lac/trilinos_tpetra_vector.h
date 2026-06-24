@@ -641,7 +641,7 @@ namespace LinearAlgebra
        * function takes a deal.II vector of values.
        */
       void
-      add(const std::vector<size_type>           &indices,
+      add(const std::vector<size_type>   &indices,
           const ::dealii::Vector<Number> &values);
 
       /**
@@ -1263,7 +1263,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     inline void
-    Vector<Number, MemorySpace>::add(const std::vector<size_type> &indices,
+    Vector<Number, MemorySpace>::add(const std::vector<size_type>   &indices,
                                      const ::dealii::Vector<Number> &values)
     {
       // if we have ghost values, do not allow
