@@ -1,0 +1,12 @@
+
+DEAL:0:0::Number of locally active dofs: 35
+DEAL:0:0::Number of dofs with contained support: 8
+DEAL:0:0::Number of owned dofs with contained support: 8
+DEAL:0:0::Total number of dofs with contained support: 8
+DEAL:0:0::
+
+DEAL:1:1::Number of locally active dofs: 35
+DEAL:1:1::Number of dofs with contained support: 2
+DEAL:1:1::Number of owned dofs with contained support: 0
+DEAL:1:1::
+

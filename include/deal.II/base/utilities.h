@@ -26,6 +26,7 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/complex.hpp>
+#include <boost/serialization/set.hpp>
 #include <boost/serialization/vector.hpp>
 
 #include <cstddef>
