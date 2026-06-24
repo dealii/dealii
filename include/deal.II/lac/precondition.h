@@ -2503,7 +2503,7 @@ namespace internal
         // starting guess for a power iteration, but in neither case a
         // zero vector yields anything useful. So skip the following code and
         // instead use the fallback below if temp_vector1 is the zero vector.
-        if (temp_vector1.l2_norm() != 0.0)
+        if (temp_vector1.all_zero() == false)
           {
             if (data.eigenvalue_algorithm ==
                 internal::EigenvalueAlgorithm::lanczos)
