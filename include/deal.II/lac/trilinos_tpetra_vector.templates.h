@@ -1573,7 +1573,7 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     const TpetraTypes::MapType<MemorySpace> &
-    Vector<Number, MemorySpace>::trilinos_partitioner()
+    Vector<Number, MemorySpace>::trilinos_partitioner() const
     {
       return *vector->getMap();
     }
