@@ -402,14 +402,24 @@ protected:
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-                  data.shape_grads[i][k] = grads[i];
+                  {
+                    if constexpr (dim == spacedim)
+                      data.shape_grads[i][k] = grads[i];
+                    else
+                      for (unsigned int d = 0; d < dim; ++d)
+                        data.shape_grads[i][k][d] = grads[i][d];
+                  }
               else
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   {
                     Tensor<2, dim> add_grads;
                     for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
                       add_grads += inverse_node_matrix(j, i) * grads[j];
-                    data.shape_grads[i][k] = add_grads;
+                    if constexpr (dim == spacedim)
+                      data.shape_grads[i][k] = add_grads;
+                    else
+                      for (unsigned int d = 0; d < dim; ++d)
+                        data.shape_grads[i][k][d] = add_grads[d];
                   }
             }
 
@@ -417,7 +427,15 @@ protected:
             {
               if (inverse_node_matrix.n_cols() == 0)
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
-                  data.shape_grad_grads[i][k] = grad_grads[i];
+                  {
+                    if constexpr (dim == spacedim)
+                      data.shape_grad_grads[i][k] = grad_grads[i];
+                    else
+                      for (unsigned int d = 0; d < dim; ++d)
+                        for (unsigned int e = 0; e < dim; ++e)
+                          data.shape_grad_grads[i][k][d][e] =
+                            grad_grads[i][d][e];
+                  }
               else
                 for (unsigned int i = 0; i < this->n_dofs_per_cell(); ++i)
                   {
@@ -425,7 +443,13 @@ protected:
                     for (unsigned int j = 0; j < this->n_dofs_per_cell(); ++j)
                       add_grad_grads +=
                         inverse_node_matrix(j, i) * grad_grads[j];
-                    data.shape_grad_grads[i][k] = add_grad_grads;
+                    if constexpr (dim == spacedim)
+                      data.shape_grad_grads[i][k] = add_grad_grads;
+                    else
+                      for (unsigned int d = 0; d < dim; ++d)
+                        for (unsigned int e = 0; e < dim; ++e)
+                          data.shape_grad_grads[i][k][d][e] =
+                            add_grad_grads[d][e];
                   }
             }
         }

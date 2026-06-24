@@ -16,3 +16,10 @@ for (deal_II_dimension : DIMENSIONS)
   {
     template class FE_PolyTensor<deal_II_dimension, deal_II_dimension>;
   }
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension == 2 && deal_II_space_dimension == 3
+    template class FE_PolyTensor<deal_II_dimension, deal_II_space_dimension>;
+#endif
+  }
