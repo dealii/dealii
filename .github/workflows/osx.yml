@@ -46,7 +46,7 @@ jobs:
         os: [macos-15, macos-26]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: info
       run: |
         g++ -v
@@ -93,7 +93,7 @@ jobs:
         os: [macos-15, macos-26]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: setup
       run: |
         brew install openmpi
