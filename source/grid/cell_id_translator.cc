@@ -11,6 +11,7 @@
 // -----------------------------------------------------------------------------
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx26/inplace_vector.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/cell_id_translator.h>
@@ -78,20 +79,18 @@ namespace internal
   CellId
   CellIDTranslator<dim>::to_cell_id(const types::global_cell_index id) const
   {
-    std::vector<std::uint8_t> child_indices;
+    std_cxx26::inplace_vector<std::uint8_t, numbers::max_n_levels - 1>
+      child_indices;
 
-    types::global_cell_index id_temp = id;
-
-    types::global_cell_index level = 0;
-
+    std::uint8_t level = 0;
     for (; level < n_global_levels; ++level)
       if (id < tree_sizes[level])
         break;
+    Assert(level > 0, ExcInternalError());
     level -= 1;
 
-    id_temp -= tree_sizes[level];
-
-    for (types::global_cell_index l = 0; l < level; ++l)
+    types::coarse_cell_id id_temp = id - tree_sizes[level];
+    for (std::uint8_t l = 0; l < level; ++l)
       {
         child_indices.push_back(id_temp %
                                 ReferenceCells::max_n_children<dim>());
@@ -100,7 +99,9 @@ namespace internal
 
     std::reverse(child_indices.begin(), child_indices.end());
 
-    return {id_temp, child_indices};
+    return CellId(id_temp,
+                  static_cast<unsigned int>(child_indices.size()),
+                  child_indices.data());
   }
 
 
