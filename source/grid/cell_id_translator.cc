@@ -15,6 +15,7 @@
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/cell_id_translator.h>
+#include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 
 #include <algorithm>
@@ -26,11 +27,11 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   template <int dim>
+  template <int spacedim>
   CellIDTranslator<dim>::CellIDTranslator(
-    const types::global_cell_index n_coarse_cells,
-    const types::global_cell_index n_global_levels)
-    : n_coarse_cells(n_coarse_cells)
-    , n_global_levels(n_global_levels)
+    const Triangulation<dim, spacedim> &tria)
+    : n_coarse_cells(tria.n_global_coarse_cells())
+    , n_global_levels(tria.n_global_levels())
   {
     // The class stores indices as types::global_cell_index variables,
     // but when configuring deal.II with default flags, this is a 32-bit

@@ -11,11 +11,16 @@
 // -----------------------------------------------------------------------------
 
 
-
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace internal
     \{
+#if deal_II_dimension == deal_II_space_dimension
       template class CellIDTranslator<deal_II_dimension>;
+#endif
+#if deal_II_dimension <= deal_II_space_dimension
+      template CellIDTranslator<deal_II_dimension>::CellIDTranslator(
+        const Triangulation<deal_II_dimension, deal_II_space_dimension> &);
+#endif
     \}
   }

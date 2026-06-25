@@ -13,6 +13,7 @@
 #ifndef dealii_distributed_repartitioning_policy_tools_h
 #define dealii_distributed_repartitioning_policy_tools_h
 
+#include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/la_parallel_vector.h>
@@ -103,15 +104,7 @@ namespace RepartitioningPolicyTools
       const Triangulation<dim, spacedim> &tria_coarse_in) const override;
 
   private:
-    /**
-     * Number of coarse cells.
-     */
-    const unsigned int n_coarse_cells;
-
-    /**
-     * Number of global levels.
-     */
-    const unsigned int n_global_levels;
+    internal::CellIDTranslator<dim> cell_id_translator;
 
     /**
      * Index set constructed from the triangulation passed to the constructor.

@@ -13,22 +13,9 @@
 
 // Test CellIDTranslator.
 
-#include <deal.II/base/mpi_consensus_algorithms.h>
-
-#include <deal.II/distributed/fully_distributed_tria.h>
-#include <deal.II/distributed/tria.h>
-
-#include <deal.II/dofs/dof_tools.h>
-
-#include <deal.II/fe/fe_q.h>
-
+#include <deal.II/grid/cell_id_translator.h>
 #include <deal.II/grid/grid_generator.h>
-
-#include <deal.II/lac/la_parallel_vector.h>
-
-#include <deal.II/multigrid/mg_transfer_matrix_free.templates.h>
-
-#include <set>
+#include <deal.II/grid/tria.h>
 
 #include "../tests.h"
 
@@ -40,27 +27,13 @@ test(const MPI_Comm comm)
   GridGenerator::subdivided_hyper_cube(basetria, 4);
   basetria.refine_global(4);
 
-  const auto determine_n_coarse_cells = [&comm](auto &tria) {
-    types::coarse_cell_id n_coarse_cells = 0;
-
-    for (auto cell : tria.active_cell_iterators())
-      if (!cell->is_artificial())
-        n_coarse_cells =
-          std::max(n_coarse_cells, cell->id().get_coarse_cell_id());
-
-    return Utilities::MPI::max(n_coarse_cells, comm) + 1;
-  };
-
   // create translator: CellID <-> unique ID
-  internal::CellIDTranslator<dim> cell_id_translator(
-    determine_n_coarse_cells(basetria), basetria.n_global_levels());
-
-
-  for (auto cell : basetria.cell_iterators())
+  internal::CellIDTranslator<dim> cell_id_translator(basetria);
+  for (const auto &cell : basetria.cell_iterators())
     {
       Assert(cell->id() == cell_id_translator.to_cell_id(
                              cell_id_translator.translate(cell)),
-             ExcNotImplemented());
+             ExcInternalError());
 
       if (cell->has_children())
         {
@@ -69,7 +42,7 @@ test(const MPI_Comm comm)
               Assert(cell->child(c)->id() ==
                        cell_id_translator.to_cell_id(
                          cell_id_translator.translate(cell, c)),
-                     ExcNotImplemented());
+                     ExcInternalError());
             }
         }
     }

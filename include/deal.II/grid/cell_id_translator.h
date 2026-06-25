@@ -14,6 +14,7 @@
 #define dealii_cell_id_translator_h
 
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/grid/cell_id.h>
@@ -24,6 +25,13 @@
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
+
+// Forward declarations
+#ifndef DOXYGEN
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+class Triangulation;
+#endif
 
 namespace internal
 {
@@ -36,8 +44,7 @@ namespace internal
    * cells, using this class:
    * @code
    * // set up translator
-   * CellIDTranslator<dim> translator(tria.n_global_coarse_cells(),
-   *                                  tria.n_global_levels());
+   * CellIDTranslator<dim> translator(tria);
    *
    * // initialize the index set with the correct size
    * IndexSet index_set(translator.size());
@@ -54,11 +61,10 @@ namespace internal
   {
   public:
     /**
-     * Constructor taking the number of global coarse cells and number of
-     * global levels of a triangulation.
+     * Constructor.
      */
-    CellIDTranslator(const types::global_cell_index n_coarse_cells,
-                     const types::global_cell_index n_global_levels);
+    template <int spacedim>
+    CellIDTranslator(const Triangulation<dim, spacedim> &tria);
 
     /**
      * Return maximum number of cells, i.e., in the case the triangulation

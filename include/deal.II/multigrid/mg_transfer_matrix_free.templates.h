@@ -795,9 +795,7 @@ namespace internal
       , communicator(
           dof_handler_fine
             .get_mpi_communicator() /*TODO: fix for different comms*/)
-      , cell_id_translator(
-          dof_handler_fine.get_triangulation().n_global_coarse_cells(),
-          dof_handler_fine.get_triangulation().n_global_levels())
+      , cell_id_translator(dof_handler_fine.get_triangulation())
     {
       AssertDimension(
         dof_handler_fine.get_triangulation().n_global_coarse_cells(),
@@ -3712,8 +3710,7 @@ MGTwoLevelTransfer<dim, VectorType>::reinit(
   if (do_polynomial_transfer == false)
     {
       const internal::CellIDTranslator<dim> cell_id_translator(
-        dof_handler_fine.get_triangulation().n_global_coarse_cells(),
-        dof_handler_fine.get_triangulation().n_global_levels());
+        dof_handler_fine.get_triangulation());
 
       AssertDimension(
         dof_handler_fine.get_triangulation().n_global_coarse_cells(),
