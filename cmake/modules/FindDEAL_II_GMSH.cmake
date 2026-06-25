@@ -56,28 +56,23 @@ endif()
 
 if(GMSH_WITH_API)
   set(GMSH_WITH_API_CONFIG_H "${GMSH_INCLUDE_DIR}/gmsh.h")
-  file(STRINGS "${GMSH_WITH_API_CONFIG_H}" GMSH_WITH_API_VERSION_MAJOR_STRING
-    REGEX "#define.*GMSH_API_VERSION_MAJOR"
-    )
-  string(REGEX REPLACE "^.*GMSH_API_VERSION_MAJOR.*([0-9]+).*" "\\1"
-    GMSH_WITH_API_VERSION_MAJOR "${GMSH_WITH_API_VERSION_MAJOR_STRING}"
-    )
-  file(STRINGS "${GMSH_WITH_API_CONFIG_H}" GMSH_WITH_API_VERSION_MINOR_STRING
-    REGEX "#define.*GMSH_API_VERSION_MINOR"
-    )
-  string(REGEX REPLACE "^.*GMSH_API_VERSION_MINOR.*([0-9]+).*" "\\1"
-    GMSH_WITH_API_VERSION_MINOR "${GMSH_WITH_API_VERSION_MINOR_STRING}"
-    )
-  file(STRINGS "${GMSH_WITH_API_CONFIG_H}" GMSH_WITH_API_VERSION_PATCH_STRING
-    REGEX "#define.*GMSH_API_VERSION_PATCH"
-    )
-  string(REGEX REPLACE "^.*GMSH_API_VERSION_PATCH.*([0-9]+).*" "\\1"
-    GMSH_WITH_API_VERSION_PATCH "${GMSH_WITH_API_VERSION_PATCH_STRING}"
-    )
+  # version 4.4 and newer of gmsh have GMSH_API_VERSION_MAJOR etc., but older
+  # versions just define a version string: for compatibility just unpack the
+  # version string
+  file(STRINGS "${GMSH_WITH_API_CONFIG_H}" GMSH_WITH_API_VERSION_STRING
+    REGEX "#define.*GMSH_API_VERSION ")
 
-  set(GMSH_WITH_API_VERSION
-    "${GMSH_WITH_API_VERSION_MAJOR}.${GMSH_WITH_API_VERSION_MINOR}.${GMSH_WITH_API_VERSION_PATCH}"
-    )
+  # The first two group matches must be the major and minor versions. Older
+  # versions of gmsh don't define a PATCH version so that match is optional:
+  string(REGEX MATCH "GMSH_API_VERSION.*\"([0-9]+)\\.([0-9]+)\\.?([0-9]+)?\""
+    _ "${GMSH_WITH_API_VERSION_STRING}")
+  set(GMSH_WITH_API_VERSION_MAJOR "${CMAKE_MATCH_1}")
+  set(GMSH_WITH_API_VERSION_MINOR "${CMAKE_MATCH_2}")
+  if("${CMAKE_MATCH_3}" STREQUAL "")
+    set(GMSH_WITH_API_VERSION_PATCH "0")
+  else()
+    set(GMSH_WITH_API_VERSION_PATCH "${CMAKE_MATCH_3}")
+  endif()
 endif()
 
 
