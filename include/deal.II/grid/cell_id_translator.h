@@ -112,8 +112,10 @@ namespace internal
 
     /**
      * Whether or not the Triangulation has Pyramid elements. If so we must
-     * assume the maximum number of children per cell is 10. Otherwise we may
-     * assume it is 2**dim.
+     * assume the maximum number of children per cell is
+     * ReferenceCells::Pyramid.n_isotropic_children() (10). Otherwise we may
+     * assume it is ReferenceCells::get_hypercube<dim>.n_isotropic_children()
+     * (2**dim).
      */
     const bool has_pyramids;
 
@@ -121,8 +123,9 @@ namespace internal
      * Maximum number of children per cell.
      *
      * @note If possible, avoid dividing by this value for performance reasons.
-     * In that circumstance check has_pyramids and, if it is false, use the
-     * 2**dim instead to improve performance.
+     * See the implementation of to_cell_id() for a workaround. In contrast,
+     * multiplication by a known constant isn't much faster than by an arbitrary
+     * integer so that case does not require a workaround.
      */
     const unsigned int max_children_per_cell;
 

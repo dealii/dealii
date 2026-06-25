@@ -100,8 +100,29 @@ namespace internal
     types::coarse_cell_id id_temp = id - tree_sizes[level];
     for (std::uint8_t l = 0; l < level; ++l)
       {
-        child_indices.push_back(id_temp % max_children_per_cell);
-        id_temp /= max_children_per_cell;
+        // Dividing by a known constant is much more efficient than diving by an
+        // arbitrary integer, so special case Pyramids and non-Pyramids:
+        if (has_pyramids)
+          {
+            constexpr unsigned int pyramid_max_children_per_cell =
+              ReferenceCells::Pyramid.n_isotropic_children();
+            Assert(max_children_per_cell <= pyramid_max_children_per_cell,
+                   ExcNotImplemented());
+            child_indices.push_back(id_temp % pyramid_max_children_per_cell);
+            id_temp /= pyramid_max_children_per_cell;
+          }
+        else
+          {
+            constexpr unsigned int hypercube_max_children_per_cell =
+              ReferenceCells::get_hypercube<dim>().n_isotropic_children();
+            // this value is equal for simplices and wedges (i.e., not pyramids)
+            // but we only need it to bound the actual maximum number of
+            // children per cell for this to work
+            Assert(max_children_per_cell <= hypercube_max_children_per_cell,
+                   ExcNotImplemented());
+            child_indices.push_back(id_temp % hypercube_max_children_per_cell);
+            id_temp /= hypercube_max_children_per_cell;
+          }
       }
 
     std::reverse(child_indices.begin(), child_indices.end());
