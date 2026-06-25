@@ -27,7 +27,6 @@ DEAL_II_NAMESPACE_OPEN
 
 /*---------------------------------------------------------------------*/
 
-// inline and template functions
 namespace internal
 {
   double
@@ -102,8 +101,6 @@ namespace internal
 
     return new_entry;
   }
-
-
 } // namespace internal
 
 /* ------------------------------------------------ */
