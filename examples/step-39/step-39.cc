@@ -72,23 +72,28 @@ namespace Step39
   // solution we compare to.
   Functions::SlitSingularityFunction<2> exact_solution;
 
-  // To begin with, let us declare the scratch and copy data objects that are
-  // used in the calls to MeshWorker::mesh_loop() below. Their role follows the
-  // same pattern as in the WorkStream framework already discussed in the step-9
-  // tutorial program: each worker operates on one cell or face at a time, gets
-  // its own scratch object with expensive temporary data such as FEValues-like
-  // objects, and writes the local result into a copy object. Because every
-  // worker has its own scratch and copy data, many such local computations can
-  // run in parallel without interfering with each other.
+  // To begin with, let us recall how MeshWorker::mesh_loop() works. Much like
+  // the WorkStream mechanism discussed in step-9, it separates the traversal
+  // of the mesh from the computation performed on each cell, boundary face, or
+  // interior face. The loop visits these objects one at a time, runs worker
+  // functions that compute purely local contributions, and then hands the
+  // results to a copier function that accumulates them into global matrices,
+  // vectors, or error indicators.
   //
-  // Once a local contribution has been computed, a separate copier stage moves
-  // it into the global matrix, right hand side, or error vector. This split
-  // between local work and global accumulation is the key idea behind
-  // WorkStream, and MeshWorker::mesh_loop() uses exactly the same organization
-  // while extending it from cell integrals to boundary and interior face
-  // integrals, including the subface terms that appear on adaptively refined
-  // meshes.
+  // This organization is what makes parallel assembly practical: the worker
+  // stage must not touch shared global data directly, and it should also avoid
+  // repeatedly allocating expensive temporary objects. Consequently, each
+  // worker receives a scratch object that owns reusable FEValues-like data and
+  // other temporary arrays, together with a copy object that stores the local
+  // contributions produced on the current cell or face. If you would like to
+  // see the general WorkStream idea in a simpler setting, step-9 gives a more
+  // introductory discussion before we apply the same pattern here to cells,
+  // faces, and subfaces.
 
+  // We start with a class that stores scratch data for assembling the global
+  // and multigrid matrices. This is the most elaborate scratch object because
+  // matrix assembly needs FEValues on cells, on boundary faces, on regular
+  // interior faces, and on subfaces at refinement edges.
   template <int dim>
   struct MatrixScratchData
   {
@@ -146,6 +151,9 @@ namespace Step39
   };
 
 
+  // Next comes the scratch object used for assembling the right-hand side.
+  // Here we only need access to boundary faces because the inhomogeneous terms
+  // come from the Nitsche boundary contributions.
   template <int dim>
   struct RightHandSideScratchData
   {
@@ -172,6 +180,11 @@ namespace Step39
   };
 
 
+  // The error estimator, in turn, needs the following scratch class. Besides
+  // FEValues-like objects on the relevant geometric entities, this object
+  // stores reusable buffers for solution values, gradients, Hessians, and
+  // exact boundary values so that the worker lambdas do not allocate these
+  // arrays repeatedly.
   template <int dim>
   struct EstimatorScratchData
   {
@@ -257,6 +270,10 @@ namespace Step39
   };
 
 
+  // To compute the actual error norms, we use another scratch class. As above,
+  // we keep both FEValues-like objects and temporary storage for function
+  // values and gradients in one per-thread object that can be reused for many
+  // cells and faces.
   template <int dim>
   struct ErrorScratchData
   {
@@ -344,10 +361,18 @@ namespace Step39
   };
 
 
+  // The first copy-data structure represents the local data associated with
+  // one face contribution. These data are kept separately because each
+  // interior face contributes four blocks coupling the two adjacent cells.
   struct FaceCopyData
   {
-    unsigned int level_1 = numbers::invalid_unsigned_int;
-    unsigned int level_2 = numbers::invalid_unsigned_int;
+    FaceCopyData()
+      : level_1(numbers::invalid_unsigned_int)
+      , level_2(numbers::invalid_unsigned_int)
+    {}
+
+    unsigned int level_1;
+    unsigned int level_2;
 
     FullMatrix<double> matrix_11;
     FullMatrix<double> matrix_12;
@@ -359,11 +384,16 @@ namespace Step39
   };
 
 
+  // Matrix assembly then uses the following copy-data class. Each worker first
+  // fills the cell matrix and, if necessary, appends additional face
+  // contributions; the copier then transfers all of this local data into the
+  // global sparse matrices.
   template <int dim>
   struct MatrixCopyData
   {
     MatrixCopyData(const unsigned int dofs_per_cell = 0)
-      : cell_matrix(dofs_per_cell, dofs_per_cell)
+      : level(numbers::invalid_unsigned_int)
+      , cell_matrix(dofs_per_cell, dofs_per_cell)
       , local_dof_indices(dofs_per_cell)
     {}
 
@@ -420,7 +450,7 @@ namespace Step39
     }
 
 
-    unsigned int level = numbers::invalid_unsigned_int;
+    unsigned int level;
 
     FullMatrix<double>                   cell_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
@@ -428,6 +458,9 @@ namespace Step39
   };
 
 
+  // For the right-hand side, a simpler copy-data class is sufficient. In this
+  // case the local result is just one cell vector together with the
+  // corresponding global DoF indices.
   struct RightHandSideCopyData
   {
     RightHandSideCopyData(const unsigned int dofs_per_cell = 0)
@@ -452,15 +485,37 @@ namespace Step39
   };
 
 
+  // Finally, the estimator and error computations share the following
+  // copy-data class. Instead of matrices or vectors, the local results are a
+  // small fixed number of scalar indicators attached to the current cell and
+  // to the faces touching it. The template argument is the number of such
+  // indicators, which is known at compile time. Specifically, we will use
+  // this class below with `n_values=1` for the error estimator, and with
+  // `n_values=2` for the error computation (where we compute both the $L_2$
+  // and $H^1$ errors).
   template <unsigned int n_values>
   struct ErrorCopyData
   {
     struct FaceContribution
     {
-      unsigned int                 cell_index_1 = numbers::invalid_unsigned_int;
-      unsigned int                 cell_index_2 = numbers::invalid_unsigned_int;
-      std::array<double, n_values> values       = {};
+      FaceContribution()
+        : cell_index_1(numbers::invalid_unsigned_int)
+        , cell_index_2(numbers::invalid_unsigned_int)
+      {
+        values.fill(0.);
+      }
+
+      unsigned int                 cell_index_1;
+      unsigned int                 cell_index_2;
+      std::array<double, n_values> values;
     };
+
+
+    ErrorCopyData()
+      : cell_index(numbers::invalid_unsigned_int)
+    {
+      cell_values.fill(0.);
+    }
 
 
     template <typename CellIterator>
@@ -485,8 +540,8 @@ namespace Step39
     }
 
 
-    unsigned int                  cell_index  = numbers::invalid_unsigned_int;
-    std::array<double, n_values>  cell_values = {};
+    unsigned int                  cell_index;
+    std::array<double, n_values>  cell_values;
     std::vector<FaceContribution> face_data;
   };
 
