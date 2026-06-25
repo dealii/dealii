@@ -30,7 +30,15 @@ namespace internal
   template <int spacedim>
   CellIDTranslator<dim>::CellIDTranslator(
     const Triangulation<dim, spacedim> &tria)
-    : n_coarse_cells(tria.n_global_coarse_cells())
+    : has_pyramids(dim == 3 && std::find(tria.get_reference_cells().begin(),
+                                         tria.get_reference_cells().end(),
+                                         ReferenceCells::Pyramid) !=
+                                 tria.get_reference_cells().end())
+    , max_children_per_cell(
+        has_pyramids ?
+          ReferenceCells::max_n_children<dim>() :
+          ReferenceCells::get_hypercube<dim>().n_isotropic_children())
+    , n_coarse_cells(tria.n_global_coarse_cells())
     , n_global_levels(tria.n_global_levels())
   {
     // The class stores indices as types::global_cell_index variables,
@@ -44,8 +52,7 @@ namespace internal
 
     for (unsigned int i = 0; i < n_global_levels; ++i)
       max_cell_index +=
-        Utilities::pow<std::uint64_t>(ReferenceCells::max_n_children<dim>(),
-                                      i) *
+        Utilities::pow<std::uint64_t>(max_children_per_cell, i) *
         n_coarse_cells;
 
     max_cell_index -= 1;
@@ -68,10 +75,10 @@ namespace internal
     tree_sizes.reserve(n_global_levels + 1);
     tree_sizes.push_back(0);
     for (unsigned int i = 0; i < n_global_levels; ++i)
-      tree_sizes.push_back(tree_sizes.back() +
-                           Utilities::pow<types::global_cell_index>(
-                             ReferenceCells::max_n_children<dim>(), i) *
-                             n_coarse_cells);
+      tree_sizes.push_back(
+        tree_sizes.back() +
+        Utilities::pow<types::global_cell_index>(max_children_per_cell, i) *
+          n_coarse_cells);
   }
 
 
@@ -93,9 +100,8 @@ namespace internal
     types::coarse_cell_id id_temp = id - tree_sizes[level];
     for (std::uint8_t l = 0; l < level; ++l)
       {
-        child_indices.push_back(id_temp %
-                                ReferenceCells::max_n_children<dim>());
-        id_temp /= ReferenceCells::max_n_children<dim>();
+        child_indices.push_back(id_temp % max_children_per_cell);
+        id_temp /= max_children_per_cell;
       }
 
     std::reverse(child_indices.begin(), child_indices.end());
@@ -109,13 +115,12 @@ namespace internal
 
   template <int dim>
   types::global_cell_index
-  CellIDTranslator<dim>::to_level_cell_index(const CellId &cell_id)
+  CellIDTranslator<dim>::to_level_cell_index(const CellId &cell_id) const
   {
     // compute level id: c_{i+1} = c_{i}*(max_n_children) + q on path to cell
     auto level_cell_id = cell_id.get_coarse_cell_id();
     for (const auto &child_index : cell_id.get_child_indices())
-      level_cell_id =
-        level_cell_id * ReferenceCells::max_n_children<dim>() + child_index;
+      level_cell_id = level_cell_id * max_children_per_cell + child_index;
 
     return level_cell_id;
   }

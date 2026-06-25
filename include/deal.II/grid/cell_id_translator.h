@@ -86,8 +86,8 @@ namespace internal
      * DoFCellAccessor to an index unique on a level.
      */
     template <typename Accessor>
-    static types::global_cell_index
-    translate_level(const TriaIterator<Accessor> &cell);
+    types::global_cell_index
+    translate_level(const TriaIterator<Accessor> &cell) const;
 
     /**
      * Convert the @p i-th child of @p to an index.
@@ -107,8 +107,24 @@ namespace internal
     /**
      * Convert a CellId to a index on that cell's level.
      */
-    static types::global_cell_index
-    to_level_cell_index(const CellId &cell_id);
+    types::global_cell_index
+    to_level_cell_index(const CellId &cell_id) const;
+
+    /**
+     * Whether or not the Triangulation has Pyramid elements. If so we must
+     * assume the maximum number of children per cell is 10. Otherwise we may
+     * assume it is 2**dim.
+     */
+    const bool has_pyramids;
+
+    /**
+     * Maximum number of children per cell.
+     *
+     * @note If possible, avoid dividing by this value for performance reasons.
+     * In that circumstance check has_pyramids and, if it is false, use the
+     * 2**dim instead to improve performance.
+     */
+    const unsigned int max_children_per_cell;
 
     /**
      * Number of global coarse cells.
@@ -133,8 +149,8 @@ namespace internal
   CellIDTranslator<dim>::size() const
   {
     return n_coarse_cells *
-           (Utilities::pow<types::global_cell_index>(
-              ReferenceCells::max_n_children<dim>(), n_global_levels) -
+           (Utilities::pow<types::global_cell_index>(max_children_per_cell,
+                                                     n_global_levels) -
             1);
   }
 
@@ -157,7 +173,8 @@ namespace internal
   template <int dim>
   template <typename Accessor>
   types::global_cell_index
-  CellIDTranslator<dim>::translate_level(const TriaIterator<Accessor> &cell)
+  CellIDTranslator<dim>::translate_level(
+    const TriaIterator<Accessor> &cell) const
   {
     static_assert(dim == Accessor::dimension &&
                     dim == Accessor::structure_dimension,
@@ -180,7 +197,7 @@ namespace internal
                   "The information can only be queried for cells.");
 
     return (translate(cell) - tree_sizes[cell->level()]) *
-             ReferenceCells::max_n_children<dim>() +
+             max_children_per_cell +
            i + tree_sizes[cell->level() + 1];
   }
 } // namespace internal
