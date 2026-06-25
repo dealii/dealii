@@ -96,6 +96,15 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
   #
   add_flags(DEAL_II_CXX_FLAGS_RELEASE "/O2")
 
+  # instruct newer versions of MSVC to treat inline in a standards-compliant way:
+  # "If /Zc:inline is specified, the compiler enforces the C++11 requirement that
+  # all functions declared inline must have a definition available in the same
+  # translation unit if they're used... This compiler option can significantly
+  # reduce .obj file size and improve linker speeds." See also
+  #
+  # https://learn.microsoft.com/en-us/cpp/build/reference/zc-inline-remove-unreferenced-comdat?view=msvc-170
+  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "/Zc:inline")
+
   #
   # Disable assert() in deal.II and user projects in release mode
   #
@@ -113,6 +122,29 @@ endif()
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
 
-  # generate some debug info:
-  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd /Od")
+  # Set debug build flags so that we may do some debugging and keep the size of
+  # the .lib reasonable. We need to avoid /Od (no optimization) since that
+  # disables /Zc:inline which makes the library very close, in size, to the 4 GB
+  # limit.
+  #
+  # These flags could include /Ob0 to disable inlining, but since that is such
+  # an important optimization for C++ let's keep it on to improve performance.
+  # Optimizing for size will disable some inlining which is an acceptable
+  # compromise.
+  #
+  # - /O1: optimize for size (less aggressive transformations)
+  # - /Oy-: keep frame pointers.
+  # - /Zi: generate debug info in a separate (.pdb) file. This always enables
+  #   /Zo (generate extra debug info) so we don't explicitly add that flag.
+  # - /MDd: link against a debug version of the standard library
+  # - /Zc:inline: same as the release build. Put it at the end to ensure it isn't
+  #   accidentally disabled (the default optimization setting, /Od, is
+  #   incompatible with this option, so set /O1 first). For an explanation of what this
+  #   does see the note in the section where we set up release flags.
+  # - /sdl: some sanitizer checks for buffer overflows, uninitialized variables, etc.
+  #
+  # Furthermore this is incompatible with the CMake default /RTC1 flag so strip
+  # that out.
+  string(REPLACE "/RTC1" "" "${DEAL_II_CXX_FLAGS_DEBUG}" "${DEAL_II_CXX_FLAGS_DEBUG}")
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/O1 /Oy- /Zi /MDd /Zc:inline /sdl")
 endif()
