@@ -219,7 +219,7 @@ namespace NonMatching
        * Return true if the incoming function bounds correspond to a function
        * which is indefinite, i.e., that is not negative or positive definite.
        */
-      inline bool
+      bool
       is_indefinite(const std::pair<double, double> &function_bounds)
       {
         if (function_bounds.first > 0)
@@ -251,7 +251,7 @@ namespace NonMatching
        * Note that the returned value can be negative. This is used to indicate
        * "how far away" a function is from being definite.
        */
-      inline double
+      double
       lower_bound_on_abs(const std::pair<double, double> &function_bounds)
       {
         Assert(function_bounds.first <= function_bounds.second,
@@ -332,7 +332,7 @@ namespace NonMatching
        * one being negative definite. Return false otherwise.
        */
       template <int dim>
-      inline bool
+      bool
       one_positive_one_negative_definite(
         const std::vector<FunctionBounds<dim>> &all_function_bounds)
       {
@@ -1041,7 +1041,7 @@ namespace NonMatching
        * direction and return the left half.
        */
       template <int dim>
-      inline BoundingBox<dim>
+      BoundingBox<dim>
       left_half(const BoundingBox<dim> &box, const unsigned int direction)
       {
         AssertIndexRange(direction, dim);
@@ -1060,7 +1060,7 @@ namespace NonMatching
        * direction and return the right half.
        */
       template <int dim>
-      inline BoundingBox<dim>
+      BoundingBox<dim>
       right_half(const BoundingBox<dim> &box, const unsigned int direction)
       {
         AssertIndexRange(direction, dim);

@@ -42,38 +42,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace internal
 {
-  template <int dim, int spacedim>
-  inline std::vector<unsigned int>
-  make_shape_function_to_row_table(const FiniteElement<dim, spacedim> &fe)
-  {
-    std::vector<unsigned int> shape_function_to_row_table(
-      fe.n_dofs_per_cell() * fe.n_components(), numbers::invalid_unsigned_int);
-    unsigned int row = 0;
-    for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
-      {
-        // loop over all components that are nonzero for this particular
-        // shape function. if a component is zero then we leave the
-        // value in the table unchanged (at the invalid value)
-        // otherwise it is mapped to the next free entry
-        unsigned int nth_nonzero_component = 0;
-        for (unsigned int c = 0; c < fe.n_components(); ++c)
-          if (fe.get_nonzero_components(i)[c] == true)
-            {
-              shape_function_to_row_table[i * fe.n_components() + c] =
-                row + nth_nonzero_component;
-              ++nth_nonzero_component;
-            }
-        row += fe.n_nonzero_components(i);
-      }
-
-    return shape_function_to_row_table;
-  }
-} // namespace internal
-
-
-
-namespace internal
-{
   namespace FEValuesImplementation
   {
     template <int dim, int spacedim>

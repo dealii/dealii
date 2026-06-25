@@ -30,26 +30,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace GridTools
 {
-  // Generic functions for appending face data in 2d or 3d. TODO: we can
-  // remove these once we have 'if constexpr'.
   namespace internal
   {
-    inline void
-    append_face_data(const CellData<1> &face_data, SubCellData &subcell_data)
-    {
-      subcell_data.boundary_lines.push_back(face_data);
-    }
-
-
-
-    inline void
-    append_face_data(const CellData<2> &face_data, SubCellData &subcell_data)
-    {
-      subcell_data.boundary_quads.push_back(face_data);
-    }
-
-
-
     // Lexical comparison for sorting CellData objects.
     template <int structdim>
     struct CellDataComparator
@@ -125,7 +107,16 @@ namespace GridTools
         SubCellData subcell_data;
 
         for (const CellData<dim - 1> &face_cell_data : face_data)
-          internal::append_face_data(face_cell_data, subcell_data);
+          {
+            if constexpr (dim - 1 == 0)
+              (void)face_data;
+            if constexpr (dim - 1 == 1)
+              subcell_data.boundary_lines.push_back(face_cell_data);
+            else if constexpr (dim - 1 == 2)
+              subcell_data.boundary_quads.push_back(face_cell_data);
+            else
+              DEAL_II_ASSERT_UNREACHABLE();
+          }
         return subcell_data;
       }
 

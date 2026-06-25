@@ -1807,6 +1807,21 @@ private:
   friend class FEValuesViews::Tensor;
 };
 
+namespace internal
+{
+  /**
+   * Compute the row indices of shape functions in internal data tables. If a
+   * component is zero then the value in this vector is
+   * numbers::invalid_unsigned_int.
+   *
+   * @note This utility function is used by FEValues and FEValuesViews and is
+   * here to avoid duplication.
+   */
+  template <int dim, int spacedim>
+  std::vector<unsigned int>
+  make_shape_function_to_row_table(const FiniteElement<dim, spacedim> &fe);
+} // namespace internal
+
 #ifndef DOXYGEN
 
 /*---------------------- Inline functions: FEValuesBase ---------------------*/

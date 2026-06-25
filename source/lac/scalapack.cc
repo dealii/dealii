@@ -29,44 +29,29 @@ DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_HDF5
 
-template <typename number>
-inline hid_t
-hdf5_type_id(const number *)
+namespace
 {
-  DEAL_II_NOT_IMPLEMENTED();
-  // don't know what to put here; it does not matter
-  return -1;
-}
+  template <typename number>
+  hid_t
+  hdf5_type_id(const number *)
+  {
+    DEAL_II_NOT_IMPLEMENTED();
+    // don't know what to put here; it does not matter
+    return -1;
+  }
 
-inline hid_t
-hdf5_type_id(const double *)
-{
-  return H5T_NATIVE_DOUBLE;
-}
+  hid_t
+  hdf5_type_id(const double *)
+  {
+    return H5T_NATIVE_DOUBLE;
+  }
 
-inline hid_t
-hdf5_type_id(const float *)
-{
-  return H5T_NATIVE_FLOAT;
-}
-
-inline hid_t
-hdf5_type_id(const int *)
-{
-  return H5T_NATIVE_INT;
-}
-
-inline hid_t
-hdf5_type_id(const unsigned int *)
-{
-  return H5T_NATIVE_UINT;
-}
-
-inline hid_t
-hdf5_type_id(const char *)
-{
-  return H5T_NATIVE_CHAR;
-}
+  hid_t
+  hdf5_type_id(const float *)
+  {
+    return H5T_NATIVE_FLOAT;
+  }
+} // namespace
 #endif // DEAL_II_WITH_HDF5
 
 

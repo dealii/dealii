@@ -257,7 +257,7 @@ namespace GridTools
      * of the @p dim space dimensions. Factorized into a function of its own
      * in order to allow parallel execution.
      */
-    inline void
+    void
     laplace_solve(const SparseMatrix<double>      &S,
                   const AffineConstraints<double> &constraints,
                   Vector<double>                  &u)

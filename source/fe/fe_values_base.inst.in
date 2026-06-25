@@ -16,6 +16,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
 #  if deal_II_dimension <= deal_II_space_dimension
     template class FEValuesBase<deal_II_dimension, deal_II_space_dimension>;
+
+    namespace internal
+    \{
+      template std::vector<unsigned int>
+      make_shape_function_to_row_table(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &);
+    \}
 #  endif
   }
 

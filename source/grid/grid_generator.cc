@@ -3424,9 +3424,8 @@ namespace GridGenerator
   namespace internal
   {
     // helper function to check if point is in 2d box
-    bool inline point_in_2d_box(const Point<2> &p,
-                                const Point<2> &c,
-                                const double    radius)
+    bool
+    point_in_2d_box(const Point<2> &p, const Point<2> &c, const double radius)
     {
       return (std::abs(p[0] - c[0]) < radius) &&
              (std::abs(p[1] - c[1]) < radius);
