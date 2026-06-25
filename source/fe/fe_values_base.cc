@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace internal
 {
   template <int dim, int spacedim>
-  inline std::vector<unsigned int>
+  std::vector<unsigned int>
   make_shape_function_to_row_table(const FiniteElement<dim, spacedim> &fe)
   {
     std::vector<unsigned int> shape_function_to_row_table(
