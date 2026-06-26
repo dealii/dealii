@@ -14,6 +14,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+#define SPLIT_INSTANTIATIONS_COUNT 3
+#define SPLIT_INSTANTIATIONS_INDEX 0
+
 #include "multigrid/mg_transfer_matrix_free.inst"
 
 DEAL_II_NAMESPACE_CLOSE

@@ -24,7 +24,9 @@ set(_unity_include_src
 set(_separate_src
   mg_tools.cc
   mg_transfer_global_coarsening.cc
-  mg_transfer_matrix_free.cc
+  mg_transfer_matrix_free_inst1.cc
+  mg_transfer_matrix_free_inst2.cc
+  mg_transfer_matrix_free_inst3.cc
   portable_mg_transfer_global_coarsening.cc
   )
 
