@@ -861,21 +861,25 @@ namespace DoFTools
                                     predicate_dofs_owned_cells.end());
     predicate_owned_set.compress();
 
-    // Build halo layer around locally owned part of subdomain.
-    // The halo layer consists of:
+    // Build halo layer around locally owned part of subdomain and sort the
+    // cells into one of two buckets:
     // - locally owned cells not fulfilling the predicate -> add to
-    // non_predicate_halo_set
+    //   non_predicate_halo_set
     // - ghost cells fulfilling the predicate -> add to predicate_ghost_set
     // - ghost cells not fulfilling the predicate -> add to non_predicate_halo
-    // set
+    //   set
+    // (Note that some ghost cells in the halo may satisfy the predicate
+    // because we first build the halo around the *locally owned cells that
+    // also satisfy the predicate*. I.e., there are cells returned by
+    // GridTools::compute_active_cell_halo_layer() that are in the halo
+    // of 'predicate_local' but actually inside the subdomain described by
+    // 'predicate'.)
     std::set<types::global_dof_index> non_predicate_dofs_halo_cells;
     std::set<types::global_dof_index> predicate_dofs_ghosts;
 
-    const std::vector<typename DoFHandler<dim, spacedim>::active_cell_iterator>
-      halo_cells =
-        GridTools::compute_active_cell_halo_layer(dof_handler, predicate_local);
-
-    for (const auto &cell : halo_cells)
+    for (const auto &cell :
+         GridTools::compute_active_cell_halo_layer(dof_handler,
+                                                   predicate_local))
       {
         const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
@@ -885,11 +889,10 @@ namespace DoFTools
             Assert(cell->is_ghost(), ExcInternalError());
             predicate_dofs_ghosts.insert(local_dof_indices.begin(),
                                          local_dof_indices.end());
-            continue;
           }
-
-        non_predicate_dofs_halo_cells.insert(local_dof_indices.begin(),
-                                             local_dof_indices.end());
+        else
+          non_predicate_dofs_halo_cells.insert(local_dof_indices.begin(),
+                                               local_dof_indices.end());
       }
 
     /*
