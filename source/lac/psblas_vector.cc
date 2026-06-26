@@ -235,6 +235,11 @@ namespace PSCToolkitWrappers
         Assert(ierr == 0, ExcCallingPSBLASFunction(ierr, "psb_c_cdins_lidx"));
       }
 
+    // Assemble the descriptor first so that the halo (ghost) information is
+    // known before the vector is allocated and assembled.
+    ierr = psb_c_cdasb(psblas_descriptor.get());
+    Assert(ierr == 0, ExcAssemblePSBLASDescriptor(ierr));
+
     // Create a new PSBLAS vector and allocate mem space for it
     psblas_vector = psb_c_new_dvector();
 
@@ -242,11 +247,16 @@ namespace PSCToolkitWrappers
                                        psblas_descriptor.get(),
                                        PSB_MATBLD_REMOTE,
                                        PSB_DUPL_DEF);
-
-    // ... and assemble descriptor
-    ierr = psb_c_cdasb(psblas_descriptor.get());
-
     Assert(ierr == 0, ExcInitializePSBLASVector(ierr));
+
+    // Assemble the vector so that storage for the ghost (halo) elements is
+    // allocated. This is required for update_ghost_values() (psb_c_dhalo) to
+    // work correctly.
+    ierr = psb_c_dgeasb_options(psblas_vector,
+                                psblas_descriptor.get(),
+                                PSB_DUPL_DEF);
+    Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
+
     state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
@@ -302,7 +312,13 @@ namespace PSCToolkitWrappers
           reinit(v.owned_elements, v.get_mpi_communicator(), true);
       }
 
-    int ierr = psb_c_dvect_clone(v.psblas_vector, psblas_vector);
+    // Copy only the locally owned entries from v into this vector. We use
+    // psb_c_dgeaxpby (this = 1.0 * v + 0.0 * this)
+    int ierr = psb_c_dgeaxpby(value_type(1.0),
+                              v.psblas_vector,
+                              value_type(0.0),
+                              psblas_vector,
+                              psblas_descriptor.get());
     AssertThrow(ierr == 0, ExcAXPBY(ierr));
 
     // If current vector has ghost elements, update them
