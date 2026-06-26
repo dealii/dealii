@@ -464,10 +464,7 @@ namespace Step45
     constraints.close();
 
     {
-      TrilinosWrappers::BlockSparsityPattern bsp(owned_partitioning,
-                                                 owned_partitioning,
-                                                 relevant_partitioning,
-                                                 mpi_communicator);
+      BlockDynamicSparsityPattern dsp(relevant_partitioning);
 
       Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)
@@ -479,23 +476,26 @@ namespace Step45
 
       DoFTools::make_sparsity_pattern(dof_handler,
                                       coupling,
-                                      bsp,
+                                      dsp,
                                       constraints,
                                       false,
                                       Utilities::MPI::this_mpi_process(
                                         mpi_communicator));
 
-      bsp.compress();
+      const IndexSet locally_relevant =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-      system_matrix.reinit(bsp);
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        dof_handler.locally_owned_dofs(),
+        mpi_communicator,
+        locally_relevant);
+
+      system_matrix.reinit(owned_partitioning, dsp, mpi_communicator);
     }
 
     {
-      TrilinosWrappers::BlockSparsityPattern preconditioner_bsp(
-        owned_partitioning,
-        owned_partitioning,
-        relevant_partitioning,
-        mpi_communicator);
+      BlockDynamicSparsityPattern preconditioner_dsp(relevant_partitioning);
 
       Table<2, DoFTools::Coupling> preconditioner_coupling(dim + 1, dim + 1);
       for (unsigned int c = 0; c < dim + 1; ++c)
@@ -507,15 +507,24 @@ namespace Step45
 
       DoFTools::make_sparsity_pattern(dof_handler,
                                       preconditioner_coupling,
-                                      preconditioner_bsp,
+                                      preconditioner_dsp,
                                       constraints,
                                       false,
                                       Utilities::MPI::this_mpi_process(
                                         mpi_communicator));
 
-      preconditioner_bsp.compress();
+      const IndexSet locally_relevant =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-      preconditioner_matrix.reinit(preconditioner_bsp);
+      SparsityTools::distribute_sparsity_pattern(
+        preconditioner_dsp,
+        dof_handler.locally_owned_dofs(),
+        mpi_communicator,
+        locally_relevant);
+
+      preconditioner_matrix.reinit(owned_partitioning,
+                                   preconditioner_dsp,
+                                   mpi_communicator);
     }
 
     system_rhs.reinit(owned_partitioning, mpi_communicator);
@@ -627,6 +636,7 @@ namespace Step45
                                                  preconditioner_matrix);
         }
 
+    preconditioner_matrix.compress(VectorOperation::add);
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
