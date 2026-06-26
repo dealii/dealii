@@ -145,6 +145,10 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
   #
   # Furthermore this is incompatible with the CMake default /RTC1 flag so strip
   # that out.
+  message(STATUS "Debug DEAL_II_CXX_FLAGS_DEBUG: ${DEAL_II_CXX_FLAGS_DEBUG}")
+  message(STATUS "Debug   CMAKE_CXX_FLAGS_DEBUG: ${CMAKE_CXX_FLAGS_DEBUG}")
+  message(STATUS "Debug       DEAL_II_CXX_FLAGS: ${DEAL_II_CXX_FLAGS}")
+  message(STATUS "Debug         CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
   string(REPLACE "/RTC1" "" "${DEAL_II_CXX_FLAGS_DEBUG}" "${DEAL_II_CXX_FLAGS_DEBUG}")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/O1 /Oy- /Zi /MDd /Zc:inline /sdl")
 endif()
