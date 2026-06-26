@@ -39,8 +39,6 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
-#include <psb_c_dbase.h>
-
 #include <iostream>
 
 #include "../../tests/tests.h"
