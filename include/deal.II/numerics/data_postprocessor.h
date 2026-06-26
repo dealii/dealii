@@ -1120,7 +1120,8 @@ private:
  *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
- *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e))]
+ *               computed_quantities[p][Tensor<2,dim>::
+ *                      component_to_unrolled_index(TableIndices<2>(d,e))]
  *                 = input_data.solution_gradients[p][d][e];
  *         }
  *     }
@@ -1157,12 +1158,15 @@ private:
  *     data_out.write_vtu (output);
  * @endcode
  *
- * This leads to the following output for the displacement field (i.e., the
- * solution) and the gradients (you may want to compare with the solution shown
+ * This leads to the following output for the displacement field, i.e., the
+ * solution (you may want to compare with the solution shown
  * in the results section of step-8; the current data is generated on a uniform
  * mesh for simplicity):
  *
  * @image html data_postprocessor_tensor_0.png
+ *
+ * The gradients generated with the help of this class then look like this:
+
  * @image html data_postprocessor_tensor_1.png
  *
  * These pictures show an ellipse representing the gradient tensor at, on
@@ -1202,7 +1206,8 @@ private:
  *                            (Tensor<2,dim>::n_independent_components));
  *           for (unsigned int d=0; d<dim; ++d)
  *             for (unsigned int e=0; e<dim; ++e)
- *               computed_quantities[p][Tensor<2,dim>::component_to_unrolled_index(TableIndices<2>(d,e))]
+ *               computed_quantities[p][Tensor<2,dim>::
+ *                       component_to_unrolled_index(TableIndices<2>(d,e))]
  *                 = (input_data.solution_gradients[p][d][e]
  *                    +
  *                    input_data.solution_gradients[p][e][d]) / 2;
