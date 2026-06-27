@@ -26,7 +26,7 @@
 set(PSBLAS_DIR "" CACHE PATH "An optional hint to a PSBLAS installation containing the PSBLAS include directory and libraries")
 set_if_empty(PSBLAS_DIR "$ENV{PSBLAS_DIR}")
 
-set(_psblas_libs "psb_base;psb_cbind;psb_linsolve;psb_prec;psb_util")
+set(_psblas_libs "psb_base;psb_cbind;psb_linsolve;psb_prec;psb_ext;psb_util")
 set(_psblas_library_variables "")
 
 foreach(_lib ${_psblas_libs})
@@ -67,30 +67,72 @@ if(EXISTS ${PSBLAS_PSBLASVERSION_H})
     )
 endif()
 
-set(_additional_libraries ${_interface_lapack} ${_interface_blas})
+#
+# PSBLAS is a Fortran library distributed as static archives. We have to
+# manually pick up the complete link interface. If
+# CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES is not available, do it
+# unconditionally for the most common case (gfortran).
+#
+# Since CMake 3.9 the gcc runtime library libgcc.a has been added to the
+# CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES variable. Additionally macOS GCC
+# adds emutls_w and heapt_w. We remove all of these because explicitly
+# linking them from a C++ linker invocation can break the build.
+#
 set(_fortran_libs ${CMAKE_Fortran_IMPLICIT_LINK_LIBRARIES})
-# Arbitrarily set this to gfortran and m, if they are not found, the user will
-# have to set them manually
+list(REMOVE_ITEM _fortran_libs gcc_s gcc emutls_w heapt_w)
 set_if_empty(_fortran_libs gfortran quadmath m)
 
+set(_additional_libraries "")
+# Platform-specific shared/static library extensions for the
+# compiler -print-file-name lookup.
+if(APPLE)
+  set(_psblas_lib_extensions ".so" ".so.1" ".dylib" ".a")
+elseif(WIN32)
+  set(_psblas_lib_extensions ".dll" ".lib" ".a")
+else()
+  set(_psblas_lib_extensions ".so" ".so.1" ".a" ".dylib")
+endif()
+
 foreach(_lib ${_fortran_libs})
+  #
+  # find_system_library uses check_cxx_source_compiles with "-l<name>" which
+  # fails when the C++ compiler wrapper does not know the Fortran runtime's
+  # library directory. We therefore also try to resolve the library via the
+  # Fortran compiler's -print-file-name.
+  #
   find_system_library(${_lib}_LIBRARY NAMES ${_lib})
+  if(NOT ${_lib}_LIBRARY OR ${_lib}_LIBRARY MATCHES "NOTFOUND")
+    foreach(__ext ${_psblas_lib_extensions})
+      execute_process(
+        COMMAND ${CMAKE_Fortran_COMPILER}
+                -print-file-name=lib${_lib}${__ext}
+        OUTPUT_VARIABLE __candidate
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        )
+      if(__candidate AND EXISTS "${__candidate}")
+        set(${_lib}_LIBRARY "${__candidate}" CACHE FILEPATH
+            "Location of ${_lib} runtime library" FORCE)
+        set(${_lib}_LIBRARY "${__candidate}")
+        mark_as_advanced(${_lib}_LIBRARY)
+        break()
+      endif()
+    endforeach()
+  endif()
   list(APPEND _additional_libraries ${_lib}_LIBRARY)
 endforeach()
 
 process_feature(PSBLAS
-  LIBRARIES 
-    REQUIRED 
+  LIBRARIES
+    REQUIRED
       ${_psblas_library_variables}
       ${_additional_libraries}
       LAPACK_LIBRARIES
     OPTIONAL
       MPI_CXX_LIBRARIES
       MPI_Fortran_LIBRARIES
-  INCLUDE_DIRS 
+  INCLUDE_DIRS
     REQUIRED PSBLAS_INCLUDE_DIR
-  LINKER_FLAGS
-    REQUIRED ${_interface_lapack} ${_interface_blas}
   CLEAR
     ${_psblas_library_variables} ${_additional_libraries} PSBLAS_INCLUDE_DIR
   )
