@@ -1032,9 +1032,24 @@ namespace Step39
   }
 
 
-  // In this function, we assemble the global system matrix, where by global
-  // we indicate that this is the matrix of the discrete system we solve and
-  // it is covering the whole mesh.
+  // In this function, we assemble the global system matrix, where by global we
+  // indicate that this is the matrix of the discrete system we solve and it
+  // is covering the whole mesh.
+  //
+  // The call to MeshWorker::mesh_loop() below follows the usual WorkStream
+  // pattern. It traverses all active cells and, depending on the flags we pass
+  // in, also visits boundary faces and interior faces. For each such geometric
+  // object, a worker function computes the corresponding local contribution:
+  // the cell worker fills the cell matrix, the boundary worker adds the
+  // Nitsche terms on Dirichlet boundaries, and the interior face worker
+  // computes the four coupling blocks associated with one face.
+  //
+  // None of these workers writes into the global sparse matrix directly.
+  // Instead, they only populate the copy object associated with the current
+  // cell. Once the local work is complete, the copier takes the data stored in
+  // that copy object and inserts it into the global matrix. This separation is
+  // what allows MeshWorker::mesh_loop() to parallelize the local integration
+  // safely.
   template <int dim>
   void InteriorPenaltyProblem<dim>::assemble_matrix()
   {
@@ -1174,8 +1189,17 @@ namespace Step39
 
 
   // Now, we do the same for the level matrices. Not too surprisingly, this
-  // function looks like a twin of the previous one. Indeed, there are only
-  // two minor differences.
+  // function looks like a twin of the previous one. The mesh loop again
+  // traverses cells, boundary faces, and interior faces, and the worker
+  // functions compute local matrix contributions without touching global data.
+  // The scratch object provides the FEValues-like data needed for those local
+  // computations, and the copy object collects the local cell matrix together
+  // with the face blocks.
+  //
+  // The main difference lies in the copier. Rather than assembling into a
+  // single global matrix, it dispatches the local data into the appropriate
+  // level matrix and, on refinement edges, into the up- and down-transfer
+  // matrices that are required by the multigrid algorithm.
   template <int dim>
   void InteriorPenaltyProblem<dim>::assemble_mg_matrix()
   {
@@ -1343,8 +1367,15 @@ namespace Step39
   }
 
 
-  // Here we have another clone of the assemble function. The difference to
+  // Here we have another clone of the assembly function. The difference to
   // assembling the system matrix consists in that we assemble a vector here.
+  //
+  // The mesh loop still uses the same worker/copier split. The cell worker is
+  // only responsible for initializing the copy object for the current cell,
+  // whereas the actual local work happens on boundary faces: there, the worker
+  // evaluates the inhomogeneous boundary values and accumulates the associated
+  // Nitsche terms into the local right-hand-side vector. The copier then adds
+  // that local vector to the global right-hand side.
   template <int dim>
   void InteriorPenaltyProblem<dim>::assemble_right_hand_side()
   {
@@ -1462,10 +1493,18 @@ namespace Step39
   }
 
 
-  // Another clone of the assemble function. The big difference to the
-  // previous ones is here that we also have an input vector.
-  // The results of the estimator are stored in a vector with one entry per
-  // cell.
+  // The next function estimates the error. The big difference to the previous
+  // mesh loop functions is that we now also read from the discrete solution
+  // vector. The results of the estimator are stored in a vector with one entry
+  // per cell.
+  //
+  // As before, MeshWorker::mesh_loop() separates the local work from the
+  // accumulation into the global output vector. The workers evaluate the
+  // current solution on cells and faces, compute the cell, boundary, and jump
+  // contributions to the estimator, and store them in the copy object. The
+  // copier then distributes these local indicators to the per-cell entries of
+  // the global estimator vector, splitting face terms evenly between the two
+  // cells that share the face.
   template <int dim>
   double InteriorPenaltyProblem<dim>::estimate()
   {
@@ -1675,14 +1714,19 @@ namespace Step39
     return estimates.block(0).l2_norm();
   }
 
-  // Here we compare our finite element solution with the (known) exact
-  // solution and compute the mean quadratic error of the gradient and the
-  // function itself. This function is a clone of the estimation function
-  // right above.
-
+  // Here we compare our finite element solution with the known exact solution
+  // and compute the mean quadratic error of the gradient and the function
+  // itself. This function is a close relative of the estimation function right
+  // above: the mesh loop again visits cells, boundary faces, and interior
+  // faces; the workers evaluate local quantities with the help of the scratch
+  // object; and the copier writes the resulting indicators into global data
+  // structures only after the local computation is finished.
+  //
   // Since we compute the error in the energy and the
   // <i>L<sup>2</sup></i>-norm, respectively, our block vector needs two
-  // blocks here.
+  // blocks here. Consequently, the copy object stores two local values per
+  // cell and per face contribution, and the copier accumulates each of them
+  // into the corresponding block.
   template <int dim>
   void InteriorPenaltyProblem<dim>::error()
   {
