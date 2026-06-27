@@ -56,24 +56,35 @@ namespace Portable
         , degree_coarse(degree_coarse)
       {}
 
-      template <typename KernelType, unsigned int deg = 1>
+      template <typename KernelType>
       DEAL_II_HOST_DEVICE bool
       run(KernelType &kernel) const
       {
-        if ((degree_fine == (2 * deg)) && (degree_coarse == deg))
-          kernel.template run<2 * deg, deg>(); // h-MG (FE_Q)
-        else if (deg < max_degree)
-          return run<KernelType, std::min(deg + 1, max_degree)>(
-            kernel); // try next degree
-        else
+        // h-MG can use a faster path
+        if (degree_fine == 2 && degree_coarse == 1)
           {
-            // due to limited functionality (e.g., FE_Q only) at the moment this
-            // should be unreachable due to the checks in the initialization
-            // phase
-            return false; // indicate that slow path has been taken
+            kernel.template run<2, 1>();
+            return true; // fast path taken
+          }
+        if (degree_fine == 4 && degree_coarse == 2)
+          {
+            kernel.template run<4, 2>();
+            return true; // fast path taken
+          }
+        if (degree_fine == 6 && degree_coarse == 3)
+          {
+            kernel.template run<6, 3>();
+            return true; // fast path taken
+          }
+        if (degree_fine == 8 && degree_coarse == 4)
+          {
+            kernel.template run<8, 4>();
+            return true; // fast path taken
           }
 
-        return true; // indicate that fast path has been taken
+        // due to limited functionality (e.g., FE_Q only) at the moment this
+        // should be unreachable due to the checks in the initialization phase
+        return false; // indicate that slow path has been taken
       }
 
     private:
