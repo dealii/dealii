@@ -1733,11 +1733,8 @@ namespace MGTools
         const auto &tria_coarse = *trias[lvl];
         const auto &tria_fine   = *trias[lvl + 1];
 
-        const unsigned int n_coarse_cells  = tria_fine.n_global_coarse_cells();
-        const unsigned int n_global_levels = tria_fine.n_global_levels();
-
         const dealii::internal::CellIDTranslator<dim> cell_id_translator(
-          n_coarse_cells, n_global_levels);
+          tria_fine);
 
         IndexSet is_fine_owned(cell_id_translator.size());
         IndexSet is_fine_required(cell_id_translator.size());

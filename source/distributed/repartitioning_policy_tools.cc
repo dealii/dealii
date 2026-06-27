@@ -105,18 +105,14 @@ namespace RepartitioningPolicyTools
   template <int dim, int spacedim>
   FirstChildPolicy<dim, spacedim>::FirstChildPolicy(
     const Triangulation<dim, spacedim> &tria_fine)
-    : n_coarse_cells(tria_fine.n_global_coarse_cells())
-    , n_global_levels(tria_fine.n_global_levels())
+    : cell_id_translator(tria_fine)
   {
     Assert(
       tria_fine.all_reference_cells_are_hyper_cube(),
       ExcMessage(
         "FirstChildPolicy is only working for pure hex meshes at the moment."));
 
-    const internal::CellIDTranslator<dim> cell_id_translator(n_coarse_cells,
-                                                             n_global_levels);
     is_level_partitions.set_size(cell_id_translator.size());
-
     for (const auto &cell : tria_fine.active_cell_iterators())
       if (cell->is_locally_owned())
         add_indices_recursively_for_first_child_policy(cell,
@@ -133,11 +129,7 @@ namespace RepartitioningPolicyTools
   {
     const auto communicator = tria_coarse_in.get_mpi_communicator();
 
-    const internal::CellIDTranslator<dim> cell_id_translator(n_coarse_cells,
-                                                             n_global_levels);
-
     IndexSet is_coarse(cell_id_translator.size());
-
     for (const auto &cell : tria_coarse_in.active_cell_iterators())
       if (cell->is_locally_owned())
         is_coarse.add_index(cell_id_translator.translate(cell));
