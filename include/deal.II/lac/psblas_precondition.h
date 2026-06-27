@@ -22,9 +22,11 @@
 #ifdef DEAL_II_WITH_AMG4PSBLAS
 
 #  include <amg_cbind.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
+#ifdef DEAL_II_WITH_AMG4PSBLAS
 namespace PSCToolkitWrappers
 {
 
@@ -231,7 +233,8 @@ namespace PSCToolkitWrappers
 
 } // namespace PSCToolkitWrappers
 
+#endif
+
 DEAL_II_NAMESPACE_CLOSE
 
-#endif
 #endif
