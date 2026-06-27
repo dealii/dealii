@@ -3951,6 +3951,23 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   // R. S. Varga, Matrix iterative analysis, 2nd ed., Springer, 2009
   if (data.degree == numbers::invalid_unsigned_int)
     {
+      // In solver mode, smoothing_range is interpreted as the relative
+      // target tolerance and must be strictly less than one. Otherwise the
+      // Chebyshev error formula below evaluates the square root of a
+      // negative number, producing a NaN that silently gets cast to an
+      // unsigned int with implementation-defined (typically zero) result.
+      // This would turn the "solver" into a single damped Jacobi step,
+      // which is almost certainly not what the user intended.
+      Assert(data.smoothing_range < 1.,
+             ExcMessage(
+               "When using PreconditionChebyshev as a solver (i.e., when "
+               "AdditionalData::degree == numbers::invalid_unsigned_int), "
+               "AdditionalData::smoothing_range must be strictly less than "
+               "one because it is interpreted as the relative target "
+               "tolerance of the Chebyshev iteration. A value >= 1 is only "
+               "meaningful when PreconditionChebyshev is used as a smoother "
+               "with a fixed polynomial degree."));
+
       const double actual_range = info.max_eigenvalue_estimate / alpha;
       const double sigma        = (1. - std::sqrt(1. / actual_range)) /
                            (1. + std::sqrt(1. / actual_range));
