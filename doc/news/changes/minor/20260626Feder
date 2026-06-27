@@ -1,4 +1,4 @@
-New: Add new preconditioner class, PreconditionAMG,
+New: Add new preconditioner class, PSCToolkitWrappers::PreconditionAMG,
 which adds a wrapper for the AMG preconditioner(s) provided by AMG4PSBLAS.
 <br>
 (Marco Feder, 2026/06/26)

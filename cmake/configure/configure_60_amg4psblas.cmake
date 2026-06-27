@@ -13,7 +13,7 @@
 ## ------------------------------------------------------------------------
 
 #
-# Configuration for the PSBLAS library:
+# Configuration for the AMG4PSBLAS library:
 #
 
 set(FEATURE_AMG4PSBLAS_DEPENDS PSBLAS)

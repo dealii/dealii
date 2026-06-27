@@ -54,20 +54,20 @@ namespace PSCToolkitWrappers
      */
     struct AdditionalData
     {
-      AdditionalData(const char        *cycle_type              = "VCYCLE",
-                     const unsigned int n_cycles                = 1,
-                     const double       aggregation_threshold   = 1e-2,
-                     const char        *aggregation_type        = "SOC1",
-                     const unsigned int aggregation_size        = 8,
-                     const char        *smoother_type           = "FBGS",
-                     const unsigned int smoother_sweeps         = 2,
-                     const unsigned int smoother_degree         = 1,
-                     const char        *aggr_prol               = "SMOOTHED",
-                     const char        *aggr_filter             = "FILTER",
-                     const char        *parallel_aggr_algorithm = "DECOUPLED",
-                     const char        *coarse_type             = "BJAC",
-                     const char        *coarse_mat_type         = "DIST",
-                     const bool         output_details          = false)
+      explicit AdditionalData(const char        *cycle_type = "VCYCLE",
+                              const unsigned int n_cycles   = 1,
+                              const double       aggregation_threshold = 1e-2,
+                              const char        *aggregation_type      = "SOC1",
+                              const unsigned int aggregation_size      = 8,
+                              const char        *smoother_type         = "FBGS",
+                              const unsigned int smoother_sweeps       = 2,
+                              const unsigned int smoother_degree       = 1,
+                              const char        *aggr_prol        = "SMOOTHED",
+                              const char        *aggr_filter      = "FILTER",
+                              const char *parallel_aggr_algorithm = "DECOUPLED",
+                              const char *coarse_type             = "BJAC",
+                              const char *coarse_mat_type         = "DIST",
+                              const bool  output_details          = false)
         : cycle_type(cycle_type)
         , n_cycles(n_cycles)
         , aggregation_threshold(aggregation_threshold)
@@ -107,6 +107,12 @@ namespace PSCToolkitWrappers
        */
       const char *aggregation_type;
 
+      /**
+       * Maximum size of aggregates when the coupled aggregation algorithm
+       * based on matching is applied. Value must be any integer power of 2,
+       * with a minimum value of 2. Used only with @p parallel_aggr_algorithm
+       * is "COUPLED" and @p aggregation_type is "MATCHBOXP".
+       */
       unsigned int aggregation_size;
 
       /**
