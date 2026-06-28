@@ -40,9 +40,6 @@
 // The include file for using MeshWorker::mesh_loop()
 #include <deal.II/meshworker/mesh_loop.h>
 
-// The include file for local integrators associated with the Laplacian
-#include <deal.II/integrators/laplace.h>
-
 // Support for multigrid methods
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/multigrid.h>
