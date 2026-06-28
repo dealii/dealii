@@ -18,6 +18,7 @@
 #include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/sparse_direct.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/trilinos_index_access.h>
 #include <deal.II/lac/vector.h>
 
 #include <complex>
@@ -1136,7 +1137,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                       "Error extracting global row view from Trilinos matrix. Error code " +
                       std::to_string(ierr) + "."));
 
-                  int global_row = trilinos_matrix.GRID(local_row);
+                  const auto global_row =
+                    TrilinosWrappers::global_row_index(trilinos_matrix,
+                                                       local_row);
 #    else
                   typename std::decay_t<decltype(trilinos_matrix)>::
                     local_inds_host_view_type local_cols;
@@ -1148,7 +1151,7 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                                                   values);
                   num_entries = local_cols.size();
 
-                  int global_row =
+                  const auto global_row =
                     trilinos_matrix.getRowMap()->getGlobalElement(local_row);
 #    endif
 
@@ -1156,7 +1159,8 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                     {
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
                       const auto global_column_id =
-                        trilinos_matrix.GCID(local_cols[j]);
+                        TrilinosWrappers::global_column_index(trilinos_matrix,
+                                                              local_cols[j]);
 #    else
                       const auto global_column_id =
                         trilinos_matrix.getColMap()->getGlobalElement(
@@ -1167,7 +1171,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                           irn[n_non_zero_local] = global_row + 1;
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
                           jcn[n_non_zero_local] =
-                            trilinos_matrix.GCID(local_cols[j]) + 1;
+                            TrilinosWrappers::global_column_index(
+                              trilinos_matrix, local_cols[j]) +
+                            1;
 #    else
                           jcn[n_non_zero_local] =
                             trilinos_matrix.getColMap()->getGlobalElement(
@@ -1278,9 +1284,11 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
 #    endif
 
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
-                  int global_row = trilinos_matrix.GRID(local_row);
+                  const auto global_row =
+                    TrilinosWrappers::global_row_index(trilinos_matrix,
+                                                       local_row);
 #    else
-                  int global_row =
+                  const auto global_row =
                     trilinos_matrix.getRowMap()->getGlobalElement(local_row);
 #    endif
                   for (int j = 0; j < num_entries; ++j)
@@ -1288,7 +1296,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                       irn[n_non_zero_local] = global_row + 1;
 #    ifdef DEAL_II_TRILINOS_WITH_EPETRA
                       jcn[n_non_zero_local] =
-                        trilinos_matrix.GCID(local_cols[j]) + 1;
+                        TrilinosWrappers::global_column_index(trilinos_matrix,
+                                                              local_cols[j]) +
+                        1;
 #    else
                       jcn[n_non_zero_local] =
                         trilinos_matrix.getColMap()->getGlobalElement(
