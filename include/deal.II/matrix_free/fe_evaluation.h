@@ -3152,8 +3152,8 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 dof_info.constraint_indicator[index_indicators];
               // run through values up to next constraint
               for (unsigned int j = 0; j < indicator.first; ++j)
-                for (unsigned int comp = 0; comp < n_components; ++comp)
-                  if (dof_indices[v][j] != numbers::invalid_unsigned_int)
+                if (dof_indices[v][j] != numbers::invalid_unsigned_int)
+                  for (unsigned int comp = 0; comp < n_components; ++comp)
                     operation.process_dof(dof_indices[v][j],
                                           *src[comp],
                                           values_dofs[comp][ind_local + j][v]);
