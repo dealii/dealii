@@ -1,0 +1,290 @@
+
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 1 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 1 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 2 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 2 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 1 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 1 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 2 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 2 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 1 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 0 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 1 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 2 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 2 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 3 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 3 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 3 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 3 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 0 0 neighbor face number, orientation: 3 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 1 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 1 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 2 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 2 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 1 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 1 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 2 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 2 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 1 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 0 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 1 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 2 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 2 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 3 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 3 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 3 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 3 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 1 0 neighbor face number, orientation: 3 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 1 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 1 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 2 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 2 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 1 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 1 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 2 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 2 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 1 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 0 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 1 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 2 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 2 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 3 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 3 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 3 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 3 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 2 0 neighbor face number, orientation: 3 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 1 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 1 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 2 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 2 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 1 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 1 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 2 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 2 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 1 4
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 0 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 1 1
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 2 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 2 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 3 0
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 3 3
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 3 5
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 3 2
+DEAL:: ok 
+DEAL::Degree: 3
+DEAL::Face number, orientation: 3 0 neighbor face number, orientation: 3 4
+DEAL:: ok 
+DEAL::
