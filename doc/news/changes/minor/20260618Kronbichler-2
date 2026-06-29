@@ -1,0 +1,6 @@
+Improved: The matrix-free framework now stores Dirichlet-constrained indices
+as index numbers::invalid_unsigned_int, rather than as a separate constraint
+that needs to be resolved from a list. This leads to slightly better machine
+code on most machines, thus speeding up matrix-free codes.
+<br>
+(Marin, 2026/06/18)

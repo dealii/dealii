@@ -439,7 +439,7 @@ namespace internal
     template <typename VectorType>
     void
     process_dof_gather(const unsigned int              *indices,
-                       VectorType                      &vec,
+                       const VectorType                &vec,
                        const unsigned int               constant_offset,
                        typename VectorType::value_type *vec_ptr,
                        VectorizedArrayType             &res,
@@ -479,8 +479,11 @@ namespace internal
                        VectorizedArrayType &res,
                        std::bool_constant<false>) const
     {
+      res = VectorizedArrayType();
+      DEAL_II_OPENMP_SIMD_PRAGMA
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        res[v] = vector_access(vec, indices[v] + constant_offset);
+        if (indices[v] != numbers::invalid_unsigned_int)
+          res[v] = vector_access(vec, indices[v] + constant_offset);
     }
 
 
@@ -694,23 +697,40 @@ namespace internal
                        VectorType                      &vec,
                        const unsigned int               constant_offset,
                        typename VectorType::value_type *vec_ptr,
-                       VectorizedArrayType             &res,
+                       const VectorizedArrayType        res,
                        std::bool_constant<true>) const
     {
       (void)constant_offset;
       (void)vec_ptr;
       (void)vec;
 
-#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512
-      for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        vector_access(vec, indices[v] + constant_offset) += res[v];
+      if constexpr (running_in_debug_mode())
+        {
+          // in debug mode, run non-vectorized version because this path
+          // has additional checks (e.g., regarding ghosting)
+          Assert(vec_ptr == vec.begin() + constant_offset, ExcInternalError());
+          process_dof_gather(indices,
+                             vec,
+                             constant_offset,
+                             vec_ptr,
+                             res,
+                             std::bool_constant<false>());
+        }
+      else
+        {
+#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512 || \
+  !defined(DEAL_II_USE_VECTORIZATION_GATHER)
+          for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
+            if (indices[v] != numbers::invalid_unsigned_int)
+              vec_ptr[indices[v]] += res[v];
 #else
-      // only use gather in case there is also scatter.
-      VectorizedArrayType tmp;
-      tmp.gather(vec_ptr, indices);
-      tmp += res;
-      tmp.scatter(indices, vec_ptr);
+          // only use gather in case there is also scatter.
+          VectorizedArrayType tmp;
+          tmp.gather(vec_ptr, indices);
+          tmp += res;
+          tmp.scatter(indices, vec_ptr);
 #endif
+        }
     }
 
 
@@ -723,11 +743,12 @@ namespace internal
                        VectorType         &vec,
                        const unsigned int  constant_offset,
                        typename VectorType::value_type *,
-                       VectorizedArrayType &res,
+                       const VectorizedArrayType res,
                        std::bool_constant<false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        vector_access_add(vec, indices[v] + constant_offset, res[v]);
+        if (indices[v] != numbers::invalid_unsigned_int)
+          vector_access_add(vec, indices[v] + constant_offset, res[v]);
     }
 
 
@@ -928,7 +949,7 @@ namespace internal
                        VectorType                      &vec,
                        const unsigned int               constant_offset,
                        typename VectorType::value_type *vec_ptr,
-                       VectorizedArrayType             &res,
+                       const VectorizedArrayType        res,
                        std::bool_constant<true>) const
     {
       Assert(vec_ptr == vec.begin() + constant_offset, ExcInternalError());
@@ -943,11 +964,12 @@ namespace internal
                        VectorType         &vec,
                        const unsigned int  constant_offset,
                        typename VectorType::value_type *,
-                       VectorizedArrayType &res,
+                       const VectorizedArrayType res,
                        std::bool_constant<false>) const
     {
       for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
-        vector_access(vec, indices[v] + constant_offset) = res[v];
+        if (indices[v] != numbers::invalid_unsigned_int)
+          vector_access(vec, indices[v] + constant_offset) = res[v];
     }
 
 

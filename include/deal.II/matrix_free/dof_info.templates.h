@@ -65,6 +65,7 @@ namespace internal
       const unsigned int dofs_this_cell = dofs_per_cell[fe_index];
       const unsigned int n_components   = start_components.back();
       unsigned int       i              = 0;
+      bool               cell_has_dirichlet_constraints = false;
       for (unsigned int comp = 0; comp < n_components; ++comp)
         {
           std::pair<unsigned short, unsigned short> constraint_iterator(0, 0);
@@ -98,6 +99,16 @@ namespace internal
                     {
                       current_dof = entries[0].first;
                       goto no_constraint;
+                    }
+
+                  // case with zero-constrained DoF: Append invalid number,
+                  // this will be handled by the read functions
+                  if (n_entries == 0)
+                    {
+                      dof_indices.push_back(numbers::invalid_unsigned_int);
+                      constraint_iterator.first++;
+                      cell_has_dirichlet_constraints = true;
+                      continue;
                     }
 
                   // append a new index to the indicators
@@ -170,19 +181,22 @@ namespace internal
         }
 
       // now to the plain indices: in case we have constraints on this cell,
-      // store the indices without the constraints resolve once again
+      // also store the indices without the constraints resolved
       if (store_plain_indices == true)
         {
           if (cell_number == 0)
-            row_starts_plain_indices.resize(
-              (row_starts.size() - 1) / n_components + 1);
-          row_starts_plain_indices[cell_number] = plain_dof_indices.size();
-          const bool cell_has_constraints =
-            cell_has_hanging_nodes ||
-            (row_starts[(cell_number + 1) * n_components].second >
-             row_starts[cell_number * n_components].second);
-          if (cell_has_constraints == true)
             {
+              row_starts_plain_indices.clear();
+              row_starts_plain_indices.resize((row_starts.size() - 1) /
+                                                  n_components +
+                                                1,
+                                              numbers::invalid_unsigned_int);
+            }
+          if (cell_has_hanging_nodes || cell_has_dirichlet_constraints ||
+              (row_starts[(cell_number + 1) * n_components].second >
+               row_starts[cell_number * n_components].second))
+            {
+              row_starts_plain_indices[cell_number] = plain_dof_indices.size();
               for (unsigned int i = 0; i < dofs_this_cell; ++i)
                 {
                   types::global_dof_index current_dof = local_indices[i];
@@ -452,14 +466,15 @@ namespace internal
                 for (unsigned int it = row_starts[cell * n_components].first;
                      it != row_starts[(cell + 1) * n_components].first;
                      ++it)
-                  {
-                    const unsigned int myindex =
-                      dof_indices[it] / chunk_size_zero_vector;
-                    if (touched_first_by[myindex] ==
-                        numbers::invalid_unsigned_int)
-                      touched_first_by[myindex] = chunk;
-                    touched_last_by[myindex] = chunk;
-                  }
+                  if (dof_indices[it] != numbers::invalid_unsigned_int)
+                    {
+                      const unsigned int myindex =
+                        dof_indices[it] / chunk_size_zero_vector;
+                      if (touched_first_by[myindex] ==
+                          numbers::invalid_unsigned_int)
+                        touched_first_by[myindex] = chunk;
+                      touched_last_by[myindex] = chunk;
+                    }
               }
           }
 

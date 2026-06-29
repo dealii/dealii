@@ -659,18 +659,25 @@ public:
    * the given address and with given offsets, each entry from the offset
    * providing one element of the vectorized array.
    *
-   * This operation corresponds to the following code (but uses a more
+   * The provided offsets are allowed to be numbers::invalid_unsigned_int, in
+   * which case no data load will be attempted. Instead, the respective entry
+   * of the vectorized array will be set to zero.
+   *
+   * This operation corresponds to the following code (but might use a more
    * efficient implementation in case the hardware allows for that):
    * @code
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
+   *   if (offsets[v] != numbers::invalid_unsigned_int)
+   *     this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
   DEAL_II_ALWAYS_INLINE
   void
   gather(const Number *base_ptr, const unsigned int *offsets)
   {
-    data = base_ptr[offsets[0]];
+    this->operator=(Number(0));
+    if (offsets[0] != numbers::invalid_unsigned_int)
+      data = base_ptr[offsets[0]];
   }
 
   /**
@@ -678,7 +685,10 @@ public:
    * size() data items to the given address and the given offsets, filling the
    * elements of the vectorized array into each offset.
    *
-   * This operation corresponds to the following code (but uses a more
+   * The provided offsets are allowed to be numbers::invalid_unsigned_int, in
+   * which case the entry will be ignored.
+   *
+   * This operation corresponds to the following code (but might use a more
    * efficient implementation in case the hardware allows for that):
    * @code
    * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
@@ -689,7 +699,8 @@ public:
   void
   scatter(const unsigned int *offsets, Number *base_ptr) const
   {
-    base_ptr[offsets[0]] = data;
+    if (offsets[0] != numbers::invalid_unsigned_int)
+      base_ptr[offsets[0]] = data;
   }
 
   /**
@@ -1187,41 +1198,26 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
+    this->operator=(0.);
     for (unsigned int i = 0; i < 2; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -1472,41 +1468,26 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
+    this->operator=(0.f);
     for (unsigned int i = 0; i < 4; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**
@@ -1808,43 +1789,28 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
+    this->operator=(0.);
     for (unsigned int i = 0; i < 2; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   DEAL_II_ALWAYS_INLINE
   void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -2249,43 +2215,28 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
+    this->operator=(0.f);
     for (unsigned int i = 0; i < 4; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   DEAL_II_ALWAYS_INLINE
   void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**
@@ -2734,16 +2685,7 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2760,27 +2702,23 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m256d zero = _mm256_setzero_pd();
-    __m256d mask = _mm256_cmp_pd(zero, zero, _CMP_EQ_OQ);
+    __m256d zero  = _mm256_setzero_pd();
+    __m128i neq32 = _mm_andnot_si128(_mm_cmpeq_epi32(index, _mm_set1_epi32(-1)),
+                                     _mm_set1_epi32(-1));
+
+    __m256d mask = _mm256_castsi256_pd(_mm256_cvtepi32_epi64(neq32));
 
     data = _mm256_mask_i32gather_pd(zero, base_ptr, index, mask, 8);
 #    else
+    this->operator=(0.);
     for (unsigned int i = 0; i < 4; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
 #    endif
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -2788,7 +2726,8 @@ public:
   {
     // no scatter operation in AVX/AVX2
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -3276,16 +3215,7 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3302,27 +3232,23 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m256 zero = _mm256_setzero_ps();
-    __m256 mask = _mm256_cmp_ps(zero, zero, _CMP_EQ_OQ);
+    __m256  zero         = _mm256_setzero_ps();
+    __m256i invalid      = _mm256_set1_epi32(numbers::invalid_unsigned_int);
+    __m256i inverse_mask = _mm256_cmpeq_epi32(index, invalid);
+    __m256i mask         = _mm256_xor_si256(invalid, inverse_mask);
 
-    data = _mm256_mask_i32gather_ps(zero, base_ptr, index, mask, 4);
+    data = _mm256_mask_i32gather_ps(
+      zero, base_ptr, index, *reinterpret_cast<__m256 *>(&mask), 4);
 #    else
+    this->operator=(0.f);
     for (unsigned int i = 0; i < 8; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
 #    endif
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3330,7 +3256,8 @@ public:
   {
     // no scatter operation in AVX/AVX2
     for (unsigned int i = 0; i < 8; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**
@@ -3884,16 +3811,7 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3910,27 +3828,23 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m512d  zero = {};
-    __mmask8 mask = 0xFF;
+    __m512d       zero    = {};
+    const __m256i invalid = _mm256_set1_epi32(numbers::invalid_unsigned_int);
+    const __m256i equal   = _mm256_cmpeq_epi32(invalid, index);
+    __mmask8      mask =
+      static_cast<__mmask8>(~(_mm256_movemask_ps(_mm256_castsi256_ps(equal))));
 
     data = _mm512_mask_i32gather_pd(zero, mask, index, base_ptr, 8);
 #    else
+    this->operator=(0.);
     for (unsigned int i = 0; i < 8; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
 #    endif
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -3939,7 +3853,8 @@ public:
 #    ifdef DEAL_II_USE_VECTORIZATION_GATHER
     for (unsigned int i = 0; i < 8; ++i)
       for (unsigned int j = i + 1; j < 8; ++j)
-        Assert(offsets[i] != offsets[j],
+        Assert(offsets[i] == numbers::invalid_unsigned_int ||
+                 offsets[i] != offsets[j],
                ExcMessage("Result of scatter undefined if two offset elements"
                           " point to the same position"));
 
@@ -3948,11 +3863,17 @@ public:
     // API allows aliasing between different vector types.
     const __m256 index_val =
       _mm256_loadu_ps(reinterpret_cast<const float *>(offsets));
-    const __m256i index = *reinterpret_cast<const __m256i *>(&index_val);
-    _mm512_i32scatter_pd(base_ptr, index, data, 8);
+    const __m256i index   = *reinterpret_cast<const __m256i *>(&index_val);
+    const __m256i invalid = _mm256_set1_epi32(numbers::invalid_unsigned_int);
+    const __m256i equal   = _mm256_cmpeq_epi32(invalid, index);
+    __mmask8      mask =
+      static_cast<__mmask8>(~(_mm256_movemask_ps(_mm256_castsi256_ps(equal))));
+    _mm512_mask_i32scatter_pd(base_ptr, mask, index, data, 8);
+
 #    else
     for (unsigned int i = 0; i < 8; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
 #    endif
   }
 
@@ -4495,16 +4416,7 @@ public:
   }
 
   /**
-   * Load @p size() from memory into the calling class, starting at
-   * the given address and with given offsets, each entry from the offset
-   * providing one element of the vectorized array.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   this->operator[](v) = base_ptr[offsets[v]];
-   * @endcode
+   * @copydoc VectorizedArray<Number>::gather()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4521,27 +4433,21 @@ public:
     // work around a warning with gcc-12 about an uninitialized initial state
     // for gather by starting with a zero guess, even though all lanes will be
     // overwritten
-    __m512    zero = {};
-    __mmask16 mask = 0xFFFF;
+    __m512        zero    = {};
+    const __m512i invalid = _mm512_set1_epi32(numbers::invalid_unsigned_int);
+    __mmask16     mask    = _mm512_cmpneq_epu32_mask(invalid, index);
 
     data = _mm512_mask_i32gather_ps(zero, mask, index, base_ptr, 4);
 #    else
+    this->operator=(0.f);
     for (unsigned int i = 0; i < 16; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
 #    endif
   }
 
   /**
-   * Write the content of the calling class into memory in form of @p
-   * size() to the given address and the given offsets, filling the
-   * elements of the vectorized array into each offset.
-   *
-   * This operation corresponds to the following code (but uses a more
-   * efficient implementation in case the hardware allows for that):
-   * @code
-   * for (unsigned int v=0; v<VectorizedArray<Number>::size(); ++v)
-   *   base_ptr[offsets[v]] = this->operator[](v);
-   * @endcode
+   * @copydoc VectorizedArray<Number>::scatter()
    */
   DEAL_II_ALWAYS_INLINE
   void
@@ -4550,7 +4456,8 @@ public:
 #    ifdef DEAL_II_USE_VECTORIZATION_GATHER
     for (unsigned int i = 0; i < 16; ++i)
       for (unsigned int j = i + 1; j < 16; ++j)
-        Assert(offsets[i] != offsets[j],
+        Assert(offsets[i] == numbers::invalid_unsigned_int ||
+                 offsets[i] != offsets[j],
                ExcMessage("Result of scatter undefined if two offset elements"
                           " point to the same position"));
 
@@ -4559,11 +4466,14 @@ public:
     // API allows aliasing between different vector types.
     const __m512 index_val =
       _mm512_loadu_ps(reinterpret_cast<const float *>(offsets));
-    const __m512i index = *reinterpret_cast<const __m512i *>(&index_val);
-    _mm512_i32scatter_ps(base_ptr, index, data, 4);
+    const __m512i index   = *reinterpret_cast<const __m512i *>(&index_val);
+    const __m512i invalid = _mm512_set1_epi32(numbers::invalid_unsigned_int);
+    __mmask16     mask    = _mm512_cmpneq_epu32_mask(invalid, index);
+    _mm512_mask_i32scatter_ps(base_ptr, mask, index, data, 4);
 #    else
     for (unsigned int i = 0; i < 16; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
 #    endif
   }
 
@@ -5175,8 +5085,10 @@ public:
   void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
+    this->operator=(0.);
     for (unsigned int i = 0; i < 2; ++i)
-      *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<double *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
@@ -5187,7 +5099,8 @@ public:
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const double *>(&data) + i);
   }
 
   /**
@@ -5436,8 +5349,10 @@ public:
   void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
+    this->operator=(0.f);
     for (unsigned int i = 0; i < 4; ++i)
-      *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        *(reinterpret_cast<float *>(&data) + i) = base_ptr[offsets[i]];
   }
 
   /**
@@ -5448,7 +5363,8 @@ public:
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
-      base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
+      if (offsets[i] != numbers::invalid_unsigned_int)
+        base_ptr[offsets[i]] = *(reinterpret_cast<const float *>(&data) + i);
   }
 
   /**

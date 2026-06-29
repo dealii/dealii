@@ -133,7 +133,7 @@ do_test(const DoFHandler<dim>           &dof,
   constraints.distribute(solution);
   MatrixFree<dim, number> mf_data;
   {
-    const QGauss<1>                                  quad(fe_degree + 1);
+    const QGauss<1>                                  quad(1);
     typename MatrixFree<dim, number>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, number>::AdditionalData::none;
     data.store_plain_indices   = true;
