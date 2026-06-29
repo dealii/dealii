@@ -17,7 +17,14 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
 
+#include <boost/process/args.hpp>
+#include <boost/process/exe.hpp>
+#include <boost/process/io.hpp>
+#include <boost/process/system.hpp>
+
 #include <fstream>
+#include <string>
+#include <vector>
 
 int
 main()
@@ -46,8 +53,13 @@ main()
 
   geo.close();
 
-  const int ierr = std::system("\"" DEAL_II_GMSH_EXECUTABLE_PATH
-                               "\" -2 file.geo 1>file.log 2>file_warn.log");
+  namespace bp = boost::process;
+
+  const std::vector<std::string> gmsh_arguments{"-2", "file.geo"};
+  const int ierr = bp::system(bp::exe = DEAL_II_GMSH_EXECUTABLE_PATH,
+                              bp::args = gmsh_arguments,
+                              bp::std_out > "file.log",
+                              bp::std_err > "file_warn.log");
   (void)ierr;
   Assert(ierr == 0, dealii::ExcInternalError());
 

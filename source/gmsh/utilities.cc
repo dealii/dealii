@@ -19,7 +19,17 @@
 
 #include <deal.II/opencascade/utilities.h>
 
+#ifdef DEAL_II_WITH_GMSH
+#  include <boost/process/args.hpp>
+#  include <boost/process/exe.hpp>
+#  include <boost/process/io.hpp>
+#  include <boost/process/system.hpp>
+#endif
+
 #include <cstdio>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 #ifdef DEAL_II_WITH_GMSH
 #  ifdef DEAL_II_WITH_OPENCASCADE
@@ -32,39 +42,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 #ifdef DEAL_II_WITH_GMSH
-namespace
-{
-  std::string
-  quote_for_system_shell(const std::string &argument)
-  {
-#  ifdef _WIN32
-    std::string quoted = "\"";
-    for (const char c : argument)
-      {
-        if (c == '"')
-          quoted += "\\\"";
-        else
-          quoted += c;
-      }
-    quoted += "\"";
-    return quoted;
-#  else
-    std::string quoted = "'";
-    for (const char c : argument)
-      {
-        if (c == '\'')
-          quoted += "'\\''";
-        else
-          quoted += c;
-      }
-    quoted += "'";
-    return quoted;
-#  endif
-  }
-} // namespace
-
-
-
 namespace Gmsh
 {
   AdditionalParameters::AdditionalParameters(
@@ -108,8 +85,7 @@ namespace Gmsh
         const char *temp = mkdtemp(tmp_dir_name);
         AssertThrow(temp != nullptr,
                     ExcMessage("Creating temporary directory failed!"));
-        base_name = temp;
-        base_name += "/tmp";
+        base_name = (std::filesystem::path(temp) / "tmp").string();
       }
 
     const std::string iges_file_name     = base_name + ".iges";
@@ -131,13 +107,14 @@ namespace Gmsh
             << "Mesh.SubdivisionAlgorithm = 1;" << std::endl;
     geofile.close();
 
-    std::stringstream command;
-    command << quote_for_system_shell(DEAL_II_GMSH_EXECUTABLE_PATH) << " -2 "
-            << quote_for_system_shell(geo_file_name) << " 1> "
-            << quote_for_system_shell(log_file_name) << " 2> "
-            << quote_for_system_shell(warnings_file_name);
+    namespace bp = boost::process;
 
-    const auto ret_value = std::system(command.str().c_str());
+    const std::vector<std::string> gmsh_arguments{"-2", geo_file_name};
+    const auto ret_value =
+      bp::system(bp::exe = DEAL_II_GMSH_EXECUTABLE_PATH,
+                 bp::args = gmsh_arguments,
+                 bp::std_out > log_file_name,
+                 bp::std_err > warnings_file_name);
     AssertThrow(ret_value == 0,
                 ExcMessage("Gmsh failed to run. Check the " + log_file_name +
                            " file."));
