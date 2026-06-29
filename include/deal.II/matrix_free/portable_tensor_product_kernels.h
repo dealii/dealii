@@ -304,7 +304,17 @@ namespace Portable
           const ViewTypeIn                                   in,
           ViewTypeOut                                        out)
     {
-#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
+      // We have two implementations for this apply() function. The first
+      // requires Kokkos version 4.0 or later, uses the modern
+      // TeamThreadMDRange, and is simpler. The second option (below)
+      // performs the i,j,k loop manually.
+      //
+      // The second implementation turns out to be slightly faster,
+      // at least until Kokkos 5.2. For now, always use the second
+      // implementation. The step-104 throughput for vmult() is 33 instead of 24
+      // MDoFs/s for an AMD W7800 and 135 instead of 96 MDoFs/s for an NVIDIA
+      // RTX 6000.
+#if 0
       if constexpr (dim == 1)
         apply_1d<n_rows,
                  n_columns,
