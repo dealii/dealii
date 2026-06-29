@@ -20,8 +20,6 @@
 #include <deal.II/opencascade/utilities.h>
 
 #ifdef DEAL_II_WITH_GMSH
-#  include <boost/process/args.hpp>
-#  include <boost/process/exe.hpp>
 #  include <boost/process/io.hpp>
 #  include <boost/process/system.hpp>
 #endif
@@ -29,7 +27,6 @@
 #include <cstdio>
 #include <filesystem>
 #include <string>
-#include <vector>
 
 #ifdef DEAL_II_WITH_GMSH
 #  ifdef DEAL_II_WITH_OPENCASCADE
@@ -109,12 +106,11 @@ namespace Gmsh
 
     namespace bp = boost::process;
 
-    const std::vector<std::string> gmsh_arguments{"-2", geo_file_name};
-    const auto ret_value =
-      bp::system(bp::exe = DEAL_II_GMSH_EXECUTABLE_PATH,
-                 bp::args = gmsh_arguments,
-                 bp::std_out > log_file_name,
-                 bp::std_err > warnings_file_name);
+    const auto ret_value = bp::system(DEAL_II_GMSH_EXECUTABLE_PATH,
+                                      "-2",
+                                      geo_file_name,
+                                      bp::std_out > log_file_name,
+                                      bp::std_err > warnings_file_name);
     AssertThrow(ret_value == 0,
                 ExcMessage("Gmsh failed to run. Check the " + log_file_name +
                            " file."));

@@ -34,21 +34,15 @@ macro(feature_gmsh_find_external var)
 
     CHECK_CXX_SOURCE_COMPILES(
       "
-      #include <boost/process/args.hpp>
-      #include <boost/process/exe.hpp>
       #include <boost/process/io.hpp>
       #include <boost/process/system.hpp>
-
-      #include <string>
-      #include <vector>
 
       int main()
       {
         namespace bp = boost::process;
 
-        const std::vector<std::string> arguments{\"--version\"};
-        return bp::system(bp::exe = \"gmsh\",
-                          bp::args = arguments,
+        return bp::system(\"gmsh\",
+                          \"--version\",
                           bp::std_out > \"gmsh.log\",
                           bp::std_err > \"gmsh_warn.log\");
       }
