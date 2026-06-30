@@ -4154,7 +4154,13 @@ public:
    * once on the underlying triangulation.
    *
    * This is only implemented for the case where dim==3.
+   *
+   * @deprecated This function was introduced in deal.II 9.8 to fix a bug
+   *   in handling edges in FE_NedelecSZ, but it will be removed again
+   *   after 9.8 in favor of a better approach. You will not want to use this
+   *   function in user code.
    */
+  DEAL_II_DEPRECATED
   std::set<TriaActiveIterator<CellAccessor<dim, spacedim>>>
   get_cells_adjacent_to_line(const unsigned int i) const;
 
