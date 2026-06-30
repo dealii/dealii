@@ -3303,6 +3303,7 @@ namespace Step80
 
 
 // @sect3{The main() function}
+#ifndef STEP_80_WITHOUT_MAIN
 int main(int argc, char *argv[])
 {
   using namespace Step80;
@@ -3392,3 +3393,4 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+#endif
