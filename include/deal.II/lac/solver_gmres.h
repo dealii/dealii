@@ -1252,7 +1252,7 @@ namespace internal
                              -h(n + n - 2) / h(n + n - 1),
                              orthogonal_vectors[n - 2]);
 
-          // h(n + n) is lucky breakdown
+          // h(n + n) = 0 is lucky breakdown
           const double scaling_factor_vv = h(n + n) > 0.0 ?
                                              1. / (h(n + n - 1) * h(n + n)) :
                                              1. / (h(n + n - 1) * h(n + n - 1));
@@ -1449,10 +1449,16 @@ namespace internal
           double tmp = 0;
           for (unsigned int i = 0; i < n - 1; ++i)
             tmp += h(n + i) * h(n + i);
-          const double alpha_j = h(n + n - 1) > tmp ?
-                                   std::sqrt(h(n + n - 1) - tmp) :
-                                   std::sqrt(h(n + n - 1));
-          h(n + n - 1)         = alpha_j;
+
+          // catch the case of lucky breakdown (= convergence), when h(n + n -
+          // 1) = 0 and the algorithm terminates as the h entry will control
+          // the residual, but we must avoid dividing by zero
+          const double alpha_j =
+            h(n + n - 1) == 0. ?
+              1. :
+              (h(n + n - 1) > tmp ? std::sqrt(h(n + n - 1) - tmp) :
+                                    std::sqrt(h(n + n - 1)));
+          h(n + n - 1) = alpha_j;
 
           tmp = 0;
           for (unsigned int i = 0; i < n - 1; ++i)
@@ -1642,8 +1648,19 @@ namespace internal
             }
 
           const double H_last = hessenberg_matrix(col + 2, col + 1);
-          const double r = 1. / std::sqrt(H_next * H_next + H_last * H_last);
-          return std::abs(H_last * r * rhs(col + 1));
+
+          // Catch the lucky breakdown case when both the current residual and
+          // the previous one (after applying the delayed correction from
+          // re-orthogonalization) are exactly zero. We will finish after this
+          // step, but must not divide by zero.
+          if (H_next == 0. && H_last == 0.)
+            return 0;
+          else
+            {
+              const double r =
+                1. / std::sqrt(H_next * H_next + H_last * H_last);
+              return std::abs(H_last * r * rhs(col + 1));
+            }
         }
       else
         {
@@ -1662,10 +1679,25 @@ namespace internal
 
           const double Hi  = matrix(col, col);
           const double Hi1 = hessenberg_matrix(col + 1, col);
-          const double r   = 1. / std::sqrt(Hi * Hi + Hi1 * Hi1);
-          rotations.emplace_back(Hi * r, Hi1 * r);
-          matrix(col, col) =
-            rotations[col].first * Hi + rotations[col].second * Hi1;
+
+          // Catch (rare) lucky breakdown where the previous iteration would
+          // have been ready but the delayed orthogonalization has prevented
+          // us from seeing it at that stage, so we must enter also this path
+          // besides the one a few lines above.
+          if (Hi == 0. && Hi1 == 0.)
+            {
+              rotations.emplace_back(1, 0);
+              matrix(col, col) = 1;
+            }
+          else
+            {
+              const double r = (Hi * Hi + Hi1 * Hi1 == 0 ?
+                                  1 :
+                                  1. / std::sqrt(Hi * Hi + Hi1 * Hi1));
+              rotations.emplace_back(Hi * r, Hi1 * r);
+              matrix(col, col) =
+                rotations[col].first * Hi + rotations[col].second * Hi1;
+            }
 
           rhs(col + 1) = -rotations[col].second * rhs(col);
           rhs(col) *= rotations[col].first;
@@ -1729,6 +1761,7 @@ namespace internal
           double s = (*rhs)(i);
           for (unsigned int j = i + 1; j < n; ++j)
             s -= projected_solution(j) * (*matrix)(i, j);
+
           projected_solution(i) = s / (*matrix)(i, i);
           AssertIsFinite(projected_solution(i));
         }
