@@ -808,12 +808,32 @@ namespace Polynomials
    */
   template <typename Number>
   Number
-  jacobi_polynomial_derivative(
-    const unsigned int degree,
-    const int          alpha,
-    const int          beta,
-    const Number       x,
-    const bool         rescale_to_dealii_unit_interval = true);
+  jacobi_polynomial_derivative(const unsigned int degree,
+                               const int          alpha,
+                               const int          beta,
+                               const Number       x,
+                               const bool rescale_to_dealii_unit_interval);
+
+  /*
+   * Evaluate k-th derivative of the Jacobi polynomial
+   * $ d^k P_n^{\alpha, \beta}(x) / dx^k $, where k equals @p derivative_order,
+   * specified by the parameters @p alpha, @p beta, @p n, where @p n is the
+   * degree of the Jacobi polynomial and @k the degree of the derivative.
+   *
+   * @note The Jacobi polynomials are not orthonormal and are defined on the
+   * unit interval $[0, 1]$ as usual for deal.II, rather than $[-1, +1]$ often
+   * used in literature. @p x is the point of evaluation. If instead the point @p
+   * x is given on the interval $[-1, +1]$ set @p rescale_to_dealii_unit_interval
+   * to false.
+   */
+  template <typename Number>
+  Number
+  jacobi_polynomial_kth_derivative(const unsigned int derivative_order,
+                                   const unsigned int degree,
+                                   const int          alpha,
+                                   const int          beta,
+                                   const Number       x,
+                                   const bool rescale_to_dealii_unit_interval);
 
   /**
    * Compute the roots of the Jacobi polynomials on the unit interval $[0, 1]$
@@ -1133,6 +1153,7 @@ namespace Polynomials
   }
 
 
+
   template <typename Number>
   Number
   jacobi_polynomial_derivative(const unsigned int degree,
@@ -1141,19 +1162,51 @@ namespace Polynomials
                                const Number       x,
                                const bool rescale_to_dealii_unit_interval)
   {
+    return jacobi_polynomial_kth_derivative(
+      1, degree, alpha, beta, x, rescale_to_dealii_unit_interval);
+  }
+
+
+
+  template <typename Number>
+  Number
+  jacobi_polynomial_kth_derivative(const unsigned int derivative_order,
+                                   const unsigned int degree,
+                                   const int          alpha,
+                                   const int          beta,
+                                   const Number       x,
+                                   const bool rescale_to_dealii_unit_interval)
+  {
     Assert(alpha >= 0 && beta >= 0,
            ExcNotImplemented("Negative alpha/beta coefficients not supported"));
 
+    if (derivative_order > degree)
+      return 0.0;
+    // P_0 = 1, so the derivative is 0
+    // special case when derivative_order = 0, then the value should be returned
+    // and not 0
+    if (degree == 0 && derivative_order != 0)
+      return 0.0;
+
     // The derivative of the Jacobi polynomial is evaluated using the recurrence
     // relations
-    if (degree == 0)
-      return 0.0;
-    if (rescale_to_dealii_unit_interval)
-      return (1 + alpha + beta + degree) *
-             jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, true);
+    Number pre_factor = 1.0;
+    for (unsigned int i = 1; i < derivative_order + 1; ++i)
+      pre_factor *= (alpha + beta + degree + i);
 
-    return 0.5 * (1 + alpha + beta + degree) *
-           jacobi_polynomial_value(degree - 1, alpha + 1, beta + 1, x, false);
+    if (rescale_to_dealii_unit_interval)
+      return pre_factor * jacobi_polynomial_value(degree - derivative_order,
+                                                  alpha + derivative_order,
+                                                  beta + derivative_order,
+                                                  x,
+                                                  true);
+
+    return std::pow(0.5, derivative_order) * pre_factor *
+           jacobi_polynomial_value(degree - derivative_order,
+                                   alpha + derivative_order,
+                                   beta + derivative_order,
+                                   x,
+                                   false);
   }
 
 

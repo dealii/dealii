@@ -2311,7 +2311,7 @@ QStroudSimplex<dim>::QStroudSimplex(const unsigned int n_points_1D)
             const double w_y =
               4.0 / (1.0 - std::pow(2.0 * points_y[j] - 1.0, 2)) /
               std::pow(Polynomials::jacobi_polynomial_derivative(
-                         n_points_1D, 1, 0, points_y[j]),
+                         n_points_1D, 1, 0, points_y[j], true),
                        2);
 
             this->weights.emplace_back(w_y * q_gauss.weight(i));
@@ -2354,13 +2354,13 @@ QStroudSimplex<dim>::QStroudSimplex(const unsigned int n_points_1D)
               const double w_y =
                 4.0 / (1.0 - std::pow(2.0 * points_y[j] - 1.0, 2)) /
                 std::pow(Polynomials::jacobi_polynomial_derivative(
-                           n_points_1D, 1, 0, points_y[j]),
+                           n_points_1D, 1, 0, points_y[j], true),
                          2);
 
               const double w_z =
                 4.0 / (1.0 - std::pow(2.0 * points_z[k] - 1.0, 2)) /
                 std::pow(Polynomials::jacobi_polynomial_derivative(
-                           n_points_1D, 2, 0, points_z[k]),
+                           n_points_1D, 2, 0, points_z[k], true),
                          2);
 
               this->weights.emplace_back(w_y * w_z * q_gauss.weight(i));
@@ -2501,7 +2501,7 @@ QGaussPyramid<dim>::QGaussPyramid(const unsigned int n_points_1D)
           const double w_k =
             factor / ((1.0 - std::pow(2.0 * points_z[k] - 1.0, 2)) *
                       std::pow(Polynomials::jacobi_polynomial_derivative(
-                                 n_points_1D, 2, 0, points_z[k]),
+                                 n_points_1D, 2, 0, points_z[k], true),
                                2));
           // rescaling x and y direction form [0,1] to [-1,1] and rescaling
           // z direction from [-1,1] to [0,1] gives an overall factor of 2
