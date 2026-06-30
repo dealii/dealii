@@ -7,10 +7,12 @@ See the [deal.II license file](https://github.com/dealii/dealii/blob/master/LICE
  Furthermore, by submitting this pull request, you confirm that:
 - You have read and agree to abide by the [Code of Conduct](https://github.com/dealii/dealii/blob/master/CODE_OF_CONDUCT.md).
 - You have read the [contributing guidelines](https://github.com/dealii/dealii/blob/master/CONTRIBUTING.md). 
+
+### AI Declaration Statement
+
 - **Use of AI tools:** 
   - [ ] Generative AI tools were used. In this case, please ensure that you complete the AI declaration statement.
   - [ ] No generative AI tools were used in preparing this contribution.
 
-### AI Declaration Statement
 
-<!-- If you have used generative AI tools while writing this pull request, please explain what these generative AI tools were used for and which model was used. Feel free to provide the prompts that were used while writing this pull request. -->
+<!-- Optional: If you have used generative AI tools while writing this pull request, please explain what these generative AI tools were used for and which model was used. Feel free to provide example of prompts that were used while writing this pull request. -->
