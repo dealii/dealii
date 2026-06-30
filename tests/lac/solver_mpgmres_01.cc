@@ -39,7 +39,7 @@ public:
   void
   vmult(Vector<double> &dst, const Vector<double> &src) const
   {
-    if (print_counter < 3)
+    if (print_counter < 2)
       deallog.get_file_stream()
         << "Applying preconditioner " << name << std::endl;
     preconditioner.vmult(dst, src);

@@ -6,7 +6,6 @@ Applying preconditioner C
 Applying preconditioner A
 Applying preconditioner B
 Applying preconditioner C
-Applying preconditioner A
 DEAL::Solver stopped within 1 - 13 iterations
 
 MPGMRES: (truncated)
@@ -16,15 +15,9 @@ Applying preconditioner C
 Applying preconditioner A
 Applying preconditioner B
 Applying preconditioner C
-Applying preconditioner A
-Applying preconditioner B
-Applying preconditioner C
 DEAL::Solver stopped within 13 - 25 iterations
 
 MPGMRES: (full)
-Applying preconditioner A
-Applying preconditioner B
-Applying preconditioner C
 Applying preconditioner A
 Applying preconditioner B
 Applying preconditioner C
