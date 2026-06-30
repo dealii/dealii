@@ -245,6 +245,33 @@ namespace Portable
     get_symmetric_gradient(const int q_point) const;
 
     /**
+     * Return the divergence of the vector-valued finite element function at
+     * quadrature point @p q_point after a call to evaluate() with
+     * EvaluationFlags::gradients set. This function is only available when the
+     * number of components equals the dimension (n_components==dim).
+     */
+    DEAL_II_HOST_DEVICE Number
+    get_divergence(const int q_point) const;
+
+    /**
+     * Write a contribution that is multiplied by the divergence of the test
+     * function to the field containing the gradients at quadrature point
+     * @p q_point for subsequent integration via integrate() with
+     * EvaluationFlags::gradients set. See submit_gradient() for further
+     * information. This function is only available when the number of
+     * components equals the dimension (n_components==dim).
+     *
+     * @note This operation writes the data to the same field as
+     * submit_gradient() and submit_symmetric_gradient(). As a consequence,
+     * only one of these functions can be used. In case several terms of this
+     * kind appear in a weak form, the contribution of a potential call to this
+     * function must be added into the diagonal of the rank-2 tensor
+     * contribution passed to submit_gradient().
+     */
+    DEAL_II_HOST_DEVICE void
+    submit_divergence(const Number &div_in, const int q_point);
+
+    /**
      * Submit the symmetric gradient @p sym_grad at quadrature point @p q_point
      * for subsequent integration via integrate() with
      * EvaluationFlags::gradients set. This function is only available when
@@ -734,6 +761,53 @@ namespace Portable
                       "equal."));
 
     return symmetrize(get_gradient(q_point));
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE Number
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    get_divergence(const int q_point) const
+  {
+    AssertIndexRange(q_point, n_q_points);
+    Assert(n_components_ == dim,
+           ExcMessage("Function get_divergence() only works when the "
+                      "number of components and the number of dimensions are "
+                      "equal."));
+    Number divergence = 0.;
+    for (unsigned int c = 0; c < dim; ++c)
+      for (unsigned int d = 0; d < dim; ++d)
+        divergence += precomputed_data->inv_jacobian(q_point, cell_id, d, c) *
+                      shared_data->gradients(q_point, d, c);
+    return divergence;
+  }
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components_,
+            typename Number>
+  DEAL_II_HOST_DEVICE void
+  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
+    submit_divergence(const Number &div_in, const int q_point)
+  {
+    AssertIndexRange(q_point, n_q_points);
+    Assert(n_components_ == dim,
+           ExcMessage("Function submit_divergence() only works when the "
+                      "number of components and the number of dimensions are "
+                      "equal."));
+    for (unsigned int c = 0; c < dim; ++c)
+      for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
+        shared_data->gradients(q_point, d_1, c) =
+          precomputed_data->inv_jacobian(q_point, cell_id, d_1, c) * div_in *
+          precomputed_data->JxW(q_point, cell_id);
   }
 
 

@@ -1,0 +1,3 @@
+Added: get_divergence() and submit_divergence() have been added to Portable::FEEvaluation.
+<br>
+(Ryan Moulday, 2026/06/29)

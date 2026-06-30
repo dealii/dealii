@@ -1,0 +1,5 @@
+
+DEAL:0::dim=2 fe_degree=1: host norm = 0.1280623409, device norm = 0.1280623409
+DEAL:0::dim=2 fe_degree=2: host norm = 0.3070508933, device norm = 0.3070508933
+DEAL:0::dim=3 fe_degree=1: host norm = 0.07703650585, device norm = 0.07703650585
+DEAL:0::dim=3 fe_degree=2: host norm = 0.08010991108, device norm = 0.08010991108
