@@ -718,18 +718,9 @@ namespace internal
         }
       else
         {
-#if DEAL_II_VECTORIZATION_WIDTH_IN_BITS < 512 || \
-  !defined(DEAL_II_USE_VECTORIZATION_GATHER)
           for (unsigned int v = 0; v < VectorizedArrayType::size(); ++v)
             if (indices[v] != numbers::invalid_unsigned_int)
               vec_ptr[indices[v]] += res[v];
-#else
-          // only use gather in case there is also scatter.
-          VectorizedArrayType tmp;
-          tmp.gather(vec_ptr, indices);
-          tmp += res;
-          tmp.scatter(indices, vec_ptr);
-#endif
         }
     }
 
