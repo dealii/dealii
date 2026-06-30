@@ -22,6 +22,7 @@
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/partitioner.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
 
 #include <deal.II/grid/cell_id.h>
 #include <deal.II/grid/cell_status.h>
@@ -42,6 +43,7 @@
 #include <map>
 #include <memory>
 #include <numeric>
+#include <set>
 #include <vector>
 
 
@@ -2171,6 +2173,14 @@ public:
   flip_all_direction_flags();
 
   /**
+   * (Re-)Create the information of adjacent cells for each line,
+   * which can be accessed via TriaAccessor::get_cells_adjacent_to_line.
+   * Note that this information is only built for the case where dim==3.
+   */
+  void
+  compute_line_to_adjacent_cells_map();
+
+  /**
    * @name Mesh refinement
    * @{
    */
@@ -4134,6 +4144,18 @@ protected:
    * Strides of non-cell arrays stored by TriaLevel, TriaFaces, etc.
    */
   internal::TriangulationImplementation::Strides<dim> strides;
+
+  /**
+   * The table stores the neighboring cells for each line.
+   * This allows for quick access to the adjacent cells,
+   * given the cell and the line number.
+   *
+   * This map is destroyed upon mesh refinement, and can be
+   * rebuilt by calling compute_line_to_adjacent_cells_map(). If
+   * that function is not called, the map does not exist.
+   */
+  std::optional<Table<2, std::set<active_cell_iterator>>>
+    line_to_adjacent_cells_map;
 
   /**
    * Write a bool vector to the given stream, writing a pre- and a postfix

@@ -2346,6 +2346,23 @@ CellAccessor<dim, spacedim>::set_neighbor(
 }
 
 
+template <int dim, int spacedim>
+std::set<TriaActiveIterator<CellAccessor<dim, spacedim>>>
+CellAccessor<dim, spacedim>::get_cells_adjacent_to_line(
+  const unsigned int i) const
+{
+  AssertIndexRange(i, this->n_lines());
+
+  // We explicitly allow the call of the get_cells_adjacent_to_line() before
+  // compute_line_to_adjacent_cells_map() was called, as this happens during
+  // the initialization of the FE element (e.g., in FE_NedelecSZ).
+  if (!this->tria->line_to_adjacent_cells_map.has_value())
+    return std::set<TriaActiveIterator<CellAccessor<dim, spacedim>>>();
+
+  const auto &map = this->tria->line_to_adjacent_cells_map;
+  return map.value()[this->active_cell_index()][i];
+}
+
 
 template <int dim, int spacedim>
 CellId
