@@ -60,3 +60,26 @@ deal_ii_initialize_cached_variables()
 set(CLEAN_UP_FILES *.log *.gmv *.gnuplot *.gpl *.eps *.pov *.ucd *.d2 *.vtu *.pvtu)
 project(${TARGET})
 deal_ii_invoke_autopilot()
+
+find_package(GTest QUIET)
+
+if(GTest_FOUND OR GTEST_FOUND)
+  enable_testing()
+
+  add_executable(${TARGET}-gtests step-80_gtests.cc)
+  target_compile_definitions(${TARGET}-gtests PRIVATE STEP_80_WITHOUT_MAIN)
+  # set_target_properties(${TARGET}-gtests PROPERTIES SKIP_BUILD_RPATH TRUE)
+
+  deal_ii_setup_target(${TARGET}-gtests)
+
+  if(TARGET GTest::gtest)
+    target_link_libraries(${TARGET}-gtests GTest::gtest)
+  elseif(TARGET GTest::GTest)
+    target_link_libraries(${TARGET}-gtests GTest::GTest)
+  else()
+    target_link_libraries(${TARGET}-gtests ${GTEST_LIBRARIES})
+    target_include_directories(${TARGET}-gtests PRIVATE ${GTEST_INCLUDE_DIRS})
+  endif()
+
+  add_test(NAME ${TARGET}-gtests COMMAND ${TARGET}-gtests)
+endif()
