@@ -1,41 +1,41 @@
 
 DEAL::FE: FESystem<2>[FE_DGQ<2>(3)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 48.2543
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 48.25434962
 DEAL::FE: FESystem<2>[FE_DGQ<2>(8)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 101.354
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 101.3535817
 DEAL::FE: FESystem<2>[FE_DGQ<2>(16)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 214.405
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 214.4045830
 DEAL::FE: FESystem<2>[FE_Q<2>(16)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 189.129
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 189.1285878
 DEAL::FE: FESystem<3>[FE_DGQ<3>(11)^3]
 DEAL::no. cells: 64
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 1340.82
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 1340.815230
 DEAL::FE: FESystem<2>[FE_DGQ<2>(3)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 48.2544
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 48.25435257
 DEAL::FE: FESystem<2>[FE_DGQ<2>(8)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 101.354
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 101.3535843
 DEAL::FE: FESystem<2>[FE_DGQ<2>(16)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 214.405
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 214.4045868
 DEAL::FE: FESystem<2>[FE_Q<2>(16)^2]
 DEAL::no. cells: 16
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 189.129
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 189.1286011
 DEAL::FE: FESystem<3>[FE_DGQ<3>(11)^3]
 DEAL::no. cells: 64
-DEAL::Error after prolongation: 0.00000
-DEAL::Norm after restriction: 1340.82
+DEAL::Error after prolongation: 0.000000000
+DEAL::Norm after restriction: 1340.815186
