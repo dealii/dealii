@@ -1031,6 +1031,9 @@ namespace LinearAlgebra
       Assert(vector_is_ghosted == false,
              ExcMessage("Cannot call compress() on a ghosted vector"));
 
+      if (partitioner->n_mpi_processes() == 1)
+        return;
+
 #ifdef DEAL_II_WITH_MPI
       // make this function thread safe
       std::lock_guard<std::mutex> lock(mutex);
@@ -1121,6 +1124,8 @@ namespace LinearAlgebra
     {
 #ifdef DEAL_II_WITH_MPI
       vector_is_ghosted = false;
+      if (partitioner->n_mpi_processes() == 1)
+        return;
 
       // in order to zero ghost part of the vector, we need to call
       // import_from_ghosted_array_finish() regardless of
