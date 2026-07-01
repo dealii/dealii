@@ -194,9 +194,7 @@ export
   using ::PCSORSetSymmetric;
   using ::PETSC_COMM_WORLD;
   using ::PETSC_COPY_VALUES;
-  using ::PETSC_FALSE;
   using ::PETSC_OWN_POINTER;
-  using ::PETSC_TRUE;
   using ::PETSC_VIEWER_STDOUT_;
   using ::PetscBool;
   using ::PetscCopyMode;
@@ -245,6 +243,17 @@ export
   using ::PetscSFSetUp;
   using ::PetscTrMalloc;
   using ::PetscViewerPushFormat;
+
+  // For some versions of PETSc, PETSC_FALSE and PETSC_TRUE are compiler
+  // values, whereas for others they are preprocessor variables. Export
+  // them if they fall in the former category.
+#  ifndef PETSC_FALSE
+  using ::PETSC_FALSE;
+#  endif
+
+#  ifndef PETSC_TRUE
+  using ::PETSC_TRUE;
+#  endif
 
 #  if defined(PETSC_HAVE_SAWS)
   using ::PetscStackSAWsGrantAccess;
