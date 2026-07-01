@@ -51,6 +51,9 @@ module;
 #  include <sunlinsol/sunlinsol_spgmr.h>
 #  include <sunmatrix/sunmatrix_dense.h>
 #  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+#    include <sundomeigest/sundomeigest_power.h>
+#  endif
 #endif
 
 
