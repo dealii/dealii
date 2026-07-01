@@ -135,7 +135,7 @@ change the character of the equation.
 
 In any case, the purpose of this discussion is to figure out
 what time stepping scheme might be appropriate for the equation. The
-conclusions is that, as a hyperbolic-kind of equation, we need to
+conclusion is that, as a hyperbolic-kind of equation, we need to
 choose a time step that satisfies a CFL-type condition. If we were to
 use an explicit method (which we will not), we would have to investigate
 the eigenvalues of the matrix that corresponds to the spatial
@@ -154,6 +154,24 @@ implicit time stepping method and can then choose a more balanced
 $k \propto h$. Indeed, we will use the implicit Crank-Nicolson
 method as we have already done in step-23 before for the regular
 wave equation.
+
+But there is a second lesson we can derive from considering the
+character of the equation. For parabolic equations like the heat
+equation, we expect that their diffusive nature results in smooth
+solutions even if the initial condition is not smooth (say, a
+discontinuous initial condition). On the other hand, wave equations
+(and in general all linear hyperbolic equations) just *transport*
+the solution. In other words, if the initial conditions are rough, the
+solution will be rough. For example, if $\psi_0\in H^s$ for some
+$s>0$, then $\psi(t)\in H^s$ (see also @cite Herr2019). The practical
+consequence is that we will get poor convergence rates when using
+nonsmooth initial conditions because we can only expect the full
+convergence rate of finite element approximations if the solution is
+sufficiently smooth (specifically: for finite elements of polynomial
+degree $p$, we only get $h^{p}$ in the energy norm if $u\in
+H^{p+1}$). We will, however, not explore this topic in this tutorial
+and instead use a smooth initial condition that then results in a
+smooth solution.
 
 
 <h3>The general idea of operator splitting</h3>
