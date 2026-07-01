@@ -249,6 +249,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_Nothing<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> & /*fe_other*/,
+  const unsigned int,
   const unsigned int) const
 {
   // the FE_Nothing has no

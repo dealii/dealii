@@ -572,6 +572,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_DGPNonparametric<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
+  const unsigned int,
   const unsigned int) const
 {
   // there are no such constraints for DGPNonparametric

@@ -1000,49 +1000,20 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
-  const unsigned int) const
+  const unsigned int                  face_no,
+  const unsigned int                  face_no_other) const
 {
   AssertDimension(dim, 3);
+  AssertIndexRange(face_no, 4);
 
   if ((dynamic_cast<const FE_SimplexP<dim> *>(&fe_other) != nullptr) ||
       (dynamic_cast<const FE_WedgeP<dim> *>(&fe_other) != nullptr) ||
       (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr))
     {
-      std::vector<std::pair<unsigned int, unsigned int>> result;
-      const unsigned int                                 face_no_neighbor =
-        (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ? 1 : 0;
-
-      // compare the face support points
-      const auto face_support_points = this->get_unit_face_support_points(0);
-      const auto face_support_points_other =
-        fe_other.get_unit_face_support_points(face_no_neighbor);
-
-      // get the offsets to only compare the DoFs within the face as the
-      // vertices and lines were done before
-      const auto face_reference_cell =
-        this->reference_cell().face_reference_cell(0);
-
-      Assert(face_reference_cell ==
-               fe_other.reference_cell().face_reference_cell(face_no_neighbor),
-             ExcInternalError());
-
-      const unsigned int offset =
-        face_reference_cell.n_vertices() +
-        face_reference_cell.n_lines() * this->n_dofs_per_line();
-
-      const unsigned int offset_other =
-        face_reference_cell.n_vertices() +
-        face_reference_cell.n_lines() * fe_other.n_dofs_per_line();
-
-      // do the comparison
-      for (unsigned int i = 0; i < this->n_dofs_per_quad(0); ++i)
-        for (unsigned int j = 0; j < fe_other.n_dofs_per_quad(face_no_neighbor);
-             ++j)
-          if (face_support_points[i + offset].distance(
-                face_support_points_other[j + offset_other]) < 1e-14)
-            result.emplace_back(i, j);
-
-      return result;
+      return FETools::hp_quad_dof_identities(*this,
+                                             fe_other,
+                                             face_no,
+                                             face_no_other);
     }
   else if (dynamic_cast<const FE_Nothing<dim> *>(&fe_other) != nullptr)
     {

@@ -141,7 +141,7 @@ test_hp_quad_dof_identities(const FiniteElement<dim> &fe,
       if (reference_cell.face_reference_cell(f) ==
           reference_cell_other.face_reference_cell(f_other))
         {
-          const auto results = fe.hp_quad_dof_identities(fe_other, f);
+          const auto results = fe.hp_quad_dof_identities(fe_other, f, f_other);
 
           unsigned int n_expected = 0;
           // they could have the same support points if they have the same

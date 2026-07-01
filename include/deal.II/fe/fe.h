@@ -1349,7 +1349,8 @@ public:
    */
   virtual std::vector<std::pair<unsigned int, unsigned int>>
   hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
-                         const unsigned int                  face_no = 0) const;
+                         const unsigned int                  face_no = 0,
+                         const unsigned int face_no_other            = 0) const;
 
   /**
    * Return whether this element dominates another one given as argument

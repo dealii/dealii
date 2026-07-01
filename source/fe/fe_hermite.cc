@@ -601,10 +601,12 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_Hermite<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &fe_other,
-  const unsigned int                  face_no) const
+  const unsigned int                  face_no,
+  const unsigned int                  face_no_other) const
 {
   (void)fe_other;
   (void)face_no;
+  (void)face_no_other;
   return {};
 }
 
