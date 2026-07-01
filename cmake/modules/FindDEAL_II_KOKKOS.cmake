@@ -159,6 +159,8 @@ if(KOKKOS_FOUND)
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=550")
     # warning #940-D: missing return statement at end of non-void function
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=940")
+    # warning #3189-D: "import" is parsed as an identifier rather than a keyword because the tokens that follow it do not match those of a preprocessor directive
+    enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=3189")
     # warning #20012-D: __host__ annotation is ignored on a function that is explicitly defaulted on its first declaration
     enable_if_supported(DEAL_II_CXX_FLAGS "-Xcudafe --diag_suppress=20012")
   endif()
