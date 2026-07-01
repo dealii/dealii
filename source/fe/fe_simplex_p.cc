@@ -778,8 +778,65 @@ FE_SimplexP<dim, spacedim>::FE_SimplexP(const unsigned int degree)
     for (unsigned int i = 0; i < this->n_dofs_per_line(); ++i)
       this->adjust_line_dof_index_for_line_orientation_table[i] =
         this->n_dofs_per_line() - 1 - i - i;
-  // We do not support multiple DoFs per quad yet
-  Assert(degree <= 3, ExcNotImplemented());
+
+  // for 1d and 2d or if there are no DoFs on the quads
+  // we can skip adjust_quad_dof_index_for_face_orientation_table
+  if (dim < 3 || degree < 3)
+    return;
+
+  // do some sanity checks
+  AssertDimension(this->n_unique_faces(), 1);
+  const unsigned int face_no = 0;
+
+  Assert(
+    this->adjust_quad_dof_index_for_face_orientation_table[0].n_elements() ==
+      this->reference_cell().n_face_orientations(face_no) *
+        this->n_dofs_per_quad(face_no),
+    ExcInternalError());
+
+  Assert((degree - 2) * (degree - 1) / 2 == this->n_dofs_per_quad(face_no),
+         ExcInternalError());
+
+  const auto face_reference_cell =
+    this->reference_cell().face_reference_cell(face_no);
+
+  // the interior nodes build a new triangle with lower degree r
+  const unsigned int r = degree - 3;
+
+  // now loop over all DoFs on the triangle
+  // 0 <= i + j <= r holds on the triangle
+  for (unsigned int j = 0, dof_index = 0; j <= r; ++j)
+    for (unsigned int i = 0; i <= r - j; ++i, ++dof_index)
+      {
+        // index in the style of barycentric coordinates
+        // the first entry is the remainder as i + j <= r has to hold
+        const std::array<unsigned int, 3> local_indices{{r - i - j, i, j}};
+
+        // go over all possible orientations
+        for (types::geometric_orientation orientation = 0;
+             orientation < this->reference_cell().n_face_orientations(face_no);
+             ++orientation)
+          {
+            // get the correct permutation for the current orientation
+            const auto permuted_indices =
+              face_reference_cell.permute_by_combined_orientation(
+                make_array_view(local_indices),
+                face_reference_cell.get_inverse_combined_orientation(
+                  orientation));
+
+            // now reconstruct the index of from the permuted i and j
+            // take orientation 0 which is the standard orientation
+            // then the index k is k =  i + j*(r+1) - (j*(j-1))/2
+            const unsigned int k =
+              permuted_indices[1] + permuted_indices[2] * (r + 1) -
+              (permuted_indices[2] * (permuted_indices[2] - 1)) / 2;
+
+            const int offset =
+              static_cast<int>(k) - static_cast<int>(dof_index);
+            this->adjust_quad_dof_index_for_face_orientation_table[face_no](
+              dof_index, orientation) = offset;
+          }
+      }
 }
 
 

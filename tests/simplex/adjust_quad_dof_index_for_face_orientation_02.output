@@ -1,0 +1,25 @@
+
+DEAL::Face number 0 neighbor face number 2 orientation 1
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 0 neighbor face number 2 orientation 2
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 0 neighbor face number 3 orientation 1
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 0 neighbor face number 3 orientation 2
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 1 neighbor face number 2 orientation 1
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 1 neighbor face number 2 orientation 2
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 1 neighbor face number 3 orientation 1
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
+DEAL::Face number 1 neighbor face number 3 orientation 2
+DEAL::Testing interpolation FE_SimplexP<3>(3)
+DEAL::  Relative interpolation errors: ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok ok
