@@ -1,0 +1,7 @@
+Fixed: SolverGMRES and SolverFGMRES with orthogonalization strategy
+LinearAlgebra::OrthogonalizationStrategy::delayed_classical_gram_schmidt (the
+default case) could run into a division by zero in the rare case when residual
+vectors became exactly zero. This invalid operation is now avoided, and the
+lucky breakdown is handled gracefully.
+<br>
+(Martin Kronbichler, 2026/06/30)
