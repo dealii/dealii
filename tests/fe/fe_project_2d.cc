@@ -206,9 +206,8 @@ test(const FiniteElement<dim> &fe,
                                         QGauss<dim>(fe.degree + 2),
                                         VectorTools::L2_norm);
 
-      typename FEValuesViews::Vector<dim>::curl_type total_curl;
+      typename FEValuesViews::Vector<dim>::curl_type total_curl{};
       double                                         total_div = 0;
-      total_curl *= 0.;
 
       FEValues<dim> fe_values(mapping,
                               fe,
