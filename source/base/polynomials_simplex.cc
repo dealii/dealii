@@ -77,74 +77,54 @@ ScalarLagrangePolynomialSimplex<
 {
   AssertIndexRange(i + j + k, this->degree() + 1);
 
-  const double x = p[0];
-
   if constexpr (dim == 1)
-    {
-      const double phi =
-        Polynomials::jacobi_polynomial_value<double>(i, 0, 0, x, true);
-
-      if (std::fabs(phi) < 1e-14)
-        return 0.0;
-
-      return phi;
-    }
+    Assert(j == 0 && k == 0, ExcInternalError());
   else if constexpr (dim == 2)
-    {
-      const double y      = p[1];
-      const double factor = std::abs(1.0 - y) < 1e-14 ? 1.0 : 1.0 / (1.0 - y);
-
-      const double x_contribution =
-        i == 0 ? 1.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   i, 0, 0, 2.0 * x * factor - 1.0, false) *
-                   std::pow(1.0 - y, i);
-
-      const double y_contribution =
-        Polynomials::jacobi_polynomial_value<double>(j, 2 * i + 1, 0, y, true);
-
-      const double phi = x_contribution * y_contribution;
-
-      if (std::fabs(phi) < 1e-14)
-        return 0.0;
-
-      return phi;
-    }
+    Assert(k == 0, ExcInternalError());
   else if constexpr (dim == 3)
     {
-      const double y = p[1];
-      const double z = p[2];
-
-      const double factor_yz =
-        std::abs(1.0 - y - z) < 1e-14 ? 1.0 : 1.0 / (1.0 - y - z);
-      const double factor_z = std::abs(1.0 - z) < 1e-14 ? 1.0 : 1.0 / (1.0 - z);
-
-      const double x_contribution =
-        i == 0 ? 1.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   i, 0, 0, 2.0 * x * factor_yz - 1.0, false) *
-                   std::pow(1.0 - y - z, i);
-
-      const double y_contribution =
-        j == 0 ? 1.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   j, 2 * i + 1, 0, 2.0 * y * factor_z - 1.0, false) *
-                   std::pow(1.0 - z, j);
-
-      const double z_contribution =
-        Polynomials::jacobi_polynomial_value<double>(
-          k, 2 * (i + j) + 2, 0, z, true);
-
-      const double phi = x_contribution * y_contribution * z_contribution;
-
-      if (std::fabs(phi) < 1e-14)
-        return 0.0;
-
-      return phi;
+      // nothing to assert
     }
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
 
-  DEAL_II_ASSERT_UNREACHABLE();
-  return 0;
+  const double x = p[0];
+  const double y = dim > 1 ? p[1] : 0.0;
+  const double z = dim > 2 ? p[2] : 0.0;
+
+  // the basis function looks like
+  // P_i^{0,0}(2x/(1-y-z)-1) * (1-y-z)^i
+  // P_j^{2*i+1,0}(2*y/(1-z)-1)*(1-z)^j
+  // P_k^{2 (i+j)+2,0}(2 z - 1)
+  // like in 2d use the homogenized Jacobi polynomials
+  // define t = 1 - y - z and s = 1 - z
+  // the first term becomes
+  // Q_i^{0,0}(x,t) = P_i^{0,0}(2x/(1-y-z)-1) * (1-y-z)^i
+  // and the second
+  // Q_j^{2i+1,0}(y,s) = P_j^{2i+1,0}(2y/(1-z)-1) * (1-z)^j
+
+  // in 1D it holds that j,k = 0, such the (homogenized) Jacobi polynomials
+  // describing the y and z contributions just equal to 1
+  // in 2D it hold that  k = 0, again this multiplies by 1
+
+  const double s = 1 - z;
+  const double t = 1 - y - z;
+
+  const double Qi =
+    Polynomials::jacobi_polynomial_homogenized_value<double>(i, 0, 0, x, t);
+
+  const double Qj = Polynomials::jacobi_polynomial_homogenized_value<double>(
+    j, 2 * i + 1, 0, y, s);
+
+  const double Pk = Polynomials::jacobi_polynomial_value<double>(
+    k, 2 * (i + j) + 2, 0, z, true);
+
+  const double phi = Qi * Qj * Pk;
+
+  if (std::fabs(phi) < 1e-14)
+    return 0.0;
+
+  return phi;
 }
 
 
@@ -199,147 +179,75 @@ ScalarLagrangePolynomialSimplex<dim>::
 {
   AssertIndexRange(i + j + k, this->degree() + 1);
 
+  if constexpr (dim == 1)
+    Assert(j == 0 && k == 0, ExcInternalError());
+  else if constexpr (dim == 2)
+    Assert(k == 0, ExcInternalError());
+  else if constexpr (dim == 3)
+    {
+      // nothing to assert
+    }
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
+
   Tensor<1, dim> grad;
 
   const double x = p[0];
+  const double y = dim > 1 ? p[1] : 0.0;
+  const double z = dim > 2 ? p[2] : 0.0;
 
-  if constexpr (dim == 1)
-    {
-      grad[0] = Polynomials::jacobi_polynomial_derivative<double>(
-                  i, 0, 0, 2.0 * x - 1.0, false) *
-                2.0;
-    }
-  else if constexpr (dim == 2)
-    {
-      const double y = p[1];
+  // define t = 1 - y - z and s = 1 - z then
+  // P_i^{0,0}(2x/t-1) * t^i
+  // P_j^{2*i+1,0}(2*y/s-1)*s^j
+  // P_k^{2 (i+j)+2,0}(2 z - 1)
+  // =
+  // Q_i^{0,0}(x,t)
+  // Q_j^{2*i+1,0}(y,s)
+  // P_k^{2*(i+j)+2,0}(2 z - 1)
 
-      const double factor = std::abs(1.0 - y) < 1e-14 ? 0.0 : 1.0 / (1.0 - y);
+  // The 1D (2D) cases are again covered by having j,k = 0 (k = 0) such that
+  // the contributions to the value equal to one and the contributions to the
+  // derivative equal to zero
 
-      const double x_contribution =
-        i == 0 ? 1.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   i, 0, 0, 2.0 * x * factor - 1.0, false) *
-                   std::pow(1.0 - y, i);
+  // get the derivatives over the product rule
+  const double s     = 1 - z;
+  const double ds_dz = -1.0;
 
-      const double y_contribution =
-        Polynomials::jacobi_polynomial_value<double>(j, 2 * i + 1, 0, y, true);
+  const double t     = 1 - y - z;
+  const double dt_dy = -1.0;
+  const double dt_dz = -1.0;
 
+  const double Qi =
+    Polynomials::jacobi_polynomial_homogenized_value<double>(i, 0, 0, x, t);
+  const double Qj = Polynomials::jacobi_polynomial_homogenized_value<double>(
+    j, 2 * i + 1, 0, y, s);
+  const double Pk = Polynomials::jacobi_polynomial_value<double>(
+    k, 2 * (i + j) + 2, 0, z, true);
 
-      const double x_derivative =
-        i == 1 ? 2.0 :
-                 Polynomials::jacobi_polynomial_derivative<double>(
-                   i, 0, 0, 2.0 * x * factor - 1.0, false) *
-                   std::pow(1.0 - y, std::max(1U, i)) * 2.0 * factor;
+  const double dQi_dx =
+    Polynomials::jacobi_polynomial_homogenized_derivative<double>(
+      1, 0, i, 0, 0, x, t);
+  const double dQi_dt =
+    Polynomials::jacobi_polynomial_homogenized_derivative<double>(
+      0, 1, i, 0, 0, x, t);
 
-      grad[0] = x_derivative * y_contribution;
+  const double dQj_dy =
+    Polynomials::jacobi_polynomial_homogenized_derivative<double>(
+      1, 0, j, 2 * i + 1, 0, y, s);
+  const double dQj_ds =
+    Polynomials::jacobi_polynomial_homogenized_derivative<double>(
+      0, 1, j, 2 * i + 1, 0, y, s);
 
-      const double y_derivative_x1 =
-        i == 1 ?
-          1.0 :
-          Polynomials::jacobi_polynomial_derivative<double>(
-            i, 0, 0, 2.0 * x * factor - 1.0, false) *
-            2.0 * x * factor * factor * std::pow(1.0 - y, std::max(1U, i));
-
-      const double y_derivative_x2 =
-        i == 1 ? 0.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   i, 0, 0, 2.0 * x * factor - 1.0, false) *
-                   i * (-1.0) * std::pow(1.0 - y, std::max(i - 1, 1U));
-
-      const double y_derivative =
-        Polynomials::jacobi_polynomial_derivative<double>(
-          j, 2 * i + 1, 0, 2.0 * y - 1.0, false) *
-        2.0;
-
-
-      grad[1] = y_derivative_x1 * y_contribution +
-                y_derivative_x2 * y_contribution +
-                x_contribution * y_derivative;
-    }
-  else if constexpr (dim == 3)
-    {
-      const double y = p[1];
-      const double z = p[2];
-
-      const double factor_yz =
-        std::abs(1.0 - y - z) < 1e-14 ? 0.0 : 1.0 / (1.0 - y - z);
-      const double factor_z = std::abs(1.0 - z) < 1e-14 ? 0.0 : 1.0 / (1.0 - z);
-
-      const double x_contribution =
-        i == 0 ? 1.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   i, 0, 0, 2.0 * x * factor_yz - 1.0, false) *
-                   std::pow(1.0 - y - z, i);
-
-      const double y_contribution =
-        j == 0 ? 1.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   j, 2 * i + 1, 0, 2.0 * y * factor_z - 1.0, false) *
-                   std::pow(1.0 - z, j);
-
-      const double z_contribution =
-        Polynomials::jacobi_polynomial_value<double>(
-          k, 2 * (i + j) + 2, 0, z, true);
+  const auto dPk_dz = Polynomials::jacobi_polynomial_derivative<double>(
+    k, 2 * (i + j) + 2, 0, z, true);
 
 
-      const double x_derivative =
-        i == 1 ? 2.0 :
-                 Polynomials::jacobi_polynomial_derivative<double>(
-                   i, 0, 0, 2.0 * x * factor_yz - 1.0, false) *
-                   std::pow(1.0 - y - z, std::max(1U, i)) * 2.0 * factor_yz;
-
-      grad[0] = x_derivative * y_contribution * z_contribution;
-
-      const double y_derivative_x1 =
-        i == 1 ? 1.0 :
-                 Polynomials::jacobi_polynomial_derivative<double>(
-                   i, 0, 0, 2.0 * x * factor_yz - 1.0, false) *
-                   2.0 * x * factor_yz * factor_yz *
-                   std::pow(1.0 - y - z, std::max(1U, i));
-
-      const double y_derivative_x2 =
-        i == 1 ? 0.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   i, 0, 0, 2.0 * x * factor_yz - 1.0, false) *
-                   i * (-1.0) * std::pow(1.0 - y - z, std::max(i - 1, 1U));
-
-      const double y_derivative =
-        j == 1 ? 2.0 * i + 3.0 :
-                 Polynomials::jacobi_polynomial_derivative<double>(
-                   j, 2 * i + 1, 0, 2.0 * y * factor_z - 1.0, false) *
-                   std::pow(1.0 - z, std::max(1U, j)) * 2.0 * factor_z;
-
-      grad[1] = y_derivative_x1 * y_contribution * z_contribution +
-                y_derivative_x2 * y_contribution * z_contribution +
-                x_contribution * y_derivative * z_contribution;
-
-
-      const double z_derivative_y1 =
-        j == 1 ?
-          0.5 * (2.0 * i + 3.0) - 0.5 * (2.0 * i + 1.0) :
-          Polynomials::jacobi_polynomial_derivative<double>(
-            j, 2 * i + 1, 0, 2.0 * y * factor_z - 1.0, false) *
-            2.0 * y * factor_z * factor_z * std::pow(1.0 - z, std::max(j, 1U));
-
-      const double z_derivative_y2 =
-        j == 1 ? 0.0 :
-                 Polynomials::jacobi_polynomial_value<double>(
-                   j, 2 * i + 1, 0, 2.0 * y * factor_z - 1.0, false) *
-                   j * (-1.0) * std::pow(1.0 - z, std::max(1U, j - 1));
-
-      const double z_derivative =
-        Polynomials::jacobi_polynomial_derivative<double>(
-          k, 2 * (i + j) + 2, 0, 2.0 * z - 1.0, false) *
-        2.0;
-
-      grad[2] = y_derivative_x1 * y_contribution * z_contribution +
-                y_derivative_x2 * y_contribution * z_contribution +
-                x_contribution * z_derivative_y1 * z_contribution +
-                x_contribution * z_derivative_y2 * z_contribution +
-                x_contribution * y_contribution * z_derivative;
-    }
-  else
-    DEAL_II_NOT_IMPLEMENTED();
+  grad[0] = dQi_dx * Qj * Pk;
+  if constexpr (dim > 1)
+    grad[1] = dQi_dt * dt_dy * Qj * Pk + Qi * dQj_dy * Pk;
+  if constexpr (dim > 2)
+    grad[2] =
+      dQi_dt * dt_dz * Qj * Pk + Qi * dQj_ds * ds_dz * Pk + Qi * Qj * dPk_dz;
 
   for (unsigned int d = 0; d < dim; ++d)
     if (std::fabs(grad[d]) < 1e-14)
