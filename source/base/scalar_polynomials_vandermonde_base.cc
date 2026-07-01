@@ -135,11 +135,22 @@ ScalarPolynomialsVandermondeBase<dim>::compute_grad_grad(
   const unsigned int i,
   const Point<dim>  &p) const
 {
-  (void)i;
-  (void)p;
+  AssertIndexRange(i, vandermonde_matrix_inverse.m());
 
-  DEAL_II_NOT_IMPLEMENTED();
-  return Tensor<2, dim>();
+  Tensor<2, dim> grad_grad;
+
+  grad_grad = 0.;
+  for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
+    grad_grad += vandermonde_matrix_inverse[i][j] *
+                 evaluate_orthogonal_basis_2nd_derivative(j, p);
+
+  if constexpr (dim > 0)
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
+        if (std::fabs(grad_grad[d][e]) < 1e-14)
+          grad_grad[d][e] = 0.0;
+
+  return grad_grad;
 }
 
 
@@ -186,12 +197,7 @@ ScalarPolynomialsVandermondeBase<dim>::compute_2nd_derivative(
   const unsigned int i,
   const Point<dim>  &p) const
 {
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-
-  return {};
+  return compute_grad_grad(i, p);
 }
 
 
@@ -215,6 +221,42 @@ ScalarPolynomialsVandermondeBase<dim>::compute_3rd_derivative(
 template <int dim>
 Tensor<4, dim>
 ScalarPolynomialsVandermondeBase<dim>::compute_4th_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  (void)i;
+  (void)p;
+
+  DEAL_II_NOT_IMPLEMENTED();
+
+  return {};
+}
+
+
+
+template <int dim>
+Tensor<2, dim>
+ScalarPolynomialsVandermondeBase<dim>::
+  evaluate_orthogonal_basis_2nd_derivative_by_degree(const unsigned int i,
+                                                     const unsigned int j,
+                                                     const unsigned int k,
+                                                     const Point<dim>  &p) const
+{
+  (void)i;
+  (void)j;
+  (void)k;
+  (void)p;
+
+  DEAL_II_NOT_IMPLEMENTED();
+
+  return {};
+}
+
+
+
+template <int dim>
+Tensor<2, dim>
+ScalarPolynomialsVandermondeBase<dim>::evaluate_orthogonal_basis_2nd_derivative(
   const unsigned int i,
   const Point<dim>  &p) const
 {
