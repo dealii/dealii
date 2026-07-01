@@ -760,4 +760,21 @@ CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(VECNEST)
 #  undef VECNEST
 EXPORT_PREPROCESSOR_SYMBOL(VECNEST)
 
+
+// For some versions of PETSc, PETSC_FALSE and PETSC_TRUE are
+// compiler values, whereas for others they are preprocessor
+// variables. In the latter case, we have to create export-able
+// symbols:
+#  ifdef PETSC_FALSE
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_FALSE)
+#    undef PETSC_FALSE
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_FALSE)
+#  endif
+
+#  ifdef PETSC_TRUE
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_TRUE)
+#    undef PETSC_TRUE
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_TRUE)
+#  endif
+
 #endif
