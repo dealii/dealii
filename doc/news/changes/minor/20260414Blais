@@ -1,0 +1,8 @@
+Added: There is now an additional overload of
+Particles::Utilities::interpolate_field_on_particles() which uses the
+FEPointEvaluation class to interpolate fields on particles efficiently. It is
+selected by providing the number of components as a compile-time template
+argument, and it can use an arbitrary mapping, whereas the existing overload
+deduces the number of components at run time and assumes a MappingQ1.
+<br>
+(Bruno Blais, 2026/04/14)
