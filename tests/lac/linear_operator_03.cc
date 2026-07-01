@@ -154,7 +154,7 @@ main()
 
   op_b.vmult(v, u);
   op_a.vmult(w, v);
-  PRINTME("(A(Bu))", x);
+  PRINTME("(A(Bu))", w);
 
   (op_a * op_b).vmult(x, u);
   PRINTME("(A*B)u", x);
