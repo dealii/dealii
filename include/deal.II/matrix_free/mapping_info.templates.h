@@ -2228,7 +2228,7 @@ namespace internal
                     0;
 
                 const unsigned int ext_hp_quad_index =
-                  data_faces.descriptor.size() == 1 ? 0 : ext_fe_index;
+                  data_faces.q_collection.size() == 1 ? 0 : ext_fe_index;
                 const unsigned int ext_hp_quad_face_no =
                   data_faces.q_collection[ext_hp_quad_index].size() == 1 ?
                     0 :
