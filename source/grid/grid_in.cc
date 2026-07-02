@@ -5593,6 +5593,12 @@ namespace
   {
     std::vector<double> quad_node_list(GeometryInfo<dim>::vertices_per_face);
 
+    // Given the indexing below, face_cell_no-1 must be a valid index:
+    Assert((face_cell_no >= 1) &&
+             (static_cast<typename decltype(cell_list)::size_type>(
+                face_cell_no) <= cell_list.size()),
+           ExcInternalError());
+
     // These orderings were reverse engineered by hand and may
     // conceivably be erroneous.
     // TODO: Currently one test (2d unstructured mesh) in the test
