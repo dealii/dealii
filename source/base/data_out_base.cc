@@ -235,7 +235,6 @@ namespace
 #  else
     (void)data;
     (void)compression_level;
-    (void)output;
     Assert(false,
            ExcMessage("This function can only be called if cmake found "
                       "a working libz installation."));
