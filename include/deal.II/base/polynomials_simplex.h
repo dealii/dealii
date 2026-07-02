@@ -51,6 +51,20 @@ public:
     const unsigned int             degree,
     const std::vector<Point<dim>> &support_points);
 
+  /**
+   * @copydoc ScalarPolynomialsBase::evaluate()
+   *
+   * @note Currently, only the vectors @p values, @p grads and @p grads_grads
+   * are filled.
+   */
+  void
+  evaluate(const Point<dim>            &unit_point,
+           std::vector<double>         &values,
+           std::vector<Tensor<1, dim>> &grads,
+           std::vector<Tensor<2, dim>> &grad_grads,
+           std::vector<Tensor<3, dim>> &third_derivatives,
+           std::vector<Tensor<4, dim>> &fourth_derivatives) const override;
+
   std::string
   name() const override;
 
@@ -99,6 +113,27 @@ private:
   Tensor<1, dim>
   evaluate_orthogonal_basis_derivative(const unsigned int i,
                                        const Point<dim>  &p) const override;
+
+  /**
+   * Evaluate the 2nd derivative of the orthogonal basis at point @p p.
+   * The indices @p i, @p j and @p k correspond to the polynomial degrees of
+   * the Jacobi polynomials.
+   */
+  virtual Tensor<2, dim>
+  evaluate_orthogonal_basis_2nd_derivative_by_degree(
+    const unsigned int i,
+    const unsigned int j,
+    const unsigned int k,
+    const Point<dim>  &p) const override;
+
+  /**
+   * Evaluate the 2nd derivative of the orthogonal basis function @p i at point
+   * @p p. This function determines the corresponding indices for the Jacobi
+   * polynomials and calls the function taking all indices as arguments.
+   */
+  virtual Tensor<2, dim>
+  evaluate_orthogonal_basis_2nd_derivative(const unsigned int i,
+                                           const Point<dim>  &p) const override;
 };
 
 

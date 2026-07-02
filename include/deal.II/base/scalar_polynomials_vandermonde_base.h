@@ -76,7 +76,8 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_derivative()
    *
-   * @note Currently, only implemented for first derivative.
+   * @note Implemented for first derivative, for simplices also the second
+   * derivative is implemented.
    */
   template <int order>
   Tensor<order, dim>
@@ -92,7 +93,7 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_2nd_derivative()
    *
-   * @note Not implemented yet.
+   * @note Only implemented for simplices.
    */
   Tensor<2, dim>
   compute_2nd_derivative(const unsigned int i,
@@ -125,7 +126,7 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_grad_grad()
    *
-   * @note Not implemented yet.
+   * @note Only implemented for simplices.
    */
   Tensor<2, dim>
   compute_grad_grad(const unsigned int i, const Point<dim> &p) const override;
@@ -184,6 +185,26 @@ protected:
   virtual Tensor<1, dim>
   evaluate_orthogonal_basis_derivative(const unsigned int i,
                                        const Point<dim>  &p) const = 0;
+
+  /**
+   * Evaluate the 2nd derivative of the orthogonal basis at point @p p.
+   * The indices @p i, @p j and @p k correspond to the polynomial degrees of
+   * the Jacobi polynomials.
+   */
+  virtual Tensor<2, dim>
+  evaluate_orthogonal_basis_2nd_derivative_by_degree(const unsigned int i,
+                                                     const unsigned int j,
+                                                     const unsigned int k,
+                                                     const Point<dim> &p) const;
+
+  /**
+   * Evaluate the 2nd derivative of the orthogonal basis function @p i at point
+   * @p p. This function determines the corresponding indices for the Jacobi
+   * polynomials and calls the function taking all indices as arguments.
+   */
+  virtual Tensor<2, dim>
+  evaluate_orthogonal_basis_2nd_derivative(const unsigned int i,
+                                           const Point<dim>  &p) const;
 };
 
 
@@ -197,11 +218,23 @@ ScalarPolynomialsVandermondeBase<dim>::compute_derivative(
 {
   Tensor<order, dim> der;
 
-  Assert(order == 1, ExcNotImplemented());
-  const auto grad = compute_grad(i, p);
+  if constexpr (order == 1)
+    {
+      const auto grad = compute_grad(i, p);
 
-  for (unsigned int i = 0; i < dim; ++i)
-    der[i] = grad[i];
+      for (unsigned int i = 0; i < dim; ++i)
+        der[i] = grad[i];
+    }
+  else if (order == 2)
+    {
+      const auto grad_grad = compute_grad_grad(i, p);
+
+      for (unsigned int i = 0; i < dim; ++i)
+        for (unsigned int e = 0; e < dim; ++e)
+          der[i][e] = grad_grad[i][e];
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return der;
 }
