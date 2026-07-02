@@ -56,6 +56,10 @@
 #  include <boost/iostreams/stream.hpp>
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+#  include <zoltan_cpp.h>
+#endif
+
 #include <optional>
 #include <set>
 
@@ -1978,6 +1982,41 @@ namespace GridTools
                           Triangulation<dim, spacedim> &triangulation,
                           const SparsityTools::Partitioner partitioner =
                             SparsityTools::Partitioner::metis);
+
+
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int            n_partitions,
+                          Triangulation<dim, spacedim> &triangulation,
+                          std::unique_ptr<Zoltan>      &zz);
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int               n_partitions,
+                          const std::vector<unsigned int> &cell_weights,
+                          Triangulation<dim, spacedim>    &triangulation,
+                          std::unique_ptr<Zoltan>         &zz);
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int            n_partitions,
+                          const SparsityPattern        &cell_connection_graph,
+                          Triangulation<dim, spacedim> &triangulation,
+                          std::unique_ptr<Zoltan>      &zz);
+
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int               n_partitions,
+                          const std::vector<unsigned int> &cell_weights,
+                          const SparsityPattern        &cell_connection_graph,
+                          Triangulation<dim, spacedim> &triangulation,
+                          std::unique_ptr<Zoltan>      &zz);
+#endif
 
   /**
    * Generates a partitioning of the active cells making up the entire domain
