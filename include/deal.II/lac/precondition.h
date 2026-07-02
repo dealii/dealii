@@ -2215,6 +2215,13 @@ public:
   step(VectorType &dst, const VectorType &src) const;
 
   /**
+   * Perform one step of the preconditioned Richardson iteration, returning
+   * the norm recorded in the last step of the local summations.
+   */
+  double
+  step_with_last_norm(VectorType &dst, const VectorType &src) const;
+
+  /**
    * Perform one transposed step of the preconditioned Richardson iteration.
    */
   void
@@ -2263,10 +2270,11 @@ private:
    * Tstep() functions are directed for a unified implementation.
    */
   template <bool use_transpose>
-  void
+  double
   apply_internal(const bool        zero_out_dst,
                  const VectorType &src,
-                 VectorType       &dst) const;
+                 VectorType       &dst,
+                 const bool        compute_final_norm = false) const;
 
   /**
    * A pointer to the underlying matrix.
@@ -3150,7 +3158,7 @@ namespace internal
 
     // generic part for non-deal.II vectors
     template <typename VectorType, typename PreconditionerType>
-    inline void
+    inline double
     vector_updates(const VectorType         &rhs,
                    const PreconditionerType &preconditioner,
                    const unsigned int        iteration_index,
@@ -3159,34 +3167,48 @@ namespace internal
                    VectorType               &solution_old,
                    VectorType               &temp_vector1,
                    VectorType               &temp_vector2,
-                   VectorType               &solution)
+                   VectorType               &solution,
+                   const bool                compute_residual_norm)
     {
+      double residual_norm = 0;
       if (iteration_index == 0)
         {
+          if (compute_residual_norm)
+            residual_norm = rhs.l2_norm();
           solution.equ(factor2, rhs);
           preconditioner.vmult(solution_old, solution);
         }
       else if (iteration_index == 1)
         {
-          // compute t = P^{-1} * (b-A*x^{n})
-          temp_vector1.sadd(-1.0, 1.0, rhs);
+          // compute t = P^{-1} * (A*x^{n} - b)
+          if (compute_residual_norm)
+            residual_norm =
+              std::sqrt(temp_vector1.add_and_dot(-1.0, rhs, temp_vector1));
+          else
+            temp_vector1.add(-1.0, rhs);
           preconditioner.vmult(solution_old, temp_vector1);
 
-          // compute x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * t
-          solution_old.sadd(factor2, 1 + factor1, solution);
+          // compute x^{n+1} = x^{n} + f_1 * x^{n} - f_2 * t
+          solution_old.sadd(-factor2, 1 + factor1, solution);
         }
       else
         {
-          // compute t = P^{-1} * (b-A*x^{n})
-          temp_vector1.sadd(-1.0, 1.0, rhs);
+          // compute t = P^{-1} * (A*x^{n} - b)
+          if (compute_residual_norm)
+            residual_norm =
+              std::sqrt(temp_vector1.add_and_dot(-1.0, rhs, temp_vector1));
+          else
+            temp_vector1.add(-1.0, rhs);
+
           preconditioner.vmult(temp_vector2, temp_vector1);
 
-          // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) + f_2 * t
-          solution_old.sadd(-factor1, factor2, temp_vector2);
+          // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) - f_2 * t
+          solution_old.sadd(-factor1, -factor2, temp_vector2);
           solution_old.add(1 + factor1, solution);
         }
 
       solution.swap(solution_old);
+      return residual_norm;
     }
 
     // generic part for deal.II vectors
@@ -3198,7 +3220,7 @@ namespace internal
           PreconditionerType,
           LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>,
         int> * = nullptr>
-    inline void
+    inline double
     vector_updates(
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
       const PreconditionerType &preconditioner,
@@ -3211,14 +3233,19 @@ namespace internal
         &temp_vector1,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
         &temp_vector2,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution)
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution,
+      const bool compute_residual_norm)
     {
       const Number factor1        = factor1_;
       const Number factor1_plus_1 = 1. + factor1_;
       const Number factor2        = factor2_;
+      double       residual_norm  = 0;
 
       if (iteration_index == 0)
         {
+          if (compute_residual_norm)
+            residual_norm = rhs.l2_norm();
+
           // compute t = P^{-1} * (b)
           preconditioner.vmult(solution_old, rhs);
 
@@ -3230,38 +3257,48 @@ namespace internal
         }
       else if (iteration_index == 1)
         {
-          // compute t = P^{-1} * (b-A*x^{n})
-          temp_vector1.sadd(-1.0, 1.0, rhs);
+          // compute t = P^{-1} * (A*x^{n} - b)
+          if (compute_residual_norm)
+            residual_norm =
+              std::sqrt(temp_vector1.add_and_dot(-1.0, rhs, temp_vector1));
+          else
+            temp_vector1.add(-1.0, rhs);
 
           preconditioner.vmult(solution_old, temp_vector1);
 
-          // compute x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * t
+          // compute x^{n+1} = x^{n} + f_1 * x^{n} - f_2 * t
           const auto solution_ptr     = solution.begin();
           const auto solution_old_ptr = solution_old.begin();
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
             solution_old_ptr[i] =
-              factor1_plus_1 * solution_ptr[i] + solution_old_ptr[i] * factor2;
+              factor1_plus_1 * solution_ptr[i] - solution_old_ptr[i] * factor2;
         }
       else
         {
-          // compute t = P^{-1} * (b-A*x^{n})
-          temp_vector1.sadd(-1.0, 1.0, rhs);
+          // compute t = P^{-1} * (A*x^{n} - b)
+          if (compute_residual_norm)
+            residual_norm =
+              std::sqrt(temp_vector1.add_and_dot(-1.0, rhs, temp_vector1));
+          else
+            temp_vector1.add(-1.0, rhs);
 
           preconditioner.vmult(temp_vector2, temp_vector1);
 
-          // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) + f_2 * t
+          // compute x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1}) - f_2 * t
           const auto solution_ptr     = solution.begin();
           const auto solution_old_ptr = solution_old.begin();
           const auto temp_vector2_ptr = temp_vector2.begin();
           DEAL_II_OPENMP_SIMD_PRAGMA
           for (unsigned int i = 0; i < solution_old.locally_owned_size(); ++i)
             solution_old_ptr[i] = factor1_plus_1 * solution_ptr[i] -
-                                  factor1 * solution_old_ptr[i] +
+                                  factor1 * solution_old_ptr[i] -
                                   temp_vector2_ptr[i] * factor2;
         }
 
       solution.swap(solution_old);
+
+      return residual_norm;
     }
 
     template <
@@ -3272,7 +3309,7 @@ namespace internal
           PreconditionerType,
           LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>,
         int> * = nullptr>
-    inline void
+    inline double
     vector_updates(
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
       const PreconditionerType &preconditioner,
@@ -3285,11 +3322,13 @@ namespace internal
         &temp_vector1,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
         &temp_vector2,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution)
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution,
+      const bool compute_residual_norm)
     {
       const Number factor1        = factor1_;
       const Number factor1_plus_1 = 1. + factor1_;
       const Number factor2        = factor2_;
+      double       residual_norm  = 0;
 
       const auto rhs_ptr          = rhs.begin();
       const auto temp_vector1_ptr = temp_vector1.begin();
@@ -3299,6 +3338,8 @@ namespace internal
 
       if (iteration_index == 0)
         {
+          if (compute_residual_norm)
+            residual_norm = rhs.l2_norm();
           preconditioner.vmult(
             temp_vector2,
             rhs,
@@ -3316,45 +3357,85 @@ namespace internal
         }
       else
         {
-          preconditioner.vmult(
-            temp_vector2,
-            temp_vector1,
-            [&](const auto begin, const auto end) {
-              if (end > begin)
-                std::memset(temp_vector2_ptr + begin,
-                            0,
-                            sizeof(Number) * (end - begin));
+          VectorizedArray<double> sum         = 0;
+          const auto              post_update = [&](const unsigned int begin,
+                                       const unsigned int end) {
+            if (iteration_index == 1)
+              {
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (std::size_t i = begin; i < end; ++i)
+                  temp_vector2_ptr[i] = factor1_plus_1 * solution_ptr[i] +
+                                        factor2 * temp_vector2_ptr[i];
+              }
+            else
+              {
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (std::size_t i = begin; i < end; ++i)
+                  temp_vector2_ptr[i] = factor1_plus_1 * solution_ptr[i] -
+                                        factor1 * solution_old_ptr[i] +
+                                        factor2 * temp_vector2_ptr[i];
+              }
+          };
+          if (compute_residual_norm)
+            preconditioner.vmult(
+              temp_vector2,
+              temp_vector1,
+              [&](const auto begin, const auto end) {
+                if (end > begin)
+                  std::memset(temp_vector2_ptr + begin,
+                              0,
+                              sizeof(Number) * (end - begin));
 
-              DEAL_II_OPENMP_SIMD_PRAGMA
-              for (std::size_t i = begin; i < end; ++i)
-                temp_vector1_ptr[i] = rhs_ptr[i] - temp_vector1_ptr[i];
-            },
-            [&](const auto begin, const auto end) {
-              if (iteration_index == 1)
-                {
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (std::size_t i = begin; i < end; ++i)
-                    temp_vector2_ptr[i] = factor1_plus_1 * solution_ptr[i] +
-                                          factor2 * temp_vector2_ptr[i];
-                }
-              else
-                {
-                  DEAL_II_OPENMP_SIMD_PRAGMA
-                  for (std::size_t i = begin; i < end; ++i)
-                    temp_vector2_ptr[i] = factor1_plus_1 * solution_ptr[i] -
-                                          factor1 * solution_old_ptr[i] +
-                                          factor2 * temp_vector2_ptr[i];
-                }
-            });
+                VectorizedArray<double> local_sum = 0;
+                constexpr unsigned int  n_lanes =
+                  VectorizedArray<double>::size();
+                const unsigned int end_regular = end / n_lanes * n_lanes;
+                for (unsigned int i = begin; i < end_regular; i += n_lanes)
+                  {
+                    VectorizedArray<double> rhs_i, tmp_i;
+                    rhs_i.load(rhs_ptr + i);
+                    tmp_i.load(temp_vector1_ptr + i);
+                    const VectorizedArray<double> residual_i = rhs_i - tmp_i;
+                    residual_i.store(temp_vector1_ptr + i);
+                    local_sum += residual_i * residual_i;
+                  }
+                for (unsigned int i = end_regular; i < end; ++i)
+                  {
+                    temp_vector1_ptr[i] = rhs_ptr[i] - temp_vector1_ptr[i];
+                    local_sum[i - end_regular] +=
+                      temp_vector1_ptr[i] * temp_vector1_ptr[i];
+                  }
+                sum += local_sum;
+              },
+              post_update);
+          else
+            preconditioner.vmult(
+              temp_vector2,
+              temp_vector1,
+              [&](const auto begin, const auto end) {
+                if (end > begin)
+                  std::memset(temp_vector2_ptr + begin,
+                              0,
+                              sizeof(Number) * (end - begin));
+
+                for (std::size_t i = begin; i < end; ++i)
+                  temp_vector1_ptr[i] = rhs_ptr[i] - temp_vector1_ptr[i];
+              },
+              post_update);
+          residual_norm =
+            std::sqrt(Utilities::MPI::sum(sum.sum(),
+                                          solution_old.get_mpi_communicator()));
         }
 
       solution_old.swap(temp_vector2);
       solution_old.swap(solution);
+
+      return residual_norm;
     }
 
     // vector updates for device vectors and DiagonalMatrix as preconditioner
     template <typename Number>
-    inline void
+    inline double
     vector_updates(
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
         &rhs,
@@ -3370,11 +3451,13 @@ namespace internal
         &temp_vector1,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
-        &solution)
+                &solution,
+      const bool compute_residual_norm)
     {
       const Number factor1        = factor1_;
       const Number factor1_plus_1 = 1. + factor1_;
       const Number factor2        = factor2_;
+      double       residual_norm  = 0;
 
       auto exec = typename ::dealii::MemorySpace::Default::kokkos_space::
         execution_space{};
@@ -3396,6 +3479,8 @@ namespace internal
             KOKKOS_LAMBDA(size_type i) {
               sol_old_data[i] = prec_data[i] * factor2 * rhs_data[i];
             });
+          if (compute_residual_norm)
+            residual_norm = rhs.l2_norm();
         }
       else if (iteration_index == 1)
         {
@@ -3409,6 +3494,9 @@ namespace internal
               sol_old_data[i]       = factor2 * prec_data[i] * residual +
                                 factor1_plus_1 * sol_data[i];
             });
+          if (compute_residual_norm)
+            residual_norm =
+              std::sqrt(temp_vector1.add_and_dot(-1.0, rhs, temp_vector1));
         }
       else
         {
@@ -3423,10 +3511,14 @@ namespace internal
                                 factor1 * sol_old_data[i] +
                                 factor1_plus_1 * sol_data[i];
             });
+          if (compute_residual_norm)
+            residual_norm =
+              std::sqrt(temp_vector1.add_and_dot(-1.0, rhs, temp_vector1));
         }
       exec.fence();
 
       solution.swap(solution_old);
+      return residual_norm;
     }
 
     // worker routine for deal.II vectors. Because of vectorization, we need
@@ -3442,7 +3534,8 @@ namespace internal
                     const Number       factor2,
                     Number            *solution_old,
                     Number            *tmp_vector,
-                    Number            *solution)
+                    Number            *solution,
+                    const bool         compute_residual_norm)
         : rhs(rhs)
         , matrix_diagonal_inverse(matrix_diagonal_inverse)
         , iteration_index(iteration_index)
@@ -3451,6 +3544,8 @@ namespace internal
         , solution_old(solution_old)
         , tmp_vector(tmp_vector)
         , solution(solution)
+        , compute_residual_norm(compute_residual_norm)
+        , sum_accumulator(0.0)
       {}
 
       void
@@ -3460,51 +3555,137 @@ namespace internal
         // (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63945), we create
         // copies of the variables factor1 and factor2 and do not check based on
         // factor1.
-        const Number factor1        = this->factor1;
-        const Number factor1_plus_1 = 1. + this->factor1;
-        const Number factor2        = this->factor2;
-        if (iteration_index == 0)
+        const double factor1        = this->factor1;
+        const double factor1_plus_1 = 1. + this->factor1;
+        const double factor2        = this->factor2;
+        if (compute_residual_norm)
           {
-            DEAL_II_OPENMP_SIMD_PRAGMA
-            for (std::size_t i = begin; i < end; ++i)
-              tmp_vector[i] = factor2 * matrix_diagonal_inverse[i] * rhs[i];
-          }
-        else if (iteration_index == 1)
-          {
-            // x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * P^{-1} * (b-A*x^{n})
-            DEAL_II_OPENMP_SIMD_PRAGMA
-            for (std::size_t i = begin; i < end; ++i)
-              // for efficiency reason, write back to temp_vector that is
-              // already read (avoid read-for-ownership)
-              tmp_vector[i] =
-                factor1_plus_1 * solution[i] +
-                factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
+            VectorizedArray<double> local_sum = 0;
+            constexpr unsigned int  n_lanes   = VectorizedArray<double>::size();
+            const unsigned int      end_regular = end / n_lanes * n_lanes;
+            if (iteration_index == 0)
+              {
+                for (unsigned int i = begin; i < end_regular; i += n_lanes)
+                  {
+                    VectorizedArray<double> rhs_i, diag_i;
+                    rhs_i.load(rhs + i);
+                    diag_i.load(matrix_diagonal_inverse + i);
+                    const VectorizedArray<double> res_i =
+                      factor2 * diag_i * rhs_i;
+                    res_i.store(tmp_vector + i);
+                    local_sum += rhs_i * rhs_i;
+                  }
+                for (unsigned int i = end_regular; i < end; ++i)
+                  {
+                    tmp_vector[i] =
+                      factor2 * matrix_diagonal_inverse[i] * rhs[i];
+                    local_sum[i - end_regular] += rhs[i] * rhs[i];
+                  }
+              }
+            else if (iteration_index == 1)
+              {
+                // x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * P^{-1} * (b-A*x^{n})
+                for (unsigned int i = begin; i < end_regular; i += n_lanes)
+                  {
+                    VectorizedArray<double> rhs_i, sol_i, tmp_i, diag_i;
+                    rhs_i.load(rhs + i);
+                    diag_i.load(matrix_diagonal_inverse + i);
+                    sol_i.load(solution + i);
+                    tmp_i.load(tmp_vector + i);
+                    const VectorizedArray<double> residual_i = rhs_i - tmp_i;
+                    local_sum += residual_i * residual_i;
+                    const VectorizedArray<double> res_i =
+                      factor1_plus_1 * sol_i + factor2 * diag_i * residual_i;
+                    res_i.store(tmp_vector + i);
+                  }
+                for (unsigned int i = end_regular; i < end; ++i)
+                  {
+                    const Number residual_i = rhs[i] - tmp_vector[i];
+                    local_sum[i - end_regular] += residual_i * residual_i;
+                    tmp_vector[i] =
+                      factor1_plus_1 * solution[i] +
+                      factor2 * matrix_diagonal_inverse[i] * residual_i;
+                  }
+              }
+            else
+              {
+                // x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1})
+                //           + f_2 * P^{-1} * (b-A*x^{n})
+                for (unsigned int i = begin; i < end_regular; i += n_lanes)
+                  {
+                    VectorizedArray<double> rhs_i, sol_i, sol_old_i, tmp_i,
+                      diag_i;
+                    rhs_i.load(rhs + i);
+                    diag_i.load(matrix_diagonal_inverse + i);
+                    sol_i.load(solution + i);
+                    sol_old_i.load(solution_old + i);
+                    tmp_i.load(tmp_vector + i);
+                    const VectorizedArray<double> residual_i = rhs_i - tmp_i;
+                    local_sum += residual_i * residual_i;
+                    const VectorizedArray<double> res_i =
+                      factor1_plus_1 * sol_i - factor1 * sol_old_i +
+                      factor2 * diag_i * residual_i;
+                    res_i.store(tmp_vector + i);
+                  }
+                for (unsigned int i = end_regular; i < end; ++i)
+                  {
+                    const Number residual_i = rhs[i] - tmp_vector[i];
+                    local_sum[i - end_regular] += residual_i * residual_i;
+                    tmp_vector[i] =
+                      factor1_plus_1 * solution[i] - factor1 * solution_old[i] +
+                      factor2 * matrix_diagonal_inverse[i] * residual_i;
+                  }
+              }
+            sum_accumulator += local_sum;
           }
         else
           {
-            // x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1})
-            //           + f_2 * P^{-1} * (b-A*x^{n})
-            DEAL_II_OPENMP_SIMD_PRAGMA
-            for (std::size_t i = begin; i < end; ++i)
-              // for efficiency reason, write back to temp_vector, which is
-              // already modified during vmult (in best case, the modified
-              // values are not written back to main memory yet so that
-              // we do not have to pay additional costs for writing and
-              // read-for-ownership)
-              tmp_vector[i] =
-                factor1_plus_1 * solution[i] - factor1 * solution_old[i] +
-                factor2 * matrix_diagonal_inverse[i] * (rhs[i] - tmp_vector[i]);
+            if (iteration_index == 0)
+              {
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (std::size_t i = begin; i < end; ++i)
+                  tmp_vector[i] = factor2 * matrix_diagonal_inverse[i] * rhs[i];
+              }
+            else if (iteration_index == 1)
+              {
+                // x^{n+1} = x^{n} + f_1 * x^{n} + f_2 * P^{-1} * (b-A*x^{n})
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (std::size_t i = begin; i < end; ++i)
+                  // for efficiency reason, write back to temp_vector that is
+                  // already read (avoid read-for-ownership)
+                  tmp_vector[i] = factor1_plus_1 * solution[i] +
+                                  factor2 * matrix_diagonal_inverse[i] *
+                                    (rhs[i] - tmp_vector[i]);
+              }
+            else
+              {
+                // x^{n+1} = x^{n} + f_1 * (x^{n}-x^{n-1})
+                //           + f_2 * P^{-1} * (b-A*x^{n})
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (std::size_t i = begin; i < end; ++i)
+                  // for efficiency reason, write back to temp_vector, which is
+                  // already modified during vmult (in best case, the modified
+                  // values are not written back to main memory yet so that
+                  // we do not have to pay additional costs for writing and
+                  // read-for-ownership)
+                  tmp_vector[i] = factor1_plus_1 * solution[i] -
+                                  factor1 * solution_old[i] +
+                                  factor2 * matrix_diagonal_inverse[i] *
+                                    (rhs[i] - tmp_vector[i]);
+              }
           }
       }
 
-      const Number      *rhs;
-      const Number      *matrix_diagonal_inverse;
-      const unsigned int iteration_index;
-      const Number       factor1;
-      const Number       factor2;
-      mutable Number    *solution_old;
-      mutable Number    *tmp_vector;
-      mutable Number    *solution;
+      const Number                   *rhs;
+      const Number                   *matrix_diagonal_inverse;
+      const unsigned int              iteration_index;
+      const Number                    factor1;
+      const Number                    factor2;
+      mutable Number                 *solution_old;
+      mutable Number                 *tmp_vector;
+      mutable Number                 *solution;
+      bool                            compute_residual_norm;
+      mutable VectorizedArray<double> sum_accumulator;
     };
 
     template <typename Number>
@@ -3514,7 +3695,13 @@ namespace internal
                          const std::size_t            size)
         : updater(updater)
       {
-        if (size < internal::VectorImplementation::minimum_parallel_grain_size)
+        Assert(updater.compute_residual_norm == false ||
+                 MultithreadInfo::n_threads() == 1,
+               ExcNotImplemented(
+                 "Currently, we cannot compute residual in parallel"));
+        if (size <
+              internal::VectorImplementation::minimum_parallel_grain_size ||
+            MultithreadInfo::n_threads() == 1)
           VectorUpdatesRange::apply_to_subrange(0, size);
         else
           apply_parallel(
@@ -3537,7 +3724,7 @@ namespace internal
 
     // selection for diagonal matrix around deal.II vector
     template <typename Number>
-    inline void
+    inline double
     vector_updates(
       const ::dealii::Vector<Number>                         &rhs,
       const dealii::DiagonalMatrix<::dealii::Vector<Number>> &jacobi,
@@ -3547,7 +3734,8 @@ namespace internal
       ::dealii::Vector<Number>                               &solution_old,
       ::dealii::Vector<Number>                               &temp_vector1,
       ::dealii::Vector<Number> &,
-      ::dealii::Vector<Number> &solution)
+      ::dealii::Vector<Number> &solution,
+      const bool                compute_residual_norm)
     {
       VectorUpdater<Number> upd(rhs.begin(),
                                 jacobi.get_vector().begin(),
@@ -3556,17 +3744,26 @@ namespace internal
                                 factor2,
                                 solution_old.begin(),
                                 temp_vector1.begin(),
-                                solution.begin());
+                                solution.begin(),
+                                compute_residual_norm);
+
       VectorUpdatesRange<Number>(upd, rhs.size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
       solution.swap(temp_vector1);
       solution_old.swap(temp_vector1);
+
+      if (compute_residual_norm)
+        return std::sqrt(
+          Utilities::MPI::sum(upd.sum_accumulator.sum(),
+                              solution_old.get_mpi_communicator()));
+      else
+        return 0;
     }
 
     // selection for diagonal matrix around parallel deal.II vector
     template <typename Number>
-    inline void
+    inline double
     vector_updates(
       const LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &rhs,
       const dealii::DiagonalMatrix<
@@ -3579,7 +3776,8 @@ namespace internal
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>
         &temp_vector1,
       LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &,
-      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution)
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Host> &solution,
+      const bool compute_residual_norm)
     {
       VectorUpdater<Number> upd(rhs.begin(),
                                 jacobi.get_vector().begin(),
@@ -3588,12 +3786,21 @@ namespace internal
                                 factor2,
                                 solution_old.begin(),
                                 temp_vector1.begin(),
-                                solution.begin());
+                                solution.begin(),
+                                compute_residual_norm);
+
       VectorUpdatesRange<Number>(upd, rhs.locally_owned_size());
 
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
       solution.swap(temp_vector1);
       solution_old.swap(temp_vector1);
+
+      if (compute_residual_norm)
+        return std::sqrt(
+          Utilities::MPI::sum(upd.sum_accumulator.sum(),
+                              solution_old.get_mpi_communicator()));
+      else
+        return 0;
     }
 
     // We need to have a separate declaration for static const members
@@ -3613,7 +3820,7 @@ namespace internal
             has_vmult_with_std_functions_for_precondition<MatrixType,
                                                           VectorType>),
         int> * = nullptr>
-    inline void
+    inline double
     vmult_and_update(const MatrixType         &matrix,
                      const PreconditionerType &preconditioner,
                      const VectorType         &rhs,
@@ -3623,19 +3830,21 @@ namespace internal
                      VectorType               &solution,
                      VectorType               &solution_old,
                      VectorType               &temp_vector1,
-                     VectorType               &temp_vector2)
+                     VectorType               &temp_vector2,
+                     const bool                compute_residual_norm)
     {
       if (iteration_index > 0)
         matrix.vmult(temp_vector1, solution);
-      vector_updates(rhs,
-                     preconditioner,
-                     iteration_index,
-                     factor1,
-                     factor2,
-                     solution_old,
-                     temp_vector1,
-                     temp_vector2,
-                     solution);
+      return vector_updates(rhs,
+                            preconditioner,
+                            iteration_index,
+                            factor1,
+                            factor2,
+                            solution_old,
+                            temp_vector1,
+                            temp_vector2,
+                            solution,
+                            compute_residual_norm);
     }
 
     // case that both the operator and the preconditioner can work on
@@ -3653,7 +3862,7 @@ namespace internal
            has_vmult_with_std_functions_for_precondition<MatrixType,
                                                          VectorType>),
         int> * = nullptr>
-    inline void
+    inline double
     vmult_and_update(const MatrixType         &matrix,
                      const PreconditionerType &preconditioner,
                      const VectorType         &rhs,
@@ -3663,16 +3872,21 @@ namespace internal
                      VectorType               &solution,
                      VectorType               &solution_old,
                      VectorType               &temp_vector1,
-                     VectorType               &temp_vector2)
+                     VectorType               &temp_vector2,
+                     const bool                compute_residual_norm)
     {
       using Number = typename VectorType::value_type;
 
       const Number factor1        = factor1_;
       const Number factor1_plus_1 = 1. + factor1_;
       const Number factor2        = factor2_;
+      double       residual_norm  = 0;
 
       if (iteration_index == 0)
         {
+          if (compute_residual_norm)
+            residual_norm = rhs.l2_norm();
+
           preconditioner.vmult(
             temp_vector2,
             rhs,
@@ -3696,26 +3910,63 @@ namespace internal
           temp_vector1.reinit(rhs, true);
           temp_vector2.reinit(rhs, true);
 
-          // 1) compute residual (including operator application)
-          matrix.vmult(
-            temp_vector1,
-            solution,
-            [&](const unsigned int start_range, const unsigned int end_range) {
-              // zero 'temp_vector1' before running the vmult
-              // operation
-              if (end_range > start_range)
-                std::memset(temp_vector1.begin() + start_range,
-                            0,
-                            sizeof(Number) * (end_range - start_range));
-            },
-            [&](const unsigned int start_range, const unsigned int end_range) {
-              const auto rhs_ptr = rhs.begin();
-              const auto tmp_ptr = temp_vector1.begin();
+          VectorizedArray<double> sum = 0;
+          const auto post_operation   = [&](const unsigned int start_range,
+                                          const unsigned int end_range) {
+            const auto rhs_ptr = rhs.begin();
+            const auto tmp_ptr = temp_vector1.begin();
 
-              DEAL_II_OPENMP_SIMD_PRAGMA
-              for (std::size_t i = start_range; i < end_range; ++i)
-                tmp_ptr[i] = rhs_ptr[i] - tmp_ptr[i];
-            });
+            DEAL_II_OPENMP_SIMD_PRAGMA
+            for (std::size_t i = start_range; i < end_range; ++i)
+              tmp_ptr[i] = rhs_ptr[i] - tmp_ptr[i];
+          };
+          // 1) compute residual (including operator application)
+          if (compute_residual_norm)
+            matrix.vmult(
+              temp_vector1,
+              solution,
+              [&](const unsigned int begin, const unsigned int end) {
+                const auto              rhs_ptr   = rhs.begin();
+                const auto              tmp_ptr   = temp_vector1.begin();
+                VectorizedArray<double> local_sum = 0;
+                constexpr unsigned int  n_lanes =
+                  VectorizedArray<double>::size();
+                const unsigned int end_regular = end / n_lanes * n_lanes;
+                for (unsigned int i = begin; i < end_regular; i += n_lanes)
+                  {
+                    VectorizedArray<double> rhs_i, tmp_i;
+                    rhs_i.load(rhs_ptr + i);
+                    tmp_i.load(tmp_ptr + i);
+                    const VectorizedArray<double> residual_i = rhs_i - tmp_i;
+                    residual_i.store(tmp_ptr + i);
+                    local_sum += residual_i * residual_i;
+                  }
+                for (unsigned int i = end_regular; i < end; ++i)
+                  {
+                    tmp_ptr[i] = rhs_ptr[i] - tmp_ptr[i];
+                    local_sum[i - end_regular] += tmp_ptr[i] * tmp_ptr[i];
+                  }
+                sum += local_sum;
+              },
+              post_operation
+
+            );
+          else
+            matrix.vmult(
+              temp_vector1,
+              solution,
+              [&](const unsigned int start_range,
+                  const unsigned int end_range) {
+                const auto rhs_ptr = rhs.begin();
+                const auto tmp_ptr = temp_vector1.begin();
+
+                DEAL_II_OPENMP_SIMD_PRAGMA
+                for (std::size_t i = start_range; i < end_range; ++i)
+                  tmp_ptr[i] = rhs_ptr[i] - tmp_ptr[i];
+              },
+              post_operation
+
+            );
 
           // 2) perform vector updates (including preconditioner application)
           preconditioner.vmult(
@@ -3750,9 +4001,13 @@ namespace internal
                                  factor2 * tmp_ptr[i];
                 }
             });
+
+          residual_norm = std::sqrt(
+            Utilities::MPI::sum(sum.sum(), solution.get_mpi_communicator()));
         }
       solution.swap(temp_vector2);
       solution_old.swap(temp_vector2);
+      return residual_norm;
     }
 
     // case that the operator can work on subranges and the preconditioner
@@ -3764,7 +4019,7 @@ namespace internal
                                                             VectorType,
                                                             PreconditionerType>,
                                int> * = nullptr>
-    inline void
+    inline double
     vmult_and_update(const MatrixType         &matrix,
                      const PreconditionerType &preconditioner,
                      const VectorType         &rhs,
@@ -3774,7 +4029,8 @@ namespace internal
                      VectorType               &solution,
                      VectorType               &solution_old,
                      VectorType               &temp_vector1,
-                     VectorType &)
+                     VectorType &,
+                     const bool compute_residual_norm)
     {
       using Number = typename VectorType::value_type;
       VectorUpdater<Number> updater(rhs.begin(),
@@ -3784,7 +4040,8 @@ namespace internal
                                     factor2,
                                     solution_old.begin(),
                                     temp_vector1.begin(),
-                                    solution.begin());
+                                    solution.begin(),
+                                    compute_residual_norm);
       if (iteration_index > 0)
         matrix.vmult(
           temp_vector1,
@@ -3807,6 +4064,9 @@ namespace internal
       // swap vectors x^{n+1}->x^{n}, given the updates in the function above
       solution.swap(temp_vector1);
       solution_old.swap(temp_vector1);
+
+      return std::sqrt(Utilities::MPI::sum(updater.sum_accumulator.sum(),
+                                           solution.get_mpi_communicator()));
     }
 
     template <typename MatrixType, typename PreconditionerType>
@@ -4024,51 +4284,58 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
 template <typename MatrixType, typename VectorType, typename PreconditionerType>
 template <bool do_transpose>
-inline void
+inline double
 PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
   apply_internal(const bool        zero_out_dst,
                  const VectorType &rhs,
-                 VectorType       &solution) const
+                 VectorType       &solution,
+                 const bool        compute_final_norm) const
 {
   std::lock_guard<std::mutex> lock(mutex);
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(rhs);
 
+  double residual_norm = 0;
   if constexpr (do_transpose)
     {
       matrix_ptr->Tvmult(temp_vector1, solution);
-      internal::PreconditionChebyshevImplementation::vector_updates(
-        rhs,
+      residual_norm =
+        internal::PreconditionChebyshevImplementation::vector_updates(
+          rhs,
+          *data.preconditioner,
+          zero_out_dst ? 0 : 1,
+          0.,
+          (data.polynomial_type ==
+           AdditionalData::PolynomialType::fourth_kind) ?
+            (4. / (3. * delta)) :
+            (1. / theta),
+          solution_old,
+          temp_vector1,
+          temp_vector2,
+          solution,
+          compute_final_norm && data.degree < 2);
+    }
+  else
+    residual_norm =
+      internal::PreconditionChebyshevImplementation::vmult_and_update(
+        *matrix_ptr,
         *data.preconditioner,
+        rhs,
         zero_out_dst ? 0 : 1,
         0.,
         (data.polynomial_type == AdditionalData::PolynomialType::fourth_kind) ?
           (4. / (3. * delta)) :
           (1. / theta),
+        solution,
         solution_old,
         temp_vector1,
         temp_vector2,
-        solution);
-    }
-  else
-    internal::PreconditionChebyshevImplementation::vmult_and_update(
-      *matrix_ptr,
-      *data.preconditioner,
-      rhs,
-      zero_out_dst ? 0 : 1,
-      0.,
-      (data.polynomial_type == AdditionalData::PolynomialType::fourth_kind) ?
-        (4. / (3. * delta)) :
-        (1. / theta),
-      solution,
-      solution_old,
-      temp_vector1,
-      temp_vector2);
+        compute_final_norm && data.degree < 2);
 
   // if delta is zero, we do not need to iterate because the updates will be
   // zero
   if (data.degree < 2 || std::abs(delta) < 1e-40)
-    return;
+    return residual_norm;
 
   double rhok = delta / theta, sigma = theta / delta;
   for (unsigned int k = 0; k < data.degree - 1; ++k)
@@ -4092,32 +4359,38 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
       if constexpr (do_transpose)
         {
           matrix_ptr->Tvmult(temp_vector1, solution);
-          internal::PreconditionChebyshevImplementation::vector_updates(
-            rhs,
-            *data.preconditioner,
-            k + (zero_out_dst ? 1 : 2),
-            factor1,
-            factor2,
-            solution_old,
-            temp_vector1,
-            temp_vector2,
-            solution);
+          residual_norm =
+            internal::PreconditionChebyshevImplementation::vector_updates(
+              rhs,
+              *data.preconditioner,
+              k + (zero_out_dst ? 1 : 2),
+              factor1,
+              factor2,
+              solution_old,
+              temp_vector1,
+              temp_vector2,
+              solution,
+              compute_final_norm && k == data.degree - 2);
         }
       else
         {
-          internal::PreconditionChebyshevImplementation::vmult_and_update(
-            *matrix_ptr,
-            *data.preconditioner,
-            rhs,
-            k + (zero_out_dst ? 1 : 2),
-            factor1,
-            factor2,
-            solution,
-            solution_old,
-            temp_vector1,
-            temp_vector2);
+          residual_norm =
+            internal::PreconditionChebyshevImplementation::vmult_and_update(
+              *matrix_ptr,
+              *data.preconditioner,
+              rhs,
+              k + (zero_out_dst ? 1 : 2),
+              factor1,
+              factor2,
+              solution,
+              solution_old,
+              temp_vector1,
+              temp_vector2,
+              compute_final_norm && k == data.degree - 2);
         }
     }
+
+  return residual_norm;
 }
 
 
@@ -4151,6 +4424,19 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::step(
   const VectorType &rhs) const
 {
   apply_internal<false>(/* zero_out_dst */ false, rhs, solution);
+}
+
+
+
+template <typename MatrixType, typename VectorType, typename PreconditionerType>
+inline double
+PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
+  step_with_last_norm(VectorType &solution, const VectorType &rhs) const
+{
+  return apply_internal<false>(/* zero_out_dst */ false,
+                               rhs,
+                               solution,
+                               /* compute_norm */ true);
 }
 
 
