@@ -82,7 +82,7 @@ test_gpu()
   auto check_host =
     Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{}, check);
 
-  const double tolerance = 1.e-8;
+  const double tolerance = std::is_same_v<Number, double> ? 1.e-14 : 2e-7;
   AssertThrow(std::abs(check_host[0] - 0.) < tolerance, ExcInternalError());
   AssertThrow(std::abs(check_host[1] - 0.) < tolerance, ExcInternalError());
   AssertThrow(std::abs(check_host[2] - 1.) < tolerance, ExcInternalError());
