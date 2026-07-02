@@ -1,0 +1,18 @@
+--- examples/step-101/step-101.cc	2026-01-29 03:40:53.480638892 +0000
++++ /tmp/step-101-testsuite.cc	2026-02-01 08:41:03.669899517 +0000
+@@ -982,7 +982,7 @@
+       // constraints are violated.
+       prm.auto_reduce_dt_target = true;
+       prm.dt_shrink_factor = 0.95;
+-      prm.max_dt_adjustment_steps = 25;
++      prm.max_dt_adjustment_steps = 20;
+ 
+       prm.write_density_scaling_output = true;
+ 
+@@ -1017,4 +1017,4 @@
+     }
+ 
+   return 0;
+-}
+\ No newline at end of file
++}
