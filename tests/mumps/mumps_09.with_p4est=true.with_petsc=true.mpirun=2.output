@@ -1,0 +1,7 @@
+
+DEAL:0::Number of dofs = 659 (578 + 81)
+DEAL:0::error: u_0: 0.0806514 p_0: 0.348625
+
+DEAL:1::Number of dofs = 659 (578 + 81)
+DEAL:1::error: u_0: 0.0806514 p_0: 0.348625
+
