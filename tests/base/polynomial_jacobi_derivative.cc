@@ -98,9 +98,12 @@ test(const double tol)
               // second derivative
               const double second_deriv = jacobi_polynomial_kth_derivative(
                 2, degree, alpha, beta, x, rescale);
+
+              // derivative approximation is 2nd order, so choose somewhat
+              // larger h to avoid running into cancellation issues
               const double second_deriv_approx =
                 get_finite_difference_second_derivative(
-                  tol, degree, alpha, beta, x, rescale);
+                  4 * tol, degree, alpha, beta, x, rescale);
 
               if (std::abs(second_deriv - second_deriv_approx) < tol)
                 deallog << "ok ";
