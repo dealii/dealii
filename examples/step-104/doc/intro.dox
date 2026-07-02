@@ -7,7 +7,7 @@ We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable
 <a name="step_104-Intro"></a>
   <h1>Introduction</h1>
 
-  This tutorial implements a matrix free algorithm
+  This tutorial implements a matrix-free algorithm
   that works on GPUs using
   Kokkos to solve the Stokes problem
 
@@ -51,7 +51,7 @@ We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable
   to the DoFHandler index 0 (velocity) and index 1 (pressure). These indices will be passed to
   Portable::FEEvaluation objects when constructed.
 
-  While this program runs (slowly) without a GPU, using a workstation with one or more GPUs or a GPU cluster
+  While this program runs without a GPU, using a workstation with one or more GPUs or a GPU cluster
   is strongly recommended. Unfortunately, installing deal.II with GPU support is non-trivial. Please see the
   [deal.II GPU wiki page](https://github.com/dealii/dealii/wiki/GPU-support-in-deal.II) for installation
   instructions.
@@ -78,9 +78,9 @@ We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable
   <h3>Linear system and preconditioning</h3>
 
   Nevertheless, we arrive at the same block linear system
-@f{eqnarray*}{
-\left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right)
-@f}
+  @f{eqnarray*}{
+    \left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right)
+  @f}
   and use the same block preconditioner as in step-32 and step-56.
   We are left with the choice for the approximation of the inverse of the velocity
   or $A$ block, the inverse of the Schur complement $S$,  the implementation of the $B^T$
@@ -117,7 +117,7 @@ We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable
   memory (CPU or main memory), while MemorySpace::Default refers to the memory of
   the default compute device (either CPUs or GPUs depending on how the Kokkos library
   used by deal.II was configured). While LinearAlgebra::distributed::Vector has
-  a default value for the memory space, which is, confusingly, MemorySpace::Host,
+  a default value for the memory space, which is MemorySpace::Host,
   we always specify the memory space explicitly in this example. Any function operating
   on vectors stored on the compute device have to run on the GPU as a kernel and
   has to be marked with the DEAL_II_HOST_DEVICE precompiler macro to let the compiler

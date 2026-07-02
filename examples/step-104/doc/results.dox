@@ -29,7 +29,7 @@ host-parallel backends available in Kokkos and thus this tutorial also
 runs with the CPU-only configurations. This is perfect for
 code development and debugging, but of course significantly slower. By default,
 the Kokkos Serial backend does not use multiple cores or explicit SIMD instructions. As such,
-the CPU-based matrix free deal.II code as in step-37 will be significantly faster.
+the CPU-based matrix-free deal.II code as in step-37 will be significantly faster.
 
 As an example, here is a quick comparison between different workstation and
 server GPUs and the time to solution for the 53 million DoF problem size:
