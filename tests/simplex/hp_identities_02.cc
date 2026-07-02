@@ -130,9 +130,10 @@ test_hp_quad_dof_identities(const FiniteElement<dim> &fe,
       if (reference_cell.face_reference_cell(f) ==
           reference_cell_other.face_reference_cell(f_other))
         {
-          const auto identities = fe.hp_quad_dof_identities(fe_other, f);
+          const auto identities =
+            fe.hp_quad_dof_identities(fe_other, f, f_other);
           const auto identities_other =
-            fe_other.hp_quad_dof_identities(fe, f_other);
+            fe_other.hp_quad_dof_identities(fe, f_other, f);
 
           for (const auto &r : identities)
             results_fe.emplace_back(r);

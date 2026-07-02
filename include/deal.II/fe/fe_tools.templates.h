@@ -3407,6 +3407,43 @@ namespace FETools
         return fe.get_first_quad_index(face_no) + index;
       }
   }
+
+
+
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe,
+                         const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int                  face_no,
+                         const unsigned int                  face_no_other)
+  {
+    // check that both faces are of the same kind
+    Assert(fe.reference_cell().face_reference_cell(face_no) ==
+             fe_other.reference_cell().face_reference_cell(face_no_other),
+           ExcInternalError());
+
+    std::vector<std::pair<unsigned int, unsigned int>> result;
+
+    // compare the face support points
+    const auto &face_support_points = fe.get_unit_face_support_points(face_no);
+    const auto &face_support_points_other =
+      fe_other.get_unit_face_support_points(face_no_other);
+
+    // get the offsets to only compare the DoFs within the face as the
+    // vertices and lines were done before
+    const unsigned int offset = fe.get_first_face_quad_index(face_no);
+    const unsigned int offset_other =
+      fe_other.get_first_face_quad_index(face_no_other);
+
+    // do the comparison
+    for (unsigned int i = 0; i < fe.n_dofs_per_quad(face_no); ++i)
+      for (unsigned int j = 0; j < fe_other.n_dofs_per_quad(face_no_other); ++j)
+        if (face_support_points[i + offset].distance(
+              face_support_points_other[j + offset_other]) < 1e-14)
+          result.emplace_back(i, j);
+
+    return result;
+  }
 } // namespace FETools
 
 

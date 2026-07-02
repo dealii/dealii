@@ -276,6 +276,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_Bernstein<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &,
+  const unsigned int,
   const unsigned int) const
 {
   // Since this FE is not interpolatory but on the vertices, we can

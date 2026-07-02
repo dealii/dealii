@@ -998,6 +998,7 @@ template <int dim, int spacedim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FiniteElement<dim, spacedim>::hp_quad_dof_identities(
   const FiniteElement<dim, spacedim> &,
+  const unsigned int,
   const unsigned int) const
 {
   DEAL_II_NOT_IMPLEMENTED();
