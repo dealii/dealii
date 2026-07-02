@@ -551,9 +551,15 @@ namespace Step43
     const double porosity;
     const double AOS_threshold;
 
-    std::shared_ptr<TrilinosWrappers::PreconditionIC> top_left_preconditioner;
-    std::shared_ptr<TrilinosWrappers::PreconditionIC>
-      bottom_right_preconditioner;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    using PreconditionType = TrilinosWrappers::PreconditionIC;
+#else
+    // IC is not available in Tpetra. Use Jacobi instead, as we do in step-31
+    // TODO: Update the documentation of this step, when we require Tpetra.
+    using PreconditionType = TrilinosWrappers::PreconditionJacobi;
+#endif
+    std::shared_ptr<PreconditionType> top_left_preconditioner;
+    std::shared_ptr<PreconditionType> bottom_right_preconditioner;
 
     bool rebuild_saturation_matrix;
 
@@ -928,13 +934,11 @@ namespace Step43
   {
     assemble_darcy_preconditioner();
 
-    top_left_preconditioner =
-      std::make_shared<TrilinosWrappers::PreconditionIC>();
+    top_left_preconditioner = std::make_shared<PreconditionType>();
     top_left_preconditioner->initialize(
       darcy_preconditioner_matrix.block(0, 0));
 
-    bottom_right_preconditioner =
-      std::make_shared<TrilinosWrappers::PreconditionIC>();
+    bottom_right_preconditioner = std::make_shared<PreconditionType>();
     bottom_right_preconditioner->initialize(
       darcy_preconditioner_matrix.block(1, 1));
   }
@@ -1473,13 +1477,12 @@ namespace Step43
 
         {
           const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                             TrilinosWrappers::PreconditionIC>
+                                             PreconditionType>
             mp_inverse(darcy_preconditioner_matrix.block(1, 1),
                        *bottom_right_preconditioner);
 
-          const LinearSolvers::BlockSchurPreconditioner<
-            TrilinosWrappers::PreconditionIC,
-            TrilinosWrappers::PreconditionIC>
+          const LinearSolvers::BlockSchurPreconditioner<PreconditionType,
+                                                        PreconditionType>
             preconditioner(darcy_matrix, mp_inverse, *top_left_preconditioner);
 
           SolverControl solver_control(darcy_matrix.m(),
@@ -1580,7 +1583,7 @@ namespace Step43
                                    1e-16 * saturation_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
-      TrilinosWrappers::PreconditionIC preconditioner;
+      PreconditionType preconditioner;
       preconditioner.initialize(saturation_matrix);
 
       cg.solve(saturation_matrix,
