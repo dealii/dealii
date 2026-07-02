@@ -563,7 +563,7 @@ public:
    * determines which vertices are first and second on a line) is the canonical
    * one in deal.II, as described in the general documentation of this class.
    */
-  unsigned int
+  constexpr unsigned int
   line_to_cell_vertices(const unsigned int line,
                         const unsigned int vertex) const;
 
@@ -606,7 +606,7 @@ public:
    * @pre `vertex < this->face_reference_cell(face).n_vertices()`
    * @post The return value `r` satisfies `r<n_vertices()`.
    */
-  unsigned int
+  constexpr unsigned int
   face_to_cell_vertices(
     const unsigned int                 face,
     const unsigned int                 vertex,
@@ -686,7 +686,7 @@ public:
    * Get vertex index of vertex @p vertex belonging to face @p face of the
    * current cell while accounting for orientation @p face_orientation .
    */
-  unsigned int
+  constexpr unsigned int
   standard_to_real_face_vertex(
     const unsigned int                 vertex,
     const unsigned int                 face,
@@ -907,7 +907,7 @@ public:
    * example, for hexahedra this is 8 for every face since quadrilaterals have
    * 8 possible orientations.
    */
-  unsigned int
+  constexpr unsigned int
   n_face_orientations(const unsigned int face_no) const;
 
   /**
@@ -3034,7 +3034,7 @@ ReferenceCell<dim>::standard_line_to_face_and_line_index(
 
 
 template <int dim>
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell<dim>::line_to_cell_vertices(const unsigned int line,
                                           const unsigned int vertex) const
 {
@@ -3048,63 +3048,63 @@ ReferenceCell<dim>::line_to_cell_vertices(const unsigned int line,
         return vertex;
       case ReferenceCells::Triangle:
         {
-          static constexpr ndarray<unsigned int, 3, 2> table = {
+          constexpr ndarray<unsigned int, 3, 2> table = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Quadrilateral:
         {
-          static constexpr ndarray<unsigned int, 4, 2> table = {
+          constexpr ndarray<unsigned int, 4, 2> table = {
             {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Tetrahedron:
         {
-          static constexpr ndarray<unsigned int, 6, 2> table = {
+          constexpr ndarray<unsigned int, 6, 2> table = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}, {{0, 3}}, {{1, 3}}, {{2, 3}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Pyramid:
         {
-          static constexpr ndarray<unsigned int, 8, 2> table = {{{{0, 2}},
-                                                                 {{1, 3}},
-                                                                 {{0, 1}},
-                                                                 {{2, 3}},
-                                                                 {{0, 4}},
-                                                                 {{1, 4}},
-                                                                 {{2, 4}},
-                                                                 {{3, 4}}}};
+          constexpr ndarray<unsigned int, 8, 2> table = {{{{0, 2}},
+                                                          {{1, 3}},
+                                                          {{0, 1}},
+                                                          {{2, 3}},
+                                                          {{0, 4}},
+                                                          {{1, 4}},
+                                                          {{2, 4}},
+                                                          {{3, 4}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Wedge:
         {
-          static constexpr ndarray<unsigned int, 9, 2> table = {{{{0, 1}},
-                                                                 {{1, 2}},
-                                                                 {{2, 0}},
-                                                                 {{3, 4}},
-                                                                 {{4, 5}},
-                                                                 {{5, 3}},
-                                                                 {{0, 3}},
-                                                                 {{1, 4}},
-                                                                 {{2, 5}}}};
+          constexpr ndarray<unsigned int, 9, 2> table = {{{{0, 1}},
+                                                          {{1, 2}},
+                                                          {{2, 0}},
+                                                          {{3, 4}},
+                                                          {{4, 5}},
+                                                          {{5, 3}},
+                                                          {{0, 3}},
+                                                          {{1, 4}},
+                                                          {{2, 5}}}};
           return table[line][vertex];
         }
       case ReferenceCells::Hexahedron:
         {
           // first four lines comprise the bottom face, next four are the top,
           // and the last four are 'bottom to top'
-          static constexpr ndarray<unsigned int, 12, 2> table = {{{{0, 2}},
-                                                                  {{1, 3}},
-                                                                  {{0, 1}},
-                                                                  {{2, 3}},
-                                                                  {{4, 6}},
-                                                                  {{5, 7}},
-                                                                  {{4, 5}},
-                                                                  {{6, 7}},
-                                                                  {{0, 4}},
-                                                                  {{1, 5}},
-                                                                  {{2, 6}},
-                                                                  {{3, 7}}}};
+          constexpr ndarray<unsigned int, 12, 2> table = {{{{0, 2}},
+                                                           {{1, 3}},
+                                                           {{0, 1}},
+                                                           {{2, 3}},
+                                                           {{4, 6}},
+                                                           {{5, 7}},
+                                                           {{4, 5}},
+                                                           {{6, 7}},
+                                                           {{0, 4}},
+                                                           {{1, 5}},
+                                                           {{2, 6}},
+                                                           {{3, 7}}}};
           return table[line][vertex];
         }
 
@@ -3202,7 +3202,7 @@ ReferenceCell<dim>::face_to_cell_lines(
 
 
 template <int dim>
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell<dim>::face_to_cell_vertices(
   const unsigned int                 face,
   const unsigned int                 vertex,
@@ -3229,7 +3229,7 @@ ReferenceCell<dim>::face_to_cell_vertices(
         }
       case ReferenceCells::Triangle:
         {
-          static constexpr ndarray<unsigned int, 3, 2> table = {
+          constexpr ndarray<unsigned int, 3, 2> table = {
             {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
           return table[face][combined_face_orientation ==
@@ -3239,15 +3239,17 @@ ReferenceCell<dim>::face_to_cell_vertices(
         }
       case ReferenceCells::Quadrilateral:
         {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
+          constexpr ndarray<unsigned int, 4, 2> table = {
+            {{{0, 2}}, {{1, 3}}, {{0, 1}}, {{2, 3}}}};
 
-          return GeometryInfo<2>::face_to_cell_vertices(
-            face, vertex, face_orientation, face_flip, face_rotation);
+          return table[face][combined_face_orientation ==
+                                 numbers::default_geometric_orientation ?
+                               vertex :
+                               (1 - vertex)];
         }
       case ReferenceCells::Tetrahedron:
         {
-          static constexpr ndarray<unsigned int, 4, 3> table = {
+          constexpr ndarray<unsigned int, 4, 3> table = {
             {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
           return table[face][standard_to_real_face_vertex(
@@ -3256,12 +3258,11 @@ ReferenceCell<dim>::face_to_cell_vertices(
       case ReferenceCells::Pyramid:
         {
           constexpr auto X = numbers::invalid_unsigned_int;
-          static constexpr ndarray<unsigned int, 5, 4> table = {
-            {{{0, 1, 2, 3}},
-             {{0, 2, 4, X}},
-             {{3, 1, 4, X}},
-             {{1, 0, 4, X}},
-             {{2, 3, 4, X}}}};
+          constexpr ndarray<unsigned int, 5, 4> table = {{{{0, 1, 2, 3}},
+                                                          {{0, 2, 4, X}},
+                                                          {{3, 1, 4, X}},
+                                                          {{1, 0, 4, X}},
+                                                          {{2, 3, 4, X}}}};
 
           return table[face][standard_to_real_face_vertex(
             vertex, face, combined_face_orientation)];
@@ -3269,23 +3270,26 @@ ReferenceCell<dim>::face_to_cell_vertices(
       case ReferenceCells::Wedge:
         {
           constexpr auto X = numbers::invalid_unsigned_int;
-          static constexpr ndarray<unsigned int, 6, 4> table = {
-            {{{1, 0, 2, X}},
-             {{3, 4, 5, X}},
-             {{0, 1, 3, 4}},
-             {{1, 2, 4, 5}},
-             {{2, 0, 5, 3}}}};
+          constexpr ndarray<unsigned int, 6, 4> table = {{{{1, 0, 2, X}},
+                                                          {{3, 4, 5, X}},
+                                                          {{0, 1, 3, 4}},
+                                                          {{1, 2, 4, 5}},
+                                                          {{2, 0, 5, 3}}}};
 
           return table[face][standard_to_real_face_vertex(
             vertex, face, combined_face_orientation)];
         }
       case ReferenceCells::Hexahedron:
         {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
+          constexpr ndarray<unsigned int, 6, 4> table = {{{{0, 2, 4, 6}},
+                                                          {{1, 3, 5, 7}},
+                                                          {{0, 4, 1, 5}},
+                                                          {{2, 6, 3, 7}},
+                                                          {{0, 1, 2, 3}},
+                                                          {{4, 5, 6, 7}}}};
 
-          return GeometryInfo<3>::face_to_cell_vertices(
-            face, vertex, face_orientation, face_flip, face_rotation);
+          return table[face][standard_to_real_face_vertex(
+            vertex, face, combined_face_orientation)];
         }
       default:
         DEAL_II_NOT_IMPLEMENTED();
@@ -3415,7 +3419,7 @@ ReferenceCell<dim>::face_vertex_location(const unsigned int face,
 
 
 template <int dim>
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell<dim>::standard_to_real_face_vertex(
   const unsigned int                 vertex,
   const unsigned int                 face,
@@ -4137,7 +4141,7 @@ ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
 
 
 template <int dim>
-inline unsigned int
+inline constexpr unsigned int
 ReferenceCell<dim>::n_face_orientations(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
