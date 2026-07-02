@@ -487,6 +487,247 @@ ScalarLagrangePolynomialSimplex<dim>::evaluate_orthogonal_basis_2nd_derivative(
 
 
 template <int dim>
+Tensor<3, dim>
+ScalarLagrangePolynomialSimplex<dim>::evaluate_orthogonal_basis_3rd_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  return evaluate_orthogonal_basis_nth_derivative<3>(i, p);
+}
+
+
+
+template <int dim>
+Tensor<4, dim>
+ScalarLagrangePolynomialSimplex<dim>::evaluate_orthogonal_basis_4th_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  return evaluate_orthogonal_basis_nth_derivative<4>(i, p);
+}
+
+
+
+template <int dim>
+template <int derivative_order>
+Tensor<derivative_order, dim>
+ScalarLagrangePolynomialSimplex<dim>::evaluate_orthogonal_basis_nth_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i, this->n());
+
+  if constexpr (dim == 1)
+    {
+      // entrance to i corresponse to degree
+      return evaluate_orthogonal_basis_nth_derivative_by_degree<
+        derivative_order>(i, 0, 0, p);
+    }
+  else if constexpr (dim == 2)
+    {
+      // find corresponding entrance to i
+      // it holds 0 <= j + k <= degree
+      for (unsigned int j = 0, counter = 0; j < this->degree() + 1; ++j)
+        for (unsigned int k = 0; k < this->degree() + 1 - j; ++k, ++counter)
+          if (counter == i)
+            return evaluate_orthogonal_basis_nth_derivative_by_degree<
+              derivative_order>(j, k, 0, p);
+    }
+  else if constexpr (dim == 3)
+    {
+      // find corresponding entrance to i
+      // it holds 0 <= j + k + l <= degree
+      for (unsigned int j = 0, counter = 0; j < this->degree() + 1; ++j)
+        for (unsigned int k = 0; k < this->degree() + 1 - j; ++k)
+          for (unsigned int l = 0; l < this->degree() + 1 - j - k;
+               ++l, ++counter)
+            if (counter == i)
+              return evaluate_orthogonal_basis_nth_derivative_by_degree<
+                derivative_order>(j, k, l, p);
+    }
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return Tensor<derivative_order, dim>();
+}
+
+
+
+template <int dim>
+template <int derivative_order>
+Tensor<derivative_order, dim>
+ScalarLagrangePolynomialSimplex<dim>::
+  evaluate_orthogonal_basis_nth_derivative_by_degree(const unsigned int i,
+                                                     const unsigned int j,
+                                                     const unsigned int k,
+                                                     const Point<dim>  &p) const
+{
+  AssertIndexRange(i + j + k, this->degree() + 1);
+
+  if constexpr (dim == 1)
+    Assert(j == 0 && k == 0, ExcInternalError());
+  else if constexpr (dim == 2)
+    Assert(k == 0, ExcInternalError());
+  else if constexpr (dim == 3)
+    {
+      // nothing to assert
+    }
+  else
+    DEAL_II_ASSERT_UNREACHABLE();
+
+  Tensor<derivative_order, dim> deriv;
+
+  // define t = 1 - y - z and s = 1 - z then
+  // P_i^{0,0}(2x/t-1) * t^i
+  // P_j^{2*i+1,0}(2*y/s-1)*s^j
+  // P_k^{2 (i+j)+2,0}(2 z - 1)
+  // =
+  // Q_i^{0,0}(x,t)
+  // Q_j^{2*i+1,0}(y,s)
+  // P_k^{2*(i+j)+2,0}(2 z - 1)
+  const double x = p[0];
+  const double y = dim > 1 ? p[1] : 0.0;
+  const double z = dim > 2 ? p[2] : 0.0;
+  const double s = 1 - z;
+  const double t = 1 - y - z;
+
+  // helper function for small values of factorial
+  // no need to get values higher than 4 as it is the highest derivative
+  // calculated
+  auto factorial = [](const unsigned int n) -> double {
+    if (n <= 1)
+      return 1.0;
+    else if (n == 2)
+      return 2.0;
+    else if (n == 3)
+      return 6.0;
+    else if (n == 4)
+      return 24.0;
+    else
+      DEAL_II_ASSERT_UNREACHABLE();
+    return 0.0;
+  };
+
+  // helper function that computes the derivatives of the polynomials given the
+  // indices of deriv
+  auto compute_derivative_of_polynomials =
+    [&](const std::array<unsigned int, derivative_order> indices) {
+      // use Leibniz ruke to get the derivatives
+      // https://en.wikipedia.org/wiki/General_Leibniz_rule
+      // get the multi index of the derivative
+      // e.g. deriv[0][0][0] is the third derivative with respect to x so
+      // a_x = 3, a_y = 0, a_z = 0
+      unsigned int a_x = 0;
+      unsigned int a_y = 0;
+      unsigned int a_z = 0;
+
+      for (const auto idx : indices)
+        {
+          if (idx == 0)
+            ++a_x;
+          else if (idx == 1)
+            ++a_y;
+          else if (idx == 2)
+            ++a_z;
+          else
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+
+      // needs to be derivative_order overall
+      Assert(a_x + a_y + a_z == derivative_order, ExcInternalError());
+
+      double derivative = 0.0;
+      // now compute the derivative with multi index a
+      // the multi index beta is for Qi
+      // the multi index gamma is for Qj
+      // the multi index delta is for Pk
+      // sum over all multi indices, but some can be skipped
+      // Qi is the only term dependent on x so beta_x = a_x
+      // Qj is independent on x so gamma_x = 0
+      // Pk is independent on x,y so delta_x, delta_y = 0
+      for (unsigned int gamma_y = 0; gamma_y <= a_y; ++gamma_y)
+        for (unsigned int gamma_z = 0; gamma_z <= a_z; ++gamma_z)
+          for (unsigned int delta_z = 0; delta_z <= a_z - gamma_z; ++delta_z)
+            {
+              // from above
+              const unsigned int beta_x = a_x;
+              // derivative in y has to add up to a_y
+              const unsigned int beta_y = a_y - gamma_y;
+              // derivative in z has to add up to a_z
+              const unsigned int beta_z = a_z - gamma_z - delta_z;
+
+              const double coeff =
+                factorial(a_y) * factorial(a_z) /
+                (factorial(beta_y) * factorial(beta_z) * factorial(gamma_y) *
+                 factorial(gamma_z) * factorial(delta_z));
+
+              const double dQi_da =
+                Polynomials::jacobi_polynomial_homogenized_derivative<double>(
+                  beta_x, beta_y + beta_z, i, 0, 0, x, t) *
+                std::pow(-1.0, beta_y + beta_z);
+
+              const double dQj_da =
+                Polynomials::jacobi_polynomial_homogenized_derivative<double>(
+                  gamma_y, gamma_z, j, 2 * i + 1, 0, y, s) *
+                std::pow(-1.0, gamma_z);
+
+              const double dPk_da =
+                delta_z == 0 ?
+                  Polynomials::jacobi_polynomial_value<double>(
+                    k, 2 * (i + j) + 2, 0, z, true) :
+                  Polynomials::jacobi_polynomial_kth_derivative<double>(
+                    delta_z, k, 2 * (i + j) + 2, 0, z, true);
+
+              derivative += coeff * dQi_da * dQj_da * dPk_da;
+            }
+
+      if (std::abs(derivative) < 1e-12)
+        return 0.0;
+
+      return derivative;
+    };
+
+  if constexpr (derivative_order == 1)
+    {
+      // use the fast version here
+      return evaluate_orthogonal_basis_derivative_by_degree(i, j, k, p);
+    }
+  else if constexpr (derivative_order == 2)
+    {
+      return evaluate_orthogonal_basis_2nd_derivative_by_degree(i, j, k, p);
+    }
+  else if constexpr (derivative_order == 3)
+    {
+      // loop over all entries in deriv
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          for (unsigned int d3 = 0; d3 < dim; ++d3)
+            {
+              std::array<unsigned int, derivative_order> d = {{d1, d2, d3}};
+              deriv[d1][d2][d3] = compute_derivative_of_polynomials(d);
+            }
+    }
+  else if constexpr (derivative_order == 4)
+    {
+      // loop over all entries in deriv
+      for (unsigned int d1 = 0; d1 < dim; ++d1)
+        for (unsigned int d2 = 0; d2 < dim; ++d2)
+          for (unsigned int d3 = 0; d3 < dim; ++d3)
+            for (unsigned int d4 = 0; d4 < dim; ++d4)
+              {
+                std::array<unsigned int, derivative_order> d = {
+                  {d1, d2, d3, d4}};
+                deriv[d1][d2][d3][d4] = compute_derivative_of_polynomials(d);
+              }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
+
+  return deriv;
+}
+
+
+
+template <int dim>
 void
 ScalarLagrangePolynomialSimplex<dim>::evaluate(
   const Point<dim>            &unit_point,
@@ -496,20 +737,25 @@ ScalarLagrangePolynomialSimplex<dim>::evaluate(
   std::vector<Tensor<3, dim>> &third_derivatives,
   std::vector<Tensor<4, dim>> &fourth_derivatives) const
 {
-  (void)third_derivatives;
-  (void)fourth_derivatives;
-
   if (values.size() == this->n())
     for (unsigned int i = 0; i < this->n(); ++i)
       values[i] = this->compute_value(i, unit_point);
 
   if (grads.size() == this->n())
     for (unsigned int i = 0; i < this->n(); ++i)
-      grads[i] = this->compute_grad(i, unit_point);
+      grads[i] = this->compute_1st_derivative(i, unit_point);
 
   if (grad_grads.size() == this->n())
     for (unsigned int i = 0; i < this->n(); ++i)
-      grad_grads[i] = this->compute_grad_grad(i, unit_point);
+      grad_grads[i] = this->compute_2nd_derivative(i, unit_point);
+
+  if (third_derivatives.size() == this->n())
+    for (unsigned int i = 0; i < this->n(); ++i)
+      third_derivatives[i] = this->compute_3rd_derivative(i, unit_point);
+
+  if (fourth_derivatives.size() == this->n())
+    for (unsigned int i = 0; i < this->n(); ++i)
+      fourth_derivatives[i] = this->compute_4th_derivative(i, unit_point);
 }
 
 
