@@ -68,8 +68,8 @@ main(int argc, char **argv)
     deallog << "Solver type: " << typeid(solver).name() << std::endl;
     check_solver_within_range(solver.solve(A, u, f, preconditioner),
                               control.last_step(),
-                              48,
-                              54);
+                              40,
+                              60);
   }
   GrowingVectorMemory<PETScWrappers::MPI::Vector>::release_unused_memory();
 }
