@@ -407,8 +407,8 @@ export
 
 // There is also the case of ex_open. This symbol is declared
 // as follows:
-//   #define ex_open(path, mode, comp_ws, io_ws, version) \
-  //    ex_open_int(path, mode, comp_ws, io_ws, version, EX_API_VERS_NODOT)
+//   #define ex_open(path, mode, comp_ws, io_ws, version) ...
+//     ... ex_open_int(path, mode, comp_ws, io_ws, version, EX_API_VERS_NODOT)
 // Of course, this is a major headache because it cannot be exported.
 // We could declare a similar preprocessor function in the same
 // way as we do it for preprocessor function-like macros that are
