@@ -70,7 +70,11 @@ enum class InitializeLibrary
   /**
    * Initialize/finalize GMSH.
    */
-  GMSH = 128
+  GMSH = 128,
+  /**
+   * Initialize/finalize T8CODE and SC.
+   */
+  T8CODE = 256
 };
 
 
