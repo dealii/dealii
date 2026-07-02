@@ -1,0 +1,15 @@
+
+DEAL::=== Lie-Trotter ===
+DEAL::t=0.0000  y=1.0000  exact=1.0000  err=0.0000
+DEAL::t=0.2500  y=0.7532  exact=0.7551  err=0.0018
+DEAL::t=0.5000  y=0.5354  exact=0.5379  err=0.0025
+DEAL::t=0.7500  y=0.3626  exact=0.3649  err=0.0023
+DEAL::t=1.0000  y=0.2366  exact=0.2384  err=0.0018
+DEAL::Final error: 0.0018
+DEAL::=== Strang ===
+DEAL::t=0.0000  y=1.0000  exact=1.0000  err=0.0000
+DEAL::t=0.2500  y=0.7551  exact=0.7551  err=0.0000
+DEAL::t=0.5000  y=0.5379  exact=0.5379  err=0.0000
+DEAL::t=0.7500  y=0.3648  exact=0.3649  err=0.0000
+DEAL::t=1.0000  y=0.2384  exact=0.2384  err=0.0000
+DEAL::Final error: 0.0000
