@@ -1420,10 +1420,8 @@ namespace LinearAlgebra
         TpetraTypes::MatrixType<Number, MemorySpace>>(*source.matrix,
                                                       Teuchos::Copy);
 
-      column_space_map =
-        Teuchos::rcp_const_cast<TpetraTypes::MapType<MemorySpace>>(
-          matrix->getColMap());
-      compressed = source.compressed;
+      column_space_map = source.column_space_map;
+      compressed       = source.compressed;
     }
 
 
