@@ -194,9 +194,7 @@ export
   using ::PCSORSetSymmetric;
   using ::PETSC_COMM_WORLD;
   using ::PETSC_COPY_VALUES;
-  using ::PETSC_FALSE;
   using ::PETSC_OWN_POINTER;
-  using ::PETSC_TRUE;
   using ::PETSC_VIEWER_STDOUT_;
   using ::PetscBool;
   using ::PetscCopyMode;
@@ -245,6 +243,17 @@ export
   using ::PetscSFSetUp;
   using ::PetscTrMalloc;
   using ::PetscViewerPushFormat;
+
+  // For some versions of PETSc, PETSC_FALSE and PETSC_TRUE are compiler
+  // values, whereas for others they are preprocessor variables. Export
+  // them if they fall in the former category.
+#  ifndef PETSC_FALSE
+  using ::PETSC_FALSE;
+#  endif
+
+#  ifndef PETSC_TRUE
+  using ::PETSC_TRUE;
+#  endif
 
 #  if defined(PETSC_HAVE_SAWS)
   using ::PetscStackSAWsGrantAccess;
@@ -750,5 +759,22 @@ EXPORT_PREPROCESSOR_SYMBOL(TS_EXACTFINALTIME_STEPOVER)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(VECNEST)
 #  undef VECNEST
 EXPORT_PREPROCESSOR_SYMBOL(VECNEST)
+
+
+// For some versions of PETSc, PETSC_FALSE and PETSC_TRUE are
+// compiler values, whereas for others they are preprocessor
+// variables. In the latter case, we have to create export-able
+// symbols:
+#  ifdef PETSC_FALSE
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_FALSE)
+#    undef PETSC_FALSE
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_FALSE)
+#  endif
+
+#  ifdef PETSC_TRUE
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_TRUE)
+#    undef PETSC_TRUE
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_TRUE)
+#  endif
 
 #endif
