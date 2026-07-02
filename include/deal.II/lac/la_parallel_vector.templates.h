@@ -1076,14 +1076,15 @@ namespace LinearAlgebra
           // device. We use values to store the elements because the function
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
-          data.values_host_buffer =
-#    if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
-            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
-                                                data.values);
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+          Kokkos::resize(Kokkos::WithoutInitializing,
+                         data.values_host_buffer,
+                         data.values.size());
 #    else
-            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
-                                                data.values);
+          Kokkos::resize(data.values_host_buffer, data.values.size());
 #    endif
+          Kokkos::deep_copy(data.values_host_buffer, data.values);
+
           partitioner->import_from_ghosted_array_start(
             operation,
             communication_channel,
@@ -1157,8 +1158,6 @@ namespace LinearAlgebra
           // The communication is done on the host, so we need to
           // move the data back to the device.
           Kokkos::deep_copy(data.values, data.values_host_buffer);
-
-          Kokkos::resize(data.values_host_buffer, 0);
         }
       else
 #  endif
@@ -1238,14 +1237,14 @@ namespace LinearAlgebra
           // device. We use values to store the elements because the function
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
-          data.values_host_buffer =
-#    if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
-            Kokkos::create_mirror_view_and_copy(Kokkos::SharedHostPinnedSpace{},
-                                                data.values);
+#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+          Kokkos::resize(Kokkos::WithoutInitializing,
+                         data.values_host_buffer,
+                         data.values.size());
 #    else
-            Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace{},
-                                                data.values);
+          Kokkos::resize(data.values_host_buffer, data.values.size());
 #    endif
+          Kokkos::deep_copy(data.values_host_buffer, data.values);
 
           partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
             communication_channel,
@@ -1316,8 +1315,6 @@ namespace LinearAlgebra
               Kokkos::deep_copy(Kokkos::subview(data.values, range),
                                 Kokkos::subview(data.values_host_buffer,
                                                 range));
-
-              Kokkos::resize(data.values_host_buffer, 0);
             }
           else
 #  endif
