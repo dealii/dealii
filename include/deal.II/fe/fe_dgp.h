@@ -314,6 +314,13 @@ public:
   FE_DGP(const unsigned int p);
 
   /**
+   * Constructor for tensor product polynomials of given polynomials @p poly.
+   * The polynomials should be independent and span a polynomial space of
+   * degree `poly.size()-1`.
+   */
+  FE_DGP(const std::vector<Polynomials::Polynomial<double>> &poly);
+
+  /**
    * Return a string that uniquely identifies a finite element. This class
    * returns <tt>FE_DGP<dim>(degree)</tt>, with @p dim and @p degree replaced
    * by appropriate values.
