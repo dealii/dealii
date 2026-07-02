@@ -1080,6 +1080,189 @@ namespace PETScWrappers
     AssertThrow(ierr == 0, ExcPETScError(ierr));
   }
 
+
+
+  /* ----------------- PreconditionASM -------------------- */
+
+  PreconditionASM::AdditionalData::AdditionalData(
+    const unsigned int     overlap,
+    const ASMType          type,
+    const LocalSubdomains &local_subdomains)
+    : overlap(overlap)
+    , type(type)
+    , local_subdomains(local_subdomains)
+  {}
+
+
+
+  PreconditionASM::PreconditionASM()
+    : PreconditionBase()
+  {}
+
+
+
+  PreconditionASM::PreconditionASM(const MatrixBase     &matrix,
+                                   const AdditionalData &additional_data)
+    : PreconditionBase(matrix.get_mpi_communicator())
+  {
+    initialize(matrix, additional_data);
+  }
+
+
+  void
+  PreconditionASM::initialize(const MatrixBase     &matrix_,
+                              const AdditionalData &additional_data_)
+  {
+    clear();
+
+    additional_data = additional_data_;
+
+    create_pc_with_mat(matrix_);
+
+    PetscErrorCode ierr = PCSetType(pc, const_cast<char *>(PCASM));
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // set the amount of overlap between the subdomains
+    ierr = PCASMSetOverlap(pc, additional_data.overlap);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // If the user provided explicit subdomains, hand them over to PETSc
+    // PCASMSetLocalSubdomains() routine. Indices are in global numbering.
+    // Each processor may own an arbitrary number of subdomains (or patches),
+    // for example one vertex-star per vertex owned by this processor.
+    //
+    // The index sets describing the local subdomains are sequential,
+    // process-local objects (created on PETSC_COMM_SELF) even though they hold
+    // global indices. This is required because each processor may contribute a
+    // different number of subdomains, so creating them on the parallel
+    // communicator would lead to mismatched collective calls.
+    if (additional_data.local_subdomains.subdomain_indices.size() > 0)
+      {
+        const std::vector<std::vector<PetscInt>> &outer_indices =
+          additional_data.local_subdomains.subdomain_indices;
+        const std::vector<std::vector<PetscInt>> &inner_indices =
+          additional_data.local_subdomains.local_indices;
+
+        // The number of (overlapping) subdomains owned by this processor.
+        const PetscInt n_local_subdomains =
+          static_cast<PetscInt>(outer_indices.size());
+
+        // The inner (non-overlapping) subdomains are optional. If provided,
+        // there must be exactly one inner subdomain per outer subdomain.
+        const bool have_local_index_set = inner_indices.size() > 0;
+        AssertThrow(
+          !have_local_index_set || inner_indices.size() == outer_indices.size(),
+          ExcMessage(
+            "If local (inner) subdomains are provided, there must be exactly "
+            "one of them for each outer subdomain."));
+
+        // Build one PETSc index set per subdomain.
+        std::vector<IS> is_subdomain(n_local_subdomains, nullptr);
+        std::vector<IS> is_local(have_local_index_set ? n_local_subdomains : 0,
+                                 nullptr);
+
+        for (PetscInt i = 0; i < n_local_subdomains; ++i)
+          {
+            // The inner (non-overlapping) subdomain is a subset of the outer
+            // (overlapping) one, hence it can never contain more indices.
+            AssertThrow(
+              !have_local_index_set ||
+                inner_indices[i].size() <= outer_indices[i].size(),
+              ExcMessage(
+                "The local (inner) subdomain cannot be larger than the outer "
+                "subdomain."));
+
+            ierr =
+              ISCreateGeneral(PETSC_COMM_SELF,
+                              static_cast<PetscInt>(outer_indices[i].size()),
+                              outer_indices[i].data(),
+                              PETSC_COPY_VALUES,
+                              &is_subdomain[i]);
+            AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+            if (have_local_index_set)
+              {
+                ierr = ISCreateGeneral(PETSC_COMM_SELF,
+                                       static_cast<PetscInt>(
+                                         inner_indices[i].size()),
+                                       inner_indices[i].data(),
+                                       PETSC_COPY_VALUES,
+                                       &is_local[i]);
+                AssertThrow(ierr == 0, ExcPETScError(ierr));
+              }
+          }
+
+        ierr = PCASMSetLocalSubdomains(pc,
+                                       n_local_subdomains,
+                                       is_subdomain.data(),
+                                       have_local_index_set ? is_local.data() :
+                                                              nullptr);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        // PETSc increases the reference count of the index sets internally, so
+        // we release our own references again.
+        for (PetscInt i = 0; i < n_local_subdomains; ++i)
+          {
+            ierr = ISDestroy(&is_subdomain[i]);
+            AssertThrow(ierr == 0, ExcPETScError(ierr));
+            if (have_local_index_set)
+              {
+                ierr = ISDestroy(&is_local[i]);
+                AssertThrow(ierr == 0, ExcPETScError(ierr));
+              }
+          }
+      }
+
+    // set the variant of the additive Schwarz method
+    PCASMType asm_type = PC_ASM_RESTRICT;
+    switch (additional_data.type)
+      {
+        case ASMType::basic:
+          asm_type = PC_ASM_BASIC;
+          break;
+        case ASMType::restrict:
+          asm_type = PC_ASM_RESTRICT;
+          break;
+        case ASMType::interpolate:
+          asm_type = PC_ASM_INTERPOLATE;
+          break;
+        case ASMType::none:
+          asm_type = PC_ASM_NONE;
+          break;
+        default:
+          DEAL_II_NOT_IMPLEMENTED();
+      }
+
+    ierr = PCASMSetType(pc, asm_type);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetFromOptions(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    ierr = PCSetUp(pc);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+    // set local solvers for all patches. By default, each patch solve is done
+    // through a direct LU (KSPPREONLY + PCLU).
+    // TODO: allow iterative solver on each patch.
+    PetscInt n_local_subdomains = 0, first_subdomain = 0;
+    // get the array of local sub-solvers
+    KSP *sub_ksp = nullptr;
+    ierr = PCASMGetSubKSP(pc, &n_local_subdomains, &first_subdomain, &sub_ksp);
+    AssertThrow(ierr == 0, ExcPETScError(ierr));
+    for (PetscInt i = 0; i < n_local_subdomains; ++i)
+      {
+        ierr = KSPSetType(sub_ksp[i], KSPPREONLY);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+
+        PC sub_pc;
+        ierr = KSPGetPC(sub_ksp[i], &sub_pc);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+        ierr = PCSetType(sub_pc, PCLU);
+        AssertThrow(ierr == 0, ExcPETScError(ierr));
+      }
+  }
+
   /* ----------------- PreconditionShell -------------------- */
 
   PreconditionShell::PreconditionShell(const MatrixBase &matrix)
