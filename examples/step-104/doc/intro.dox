@@ -1,0 +1,177 @@
+  <i>
+This program was contributed by Quang Hoang and Timo Heister, Clemson University.
+
+We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable NVIDIA GPU acceleration for open source FEM simulations in deal.II". Many thanks to Daniel Arndt, Rene Gassmöller, and Bruno Turcksin for help with GPU support in deal.II and this tutorial.
+</i>
+
+<a name="step_104-Intro"></a>
+  <h1>Introduction</h1>
+
+  This tutorial implements a matrix-free algorithm
+  that works on GPUs using
+  Kokkos to solve the Stokes problem
+
+  @f{align}{
+    -\Delta \mathbf{u} + \nabla p &= \mathbf{f} \quad \text{in } \Omega, \\
+    \nabla \cdot \mathbf{u} &= 0 \quad \text{in } \Omega, \\
+    \mathbf{u} &= \mathbf{0} \quad \text{on } \partial\Omega,
+  @f}
+
+  where we want to solve for velocity $\mathbf{u}$ and pressure $p$.
+  The Stokes equations model the behavior of slow-moving, viscous flow,
+  which is often relevant in applications of biofluid dynamics, microfluidics,
+  and flow of geomaterials like ice or rock.
+
+  The algorithm that is implemented in this tutorial is matrix-free, meaning we use no assembled matrices.
+  Matrix-free methods have been instrumental in speeding up finite element
+  computations, as memory bandwidth is often a massive bottleneck when using
+  matrix-based methods. Matrix-free methods exploit the fact that simple
+  computations such as addition and multiplication are relatively quick
+  compared to memory bandwidth, so instead of storing data in a matrix and
+  using them to apply the action of the linear operator,
+  matrix vector products are computed on the fly. This approach
+  is discussed in detail in step-37 using the MatrixFree framework that runs on CPUs only.
+
+  Here, we use the Portable::MatrixFree class instead, which is a similar
+  framework but implemented using Kokkos to run on GPUs and first introduced
+  in step-64.
+  Just as in that tutorial, which solves the Helmholtz equation instead of the Stokes equations,
+  we use Portable::MatrixFree and Portable::FEEvaluation, which make use of the Kokkos library
+  to implement a portable algorithm that works well on both GPUs and CPUs.
+  Finite element simulations on GPUs offer several benefits compared to traditional CPU calculations,
+  for example a higher compute performance and memory bandwidth
+  for a specified power budget.
+
+  Unlike step-64, this tutorial solves for two solution variables, namely velocity $\mathbf{u}$ and
+  pressure $p$, which means we will need two DoFHandlers and Portable::FEEvaluation
+  objects, and the solution will be stored in a block vector with two blocks. Unlike earlier
+  tutorials that assemble matrices, like step-22, we do not build an FESystem that represents the
+  combination of velocity and pressure. Instead, the Portable::MatrixFree object is initialized
+  with a vector of DoFHandlers. Later, we can reference the velocity and pressure by referring
+  to the DoFHandler index 0 (velocity) and index 1 (pressure). These indices will be passed to
+  Portable::FEEvaluation objects when constructed.
+
+  While this program runs without a GPU, using a workstation with one or more GPUs or a GPU cluster
+  is strongly recommended. Unfortunately, installing deal.II with GPU support is non-trivial. Please see the
+  [deal.II GPU wiki page](https://github.com/dealii/dealii/wiki/GPU-support-in-deal.II) for installation
+  instructions.
+
+  The Stokes system and linear solvers for it have been discussed in various tutorials
+  including step-22 (discretization, Schur complement solver),
+  step-32 and step-56 (using the same block preconditioner), and also
+  step-55 (simpler block preconditioner, combined with AMG).
+  Instead of repeating us here, we refer to the derivation in these tutorials and only highlight
+  the differences.
+
+  <h3>Weak Form</h3>
+
+  While the usage of stable Taylor-Hood elements is the same as in step-22 and step-56, the discretization
+  is slightly different because we consider the standard Laplacian instead of the deformation tensor acting
+  on the velocity. This leads to the weak form
+
+  @f{eqnarray*}{
+    (\nabla \mathbf{u}, \nabla \mathbf{v})_{\Omega} - (p, \nabla \cdot \mathbf{v})_{\Omega}
+    &= (\mathbf{f}, \mathbf{v})_{\Omega},\\ (q, \nabla \cdot \mathbf{u})_{\Omega} & = 0.
+  @f}
+
+
+  <h3>Linear system and preconditioning</h3>
+
+  Nevertheless, we arrive at the same block linear system
+  @f{eqnarray*}{
+    \left(\begin{array}{cc} A & B^T \\ B & 0 \end{array}\right)
+  @f}
+  and use the same block preconditioner as in step-32 and step-56.
+  We are left with the choice for the approximation of the inverse of the velocity
+  or $A$ block, the inverse of the Schur complement $S$,  the implementation of the $B^T$
+  operator, and the Stokes operator. All of which we perform matrix-free.
+
+  Here, we choose to approximate the inverse of the velocity block by a single v-cycle
+  using the matrix-free, global coarsening, geometric multigrid method. See @cite munch2022gc
+  for the algorithmic details for the CPU implementation. As a smoother
+  we use a Chebyshev iteration around the point-Jacobi scheme, i.e., the inverse of the
+  diagonal of $A$. This is discussed in step-37.
+
+  The inverse of the Schur complement $S$ is approximated by a a Chebyshev iteration
+  applied to the pressure mass matrix (without using multigrid). We do not need to
+  use a multigrid method because the mass matrix is much easier to solve, and because
+  using multigrid on a significantly smaller problem would cause additional computational
+  overhead.
+
+  While this is a slight variation on the preconditioners discussed in other tutorials,
+  the same principles apply. Because we do not perform inner solves as done in step-32,
+  the preconditioner is a linear operator. Therefore, we do not require the use of
+  flexible GMRES. This saves precious device memory on the GPUs.
+
+  <h3>GPU Acceleration</h3>
+
+  Not all parts of this example run on the GPU. Partly, this is because
+  GPU support in deal.II is still early and some parts could and most certainly
+  will be ported to run on GPUs. Additionally, some steps in this program
+  do not lend themselves to GPU acceleration because they are hard or impossible
+  to parallelize and because they require IO, complex logic, or dynamic memory allocation.
+
+  As in step-64, we use the template parameter
+  MemorySpace::Default and MemorySpace::Host to indicate where the solution data
+  of a particular vector is stored. MemorySpace::Host always indicates the host
+  memory (CPU or main memory), while MemorySpace::Default refers to the memory of
+  the default compute device (either CPUs or GPUs depending on how the Kokkos library
+  used by deal.II was configured). While LinearAlgebra::distributed::Vector has
+  a default value for the memory space, which is MemorySpace::Host,
+  we always specify the memory space explicitly in this example. Any function operating
+  on vectors stored on the compute device have to run on the GPU as a kernel and
+  has to be marked with the DEAL_II_HOST_DEVICE precompiler macro to let the compiler
+  know that this code has to be compiled for the programming model of the relevant
+  compute device. This implies that the code in these functions cannot make use of
+  functionality that is not available on this device. Before the CPU can operate on
+  a vector, the data has to be copied into system memory (by copying into a vector with
+  MemorySpace::Host).
+
+  In short, we currently perform setup and postprocessing on the CPU, while the
+  linear solve runs on the GPU. The example performs the following steps:
+
+  1. Setup
+    1.1. Generate and refine the mesh (MPI parallel, CPU)
+    1.2. Distribute DoFs, compute constraints (CPU)
+    1.3. Assemble right-hand side vector (CPU)
+    1.3. Create mesh hierarchy for multigrid (CPU)
+    1.4. Setup Portable::MatrixFree operator: evaluate inverse Jacobians, mapping, cell geometry (CPU)
+    1.5. Setup multigrid operators, smoothers, transfer (CPU)
+  2. Solve
+    2.1. GMRES algorithm (CPU logic, operations on GPU):
+         - Vector operations: inner products, ... (GPU)
+         - Matrix-Vector product: Portable::MatrixFree (GPU)
+         - GMG preconditioner: Smoother, transfer, coarse solve (GPU)
+  3. Postprocess
+    3.1. Move solution to host memory
+    3.2. Compute errors (currently CPU only)
+
+  Notice that roughly speaking the setup and postprocess happen on the CPU, with the linear solve step happening on the GPU. With
+  complex problems, this will be the majority of the computational time.
+
+  @note The GMG transfer currently uses MGTwoLevelTransferCopyToHost, which, as the name implies, performs the operation
+  on the CPU as the GPU implementation has not been completed.
+
+  <h3>Test case</h3>
+
+  Our test problem features a unit hypercube with the manufactured solution
+
+  @f{align}{
+    u &= \pi \sin^2(\pi x) \sin(2\pi y), \\
+    v &= -\pi \sin(2\pi x) \sin^2(\pi y), \\
+    p &= \cos(\pi x) \cos(\pi y)
+  @f}
+
+  in two dimensions and
+
+   @f{align}{
+   u &= \pi  \sin^2(\pi x)(\sin^2(\pi z)\sin(2\pi y)-\sin^2(\pi y)\sin(2\pi
+   z)), \\
+   v &= \pi  \sin^2(\pi y)  (\sin^2(\pi x)  \sin(2\pi z) - \sin^2(\pi
+   z)\sin(2\pi x)), \\
+   w &= \pi \sin^2(\pi z)  (\sin^2(\pi y)  \sin(2\pi x) -
+   \sin^2(\pi x)\sin(2\pi y)), \\
+   p &= \cos(\pi x)\cos(\pi y)\cos(\pi z)
+   @f}
+
+  in three dimensions.
