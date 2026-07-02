@@ -27,7 +27,8 @@
 #    include <Xpetra_CrsMatrixWrap.hpp>
 #    include <Xpetra_DefaultPlatform.hpp>
 #    include <Xpetra_Map.hpp>
-#    include <Xpetra_MultiVectorFactory_decl.hpp>
+#    include <Xpetra_MapFactory.hpp>
+#    include <Xpetra_MultiVectorFactory.hpp>
 #    include <Xpetra_Parameters.hpp>
 
 #    ifdef DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH
@@ -49,7 +50,6 @@ namespace LinearAlgebra
 {
   namespace TpetraWrappers
   {
-
     namespace XpetraTypes
     {
       /**
