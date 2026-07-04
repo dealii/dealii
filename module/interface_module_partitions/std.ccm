@@ -729,7 +729,13 @@ export
     using std::operator<=>;
   } // namespace std
 
-#if defined(__GLIBCXX__) // For GCC's support library
+
+// When compiling with Clang but using (as is the default) the GCC standard
+// library, we have to export a few symbols from the __gnu_cxx namespace as
+// well. Interestingly, we only need to do this when compiling with Clang but
+// not with GCC; the latter apparently finds these symbols itself and will
+// instead issue errors if we try to export them here.
+#if defined(__GLIBCXX__) && defined(__clang__)
 
   namespace __gnu_cxx
   {
