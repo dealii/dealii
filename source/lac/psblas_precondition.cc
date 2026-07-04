@@ -75,12 +75,12 @@ namespace PSCToolkitWrappers
                     additional_data.smoother_type);
 
     // From the AMG4PSBLAS manual: if "SMOOTHER_TYPE" is set to
-    // "POLY", then "SMOOTHER_SWEEPS" is ignored and the
-    // polynomial degree is used instead.
+    // "POLY", then "SMOOTHER_SWEEPS" is ignored and the number of smoother
+    // sweeps equals the polynomial degree is used instead.
     if (std::strcmp(additional_data.smoother_type, "POLY") == 0)
       amg_c_dprecseti(psblas_preconditioner,
                       "POLY_DEGREE",
-                      additional_data.smoother_degree);
+                      additional_data.smoother_sweeps);
     else
       amg_c_dprecseti(psblas_preconditioner,
                       "SMOOTHER_SWEEPS",
