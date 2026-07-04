@@ -61,7 +61,6 @@ namespace PSCToolkitWrappers
                               const unsigned int aggregation_size      = 8,
                               const char        *smoother_type         = "FBGS",
                               const unsigned int smoother_sweeps       = 2,
-                              const unsigned int smoother_degree       = 1,
                               const char        *aggr_prol        = "SMOOTHED",
                               const char        *aggr_filter      = "FILTER",
                               const char *parallel_aggr_algorithm = "DECOUPLED",
@@ -75,7 +74,6 @@ namespace PSCToolkitWrappers
         , aggregation_size(aggregation_size)
         , smoother_type(smoother_type)
         , smoother_sweeps(smoother_sweeps)
-        , smoother_degree(smoother_degree)
         , aggr_prol(aggr_prol)
         , aggr_filter(aggr_filter)
         , parallel_aggr_algorithm(parallel_aggr_algorithm)
@@ -110,7 +108,7 @@ namespace PSCToolkitWrappers
       /**
        * Maximum size of aggregates when the coupled aggregation algorithm
        * based on matching is applied. Value must be any integer power of 2,
-       * with a minimum value of 2. Used only with @p parallel_aggr_algorithm
+       * with a minimum value of 2. Used only when @p parallel_aggr_algorithm
        * is "COUPLED" and @p aggregation_type is "MATCHBOXP".
        */
       unsigned int aggregation_size;
@@ -121,17 +119,13 @@ namespace PSCToolkitWrappers
       const char *smoother_type;
 
       /**
-       * Number of sweeps of the smoother or one-level preconditioner. It is
-       * ignored if the smoother is "POLY".
+       * Number of sweeps of the smoother or one-level preconditioner. If the
+       * chosen smoother is "POLY", then this parameter is the degree of the
+       * polynomial smoother. For the Chebyshev polynomial smoother (typical
+       * choice for elliptic problems), the degree is equal to the number of
+       * matrix-vector products performed by the smoother.
        */
       unsigned int smoother_sweeps;
-
-      /**
-       * Degree of the polynomial smoother, which equals the number of
-       * matrix-vector products performed by the smoother. Ignored if the
-       * smoother is not 'POLY'.
-       */
-      unsigned int smoother_degree;
 
       /**
        * Prolongator used by the aggregation algorithm: smoothed or unsmoothed
@@ -198,11 +192,10 @@ namespace PSCToolkitWrappers
     void
     clear();
 
-
     /**
      * Return the pointer the underlying preconditioner. This is for advanced
      * users only who want to try out additional features of the AMG4PSBLAS
-     * preconditioner not supported through the current interface.
+     * preconditioner not supported through the current wrapperinterface.
      */
     amg_c_dprec *
     get_psblas_preconditioner();
