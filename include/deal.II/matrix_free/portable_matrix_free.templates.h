@@ -1487,40 +1487,70 @@ namespace Portable
 
     Kokkos::Array<PrecomputedData, n_max_dof_handlers> colored_data;
 
+    // helper to process one color
+    auto do_color = [&](const unsigned int color) {
+      using TeamPolicy =
+        Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>;
+      auto team_policy = (this->team_size == numbers::invalid_unsigned_int) ?
+                           TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                           TeamPolicy(exec, n_cells[color], this->team_size);
+
+      for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
+        colored_data[di] = get_data(color, di);
+
+      internal::ApplyKernel<dim, Number, Functor, true> apply_kernel(
+        func, dof_handler_data.size(), colored_data, src, dst);
+
+      Kokkos::parallel_for("dealii::MatrixFree::distributed_cell_loop color " +
+                             std::to_string(color),
+                           team_policy,
+                           apply_kernel);
+    };
+
     if (overlap_communication_computation)
       {
-        Assert(
-          false,
-          ExcNotImplemented(
-            "distributed_cell_loop() with BlockVector and overlapping communication is not implemented."));
+        src.update_ghost_values_start();
+
+        // In parallel, it's possible that some processors do not own any
+        // cells.
+        if (n_cells[0] > 0)
+          {
+            do_color(0);
+            // No fence() is necessary here.
+          }
+
+        src.update_ghost_values_finish();
+
+        // In serial this color does not exist because there are no ghost
+        // cells
+        if (n_cells[1] > 0)
+          {
+            do_color(1);
+
+            // We need a synchronization point because we don't want
+            // device-aware MPI to start the MPI communication until the
+            // kernel is done.
+            Kokkos::fence();
+          }
+
+        for (unsigned int block = 0; block < dst.n_blocks(); ++block)
+          dst.block(block).compress_start(block + 100, VectorOperation::add);
+
+        // When the mesh is coarse it is possible that some processors do
+        // not own any cells
+        if (n_cells[2] > 0)
+          do_color(2);
+
+        for (unsigned int block = 0; block < dst.n_blocks(); ++block)
+          dst.block(block).compress_finish(VectorOperation::add);
       }
     else
       {
         src.update_ghost_values();
 
-        // Execute the loop on the cells
         for (unsigned int color = 0; color < n_colors; ++color)
           if (n_cells[color] > 0)
-            {
-              using TeamPolicy = Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>;
-              auto team_policy =
-                (this->team_size == numbers::invalid_unsigned_int) ?
-                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
-                  TeamPolicy(exec, n_cells[color], this->team_size);
-
-              for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
-                colored_data[di] = get_data(color, di);
-
-              internal::ApplyKernel<dim, Number, Functor, true> apply_kernel(
-                func, dof_handler_data.size(), colored_data, src, dst);
-
-              Kokkos::parallel_for(
-                "dealii::MatrixFree::distributed_cell_loop color " +
-                  std::to_string(color),
-                team_policy,
-                apply_kernel);
-            }
+            do_color(color);
 
         exec.fence();
         dst.compress(VectorOperation::add);
