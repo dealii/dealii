@@ -1502,9 +1502,12 @@ namespace Portable
         for (unsigned int color = 0; color < n_colors; ++color)
           if (n_cells[color] > 0)
             {
-              Kokkos::TeamPolicy<
-                MemorySpace::Default::kokkos_space::execution_space>
-                team_policy(exec, n_cells[color], Kokkos::AUTO);
+              using TeamPolicy = Kokkos::TeamPolicy<
+                MemorySpace::Default::kokkos_space::execution_space>;
+              auto team_policy =
+                (this->team_size == numbers::invalid_unsigned_int) ?
+                  TeamPolicy(exec, n_cells[color], Kokkos::AUTO) :
+                  TeamPolicy(exec, n_cells[color], this->team_size);
 
               for (unsigned int di = 0; di < dof_handler_data.size(); ++di)
                 colored_data[di] = get_data(color, di);
