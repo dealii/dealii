@@ -413,6 +413,35 @@ namespace LinearAlgebra
       update_ghost_values() const;
 
       /**
+       * Initiates communication for the @p update_ghost_values() function
+       * with non-blocking communication. This function does not wait for the
+       * transfer to finish, in order to allow for other computations during
+       * the time it takes until all data arrives.
+       *
+       * Before the data is actually exchanged, the function must be followed
+       * by a call to @p update_ghost_values_finish().
+       *
+       * In case this function is called for more than one vector before
+       * @p update_ghost_values_finish() is invoked, it is mandatory to specify
+       * a unique communication channel to each such call. Otherwise, data
+       * corruption can occur. Consecutive channels starting from the given
+       * value are used.
+       */
+      void
+      update_ghost_values_start(
+        const unsigned int communication_channel_start = 100) const;
+
+      /**
+       * For all requests that have been started in update_ghost_values_start,
+       * wait for the communication to finish.
+       *
+       * Must follow a call to the @p update_ghost_values_start function
+       * before reading data from ghost indices.
+       */
+      void
+      update_ghost_values_finish() const;
+
+      /**
        * This method zeros the entries on ghost dofs, but does not touch
        * locally owned DoFs.
        *

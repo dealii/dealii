@@ -458,24 +458,55 @@ namespace LinearAlgebra
     void
     BlockVector<Number, MemorySpace>::update_ghost_values() const
     {
+      update_ghost_values_start();
+      update_ghost_values_finish();
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    BlockVector<Number, MemorySpace>::update_ghost_values_start(
+      const unsigned int communication_channel_start) const
+    {
+      // Have at most communication_block_size ghost exchanges in parallel and
+      // wait for others to finish by tackling them chunk by chunk. The last
+      // chunk is potentially smaller, so we iterate backwards and leave the
+      // full chunk 0 for update_ghost_values_finish() to finish.
       const unsigned int n_chunks =
         (this->n_blocks() + communication_block_size - 1) /
         communication_block_size;
-      for (unsigned int c = 0; c < n_chunks; ++c)
+      for (unsigned int c = n_chunks; c > 0; --c)
         {
-          const unsigned int start = c * communication_block_size;
+          const unsigned int chunk_index = c - 1;
+          const unsigned int start = chunk_index * communication_block_size;
           const unsigned int end =
             std::min(start + communication_block_size, this->n_blocks());
 
-          // In order to avoid conflict with possible other ongoing
-          // communication requests (from LA::distributed::Vector that supports
-          // unfinished requests), add 100 to the communication tag (the first
-          // 100 can be used by normal vectors)
           for (unsigned int block = start; block < end; ++block)
-            this->block(block).update_ghost_values_start(block - start + 100);
-          for (unsigned int block = start; block < end; ++block)
-            this->block(block).update_ghost_values_finish();
+            this->block(block).update_ghost_values_start(
+              block - start + communication_channel_start);
+
+          if (chunk_index > 0)
+            {
+              // finish the current chunk:
+              for (unsigned int block = start; block < end; ++block)
+                this->block(block).update_ghost_values_finish();
+            }
         }
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    void
+    BlockVector<Number, MemorySpace>::update_ghost_values_finish() const
+    {
+      const unsigned int start = 0;
+      const unsigned int end =
+        std::min(start + communication_block_size, this->n_blocks());
+      for (unsigned int block = start; block < end; ++block)
+        this->block(block).update_ghost_values_finish();
     }
 
 
