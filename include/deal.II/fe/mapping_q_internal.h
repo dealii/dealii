@@ -1381,7 +1381,7 @@ namespace internal
             if (is_translation)
               continue;
 
-            if (dim == spacedim && update_flags & update_volume_elements)
+            if (update_flags & update_volume_elements)
               data.volume_elements[i] = derivative.determinant();
 
             if (update_flags & update_contravariant_transformation)
