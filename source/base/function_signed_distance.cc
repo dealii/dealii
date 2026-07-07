@@ -460,6 +460,93 @@ namespace Functions
       return q_perp / r;
     }
 
+#ifdef DEAL_II_WITH_ITK
+    template <int dim>
+    ArbitraryLevelSet<dim>::ArbitraryLevelSet(
+      const std::string &filename,
+      const unsigned int level_set_quantity_cut_off_lower_bound,
+      const unsigned int level_set_quantity_cut_off_upper_bound)
+      : Function<dim>()
+    {
+      // read the Image
+      using ReaderType = itk::ImageFileReader<InputImageType>;
+      auto reader      = ReaderType::New();
+      reader->SetFileName(filename);
+
+      // Threshold to create the level set mask
+      using ThresholdFilterType =
+        itk::BinaryThresholdImageFilter<InputImageType, MaskImageType>;
+      auto thresholdFilter = ThresholdFilterType::New();
+      thresholdFilter->SetInput(reader->GetOutput());
+      thresholdFilter->SetLowerThreshold(
+        level_set_quantity_cut_off_lower_bound);
+      thresholdFilter->SetUpperThreshold(
+        level_set_quantity_cut_off_upper_bound);
+      thresholdFilter->SetInsideValue(255); // The foreground
+      thresholdFilter->SetOutsideValue(0);  // The background
+
+      // Configure Maurer Distance
+      using DistanceFilterType =
+        itk::SignedMaurerDistanceMapImageFilter<MaskImageType, OutputImageType>;
+      auto distanceFilter = DistanceFilterType::New();
+      distanceFilter->SetInput(thresholdFilter->GetOutput());
+      distanceFilter->SetSquaredDistance(
+        false); // we want the actual distance to distinguish between inside and
+                // outside
+      distanceFilter->SetUseImageSpacing(
+        true); // this basically gives us the information that we use equal
+               // spacing of the pixels and that the y-pixel length is not
+               // different than the x-pixel length
+      distanceFilter->SetInsideIsPositive(
+        false); // same as deal.II, if we are inside we have negative values.
+
+      try
+        {
+          // execute the pipeline once during initialization
+          distanceFilter->Update();
+        }
+      catch (const itk::ExceptionObject &error)
+        {
+          AssertThrow(false,
+                      ExcMessage(
+                        std::string(
+                          "ITK Error during distance map computation: ") +
+                        error.what()));
+        }
+
+      // Store the output map and set up the interpolator for fast querying
+      this->distanceMap  = distanceFilter->GetOutput();
+      this->interpolator = InterpolatorType::New();
+      this->interpolator->SetInputImage(this->distanceMap);
+    }
+
+    template <int dim>
+    double
+    ArbitraryLevelSet<dim>::value(const Point<dim>  &point,
+                                  const unsigned int component) const
+    {
+      // we need to make it an itk point for evaluation
+      itk::Point<double, dim> itk_point;
+      for (unsigned int i = 0; i < dim; ++i)
+        {
+          itk_point[i] = point[i];
+        }
+
+      // if we are inside, then evaluate.
+      if (interpolator->IsInsideBuffer(itk_point))
+        {
+          return interpolator->Evaluate(itk_point);
+        }
+      else
+        {
+          // we just return a large number greater than zero to clearly state
+          // that the point w.r.t our level set is outside the domain described
+          // by the input file.
+          return 50.0;
+        }
+    }
+
+#endif
   } // namespace SignedDistance
 } // namespace Functions
 
