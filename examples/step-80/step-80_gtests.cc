@@ -309,7 +309,7 @@ namespace
         << "    set Fluid grid generator arguments = 0: 1: false\n"
         << "    set Initial fluid refinement       = 3\n"
         << "    set Solid grid generator           = hyper_cube\n"
-        << "    set Solid grid generator arguments = 0: 1: false\n"
+        << "    set Solid grid generator arguments = 0.1: 0.9: false\n"
         << "    set Initial solid refinement       = 3\n"
         << "  end\n"
         << "  subsection Navier-Stokes boundary conditions\n"
@@ -321,6 +321,8 @@ namespace
         << "  subsection Solver parameters\n"
         << "    set Inner solver tolerance          = 1e-14\n"
         << "    set Inner solver maximum iterations = 2000\n"
+        << "    set Coupling quadrature iterations  = 5\n"
+        << "    set Coupling quadrature type        = gauss_lobatto\n"
         << "  end\n"
         << "end\n";
 
