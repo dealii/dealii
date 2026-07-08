@@ -304,8 +304,8 @@ FE_WedgeP<dim, spacedim>::hp_line_dof_identities(
   std::vector<std::pair<unsigned int, unsigned int>> identities;
   // check if the support points are the same location on the line
   // to avoid rescaling for pyramids use the support points on the faces
-  const auto face_support_points = this->get_unit_face_support_points(0);
-  const auto face_support_points_other =
+  const auto  face_support_points = this->get_unit_face_support_points(0);
+  const auto &face_support_points_other =
     fe_other.get_unit_face_support_points(0);
 
   // now just compare the DoFs on the line going from [0,0] to [1,0]
@@ -371,8 +371,8 @@ FE_WedgeP<dim, spacedim>::hp_quad_dof_identities(
     }
 
   // compare the face support points
-  const auto face_support_points = this->get_unit_face_support_points(face_no);
-  const auto face_support_points_other =
+  const auto  face_support_points = this->get_unit_face_support_points(face_no);
+  const auto &face_support_points_other =
     fe_other.get_unit_face_support_points(face_no_neighbor);
 
   // get the offsets to skip vertices and lines
