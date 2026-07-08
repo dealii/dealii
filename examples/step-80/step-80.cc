@@ -620,6 +620,7 @@ namespace Step80
 
     void run();
 
+  private:
     void make_grid();
 
     double compute_time_step() const;
