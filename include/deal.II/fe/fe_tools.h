@@ -989,6 +989,19 @@ namespace FETools
                      const types::geometric_orientation  combined_orientation);
 
   /**
+   * Given two finite elements which both have support points on their faces,
+   * compute the DoF identities.
+   *
+   * @see FiniteElement::hp_quad_dof_identities()
+   */
+  template <int dim, int spacedim>
+  std::vector<std::pair<unsigned int, unsigned int>>
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe,
+                         const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int                  face_no,
+                         const unsigned int                  face_no_other);
+
+  /**
    * A namespace that contains functions that help setting up internal
    * data structures when implementing FiniteElement which are build
    * from simpler ("base") elements, for example FESystem. The things

@@ -383,7 +383,8 @@ template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_RaviartThomasNodal<dim>::hp_quad_dof_identities(
   const FiniteElement<dim> &fe_other,
-  const unsigned int        face_no) const
+  const unsigned int        face_no,
+  const unsigned int        face_no_other) const
 {
   // we can presently only compute these identities if both FEs are
   // FE_RaviartThomasNodals or if the other one is FE_Nothing
@@ -398,7 +399,7 @@ FE_RaviartThomasNodal<dim>::hp_quad_dof_identities(
       const unsigned int p = this->n_dofs_per_quad(face_no);
 
       AssertDimension(fe_q_other->n_unique_faces(), 1);
-      const unsigned int q = fe_q_other->n_dofs_per_quad(0);
+      const unsigned int q = fe_q_other->n_dofs_per_quad(face_no_other);
 
       std::vector<std::pair<unsigned int, unsigned int>> identities;
 

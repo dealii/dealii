@@ -376,6 +376,7 @@ FE_DGPMonomial<dim>::hp_line_dof_identities(
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int>>
 FE_DGPMonomial<dim>::hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
+                                            const unsigned int,
                                             const unsigned int) const
 {
   // there are no such constraints for DGPMonomial

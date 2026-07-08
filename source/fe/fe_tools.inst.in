@@ -179,6 +179,13 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const unsigned int,
         const unsigned int,
         const types::geometric_orientation);
+
+      template std::vector<std::pair<unsigned int, unsigned int>>
+      hp_quad_dof_identities(
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const FiniteElement<deal_II_dimension, deal_II_space_dimension> &,
+        const unsigned int,
+        const unsigned int);
 #endif
 
 #if deal_II_dimension == deal_II_space_dimension
