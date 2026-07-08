@@ -306,8 +306,8 @@
  * cells without violating the requirements stated above. We will show two
  * examples where this is obvious.
  *
- * The first such example is the following, which we will call the ``four
- * cells at the end'' because of the four cells that close of the right end of
+ * The first such example is the following, which we will call the "four
+ * cells at the end" because of the four cells that close of the right end of
  * a row of three vertical cells each (in the following picture we only show
  * one such column of three cells at the left, but we will indicate what
  * happens if we prolong this list):
