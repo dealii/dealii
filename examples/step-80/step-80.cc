@@ -304,12 +304,12 @@ namespace Step80
 
     std::list<types::boundary_id> dirichlet_ids{0};
 
-    std::string name_of_fluid_grid       = "hyper_cube";
-    std::string arguments_for_fluid_grid = "-1: 1: false";
-    std::string name_of_solid_grid       = "hyper_rectangle";
-    std::string arguments_for_solid_grid = spacedim == 2 ?
-                                             "-.5, -.1: .5, .1: false" :
-                                             "-.5, -.1, -.1: .5, .1, .1: false";
+    std::string name_of_fluid_grid           = "hyper_cube";
+    std::string arguments_for_fluid_grid     = "-1: 1: false";
+    std::string name_of_solid_grid           = "hyper_rectangle";
+    std::string arguments_for_solid_grid     = spacedim == 2 ?
+                                                 "-.5, -.1: .5, .1: false" :
+                                                 "-.5, -.1, -.1: .5, .1, .1: false";
     std::string name_of_tracer_particle_grid = "hyper_ball";
     std::string arguments_for_tracer_particle_grid =
       spacedim == 2 ? "0.3, 0.3: 0.1: false" : "0.3, 0.3, 0.3 : 0.1: false";
@@ -1950,7 +1950,7 @@ namespace Step80
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     std::vector<Tensor<1, spacedim>> w_old(n_q_points);
-    std::vector<Vector<double>> solid_rhs_values(n_q_points,
+    std::vector<Vector<double>>      solid_rhs_values(n_q_points,
                                                  Vector<double>(2 * spacedim));
 
     for (const auto &cell : solid_dh.active_cell_iterators())
@@ -2165,8 +2165,8 @@ namespace Step80
 
     DynamicSparsityPattern dsp(locally_relevant_dofs);
     auto                   add_pattern = [&](const auto        &matrix,
-                                             const unsigned int row_block,
-                                             const unsigned int col_block) {
+                           const unsigned int row_block,
+                           const unsigned int col_block) {
       for (types::global_dof_index row = matrix.local_range().first;
            row < matrix.local_range().second;
            ++row)
@@ -2429,7 +2429,7 @@ namespace Step80
     block_system_solution.block(3) =
       fluid_locally_relevant_solution.block(1); // p
 
-    SolverControl solver_control(par.outer_max_iterations,
+    SolverControl                      solver_control(par.outer_max_iterations,
                                  std::max(par.outer_tolerance, tolerance),
                                  true,
                                  false);
@@ -2848,7 +2848,7 @@ namespace Step80
     std::vector<Tensor<2, spacedim>> u_grad(n_q_points);
     std::vector<double>              u_div(n_q_points);
     std::vector<double>              p_val(n_q_points);
-    std::vector<Vector<double>> fluid_rhs_values(n_q_points,
+    std::vector<Vector<double>>      fluid_rhs_values(n_q_points,
                                                  Vector<double>(spacedim + 1));
 
     fluid_system_rhs = 0;
@@ -2956,7 +2956,7 @@ namespace Step80
     std::vector<double>                       div_w(n_solid_q_points);
     std::vector<Tensor<1, spacedim>>          w_dot_val(n_solid_q_points);
     std::vector<Tensor<1, spacedim>>          lambda_val(n_solid_q_points);
-    std::vector<Vector<double>> solid_rhs_values(n_solid_q_points,
+    std::vector<Vector<double>>               solid_rhs_values(n_solid_q_points,
                                                  Vector<double>(2 * spacedim));
 
     solid_system_rhs = 0;
