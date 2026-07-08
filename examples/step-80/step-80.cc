@@ -2053,22 +2053,28 @@ namespace Step80
     Assert(dof_handler_coupling,
            ExcMessage(
              "setup_coupling() must be called before assemble_coupling()."));
-    const auto &constraints = active_fluid_constraints();
+    // const auto &constraints = active_fluid_constraints();
 
     coupling_matrix           = 0;
     coupling_transpose_matrix = 0;
-    dof_handler_coupling->create_coupling_mass_matrix(coupling_quadrature,
-                                                      coupling_matrix,
-                                                      constraints,
-                                                      solid_constraints,
-                                                      false,
-                                                      true);
-    dof_handler_coupling->create_coupling_mass_matrix(coupling_quadrature,
-                                                      coupling_transpose_matrix,
-                                                      constraints,
-                                                      solid_constraints,
-                                                      true,
-                                                      true);
+    dof_handler_coupling->create_coupling_mass_matrix(
+      coupling_quadrature,
+      coupling_matrix,
+      // constraints,
+      // solid_constraints,
+      AffineConstraints<double>(),
+      AffineConstraints<double>(),
+      false,
+      true);
+    dof_handler_coupling->create_coupling_mass_matrix(
+      coupling_quadrature,
+      coupling_transpose_matrix,
+      AffineConstraints<double>(),
+      AffineConstraints<double>(),
+      // constraints,
+      // solid_constraints,
+      true,
+      true);
   }
 
 
