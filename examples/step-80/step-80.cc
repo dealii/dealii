@@ -1211,16 +1211,25 @@ namespace Step80
     coupling_transpose_matrix.clear();
     fluid_quadrature = QGauss<spacedim>(fluid_fe->degree + 1);
     solid_quadrature = QGauss<spacedim>(solid_fe->degree + 1);
-    const unsigned int coupling_order =
-      std::max(fluid_fe->degree, solid_fe->degree) + 1;
+
+    const unsigned int required_degree = fluid_fe->degree + solid_fe->degree;
     if (par.coupling_quadrature_type == "gauss_lobatto")
-      coupling_quadrature = QIterated<dim>(QGaussLobatto<1>(coupling_order),
-                                           par.coupling_quadrature_iterations);
+      {
+        // 2n-3 >= required_degree  =>  n >= (required_degree + 3) / 2.
+        const unsigned int coupling_order = required_degree / 2 + 2;
+        coupling_quadrature =
+          QIterated<dim>(QGaussLobatto<1>(coupling_order),
+                         par.coupling_quadrature_iterations);
+      }
     else
-      coupling_quadrature =
-        QIterated<dim>(QuadratureSelector<1>(par.coupling_quadrature_type,
-                                             coupling_order),
-                       par.coupling_quadrature_iterations);
+      {
+        // 2n-1 >= required_degree  =>  n >= (required_degree + 1) / 2.
+        const unsigned int coupling_order = required_degree / 2 + 1;
+        coupling_quadrature =
+          QIterated<dim>(QuadratureSelector<1>(par.coupling_quadrature_type,
+                                               coupling_order),
+                         par.coupling_quadrature_iterations);
+      }
 
     fluid_dh.distribute_dofs(*fluid_fe);
 
