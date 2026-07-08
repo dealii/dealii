@@ -93,9 +93,8 @@ namespace Step80
                                         cg_solver_lagrangian,
                                         problem.fluid_velocity_preconditioner);
 
-    std::array<std::array<LinOp, 2>, 2> system_array = {
-      {{{A11_aug, Bt}},  // vel
-       {{B, Z6}}}};      // pres
+    std::array<std::array<LinOp, 2>, 2> system_array = {{{{A11_aug, Bt}}, // vel
+                                                         {{B, Z6}}}}; // pres
 
     const auto system  = block_operator<2, 2, BVec>(system_array);
     auto       prec_AL = system;
@@ -121,7 +120,7 @@ namespace Step80
     block_system_solution.block(1) =
       problem.fluid_locally_relevant_solution.block(1);
 
-    SolverControl solver_control(par.outer_max_iterations,
+    SolverControl                      solver_control(par.outer_max_iterations,
                                  std::max(par.outer_tolerance, tolerance),
                                  true,
                                  false);
@@ -152,7 +151,8 @@ namespace Step80
   }
 } // namespace Step80
 
-TEST(Step80, GetDimensionAndSpacedimensionReadsParameterHandler) {
+TEST(Step80, GetDimensionAndSpacedimensionReadsParameterHandler)
+{
   dealii::ParameterHandler prm;
 
   prm.declare_entry("dimension", "2", dealii::Patterns::Integer(2, 3));
@@ -166,7 +166,8 @@ TEST(Step80, GetDimensionAndSpacedimensionReadsParameterHandler) {
   EXPECT_EQ(spacedim, 3U);
 }
 
-TEST(Step80, MPIIsInitialized) {
+TEST(Step80, MPIIsInitialized)
+{
   int initialized = 0;
   ASSERT_EQ(MPI_Initialized(&initialized), MPI_SUCCESS);
   EXPECT_NE(initialized, 0);
@@ -190,21 +191,22 @@ TEST(Step80, MPIIsInitialized) {
 //   f_x = (pi/2) sin(2 pi x) + 2 pi^2 sin(pi x) cos(pi y) + pi cos(pi x) sin(pi
 //   y), f_y = (pi/2) sin(2 pi y) - 2 pi^2 cos(pi x) sin(pi y) + pi sin(pi x)
 //   cos(pi y).
-TEST(Step80, NavierStokesManufacturedSolutionConvergence) {
+TEST(Step80, NavierStokesManufacturedSolutionConvergence)
+{
   using namespace dealii;
   using namespace Step80;
 
-  constexpr int dim = 2;
+  constexpr int dim      = 2;
   constexpr int spacedim = 2;
 
   const std::string exact_expr =
-      "sin(pi*x)*cos(pi*y); -cos(pi*x)*sin(pi*y); sin(pi*x)*sin(pi*y)";
+    "sin(pi*x)*cos(pi*y); -cos(pi*x)*sin(pi*y); sin(pi*x)*sin(pi*y)";
   const std::string rhs_expr =
-      "0.5*pi*sin(2*pi*x) + 2*pi*pi*sin(pi*x)*cos(pi*y) + "
-      "pi*cos(pi*x)*sin(pi*y);"
-      " 0.5*pi*sin(2*pi*y) - 2*pi*pi*cos(pi*x)*sin(pi*y) + "
-      "pi*sin(pi*x)*cos(pi*y);"
-      " 0";
+    "0.5*pi*sin(2*pi*x) + 2*pi*pi*sin(pi*x)*cos(pi*y) + "
+    "pi*cos(pi*x)*sin(pi*y);"
+    " 0.5*pi*sin(2*pi*y) - 2*pi*pi*cos(pi*x)*sin(pi*y) + "
+    "pi*sin(pi*x)*cos(pi*y);"
+    " 0";
 
   // Assemble a parameter file. Everything not listed here keeps its default;
   // in particular the velocity element stays FE_Q<2>(2). Solver tolerances are
@@ -247,14 +249,14 @@ TEST(Step80, NavierStokesManufacturedSolutionConvergence) {
 
   // Write the parameters to a temporary file and initialize
   const std::string prm_filename =
-      (std::filesystem::temp_directory_path() / "step-80-mms.prm").string();
+    (std::filesystem::temp_directory_path() / "step-80-mms.prm").string();
   {
     std::ofstream out(prm_filename);
     out << prm.str();
   }
 
   const auto [file_dim, file_spacedim] =
-      get_dimension_and_spacedimension(prm_filename);
+    get_dimension_and_spacedimension(prm_filename);
   ASSERT_EQ(file_dim, static_cast<unsigned int>(dim));
   ASSERT_EQ(file_spacedim, static_cast<unsigned int>(spacedim));
 
@@ -262,67 +264,73 @@ TEST(Step80, NavierStokesManufacturedSolutionConvergence) {
   ParameterAcceptor::initialize(prm_filename);
 
   const std::vector<unsigned int> levels = {2, 3, 4};
-  std::vector<double> h_values;
-  std::vector<double> l2_errors;
+  std::vector<double>             h_values;
+  std::vector<double>             l2_errors;
 
   ConvergenceTable convergence_table;
 
-  for (const unsigned int level : levels) {
-    par.initial_fluid_refinement = level;
+  for (const unsigned int level : levels)
+    {
+      par.initial_fluid_refinement = level;
 
-    NavierStokesImmersedProblem<dim, spacedim> problem(par);
-    problem.make_grid();
-    problem.initial_setup();
-    problem.setup_dofs();
-    problem.interpolate_initial_conditions();
+      NavierStokesImmersedProblem<dim, spacedim> problem(par);
+      problem.make_grid();
+      problem.initial_setup();
+      problem.setup_dofs();
+      problem.interpolate_initial_conditions();
 
-    // Steady state via Picard iteration. With alpha = 0 the time term drops
-    // out, so the system matrix is independent of the previous iterate and is
-    // assembled once; only the (lagged) convective term in the right-hand
-    // side changes from one iteration to the next. Iterate until the velocity
-    // update is well below the discretization error.
-    problem.assemble_navier_stokes_system(0.0);
+      // Steady state via Picard iteration. With alpha = 0 the time term drops
+      // out, so the system matrix is independent of the previous iterate and is
+      // assembled once; only the (lagged) convective term in the right-hand
+      // side changes from one iteration to the next. Iterate until the velocity
+      // update is well below the discretization error.
+      problem.assemble_navier_stokes_system(0.0);
 
-    double change = 1.0;
-    for (unsigned int it = 0; it < 50 && change > 1e-9; ++it) {
-      LA::MPI::Vector previous_velocity = problem.fluid_solution.block(0);
+      double change = 1.0;
+      for (unsigned int it = 0; it < 50 && change > 1e-9; ++it)
+        {
+          LA::MPI::Vector previous_velocity = problem.fluid_solution.block(0);
 
-      problem.assemble_navier_stokes_rhs(0.0);
-      solve_navier_stokes(problem);
-      problem.fluid_locally_relevant_solution_old =
-          problem.fluid_locally_relevant_solution;
+          problem.assemble_navier_stokes_rhs(0.0);
+          solve_navier_stokes(problem);
+          problem.fluid_locally_relevant_solution_old =
+            problem.fluid_locally_relevant_solution;
 
-      previous_velocity -= problem.fluid_solution.block(0);
-      change = previous_velocity.l2_norm();
-    }
+          previous_velocity -= problem.fluid_solution.block(0);
+          change = previous_velocity.l2_norm();
+        }
 
-    // L2 error of the velocity components only (mask out the pressure).
-    const ComponentSelectFunction<spacedim> velocity_mask(
+      // L2 error of the velocity components only (mask out the pressure).
+      const ComponentSelectFunction<spacedim> velocity_mask(
         std::pair<unsigned int, unsigned int>(0, spacedim), spacedim + 1);
 
-    Vector<double> cellwise_error(
+      Vector<double> cellwise_error(
         problem.fluid_dh.get_triangulation().n_active_cells());
-    VectorTools::integrate_difference(
-        problem.fluid_dh, problem.fluid_locally_relevant_solution,
-        par.navier_stokes_analytical_solution, cellwise_error,
-        QGauss<spacedim>(problem.fluid_fe->degree + 2), VectorTools::L2_norm,
-        &velocity_mask);
+      VectorTools::integrate_difference(problem.fluid_dh,
+                                        problem.fluid_locally_relevant_solution,
+                                        par.navier_stokes_analytical_solution,
+                                        cellwise_error,
+                                        QGauss<spacedim>(
+                                          problem.fluid_fe->degree + 2),
+                                        VectorTools::L2_norm,
+                                        &velocity_mask);
 
-    const double l2_error =
+      const double l2_error =
         VectorTools::compute_global_error(problem.fluid_dh.get_triangulation(),
-                                          cellwise_error, VectorTools::L2_norm);
+                                          cellwise_error,
+                                          VectorTools::L2_norm);
 
-    const double h = 1.0 / std::pow(2.0, level);
-    h_values.push_back(h);
-    l2_errors.push_back(l2_error);
+      const double h = 1.0 / std::pow(2.0, level);
+      h_values.push_back(h);
+      l2_errors.push_back(l2_error);
 
-    convergence_table.add_value("level", level);
-    convergence_table.add_value(
+      convergence_table.add_value("level", level);
+      convergence_table.add_value(
         "cells", problem.fluid_dh.get_triangulation().n_active_cells());
-    convergence_table.add_value("dofs", problem.fluid_dh.n_dofs());
-    convergence_table.add_value("h", h);
-    convergence_table.add_value("L2_velocity", l2_error);
-  }
+      convergence_table.add_value("dofs", problem.fluid_dh.n_dofs());
+      convergence_table.add_value("h", h);
+      convergence_table.add_value("L2_velocity", l2_error);
+    }
 
   // Format and print the convergence table. The rate column is computed
   // assuming h halves between consecutive rows (one global refinement each).
@@ -331,7 +339,7 @@ TEST(Step80, NavierStokesManufacturedSolutionConvergence) {
   convergence_table.set_precision("L2_velocity", 6);
   convergence_table.set_scientific("L2_velocity", true);
   convergence_table.evaluate_convergence_rates(
-      "L2_velocity", ConvergenceTable::reduction_rate_log2);
+    "L2_velocity", ConvergenceTable::reduction_rate_log2);
 
   std::cout << "\nNavier-Stokes manufactured-solution convergence:\n";
   convergence_table.write_text(std::cout);
@@ -339,17 +347,19 @@ TEST(Step80, NavierStokesManufacturedSolutionConvergence) {
 
   // For FE_Q(2) velocity we expect an L2 convergence rate of ~3. Require the
   // observed rate on each successive mesh pair to exceed velocity_degree + 0.5.
-  for (unsigned int i = 1; i < levels.size(); ++i) {
-    const double rate = std::log(l2_errors[i - 1] / l2_errors[i]) /
-                        std::log(h_values[i - 1] / h_values[i]);
-    EXPECT_GT(rate, 2.5)
+  for (unsigned int i = 1; i < levels.size(); ++i)
+    {
+      const double rate = std::log(l2_errors[i - 1] / l2_errors[i]) /
+                          std::log(h_values[i - 1] / h_values[i]);
+      EXPECT_GT(rate, 2.5)
         << "L2 velocity convergence rate between refinement levels "
         << levels[i - 1] << " and " << levels[i] << " is only " << rate
         << " (errors " << l2_errors[i - 1] << " -> " << l2_errors[i] << ").";
-  }
+    }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
