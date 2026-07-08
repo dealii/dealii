@@ -3567,7 +3567,9 @@ namespace internal
         this->partitioner_coarse = external_partitioner_coarse;
         success_flags.first      = true;
       }
-    else if (internal::is_partitioner_contained(this->partitioner_coarse,
+    else if (std::is_same_v<typename VectorType::memory_space,
+                            dealii::MemorySpace::Host> &&
+             internal::is_partitioner_contained(this->partitioner_coarse,
                                                 external_partitioner_coarse))
       {
         this->vec_coarse.reinit(0);
@@ -3599,7 +3601,9 @@ namespace internal
         this->partitioner_fine = external_partitioner_fine;
         success_flags.second   = true;
       }
-    else if (internal::is_partitioner_contained(this->partitioner_fine,
+    else if (std::is_same_v<typename VectorType::memory_space,
+                            dealii::MemorySpace::Host> &&
+             internal::is_partitioner_contained(this->partitioner_fine,
                                                 external_partitioner_fine))
       {
         this->vec_fine.reinit(0);
