@@ -157,8 +157,8 @@ namespace internal
     double
     mu_rand_seed(const double seed)
     {
-      static std::mutex           rand_mutex;
-      std::lock_guard<std::mutex> lock(rand_mutex);
+      static std::mutex rand_mutex;
+      std::scoped_lock  lock(rand_mutex);
 
       std::uniform_real_distribution<> uniform_distribution(0., 1.);
 
@@ -177,7 +177,7 @@ namespace internal
     mu_rand()
     {
       static std::mutex                rand_mutex;
-      std::lock_guard<std::mutex>      lock(rand_mutex);
+      std::scoped_lock                 lock(rand_mutex);
       std::uniform_real_distribution<> uniform_distribution(0., 1.);
       const unsigned int  seed = static_cast<unsigned long>(std::time(nullptr));
       static std::mt19937 rng(seed);

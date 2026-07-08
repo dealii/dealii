@@ -962,7 +962,7 @@ namespace Threads
         // Else, we need to go under a lock and try again. A different thread
         // may have waited and finished the task since then, so we have to try
         // a second time. (This is Schmidt's double-checking pattern.)
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
         if (task_has_finished)
           return;
         else

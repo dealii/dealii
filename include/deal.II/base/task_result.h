@@ -429,7 +429,7 @@ namespace Threads
     // First lock the other object, then move the members of the other
     // object and reset it. Note that we do not have to wait for
     // the other object's task to finish (nor should we).
-    std::lock_guard<std::mutex> lock(other.mutex);
+    std::scoped_lock lock(other.mutex);
 
     result_is_available       = other.result_is_available.load();
     other.result_is_available = false;
@@ -466,7 +466,7 @@ namespace Threads
     // Having established that there is no previous task still running,
     // set the current task as the one we're waiting for:
     {
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
       task = t;
     }
   }
@@ -485,7 +485,7 @@ namespace Threads
     // object, and finally reset it. Note that we do not have to wait for
     // the other object's task to finish (nor should we): We may simply
     // inherit the other object's task.
-    std::lock_guard<std::mutex> lock(other.mutex);
+    std::scoped_lock lock(other.mutex);
 
     result_is_available       = other.result_is_available.load();
     other.result_is_available = false;
@@ -515,7 +515,7 @@ namespace Threads
     // to check that perhaps it has appeared in the meantime. We again use
     // the double-checking pattern:
     {
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
       if (result_is_available)
         return;
       else
@@ -559,7 +559,7 @@ namespace Threads
   inline void
   TaskResult<T>::clear()
   {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::scoped_lock lock(mutex);
 
     if (result_is_available)
       {
@@ -596,7 +596,7 @@ namespace Threads
       // that this happens under the lock, so only one thread gets to be in
       // this code block at the same time:
       {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
         if (result_is_available)
           return;
         else
@@ -637,7 +637,7 @@ namespace Threads
       // result_is_available==true and task.has_value()==false. We can
       // check that, but only under a lock.
       {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
         if (result_is_available)
           return false;
         else

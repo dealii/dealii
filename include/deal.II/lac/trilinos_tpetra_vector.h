@@ -1282,7 +1282,7 @@ namespace LinearAlgebra
       {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
         // Make this part of the function thread safe
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
 #  endif
 
         vector_map = vector->getMap().ptr();
@@ -1331,7 +1331,7 @@ namespace LinearAlgebra
             {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
               // Make this part of the function thread safe
-              std::lock_guard<std::mutex> lock(mutex);
+              std::scoped_lock lock(mutex);
 #  endif
 
               // The element is not in the locally owned part, and
@@ -1346,7 +1346,7 @@ namespace LinearAlgebra
             {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
               // Make this part of the function thread safe
-              std::lock_guard<std::mutex> lock(mutex);
+              std::scoped_lock lock(mutex);
 #  endif
 
               // If the element was not in the locally owned part,
@@ -1420,7 +1420,7 @@ namespace LinearAlgebra
       {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
         // Make this part of the function thread safe
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
 #  endif
 
         vector_map = vector->getMap().ptr();
@@ -1469,7 +1469,7 @@ namespace LinearAlgebra
             {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
               // Make this part of the function thread safe
-              std::lock_guard<std::mutex> lock(mutex);
+              std::scoped_lock lock(mutex);
 #  endif
 
               // The element is not in the locally owned part, and
@@ -1484,7 +1484,7 @@ namespace LinearAlgebra
             {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
               // Make this part of the function thread safe
-              std::lock_guard<std::mutex> lock(mutex);
+              std::scoped_lock lock(mutex);
 #  endif
 
               // If the element was not in the locally owned part,

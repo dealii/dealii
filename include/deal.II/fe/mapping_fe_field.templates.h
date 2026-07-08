@@ -512,7 +512,7 @@ MappingFEField<dim, spacedim, VectorType>::get_vertices(
   else
     AssertDimension(euler_vector[0]->size(), euler_dof_handler->n_dofs());
 
-  std::lock_guard<std::mutex> lock(fe_values_mutex);
+  std::scoped_lock lock(fe_values_mutex);
   fe_values.reinit(dof_cell);
   if (uses_level_dofs)
     dof_cell->get_mg_dof_indices(dof_indices);

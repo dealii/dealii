@@ -4030,7 +4030,7 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
                  const VectorType &rhs,
                  VectorType       &solution) const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
   if (eigenvalues_are_initialized == false)
     estimate_eigenvalues(rhs);
 

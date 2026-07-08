@@ -93,7 +93,7 @@ public:
    * <code>throw</code>, or by simply reaching the closing brace. In all of
    * these cases, it is not necessary to remember to pop the prefix manually
    * using LogStream::pop(). In this, it works just like the better known
-   * std::unique_ptr and std::lock_guard classes.
+   * std::unique_ptr and std::scoped_lock classes.
    */
   class Prefix
   {

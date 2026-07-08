@@ -345,7 +345,7 @@ template <typename StreamType>
 inline void
 EnableObserverPointer::list_subscribers(StreamType &stream) const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   for (const auto &it : counter_map)
     stream << it.second << '/' << counter << " subscriptions from \""

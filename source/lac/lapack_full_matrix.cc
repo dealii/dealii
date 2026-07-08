@@ -713,7 +713,7 @@ LAPACKFullMatrix<number>::vmult(Vector<number>       &w,
         }
       case svd:
         {
-          std::lock_guard<std::mutex> lock(mutex);
+          std::scoped_lock lock(mutex);
           AssertDimension(v.size(), this->n());
           AssertDimension(w.size(), this->m());
           // Compute V^T v
@@ -748,7 +748,7 @@ LAPACKFullMatrix<number>::vmult(Vector<number>       &w,
         }
       case inverse_svd:
         {
-          std::lock_guard<std::mutex> lock(mutex);
+          std::scoped_lock lock(mutex);
           AssertDimension(w.size(), this->n());
           AssertDimension(v.size(), this->m());
           // Compute U^T v
@@ -850,7 +850,7 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number>       &w,
         }
       case svd:
         {
-          std::lock_guard<std::mutex> lock(mutex);
+          std::scoped_lock lock(mutex);
           AssertDimension(w.size(), this->n());
           AssertDimension(v.size(), this->m());
 
@@ -886,7 +886,7 @@ LAPACKFullMatrix<number>::Tvmult(Vector<number>       &w,
         }
       case inverse_svd:
         {
-          std::lock_guard<std::mutex> lock(mutex);
+          std::scoped_lock lock(mutex);
           AssertDimension(v.size(), this->n());
           AssertDimension(w.size(), this->m());
 
@@ -1045,7 +1045,7 @@ LAPACKFullMatrix<number>::Tmmult(LAPACKFullMatrix<number>       &C,
   // https://stackoverflow.com/questions/3548069/multiplying-three-matrices-in-blas-with-the-middle-one-being-diagonal
   // http://mathforum.org/kb/message.jspa?messageID=3546564
 
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
   // First, get V*B into "work" array
   work.resize(kk * nn);
   // following http://icl.cs.utk.edu/lapack-forum/viewtopic.php?f=2&t=768#p2577
@@ -1444,7 +1444,7 @@ template <typename number>
 number
 LAPACKFullMatrix<number>::norm(const char type) const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   Assert(state == LAPACKSupport::matrix ||
            state == LAPACKSupport::inverse_matrix,
@@ -1521,7 +1521,7 @@ template <typename number>
 number
 LAPACKFullMatrix<number>::reciprocal_condition_number(const number a_norm) const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
   Assert(state == cholesky, ExcState(state));
   number rcond = 0.;
 
@@ -1554,7 +1554,7 @@ template <typename number>
 number
 LAPACKFullMatrix<number>::reciprocal_condition_number() const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
   Assert(property == upper_triangular || property == lower_triangular,
          ExcProperty(property));
   number rcond = 0.;

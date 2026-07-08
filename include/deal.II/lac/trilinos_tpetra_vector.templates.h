@@ -405,7 +405,7 @@ namespace LinearAlgebra
       {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
         // Make this part of the function thread safe
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
 #  endif
 
         vector_map = vector->getMap().ptr();
@@ -840,7 +840,7 @@ namespace LinearAlgebra
     {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
       // Make this part of the function thread safe
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
 #  endif
 
       // Get the local index
@@ -1313,7 +1313,7 @@ namespace LinearAlgebra
     {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
       // Make this part of the function thread safe
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
 #  endif
 
       return vector->getGlobalLength();
@@ -1337,7 +1337,7 @@ namespace LinearAlgebra
     {
 #  ifndef HAVE_TEUCHOS_THREAD_SAFE
       // Make this part of the function thread safe
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
 #  endif
 
       const size_type begin = vector->getMap()->getMinGlobalIndex();

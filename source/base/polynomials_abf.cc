@@ -83,7 +83,7 @@ PolynomialsABF<dim>::evaluate(
   // using a mutex to make sure they
   // are not used by multiple threads
   // at once
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   p_values.resize((values.empty()) ? 0 : n_sub);
   p_grads.resize((grads.empty()) ? 0 : n_sub);
