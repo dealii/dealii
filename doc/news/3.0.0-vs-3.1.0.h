@@ -93,7 +93,7 @@ All entries are signed with the names of the author.
        <code class="program">common/scripts/make_dependencies.pl</code>
        script that sets up the dependencies for the make files had a
        problem when the path to the library included special characters
-       such as `+'. This is now fixed.
+       such as "+". This is now fixed.
        <br>
        (WB 2000/06/15)
        </p>
@@ -496,7 +496,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: the ``copy-like'' constructor of
+       Fix: the "copy-like" constructor of
        <code>SparsityPattern</code> that copies another
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.

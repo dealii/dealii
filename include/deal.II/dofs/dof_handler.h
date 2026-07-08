@@ -143,7 +143,7 @@ class DoFCellAccessor;
  *
  * <h3>Distribution of indices for degrees of freedom</h3>
  *
- * The degrees of freedom (`dofs') are distributed on the given triangulation
+ * The degrees of freedom ("dofs") are distributed on the given triangulation
  * by the function distribute_dofs(). It gets passed a finite element object
  * describing how many degrees of freedom are located on vertices, lines, etc.
  * It traverses the triangulation cell by cell and numbers the dofs of that

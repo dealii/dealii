@@ -820,7 +820,7 @@ public:
 
   /**
    * Return a list of implemented input formats. The different names are
-   * separated by vertical bar signs (<tt>`|'</tt>) as used by the
+   * separated by vertical bar signs ("|") as used by the
    * ParameterHandler classes.
    */
   static std::string

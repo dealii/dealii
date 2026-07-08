@@ -2379,7 +2379,8 @@ namespace Step14
     // On the other hand, computation of the edge terms for the error estimate
     // is not so simple. First, we have to distinguish between faces with and
     // without hanging nodes. Because it is the simple case, we first consider
-    // the case without hanging nodes on a face (let's call this the `regular'
+    // the case without hanging nodes on a face (let's call this the
+    // "regular"
     // case):
     template <int dim>
     void WeightedResidual<dim>::integrate_over_regular_face(

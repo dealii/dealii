@@ -1116,7 +1116,7 @@ All entries are signed with the names of the author.
        curved boundary are transformed by the given <code
        class="class">Mapping</code> class. The default mapping is
        <code>MappingQ1</code>. Note, that the grids do
-       not show the `original' domain with boundaries described by the
+       not show the "original" domain with boundaries described by the
        <code>Boundary</code> classes but the
        discretized domain whose boundary cells are transformed using the
        given mapping.

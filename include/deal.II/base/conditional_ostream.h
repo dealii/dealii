@@ -56,8 +56,8 @@ DEAL_II_NAMESPACE_OPEN
  * pout << "done" << std::endl;
  * @endcode
  *
- * Here, `Reading parameter file on process xy' is printed by each process
- * separately. In contrast to that, `Solving ...' and `done' is printed to
+ * Here, "Reading parameter file on process xy" is printed by each process
+ * separately. In contrast to that, "Solving ..." and "done" is printed to
  * standard output only once, namely by process 0.
  *
  * This class is not derived from ostream. Therefore

@@ -80,7 +80,7 @@ namespace Utilities
        * pattern with values from @p locally_owned_array.
        *
        * In the default case, only one object is communicated per entry
-       * (`n_components_templated == 1'). If you want to communicate more
+       * (`n_components_templated == 1`). If you want to communicate more
        * entries, you can increase the value of @p n_components_templated in the
        * case that you know the size at compile time. If you want to set the
        * size during runtime, you can set @p n_components. However,

@@ -557,7 +557,7 @@ protected:
    * a quad, <code>8 + 12*(degree-1) + 6*(degree-1)*(degree-1)</code> for a
    * hex) and as many rows as there are strictly interior points.
    *
-   * For the definition of this table see equation (8) of the `mapping'
+   * For the definition of this table see equation (8) of the "mapping"
    * report.
    */
   const std::vector<Table<2, double>>

@@ -1554,7 +1554,7 @@ public:
      * ends would be coarsened, after which the next outermost cells would
      * need to be coarsened. Therefore, only one loop of flagging cells like
      * this could be done to avoid eating up the whole chain of refined cells
-     * (`chain reaction'...).
+     * ("chain reaction"...).
      *
      * This algorithm also takes into account cells which are not actually
      * refined but are flagged for refinement. If necessary, it takes away the

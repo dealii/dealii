@@ -2542,7 +2542,7 @@ namespace Step33
 
 // @sect3{main()}
 
-// The following ``main'' function is similar to previous examples and need
+// The following `main` function is similar to previous examples and need
 // not to be commented on. Note that the program aborts if no input file name
 // is given on the command line.
 int main(int argc, char *argv[])

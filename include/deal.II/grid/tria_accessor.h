@@ -3347,10 +3347,10 @@ public:
    *
    * Here, if you are on cell `1.3` and ask for its left neighbor (which is,
    * according to the conventions spelled out in the GeometryInfo class, its
-   * <i>zeroth</i> neighbor), then you will get the parent cell of `3.5`, since
-   * this is the smallest cell for which we have `(1.3)->face(0) ==
-   * (3.5)->parent()->face(1)`. Note, that you will not obtain the parent cell
-   * of `2.8`.
+   * <i>zeroth</i> neighbor), then you will get the parent cell of `3.5`,
+   * since this is the smallest cell for which we have
+   * `(1.3)->face(0) == (3.5)->parent()->face(1)`. Note, that you will not
+   * obtain the parent cell of `2.8`.
    *
    * Further, if you ask for the right (i.e. the <i>first</i>) neighbor of cell
    * `4.1`, then you will get cell `1.3`. Consequently, there are two

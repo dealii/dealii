@@ -226,7 +226,7 @@ namespace Step7
   // certain way when we change the coordinate system; however, they do not
   // share the same connotation that points have and are only objects in a
   // more abstract space than the one spanned by the coordinate
-  // directions. (In fact, gradients live in `reciprocal' space, since the
+  // directions. (In fact, gradients live in "reciprocal" space, since the
   // dimension of their components is not that of a length, but of one over
   // length).
   template <int dim>
@@ -414,7 +414,7 @@ namespace Step7
     // The second to last variable stores the refinement mode passed to the
     // constructor. Since it is only set in the constructor, we can declare
     // this variable constant, to avoid that someone sets it involuntarily
-    // (e.g. in an `if'-statement where == was written as = by chance).
+    // (e.g. in an `if`-statement where == was written as = by chance).
     const RefinementMode refinement_mode;
 
     // For each refinement level some data (like the number of cells, or the
@@ -1098,16 +1098,16 @@ namespace Step7
     // the columns are the keys given as argument to the
     // <code>add_value</code> functions. To have TeX captions that differ from
     // the default ones you can specify them by the following function calls.
-    // Note, that `\\' is reduced to `\' by the compiler such that the real
-    // TeX caption is, e.g., `$L^\infty$-error'.
+    // Note that `\\` is reduced to `\` by the compiler such that the real
+    // TeX caption is, e.g., `$L^\infty$-error`.
     convergence_table.set_tex_caption("cells", "\\# cells");
     convergence_table.set_tex_caption("dofs", "\\# dofs");
     convergence_table.set_tex_caption("L2", "$L^2$-error");
     convergence_table.set_tex_caption("H1", "$H^1$-error");
     convergence_table.set_tex_caption("Linfty", "$L^\\infty$-error");
 
-    // Finally, the default LaTeX format for each column of the table is `c'
-    // (centered). To specify a different (e.g. `right') one, the following
+    // Finally, the default LaTeX format for each column of the table is `c`
+    // (centered). To specify a different (e.g. "right") one, the following
     // function may be used:
     convergence_table.set_tex_format("cells", "r");
     convergence_table.set_tex_format("dofs", "r");
@@ -1191,8 +1191,8 @@ namespace Step7
         convergence_table.evaluate_convergence_rates(
           "H1", ConvergenceTable::reduction_rate_log2);
         // Each of these function calls produces an additional column that is
-        // merged with the original column (in our example the `L2' and the
-        // `H1' column) to a supercolumn.
+        // merged with the original column (in our example the `L2` and the
+        // `H1` column) to a supercolumn.
 
         // Finally, we want to write this convergence chart again, first to
         // the screen and then, in LaTeX format, to disk. The filename is
