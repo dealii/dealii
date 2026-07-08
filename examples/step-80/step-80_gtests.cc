@@ -25,7 +25,18 @@
 #include <iostream>
 #include <sstream>
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wkeyword-macro"
+#endif
+
+#define private public
 #include "step-80.cc"
+#undef private
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#endif
 
 namespace Step80
 {
@@ -257,6 +268,145 @@ namespace Step80
   }
 } // namespace Step80
 
+namespace
+{
+  struct CouplingProjectionConfig
+  {
+    std::string id;
+    std::string velocity_fe;
+    std::string pressure_fe;
+    std::string displacement_fe;
+    std::string lagrange_fe;
+    double      tolerance = 1e-11;
+  };
+
+  void run_coupling_projection_test(const CouplingProjectionConfig &config)
+  {
+    using namespace dealii;
+    using namespace Step80;
+
+    ParameterAcceptor::clear();
+
+    constexpr int dim      = 2;
+    constexpr int spacedim = 2;
+
+    const std::string velocity_expr = "1 + x + 2*y; -0.5 + 3*x - y; 0";
+    const std::string output_dir =
+      "test-output-coupling-projection-" + config.id;
+
+    std::ostringstream prm;
+    prm << "subsection Navier-Stokes Immersed Problem\n"
+        << "  set Output directory     = " << output_dir << "\n"
+        << "  set Output frequency     = 1\n"
+        << "  subsection Finite element spaces\n"
+        << "    set Velocity            = " << config.velocity_fe << "\n"
+        << "    set Pressure            = " << config.pressure_fe << "\n"
+        << "    set Displacement        = " << config.displacement_fe << "\n"
+        << "    set Lagrange multiplier = " << config.lagrange_fe << "\n"
+        << "  end\n"
+        << "  subsection Grid generation\n"
+        << "    set Fluid grid generator           = hyper_cube\n"
+        << "    set Fluid grid generator arguments = 0: 1: false\n"
+        << "    set Initial fluid refinement       = 3\n"
+        << "    set Solid grid generator           = hyper_cube\n"
+        << "    set Solid grid generator arguments = 0: 1: false\n"
+        << "    set Initial solid refinement       = 3\n"
+        << "  end\n"
+        << "  subsection Navier-Stokes boundary conditions\n"
+        << "    set Function expression = " << velocity_expr << "\n"
+        << "  end\n"
+        << "  subsection Navier-Stokes initial conditions\n"
+        << "    set Function expression = " << velocity_expr << "\n"
+        << "  end\n"
+        << "  subsection Solver parameters\n"
+        << "    set Inner solver tolerance          = 1e-14\n"
+        << "    set Inner solver maximum iterations = 2000\n"
+        << "  end\n"
+        << "end\n";
+
+    const std::string prm_filename =
+      (std::filesystem::temp_directory_path() /
+       ("step-80-coupling-projection-" + config.id + ".prm"))
+        .string();
+    {
+      std::ofstream out(prm_filename);
+      out << prm.str();
+    }
+
+    const auto [file_dim, file_spacedim] =
+      get_dimension_and_spacedimension(prm_filename);
+    ASSERT_EQ(file_dim, static_cast<unsigned int>(dim));
+    ASSERT_EQ(file_spacedim, static_cast<unsigned int>(spacedim));
+
+    NavierStokesImmersedProblemParameters<dim, spacedim> par;
+    ParameterAcceptor::initialize(prm_filename);
+
+    NavierStokesImmersedProblem<dim, spacedim> problem(par);
+    problem.make_grid();
+    problem.initial_setup();
+    problem.setup_dofs();
+    problem.interpolate_initial_conditions();
+    problem.setup_coupling();
+    problem.assemble_coupling();
+    problem.assemble_elasticity_system(1.0);
+
+    LA::MPI::Vector projected_rhs(problem.solid_owned_dofs[1],
+                                  problem.mpi_communicator);
+    LA::MPI::Vector projected_multiplier(problem.solid_owned_dofs[1],
+                                         problem.mpi_communicator);
+
+    problem.coupling_matrix.block(1, 0).vmult(projected_rhs,
+                                              problem.fluid_solution.block(0));
+
+    SolverControl             solver_control(par.inner_max_iterations,
+                                 par.inner_tolerance,
+                                 false,
+                                 false);
+    SolverCG<LA::MPI::Vector> cg(solver_control);
+    cg.solve(problem.solid_preconditioner.block(1, 1),
+             projected_multiplier,
+             projected_rhs,
+             problem.solid_lagrange_preconditioner);
+
+    problem.solid_solution                  = 0;
+    problem.solid_solution.block(1)         = projected_multiplier;
+    problem.solid_locally_relevant_solution = problem.solid_solution;
+
+    problem.output_results(/*cycle=*/0, /*time=*/0.0);
+
+    FunctionParser<spacedim> exact_multiplier(2 * spacedim);
+    exact_multiplier.initialize(
+      FunctionParser<spacedim>::default_variable_names(),
+      "0; 0; 1 + x + 2*y; -0.5 + 3*x - y",
+      {});
+
+    const ComponentSelectFunction<spacedim> multiplier_mask(
+      std::pair<unsigned int, unsigned int>(spacedim, 2 * spacedim),
+      2 * spacedim);
+
+    Vector<double> cellwise_error(
+      problem.solid_dh.get_triangulation().n_active_cells());
+    VectorTools::integrate_difference(problem.solid_dh,
+                                      problem.solid_locally_relevant_solution,
+                                      exact_multiplier,
+                                      cellwise_error,
+                                      QGauss<spacedim>(
+                                        problem.solid_fe->degree + 2),
+                                      VectorTools::L2_norm,
+                                      &multiplier_mask);
+
+    const double l2_error =
+      VectorTools::compute_global_error(problem.solid_dh.get_triangulation(),
+                                        cellwise_error,
+                                        VectorTools::L2_norm);
+
+    EXPECT_LT(l2_error, config.tolerance)
+      << "Configuration " << config.id << " failed with FE tuple ("
+      << config.velocity_fe << ", " << config.displacement_fe << ", "
+      << config.lagrange_fe << ") and L2 error " << l2_error;
+  }
+} // namespace
+
 TEST(Step80, GetDimensionAndSpacedimensionReadsParameterHandler)
 {
   dealii::ParameterHandler prm;
@@ -280,6 +430,50 @@ TEST(Step80, MPIIsInitialized)
 
   EXPECT_EQ(dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD), 1U);
 }
+
+// This test exercises the actual step-80 coupling operators. We interpolate a
+// manufactured velocity field into the fluid velocity space, apply the
+// velocity-to-Lagrange-multiplier coupling matrix to obtain the corresponding
+// right-hand side in the multiplier space, invert the multiplier mass matrix,
+// and then measure the L2 error of the recovered multiplier field against the
+// original analytical function on the solid mesh. We also write the fluid and
+// solid fields through NavierStokesImmersedProblem::output_results() so they
+// can be inspected in ParaView with the standard step-80 output layout.
+class CouplingProjectionParameterizedTest
+  : public ::testing::TestWithParam<CouplingProjectionConfig>
+{};
+
+TEST_P(CouplingProjectionParameterizedTest, RecoversManufacturedVelocity)
+{
+  run_coupling_projection_test(GetParam());
+}
+
+INSTANTIATE_TEST_SUITE_P(
+  FECombinations,
+  CouplingProjectionParameterizedTest,
+  ::testing::Values(CouplingProjectionConfig{"q1_q1_q1",
+                                             "FE_Q<2>(1)",
+                                             "FE_DGP<2>(0)",
+                                             "FE_Q<2>(1)",
+                                             "FE_Q<2>(1)"},
+                    CouplingProjectionConfig{"q2_q2_q2",
+                                             "FE_Q<2>(2)",
+                                             "FE_DGP<2>(1)",
+                                             "FE_Q<2>(2)",
+                                             "FE_Q<2>(2)"},
+                    CouplingProjectionConfig{"q2_q1_q1",
+                                             "FE_Q<2>(2)",
+                                             "FE_DGP<2>(1)",
+                                             "FE_Q<2>(1)",
+                                             "FE_Q<2>(1)"},
+                    CouplingProjectionConfig{"q2_q2_q1",
+                                             "FE_Q<2>(2)",
+                                             "FE_DGP<2>(1)",
+                                             "FE_Q<2>(2)",
+                                             "FE_Q<2>(1)"}),
+  [](const testing::TestParamInfo<CouplingProjectionConfig> &info) {
+    return info.param.id;
+  });
 
 // Method of manufactured solutions (MMS) verification of the Navier-Stokes
 // part of the solver without any solid. We solve a
