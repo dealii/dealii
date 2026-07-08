@@ -1289,6 +1289,9 @@ namespace Portable
   {
     if (mg_level == numbers::invalid_unsigned_int)
       {
+        AssertIndexRange(color, get_colored_graph().size());
+        AssertIndexRange(index, get_colored_graph()[color].size());
+
         const unsigned int cell_level =
           get_colored_graph()[color][index]->level();
 
@@ -1303,6 +1306,9 @@ namespace Portable
       }
     else
       {
+        AssertIndexRange(color, get_colored_level_graph().size());
+        AssertIndexRange(index, get_colored_level_graph()[color].size());
+
         const unsigned int cell_level =
           get_colored_level_graph()[color][index]->level();
 
