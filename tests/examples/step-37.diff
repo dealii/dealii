@@ -2,7 +2,7 @@
 < 
 ---
 > #include "../example_test.h"
-1003,1005c1003,1006
+976,978c976,979
 <             smoother_data[0].smoothing_range = 1e-3;
 <             smoother_data[0].degree          = numbers::invalid_unsigned_int;
 <             smoother_data[0].eig_cg_n_iterations = mg_matrices[0].m();
@@ -11,12 +11,12 @@
 >             smoother_data[0].degree          = 5;
 >             smoother_data[0].max_eigenvalue = 2;
 >             smoother_data[0].eig_cg_n_iterations = 0;
-1006a1008,1009
+979a981,982
 >         smoother_data[level].eigenvalue_algorithm =
 >           internal::EigenvalueAlgorithm::power_iteration;
-1082d1084
+1055d1057
 <     pcout << "Total setup time               (wall) " << setup_time << "s\n";
-1087,1088c1089,1094
+1060,1061c1062,1067
 <     cg.solve(system_matrix, solution, system_rhs, preconditioner);
 < 
 ---
@@ -26,14 +26,14 @@
 >                               solver_control.last_step(),
 >                               4,
 >                               7);
-1091,1093c1097,1098
+1064,1066c1070,1071
 <     pcout << "Time solve (" << solver_control.last_step() << " iterations)"
 <           << (solver_control.last_step() < 10 ? "  " : " ") << "(CPU/wall) "
 <           << time.cpu_time() << "s/" << time.wall_time() << "s\n";
 ---
 > //    pcout << "Time solve (" << solver_control.last_step() << " iterations)"
 > //          << std::endl;
-1151,1161c1156
+1124,1134c1129
 <     {
 <       const unsigned int n_vect_doubles = VectorizedArray<double>::size();
 <       const unsigned int n_vect_bits    = 8 * sizeof(double) * n_vect_doubles;
