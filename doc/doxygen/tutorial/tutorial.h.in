@@ -748,44 +748,45 @@
  *
  *   <tr valign="top">
  *     <td width="400px"> Creating a grid. A simple way to write it to a file
- *     <td>step-1</td>
  *     </td>
+ *     <td>step-1</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Degrees of freedom
- *     <td>step-2</td>
  *     </td>
+ *     <td>step-2</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Solving the Laplace equation
- *     <td>step-3</td>
  *     </td>
+ *     <td>step-3</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Dimension independent programming, non-zero data
- *     <td>step-4</td>
  *     </td>
+ *     <td>step-4</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Computing on uniformly refined meshes
- *     <td>step-5</td>
  *     </td>
+ *     <td>step-5</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Adaptivity
- *     <td>step-6, step-26</td>
  *     </td>
+ *     <td>step-6, step-26</td>
  *   </tr>
  *
  *   <tr valign="top">
  *     <td> Evaluating errors
- *     <td>step-7</td>
  *     </td>
+ *     <td>step-7</td>
+ *   </tr>
  *
  *   <tr valign="top">
  *     <td> Nonlinear problems, Newton's method
@@ -1470,7 +1471,7 @@
  *         step-57,
  *         step-70,
  *         step-104
- *    </td>
+ *     </td>
  *   </tr>
  *
  *   <tr valign="top">
@@ -1492,6 +1493,7 @@
  *
  *   <tr valign="top">
  *     <td> Coupling different equations in different parts of the domain
+ *     </td>
  *     <td>step-46</td>
  *   </tr>
  *

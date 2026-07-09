@@ -291,7 +291,7 @@ class MatrixFree;
  * DoFRenumbering::Cuthill_McKee after DoFHandler::distribute_dofs.
  *
  * With this renumbering, we needed an average of 57.3 iterations for the
- * testcase outlined above, and a runtime of 6min10s. </td> </td> </tr>
+ * testcase outlined above, and a runtime of 6min10s. </td> </tr>
  *
  * <tr> <td>
  * @image html "reorder_sparsity_step_31_boost_cmk.png"

@@ -321,7 +321,7 @@ namespace Step86
   // during the course of the simulation.
   //
   // Finally, we create the actual non-homogeneous `current_constraints` by
-  // calling `update_current_constraints). These are also used during the
+  // calling `update_current_constraints()`. These are also used during the
   // assembly and during the residual evaluation.
   template <int dim>
   void HeatEquation<dim>::setup_system(const double time)

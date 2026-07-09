@@ -1,4 +1,4 @@
-New: Added a `DoFRenumbering::component_wise`(...)` overload that accepts FEValuesExtractors, where the ordering is
+New: Added a `DoFRenumbering::component_wise()` overload that accepts FEValuesExtractors, where the ordering is
 defined by the order of the passed extractors. Convenience alias `AnyExtractor` is introduced for a variant type holding
 any of the supported `FEValuesExtractors` (scalar, vector, tensor, symmetric tensor).
 <br>
