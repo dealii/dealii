@@ -27,7 +27,7 @@ test(const unsigned int n_refinements)
   using VectorType =
     LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>;
 
-  using MatrixType   = Portable::LaplaceOperator<dim, fe_degree, Number>;
+  using MatrixType   = Portable::LaplaceOperator<dim, fe_degree, 1, Number>;
   using SmootherType = PreconditionChebyshev<MatrixType, VectorType>;
   using TransferType = Portable::MGTwoLevelTransfer<dim, VectorType>;
 
