@@ -41,6 +41,7 @@
 #include <deal.II/multigrid/mg_transfer_global_coarsening.h>
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
 #include <deal.II/multigrid/multigrid.h>
+#include <deal.II/multigrid/portable_mg_transfer_global_coarsening.h>
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
@@ -996,7 +997,7 @@ namespace Step104
                                                             max_level);
     MGLevelObject<LevelMatrixType>           mg_matrices(min_level, max_level);
 
-    MGLevelObject<MGTwoLevelTransferCopyToHost<dim, VectorType>> mg_transfers(
+    MGLevelObject<Portable::MGTwoLevelTransfer<dim, VectorType>> mg_transfers(
       min_level, max_level);
 
     std::vector<std::shared_ptr<Portable::MatrixFree<dim, Number>>>
@@ -1045,10 +1046,11 @@ namespace Step104
 
     // transfer operator
     for (unsigned int level = min_level; level < max_level; ++level)
-      mg_transfers[level + 1].reinit(mg_dof_handlers[level + 1],
-                                     mg_dof_handlers[level],
-                                     mg_constraints[level + 1],
-                                     mg_constraints[level]);
+      mg_transfers[level + 1].reinit_geometric_transfer(
+        mg_dof_handlers[level + 1],
+        mg_dof_handlers[level],
+        mg_constraints[level + 1],
+        mg_constraints[level]);
 
     MGTransferType mg_transfer(mg_transfers, [&](const auto l, auto &vec) {
       mg_matrices[l].initialize_dof_vector(vec);
