@@ -402,7 +402,7 @@ FE_PolyTensor<dim, spacedim>::shape_value_component(
   AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, dim);
 
-  std::lock_guard<std::mutex> lock(cache_mutex);
+  std::scoped_lock lock(cache_mutex);
 
   if (cached_point != p || cached_values.empty())
     {
@@ -447,7 +447,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_component(
   AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, dim);
 
-  std::lock_guard<std::mutex> lock(cache_mutex);
+  std::scoped_lock lock(cache_mutex);
 
   if (cached_point != p || cached_grads.empty())
     {
@@ -493,7 +493,7 @@ FE_PolyTensor<dim, spacedim>::shape_grad_grad_component(
   AssertIndexRange(i, this->n_dofs_per_cell());
   AssertIndexRange(component, dim);
 
-  std::lock_guard<std::mutex> lock(cache_mutex);
+  std::scoped_lock lock(cache_mutex);
 
   if (cached_point != p || cached_grad_grads.empty())
     {

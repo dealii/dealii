@@ -938,7 +938,7 @@ TensorProductMatrixSymmetricSum<dim, Number, n_rows_1d>::vmult(
   const ArrayView<Number>       &dst_view,
   const ArrayView<const Number> &src_view) const
 {
-  std::lock_guard<std::mutex> lock(this->mutex);
+  std::scoped_lock lock(this->mutex);
   this->vmult(dst_view, src_view, this->tmp_array);
 }
 

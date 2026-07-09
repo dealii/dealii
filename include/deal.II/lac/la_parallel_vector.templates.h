@@ -1036,7 +1036,7 @@ namespace LinearAlgebra
 
 #ifdef DEAL_II_WITH_MPI
       // make this function thread safe
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
 
       // allocate import_data in case it is not set up yet
       if (partitioner->n_import_indices() > 0)
@@ -1133,7 +1133,7 @@ namespace LinearAlgebra
       // compress_requests.empty()
 
       // make this function thread safe
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
       if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
         {
@@ -1197,7 +1197,7 @@ namespace LinearAlgebra
         return;
 
       // make this function thread safe
-      std::lock_guard<std::mutex> lock(mutex);
+      std::scoped_lock lock(mutex);
 
       // allocate import_data in case it is not set up yet
       if (partitioner->n_import_indices() > 0)
@@ -1295,7 +1295,7 @@ namespace LinearAlgebra
       if (update_ghost_values_requests.size() > 0)
         {
           // make this function thread safe
-          std::lock_guard<std::mutex> lock(mutex);
+          std::scoped_lock lock(mutex);
 
 #  if !defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
           if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)

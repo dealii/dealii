@@ -92,7 +92,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(vertex_to_cells_mutex);
+    std::scoped_lock lock(vertex_to_cells_mutex);
 
     if (update_flags & update_vertex_to_cell_map)
       {
@@ -116,7 +116,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(vertex_to_cell_centers_mutex);
+    std::scoped_lock lock(vertex_to_cell_centers_mutex);
 
     if (update_flags & update_vertex_to_cell_centers_directions)
       {
@@ -141,7 +141,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(used_vertices_mutex);
+    std::scoped_lock lock(used_vertices_mutex);
 
     if (update_flags & update_used_vertices)
       {
@@ -165,7 +165,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(used_vertices_rtree_mutex);
+    std::scoped_lock lock(used_vertices_rtree_mutex);
 
     if (update_flags & update_used_vertices_rtree)
       {
@@ -197,7 +197,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(cell_bounding_boxes_rtree_mutex);
+    std::scoped_lock lock(cell_bounding_boxes_rtree_mutex);
 
     if (update_flags & update_cell_bounding_boxes_rtree)
       {
@@ -231,8 +231,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(
-      locally_owned_cell_bounding_boxes_rtree_mutex);
+    std::scoped_lock lock(locally_owned_cell_bounding_boxes_rtree_mutex);
 
     if (update_flags & update_locally_owned_cell_bounding_boxes_rtree)
       {
@@ -270,7 +269,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(covering_rtree_mutex);
+    std::scoped_lock lock(covering_rtree_mutex);
 
     if (update_flags & update_covering_rtree ||
         covering_rtree.find(level) == covering_rtree.end())
@@ -311,7 +310,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(vertex_to_neighbor_subdomain_mutex);
+    std::scoped_lock lock(vertex_to_neighbor_subdomain_mutex);
 
     if (update_flags & update_vertex_to_neighbor_subdomain)
       {
@@ -342,7 +341,7 @@ namespace GridTools
     // reset the flag that indices that this needs to happen to zero), and
     // then return it. Make this thread-safe by using a mutex to guard
     // all of this:
-    std::lock_guard<std::mutex> lock(vertices_with_ghost_neighbors_mutex);
+    std::scoped_lock lock(vertices_with_ghost_neighbors_mutex);
 
     if (update_flags & update_vertex_with_ghost_neighbors)
       {

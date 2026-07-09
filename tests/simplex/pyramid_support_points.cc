@@ -34,7 +34,7 @@ test(const unsigned int degree)
     for (const auto f : fe.reference_cell().face_indices())
       {
         deallog << "Face " << f << std::endl;
-        const auto unit_face_support_points =
+        const auto &unit_face_support_points =
           fe.get_unit_face_support_points(f);
         for (const auto &p : unit_face_support_points)
           deallog << p << std::endl;

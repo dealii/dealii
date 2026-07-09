@@ -1246,8 +1246,7 @@ namespace internal
                 const unsigned int next_bucket =
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
 
-                std::lock_guard<std::mutex> lock(
-                  mutexes[*it / bucket_size_threading]);
+                std::scoped_lock lock(mutexes[*it / bucket_size_threading]);
                 for (; it != end_unique && *it < next_bucket; ++it)
                   {
                     AssertIndexRange(*it, row_lengths.size());
@@ -1285,8 +1284,7 @@ namespace internal
                 const unsigned int next_bucket =
                   (*it / bucket_size_threading + 1) * bucket_size_threading;
 
-                std::lock_guard<std::mutex> lock(
-                  mutexes[*it / bucket_size_threading]);
+                std::scoped_lock lock(mutexes[*it / bucket_size_threading]);
                 for (; it != end_unique && *it < next_bucket; ++it)
                   if (row_lengths[*it] > 0)
                     connectivity_dof.add(*it, block);

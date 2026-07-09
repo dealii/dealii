@@ -62,7 +62,7 @@ ParameterAcceptor::ParameterAcceptor(const std::string &name)
   : acceptor_id(ParameterAcceptor::get_next_free_id())
   , section_name(name)
 {
-  std::lock_guard<std::mutex> l(class_list_mutex);
+  std::scoped_lock l(class_list_mutex);
   class_list.insert(this);
 }
 
@@ -70,7 +70,7 @@ ParameterAcceptor::ParameterAcceptor(const std::string &name)
 
 ParameterAcceptor::~ParameterAcceptor()
 {
-  std::lock_guard<std::mutex> l(class_list_mutex);
+  std::scoped_lock l(class_list_mutex);
   // Notice that it is possible that the class is no longer in the static list.
   // This happens when the clear() method has been called. erase() does the
   // righy thing anyway by only removing this class if it's still in the list.
@@ -137,7 +137,7 @@ ParameterAcceptor::initialize(std::istream &input_stream, ParameterHandler &prm)
 void
 ParameterAcceptor::clear()
 {
-  std::lock_guard<std::mutex> l(class_list_mutex);
+  std::scoped_lock l(class_list_mutex);
   class_list.clear();
   prm.clear();
 }
@@ -294,9 +294,9 @@ ParameterAcceptor::get_acceptor_id() const
 unsigned int
 ParameterAcceptor::get_next_free_id()
 {
-  static std::mutex           id_mutex;
-  std::lock_guard<std::mutex> lock(id_mutex);
-  static int                  current_id = 0;
+  static std::mutex id_mutex;
+  std::scoped_lock  lock(id_mutex);
+  static int        current_id = 0;
   return current_id++;
 }
 

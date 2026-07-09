@@ -41,7 +41,7 @@ namespace Threads
       // std::abort, though
       static Mutex mutex;
       {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
 
         std::cerr
           << std::endl
@@ -81,7 +81,7 @@ namespace Threads
       // std::abort, though
       static Mutex mutex;
       {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::scoped_lock lock(mutex);
 
         std::cerr
           << std::endl

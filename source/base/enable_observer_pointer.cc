@@ -136,7 +136,7 @@ void
 EnableObserverPointer::subscribe(std::atomic<bool> *const validity,
                                  const std::string       &id) const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   if (object_info == nullptr)
     object_info = &typeid(*this);
@@ -161,7 +161,7 @@ EnableObserverPointer::unsubscribe(std::atomic<bool> *const validity,
       return;
     }
 
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   auto it = counter_map.find(id);
   if (it == counter_map.end())

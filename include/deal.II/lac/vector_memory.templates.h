@@ -112,7 +112,7 @@ inline GrowingVectorMemory<VectorType>::GrowingVectorMemory(
   // the member variable being accessed is 'static', which is the case
   // for the things get_pool() returns, and in that case the mutex itself
   // must also be 'static' as it is here.
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
   get_pool().initialize(initial_size);
 }
 
@@ -137,7 +137,7 @@ template <typename VectorType>
 inline VectorType *
 GrowingVectorMemory<VectorType>::alloc()
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   ++total_alloc;
   ++current_alloc;
@@ -166,7 +166,7 @@ template <typename VectorType>
 inline void
 GrowingVectorMemory<VectorType>::free(const VectorType *const v)
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   // Find the vector to be de-allocated and mark it as now unused:
   for (entry_type &i : *get_pool().data)
@@ -190,7 +190,7 @@ template <typename VectorType>
 inline void
 GrowingVectorMemory<VectorType>::release_unused_memory()
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   if (get_pool().data != nullptr)
     get_pool().data->clear();
@@ -202,7 +202,7 @@ template <typename VectorType>
 inline std::size_t
 GrowingVectorMemory<VectorType>::memory_consumption() const
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::scoped_lock lock(mutex);
 
   std::size_t result = sizeof(*this);
   for (const auto &[_, ptr] : *get_pool().data)

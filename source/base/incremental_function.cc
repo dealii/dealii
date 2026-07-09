@@ -52,7 +52,7 @@ namespace Functions
   {
     // since we modify a mutable member variable, lock the
     // the data via a mutex
-    std::lock_guard<std::mutex> lock(mutex);
+    std::scoped_lock lock(mutex);
 
     // Cache the time state of the base class in case it has been changed
     // within the user code. We reset the wrapped function to the original
@@ -81,7 +81,7 @@ namespace Functions
   {
     // since we modify a mutable member variable, lock the
     // the data via a mutex
-    std::lock_guard<std::mutex> lock(mutex);
+    std::scoped_lock lock(mutex);
 
     // Cache the time state of the base class in case it has been changed
     // within the user code. We reset the wrapped function to the original

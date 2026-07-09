@@ -389,7 +389,7 @@ FE_SimplexPoly<dim, spacedim>::get_prolongation_matrix(
   // initialization upon first request
   if (this->prolongation[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(prolongation_matrix_mutex);
+      std::scoped_lock lock(prolongation_matrix_mutex);
 
       // if matrix got updated while waiting for the lock
       if (this->prolongation[refinement_case - 1][child].n() ==
@@ -483,7 +483,7 @@ FE_SimplexPoly<dim, spacedim>::get_restriction_matrix(
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(restriction_matrix_mutex);
+      std::scoped_lock lock(restriction_matrix_mutex);
 
       // if matrix got updated while waiting for the lock
       if (this->restriction[refinement_case - 1][child].n() ==
@@ -998,8 +998,8 @@ FE_SimplexP<dim, spacedim>::hp_line_dof_identities(
       std::vector<std::pair<unsigned int, unsigned int>> identities;
       // check if the support points are the same location on the line
       // to avoid rescaling for pyramids use the support points on the faces
-      const auto face_support_points = this->get_unit_face_support_points(0);
-      const auto face_support_points_other =
+      const auto &face_support_points = this->get_unit_face_support_points(0);
+      const auto &face_support_points_other =
         fe_other.get_unit_face_support_points(0);
 
       // now just compare the DoFs on the line going from [0,0] to [1,0]
@@ -1070,8 +1070,8 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
         (dynamic_cast<const FE_PyramidP<dim> *>(&fe_other) != nullptr) ? 1 : 0;
 
       // compare the face support points
-      const auto face_support_points = this->get_unit_face_support_points(0);
-      const auto face_support_points_other =
+      const auto &face_support_points = this->get_unit_face_support_points(0);
+      const auto &face_support_points_other =
         fe_other.get_unit_face_support_points(face_no_neighbor);
 
       // get the offsets to only compare the DoFs within the face as the
@@ -1270,7 +1270,7 @@ FE_SimplexDGP<dim, spacedim>::get_restriction_matrix(
   // initialization upon first request
   if (this->restriction[refinement_case - 1][child].n() == 0)
     {
-      std::lock_guard<std::mutex> lock(this->restriction_matrix_mutex);
+      std::scoped_lock lock(this->restriction_matrix_mutex);
 
       // if matrix got updated while waiting for the lock
       if (this->restriction[refinement_case - 1][child].n() ==

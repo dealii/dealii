@@ -192,7 +192,7 @@ LogStream::operator<<(std::ostream &(*p)(std::ostream &))
 
   if (query_streambuf.flushed())
     {
-      std::lock_guard<std::mutex> lock(write_lock);
+      std::scoped_lock lock(write_lock);
 
       // Print the line head in case of a previous newline:
       if (at_newline)
@@ -219,7 +219,7 @@ LogStream::attach(std::ostream                 &o,
                   const bool                    print_job_id,
                   const std::ios_base::fmtflags flags)
 {
-  std::lock_guard<std::mutex> lock(log_lock);
+  std::scoped_lock lock(log_lock);
   file = &o;
   o.setf(flags);
   if (print_job_id)
@@ -230,7 +230,7 @@ LogStream::attach(std::ostream                 &o,
 void
 LogStream::detach()
 {
-  std::lock_guard<std::mutex> lock(log_lock);
+  std::scoped_lock lock(log_lock);
   file = nullptr;
 }
 
@@ -348,9 +348,9 @@ LogStream::width(const std::streamsize wide)
 unsigned int
 LogStream::depth_console(const unsigned int n)
 {
-  std::lock_guard<std::mutex> lock(log_lock);
-  const unsigned int          h = std_depth;
-  std_depth                     = n;
+  std::scoped_lock   lock(log_lock);
+  const unsigned int h = std_depth;
+  std_depth            = n;
   return h;
 }
 
@@ -359,9 +359,9 @@ LogStream::depth_console(const unsigned int n)
 unsigned int
 LogStream::depth_file(const unsigned int n)
 {
-  std::lock_guard<std::mutex> lock(log_lock);
-  const unsigned int          h = file_depth;
-  file_depth                    = n;
+  std::scoped_lock   lock(log_lock);
+  const unsigned int h = file_depth;
+  file_depth           = n;
   return h;
 }
 
@@ -370,9 +370,9 @@ LogStream::depth_file(const unsigned int n)
 bool
 LogStream::log_thread_id(const bool flag)
 {
-  std::lock_guard<std::mutex> lock(log_lock);
-  const bool                  h = print_thread_id;
-  print_thread_id               = flag;
+  std::scoped_lock lock(log_lock);
+  const bool       h = print_thread_id;
+  print_thread_id    = flag;
   return h;
 }
 

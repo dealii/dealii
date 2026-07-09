@@ -22,7 +22,7 @@ permissions:
 jobs:
   tidy:
     name: tidy
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
