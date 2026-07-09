@@ -63,8 +63,8 @@ namespace Portable
    *
    * The transfer is built from the underlying DoFHandler and AffineConstraints
    * objects on the coarse and fine side, collecting an explicit copy of all
-   * indices on both sides. For the moment, this works with FE_Q and a single
-   * DoFHandler.
+   * indices on both sides. At the moment, this class supports FE_Q and
+   * FESystem(FE_Q).
    */
   template <int dim, typename VectorType>
   class MGTwoLevelTransfer
@@ -206,7 +206,7 @@ namespace Portable
       using TeamHandle = Kokkos::TeamPolicy<
         MemorySpace::Default::kokkos_space::execution_space>::member_type;
 
-      using SharedViewValues =
+      using SharedViewScratchPad =
         Kokkos::View<Number *,
                      MemorySpace::Default::kokkos_space::execution_space::
                        scratch_memory_space,
@@ -220,22 +220,22 @@ namespace Portable
       /**
        * Prolongation matrix in the scratch device memory.
        */
-      const SharedViewValues &prolongation_matrix_device;
+      const SharedViewScratchPad &prolongation_matrix_device;
 
       /**
        * Memory for coarse dof values.
        */
-      SharedViewValues &values_coarse;
+      SharedViewScratchPad &values_coarse;
 
       /**
        * Memory for fine dof values.
        */
-      SharedViewValues &values_fine;
+      SharedViewScratchPad &values_fine;
 
       /**
        * Memory for temporary arrays required by kernel evaluation.
        */
-      SharedViewValues &scratch_pad;
+      SharedViewScratchPad &scratch_pad;
     };
 
   protected:

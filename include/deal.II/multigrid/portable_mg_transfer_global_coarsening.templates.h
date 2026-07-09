@@ -81,6 +81,16 @@ namespace Portable
             kernel.template run<8, 4>();
             return true; // fast path taken
           }
+        if (degree_fine == 10 && degree_coarse == 5)
+          {
+            kernel.template run<8, 4>();
+            return true; // fast path taken
+          }
+        if (degree_fine == 12 && degree_coarse == 6)
+          {
+            kernel.template run<8, 4>();
+            return true; // fast path taken
+          }
 
         // due to limited functionality (e.g., FE_Q only) at the moment this
         // should be unreachable due to the checks in the initialization phase
@@ -104,7 +114,7 @@ namespace Portable
       using TeamHandle = Kokkos::TeamPolicy<
         MemorySpace::Default::kokkos_space::execution_space>::member_type;
 
-      using SharedViewValues =
+      using SharedViewScratchPad =
         Kokkos::View<Number *,
                      MemorySpace::Default::kokkos_space::execution_space::
                        scratch_memory_space,
@@ -113,12 +123,8 @@ namespace Portable
       DEAL_II_HOST_DEVICE
       CellProlongator(
         const typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData
-                                  *cell_data,
-        const DeviceVector<Number> src,
-        const DeviceVector<Number> dst)
+          *cell_data)
         : cell_data(cell_data)
-        , src(src)
-        , dst(dst)
       {}
 
       template <int degree_fine, int degree_coarse>
@@ -149,8 +155,8 @@ namespace Portable
             scratch_memory_space>
           eval(team_member,
                prolongation_matrix_scratch,
-               SharedViewValues(),
-               SharedViewValues(),
+               SharedViewScratchPad(),
+               SharedViewScratchPad(),
                scratch_for_eval);
 
         // apply kernel in each direction
@@ -189,9 +195,7 @@ namespace Portable
 
     private:
       const typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData
-                                *cell_data;
-      const DeviceVector<Number> src;
-      const DeviceVector<Number> dst;
+        *cell_data;
     };
 
     /**
@@ -206,7 +210,7 @@ namespace Portable
       using TeamHandle = Kokkos::TeamPolicy<
         MemorySpace::Default::kokkos_space::execution_space>::member_type;
 
-      using SharedViewValues =
+      using SharedViewScratchPad =
         Kokkos::View<Number *,
                      MemorySpace::Default::kokkos_space::execution_space::
                        scratch_memory_space,
@@ -215,12 +219,8 @@ namespace Portable
       DEAL_II_HOST_DEVICE
       CellRestrictor(
         const typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData
-                                  *cell_data,
-        const DeviceVector<Number> src,
-        const DeviceVector<Number> dst)
+          *cell_data)
         : cell_data(cell_data)
-        , src(src)
-        , dst(dst)
       {}
 
       template <int degree_fine, int degree_coarse>
@@ -251,8 +251,8 @@ namespace Portable
             scratch_memory_space>
           eval(team_member,
                prolongation_matrix_scratch,
-               SharedViewValues(),
-               SharedViewValues(),
+               SharedViewScratchPad(),
+               SharedViewScratchPad(),
                scratch_for_eval);
 
         // apply kernel in each direction
@@ -291,9 +291,7 @@ namespace Portable
 
     private:
       const typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData
-                                *cell_data;
-      const DeviceVector<Number> src;
-      const DeviceVector<Number> dst;
+        *cell_data;
     };
 
     class MGTwoLevelTransferImplementation
@@ -630,6 +628,13 @@ namespace Portable
         using Number = typename VectorType::value_type;
 
         using SharedViewValues =
+          Kokkos::View<Number **,
+                       Kokkos::LayoutLeft,
+                       MemorySpace::Default::kokkos_space::execution_space::
+                         scratch_memory_space,
+                       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
+        using SharedViewScratchPad =
           Kokkos::View<Number *,
                        MemorySpace::Default::kokkos_space::execution_space::
                          scratch_memory_space,
@@ -644,10 +649,17 @@ namespace Portable
 
         unsigned int scheme_index = 0;
 
+        const unsigned int n_components = transfer.n_components;
+
         for (const auto &scheme : transfer.schemes)
           {
             if (scheme.n_coarse_cells == 0)
               continue;
+
+            const unsigned int n_scalar_dofs_per_cell_coarse =
+              scheme.n_dofs_per_cell_coarse / n_components;
+            const unsigned int n_scalar_dofs_per_cell_fine =
+              scheme.n_dofs_per_cell_fine / n_components;
 
             auto team_policy =
               TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
@@ -665,15 +677,15 @@ namespace Portable
                 (scheme.degree_coarse + scheme.degree_fine + 2);
 
             const auto team_shmem_size =
-              SharedViewValues::shmem_size(
-                scheme.n_dofs_per_cell_coarse) + // coarse dof values
-              SharedViewValues::shmem_size(
-                scheme.n_dofs_per_cell_fine) + // fine dof values
-              SharedViewValues::shmem_size(
+              SharedViewValues::shmem_size(n_scalar_dofs_per_cell_coarse,
+                                           n_components) + // coarse dof values
+              SharedViewValues::shmem_size(n_scalar_dofs_per_cell_fine,
+                                           n_components) + // fine dof values
+              SharedViewScratchPad::shmem_size(
                 (scheme.degree_coarse + 1) *
                 (scheme.degree_fine + 1)) // prolongation matrix
               +
-              SharedViewValues::shmem_size(
+              SharedViewScratchPad::shmem_size(
                 scratch_pad_size); // scratch pad for tensor product evaluation
 
             team_policy.set_scratch_size(0, Kokkos::PerTeam(team_shmem_size));
@@ -685,18 +697,20 @@ namespace Portable
               KOKKOS_LAMBDA(const TeamHandle &team_member) {
                 const int coarse_cell_index = team_member.league_rank();
 
-                SharedViewValues prolongation_matrix_device(
+                SharedViewScratchPad prolongation_matrix_device(
                   team_member.team_shmem(),
                   (scheme.degree_coarse + 1) * (scheme.degree_fine + 1));
 
                 SharedViewValues values_coarse(team_member.team_shmem(),
-                                               scheme.n_dofs_per_cell_coarse);
+                                               n_scalar_dofs_per_cell_coarse,
+                                               n_components);
 
                 SharedViewValues values_fine(team_member.team_shmem(),
-                                             scheme.n_dofs_per_cell_fine);
+                                             n_scalar_dofs_per_cell_fine,
+                                             n_components);
 
-                SharedViewValues scratch_pad(team_member.team_shmem(),
-                                             scratch_pad_size);
+                SharedViewScratchPad scratch_pad(team_member.team_shmem(),
+                                                 scratch_pad_size);
 
                 // copy prolongation matrix to the scratch memory
                 Kokkos::parallel_for(
@@ -713,28 +727,43 @@ namespace Portable
                 Kokkos::parallel_for(
                   Kokkos::TeamThreadRange(team_member,
                                           scheme.n_dofs_per_cell_coarse),
-                  [&](const int &i) {
-                    const unsigned int dof_index =
-                      scheme.dof_indices_coarse(i, coarse_cell_index);
-                    if (dof_index != numbers::invalid_unsigned_int)
-                      values_coarse(i) = src_device[dof_index];
+                  [&](const int &thread_id) {
+                    const int component =
+                      thread_id / n_scalar_dofs_per_cell_coarse;
+                    const int local_dof =
+                      thread_id % n_scalar_dofs_per_cell_coarse;
+
+                    const unsigned int global_dof =
+                      scheme.dof_indices_coarse(thread_id, coarse_cell_index);
+
+                    if (global_dof != numbers::invalid_unsigned_int)
+                      values_coarse(local_dof, component) =
+                        src_device[global_dof];
                     else
-                      values_coarse(i) = 0.;
+                      values_coarse(local_dof, component) = 0.;
                   });
                 team_member.team_barrier();
 
-                typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData
-                  cell_data{team_member,
-                            prolongation_matrix_device,
-                            values_coarse,
-                            values_fine,
-                            scratch_pad};
+                for (unsigned int c = 0; c < n_components; ++c)
+                  {
+                    SharedViewScratchPad values_coarse_component =
+                      Kokkos::subview(values_coarse, Kokkos::ALL, c);
+                    SharedViewScratchPad values_fine_component =
+                      Kokkos::subview(values_fine, Kokkos::ALL, c);
 
-                CellProlongator<dim, VectorType> cell_prolongator(&cell_data,
-                                                                  src_device,
-                                                                  dst_device);
+                    typename MGTwoLevelTransfer<dim,
+                                                VectorType>::TransferCellData
+                      cell_data{team_member,
+                                prolongation_matrix_device,
+                                values_coarse_component,
+                                values_fine_component,
+                                scratch_pad};
 
-                cell_transfer.run(cell_prolongator);
+                    CellProlongator<dim, VectorType> cell_prolongator(
+                      &cell_data);
+
+                    cell_transfer.run(cell_prolongator);
+                  }
 
                 // apply weights if element is continuous
                 if (scheme.weights.size() > 0)
@@ -742,8 +771,14 @@ namespace Portable
                     Kokkos::parallel_for(
                       Kokkos::TeamThreadRange(team_member,
                                               scheme.n_dofs_per_cell_fine),
-                      [&](const int &i) {
-                        values_fine(i) *= scheme.weights(i, coarse_cell_index);
+                      [&](const int &thread_id) {
+                        const int component =
+                          thread_id / n_scalar_dofs_per_cell_fine;
+                        const int local_dof =
+                          thread_id % n_scalar_dofs_per_cell_fine;
+
+                        values_fine(local_dof, component) *=
+                          scheme.weights(thread_id, coarse_cell_index);
                       });
                     team_member.team_barrier();
                   }
@@ -752,10 +787,17 @@ namespace Portable
                 Kokkos::parallel_for(
                   Kokkos::TeamThreadRange(team_member,
                                           scheme.n_dofs_per_cell_fine),
-                  [&](const int &i) {
-                    const unsigned int dof_index =
-                      scheme.dof_indices_fine(i, coarse_cell_index);
-                    Kokkos::atomic_add(&dst_device[dof_index], values_fine(i));
+                  [&](const int &thread_id) {
+                    const int component =
+                      thread_id / n_scalar_dofs_per_cell_fine;
+                    const int local_dof =
+                      thread_id % n_scalar_dofs_per_cell_fine;
+
+                    const unsigned int global_dof =
+                      scheme.dof_indices_fine(thread_id, coarse_cell_index);
+
+                    Kokkos::atomic_add(&dst_device[global_dof],
+                                       values_fine(local_dof, component));
                   });
                 team_member.team_barrier();
               });
@@ -780,6 +822,13 @@ namespace Portable
         using Number = typename VectorType::value_type;
 
         using SharedViewValues =
+          Kokkos::View<Number **,
+                       Kokkos::LayoutLeft,
+                       MemorySpace::Default::kokkos_space::execution_space::
+                         scratch_memory_space,
+                       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
+        using SharedViewScratchPad =
           Kokkos::View<Number *,
                        MemorySpace::Default::kokkos_space::execution_space::
                          scratch_memory_space,
@@ -792,12 +841,19 @@ namespace Portable
         DeviceVector<Number> src_device(src.get_values(),
                                         src.locally_owned_size());
 
+        const unsigned int n_components = transfer.n_components;
+
         unsigned int scheme_index = 0;
 
         for (const auto &scheme : transfer.schemes)
           {
             if (scheme.n_coarse_cells == 0)
               continue;
+
+            const unsigned int n_scalar_dofs_per_cell_coarse =
+              scheme.n_dofs_per_cell_coarse / n_components;
+            const unsigned int n_scalar_dofs_per_cell_fine =
+              scheme.n_dofs_per_cell_fine / n_components;
 
             auto team_policy =
               TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
@@ -815,15 +871,15 @@ namespace Portable
                 (scheme.degree_coarse + scheme.degree_fine + 2);
 
             const auto team_shmem_size =
-              SharedViewValues::shmem_size(
-                scheme.n_dofs_per_cell_coarse) + // coarse dof values
-              SharedViewValues::shmem_size(
-                scheme.n_dofs_per_cell_fine) + // fine dof values
-              SharedViewValues::shmem_size(
+              SharedViewValues::shmem_size(n_scalar_dofs_per_cell_coarse,
+                                           n_components) + // coarse dof values
+              SharedViewValues::shmem_size(n_scalar_dofs_per_cell_fine,
+                                           n_components) + // fine dof values
+              SharedViewScratchPad::shmem_size(
                 (scheme.degree_coarse + 1) *
                 (scheme.degree_fine + 1)) // prolongation matrix
               +
-              SharedViewValues::shmem_size(
+              SharedViewScratchPad::shmem_size(
                 scratch_pad_size); // scratch pad for tensor product evaluation
 
             team_policy.set_scratch_size(0, Kokkos::PerTeam(team_shmem_size));
@@ -835,18 +891,20 @@ namespace Portable
               KOKKOS_LAMBDA(const TeamHandle &team_member) {
                 const int coarse_cell_index = team_member.league_rank();
 
-                SharedViewValues prolongation_matrix_device(
+                SharedViewScratchPad prolongation_matrix_device(
                   team_member.team_shmem(),
                   (scheme.degree_coarse + 1) * (scheme.degree_fine + 1));
 
                 SharedViewValues values_coarse(team_member.team_shmem(),
-                                               scheme.n_dofs_per_cell_coarse);
+                                               n_scalar_dofs_per_cell_coarse,
+                                               n_components);
 
                 SharedViewValues values_fine(team_member.team_shmem(),
-                                             scheme.n_dofs_per_cell_fine);
+                                             n_scalar_dofs_per_cell_fine,
+                                             n_components);
 
-                SharedViewValues scratch_pad(team_member.team_shmem(),
-                                             scratch_pad_size);
+                SharedViewScratchPad scratch_pad(team_member.team_shmem(),
+                                                 scratch_pad_size);
 
                 // copy prolongation matrix to the scratch memory
                 Kokkos::parallel_for(
@@ -863,10 +921,16 @@ namespace Portable
                 Kokkos::parallel_for(
                   Kokkos::TeamThreadRange(team_member,
                                           scheme.n_dofs_per_cell_fine),
-                  [&](const int &i) {
-                    const unsigned int dof_index =
-                      scheme.dof_indices_fine(i, coarse_cell_index);
-                    values_fine(i) = src_device[dof_index];
+                  [&](const int &thread_id) {
+                    const int component =
+                      thread_id / n_scalar_dofs_per_cell_fine;
+                    const int local_dof =
+                      thread_id % n_scalar_dofs_per_cell_fine;
+
+                    const unsigned int global_dof =
+                      scheme.dof_indices_fine(thread_id, coarse_cell_index);
+
+                    values_fine(local_dof, component) = src_device[global_dof];
                   });
                 team_member.team_barrier();
 
@@ -876,35 +940,54 @@ namespace Portable
                     Kokkos::parallel_for(
                       Kokkos::TeamThreadRange(team_member,
                                               scheme.n_dofs_per_cell_fine),
-                      [&](const int &i) {
-                        values_fine(i) *= scheme.weights(i, coarse_cell_index);
+                      [&](const int &thread_id) {
+                        const int component =
+                          thread_id / n_scalar_dofs_per_cell_fine;
+                        const int local_dof =
+                          thread_id % n_scalar_dofs_per_cell_fine;
+
+                        values_fine(local_dof, component) *=
+                          scheme.weights(thread_id, coarse_cell_index);
                       });
                     team_member.team_barrier();
                   }
 
-                typename MGTwoLevelTransfer<dim, VectorType>::TransferCellData
-                  cell_data{team_member,
-                            prolongation_matrix_device,
-                            values_coarse,
-                            values_fine,
-                            scratch_pad};
+                for (unsigned int c = 0; c < n_components; ++c)
+                  {
+                    SharedViewScratchPad values_coarse_component =
+                      Kokkos::subview(values_coarse, Kokkos::ALL, c);
+                    SharedViewScratchPad values_fine_component =
+                      Kokkos::subview(values_fine, Kokkos::ALL, c);
 
-                CellRestrictor<dim, VectorType> cell_restrictor(&cell_data,
-                                                                src_device,
-                                                                dst_device);
+                    typename MGTwoLevelTransfer<dim,
+                                                VectorType>::TransferCellData
+                      cell_data{team_member,
+                                prolongation_matrix_device,
+                                values_coarse_component,
+                                values_fine_component,
+                                scratch_pad};
 
-                cell_transfer.run(cell_restrictor);
+                    CellRestrictor<dim, VectorType> cell_restrictor(&cell_data);
+
+                    cell_transfer.run(cell_restrictor);
+                  }
 
                 // distribute coarse dofs values
                 Kokkos::parallel_for(
                   Kokkos::TeamThreadRange(team_member,
                                           scheme.n_dofs_per_cell_coarse),
-                  [&](const int &i) {
-                    const unsigned int dof_index =
-                      scheme.dof_indices_coarse(i, coarse_cell_index);
-                    if (dof_index != numbers::invalid_unsigned_int)
-                      Kokkos::atomic_add(&dst_device[dof_index],
-                                         values_coarse(i));
+                  [&](const int &thread_id) {
+                    const int component =
+                      thread_id / n_scalar_dofs_per_cell_coarse;
+                    const int local_dof =
+                      thread_id % n_scalar_dofs_per_cell_coarse;
+
+                    const unsigned int global_dof =
+                      scheme.dof_indices_coarse(thread_id, coarse_cell_index);
+
+                    if (global_dof != numbers::invalid_unsigned_int)
+                      Kokkos::atomic_add(&dst_device[global_dof],
+                                         values_coarse(local_dof, component));
                   });
                 team_member.team_barrier();
               });
