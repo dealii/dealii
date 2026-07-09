@@ -1,4 +1,4 @@
-Running on 1 MPI ranks (with  threads each) in DEBUG mode
+Running on 1 MPI ranks (with  threads each)
 Kokkos execution space: Serial
 dim: 3
 Element: Q2-Q1
