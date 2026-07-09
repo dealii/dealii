@@ -741,6 +741,11 @@ export
   {
     using __gnu_cxx::operator-;
     using __gnu_cxx::operator==;
+    using __gnu_cxx::operator<;
+    using __gnu_cxx::operator<=;
+    using __gnu_cxx::operator>;
+    using __gnu_cxx::operator>=;
+    using __gnu_cxx::operator!=;
     using __gnu_cxx::operator<=>;
   } // namespace __gnu_cxx
 
