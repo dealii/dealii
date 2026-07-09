@@ -76,7 +76,7 @@
  * Many functions and classes in deal.II require an object which knows how to
  * calculate matrix-vector products (the member function <code>vmult</code>),
  * transposed matrix-vector products (the member function
- * <code>Tvmult</code>), as well as the `multiply and add` equivalents
+ * <code>Tvmult</code>), as well as the "multiply and add" equivalents
  * <code>vmult_add</code> and <code>Tvmult_add</code>. Some functions only
  * require <code>vmult</code> and <code>Tvmult</code>, but an object should
  * implement all four member functions if the template requires a MatrixType
