@@ -534,7 +534,7 @@ jobs:
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            ninja-build wget lsb-release gnupg g++-15
+            ninja-build wget lsb-release gnupg g++-16
         sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 23
     - uses: actions/checkout@v7
       with:
