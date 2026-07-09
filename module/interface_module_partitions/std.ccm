@@ -730,21 +730,7 @@ export
   } // namespace std
 
 
-// When compiling with Clang but using (as is the default) the GCC standard
-// library, we have to export a few symbols from the __gnu_cxx namespace as
-// well. Interestingly, we only need to do this when compiling with Clang but
-// not with GCC; the latter apparently finds these symbols itself and will
-// instead issue errors if we try to export them here.
-#if defined(__GLIBCXX__) && defined(__clang__)
-
-  namespace __gnu_cxx
-  {
-    using __gnu_cxx::operator-;
-    using __gnu_cxx::operator==;
-    using __gnu_cxx::operator<=>;
-  } // namespace __gnu_cxx
-
-#elif defined(_LIBCPP_VERSION) // For CLang's support library
+#if defined(_LIBCPP_VERSION) // For CLang's support library
 
   _LIBCPP_BEGIN_NAMESPACE_STD
 
