@@ -83,12 +83,12 @@ namespace Portable
           }
         if (degree_fine == 10 && degree_coarse == 5)
           {
-            kernel.template run<8, 4>();
+            kernel.template run<10, 5>();
             return true; // fast path taken
           }
         if (degree_fine == 12 && degree_coarse == 6)
           {
-            kernel.template run<8, 4>();
+            kernel.template run<12, 6>();
             return true; // fast path taken
           }
 
@@ -765,25 +765,7 @@ namespace Portable
                     cell_transfer.run(cell_prolongator);
                   }
 
-                // apply weights if element is continuous
-                if (scheme.weights.size() > 0)
-                  {
-                    Kokkos::parallel_for(
-                      Kokkos::TeamThreadRange(team_member,
-                                              scheme.n_dofs_per_cell_fine),
-                      [&](const int &thread_id) {
-                        const int component =
-                          thread_id / n_scalar_dofs_per_cell_fine;
-                        const int local_dof =
-                          thread_id % n_scalar_dofs_per_cell_fine;
-
-                        values_fine(local_dof, component) *=
-                          scheme.weights(thread_id, coarse_cell_index);
-                      });
-                    team_member.team_barrier();
-                  }
-
-                // distributed fine values
+                // apply weights and add fine values into results vector
                 Kokkos::parallel_for(
                   Kokkos::TeamThreadRange(team_member,
                                           scheme.n_dofs_per_cell_fine),
@@ -796,8 +778,12 @@ namespace Portable
                     const unsigned int global_dof =
                       scheme.dof_indices_fine(thread_id, coarse_cell_index);
 
+                    const Number weight =
+                      scheme.weights(thread_id, coarse_cell_index);
+
                     Kokkos::atomic_add(&dst_device[global_dof],
-                                       values_fine(local_dof, component));
+                                       weight *
+                                         values_fine(local_dof, component));
                   });
                 team_member.team_barrier();
               });
@@ -917,7 +903,7 @@ namespace Portable
                   });
                 team_member.team_barrier();
 
-                // read fine dof values
+                // read fine dof values and apply weights
                 Kokkos::parallel_for(
                   Kokkos::TeamThreadRange(team_member,
                                           scheme.n_dofs_per_cell_fine),
@@ -927,30 +913,16 @@ namespace Portable
                     const int local_dof =
                       thread_id % n_scalar_dofs_per_cell_fine;
 
+                    const Number weight =
+                      scheme.weights(thread_id, coarse_cell_index);
+
                     const unsigned int global_dof =
                       scheme.dof_indices_fine(thread_id, coarse_cell_index);
 
-                    values_fine(local_dof, component) = src_device[global_dof];
+                    values_fine(local_dof, component) =
+                      weight * src_device[global_dof];
                   });
                 team_member.team_barrier();
-
-                // apply weights if element is continuous
-                if (scheme.weights.size() > 0)
-                  {
-                    Kokkos::parallel_for(
-                      Kokkos::TeamThreadRange(team_member,
-                                              scheme.n_dofs_per_cell_fine),
-                      [&](const int &thread_id) {
-                        const int component =
-                          thread_id / n_scalar_dofs_per_cell_fine;
-                        const int local_dof =
-                          thread_id % n_scalar_dofs_per_cell_fine;
-
-                        values_fine(local_dof, component) *=
-                          scheme.weights(thread_id, coarse_cell_index);
-                      });
-                    team_member.team_barrier();
-                  }
 
                 for (unsigned int c = 0; c < n_components; ++c)
                   {
