@@ -112,6 +112,13 @@ VERBATIM_HEADERS       = NO
 ALPHABETICAL_INDEX     = YES
 
 #---------------------------------------------------------------------------
+# configuration options related to the markdown formatting
+#---------------------------------------------------------------------------
+
+MARKDOWN_SUPPORT       = YES
+MARKDOWN_STRICT        = NO
+
+#---------------------------------------------------------------------------
 # configuration options related to the HTML output
 #---------------------------------------------------------------------------
 
