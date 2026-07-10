@@ -214,7 +214,7 @@ namespace fast_transcendental
      * <ol>
      *
      * <li> Static cast of each floating-point value to its corresponding integer
-     * type (`float` to `int32_t`, `double` to int64_t`).
+     * type (`float` to `int32_t`, `double` to `int64_t`).
      *
      * <li> Reinterpretation of the resulting integer vector as a floating-point
      * vector via bitwise casting.

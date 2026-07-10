@@ -186,13 +186,13 @@
  * freedom that correspond to a single block are enumerated consecutively.
  *
  * If you do this, you naturally partition matrices and vectors into blocks as
- * well (see @ref GlossBlockLA "block (linear algebra)).  In most cases, when
+ * well (see @ref GlossBlockLA "block (linear algebra)"). In most cases, when
  * you subdivide a matrix or vector into blocks, you do so by creating one
  * block for each block defined by the finite element (i.e. in most practical
  * cases the FESystem object). However, this needs not be so: the
  * DoFRenumbering::component_wise function allows to group several vector
  * components or finite element blocks into the same logical block (see, for
- * example, the @ref step_22 "step-22" or step-31 tutorial programs, as
+ * example, the step-22 or step-31 tutorial programs, as
  * opposed to step-20). As a consequence, using this feature, we can achieve
  * the same result, i.e. subdividing matrices into $2\times 2$ blocks and
  * vectors into 2 blocks, for the second way of creating a Stokes element
