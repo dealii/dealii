@@ -20,6 +20,37 @@ which corresponds to best-approximation of the Q2 and Q1 spaces)
 and decent linear scaling with problem size: A factor 8 in increase in unknowns leads to
 a factor of 8 in solve time, at least on the finer refinement levels.
 
+<h3>Higher Order Throughput</h3>
+
+GPUs profit from fine-grained parallelism. In fact, a modern GPU like an H100 requires
+a significant number of small parallel work items to saturate the device. An H100 has
+132 SMs, each needing about 10-20 thread blocks to be occupied, with 256 threads per
+block. This would require at least 300,000 parallel threads to make use of the whole
+GPU. This is only a simplified estimate and only holds in the case the parallel task
+is compute-bound, while here, in fact, most kernels are typically memory-bound.
+Regardless, the matrix-free operator and smoother application is parallelized by
+a loop over cells and inner loops over 1d or 3d quadrature point loops, depending on the
+operation. This means that higher order methods offer more parallelism and
+they also need to stream in less memory per DoF.
+
+Based on this argument, we would expect better performance for higher order methods.
+This is clearly visible when we take a look at the following results (run on an RTX
+6000 using the finest mesh that fits into memory):
+
+| Element |        DoFs | Operator MDoFs/s |
+|---------|------------:|-----------------:|
+| Q2Q1    |  53,070,468 |              557 |
+| Q3Q2    | 188,174,468 |            1,627 |
+| Q4Q3    |  58,112,836 |            2,895 |
+| Q5Q4    | 116,203,076 |            3,160 |
+
+The number of DoFs processed per second for a single application of the Stokes operator clearly increases
+significantly with polynomial degree. The whole solver is a bit harder to objectively compare as
+the higher order discretization requires more iterations and adjustments to GMG parameters like the
+Chebychev degree of the smoother. To keep things simple, we omit these results here.
+
+
+
 <h3>Performance Portability</h3>
 
 The advantage of using Kokkos instead of writing a code in one of the vendor
