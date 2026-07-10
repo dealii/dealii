@@ -730,11 +730,11 @@ export
   } // namespace std
 
 
-// When compiling with Clang but using (as is the default) the GCC standard
-// library, we have to export a few symbols from the __gnu_cxx namespace as
-// well. Interestingly, we only need to do this when compiling with Clang but
-// not with GCC; the latter apparently finds these symbols itself and will
-// instead issue errors if we try to export them here.
+// When compiling with Clang but using libstdc++, export the libstdc++
+// iterator comparison operators from __gnu_cxx as well. With newer
+// libstdc++ versions these comparisons are available via operator<=>, but
+// Clang does not reliably synthesize the rewritten relational operators when
+// the iterators are used through an imported module interface.
 #if defined(__GLIBCXX__) && defined(__clang__)
 
   namespace __gnu_cxx
@@ -742,6 +742,51 @@ export
     using __gnu_cxx::operator-;
     using __gnu_cxx::operator==;
     using __gnu_cxx::operator<=>;
+
+    template <typename _IteratorL, typename _IteratorR, typename _Container>
+    [[nodiscard]] constexpr bool
+    operator<(const __normal_iterator<_IteratorL, _Container> &__lhs,
+              const __normal_iterator<_IteratorR, _Container>
+                &__rhs) noexcept(noexcept(__lhs.base() < __rhs.base()))
+    {
+      return __lhs.base() < __rhs.base();
+    }
+
+    template <typename _IteratorL, typename _IteratorR, typename _Container>
+    [[nodiscard]] constexpr bool
+    operator>(const __normal_iterator<_IteratorL, _Container> &__lhs,
+              const __normal_iterator<_IteratorR, _Container>
+                &__rhs) noexcept(noexcept(__rhs < __lhs))
+    {
+      return __rhs < __lhs;
+    }
+
+    template <typename _IteratorL, typename _IteratorR, typename _Container>
+    [[nodiscard]] constexpr bool
+    operator<=(const __normal_iterator<_IteratorL, _Container> &__lhs,
+               const __normal_iterator<_IteratorR, _Container>
+                 &__rhs) noexcept(noexcept(!(__rhs < __lhs)))
+    {
+      return !(__rhs < __lhs);
+    }
+
+    template <typename _IteratorL, typename _IteratorR, typename _Container>
+    [[nodiscard]] constexpr bool
+    operator>=(const __normal_iterator<_IteratorL, _Container> &__lhs,
+               const __normal_iterator<_IteratorR, _Container>
+                 &__rhs) noexcept(noexcept(!(__lhs < __rhs)))
+    {
+      return !(__lhs < __rhs);
+    }
+
+    template <typename _IteratorL, typename _IteratorR, typename _Container>
+    [[nodiscard]] constexpr bool
+    operator!=(const __normal_iterator<_IteratorL, _Container> &__lhs,
+               const __normal_iterator<_IteratorR, _Container>
+                 &__rhs) noexcept(noexcept(!(__lhs == __rhs)))
+    {
+      return !(__lhs == __rhs);
+    }
   } // namespace __gnu_cxx
 
 #elif defined(_LIBCPP_VERSION) // For CLang's support library
