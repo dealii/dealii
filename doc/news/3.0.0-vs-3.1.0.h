@@ -496,7 +496,7 @@ All entries are signed with the names of the author.
        </p>
 
   <li> <p>
-       Fix: the ``copy-like'' constructor of
+       Fix: the "copy-like" constructor of
        <code>SparsityPattern</code> that copies another
        object and adds some off-diagonals had a bug that caused an
        exception in some cases. This is now fixed.

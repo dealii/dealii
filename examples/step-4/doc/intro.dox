@@ -4,7 +4,7 @@
 @dealiiVideoLecture{12,13}
 
 deal.II has a unique feature which we call
-``dimension independent programming''. You may have noticed in the
+"dimension independent programming". You may have noticed in the
 previous examples that many classes had a number in angle brackets
 suffixed to them. This is to indicate that for example the
 triangulation in two and three space dimensions are different, but
