@@ -1,7 +1,8 @@
-  <i>
+<i>
 This program was contributed by Quang Hoang and Timo Heister, Clemson University.
 
-We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable NVIDIA GPU acceleration for open source FEM simulations in deal.II". Many thanks to Daniel Arndt, Rene Gassmöller, and Bruno Turcksin for help with GPU support in deal.II and this tutorial.
+We acknowledge support from the NVIDIA Academic Grant Program award "Sustainable NVIDIA GPU acceleration for open source FEM simulations in deal.II". Many thanks
+to Daniel Arndt, Rene Gassmöller, Martin Kronbichler, Ivan Prusak, and Bruno Turcksin for help with GPU support in deal.II and this tutorial.
 </i>
 
 <a name="step_104-Intro"></a>
