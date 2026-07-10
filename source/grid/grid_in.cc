@@ -2479,6 +2479,12 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
             else
               in >> vertex_number >> x[0] >> x[1] >> x[2];
 
+            AssertThrow(
+              global_vertex < n_vertices,
+              ExcMessage(
+                "The Gmsh file lists more nodes than were declared in the "
+                "header of the $Nodes section."));
+
             for (unsigned int d = 0; d < spacedim; ++d)
               vertices[global_vertex][d] = x[d];
             // store mapping
