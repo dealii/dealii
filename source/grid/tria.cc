@@ -18,6 +18,8 @@
 #include <deal.II/base/mpi_large_count.h>
 #include <deal.II/base/mpi_stub.h>
 #include <deal.II/base/ndarray.h>
+#include <deal.II/base/signaling_nan.h>
+#include <deal.II/base/std_cxx26/inplace_vector.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
@@ -1645,51 +1647,77 @@ namespace
 
 
   /**
-   * Return whether any of the
-   * children of the given cell is
-   * distorted or not. This is the
-   * function for dim==spacedim.
-   */
-  template <int dim>
-  bool
-  has_distorted_children(
-    const typename Triangulation<dim, dim>::cell_iterator &cell)
-  {
-    Assert(cell->has_children(), ExcInternalError());
-
-    for (unsigned int c = 0; c < cell->n_children(); ++c)
-      {
-        Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-          vertices[i] = cell->child(c)->vertex(i);
-
-        Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
-        GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
-
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-          if (determinants[i] <=
-              1e-9 * Utilities::fixed_power<dim>(cell->child(c)->diameter()))
-            return true;
-      }
-
-    return false;
-  }
-
-
-  /**
-   * Function for dim!=spacedim. As
-   * for
-   * collect_distorted_coarse_cells,
-   * there is nothing that we can do
-   * in this case.
+   * Return whether any of the children of the given cell is distorted
+   * or not.
    */
   template <int dim, int spacedim>
   bool
   has_distorted_children(
-    const typename Triangulation<dim, spacedim>::cell_iterator &)
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell)
   {
-    return false;
+    Assert(cell->has_children(), ExcInternalError());
+    Assert(cell->reference_cell().is_hyper_cube(), ExcNotImplemented());
+
+    if constexpr (dim == spacedim)
+      {
+        for (unsigned int c = 0; c < cell->n_children(); ++c)
+          {
+            // We call this function during mesh refinement, at a time
+            // when the cell vertex cache has not yet been
+            // re-built. As a consequence, we cannot call
+            // cell->vertex(), or cell->diameter() (the latter
+            // implicitly depending on the former). Instead, we have to
+            // use a helper function to extract vertex locations into
+            // an array that bypasses the cache.
+
+            const unsigned int n_vertices = cell->child(c)->n_vertices();
+            std_cxx26::inplace_vector<unsigned int,
+                                      ReferenceCells::max_n_vertices<dim>()>
+              child_vertex_indices(n_vertices);
+            GridTools::internal::extract_vertices_without_cache<dim, spacedim>(
+              cell->child(c), child_vertex_indices);
+
+            Point<dim> child_vertices[GeometryInfo<dim>::vertices_per_cell];
+            for (unsigned int i = 0; i < n_vertices; ++i)
+              child_vertices[i] = cell->get_triangulation()
+                                    .get_vertices()[child_vertex_indices[i]];
+
+            Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+            GeometryInfo<dim>::alternating_form_at_vertices(child_vertices,
+                                                            determinants);
+
+            double child_diameter = numbers::signaling_nan<double>();
+            if constexpr (dim == 1)
+              child_diameter = (child_vertices[1] - child_vertices[0]).norm();
+            else if constexpr (dim == 2)
+              // Take the longer one of the two diagonals of the quadrilateral
+              child_diameter =
+                std::max({(child_vertices[3] - child_vertices[0]).norm(),
+                          (child_vertices[2] - child_vertices[1]).norm()});
+            else if constexpr (dim == 3)
+              // Take the longest of the four diagonals of the hexahedron
+              child_diameter =
+                std::max({(child_vertices[7] - child_vertices[0]).norm(),
+                          (child_vertices[6] - child_vertices[1]).norm(),
+                          (child_vertices[2] - child_vertices[5]).norm(),
+                          (child_vertices[3] - child_vertices[4]).norm()});
+            else
+              DEAL_II_NOT_IMPLEMENTED();
+
+            for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+              if (determinants[i] <=
+                  1e-9 * Utilities::fixed_power<dim>(child_diameter))
+                return true;
+          }
+
+        return false;
+      }
+    else
+      // Like for collect_distorted_coarse_cells, there is nothing
+      // that we can do in this case.
+      return false;
   }
+
 
 
   template <int dim, int spacedim>
