@@ -1645,51 +1645,42 @@ namespace
 
 
   /**
-   * Return whether any of the
-   * children of the given cell is
-   * distorted or not. This is the
-   * function for dim==spacedim.
+   * Return whether any of the children of the given cell is distorted
+   * or not.
    */
-  template <int dim>
+  template <int dim, int spacedim>
   bool
   has_distorted_children(
     const typename Triangulation<dim, dim>::cell_iterator &cell)
   {
     Assert(cell->has_children(), ExcInternalError());
 
-    for (unsigned int c = 0; c < cell->n_children(); ++c)
+    if constexpr (dim == spacedim)
       {
-        Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-          vertices[i] = cell->child(c)->vertex(i);
+        for (unsigned int c = 0; c < cell->n_children(); ++c)
+          {
+            Point<dim> vertices[GeometryInfo<dim>::vertices_per_cell];
+            for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+              vertices[i] = cell->child(c)->vertex(i);
 
-        Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
-        GeometryInfo<dim>::alternating_form_at_vertices(vertices, determinants);
+            Tensor<0, dim> determinants[GeometryInfo<dim>::vertices_per_cell];
+            GeometryInfo<dim>::alternating_form_at_vertices(vertices,
+                                                            determinants);
 
-        for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
-          if (determinants[i] <=
-              1e-9 * Utilities::fixed_power<dim>(cell->child(c)->diameter()))
-            return true;
+            for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+              if (determinants[i] <= 1e-9 * Utilities::fixed_power<dim>(
+                                              cell->child(c)->diameter()))
+                return true;
+          }
+
+        return false;
       }
-
-    return false;
+    else
+      // Like for collect_distorted_coarse_cells, there is nothing
+      // that we can do in this case.
+      return false;
   }
 
-
-  /**
-   * Function for dim!=spacedim. As
-   * for
-   * collect_distorted_coarse_cells,
-   * there is nothing that we can do
-   * in this case.
-   */
-  template <int dim, int spacedim>
-  bool
-  has_distorted_children(
-    const typename Triangulation<dim, spacedim>::cell_iterator &)
-  {
-    return false;
-  }
 
 
   template <int dim, int spacedim>
