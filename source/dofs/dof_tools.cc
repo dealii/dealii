@@ -2262,17 +2262,6 @@ namespace DoFTools
     namespace
     {
       /**
-       * Return true if the given element is primitive.
-       */
-      template <int dim, int spacedim>
-      bool
-      all_elements_are_primitive(const FiniteElement<dim, spacedim> &fe)
-      {
-        return fe.is_primitive();
-      }
-
-
-      /**
        * Return true if each element of the given element collection is
        * primitive.
        */

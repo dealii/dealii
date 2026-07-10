@@ -1400,17 +1400,6 @@ namespace
 
 
   template <int structdim, int dim, int spacedim>
-  double
-  measure(const TriaAccessor<structdim, dim, spacedim> &)
-  {
-    // catch-all for all cases not explicitly
-    // listed above
-    DEAL_II_NOT_IMPLEMENTED();
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-
-
-  template <int structdim, int dim, int spacedim>
   Point<spacedim>
   get_new_point_on_object(const TriaAccessor<structdim, dim, spacedim> &obj,
                           const bool use_interpolation)
