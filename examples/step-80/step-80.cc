@@ -35,8 +35,6 @@
 #include <deal.II/lac/affine_constraints.templates.h>
 #include <deal.II/fe/mapping_fe_field.h>
 
-#include <deal.II/sundials/ida.h>
-
 #include <boost/algorithm/string.hpp>
 #include <deal.II/non_matching/dof_handler_coupling.h>
 #include <deal.II/numerics/vector_tools_interpolate.h>
@@ -119,9 +117,6 @@ namespace LA
 #  include <TopoDS.hxx>
 #endif
 
-#ifdef DEAL_II_WITH_SUNDIALS
-#  include <deal.II/sundials/ida.h>
-#endif
 
 #include <iostream>
 #include <map>
@@ -282,11 +277,7 @@ namespace Step80
 
     unsigned int output_frequency = 1;
 
-    bool use_ida = false;
-
-#ifdef DEAL_II_WITH_SUNDIALS
-    SUNDIALS::IDA<LA::MPI::BlockVector>::AdditionalData ida_data;
-#endif
+    // bool use_ida = false;
 
     unsigned int initial_fluid_refinement      = 5;
     unsigned int initial_solid_refinement      = 5;
@@ -409,11 +400,6 @@ namespace Step80
 
     add_parameter("Final time", final_time);
 
-    add_parameter("Use IDA time integrator",
-                  use_ida,
-                  "Use SUNDIALS IDA for adaptive time stepping instead of "
-                  "the fixed-step loop.");
-
     add_parameter(
       "Particle predictor",
       particle_predictor,
@@ -421,13 +407,6 @@ namespace Step80
       "fluid velocity before each solve, reducing the time step if any "
       "particles would leave the fluid domain.");
 
-#ifdef DEAL_II_WITH_SUNDIALS
-    {
-      this->prm.enter_subsection("IDA parameters");
-      ida_data.add_parameters(this->prm);
-      this->prm.leave_subsection();
-    }
-#endif
 
     enter_subsection("Physical properties");
     {
@@ -791,14 +770,6 @@ namespace Step80
 
     FEValuesExtractors::Vector displacement;
     FEValuesExtractors::Vector lagrange_multiplier;
-
-#ifdef DEAL_II_WITH_SUNDIALS
-    // Effective time step size communicated from the IDA Jacobian setup to
-    // the solve and output callbacks.
-    double ida_current_time_step = 0.0;
-    // Output cycle counter used inside the IDA output_step callback.
-    unsigned int ida_output_cycle = 0;
-#endif
   };
 
 
@@ -2820,14 +2791,6 @@ namespace Step80
   template <int dim, int spacedim>
   void NavierStokesImmersedProblem<dim, spacedim>::run()
   {
-#ifdef DEAL_II_WITH_SUNDIALS
-    if (par.use_ida)
-      {
-        run_with_ida();
-        return;
-      }
-#endif
-
 #ifdef USE_PETSC_LA
     pcout << "Running NavierStokesImmersedProblem<"
           << Utilities::dim_string(dim, spacedim) << "> using PETSc."
