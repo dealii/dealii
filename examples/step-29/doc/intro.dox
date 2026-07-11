@@ -105,7 +105,7 @@ c (n\cdot\nabla u) + i\,\omega\,u &=&0, \qquad x\in\Gamma_2,\\
 u &=& 1,  \qquad x\in\Gamma_1.
 @f}
 This is a Helmholtz equation (similar to the one in step-7, but this time with
-''the bad sign'') with Dirichlet data on $\Gamma_1$ and mixed boundary
+"the bad sign") with Dirichlet data on $\Gamma_1$ and mixed boundary
 conditions on $\Gamma_2$. Because of the condition on $\Gamma_2$, we cannot just
 treat the equations for real and imaginary parts of $u$ separately. What we can
 do however is to view the PDE for $u$ as a system of two PDEs for the real and

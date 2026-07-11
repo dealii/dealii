@@ -254,7 +254,7 @@ namespace GraphColoring
       for (unsigned int i = 0; i < partition_size; ++i)
         for (unsigned int j = i + 1; j < partition_size; ++j)
           // If the two iterators share indices then we increase the degree of
-          // the vertices and create an ''edge'' in the graph.
+          // the vertices and create an "edge" in the graph.
           if (have_nonempty_intersection(conflict_indices[i],
                                          conflict_indices[j]))
             {
