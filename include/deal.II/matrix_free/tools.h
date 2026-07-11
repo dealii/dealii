@@ -1413,7 +1413,7 @@ namespace MatrixFreeTools
             fe_eval(data, m_dof_handler_index);
         const typename Portable::MatrixFree<dim, Number>::PrecomputedData
                  *gpu_data = &data->precomputed_data[m_dof_handler_index];
-        const int cell     = data->cell_index;
+        const int cell     = data->cell_index - gpu_data->first_cell;
 
         constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
         typename decltype(fe_eval)::value_type
