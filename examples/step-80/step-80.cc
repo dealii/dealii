@@ -300,18 +300,19 @@ namespace Step80
     double lame_mu     = 1.0;
     double lame_lambda = 1.0;
 
+    bool include_convective_term = true;
+
     bool particle_predictor = true;
 
     std::list<types::boundary_id> dirichlet_ids{0};
-
-    std::string name_of_fluid_grid           = "hyper_cube";
-    std::string arguments_for_fluid_grid     = "-1: 1: false";
-    std::string name_of_solid_grid           = "hyper_rectangle";
-    std::string arguments_for_solid_grid     = spacedim == 2 ?
-                                                 "-.5, -.1: .5, .1: false" :
-                                                 "-.5, -.1, -.1: .5, .1, .1: false";
-    std::string name_of_tracer_particle_grid = "hyper_ball";
-    std::string arguments_for_tracer_particle_grid =
+    std::string                   name_of_fluid_grid       = "hyper_cube";
+    std::string                   arguments_for_fluid_grid = "-1: 1: false";
+    std::string                   name_of_solid_grid       = "hyper_rectangle";
+    std::string                   arguments_for_solid_grid = spacedim == 2 ?
+                                                               "-.5, -.1: .5, .1: false" :
+                                                               "-.5, -.1, -.1: .5, .1, .1: false";
+    std::string                   name_of_tracer_particle_grid = "hyper_ball";
+    std::string                   arguments_for_tracer_particle_grid =
       spacedim == 2 ? "0.3, 0.3: 0.1: false" : "0.3, 0.3, 0.3 : 0.1: false";
 
     int          max_level_refinement = 8;
@@ -434,6 +435,12 @@ namespace Step80
       add_parameter("Density", density);
       add_parameter("Lame mu", lame_mu);
       add_parameter("Lame lambda", lame_lambda);
+      add_parameter(
+        "Include convective term",
+        include_convective_term,
+        "If true, the explicit convective term rho*(u^n * grad) u^n is added "
+        "to the Navier-Stokes right-hand side. Set to false to drop the "
+        "convective term and recover the (unsteady Stokes) momentum equation.");
     }
     leave_subsection();
 
@@ -625,24 +632,6 @@ namespace Step80
 
     double compute_time_step() const;
 
-#ifdef DEAL_II_WITH_SUNDIALS
-    void run_with_ida();
-
-    void ida_residual(const double                t,
-                      const LA::MPI::BlockVector &y,
-                      const LA::MPI::BlockVector &y_dot,
-                      LA::MPI::BlockVector       &residual);
-
-    void ida_setup_jacobian(const double                t,
-                            const LA::MPI::BlockVector &y,
-                            const LA::MPI::BlockVector &y_dot,
-                            const double                alpha);
-
-    void ida_solve_with_jacobian(const LA::MPI::BlockVector &rhs,
-                                 LA::MPI::BlockVector       &dst,
-                                 const double                tolerance);
-#endif
-
     void                    setup_solid_particles();
     void                    setup_tracer_particles();
     void                    euler_step_tracer_particles(const double dt);
@@ -652,11 +641,31 @@ namespace Step80
     void                             setup_dofs();
     void                             interpolate_initial_conditions();
     void                             update_solid_current_position();
+    void                             check_immersed_mapping_is_valid() const;
     void                             setup_coupling();
     const AffineConstraints<double> &active_fluid_constraints() const;
 
+    // Augmentation is always disabled when solving with MUMPS, regardless of
+    // the "Use operator augmentation" parameter. The augmentation is only a
+    // preconditioning device for "augmented_split" solver: that solver adds the
+    // matching compensating off-diagonal blocks and right-hand-side terms that
+    // keep the augmented system equivalent to the original saddle point. The
+    // direct MUMPS solver instead assembles and factorizes the monolithic
+    // saddle point as-is
+    bool use_operator_augmentation() const
+    {
+      if (!par.use_operator_augmentation)
+        return false;
+#ifdef DEAL_II_WITH_MUMPS
+      if (par.solver_type == SolverType::mumps)
+        return false;
+#endif
+      return true;
+    }
+
     void assemble_navier_stokes_system(const double &alpha);
     void assemble_navier_stokes_rhs(const double &alpha);
+
 
     void assemble_elasticity_system(const double &alpha);
     void assemble_elasticity_rhs(const double &alpha);
@@ -748,6 +757,8 @@ namespace Step80
     LA::MPI::BlockVector fluid_system_rhs;
     LA::MPI::BlockVector fluid_dual_of_constant_pressure;
     LA::MPI::BlockVector fluid_constant_pressure;
+
+    bool fluid_has_open_boundary = false;
 
     LA::MPI::BlockVector solid_solution;
     LA::MPI::BlockVector solid_locally_relevant_solution;
@@ -1283,10 +1294,28 @@ namespace Step80
             fluid_homogeneous_constraints,
             fluid_fe->component_mask(velocity));
         }
-
       fluid_constraints.close();
       fluid_homogeneous_constraints.close();
     }
+
+
+    {
+      const std::set<types::boundary_id> dirichlet_set(
+        par.dirichlet_ids.begin(), par.dirichlet_ids.end());
+      bool local_open = false;
+      for (const auto &cell : fluid_dh.active_cell_iterators())
+        if (cell->is_locally_owned() && cell->at_boundary())
+          for (const auto f : cell->face_indices())
+            if (cell->face(f)->at_boundary())
+              {
+                const auto bid = cell->face(f)->boundary_id();
+                if (dirichlet_set.count(bid) == 0)
+                  local_open = true;
+              }
+      fluid_has_open_boundary =
+        Utilities::MPI::logical_or(local_open, mpi_communicator);
+    }
+
 
     auto locally_owned_fluid_dofs_per_processor =
       Utilities::MPI::all_gather(mpi_communicator,
@@ -1301,8 +1330,7 @@ namespace Step80
             coupling[c][d] = DoFTools::none;
           else if (c == spacedim || d == spacedim || c == d)
             coupling[c][d] = DoFTools::always;
-          else if (par.use_operator_augmentation && c < spacedim &&
-                   d < spacedim)
+          else if (c < spacedim && d < spacedim)
             coupling[c][d] = DoFTools::always;
           else
             coupling[c][d] = DoFTools::none;
@@ -1446,7 +1474,6 @@ namespace Step80
       {
         solid_preconditioner.clear();
 
-        std::cout << "Solid preconditioner" << std::endl;
         Table<2, DoFTools::Coupling> coupling(2 * spacedim, 2 * spacedim);
         for (unsigned int c = 0; c < spacedim; ++c)
           for (unsigned int d = 0; d < spacedim; ++d)
@@ -1459,13 +1486,8 @@ namespace Step80
             else
               coupling[c][d] = DoFTools::none;
 
-        std::cout << "Coupling is made" << std::endl;
-
-
         BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
                                         solid_dofs_per_block);
-        std::cout << "DSP is made " << std::endl;
-
 
         DoFTools::make_sparsity_pattern(
           solid_dh, coupling, dsp, solid_constraints, false);
@@ -1491,6 +1513,63 @@ namespace Step80
     owned_current_position.block(1) = solid_reference_configuration.block(1);
     owned_current_position.block(0) += solid_solution.block(0);
     solid_current_position = owned_current_position;
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::check_immersed_mapping_is_valid()
+    const
+  {
+    Assert(solid_mapping != nullptr,
+           ExcMessage("The immersed mapping has not been initialized yet."));
+
+    FEValues<dim, spacedim> fe_values(*solid_mapping,
+                                      *solid_fe,
+                                      coupling_quadrature,
+                                      update_jacobians |
+                                        update_quadrature_points);
+
+    double                   min_detJ = std::numeric_limits<double>::max();
+    bool                     inverted = false;
+    Point<spacedim>          bad_point;
+    types::global_cell_index bad_cell = numbers::invalid_unsigned_int;
+
+    for (const auto &cell : solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          fe_values.reinit(cell);
+          for (unsigned int q = 0; q < coupling_quadrature.size(); ++q)
+            {
+              const double detJ = fe_values.jacobian(q).determinant();
+              if (detJ < min_detJ)
+                {
+                  min_detJ  = detJ;
+                  bad_point = fe_values.quadrature_point(q);
+                  bad_cell  = cell->active_cell_index();
+                }
+              if (detJ <= 0.)
+                inverted = true;
+            }
+        }
+
+    const double global_min_detJ =
+      Utilities::MPI::min(min_detJ, mpi_communicator);
+    const bool global_inverted =
+      Utilities::MPI::logical_or(inverted, mpi_communicator);
+
+    AssertThrow(
+      !global_inverted,
+      ExcMessage(
+        "The immersed solid mesh has inverted: the Jacobian determinant of "
+        "the deformation map x = X + u(X) is non-positive (minimum value "
+        "det(J) = " +
+        std::to_string(global_min_detJ) +
+        ") at a coupling quadrature point (near " +
+        std::to_string(bad_point[0]) + ", " + std::to_string(bad_point[1]) +
+        " on local solid cell " + std::to_string(bad_cell) +
+        "). This means the solid has folded over itself and the coupling "
+        "operators are no longer meaningful."));
   }
 
 
@@ -1618,12 +1697,13 @@ namespace Step80
     FullMatrix<double> cell_fluid_matrix(dofs_per_cell, dofs_per_cell);
     FullMatrix<double> cell_fluid_mass_matrix(dofs_per_cell, dofs_per_cell);
 
-    std::vector<Tensor<1, spacedim>> phi_u(dofs_per_cell);
-    std::vector<Tensor<2, spacedim>> grad_phi_u(dofs_per_cell);
-    std::vector<double>              div_phi_u(dofs_per_cell);
-    std::vector<double>              phi_p(dofs_per_cell);
-    std::vector<Tensor<1, spacedim>> u(n_q_points);
-    std::vector<Tensor<2, spacedim>> grad_u(n_q_points);
+    std::vector<Tensor<1, spacedim>>          phi_u(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_u(dofs_per_cell);
+    std::vector<SymmetricTensor<2, spacedim>> sym_grad_phi_u(dofs_per_cell);
+    std::vector<double>                       div_phi_u(dofs_per_cell);
+    std::vector<double>                       phi_p(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          u(n_q_points);
+    std::vector<Tensor<2, spacedim>>          grad_u(n_q_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -1640,7 +1720,9 @@ namespace Step80
                 {
                   phi_u[k]      = fe_values[velocity].value(k, q);
                   grad_phi_u[k] = fe_values[velocity].gradient(k, q);
-                  div_phi_u[k]  = fe_values[velocity].divergence(k, q);
+                  sym_grad_phi_u[k] =
+                    fe_values[velocity].symmetric_gradient(k, q);
+                  div_phi_u[k] = fe_values[velocity].divergence(k, q);
 
                   phi_p[k] = fe_values[pressure].value(k, q);
                 }
@@ -1651,10 +1733,10 @@ namespace Step80
                     {
                       cell_fluid_matrix(i, j) +=
                         ((par.density * alpha) * phi_u[i] * phi_u[j] +
-                         par.viscosity *
-                           scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+                         par.viscosity * scalar_product(sym_grad_phi_u[i],
+                                                        sym_grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                         (par.use_operator_augmentation ?
+                         (use_operator_augmentation() ?
                             par.gamma_AL_background * div_phi_u[i] *
                               div_phi_u[j] :
                             0.)) *
@@ -1681,7 +1763,7 @@ namespace Step80
 
     // Add augmented Lagrangian penalty on the immersed domain through the
     // coupling helper.
-    if (par.use_operator_augmentation)
+    if (use_operator_augmentation())
       {
         if (!dof_handler_coupling)
           dof_handler_coupling =
@@ -1754,12 +1836,13 @@ namespace Step80
     std::vector<Vector<double>> rhs_values(n_q_points,
                                            Vector<double>(spacedim + 1));
 
-    std::vector<Tensor<1, spacedim>> phi_u(dofs_per_cell);
-    std::vector<Tensor<2, spacedim>> grad_phi_u(dofs_per_cell);
-    std::vector<double>              div_phi_u(dofs_per_cell);
-    std::vector<double>              phi_p(dofs_per_cell);
-    std::vector<Tensor<1, spacedim>> u(n_q_points);
-    std::vector<Tensor<2, spacedim>> grad_u(n_q_points);
+    std::vector<Tensor<1, spacedim>>          phi_u(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_u(dofs_per_cell);
+    std::vector<SymmetricTensor<2, spacedim>> sym_grad_phi_u(dofs_per_cell);
+    std::vector<double>                       div_phi_u(dofs_per_cell);
+    std::vector<double>                       phi_p(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          u(n_q_points);
+    std::vector<Tensor<2, spacedim>>          grad_u(n_q_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
@@ -1782,7 +1865,9 @@ namespace Step80
                 {
                   phi_u[k]      = fe_values[velocity].value(k, q);
                   grad_phi_u[k] = fe_values[velocity].gradient(k, q);
-                  div_phi_u[k]  = fe_values[velocity].divergence(k, q);
+                  sym_grad_phi_u[k] =
+                    fe_values[velocity].symmetric_gradient(k, q);
+                  div_phi_u[k] = fe_values[velocity].divergence(k, q);
 
                   phi_p[k] = fe_values[pressure].value(k, q);
                 }
@@ -1795,10 +1880,10 @@ namespace Step80
                         {
                           cell_matrix(i, j) +=
                             (par.density * alpha * phi_u[i] * phi_u[j] +
-                             par.viscosity *
-                               scalar_product(grad_phi_u[i], grad_phi_u[j]) -
+                             par.viscosity * scalar_product(sym_grad_phi_u[i],
+                                                            sym_grad_phi_u[j]) -
                              div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
-                             (par.use_operator_augmentation ?
+                             (use_operator_augmentation() ?
                                 par.gamma_AL_background * div_phi_u[i] *
                                   div_phi_u[j] :
                                 0.)) *
@@ -1808,10 +1893,16 @@ namespace Step80
 
                   const unsigned int component_i =
                     fluid_fe->system_to_component_index(i).first;
+
+                  // The explicit convective term -rho*(u^n . grad) u^n is only
+                  // included when 'Include convective term' is true.
+                  const Tensor<1, spacedim> convective =
+                    par.include_convective_term ? grad_u[q] * u[q] :
+                                                  Tensor<1, spacedim>();
                   cell_rhs(i) +=
                     (par.density *
                      (fe_values.shape_value(i, q) * rhs_values[q](component_i) +
-                      (u[q] * alpha - grad_u[q] * u[q]) * phi_u[i])) *
+                      (u[q] * alpha - convective) * phi_u[i])) *
                     fe_values.JxW(q);
                 }
             }
@@ -1851,6 +1942,7 @@ namespace Step80
 
 
     std::vector<SymmetricTensor<2, spacedim>> grad_eps_phi_w(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_w(dofs_per_cell);
     std::vector<double>                       div_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
@@ -1871,6 +1963,7 @@ namespace Step80
                 {
                   grad_eps_phi_w[k] =
                     fe_values[displacement].symmetric_gradient(k, q);
+                  grad_phi_w[k]   = fe_values[displacement].gradient(k, q);
                   div_phi_w[k]    = fe_values[displacement].divergence(k, q);
                   phi_w[k]        = fe_values[displacement].value(k, q);
                   phi_lagrange[k] = fe_values[lagrange_multiplier].value(k, q);
@@ -1880,11 +1973,15 @@ namespace Step80
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      cell_matrix(i, j) +=
+                      // Elastic bilinear form
+                      const double elastic_ij =
                         (2 * par.lame_mu *
                            scalar_product(grad_eps_phi_w[i],
                                           grad_eps_phi_w[j]) +
-                         par.lame_lambda * div_phi_w[i] * div_phi_w[j] -
+                         par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
+
+                      cell_matrix(i, j) +=
+                        (elastic_ij -
                          // lagrange * disp
                          (phi_lagrange[i] * phi_w[j] * alpha) -
                          // disp * lagrange
@@ -1938,7 +2035,8 @@ namespace Step80
 
     FEValues<spacedim> fe_values_rhs(*solid_fe,
                                      solid_quadrature,
-                                     update_values | update_quadrature_points |
+                                     update_values | update_gradients |
+                                       update_quadrature_points |
                                        update_JxW_values);
 
     FEValues<spacedim> fe_values_matrix(*solid_fe,
@@ -1953,6 +2051,7 @@ namespace Step80
     Vector<double>     cell_rhs(dofs_per_cell);
 
     std::vector<SymmetricTensor<2, spacedim>> grad_eps_phi_w(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_w(dofs_per_cell);
     std::vector<double>                       div_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
@@ -2003,6 +2102,8 @@ namespace Step80
                     {
                       grad_eps_phi_w[k] =
                         fe_values_matrix[displacement].symmetric_gradient(k, q);
+                      grad_phi_w[k] =
+                        fe_values_matrix[displacement].gradient(k, q);
                       div_phi_w[k] =
                         fe_values_matrix[displacement].divergence(k, q);
                       phi_w[k] = fe_values_matrix[displacement].value(k, q);
@@ -2014,11 +2115,14 @@ namespace Step80
                     {
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
                         {
-                          cell_matrix(i, j) +=
+                          const double elastic_ij =
                             (2 * par.lame_mu *
                                scalar_product(grad_eps_phi_w[i],
                                               grad_eps_phi_w[j]) +
-                             par.lame_lambda * div_phi_w[i] * div_phi_w[j] -
+                             par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
+
+                          cell_matrix(i, j) +=
+                            (elastic_ij -
                              // lagrange * disp
                              (phi_lagrange[i] * phi_w[j] * alpha) -
                              // disp * lagrange
@@ -2318,6 +2422,8 @@ namespace Step80
         solid_locally_relevant_solution = solid_solution;
 
         pcout << "   Solved with MUMPS." << std::endl;
+        pcout << "Volume of the solid domain: "
+              << GridTools::volume(solid_tria, *solid_mapping) << std::endl;
         return;
       }
 #endif
@@ -2362,7 +2468,7 @@ namespace Step80
     const auto gamma2 = par.gamma_AL_immersed;
 
     auto A11_aug = null_operator(A);
-    if (par.use_operator_augmentation)
+    if (use_operator_augmentation())
       A11_aug = A;
     else
       A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
@@ -2465,17 +2571,24 @@ namespace Step80
     constraints.distribute(fluid_solution);
     solid_constraints.distribute(solid_solution);
 
-    if (fluid_constant_pressure.size() == 0)
+    // Normalize the pressure to zero mean only when the fluid domain is fully
+    // enclosed by Dirichlet boundaries: in that case the pressure is defined
+    // only up to an additive constant.
+    if (!fluid_has_open_boundary)
       {
-        fluid_constant_pressure.reinit(fluid_solution);
-        fluid_constant_pressure.block(1) =
-          invMp * fluid_dual_of_constant_pressure.block(1);
+        if (fluid_constant_pressure.size() == 0)
+          {
+            fluid_constant_pressure.reinit(fluid_solution);
+            fluid_constant_pressure.block(1) =
+              invMp * fluid_dual_of_constant_pressure.block(1);
+          }
+
+        const auto avg_pressure =
+          fluid_dual_of_constant_pressure * fluid_solution;
+
+        fluid_solution.block(1).add(-avg_pressure,
+                                    fluid_constant_pressure.block(1));
       }
-
-    const auto avg_pressure = fluid_dual_of_constant_pressure * fluid_solution;
-
-    fluid_solution.block(1).add(-avg_pressure,
-                                fluid_constant_pressure.block(1));
 
     fluid_locally_relevant_solution = fluid_solution;
     solid_locally_relevant_solution = solid_solution;
@@ -2769,7 +2882,7 @@ namespace Step80
               }
           }
 
-        if (cycle == 0 || update_timestep || par.use_operator_augmentation)
+        if (cycle == 0 || update_timestep || use_operator_augmentation())
           assemble_navier_stokes_system(1. / time_step);
         if (cycle == 0 || update_timestep)
           assemble_elasticity_system(1. / time_step);
@@ -2777,6 +2890,7 @@ namespace Step80
         assemble_navier_stokes_rhs(1. / time_step);
         assemble_elasticity_rhs(1. / time_step);
 
+        check_immersed_mapping_is_valid();
         setup_coupling();
         assemble_coupling();
 #ifdef DEAL_II_WITH_MUMPS
@@ -2807,523 +2921,6 @@ namespace Step80
         solid_locally_relevant_solution_old = solid_locally_relevant_solution;
       }
   }
-
-
-
-#ifdef DEAL_II_WITH_SUNDIALS
-  // @sect4{IDA residual callback}
-  // Encodes the DAE residual F(t, y, y_dot) = 0 required by IDA.
-  // The combined solution vector y holds [fluid_block(0), fluid_block(1),
-  // solid_block(0), solid_block(1)].  The residual is computed by calling the
-  // same assembly routines used in the fixed-step loop, but replacing the
-  // finite-difference time derivative with the IDA-supplied y_dot.  Because
-  // IDA drives the effective step size through alpha = d(y_dot)/dy = 1/h, the
-  // assembly routines (which take an explicit time_step argument) use
-  // ida_current_time_step, which is set in the Jacobian setup callback
-  // (called before every residual evaluation inside the same Newton step).
-  template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::ida_residual(
-    const double                t,
-    const LA::MPI::BlockVector &y,
-    const LA::MPI::BlockVector &y_dot,
-    LA::MPI::BlockVector       &residual)
-  {
-    // Unpack state and derivative vectors.
-    fluid_locally_relevant_solution.block(0) = y.block(0);
-    fluid_locally_relevant_solution.block(1) = y.block(1);
-    solid_locally_relevant_solution.block(0) = y.block(2);
-    solid_locally_relevant_solution.block(1) = y.block(3);
-
-    fluid_locally_relevant_solution_dot.block(0) = y_dot.block(0);
-    fluid_locally_relevant_solution_dot.block(1) = y_dot.block(1);
-    solid_locally_relevant_solution_dot.block(0) = y_dot.block(2);
-    solid_locally_relevant_solution_dot.block(1) = y_dot.block(3);
-
-    pcout << "t = " << t << ", y norm : " << y.l2_norm()
-          << ", y_dot_diff norm : "
-          << y_dot.block(0).l2_norm() + y_dot.block(2).l2_norm() << std::endl;
-
-    const unsigned int n_q_points = fluid_quadrature.size();
-
-    // -------------------------------------------------------------------------
-    // Fluid residual: same weak form as in assemble_navier_stokes_system(),
-    // with the time derivative term replaced by IDA's y_dot.
-    // -------------------------------------------------------------------------
-    FEValues<spacedim> fluid_fe_values(*fluid_fe,
-                                       fluid_quadrature,
-                                       update_values | update_gradients |
-                                         update_quadrature_points |
-                                         update_JxW_values);
-
-    const unsigned int fluid_dofs_per_cell = fluid_fe->n_dofs_per_cell();
-    Vector<double>     fluid_local_residual(fluid_dofs_per_cell);
-    std::vector<types::global_dof_index> fluid_dof_indices(fluid_dofs_per_cell);
-
-    std::vector<Tensor<1, spacedim>> u_val(n_q_points);
-    std::vector<Tensor<1, spacedim>> u_dot_val(n_q_points);
-    std::vector<Tensor<2, spacedim>> u_grad(n_q_points);
-    std::vector<double>              u_div(n_q_points);
-    std::vector<double>              p_val(n_q_points);
-    std::vector<Vector<double>>      fluid_rhs_values(n_q_points,
-                                                 Vector<double>(spacedim + 1));
-
-    fluid_system_rhs = 0;
-    for (const auto &cell : fluid_dh.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          fluid_fe_values.reinit(cell);
-          fluid_local_residual = 0;
-
-          fluid_fe_values[velocity].get_function_values(
-            fluid_locally_relevant_solution, u_val);
-          fluid_fe_values[velocity].get_function_values(
-            fluid_locally_relevant_solution_dot, u_dot_val);
-          fluid_fe_values[velocity].get_function_gradients(
-            fluid_locally_relevant_solution, u_grad);
-          fluid_fe_values[velocity].get_function_divergences(
-            fluid_locally_relevant_solution, u_div);
-          fluid_fe_values[pressure].get_function_values(
-            fluid_locally_relevant_solution, p_val);
-          par.navier_stokes_rhs.vector_value_list(
-            fluid_fe_values.get_quadrature_points(), fluid_rhs_values);
-
-          cell->get_dof_indices(fluid_dof_indices);
-
-          for (unsigned int q = 0; q < n_q_points; ++q)
-            for (unsigned int i = 0; i < fluid_dofs_per_cell; ++i)
-              {
-                const double JxW   = fluid_fe_values.JxW(q);
-                const auto  &phi_i = fluid_fe_values[velocity].value(i, q);
-                const auto  &div_phi_i =
-                  fluid_fe_values[velocity].divergence(i, q);
-                const auto &grad_phi_i =
-                  fluid_fe_values[velocity].gradient(i, q);
-                const auto &psi_i = fluid_fe_values[pressure].value(i, q);
-                const unsigned int component_i =
-                  fluid_fe->system_to_component_index(i).first;
-
-                fluid_local_residual(i) +=
-                  (par.density * u_dot_val[q] * phi_i +
-                   par.density * (u_grad[q] * u_val[q]) * phi_i +
-                   par.viscosity * scalar_product(u_grad[q], grad_phi_i) -
-                   p_val[q] * div_phi_i - psi_i * u_div[q] +
-                   (par.use_operator_augmentation ?
-                      par.gamma_AL_background * u_div[q] * div_phi_i :
-                      0) -
-                   par.density * fluid_fe_values.shape_value(i, q) *
-                     fluid_rhs_values[q](component_i)) *
-                  JxW;
-              }
-
-          fluid_constraints.distribute_local_to_global(fluid_local_residual,
-                                                       fluid_dof_indices,
-                                                       fluid_system_rhs);
-        }
-
-    // add to the fluid system residual, the integral of lagrange
-    // multiplier times the basis functions of the fluid:
-    // - C^T * lambda
-    LA::MPI::BlockVector lambda_block;
-    IndexSet             lambda_relevant_dofs =
-      dof_handler_coupling->extract_immersed_dof_indexset(coupling_quadrature);
-    lambda_block.reinit(lambda_relevant_dofs.split_by_block(
-                          solid_dofs_per_block),
-                        mpi_communicator);
-    lambda_block.block(1) = y.block(3);
-
-    dof_handler_coupling->integrate_dh2_field_against_dh1_basis(
-      coupling_quadrature,
-      lambda_block,
-      fluid_system_rhs,
-      solid_constraints,
-      true,
-      -1.0);
-
-    if (par.use_operator_augmentation)
-      {
-        dof_handler_coupling->apply_nitsche_restriction(
-          coupling_quadrature,
-          fluid_locally_relevant_solution,
-          par.gamma_AL_background,
-          fluid_system_rhs,
-          fluid_constraints,
-          true);
-      }
-
-    fluid_system_rhs.compress(VectorOperation::add);
-
-    // -------------------------------------------------------------------------
-    // Solid residual: same weak form as in assemble_elasticity_system(), but
-    // replacing (w - w_old)/dt with w_dot in the lagrange-multiplier equation.
-    // -------------------------------------------------------------------------
-    FEValues<spacedim> solid_fe_values(*solid_fe,
-                                       solid_quadrature,
-                                       update_values | update_gradients |
-                                         update_quadrature_points |
-                                         update_JxW_values);
-
-    const unsigned int solid_dofs_per_cell = solid_fe->n_dofs_per_cell();
-    Vector<double>     solid_local_residual(solid_dofs_per_cell);
-    std::vector<types::global_dof_index> solid_dof_indices(solid_dofs_per_cell);
-
-    const unsigned int n_solid_q_points = solid_quadrature.size();
-
-    std::vector<SymmetricTensor<2, spacedim>> eps_w(n_solid_q_points);
-    std::vector<double>                       div_w(n_solid_q_points);
-    std::vector<Tensor<1, spacedim>>          w_dot_val(n_solid_q_points);
-    std::vector<Tensor<1, spacedim>>          lambda_val(n_solid_q_points);
-    std::vector<Vector<double>>               solid_rhs_values(n_solid_q_points,
-                                                 Vector<double>(2 * spacedim));
-
-    solid_system_rhs = 0;
-    for (const auto &cell : solid_dh.active_cell_iterators())
-      if (cell->is_locally_owned())
-        {
-          solid_fe_values.reinit(cell);
-          solid_local_residual = 0;
-
-          solid_fe_values[displacement].get_function_symmetric_gradients(
-            solid_locally_relevant_solution, eps_w);
-          solid_fe_values[displacement].get_function_divergences(
-            solid_locally_relevant_solution, div_w);
-          solid_fe_values[displacement].get_function_values(
-            solid_locally_relevant_solution_dot, w_dot_val);
-          solid_fe_values[lagrange_multiplier].get_function_values(
-            solid_locally_relevant_solution, lambda_val);
-
-          par.solid_rhs.vector_value_list(
-            solid_fe_values.get_quadrature_points(), solid_rhs_values);
-
-          cell->get_dof_indices(solid_dof_indices);
-
-          for (unsigned int q = 0; q < n_solid_q_points; ++q)
-            for (unsigned int i = 0; i < solid_dofs_per_cell; ++i)
-              {
-                const double JxW = solid_fe_values.JxW(q);
-                const auto  &eps_phi_w_i =
-                  solid_fe_values[displacement].symmetric_gradient(i, q);
-                const auto &div_phi_w_i =
-                  solid_fe_values[displacement].divergence(i, q);
-                const auto &phi_w_i = solid_fe_values[displacement].value(i, q);
-                const auto &phi_l_i =
-                  solid_fe_values[lagrange_multiplier].value(i, q);
-
-                const auto comp_i =
-                  solid_fe->system_to_component_index(i).first;
-
-                solid_local_residual(i) +=
-                  (2.0 * par.lame_mu * scalar_product(eps_w[q], eps_phi_w_i) //
-                   + par.lame_lambda * div_w[q] * div_phi_w_i                //
-                   - (lambda_val[q] * phi_w_i) - (w_dot_val[q] * phi_l_i)    //
-                   - solid_rhs_values[q](comp_i) *
-                       solid_fe_values.shape_value(i, q)) *
-                  JxW;
-              }
-
-          solid_constraints.distribute_local_to_global(solid_local_residual,
-                                                       solid_dof_indices,
-                                                       solid_system_rhs);
-        }
-
-    // add to the solid system residual, the integral of u times the lagrange
-    // multiplier: C u
-    dof_handler_coupling->integrate_dh1_field_against_dh2_basis(
-      coupling_quadrature,
-      fluid_locally_relevant_solution,
-      solid_system_rhs,
-      solid_constraints,
-      true);
-
-    solid_system_rhs.compress(VectorOperation::add);
-
-    residual.block(0) = fluid_system_rhs.block(0);
-    residual.block(1) = fluid_system_rhs.block(1);
-    residual.block(2) = solid_system_rhs.block(0);
-    residual.block(3) = solid_system_rhs.block(1);
-  }
-
-
-
-  // @sect4{IDA Jacobian setup callback}
-  // Called by IDA whenever a new Jacobian is needed. We re-assemble the
-  // system matrices for the current step size h = 1/alpha (IDA passes
-  // alpha = d(y_dot)/dy for the current BDF formula).
-  template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::ida_setup_jacobian(
-    const double /*t*/,
-    const LA::MPI::BlockVector &y,
-    const LA::MPI::BlockVector & /*y_dot*/,
-    const double alpha)
-  {
-    ida_current_time_step             = 1.0 / alpha;
-    use_homogeneous_fluid_constraints = true;
-
-    // Unpack y into the individual block vectors used by the assembly routines
-    fluid_solution.block(0) = y.block(0);
-    fluid_solution.block(1) = y.block(1);
-    solid_solution.block(0) = y.block(2);
-    solid_solution.block(1) = y.block(3);
-
-    update_solid_current_position();
-    setup_coupling();
-    assemble_coupling();
-
-    fluid_locally_relevant_solution = fluid_solution;
-    solid_locally_relevant_solution = solid_solution;
-
-    // Use an inexact (symmetric) Jacobian: the convective term is not
-    // updated here to avoid velocity-dependence.  Only reassemble when dt
-    // changes so the mass-matrix scaling M/dt stays current.
-    // if (alpha_changed)
-    {
-      assemble_navier_stokes_system(alpha);
-      assemble_elasticity_system(alpha);
-    }
-    // update_particle_positions();
-
-#  ifdef DEAL_II_WITH_MUMPS
-    if (par.solver_type == SolverType::mumps)
-      assemble_mumps_matrix();
-#  endif
-
-    use_homogeneous_fluid_constraints = false;
-  }
-
-
-
-  // @sect4{IDA linear solve callback}
-  // Called by IDA to solve J*dst = rhs.  We reuse the existing
-  // augmented-Lagrangian preconditioned GMRES solver (or MUMPS if available).
-  template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::ida_solve_with_jacobian(
-    const LA::MPI::BlockVector &rhs,
-    LA::MPI::BlockVector       &dst,
-    const double                tolerance)
-  {
-    use_homogeneous_fluid_constraints = true;
-
-    // Wrap the four blocks into the fluid/solid sub-vectors that solve()
-    // expects on the system rhs.
-    fluid_system_rhs.block(0) = rhs.block(0);
-    fluid_system_rhs.block(1) = rhs.block(1);
-    solid_system_rhs.block(0) = rhs.block(2);
-    solid_system_rhs.block(1) = rhs.block(3);
-
-#  ifdef DEAL_II_WITH_MUMPS
-    if (par.solver_type == SolverType::mumps)
-      assemble_mumps_rhs();
-#  endif
-
-    solve(tolerance);
-
-    dst.block(0) = fluid_solution.block(0);
-    dst.block(1) = fluid_solution.block(1);
-    dst.block(2) = solid_solution.block(0);
-    dst.block(3) = solid_solution.block(1);
-
-    use_homogeneous_fluid_constraints = false;
-  }
-
-
-
-  // @sect4{IDA-driven time loop}
-  // This function replaces run() when par.use_ida == true. It sets up the
-  // SUNDIALS IDA time stepper, connects the callbacks above, and calls
-  // solve_dae().
-  template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::run_with_ida()
-  {
-    use_homogeneous_fluid_constraints = false;
-
-#  ifdef USE_PETSC_LA
-    pcout << "Running NavierStokesImmersedProblem<"
-          << Utilities::dim_string(dim, spacedim)
-          << "> using PETSc + SUNDIALS IDA." << std::endl;
-#  else
-    pcout << "Running NavierStokesImmersedProblem<"
-          << Utilities::dim_string(dim, spacedim)
-          << "> using Trilinos + SUNDIALS IDA." << std::endl;
-#  endif
-
-    if (!std::filesystem::exists(par.output_directory))
-      std::filesystem::create_directory(par.output_directory);
-
-    par.prm.print_parameters(par.output_directory + "/" + "used_parameters_" +
-                               std::to_string(dim) + std::to_string(spacedim) +
-                               ".prm",
-                             ParameterHandler::Short);
-
-    // One-time setup (same as run())
-    make_grid();
-    initial_setup();
-    setup_dofs();
-    interpolate_initial_conditions();
-    setup_solid_particles();
-    setup_tracer_particles();
-    update_solid_current_position();
-    setup_coupling();
-
-    const double warm_start_dt   = par.ida_data.initial_step_size;
-    const double warm_start_time = par.ida_data.initial_time;
-
-    LA::MPI::BlockVector old_fluid_solution;
-    LA::MPI::BlockVector old_solid_solution;
-    old_fluid_solution.reinit(fluid_solution);
-    old_solid_solution.reinit(solid_solution);
-    old_fluid_solution = fluid_solution;
-    old_solid_solution = solid_solution;
-
-    par.set_time(warm_start_time);
-
-    if (par.particle_predictor)
-      {
-        const auto [changed, new_time_step] =
-          attempt_particle_displacement(warm_start_dt);
-        if (changed)
-          pcout << "Warm start kept fixed dt = " << warm_start_dt
-                << " despite particle predictor suggesting " << new_time_step
-                << '.' << std::endl;
-      }
-
-    assemble_navier_stokes_system(1. / warm_start_dt);
-    assemble_elasticity_system(1. / warm_start_dt);
-    assemble_navier_stokes_rhs(1. / warm_start_dt);
-    assemble_elasticity_rhs(1. / warm_start_dt);
-    setup_coupling();
-    assemble_coupling();
-#  ifdef DEAL_II_WITH_MUMPS
-    if (par.solver_type == SolverType::mumps)
-      {
-        assemble_mumps_matrix();
-        assemble_mumps_rhs();
-      }
-#  endif
-
-    solve();
-
-    ida_output_cycle = 0;
-    output_results(ida_output_cycle, par.ida_data.initial_time);
-
-    fluid_locally_relevant_solution_old = fluid_locally_relevant_solution;
-    solid_locally_relevant_solution_old = solid_locally_relevant_solution;
-
-    // Build the combined solution vector y = [u, p, w, lambda] from the
-    // warm-started state and estimate consistent differential derivatives by
-    // backward Euler over the warm-start step.
-    const std::vector<IndexSet> block_partitioning = {fluid_owned_dofs[0],
-                                                      fluid_owned_dofs[1],
-                                                      solid_owned_dofs[0],
-                                                      solid_owned_dofs[1]};
-    LA::MPI::BlockVector        y, y_dot;
-    y.reinit(block_partitioning, mpi_communicator);
-    y_dot.reinit(block_partitioning, mpi_communicator);
-
-    y.block(0) = fluid_solution.block(0);
-    y.block(1) = fluid_solution.block(1);
-    y.block(2) = solid_solution.block(0);
-    y.block(3) = solid_solution.block(1);
-
-    y_dot          = 0.;
-    y_dot.block(0) = fluid_solution.block(0);
-    y_dot.block(0).add(-1., old_fluid_solution.block(0));
-    y_dot.block(0) *= 1. / warm_start_dt;
-    y_dot.block(2) = solid_solution.block(0);
-    y_dot.block(2).add(-1., old_solid_solution.block(0));
-    y_dot.block(2) *= 1. / warm_start_dt;
-
-    auto ida_data         = par.ida_data;
-    ida_data.initial_time = warm_start_time + warm_start_dt;
-
-    // Build IDA with the parameters from the parameter file
-    SUNDIALS::IDA<LA::MPI::BlockVector> ida(ida_data, mpi_communicator);
-
-    ida.reinit_vector = [&](LA::MPI::BlockVector &v) {
-      v.reinit(block_partitioning, mpi_communicator);
-    };
-
-    ida.residual = [&](const double                t,
-                       const LA::MPI::BlockVector &yy,
-                       const LA::MPI::BlockVector &yydot,
-                       LA::MPI::BlockVector       &res) {
-      par.set_time(t);
-      ida_residual(t, yy, yydot, res);
-      pcout << "Computed residual at t = " << t
-            << ", ||res|| = " << res.l2_norm() << " -- ("
-            << res.block(0).l2_norm() << ", " << res.block(1).l2_norm() << ", "
-            << res.block(2).l2_norm() << ", " << res.block(3).l2_norm() << ")"
-            << std::endl;
-    };
-
-    ida.setup_jacobian = [&](const double                t,
-                             const LA::MPI::BlockVector &yy,
-                             const LA::MPI::BlockVector &yydot,
-                             const double                alpha_jac) {
-      par.set_time(t);
-      pcout << "Setting up Jacobian at t = " << t << ", alpha = " << alpha_jac
-            << std::endl;
-      ida_setup_jacobian(t, yy, yydot, alpha_jac);
-    };
-
-    ida.solve_with_jacobian = [&](const LA::MPI::BlockVector &src,
-                                  LA::MPI::BlockVector       &dst,
-                                  const double                tol) {
-      pcout << "Solving linear system with Jacobian, tol = " << tol
-            << std::endl;
-      ida_solve_with_jacobian(src, dst, tol);
-    };
-
-    ida.output_step = [&](const double                t,
-                          const LA::MPI::BlockVector &sol,
-                          const LA::MPI::BlockVector & /*sol_dot*/,
-                          const unsigned int step_number) {
-      fluid_locally_relevant_solution.block(0) = sol.block(0);
-      fluid_locally_relevant_solution.block(1) = sol.block(1);
-      solid_locally_relevant_solution.block(0) = sol.block(2);
-      solid_locally_relevant_solution.block(1) = sol.block(3);
-
-      ++ida_output_cycle;
-      output_results(step_number, t);
-
-      // Update particle positions after each output step
-      fluid_solution.block(0) = sol.block(0);
-      fluid_solution.block(1) = sol.block(1);
-      solid_solution.block(0) = sol.block(2);
-      solid_solution.block(1) = sol.block(3);
-      update_particle_positions();
-      euler_step_tracer_particles(
-        ida_current_time_step > 0.0 ? ida_current_time_step : warm_start_dt);
-      tracer_particle_handler.sort_particles_into_subdomains_and_cells();
-
-      fluid_locally_relevant_solution_old = fluid_locally_relevant_solution;
-      solid_locally_relevant_solution_old = solid_locally_relevant_solution;
-    };
-
-    // Indicate which components are differential (velocity and displacement
-    // are differential; pressure and Lagrange multiplier are algebraic).
-    // IDA requires an IndexSet over the global combined vector sized y.size().
-    // The combined vector blocks are:
-    //   block 0: fluid velocity  (fluid_owned_dofs[0])
-    //   block 1: fluid pressure  (fluid_owned_dofs[1])  -- algebraic
-    //   block 2: solid displace  (solid_owned_dofs[0])
-    //   block 3: solid Lagrange  (solid_owned_dofs[1])  -- algebraic
-    ida.differential_components = [&]() -> IndexSet {
-      IndexSet diff(y.size());
-      diff.add_indices(
-        y.locally_owned_elements().get_view(0, fluid_owned_dofs[0].size()));
-      diff.add_indices(y.locally_owned_elements().get_view(
-        fluid_owned_dofs[0].size() + fluid_owned_dofs[1].size(),
-        fluid_owned_dofs[0].size() + fluid_owned_dofs[1].size() +
-          solid_owned_dofs[0].size()));
-      return diff;
-    };
-
-    ida_current_time_step = warm_start_dt;
-
-    auto n_steps = ida.solve_dae(y, y_dot);
-    pcout << "IDA finished with " << n_steps << " steps taken." << std::endl;
-  }
-#endif // DEAL_II_WITH_SUNDIALS
-
 } // namespace Step80
 
 
