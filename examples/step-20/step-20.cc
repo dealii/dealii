@@ -653,7 +653,7 @@ namespace Step20
   // different quantities and may have different orders of convergence (this
   // isn't the case here, by choice of the used finite elements, but is
   // frequently the case in mixed finite element applications). What we
-  // therefore have to do is to `mask' the components that we are interested
+  // therefore have to do is to "mask" the components that we are interested
   // in. This is easily done: the
   // <code>VectorTools::integrate_difference</code> function takes as one of its
   // arguments a pointer to a weight function (the parameter defaults to the

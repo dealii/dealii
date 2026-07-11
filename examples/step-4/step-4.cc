@@ -208,7 +208,7 @@ double BoundaryValues<dim>::value(const Point<dim> &p,
 // define the template functions. Only later, the compiler will find a
 // declaration of <code>Step4@<2@></code> (in the <code>main</code> function,
 // actually) and compile the entire class with <code>dim</code> replaced by 2,
-// a process referred to as `instantiation of a template'. When doing so, it
+// a process referred to as "instantiation of a template". When doing so, it
 // will also replace instances of <code>RightHandSide@<dim@></code> by
 // <code>RightHandSide@<2@></code> and instantiate the latter class from the
 // class template.
@@ -511,7 +511,7 @@ void Step4<dim>::run()
 // dimension we request. The emphasis here lies on the fact that we only need
 // to change a single place. This makes it rather trivial to debug the program
 // in 2d where computations are fast, and then switch a single place to a 3 to
-// run the much more computing intensive program in 3d for `real'
+// run the much more computing intensive program in 3d for "real"
 // computations.
 //
 // Each of the two blocks is enclosed in braces to make sure that the

@@ -2589,7 +2589,7 @@ namespace internal
   /**
    * This struct implements the action of the inverse @ref GlossMassMatrix "mass matrix" operation
    * with user-provided coefficients at quadrature points (in contrast to
-   * CellwiseInverseMassMatrixImplBasic, which implicitly uses `1/(|J|xW)' as
+   * CellwiseInverseMassMatrixImplBasic, which implicitly uses `1/(|J|xW)` as
    * coefficient).
    */
   template <int dim, typename Number>

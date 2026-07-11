@@ -2566,7 +2566,7 @@ namespace DataOutBase
 
   /**
    * Return a list of implemented output formats. The different names are
-   * separated by vertical bar signs (<tt>`|'</tt>) as used by the
+   * separated by vertical bar signs ("|") as used by the
    * ParameterHandler classes.
    */
   std::string

@@ -84,7 +84,7 @@ namespace hp
  * the matrix wasn't empty before. Therefore you may want to clear the matrix
  * before assemblage.
  *
- * By default, all created matrices are `raw': they are not condensed, i.e.
+ * By default, all created matrices are "raw": they are not condensed, i.e.
  * hanging nodes are not eliminated. The reason is that you may want to add
  * several matrices and could then condense afterwards only once, instead of
  * for every matrix. To actually do computations with these matrices, you have

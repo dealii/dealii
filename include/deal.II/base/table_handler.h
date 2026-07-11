@@ -43,8 +43,9 @@ namespace internal
   /**
    * A <tt>TableEntry</tt> stores the value of a table entry. It can either be
    * of type int, unsigned int, std::uint64_t, double or std::string. In
-   * essence, this structure is the same as `std::variant<int,unsigned
-   * int,std::uint64_t,double,std::string>` but we wrap this object in a
+   * essence, this structure is the same as
+   * `std::variant<int, unsigned int, std::uint64_t, double, std::string>` but
+   * we wrap this object in a
    * structure for which we can write a function that can serialize it. This is
    * also why the function is not in fact of type std::any.
    */
@@ -697,7 +698,7 @@ protected:
 
     /**
      * The column format in tex output.  By default, this is <tt>"c"</tt>,
-     * meaning `centered'. This may be changed by calling
+     * meaning "centered". This may be changed by calling
      * <tt>TableHandler::set_tex_format(...)</tt> with <tt>"c", "r", "l"</tt>
      * for centered, right or left.
      */

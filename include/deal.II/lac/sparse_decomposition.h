@@ -89,7 +89,7 @@ DEAL_II_NAMESPACE_OPEN
  * 4/ It is possible to give a user defined sparsity to
  * <code>use_this_sparsity</code>. Then, no sparsity is created but
  * <code>*use_this_sparsity</code> is used to store the decomposed matrix. For
- * restrictions on the sparsity see section `Fill-in' above).
+ * restrictions on the sparsity see section "Fill-in" above).
  *
  *
  * <h3>Particular implementations</h3>

@@ -383,7 +383,7 @@ namespace Polynomials
    * polynomial of degree <tt>n</tt> has got <tt>n+1</tt> interpolation
    * points. The interpolation points are sorted in ascending order. This
    * order gives an index to each interpolation point.  A Lagrangian
-   * polynomial equals to 1 at its `support point', and 0 at all other
+   * polynomial equals to 1 at its "support point", and 0 at all other
    * interpolation points. For example, if the degree is 3, and the support
    * point is 1, then the polynomial represented by this object is cubic and
    * its value is 1 at the point <tt>x=1/3</tt>, and zero at the point

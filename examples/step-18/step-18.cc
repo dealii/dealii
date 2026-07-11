@@ -83,7 +83,7 @@ namespace Step18
   //
   // We will not give this class any meaningful functionality beyond being
   // able to store data, i.e. there are no constructors, destructors, or other
-  // member functions. In such cases of `dumb' classes, we usually opt to
+  // member functions. In such cases of "dumb" classes, we usually opt to
   // declare them as <code>struct</code> rather than <code>class</code>, to
   // indicate that they are closer to C-style structures than C++-style
   // classes.
