@@ -12,11 +12,11 @@
 
 
 /**
- *
- * Test global-coarsening multigrid so that it works also on refinement levels.
+ * Like matrix_free_multigrid_h_01.cc but for a system of finite elements.
  */
 
 #include "multigrid_util.h"
+
 
 using namespace dealii;
 
@@ -26,62 +26,57 @@ test(const unsigned int n_refinements)
 {
   using VectorType =
     LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>;
-  using HostVectorType =
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>;
 
-  using MatrixType   = Portable::LaplaceOperator<dim, fe_degree, 1, Number>;
+  using MatrixType   = Portable::LaplaceOperator<dim, fe_degree, dim, Number>;
   using SmootherType = PreconditionChebyshev<MatrixType, VectorType>;
   using TransferType = Portable::MGTwoLevelTransfer<dim, VectorType>;
-
-  parallel::distributed::Triangulation<dim> tria(
-    MPI_COMM_WORLD,
-    Triangulation<dim>::MeshSmoothing::none,
-    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::subdivided_hyper_cube(tria, 2);
-  tria.refine_global(n_refinements);
 
   const unsigned int min_level = 0;
   const unsigned int max_level = n_refinements;
 
+  MGLevelObject<Triangulation<dim>>        triangulations(min_level, max_level);
+  MGLevelObject<DoFHandler<dim>>           dof_handlers(min_level, max_level);
   MGLevelObject<AffineConstraints<Number>> constraints(min_level, max_level);
   MGLevelObject<TransferType>              transfers(min_level, max_level);
   MGLevelObject<MatrixType>                operators(min_level, max_level);
   MGLevelObject<SmootherType>              smoothers(min_level, max_level);
-
-  std::unique_ptr<FiniteElement<dim>> fe;
-  fe = std::make_unique<FE_Q<dim>>(fe_degree);
-
-  // set up dofhandler
-  DoFHandler<dim> dof_handler(tria);
-  dof_handler.distribute_dofs(*fe);
-  dof_handler.distribute_mg_dofs();
-
-  const std::set<types::boundary_id> dirichlet_boundary = {0};
-  MGConstrainedDoFs                  mg_constrained_dofs;
-  mg_constrained_dofs.initialize(dof_handler);
-  mg_constrained_dofs.make_zero_boundary_constraints(dof_handler,
-                                                     dirichlet_boundary);
 
   AffineConstraints<Number> constraints_fine;
 
   // set up levels
   for (auto l = min_level; l <= max_level; ++l)
     {
-      auto &constraint = constraints[l];
-      auto &op         = operators[l];
+      auto &tria        = triangulations[l];
+      auto &dof_handler = dof_handlers[l];
+      auto &constraint  = constraints[l];
+      auto &op          = operators[l];
+
+      std::unique_ptr<FiniteElement<dim>> fe;
+      fe = std::make_unique<FE_Q<dim>>(fe_degree);
+
+
+      // set up triangulation
+      GridGenerator::subdivided_hyper_cube(tria, 2);
+      tria.refine_global(l);
+
+      // set up dofhandler
+      dof_handler.reinit(tria);
+      dof_handler.distribute_dofs(FESystem<dim>(*fe, dim));
 
       // set up constraints
-      const IndexSet relevant_dofs =
-        DoFTools::extract_locally_relevant_level_dofs(dof_handler, l);
-      constraint.reinit(dof_handler.locally_owned_mg_dofs(l), relevant_dofs);
-      constraint.add_lines(mg_constrained_dofs.get_boundary_indices(l));
+      const IndexSet locally_relevant_dofs =
+        DoFTools::extract_locally_relevant_dofs(dof_handler);
+      constraint.reinit(dof_handler.locally_owned_dofs(),
+                        locally_relevant_dofs);
+      VectorTools::interpolate_boundary_values(
+        dof_handler, 0, Functions::ZeroFunction<dim>(dim), constraint);
       constraint.close();
 
       if (l == max_level)
         constraints_fine.copy_from(constraint);
 
       // set up operator
-      op.reinit(dof_handler, constraint, l);
+      op.reinit(dof_handler, constraint);
 
       typename SmootherType::AdditionalData smoother_data;
       if (l > 0)
@@ -106,10 +101,10 @@ test(const unsigned int n_refinements)
 
   // set up transfer operator
   for (unsigned int l = min_level; l < max_level; ++l)
-    {
-      transfers[l + 1].reinit_geometric_transfer(
-        dof_handler, dof_handler, constraints[l + 1], constraints[l], l + 1, l);
-    }
+    transfers[l + 1].reinit_geometric_transfer(dof_handlers[l + 1],
+                                               dof_handlers[l],
+                                               constraints[l + 1],
+                                               constraints[l]);
 
   VectorType src, dst;
 

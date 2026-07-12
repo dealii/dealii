@@ -25,6 +25,7 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_simplex_p.h>
+#include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/mapping_fe.h>
 
@@ -65,7 +66,10 @@ namespace Portable
 
   // --- Matrix-free operator utilities ---
 
-  template <int dim, int fe_degree, typename Number = double>
+  template <int dim,
+            int fe_degree,
+            int n_components = 1,
+            typename Number  = double>
   class LaplaceOperatorQuad
   {
   public:
@@ -73,7 +77,8 @@ namespace Portable
     LaplaceOperatorQuad() = default;
 
     DEAL_II_HOST_DEVICE void
-    operator()(FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> *fe_eval,
+    operator()(FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number>
+                        *fe_eval,
                const int q_point) const
     {
       fe_eval->submit_gradient(fe_eval->get_gradient(q_point), q_point);
@@ -83,7 +88,10 @@ namespace Portable
       dealii::Utilities::pow(fe_degree + 1, dim);
   };
 
-  template <int dim, int fe_degree, typename Number = double>
+  template <int dim,
+            int fe_degree,
+            int n_components = 1,
+            typename Number  = double>
   class LocalLaplaceOperator
   {
   public:
@@ -94,11 +102,12 @@ namespace Portable
                const DeviceVector<Number>                   &src,
                DeviceVector<Number>                         &dst) const
     {
-      FEEvaluation<dim, fe_degree, fe_degree + 1, 1, Number> fe_eval(data);
+      FEEvaluation<dim, fe_degree, fe_degree + 1, n_components, Number> fe_eval(
+        data);
       fe_eval.read_dof_values(src);
       fe_eval.evaluate(EvaluationFlags::gradients);
 
-      LaplaceOperatorQuad<dim, fe_degree> quad;
+      LaplaceOperatorQuad<dim, fe_degree, n_components> quad;
       data->for_each_quad_point(
         [&](const int &q_point) { quad(&fe_eval, q_point); });
 
@@ -106,12 +115,15 @@ namespace Portable
       fe_eval.distribute_local_to_global(dst);
     }
 
-    static constexpr unsigned int n_q_points =
-      Utilities::pow(fe_degree + 1, dim);
+    static const unsigned int n_q_points =
+      dealii::Utilities::pow(fe_degree + 1, dim);
   };
 
 
-  template <int dim, int fe_degree, typename Number = double>
+  template <int dim,
+            int fe_degree,
+            int n_components = 1,
+            typename Number  = double>
   class LaplaceOperator : public EnableObserverPointer
   {
     using number = Number;
@@ -147,7 +159,7 @@ namespace Portable
             &src) const
     {
       dst = 0.;
-      LocalLaplaceOperator<dim, fe_degree, number> cell_operator;
+      LocalLaplaceOperator<dim, fe_degree, n_components, number> cell_operator;
       matrix_free.cell_loop(cell_operator, src, dst);
       matrix_free.copy_constrained_values(src, dst);
     }
@@ -179,10 +191,10 @@ namespace Portable
         &inverse_diagonal = inverse_diagonal_entries->get_vector();
       this->initialize_dof_vector(inverse_diagonal);
 
-      LaplaceOperatorQuad<dim, fe_degree, number> operator_quad;
+      LaplaceOperatorQuad<dim, fe_degree, n_components, number> operator_quad;
 
       MatrixFreeTools::
-        compute_diagonal<dim, fe_degree, fe_degree + 1, 1, number>(
+        compute_diagonal<dim, fe_degree, fe_degree + 1, n_components, number>(
           matrix_free,
           inverse_diagonal,
           operator_quad,
@@ -219,9 +231,12 @@ namespace Portable
                               quadrature_formula,
                               update_values | update_JxW_values);
 
-      Vector<double> cell_rhs(n_local_dofs);
+      const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
+      const unsigned int n_q_points    = quadrature_formula.size();
 
-      std::vector<types::global_dof_index> local_dof_indices(n_local_dofs);
+      Vector<double> cell_rhs(dofs_per_cell);
+
+      std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
@@ -232,7 +247,7 @@ namespace Portable
               fe_values.reinit(cell);
 
               for (unsigned int q_index = 0; q_index < n_q_points; ++q_index)
-                for (unsigned int i = 0; i < n_local_dofs; ++i)
+                for (unsigned int i = 0; i < dofs_per_cell; ++i)
                   cell_rhs(i) += (fe_values.shape_value(i, q_index) * 1.0 *
                                   fe_values.JxW(q_index));
 
@@ -300,11 +315,6 @@ namespace Portable
     {
       return matrix_free.get_vector_partitioner();
     }
-
-    static constexpr unsigned int n_local_dofs =
-      Utilities::pow(fe_degree + 1, dim);
-    static constexpr unsigned int n_q_points =
-      Utilities::pow(fe_degree + 1, dim);
 
   private:
     MatrixFree<dim, number> matrix_free;

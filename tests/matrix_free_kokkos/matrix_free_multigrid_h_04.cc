@@ -13,7 +13,7 @@
 
 /**
  *
- * Test global-coarsening multigrid so that it works also on refinement levels.
+ * Like matrix_free_multigrid_h_02.cc but for a system of finite elements.
  */
 
 #include "multigrid_util.h"
@@ -29,7 +29,7 @@ test(const unsigned int n_refinements)
   using HostVectorType =
     LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>;
 
-  using MatrixType   = Portable::LaplaceOperator<dim, fe_degree, 1, Number>;
+  using MatrixType   = Portable::LaplaceOperator<dim, fe_degree, dim, Number>;
   using SmootherType = PreconditionChebyshev<MatrixType, VectorType>;
   using TransferType = Portable::MGTwoLevelTransfer<dim, VectorType>;
 
@@ -53,7 +53,7 @@ test(const unsigned int n_refinements)
 
   // set up dofhandler
   DoFHandler<dim> dof_handler(tria);
-  dof_handler.distribute_dofs(*fe);
+  dof_handler.distribute_dofs(FESystem<dim>(*fe, dim));
   dof_handler.distribute_mg_dofs();
 
   const std::set<types::boundary_id> dirichlet_boundary = {0};
