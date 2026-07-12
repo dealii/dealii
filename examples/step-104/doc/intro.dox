@@ -153,9 +153,6 @@ to Daniel Arndt, Rene Gassmöller, Martin Kronbichler, Ivan Prusak, and Bruno Tu
   Notice that roughly speaking the setup and postprocess happen on the CPU, with the linear solve step happening on the GPU. With
   complex problems, this will be the majority of the computational time.
 
-  @note The GMG transfer currently uses MGTwoLevelTransferCopyToHost, which, as the name implies, performs the operation
-  on the CPU as the GPU implementation has not been completed.
-
   <h3>Test case</h3>
 
   Our test problem features a unit hypercube with the manufactured solution
