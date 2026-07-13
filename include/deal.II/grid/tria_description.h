@@ -129,6 +129,11 @@ namespace TriangulationDescription
     types::subdomain_id level_subdomain_id;
 
     /**
+     * material id of the cell.
+     */
+    types::material_id material_id;
+
+    /**
      * Manifold id of the cell.
      */
     types::manifold_id manifold_id;
@@ -474,6 +479,7 @@ namespace TriangulationDescription
   CellData<dim>::CellData()
     : subdomain_id(numbers::invalid_subdomain_id)
     , level_subdomain_id(numbers::invalid_subdomain_id)
+    , material_id(0)
     , manifold_id(numbers::flat_manifold_id)
   {
     std::fill(id.begin(), id.end(), numbers::invalid_unsigned_int);
@@ -495,6 +501,7 @@ namespace TriangulationDescription
     ar &id;
     ar &subdomain_id;
     ar &level_subdomain_id;
+    ar &material_id;
     ar &manifold_id;
     if (dim >= 2)
       ar &manifold_line_ids;
@@ -539,6 +546,8 @@ namespace TriangulationDescription
     if (this->subdomain_id != other.subdomain_id)
       return false;
     if (this->level_subdomain_id != other.level_subdomain_id)
+      return false;
+    if (this->material_id != other.material_id)
       return false;
     if (this->manifold_id != other.manifold_id)
       return false;
