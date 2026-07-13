@@ -40,13 +40,15 @@ endif()
 #
 # Are all dependencies fulfilled?
 #
-if(NOT DEAL_II_TRILINOS_WITH_SACADO OR NOT DEAL_II_WITH_MUPARSER)
+if(NOT DEAL_II_TRILINOS_WITH_EPETRA OR NOT DEAL_II_TRILINOS_WITH_SACADO OR NOT DEAL_II_WITH_MUPARSER)
   message(FATAL_ERROR "
 Error! This tutorial requires a deal.II library that was configured with the following options:
     DEAL_II_WITH_MUPARSER = ON
+    DEAL_II_TRILINOS_WITH_EPETRA = ON
     DEAL_II_TRILINOS_WITH_SACADO = ON
 However, the deal.II library found at ${DEAL_II_PATH} was configured with these options:
     DEAL_II_WITH_MUPARSER = ${DEAL_II_WITH_MUPARSER}
+    DEAL_II_TRILINOS_WITH_EPETRA = ${DEAL_II_TRILINOS_WITH_EPETRA}
     DEAL_II_TRILINOS_WITH_SACADO = ${DEAL_II_TRILINOS_WITH_SACADO}
 This conflicts with the requirements."
     )
