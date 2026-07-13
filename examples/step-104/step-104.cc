@@ -609,7 +609,7 @@ namespace Step104
           velocity_term[d][d] -= pressure_value;
         fe_u.submit_gradient(velocity_term, q_point);
 
-        const Number pressure_term = trace(gradient_u);
+        const Number pressure_term = -trace(gradient_u);
         fe_p.submit_value(pressure_term, q_point);
       });
 

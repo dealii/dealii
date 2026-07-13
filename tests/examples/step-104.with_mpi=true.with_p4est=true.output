@@ -7,12 +7,12 @@ refinement: 0, n_dofs: 2312 = 2187 + 125
 GMG velocity block smoothers:
     level: 1 n_dofs: 375, eigenvalue spectrum: [ 0.3748094237, 1.432009386 ]
     level: 2 n_dofs: 2187, eigenvalue spectrum: [ 0.09606982461, 1.534153946 ]
-Solver converged in 11 iterations in 0 seconds
+Solver converged in 10 iterations in 0 seconds
 velocity error: 0.04512777779 pressure error: 0.1489693597
 
 refinement: 1, n_dofs: 15468 = 14739 + 729
 GMG velocity block smoothers:
     level: 2 n_dofs: 2187, eigenvalue spectrum: [ 0.09606982458, 1.538632983 ]
     level: 3 n_dofs: 14739, eigenvalue spectrum: [ 0.02701368613, 1.586314951 ]
-Solver converged in 28 iterations in 0 seconds
+Solver converged in 20 iterations in 0 seconds
 velocity error: 0.006038671786 pressure error: 0.01232929908
