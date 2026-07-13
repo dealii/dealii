@@ -47,11 +47,14 @@ subsection Navier-Stokes Immersed Problem
     set Variable names      = x,y,t
   end
   subsection Physical properties
-    set Density                 = 1
-    set Lame lambda             = 10
-    set Lame mu                 = 10
-    set Include convective term = false
-    set Viscosity               = 0.1
+    set Density                   = 1
+    set Lame lambda               = 10
+    set Lame mu                   = 10
+    set Include convective term   = false
+    set Use nonlinear solid model = false
+    set Nonlinear solid gamma     = 1.333
+    set Nonlinear solid eta       = 9.242
+    set Viscosity                 = 0.1
   end
   subsection Reference configuration and multiplier
     set Function constants  =
@@ -85,5 +88,7 @@ subsection Navier-Stokes Immersed Problem
     set Inner solver tolerance                     = 1e-14
     set Outer solver maximum iterations            = 1000
     set Outer solver tolerance                     = 1e-06
+    set Newton maximum iterations                  = 20
+    set Newton tolerance                           = 1e-8
   end
 end
