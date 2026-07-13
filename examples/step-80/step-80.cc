@@ -293,6 +293,12 @@ namespace Step80
 
     bool include_convective_term = true;
 
+    // Nonlinear hyperelastic solid model. P(F) = gamma * exp(eta*(tr(F^T F) -
+    // dim)) * F, solved with Newton. See Boffi, et al. (2023).
+    bool   use_nonlinear_solid_model = false;
+    double nonlinear_solid_gamma     = 1.333;
+    double nonlinear_solid_eta       = 9.242;
+
     bool particle_predictor = true;
 
     std::list<types::boundary_id> dirichlet_ids{0};
@@ -328,6 +334,9 @@ namespace Step80
     bool         log_inner_lagrangian_iterations = false;
     bool         use_operator_augmentation       = false;
     SolverType   solver_type                     = SolverType::augmented_split;
+
+    unsigned int newton_max_iterations = 20;
+    double       newton_tolerance      = 1e-8;
 
     using PrmFunction =
       ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
@@ -420,6 +429,14 @@ namespace Step80
         "If true, the explicit convective term rho*(u^n * grad) u^n is added "
         "to the Navier-Stokes right-hand side. Set to false to drop the "
         "convective term and recover the (unsteady Stokes) momentum equation.");
+      add_parameter(
+        "Use nonlinear solid model",
+        use_nonlinear_solid_model,
+        "If true, the immersed solid is governed by the nonlinear "
+        "hyperelastic law P(F) = gamma*exp(eta*(tr(F^T F) - dim))*F, solved "
+        "with Newton's method. If false, the linear elastic model is used.");
+      add_parameter("Nonlinear solid gamma", nonlinear_solid_gamma);
+      add_parameter("Nonlinear solid eta", nonlinear_solid_eta);
     }
     leave_subsection();
 
@@ -503,6 +520,8 @@ namespace Step80
                     log_inner_lagrangian_iterations);
       add_parameter("Use operator augmentation", use_operator_augmentation);
       add_parameter("Solver type", solver_type);
+      add_parameter("Newton maximum iterations", newton_max_iterations);
+      add_parameter("Newton tolerance", newton_tolerance);
     }
     leave_subsection();
 
@@ -1918,6 +1937,10 @@ namespace Step80
     std::vector<double>                       div_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
 
+    // Gradient of the current displacement iterate w^{(k)}, needed to build
+    // the deformation gradient F = I + grad(w) for the nonlinear tangent.
+    std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
+
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
     for (const auto &cell : solid_dh.active_cell_iterators())
@@ -1927,6 +1950,10 @@ namespace Step80
           cell_preconditioner = 0;
 
           fe_values.reinit(cell);
+
+          if (par.use_nonlinear_solid_model)
+            fe_values[displacement].get_function_gradients(
+              solid_locally_relevant_solution, grad_w_current);
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
@@ -1940,16 +1967,39 @@ namespace Step80
                   phi_lagrange[k] = fe_values[lagrange_multiplier].value(k, q);
                 }
 
+              // Nonlinear hyperelastic data at quadrature point. With
+              // F = I + grad(w^{(k)}) and g = gamma*exp(eta*(F:F - dim)), the
+              // stress is P(F) = g*F and the tangent is dP/dF = g*(I4 + 2*eta*F
+              // (x) F)
+              Tensor<2, spacedim> F;
+              double              g = 0.;
+              if (par.use_nonlinear_solid_model)
+                {
+                  F = grad_w_current[q];
+                  for (unsigned int d = 0; d < spacedim; ++d)
+                    F[d][d] += 1.;
+                  g = par.nonlinear_solid_gamma *
+                      std::exp(par.nonlinear_solid_eta *
+                               (scalar_product(F, F) - spacedim));
+                }
+
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      // Elastic bilinear form
+                      // Elastic bilinear form can be either for the linear
+                      // model or the tangent stiffness (nonlinear
+                      // model).
                       const double elastic_ij =
-                        (2 * par.lame_mu *
-                           scalar_product(grad_eps_phi_w[i],
-                                          grad_eps_phi_w[j]) +
-                         par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
+                        par.use_nonlinear_solid_model ?
+                          g * (scalar_product(grad_phi_w[i], grad_phi_w[j]) +
+                               2. * par.nonlinear_solid_eta *
+                                 scalar_product(F, grad_phi_w[i]) *
+                                 scalar_product(F, grad_phi_w[j])) :
+                          (2 * par.lame_mu *
+                             scalar_product(grad_eps_phi_w[i],
+                                            grad_eps_phi_w[j]) +
+                           par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
 
                       cell_matrix(i, j) +=
                         (elastic_ij -
@@ -2033,6 +2083,10 @@ namespace Step80
     std::vector<Vector<double>>      solid_rhs_values(n_q_points,
                                                  Vector<double>(2 * spacedim));
 
+    // Gradient of the current displacement iterate w^{(k)}, used to evaluate
+    // the nonlinear internal force and the Newton right-hand side.
+    std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
+
     for (const auto &cell : solid_dh.active_cell_iterators())
       if (cell->is_locally_owned())
         {
@@ -2041,12 +2095,34 @@ namespace Step80
           fe_values_rhs[displacement].get_function_values(
             solid_locally_relevant_solution_old, w_old);
 
+          if (par.use_nonlinear_solid_model)
+            fe_values_rhs[displacement].get_function_gradients(
+              solid_locally_relevant_solution, grad_w_current);
+
           par.solid_rhs.vector_value_list(fe_values_rhs.get_quadrature_points(),
                                           solid_rhs_values);
 
           cell_rhs = 0;
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
+              // Nonlinear hyperelastic data at this quadrature point. Because
+              // we solve for the full solution (not the Newton increment), the
+              // solid displacement row picks up the extra right-hand side
+              // K_s(w^{(k)}) w^{(k)} - N(w^{(k)}), with internal force
+              // N_i = (P(F), grad chi_i) and F = I + grad(w^{(k)}).
+              Tensor<2, spacedim> F, H;
+              double              g = 0.;
+              if (par.use_nonlinear_solid_model)
+                {
+                  H = grad_w_current[q];
+                  F = H;
+                  for (unsigned int d = 0; d < spacedim; ++d)
+                    F[d][d] += 1.;
+                  g = par.nonlinear_solid_gamma *
+                      std::exp(par.nonlinear_solid_eta *
+                               (scalar_product(F, F) - spacedim));
+                }
+
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   const auto &phi_lagrange =
@@ -2059,6 +2135,21 @@ namespace Step80
                                   solid_rhs_values[q](comp_i) *
                                     fe_values_rhs.shape_value(i, q)) *
                                  fe_values_rhs.JxW(q);
+
+                  if (par.use_nonlinear_solid_model)
+                    {
+                      const Tensor<2, spacedim> grad_phi_i =
+                        fe_values_rhs[displacement].gradient(i, q);
+                      // (K_s w^{(k)})_i - N_i, where the second scalar_product
+                      // term is the internal force N_i = g * (F : grad chi_i).
+                      cell_rhs(i) += g *
+                                     (scalar_product(grad_phi_i, H) +
+                                      2. * par.nonlinear_solid_eta *
+                                        scalar_product(F, grad_phi_i) *
+                                        scalar_product(F, H) -
+                                      scalar_product(F, grad_phi_i)) *
+                                     fe_values_rhs.JxW(q);
+                    }
                 }
             }
           cell->get_dof_indices(local_dof_indices);
@@ -2082,15 +2173,33 @@ namespace Step80
                         fe_values_matrix[lagrange_multiplier].value(k, q);
                     }
 
+                  Tensor<2, spacedim> F;
+                  double              g = 0.;
+                  if (par.use_nonlinear_solid_model)
+                    {
+                      F = grad_w_current[q];
+                      for (unsigned int d = 0; d < spacedim; ++d)
+                        F[d][d] += 1.;
+                      g = par.nonlinear_solid_gamma *
+                          std::exp(par.nonlinear_solid_eta *
+                                   (scalar_product(F, F) - spacedim));
+                    }
+
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
                         {
                           const double elastic_ij =
-                            (2 * par.lame_mu *
-                               scalar_product(grad_eps_phi_w[i],
-                                              grad_eps_phi_w[j]) +
-                             par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
+                            par.use_nonlinear_solid_model ?
+                              g *
+                                (scalar_product(grad_phi_w[i], grad_phi_w[j]) +
+                                 2. * par.nonlinear_solid_eta *
+                                   scalar_product(F, grad_phi_w[i]) *
+                                   scalar_product(F, grad_phi_w[j])) :
+                              (2 * par.lame_mu *
+                                 scalar_product(grad_eps_phi_w[i],
+                                                grad_eps_phi_w[j]) +
+                               par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
 
                           cell_matrix(i, j) +=
                             (elastic_ij -
@@ -2847,24 +2956,63 @@ namespace Step80
 
         if (cycle == 0 || update_timestep || use_operator_augmentation())
           assemble_navier_stokes_system(1. / time_step);
-        if (cycle == 0 || update_timestep)
-          assemble_elasticity_system(1. / time_step);
 
         assemble_navier_stokes_rhs(1. / time_step);
-        assemble_elasticity_rhs(1. / time_step);
 
         check_immersed_mapping_is_valid();
         setup_coupling();
         assemble_coupling();
-#ifdef DEAL_II_WITH_MUMPS
-        if (par.solver_type == SolverType::mumps)
-          {
-            assemble_mumps_matrix();
-            assemble_mumps_rhs();
-          }
-#endif
 
-        solve();
+        if (par.use_nonlinear_solid_model)
+          {
+            // The nonlinear hyperelastic solid model is solved with Newton's
+            // method. At each time step, all blocks stay the same, excecpt for
+            // the solid stiffness and its residual which are reassembled at
+            // each Newton iteration.
+            // Since we solve for the full solution (not the usual increment),
+            // the linear rows keep their usual right-hand side while the solid
+            // displacement row carries the extra term K_s(w^{(k)}) w^{(k)} -
+            // N(w^{(k)}).
+            for (unsigned int newton_iteration = 0;
+                 newton_iteration < par.newton_max_iterations;
+                 ++newton_iteration)
+              {
+                assemble_elasticity_system(1. / time_step);
+                assemble_elasticity_rhs(1. / time_step);
+#ifdef DEAL_II_WITH_MUMPS
+                if (par.solver_type == SolverType::mumps)
+                  {
+                    assemble_mumps_matrix();
+                    assemble_mumps_rhs();
+                  }
+#endif
+                LA::MPI::BlockVector previous_solid_solution = solid_solution;
+                solve();
+                previous_solid_solution -= solid_solution;
+                const double increment =
+                  previous_solid_solution.block(0).l2_norm();
+                pcout << "   Newton iteration " << newton_iteration
+                      << ": displacement increment = " << increment
+                      << std::endl;
+                if (increment < par.newton_tolerance)
+                  break;
+              }
+          }
+        else
+          {
+            // Linear model, no Newton
+            if (cycle == 0 || update_timestep)
+              assemble_elasticity_system(1. / time_step);
+            assemble_elasticity_rhs(1. / time_step);
+#ifdef DEAL_II_WITH_MUMPS
+            if (par.solver_type == SolverType::mumps)
+              {
+                assemble_mumps_matrix();
+                assemble_mumps_rhs();
+              }
+#endif
+            solve();
+          }
 
         update_particle_positions();
 
