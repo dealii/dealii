@@ -1,3 +1,0 @@
-Removed: The `setup` function for all preconditioners in the `PETScWrappers` namespace has been deprecated. Its action is now automatically performed during `initialize`.
-<br>
-(Ryan Moulday, 2025/09/18)
