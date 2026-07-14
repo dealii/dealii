@@ -104,7 +104,8 @@ namespace internal
     }
 
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_WITH_TRILINOS
+#  if !defined(DEAL_II_TRILINOS_WITH_TPETRA)
     /**
      * Adjust vectors on all levels to correct size.  Here, we just count the
      * numbers of degrees of freedom on each level and @p reinit each level
@@ -130,6 +131,35 @@ namespace internal
                           tria->get_mpi_communicator());
         }
     }
+#  else
+    /**
+     * Adjust vectors on all levels to correct size.  Here, we just count the
+     * numbers of degrees of freedom on each level and @p reinit each level
+     * vector to this length.
+     */
+    template <int dim, int spacedim, typename Number, typename MemorySpace>
+    void
+    reinit_vector(
+      const DoFHandler<dim, spacedim> &dof_handler,
+      const std::vector<unsigned int> &,
+      MGLevelObject<LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>>
+        &v)
+    {
+      const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
+        (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
+                        *>(&dof_handler.get_triangulation()));
+      AssertThrow(
+        tria != nullptr,
+        ExcMessage(
+          "multigrid with Trilinos vectors only works with a parallel Triangulation!"));
+
+      for (unsigned int level = v.min_level(); level <= v.max_level(); ++level)
+        {
+          v[level].reinit(dof_handler.locally_owned_mg_dofs(level),
+                          tria->get_mpi_communicator());
+        }
+    }
+#  endif
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
