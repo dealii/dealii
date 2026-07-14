@@ -32,8 +32,8 @@
 
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/trilinos_precondition.h>
-#include <deal.II/lac/trilinos_solver.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_vector.h>
 
@@ -154,7 +154,7 @@ void
 LaplaceProblem::solve()
 {
   SolverControl                             solver_control(1e03, 1e-03);
-  TrilinosWrappers::SolverCG                cg_solver(solver_control);
+  SolverCG<TrilinosWrappers::MPI::Vector>   cg_solver(solver_control);
   TrilinosWrappers::PreconditionBlockJacobi preconditioner;
   preconditioner.initialize(A);
   cg_solver.solve(A, x, b, preconditioner);
