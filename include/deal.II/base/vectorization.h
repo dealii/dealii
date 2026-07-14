@@ -1634,8 +1634,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const double x) &
   {
     data = _mm_set1_pd(x);
@@ -1647,7 +1646,7 @@ public:
    * rvalue references; because it does not make sense to assign
    * something to a temporary, the function is deleted.
    */
-  VectorizedArray &
+  inline VectorizedArray &
   operator=(const double scalar) && = delete;
 
   /**
@@ -2078,8 +2077,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const float x) &
   {
     data = _mm_set1_ps(x);
