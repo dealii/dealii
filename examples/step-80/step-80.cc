@@ -2552,9 +2552,12 @@ namespace Step80
       A11_aug = A;
     else
       A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
-    auto A22_aug = K + gamma2 * Dt * invW * D;
-    auto A12_aug = gamma1 * Ct * invW * D;
-    auto A21_aug = gamma2 * Dt * invW * C;
+
+      
+    const auto Dtr = transpose_operator(D); // D^T = -alpha*M_s (M_s symmetric)
+    auto       A22_aug = K + gamma2 * Dtr * invW * D;
+    auto       A12_aug = gamma1 * Ct * invW * D;
+    auto       A21_aug = gamma2 * Dtr * invW * C;
 
     SolverControl inner_solver_control_lagrangian(
       par.inner_lagrangian_max_iterations,
@@ -2617,8 +2620,10 @@ namespace Step80
     block_system_rhs.block(2) = solid_system_rhs.block(1);
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
 
+    // Augment the RHS consistently with the operator augmentation above so the
+    // solution is unchanged. The w-row uses D^T (Dtr), matching A21_aug/A22_aug.
     block_system_rhs.block(0) += gamma1 * Ct * invW * block_system_rhs.block(2);
-    block_system_rhs.block(1) += gamma2 * Dt * invW * block_system_rhs.block(2);
+    block_system_rhs.block(1) += gamma2 * Dtr * invW * block_system_rhs.block(2);
 
 
     block_system_solution.reinit(block_system_rhs);
