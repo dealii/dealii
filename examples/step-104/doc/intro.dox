@@ -14,7 +14,7 @@ to Daniel Arndt, Rene Gassmöller, Martin Kronbichler, Ivan Prusak, and Bruno Tu
 
   @f{align}{
     -\Delta \mathbf{u} + \nabla p &= \mathbf{f} \quad \text{in } \Omega, \\
-    \nabla \cdot \mathbf{u} &= 0 \quad \text{in } \Omega, \\
+    -\nabla \cdot \mathbf{u} &= 0 \quad \text{in } \Omega, \\
     \mathbf{u} &= \mathbf{0} \quad \text{on } \partial\Omega,
   @f}
 
@@ -72,7 +72,7 @@ to Daniel Arndt, Rene Gassmöller, Martin Kronbichler, Ivan Prusak, and Bruno Tu
 
   @f{eqnarray*}{
     (\nabla \mathbf{u}, \nabla \mathbf{v})_{\Omega} - (p, \nabla \cdot \mathbf{v})_{\Omega}
-    &= (\mathbf{f}, \mathbf{v})_{\Omega},\\ (q, \nabla \cdot \mathbf{u})_{\Omega} & = 0.
+    &= (\mathbf{f}, \mathbf{v})_{\Omega},\\ -(q, \nabla \cdot \mathbf{u})_{\Omega} &=&0.
   @f}
 
 
