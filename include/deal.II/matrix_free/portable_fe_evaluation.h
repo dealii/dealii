@@ -619,6 +619,8 @@ namespace Portable
     submit_value(const value_type &value, const int q_point)
   {
     AssertIndexRange(q_point, n_q_points);
+    Assert(precomputed_data->JxW.size() > 0,
+           ExcMessage("submit_value() requires precomputed JxW"));
     if constexpr (n_components_ == 1)
       {
         shared_data->values(q_point, 0) =
@@ -671,6 +673,8 @@ namespace Portable
     get_gradient(const int q_point) const
   {
     AssertIndexRange(q_point, n_q_points);
+    Assert(precomputed_data->inv_jacobian.size() > 0,
+           ExcMessage("get_gradient() requires precomputed inv_jacobian"));
     gradient_type grad;
 
     if constexpr (n_components_ == 1)
@@ -714,6 +718,11 @@ namespace Portable
     submit_gradient(const gradient_type &gradient, const int q_point)
   {
     AssertIndexRange(q_point, n_q_points);
+    Assert(precomputed_data->inv_jacobian.size() > 0,
+           ExcMessage("submit_gradient() requires precomputed inv_jacobian"));
+    Assert(precomputed_data->JxW.size() > 0,
+           ExcMessage("submit_gradient() requires precomputed JxW"));
+
     if constexpr (n_components_ == 1)
       {
         for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
@@ -779,6 +788,9 @@ namespace Portable
            ExcMessage("Function get_divergence() only works when the "
                       "number of components and the number of dimensions are "
                       "equal."));
+    Assert(precomputed_data->inv_jacobian.size() > 0,
+           ExcMessage("get_divergence() requires precomputed inv_jacobian"));
+
     Number divergence = 0.;
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d = 0; d < dim; ++d)
@@ -803,6 +815,11 @@ namespace Portable
            ExcMessage("Function submit_divergence() only works when the "
                       "number of components and the number of dimensions are "
                       "equal."));
+    Assert(precomputed_data->inv_jacobian.size() > 0,
+           ExcMessage("submit_divergence() requires precomputed inv_jacobian"));
+    Assert(precomputed_data->JxW.size() > 0,
+           ExcMessage("submit_divergence() requires precomputed JxW"));
+
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
         shared_data->gradients(q_point, d_1, c) =
@@ -827,6 +844,11 @@ namespace Portable
            ExcMessage("Function submit_symmetric_gradient() only works when "
                       "the number of components and the number of dimensions "
                       "are equal."));
+    Assert(precomputed_data->inv_jacobian.size() > 0,
+           ExcMessage(
+             "submit_symmetric_gradient() requires precomputed inv_jacobian"));
+    Assert(precomputed_data->JxW.size() > 0,
+           ExcMessage("submit_symmetric_gradient() requires precomputed JxW"));
 
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
