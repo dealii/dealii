@@ -29,7 +29,7 @@ Boussinesq equations that read as follows:
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho\; \beta \; T\; \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u} &=& 0,
+  -\nabla \cdot {\mathbf u} &=& 0,
   \\
   \frac{\partial T}{\partial t}
   +
@@ -167,7 +167,7 @@ mixed Laplace system of the form
 where now we have a Stokes system
 @f{eqnarray*}{
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=& f, \\
-  \nabla\cdot \mathbf u &=& 0,
+  -\nabla\cdot \mathbf u &=& 0,
 @f}
 where $\nabla \cdot \eta \varepsilon (\cdot)$ is an operator similar to the
 Laplacian $\Delta$ applied to a vector field.
@@ -194,7 +194,7 @@ time step $n - 1$ as
   -\nabla \cdot (2\eta \varepsilon ({\mathbf u}^{n-1})) + \nabla p^{n-1} &=&
   -\rho\; \beta \; T^{n-1} \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u}^{n-1} &=& 0,
+  -\nabla \cdot {\mathbf u}^{n-1} &=& 0,
 @f}
 and then the temperature equation with an extrapolated velocity field to
 time $n$.
@@ -317,7 +317,7 @@ by their discrete counterparts:
   &=&
   -({\mathbf v}_h, \rho\; \beta \; T^{n-1}_h \mathbf{g}),
   \\
-  (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0,
+  -(q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0,
 @f}
 for all test functions $\mathbf v_h, q_h$. The first term of the first
 equation is considered as the inner product between tensors, i.e.
@@ -336,7 +336,7 @@ that we implement is
   &=&
   -({\mathbf v}_h, \rho\; \beta \; T^{n-1}_h \mathbf{g}),
   \\
-  (q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0.
+  -(q_h, \nabla \cdot {\mathbf u}^{n-1}_h) &=& 0.
 @f}
 
 This is exactly the same as what we already discussed in

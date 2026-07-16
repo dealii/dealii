@@ -70,7 +70,7 @@ velocity and pressure field:
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   -\rho \; \beta \; T \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u} &=& 0.
+  -\nabla \cdot {\mathbf u} &=& 0.
 @f}
 The right hand side of the first equation appears a wee bit
 unmotivated. Here's how things should really be. We
@@ -106,7 +106,7 @@ with which the Stokes equations would read:
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p_{\text{dyn}} &=&
   -\rho_{\text{ref}} \; \beta \; T \; \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u} &=& 0.
+  -\nabla \cdot {\mathbf u} &=& 0.
 @f}
 This is exactly the form we used in step-31, and it was
 appropriate to do so because all changes in the fluid flow are only
@@ -121,7 +121,7 @@ that considers the total pressure instead:
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T)\; \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u} &=& 0.
+  -\nabla \cdot {\mathbf u} &=& 0.
 @f}
 There are several advantages to this:
 
@@ -178,7 +178,7 @@ Remember that we want to solve the following set of equations:
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T) \mathbf{g},
   \\
-  \nabla \cdot {\mathbf u} &=& 0,
+  -\nabla \cdot {\mathbf u} &=& 0,
   \\
   \frac{\partial T}{\partial t}
   +
@@ -274,7 +274,7 @@ $10^{17}$. So, we now get this for the Stokes system:
   -\nabla \cdot (2 \eta \varepsilon ({\mathbf u})) + \nabla p &=&
   \rho(T) \; \mathbf{g},
   \\
-  \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
+  -\frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
 @f}
 The trouble with this is that the result is not symmetric any more (we have
 $\frac{\eta}{L} \nabla \cdot$ at the bottom left, but not its transpose
@@ -285,7 +285,7 @@ scaled pressure $\hat p = \frac{L}{\eta}p$, and we get the scaled equations
   \nabla \left(\frac{\eta}{L} \hat p\right) &=&
   \rho(T) \; \mathbf{g},
   \\
-  \frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
+  -\frac{\eta}{L} \nabla \cdot {\mathbf u} &=& 0.
 @f}
 This is now symmetric. Obviously, we can easily recover the original pressure
 $p$ from the scaled pressure $\hat p$ that we compute as a result of this
