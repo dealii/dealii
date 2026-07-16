@@ -2147,18 +2147,6 @@ CellAccessor<dim, spacedim>::at_boundary() const
 
 
 template <int dim, int spacedim>
-types::material_id
-CellAccessor<dim, spacedim>::material_id() const
-{
-  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
-  return this->tria->levels[this->level()]
-    ->cells.boundary_or_material_id[this->present_index]
-    .material_id;
-}
-
-
-
-template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_material_id(
   const types::material_id mat_id) const
