@@ -8081,6 +8081,18 @@ CellAccessor<dim, spacedim>::is_artificial_on_level() const
 
 
 template <int dim, int spacedim>
+inline types::material_id
+CellAccessor<dim, spacedim>::material_id() const
+{
+  Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  return this->tria->levels[this->level()]
+    ->cells.boundary_or_material_id[this->present_index]
+    .material_id;
+}
+
+
+
+template <int dim, int spacedim>
 inline types::subdomain_id
 CellAccessor<dim, spacedim>::subdomain_id() const
 {
