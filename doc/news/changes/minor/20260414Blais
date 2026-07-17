@@ -1,0 +1,10 @@
+Added: There is now an additional overload of
+Particles::Utilities::interpolate_field_on_particles() which uses the
+FEPointEvaluation class to interpolate fields on particles efficiently. It is
+selected by providing the number of components as a compile-time template
+argument, and it takes an arbitrary mapping (defaulting to the reference cell's
+default linear mapping), whereas the existing overload deduces the number of
+components at run time and evaluates the shape functions directly at the
+reference location of each particle.
+<br>
+(Bruno Blais, 2026/04/14)
