@@ -350,7 +350,8 @@ private:
  *   = \frac{J\, \hat{\mathbf u}(\hat{\mathbf x})}{\sqrt{\det(J^T J)}},
  * @f]
  * where $J \in \mathbb R^{\text{spacedim}\times\text{dim}}$ is the Jacobian of
- * the mapping from the reference cell to the surface cell. The number of components of the element therefore equals
+ * the mapping from the reference cell to the surface cell. The number of
+ * components of the element therefore equals
  * @p spacedim, not @p dim, so that the field can be accessed as a
  * @p spacedim -valued vector through FEValuesExtractors::Vector.
  *
