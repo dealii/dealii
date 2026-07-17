@@ -145,6 +145,8 @@ namespace internal
       MGLevelObject<LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>>
         &v)
     {
+      // The implementation is the same as for TrilinosWrappers::MPI::Vector
+      // above.
       const dealii::parallel::TriangulationBase<dim, spacedim> *tria =
         (dynamic_cast<const dealii::parallel::TriangulationBase<dim, spacedim>
                         *>(&dof_handler.get_triangulation()));
