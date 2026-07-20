@@ -53,6 +53,8 @@ jobs:
             os: ubuntu-22.04
           - ubuntu_version: noble
             os: ubuntu-24.04
+          - ubuntu_version: resolute
+            os: ubuntu-26.04
 
     steps:
     - uses: actions/checkout@v7
@@ -104,7 +106,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy, noble]
+        ubuntu_version: [jammy, noble, resolute]
         os: [ubuntu-24.04, ubuntu-24.04-arm]
         include:
           - os: ubuntu-24.04
@@ -187,7 +189,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy, noble]
+        ubuntu_version: [jammy, noble, resolute]
 
     container:
       image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
