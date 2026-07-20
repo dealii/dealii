@@ -1368,11 +1368,24 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
 {
   if (present_cell.is_initialized())
     {
-      if (&cell->get_triangulation() !=
-          &present_cell
-             .
-             operator typename Triangulation<dim, spacedim>::cell_iterator()
-             ->get_triangulation())
+      const auto stored_cell =
+        present_cell.
+        operator typename Triangulation<dim, spacedim>::cell_iterator();
+
+      // There's no good way to check that the corresponding Triangulation
+      // objects are still alive. approximate that by checking that the
+      // partitioner isn't expired. If the Triangulation doesn't exist any more
+      // this call may crash or the assertion may correctly fail (since there is
+      // no more partitioner).
+      Assert(!cell->get_triangulation()
+                .global_active_cell_index_partitioner()
+                .expired(),
+             ExcInternalError());
+      Assert(!stored_cell->get_triangulation()
+                .global_active_cell_index_partitioner()
+                .expired(),
+             ExcInternalError());
+      if (&cell->get_triangulation() != &stored_cell->get_triangulation())
         {
           // the triangulations for the previous cell and the current cell
           // do not match. disconnect from the previous triangulation and
