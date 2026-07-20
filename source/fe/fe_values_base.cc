@@ -235,8 +235,7 @@ FEValuesBase<dim, spacedim>::FEValuesBase(
 template <int dim, int spacedim>
 FEValuesBase<dim, spacedim>::~FEValuesBase()
 {
-  tria_listener_refinement.disconnect();
-  tria_listener_mesh_transform.disconnect();
+  tria_listener_any_change.disconnect();
 }
 
 
@@ -1353,16 +1352,11 @@ template <int dim, int spacedim>
 void
 FEValuesBase<dim, spacedim>::invalidate_present_cell()
 {
-  // if there is no present cell, then we shouldn't be
-  // connected via a signal to a triangulation
+  // We cannot get here unless there is a cell to invalidate
   Assert(present_cell.is_initialized(), ExcInternalError());
 
-  // so delete the present cell and
-  // disconnect from the signal we have with
-  // it
-  tria_listener_refinement.disconnect();
-  tria_listener_mesh_transform.disconnect();
   present_cell = {};
+  tria_listener_any_change.disconnect();
 }
 
 
@@ -1386,24 +1380,15 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
           // cell because we shouldn't be comparing cells from different
           // triangulations
           invalidate_present_cell();
-          tria_listener_refinement =
+          tria_listener_any_change =
             cell->get_triangulation().signals.any_change.connect(
-              [this]() { this->invalidate_present_cell(); });
-          tria_listener_mesh_transform =
-            cell->get_triangulation().signals.mesh_movement.connect(
               [this]() { this->invalidate_present_cell(); });
         }
     }
   else
     {
-      // if this FEValues has never been set to any cell at all, then
-      // at least subscribe to the triangulation to get notified of
-      // changes
-      tria_listener_refinement =
-        cell->get_triangulation().signals.post_refinement.connect(
-          [this]() { this->invalidate_present_cell(); });
-      tria_listener_mesh_transform =
-        cell->get_triangulation().signals.mesh_movement.connect(
+      tria_listener_any_change =
+        cell->get_triangulation().signals.any_change.connect(
           [this]() { this->invalidate_present_cell(); });
     }
 }
