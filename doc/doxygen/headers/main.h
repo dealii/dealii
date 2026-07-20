@@ -167,7 +167,7 @@
  *   abstract properties of the finite dimensional space $V_h$ in which we
  *   seek the discrete solution, the %DoFHandler classes enumerate a concrete
  *   basis of this space so that we can represent the discrete solution as
- *   $u_h(\mathbf x)= \sum_j U_j \varphi_i(\mathbf x)$ by an ordered set of
+ *   $u_h(\mathbf x)= \sum_j U_j \varphi_j(\mathbf x)$ by an ordered set of
  *   coefficients $U_j$.
  *
  *   Just as with triangulation objects, most operations on
