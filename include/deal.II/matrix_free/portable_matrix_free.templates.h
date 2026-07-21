@@ -153,14 +153,24 @@ namespace Portable
     {
       const unsigned int n_cells = data->n_cells[color];
 
+      // First set up the DoF data views:
       typename MatrixFree<dim, Number>::DoFInfo &dof_data =
         data->dof_handler_data[dof_handler_index];
-      typename MatrixFree<dim, Number>::MappingInfo &mapping_info =
-        data->mapping_info[0];
 
 
+      // Initialize to zero, i.e., unconstrained cell
+      auto s = std::string("constraint_mask_") + std::to_string(color);
+      auto n = static_cast<unsigned int>(n_cells * n_components);
+      auto x =
+        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                     MemorySpace::Default::kokkos_space>(s, n);
+      dof_data.constraint_mask[color] = x;
 
-      // Create the Views
+      // Create the host mirrow Views and fill them
+      auto constraint_mask_host =
+        Kokkos::create_mirror_view(dof_data.constraint_mask[color]);
+
+
       dof_data.local_to_global[color] =
         Kokkos::View<types::global_dof_index **,
                      MemorySpace::Default::kokkos_space>(
@@ -168,6 +178,10 @@ namespace Portable
                              Kokkos::WithoutInitializing),
           dofs_per_cell,
           n_cells);
+
+      // Then also create the mapping info views:
+      typename MatrixFree<dim, Number>::MappingInfo &mapping_info =
+        data->mapping_info[0];
 
       if ((update_flags & update_quadrature_points) && dof_handler_index == 0)
         mapping_info.q_points[color] =
@@ -193,16 +207,6 @@ namespace Portable
                                Kokkos::WithoutInitializing),
             q_points_per_cell,
             n_cells);
-
-      // Initialize to zero, i.e., unconstrained cell
-      dof_data.constraint_mask[color] =
-        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-                     MemorySpace::Default::kokkos_space>(
-          "constraint_mask_" + std::to_string(color), n_cells * n_components);
-
-      // Create the host mirrow Views and fill them
-      auto constraint_mask_host =
-        Kokkos::create_mirror_view(dof_data.constraint_mask[color]);
 
       typename std::remove_reference_t<
         decltype(mapping_info.q_points[color])>::host_mirror_type q_points_host;
@@ -238,6 +242,8 @@ namespace Portable
         inv_jacobian_host =
           Kokkos::create_mirror_view(mapping_info.inv_jacobian[color]);
 #endif
+
+
       struct ScratchData
       {
         FEValues<dim>                        fe_values;
