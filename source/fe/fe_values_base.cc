@@ -145,14 +145,22 @@ operator typename Triangulation<dim, spacedim>::cell_iterator() const
 {
   Assert(is_initialized(), ExcNotReinited());
 
-  // We can always convert to a tria iterator, regardless of which of
-  // the three types of cell we store.
-  return std::visit(
-    [](auto &cell_iterator) ->
-    typename Triangulation<dim, spacedim>::cell_iterator {
-      return cell_iterator;
-    },
-    cell.value());
+  auto convert = [](const auto &cell) {
+    return typename Triangulation<dim, spacedim>::cell_iterator(cell);
+  };
+
+  switch (cell.value().index())
+    {
+      case 0:
+        return convert(std::get<0>(cell.value()));
+      case 1:
+        return convert(std::get<1>(cell.value()));
+      case 2:
+        return convert(std::get<2>(cell.value()));
+      default:
+        DEAL_II_ASSERT_UNREACHABLE();
+        return {};
+    }
 }
 
 
