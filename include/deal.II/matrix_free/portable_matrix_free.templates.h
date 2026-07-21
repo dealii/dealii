@@ -48,6 +48,34 @@ namespace Portable
 {
   namespace internal
   {
+    template <int dim>
+    struct ScratchData
+    {
+      FEValues<dim>                        fe_values;
+      std::vector<types::global_dof_index> local_dof_indices;
+      std::vector<types::global_dof_index> lexicographic_dof_indices;
+
+      explicit ScratchData(const FEValues<dim> &fe_values)
+        : fe_values(fe_values.get_mapping(),
+                    fe_values.get_fe(),
+                    fe_values.get_quadrature(),
+                    fe_values.get_update_flags())
+        , local_dof_indices(fe_values.dofs_per_cell)
+        , lexicographic_dof_indices(fe_values.dofs_per_cell)
+      {}
+
+
+      ScratchData(const ScratchData &scratch)
+        : fe_values(scratch.fe_values.get_mapping(),
+                    scratch.fe_values.get_fe(),
+                    scratch.fe_values.get_quadrature(),
+                    scratch.fe_values.get_update_flags())
+        , local_dof_indices(scratch.local_dof_indices.size())
+        , lexicographic_dof_indices(scratch.lexicographic_dof_indices.size())
+      {}
+    };
+
+
     /**
      * Helper class to (re)initialize MatrixFree object.
      */
@@ -158,47 +186,55 @@ namespace Portable
       typename MatrixFree<dim, Number>::MappingInfo &mapping_info =
         data->mapping_info[0];
 
+      using LocalToGlobalView =
+        Kokkos::View<types::global_dof_index **,
+                     MemorySpace::Default::kokkos_space>;
+      using QPointsView =
+        Kokkos::View<Point<dim, Number> **, MemorySpace::Default::kokkos_space>;
+      using JxWView =
+        Kokkos::View<Number **, MemorySpace::Default::kokkos_space>;
+      using InvJacobianView =
+        Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>;
+      using ConstraintMaskView =
+        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                     MemorySpace::Default::kokkos_space>;
+
 
 
       // Create the Views
       dof_data.local_to_global[color] =
-        Kokkos::View<types::global_dof_index **,
-                     MemorySpace::Default::kokkos_space>(
-          Kokkos::view_alloc("local_to_global_" + std::to_string(color),
-                             Kokkos::WithoutInitializing),
-          dofs_per_cell,
-          n_cells);
+        LocalToGlobalView(Kokkos::view_alloc("local_to_global_" +
+                                               std::to_string(color),
+                                             Kokkos::WithoutInitializing),
+                          dofs_per_cell,
+                          n_cells);
 
       if ((update_flags & update_quadrature_points) && dof_handler_index == 0)
         mapping_info.q_points[color] =
-          Kokkos::View<Point<dim, Number> **,
-                       MemorySpace::Default::kokkos_space>(
-            Kokkos::view_alloc("q_points_" + std::to_string(color),
-                               Kokkos::WithoutInitializing),
-            q_points_per_cell,
-            n_cells);
+          QPointsView(Kokkos::view_alloc("q_points_" + std::to_string(color),
+                                         Kokkos::WithoutInitializing),
+                      q_points_per_cell,
+                      n_cells);
 
       if ((update_flags & update_JxW_values) && dof_handler_index == 0)
         mapping_info.JxW[color] =
-          Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
-            Kokkos::view_alloc("JxW_" + std::to_string(color),
-                               Kokkos::WithoutInitializing),
-            q_points_per_cell,
-            n_cells);
+          JxWView(Kokkos::view_alloc("JxW_" + std::to_string(color),
+                                     Kokkos::WithoutInitializing),
+                  q_points_per_cell,
+                  n_cells);
 
       if ((update_flags & update_gradients) && dof_handler_index == 0)
         mapping_info.inv_jacobian[color] =
-          Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
-            Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
-                               Kokkos::WithoutInitializing),
-            q_points_per_cell,
-            n_cells);
+          InvJacobianView(Kokkos::view_alloc("inv_jacobian_" +
+                                               std::to_string(color),
+                                             Kokkos::WithoutInitializing),
+                          q_points_per_cell,
+                          n_cells);
 
       // Initialize to zero, i.e., unconstrained cell
       dof_data.constraint_mask[color] =
-        Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
-                     MemorySpace::Default::kokkos_space>(
-          "constraint_mask_" + std::to_string(color), n_cells * n_components);
+        ConstraintMaskView("constraint_mask_" + std::to_string(color),
+                           n_cells * n_components);
 
       // Create the host mirrow Views and fill them
       auto constraint_mask_host =
@@ -238,34 +274,9 @@ namespace Portable
         inv_jacobian_host =
           Kokkos::create_mirror_view(mapping_info.inv_jacobian[color]);
 #endif
-      struct ScratchData
-      {
-        FEValues<dim>                        fe_values;
-        std::vector<types::global_dof_index> local_dof_indices;
-        std::vector<types::global_dof_index> lexicographic_dof_indices;
-
-        explicit ScratchData(const FEValues<dim> &fe_values)
-          : fe_values(fe_values.get_mapping(),
-                      fe_values.get_fe(),
-                      fe_values.get_quadrature(),
-                      fe_values.get_update_flags())
-          , local_dof_indices(fe_values.dofs_per_cell)
-          , lexicographic_dof_indices(fe_values.dofs_per_cell)
-        {}
-
-
-        ScratchData(const ScratchData &scratch)
-          : fe_values(scratch.fe_values.get_mapping(),
-                      scratch.fe_values.get_fe(),
-                      scratch.fe_values.get_quadrature(),
-                      scratch.fe_values.get_update_flags())
-          , local_dof_indices(scratch.local_dof_indices.size())
-          , lexicographic_dof_indices(scratch.lexicographic_dof_indices.size())
-        {}
-      };
 
       auto worker = [&](const unsigned int cell_id,
-                        ScratchData       &scratch_data,
+                        ScratchData<dim>  &scratch_data,
                         int & /*copy_data*/) {
         std::vector<types::global_dof_index> &local_dof_indices =
           scratch_data.local_dof_indices;
@@ -342,7 +353,7 @@ namespace Portable
                       graph.size(),
                       worker,
                       std::function<void(const int)>(),
-                      ScratchData(fe_values),
+                      ScratchData<dim>(fe_values),
                       0);
 
       // Copy the data to the device
