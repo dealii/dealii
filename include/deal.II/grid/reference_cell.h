@@ -952,8 +952,8 @@ public:
    * the current entity.
    *
    * @returns A number that describes a relative orientation. For more
-   * information see @ref GlossCombinedOrientation "the combined orientation
-   * glossary entry".
+   * information see
+   * @ref GlossCombinedOrientation "the combined orientation glossary entry".
    */
   template <typename T>
   types::geometric_orientation
