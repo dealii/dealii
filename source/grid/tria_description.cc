@@ -663,6 +663,8 @@ namespace TriangulationDescription
                       cell_info.boundary_ids.emplace_back(f, boundary_ind);
                   }
 
+                cell_info.material_id = cell->material_id();
+
                 // save manifold id
                 {
                   // ... of cell

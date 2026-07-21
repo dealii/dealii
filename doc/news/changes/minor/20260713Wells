@@ -1,0 +1,4 @@
+Fixed: TriangulationDescription::Description now correctly sets material_ids
+of cells on finer levels.
+<br>
+(David Wells, 2026/07/13)

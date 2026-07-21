@@ -13604,8 +13604,8 @@ void Triangulation<dim, spacedim>::create_triangulation(
        level < cell_infos.size() && !cell_infos[level].empty();
        ++level)
     {
-      // a) set manifold ids here (because new vertices have to be
-      //    positioned correctly during each refinement step)
+      // a) set material and manifold ids here (because new vertices
+      //    have to be positioned correctly during each refinement step)
       {
         auto cell      = this->begin(level);
         auto cell_info = cell_infos[level].begin();
@@ -13613,6 +13613,8 @@ void Triangulation<dim, spacedim>::create_triangulation(
           {
             while (cell_info->id != cell->id().template to_binary<dim>())
               ++cell;
+
+            cell->set_material_id(cell_info->material_id);
             if (dim == 2)
               for (const auto face : cell->face_indices())
                 cell->face(face)->set_manifold_id(
