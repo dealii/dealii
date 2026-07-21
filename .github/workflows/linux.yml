@@ -509,13 +509,13 @@ jobs:
         make compile_test_executables
 
   ####################
-  # clang-23-modules #
+  # clang-22-modules #
   ####################
 
-  clang-23-modules:
+  clang-22-modules:
     # simple build testing C++20 modules
 
-    name: noble clang-23 modules
+    name: noble clang-22 modules
     runs-on: [ubuntu-latest]
     container:
       image: dealii/dependencies:noble-v9.7.1
@@ -535,7 +535,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
             ninja-build wget lsb-release gnupg g++-15
-        sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 23
+        sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 22
     - uses: actions/checkout@v7
       with:
         repository: kokkos/kokkos
@@ -548,7 +548,7 @@ jobs:
         cd build
         cmake -GNinja \
               -D BUILD_SHARED_LIBS=ON \
-              -D CMAKE_CXX_COMPILER=clang++-23 \
+              -D CMAKE_CXX_COMPILER=clang++-22 \
               -D CMAKE_CXX_STANDARD=23 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
@@ -560,8 +560,8 @@ jobs:
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
               -D CMAKE_CXX_STANDARD=23 \
-              -D CMAKE_C_COMPILER=clang-23 \
-              -D CMAKE_CXX_COMPILER=clang++-23 \
+              -D CMAKE_C_COMPILER=clang-22 \
+              -D CMAKE_CXX_COMPILER=clang++-22 \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_CXX20_MODULE=ON \
               -D DEAL_II_WITH_CGAL=OFF \
