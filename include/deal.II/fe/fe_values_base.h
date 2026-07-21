@@ -1667,22 +1667,10 @@ protected:
   CellIteratorWrapper present_cell;
 
   /**
-   * A signal connection we use to ensure we get informed whenever the
-   * triangulation changes by refinement. We need to know about that because
-   * it invalidates all cell iterators and, as part of that, the
-   * 'present_cell' iterator we keep around between subsequent calls to
-   * reinit() in order to compute the cell similarity.
+   * If the Triangulation changes in any way then clear all cached data (i.e.,
+   * the iterator in present_cell).
    */
-  boost::signals2::connection tria_listener_refinement;
-
-  /**
-   * A signal connection we use to ensure we get informed whenever the
-   * triangulation changes by mesh transformations. We need to know about that
-   * because it invalidates all cell iterators and, as part of that, the
-   * 'present_cell' iterator we keep around between subsequent calls to
-   * reinit() in order to compute the cell similarity.
-   */
-  boost::signals2::connection tria_listener_mesh_transform;
+  boost::signals2::connection tria_listener_any_change;
 
   /**
    * A function that is connected to the triangulation in order to reset the
