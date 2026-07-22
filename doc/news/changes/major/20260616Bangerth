@@ -25,6 +25,7 @@ release). Specifically, these classes and functions are:
 - MeshWorker::IntegrationInfoBox
 - MeshWorker::loop().
 
+<br>
 This has also led to many other classes that were previously only used
 within the classes and functions mentioned above, and that are now
 also deprecated:
@@ -47,6 +48,7 @@ also deprecated:
 - MeshWorker::LoopControl
 - MeshWorker::cell_action()
 
+<br>
 All of these classes will disappear in a future release.
 
 <br>
