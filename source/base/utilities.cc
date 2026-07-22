@@ -489,9 +489,7 @@ namespace Utilities
       {
         // We have to add the padding zeroes in front of the number
         const unsigned int padding_position = (lc_string[0] == '-') ? 1 : 0;
-
-        const std::string padding(digits - lc_string.size(), '0');
-        lc_string.insert(padding_position, padding);
+        lc_string.insert(padding_position, digits - lc_string.size(), '0');
       }
 
     return lc_string;
