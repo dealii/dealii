@@ -1,4 +1,0 @@
-Improved: The function vectorized_load_and_transpose() now produces more
-efficient remainder code for sizes 1, 2, 3 on x86.
-<br>
-(Martin Kronbichler, 2026/06/09)

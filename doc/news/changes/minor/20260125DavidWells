@@ -1,3 +1,0 @@
-Fixed: MappingFEField::get_vertices() correctly works with threads again.
-<br>
-(David Wells, 2026/01/25)

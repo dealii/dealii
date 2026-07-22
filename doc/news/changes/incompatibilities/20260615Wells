@@ -1,5 +1,0 @@
-Changed: TriangulationDescription::CellData::boundary_ids is now a
-std_cxx26::inplace_vector instead of a std::vector. This change makes this
-class, when compiling with C++20 or newer, trivially copyable.
-<br>
-(David Wells, 2026/06/15)

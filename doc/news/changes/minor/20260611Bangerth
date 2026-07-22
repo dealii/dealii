@@ -1,6 +1,0 @@
-Changed: The step-39 tutorial program has been rewritten to use
-MeshWorker::mesh_loop() instead of the removed MeshWorker::loop(),
-MeshWorker::DoFInfo, MeshWorker::IntegrationInfo, and
-MeshWorker::IntegrationInfoBox interfaces.
-<br>
-(Wolfgang Bangerth, 2026/06/11)

@@ -1,6 +1,0 @@
-New: Improve VTK dataset import/export utilities by supporting conversion of
-generic VTK datasets to unstructured grids while preserving attached data
-arrays, adding XML `.vtu` reading support, and propagating optional material,
-boundary, and manifold id field names through `read_tria()` and `read_vtk()`.
-<br>
-(Luca Heltai, 2026/05/21)

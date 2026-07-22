@@ -1,5 +1,0 @@
-Fixed: DoFTools::extract_dofs_with_support_contained_within() previously returned
-DoFs as contained within when running in parallel that are actually not contained
-within.
-<br>
-(Torsten Schmid, 2026/06/23)

@@ -1,5 +1,0 @@
-New: There is now a version of GridGenerator::cheese() that allows the
-creation of meshes based on true/false masks for pixelized/voxelized
-data.
-<br>
-(Wolfgang Bangerth, 2026/04/28)

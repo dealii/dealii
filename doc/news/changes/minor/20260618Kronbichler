@@ -1,6 +1,0 @@
-Improved: The functions VectorizedArray::gather() and
-VectorizedArray::scatter() are now able to filter out indices with value
-numbers::invalid_unsigned_int, indicating a mask for the vector access.
-This is useful for indirect index access.
-<br>
-(Martin Kronbichler, 2026/06/18)

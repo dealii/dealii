@@ -1,3 +1,0 @@
-Fixed: TrilinosWrappers::ROLAdaptor::reduce() now also works on parallel.
-<br>
-(Marc Fehling, 2025/11/19)

@@ -1,3 +1,0 @@
-New: FEEvaluationData::read_cell_data now is also able to fetch data from Table
-<br>
-(Michał Wichrowski, 2025/09/27)

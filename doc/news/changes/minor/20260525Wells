@@ -1,6 +1,0 @@
-Improved: FilteredIterator now re-uses the provided predicate object
-between different iterators instead of copying it (which required
-an allocation). This lowers the number of allocations in step-32 by
-about 15\%.
-<br>
-(David Wells, 2026/05/25)

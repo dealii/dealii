@@ -1,7 +1,0 @@
-Fixed: The SolverFIRE class assumed that the matrix object has a
-`residual()` function, but this function is not part of the required
-interface for all matrix types that can be passed to linear
-solvers. This is now fixed by instead relying on `vmult()`
-functionality.
-<br>
-(Wolfgang Bangerth, 2026/05/21)

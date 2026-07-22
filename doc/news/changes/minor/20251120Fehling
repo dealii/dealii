@@ -1,5 +1,0 @@
-New: You can now mask vector elements in TrilinosWrappers::ROLAdaptor to
-reduce the size of the optimization space. This is useful for excluding
-constrained degrees of freedom from the optimization process.
-<br>
-(Marc Fehling, 2025/11/20)

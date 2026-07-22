@@ -1,4 +1,0 @@
-Improved: VTU output is now about 5\% faster on large meshes
-and no longer allocates memory for every processed cell.
-<br>
-(David Wells, 2026/05/03)
