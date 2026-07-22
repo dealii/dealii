@@ -4,8 +4,8 @@ deal.II Copyright and License
 This directory contains the deal.II library.
 
 The deal.II library is copyrighted by the deal.II authors. This term refers
-to the people listed in the file `AUTHORS` and in the [authors
-list](https://dealii.org/authors.html) on the webpage.
+to the people listed in the file `AUTHORS.md` and in the [authors
+list](https://dealii.org/community/team/) on the webpage.
 
 This project is licensed under the terms of the [<b>Apache License
 2.0</b>](https://spdx.org/licenses/Apache-2.0.html) with [<b>LLVM
