@@ -594,7 +594,8 @@ namespace GridGenerator
    * geometry consists of a channel of size $[-L_{pre}, -H_{below}] \times
    * [L_{post}, H_{above}] \times [0, W] $ (where the $z$ dimension is omitted
    * in 2d) with a cylinder, parallel to the $z$ axis with diameter $1$,
-   * centered at $(0, 0, 0)$. The channel has three distinct regions: <ol>
+   * centered at $(0, 0, 0)$. The channel has three distinct regions:
+   * <ol>
    *   <li>If @p n_shells is greater than zero, then there are that many shells
    *   centered around the cylinder,</li>
    *   <li>a blending region between the shells and the rest of the
@@ -686,7 +687,8 @@ namespace GridGenerator
    * $[-outer_radius - L_{pre}, outer_radius + L_{post}] \times
    * [-outer_radius - H_{below}, outer_radius + H_{above}] \times [-outer_radius
    * - W_{front}, outer_radius + W_{back}] $ with the sphere inside. The channel
-   * has three distinct regions: <ol>
+   * has three distinct regions:
+   * <ol>
    *   <li>The sphere,</li>
    *   <li>a blending region between the sphere and the cube that contains it, and</li>
    *   <li>a bulk region consisting of Cartesian cells.</li>
