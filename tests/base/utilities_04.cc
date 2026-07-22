@@ -73,6 +73,9 @@ test()
                 ' ',
                 "combining|whitespace|and new|line");
 
+  // A word longer than width followed by a newline must not look past that
+  // newline for a later space (would otherwise split "b c" across lines).
+  test_function("a \nverylongword\nb c", 10, ' ', "a|verylongword|b c");
 
   deallog << "OK" << std::endl;
 }

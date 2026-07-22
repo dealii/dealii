@@ -802,11 +802,28 @@ namespace Utilities
             // if there are no spaces, then try if
             // there are spaces coming up
             if (location == 0)
-              for (location = std::min<int>(width, text.size() - 1);
-                   location < static_cast<int>(text.size());
-                   ++location)
-                if (text[location] == delimiter)
-                  break;
+              {
+                // If an unbreakable word is longer than width and followed by a
+                // newline, break at the newline. Otherwise the search below
+                // would look past '\n' for a space and incorrectly pull later
+                // text onto this line (e.g. "verylongword\nb c" with a small
+                // width would become "verylongword\nb" and "c").
+                if (pos_newline != std::string::npos)
+                  {
+                    std::string line(text, 0, pos_newline);
+                    while ((line.size() != 0) && (line.back() == delimiter))
+                      line.erase(line.size() - 1, 1);
+                    lines.push_back(line);
+                    text.erase(0, pos_newline + 1);
+                    continue;
+                  }
+
+                for (location = std::min<int>(width, text.size() - 1);
+                     location < static_cast<int>(text.size());
+                     ++location)
+                  if (text[location] == delimiter)
+                    break;
+              }
 
             // now take the text up to the found
             // location and put it into a single
