@@ -105,7 +105,11 @@ namespace internal
 
 
 #ifdef DEAL_II_WITH_TRILINOS
-#  if !defined(DEAL_II_TRILINOS_WITH_TPETRA)
+// TrilinosWrappers is an alias for LinearAlgebra::TpetraWrappers<double,
+// MemorySpace::Host> if Trilinos was configured with Tpetra but without Epetra.
+// Thus, it's sufficient to instantiate TrilinosWrappers when there is Epetra
+// support.
+#  if defined(DEAL_II_TRILINOS_WITH_EPETRA)
     /**
      * Adjust vectors on all levels to correct size.  Here, we just count the
      * numbers of degrees of freedom on each level and @p reinit each level
@@ -131,7 +135,8 @@ namespace internal
                           tria->get_mpi_communicator());
         }
     }
-#  else
+#  endif
+#  if defined(DEAL_II_TRILINOS_WITH_TPETRA)
     /**
      * Adjust vectors on all levels to correct size.  Here, we just count the
      * numbers of degrees of freedom on each level and @p reinit each level

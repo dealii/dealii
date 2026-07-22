@@ -103,8 +103,11 @@ for (deal_II_dimension : DIMENSIONS; S1, S2 : REAL_SCALARS)
 
 for (deal_II_dimension : DIMENSIONS)
   {
-#ifdef DEAL_II_WITH_TRILINOS
-#  if !defined(DEAL_II_TRILINOS_WITH_TPETRA)
+// TrilinosWrappers is an alias for LinearAlgebra::TpetraWrappers<double,
+// MemorySpace::Host> if Trilinos was configured with Tpetra but without Epetra.
+// Thus, it's sufficient to instantiate TrilinosWrappers when there is Epetra
+// support.
+#if defined(DEAL_II_TRILINOS_WITH_EPETRA)
     template void
     MGLevelGlobalTransfer<TrilinosWrappers::MPI::Vector>::copy_to_mg(
       const DoFHandler<deal_II_dimension> &,
@@ -120,7 +123,8 @@ for (deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension> &,
       TrilinosWrappers::MPI::Vector &,
       const MGLevelObject<TrilinosWrappers::MPI::Vector> &) const;
-#  else
+#endif
+#if defined(DEAL_II_TRILINOS_WITH_TPETRA)
     template void
     MGLevelGlobalTransfer<LinearAlgebra::TpetraWrappers::Vector<double>>::
       copy_to_mg(const DoFHandler<deal_II_dimension> &,
@@ -141,7 +145,7 @@ for (deal_II_dimension : DIMENSIONS)
         const MGLevelObject<LinearAlgebra::TpetraWrappers::Vector<double>> &)
         const;
 
-#    ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT
     template void
     MGLevelGlobalTransfer<LinearAlgebra::TpetraWrappers::Vector<float>>::
       copy_to_mg(const DoFHandler<deal_II_dimension> &,
@@ -161,7 +165,6 @@ for (deal_II_dimension : DIMENSIONS)
         LinearAlgebra::TpetraWrappers::Vector<float> &,
         const MGLevelObject<LinearAlgebra::TpetraWrappers::Vector<float>> &)
         const;
-#    endif
 #  endif
 #endif
 
