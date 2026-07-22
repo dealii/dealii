@@ -106,7 +106,7 @@ namespace parallel
     namespace GridRefinement
     {
       /**
-       * Like dealii::GridRefinement::refine_and_coarsen_fixed_number, but
+       * Like ::GridRefinement::refine_and_coarsen_fixed_number, but
        * designed for parallel computations, where each process has only
        * information about locally owned cells.
        *
@@ -161,7 +161,7 @@ namespace parallel
           std::numeric_limits<types::global_cell_index>::max());
 
       /**
-       * Like dealii::GridRefinement::refine_and_coarsen_fixed_fraction, but
+       * Like ::GridRefinement::refine_and_coarsen_fixed_fraction, but
        * designed for parallel computations, where each process only has
        * information about locally owned cells.
        *
