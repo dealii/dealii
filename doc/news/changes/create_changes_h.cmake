@@ -13,7 +13,7 @@
 function(cat IN_FILE OUT_FILE INDENT)
   file(READ ${IN_FILE} CONTENTS)
   if(${INDENT} MATCHES "TRUE")
-    file(STRINGS ${IN_FILE} LINESTMP)
+    file(STRINGS ${IN_FILE} LINESTMP ENCODING UTF-8)
     foreach(LINETMP ${LINESTMP})
       file(APPEND ${OUT_FILE} "  ${LINETMP}\n")
     endforeach()
