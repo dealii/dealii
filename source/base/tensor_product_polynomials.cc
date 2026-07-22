@@ -32,16 +32,6 @@ namespace internal
 {
   namespace
   {
-    template <std::size_t dim>
-    void
-    compute_tensor_index(const unsigned int,
-                         const unsigned int,
-                         const unsigned int,
-                         std::array<unsigned int, dim> &)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
-
     void
     compute_tensor_index(const unsigned int n,
                          const unsigned int,
