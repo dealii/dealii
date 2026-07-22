@@ -971,14 +971,12 @@ plot_shape_function(DoFHandler<dim> &dof_handler, unsigned int patches = 5)
     {
       std::cout << "...start printing support points" << std::endl;
 
-      std::map<types::global_dof_index, Point<dim>> support_points;
-      MappingQ1<dim>                                mapping;
-      hp::MappingCollection<dim>                    hp_mapping;
+      MappingQ1<dim>             mapping;
+      hp::MappingCollection<dim> hp_mapping;
       for (unsigned int i = 0; i < dof_handler.get_fe_collection().size(); ++i)
         hp_mapping.push_back(mapping);
-      DoFTools::map_dofs_to_support_points(hp_mapping,
-                                           dof_handler,
-                                           support_points);
+      std::map<types::global_dof_index, Point<dim>> support_points =
+        DoFTools::map_dofs_to_support_points(hp_mapping, dof_handler);
 
       const std::string base_filename =
         "DOFs" + dealii::Utilities::int_to_string(dim) + "_p" +

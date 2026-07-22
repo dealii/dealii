@@ -106,9 +106,9 @@ test(const bool adaptive_ref = true)
   // output in Gnuplot for visual inspection
   if (dim == 2)
     {
-      std::map<types::global_dof_index, Point<dim>> support_points;
       MappingQ1<dim>                                mapping;
-      DoFTools::map_dofs_to_support_points(mapping, dof, support_points);
+      std::map<types::global_dof_index, Point<dim>> support_points =
+        DoFTools::map_dofs_to_support_points(mapping, dof);
 
       const std::string href = (adaptive_ref ? "" : "global_");
       const std::string base_filename =

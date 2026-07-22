@@ -673,10 +673,8 @@ MeshWorkerAffineConstraintsTest<dim>::createInhomConstraints()
                                            BoundaryValues<dim>(),
                                            this->constraintsInhom);
   // constraint of the origin
-  std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(this->mapping,
-                                       this->dof_handler,
-                                       support_points);
+  std::map<types::global_dof_index, Point<dim>> support_points =
+    DoFTools::map_dofs_to_support_points(this->mapping, this->dof_handler);
   for (unsigned int dof_index = 0; dof_index < this->dof_handler.n_dofs();
        ++dof_index)
     {

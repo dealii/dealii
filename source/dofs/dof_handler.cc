@@ -2621,17 +2621,6 @@ void DoFHandler<dim, spacedim>::set_active_fe_indices(
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-void DoFHandler<dim, spacedim>::set_active_fe_indices(
-  const std::vector<unsigned int> &active_fe_indices)
-{
-  set_active_fe_indices(std::vector<types::fe_index>(active_fe_indices.begin(),
-                                                     active_fe_indices.end()));
-}
-
-
-
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 std::vector<types::fe_index> DoFHandler<dim, spacedim>::get_active_fe_indices()
   const
 {

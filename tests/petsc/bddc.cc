@@ -155,10 +155,8 @@ main(int argc, char *argv[])
   PETScWrappers::PreconditionBDDC<2>::AdditionalData data;
 
   // Now we setup the dof coordinates if a sufficiently new PETSc is used
-  std::map<types::global_dof_index, Point<2>> dof_2_point;
-  DoFTools::map_dofs_to_support_points(MappingQ1<2>(),
-                                       dof_handler,
-                                       dof_2_point);
+  std::map<types::global_dof_index, Point<2>> dof_2_point =
+    DoFTools::map_dofs_to_support_points(MappingQ1<2>(), dof_handler);
   std::vector<Point<2>> coords(locally_owned_dofs.n_elements());
   unsigned int          k = 0;
   for (auto it = locally_owned_dofs.begin(); it != locally_owned_dofs.end();

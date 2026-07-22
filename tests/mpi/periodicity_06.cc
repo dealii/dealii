@@ -162,10 +162,8 @@ test(const unsigned numRefinementLevels = 2)
   const IndexSet locally_relevant_dofs =
     DoFTools::extract_locally_relevant_dofs(dof_handler);
 
-  std::map<types::global_dof_index, Point<dim>> supportPoints;
-  DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
-                                       dof_handler,
-                                       supportPoints);
+  std::map<types::global_dof_index, Point<dim>> supportPoints =
+    DoFTools::map_dofs_to_support_points(MappingQ1<dim>(), dof_handler);
 
   /// creating combined hanging node and periodic constraint matrix
   AffineConstraints<double> constraints;

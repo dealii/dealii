@@ -135,13 +135,14 @@ create_tria(const unsigned int  face_no,
   }
 
   {
-    const auto face = dummy.begin()->face(face_no);
+    const auto                  face = dummy.begin()->face(face_no);
+    std::array<unsigned int, 3> v{
+      {face->vertex_index(0), face->vertex_index(1), face->vertex_index(2)}};
+    ArrayView<const unsigned int> view(v.cbegin(), v.size());
+    ;
     const auto permuted =
-      ReferenceCells::Triangle.permute_according_orientation(
-        std::array<unsigned int, 3>{{face->vertex_index(0),
-                                     face->vertex_index(1),
-                                     face->vertex_index(2)}},
-        orientation);
+      ReferenceCells::Triangle.permute_by_combined_orientation(view,
+                                                               orientation);
 
     auto direction =
       cross_product_3d(vertices[permuted[1]] - vertices[permuted[0]],
