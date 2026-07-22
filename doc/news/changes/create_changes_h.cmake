@@ -22,16 +22,34 @@ function(cat IN_FILE OUT_FILE INDENT)
   endif()
 endfunction()
 
+# Given a directory, take all of the changelog files in that
+# directory (assumed to be starting with a date, i.e., number)
+# and process them into an HTML-formatted list. Write that into
+# an output file.
 function(process IN_DIR OUT_FILE)
   file(APPEND ${OUT_FILE} "<ol>\n")
+
+  # Get all of the files in this directory and sort the
+  # list of files newest-to-oldest
   file(GLOB ENTRY_LIST ${IN_DIR}/[0-9]*)
   list(SORT ENTRY_LIST)
   list(REVERSE ENTRY_LIST)
+
+  # Then concatenate as a bullet point list. Exclude entries
+  # called 'dummy' that we place in each directory at the
+  # beginning of each release process to ensure no directory
+  # is empty. Also exclude files that are back-up files as
+  # indicated by having a trailing tilde.
   foreach(ENTRY ${ENTRY_LIST})
+    if ((ENTRY MATCHES ".*dummy$") OR (ENTRY MATCHES ".*~$"))
+      continue()
+    endif()
+
     file(APPEND ${OUT_FILE} "\n <li>\n")
-    CAT(${ENTRY} ${OUT_FILE} "TRUE")
+    cat(${ENTRY} ${OUT_FILE} "TRUE")
     file(APPEND ${OUT_FILE} " </li>\n")
   endforeach()
+
   file(APPEND ${OUT_FILE} "\n</ol>\n")
 endfunction()
 
