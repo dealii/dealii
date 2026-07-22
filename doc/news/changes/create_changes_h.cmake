@@ -40,21 +40,25 @@ endfunction()
 # First, create a file 'changes.h.in' based on all changelog fragments.
 set(OUTPUT_FILE_TEMP "${OUTPUT_FILE}.in")
 file(WRITE ${OUTPUT_FILE_TEMP} "")
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header
+
+# Then concatenate its various building blocks, where necessary
+# creating these building blocks via the 'process()' function
+# above.
+cat    (${CMAKE_CURRENT_SOURCE_DIR}/header
         ${OUTPUT_FILE_TEMP} "FALSE")
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_incompatibilities
+cat    (${CMAKE_CURRENT_SOURCE_DIR}/header_incompatibilities
         ${OUTPUT_FILE_TEMP} "FALSE")
-PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/incompatibilities
+process(${CMAKE_CURRENT_SOURCE_DIR}/incompatibilities
         ${OUTPUT_FILE_TEMP})
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_major
+cat    (${CMAKE_CURRENT_SOURCE_DIR}/header_major
         ${OUTPUT_FILE_TEMP} "FALSE")
-PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/major
+process(${CMAKE_CURRENT_SOURCE_DIR}/major
         ${OUTPUT_FILE_TEMP})
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/header_minor
+cat    (${CMAKE_CURRENT_SOURCE_DIR}/header_minor
         ${OUTPUT_FILE_TEMP} "FALSE")
-PROCESS(${CMAKE_CURRENT_SOURCE_DIR}/minor
+process(${CMAKE_CURRENT_SOURCE_DIR}/minor
         ${OUTPUT_FILE_TEMP})
-CAT    (${CMAKE_CURRENT_SOURCE_DIR}/footer
+cat    (${CMAKE_CURRENT_SOURCE_DIR}/footer
         ${OUTPUT_FILE_TEMP} "FALSE")
 
 # Copy it over to 'changes.h' but only touch the time stamp
