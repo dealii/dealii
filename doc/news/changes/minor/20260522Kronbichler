@@ -1,5 +1,0 @@
-Fixed: FEEvaluation::distribute_local_to_global() would produce a segmentation
-fault if initialized with DoFHandler::active_cell_iterator and used with
-LinearAlgebra::distributed::Vector. This is now fixed.
-<br>
-(Martin Kronbichler, 2026/05/22)

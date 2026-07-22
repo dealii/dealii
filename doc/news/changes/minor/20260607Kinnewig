@@ -1,4 +1,0 @@
-New: Add new preconditioner class: PreconditionFROSch,
-which adds a wrapper for the FROSch preconditioner, that is part of Trilinos.
-<br>
-(Sebastian Kinnewig, 2026/06/07)

@@ -1,5 +1,0 @@
-New: Add a new signed distance function for an infinite cylinder
-(Functions::SignedDistance::InfiniteCylinder). It supports calculation of its
-values and gradients.
-<br>
-(Magdalena Schreter-Fleischhacker, Julian Brotz, Bruno Blais, 2026/04/30)

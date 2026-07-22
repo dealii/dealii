@@ -1,5 +1,0 @@
-New: The GridGenerator::convert_simplex_to_hypercube_mesh() function
-splits all cells of a simplex mesh into hypercubes, producing a
-mesh with cells of only the latter kind.
-<br>
-(Wolfgang Bangerth, Dominik Still, 2025/09/25)

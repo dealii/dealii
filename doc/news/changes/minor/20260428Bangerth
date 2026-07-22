@@ -1,5 +1,0 @@
-Fixed: Despite its name, the GridGenerator::cheese() function in 3d
-did not actually create any holes. It just produced a solid
-volume. This is now fixed.
-<br>
-(Wolfgang Bangerth, 2026/04/28)

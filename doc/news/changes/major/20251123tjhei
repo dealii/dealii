@@ -1,3 +1,0 @@
-New: PETSc linear algebra now supports multi-threaded assembly and reading from ghost vectors.
-<br>
-(Timo Heister, 2025/11/23)

@@ -1,4 +1,0 @@
-Fixed: Fix multigrid W- and F-cycles. Previously, intermediate
-solutions were overwritten between cycles, effectively resulting in a V-cycle.
-<br>
-(Peter Munch, 2026/05/18)

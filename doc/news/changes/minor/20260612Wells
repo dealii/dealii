@@ -1,4 +1,0 @@
-Improved: Functions in Utilities::MPI no longer compress and decompress their input
-arguments. This makes, e.g., Utilities::MPI::gather() about twice as fast.
-<br>
-(David Wells, 2026/06/12)

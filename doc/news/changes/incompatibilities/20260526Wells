@@ -1,6 +1,0 @@
-Changed: The maximum number of levels in a Triangulation
-is now capped at 31. This is the same limit used by p4est,
-and was previously implicitly enforced through the CellId
-class.
-<br>
-(David Wells, 2026/05/26)

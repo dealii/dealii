@@ -1,4 +1,0 @@
-Moved: The function ReferenceCell::n_vertices_to_type() has been deprecated.
-Its replacement is ReferenceCells::n_vertices_to_reference_cell().
-<br>
-(Wolfgang Bangerth, 2026/05/12)
