@@ -960,7 +960,7 @@ namespace FETools
    * @deprecated Use FETools::cell_to_face_patch_numbering() instead.
    */
   template <int dim>
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use FETools::cell_to_face_patch_numbering() instead.")
   std::pair<
     std::vector<unsigned int>,
