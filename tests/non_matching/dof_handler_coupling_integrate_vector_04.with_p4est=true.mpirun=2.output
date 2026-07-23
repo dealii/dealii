@@ -1,0 +1,13 @@
+
+DEAL:0::integrate_vector_02
+DEAL:0::n_dofs(dh1): 25
+DEAL:0::n_dofs(dh2): 9
+DEAL:0::dst l1_norm: 4.50000
+DEAL:0::dst l2_norm: 1.27260
+
+DEAL:1::integrate_vector_02
+DEAL:1::n_dofs(dh1): 25
+DEAL:1::n_dofs(dh2): 9
+DEAL:1::dst l1_norm: 4.50000
+DEAL:1::dst l2_norm: 1.27260
+
