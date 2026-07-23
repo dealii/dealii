@@ -40,8 +40,10 @@ function(process IN_DIR OUT_FILE)
   # beginning of each release process to ensure no directory
   # is empty. Also exclude files that are back-up files as
   # indicated by having a trailing tilde.
+  list(LENGTH ENTRY_LIST n_entries)
   foreach(ENTRY ${ENTRY_LIST})
-    if ((ENTRY MATCHES ".*dummy$") OR (ENTRY MATCHES ".*~$"))
+    if (((n_entries GREATER 1) AND (ENTRY MATCHES ".*dummy$"))
+        OR (ENTRY MATCHES ".*~$"))
       continue()
     endif()
 
