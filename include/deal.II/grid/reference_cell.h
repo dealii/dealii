@@ -3410,21 +3410,33 @@ ReferenceCell<dim>::standard_to_real_face_vertex(
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
   AssertIndexRange(face_orientation, n_face_orientations(face));
 
-  switch (face_reference_cell(face))
+  if constexpr (dim == 1)
+    return vertex;
+  else if constexpr (dim == 2)
+    return line_vertex_permutations[face_orientation][vertex];
+  else
     {
-      case ReferenceCells::Vertex:
-        // test to ensure that face_orientation is
-        // default_geometric_orientation already done with
-        // AssertIndexRange(face_orientation, ...) above.
-        return vertex;
-      case ReferenceCells::Line:
-        return line_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Triangle:
-        return triangle_vertex_permutations[face_orientation][vertex];
-      case ReferenceCells::Quadrilateral:
-        return quadrilateral_vertex_permutations[face_orientation][vertex];
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return triangle_vertex_permutations[face_orientation][vertex];
+          case ReferenceCells::Pyramid:
+            if (face == 0)
+              return quadrilateral_vertex_permutations[face_orientation]
+                                                      [vertex];
+            else
+              return triangle_vertex_permutations[face_orientation][vertex];
+          case ReferenceCells::Wedge:
+            if (face < 2)
+              return triangle_vertex_permutations[face_orientation][vertex];
+            else
+              return quadrilateral_vertex_permutations[face_orientation]
+                                                      [vertex];
+          case ReferenceCells::Hexahedron:
+            return quadrilateral_vertex_permutations[face_orientation][vertex];
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
     }
 
   DEAL_II_ASSERT_UNREACHABLE();
