@@ -3456,11 +3456,21 @@ ReferenceCell<dim>::standard_to_real_face_line(
   AssertIndexRange(line, face_reference_cell(face).n_lines());
   AssertIndexRange(face_orientation, n_face_orientations(face));
 
-  switch (face_reference_cell(face))
+  switch (this->kind)
     {
-      case ReferenceCells::Triangle:
+      case ReferenceCells::Tetrahedron:
         return triangle_line_permutations[face_orientation][line];
-      case ReferenceCells::Quadrilateral:
+      case ReferenceCells::Pyramid:
+        if (face == 0)
+          return quadrilateral_line_permutations[face_orientation][line];
+        else
+          return triangle_line_permutations[face_orientation][line];
+      case ReferenceCells::Wedge:
+        if (face < 2)
+          return triangle_line_permutations[face_orientation][line];
+        else
+          return quadrilateral_line_permutations[face_orientation][line];
+      case ReferenceCells::Hexahedron:
         return quadrilateral_line_permutations[face_orientation][line];
       // case ReferenceCells::Vertex:
       // case ReferenceCells::Line:
