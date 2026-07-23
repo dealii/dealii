@@ -134,32 +134,6 @@ namespace Utilities
         const AdditionalData &additional_data = AdditionalData());
 
       /**
-       * Constructor. This constructor is deprecated. Use the other constructor
-       * taking AdditionalData instead.
-       *
-       * @param tolerance Tolerance in terms of unit cell coordinates for
-       *   determining all cells around a point passed to the class during
-       *   reinit(). Depending on the problem, it might be necessary to adjust
-       *   the tolerance in order to be able to identify a cell.
-       *   Floating point arithmetic implies that a point will, in general, not
-       *   lie exactly on a vertex, edge, or face.
-       * @param enforce_unique_mapping Enforce unique mapping, i.e.,
-       *   (one-to-one) relation of points and cells.
-       * @param rtree_level RTree level to be used during the construction of the bounding boxes.
-       * @param marked_vertices Function that marks relevant vertices to make search
-       *   of active cells around point more efficient.
-       *
-       * @deprecated
-       */
-      DEAL_II_DEPRECATED_WITH_COMMENT(
-        "Use the constructor with AdditionalData struct.")
-      RemotePointEvaluation(
-        const double       tolerance,
-        const bool         enforce_unique_mapping                 = false,
-        const unsigned int rtree_level                            = 0,
-        const std::function<std::vector<bool>()> &marked_vertices = {});
-
-      /**
        * Destructor.
        */
       ~RemotePointEvaluation();

@@ -56,21 +56,6 @@ namespace Utilities
 
 
     template <int dim, int spacedim>
-    RemotePointEvaluation<dim, spacedim>::RemotePointEvaluation(
-      const double                              tolerance,
-      const bool                                enforce_unique_mapping,
-      const unsigned int                        rtree_level,
-      const std::function<std::vector<bool>()> &marked_vertices)
-      : additional_data(tolerance,
-                        enforce_unique_mapping,
-                        rtree_level,
-                        marked_vertices)
-      , ready_flag(false)
-    {}
-
-
-
-    template <int dim, int spacedim>
     RemotePointEvaluation<dim, spacedim>::~RemotePointEvaluation()
     {
       if (tria_signal.connected())

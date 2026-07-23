@@ -79,7 +79,7 @@ FE_NedelecNodal<dim>::FE_NedelecNodal(const unsigned int degree)
         true),
       std::vector<ComponentMask>(
         PolynomialsVectorAnisotropic<dim>::n_polynomials(degree, degree + 1),
-        std::vector<bool>(dim, true)))
+        ComponentMask(dim, true)))
 {
   Assert(dim >= 2, ExcImpossibleInDim(dim));
 
