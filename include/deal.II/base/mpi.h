@@ -1217,10 +1217,13 @@ namespace Utilities
      * @param[in] root_process The process, which receives the objects from all
      * processes. By default the process with rank 0 is the root process.
      *
-     * @return The @p root_process receives a vector of objects, with size equal to the number of
+     * @return On @p root_process, this function returns a vector of objects
+     *  with size equal to the number of
      *  processes in the MPI communicator. Each entry contains the object
      *  received from the processor with the corresponding rank within the
-     *  communicator. All other processes receive an empty vector.
+     *  communicator. On all other processes, the function returns an empty
+     *  vector. (If you need the information on *all* processes, use
+     *  all_gather() instead.)
      */
     template <typename T>
     [[nodiscard]] std::vector<T>
