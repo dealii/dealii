@@ -814,15 +814,6 @@ public:
   /**
    * Return the position in real coordinates of the given point index among
    * the points passed to reinit().
-   *
-   * @deprecated Use the function quadrature_point() instead.
-   */
-  DEAL_II_DEPRECATED Point<spacedim, Number>
-                     real_point(const unsigned int point_index) const;
-
-  /**
-   * Return the position in real coordinates of the given point index among
-   * the points passed to reinit().
    */
   Point<spacedim, Number>
   quadrature_point(const unsigned int point_index) const;
@@ -2335,16 +2326,6 @@ FEPointEvaluationBase<n_components_, dim, spacedim, Number>::JxW(
            ExcFEPointEvaluationAccessToUninitializedMappingField(
              "update_JxW_values"));
   return JxW_ptr[point_index];
-}
-
-
-
-template <int n_components_, int dim, int spacedim, typename Number>
-inline Point<spacedim, Number>
-FEPointEvaluationBase<n_components_, dim, spacedim, Number>::real_point(
-  const unsigned int point_index) const
-{
-  return quadrature_point(point_index);
 }
 
 

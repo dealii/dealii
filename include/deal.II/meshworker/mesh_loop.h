@@ -26,7 +26,6 @@
 #include <deal.II/meshworker/assemble_flags.h>
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/local_integrator.h>
 #include <deal.II/meshworker/loop.h>
 
 #include <functional>

@@ -183,20 +183,6 @@ public:
   operator=(ObserverPointer<T, P> &&other) noexcept;
 
   /**
-   * Delete the object pointed to and set the pointer to nullptr. Note
-   * that unlike what the documentation of the class describes, *this
-   * function actually deletes the object pointed to*. That is, this
-   * function assumes a ObserverPointer's ownership of the object pointed to.
-   *
-   * @deprecated This function is deprecated. It does not use the
-   * semantics we usually use for this class, and its use is surely
-   * going to be confusing.
-   */
-  DEAL_II_DEPRECATED
-  void
-  clear();
-
-  /**
    * Conversion to normal pointer.
    */
   operator T *() const;
@@ -424,21 +410,6 @@ inline ObserverPointer<T, P>::~ObserverPointer()
 
   if (pointed_to_object_is_alive && pointer != nullptr)
     pointer->unsubscribe(&pointed_to_object_is_alive, id);
-}
-
-
-
-template <typename T, typename P>
-inline void
-ObserverPointer<T, P>::clear()
-{
-  if (pointed_to_object_is_alive && pointer != nullptr)
-    {
-      pointer->unsubscribe(&pointed_to_object_is_alive, id);
-      delete pointer;
-      Assert(pointed_to_object_is_alive == false, ExcInternalError());
-    }
-  pointer = nullptr;
 }
 
 

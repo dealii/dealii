@@ -1101,25 +1101,6 @@ namespace FETools
         &fe_systems);
 
     /**
-     * Same as above but for a specific number of sub-elements.
-     *
-     * @deprecated Use the versions of this function that take a
-     *   vector of elements or an initializer list as arguments.
-     */
-    template <int dim, int spacedim>
-    DEAL_II_DEPRECATED FiniteElementData<dim>
-    multiply_dof_numbers(const FiniteElement<dim, spacedim> *fe1,
-                         const unsigned int                  N1,
-                         const FiniteElement<dim, spacedim> *fe2 = nullptr,
-                         const unsigned int                  N2  = 0,
-                         const FiniteElement<dim, spacedim> *fe3 = nullptr,
-                         const unsigned int                  N3  = 0,
-                         const FiniteElement<dim, spacedim> *fe4 = nullptr,
-                         const unsigned int                  N4  = 0,
-                         const FiniteElement<dim, spacedim> *fe5 = nullptr,
-                         const unsigned int                  N5  = 0);
-
-    /**
      * Compute the "restriction is additive" flags (see the
      * documentation of the FiniteElement class) for a list of finite
      * elements with multiplicities given in the second argument.
@@ -1148,38 +1129,6 @@ namespace FETools
       const std::initializer_list<
         std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
         &fe_systems);
-
-    /**
-     * Take a @p FiniteElement object and return a boolean vector
-     * describing the @p restriction_is_additive_flags (see the
-     * documentation of the FiniteElement class) for each shape function
-     * of the mixed element consisting of @p N1, @p N2, ... copies of
-     * the sub-elements @p fe1, @p fe2, ...
-     *
-     * The "restriction is additive" flags are properties of
-     * individual shape functions that do not depend on whether the
-     * composed element uses the tensor product or combination
-     * strategy outlined in the documentation of the
-     * FETools::Compositing namespace. Consequently, this function
-     * does not have a @p do_tensor_product argument.
-     *
-     * @deprecated Use the versions of this function that take a
-     *   vector of elements or an initializer list as arguments.
-     */
-    template <int dim, int spacedim>
-    DEAL_II_DEPRECATED std::vector<bool>
-                       compute_restriction_is_additive_flags(
-                         const FiniteElement<dim, spacedim> *fe1,
-                         const unsigned int                  N1,
-                         const FiniteElement<dim, spacedim> *fe2 = nullptr,
-                         const unsigned int                  N2  = 0,
-                         const FiniteElement<dim, spacedim> *fe3 = nullptr,
-                         const unsigned int                  N3  = 0,
-                         const FiniteElement<dim, spacedim> *fe4 = nullptr,
-                         const unsigned int                  N4  = 0,
-                         const FiniteElement<dim, spacedim> *fe5 = nullptr,
-                         const unsigned int                  N5  = 0);
-
 
     /**
      * Compute the nonzero components for each shape function of a
@@ -1215,42 +1164,6 @@ namespace FETools
       const std::initializer_list<
         std::pair<std::unique_ptr<FiniteElement<dim, spacedim>>, unsigned int>>
         &fe_systems);
-
-    /**
-     * Compute the non-zero vector components of a composed finite
-     * element. This function is similar to the previous one, except
-     * that the pointers indicate the elements to be composed, and the
-     * arguments @p N1, @p N2, ... the multiplicities. Null pointers
-     * indicate that an argument is to be skipped.
-     *
-     * If @p do_tensor_product is true, the number of components (and
-     * thus the size of the ComponentMask objects) is the sum over the
-     * product of the number of components in each of the finite
-     * elements times the corresponding multiplicity.  Otherwise the
-     * number of components is taken from the first finite element with
-     * non-zero multiplicity, and all other elements with non-zero
-     * multiplicities need to have the same number of vector components.
-     *
-     * See the documentation of namespace FETools::Compositing for more
-     * information about the @p do_tensor_product argument.
-     *
-     * @deprecated Use the versions of this function that take a
-     *   vector of elements or an initializer list as arguments.
-     */
-    template <int dim, int spacedim>
-    DEAL_II_DEPRECATED std::vector<ComponentMask>
-                       compute_nonzero_components(
-                         const FiniteElement<dim, spacedim> *fe1,
-                         const unsigned int                  N1,
-                         const FiniteElement<dim, spacedim> *fe2 = nullptr,
-                         const unsigned int                  N2  = 0,
-                         const FiniteElement<dim, spacedim> *fe3 = nullptr,
-                         const unsigned int                  N3  = 0,
-                         const FiniteElement<dim, spacedim> *fe4 = nullptr,
-                         const unsigned int                  N4  = 0,
-                         const FiniteElement<dim, spacedim> *fe5 = nullptr,
-                         const unsigned int                  N5  = 0,
-                         const bool                          do_tensor_product = true);
 
     /**
      * For a given (composite) @p finite_element build @p

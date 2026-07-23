@@ -2303,49 +2303,6 @@ public:
   /** @} */
 
   /**
-   * The elements of this `enum` are used to inform functions how a
-   * specific cell is going to change. This is used in the course of
-   * transferring data from one mesh to a refined or coarsened version of
-   * the mesh, for example. Note that this may me different than the
-   * refine_flag() and coarsen_flag() set on a cell, for example in
-   * parallel calculations, because of refinement constraints that an
-   * individual machine does not see.
-   *
-   * @deprecated This is an alias for backward compatibility. Use
-   * ::dealii::CellStatus directly.
-   */
-  using CellStatus DEAL_II_DEPRECATED = ::dealii::CellStatus;
-
-  /**
-   * @deprecated This is an alias for backward compatibility. Use
-   * ::dealii::CellStatus directly.
-   */
-  static constexpr auto CELL_PERSIST DEAL_II_DEPRECATED =
-    ::dealii::CellStatus::cell_will_persist;
-
-  /**
-   * @deprecated This is an alias for backward compatibility. Use
-   * ::dealii::CellStatus directly.
-   */
-  static constexpr auto CELL_REFINE DEAL_II_DEPRECATED =
-    ::dealii::CellStatus::cell_will_be_refined;
-
-  /**
-   * @deprecated This is an alias for backward compatibility. Use
-   * ::dealii::CellStatus directly.
-   */
-  static constexpr auto CELL_COARSEN DEAL_II_DEPRECATED =
-    ::dealii::CellStatus::children_will_be_coarsened;
-
-  /**
-   * @deprecated This is an alias for backward compatibility. Use
-   * ::dealii::CellStatus directly.
-   */
-  static constexpr auto CELL_INVALID DEAL_II_DEPRECATED =
-    ::dealii::CellStatus::cell_invalid;
-
-
-  /**
    * A structure used to accumulate the results of the `weight` signal slot
    * functions below. It takes an iterator range and returns the sum of
    * values.

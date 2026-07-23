@@ -229,15 +229,6 @@ public:
   Tensor<1, dim, Number>
   normal_vector(const unsigned int q_point) const;
 
-  /**
-   * Same as `normal_vector(const unsigned int q_point)`.
-   *
-   * @deprecated Use normal_vector() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT("Use normal_vector() instead.")
-  Tensor<1, dim, Number>
-  get_normal_vector(const unsigned int q_point) const;
-
   /** @} */
 
   /**
@@ -1315,17 +1306,6 @@ FEEvaluationData<dim, Number, is_face>::normal_vector(
     return normal_vectors[0];
   else
     return normal_vectors[q_point];
-}
-
-
-
-// This function is deprecated.
-template <int dim, typename Number, bool is_face>
-inline DEAL_II_ALWAYS_INLINE Tensor<1, dim, Number>
-FEEvaluationData<dim, Number, is_face>::get_normal_vector(
-  const unsigned int q_point) const
-{
-  return normal_vector(q_point);
 }
 
 

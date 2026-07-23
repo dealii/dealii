@@ -79,14 +79,6 @@ public:
   BlockMask() = default;
 
   /**
-   * Deprecated constructor allowing implicit conversion.
-   */
-  template <typename = void>
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Implicit conversions from std::vector<bool> to BlockMask are deprecated!")
-  BlockMask(const std::vector<bool> &block_mask);
-
-  /**
    * Initialize an object of this type with a set of selected blocks specified
    * by the argument.
    *
@@ -243,12 +235,6 @@ operator<<(std::ostream &out, const BlockMask &mask);
 
 #ifndef DOXYGEN
 // -------------------- inline functions ---------------------
-
-template <typename>
-inline BlockMask::BlockMask(const std::vector<bool> &block_mask)
-  : block_mask(block_mask)
-{}
-
 
 inline BlockMask::BlockMask(const std::vector<bool> &block_mask)
   : block_mask(block_mask)

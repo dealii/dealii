@@ -617,34 +617,6 @@ public:
   operator[](const TableIndices<rank_> &indices);
 
   /**
-   * Return a pointer to the first element of the underlying storage.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  begin_raw();
-
-  /**
-   * Return a const pointer to the first element of the underlying storage.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  begin_raw() const;
-
-  /**
-   * Return a pointer to the element past the end of the underlying storage.
-   */
-  DEAL_II_DEPRECATED
-  Number *
-  end_raw();
-
-  /**
-   * Return a pointer to the element past the end of the underlying storage.
-   */
-  DEAL_II_DEPRECATED
-  const Number *
-  end_raw() const;
-
-  /**
    * Assignment operator from tensors with different underlying scalar type.
    * This obviously requires that the @p OtherNumber type is convertible to @p
    * Number.
@@ -1489,64 +1461,6 @@ Tensor<rank_, dim, Number>::operator[](const TableIndices<rank_> &indices)
          ExcMessage("Cannot access an object of type Tensor<rank_,0,Number>"));
 
   return TensorAccessors::extract<rank_>(*this, indices);
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline Number *
-Tensor<rank_, dim, Number>::begin_raw()
-{
-  static_assert(rank_ == 1,
-                "This function is only available for rank-1 tensors "
-                "because higher-rank tensors may not store their elements "
-                "in a contiguous array.");
-
-  return std::addressof(
-    this->operator[](this->unrolled_to_component_indices(0)));
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline const Number *
-Tensor<rank_, dim, Number>::begin_raw() const
-{
-  static_assert(rank_ == 1,
-                "This function is only available for rank-1 tensors "
-                "because higher-rank tensors may not store their elements "
-                "in a contiguous array.");
-
-  return std::addressof(
-    this->operator[](this->unrolled_to_component_indices(0)));
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline Number *
-Tensor<rank_, dim, Number>::end_raw()
-{
-  static_assert(rank_ == 1,
-                "This function is only available for rank-1 tensors "
-                "because higher-rank tensors may not store their elements "
-                "in a contiguous array.");
-
-  return begin_raw() + n_independent_components;
-}
-
-
-
-template <int rank_, int dim, typename Number>
-inline const Number *
-Tensor<rank_, dim, Number>::end_raw() const
-{
-  static_assert(rank_ == 1,
-                "This function is only available for rank-1 tensors "
-                "because higher-rank tensors may not store their elements "
-                "in a contiguous array.");
-
-  return begin_raw() + n_independent_components;
 }
 
 
