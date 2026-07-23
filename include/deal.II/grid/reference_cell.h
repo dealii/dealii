@@ -3192,86 +3192,90 @@ ReferenceCell<dim>::face_to_cell_vertices(
   AssertIndexRange(face, n_faces());
   AssertIndexRange(vertex, face_reference_cell(face).n_vertices());
   AssertIndexRange(combined_face_orientation, n_face_orientations(face));
+  AssertDimension(dim, get_dimension());
 
-  switch (this->kind)
-    {
-      case ReferenceCells::Vertex:
-        {
-          // We can't get here based on the assertions above: vertices
-          // have no faces.
+  if constexpr (dim == 0)
+    // We can't get here based on the assertions above: vertices
+    // have no faces.
+    DEAL_II_ASSERT_UNREACHABLE();
+  else if constexpr (dim == 1)
+    // A line has only one vertex per face, so the vertex we are
+    // looking for is actually the face we were given:
+    return face;
+  else if constexpr (dim == 2)
+    switch (this->kind)
+      {
+        case ReferenceCells::Triangle:
+          {
+            static constexpr ndarray<unsigned int, 3, 2> table = {
+              {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+
+            return table[face][combined_face_orientation ==
+                                   numbers::default_geometric_orientation ?
+                                 vertex :
+                                 (1 - vertex)];
+          }
+        case ReferenceCells::Quadrilateral:
+          {
+            const auto [face_orientation, face_rotation, face_flip] =
+              internal::split_face_orientation(combined_face_orientation);
+
+            return GeometryInfo<2>::face_to_cell_vertices(
+              face, vertex, face_orientation, face_flip, face_rotation);
+          }
+        default:
           DEAL_II_ASSERT_UNREACHABLE();
-          break;
-        }
-      case ReferenceCells::Line:
-        {
-          // A line has only one vertex per face, so the vertex we are
-          // looking for is actually the face we were given:
-          return face;
-        }
-      case ReferenceCells::Triangle:
-        {
-          static constexpr ndarray<unsigned int, 3, 2> table = {
-            {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+      }
+  else
+    switch (this->kind)
+      {
+        case ReferenceCells::Tetrahedron:
+          {
+            static constexpr ndarray<unsigned int, 4, 3> table = {
+              {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
-          return table[face][combined_face_orientation ==
-                                 numbers::default_geometric_orientation ?
-                               vertex :
-                               (1 - vertex)];
-        }
-      case ReferenceCells::Quadrilateral:
-        {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
+            return table[face][standard_to_real_face_vertex(
+              vertex, face, combined_face_orientation)];
+          }
+        case ReferenceCells::Pyramid:
+          {
+            constexpr auto X = numbers::invalid_unsigned_int;
+            static constexpr ndarray<unsigned int, 5, 4> table = {
+              {{{0, 1, 2, 3}},
+               {{0, 2, 4, X}},
+               {{3, 1, 4, X}},
+               {{1, 0, 4, X}},
+               {{2, 3, 4, X}}}};
 
-          return GeometryInfo<2>::face_to_cell_vertices(
-            face, vertex, face_orientation, face_flip, face_rotation);
-        }
-      case ReferenceCells::Tetrahedron:
-        {
-          static constexpr ndarray<unsigned int, 4, 3> table = {
-            {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
+            return table[face][standard_to_real_face_vertex(
+              vertex, face, combined_face_orientation)];
+          }
+        case ReferenceCells::Wedge:
+          {
+            constexpr auto X = numbers::invalid_unsigned_int;
+            static constexpr ndarray<unsigned int, 6, 4> table = {
+              {{{1, 0, 2, X}},
+               {{3, 4, 5, X}},
+               {{0, 1, 3, 4}},
+               {{1, 2, 4, 5}},
+               {{2, 0, 5, 3}}}};
 
-          return table[face][standard_to_real_face_vertex(
-            vertex, face, combined_face_orientation)];
-        }
-      case ReferenceCells::Pyramid:
-        {
-          constexpr auto X = numbers::invalid_unsigned_int;
-          static constexpr ndarray<unsigned int, 5, 4> table = {
-            {{{0, 1, 2, 3}},
-             {{0, 2, 4, X}},
-             {{3, 1, 4, X}},
-             {{1, 0, 4, X}},
-             {{2, 3, 4, X}}}};
+            return table[face][standard_to_real_face_vertex(
+              vertex, face, combined_face_orientation)];
+          }
+        case ReferenceCells::Hexahedron:
+          {
+            const auto [face_orientation, face_rotation, face_flip] =
+              internal::split_face_orientation(combined_face_orientation);
 
-          return table[face][standard_to_real_face_vertex(
-            vertex, face, combined_face_orientation)];
-        }
-      case ReferenceCells::Wedge:
-        {
-          constexpr auto X = numbers::invalid_unsigned_int;
-          static constexpr ndarray<unsigned int, 6, 4> table = {
-            {{{1, 0, 2, X}},
-             {{3, 4, 5, X}},
-             {{0, 1, 3, 4}},
-             {{1, 2, 4, 5}},
-             {{2, 0, 5, 3}}}};
+            return GeometryInfo<3>::face_to_cell_vertices(
+              face, vertex, face_orientation, face_flip, face_rotation);
+          }
+        default:
+          DEAL_II_NOT_IMPLEMENTED();
+      }
 
-          return table[face][standard_to_real_face_vertex(
-            vertex, face, combined_face_orientation)];
-        }
-      case ReferenceCells::Hexahedron:
-        {
-          const auto [face_orientation, face_rotation, face_flip] =
-            internal::split_face_orientation(combined_face_orientation);
-
-          return GeometryInfo<3>::face_to_cell_vertices(
-            face, vertex, face_orientation, face_flip, face_rotation);
-        }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
-    }
-
+  DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
 }
 
