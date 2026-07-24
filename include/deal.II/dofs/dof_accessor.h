@@ -3192,9 +3192,9 @@ namespace internal
                       0,
                       line_indices[line],
                       fe_index,
-                      [&fe, line_orientation](const auto d) {
+                      [&fe](const auto d) {
                         return fe.adjust_line_dof_index_for_line_orientation(
-                          d, line_orientation);
+                          d, numbers::reverse_line_orientation);
                       },
                       std::integral_constant<int, 1>(),
                       dof_indices_ptr,
