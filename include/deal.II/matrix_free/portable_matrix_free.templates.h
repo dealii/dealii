@@ -506,7 +506,9 @@ namespace Portable
                                 Functor::n_q_points,
                                 precomputed_data[d]);
 
-        const int cell_index = team_member.league_rank();
+        const int cell_index =
+          precomputed_data[0].row_start / precomputed_data[0].padding_length +
+          team_member.league_rank();
 
         typename MatrixFree<dim, Number>::Data data{team_member,
                                                     Functor::n_q_points,
@@ -909,7 +911,9 @@ namespace Portable
               Kokkos::parallel_for(
                 Kokkos::TeamVectorRange(team_member, n_q_points),
                 [&](const int q_point) {
-                  const int cell_index = team_member.league_rank();
+                  const int cell_index =
+                    colored_data[0].row_start / colored_data[0].padding_length +
+                    team_member.league_rank();
 
                   Kokkos::Array<SharedData<dim, Number>, n_max_dof_handlers>
                     shared_data;
