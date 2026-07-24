@@ -71,7 +71,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim>
-  class DEAL_II_DEPRECATED_EARLY IntegrationInfo
+  class DEAL_II_DEPRECATED IntegrationInfo
   {
   private:
     /// vector of FEValues objects
@@ -291,7 +291,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <int dim, int spacedim = dim>
-  class DEAL_II_DEPRECATED_EARLY IntegrationInfoBox
+  class DEAL_II_DEPRECATED IntegrationInfoBox
   {
   public:
     /**

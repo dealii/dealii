@@ -43,7 +43,7 @@ namespace Algorithms
    * @deprecated The caller should set up and manage a DataOut object instead.
    */
   template <typename VectorType, int dim, int spacedim = dim>
-  class DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  class DEAL_II_DEPRECATED_WITH_COMMENT(
     "The caller should set up and manage a DataOut object instead.")
     DoFOutputOperator : public OutputOperator<VectorType>
   {

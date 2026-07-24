@@ -76,7 +76,7 @@ namespace MeshWorker
    * @ingroup MeshWorker
    */
   template <typename number>
-  class DEAL_II_DEPRECATED_EARLY LocalResults
+  class DEAL_II_DEPRECATED LocalResults
   {
   public:
     /**
