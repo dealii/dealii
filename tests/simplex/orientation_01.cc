@@ -30,9 +30,11 @@ test(const ReferenceCell<dim> type, const unsigned int n_orientations)
       for (unsigned int i = 0; i < n_points; ++i)
         origin[i] = i;
 
-      const auto permuted = type.permute_according_orientation(origin, o);
-      const unsigned int origin_back =
-        type.compute_orientation(permuted, origin);
+      ArrayView<const unsigned int> origin_view(origin.cbegin(), n_points);
+      const auto                    permuted =
+        type.permute_by_combined_orientation(origin_view, o);
+      const unsigned int origin_back = type.get_combined_orientation(
+        make_array_view(permuted.cbegin(), permuted.cend()), origin_view);
 
       AssertDimension(o, origin_back);
     }

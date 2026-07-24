@@ -41,11 +41,14 @@ test(const types::geometric_orientation orientation)
   }
 
   {
-    const auto &face                = dummy.begin()->face(face_no);
-    const auto  face_reference_cell = face->reference_cell();
-    const auto  permuted =
-      ReferenceCells::Triangle.permute_according_orientation(
-        std::array<unsigned int, 3>{{0, 1, 2}}, orientation);
+    const auto                   &face = dummy.begin()->face(face_no);
+    const auto                    face_reference_cell = face->reference_cell();
+    std::array<unsigned int, 3>   v{{0, 1, 2}};
+    ArrayView<const unsigned int> view(v.cbegin(), v.size());
+    ;
+    const auto permuted =
+      ReferenceCells::Triangle.permute_by_combined_orientation(view,
+                                                               orientation);
 
     auto direction =
       cross_product_3d(vertices[permuted[1]] - vertices[permuted[0]],

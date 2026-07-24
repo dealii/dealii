@@ -52,8 +52,8 @@ test()
 
   MappingQ<dim> mapping(3);
 
-  std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(mapping, dof_handler, support_points);
+  std::map<types::global_dof_index, Point<dim>> support_points =
+    DoFTools::map_dofs_to_support_points(mapping, dof_handler);
 
   out << "set view equal xy" << std::endl
       << "plot '-' using 1:2 with lines, '-' with labels point pt 2 offset 1,1"

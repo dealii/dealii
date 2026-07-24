@@ -57,9 +57,9 @@ test(const unsigned int fe_degree, unsigned int n_components)
 
   std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
-  std::map<types::global_dof_index, Point<dim>> support_points;
   MappingQ1<dim>                                mapping;
-  DoFTools::map_dofs_to_support_points(mapping, dof_handler, support_points);
+  std::map<types::global_dof_index, Point<dim>> support_points =
+    DoFTools::map_dofs_to_support_points(mapping, dof_handler);
   deallog << "Support points:" << std::endl;
   for (unsigned int i = 0; i < dof_handler.n_dofs(); ++i)
     {

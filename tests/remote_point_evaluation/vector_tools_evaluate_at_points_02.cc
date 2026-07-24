@@ -137,11 +137,8 @@ public:
       dof_handler.locally_owned_dofs(),
       DoFTools::extract_locally_relevant_dofs(dof_handler));
     {
-      std::map<types::global_dof_index, Point<dim>> support_points;
-
-      DoFTools::map_dofs_to_support_points(mapping,
-                                           dof_handler,
-                                           support_points);
+      std::map<types::global_dof_index, Point<dim>> support_points =
+        DoFTools::map_dofs_to_support_points(mapping, dof_handler);
 
       std::vector<types::global_dof_index> global_ids;
 

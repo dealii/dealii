@@ -140,10 +140,8 @@ test(const unsigned numRefinementLevels = 2)
     Utilities::MPI::all_gather(MPI_COMM_WORLD,
                                dof_handler.locally_owned_dofs());
 
-  std::map<types::global_dof_index, Point<dim>> supportPoints;
-  DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
-                                       dof_handler,
-                                       supportPoints);
+  std::map<types::global_dof_index, Point<dim>> supportPoints =
+    DoFTools::map_dofs_to_support_points(MappingQ1<dim>(), dof_handler);
 
   /// creating combined hanging node and periodic constraint matrix
   AffineConstraints<double> constraints;

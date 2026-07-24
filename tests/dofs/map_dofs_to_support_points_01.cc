@@ -52,14 +52,14 @@ test()
   mask.set(1, false);
 
   MappingQ<dim>                                 mapping(1);
-  std::map<types::global_dof_index, Point<dim>> support_points_0;
-  DoFTools::map_dofs_to_support_points(mapping, dof, support_points_0, mask);
+  std::map<types::global_dof_index, Point<dim>> support_points_0 =
+    DoFTools::map_dofs_to_support_points(mapping, dof, mask);
 
   mask.set(0, false);
   mask.set(1, true);
 
-  std::map<types::global_dof_index, Point<dim>> support_points_1;
-  DoFTools::map_dofs_to_support_points(mapping, dof, support_points_1, mask);
+  std::map<types::global_dof_index, Point<dim>> support_points_1 =
+    DoFTools::map_dofs_to_support_points(mapping, dof, mask);
 
   auto it_0 = support_points_0.begin();
   auto it_1 = support_points_1.begin();

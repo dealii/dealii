@@ -2170,26 +2170,6 @@ namespace DoFTools
                             std::vector<unsigned int>());
 
   /**
-   * For each active cell of a DoFHandler, extract the active finite element
-   * index and fill the vector given as second argument. This vector is assumed
-   * to have as many entries as there are active cells.
-   *
-   * For DoFHandler objects without hp-capabilities given as first argument, the
-   * returned vector will consist of only zeros, indicating that all cells use
-   * the same finite element. In hp-mode, the values may be different, though.
-   *
-   * As we do not know the active FE index on artificial cells, we set them to
-   * the invalid value numbers::invalid_fe_index.
-   *
-   * @deprecated Use DoFHandler::get_active_fe_indices() that returns the result
-   * vector.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
-                        std::vector<unsigned int>       &active_fe_indices);
-
-  /**
    * Count how many degrees of freedom live on a set of cells (i.e., a patch)
    * described by the argument.
    *
@@ -2368,35 +2348,6 @@ namespace DoFTools
     const DoFHandler<dim, spacedim>            &dof_handler,
     const ComponentMask                        &mask = {},
     const bool map_locally_relevant_dofs             = true);
-
-  /**
-   * A version of the function of same name that returns the map via its third
-   * argument. This function is deprecated.
-   * @deprecated Use the function that returns the `std::map` instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  map_dofs_to_support_points(
-    const Mapping<dim, spacedim>                       &mapping,
-    const DoFHandler<dim, spacedim>                    &dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask = {},
-    const bool map_locally_relevant_dofs                     = true);
-
-  /**
-   * A version of the function of same name that returns the map via its third
-   * argument. This function is deprecated.
-   * @deprecated Use the function that returns the `std::map` instead.
-   */
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  map_dofs_to_support_points(
-    const hp::MappingCollection<dim, spacedim>         &mapping,
-    const DoFHandler<dim, spacedim>                    &dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask = {},
-    const bool map_locally_relevant_dofs                     = true);
-
 
   /**
    * This is the opposite function to the one above. It generates a map where

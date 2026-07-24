@@ -220,10 +220,6 @@ for (deal_II_dimension : DIMENSIONS)
       const DoFHandler<deal_II_dimension> &dof_handler,
       const ComponentMask                 &selected_components);
 
-    template void DoFTools::get_active_fe_indices<deal_II_dimension>(
-      const DoFHandler<deal_II_dimension> &dof_handler,
-      std::vector<unsigned int>           &active_fe_indices);
-
     template void DoFTools::get_subdomain_association<deal_II_dimension>(
       const DoFHandler<deal_II_dimension> &dof_handler,
       std::vector<types::subdomain_id>    &subdomain_association);
@@ -429,25 +425,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
           &,
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         std::vector<Point<deal_II_space_dimension>> &,
-        const ComponentMask &,
-        const bool);
-
-      // This function is deprecated:
-      template void
-      map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
-        const Mapping<deal_II_dimension, deal_II_space_dimension> &,
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
-        const ComponentMask &,
-        const bool);
-
-      // This function is deprecated:
-      template void
-      map_dofs_to_support_points<deal_II_dimension, deal_II_space_dimension>(
-        const hp::MappingCollection<deal_II_dimension, deal_II_space_dimension>
-          &,
-        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
-        std::map<types::global_dof_index, Point<deal_II_space_dimension>> &,
         const ComponentMask &,
         const bool);
 
