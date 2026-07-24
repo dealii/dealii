@@ -18,6 +18,18 @@
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/function.h>
 
+#ifdef DEAL_II_WITH_ITK
+#  include <itkBinaryThresholdImageFilter.h>
+#  include <itkImage.h>
+#  include <itkImageFileReader.h>
+#  include <itkImageFileWriter.h>
+#  include <itkLinearInterpolateImageFunction.h>
+#  include <itkSignedMaurerDistanceMapImageFilter.h>
+
+#  include <string>
+
+#endif
+
 #include <array>
 
 DEAL_II_NAMESPACE_OPEN
@@ -383,6 +395,72 @@ namespace Functions
       const Tensor<1, dim> axis;
       const double         R;
     };
+
+#ifdef DEAL_II_WITH_ITK
+    /**
+     * Signed-Distance level set function generated from arbitrary binary
+     * images.
+     */
+
+    template <int dim>
+    class ArbitraryLevelSet : public Function<dim>
+    {
+    public:
+      /**
+       * @brief Constructs an arbitrary level set from a binary data file.
+       *
+       * Initializes the level set using the specified input file and the
+       * corresponding cut offs of the data range.
+       * This data range could be density or really any parameter.
+       * Also this class obviously does only work for
+       * dim=2,3, since there are no one-dimensional images.
+       *
+       * @param filename Path to the file containing the level set data.
+       * @param level_set_quantity_cut_off_lower_bound Lower bound of the valid data range.
+       * @param level_set_quantity_cut_off_upper_bound Upper bound of the valid data range.
+       */
+      ArbitraryLevelSet(
+        const std::string &filename,
+        const unsigned int level_set_quantity_cut_off_lower_bound,
+        const unsigned int level_set_quantity_cut_off_upper_bound);
+
+      /**
+       * @brief Evaluates the level set function at a given point.
+       *
+       * Returns the value of the level set function at the specified spatial
+       * location. The component argument is ignored for scalar-valued level
+       * set functions.
+       * It is important to mention that this function can only evaluate points
+       * inside of the level set accurately. If a point lies outside a default
+       * value will be returned.
+       *
+       * @param point The point at which to evaluate the level set.
+       * @param component The vector component to evaluate (default: 0).
+       * @return The value of the level set function at the specified point.
+       */
+      virtual double
+      value(const Point<dim>  &point,
+            const unsigned int component = 0) const override;
+
+    private:
+      using InputPixelType = float;
+      using InputImageType = itk::Image<InputPixelType, dim>;
+
+      using MaskPixelType = unsigned char;
+      using MaskImageType = itk::Image<MaskPixelType, dim>;
+
+      using OutputPixelType = float;
+      using OutputImageType = itk::Image<OutputPixelType, dim>;
+
+      using InterpolatorType =
+        itk::LinearInterpolateImageFunction<OutputImageType, double>;
+
+      typename OutputImageType::Pointer  distanceMap;
+      typename InterpolatorType::Pointer interpolator;
+    };
+
+#endif
+
   } // namespace SignedDistance
 } // namespace Functions
 

@@ -221,6 +221,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_GMSH_WITH_API=1 \
                          DEAL_II_WITH_GSL=1 \
                          DEAL_II_WITH_HDF5=1 \
+                         DEAL_II_WITH_ITK=1 \
                          DEAL_II_WITH_NETCDF=1 \
                          DEAL_II_WITH_LAPACK=1 \
                          DEAL_II_LAPACK_WITH_MKL=1 \
