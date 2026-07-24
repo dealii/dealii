@@ -750,71 +750,61 @@ namespace Utilities
                         const unsigned int width,
                         const char         delimiter)
   {
-    std::string              text = original_text;
     std::vector<std::string> lines;
 
-    // remove trailing spaces
-    while ((text.size() != 0) && (text.back() == delimiter))
-      text.erase(text.size() - 1, 1);
-
-    // then split the text into lines
-    while (text.size() != 0)
+    // First split at each '\n', then wrap every resulting piece to width.
+    std::size_t start = 0;
+    while (true)
       {
-        // in each iteration, first remove
-        // leading spaces
-        while ((text.size() != 0) && (text[0] == delimiter))
+        const std::size_t pos  = original_text.find('\n', start);
+        std::string       text = original_text.substr(
+          start, (pos == std::string::npos ? std::string::npos : pos - start));
+
+        // Remove leading/trailing delimiters on this piece.
+        while ((text.size() != 0) && (text.front() == delimiter))
           text.erase(0, 1);
+        while ((text.size() != 0) && (text.back() == delimiter))
+          text.pop_back();
 
-        std::size_t pos_newline = text.find_first_of('\n', 0);
-        if (pos_newline != std::string::npos && pos_newline <= width)
+        if (text.empty())
           {
-            std::string line(text, 0, pos_newline);
-            while ((line.size() != 0) && (line.back() == delimiter))
-              line.erase(line.size() - 1, 1);
-            lines.push_back(line);
-            text.erase(0, pos_newline + 1);
-            continue;
-          }
-
-        // if we can fit everything into one
-        // line, then do so. otherwise, we have
-        // to keep breaking
-        if (text.size() < width)
-          {
-            // remove trailing spaces
-            while ((text.size() != 0) && (text.back() == delimiter))
-              text.erase(text.size() - 1, 1);
-            lines.push_back(text);
-            text = "";
+            // Keep blank lines from consecutive newlines, but not a trailing
+            // empty segment from a final '\n' (or a fully empty input).
+            if (pos != std::string::npos)
+              lines.emplace_back();
           }
         else
           {
-            // starting at position width, find the
-            // location of the previous space, so
-            // that we can break around there
-            int location = std::min<int>(width, text.size() - 1);
-            for (; location > 0; --location)
-              if (text[location] == delimiter)
-                break;
+            while (text.size() > width)
+              {
+                // Prefer the last delimiter that still yields a line of length
+                // at most width. If there is none, take up to the next
+                // delimiter (a single word longer than width).
+                std::size_t location = text.rfind(delimiter, width);
+                if (location == 0 || location == std::string::npos)
+                  {
+                    location = text.find(delimiter, width);
+                    if (location == std::string::npos)
+                      break;
+                  }
 
-            // if there are no spaces, then try if
-            // there are spaces coming up
-            if (location == 0)
-              for (location = std::min<int>(width, text.size() - 1);
-                   location < static_cast<int>(text.size());
-                   ++location)
-                if (text[location] == delimiter)
-                  break;
+                std::string line = text.substr(0, location);
+                while ((line.size() != 0) && (line.back() == delimiter))
+                  line.pop_back();
+                lines.push_back(line);
 
-            // now take the text up to the found
-            // location and put it into a single
-            // line, and remove it from 'text'
-            std::string line(text, 0, location);
-            while ((line.size() != 0) && (line.back() == delimiter))
-              line.erase(line.size() - 1, 1);
-            lines.push_back(line);
-            text.erase(0, location);
+                text.erase(0, location);
+                while ((text.size() != 0) && (text.front() == delimiter))
+                  text.erase(0, 1);
+              }
+
+            if (text.size() != 0)
+              lines.push_back(text);
           }
+
+        if (pos == std::string::npos)
+          break;
+        start = pos + 1;
       }
 
     return lines;

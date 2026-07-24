@@ -73,6 +73,9 @@ test()
                 ' ',
                 "combining|whitespace|and new|line");
 
+  // Longer words with newlines are tricky:
+  test_function("a \nverylongword\nb c", 10, ' ', "a|verylongword|b c");
+  test_function("verylongword a\nb c", 10, ' ', "verylongword|a|b c");
 
   deallog << "OK" << std::endl;
 }
