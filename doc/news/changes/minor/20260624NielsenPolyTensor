@@ -1,0 +1,10 @@
+New: FE_PolyTensor now supports the codimension-one case (dim &lt; spacedim).
+The internal computation of mapped shape gradients and Hessians, which is
+stored using DerivativeForm objects, is guarded so that the reference-cell
+polynomial gradients and Hessians are copied row by row when dim != spacedim
+instead of relying on a DerivativeForm/Tensor assignment that is only valid
+for dim == spacedim. An explicit instantiation for dim=2, spacedim=3 is
+provided. This is a prerequisite for tensor-valued elements such as
+Raviart-Thomas elements on embedded surfaces.
+<br>
+(Jakob Tore Kammeyer Nielsen, 2026/06/24)

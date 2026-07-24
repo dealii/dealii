@@ -1,0 +1,4 @@
+
+DEAL::FE_RaviartThomasNodal<2,3>(0)
+DEAL::  all shape values finite: yes
+DEAL::  remainder and vectorized paths agree (diff < 1e-12): yes

@@ -335,9 +335,42 @@ private:
  * @note The degree stored in the member variable
  * FiniteElementData<dim>::degree is higher by one than the constructor
  * argument!
+ *
+ * <h3>Use on codimension-one (surface) meshes</h3>
+ *
+ * Unlike FE_RaviartThomas, this class is also instantiated for the
+ * codimension-one case <tt>dim=2, spacedim=3</tt>, i.e. for a two-dimensional
+ * surface mesh embedded in three-dimensional space. In this case the element
+ * represents a @p spacedim -valued vector field that
+ * is everywhere <i>tangential</i> to the surface. The reference-cell,
+ * <tt>dim</tt>-valued Raviart-Thomas shape functions are mapped to the real,
+ * tangential, <tt>spacedim</tt>-valued field by the surface Piola transform
+ * @f[
+ *   \mathbf u(\mathbf x)
+ *   = \frac{J\, \hat{\mathbf u}(\hat{\mathbf x})}{\sqrt{\det(J^T J)}},
+ * @f]
+ * where $J \in \mathbb R^{\text{spacedim}\times\text{dim}}$ is the Jacobian of
+ * the mapping from the reference cell to the surface cell. The number of
+ * components of the element therefore equals
+ * @p spacedim, not @p dim, so that the field can be accessed as a
+ * @p spacedim -valued vector through FEValuesExtractors::Vector.
+ *
+ * @note The following features are currently not implemented for the
+ * codimension-one case (<tt>dim != spacedim</tt>) and only available for the
+ * usual <tt>dim == spacedim</tt> case: hanging-node and hp constraints (and
+ * therefore mesh refinement involving hanging nodes); restriction and
+ * prolongation matrices. In addition, the inverse interpolation
+ * (convert_generalized_support_point_values_to_dof_values(), as used by
+ * VectorTools::interpolate(), for example) would need to apply the (inverse)
+ * surface Piola transform, which is not implemented for this case; calling
+ * it for <tt>dim != spacedim</tt> therefore triggers
+ * DEAL_II_NOT_IMPLEMENTED() rather than silently returning an incorrect
+ * result. The forward evaluation of
+ * shape function values and gradients, which does use the correct surface
+ * Piola transform, is exact for arbitrary surface orientations.
  */
-template <int dim>
-class FE_RaviartThomasNodal : public FE_PolyTensor<dim>
+template <int dim, int spacedim = dim>
+class FE_RaviartThomasNodal : public FE_PolyTensor<dim, spacedim>
 {
 public:
   /**
@@ -354,21 +387,27 @@ public:
   get_name() const override;
 
   // documentation inherited from the base class
-  virtual std::unique_ptr<FiniteElement<dim, dim>>
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
   virtual void
-  get_face_interpolation_matrix(const FiniteElement<dim> &source,
-                                FullMatrix<double>       &matrix,
+  get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
+                                FullMatrix<double>                 &matrix,
                                 const unsigned int face_no = 0) const override;
 
   virtual void
   get_subface_interpolation_matrix(
-    const FiniteElement<dim> &source,
-    const unsigned int        subface,
-    FullMatrix<double>       &matrix,
-    const unsigned int        face_no = 0) const override;
+    const FiniteElement<dim, spacedim> &source,
+    const unsigned int                  subface,
+    FullMatrix<double>                 &matrix,
+    const unsigned int                  face_no = 0) const override;
 
+  /**
+   * @copydoc FiniteElement::convert_generalized_support_point_values_to_dof_values()
+   *
+   * @note This function is not implemented for the codimension-one case
+   * (<tt>dim != spacedim</tt>).
+   */
   virtual void
   convert_generalized_support_point_values_to_dof_values(
     const std::vector<Vector<double>> &support_point_values,
@@ -378,20 +417,22 @@ public:
   hp_constraints_are_implemented() const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_vertex_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_vertex_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_line_dof_identities(const FiniteElement<dim> &fe_other) const override;
+  hp_line_dof_identities(
+    const FiniteElement<dim, spacedim> &fe_other) const override;
 
   virtual std::vector<std::pair<unsigned int, unsigned int>>
-  hp_quad_dof_identities(const FiniteElement<dim> &fe_other,
-                         const unsigned int        face_no = 0) const override;
+  hp_quad_dof_identities(const FiniteElement<dim, spacedim> &fe_other,
+                         const unsigned int face_no = 0) const override;
 
   /**
    * @copydoc FiniteElement::compare_for_domination()
    */
   virtual FiniteElementDomination::Domination
-  compare_for_domination(const FiniteElement<dim> &fe_other,
+  compare_for_domination(const FiniteElement<dim, spacedim> &fe_other,
                          const unsigned int codim = 0) const override final;
 
   virtual const FullMatrix<double> &

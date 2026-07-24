@@ -1219,6 +1219,11 @@ namespace FETools
           std::make_unique<FETools::FEFactory<FE_Q<dim, spacedim>>>();
         result["FE_Bernstein"] =
           std::make_unique<FETools::FEFactory<FE_Bernstein<dim, spacedim>>>();
+        // FE_RaviartThomasNodal is only explicitly instantiated for the
+        // codimension-one case dim=2, spacedim=3.
+        if constexpr (dim == 2 && spacedim == 3)
+          result["FE_RaviartThomasNodal"] = std::make_unique<
+            FETools::FEFactory<FE_RaviartThomasNodal<dim, spacedim>>>();
         result["FE_SimplexP"] =
           std::make_unique<FETools::FEFactory<FE_SimplexP<dim, spacedim>>>();
         result["FE_SimplexDGP"] =
