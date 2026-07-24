@@ -22,6 +22,7 @@
 
 #  include <deal.II/lac/block_matrix_base.h>
 #  include <deal.II/lac/block_sparse_matrix.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_block_vector.h>
@@ -165,6 +166,17 @@ namespace LinearAlgebra
              const bool                      exchange_data = false);
 
       /**
+       * Resize the matrix, by using an array of index sets to determine the
+       * %parallel distribution of the individual matrices. This function
+       * assumes that a quadratic block matrix is generated.
+       */
+      void
+      reinit(const std::vector<IndexSet> &input_maps,
+             const BlockSparsityPattern  &block_sparsity_pattern,
+             const MPI_Comm               communicator  = MPI_COMM_WORLD,
+             const bool                   exchange_data = false);
+
+      /**
        * Resize the matrix and initialize it by the given sparsity pattern.
        * Since no distribution map is given, the result is a block matrix for
        * which all elements are stored locally.
@@ -172,6 +184,14 @@ namespace LinearAlgebra
       template <typename BlockSparsityPatternType>
       void
       reinit(const BlockSparsityPatternType &block_sparsity_pattern);
+
+      /**
+       * Resize the matrix and initialize it by the given sparsity pattern.
+       * Since no distribution map is given, the result is a block matrix for
+       * which all elements are stored locally.
+       */
+      void
+      reinit(const BlockSparsityPattern &block_sparsity_pattern);
 
       /**
        * This function initializes the Trilinos matrix using the deal.II sparse
