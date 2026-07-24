@@ -5710,8 +5710,8 @@ namespace
 
     // Write out title - Note: No other commented text can be inserted below
     // the title in a UCD file
-    output << "# Abaqus to UCD mesh conversion" << std::endl;
-    output << "# Mesh type: AVS UCD" << std::endl;
+    output << "# Abaqus to UCD mesh conversion" << '\n';
+    output << "# Mesh type: AVS UCD" << '\n';
 
     // ========================================================
     // ASCII UCD File Format
@@ -5741,22 +5741,24 @@ namespace
 
     // Write out header
     output << node_list.size() << "\t" << (cell_list.size() + face_list.size())
-           << "\t0\t0\t0" << std::endl;
-
-    output.width(16);
-    output.precision(8);
+           << "\t0\t0\t0" << '\n';
 
     // Write out node numbers
     // Loop over all nodes
+    output.setf(std::ios::scientific, std::ios::floatfield);
     for (const auto &node : node_list)
       {
-        // Node number
-        output << node[0] << "\t";
+        // Node number. It is stored as a double, but it's an integer, so we can
+        // just output it as that:
+        output << static_cast<int>(node[0]) << "\t";
 
-        // Node coordinates
-        output.setf(std::ios::scientific, std::ios::floatfield);
+        // Node coordinates. For these, we need to set the precision and width
+        // so that we catch as much precision as possible:
         for (unsigned int jj = 1; jj < spacedim + 1; ++jj)
           {
+            output.width(20);
+            output.precision(16);
+
             // invoke tolerance -> set points close to zero equal to zero
             if (std::abs(node[jj]) > tolerance)
               output << static_cast<double>(node[jj]) << "\t";
@@ -5766,9 +5768,9 @@ namespace
         if (spacedim == 2)
           output << 0.0 << "\t";
 
-        output << std::endl;
-        output.unsetf(std::ios::floatfield);
+        output << '\n';
       }
+    output.unsetf(std::ios::floatfield);
 
     // Write out cell node numbers
     for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
@@ -5779,7 +5781,7 @@ namespace
              ++jj)
           output << cell_list[ii][jj] << "\t";
 
-        output << std::endl;
+        output << '\n';
       }
 
     // Write out quad node numbers
@@ -5791,8 +5793,10 @@ namespace
              ++jj)
           output << face_list[ii][jj] << "\t";
 
-        output << std::endl;
+        output << '\n';
       }
+
+    output << std::flush;
   }
 } // namespace
 
