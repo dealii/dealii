@@ -1,0 +1,42 @@
+<h1>Results</h1>
+
+This section sketches how to reproduce the validation scenarios discussed in the
+SEMA paper with this code. The program expects a parameter file on the command
+line; if none is provided it will generate a default `parameters.prm` matching
+the current dimension and co-dimension.
+
+<h3>Setup checklist</h3>
+
+- Choose dimension (`dimension`, `space dimension`) and mesh generators for
+  fluid, solid, and tracer particles in `Navier-Stokes Immersed Problem/`.
+- Pick material parameters (`Viscosity`, `Density`, `Lame mu`, `Lame lambda`)
+  consistent with the intended test.
+- Prescribe boundary data in `Navier-Stokes boundary conditions` and initial
+  conditions for fluid and solid.
+- Set `Number of time steps`, `Final time`, and `Output frequency`.
+
+
+<h3>Compressed disk recovery</h3>
+
+A neo-Hookean disk compressed to $\lambda_0 R$ is released in a quiescent box.
+Record:
+- Position of the disk center over time.
+- Volume of the disk versus cumulative fluid flux across the open boundary.
+- Sensitivity to mesh refinement (`Initial fluid/solid refinement`).
+
+
+<h3>Annulus inflation with a point source</h3>
+
+An annulus immersed in a box is inflated by a mass source at the center. Track:
+- Growth of mean normal stress and deformation of the ring.
+- Difference between injected fluid volume and solid volume loss as an error
+  indicator for different refinement levels.
+
+
+<h3>What to report</h3>
+
+- Plots of the metrics above versus time, including convergence with respect to
+  spatial refinements.
+- Wall-clock timings from `TimerOutput` to compare assembly and solver costs.
+- Notes on stability of the distributed Lagrange multiplier coupling for the
+  chosen parameters.

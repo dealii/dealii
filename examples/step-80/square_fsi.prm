@@ -1,0 +1,94 @@
+set dimension       = 2
+set space dimension = 2
+subsection Navier-Stokes Immersed Problem
+  set Dirichlet boundary ids                = 0
+  set Final time                            = 2
+  set Fluid bounding boxes extraction level = 1
+  set Number of time steps                  = 201
+  set Output directory                      = ./square_test/
+  set Output frequency                      = 1
+  set Particle predictor                    = false
+  subsection Finite element spaces
+    set Velocity            = FE_Q<2>(2)
+    set Pressure            = FE_Q<2>(1)#FE_DGP<2>(1)
+    set Displacement        = FE_Q<2>(1)
+    set Lagrange multiplier = FE_Q<2>(1)
+  end
+  subsection Grid generation
+    set Fluid grid generator                     = hyper_cube
+    set Fluid grid generator arguments           = 0: 1: false
+    set Initial fluid refinement                 = 6
+    set Solid grid generator                     = hyper_rectangle
+    set Solid grid generator arguments           = 0.35, 0.35 : 0.65, 0.65 : false
+    set Initial solid refinement                 = 4
+    set Tracer particle grid generator           = hyper_ball
+    set Tracer particle grid generator arguments = 0.75, 0.85: 0.05: false
+    set Tracer particle insertion refinement     = 3
+  end
+  subsection Initial displacement and multiplier
+    # initial deformation (about (0.5,0.5)): w0 = (-0.4*(x-0.5), +0.4*(y-0.5))  =>  div w0 = -0.4 + 0.4 = 0 exactly.
+    set Function constants  =
+    set Function expression = -0.4*(x - 0.5); 0.4*(y - 0.5); 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes boundary conditions
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes initial conditions
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Navier-Stokes right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Physical properties
+    set Density                   = 1
+    set Lame lambda               = 10
+    set Lame mu                   = 10
+    set Include convective term   = false
+    set Use nonlinear solid model = false
+    set Nonlinear solid gamma     = 1.333
+    set Nonlinear solid eta       = 9.242
+    set Viscosity                 = 0.1
+  end
+  subsection Reference configuration and multiplier
+    set Function constants  =
+    set Function expression = x; y; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 20000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 8
+    set Refinement minimal level       = 5
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Solid right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,t
+  end
+  subsection Solver parameters
+    set Solver type                                = mumps#augmented_split
+    set Use operator augmentation                  = false#true
+    set Coupling quadrature type                   = gauss
+    set Gamma AL background                        = 10
+    set Gamma AL immersed                          = 0.01
+    set Inner Lagrangian solver maximum iterations = 500
+    set Inner Lagrangian solver tolerance          = 1e-2
+    set Log inner Lagrangian iterations            = false
+    set Inner solver maximum iterations            = 100
+    set Inner solver tolerance                     = 1e-14
+    set Outer solver maximum iterations            = 1000
+    set Outer solver tolerance                     = 1e-06
+    set Newton maximum iterations                  = 20
+    set Newton tolerance                           = 1e-8
+  end
+end
