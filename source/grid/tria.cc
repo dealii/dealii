@@ -1553,40 +1553,6 @@ namespace
   }
 
 
-  template <int dim, int spacedim>
-  unsigned int
-  middle_vertex_index(
-    const typename Triangulation<dim, spacedim>::hex_iterator &hex)
-  {
-    switch (static_cast<unsigned char>(hex->refinement_case()))
-      {
-        case RefinementCase<3>::cut_x:
-          return middle_vertex_index<dim, spacedim>(hex->child(0)->quad(1));
-          break;
-        case RefinementCase<3>::cut_y:
-          return middle_vertex_index<dim, spacedim>(hex->child(0)->quad(3));
-          break;
-        case RefinementCase<3>::cut_z:
-          return middle_vertex_index<dim, spacedim>(hex->child(0)->quad(5));
-          break;
-        case RefinementCase<3>::cut_xy:
-          return middle_vertex_index<dim, spacedim>(hex->child(0)->line(11));
-          break;
-        case RefinementCase<3>::cut_xz:
-          return middle_vertex_index<dim, spacedim>(hex->child(0)->line(5));
-          break;
-        case RefinementCase<3>::cut_yz:
-          return middle_vertex_index<dim, spacedim>(hex->child(0)->line(7));
-          break;
-        case RefinementCase<3>::cut_xyz:
-          return hex->child(0)->vertex_index(7);
-          break;
-        default:
-          break;
-      }
-    return numbers::invalid_unsigned_int;
-  }
-
 
   /**
    * Collect all coarse mesh cells
