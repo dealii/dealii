@@ -52,9 +52,15 @@ if(POLICY CMP0167)
 endif()
 
 if(POLICY CMP0177)
-  # Introduced in CMAKE 3:31: Normalize DESTINATION paths so that they do
+  # Introduced in CMake 3:31: Normalize DESTINATION paths so that they do
   # not contain "." or "..".
   cmake_policy(SET CMP0177 NEW)
+endif()
+
+if(POLICY CMP0219)
+  # Introduced in CMake 4.4: macro() invocations preserve backslashes in
+  # arguments.
+  cmake_policy(SET CMP0219 OLD)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules/)
