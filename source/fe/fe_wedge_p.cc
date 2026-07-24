@@ -14,6 +14,7 @@
 
 #include <deal.II/base/polynomials_barycentric.h>
 #include <deal.II/base/qprojector.h>
+#include <deal.II/base/quadrature_lib.h>
 
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nothing.h>
@@ -75,6 +76,122 @@ namespace
 
     return internal::expand<3>({{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
   }
+
+  /**
+   * Helper function that returns a vector that contains the unit cell support
+   * points for FE_WedgePoly.
+   */
+  template <int dim>
+  std::vector<Point<dim>>
+  unit_support_points_fe_wedge_p(const unsigned int degree)
+  {
+    Assert(degree > 0, ExcNotImplemented());
+
+    if constexpr (dim == 3)
+      {
+        std::vector<Point<dim>> unit_points;
+
+        const auto reference_cell = ReferenceCells::Wedge;
+
+        // construct the support points as the tensor product of a triangle and
+        // a line
+        // FE_SimplexP returns equidistant points while FE_Q gives Gauss-Lobatto
+        // points for degree > 2, so the edges of the faces are not compatible
+        // at degree > 2 if the "normal" FE_Q is used here, thus, use an
+        // equidistant FE_Q instead
+        // when FE_SimplexP has electrostatic support points switch to FE_Q
+        // until then assert that we are not at a degree larger than 2
+        Assert(degree < 3, ExcInternalError());
+
+        const FE_SimplexP<1> fe_line(degree);
+        const FE_SimplexP<2> fe_triangle(degree);
+        const FE_Q<2>        fe_quad(QIterated<1>(QTrapezoid<1>(), degree));
+
+        // start with the vertices
+        for (const unsigned int v : reference_cell.vertex_indices())
+          unit_points.push_back(reference_cell.vertex(v));
+
+        // lines
+        for (const unsigned int l : reference_cell.line_indices())
+          {
+            const Point<dim> v0 =
+              reference_cell.vertex(reference_cell.line_to_cell_vertices(l, 0));
+            const Point<dim> v1 =
+              reference_cell.vertex(reference_cell.line_to_cell_vertices(l, 1));
+
+            for (unsigned int i = 0; i < degree - 1; ++i)
+              {
+                // shift the point on the line such that the support points on
+                // the edges are compatible
+                const double distance = fe_line.unit_support_point(
+                  fe_line.get_first_line_index() + i)[0];
+                unit_points.push_back(v0 + distance * (v1 - v0));
+              }
+          }
+
+        // faces
+        for (const unsigned int f : reference_cell.face_indices())
+          {
+            const auto face_reference_cell =
+              reference_cell.face_reference_cell(f);
+
+            const bool is_triangular_face =
+              reference_cell.face_reference_cell(f).is_simplex();
+
+            const unsigned int n_dofs_per_quad =
+              is_triangular_face ? fe_triangle.n_dofs_per_quad() :
+                                   fe_quad.n_dofs_per_quad();
+
+            const std::vector<Point<2>> face_support_points =
+              is_triangular_face ? fe_triangle.get_unit_support_points() :
+                                   fe_quad.get_unit_support_points();
+
+            const unsigned int first_quad_index =
+              is_triangular_face ? fe_triangle.get_first_quad_index() :
+                                   fe_quad.get_first_quad_index();
+
+            // go over all DoFs on the face
+            for (unsigned int i = 0; i < n_dofs_per_quad; ++i)
+              {
+                Point<dim> p;
+                // linear interpolate the point form the vertices of the face
+                // looking at the triangle it is the same as using barycentric
+                // coordinates as the linear shape functions are: 1-x-y, x, y
+                for (unsigned int v = 0; v < face_reference_cell.n_vertices();
+                     ++v)
+                  {
+                    const auto vertex = reference_cell.vertex(
+                      reference_cell.face_to_cell_vertices(
+                        f, v, numbers::default_geometric_orientation));
+
+                    p += face_reference_cell.d_linear_shape_function(
+                           face_support_points[first_quad_index + i], v) *
+                         vertex;
+                  }
+                unit_points.push_back(p);
+              }
+          }
+
+        // interior, this is just the tensor product of the interior nodes of
+        // the triangle with the line
+        for (unsigned int i = 0; i < degree - 1; ++i)
+          for (unsigned int j = 0; j < fe_triangle.n_dofs_per_quad(); ++j)
+            {
+              const double z = fe_line.unit_support_point(
+                fe_line.get_first_line_index() + i)[0];
+
+              const Point<2> x_y = fe_triangle.unit_support_point(
+                fe_triangle.get_first_quad_index() + j);
+
+              unit_points.push_back(Point<dim>(x_y[0], x_y[1], z));
+            }
+
+        return unit_points;
+      }
+    else
+      DEAL_II_ASSERT_UNREACHABLE();
+    return {};
+  }
 } // namespace
 
 
@@ -86,7 +203,9 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   const bool                                        prolongation_is_additive,
   const typename FiniteElementData<dim>::Conformity conformity)
   : dealii::FE_Poly<dim, spacedim>(
-      ScalarLagrangePolynomialWedge<dim>(degree),
+      ScalarLagrangePolynomialWedge<dim>(degree,
+                                         unit_support_points_fe_wedge_p<dim>(
+                                           degree)),
       FiniteElementData<dim>(dpos,
                              reinterpret_cast<const ReferenceCell<dim> &>(
                                ReferenceCells::Wedge),
@@ -115,10 +234,9 @@ FE_WedgePoly<dim, spacedim>::FE_WedgePoly(
   Assert(1 <= degree && degree <= 2, ExcNotImplemented());
 
   const FE_SimplexP<2> fe_triangle(degree);
-  const FE_Q<1>        fe_line(degree);
   const FE_Q<2>        fe_quad(degree);
 
-  this->unit_support_points = internal::get_wedge_support_points<dim>(degree);
+  this->unit_support_points = unit_support_points_fe_wedge_p<dim>(degree);
 
   this->unit_face_support_points.resize(this->reference_cell().n_faces());
 
