@@ -180,6 +180,19 @@ namespace TriangulationDescription
     Description();
 
     /**
+     * Reorder coarse-grid cells hierarchically (as also done in
+     * parallel::distributed::Triangulation).
+     */
+    void
+    reorder_coarse_grid();
+
+    /**
+     * Reorder coarse-grid cells.
+     */
+    void
+    reorder_coarse_grid(const std::vector<unsigned int> &new_order);
+
+    /**
      * Read or write the data of this object to or from a stream for the
      * purpose of serialization using the [BOOST serialization
      * library](https://www.boost.org/doc/libs/1_74_0/libs/serialization/doc/index.html).
@@ -509,15 +522,6 @@ namespace TriangulationDescription
       ar &manifold_quad_ids;
     ar &boundary_ids;
   }
-
-
-
-  template <int dim, int spacedim>
-  Description<dim, spacedim>::Description()
-    : comm(MPI_COMM_NULL)
-    , settings(Settings::default_setting)
-    , smoothing(Triangulation<dim, spacedim>::MeshSmoothing::none)
-  {}
 
 
 
