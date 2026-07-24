@@ -1,0 +1,21 @@
+
+DEAL:0:1c/2d/2d/odd-false::dim: 2, spacedim: 2
+DEAL:0:1c/2d/2d/odd-false::Total number of particles: 64
+DEAL:0:1c/2d/3d/odd-false::dim: 2, spacedim: 3
+DEAL:0:1c/2d/3d/odd-false::Total number of particles: 64
+DEAL:0:1c/3d/3d/odd-false::dim: 3, spacedim: 3
+DEAL:0:1c/3d/3d/odd-false::Total number of particles: 512
+DEAL:0:3c/2d/2d/odd-false::dim: 2, spacedim: 2
+DEAL:0:3c/2d/2d/odd-false::Total number of particles: 64
+DEAL:0:3c/2d/3d/odd-false::dim: 2, spacedim: 3
+DEAL:0:3c/2d/3d/odd-false::Total number of particles: 64
+DEAL:0:3c/3d/3d/odd-false::dim: 3, spacedim: 3
+DEAL:0:3c/3d/3d/odd-false::Total number of particles: 512
+DEAL:0:1c/2d/2d/odd-true::dim: 2, spacedim: 2
+DEAL:0:1c/2d/2d/odd-true::Total number of particles: 64
+DEAL:0:1c/2d/3d/odd-true::dim: 2, spacedim: 3
+DEAL:0:1c/2d/3d/odd-true::Total number of particles: 64
+DEAL:0:1c/3d/3d/odd-true::dim: 3, spacedim: 3
+DEAL:0:1c/3d/3d/odd-true::Total number of particles: 512
+
+
