@@ -3054,10 +3054,20 @@ namespace internal
                          .second;
 
             // 2) LINE dofs
-            if (structdim == 2 || structdim == 3)
-              for (const auto line : accessor.line_indices())
-                index +=
-                  process_object_range(*accessor.line(line), fe_index).second;
+            if constexpr (structdim == 2 || structdim == 3)
+              {
+                const auto line_indices = TriaAccessorImplementation::
+                  Implementation::get_line_indices_of_cell(accessor);
+                for (const auto line_no : accessor.line_indices())
+                  {
+                    const DoFAccessor<1, dim, spacedim, level_dof_access> line(
+                      &accessor.get_triangulation(),
+                      0,
+                      line_indices[line_no],
+                      &accessor.get_dof_handler());
+                    index += process_object_range(line, fe_index).second;
+                  }
+              }
 
             // 3) FACE dofs
             if (structdim == 3)
