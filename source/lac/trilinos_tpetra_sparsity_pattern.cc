@@ -391,10 +391,15 @@ namespace LinearAlgebra
         const size_type<MemorySpace> first_row = row_map->getMinGlobalIndex(),
                                      last_row =
                                        row_map->getMaxGlobalIndex() + 1;
-        Teuchos::Array<size_t> n_entries_per_row(last_row - first_row);
 
-        for (size_type<MemorySpace> row = first_row; row < last_row; ++row)
-          n_entries_per_row[row - first_row] = sp.row_length(row);
+        Teuchos::Array<size_t> n_entries_per_row(
+          row_map->getLocalNumElements());
+
+        if (row_map->getLocalNumElements() > 0)
+          {
+            for (size_type<MemorySpace> row = first_row; row < last_row; ++row)
+              n_entries_per_row[row - first_row] = sp.row_length(row);
+          }
 
         AssertThrow(
           std::accumulate(n_entries_per_row.begin(),
@@ -426,26 +431,29 @@ namespace LinearAlgebra
 
         std::vector<TrilinosWrappers::types::int_type> row_indices;
 
-        for (size_type<MemorySpace> row = first_row; row < last_row; ++row)
+        if (row_map->getLocalNumElements() > 0)
           {
-            const TrilinosWrappers::types::int_type row_length =
-              sp.row_length(row);
-            if (row_length == 0)
-              continue;
+            for (size_type<MemorySpace> row = first_row; row < last_row; ++row)
+              {
+                const TrilinosWrappers::types::int_type row_length =
+                  sp.row_length(row);
+                if (row_length == 0)
+                  continue;
 
-            row_indices.resize(row_length, -1);
-            {
-              typename SparsityPatternType::iterator p = sp.begin(row);
-              // avoid incrementing p over the end of the current row because
-              // it is slow for DynamicSparsityPattern in parallel
-              for (int col = 0; col < row_length;)
+                row_indices.resize(row_length, -1);
                 {
-                  row_indices[col++] = p->column();
-                  if (col < row_length)
-                    ++p;
+                  typename SparsityPatternType::iterator p = sp.begin(row);
+                  // avoid incrementing p over the end of the current row
+                  // because it is slow for DynamicSparsityPattern in parallel
+                  for (int col = 0; col < row_length;)
+                    {
+                      row_indices[col++] = p->column();
+                      if (col < row_length)
+                        ++p;
+                    }
                 }
-            }
-            graph->insertGlobalIndices(row, row_length, row_indices.data());
+                graph->insertGlobalIndices(row, row_length, row_indices.data());
+              }
           }
 
         graph->globalAssemble();
