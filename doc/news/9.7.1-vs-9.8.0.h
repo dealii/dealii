@@ -114,7 +114,7 @@ inconvenience this causes.
   Changed: In three space dimensions, the curl of a vector field is unambiguously
   a three-dimensional vector. In two space dimensions, it is typically defined
   as a scalar, interpreted as the magnitude of a vector aligned with the $z$-axis
-  the results from taking the curl of a vector field that lives in the $x-y$ plane.
+  that results from taking the curl of a vector field that lives in the $x-y$ plane.
   For historical reasons, deal.II used to represent this scalar as a Tensor<1,1>
   (i.e., a tensor of rank one -- a tensor with one index -- for which the only
   possible value of the index is zero). This is, of course, entirely equivalent
