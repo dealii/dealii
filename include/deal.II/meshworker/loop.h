@@ -200,7 +200,7 @@ namespace MeshWorker
   /**
    * Collection of parameters to control the execution of MeshWorker loops.
    */
-  class DEAL_II_DEPRECATED_EARLY LoopControl
+  class DEAL_II_DEPRECATED LoopControl
   {
   public:
     /**
@@ -310,7 +310,7 @@ namespace MeshWorker
             int dim,
             int spacedim,
             typename IteratorType>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   cell_action(
     IteratorType              cell,
     DoFInfoBox<dim, DOFINFO> &dof_info,
@@ -558,7 +558,7 @@ namespace MeshWorker
             class INFOBOX,
             typename AssemblerType,
             typename IteratorType>
-  DEAL_II_DEPRECATED_EARLY void
+  DEAL_II_DEPRECATED void
   loop(IteratorType                                             begin,
        std_cxx20::type_identity_t<IteratorType>                 end,
        DOFINFO                                                 &dinfo,

@@ -137,7 +137,7 @@ public:
    *
    * @deprecated Use ReferenceCells::n_vertices_to_reference_cell() instead.
    */
-  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use ReferenceCells::n_vertices_to_reference_cell() instead")
   static ReferenceCell
   n_vertices_to_type(const int dim_, const unsigned int n_vertices);

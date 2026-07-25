@@ -136,20 +136,20 @@ namespace MGTransferGlobalCoarseningTools
 
 
 template <int dim, typename Number>
-using MGTransferMF DEAL_II_DEPRECATED_EARLY = MGTransferMatrixFree<dim, Number>;
+using MGTransferMF DEAL_II_DEPRECATED = MGTransferMatrixFree<dim, Number>;
 
 template <int dim, typename Number>
-using MGTransferBlockMF DEAL_II_DEPRECATED_EARLY =
+using MGTransferBlockMF DEAL_II_DEPRECATED =
   MGTransferBlockMatrixFree<dim, Number>;
 
 template <int dim, typename VectorType>
-using MGTransferGlobalCoarsening DEAL_II_DEPRECATED_EARLY =
+using MGTransferGlobalCoarsening DEAL_II_DEPRECATED =
   MGTransferMatrixFree<dim,
                        typename VectorType::value_type,
                        ::dealii::MemorySpace::Host>;
 
 template <int dim, typename VectorType>
-using MGTransferBlockGlobalCoarsening DEAL_II_DEPRECATED_EARLY =
+using MGTransferBlockGlobalCoarsening DEAL_II_DEPRECATED =
   MGTransferBlockMatrixFree<dim, typename VectorType::value_type>;
 
 

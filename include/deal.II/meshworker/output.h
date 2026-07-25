@@ -51,7 +51,7 @@ namespace MeshWorker
      *
      * @note In the current implementation, only cell data can be written.
      */
-    class DEAL_II_DEPRECATED_EARLY GnuplotPatch
+    class DEAL_II_DEPRECATED GnuplotPatch
     {
     public:
       /**

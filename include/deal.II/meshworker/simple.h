@@ -53,7 +53,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename VectorType>
-    class DEAL_II_DEPRECATED_EARLY ResidualSimple
+    class DEAL_II_DEPRECATED ResidualSimple
     {
     public:
       /**
@@ -146,7 +146,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename MatrixType>
-    class DEAL_II_DEPRECATED_EARLY MatrixSimple
+    class DEAL_II_DEPRECATED MatrixSimple
     {
     public:
       /**
@@ -248,7 +248,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename MatrixType>
-    class DEAL_II_DEPRECATED_EARLY MGMatrixSimple
+    class DEAL_II_DEPRECATED MGMatrixSimple
     {
     public:
       /**
@@ -431,9 +431,8 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename MatrixType, typename VectorType>
-    class DEAL_II_DEPRECATED_EARLY SystemSimple
-      : private MatrixSimple<MatrixType>,
-        private ResidualSimple<VectorType>
+    class DEAL_II_DEPRECATED SystemSimple : private MatrixSimple<MatrixType>,
+                                            private ResidualSimple<VectorType>
     {
     public:
       /**

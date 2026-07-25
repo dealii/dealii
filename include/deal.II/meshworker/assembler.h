@@ -106,7 +106,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename VectorType>
-    class DEAL_II_DEPRECATED_EARLY ResidualLocalBlocksToGlobalBlocks
+    class DEAL_II_DEPRECATED ResidualLocalBlocksToGlobalBlocks
     {
     public:
       /**
@@ -205,7 +205,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename MatrixType, typename number = double>
-    class DEAL_II_DEPRECATED_EARLY MatrixLocalBlocksToGlobalBlocks
+    class DEAL_II_DEPRECATED MatrixLocalBlocksToGlobalBlocks
     {
     public:
       /**
@@ -320,7 +320,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename MatrixType, typename number = double>
-    class DEAL_II_DEPRECATED_EARLY MGMatrixLocalBlocksToGlobalBlocks
+    class DEAL_II_DEPRECATED MGMatrixLocalBlocksToGlobalBlocks
     {
     public:
       using MatrixPtrVector = MGMatrixBlockVector<MatrixType>;

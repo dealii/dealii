@@ -43,7 +43,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename number = double>
-    class DEAL_II_DEPRECATED_EARLY Functional
+    class DEAL_II_DEPRECATED Functional
     {
     public:
       /**
@@ -100,7 +100,7 @@ namespace MeshWorker
      * @ingroup MeshWorker
      */
     template <typename number = double>
-    class DEAL_II_DEPRECATED_EARLY CellsAndFaces
+    class DEAL_II_DEPRECATED CellsAndFaces
     {
     public:
       /**

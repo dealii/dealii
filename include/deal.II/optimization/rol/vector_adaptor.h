@@ -31,7 +31,7 @@ namespace Rol
    * @deprecated Use TrilinosWrappers::ROLAdaptor instead.
    */
   template <typename VectorType>
-  using VectorAdaptor DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+  using VectorAdaptor DEAL_II_DEPRECATED_WITH_COMMENT(
     "Use dealii::TrilinosWrappers::ROLAdaptor instead.") =
     dealii::TrilinosWrappers::ROLAdaptor<VectorType>;
 } // namespace Rol

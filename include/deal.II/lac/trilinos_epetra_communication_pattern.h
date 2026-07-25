@@ -40,7 +40,7 @@ namespace LinearAlgebra
      * for use in places where a Utilities::MPI::CommunicationPatternBase object
      * is required.
      */
-    class DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    class DEAL_II_DEPRECATED_WITH_COMMENT(
       "Transition to functionality provided in TrilinosWrappers or TpetraWrappers!")
       CommunicationPattern : public Utilities::MPI::CommunicationPatternBase
     {

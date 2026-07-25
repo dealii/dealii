@@ -67,7 +67,7 @@ namespace Algorithms
    * residual"</tt> is inserted before <tt>"Newton iterate"</tt>.
    */
   template <typename VectorType>
-  class DEAL_II_DEPRECATED_EARLY Newton : public OperatorBase
+  class DEAL_II_DEPRECATED Newton : public OperatorBase
   {
   public:
     /**
