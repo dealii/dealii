@@ -34,26 +34,64 @@ namespace
   internal::GenericDoFsPerObject
   get_dpo_vector_fe_wedge_p(const unsigned int degree)
   {
+    Assert(degree > 0, ExcNotImplemented());
+
     internal::GenericDoFsPerObject dpo;
 
-    if (degree == 1)
-      {
-        dpo.dofs_per_object_exclusive  = {{1}, {0}, {0, 0, 0, 0, 0}, {0}};
-        dpo.dofs_per_object_inclusive  = {{1}, {2}, {3, 3, 4, 4, 4}, {6}};
-        dpo.object_index               = {{}, {6}, {6}, {6}};
-        dpo.first_object_index_on_face = {{}, {3, 3, 4, 4, 4}, {3, 3, 4, 4, 4}};
-      }
-    else if (degree == 2)
-      {
-        dpo.dofs_per_object_exclusive  = {{1}, {1}, {0, 0, 1, 1, 1}, {0}};
-        dpo.dofs_per_object_inclusive  = {{1}, {3}, {6, 6, 9, 9, 9}, {18}};
-        dpo.object_index               = {{}, {6}, {15, 15, 15, 16, 17}, {18}};
-        dpo.first_object_index_on_face = {{}, {3, 3, 4, 4, 4}, {6, 6, 8, 8, 8}};
-      }
-    else
-      {
-        DEAL_II_NOT_IMPLEMENTED();
-      }
+    const unsigned int n_dofs_total =
+      (degree + 1) * (degree + 1) * (degree + 2) / 2;
+
+    const unsigned int n_dofs_per_line = degree - 1;
+
+    const unsigned int n_dofs_per_tri =
+      degree > 1 ? (degree - 2) * (degree - 1) / 2 : 0;
+
+    const unsigned int n_dofs_per_quad = (degree - 1) * (degree - 1);
+
+    const unsigned int n_dof_per_volume =
+      n_dofs_total - 6 - 9 * n_dofs_per_line - 2 * n_dofs_per_tri -
+      3 * n_dofs_per_quad;
+
+    const unsigned int n_dof_per_tri_inclusive =
+      (degree + 1) * (degree + 2) / 2;
+
+    const unsigned int n_dofs_per_quad_inclusive = (degree + 1) * (degree + 1);
+
+    dpo.dofs_per_object_exclusive = {{1},
+                                     {n_dofs_per_line},
+                                     {n_dofs_per_tri,
+                                      n_dofs_per_tri,
+                                      n_dofs_per_quad,
+                                      n_dofs_per_quad,
+                                      n_dofs_per_quad},
+                                     {n_dof_per_volume}};
+
+    dpo.dofs_per_object_inclusive = {{1},
+                                     {n_dofs_per_line + 2},
+                                     {n_dof_per_tri_inclusive,
+                                      n_dof_per_tri_inclusive,
+                                      n_dofs_per_quad_inclusive,
+                                      n_dofs_per_quad_inclusive,
+                                      n_dofs_per_quad_inclusive},
+                                     {n_dofs_total}};
+
+    dpo.object_index = {
+      {},
+      {6},
+      {6 + 9 * n_dofs_per_line,
+       6 + 9 * n_dofs_per_line + n_dofs_per_tri,
+       6 + 9 * n_dofs_per_line + 2 * n_dofs_per_tri,
+       6 + 9 * n_dofs_per_line + 2 * n_dofs_per_tri + n_dofs_per_quad,
+       6 + 9 * n_dofs_per_line + 2 * n_dofs_per_tri + 2 * n_dofs_per_quad},
+      {6 + 9 * n_dofs_per_line + 2 * n_dofs_per_tri + 3 * n_dofs_per_quad}};
+
+    dpo.first_object_index_on_face = {{},
+                                      {3, 3, 4, 4, 4},
+                                      {3 + 3 * n_dofs_per_line,
+                                       3 + 3 * n_dofs_per_line,
+                                       4 + 4 * n_dofs_per_line,
+                                       4 + 4 * n_dofs_per_line,
+                                       4 + 4 * n_dofs_per_line}};
 
     return dpo;
   }
@@ -64,14 +102,9 @@ namespace
   internal::GenericDoFsPerObject
   get_dpo_vector_fe_wedge_dgp(const unsigned int degree)
   {
-    unsigned int n_dofs = 0;
+    Assert(degree > 0, ExcNotImplemented());
 
-    if (degree == 1)
-      n_dofs = 6;
-    else if (degree == 2)
-      n_dofs = 18;
-    else
-      DEAL_II_NOT_IMPLEMENTED();
+    const unsigned int n_dofs = (degree + 1) * (degree + 1) * (degree + 2) / 2;
 
     return internal::expand<3>({{0, 0, 0, n_dofs}}, ReferenceCells::Wedge);
   }
