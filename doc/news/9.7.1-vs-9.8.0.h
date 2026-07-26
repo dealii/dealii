@@ -114,14 +114,14 @@ inconvenience this causes.
   Changed: In three space dimensions, the curl of a vector field is unambiguously
   a three-dimensional vector. In two space dimensions, it is typically defined
   as a scalar, interpreted as the magnitude of a vector aligned with the $z$-axis
-  that results from taking the curl of a vector field that lives in the $x-y$ plane.
+  that results from taking the curl of a vector field that lives in the $x$-$y$ plane.
   For historical reasons, deal.II used to represent this scalar as a Tensor<1,1>
   (i.e., a tensor of rank one -- a tensor with one index -- for which the only
   possible value of the index is zero). This is, of course, entirely equivalent
   to it being a scalar, but it is semantically wrong: The data type should have
-  been a scalar, not an array of which one can take the zeroth element. This is
+  been a scalar, not a vector with one element. This is
   now fixed: The data type defined by FEValuesViews::Vector::curl_type used for
-  curls is not simply a scalar value for `dim==2`. For `dim==3`, it is
+  curls is now simply a scalar value for `dim==2`. For `dim==3`, it is
   unchanged from what it was before.
   <br>
   (Wolfgang Bangerth, 2026/03/31)
@@ -138,7 +138,7 @@ inconvenience this causes.
  </li>
 
  <li>
-  Deprecated: Overloads for TrilinosWrappers classes allowing a default number of
+  Deprecated: Overloads for TrilinosWrappers sparse matrix classes allowing a default number of
   entries per row have been deprecated. The respective overloads for TpetraWrappers
   classes have been removed.
   <br>
@@ -166,7 +166,7 @@ inconvenience this causes.
   elements need to be treated as unchangeable. This is because whenever
   you change a locally-owned element of such a vector, this change is
   not propagated to those processes that store this element among their
-  ghost elements. As a consequence, these processes view of the vector
+  ghost elements; these processes' view of the vector
   is now no longer in sync with the view on that process that owns the
   element, and that is a common source of very hard to find bugs.
   <br>
