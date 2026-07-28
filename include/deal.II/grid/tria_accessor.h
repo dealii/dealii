@@ -4134,6 +4134,18 @@ public:
   point_inside(const Point<spacedim> &p) const;
 
   /**
+   * Set the neighbor @p i of this cell to the cell pointed to by @p pointer.
+   *
+   * This function shouldn't really be public (but needs to for various
+   * reasons in order not to make a long list of functions friends): it
+   * modifies internal data structures and may leave things. Do not use it
+   * from application codes.
+   */
+  void
+  set_neighbor(const unsigned int                               i,
+               const TriaIterator<CellAccessor<dim, spacedim>> &pointer) const;
+
+  /**
    * Return all cells adjacent to line @p i of this cell.
    *
    * @note This information is not computed by default, as the computation

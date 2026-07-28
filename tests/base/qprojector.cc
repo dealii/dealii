@@ -62,10 +62,11 @@ check_face(Quadrature<1> &q1)
     {
       deallog << "Face " << f << std::endl;
 
-      Quadrature<dim> quadrature =
-        QProjector<dim>::project_to_face(ReferenceCells::get_hypercube<dim>(),
-                                         subquadrature,
-                                         f);
+      Quadrature<dim> quadrature = QProjector<dim>::project_to_face(
+        ReferenceCells::get_hypercube<dim>(),
+        subquadrature,
+        f,
+        numbers::default_geometric_orientation);
       for (unsigned int k = 0; k < quadrature.size(); ++k)
         deallog << quadrature.point(k) << std::endl;
     }
@@ -75,10 +76,11 @@ check_face(Quadrature<1> &q1)
       {
         deallog << "Face " << f << " subface " << s << std::endl;
 
-        Quadrature<dim> quadrature =
-          QProjector<dim>::project_to_face(ReferenceCells::get_hypercube<dim>(),
-                                           subquadrature,
-                                           f);
+        Quadrature<dim> quadrature = QProjector<dim>::project_to_face(
+          ReferenceCells::get_hypercube<dim>(),
+          subquadrature,
+          f,
+          numbers::default_geometric_orientation);
         for (unsigned int k = 0; k < quadrature.size(); ++k)
           deallog << quadrature.point(k) << std::endl;
       }
@@ -105,7 +107,10 @@ check_faces(Quadrature<1> &q1)
       deallog << "Face " << f << " orientation false" << std::endl;
 
       unsigned int offset = QProjector<dim>::DataSetDescriptor::face(
-        ReferenceCells::get_hypercube<dim>(), f, false, false, false, nqs);
+        ReferenceCells::get_hypercube<dim>(),
+        f,
+        internal::combined_face_orientation(false, false, false),
+        nqs);
 
       for (unsigned int k = 0; k < nqs; ++k)
         deallog << faces.point(offset + k) << std::endl;
@@ -113,7 +118,10 @@ check_faces(Quadrature<1> &q1)
       deallog << "Face " << f << " orientation true" << std::endl;
 
       offset = QProjector<dim>::DataSetDescriptor::face(
-        ReferenceCells::get_hypercube<dim>(), f, true, false, false, nqs);
+        ReferenceCells::get_hypercube<dim>(),
+        f,
+        internal::combined_face_orientation(true, false, false),
+        nqs);
 
       for (unsigned int k = 0; k < nqs; ++k)
         deallog << faces.point(offset + k) << std::endl;

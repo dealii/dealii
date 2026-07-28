@@ -1885,17 +1885,6 @@ public:
   get_mpi_communicator() const;
 
   /**
-   * Return the MPI communicator used by this triangulation. In the case of
-   * a serial Triangulation object, MPI_COMM_SELF is returned.
-   *
-   * @deprecated Use get_mpi_communicator() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Access the MPI communicator with get_mpi_communicator() instead.")
-  MPI_Comm
-  get_communicator() const;
-
-  /**
    * Return the partitioner for the global indices of the cells on the active
    * level of the triangulation, which is returned by the function
    * CellAccessor::global_active_cell_index().

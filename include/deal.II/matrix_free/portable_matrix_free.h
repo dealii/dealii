@@ -393,22 +393,6 @@ namespace Portable
       Kokkos::Array<SharedData<dim, Number>, n_max_dof_handlers> &shared_data;
 
       /**
-       * Return the quadrature point index local. The index is
-       * only unique for a given MPI process.
-       *
-       * @deprecated Use local_q_point_id() with two arguments instead.
-       */
-      DEAL_II_DEPRECATED DEAL_II_HOST_DEVICE unsigned int
-      local_q_point_id(const unsigned int cell,
-                       const unsigned int n_q_points_,
-                       const unsigned int q_point) const
-      {
-        Assert(n_q_points_ == n_q_points,
-               ExcMessage("Incorrect argument value: n_q_points"));
-        return local_q_point_id(cell, q_point);
-      }
-
-      /**
        * Return the quadrature point index of the given cell and @p q_point index.
        * The index returned is only unique for a given MPI process.
        */

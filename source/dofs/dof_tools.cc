@@ -1621,7 +1621,7 @@ namespace DoFTools
         mg_level == numbers::invalid_unsigned_int ?
           DoFTools::extract_locally_active_dofs(dof_handler) :
           DoFTools::extract_locally_active_level_dofs(dof_handler, mg_level),
-        dof_handler.get_communicator());
+        dof_handler.get_mpi_communicator());
 
       for (unsigned int i = 0; i < n_modes; ++i)
         {

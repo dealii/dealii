@@ -133,9 +133,6 @@ transfer(std::ostream &out)
 
   // test b): do some coarsening and
   // refinement
-  q_soltrans.clear();
-  dgq_soltrans.clear();
-
   counter = 0;
   cell    = tria.begin_active();
   endc    = tria.end();

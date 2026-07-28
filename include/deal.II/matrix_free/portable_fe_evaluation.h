@@ -281,26 +281,6 @@ namespace Portable
     submit_symmetric_gradient(const SymmetricTensor<2, dim, Number> &sym_grad,
                               const int                              q_point);
 
-    // clang-format off
-    /**
-     * Apply the functor @p func to each quadrature point in parallel.
-     * The functor is invoked with the FEEvaluation object and the quadrature
-     * point index as arguments.
-     *
-     * @p func needs to define
-     * \code
-     * DEAL_II_HOST_DEVICE void operator()(
-     *   Portable::FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number> *fe_eval,
-     *   int q_point) const;
-     * \endcode
-     *
-     * @deprecated Use MatrixFree::Data::for_each_quad_point() instead.
-     */
-    // clang-format on
-    template <typename Functor>
-    DEAL_II_DEPRECATED DEAL_II_HOST_DEVICE void
-    apply_for_each_quad_point(const Functor &func);
-
   private:
     const unsigned int                                       dof_handler_index;
     const typename MatrixFree<dim, Number>::Data            *data;
@@ -860,23 +840,6 @@ namespace Portable
           shared_data->gradients(q_point, d_1, c) =
             tmp * precomputed_data->JxW(q_point, cell_id);
         }
-  }
-
-
-
-  template <int dim,
-            int fe_degree,
-            int n_q_points_1d,
-            int n_components_,
-            typename Number>
-  template <typename Functor>
-  DEAL_II_HOST_DEVICE void
-  FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
-    apply_for_each_quad_point(const Functor &func)
-  {
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member, n_q_points),
-                         [&](const int &i) { func(this, i); });
-    data->team_member.team_barrier();
   }
 
 

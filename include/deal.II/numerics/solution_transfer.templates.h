@@ -512,15 +512,6 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
 
 
 
-template <int dim, typename VectorType, int spacedim>
-void
-SolutionTransfer<dim, VectorType, spacedim>::clear()
-{
-  // nothing to do
-}
-
-
-
 namespace Legacy
 {
 

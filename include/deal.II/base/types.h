@@ -180,14 +180,6 @@ namespace types
    * @ref GlossMaterialId "Glossary entry on material indicators"
    */
   using material_id = unsigned int;
-
-  /**
-   * The type used to denote geometric entity types.
-   *
-   * @deprecated This type was previously only used in library internals and is
-   * deprecated without replacement.
-   */
-  using geometric_entity_type DEAL_II_DEPRECATED = std::uint8_t;
 } // namespace types
 
 /**

@@ -130,97 +130,6 @@ namespace Utilities
     namespace ConsensusAlgorithms
     {
       /**
-       * A base class for concrete implementations of classes that
-       * provide the information that the algorithms derived from
-       * the ConsensusAlgorithms::Interface base class require. The main
-       * functionality of this class is to return a list of process
-       * ranks this process wants data from and to deal with the optional
-       * payload of the messages sent/received by the ConsensusAlgorithm
-       * classes.
-       *
-       * There are two kinds of messages:
-       * - send/request message: A message consisting of a data request
-       *   which should be answered by another process. This message is
-       *   considered as a request message by the receiving rank.
-       * - receive message: The answer to a send/request message.
-       *
-       * @tparam RequestType The type of the elements of the vector to sent.
-       * @tparam AnswerType The type of the elements of the vector to received.
-       *
-       * @note Since the payloads of the messages are optional, users have
-       *    to deal with buffers themselves. The ConsensusAlgorithm classes
-       *    (1) deliver only references to empty vectors (of size 0) the data
-       *    to be sent can be inserted to or read from, and (2) communicate
-       *    these vectors blindly.
-       *
-       * @deprecated Instead of deriving a class from this base class and
-       *   providing a corresponding object to one of the run() functions,
-       *   use the free functions in this namespace that take function
-       *   objects as arguments.
-       */
-      template <typename RequestType, typename AnswerType>
-      class DEAL_II_DEPRECATED Process
-      {
-      public:
-        /**
-         * Destructor. Made `virtual` to ensure that one can work with
-         * derived classes.
-         */
-        virtual ~Process() = default;
-
-        /**
-         * @return A vector of ranks this process wants to send a request to.
-         *
-         * @note This is the only method which has to be implemented since the
-         *       payloads of the messages are optional.
-         */
-        virtual std::vector<unsigned int>
-        compute_targets() = 0;
-
-        /**
-         * Add a payload to the request to the process with the specified rank.
-         *
-         * @param[in]  other_rank Rank of the process.
-         * @param[out] send_buffer data to be sent part of the request
-         * (optional).
-         *
-         * @note The buffer is empty. Before using it, you have to set its size.
-         */
-        virtual void
-        create_request(const unsigned int other_rank, RequestType &send_buffer);
-
-        /**
-         * Prepare the buffer where the payload of the answer of the request to
-         * the process with the specified rank is saved in.
-         *
-         * @param[in]  other_rank Rank of the process.
-         * @param[in]  buffer_recv Received payload (optional).
-         * @param[out] request_buffer Payload to be sent as part of the request
-         *             (optional).
-         *
-         * @note The request_buffer is empty. Before using it, you have to set
-         *       its size.
-         */
-        virtual void
-        answer_request(const unsigned int other_rank,
-                       const RequestType &buffer_recv,
-                       AnswerType        &request_buffer);
-
-        /**
-         * Process the payload of the answer of the request to the process with
-         * the specified rank.
-         *
-         * @param[in] other_rank rank of the process
-         * @param[in] recv_buffer data to be sent part of the request (optional)
-         */
-        virtual void
-        read_answer(const unsigned int other_rank,
-                    const AnswerType  &recv_buffer);
-      };
-
-
-
-      /**
        * A base class for algorithms that implement consensus algorithms,
        * see the documentation of the surrounding namespace for more
        * information.
@@ -247,25 +156,6 @@ namespace Utilities
          * derived classes.
          */
         virtual ~Interface() = default;
-
-        DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-        /**
-         * Run the consensus algorithm and return a vector of process ranks
-         * that have requested answers from the current process.
-         *
-         * This version of the run() function simply unpacks the functions
-         * packaged in `process` and calls the version of the run() function
-         * that takes a number of `std::function` arguments.
-         *
-         * @deprecated Instead of deriving a class from the Process base class and
-         *   providing a corresponding object to this function,
-         *   use the other run() function in this class that takes function
-         *   objects as arguments.
-         */
-        DEAL_II_DEPRECATED
-        std::vector<unsigned int>
-        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm);
-        DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
         /**
          * Run the consensus algorithm and return a vector of process ranks
@@ -328,13 +218,6 @@ namespace Utilities
          * Destructor.
          */
         virtual ~NBX() = default;
-
-        DEAL_II_DEPRECATED
-        std::vector<unsigned int>
-        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
-        {
-          return Interface<RequestType, AnswerType>::run(process, comm);
-        }
 
         /**
          * @copydoc Interface::run()
@@ -583,13 +466,6 @@ namespace Utilities
          */
         virtual ~PEX() = default;
 
-        DEAL_II_DEPRECATED
-        std::vector<unsigned int>
-        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
-        {
-          return Interface<RequestType, AnswerType>::run(process, comm);
-        }
-
         /**
          * @copydoc Interface::run()
          */
@@ -802,13 +678,6 @@ namespace Utilities
          */
         Serial() = default;
 
-        DEAL_II_DEPRECATED
-        std::vector<unsigned int>
-        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
-        {
-          return Interface<RequestType, AnswerType>::run(process, comm);
-        }
-
         /**
          * @copydoc Interface::run()
          */
@@ -933,13 +802,6 @@ namespace Utilities
          * Destructor.
          */
         virtual ~Selector() = default;
-
-        DEAL_II_DEPRECATED
-        std::vector<unsigned int>
-        run(Process<RequestType, AnswerType> &process, const MPI_Comm comm)
-        {
-          return Interface<RequestType, AnswerType>::run(process, comm);
-        }
 
         /**
          * @copydoc Interface::run()
@@ -1393,68 +1255,6 @@ namespace Utilities
 #  endif
         }
       } // namespace internal
-
-
-
-      template <typename RequestType, typename AnswerType>
-      void
-      Process<RequestType, AnswerType>::answer_request(const unsigned int,
-                                                       const RequestType &,
-                                                       AnswerType &)
-      {
-        // nothing to do
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      void
-      Process<RequestType, AnswerType>::create_request(const unsigned int,
-                                                       RequestType &)
-      {
-        // nothing to do
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      void
-      Process<RequestType, AnswerType>::read_answer(const unsigned int,
-                                                    const AnswerType &)
-      {
-        // nothing to do
-      }
-
-
-
-      template <typename RequestType, typename AnswerType>
-      std::vector<unsigned int>
-      Interface<RequestType, AnswerType>::run(
-        Process<RequestType, AnswerType> &process,
-        const MPI_Comm                    comm)
-      {
-        // Unpack the 'process' object and call the function that takes
-        // function objects for all operations.
-        return run(
-          process.compute_targets(),
-          /* create_request: */
-          [&process](const unsigned int target) {
-            RequestType request;
-            process.create_request(target, request);
-            return request;
-          },
-          /* answer_request: */
-          [&process](const unsigned int source, const RequestType &request) {
-            AnswerType answer;
-            process.answer_request(source, request, answer);
-            return answer;
-          },
-          /* process_answer: */
-          [&process](const unsigned int target, const AnswerType &answer) {
-            process.read_answer(target, answer);
-          },
-          comm);
-      }
 
 
 

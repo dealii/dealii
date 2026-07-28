@@ -200,46 +200,6 @@ template <int spacedim>
 template <typename Number>
 void
 KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim>    &mapping,
-  const DoFHandler<1, spacedim> &dof_handler,
-  const hp::QCollection<0>      &quadrature,
-  const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                           &neumann_bc,
-  const ReadVector<Number> &solution,
-  Vector<float>            &error,
-  const ComponentMask      &component_mask,
-  const Function<spacedim> *coefficients,
-  const unsigned int        n_threads,
-  const types::subdomain_id subdomain_id,
-  const types::material_id  material_id,
-  const Strategy            strategy)
-{
-  // DEPRECATED
-  // just pass on to the other function
-  std::vector<const ReadVector<Number> *>  solutions(1, &solution);
-  std::vector<Vector<float> *>             errors(1, &error);
-  ArrayView<Vector<float> *>               error_view = make_array_view(errors);
-  const hp::MappingCollection<1, spacedim> mapping_collection(mapping);
-  estimate(mapping_collection,
-           dof_handler,
-           quadrature,
-           neumann_bc,
-           make_array_view(solutions),
-           error_view,
-           component_mask,
-           coefficients,
-           n_threads,
-           subdomain_id,
-           material_id,
-           strategy);
-}
-
-
-
-template <int spacedim>
-template <typename Number>
-void
-KellyErrorEstimator<1, spacedim>::estimate(
   const DoFHandler<1, spacedim> &dof_handler,
   const hp::QCollection<0>      &quadrature,
   const std::map<types::boundary_id, const Function<spacedim, Number> *>
@@ -559,43 +519,6 @@ KellyErrorEstimator<1, spacedim>::estimate(
           (*errors[s])(cell->active_cell_index()) =
             std::sqrt((*errors[s])(cell->active_cell_index()));
       }
-}
-
-
-
-template <int spacedim>
-template <typename Number>
-void
-KellyErrorEstimator<1, spacedim>::estimate(
-  const Mapping<1, spacedim>    &mapping,
-  const DoFHandler<1, spacedim> &dof_handler,
-  const hp::QCollection<0>      &quadrature,
-  const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                                              &neumann_bc,
-  const ArrayView<const ReadVector<Number> *> &solutions,
-  ArrayView<Vector<float> *>                  &errors,
-  const ComponentMask                         &component_mask,
-  const Function<spacedim>                    *coefficients,
-  const unsigned int                           n_threads,
-  const types::subdomain_id                    subdomain_id,
-  const types::material_id                     material_id,
-  const Strategy                               strategy)
-{
-  // DEPRECATED
-  // just pass on to the other function
-  const hp::MappingCollection<1, spacedim> mapping_collection(mapping);
-  estimate(mapping_collection,
-           dof_handler,
-           quadrature,
-           neumann_bc,
-           solutions,
-           errors,
-           component_mask,
-           coefficients,
-           n_threads,
-           subdomain_id,
-           material_id,
-           strategy);
 }
 
 

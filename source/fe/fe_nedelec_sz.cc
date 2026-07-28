@@ -1823,7 +1823,6 @@ FE_NedelecSZ<dim, spacedim>::fill_edge_values(
                     if (line_neighbor_is_coarser[line])
                       continue;
 
-
                     const int cell_level = cell->level();
                     for (auto &neighbor_cell :
                          cell->get_cells_adjacent_to_line(line))
