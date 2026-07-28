@@ -63,7 +63,7 @@ test(const unsigned int degree)
       create_description_from_triangulation_in_groups<dim, dim>(
         serial_grid_generator,
         serial_grid_partitioner,
-        tria.get_communicator(),
+        tria.get_mpi_communicator(),
         group_size,
         dealii::Triangulation<dim>::none,
         triangulation_description_setting);

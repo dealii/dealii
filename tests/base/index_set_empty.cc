@@ -53,9 +53,7 @@ test()
       deallog << "Not OK" << std::endl;
     }
 
-  index_set.pop_back();
-  index_set.pop_back();
-  index_set.pop_back();
+  index_set.clear();
 
   if (index_set.is_empty() == (index_set.n_elements() == 0))
     {

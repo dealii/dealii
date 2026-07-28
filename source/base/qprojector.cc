@@ -31,75 +31,6 @@ namespace internal
     namespace
     {
       /**
-       * Internal function to translate a 2-dimensional quadrature formula to
-       * a 3-dimensional quadrature formula on hex elements, addressing both
-       * standard faces (FEFaceValues) and subfaces (FESubfaceValues),
-       * depending on the given refinement case and subface.
-       */
-      void
-      project_to_hex_face_and_append(
-        const std::vector<Point<2>> &points,
-        const unsigned int           face_no,
-        std::vector<Point<3>>       &q_points,
-        const RefinementCase<2> &ref_case   = RefinementCase<2>::no_refinement,
-        const unsigned int       subface_no = 0)
-      {
-        // one coordinate is at a const value. for faces 0, 2 and 4 this value
-        // is 0.0, for faces 1, 3 and 5 it is 1.0
-        const double const_value = face_no % 2;
-
-        // local 2d coordinates are xi and eta, global 3d coordinates are x, y
-        // and z. those have to be mapped. the following indices tell, which
-        // global coordinate (0->x, 1->y, 2->z) corresponds to which local one
-        const unsigned int xi_index    = (1 + face_no / 2) % 3,
-                           eta_index   = (2 + face_no / 2) % 3,
-                           const_index = face_no / 2;
-
-        // for a standard face (no refinement), we use the default values of
-        // the xi and eta scales and translations, otherwise the xi and eta
-        // values will be scaled (by factor 0.5 or factor 1.0) depending on
-        // the refinement case and translated (by 0.0 or 0.5) depending on the
-        // refinement case and subface_no
-        double xi_scale = 1.0, eta_scale = 1.0, xi_translation = 0.0,
-               eta_translation = 0.0;
-
-        // set the scale and translation parameter for individual subfaces
-        switch (ref_case)
-          {
-            case RefinementCase<2>::no_refinement:
-              break;
-            case RefinementCase<2>::cut_x:
-              xi_scale       = 0.5;
-              xi_translation = subface_no % 2 * 0.5;
-              break;
-            case RefinementCase<2>::cut_y:
-              eta_scale       = 0.5;
-              eta_translation = subface_no % 2 * 0.5;
-              break;
-            case RefinementCase<2>::cut_xy:
-              xi_scale        = 0.5;
-              eta_scale       = 0.5;
-              xi_translation  = int(subface_no % 2) * 0.5;
-              eta_translation = int(subface_no / 2) * 0.5;
-              break;
-            default:
-              DEAL_II_ASSERT_UNREACHABLE();
-              break;
-          }
-
-        // finally, compute the scaled, translated, projected quadrature
-        // points
-        for (const Point<2> &p : points)
-          {
-            Point<3> cell_point;
-            cell_point[xi_index]    = xi_scale * p[0] + xi_translation;
-            cell_point[eta_index]   = eta_scale * p[1] + eta_translation;
-            cell_point[const_index] = const_value;
-            q_points.push_back(cell_point);
-          }
-      }
-
-      /**
        * Append the points and weights of a quadrature rule projected onto a
        * subobject (either face or subface) to the end of two vectors. These
        * vectors should ultimately be indexed with a
@@ -173,84 +104,6 @@ namespace internal
 
 
 
-template <>
-void
-QProjector<1>::project_to_face(const ReferenceCell<1> &reference_cell,
-                               const Quadrature<0>    &quadrature,
-                               const unsigned int      face_no,
-                               std::vector<Point<1>>  &q_points)
-{
-  AssertDimension(quadrature.size(), q_points.size());
-  const auto face_quadrature =
-    QProjector<1>::project_to_face(reference_cell,
-                                   quadrature,
-                                   face_no,
-                                   numbers::default_geometric_orientation);
-  q_points = face_quadrature.get_points();
-}
-
-
-
-template <>
-void
-QProjector<2>::project_to_face(const ReferenceCell<2> &reference_cell,
-                               const Quadrature<1>    &quadrature,
-                               const unsigned int      face_no,
-                               std::vector<Point<2>>  &q_points)
-{
-  AssertDimension(quadrature.size(), q_points.size());
-  const auto face_quadrature =
-    QProjector<2>::project_to_face(reference_cell,
-                                   quadrature,
-                                   face_no,
-                                   numbers::default_geometric_orientation);
-  q_points = face_quadrature.get_points();
-}
-
-
-
-template <>
-void
-QProjector<3>::project_to_face(const ReferenceCell<3> &reference_cell,
-                               const Quadrature<2>    &quadrature,
-                               const unsigned int      face_no,
-                               std::vector<Point<3>>  &q_points)
-{
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-  (void)reference_cell;
-
-  AssertIndexRange(face_no, GeometryInfo<3>::faces_per_cell);
-  Assert(q_points.size() == quadrature.size(),
-         ExcDimensionMismatch(q_points.size(), quadrature.size()));
-  q_points.clear();
-  internal::QProjector::project_to_hex_face_and_append(quadrature.get_points(),
-                                                       face_no,
-                                                       q_points);
-}
-
-
-
-template <int dim>
-Quadrature<dim>
-QProjector<dim>::project_to_oriented_face(
-  const ReferenceCell<dim>  &reference_cell,
-  const Quadrature<dim - 1> &quadrature,
-  const unsigned int         face_no,
-  const bool                 face_orientation,
-  const bool                 face_flip,
-  const bool                 face_rotation)
-{
-  return QProjector<dim>::project_to_face(
-    reference_cell,
-    quadrature,
-    face_no,
-    internal::combined_face_orientation(face_orientation,
-                                        face_rotation,
-                                        face_flip));
-}
-
-
-
 template <int dim>
 Quadrature<dim>
 QProjector<dim>::project_to_face(
@@ -285,95 +138,6 @@ QProjector<dim>::project_to_face(
                                               weights);
 
   return Quadrature<dim>(std::move(points), std::move(weights));
-}
-
-
-
-template <>
-void
-QProjector<1>::project_to_subface(const ReferenceCell<1> &reference_cell,
-                                  const Quadrature<0> &,
-                                  const unsigned int face_no,
-                                  const unsigned int,
-                                  std::vector<Point<1>> &q_points,
-                                  const RefinementCase<0> &)
-{
-  Assert(reference_cell == ReferenceCells::Line, ExcNotImplemented());
-  (void)reference_cell;
-
-  const unsigned int dim = 1;
-  AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-  AssertDimension(q_points.size(), 1);
-
-  q_points[0] = Point<dim>(static_cast<double>(face_no));
-}
-
-
-
-template <>
-void
-QProjector<2>::project_to_subface(const ReferenceCell<2>  &reference_cell,
-                                  const Quadrature<1>     &quadrature,
-                                  const unsigned int       face_no,
-                                  const unsigned int       subface_no,
-                                  std::vector<Point<2>>   &q_points,
-                                  const RefinementCase<1> &ref_case)
-{
-  AssertDimension(quadrature.size(), q_points.size());
-  const auto face_quadrature =
-    project_to_subface(reference_cell,
-                       quadrature,
-                       face_no,
-                       subface_no,
-                       numbers::default_geometric_orientation,
-                       ref_case);
-  q_points = face_quadrature.get_points();
-}
-
-
-
-template <>
-void
-QProjector<3>::project_to_subface(const ReferenceCell<3>  &reference_cell,
-                                  const Quadrature<2>     &quadrature,
-                                  const unsigned int       face_no,
-                                  const unsigned int       subface_no,
-                                  std::vector<Point<3>>   &q_points,
-                                  const RefinementCase<2> &ref_case)
-{
-  Assert(reference_cell == ReferenceCells::Hexahedron, ExcNotImplemented());
-  (void)reference_cell;
-  AssertDimension(quadrature.size(), q_points.size());
-  const auto face_quadrature =
-    project_to_subface(reference_cell,
-                       quadrature,
-                       face_no,
-                       subface_no,
-                       numbers::default_geometric_orientation,
-                       ref_case);
-  q_points = face_quadrature.get_points();
-}
-
-
-
-template <int dim>
-Quadrature<dim>
-QProjector<dim>::project_to_oriented_subface(
-  const ReferenceCell<dim>  &reference_cell,
-  const Quadrature<dim - 1> &quadrature,
-  const unsigned int         face_no,
-  const unsigned int         subface_no,
-  const bool,
-  const bool,
-  const bool,
-  const internal::SubfaceCase<dim>)
-{
-  return QProjector<dim>::project_to_subface(
-    reference_cell,
-    quadrature,
-    face_no,
-    subface_no,
-    RefinementCase<dim - 1>::isotropic_refinement);
 }
 
 
@@ -635,26 +399,6 @@ QProjector<dim>::project_to_line(const ReferenceCell<dim> &reference_cell,
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
 QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell<dim> &reference_cell,
-  const unsigned int        face_no,
-  const bool                face_orientation,
-  const bool                face_flip,
-  const bool                face_rotation,
-  const unsigned int        n_quadrature_points)
-{
-  return face(reference_cell,
-              face_no,
-              internal::combined_face_orientation(face_orientation,
-                                                  face_rotation,
-                                                  face_flip),
-              n_quadrature_points);
-}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::face(
   const ReferenceCell<dim>          &reference_cell,
   const unsigned int                 face_no,
   const types::geometric_orientation combined_orientation,
@@ -669,26 +413,6 @@ QProjector<dim>::DataSetDescriptor::face(
   return {(reference_cell.n_face_orientations(face_no) * face_no +
            combined_orientation) *
           n_quadrature_points};
-}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell<dim>       &reference_cell,
-  const unsigned int              face_no,
-  const bool                      face_orientation,
-  const bool                      face_flip,
-  const bool                      face_rotation,
-  const hp::QCollection<dim - 1> &quadrature)
-{
-  return face(reference_cell,
-              face_no,
-              internal::combined_face_orientation(face_orientation,
-                                                  face_rotation,
-                                                  face_flip),
-              quadrature);
 }
 
 
@@ -713,31 +437,6 @@ QProjector<dim>::DataSetDescriptor::face(
 
   return {offset + combined_orientation *
                      quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::subface(
-  const ReferenceCell<dim>        &reference_cell,
-  const unsigned int               face_no,
-  const unsigned int               subface_no,
-  const bool                       face_orientation,
-  const bool                       face_flip,
-  const bool                       face_rotation,
-  const unsigned int               n_quadrature_points,
-  const internal::SubfaceCase<dim> ref_case)
-{
-  return QProjector<dim>::DataSetDescriptor::subface(
-    reference_cell,
-    face_no,
-    subface_no,
-    internal::combined_face_orientation(face_orientation,
-                                        face_rotation,
-                                        face_flip),
-    n_quadrature_points,
-    ref_case);
 }
 
 
@@ -802,43 +501,6 @@ QProjector<dim>::DataSetDescriptor::subface(
   DEAL_II_ASSERT_UNREACHABLE();
 
   return index;
-}
-
-
-
-template <int dim>
-Quadrature<dim>
-QProjector<dim>::project_to_face(const ReferenceCell<dim> &reference_cell,
-                                 const SubQuadrature      &quadrature,
-                                 const unsigned int        face_no)
-{
-  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
-         ExcNotImplemented());
-  (void)reference_cell;
-
-  std::vector<Point<dim>> points(quadrature.size());
-  project_to_face(reference_cell, quadrature, face_no, points);
-  return Quadrature<dim>(points, quadrature.get_weights());
-}
-
-
-
-template <int dim>
-Quadrature<dim>
-QProjector<dim>::project_to_subface(const ReferenceCell<dim> &reference_cell,
-                                    const SubQuadrature      &quadrature,
-                                    const unsigned int        face_no,
-                                    const unsigned int        subface_no,
-                                    const RefinementCase<dim - 1> &ref_case)
-{
-  Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
-         ExcNotImplemented());
-  (void)reference_cell;
-
-  std::vector<Point<dim>> points(quadrature.size());
-  project_to_subface(
-    reference_cell, quadrature, face_no, subface_no, points, ref_case);
-  return Quadrature<dim>(points, quadrature.get_weights());
 }
 
 

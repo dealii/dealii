@@ -405,13 +405,6 @@ public:
   void
   deserialize(std::vector<VectorType *> &all_in);
 
-  /**
-   * Reinit this class to the state that it has directly after calling the
-   * constructor.
-   */
-  DEAL_II_DEPRECATED void
-  clear();
-
 private:
   /**
    * Pointer to the degree of freedom handler to work with.

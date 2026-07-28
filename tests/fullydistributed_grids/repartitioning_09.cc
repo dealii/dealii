@@ -60,7 +60,7 @@ public:
     Utilities::MPI::RemotePointEvaluation<dim, spacedim> rpe;
     Vector<double> ranks(tria_background.n_active_cells());
     ranks =
-      Utilities::MPI::this_mpi_process(tria_background.get_communicator());
+      Utilities::MPI::this_mpi_process(tria_background.get_mpi_communicator());
 
     const auto point_ranks =
       VectorTools::point_values<1>(mapping,
@@ -104,11 +104,12 @@ output_mesh(const Triangulation<dim> &tria_background, const std::string label)
   data_out_background.attach_triangulation(tria_background);
 
   Vector<double> ranks(tria_background.n_active_cells());
-  ranks = Utilities::MPI::this_mpi_process(tria_background.get_communicator());
+  ranks =
+    Utilities::MPI::this_mpi_process(tria_background.get_mpi_communicator());
   data_out_background.add_data_vector(ranks, "ranks");
   data_out_background.build_patches();
-  data_out_background.write_vtu_in_parallel(label,
-                                            tria_background.get_communicator());
+  data_out_background.write_vtu_in_parallel(
+    label, tria_background.get_mpi_communicator());
 }
 
 
