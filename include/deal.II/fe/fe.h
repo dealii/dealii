@@ -3331,6 +3331,65 @@ FiniteElement<dim, spacedim>::face_system_to_component_index(
 
 
 template <int dim, int spacedim>
+inline unsigned int
+FiniteElement<dim, spacedim>::adjust_line_dof_index_for_line_orientation(
+  const unsigned int                 index,
+  const types::geometric_orientation combined_orientation) const
+{
+  Assert(combined_orientation == numbers::default_geometric_orientation ||
+           combined_orientation == numbers::reverse_line_orientation,
+         ExcInternalError());
+
+  AssertIndexRange(index, this->n_dofs_per_line());
+  Assert(adjust_line_dof_index_for_line_orientation_table.size() ==
+           this->n_dofs_per_line(),
+         ExcInternalError());
+  if (combined_orientation == numbers::default_geometric_orientation)
+    return index;
+  else
+    return index + adjust_line_dof_index_for_line_orientation_table[index];
+}
+
+
+
+template <int dim, int spacedim>
+inline unsigned int
+FiniteElement<dim, spacedim>::adjust_quad_dof_index_for_face_orientation(
+  const unsigned int                 index,
+  const unsigned int                 face,
+  const types::geometric_orientation combined_orientation) const
+{
+  // general template for 1d and 2d: not
+  // implemented. in fact, the function
+  // shouldn't even be called unless we are
+  // in 3d, so throw an internal error
+  Assert(dim == 3, ExcInternalError());
+  if (dim < 3)
+    return index;
+
+  // adjust dofs on 3d faces if the face is
+  // flipped. note that we query a table that
+  // derived elements need to have set up
+  // front. the exception are discontinuous
+  // elements for which there should be no
+  // face dofs anyway (i.e. dofs_per_quad==0
+  // in 3d), so we don't need the table, but
+  // the function should also not have been
+  // called
+  AssertIndexRange(index, this->n_dofs_per_quad(face));
+  const auto table_n = this->n_unique_2d_subobjects() == 1 ? 0 : face;
+  Assert(
+    adjust_quad_dof_index_for_face_orientation_table[table_n].n_elements() ==
+      (this->reference_cell().n_face_orientations(face)) *
+        this->n_dofs_per_quad(face),
+    ExcInternalError());
+  return index + adjust_quad_dof_index_for_face_orientation_table[table_n](
+                   index, combined_orientation);
+}
+
+
+
+template <int dim, int spacedim>
 inline std::pair<std::pair<unsigned int, unsigned int>, unsigned int>
 FiniteElement<dim, spacedim>::system_to_base_index(
   const unsigned int index) const
