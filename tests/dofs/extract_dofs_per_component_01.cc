@@ -54,9 +54,8 @@ test()
     DoFTools::locally_owned_dofs_per_component(dof, mask);
 
   MappingQ<dim>                                 mapping(1);
-  std::map<types::global_dof_index, Point<dim>> support_points;
-
-  DoFTools::map_dofs_to_support_points(mapping, dof, support_points);
+  std::map<types::global_dof_index, Point<dim>> support_points =
+    DoFTools::map_dofs_to_support_points(mapping, dof);
 
   for (unsigned int c = 0; c < dofs_per_components.size(); ++c)
     {

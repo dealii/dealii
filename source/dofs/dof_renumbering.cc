@@ -2643,10 +2643,8 @@ namespace DoFRenumbering
              "Lexicographic renumbering is not implemented for distributed "
              "triangulations."));
 
-    std::map<types::global_dof_index, Point<dim>> dof_location_map;
-    DoFTools::map_dofs_to_support_points(MappingQ1<dim>(),
-                                         dof_handler,
-                                         dof_location_map);
+    std::map<types::global_dof_index, Point<dim>> dof_location_map =
+      DoFTools::map_dofs_to_support_points(MappingQ1<dim>(), dof_handler);
     std::vector<std::pair<types::global_dof_index, Point<dim>>>
       dof_location_vector;
 

@@ -490,11 +490,9 @@ namespace Step37
 
     if (dim == 2 && Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1)
       {
-        std::map<types::global_dof_index, Point<dim>> support_points;
         MappingQ<dim> mapping(degree_finite_element);
-        DoFTools::map_dofs_to_support_points(mapping,
-                                             dof_handler,
-                                             support_points);
+        std::map<types::global_dof_index, Point<dim>> support_points =
+          DoFTools::map_dofs_to_support_points(mapping, dof_handler);
 
         const std::string base_filename =
           "grid" + dealii::Utilities::int_to_string(dim) + "_" +

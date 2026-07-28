@@ -42,8 +42,8 @@ test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs(fe);
 
-  std::map<types::global_dof_index, Point<dim>> points;
-  DoFTools::map_dofs_to_support_points(MappingQ<dim>(1), dofh, points);
+  std::map<types::global_dof_index, Point<dim>> points =
+    DoFTools::map_dofs_to_support_points(MappingQ<dim>(1), dofh);
   if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
     {
       for (typename std::map<types::global_dof_index,

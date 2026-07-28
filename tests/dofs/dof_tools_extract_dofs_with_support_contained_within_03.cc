@@ -113,9 +113,9 @@ test(const bool left = true)
                 << std::endl;
       cm.print(std::cout);
 
-      std::map<types::global_dof_index, Point<dim>> support_points;
       MappingQ1<dim>                                mapping;
-      DoFTools::map_dofs_to_support_points(mapping, dh, support_points);
+      std::map<types::global_dof_index, Point<dim>> support_points =
+        DoFTools::map_dofs_to_support_points(mapping, dh);
 
       const std::string filename =
         "grid" + Utilities::int_to_string(dim) + ".gp";

@@ -113,8 +113,8 @@ test()
       deallog << std::endl;
     }
 
-  std::map<types::global_dof_index, Point<dim>> support_points;
-  DoFTools::map_dofs_to_support_points(MappingQ1<dim>(), dofh, support_points);
+  std::map<types::global_dof_index, Point<dim>> support_points =
+    DoFTools::map_dofs_to_support_points(MappingQ1<dim>(), dofh);
   DoFTools::write_gnuplot_dof_support_point_info(deallog.get_file_stream(),
                                                  support_points);
 }

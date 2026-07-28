@@ -582,15 +582,6 @@ public:
   set_active_fe_indices(const std::vector<types::fe_index> &active_fe_indices);
 
   /**
-   * @copydoc set_active_fe_indices()
-   *
-   * @deprecated Use set_active_fe_indices() with the types::fe_index datatype.
-   */
-  DEAL_II_DEPRECATED
-  void
-  set_active_fe_indices(const std::vector<unsigned int> &active_fe_indices);
-
-  /**
    * For each locally relevant cell, extract the active finite element index and
    * return them in the order in which we iterate over active cells.
    *

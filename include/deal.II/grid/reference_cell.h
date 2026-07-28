@@ -960,25 +960,6 @@ public:
   get_combined_orientation(const ArrayView<const T> &vertices_0,
                            const ArrayView<const T> &vertices_1) const;
 
-
-  /**
-   * Inverse function of compute_orientation(): Given a set of
-   * vertex-associated objects (such as vertex indices, locations, etc.) and
-   * a desired orientation permutation, return the permuted vertex information.
-   *
-   * The size of the input and output arrays, i.e., the template argument `N`,
-   * must be equal to or larger than the number of vertices of the current
-   * entity. If it is larger, only those elements of the input and output
-   * arrays are read from or written to that correspond to valid vertex
-   * indices.
-   *
-   * @deprecated Use permute_by_combined_orientation() instead.
-   */
-  template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED std::array<T, N>
-  permute_according_orientation(const std::array<T, N> &vertices,
-                                const unsigned int      orientation) const;
-
   /**
    * This is the inverse function to get_combined_orientation(): Given a set of
    * vertex-associated objects (such as vertex indices, locations, etc.) and
@@ -4494,34 +4475,6 @@ ReferenceCell<dim>::get_combined_orientation(
   Assert(false,
          (internal::NoPermutation<dim, T>(*this, vertices_0, vertices_1)));
   return std::numeric_limits<types::geometric_orientation>::max();
-}
-
-
-
-template <int dim>
-template <typename T, std::size_t N>
-inline std::array<T, N>
-ReferenceCell<dim>::permute_according_orientation(
-  const std::array<T, N> &vertices,
-  const unsigned int      orientation) const
-{
-  Assert(N >= n_vertices(),
-         ExcMessage("The number of array elements must be equal to or "
-                    "greater than the number of vertices of the cell "
-                    "referenced by this object."));
-
-  // Call the non-deprecated function, taking care of calling it only with
-  // those array elements that we actually care about (see the note
-  // in the documentation about the arguments potentially being
-  // larger arrays than necessary).
-  const auto permutation = permute_by_combined_orientation(
-    make_array_view(vertices.begin(), vertices.begin() + n_vertices()),
-    orientation);
-
-  std::array<T, N> temp;
-  std::copy(permutation.begin(), permutation.end(), temp.begin());
-
-  return temp;
 }
 
 

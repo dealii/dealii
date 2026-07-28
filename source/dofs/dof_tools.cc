@@ -1780,19 +1780,6 @@ namespace DoFTools
 
 
   template <int dim, int spacedim>
-  void
-  get_active_fe_indices(const DoFHandler<dim, spacedim> &dof_handler,
-                        std::vector<unsigned int>       &active_fe_indices)
-  {
-    AssertDimension(active_fe_indices.size(),
-                    dof_handler.get_triangulation().n_active_cells());
-
-    std::vector<types::fe_index> indices = dof_handler.get_active_fe_indices();
-
-    active_fe_indices.assign(indices.begin(), indices.end());
-  }
-
-  template <int dim, int spacedim>
   std::vector<IndexSet>
   locally_owned_dofs_per_subdomain(const DoFHandler<dim, spacedim> &dof_handler)
   {
@@ -2767,46 +2754,6 @@ namespace DoFTools
     // Let the internal function do all the work, just make sure that it
     // gets a MappingCollection
     support_points = internal::map_dofs_to_support_points_vector(
-      mapping, dof_handler, mask, map_locally_relevant_dofs);
-  }
-
-
-  // This function is deprecated:
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  map_dofs_to_support_points(
-    const Mapping<dim, spacedim>                       &mapping,
-    const DoFHandler<dim, spacedim>                    &dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask,
-    const bool map_locally_relevant_dofs)
-  {
-    support_points.clear();
-
-    // Let the internal function do all the work, just make sure that it
-    // gets a MappingCollection
-    const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
-
-    support_points = internal::map_dofs_to_support_points(
-      mapping_collection, dof_handler, mask, map_locally_relevant_dofs);
-  }
-
-
-  // This function is deprecated:
-  template <int dim, int spacedim>
-  DEAL_II_DEPRECATED void
-  map_dofs_to_support_points(
-    const hp::MappingCollection<dim, spacedim>         &mapping,
-    const DoFHandler<dim, spacedim>                    &dof_handler,
-    std::map<types::global_dof_index, Point<spacedim>> &support_points,
-    const ComponentMask                                &mask,
-    const bool map_locally_relevant_dofs)
-  {
-    support_points.clear();
-
-    // Let the internal function do all the work, just make sure that it
-    // gets a MappingCollection
-    support_points = internal::map_dofs_to_support_points(
       mapping, dof_handler, mask, map_locally_relevant_dofs);
   }
 
