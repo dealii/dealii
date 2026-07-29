@@ -4120,10 +4120,13 @@ namespace GridGenerator
 
     if (use_transfinite_region)
       {
-        tria.set_manifold(tfi_manifold_id, FlatManifold<2>());
         TransfiniteInterpolationManifold<2> inner_manifold;
         inner_manifold.initialize(tria);
         tria.set_manifold(tfi_manifold_id, inner_manifold);
+      }
+    else
+      {
+        tria.set_manifold(tfi_manifold_id, FlatManifold<2>());
       }
 
     if (colorize)
@@ -4191,10 +4194,7 @@ namespace GridGenerator
                                0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
-    tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
-    tria.set_manifold(tfi_manifold_id, FlatManifold<3>());
     const CylindricalManifold<3> cylindrical_manifold(direction, axial_point);
-
     tria.set_manifold(cylindrical_manifold_id, cylindrical_manifold);
 
     if (use_transfinite_region)
@@ -4202,6 +4202,10 @@ namespace GridGenerator
         TransfiniteInterpolationManifold<3> inner_manifold;
         inner_manifold.initialize(tria);
         tria.set_manifold(tfi_manifold_id, inner_manifold);
+      }
+    else
+      {
+        tria.set_manifold(tfi_manifold_id, FlatManifold<3>());
       }
 
     // From extrude_triangulation: since the maximum boundary id of tria_2 was
