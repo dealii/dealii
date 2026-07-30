@@ -96,8 +96,8 @@ test<3>(const unsigned int n_points)
                         ReferenceCells::Tetrahedron,
                         face_no,
                         internal::combined_face_orientation(face_orientation,
-                                                            face_flip,
-                                                            face_rotation),
+                                                            face_rotation,
+                                                            face_flip),
                         quad_ref.size());
          q < quad_ref.size();
          ++q, ++i)
