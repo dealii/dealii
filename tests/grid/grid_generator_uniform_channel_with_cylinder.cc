@@ -23,25 +23,25 @@
 
 
 void
-dim_2(std::ostream &os)
+dim_2(std::ostream &os, const bool transfinite)
 {
   const unsigned int d = 2;
   Triangulation<d>   tr;
 
   GridGenerator::uniform_channel_with_cylinder(
-    tr, {3, 5, 4, 4}, 1, 2, 0.75, 4, 2, true, true);
+    tr, {3, 5, 4, 4}, 1, 2, 0.75, 4, 2, transfinite, true);
 
   GridOut gout;
   gout.write_vtk(tr, os);
 }
 
 void
-dim_3(std::ostream &os)
+dim_3(std::ostream &os, const bool transfinite)
 {
   const unsigned int d = 3;
   Triangulation<d>   tr;
   GridGenerator::uniform_channel_with_cylinder(
-    tr, {3, 5, 4, 4}, 1, 2, 0.75, 4, 2, true, true);
+    tr, {3, 5, 4, 4}, 1, 2, 0.75, 4, 2, transfinite, true);
   GridOut gout;
   gout.write_vtk(tr, os);
 }
@@ -52,6 +52,8 @@ main()
 {
   initlog(true);
   std::ostream &logfile = deallog.get_file_stream();
-  dim_2(logfile);
-  dim_3(logfile);
+  dim_2(logfile, true);
+  dim_2(logfile, false);
+  dim_3(logfile, true);
+  dim_3(logfile, false);
 }
