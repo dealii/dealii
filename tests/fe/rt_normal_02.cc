@@ -107,8 +107,8 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
                   ReferenceCells::Quadrilateral,
                   f,
                   internal::combined_face_orientation(cell->face_orientation(f),
-                                                      cell->face_flip(f),
-                                                      cell->face_rotation(f)),
+                                                      cell->face_rotation(f),
+                                                      cell->face_flip(f)),
                   quad.size()));
               fe_v_face.reinit(cell, f);
 
@@ -122,8 +122,8 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
                   neighbor,
                   internal::combined_face_orientation(
                     cell_n->face_orientation(neighbor),
-                    cell_n->face_flip(neighbor),
-                    cell_n->face_rotation(neighbor)),
+                    cell_n->face_rotation(neighbor),
+                    cell_n->face_flip(neighbor)),
                   quad.size()));
 
               // Get values from solution vector (For Trap.Rule)
