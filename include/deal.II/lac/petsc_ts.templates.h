@@ -445,14 +445,12 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        (user->decide_and_prepare_for_remeshing ?
-              [&](const real_type    t,
-               const unsigned int step,
-               const VectorType  &y,
-               bool              &resize) {
-             resize = user->decide_and_prepare_for_remeshing(t, step, y);
-           } :
-              user->decide_for_coarsening_and_refinement),
+        [&](const real_type    t,
+            const unsigned int step,
+            const VectorType  &y,
+            bool              &resize) {
+          resize = user->decide_and_prepare_for_remeshing(t, step, y);
+        },
         user->pending_exception,
         {},
         t,
@@ -489,15 +487,7 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        (user->transfer_solution_vectors_to_new_mesh ?
-              // If we can, call the new callback
-           user->transfer_solution_vectors_to_new_mesh :
-              // otherwise, use the old one where we just ignore the time:
-           [user](const real_type /*t*/,
-                  const std::vector<VectorType> &all_in,
-                  std::vector<VectorType>       &all_out) {
-             user->interpolate(all_in, all_out);
-           }),
+        user->transfer_solution_vectors_to_new_mesh,
         user->pending_exception,
         {},
         user->get_time(),
@@ -631,11 +621,7 @@ namespace PETScWrappers
 
       const int lineno = __LINE__;
       const int err    = call_and_possibly_capture_ts_exception(
-        // Call the user-provided callback. Use the new name if used,
-        // or the legacy name otherwise.
-        (user->update_constrained_components ?
-              user->update_constrained_components :
-              user->distribute),
+        user->update_constrained_components,
         user->pending_exception,
         [user, ts]() -> void {
           user->error_in_function = true;
@@ -1052,52 +1038,22 @@ namespace PETScWrappers
         AssertPETSc(KSPSetPC(ksp, solve_with_jacobian_pc.get_pc()));
       }
 
-    if (distribute || update_constrained_components)
-      {
-        if (update_constrained_components)
-          Assert(!distribute,
-                 ExcMessage(
-                   "The 'distribute' callback name of the TimeStepper "
-                   "class is deprecated. If you are setting the equivalent "
-                   "'update_constrained_components' callback, you cannot also "
-                   "set the 'distribute' callback."));
-        AssertPETSc(TSSetPostStage(ts, ts_poststage));
-      }
+    if (update_constrained_components)
+      AssertPETSc(TSSetPostStage(ts, ts_poststage));
 
     // Attach user monitoring routine.
     if (monitor)
       AssertPETSc(TSMonitorSet(ts, ts_monitor, this, nullptr));
 
     // Handle AMR.
-    if (decide_and_prepare_for_remeshing ||
-        decide_for_coarsening_and_refinement)
+    if (decide_and_prepare_for_remeshing)
       {
-        if (decide_and_prepare_for_remeshing)
-          Assert(
-            !decide_for_coarsening_and_refinement,
-            ExcMessage(
-              "The 'decide_for_coarsening_and_refinement' callback name "
-              "of the TimeStepper class is deprecated. If you are setting "
-              "the equivalent 'decide_and_prepare_for_remeshing' callback, you "
-              "cannot also set the 'decide_for_coarsening_and_refinement' "
-              "callback."));
-
         // If we have the decide_and_prepare_for_remeshing callback
         // set, then we also need to have the callback for actually
         // transferring the solution:
-        AssertThrow(interpolate || transfer_solution_vectors_to_new_mesh,
+        AssertThrow(transfer_solution_vectors_to_new_mesh,
                     StandardExceptions::ExcFunctionNotProvided(
                       "transfer_solution_vectors_to_new_mesh"));
-
-        if (transfer_solution_vectors_to_new_mesh)
-          Assert(
-            !interpolate,
-            ExcMessage(
-              "The 'interpolate' callback name "
-              "of the TimeStepper class is deprecated. If you are setting "
-              "the equivalent 'transfer_solution_vectors_to_new_mesh' callback, you "
-              "cannot also set the 'interpolate' "
-              "callback."));
 
 #  if DEAL_II_PETSC_VERSION_GTE(3, 21, 0)
         (void)ts_poststep_amr;
