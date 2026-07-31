@@ -176,23 +176,23 @@ public:
 
     // This callback is invoked after a successful stage.
     // Here we only print that the callback is invoked.
-    time_stepper.distribute = [&](const real_type t, VectorType &) -> void {
+    time_stepper.update_constrained_components = [&](const real_type t,
+                                                     VectorType &) -> void {
       deallog << "Distribute at time " << t << std::endl;
     };
 
     // This callback is used to decide to remesh.
-    time_stepper.decide_for_coarsening_and_refinement =
-      [&](const real_type    t,
-          const unsigned int step,
-          const VectorType &,
-          bool &resize) {
+    time_stepper.decide_and_prepare_for_remeshing =
+      [&](const real_type t, const unsigned int step, const VectorType &) {
         deallog << "Prepare at time " << t << " and step " << step << std::endl;
-        resize = (step && step % 5 == 0);
+        return (step && step % 5 == 0);
       };
 
     // This callback is called if decide_and_prepare_for_remeshing returns true.
-    time_stepper.interpolate = [&](const std::vector<VectorType> &all_in,
-                                   std::vector<VectorType> &all_out) -> void {
+    time_stepper.transfer_solution_vectors_to_new_mesh =
+      [&](const double /*time*/,
+          const std::vector<VectorType> &all_in,
+          std::vector<VectorType>       &all_out) -> void {
       deallog << "Interpolate" << std::endl;
       for (auto &v : all_in)
         all_out.push_back(v);
