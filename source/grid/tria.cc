@@ -21,6 +21,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/tria_base.h>
 
@@ -212,6 +213,38 @@ namespace internal
     // a member variable for later.
     variable_size_data_stored = (n_callbacks_variable > 0);
 
+    // A parallel::shared::Triangulation with artificial cells hands us a
+    // cell_relations vector that traverses the entire (replicated)
+    // triangulation. The registered callbacks, however, can typically only
+    // be evaluated on cells that are locally relevant: querying DoF
+    // indices, or reading from a ghosted vector is not possible on
+    // artificial cells. We thus invoke the callbacks only on cells owned
+    // by the present MPI rank (for a coarsened parent: on the rank owning
+    // the first child) and leave the buffer portions of all remaining
+    // cells padded with the neutral filler (all bits set). The buffers,
+    // which have identical layout on all ranks, are then combined with a
+    // bitwise-and reduction at the end of this function so that every
+    // rank ends up with valid data for every cell.
+    const ::dealii::parallel::shared::Triangulation<dim, spacedim>
+      *shared_tria =
+        (cell_relations.empty() ?
+           nullptr :
+           dynamic_cast<
+             const ::dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+             &cell_relations.front().first->get_triangulation()));
+    const bool restrict_callbacks_to_locally_owned_cells =
+      (shared_tria != nullptr) && shared_tria->with_artificial_cells();
+    const types::subdomain_id my_subdomain =
+      (restrict_callbacks_to_locally_owned_cells ?
+         shared_tria->locally_owned_subdomain() :
+         numbers::invalid_subdomain_id);
+
+    Assert(
+      !(restrict_callbacks_to_locally_owned_cells && variable_size_data_stored),
+      ExcMessage(
+        "Attaching variable size data to a parallel::shared::Triangulation "
+        "with artificial cells is currently not implemented."));
+
     // If variable transfer is scheduled, we will store the data size that
     // each variable size callback function writes in this auxiliary
     // container. The information will be stored by each cell in this vector
@@ -280,18 +313,38 @@ namespace internal
                 break;
             }
 
+          // Determine whether the callbacks can and should be invoked on
+          // this cell: never on cells flagged with
+          // CellStatus::cell_invalid, and, when restricted to locally
+          // owned cells, only on the rank owning the cell (respectively,
+          // for a to-be-coarsened parent cell, the rank owning the first
+          // child).
+          bool evaluate_callbacks_on_cell =
+            (cell_status != CellStatus::cell_invalid);
+          if (evaluate_callbacks_on_cell &&
+              restrict_callbacks_to_locally_owned_cells)
+            {
+              if (cell_status == CellStatus::children_will_be_coarsened)
+                evaluate_callbacks_on_cell =
+                  (dealii_cell->child(0)->subdomain_id() == my_subdomain);
+              else
+                evaluate_callbacks_on_cell =
+                  (dealii_cell->subdomain_id() == my_subdomain);
+            }
+
           // Reserve memory corresponding to the number of callback
           // functions that will be called.
           // If variable size transfer is scheduled, we need to leave
           // room for an array that holds information about how many
           // bytes each of the variable size callback functions will
           // write.
-          // On cells flagged with CellStatus::cell_invalid, only its CellStatus
-          // will be stored.
+          // On cells flagged with CellStatus::cell_invalid, as well as on
+          // cells on which the callbacks are not evaluated, only the
+          // CellStatus will be stored.
           const unsigned int n_fixed_size_data_sets_on_cell =
-            1 + ((cell_status == CellStatus::cell_invalid) ?
-                   0 :
-                   ((variable_size_data_stored ? 1 : 0) + n_callbacks_fixed));
+            1 + (evaluate_callbacks_on_cell ?
+                   ((variable_size_data_stored ? 1 : 0) + n_callbacks_fixed) :
+                   0);
           data_cell_fixed_it->resize(n_fixed_size_data_sets_on_cell);
 
           // We continue with packing all data on this specific cell.
@@ -305,8 +358,9 @@ namespace internal
           ++data_fixed_it;
 
           // Proceed with all registered callback functions.
-          // Skip cells with the CellStatus::cell_invalid flag.
-          if (cell_status != CellStatus::cell_invalid)
+          // Skip cells with the CellStatus::cell_invalid flag, as well as
+          // cells on which we must not evaluate the callbacks.
+          if (evaluate_callbacks_on_cell)
             {
               // Pack fixed size data.
               for (auto callback_it = pack_callbacks_fixed.cbegin();
@@ -511,6 +565,30 @@ namespace internal
     Assert(src_data_fixed.size() == expected_size_fixed, ExcInternalError());
     Assert(src_data_variable.size() == expected_size_variable,
            ExcInternalError());
+
+#ifdef DEAL_II_WITH_MPI
+    // If we invoked the callbacks only on locally owned cells, combine
+    // the buffers over all ranks: The buffer has identical layout on all
+    // ranks. Each callback data portion has been written by exactly one
+    // rank and is padded with the neutral element (all bits set) on all
+    // other ranks; the CellStatus portions are bitwise identical on all
+    // ranks. A bitwise-and reduction therefore leaves every rank with
+    // valid data for every cell.
+    if (restrict_callbacks_to_locally_owned_cells &&
+        (src_data_fixed.size() > 0))
+      {
+        Assert(src_data_fixed.size() <=
+                 static_cast<std::size_t>(std::numeric_limits<int>::max()),
+               ExcNotImplemented());
+        const int ierr = MPI_Allreduce(MPI_IN_PLACE,
+                                       src_data_fixed.data(),
+                                       static_cast<int>(src_data_fixed.size()),
+                                       MPI_BYTE,
+                                       MPI_BAND,
+                                       mpi_communicator);
+        AssertThrowMPI(ierr);
+      }
+#endif
   }
 
 
@@ -582,6 +660,26 @@ namespace internal
         Assert(dest_data_fixed.size() > 0,
                ExcMessage("No data has been received!"));
       }
+
+    // On a parallel::shared::Triangulation with artificial cells the
+    // buffer contains valid data for every cell (see the corresponding
+    // comment in pack_data()), but the unpack callback can typically only
+    // be evaluated on locally relevant cells. Mirroring the behavior of
+    // the parallel::distributed::Triangulation, we invoke the callback
+    // only on cells owned by the present MPI rank.
+    const ::dealii::parallel::shared::Triangulation<dim, spacedim>
+      *shared_tria =
+        (cell_relations.empty() ?
+           nullptr :
+           dynamic_cast<
+             const ::dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+             &cell_relations.front().first->get_triangulation()));
+    const bool restrict_callbacks_to_locally_owned_cells =
+      (shared_tria != nullptr) && shared_tria->with_artificial_cells();
+    const types::subdomain_id my_subdomain =
+      (restrict_callbacks_to_locally_owned_cells ?
+         shared_tria->locally_owned_subdomain() :
+         numbers::invalid_subdomain_id);
 
     std::vector<char>::const_iterator dest_data_it;
     std::vector<char>::const_iterator dest_sizes_cell_it;
@@ -685,21 +783,35 @@ namespace internal
             ++dest_sizes_it;
           }
 
+        // In all non-invalid cases below, dealii_cell is an active cell
+        // of the updated triangulation (in the case of
+        // CellStatus::cell_will_be_refined it is the first child of the
+        // refined cell), so we can query its subdomain id to decide
+        // whether the callback should be invoked on the present rank.
+        const bool evaluate_callback_on_cell =
+          (restrict_callbacks_to_locally_owned_cells == false) ||
+          (cell_status == CellStatus::cell_invalid) ||
+          (dealii_cell->subdomain_id() == my_subdomain);
+
         switch (cell_status)
           {
             case CellStatus::cell_will_persist:
             case CellStatus::children_will_be_coarsened:
-              unpack_callback(dealii_cell,
-                              cell_status,
-                              boost::make_iterator_range(dest_data_it,
-                                                         dest_data_it + size));
+              if (evaluate_callback_on_cell)
+                unpack_callback(dealii_cell,
+                                cell_status,
+                                boost::make_iterator_range(dest_data_it,
+                                                           dest_data_it +
+                                                             size));
               break;
 
             case CellStatus::cell_will_be_refined:
-              unpack_callback(dealii_cell->parent(),
-                              cell_status,
-                              boost::make_iterator_range(dest_data_it,
-                                                         dest_data_it + size));
+              if (evaluate_callback_on_cell)
+                unpack_callback(dealii_cell->parent(),
+                                cell_status,
+                                boost::make_iterator_range(dest_data_it,
+                                                           dest_data_it +
+                                                             size));
               break;
 
             case CellStatus::cell_invalid:
