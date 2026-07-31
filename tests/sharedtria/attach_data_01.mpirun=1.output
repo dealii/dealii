@@ -1,0 +1,25 @@
+
+DEAL:1d::cells before: 8
+DEAL:1d::flags after prepare: refine=2 coarsen=4
+DEAL:1d::handle=1
+DEAL:1d::cells after: 8
+DEAL:1d::packed:   persist=2 refine=2 coarsen=2
+DEAL:1d::unpacked: persist=2 refine=2 coarsen=2
+DEAL:1d::mismatches: 0
+DEAL:1d::OK
+DEAL:2d::cells before: 64
+DEAL:2d::flags after prepare: refine=4 coarsen=32
+DEAL:2d::handle=1
+DEAL:2d::cells after: 52
+DEAL:2d::packed:   persist=28 refine=4 coarsen=8
+DEAL:2d::unpacked: persist=28 refine=4 coarsen=8
+DEAL:2d::mismatches: 0
+DEAL:2d::OK
+DEAL:3d::cells before: 512
+DEAL:3d::flags after prepare: refine=8 coarsen=256
+DEAL:3d::handle=1
+DEAL:3d::cells after: 344
+DEAL:3d::packed:   persist=248 refine=8 coarsen=32
+DEAL:3d::unpacked: persist=248 refine=8 coarsen=32
+DEAL:3d::mismatches: 0
+DEAL:3d::OK
