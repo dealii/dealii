@@ -472,6 +472,8 @@ endif()
 set(_status "neutral")
 set(_summary "")
 
+set(CTEST_USE_LAUNCHERS true)
+
 ctest_start(Experimental TRACK ${TRACK})
 
 message("-- Running ctest_update() to query git information")

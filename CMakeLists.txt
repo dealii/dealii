@@ -184,6 +184,7 @@ add_subdirectory(examples)
 add_subdirectory(contrib/utilities)
 
 if(DEAL_II_HAVE_TESTS_DIRECTORY)
+  include(CTestUseLaunchers)
   add_subdirectory(tests)
 endif()
 
