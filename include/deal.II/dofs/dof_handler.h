@@ -21,6 +21,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/base/iterator_range.h>
+#include <deal.II/base/lazy.h>
 #include <deal.II/base/observer_pointer.h>
 #include <deal.II/base/types.h>
 
@@ -718,7 +719,10 @@ public:
    * global and level vectors is stored in a BlockInfo object accessible with
    * block_info(). This function initializes the local block structure on each
    * cell in the same object.
+   *
+   * @deprecated Use an external BlockInfo instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use an external BlockInfo instead.")
   void
   initialize_local_block_info();
 
@@ -1130,7 +1134,10 @@ public:
    * done on each level of the multigrid hierarchy. Additionally, the block
    * structure on each cell can be generated in this object by calling
    * initialize_local_block_info().
+   *
+   * @deprecated Use an external BlockInfo instead.
    */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT("Use an external BlockInfo instead.")
   const BlockInfo &
   block_info() const;
 
@@ -1456,9 +1463,15 @@ private:
   };
 
   /**
+   * Set up the BlockInfo object.
+   */
+  BlockInfo
+  compute_block_info() const;
+
+  /**
    * An object containing information on the block structure.
    */
-  BlockInfo block_info_object;
+  Lazy<BlockInfo> block_info_object;
 
   /**
    * Boolean indicating whether or not the current DoFHandler has
@@ -1920,9 +1933,8 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 inline const BlockInfo &DoFHandler<dim, spacedim>::block_info() const
 {
-  Assert(this->hp_capability_enabled == false, ExcNotImplementedWithHP());
-
-  return block_info_object;
+  return block_info_object.value_or_initialize(
+    [&, this]() { return this->compute_block_info(); });
 }
 
 
@@ -2001,7 +2013,7 @@ void DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
     }
   else
     {
-      ar &this->block_info_object;
+      // Ignore BlockInfo: it will be recomputed on first access
       ar &number_cache;
 
       ar &this->object_dof_indices;
@@ -2062,7 +2074,7 @@ void DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
     }
   else
     {
-      ar &this->block_info_object;
+      // Ignore BlockInfo: it will be recomputed on first access
       ar &number_cache;
 
       object_dof_indices.clear();

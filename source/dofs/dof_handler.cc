@@ -2111,7 +2111,9 @@ std::size_t DoFHandler<dim, spacedim>::memory_consumption() const
     {
       // collect size of multigrid data structures
 
-      mem += MemoryConsumption::memory_consumption(this->block_info_object);
+      if (this->block_info_object.has_value())
+        mem += MemoryConsumption::memory_consumption(
+          this->block_info_object.value());
 
       for (unsigned int level = 0; level < this->mg_levels.size(); ++level)
         mem += this->mg_levels[level]->memory_consumption();
@@ -2127,6 +2129,27 @@ std::size_t DoFHandler<dim, spacedim>::memory_consumption() const
     }
 
   return mem;
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+BlockInfo DoFHandler<dim, spacedim>::compute_block_info() const
+{
+  Assert(this->hp_capability_enabled == false, ExcNotImplementedWithHP());
+
+  BlockInfo new_block_info;
+  // BlockInfo::initialize() doesn't work with distributed objects. Preserve
+  // backwards compatibility by skipping that step instead of using an
+  // assertion:
+  if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
+        &*this->tria) == nullptr)
+    new_block_info.initialize(*this);
+  // However, local information only depends on the FiniteElement and always
+  // works:
+  new_block_info.initialize_local(*this);
+  return new_block_info;
 }
 
 
@@ -2270,13 +2293,11 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
   //     tg.join_all();
   //   }
 
-  // Initialize the block info object only if this is a sequential
-  // triangulation. It doesn't work correctly yet if it is parallel and has not
-  // yet been implemented for hp-mode.
-  if (!hp_capability_enabled &&
-      dynamic_cast<const parallel::DistributedTriangulationBase<dim, spacedim>
-                     *>(&*this->tria) == nullptr)
-    this->block_info_object.initialize(*this, false, true);
+  if (block_info_object.has_value())
+    {
+      block_info_object.reset();
+      this->block_info();
+    }
 }
 
 
@@ -2304,11 +2325,11 @@ void DoFHandler<dim, spacedim>::distribute_mg_dofs()
   internal::DoFHandlerImplementation::Implementation::reserve_space_mg(*this);
   this->mg_number_cache = this->policy->distribute_mg_dofs();
 
-  // initialize the block info object only if this is a sequential
-  // triangulation. it doesn't work correctly yet if it is parallel
-  if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
-        &*this->tria) == nullptr)
-    this->block_info_object.initialize(*this, true, false);
+  if (block_info_object.has_value())
+    {
+      block_info_object.reset();
+      this->block_info();
+    }
 }
 
 
@@ -2317,9 +2338,7 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::initialize_local_block_info()
 {
-  AssertThrow(hp_capability_enabled == false, ExcNotImplementedWithHP());
-
-  this->block_info_object.initialize_local(*this);
+  // This is now handled by compute_block_info()
 }
 
 
