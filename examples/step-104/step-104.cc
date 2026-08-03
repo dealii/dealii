@@ -961,9 +961,10 @@ namespace Step104
     {
       dealii::Timer t(tria.get_mpi_communicator());
       stokes_operator.vmult(solution, rhs);
-      const double time          = t.wall_time();
-      const double dofs_p_second = static_cast<double>(solution.size()) / time;
-      pcout << "Stokes operator: " << time << " s, DoFs/s: " << dofs_p_second
+      const double time = t.wall_time();
+      const double mdofs_p_second =
+        1e-6 * static_cast<double>(solution.size()) / time;
+      pcout << "Stokes operator: " << time << " s, MDoFs/s: " << mdofs_p_second
             << std::endl;
       solution = 0.0;
     }
@@ -1098,8 +1099,7 @@ namespace Step104
           }
       }
 
-    MGSmootherPrecondition<LevelMatrixType, SmootherType, VectorType>
-      mg_smoother;
+    MGSmootherRelaxation<LevelMatrixType, SmootherType, VectorType> mg_smoother;
     mg_smoother.initialize(mg_matrices, smoother_data);
 
     // Estimate and print the eigenvalue spectrum of the velocity block on each
