@@ -2314,26 +2314,6 @@ CellAccessor<dim, spacedim>::recursively_set_subdomain_id(
 }
 
 
-
-template <int dim, int spacedim>
-void
-CellAccessor<dim, spacedim>::set_neighbor(
-  const unsigned int                               face_no,
-  const TriaIterator<CellAccessor<dim, spacedim>> &neighbor) const
-{
-  AssertIndexRange(face_no, this->n_faces());
-
-  auto &level = this->tria->levels[this->level()];
-  if (neighbor.state() == IteratorState::valid)
-    level->set_neighbor(this->present_index,
-                        face_no,
-                        neighbor->level(),
-                        neighbor->index());
-  else
-    level->set_neighbor(this->present_index, face_no, -1, -1);
-}
-
-
 template <int dim, int spacedim>
 std::set<TriaActiveIterator<CellAccessor<dim, spacedim>>>
 CellAccessor<dim, spacedim>::get_cells_adjacent_to_line(
