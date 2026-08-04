@@ -194,9 +194,7 @@ macro(_test_cxx17_support)
     DEAL_II_HAVE_CXX17_FEATURES
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
     DEAL_II_HAVE_CXX14_FEATURES
-    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
     DEAL_II_HAVE_CXX11_FEATURES
-    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
     )
 
   CHECK_CXX_SOURCE_COMPILES(
@@ -290,28 +288,6 @@ macro(_test_cxx17_support)
     "
     DEAL_II_HAVE_CXX14_FEATURES)
 
-  # Clang-3.5* or older, bail out with a spurious error message in case
-  # of an undeduced auto return type.
-  #
-  # https://llvm.org/bugs/show_bug.cgi?id=16876
-  set(_flags "${DEAL_II_CXX_FLAGS_DEBUG}")
-  strip_flag(_flags "-Wa,--compress-debug-sections")
-  add_flags(CMAKE_REQUIRED_FLAGS "${_flags}")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    struct foo
-    {
-      auto func();
-    };
-    int main()
-    {
-      foo bar;
-      (void) bar;
-    }
-    "
-    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
-  _set_up_cmake_required()
-
   # Check some generic C++11 features
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -344,21 +320,10 @@ macro(_test_cxx17_support)
     "
     DEAL_II_HAVE_CXX11_FEATURES)
 
-  # clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <functional>
-    struct A { void foo() const {} };
-    int main() { A a; std::bind(&A::foo,a)(); return 0; }
-    "
-    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
-
   if(DEAL_II_HAVE_CXX17_FEATURES AND
      DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK AND
      DEAL_II_HAVE_CXX14_FEATURES AND
-     DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK AND
-     DEAL_II_HAVE_CXX11_FEATURES AND
-     DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
+     DEAL_II_HAVE_CXX11_FEATURES)
     message(STATUS "C++17 support is enabled.")
     set(DEAL_II_HAVE_CXX17 TRUE)
     set(_cxx_standard 17)
@@ -454,11 +419,8 @@ unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
   DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
-  DEAL_II_CXX14_CONSTEXPR_BUG_OK
   )
 
 
@@ -534,68 +496,10 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
 
 #
-# Try to enable a fallthrough attribute. This is a language feature in C++17,
-# but a compiler extension in earlier language versions.
+# The [[fallthrough]] attribute is a language feature in C++17, which we
+# require. Simply set the macro unconditionally.
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main()
-  {
-    int i = 42;
-    int j = 10;
-    switch(i)
-      {
-      case 1:
-        ++j;
-        [[fallthrough]];
-      case 2:
-        ++j;
-        [[fallthrough]];
-      default:
-        break;
-      }
-
-    return i + j;
-  }
-  "
-  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-  )
-
-#
-# see if the current compiler configuration supports the GCC extension
-# __attribute__((fallthrough)) syntax instead
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main()
-  {
-    int i = 42;
-    int j = 10;
-    switch(i)
-      {
-      case 1:
-        ++j;
-        __attribute__((fallthrough));
-      case 2:
-        ++j;
-        __attribute__((fallthrough));
-      default:
-        break;
-      }
-
-    return i + j;
-  }
-  "
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
-  )
-
-if(DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH)
-  set(DEAL_II_FALLTHROUGH "[[fallthrough]]")
-elseif(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
-  set(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
-else()
-  set(DEAL_II_FALLTHROUGH " ")
-endif()
+set(DEAL_II_FALLTHROUGH "[[fallthrough]]")
 
 
 #
@@ -634,49 +538,16 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# Check for correct c++14 constexpr support.
+# C++14 allows to call non-constexpr functions from constexpr functions as
+# long as there exists an argument value such that an invocation of the
+# function or constructor could be an evaluated subexpression of a core
+# constant expression. All supported compilers implement this correctly --
+# with the exception of MSVC, which in some cases crashes with an internal
+# compiler error when we declare the respective functions as 'constexpr',
+# see #9080. Thus, disable "constexpr" unconditionally for MSVC.
 #
-# As long as there exists an argument value such that an invocation of the
-# function or constructor could be an evaluated subexpression of a core constant
-# expression, C++14 allows to call non-constexpr functions from constexpr
-# functions.
-#
-# Unfortunately, not all compilers obey the standard in this regard. In some
-# cases, MSVC 2019 crashes with an internal compiler error when we
-# declare the respective functions as 'constexpr' even though the test below
-# passes, see #9080.
-#
-# We only run this check if we have CXX14 support, otherwise the use of constexpr
-# is limited (non-const constexpr functions for example).
-#
-
-# MSVC has considerable problems with "constexpr", disable unconditionally
-# for now
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(DEAL_II_CXX14_CONSTEXPR_BUG true)
-else()
-  check_cxx_compiler_bug(
-    "
-    #define Assert(x,y) if (!(x)) throw y;
-    void bar()
-    {}
-
-    constexpr int
-    foo(const int n)
-    {
-      Assert(n>0, \"hello\");
-      if(!(n >= 0))
-        bar();
-      return n;
-    }
-
-    int main()
-    {
-      constexpr unsigned int n=foo(1);
-      return n;
-    }
-    "
-    DEAL_II_CXX14_CONSTEXPR_BUG)
 endif()
 
 set(DEAL_II_CONSTEXPR "constexpr")

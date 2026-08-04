@@ -1,0 +1,6 @@
+Changed: The minimum CMake version required to configure and build deal.II
+has been raised to 3.16. In addition, a number of obsolete configure checks
+and workarounds for compiler, linker, and tool versions that can no longer
+build deal.II have been removed from the build system.
+<br>
+(Matthias Maier, 2026/08/04)

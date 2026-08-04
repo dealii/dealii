@@ -38,38 +38,6 @@ CHECK_CXX_SYMBOL_EXISTS("getpid" "unistd.h" DEAL_II_HAVE_GETPID)
 
 ########################################################################
 #                                                                      #
-#                        Mac OSX specific setup:                       #
-#                                                                      #
-########################################################################
-
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  #
-  # Use -Wno-long-double on Apple Darwin to avoid some unnecessary
-  # warnings. However, newer gccs on that platform do not have
-  # this flag any more, so check whether we can indeed do this
-  #
-  enable_if_supported(DEAL_II_CXX_FLAGS "-Wno-long-double")
-
-  #
-  # On Mac OS X, -rdynamic is accepted by the compiler (i.e.
-  # it doesn't produce an error) but we always get a warning
-  # that it isn't supported.
-  #
-  # TODO: MM: Check whether this is still necessary...
-  #
-  strip_flag(DEAL_II_LINKER_FLAGS "-rdynamic")
-
-  #
-  # At least on Clang 5.0.0 the template depth is set to 128, which is too low
-  # to compile parts of the library. Fix this by setting a large value.
-  #
-  enable_if_supported(DEAL_II_CXX_FLAGS "-ftemplate-depth=1024")
-endif()
-
-
-
-########################################################################
-#                                                                      #
 #                   Windows and CYGWIN specific setup:                 #
 #                                                                      #
 ########################################################################

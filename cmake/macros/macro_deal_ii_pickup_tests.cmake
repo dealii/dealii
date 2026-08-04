@@ -86,14 +86,7 @@ function(pad_string_right output _str _length)
   math(EXPR _strlen "${_length} - ${_strlen}")
 
   if(_strlen GREATER 0)
-    if(${CMAKE_VERSION} VERSION_LESS "3.15")
-      unset(_pad)
-      foreach(_i RANGE 1 ${_strlen}) # inclusive
-        string(APPEND _pad " ")
-      endforeach()
-    else()
-      string(REPEAT " " ${_strlen} _pad)
-    endif()
+    string(REPEAT " " ${_strlen} _pad)
     set(_str "${_str}${_pad}")
   endif()
 
@@ -106,14 +99,7 @@ function(pad_string_left output _str _length)
   math(EXPR _strlen "${_length} - ${_strlen}")
 
   if(_strlen GREATER 0)
-    if(${CMAKE_VERSION} VERSION_LESS "3.15")
-      unset(_pad)
-      foreach(_i RANGE 1 ${_strlen}) # inclusive
-        string(APPEND _pad " ")
-      endforeach()
-    else()
-      string(REPEAT " " ${_strlen} _pad)
-    endif()
+    string(REPEAT " " ${_strlen} _pad)
     set(_str "${_pad}${_str}")
   endif()
 

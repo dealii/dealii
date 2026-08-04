@@ -286,11 +286,7 @@ if(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
   # Choosing the right compiler flag is a bit of a mess:
   #
   if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "15" )
-      set(_keyword "qopenmp")
-    elseif("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER "14" )
-      set(_keyword "openmp")
-    endif()
+    set(_keyword "qopenmp")
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(_keyword "openmp")
   else()

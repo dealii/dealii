@@ -30,11 +30,11 @@
 message(STATUS "This is CMake ${CMAKE_VERSION}")
 message(STATUS "")
 
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.16.0)
 #
-# We support all policy changes up to version 3.13.4.
+# We support all policy changes up to version 3.16.0.
 #
-cmake_policy(VERSION 3.13.4)
+cmake_policy(VERSION 3.16.0)
 
 if(POLICY CMP0144)
   # Introduced in CMake 3.27: find_package(<PackageName>) searches
