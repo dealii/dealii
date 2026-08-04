@@ -245,11 +245,7 @@ endif()
 # uncompressed by default. Fortunately, we can also enable compressed
 # output for the linker.
 #
-# The flag also doesn't appear to be working on Cygwin, as
-# per email by John Fowkes on the mailing list in Feb 2012,
-# so don't run the test on cygwin.
-#
-# Finally, Intel's icpc compiler complains about the flag
+# Intel's icpc compiler complains about the flag
 # but apparently only if the file to be compiled contains
 # particular content. See bug #46 in the Google Code bug
 # data base (http://code.google.com/p/dealii/issues/detail?id=46).
@@ -258,8 +254,7 @@ endif()
 #
 # - Matthias Maier, rewritten 2012, 2013
 #
-if( (NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN") AND
-    (NOT CMAKE_SYSTEM_NAME MATCHES "Windows") AND
+if( (NOT CMAKE_SYSTEM_NAME MATCHES "Windows") AND
     (NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel") )
   add_flags(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_DEBUG}")
   enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
