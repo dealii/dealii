@@ -18,16 +18,6 @@
 
 
 #
-# Intel 16.0.1 produces wrong code that creates a race condition in
-# tests/fe/curl_curl_01.debug but 16.0.2 is known to work. Blacklist this
-# version. Also see github.com/dealii/dealii/issues/2203
-#
-if(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL "16.0.1" )
-  message(FATAL_ERROR "Intel compiler version 16.0.1 is not supported, please update to 16.0.2 or newer!")
-endif()
-
-
-#
 # Check for a regression in gcc-11.1.0 where a deleted move constructor
 # prevents templated constructor from being used. For details see
 #
