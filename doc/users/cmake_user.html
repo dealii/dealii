@@ -63,7 +63,7 @@
   version):
 
 <pre class="cmake">
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.16.0)
 
 find_package(deal.II 9.8.0 REQUIRED
   HINTS ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
@@ -271,7 +271,7 @@ mycode/include/*.h
 In this case the top level <code>CMakeLists.txt</code> file may be:
 <pre class="cmake">
 # top level CMakeLists.txt
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.16.0)
 find_package(deal.II 9.8.0 REQUIRED)
 
 deal_ii_initialize_cached_variables()
@@ -660,7 +660,7 @@ set(TARGET_SRC
   # You can specify additional files here!
 )
 
-cmake_minimum_required(VERSION 3.13.4)
+cmake_minimum_required(VERSION 3.16.0)
 deal_ii_initialize_cached_variables()
 project(${TARGET} CXX)
 deal_ii_invoke_autopilot()
