@@ -421,7 +421,6 @@ unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
   DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
-  DEAL_II_CXX14_CONSTEXPR_BUG_OK
   )
 
 
@@ -539,49 +538,16 @@ CHECK_CXX_SOURCE_COMPILES(
 
 
 #
-# Check for correct c++14 constexpr support.
+# C++14 allows to call non-constexpr functions from constexpr functions as
+# long as there exists an argument value such that an invocation of the
+# function or constructor could be an evaluated subexpression of a core
+# constant expression. All supported compilers implement this correctly --
+# with the exception of MSVC, which in some cases crashes with an internal
+# compiler error when we declare the respective functions as 'constexpr',
+# see #9080. Thus, disable "constexpr" unconditionally for MSVC.
 #
-# As long as there exists an argument value such that an invocation of the
-# function or constructor could be an evaluated subexpression of a core constant
-# expression, C++14 allows to call non-constexpr functions from constexpr
-# functions.
-#
-# Unfortunately, not all compilers obey the standard in this regard. In some
-# cases, MSVC 2019 crashes with an internal compiler error when we
-# declare the respective functions as 'constexpr' even though the test below
-# passes, see #9080.
-#
-# We only run this check if we have CXX14 support, otherwise the use of constexpr
-# is limited (non-const constexpr functions for example).
-#
-
-# MSVC has considerable problems with "constexpr", disable unconditionally
-# for now
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   set(DEAL_II_CXX14_CONSTEXPR_BUG true)
-else()
-  check_cxx_compiler_bug(
-    "
-    #define Assert(x,y) if (!(x)) throw y;
-    void bar()
-    {}
-
-    constexpr int
-    foo(const int n)
-    {
-      Assert(n>0, \"hello\");
-      if(!(n >= 0))
-        bar();
-      return n;
-    }
-
-    int main()
-    {
-      constexpr unsigned int n=foo(1);
-      return n;
-    }
-    "
-    DEAL_II_CXX14_CONSTEXPR_BUG)
 endif()
 
 set(DEAL_II_CONSTEXPR "constexpr")
