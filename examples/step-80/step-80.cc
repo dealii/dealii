@@ -27,6 +27,7 @@
 #include <deal.II/base/quadrature_selector.h>
 #include <deal.II/base/timer.h>
 
+#include <deal.II/grid/grid_tools_geometry.h>
 #include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/lac/linear_operator.h>
 #include <deal.II/lac/linear_operator_tools.h>
@@ -704,6 +705,9 @@ namespace Step80
     DoFHandler<spacedim>      fluid_dh;
     DoFHandler<dim, spacedim> solid_dh;
 
+    double solid_cell_diameter = 0.0;
+    double fluid_cell_diameter = 0.0;
+
     std::unique_ptr<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>
       solid_mapping;
     std::unique_ptr<NonMatching::DoFHandlerCoupling<dim, spacedim>>
@@ -933,6 +937,16 @@ namespace Step80
       }
 
     solid_tria.refine_global(par.initial_solid_refinement);
+
+    fluid_cell_diameter = GridTools::minimal_cell_diameter(fluid_tria);
+    solid_cell_diameter = GridTools::minimal_cell_diameter(solid_tria);
+
+    pcout << "   Fluid mesh: " << fluid_tria.n_global_active_cells()
+          << " cells, minimal cell diameter: " << fluid_cell_diameter
+          << std::endl;
+    pcout << "   Solid mesh: " << solid_tria.n_global_active_cells()
+          << " cells, minimal cell diameter: " << solid_cell_diameter
+          << std::endl;
   }
 
 
@@ -1767,7 +1781,7 @@ namespace Step80
 
         dof_handler_coupling->create_nitsche_restriction_matrix(
           coupling_quadrature,
-          par.gamma_AL_background,
+          par.gamma_AL_background / (solid_cell_diameter * solid_cell_diameter),
           fluid_matrix,
           constraints,
           true);
@@ -2544,6 +2558,10 @@ namespace Step80
     auto invMp = inverse_operator(Mp, cg_solver, fluid_pressure_preconditioner);
     auto invW  = inverse_operator(M, cg_solver, solid_lagrange_preconditioner);
 
+    // scale by h^2 to match the scaling of the Lagrange multiplier duality
+    // pairing
+    invW *= 1.0 / (solid_cell_diameter * solid_cell_diameter);
+
     const auto gamma1 = par.gamma_AL_background;
     const auto gamma2 = par.gamma_AL_immersed;
 
@@ -2553,7 +2571,7 @@ namespace Step80
     else
       A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
 
-      
+
     const auto Dtr = transpose_operator(D); // D^T = -alpha*M_s (M_s symmetric)
     auto       A22_aug = K + gamma2 * Dtr * invW * D;
     auto       A12_aug = gamma1 * Ct * invW * D;
@@ -2621,9 +2639,11 @@ namespace Step80
     block_system_rhs.block(3) = fluid_system_rhs.block(1);
 
     // Augment the RHS consistently with the operator augmentation above so the
-    // solution is unchanged. The w-row uses D^T (Dtr), matching A21_aug/A22_aug.
+    // solution is unchanged. The w-row uses D^T (Dtr), matching
+    // A21_aug/A22_aug.
     block_system_rhs.block(0) += gamma1 * Ct * invW * block_system_rhs.block(2);
-    block_system_rhs.block(1) += gamma2 * Dtr * invW * block_system_rhs.block(2);
+    block_system_rhs.block(1) +=
+      gamma2 * Dtr * invW * block_system_rhs.block(2);
 
 
     block_system_solution.reinit(block_system_rhs);
