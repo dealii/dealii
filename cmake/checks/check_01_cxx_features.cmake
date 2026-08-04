@@ -195,7 +195,6 @@ macro(_test_cxx17_support)
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
     DEAL_II_HAVE_CXX14_FEATURES
     DEAL_II_HAVE_CXX11_FEATURES
-    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
     )
 
   CHECK_CXX_SOURCE_COMPILES(
@@ -321,20 +320,10 @@ macro(_test_cxx17_support)
     "
     DEAL_II_HAVE_CXX11_FEATURES)
 
-  # clang libc++ bug, see https://llvm.org/bugs/show_bug.cgi?id=20084
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <functional>
-    struct A { void foo() const {} };
-    int main() { A a; std::bind(&A::foo,a)(); return 0; }
-    "
-    DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
-
   if(DEAL_II_HAVE_CXX17_FEATURES AND
      DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK AND
      DEAL_II_HAVE_CXX14_FEATURES AND
-     DEAL_II_HAVE_CXX11_FEATURES AND
-     DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
+     DEAL_II_HAVE_CXX11_FEATURES)
     message(STATUS "C++17 support is enabled.")
     set(DEAL_II_HAVE_CXX17 TRUE)
     set(_cxx_standard 17)
