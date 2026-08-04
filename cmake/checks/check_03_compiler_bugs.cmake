@@ -18,19 +18,6 @@
 
 
 #
-# In intel (at least 13.1 and 14), vectorization causes
-# wrong code. See https://code.google.com/p/dealii/issues/detail?id=156
-# or tests/hp/solution_transfer.cc
-# A work-around is to disable all vectorization.
-#
-# - Timo Heister, 2013, 2015
-#
-if(CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "15.0.3" )
-  enable_if_supported(DEAL_II_CXX_FLAGS_RELEASE "-no-vec")
-endif()
-
-
-#
 # Intel 16.0.1 produces wrong code that creates a race condition in
 # tests/fe/curl_curl_01.debug but 16.0.2 is known to work. Blacklist this
 # version. Also see github.com/dealii/dealii/issues/2203
