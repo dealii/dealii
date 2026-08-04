@@ -1,0 +1,4 @@
+Deprecated: The macro DEAL_II_FALLTHROUGH is deprecated. Use the C++17
+attribute [[fallthrough]] directly instead.
+<br>
+(Matthias Maier, 2026/08/04)
