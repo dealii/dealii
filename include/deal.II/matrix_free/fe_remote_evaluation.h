@@ -1128,8 +1128,13 @@ namespace Utilities
         // Construct the communication object for every face ID:
         // 1) RemotePointEvaluation with user specified function for marked
         // vertices.
+        typename Utilities::MPI::RemotePointEvaluation<dim>::AdditionalData
+             additional_data(tolerance,
+                          /*enforce_unique_mapping*/ false,
+                          /* rtree_level */ 0,
+                          marked_vertices);
         auto rpe = std::make_shared<Utilities::MPI::RemotePointEvaluation<dim>>(
-          tolerance, false, 0, marked_vertices);
+          additional_data);
 
         // 2) Face batch IDs and number of faces in batch.
         std::vector<std::pair<unsigned int, unsigned int>>
