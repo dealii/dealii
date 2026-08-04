@@ -35,14 +35,12 @@ endif()
 
 # Correspondence between AppleClang version and upstream Clang version:
 # https://en.wikipedia.org/wiki/Xcode#Xcode_11.0_-_14.x_(since_SwiftUI_framework)_2
-if(POLICY CMP0025)
-  if( CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
-      CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0" )
-    message(FATAL_ERROR "\n"
-      "deal.II requires support for features of C++17 that are not present in\n"
-      "versions of AppleClang prior to 12.0."
-      )
-  endif()
+if( CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" AND
+    CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0" )
+  message(FATAL_ERROR "\n"
+    "deal.II requires support for features of C++17 that are not present in\n"
+    "versions of AppleClang prior to 12.0."
+    )
 endif()
 
 
