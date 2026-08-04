@@ -194,7 +194,6 @@ macro(_test_cxx17_support)
     DEAL_II_HAVE_CXX17_FEATURES
     DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK
     DEAL_II_HAVE_CXX14_FEATURES
-    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK
     DEAL_II_HAVE_CXX11_FEATURES
     DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK
     )
@@ -290,28 +289,6 @@ macro(_test_cxx17_support)
     "
     DEAL_II_HAVE_CXX14_FEATURES)
 
-  # Clang-3.5* or older, bail out with a spurious error message in case
-  # of an undeduced auto return type.
-  #
-  # https://llvm.org/bugs/show_bug.cgi?id=16876
-  set(_flags "${DEAL_II_CXX_FLAGS_DEBUG}")
-  strip_flag(_flags "-Wa,--compress-debug-sections")
-  add_flags(CMAKE_REQUIRED_FLAGS "${_flags}")
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    struct foo
-    {
-      auto func();
-    };
-    int main()
-    {
-      foo bar;
-      (void) bar;
-    }
-    "
-    DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK)
-  _set_up_cmake_required()
-
   # Check some generic C++11 features
   CHECK_CXX_SOURCE_COMPILES(
     "
@@ -356,7 +333,6 @@ macro(_test_cxx17_support)
   if(DEAL_II_HAVE_CXX17_FEATURES AND
      DEAL_II_HAVE_CXX17_CONSTEXPR_LAMBDA_BUG_OK AND
      DEAL_II_HAVE_CXX14_FEATURES AND
-     DEAL_II_HAVE_CXX14_CLANGAUTODEBUG_BUG_OK AND
      DEAL_II_HAVE_CXX11_FEATURES AND
      DEAL_II_HAVE_CXX11_FUNCTIONAL_LLVMBUG20084_OK)
     message(STATUS "C++17 support is enabled.")
