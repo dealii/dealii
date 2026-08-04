@@ -24,7 +24,6 @@
 #   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
 #   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
 #   DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
-#   DEAL_II_FALLTHROUGH
 #   DEAL_II_CONSTEXPR
 #
 
@@ -494,13 +493,6 @@ CHECK_CXX_SOURCE_COMPILES(
   }
   "
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
-
-#
-# The [[fallthrough]] attribute is a language feature in C++17, which we
-# require. Simply set the macro unconditionally.
-#
-set(DEAL_II_FALLTHROUGH "[[fallthrough]]")
-
 
 #
 # Check for c++17 Bessel function support. Unfortunately libc++ version 10

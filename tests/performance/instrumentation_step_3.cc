@@ -100,7 +100,7 @@ Step3::make_grid()
         triangulation.refine_global(6);
         break;
       case TestingEnvironment::medium:
-        DEAL_II_FALLTHROUGH;
+        [[fallthrough]];
       case TestingEnvironment::heavy:
         triangulation.refine_global(7);
         break;
