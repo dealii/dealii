@@ -817,8 +817,7 @@ namespace Step104
     // Apply the top right block: tmp.u = -B^T * dst.p + src.u
     {
       BT_operator.vmult(tmp, dst);
-      tmp.block(0) *= -1.0;
-      tmp.block(0) += src.block(0);
+      tmp.block(0).sadd(-1.0, 1.0, src.block(0));
     }
 
     // Finally the velocity block:
