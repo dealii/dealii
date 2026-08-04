@@ -419,8 +419,6 @@ unset_if_changed(CHECK_CXX_FEATURES_FLAGS_SAVED
   "${CMAKE_REQUIRED_FLAGS}${CMAKE_CXX_STANDARD}"
   DEAL_II_HAVE_FP_EXCEPTIONS
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS
-  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
   DEAL_II_HAVE_CXX17_BESSEL_FUNCTIONS
   DEAL_II_HAVE_CXX17_LEGENDRE_FUNCTIONS
   DEAL_II_CXX14_CONSTEXPR_BUG_OK
@@ -499,68 +497,10 @@ CHECK_CXX_SOURCE_COMPILES(
   DEAL_II_HAVE_COMPLEX_OPERATOR_OVERLOADS)
 
 #
-# Try to enable a fallthrough attribute. This is a language feature in C++17,
-# but a compiler extension in earlier language versions.
+# The [[fallthrough]] attribute is a language feature in C++17, which we
+# require. Simply set the macro unconditionally.
 #
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main()
-  {
-    int i = 42;
-    int j = 10;
-    switch(i)
-      {
-      case 1:
-        ++j;
-        [[fallthrough]];
-      case 2:
-        ++j;
-        [[fallthrough]];
-      default:
-        break;
-      }
-
-    return i + j;
-  }
-  "
-  DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH
-  )
-
-#
-# see if the current compiler configuration supports the GCC extension
-# __attribute__((fallthrough)) syntax instead
-#
-CHECK_CXX_SOURCE_COMPILES(
-  "
-  int main()
-  {
-    int i = 42;
-    int j = 10;
-    switch(i)
-      {
-      case 1:
-        ++j;
-        __attribute__((fallthrough));
-      case 2:
-        ++j;
-        __attribute__((fallthrough));
-      default:
-        break;
-      }
-
-    return i + j;
-  }
-  "
-  DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH
-  )
-
-if(DEAL_II_HAVE_CXX17_ATTRIBUTE_FALLTHROUGH)
-  set(DEAL_II_FALLTHROUGH "[[fallthrough]]")
-elseif(DEAL_II_HAVE_ATTRIBUTE_FALLTHROUGH)
-  set(DEAL_II_FALLTHROUGH "__attribute__((fallthrough))")
-else()
-  set(DEAL_II_FALLTHROUGH " ")
-endif()
+set(DEAL_II_FALLTHROUGH "[[fallthrough]]")
 
 
 #
