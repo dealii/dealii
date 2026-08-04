@@ -35,7 +35,7 @@ macro(expand_instantiations _target _inst_in_files)
     string(REGEX REPLACE "\\.in$" "" _inst_file "${_inst_in_file}" )
 
     if(NOT CMAKE_CROSSCOMPILING)
-      set(_command expand_instantiations_exe)
+      set(_command "$<TARGET_FILE:expand_instantiations_exe>")
       set(_dependency expand_instantiations_exe)
     else()
       set(_command expand_instantiations)
@@ -45,19 +45,29 @@ macro(expand_instantiations _target _inst_in_files)
     # create a .inst.tmp file first and only move to the correct name if the
     # first call succeeds. Otherwise we might be generating an incomplete
     # .inst file
+    #
+    # With CTEST_USE_LAUNCHERS enabled, "ctest --launch" sometimes fails to
+    # forward its own stdin to the launched process, see
+    # https://gitlab.kitware.com/cmake/cmake/-/issues/27610 In this case
+    # expand_instantiations reads in an empty file and aborts with
+    #     "Invalid instantiation list: missing 'for'".
+    # Redirect via a small run_expand_instantiations.cmake wrapper instead.
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
       DEPENDS ${_dependency}
               ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
               ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
-      COMMAND ${_command}
-      ARGS ${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments
-           < ${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}
-           > ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}.tmp
+      COMMAND ${CMAKE_COMMAND}
+      ARGS "-DEXE=${_command}"
+           "-DCLASS_LIST_FILE=${CMAKE_BINARY_DIR}/${DEAL_II_SHARE_RELDIR}/template-arguments"
+           "-DIN=${CMAKE_CURRENT_SOURCE_DIR}/${_inst_in_file}"
+           "-DOUT=${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}.tmp"
+           -P "${CMAKE_SOURCE_DIR}/cmake/scripts/run_expand_instantiations.cmake"
       COMMAND ${CMAKE_COMMAND}
       ARGS -E rename
            ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}.tmp
            ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file}
+      VERBATIM
       )
 
     list(APPEND _inst_targets ${CMAKE_CURRENT_BINARY_DIR}/${_inst_file})
