@@ -81,29 +81,64 @@ template <int dim>
 std::string
 ReferenceCell<dim>::to_string() const
 {
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return "Vertex";
-      case ReferenceCells::Line:
-        return "Line";
-      case ReferenceCells::Triangle:
-        return "Tri";
-      case ReferenceCells::Quadrilateral:
-        return "Quad";
-      case ReferenceCells::Tetrahedron:
-        return "Tet";
-      case ReferenceCells::Pyramid:
-        return "Pyramid";
-      case ReferenceCells::Wedge:
-        return "Wedge";
-      case ReferenceCells::Hexahedron:
-        return "Hex";
-      case ReferenceCells::Invalid<dim>:
-        return "Invalid";
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Vertex:
+            return "Vertex";
+          case ReferenceCells::Invalid<dim>:
+            return "Invalid";
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
     }
+  else if constexpr (dim == 1)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Line:
+            return "Line";
+          case ReferenceCells::Invalid<dim>:
+            return "Invalid";
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return "Tri";
+          case ReferenceCells::Quadrilateral:
+            return "Quad";
+          case ReferenceCells::Invalid<dim>:
+            return "Invalid";
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return "Tet";
+          case ReferenceCells::Pyramid:
+            return "Pyramid";
+          case ReferenceCells::Wedge:
+            return "Wedge";
+          case ReferenceCells::Hexahedron:
+            return "Hex";
+          case ReferenceCells::Invalid<dim>:
+            return "Invalid";
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return "Invalid";
 }
@@ -572,38 +607,60 @@ ReferenceCell<dim>::exodusii_vertex_to_deal_vertex(
 {
   AssertIndexRange(vertex_n, n_vertices());
 
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Line:
-      case ReferenceCells::Triangle:
-        return vertex_n;
-      case ReferenceCells::Quadrilateral:
-        {
-          constexpr std::array<unsigned int, 4> exodus_to_deal{{0, 1, 3, 2}};
-          return exodus_to_deal[vertex_n];
-        }
-      case ReferenceCells::Tetrahedron:
-        return vertex_n;
-      case ReferenceCells::Hexahedron:
-        {
-          constexpr std::array<unsigned int, 8> exodus_to_deal{
-            {0, 1, 3, 2, 4, 5, 7, 6}};
-          return exodus_to_deal[vertex_n];
-        }
-      case ReferenceCells::Wedge:
-        {
-          constexpr std::array<unsigned int, 6> exodus_to_deal{
-            {2, 1, 0, 5, 4, 3}};
-          return exodus_to_deal[vertex_n];
-        }
-      case ReferenceCells::Pyramid:
-        {
-          constexpr std::array<unsigned int, 5> exodus_to_deal{{0, 1, 3, 2, 4}};
-          return exodus_to_deal[vertex_n];
-        }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      DEAL_II_NOT_IMPLEMENTED();
     }
+  else if constexpr (dim == 1)
+    {
+      return vertex_n;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return vertex_n;
+          case ReferenceCells::Quadrilateral:
+            {
+              constexpr std::array<unsigned int, 4> exodus_to_deal{
+                {0, 1, 3, 2}};
+              return exodus_to_deal[vertex_n];
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return vertex_n;
+          case ReferenceCells::Hexahedron:
+            {
+              constexpr std::array<unsigned int, 8> exodus_to_deal{
+                {0, 1, 3, 2, 4, 5, 7, 6}};
+              return exodus_to_deal[vertex_n];
+            }
+          case ReferenceCells::Wedge:
+            {
+              constexpr std::array<unsigned int, 6> exodus_to_deal{
+                {2, 1, 0, 5, 4, 3}};
+              return exodus_to_deal[vertex_n];
+            }
+          case ReferenceCells::Pyramid:
+            {
+              constexpr std::array<unsigned int, 5> exodus_to_deal{
+                {0, 1, 3, 2, 4}};
+              return exodus_to_deal[vertex_n];
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -616,42 +673,64 @@ ReferenceCell<dim>::exodusii_face_to_deal_face(const unsigned int face_n) const
 {
   AssertIndexRange(face_n, n_faces());
 
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return 0;
-      case ReferenceCells::Line:
-      case ReferenceCells::Triangle:
-        return face_n;
-      case ReferenceCells::Quadrilateral:
-        {
-          constexpr std::array<unsigned int, 4> exodus_to_deal{{2, 1, 3, 0}};
-          return exodus_to_deal[face_n];
-        }
-      case ReferenceCells::Tetrahedron:
-        {
-          constexpr std::array<unsigned int, 4> exodus_to_deal{{1, 3, 2, 0}};
-          return exodus_to_deal[face_n];
-        }
-      case ReferenceCells::Hexahedron:
-        {
-          constexpr std::array<unsigned int, 6> exodus_to_deal{
-            {2, 1, 3, 0, 4, 5}};
-          return exodus_to_deal[face_n];
-        }
-      case ReferenceCells::Wedge:
-        {
-          constexpr std::array<unsigned int, 6> exodus_to_deal{{3, 4, 2, 0, 1}};
-          return exodus_to_deal[face_n];
-        }
-      case ReferenceCells::Pyramid:
-        {
-          constexpr std::array<unsigned int, 5> exodus_to_deal{{3, 2, 4, 1, 0}};
-          return exodus_to_deal[face_n];
-        }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return 0;
     }
+  else if constexpr (dim == 1)
+    {
+      return face_n;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return face_n;
+          case ReferenceCells::Quadrilateral:
+            {
+              constexpr std::array<unsigned int, 4> exodus_to_deal{
+                {2, 1, 3, 0}};
+              return exodus_to_deal[face_n];
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              constexpr std::array<unsigned int, 4> exodus_to_deal{
+                {1, 3, 2, 0}};
+              return exodus_to_deal[face_n];
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              constexpr std::array<unsigned int, 6> exodus_to_deal{
+                {2, 1, 3, 0, 4, 5}};
+              return exodus_to_deal[face_n];
+            }
+          case ReferenceCells::Wedge:
+            {
+              constexpr std::array<unsigned int, 6> exodus_to_deal{
+                {3, 4, 2, 0, 1}};
+              return exodus_to_deal[face_n];
+            }
+          case ReferenceCells::Pyramid:
+            {
+              constexpr std::array<unsigned int, 5> exodus_to_deal{
+                {3, 2, 4, 1, 0}};
+              return exodus_to_deal[face_n];
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -699,29 +778,48 @@ template <int dim>
 unsigned int
 ReferenceCell<dim>::vtk_linear_type() const
 {
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return VTKCellType::VTK_VERTEX;
-      case ReferenceCells::Line:
-        return VTKCellType::VTK_LINE;
-      case ReferenceCells::Triangle:
-        return VTKCellType::VTK_TRIANGLE;
-      case ReferenceCells::Quadrilateral:
-        return VTKCellType::VTK_QUAD;
-      case ReferenceCells::Tetrahedron:
-        return VTKCellType::VTK_TETRA;
-      case ReferenceCells::Pyramid:
-        return VTKCellType::VTK_PYRAMID;
-      case ReferenceCells::Wedge:
-        return VTKCellType::VTK_WEDGE;
-      case ReferenceCells::Hexahedron:
-        return VTKCellType::VTK_HEXAHEDRON;
-      case ReferenceCells::Invalid<dim>:
-        return VTKCellType::VTK_INVALID;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return VTKCellType::VTK_VERTEX;
     }
+  else if constexpr (dim == 1)
+    {
+      return VTKCellType::VTK_LINE;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return VTKCellType::VTK_TRIANGLE;
+          case ReferenceCells::Quadrilateral:
+            return VTKCellType::VTK_QUAD;
+          case ReferenceCells::Invalid<dim>:
+            return VTKCellType::VTK_INVALID;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return VTKCellType::VTK_TETRA;
+          case ReferenceCells::Pyramid:
+            return VTKCellType::VTK_PYRAMID;
+          case ReferenceCells::Wedge:
+            return VTKCellType::VTK_WEDGE;
+          case ReferenceCells::Hexahedron:
+            return VTKCellType::VTK_HEXAHEDRON;
+          case ReferenceCells::Invalid<dim>:
+            return VTKCellType::VTK_INVALID;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return VTKCellType::VTK_INVALID;
 }
@@ -732,29 +830,48 @@ template <int dim>
 unsigned int
 ReferenceCell<dim>::vtk_quadratic_type() const
 {
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return VTKCellType::VTK_VERTEX;
-      case ReferenceCells::Line:
-        return VTKCellType::VTK_QUADRATIC_EDGE;
-      case ReferenceCells::Triangle:
-        return VTKCellType::VTK_QUADRATIC_TRIANGLE;
-      case ReferenceCells::Quadrilateral:
-        return VTKCellType::VTK_QUADRATIC_QUAD;
-      case ReferenceCells::Tetrahedron:
-        return VTKCellType::VTK_QUADRATIC_TETRA;
-      case ReferenceCells::Pyramid:
-        return VTKCellType::VTK_QUADRATIC_PYRAMID;
-      case ReferenceCells::Wedge:
-        return VTKCellType::VTK_QUADRATIC_WEDGE;
-      case ReferenceCells::Hexahedron:
-        return VTKCellType::VTK_QUADRATIC_HEXAHEDRON;
-      case ReferenceCells::Invalid<dim>:
-        return VTKCellType::VTK_INVALID;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return VTKCellType::VTK_VERTEX;
     }
+  else if constexpr (dim == 1)
+    {
+      return VTKCellType::VTK_QUADRATIC_EDGE;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return VTKCellType::VTK_QUADRATIC_TRIANGLE;
+          case ReferenceCells::Quadrilateral:
+            return VTKCellType::VTK_QUADRATIC_QUAD;
+          case ReferenceCells::Invalid<dim>:
+            return VTKCellType::VTK_INVALID;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return VTKCellType::VTK_QUADRATIC_TETRA;
+          case ReferenceCells::Pyramid:
+            return VTKCellType::VTK_QUADRATIC_PYRAMID;
+          case ReferenceCells::Wedge:
+            return VTKCellType::VTK_QUADRATIC_WEDGE;
+          case ReferenceCells::Hexahedron:
+            return VTKCellType::VTK_QUADRATIC_HEXAHEDRON;
+          case ReferenceCells::Invalid<dim>:
+            return VTKCellType::VTK_INVALID;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return VTKCellType::VTK_INVALID;
 }
@@ -765,29 +882,48 @@ template <int dim>
 unsigned int
 ReferenceCell<dim>::vtk_lagrange_type() const
 {
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return VTKCellType::VTK_VERTEX;
-      case ReferenceCells::Line:
-        return VTKCellType::VTK_LAGRANGE_CURVE;
-      case ReferenceCells::Triangle:
-        return VTKCellType::VTK_LAGRANGE_TRIANGLE;
-      case ReferenceCells::Quadrilateral:
-        return VTKCellType::VTK_LAGRANGE_QUADRILATERAL;
-      case ReferenceCells::Tetrahedron:
-        return VTKCellType::VTK_LAGRANGE_TETRAHEDRON;
-      case ReferenceCells::Pyramid:
-        return VTKCellType::VTK_LAGRANGE_PYRAMID;
-      case ReferenceCells::Wedge:
-        return VTKCellType::VTK_LAGRANGE_WEDGE;
-      case ReferenceCells::Hexahedron:
-        return VTKCellType::VTK_LAGRANGE_HEXAHEDRON;
-      case ReferenceCells::Invalid<dim>:
-        return VTKCellType::VTK_INVALID;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return VTKCellType::VTK_VERTEX;
     }
+  else if constexpr (dim == 1)
+    {
+      return VTKCellType::VTK_LAGRANGE_CURVE;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return VTKCellType::VTK_LAGRANGE_TRIANGLE;
+          case ReferenceCells::Quadrilateral:
+            return VTKCellType::VTK_LAGRANGE_QUADRILATERAL;
+          case ReferenceCells::Invalid<dim>:
+            return VTKCellType::VTK_INVALID;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return VTKCellType::VTK_LAGRANGE_TETRAHEDRON;
+          case ReferenceCells::Pyramid:
+            return VTKCellType::VTK_LAGRANGE_PYRAMID;
+          case ReferenceCells::Wedge:
+            return VTKCellType::VTK_LAGRANGE_WEDGE;
+          case ReferenceCells::Hexahedron:
+            return VTKCellType::VTK_LAGRANGE_HEXAHEDRON;
+          case ReferenceCells::Invalid<dim>:
+            return VTKCellType::VTK_INVALID;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return VTKCellType::VTK_INVALID;
 }
@@ -1007,44 +1143,66 @@ ReferenceCell<dim>::vtk_vertex_to_deal_vertex(
   //
   // For the ordering, see the VTK manual (for example at
   // http://www.princeton.edu/~efeibush/viscourse/vtk.pdf, page 9).
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return vertex_index;
-      case ReferenceCells::Line:
-        return vertex_index;
-      case ReferenceCells::Triangle:
-        return vertex_index;
-      case ReferenceCells::Quadrilateral:
-        {
-          static constexpr std::array<unsigned int, 4> index_translation_table =
-            {{0, 1, 3, 2}};
-          return index_translation_table[vertex_index];
-        }
-      case ReferenceCells::Tetrahedron:
-        return vertex_index;
-      case ReferenceCells::Pyramid:
-        {
-          static constexpr std::array<unsigned int, 5> index_translation_table =
-            {{0, 1, 3, 2, 4}};
-          return index_translation_table[vertex_index];
-        }
-      case ReferenceCells::Wedge:
-        return vertex_index;
-      case ReferenceCells::Hexahedron:
-        {
-          static constexpr std::array<unsigned int, 8> index_translation_table =
-            {{0, 1, 3, 2, 4, 5, 7, 6}};
-          return index_translation_table[vertex_index];
-        }
-      case ReferenceCells::Invalid<dim>:
-        {
-          DEAL_II_NOT_IMPLEMENTED();
-          return numbers::invalid_unsigned_int;
-        }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return vertex_index;
     }
+  else if constexpr (dim == 1)
+    {
+      return vertex_index;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return vertex_index;
+          case ReferenceCells::Quadrilateral:
+            {
+              static constexpr std::array<unsigned int, 4>
+                index_translation_table = {{0, 1, 3, 2}};
+              return index_translation_table[vertex_index];
+            }
+          case ReferenceCells::Invalid<dim>:
+            {
+              DEAL_II_NOT_IMPLEMENTED();
+              return numbers::invalid_unsigned_int;
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return vertex_index;
+          case ReferenceCells::Pyramid:
+            {
+              static constexpr std::array<unsigned int, 5>
+                index_translation_table = {{0, 1, 3, 2, 4}};
+              return index_translation_table[vertex_index];
+            }
+          case ReferenceCells::Wedge:
+            return vertex_index;
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr std::array<unsigned int, 8>
+                index_translation_table = {{0, 1, 3, 2, 4, 5, 7, 6}};
+              return index_translation_table[vertex_index];
+            }
+          case ReferenceCells::Invalid<dim>:
+            {
+              DEAL_II_NOT_IMPLEMENTED();
+              return numbers::invalid_unsigned_int;
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -1108,28 +1266,46 @@ ReferenceCell<dim>::gmsh_element_type() const
     15 Point (1 node).
   */
 
-  switch (this->kind)
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return 15;
-      case ReferenceCells::Line:
-        return 1;
-      case ReferenceCells::Triangle:
-        return 2;
-      case ReferenceCells::Quadrilateral:
-        return 3;
-      case ReferenceCells::Tetrahedron:
-        return 4;
-      case ReferenceCells::Pyramid:
-        return 7;
-      case ReferenceCells::Wedge:
-        return 6;
-      case ReferenceCells::Hexahedron:
-        return 5;
-      case ReferenceCells::Invalid<dim>:
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return 15;
     }
+  else if constexpr (dim == 1)
+    {
+      return 1;
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return 2;
+          case ReferenceCells::Quadrilateral:
+            return 3;
+          case ReferenceCells::Invalid<dim>:
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return 4;
+          case ReferenceCells::Pyramid:
+            return 7;
+          case ReferenceCells::Wedge:
+            return 6;
+          case ReferenceCells::Hexahedron:
+            return 5;
+          case ReferenceCells::Invalid<dim>:
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -1397,62 +1573,94 @@ ReferenceCell<dim>::closest_point(const Point<dim> &p) const
           constexpr unsigned int x_index = 0;
           constexpr unsigned int y_index = (dim >= 2 ? 1 : 0);
           constexpr unsigned int z_index = (dim >= 3 ? 2 : 0);
-          switch (this->kind)
+          if constexpr (dim == 0)
             {
-              case ReferenceCells::Vertex:
-                DEAL_II_ASSERT_UNREACHABLE();
-                break;
-                // the bounds for each dimension of a hypercube are mutually
-                // independent:
-              case ReferenceCells::Line:
-              case ReferenceCells::Quadrilateral:
-              case ReferenceCells::Hexahedron:
-                for (unsigned int d = 0; d < dim; ++d)
-                  result[d] = std::clamp(result[d], 0.0, 1.0);
-                // simplices can use the standard definition of a simplex:
-                break;
-              case ReferenceCells::Triangle:
-                result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-                result[y_index] =
-                  std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-                break;
-              case ReferenceCells::Tetrahedron:
-                result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-                result[y_index] =
-                  std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-                result[z_index] =
-                  std::clamp(result[z_index],
-                             0.0,
-                             1.0 - result[x_index] - result[y_index]);
-                break;
-              // wedges and pyramids are more ad-hoc:
-              case ReferenceCells::Wedge:
-                result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-                result[y_index] =
-                  std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-                result[z_index] = std::clamp(result[z_index], 0.0, 1.0);
-                break;
-              case ReferenceCells::Pyramid:
-                {
-                  result[x_index] = std::clamp(result[x_index], -1.0, 1.0);
-                  result[y_index] = std::clamp(result[y_index], -1.0, 1.0);
-                  // It suffices to transform everything to the first quadrant
-                  // to adjust z:
-                  const auto x_abs = std::abs(result[x_index]);
-                  const auto y_abs = std::abs(result[y_index]);
-
-                  if (y_abs <= x_abs)
-                    result[z_index] =
-                      std::clamp(result[z_index], 0.0, 1.0 - x_abs);
-                  else
-                    result[z_index] =
-                      std::clamp(result[z_index], 0.0, 1.0 - y_abs);
-                }
-                break;
-              default:
-                DEAL_II_NOT_IMPLEMENTED();
+              DEAL_II_ASSERT_UNREACHABLE();
             }
+          else if constexpr (dim == 1)
+            {
+              // the bounds for each dimension of a hypercube are mutually
+              // independent:
+              for (unsigned int d = 0; d < dim; ++d)
+                result[d] = std::clamp(result[d], 0.0, 1.0);
+            }
+          else if constexpr (dim == 2)
+            {
+              switch (this->kind)
+                {
+                  case ReferenceCells::Quadrilateral:
+                    // the bounds for each dimension of a hypercube are mutually
+                    // independent:
+                    for (unsigned int d = 0; d < dim; ++d)
+                      result[d] = std::clamp(result[d], 0.0, 1.0);
+                    break;
+
+                  case ReferenceCells::Triangle:
+                    // simplices can use the standard definition of a simplex:
+                    result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
+                    result[y_index] =
+                      std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                    break;
+
+                  default:
+                    DEAL_II_NOT_IMPLEMENTED();
+                }
+            }
+          else if constexpr (dim == 3)
+            {
+              switch (this->kind)
+                {
+                  case ReferenceCells::Hexahedron:
+                    // the bounds for each dimension of a hypercube are mutually
+                    // independent:
+                    for (unsigned int d = 0; d < dim; ++d)
+                      result[d] = std::clamp(result[d], 0.0, 1.0);
+                    break;
+
+                  case ReferenceCells::Tetrahedron:
+                    // simplices can use the standard definition of a simplex:
+                    result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
+                    result[y_index] =
+                      std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                    result[z_index] =
+                      std::clamp(result[z_index],
+                                 0.0,
+                                 1.0 - result[x_index] - result[y_index]);
+                    break;
+
+                    // wedges and pyramids are more ad-hoc:
+                  case ReferenceCells::Wedge:
+                    result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
+                    result[y_index] =
+                      std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                    result[z_index] = std::clamp(result[z_index], 0.0, 1.0);
+                    break;
+
+                  case ReferenceCells::Pyramid:
+                    {
+                      result[x_index] = std::clamp(result[x_index], -1.0, 1.0);
+                      result[y_index] = std::clamp(result[y_index], -1.0, 1.0);
+                      // It suffices to transform everything to the first
+                      // quadrant to adjust z:
+                      const auto x_abs = std::abs(result[x_index]);
+                      const auto y_abs = std::abs(result[y_index]);
+
+                      if (y_abs <= x_abs)
+                        result[z_index] =
+                          std::clamp(result[z_index], 0.0, 1.0 - x_abs);
+                      else
+                        result[z_index] =
+                          std::clamp(result[z_index], 0.0, 1.0 - y_abs);
+                    }
+                    break;
+                  default:
+                    DEAL_II_NOT_IMPLEMENTED();
+                }
+            }
+          else
+            DEAL_II_NOT_IMPLEMENTED();
         }
+
       // We should be within 4 * eps of the cell by this point. The roundoff
       // error comes from, e.g., computing (1 - x) + x when moving points onto
       // the top of a Pyramid.
