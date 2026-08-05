@@ -854,15 +854,15 @@ namespace
             case 3:
               AssertIndexRange(zstep, n_subdivisions + 1);
               point_no += (n_subdivisions + 1) * (n_subdivisions + 1) * zstep;
-              DEAL_II_FALLTHROUGH;
+              [[fallthrough]];
             case 2:
               AssertIndexRange(ystep, n_subdivisions + 1);
               point_no += (n_subdivisions + 1) * ystep;
-              DEAL_II_FALLTHROUGH;
+              [[fallthrough]];
             case 1:
               AssertIndexRange(xstep, n_subdivisions + 1);
               point_no += xstep;
-              DEAL_II_FALLTHROUGH;
+              [[fallthrough]];
             case 0:
               // break here for dim<=3
               break;

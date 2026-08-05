@@ -152,7 +152,7 @@ namespace VectorTools
             break;
 
           case FiniteElementData<dim>::H1:
-            DEAL_II_FALLTHROUGH;
+            [[fallthrough]];
           case FiniteElementData<dim>::L2:
             // See Monk, Finite Element Methods for Maxwell's Equations,
             // p. 77ff, formula (3.74).

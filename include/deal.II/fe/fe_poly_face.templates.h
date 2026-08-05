@@ -148,7 +148,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
                                               face_no)][i];
                   }
               }
-              DEAL_II_FALLTHROUGH;
+              [[fallthrough]];
 
             case 2:
               {
@@ -175,7 +175,7 @@ FE_PolyFace<PolynomialType, dim, spacedim>::fill_fe_face_values(
                       }
                   }
               }
-              DEAL_II_FALLTHROUGH;
+              [[fallthrough]];
 
             case 1:
               {

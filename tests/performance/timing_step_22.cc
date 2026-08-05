@@ -609,7 +609,7 @@ StokesProblem<dim>::run()
         triangulation.refine_global(5 - dim);
         break;
       case TestingEnvironment::medium:
-        DEAL_II_FALLTHROUGH;
+        [[fallthrough]];
       case TestingEnvironment::heavy:
         triangulation.refine_global(6 - dim);
         break;

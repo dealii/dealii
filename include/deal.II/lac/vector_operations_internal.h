@@ -1156,18 +1156,18 @@ namespace internal
                 r2 = op(index++);
                 for (size_type j = 1; j < 8; ++j)
                   r2 += op(index++);
-                DEAL_II_FALLTHROUGH;
+                [[fallthrough]];
               case 2:
                 r1 = op(index++);
                 for (size_type j = 1; j < 8; ++j)
                   r1 += op(index++);
                 r1 += r2;
-                DEAL_II_FALLTHROUGH;
+                [[fallthrough]];
               case 1:
                 r2 = op(index++);
                 for (size_type j = 1; j < 8; ++j)
                   r2 += op(index++);
-                DEAL_II_FALLTHROUGH;
+                [[fallthrough]];
               default:
                 for (size_type j = 0; j < remainder_inner; ++j)
                   r0 += op(index++);

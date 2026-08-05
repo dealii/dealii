@@ -270,7 +270,14 @@ DEAL_II_NAMESPACE_CLOSE
 #  endif
 #endif
 
-#cmakedefine DEAL_II_FALLTHROUGH @DEAL_II_FALLTHROUGH@
+/**
+ * An alias for the C++17 attribute <code>[[fallthrough]]</code>.
+ *
+ * @deprecated This macro is deprecated. Use the C++17 attribute
+ * <code>[[fallthrough]]</code> directly instead.
+ */
+#define DEAL_II_FALLTHROUGH [[fallthrough]]
+
 #cmakedefine DEAL_II_CONSTEXPR @DEAL_II_CONSTEXPR@
 
 

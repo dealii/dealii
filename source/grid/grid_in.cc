@@ -3558,10 +3558,10 @@ GridIn<dim, spacedim>::parse_tecplot_header(
     {
       case 3:
         IJK[2] = 0;
-        DEAL_II_FALLTHROUGH;
+        [[fallthrough]];
       case 2:
         IJK[1] = 0;
-        DEAL_II_FALLTHROUGH;
+        [[fallthrough]];
       case 1:
         IJK[0] = 0;
     }
