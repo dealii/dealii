@@ -1,0 +1,10 @@
+Improved: Several ReferenceCell member functions
+(ReferenceCell::face_to_cell_vertices(),
+ReferenceCell::standard_to_real_face_vertex(),
+ReferenceCell::face_to_cell_line_orientation(), and
+ReferenceCell::standard_to_real_face_line()) were optimized and can, with a
+`constexpr ReferenceCell`, now be inlined. These optimizations make uniform
+refinement of a tetrahedral Triangulation about 16\% less expensive (as measured
+by callgrind).
+<br>
+(David Wells, 2026/08/01)
