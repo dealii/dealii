@@ -142,10 +142,6 @@ SolutionTransfer<dim, VectorType, spacedim>::
   prepare_for_coarsening_and_refinement(
     const std::vector<const VectorType *> &all_in)
 {
-  const dealii::internal::parallel::shared::
-    TemporarilyRestoreSubdomainIds<dim, spacedim>
-      subdomain_modifier(dof_handler->get_triangulation());
-
   for (unsigned int i = 0; i < all_in.size(); ++i)
     Assert(all_in[i]->size() == dof_handler->n_dofs(),
            ExcDimensionMismatch(all_in[i]->size(), dof_handler->n_dofs()));
