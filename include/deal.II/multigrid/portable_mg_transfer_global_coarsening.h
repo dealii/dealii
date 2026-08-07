@@ -173,16 +173,38 @@ namespace Portable
 
       /**
        * Prolongation matrix used for the prolongate_and_add() and
-       * restrict_and_add() functions.
+       * restrict_and_add() functions. Empty for the identity scheme
+       * (cells that are not refined between the two levels).
        */
       Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
         prolongation_matrix;
 
       /**
-       * DoF indices on the coarse solution space.
+       * CRS offsets into #coarse_constraint_indices /
+       * #coarse_constraint_weights for reading and writing coarse DoFs
+       * including AffineConstraints (hanging nodes and Dirichlet). Size is
+       * `n_coarse_cells * n_dofs_per_cell_coarse + 1`.
        */
-      Kokkos::View<unsigned int **, MemorySpace::Default::kokkos_space>
-        dof_indices_coarse;
+      Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space>
+        coarse_constraint_offsets;
+
+      /**
+       * Global (locally owned + ghost) DoF indices for the coarse constraint
+       * CRS. One-dimensional; length equals `#coarse_constraint_weights` and
+       * `coarse_constraint_offsets(n_coarse_cells * n_dofs_per_cell_coarse)`.
+       * For local DoF `i` on cell `c`, entries lie in the half-open range
+       * `[coarse_constraint_offsets(c * n_dofs_per_cell_coarse + i),
+       *   coarse_constraint_offsets(c * n_dofs_per_cell_coarse + i + 1))`.
+       */
+      Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space>
+        coarse_constraint_indices;
+
+      /**
+       * Constraint weights referenced by the coarse constraint CRS. For
+       * unconstrained DoFs this is a single entry with weight 1.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+        coarse_constraint_weights;
 
       /**
        * DoF indices on the fine solution space.
@@ -194,6 +216,15 @@ namespace Portable
        * Weights for continuous elements.
        */
       Kokkos::View<Number **, MemorySpace::Default::kokkos_space> weights;
+
+      /**
+       * Fast hanging-node constraint masks for each coarse cell of this
+       * scheme (ConstraintKinds::unconstrained if none). Empty if the host
+       * setup did not enable the fast hanging-node algorithm.
+       */
+      Kokkos::View<dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                   MemorySpace::Default::kokkos_space>
+        hanging_node_masks;
     };
 
     /**
@@ -267,6 +298,13 @@ namespace Portable
      * Multigrid level used during initialization.
      */
     unsigned int mg_level_fine;
+
+    /**
+     * 1D hanging-node interpolation weights (subface interpolation matrix)
+     * shared by all schemes when the fast hanging-node algorithm is used.
+     */
+    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+      hanging_node_constraint_weights;
 
     dealii::MGTwoLevelTransfer<
       dim,
