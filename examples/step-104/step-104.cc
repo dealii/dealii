@@ -1016,6 +1016,7 @@ namespace Step104
         constraint.reinit(dof_handler.locally_owned_dofs(),
                           DoFTools::extract_locally_relevant_dofs(dof_handler));
 
+        DoFTools::make_hanging_node_constraints(dof_handler, constraint);
         DoFTools::make_zero_boundary_constraints(dof_handler, constraint);
         constraint.close();
 
