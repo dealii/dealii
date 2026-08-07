@@ -283,6 +283,22 @@ namespace parallel
       execute_coarsening_and_refinement() override;
 
       /**
+       * Prepare the triangulation for coarsening and refinement.
+       *
+       * @note In addition to what the function of the base
+       * dealii::Triangulation class does, this function first synchronizes
+       * the refinement and coarsening flags over all processes. Each MPI
+       * process only needs to set these flags on its own locally owned
+       * cells; synchronizing them first guarantees that decisions made
+       * during flag smoothing (such as removing the coarsening flags of a
+       * group of sibling cells if not all children are flagged) are made
+       * with knowledge of the flags set by all processes, and consequently
+       * do not depend on how the triangulation is partitioned.
+       */
+      virtual bool
+      prepare_coarsening_and_refinement() override;
+
+      /**
        * Create a triangulation.
        *
        * This function also partitions triangulation based on the MPI
@@ -406,6 +422,16 @@ namespace parallel
        */
       void
       partition();
+
+      /**
+       * Synchronize the refinement and coarsening flags over all MPI
+       * processes: Each process only needs to set the flags on its own
+       * locally owned cells; this function combines the flags of all
+       * processes so that afterwards every process holds the complete set
+       * of flags for the entire (replicated) triangulation.
+       */
+      void
+      communicate_coarsening_and_refinement_flags();
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning
