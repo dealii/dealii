@@ -1,0 +1,11 @@
+
+DEAL::adaptive cycle: 0, n_dofs: 59
+DEAL::converged in 4 iterations.
+DEAL::velocity error: 0.19 pressure error: 0.092
+DEAL::adaptive cycle: 1, n_dofs: 187
+DEAL::converged in 8 iterations.
+DEAL::velocity error: 0.039 pressure error: 0.14
+DEAL::adaptive cycle: 2, n_dofs: 331
+DEAL::converged in 10 iterations.
+DEAL::velocity error: 0.031 pressure error: 0.12
+DEAL::OK

@@ -1,0 +1,11 @@
+
+DEAL::n_cells: 52 n_dofs: 162
+DEAL::converged in 6 iterations.
+DEAL::Error: 0.000708805
+DEAL::n_cells: 52 n_dofs: 578
+DEAL::converged in 6 iterations.
+DEAL::Error: 7.66893e-15
+DEAL::n_cells: 400 n_dofs: 2187
+DEAL::converged in 6 iterations.
+DEAL::Error: 0.000166879
+DEAL::OK

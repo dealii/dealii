@@ -27,6 +27,8 @@
 #include <deal.II/fe/fe_tools.h>
 #include <deal.II/fe/fe_values.h>
 
+#include <deal.II/matrix_free/hanging_nodes_internal.h>
+#include <deal.II/matrix_free/portable_hanging_nodes_internal.h>
 #include <deal.II/matrix_free/portable_tensor_product_kernels.h>
 
 #include <deal.II/multigrid/mg_transfer_matrix_free.h>
@@ -101,6 +103,74 @@ namespace Portable
       const unsigned int degree_fine;
       const unsigned int degree_coarse;
     };
+
+
+
+    /**
+     * Dispatch resolve_hanging_nodes for a run-time coarse degree.
+     */
+    class HangingNodeDegreeFactory
+    {
+    public:
+      static const unsigned int max_degree = 9;
+
+      explicit HangingNodeDegreeFactory(const unsigned int degree)
+        : degree(degree)
+      {}
+
+      template <int dim, bool transpose, typename Number, typename ViewType>
+      DEAL_II_HOST_DEVICE bool
+      run(const Kokkos::TeamPolicy<
+            MemorySpace::Default::kokkos_space::execution_space>::member_type
+            &team_member,
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
+            constraint_weights,
+          const dealii::internal::MatrixFreeFunctions::ConstraintKinds
+                   constraint_mask,
+          ViewType values) const
+      {
+        // resolve_hanging_nodes() only implements dim == 2 and dim == 3.
+        if constexpr (dim < 2)
+          {
+            (void)team_member;
+            (void)constraint_weights;
+            (void)constraint_mask;
+            (void)values;
+            return false;
+          }
+        else
+          {
+#define DEAL_II_HANGING_NODE_DEGREE_CASE(degree_value)             \
+  case degree_value:                                               \
+    {                                                              \
+      resolve_hanging_nodes<dim, degree_value, transpose, Number>( \
+        team_member, constraint_weights, constraint_mask, values); \
+      return true;                                                 \
+    }
+
+            switch (degree)
+              {
+                DEAL_II_HANGING_NODE_DEGREE_CASE(1)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(2)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(3)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(4)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(5)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(6)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(7)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(8)
+                DEAL_II_HANGING_NODE_DEGREE_CASE(9)
+                default:
+                  return false;
+              }
+#undef DEAL_II_HANGING_NODE_DEGREE_CASE
+          }
+      }
+
+    private:
+      const unsigned int degree;
+    };
+
+
 
     /**
      * Helper class containing the cell-wise prolongation operation.
@@ -449,12 +519,9 @@ namespace Portable
         }
 
         // -------- prolongation matrix (0) -> identity matrix --------
-
+        //
         // nothing to do since for identity prolongation matrices a short-cut
         // code path is used during prolongation/restriction
-
-        // Hasn't been tested with local mesh refinement yet!
-        Assert(transfer.schemes[0].n_coarse_cells == 0, ExcNotImplemented());
 
         // --------------prolongation matrix (i = 1 ... n)--------------
         {
@@ -493,24 +560,110 @@ namespace Portable
             }
         }
 
-        // ------------------- fill dof indices-------------------
+        // ------------------- hanging-node weights -------------------
+        const auto &constraint_info_coarse =
+          transfer_cpu.constraint_info_coarse;
+        const bool has_hanging_nodes =
+          constraint_info_coarse.hanging_node_constraint_masks.empty() == false;
 
+        if (has_hanging_nodes)
+          {
+            Assert(constraint_info_coarse.shape_infos.empty() == false,
+                   ExcInternalError());
+            const auto &subface_matrix =
+              constraint_info_coarse.shape_infos.front()
+                .data.front()
+                .subface_interpolation_matrices[0];
+
+            transfer.hanging_node_constraint_weights =
+              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                Kokkos::view_alloc("hanging_node_constraint_weights",
+                                   Kokkos::WithoutInitializing),
+                subface_matrix.size());
+
+            using UnmanagedViewType =
+              Kokkos::View<const Number *,
+                           Kokkos::HostSpace,
+                           Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+            UnmanagedViewType view(subface_matrix.data(),
+                                   subface_matrix.size());
+            Kokkos::deep_copy(transfer.hanging_node_constraint_weights, view);
+          }
+
+        // ---------- coarse constraint CRS + fine dof indices ----------
         {
+          MemorySpace::Default::kokkos_space::execution_space exec;
+
           unsigned int scheme_counter = 0;
           unsigned int cell_counter   = 0;
           for (auto &scheme : transfer.schemes)
             {
               if (scheme.n_coarse_cells == 0)
-                continue;
+                {
+                  ++scheme_counter;
+                  continue;
+                }
 
-              scheme.dof_indices_coarse =
-                Kokkos::View<unsigned int **,
-                             MemorySpace::Default::kokkos_space>(
-                  Kokkos::view_alloc("h_transfer_dof_indices_coarse_scheme_" +
-                                       std::to_string(scheme_counter),
-                                     Kokkos::WithoutInitializing),
-                  scheme.n_dofs_per_cell_coarse,
-                  scheme.n_coarse_cells);
+              const unsigned int n_rows =
+                scheme.n_coarse_cells * scheme.n_dofs_per_cell_coarse;
+
+              // CRS is only needed for non-Dirichlet AffineConstraints
+              // (multi-entry / weighted). Homogeneous Dirichlet uses
+              // invalid_unsigned_int on the identity path.
+              bool use_constraint_crs = false;
+              {
+                for (unsigned int cell = 0; cell < scheme.n_coarse_cells;
+                     ++cell)
+                  {
+                    const unsigned int coarse_cell_index = cell_counter + cell;
+                    unsigned int       index_indicators =
+                      constraint_info_coarse.row_starts[coarse_cell_index]
+                        .second;
+                    const unsigned int next_index_indicators =
+                      constraint_info_coarse.row_starts[coarse_cell_index + 1]
+                        .second;
+
+                    for (; index_indicators != next_index_indicators;
+                         ++index_indicators)
+                      {
+                        const unsigned int pool_row =
+                          constraint_info_coarse
+                            .constraint_indicator[index_indicators]
+                            .second;
+                        if (constraint_info_coarse.constraint_pool_data
+                              .empty() == false)
+                          {
+                            const unsigned int begin =
+                              constraint_info_coarse
+                                .constraint_pool_row_index[pool_row];
+                            const unsigned int end =
+                              constraint_info_coarse
+                                .constraint_pool_row_index[pool_row + 1];
+                            if (begin != end)
+                              {
+                                use_constraint_crs = true;
+                                break;
+                              }
+                          }
+                      }
+                    if (use_constraint_crs)
+                      break;
+                  }
+              }
+
+              std::vector<unsigned int> constraint_offsets;
+              std::vector<unsigned int> constraint_indices;
+              std::vector<Number>       constraint_weights;
+              if (use_constraint_crs)
+                {
+                  constraint_offsets.resize(n_rows + 1);
+                  constraint_indices.reserve(n_rows);
+                  constraint_weights.reserve(n_rows);
+                }
+              else
+                {
+                  constraint_indices.resize(n_rows);
+                }
 
               scheme.dof_indices_fine =
                 Kokkos::View<unsigned int **,
@@ -521,31 +674,41 @@ namespace Portable
                   scheme.n_dofs_per_cell_fine,
                   scheme.n_coarse_cells);
 
-              auto dof_indices_coarse_host =
-                Kokkos::create_mirror_view(scheme.dof_indices_coarse);
-
               auto dof_indices_fine_host =
                 Kokkos::create_mirror_view(scheme.dof_indices_fine);
+
+              typename std::remove_reference_t<
+                decltype(scheme.hanging_node_masks)>::host_mirror_type
+                hanging_node_masks_host;
+              if (has_hanging_nodes)
+                {
+                  scheme.hanging_node_masks = Kokkos::View<
+                    dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
+                    MemorySpace::Default::kokkos_space>(
+                    "h_transfer_hanging_node_masks_scheme_" +
+                      std::to_string(scheme_counter),
+                    scheme.n_coarse_cells);
+                  hanging_node_masks_host =
+                    Kokkos::create_mirror_view(scheme.hanging_node_masks);
+                }
 
               const unsigned int first_cell = cell_counter;
               for (unsigned int cell = 0; cell < scheme.n_coarse_cells; ++cell)
                 {
                   const unsigned int coarse_cell_index = first_cell + cell;
 
-                  // fill coarse indices
+                  // expand ConstraintInfo into identity indices (with
+                  // Dirichlet as invalid) or a CRS gather/scatter map
                   {
                     const unsigned int *dof_indices_coarse =
-                      transfer_cpu.constraint_info_coarse.dof_indices.data() +
-                      transfer_cpu.constraint_info_coarse
-                        .row_starts[coarse_cell_index]
+                      constraint_info_coarse.dof_indices.data() +
+                      constraint_info_coarse.row_starts[coarse_cell_index]
                         .first;
                     unsigned int index_indicators =
-                      transfer_cpu.constraint_info_coarse
-                        .row_starts[coarse_cell_index]
+                      constraint_info_coarse.row_starts[coarse_cell_index]
                         .second;
-                    unsigned int next_index_indicators =
-                      transfer_cpu.constraint_info_coarse
-                        .row_starts[coarse_cell_index + 1]
+                    const unsigned int next_index_indicators =
+                      constraint_info_coarse.row_starts[coarse_cell_index + 1]
                         .second;
 
                     unsigned int ind_local = 0;
@@ -553,27 +716,85 @@ namespace Portable
                          ++index_indicators)
                       {
                         const std::pair<unsigned short, unsigned short>
-                          indicator = transfer_cpu.constraint_info_coarse
+                          indicator = constraint_info_coarse
                                         .constraint_indicator[index_indicators];
 
                         for (unsigned int j = 0; j < indicator.first; ++j)
                           {
-                            dof_indices_coarse_host(ind_local + j, cell) =
-                              dof_indices_coarse[j];
+                            const unsigned int row =
+                              cell * scheme.n_dofs_per_cell_coarse + ind_local +
+                              j;
+                            if (use_constraint_crs)
+                              {
+                                constraint_offsets[row] =
+                                  constraint_indices.size();
+                                constraint_indices.push_back(
+                                  dof_indices_coarse[j]);
+                                constraint_weights.push_back(Number(1.));
+                              }
+                            else
+                              constraint_indices[row] = dof_indices_coarse[j];
                           }
                         ind_local += indicator.first;
                         dof_indices_coarse += indicator.first;
 
-                        dof_indices_coarse_host(ind_local, cell) =
-                          numbers::invalid_unsigned_int;
+                        const unsigned int row =
+                          cell * scheme.n_dofs_per_cell_coarse + ind_local;
+
+                        if (use_constraint_crs)
+                          {
+                            constraint_offsets[row] = constraint_indices.size();
+
+                            const unsigned int pool_row = indicator.second;
+                            const Number      *data_val =
+                              constraint_info_coarse.constraint_pool_data
+                                  .empty() ?
+                                     nullptr :
+                                     constraint_info_coarse.constraint_pool_data
+                                    .data() +
+                                  constraint_info_coarse
+                                    .constraint_pool_row_index[pool_row];
+                            const Number *end_pool =
+                              constraint_info_coarse.constraint_pool_data
+                                  .empty() ?
+                                nullptr :
+                                constraint_info_coarse.constraint_pool_data
+                                    .data() +
+                                  constraint_info_coarse
+                                    .constraint_pool_row_index[pool_row + 1];
+
+                            for (; data_val != end_pool;
+                                 ++data_val, ++dof_indices_coarse)
+                              {
+                                constraint_indices.push_back(
+                                  *dof_indices_coarse);
+                                constraint_weights.push_back(*data_val);
+                              }
+                          }
+                        else
+                          {
+                            // Homogeneous Dirichlet: empty constraint pool.
+                            constraint_indices[row] =
+                              numbers::invalid_unsigned_int;
+                          }
 
                         ++ind_local;
                       }
 
                     for (; ind_local < scheme.n_dofs_per_cell_coarse;
                          ++dof_indices_coarse, ++ind_local)
-                      dof_indices_coarse_host(ind_local, cell) =
-                        *dof_indices_coarse;
+                      {
+                        const unsigned int row =
+                          cell * scheme.n_dofs_per_cell_coarse + ind_local;
+                        if (use_constraint_crs)
+                          {
+                            constraint_offsets[row] = constraint_indices.size();
+                            constraint_indices.push_back(*dof_indices_coarse);
+                            constraint_weights.push_back(Number(1.));
+                          }
+                        else
+                          constraint_indices[row] = *dof_indices_coarse;
+                      }
                   }
 
                   // fill fine indices
@@ -589,22 +810,102 @@ namespace Portable
                       dof_indices_fine_host(j, cell) = *dof_indices_fine;
                   }
 
+                  if (has_hanging_nodes)
+                    hanging_node_masks_host(cell) =
+                      dealii::internal::MatrixFreeFunctions::decompress(
+                        constraint_info_coarse
+                          .hanging_node_constraint_masks[coarse_cell_index],
+                        dim);
+
                   ++cell_counter;
                 }
 
-              // copy to the device memory
-              {
-                Kokkos::deep_copy(scheme.dof_indices_coarse,
-                                  dof_indices_coarse_host);
-                Kokkos::fence();
+              if (use_constraint_crs)
+                constraint_offsets[n_rows] = constraint_indices.size();
 
-                Kokkos::deep_copy(scheme.dof_indices_fine,
+              scheme.use_constraint_crs = use_constraint_crs;
+              Assert(use_constraint_crs || constraint_indices.size() == n_rows,
+                     ExcInternalError());
+
+              scheme.coarse_constraint_indices =
+                Kokkos::View<unsigned int *,
+                             MemorySpace::Default::kokkos_space>(
+                  Kokkos::view_alloc("h_transfer_coarse_constraint_indices_" +
+                                       std::to_string(scheme_counter),
+                                     Kokkos::WithoutInitializing),
+                  constraint_indices.size());
+
+              if (use_constraint_crs)
+                {
+                  scheme.coarse_constraint_offsets =
+                    Kokkos::View<unsigned int *,
+                                 MemorySpace::Default::kokkos_space>(
+                      Kokkos::view_alloc(
+                        "h_transfer_coarse_constraint_offsets_" +
+                          std::to_string(scheme_counter),
+                        Kokkos::WithoutInitializing),
+                      constraint_offsets.size());
+                  scheme.coarse_constraint_weights =
+                    Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                      Kokkos::view_alloc(
+                        "h_transfer_coarse_constraint_weights_" +
+                          std::to_string(scheme_counter),
+                        Kokkos::WithoutInitializing),
+                      constraint_weights.size());
+                }
+              else
+                {
+                  scheme.coarse_constraint_offsets =
+                    Kokkos::View<unsigned int *,
+                                 MemorySpace::Default::kokkos_space>();
+                  scheme.coarse_constraint_weights =
+                    Kokkos::View<Number *,
+                                 MemorySpace::Default::kokkos_space>();
+                }
+
+              {
+                using UnmanagedUIntViewType =
+                  Kokkos::View<const unsigned int *,
+                               Kokkos::HostSpace,
+                               Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+                using UnmanagedNumberViewType =
+                  Kokkos::View<const Number *,
+                               Kokkos::HostSpace,
+                               Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
+                UnmanagedUIntViewType indices_view(constraint_indices.data(),
+                                                   constraint_indices.size());
+
+                Kokkos::deep_copy(exec,
+                                  scheme.coarse_constraint_indices,
+                                  indices_view);
+                if (use_constraint_crs)
+                  {
+                    UnmanagedUIntViewType offsets_view(
+                      constraint_offsets.data(), constraint_offsets.size());
+                    UnmanagedNumberViewType weights_view(
+                      constraint_weights.data(), constraint_weights.size());
+
+                    Kokkos::deep_copy(exec,
+                                      scheme.coarse_constraint_offsets,
+                                      offsets_view);
+                    Kokkos::deep_copy(exec,
+                                      scheme.coarse_constraint_weights,
+                                      weights_view);
+                  }
+                Kokkos::deep_copy(exec,
+                                  scheme.dof_indices_fine,
                                   dof_indices_fine_host);
-                Kokkos::fence();
+                if (has_hanging_nodes)
+                  Kokkos::deep_copy(exec,
+                                    scheme.hanging_node_masks,
+                                    hanging_node_masks_host);
               }
 
               ++scheme_counter;
             }
+
+          exec.fence();
         }
 
         // ------------------- weights-------------------
@@ -650,9 +951,17 @@ namespace Portable
         unsigned int scheme_index = 0;
 
         const unsigned int n_components = transfer.n_components;
+        const auto         hanging_node_weights =
+          transfer.hanging_node_constraint_weights;
 
         for (const auto &scheme : transfer.schemes)
           {
+            // Per scheme we select:
+            // - whether a prolongation matrix is needed, or the levels share
+            //   the same cells (identity);
+            // - how coarse constraints are applied: Dirichlet via
+            //   invalid_unsigned_int indices, hanging nodes via masks, or
+            //   general AffineConstraints via CRS.
             if (scheme.n_coarse_cells == 0)
               continue;
 
@@ -661,33 +970,58 @@ namespace Portable
             const unsigned int n_scalar_dofs_per_cell_fine =
               scheme.n_dofs_per_cell_fine / n_components;
 
-            auto team_policy =
-              TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
+            const bool needs_interpolation =
+              scheme.prolongation_matrix.extent(0) > 0;
+            const bool has_hanging_nodes =
+              scheme.hanging_node_masks.extent(0) > 0;
 
-            CellTransferFactory cell_transfer(scheme.degree_fine,
+            CellTransferFactory      cell_transfer(scheme.degree_fine,
                                               scheme.degree_coarse);
+            HangingNodeDegreeFactory hanging_node_factory(scheme.degree_coarse);
 
-            unsigned int scratch_pad_size = 0;
-            if constexpr (dim == 2)
-              scratch_pad_size =
-                (scheme.degree_coarse + 1) * (scheme.degree_fine + 1);
-            else if constexpr (dim == 3)
-              scratch_pad_size =
-                (scheme.degree_coarse + 1) * (scheme.degree_fine + 1) *
-                (scheme.degree_coarse + scheme.degree_fine + 2);
+            unsigned int scratch_pad_size         = 0;
+            unsigned int prolongation_matrix_size = 0;
+            if (needs_interpolation)
+              {
+                prolongation_matrix_size =
+                  (scheme.degree_coarse + 1) * (scheme.degree_fine + 1);
+                if constexpr (dim == 2)
+                  scratch_pad_size =
+                    (scheme.degree_coarse + 1) * (scheme.degree_fine + 1);
+                else if constexpr (dim == 3)
+                  scratch_pad_size =
+                    (scheme.degree_coarse + 1) * (scheme.degree_fine + 1) *
+                    (scheme.degree_coarse + scheme.degree_fine + 2);
+              }
 
             const auto team_shmem_size =
               SharedViewValues::shmem_size(n_scalar_dofs_per_cell_coarse,
-                                           n_components) + // coarse dof values
+                                           n_components) +
               SharedViewValues::shmem_size(n_scalar_dofs_per_cell_fine,
-                                           n_components) + // fine dof values
-              SharedViewScratchPad::shmem_size(
-                (scheme.degree_coarse + 1) *
-                (scheme.degree_fine + 1)) // prolongation matrix
-              +
-              SharedViewScratchPad::shmem_size(
-                scratch_pad_size); // scratch pad for tensor product evaluation
+                                           n_components) +
+              SharedViewScratchPad::shmem_size(prolongation_matrix_size) +
+              SharedViewScratchPad::shmem_size(scratch_pad_size);
 
+            const auto coarse_constraint_offsets =
+              scheme.coarse_constraint_offsets;
+            const auto coarse_constraint_indices =
+              scheme.coarse_constraint_indices;
+            const auto coarse_constraint_weights =
+              scheme.coarse_constraint_weights;
+            const auto         hanging_node_masks  = scheme.hanging_node_masks;
+            const auto         dof_indices_fine    = scheme.dof_indices_fine;
+            const auto         weights             = scheme.weights;
+            const auto         prolongation_matrix = scheme.prolongation_matrix;
+            const unsigned int n_dofs_coarse = scheme.n_dofs_per_cell_coarse;
+            const unsigned int n_dofs_fine   = scheme.n_dofs_per_cell_fine;
+
+            const bool use_crs = scheme.use_constraint_crs;
+            TeamPolicy team_policy =
+              use_crs ? TeamPolicy(exec,
+                                   scheme.n_coarse_cells,
+                                   Kokkos::AUTO,
+                                   Kokkos::AUTO) :
+                        TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
             team_policy.set_scratch_size(0, Kokkos::PerTeam(team_shmem_size));
 
             Kokkos::parallel_for(
@@ -698,8 +1032,7 @@ namespace Portable
                 const int coarse_cell_index = team_member.league_rank();
 
                 SharedViewScratchPad prolongation_matrix_device(
-                  team_member.team_shmem(),
-                  (scheme.degree_coarse + 1) * (scheme.degree_fine + 1));
+                  team_member.team_shmem(), prolongation_matrix_size);
 
                 SharedViewValues values_coarse(team_member.team_shmem(),
                                                n_scalar_dofs_per_cell_coarse,
@@ -712,63 +1045,116 @@ namespace Portable
                 SharedViewScratchPad scratch_pad(team_member.team_shmem(),
                                                  scratch_pad_size);
 
-                // copy prolongation matrix to the scratch memory
-                Kokkos::parallel_for(
-                  Kokkos::TeamThreadRange(team_member,
-                                          (scheme.degree_coarse + 1) *
-                                            (scheme.degree_fine + 1)),
-                  [&](const int &i) {
-                    prolongation_matrix_device(i) =
-                      scheme.prolongation_matrix(i);
-                  });
-                team_member.team_barrier();
+                if (needs_interpolation)
+                  {
+                    Kokkos::parallel_for(
+                      Kokkos::TeamThreadRange(team_member,
+                                              prolongation_matrix_size),
+                      [&](const int &i) {
+                        prolongation_matrix_device(i) = prolongation_matrix(i);
+                      });
+                    team_member.team_barrier();
+                  }
 
                 // read coarse dof values
                 Kokkos::parallel_for(
-                  Kokkos::TeamThreadRange(team_member,
-                                          scheme.n_dofs_per_cell_coarse),
+                  Kokkos::TeamThreadRange(team_member, n_dofs_coarse),
                   [&](const int &thread_id) {
                     const int component =
                       thread_id / n_scalar_dofs_per_cell_coarse;
                     const int local_dof =
                       thread_id % n_scalar_dofs_per_cell_coarse;
 
-                    const unsigned int global_dof =
-                      scheme.dof_indices_coarse(thread_id, coarse_cell_index);
+                    const unsigned int row =
+                      coarse_cell_index * n_dofs_coarse + thread_id;
 
-                    if (global_dof != numbers::invalid_unsigned_int)
-                      values_coarse(local_dof, component) =
-                        src_device[global_dof];
+                    if (use_crs)
+                      {
+                        Number     result = 0.;
+                        const auto begin  = coarse_constraint_offsets(row);
+                        const auto end    = coarse_constraint_offsets(row + 1);
+
+                        Kokkos::parallel_reduce(
+                          Kokkos::ThreadVectorRange(team_member, begin, end),
+                          [&](const int &k, Number &value) {
+                            value += coarse_constraint_weights(k) *
+                                     src_device[coarse_constraint_indices(k)];
+                          },
+                          Kokkos::Sum<Number>(result));
+
+                        values_coarse(local_dof, component) = result;
+                      }
                     else
-                      values_coarse(local_dof, component) = 0.;
+                      {
+                        const unsigned int global_dof =
+                          coarse_constraint_indices(row);
+                        values_coarse(local_dof, component) =
+                          (global_dof != numbers::invalid_unsigned_int) ?
+                            src_device[global_dof] :
+                            Number(0.);
+                      }
                   });
                 team_member.team_barrier();
 
-                for (unsigned int c = 0; c < n_components; ++c)
+                // fast hanging-node interpolation on the coarse cell
+                if (has_hanging_nodes)
                   {
-                    SharedViewScratchPad values_coarse_component =
-                      Kokkos::subview(values_coarse, Kokkos::ALL, c);
-                    SharedViewScratchPad values_fine_component =
-                      Kokkos::subview(values_fine, Kokkos::ALL, c);
+                    const auto mask = hanging_node_masks(coarse_cell_index);
+                    if (mask != dealii::internal::MatrixFreeFunctions::
+                                  ConstraintKinds::unconstrained)
+                      for (unsigned int c = 0; c < n_components; ++c)
+                        {
+                          SharedViewScratchPad values_coarse_component =
+                            Kokkos::subview(values_coarse, Kokkos::ALL, c);
+                          hanging_node_factory.template run<dim, false, Number>(
+                            team_member,
+                            hanging_node_weights,
+                            mask,
+                            values_coarse_component);
+                        }
+                  }
 
-                    typename MGTwoLevelTransfer<dim,
-                                                VectorType>::TransferCellData
-                      cell_data{team_member,
-                                prolongation_matrix_device,
-                                values_coarse_component,
-                                values_fine_component,
-                                scratch_pad};
+                if (needs_interpolation)
+                  {
+                    for (unsigned int c = 0; c < n_components; ++c)
+                      {
+                        SharedViewScratchPad values_coarse_component =
+                          Kokkos::subview(values_coarse, Kokkos::ALL, c);
+                        SharedViewScratchPad values_fine_component =
+                          Kokkos::subview(values_fine, Kokkos::ALL, c);
 
-                    CellProlongator<dim, VectorType> cell_prolongator(
-                      &cell_data);
+                        typename MGTwoLevelTransfer<dim, VectorType>::
+                          TransferCellData cell_data{team_member,
+                                                     prolongation_matrix_device,
+                                                     values_coarse_component,
+                                                     values_fine_component,
+                                                     scratch_pad};
 
-                    cell_transfer.run(cell_prolongator);
+                        CellProlongator<dim, VectorType> cell_prolongator(
+                          &cell_data);
+
+                        cell_transfer.run(cell_prolongator);
+                      }
+                  }
+                else
+                  {
+                    // identity scheme: cell exists on both levels
+                    Kokkos::parallel_for(
+                      Kokkos::TeamThreadRange(team_member, n_dofs_coarse),
+                      [&](const int &thread_id) {
+                        const int component =
+                          thread_id / n_scalar_dofs_per_cell_coarse;
+                        const int local_dof =
+                          thread_id % n_scalar_dofs_per_cell_coarse;
+                        values_fine(local_dof, component) =
+                          values_coarse(local_dof, component);
+                      });
+                    team_member.team_barrier();
                   }
 
                 // apply weights and add fine values into results vector
                 Kokkos::parallel_for(
-                  Kokkos::TeamThreadRange(team_member,
-                                          scheme.n_dofs_per_cell_fine),
+                  Kokkos::TeamThreadRange(team_member, n_dofs_fine),
                   [&](const int &thread_id) {
                     const int component =
                       thread_id / n_scalar_dofs_per_cell_fine;
@@ -776,10 +1162,9 @@ namespace Portable
                       thread_id % n_scalar_dofs_per_cell_fine;
 
                     const unsigned int global_dof =
-                      scheme.dof_indices_fine(thread_id, coarse_cell_index);
+                      dof_indices_fine(thread_id, coarse_cell_index);
 
-                    const Number weight =
-                      scheme.weights(thread_id, coarse_cell_index);
+                    const Number weight = weights(thread_id, coarse_cell_index);
 
                     Kokkos::atomic_add(&dst_device[global_dof],
                                        weight *
@@ -828,11 +1213,20 @@ namespace Portable
                                         src.locally_owned_size());
 
         const unsigned int n_components = transfer.n_components;
+        const auto         hanging_node_weights =
+          transfer.hanging_node_constraint_weights;
 
         unsigned int scheme_index = 0;
 
         for (const auto &scheme : transfer.schemes)
           {
+            // Per scheme we select:
+            // - whether a prolongation matrix is needed, or the levels share
+            //   the same cells (identity);
+            // - how coarse constraints are applied: Dirichlet via
+            //   invalid_unsigned_int indices, hanging nodes via masks, or
+            //   general AffineConstraints via CRS.
+
             if (scheme.n_coarse_cells == 0)
               continue;
 
@@ -841,33 +1235,58 @@ namespace Portable
             const unsigned int n_scalar_dofs_per_cell_fine =
               scheme.n_dofs_per_cell_fine / n_components;
 
-            auto team_policy =
-              TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
+            const bool needs_interpolation =
+              scheme.prolongation_matrix.extent(0) > 0;
+            const bool has_hanging_nodes =
+              scheme.hanging_node_masks.extent(0) > 0;
 
-            CellTransferFactory cell_transfer(scheme.degree_fine,
+            CellTransferFactory      cell_transfer(scheme.degree_fine,
                                               scheme.degree_coarse);
+            HangingNodeDegreeFactory hanging_node_factory(scheme.degree_coarse);
 
-            unsigned int scratch_pad_size = 0;
-            if constexpr (dim == 2)
-              scratch_pad_size =
-                (scheme.degree_coarse + 1) * (scheme.degree_fine + 1);
-            else if constexpr (dim == 3)
-              scratch_pad_size =
-                (scheme.degree_coarse + 1) * (scheme.degree_fine + 1) *
-                (scheme.degree_coarse + scheme.degree_fine + 2);
+            unsigned int scratch_pad_size         = 0;
+            unsigned int prolongation_matrix_size = 0;
+            if (needs_interpolation)
+              {
+                prolongation_matrix_size =
+                  (scheme.degree_coarse + 1) * (scheme.degree_fine + 1);
+                if constexpr (dim == 2)
+                  scratch_pad_size =
+                    (scheme.degree_coarse + 1) * (scheme.degree_fine + 1);
+                else if constexpr (dim == 3)
+                  scratch_pad_size =
+                    (scheme.degree_coarse + 1) * (scheme.degree_fine + 1) *
+                    (scheme.degree_coarse + scheme.degree_fine + 2);
+              }
 
             const auto team_shmem_size =
               SharedViewValues::shmem_size(n_scalar_dofs_per_cell_coarse,
-                                           n_components) + // coarse dof values
+                                           n_components) +
               SharedViewValues::shmem_size(n_scalar_dofs_per_cell_fine,
-                                           n_components) + // fine dof values
-              SharedViewScratchPad::shmem_size(
-                (scheme.degree_coarse + 1) *
-                (scheme.degree_fine + 1)) // prolongation matrix
-              +
-              SharedViewScratchPad::shmem_size(
-                scratch_pad_size); // scratch pad for tensor product evaluation
+                                           n_components) +
+              SharedViewScratchPad::shmem_size(prolongation_matrix_size) +
+              SharedViewScratchPad::shmem_size(scratch_pad_size);
 
+            const auto coarse_constraint_offsets =
+              scheme.coarse_constraint_offsets;
+            const auto coarse_constraint_indices =
+              scheme.coarse_constraint_indices;
+            const auto coarse_constraint_weights =
+              scheme.coarse_constraint_weights;
+            const auto         hanging_node_masks  = scheme.hanging_node_masks;
+            const auto         dof_indices_fine    = scheme.dof_indices_fine;
+            const auto         weights             = scheme.weights;
+            const auto         prolongation_matrix = scheme.prolongation_matrix;
+            const unsigned int n_dofs_coarse = scheme.n_dofs_per_cell_coarse;
+            const unsigned int n_dofs_fine   = scheme.n_dofs_per_cell_fine;
+
+            const bool use_crs = scheme.use_constraint_crs;
+            TeamPolicy team_policy =
+              use_crs ? TeamPolicy(exec,
+                                   scheme.n_coarse_cells,
+                                   Kokkos::AUTO,
+                                   Kokkos::AUTO) :
+                        TeamPolicy(exec, scheme.n_coarse_cells, Kokkos::AUTO);
             team_policy.set_scratch_size(0, Kokkos::PerTeam(team_shmem_size));
 
             Kokkos::parallel_for(
@@ -878,8 +1297,7 @@ namespace Portable
                 const int coarse_cell_index = team_member.league_rank();
 
                 SharedViewScratchPad prolongation_matrix_device(
-                  team_member.team_shmem(),
-                  (scheme.degree_coarse + 1) * (scheme.degree_fine + 1));
+                  team_member.team_shmem(), prolongation_matrix_size);
 
                 SharedViewValues values_coarse(team_member.team_shmem(),
                                                n_scalar_dofs_per_cell_coarse,
@@ -892,74 +1310,124 @@ namespace Portable
                 SharedViewScratchPad scratch_pad(team_member.team_shmem(),
                                                  scratch_pad_size);
 
-                // copy prolongation matrix to the scratch memory
-                Kokkos::parallel_for(
-                  Kokkos::TeamThreadRange(team_member,
-                                          (scheme.degree_coarse + 1) *
-                                            (scheme.degree_fine + 1)),
-                  [&](const int &i) {
-                    prolongation_matrix_device(i) =
-                      scheme.prolongation_matrix(i);
-                  });
-                team_member.team_barrier();
+                if (needs_interpolation)
+                  {
+                    Kokkos::parallel_for(
+                      Kokkos::TeamThreadRange(team_member,
+                                              prolongation_matrix_size),
+                      [&](const int &i) {
+                        prolongation_matrix_device(i) = prolongation_matrix(i);
+                      });
+                    team_member.team_barrier();
+                  }
 
                 // read fine dof values and apply weights
                 Kokkos::parallel_for(
-                  Kokkos::TeamThreadRange(team_member,
-                                          scheme.n_dofs_per_cell_fine),
+                  Kokkos::TeamThreadRange(team_member, n_dofs_fine),
                   [&](const int &thread_id) {
                     const int component =
                       thread_id / n_scalar_dofs_per_cell_fine;
                     const int local_dof =
                       thread_id % n_scalar_dofs_per_cell_fine;
 
-                    const Number weight =
-                      scheme.weights(thread_id, coarse_cell_index);
+                    const Number weight = weights(thread_id, coarse_cell_index);
 
                     const unsigned int global_dof =
-                      scheme.dof_indices_fine(thread_id, coarse_cell_index);
+                      dof_indices_fine(thread_id, coarse_cell_index);
 
                     values_fine(local_dof, component) =
                       weight * src_device[global_dof];
                   });
                 team_member.team_barrier();
 
-                for (unsigned int c = 0; c < n_components; ++c)
+                if (needs_interpolation)
                   {
-                    SharedViewScratchPad values_coarse_component =
-                      Kokkos::subview(values_coarse, Kokkos::ALL, c);
-                    SharedViewScratchPad values_fine_component =
-                      Kokkos::subview(values_fine, Kokkos::ALL, c);
+                    for (unsigned int c = 0; c < n_components; ++c)
+                      {
+                        SharedViewScratchPad values_coarse_component =
+                          Kokkos::subview(values_coarse, Kokkos::ALL, c);
+                        SharedViewScratchPad values_fine_component =
+                          Kokkos::subview(values_fine, Kokkos::ALL, c);
 
-                    typename MGTwoLevelTransfer<dim,
-                                                VectorType>::TransferCellData
-                      cell_data{team_member,
-                                prolongation_matrix_device,
-                                values_coarse_component,
-                                values_fine_component,
-                                scratch_pad};
+                        typename MGTwoLevelTransfer<dim, VectorType>::
+                          TransferCellData cell_data{team_member,
+                                                     prolongation_matrix_device,
+                                                     values_coarse_component,
+                                                     values_fine_component,
+                                                     scratch_pad};
 
-                    CellRestrictor<dim, VectorType> cell_restrictor(&cell_data);
+                        CellRestrictor<dim, VectorType> cell_restrictor(
+                          &cell_data);
 
-                    cell_transfer.run(cell_restrictor);
+                        cell_transfer.run(cell_restrictor);
+                      }
+                  }
+                else
+                  {
+                    Kokkos::parallel_for(
+                      Kokkos::TeamThreadRange(team_member, n_dofs_coarse),
+                      [&](const int &thread_id) {
+                        const int component =
+                          thread_id / n_scalar_dofs_per_cell_coarse;
+                        const int local_dof =
+                          thread_id % n_scalar_dofs_per_cell_coarse;
+                        values_coarse(local_dof, component) =
+                          values_fine(local_dof, component);
+                      });
+                    team_member.team_barrier();
                   }
 
-                // distribute coarse dofs values
+                // transpose hanging-node interpolation before scattering
+                if (has_hanging_nodes)
+                  {
+                    const auto mask = hanging_node_masks(coarse_cell_index);
+                    if (mask != dealii::internal::MatrixFreeFunctions::
+                                  ConstraintKinds::unconstrained)
+                      for (unsigned int c = 0; c < n_components; ++c)
+                        {
+                          SharedViewScratchPad values_coarse_component =
+                            Kokkos::subview(values_coarse, Kokkos::ALL, c);
+                          hanging_node_factory.template run<dim, true, Number>(
+                            team_member,
+                            hanging_node_weights,
+                            mask,
+                            values_coarse_component);
+                        }
+                  }
+
+                // distribute coarse dof values
                 Kokkos::parallel_for(
-                  Kokkos::TeamThreadRange(team_member,
-                                          scheme.n_dofs_per_cell_coarse),
+                  Kokkos::TeamThreadRange(team_member, n_dofs_coarse),
                   [&](const int &thread_id) {
                     const int component =
                       thread_id / n_scalar_dofs_per_cell_coarse;
                     const int local_dof =
                       thread_id % n_scalar_dofs_per_cell_coarse;
 
-                    const unsigned int global_dof =
-                      scheme.dof_indices_coarse(thread_id, coarse_cell_index);
+                    const Number value = values_coarse(local_dof, component);
+                    const unsigned int row =
+                      coarse_cell_index * n_dofs_coarse + thread_id;
 
-                    if (global_dof != numbers::invalid_unsigned_int)
-                      Kokkos::atomic_add(&dst_device[global_dof],
-                                         values_coarse(local_dof, component));
+                    if (use_crs)
+                      {
+                        const auto begin = coarse_constraint_offsets(row);
+                        const auto end   = coarse_constraint_offsets(row + 1);
+
+                        Kokkos::parallel_for(
+                          Kokkos::ThreadVectorRange(team_member, begin, end),
+                          [&](const int &k) {
+                            Kokkos::atomic_add(
+                              &dst_device[coarse_constraint_indices(k)],
+                              coarse_constraint_weights(k) * value);
+                          });
+                      }
+                    else
+                      {
+                        const unsigned int global_dof =
+                          coarse_constraint_indices(row);
+                        if (global_dof != numbers::invalid_unsigned_int)
+                          Kokkos::atomic_add(&dst_device[global_dof], value);
+                      }
                   });
                 team_member.team_barrier();
               });

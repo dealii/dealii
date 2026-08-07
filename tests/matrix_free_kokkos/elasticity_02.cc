@@ -284,7 +284,7 @@ private:
 
 template <int dim, int degree>
 void
-test(const unsigned int refinement)
+test()
 {
   using VectorType =
     LinearAlgebra::distributed::Vector<double, MemorySpace::Default>;
@@ -295,15 +295,18 @@ test(const unsigned int refinement)
 
   parallel::distributed::Triangulation<dim> tria(MPI_COMM_WORLD);
   GridGenerator::hyper_cube(tria, 0., 1.);
-  tria.refine_global(refinement);
+  tria.refine_global(3);
+  tria.begin_active()->set_refine_flag();
+  tria.execute_coarsening_and_refinement();
+
   MappingQ1<dim>  mapping;
   const FE_Q<dim> scalar_fe(degree);
   FESystem<dim>   fe(scalar_fe, dim);
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  deallog << "refinement: " << refinement << " n_dofs: " << dof_handler.n_dofs()
-          << std::endl;
+  deallog << "n_cells: " << tria.n_active_cells()
+          << " n_dofs: " << dof_handler.n_dofs() << std::endl;
 
   AffineConstraints<double> constraints;
   constraints.reinit(dof_handler.locally_owned_dofs(),
@@ -450,8 +453,8 @@ main(int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   initlog();
-  test<2, 1>(2);
-  test<2, 1>(3);
-  test<2, 1>(4);
+  test<2, 1>();
+  test<2, 2>();
+  test<3, 1>();
   deallog << "OK" << std::endl;
 }
