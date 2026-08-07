@@ -354,7 +354,7 @@ namespace parallel
     template <int dim, int spacedim>
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim,
-                       spacedim>::communicate_refinement_and_coarsening_flags()
+                       spacedim>::communicate_coarsening_and_refinement_flags()
     {
       // make sure that all refinement/coarsening flags are the same on all
       // processes
@@ -423,7 +423,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
     {
-      communicate_refinement_and_coarsening_flags();
+      communicate_coarsening_and_refinement_flags();
 
       return dealii::Triangulation<dim, spacedim>::
         prepare_coarsening_and_refinement();
@@ -435,7 +435,7 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     void Triangulation<dim, spacedim>::execute_coarsening_and_refinement()
     {
-      communicate_refinement_and_coarsening_flags();
+      communicate_coarsening_and_refinement_flags();
 
       dealii::Triangulation<dim, spacedim>::execute_coarsening_and_refinement();
       partition();

@@ -431,7 +431,7 @@ namespace parallel
        * of flags for the entire (replicated) triangulation.
        */
       void
-      communicate_refinement_and_coarsening_flags();
+      communicate_coarsening_and_refinement_flags();
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning
