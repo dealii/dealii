@@ -148,11 +148,15 @@ test()
         gpu_data, additional_data.mapping_update_flags);
       for (unsigned int cell_id = 0; cell_id < n_cells; ++cell_id)
         {
+          const unsigned int global_cell_id =
+            gpu_data.row_start / gpu_data.padding_length + cell_id;
           for (unsigned int i = 0; i < n_q_points_per_cell; ++i)
             {
               const unsigned int pos =
-                gpu_data_host.local_q_point_id(cell_id, n_q_points_per_cell, i);
-              auto         p = gpu_data_host.get_quadrature_point(cell_id, i);
+                gpu_data_host.local_q_point_id(global_cell_id,
+                                               n_q_points_per_cell,
+                                               i);
+              auto p = gpu_data_host.get_quadrature_point(global_cell_id, i);
               const double p_val = dim == 2 ? p[0] + p[1] : p[0] + p[1] + p[2];
               AssertThrow(std::abs(coef[pos] - p_val) < 1e-12,
                           ExcInternalError());

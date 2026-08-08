@@ -1,0 +1,9 @@
+Changed: The cell index exposed to user code in the portable (Kokkos) matrix-free framework is now a global index. Impacts include:
+Portable::FEEvaluation::get_current_cell_index(),
+the cell_index passed to Portable::MatrixFree::Data,
+the cell argument handed to functors by Portable::MatrixFree::evaluate_coefficients(),
+and the cell argument of Portable::MatrixFree::Data::local_q_point_id() and get_quadrature_point() (and
+their host equivalents).
+User code that previously combined get_current_cell_index() with a color offset, or that indexed per-color arrays by cell_index, should now use the global index directly.
+<br>
+(Ryan Moulday, 2026/07/11)
