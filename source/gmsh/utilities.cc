@@ -19,7 +19,14 @@
 
 #include <deal.II/opencascade/utilities.h>
 
+#ifdef DEAL_II_WITH_GMSH
+#  include <boost/process/io.hpp>
+#  include <boost/process/system.hpp>
+#endif
+
 #include <cstdio>
+#include <filesystem>
+#include <string>
 
 #ifdef DEAL_II_WITH_GMSH
 #  ifdef DEAL_II_WITH_OPENCASCADE
@@ -75,8 +82,7 @@ namespace Gmsh
         const char *temp = mkdtemp(tmp_dir_name);
         AssertThrow(temp != nullptr,
                     ExcMessage("Creating temporary directory failed!"));
-        base_name = temp;
-        base_name += "tmp";
+        base_name = (std::filesystem::path(temp) / "tmp").string();
       }
 
     const std::string iges_file_name     = base_name + ".iges";
@@ -98,11 +104,13 @@ namespace Gmsh
             << "Mesh.SubdivisionAlgorithm = 1;" << std::endl;
     geofile.close();
 
-    std::stringstream command;
-    command << DEAL_II_GMSH_EXECUTABLE_PATH << " -2 " << geo_file_name << " 1> "
-            << log_file_name << " 2> " << warnings_file_name;
+    namespace bp = boost::process;
 
-    const auto ret_value = std::system(command.str().c_str());
+    const auto ret_value = bp::system(DEAL_II_GMSH_EXECUTABLE_PATH,
+                                      "-2",
+                                      geo_file_name,
+                                      bp::std_out > log_file_name,
+                                      bp::std_err > warnings_file_name);
     AssertThrow(ret_value == 0,
                 ExcMessage("Gmsh failed to run. Check the " + log_file_name +
                            " file."));
