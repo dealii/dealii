@@ -132,7 +132,36 @@ namespace
     if (is_only_hypercube)
       GridTools::consistently_order_cells(cells);
   }
+
+
+  /**
+   * A replacement function for getline_dos_or_unix() that strips a trailing
+   * \r if necessary. This makes it possible to read files that were written
+   * with the DOS/Windows convention for file endings.
+   */
+  template <class CharT, class Traits, class Allocator>
+  std::basic_istream<CharT, Traits> &
+  getline_dos_or_unix(std::basic_istream<CharT, Traits>           &input,
+                      std::basic_string<CharT, Traits, Allocator> &line)
+  {
+    std::getline(input, line);
+
+    // We tend to get files from folks who run on (or at least generate
+    // meshes on) Windows and where line endings are \r\n instead of just
+    // \n. The \r is redundant unless you still use a line printer,
+    // so get rid of it in order to not confuse any of the functions
+    // below that try to interpret the entire content of a line
+    // as a string, often leading to very difficult to interpret error
+    // messages if a string still contains the '\r':
+    if ((line.size() > 0) && (line.back() == '\r'))
+      line.erase(line.size() - 1);
+
+    return input;
+  }
+
 } // namespace
+
+
 
 template <int dim, int spacedim>
 GridIn<dim, spacedim>::GridIn()
@@ -595,7 +624,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                       // SCALARS MaterialID int 1
                       // (the last number is optional)
                       std::string line;
-                      std::getline(in, line);
+                      getline_dos_or_unix(in, line);
 
                       AssertThrow(
                         line.substr(1,
@@ -826,7 +855,7 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
             {
               std::string line;
               AssertThrow(in.fail() == false, ExcIO());
-              std::getline(in, line);
+              getline_dos_or_unix(in, line);
               // remove leading and trailing spaces in the line
               boost::algorithm::trim(line);
               if (line.compare("-1") == 0) // end of section
@@ -1029,15 +1058,15 @@ GridIn<dim, spacedim>::read_unv(std::istream &in)
           // integer IDs from, e.g., strings.
           std::string line;
           // The next character in the input buffer is a newline character so
-          // we need a call to std::getline() to retrieve it (it is logically
-          // a line):
-          std::getline(in, line);
+          // we need a call to getline_dos_or_unix() to retrieve it (it is
+          // logically a line):
+          getline_dos_or_unix(in, line);
           AssertThrow(line.empty(),
                       ExcMessage(
                         "The line before the line containing an ID has too "
                         "many entries. This is not a valid UNV file."));
           // now get the line containing the id:
-          std::getline(in, line);
+          getline_dos_or_unix(in, line);
           AssertThrow(in.fail() == false, ExcIO());
           std::istringstream id_stream(line);
           id_stream >> id;
@@ -1577,21 +1606,21 @@ GridIn<dim, spacedim>::read_xda(std::istream &in)
 
   std::string line;
   // skip comments at start of file
-  std::getline(in, line);
+  getline_dos_or_unix(in, line);
 
   unsigned int n_vertices;
   unsigned int n_cells;
 
   // read cells, throw away rest of line
   in >> n_cells;
-  std::getline(in, line);
+  getline_dos_or_unix(in, line);
 
   in >> n_vertices;
-  std::getline(in, line);
+  getline_dos_or_unix(in, line);
 
   // ignore following 8 lines
   for (unsigned int i = 0; i < 8; ++i)
-    std::getline(in, line);
+    getline_dos_or_unix(in, line);
 
   // set up array of cells
   std::vector<CellData<dim>> cells(n_cells);
@@ -1652,7 +1681,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
     {
       // read one line
       std::string line;
-      std::getline(in, line);
+      getline_dos_or_unix(in, line);
 
       // We tend to get these sorts of files from folks who run on
       // Windows and where line endings are \r\n instead of just
@@ -1707,7 +1736,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
         std::string dummy;
         while (whole_file.peek() == '\n')
           whole_file.get();
-        std::getline(whole_file, dummy);
+        getline_dos_or_unix(whole_file, dummy);
       }
   }
 
@@ -1720,7 +1749,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
         std::string dummy;
         while (whole_file.peek() == '\n')
           whole_file.get();
-        std::getline(whole_file, dummy);
+        getline_dos_or_unix(whole_file, dummy);
       }
   }
 
@@ -1746,7 +1775,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
     std::string s;
     while (whole_file.peek() == '\n')
       whole_file.get();
-    std::getline(whole_file, s);
+    getline_dos_or_unix(whole_file, s);
     AssertThrow(s == "4 Mesh",
                 ExcMessage("Expected '4 Mesh', but got '" + s + "'."));
   }
@@ -2209,11 +2238,11 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
 
   // Comments can be included by mesh generating software and must be deleted,
   // a string is filed with the content of the file stripped of the comments
-  while (std::getline(input_stream, line))
+  while (getline_dos_or_unix(input_stream, line))
     {
       if (line == "$Comments")
         {
-          while (std::getline(input_stream, line))
+          while (getline_dos_or_unix(input_stream, line))
             {
               if (line == "$EndComments")
                 {
@@ -5268,7 +5297,7 @@ namespace
     AssertThrow(input_stream.fail() == false, ExcIO());
     std::string line;
 
-    while (std::getline(input_stream, line))
+    while (getline_dos_or_unix(input_stream, line))
       {
       cont:
         std::transform(line.begin(),
@@ -5280,7 +5309,7 @@ namespace
             line.compare(0, 5, "*PART") == 0)
           {
             // Skip header and comments
-            while (std::getline(input_stream, line))
+            while (getline_dos_or_unix(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont; // My eyes, they burn!
@@ -5295,7 +5324,7 @@ namespace
 
             // Contains lines in the form:
             // Index, x, y, z
-            while (std::getline(input_stream, line))
+            while (getline_dos_or_unix(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont;
@@ -5336,7 +5365,7 @@ namespace
             }
 
             // Read ELEMENT definition
-            while (std::getline(input_stream, line))
+            while (getline_dos_or_unix(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont;
@@ -5385,7 +5414,7 @@ namespace
             // definition of each "set" of faces that comprise the surface
             // These are either marked by an "S" or "E" in 3d or 2d
             // respectively.
-            while (std::getline(input_stream, line))
+            while (getline_dos_or_unix(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont;
@@ -5471,7 +5500,7 @@ namespace
             if (generate_idx != std::string::npos)
               {
                 // Option (1)
-                std::getline(input_stream, line);
+                getline_dos_or_unix(input_stream, line);
                 std::istringstream iss(line);
                 char               comma;
                 int                elid_start;
@@ -5514,12 +5543,12 @@ namespace
                   elements.push_back(i);
                 elsets_list[elset_name] = elements;
 
-                std::getline(input_stream, line);
+                getline_dos_or_unix(input_stream, line);
               }
             else
               {
                 // Option (2)
-                while (std::getline(input_stream, line))
+                while (getline_dos_or_unix(input_stream, line))
                   {
                     if (line[0] == '*')
                       break;
@@ -5550,7 +5579,7 @@ namespace
         else if (line.compare(0, 5, "*NSET") == 0)
           {
             // Skip nodesets; we have no use for them
-            while (std::getline(input_stream, line))
+            while (getline_dos_or_unix(input_stream, line))
               {
                 if (line[0] == '*')
                   goto cont;
