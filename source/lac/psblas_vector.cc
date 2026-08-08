@@ -145,6 +145,7 @@ namespace PSCToolkitWrappers
         Assert(ierr == 0,
                ExcCallingPSBLASFunction(ierr, "psb_c_dvect_set_scal"));
       }
+
     state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
@@ -284,6 +285,17 @@ namespace PSCToolkitWrappers
         reinit(v.owned_elements,
                v.get_mpi_communicator(),
                omit_zeroing_entries);
+
+        int ierr;
+        if (!psb_c_cd_is_asb(psblas_descriptor.get()))
+          {
+            ierr = psb_c_cdasb(psblas_descriptor.get());
+            Assert(ierr == 0, ExcAssemblePSBLASDescriptor(ierr));
+          }
+        ierr = psb_c_dgeasb_options(psblas_vector,
+                                    psblas_descriptor.get(),
+                                    PSB_DUPL_DEF);
+        Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
       }
   }
 
