@@ -2564,15 +2564,21 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
           }
         else if (gmsh_file_format == 40)
           {
-            int tagEntity, dimEntity;
+            int          tagEntity;
+            unsigned int dimEntity;
             in >> tagEntity >> dimEntity >> cell_type >> numElements;
+            AssertThrow(dimEntity < tag_maps.size(),
+                        ExcInvalidGMSHInput(std::to_string(dimEntity)));
             material_id = tag_maps[dimEntity][tagEntity];
           }
         else
           {
             // for gmsh_file_format 4.1 the order of tag and dim is reversed,
-            int tagEntity, dimEntity;
+            int          tagEntity;
+            unsigned int dimEntity;
             in >> dimEntity >> tagEntity >> cell_type >> numElements;
+            AssertThrow(dimEntity < tag_maps.size(),
+                        ExcInvalidGMSHInput(std::to_string(dimEntity)));
             material_id = tag_maps[dimEntity][tagEntity];
           }
 
