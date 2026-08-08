@@ -1089,9 +1089,6 @@ DataOut<dim, spacedim>::build_patches(
   const unsigned int                          n_subdivisions_,
   const CurvedCellRegion                      curved_region)
 {
-  // Check consistency of redundant template parameter
-  Assert(dim == dim, ExcDimensionMismatch(dim, dim));
-
   Assert(this->triangulation != nullptr,
          Exceptions::DataOutImplementation::ExcNoTriangulationSelected());
 
