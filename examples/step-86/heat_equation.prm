@@ -30,6 +30,7 @@ subsection Heat Equation
       set maximum number of steps = -1
       set options prefix          =
       set solver type             = beuler
+      set problem type            = linear
     end
 
     subsection Error control
