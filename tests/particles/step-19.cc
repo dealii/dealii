@@ -756,8 +756,7 @@ namespace Step19
                         << particle->get_id() << ": " << new_velocity
                         << std::endl;
                 particle->set_properties(
-                  make_array_view(new_velocity.begin_raw(),
-                                  new_velocity.end_raw()));
+                  make_array_view(&new_velocity[0], &new_velocity[0] + dim));
 
                 // With the new velocity, we can then also update the location
                 // of the particle and tell the particle about it.

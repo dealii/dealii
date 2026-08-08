@@ -31,25 +31,25 @@
 
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
-#include <deal.II/numerics/vector_tools.h>
-
-#include "../tests.h"
-
-// To generate a reference solution
-#include <deal.II/integrators/laplace.h>
-
 #include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/copy_data.h>
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/loop.h>
+#include <deal.II/meshworker/mesh_loop.h>
+#include <deal.II/meshworker/scratch_data.h>
+
+#include <deal.II/numerics/vector_tools.h>
 
 #include <iostream>
+
+#include "../tests.h"
 
 
 // forward declare this function. will be implemented in .cc files
@@ -689,92 +689,301 @@ private:
 
 
 
-// Reference solution created with MeshWorker
+// Helper integrators replacing LocalIntegrators::Laplace
+
+template <int dim, typename FEType>
+void
+assemble_cell_matrix(FullMatrix<double> &M, const FEType &fe)
+{
+  // assume M has been resized by caller; just zero and assemble
+  M                    = 0;
+  const unsigned int n = fe.get_fe().dofs_per_cell;
+  Assert(M.m() == (int)n && M.n() == (int)n,
+         ExcMessage("matrix size mismatch"));
+  for (unsigned int q = 0; q < fe.n_quadrature_points; ++q)
+    {
+      const double w = fe.JxW(q);
+      for (unsigned int i = 0; i < n; ++i)
+        {
+          const Tensor<1, dim> gi = fe.shape_grad(i, q);
+          for (unsigned int j = 0; j < n; ++j)
+            M(i, j) += (gi * fe.shape_grad(j, q)) * w;
+        }
+    }
+}
+
+
+template <int dim, typename FEFM, typename FEFP>
+void
+assemble_interior_face_ip(FullMatrix<double> &Mcc,
+                          FullMatrix<double> &Mcn,
+                          FullMatrix<double> &Mnc,
+                          FullMatrix<double> &Mnn,
+                          const FEFM         &fe_m,
+                          const FEFP         &fe_p,
+                          const double        penalty)
+{
+  Mcc = 0;
+  Mcn = 0;
+  Mnc = 0;
+  Mnn = 0;
+
+  const unsigned int nm = fe_m.get_fe().dofs_per_cell;
+  const unsigned int np = fe_p.get_fe().dofs_per_cell;
+  Assert(Mcc.m() == (int)nm && Mcc.n() == (int)nm, ExcMessage("Mcc size"));
+  Assert(Mcn.m() == (int)nm && Mcn.n() == (int)np, ExcMessage("Mcn size"));
+  Assert(Mnc.m() == (int)np && Mnc.n() == (int)nm, ExcMessage("Mnc size"));
+  Assert(Mnn.m() == (int)np && Mnn.n() == (int)np, ExcMessage("Mnn size"));
+
+  // first pass: use minus side normal
+  for (unsigned int q = 0; q < fe_m.n_quadrature_points; ++q)
+    {
+      const double         w    = fe_m.JxW(q);
+      const Tensor<1, dim> nvec = fe_m.normal_vector(q);
+
+      for (unsigned int i = 0; i < nm; ++i)
+        {
+          const double phi_i_m    = fe_m.shape_value(i, q);
+          const double dn_phi_i_m = fe_m.shape_grad(i, q) * nvec;
+          for (unsigned int j = 0; j < nm; ++j)
+            {
+              const double phi_j_m    = fe_m.shape_value(j, q);
+              const double dn_phi_j_m = fe_m.shape_grad(j, q) * nvec;
+              Mcc(i, j) +=
+                (penalty * phi_i_m * phi_j_m -
+                 0.5 * (dn_phi_j_m * phi_i_m + dn_phi_i_m * phi_j_m)) *
+                w;
+            }
+        }
+
+      for (unsigned int i = 0; i < nm; ++i)
+        for (unsigned int j = 0; j < np; ++j)
+          {
+            const double phi_i_m    = fe_m.shape_value(i, q);
+            const double dn_phi_i_m = fe_m.shape_grad(i, q) * nvec;
+            const double phi_j_p    = fe_p.shape_value(j, q);
+            const double dn_phi_j_p =
+              fe_p.shape_grad(j, q) *
+              nvec; // note: use same normal direction for consistency
+
+            Mcn(i, j) += (-penalty * phi_i_m * phi_j_p +
+                          0.5 * (dn_phi_j_p * phi_i_m - dn_phi_i_m * phi_j_p)) *
+                         w;
+            Mnc(j, i) += (-penalty * phi_j_p * phi_i_m +
+                          0.5 * (dn_phi_i_m * phi_j_p - dn_phi_j_p * phi_i_m)) *
+                         w;
+          }
+    }
+
+  // second pass: fill Mnn correctly using plus side normal
+  for (unsigned int q = 0; q < fe_p.n_quadrature_points; ++q)
+    {
+      const double         w    = fe_p.JxW(q);
+      const Tensor<1, dim> nvec = fe_p.normal_vector(q);
+      for (unsigned int i = 0; i < np; ++i)
+        for (unsigned int j = 0; j < np; ++j)
+          {
+            const double phi_i_p    = fe_p.shape_value(i, q);
+            const double dn_phi_i_p = fe_p.shape_grad(i, q) * nvec;
+            const double phi_j_p    = fe_p.shape_value(j, q);
+            const double dn_phi_j_p = fe_p.shape_grad(j, q) * nvec;
+            Mnn(i, j) += (penalty * phi_i_p * phi_j_p -
+                          0.5 * (dn_phi_j_p * phi_i_p + dn_phi_i_p * phi_j_p)) *
+                         w;
+          }
+    }
+}
+
+
+template <int dim, typename FEType>
+void
+assemble_boundary_nitsche(FullMatrix<double> &Mcc,
+                          const FEType       &fe,
+                          const double        penalty)
+{
+  Mcc                  = 0;
+  const unsigned int n = fe.get_fe().dofs_per_cell;
+  Assert(Mcc.m() == (int)n && Mcc.n() == (int)n, ExcMessage("Mcc size"));
+
+  for (unsigned int q = 0; q < fe.n_quadrature_points; ++q)
+    {
+      const double         w    = fe.JxW(q);
+      const Tensor<1, dim> nvec = fe.normal_vector(q);
+      for (unsigned int i = 0; i < n; ++i)
+        {
+          const double phi_i    = fe.shape_value(i, q);
+          const double dn_phi_i = fe.shape_grad(i, q) * nvec;
+          for (unsigned int j = 0; j < n; ++j)
+            {
+              const double phi_j    = fe.shape_value(j, q);
+              const double dn_phi_j = fe.shape_grad(j, q) * nvec;
+              Mcc(i, j) += (penalty * phi_i * phi_j -
+                            0.5 * (dn_phi_j * phi_i + dn_phi_i * phi_j)) *
+                           w;
+            }
+        }
+    }
+}
+
+
+// Reference solution created with MeshWorker but implemented via mesh_loop
 template <int dim>
-class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
+class MatrixIntegrator
 {
 public:
+  MatrixIntegrator()
+    : matrix(nullptr)
+  {}
+
+  MatrixIntegrator(SparseMatrix<double> &matrix)
+    : matrix(&matrix)
+  {}
+
+  // cell worker
+  template <typename CellIteratorType>
   void
-  cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
+  cell(const CellIteratorType                &cell,
+       MeshWorker::ScratchData<dim>          &scratch,
+       MeshWorker::CopyData<4, 1, 2, double> &copy) const
+  {
+    const auto        &fe   = scratch.reinit(cell);
+    const unsigned int dofs = fe.get_fe().dofs_per_cell;
+    copy.reinit(0, dofs, dofs);
+    copy.local_dof_indices[0].resize(dofs);
+    cell->get_active_or_mg_dof_indices(copy.local_dof_indices[0]);
+    // compute cell matrix
+    assemble_cell_matrix<dim>(copy.matrices[0], fe);
+  }
+
+  // face worker
+  template <typename CellIteratorType>
   void
-  boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
+  face(const CellIteratorType                &cell1,
+       const unsigned int                     face1,
+       const unsigned int                     subface1,
+       const CellIteratorType                &cell2,
+       const unsigned int                     face2,
+       const unsigned int                     subface2,
+       MeshWorker::ScratchData<dim>          &scratch,
+       MeshWorker::CopyData<4, 1, 2, double> &copy) const
+  {
+    const auto &fe1 = scratch.reinit(cell1, face1);
+    const auto &fe2 = scratch.reinit(cell2, face2);
+
+    const unsigned int dofs1 = fe1.get_fe().dofs_per_cell;
+    const unsigned int dofs2 = fe2.get_fe().dofs_per_cell;
+
+    // prepare storage: M_cc, M_cn, M_nc, M_nn
+    copy.reinit(0, dofs1, dofs1);
+    copy.reinit(1, dofs1, dofs2);
+    copy.reinit(2, dofs2, dofs1);
+    copy.reinit(3, dofs2, dofs2);
+
+    copy.local_dof_indices[0].resize(dofs1);
+    copy.local_dof_indices[1].resize(dofs2);
+    cell1->get_active_or_mg_dof_indices(copy.local_dof_indices[0]);
+    cell2->get_active_or_mg_dof_indices(copy.local_dof_indices[1]);
+
+    // compute penalty similar to previous implementation
+    const unsigned int deg = fe1.get_fe().tensor_degree();
+    Tensor<2, dim>     inverse_jacobian =
+      transpose(fe1.jacobian(0).covariant_form());
+    const double normal_volume_fraction1 = std::abs(
+      (inverse_jacobian[GeometryInfo<dim>::unit_normal_direction[face1]] *
+       fe1.normal_vector(0)));
+    inverse_jacobian = transpose(fe2.jacobian(0).covariant_form());
+    const double normal_volume_fraction2 = std::abs(
+      (inverse_jacobian[GeometryInfo<dim>::unit_normal_direction[face2]] *
+       fe2.normal_vector(0)));
+    double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
+                     std::max(1U, deg) * (deg + 1.0);
+
+    // assemble interior-face IP/SIPG contributions
+    assemble_interior_face_ip<dim>(copy.matrices[0],
+                                   copy.matrices[1],
+                                   copy.matrices[2],
+                                   copy.matrices[3],
+                                   fe1,
+                                   fe2,
+                                   penalty);
+  }
+
+  // boundary worker
+  template <typename CellIteratorType>
   void
-  face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-       MeshWorker::DoFInfo<dim>                  &dinfo2,
-       typename MeshWorker::IntegrationInfo<dim> &info1,
-       typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  boundary(const CellIteratorType                &cell,
+           const unsigned int                     face,
+           MeshWorker::ScratchData<dim>          &scratch,
+           MeshWorker::CopyData<4, 1, 2, double> &copy) const
+  {
+    const auto        &fe   = scratch.reinit(cell, face);
+    const unsigned int dofs = fe.get_fe().dofs_per_cell;
+    copy.reinit(0, dofs, dofs);
+    copy.local_dof_indices[0].resize(dofs);
+    cell->get_active_or_mg_dof_indices(copy.local_dof_indices[0]);
+
+    const unsigned int deg = fe.get_fe().tensor_degree();
+    Tensor<2, dim>     inverse_jacobian =
+      transpose(fe.jacobian(0).covariant_form());
+    const double normal_volume_fraction = std::abs(
+      (inverse_jacobian[GeometryInfo<dim>::unit_normal_direction[face]] *
+       fe.normal_vector(0)));
+    double penalty =
+      2.0 * normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
+
+    assemble_boundary_nitsche<dim>(copy.matrices[0], fe, penalty);
+  }
+
+  // copier: assemble copy data into global sparse matrix
+  void
+  copier(const MeshWorker::CopyData<4, 1, 2, double> &copy) const
+  {
+    // assemble cell matrix if present
+    if (copy.matrices[0].m() > 0 && copy.local_dof_indices[0].size() > 0)
+      {
+        const auto &rows = copy.local_dof_indices[0];
+        for (unsigned int i = 0; i < copy.matrices[0].m(); ++i)
+          for (unsigned int j = 0; j < copy.matrices[0].n(); ++j)
+            if (matrix)
+              matrix->add(rows[i], rows[j], copy.matrices[0](i, j));
+      }
+
+    // If ip matrices were filled, assemble them too
+    // M_cn (1) : rows = local_dof_indices[0], cols = local_dof_indices[1]
+    if (copy.matrices[1].m() > 0)
+      {
+        const auto &rows = copy.local_dof_indices[0];
+        const auto &cols = copy.local_dof_indices[1];
+        for (unsigned int i = 0; i < copy.matrices[1].m(); ++i)
+          for (unsigned int j = 0; j < copy.matrices[1].n(); ++j)
+            if (matrix)
+              matrix->add(rows[i], cols[j], copy.matrices[1](i, j));
+      }
+    // M_nc (2)
+    if (copy.matrices[2].m() > 0)
+      {
+        const auto &rows = copy.local_dof_indices[1];
+        const auto &cols = copy.local_dof_indices[0];
+        for (unsigned int i = 0; i < copy.matrices[2].m(); ++i)
+          for (unsigned int j = 0; j < copy.matrices[2].n(); ++j)
+            if (matrix)
+              matrix->add(rows[i], cols[j], copy.matrices[2](i, j));
+      }
+    // M_nn (3)
+    if (copy.matrices[3].m() > 0)
+      {
+        const auto &rows = copy.local_dof_indices[1];
+        const auto &cols = copy.local_dof_indices[1];
+        for (unsigned int i = 0; i < copy.matrices[3].m(); ++i)
+          for (unsigned int j = 0; j < copy.matrices[3].n(); ++j)
+            if (matrix)
+              matrix->add(rows[i], cols[j], copy.matrices[3](i, j));
+      }
+  }
+
+private:
+  SparseMatrix<double> *matrix;
 };
-
-
-
-template <int dim>
-void
-MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim>                  &dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
-{
-  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
-                                         info.fe_values());
-}
-
-
-
-template <int dim>
-void
-MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim>                  &dinfo1,
-  MeshWorker::DoFInfo<dim>                  &dinfo2,
-  typename MeshWorker::IntegrationInfo<dim> &info1,
-  typename MeshWorker::IntegrationInfo<dim> &info2) const
-{
-  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
-  // Manually compute penalty parameter instead of using the function
-  // compute_penalty because we do it slightly differently on non-Cartesian
-  // meshes.
-  Tensor<2, dim> inverse_jacobian =
-    transpose(info1.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction1 =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number]] *
-              info1.fe_values(0).normal_vector(0)));
-  inverse_jacobian = transpose(info2.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction2 =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number]] *
-              info1.fe_values(0).normal_vector(0)));
-  double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
-                   std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
-                                       dinfo1.matrix(0, true).matrix,
-                                       dinfo2.matrix(0, true).matrix,
-                                       dinfo2.matrix(0, false).matrix,
-                                       info1.fe_values(0),
-                                       info2.fe_values(0),
-                                       penalty);
-}
-
-
-
-template <int dim>
-void
-MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim>                  &dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
-{
-  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
-  Tensor<2, dim>     inverse_jacobian =
-    transpose(info.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
-              info.fe_values(0).normal_vector(0)));
-  double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
-                                            info.fe_values(0),
-                                            penalty);
-}
 
 
 
@@ -822,23 +1031,73 @@ do_test(const DoFHandler<dim>           &dof,
     sparsity.copy_from(d_sparsity);
   }
   matrix.reinit(sparsity);
-  MeshWorker::IntegrationInfoBox<dim> info_box;
-  UpdateFlags                         update_flags =
-    update_values | update_gradients | update_jacobians;
-  info_box.add_update_flags_all(update_flags);
-  info_box.initialize_gauss_quadrature(n_q_points_1d,
-                                       n_q_points_1d,
-                                       n_q_points_1d);
-  info_box.initialize(dof.get_fe(), mapping);
+  using ScratchDataType = MeshWorker::ScratchData<dim>;
+  using CopyDataType    = MeshWorker::CopyData<4, 1, 2, double>;
 
-  MeshWorker::DoFInfo<dim> dof_info(dof);
+  const QGauss<dim>     quad_cell(n_q_points_1d > 0 ? n_q_points_1d :
+                                                  dof.get_fe().degree + 1);
+  const QGauss<dim - 1> quad_face(n_q_points_1d > 0 ? n_q_points_1d :
+                                                      dof.get_fe().degree + 1);
+  const UpdateFlags     cell_update_flags =
+    update_values | update_gradients | update_jacobians | update_JxW_values;
+  const UpdateFlags face_update_flags = update_values | update_gradients |
+                                        update_normal_vectors |
+                                        update_JxW_values | update_jacobians;
 
-  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assembler;
-  assembler.initialize(matrix);
+  ScratchDataType scratch(
+    dof.get_fe(), quad_cell, cell_update_flags, quad_face, face_update_flags);
+  CopyDataType copy;
 
-  MatrixIntegrator<dim> integrator;
-  MeshWorker::integration_loop<dim, dim>(
-    dof.begin_active(), dof.end(), dof_info, info_box, integrator, assembler);
+  MatrixIntegrator<dim> integrator(matrix);
+
+  using CellIt = decltype(dof.begin_active());
+
+  std::function<void(const CellIt &, ScratchDataType &, CopyDataType &)>
+    cell_worker = [&](const CellIt &cell, ScratchDataType &s, CopyDataType &c) {
+      integrator.cell(cell, s, c);
+    };
+
+  std::function<void(const CopyDataType &)> copier_fn =
+    [&](const CopyDataType &c) { integrator.copier(c); };
+
+  std::function<
+    void(const CellIt &, const unsigned int, ScratchDataType &, CopyDataType &)>
+    boundary_worker =
+      [&](const CellIt      &cell,
+          const unsigned int face,
+          ScratchDataType   &s,
+          CopyDataType      &c) { integrator.boundary(cell, face, s, c); };
+
+  std::function<void(const CellIt &,
+                     const unsigned int,
+                     const unsigned int,
+                     const CellIt &,
+                     const unsigned int,
+                     const unsigned int,
+                     ScratchDataType &,
+                     CopyDataType &)>
+    face_worker = [&](const CellIt      &cell1,
+                      const unsigned int face1,
+                      const unsigned int subface1,
+                      const CellIt      &cell2,
+                      const unsigned int face2,
+                      const unsigned int subface2,
+                      ScratchDataType   &s,
+                      CopyDataType      &c) {
+      integrator.face(cell1, face1, subface1, cell2, face2, subface2, s, c);
+    };
+
+  MeshWorker::mesh_loop(dof.begin_active(),
+                        dof.end(),
+                        cell_worker,
+                        copier_fn,
+                        scratch,
+                        copy,
+                        MeshWorker::assemble_own_cells |
+                          MeshWorker::assemble_own_interior_faces_once |
+                          MeshWorker::assemble_boundary_faces,
+                        boundary_worker,
+                        face_worker);
 
   matrix.vmult(out, in);
 

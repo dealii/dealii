@@ -615,13 +615,6 @@ namespace PETScWrappers
     std::function<IndexSet()> algebraic_components;
 
     /**
-     * @deprecated This callback is equivalent to `update_constrained_components`, but is
-     * deprecated. Use `update_constrained_components` instead.
-     */
-    DEAL_II_DEPRECATED
-    std::function<void(const real_type t, VectorType &y)> distribute;
-
-    /**
      * Callback to set the values of constrained components to their correct
      * values. Constrained components are a subset of the algebraic
      * components discussed in the documentation of the
@@ -641,20 +634,6 @@ namespace PETScWrappers
      */
     std::function<void(const real_type t, VectorType &y)>
       update_constrained_components;
-
-    /**
-     * @deprecated This callback is equivalent to `decide_and_prepare_for_remeshing`
-     * except that it returns the decision whether or not to stop
-     * operations via the last reference argument of the function
-     * object instead of a plain return value. This callback is
-     * deprecated. Use `decide_and_prepare_for_remeshing` instead.
-     */
-    DEAL_II_DEPRECATED
-    std::function<void(const real_type    t,
-                       const unsigned int step,
-                       const VectorType  &y,
-                       bool              &resize)>
-      decide_for_coarsening_and_refinement;
 
     /**
      * A callback that returns whether or not to stop time stepping at the
@@ -678,15 +657,6 @@ namespace PETScWrappers
     std::function<
       bool(const real_type t, const unsigned int step, const VectorType &y)>
       decide_and_prepare_for_remeshing;
-
-    /**
-     * @deprecated This callback is equivalent to `transfer_solution_vectors_to_new_mesh`, but is
-     * deprecated. Use `transfer_solution_vectors_to_new_mesh` instead.
-     */
-    DEAL_II_DEPRECATED
-    std::function<void(const std::vector<VectorType> &all_in,
-                       std::vector<VectorType>       &all_out)>
-      interpolate;
 
     /**
      * Callback to perform mesh adaptation and transfer solution vectors

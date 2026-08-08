@@ -595,32 +595,6 @@ public:
   AffineConstraints();
 
   /**
-   * Constructor. The supplied IndexSet defines for which indices
-   * this object will store constraints. In a calculation
-   * with a DoFHandler object based on parallel::distributed::Triangulation
-   * or parallel::shared::Triangulation, one should use the set of locally
-   * relevant DoFs (see
-   * @ref GlossLocallyRelevantDof).
-   *
-   * The given IndexSet allows the AffineConstraints container to save
-   * memory by just not caring about degrees of freedom that are not of
-   * importance to the current processor. In contrast, in parallel
-   * computations, if you do not provide such an index set (here, or
-   * using the reinit() function that takes such an argument), the
-   * current object will allocate memory proportional to the *total*
-   * number of degrees of freedom (accumulated over all processes),
-   * which is clearly wasteful and not efficient -- and should be considered
-   * a bug.
-   *
-   * @deprecated This constructor is equivalent to calling the following one with
-   *   both of its arguments equal to the index set provided here. This
-   *   is not wrong, but inefficient. Use the following constructor instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the constructor with two index set arguments.")
-  explicit AffineConstraints(const IndexSet &locally_stored_constraints);
-
-  /**
    * Constructor. The supplied IndexSet objects define which of the indices
    * the object may encounter are locally owned, and for which indices
    * this object will store constraints. In a calculation
@@ -706,19 +680,6 @@ public:
   reinit();
 
   /**
-   * clear() the AffineConstraints object and supply an IndexSet that describes
-   * for which degrees of freedom this object can store constraints. See
-   * the discussion in the documentation of the constructor of this class
-   * that takes a single index set as argument.
-   *
-   * @deprecated Use the reinit() function with two index set arguments instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the reinit() function with two index set arguments.")
-  void
-  reinit(const IndexSet &locally_stored_constraints);
-
-  /**
    * clear() the AffineConstraints object and supply both an IndexSet
    * object that describes which degrees of freedom the current process
    * owns, and an IndexSet that describes
@@ -760,39 +721,6 @@ public:
    */
   const IndexSet &
   get_local_lines() const;
-
-  /**
-   * This function copies the content of @p constraints_in with DoFs that are
-   * element of the IndexSet @p filter. Elements that are not present in the
-   * IndexSet are ignored. All DoFs will be transformed to local index space
-   * of the filter, both the constrained DoFs and the other DoFs these entries
-   * are constrained to. The local index space of the filter is a contiguous
-   * numbering of all (global) DoFs that are elements in the filter.
-   *
-   * If, for example, the filter represents the range <tt>[10,20)</tt>, and
-   * the constraints object @p constraints_in includes the global indices
-   * <tt>{7,13,14}</tt>, the indices <tt>{3,4}</tt> are added to the calling
-   * constraints object (since 13 and 14 are elements in the filter and element
-   * 13 is the fourth element in the index, and 14 is the fifth).
-   *
-   * This function provides an easy way to create a AffineConstraints for
-   * certain vector components in a vector-valued problem from a full
-   * AffineConstraints, i.e. extracting a diagonal subblock from a larger
-   * AffineConstraints. The block is specified by the IndexSet argument.
-   *
-   * @deprecated This function is a combination of the get_view() function
-   *   and merge() in that it selects a subset of constraints from another
-   *   constraints object that is then merged into the current one. But
-   *   the current function does not deal well with index sets. Furthermore,
-   *   it simply discards parts of constraints that constrain one degree
-   *   of freedom against ones that are not selected in the filter -- something
-   *   that should probably be considered a bug. Use get_view() and merge()
-   *   instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT("Use get_view() and merge() instead.")
-  void
-  add_selected_constraints(const AffineConstraints &constraints_in,
-                           const IndexSet          &filter);
 
   /**
    * @name Adding constraints
@@ -2369,15 +2297,6 @@ private:
 template <typename number>
 inline AffineConstraints<number>::AffineConstraints()
   : AffineConstraints<number>(IndexSet(), IndexSet())
-{}
-
-
-
-template <typename number>
-inline AffineConstraints<number>::AffineConstraints(
-  const IndexSet &locally_stored_constraints)
-  : AffineConstraints<number>(locally_stored_constraints,
-                              locally_stored_constraints)
 {}
 
 

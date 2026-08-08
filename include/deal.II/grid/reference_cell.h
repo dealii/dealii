@@ -911,27 +911,6 @@ public:
   n_face_orientations(const unsigned int face_no) const;
 
   /**
-   * Determine the orientation of the current entity described by its
-   * vertices @p vertices_1 relative to an entity described by @p vertices_0.
-   * The two arrays given as arguments can be arrays of global vertex
-   * indices or local vertex indices, arrays of vertex locations, or
-   * arrays of any other objects identifying the vertices and the order
-   * in which they are encountered in a cell.
-   *
-   * The size of the arrays, i.e., the template argument `N`,
-   * must be equal to or larger than the number of vertices of the current
-   * entity. If it is larger, only those elements of the input and output
-   * arrays are read from or written to that correspond to valid vertex
-   * indices.
-   *
-   * @deprecated Use get_combined_orientation() instead.
-   */
-  template <typename T, std::size_t N>
-  DEAL_II_DEPRECATED types::geometric_orientation
-                     compute_orientation(const std::array<T, N> &vertices_0,
-                                         const std::array<T, N> &vertices_1) const;
-
-  /**
    * Determine the relative orientation of the current entity described by its
    * vertices @p vertices_1 relative to an entity described by @p vertices_0.
    * Relative orientations are special cases of permutations since every
@@ -4424,29 +4403,6 @@ namespace internal
   };
 
 } // namespace internal
-
-
-
-template <int dim>
-template <typename T, std::size_t N>
-inline types::geometric_orientation
-ReferenceCell<dim>::compute_orientation(
-  const std::array<T, N> &vertices_0,
-  const std::array<T, N> &vertices_1) const
-{
-  Assert(N >= n_vertices(),
-         ExcMessage("The number of array elements must be equal to or "
-                    "greater than the number of vertices of the cell "
-                    "referenced by this object."));
-
-  // Call the non-deprecated function, taking care of calling it only with
-  // those array elements that we actually care about (see the note
-  // in the documentation about the arguments potentially being
-  // larger arrays than necessary).
-  return get_combined_orientation(
-    make_array_view(vertices_0.begin(), vertices_0.begin() + n_vertices()),
-    make_array_view(vertices_1.begin(), vertices_1.begin() + n_vertices()));
-}
 
 
 

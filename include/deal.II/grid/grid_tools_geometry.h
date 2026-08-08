@@ -681,7 +681,8 @@ namespace GridTools
               -> Point<spacedim> {
               return object->get_manifold().get_new_point(
                 make_array_view(vertices.begin(), vertices.end()),
-                make_array_view(weights.begin_raw(), weights.end_raw()));
+                make_array_view(&weights[0],
+                                &weights[0] + n_vertices_per_cell));
             };
 
             // pick the initial weights as (normalized) inverse distances from
