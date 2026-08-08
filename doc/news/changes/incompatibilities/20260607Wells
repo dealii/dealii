@@ -1,0 +1,6 @@
+Changed: The default `chunk_size` for WorkStream::run() was raised to `32` from
+`8`. This value, combined with other changes, keeps performance (measured in
+wall clock time) of common WorkStream loops about the same while significantly
+lowering memory allocations and usage while using TaskFlow.
+<br>
+(David Wells, 2026/06/07)
