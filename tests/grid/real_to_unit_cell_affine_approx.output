@@ -57,6 +57,18 @@ DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 5_0:: -0.00717968 1.
 DEAL::Distance to mapping point: 2.50718 -2.22045e-16 -3.76077 
 DEAL::Point p=(-0.400000 0.100000 0.600000) on cell with id 6_0:: 1.30415 -0.00717968 1.26077
 DEAL::Distance to mapping point: 2.22045e-16 -1.49282 2.23923 
+DEAL::Triangle
+DEAL::Point p=(0.200000 0.300000) on cell with id 0_0:: 0.200000 0.300000
+DEAL::Distance to mapping point: 0.00000 0.00000
+DEAL::Tetrahedron
+DEAL::Point p=(0.100000 0.200000 0.300000) on cell with id 0_0:: 0.100000 0.200000 0.300000
+DEAL::Distance to mapping point: 0.00000 0.00000 0.00000
+DEAL::Wedge
+DEAL::Point p=(0.200000 0.300000 0.400000) on cell with id 0_0:: 0.200000 0.300000 0.400000
+DEAL::Distance to mapping point: 0.00000 0.00000 0.00000
+DEAL::Pyramid
+DEAL::Point p=(0.100000 -0.200000 0.300000) on cell with id 0_0:: 0.100000 -0.200000 0.300000
+DEAL::Distance to mapping point: 0.00000 0.00000 0.00000
 DEAL::Point p=(-0.400000 0.00000) on cell with id 0_0:: -0.115537
 DEAL::Distance to mapping point: 0.00000 
 DEAL::Point p=(-0.400000 0.00000) on cell with id 1_0:: 0.119577
