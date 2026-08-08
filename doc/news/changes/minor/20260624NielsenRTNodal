@@ -1,0 +1,11 @@
+New: FE_RaviartThomasNodal is now templated on both dim and spacedim and can
+be used on codimension-one meshes (dim=2, spacedim=3). In this case the
+element represents a spacedim-valued vector field that is everywhere tangential
+to the surface, transformed from the reference cell with the surface Piola
+transform. The element has n_components == spacedim. Note that on non-smooth
+(non-C&sup1;) manifolds the resulting field is non-conforming, as the normal
+direction is discontinuous across cell edges; hanging-node and hp constraints
+as well as mesh refinement with hanging nodes are not yet supported for the
+codimension-one case.
+<br>
+(Jakob Tore Kammeyer Nielsen, 2026/06/24)

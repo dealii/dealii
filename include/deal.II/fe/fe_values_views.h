@@ -2190,7 +2190,7 @@ namespace FEValuesViews
     else
       {
         value_type return_value;
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           if (shape_function_data[shape_function]
                 .is_nonzero_shape_function_component[d])
             return_value[d] = fe_values->finite_element_output.shape_values(
@@ -2228,7 +2228,7 @@ namespace FEValuesViews
     else
       {
         gradient_type return_value;
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           if (shape_function_data[shape_function]
                 .is_nonzero_shape_function_component[d])
             return_value[d] =
@@ -2264,7 +2264,7 @@ namespace FEValuesViews
     else
       {
         divergence_type return_value = 0;
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           if (shape_function_data[shape_function]
                 .is_nonzero_shape_function_component[d])
             return_value +=
@@ -2472,7 +2472,7 @@ namespace FEValuesViews
     else
       {
         hessian_type return_value;
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           if (shape_function_data[shape_function]
                 .is_nonzero_shape_function_component[d])
             return_value[d] =
@@ -2512,7 +2512,7 @@ namespace FEValuesViews
     else
       {
         third_derivative_type return_value;
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           if (shape_function_data[shape_function]
                 .is_nonzero_shape_function_component[d])
             return_value[d] =
@@ -2615,7 +2615,7 @@ namespace FEValuesViews
     else
       {
         gradient_type return_value;
-        for (unsigned int d = 0; d < dim; ++d)
+        for (unsigned int d = 0; d < spacedim; ++d)
           if (shape_function_data[shape_function]
                 .is_nonzero_shape_function_component[d])
             return_value[d] =
