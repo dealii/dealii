@@ -233,7 +233,7 @@ MappingP1<dim, spacedim>::maybe_update_normal_vectors(
   std::vector<Tensor<1, spacedim>> &normal_vectors) const
 {
   const Tensor<1, dim> ref_normal_vector =
-    ReferenceCells::get_simplex<dim>().unit_normal_vectors(face_no);
+    ReferenceCells::get_simplex<dim>().face_normal_vector(face_no);
   Tensor<1, spacedim> normal_vector =
     apply_transformation(data.covariant, ref_normal_vector);
   normal_vector /= normal_vector.norm();

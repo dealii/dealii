@@ -449,43 +449,6 @@ public:
    */
 
   /**
-   * Return the default combined face orientation flag (i.e., the default set of
-   * orientations, defined by orientation, rotate, and flip for a face in 3d).
-   *
-   * @deprecated Use numbers::default_geometric_orientation instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use numbers::default_geometric_orientation instead.")
-  static constexpr types::geometric_orientation
-  default_combined_face_orientation();
-
-  /**
-   * Return the reversed (non-default orientation) line orientation flag. As
-   * lines only have two possible orientations, this function and
-   * ReferenceCell<dim>::default_combined_face_orientation() encode all of its
-   * possible orientation states.
-   *
-   * @deprecated Use numbers::reverse_line_orientation instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use numbers::reverse_line_orientation instead.")
-  static constexpr types::geometric_orientation
-  reversed_combined_line_orientation();
-
-  /**
-   * Return which child cells are adjacent to a certain face of the
-   * parent cell.
-   *
-   * @deprecated Use the version of this function which takes the orientation as
-   * the third parameter instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the version of this function which takes the orientation as the third "
-    "parameter instead.")
-  unsigned int
-  child_cell_on_face(const unsigned int face, const unsigned int subface) const;
-
-  /**
    * Return which child cells are adjacent to a certain face of the
    * parent cell.
    *
@@ -703,22 +666,6 @@ public:
     const types::geometric_orientation face_orientation) const;
 
   /**
-   * Return whether the line with index @p line is oriented in standard
-   * direction within a cell, given the @p face_orientation of the face within
-   * the current cell, and @p line_orientation for the line within that face.
-   *
-   * @deprecated Use face_to_cell_line_orientation() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use face_to_cell_line_orientation() instead.")
-  types::geometric_orientation
-  standard_vs_true_line_orientation(
-    const unsigned int                 line,
-    const unsigned int                 face,
-    const types::geometric_orientation face_orientation,
-    const types::geometric_orientation line_orientation) const;
-
-  /**
    * @brief Convert a line orientation defined relative to a face to the
    * canonical per-cell line orientation.
    *
@@ -874,33 +821,10 @@ public:
   face_tangent_vector(const unsigned int face_no, const unsigned int i) const;
 
   /**
-   * Return $i$-th unit tangent vector to a face of the reference cell.
-   * The vectors are arranged in such an order that the
-   * cross product between the two vectors returns the face normal vector.
-   *
-   * @pre $i$ must be between zero and `dim-1`.
-   *
-   * @deprecated Use face_tangent_vector() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT("Use face_tangent_vector() instead.")
-  Tensor<1, dim>
-  unit_tangential_vectors(const unsigned int face_no,
-                          const unsigned int i) const;
-
-  /**
    * Return the unit normal vector of a face of the reference cell.
    */
   Tensor<1, dim>
   face_normal_vector(const unsigned int face_no) const;
-
-  /**
-   * Return the unit normal vector of a face of the reference cell.
-   *
-   * @deprecated Use face_normal_vector() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT("Use face_normal_vector() instead.")
-  Tensor<1, dim>
-  unit_normal_vectors(const unsigned int face_no) const;
 
   /**
    * Return the number of orientations for a face in the ReferenceCell. For
@@ -2776,38 +2700,6 @@ ReferenceCell<dim>::face_reference_cell(const unsigned int face_no) const
 
 
 template <int dim>
-inline constexpr types::geometric_orientation
-ReferenceCell<dim>::default_combined_face_orientation()
-{
-  return numbers::default_geometric_orientation;
-}
-
-
-
-template <int dim>
-inline constexpr types::geometric_orientation
-ReferenceCell<dim>::reversed_combined_line_orientation()
-{
-  // For a reversed line 'orientation' is false and neither flip nor rotate
-  // are defined.
-  return numbers::reverse_line_orientation;
-}
-
-
-
-template <int dim>
-inline unsigned int
-ReferenceCell<dim>::child_cell_on_face(const unsigned int face,
-                                       const unsigned int subface) const
-{
-  return child_cell_on_face(face,
-                            subface,
-                            numbers::default_geometric_orientation);
-}
-
-
-
-template <int dim>
 inline unsigned int
 ReferenceCell<dim>::child_cell_on_face(
   const unsigned int                 face,
@@ -3993,16 +3885,6 @@ ReferenceCell<dim>::contains_point(const Point<dim> &p,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell<dim>::unit_tangential_vectors(const unsigned int face_no,
-                                            const unsigned int i) const
-{
-  return face_tangent_vector(face_no, i);
-}
-
-
-
-template <int dim>
-inline Tensor<1, dim>
 ReferenceCell<dim>::face_tangent_vector(const unsigned int face_no,
                                         const unsigned int i) const
 {
@@ -4107,15 +3989,6 @@ ReferenceCell<dim>::face_tangent_vector(const unsigned int face_no,
 
 template <int dim>
 inline Tensor<1, dim>
-ReferenceCell<dim>::unit_normal_vectors(const unsigned int face_no) const
-{
-  return face_normal_vector(face_no);
-}
-
-
-
-template <int dim>
-inline Tensor<1, dim>
 ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
 {
   if (is_hyper_cube())
@@ -4165,22 +4038,6 @@ ReferenceCell<dim>::n_face_orientations(const unsigned int face_no) const
 
   DEAL_II_ASSERT_UNREACHABLE();
   return numbers::invalid_unsigned_int;
-}
-
-
-
-template <int dim>
-inline types::geometric_orientation
-ReferenceCell<dim>::standard_vs_true_line_orientation(
-  const unsigned int                 line,
-  const unsigned int                 face,
-  const types::geometric_orientation combined_face_orientation,
-  const types::geometric_orientation line_orientation) const
-{
-  return face_to_cell_line_orientation(line,
-                                       face,
-                                       combined_face_orientation,
-                                       line_orientation);
 }
 
 

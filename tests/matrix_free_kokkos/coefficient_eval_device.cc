@@ -51,16 +51,18 @@ DummyOperator<dim, fe_degree>::operator()(
   const Portable::DeviceVector<double>                   &src,
   Portable::DeviceVector<double>                         &dst) const
 {
-  Kokkos::parallel_for(
-    Kokkos::TeamThreadRange(data->team_member, n_q_points),
-    [&](const int q_point) {
-      const unsigned int pos =
-        data->local_q_point_id(data->cell_index, n_q_points, q_point);
+  Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member, n_q_points),
+                       [&](const int q_point) {
+                         const unsigned int pos =
+                           data->local_q_point_id(data->cell_index, q_point);
 
-      auto point = data->get_quadrature_point(data->cell_index, q_point);
-      dst[pos] =
-        (dim == 2) ? (point[0] + point[1]) : (point[0] + point[1] + point[2]);
-    });
+                         auto point =
+                           data->get_quadrature_point(data->cell_index,
+                                                      q_point);
+                         dst[pos] = (dim == 2) ?
+                                      (point[0] + point[1]) :
+                                      (point[0] + point[1] + point[2]);
+                       });
 }
 
 

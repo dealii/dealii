@@ -1181,44 +1181,6 @@ KellyErrorEstimator<dim, spacedim>::estimate(
 }
 
 
-template <int dim, int spacedim>
-template <typename Number>
-void
-KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim>    &mapping,
-  const DoFHandler<dim, spacedim> &dof_handler,
-  const hp::QCollection<dim - 1>  &quadrature,
-  const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                           &neumann_bc,
-  const ReadVector<Number> &solution,
-  Vector<float>            &error,
-  const ComponentMask      &component_mask,
-  const Function<spacedim> *coefficients,
-  const unsigned int        n_threads,
-  const types::subdomain_id subdomain_id,
-  const types::material_id  material_id,
-  const Strategy            strategy)
-{
-  // DEPRECATED
-  // just pass on to the other function
-  std::vector<const ReadVector<Number> *> solutions(1, &solution);
-  std::vector<Vector<float> *>            errors(1, &error);
-  ArrayView<Vector<float> *>              error_view = make_array_view(errors);
-  const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
-  estimate(mapping_collection,
-           dof_handler,
-           quadrature,
-           neumann_bc,
-           make_array_view(solutions),
-           error_view,
-           component_mask,
-           coefficients,
-           n_threads,
-           subdomain_id,
-           material_id,
-           strategy);
-}
-
 
 template <int dim, int spacedim>
 template <typename Number>
@@ -1406,43 +1368,6 @@ KellyErrorEstimator<dim, spacedim>::estimate(
         for (unsigned int n = 0; n < n_solution_vectors; ++n)
           (*errors[n])(present_cell) = std::sqrt((*errors[n])(present_cell));
       }
-}
-
-
-
-template <int dim, int spacedim>
-template <typename Number>
-void
-KellyErrorEstimator<dim, spacedim>::estimate(
-  const Mapping<dim, spacedim>    &mapping,
-  const DoFHandler<dim, spacedim> &dof_handler,
-  const hp::QCollection<dim - 1>  &quadrature,
-  const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                                              &neumann_bc,
-  const ArrayView<const ReadVector<Number> *> &solutions,
-  ArrayView<Vector<float> *>                  &errors,
-  const ComponentMask                         &component_mask,
-  const Function<spacedim>                    *coefficients,
-  const unsigned int                           n_threads,
-  const types::subdomain_id                    subdomain_id,
-  const types::material_id                     material_id,
-  const Strategy                               strategy)
-{
-  // DEPRECATED
-  // just pass on to the other function
-  const hp::MappingCollection<dim, spacedim> mapping_collection(mapping);
-  estimate(mapping_collection,
-           dof_handler,
-           quadrature,
-           neumann_bc,
-           solutions,
-           errors,
-           component_mask,
-           coefficients,
-           n_threads,
-           subdomain_id,
-           material_id,
-           strategy);
 }
 
 

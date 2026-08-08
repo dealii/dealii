@@ -3173,7 +3173,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
               ExcMessage("Triangulation is not fully distributed!"));
 
   // Now it's safe to call get_communicator()
-  MPI_Comm mpi_comm = parallel_tria->get_communicator();
+  MPI_Comm mpi_comm = parallel_tria->get_mpi_communicator();
 
   const unsigned int nprocs = Utilities::MPI::n_mpi_processes(mpi_comm);
   const unsigned int rank   = Utilities::MPI::this_mpi_process(mpi_comm);

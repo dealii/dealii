@@ -13009,15 +13009,6 @@ MPI_Comm Triangulation<dim, spacedim>::get_mpi_communicator() const
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-MPI_Comm Triangulation<dim, spacedim>::get_communicator() const
-{
-  return get_mpi_communicator();
-}
-
-
-
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 std::weak_ptr<const Utilities::MPI::Partitioner> Triangulation<dim, spacedim>::
   global_active_cell_index_partitioner() const
 {

@@ -288,17 +288,6 @@ private:
 };
 
 
-/**
- * A type alias for the EnableObserverPointer class that makes sure
- * the previous name of the class, Subscriptor, continues to be available.
- *
- * @deprecated Use the new name of the class, ObserverPointer, instead.
- */
-using Subscriptor DEAL_II_DEPRECATED_WITH_COMMENT(
-  "Use the new name of the class, EnableObserverPointer.") =
-  EnableObserverPointer;
-
-
 //---------------------------------------------------------------------------
 
 inline EnableObserverPointer::EnableObserverPointer()

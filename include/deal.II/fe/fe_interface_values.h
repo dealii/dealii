@@ -1706,20 +1706,6 @@ public:
    * The normal points in outwards direction as seen from the first cell of
    * this interface.
    *
-   * @deprecated Use the function normal_vector().
-   *
-   * @dealiiRequiresUpdateFlags{update_normal_vectors}
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT("Use the function normal_vector().")
-  Tensor<1, spacedim>
-  normal(const unsigned int q_point_index) const;
-
-  /**
-   * Return the normal in a given quadrature point.
-   *
-   * The normal points in outwards direction as seen from the first cell of
-   * this interface.
-   *
    * @dealiiRequiresUpdateFlags{update_normal_vectors}
    */
   Tensor<1, spacedim>
@@ -3108,15 +3094,6 @@ FEInterfaceValues<dim, spacedim>::get_fe_face_values(
       "You are on a boundary, so you can only ask for the first FEFaceValues object."));
 
   return (cell_index == 0) ? *fe_face_values : *fe_face_values_neighbor;
-}
-
-
-
-template <int dim, int spacedim>
-Tensor<1, spacedim>
-FEInterfaceValues<dim, spacedim>::normal(const unsigned int q_point_index) const
-{
-  return normal_vector(q_point_index);
 }
 
 

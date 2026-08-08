@@ -4144,7 +4144,6 @@ public:
   set_neighbor(const unsigned int                               i,
                const TriaIterator<CellAccessor<dim, spacedim>> &pointer) const;
 
-
   /**
    * Return all cells adjacent to line @p i of this cell.
    *

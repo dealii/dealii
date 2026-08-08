@@ -451,32 +451,6 @@ public:
   /**
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp-finite element dof handlers.
-   *
-   * @deprecated Use the version of this function which takes a
-   * hp::MappingCollection instead.
-   */
-  template <typename Number>
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the version of this function which takes a hp::MappingCollection instead.")
-  static void estimate(
-    const Mapping<dim, spacedim>    &mapping,
-    const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1>  &quadrature,
-    const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                             &neumann_bc,
-    const ReadVector<Number> &solution,
-    Vector<float>            &error,
-    const ComponentMask      &component_mask = {},
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
-
-
-  /**
-   * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename Number>
   static void
@@ -516,31 +490,6 @@ public:
     const types::material_id  material_id  = numbers::invalid_material_id,
     const Strategy            strategy     = cell_diameter_over_24);
 
-
-  /**
-   * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
-   *
-   * @deprecated Use the version of this function which takes a
-   * hp::MappingCollection instead.
-   */
-  template <typename Number>
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the version of this function which takes a hp::MappingCollection instead.")
-  static void estimate(
-    const Mapping<dim, spacedim>    &mapping,
-    const DoFHandler<dim, spacedim> &dof,
-    const hp::QCollection<dim - 1>  &quadrature,
-    const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                                                &neumann_bc,
-    const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *>                  &errors,
-    const ComponentMask                         &component_mask = {},
-    const Function<spacedim>                    *coefficients   = nullptr,
-    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-    const types::material_id  material_id  = numbers::invalid_material_id,
-    const Strategy            strategy     = cell_diameter_over_24);
 
 
   /**
@@ -791,33 +740,6 @@ public:
   /**
    * Equivalent to the set of functions above, except that this one takes a
    * quadrature collection for hp-finite element dof handlers.
-   *
-   * @deprecated Use the version of this function which takes a
-   * hp::MappingCollection instead.
-   */
-  template <typename Number>
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the version of this function which takes a hp::MappingCollection instead.")
-  static void estimate(
-    const Mapping<1, spacedim>    &mapping,
-    const DoFHandler<1, spacedim> &dof,
-    const hp::QCollection<0>      &quadrature,
-    const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                             &neumann_bc,
-    const ReadVector<Number> &solution,
-    Vector<float>            &error,
-    const ComponentMask      &component_mask = {},
-    const Function<spacedim> *coefficients   = nullptr,
-    const unsigned int        n_threads      = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id   = numbers::invalid_subdomain_id,
-    const types::material_id  material_id    = numbers::invalid_material_id,
-    const Strategy            strategy       = cell_diameter_over_24);
-
-
-
-  /**
-   * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
    */
   template <typename Number>
   static void
@@ -847,33 +769,6 @@ public:
     const hp::MappingCollection<1, spacedim> &mapping,
     const DoFHandler<1, spacedim>            &dof,
     const hp::QCollection<0>                 &quadrature,
-    const std::map<types::boundary_id, const Function<spacedim, Number> *>
-                                                &neumann_bc,
-    const ArrayView<const ReadVector<Number> *> &solutions,
-    ArrayView<Vector<float> *>                  &errors,
-    const ComponentMask                         &component_mask = {},
-    const Function<spacedim>                    *coefficients   = nullptr,
-    const unsigned int        n_threads    = numbers::invalid_unsigned_int,
-    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
-    const types::material_id  material_id  = numbers::invalid_material_id,
-    const Strategy            strategy     = cell_diameter_over_24);
-
-
-
-  /**
-   * Equivalent to the set of functions above, except that this one takes a
-   * quadrature collection for hp-finite element dof handlers.
-   *
-   * @deprecated Use the version of this function which takes a
-   * hp::MappingCollection instead.
-   */
-  template <typename Number>
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Use the version of this function which takes a hp::MappingCollection instead.")
-  static void estimate(
-    const Mapping<1, spacedim>    &mapping,
-    const DoFHandler<1, spacedim> &dof,
-    const hp::QCollection<0>      &quadrature,
     const std::map<types::boundary_id, const Function<spacedim, Number> *>
                                                 &neumann_bc,
     const ArrayView<const ReadVector<Number> *> &solutions,
