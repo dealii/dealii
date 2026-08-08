@@ -332,7 +332,8 @@ protected:
    *
    * The degree of these polynomials is <tt>polynomials.size()-1</tt>.
    */
-  FE_DGQ(const std::vector<Polynomials::Polynomial<double>> &polynomials);
+  explicit FE_DGQ(
+    const std::vector<Polynomials::Polynomial<double>> &polynomials);
 
 private:
   /**
@@ -435,7 +436,7 @@ public:
 
 /**
  * Implementation of scalar, discontinuous tensor product elements based on
- * Legendre polynomials, described by the tensor product of the polynomial
+ * arbitrary polynomials, described by the tensor product of the polynomial
  * space Polynomials::Legendre. The tensor product is achieved using
  * TensorProductPolynomials and the ordering of shape functions, like in
  * TensorProductPolynomials, is lexicographic. For instance, the ordering in 2d
@@ -449,7 +450,53 @@ public:
  * See the base class documentation in FE_DGQ for details.
  */
 template <int dim, int spacedim = dim>
-class FE_DGQLegendre : public FE_DGQ<dim, spacedim>
+class FE_DGQArbitraryPolynomialSpace : public FE_DGQ<dim, spacedim>
+{
+public:
+  /**
+   * Constructor for tensor product polynomials based on the
+   * given polynomials @p poly. The polynomials should be independent
+   * and span a polynomial space of degree `poly.size()-1`.
+   */
+  FE_DGQArbitraryPolynomialSpace(
+    const std::vector<Polynomials::Polynomial<double>> &poly_space_1D);
+
+  /**
+   * Return a string that identifies the finite element.
+   */
+  virtual std::string
+  get_name() const override;
+
+  virtual std::unique_ptr<FiniteElement<dim, spacedim>>
+  clone() const override;
+
+private:
+  /**
+   * Underlying 1D polynomial space.
+   */
+  const std::vector<Polynomials::Polynomial<double>> poly_space_1D;
+};
+
+
+
+/**
+ * Implementation of scalar, discontinuous tensor product elements based on
+ * Legendre polynomials, described by the tensor product of the polynomial
+ * space Polynomials::Legendre. The tensor product is achieved using
+ * TensorProductPolynomials and the ordering of shape functions, like in
+ * TensorProductPolynomials, is lexicographic. For instance, the ordering in 2d
+ * is $P_0(x)P_0(y),\ P_1(x)P_0(y),\ \ldots,\ P_n(x)P_0(y),\ P_0(x)P_1(y),
+ * \ \ldots,\ P_n(x)P_1(y),\ \ldots,\ P_0(x)P_n(y),\ \ldots,\ P_n(x)P_n(y)$
+ * when <tt>degree=n</tt> where $\{P_i\}_{i=0}^{n}$ are the one-dimensional
+ * Legendre polynomials defined on $[0,1]$. As opposed to the basic FE_DGQ
+ * element, these elements are not interpolatory and no support points are
+ * defined.
+ *
+ * See the base class documentation in FE_DGQArbitraryPolynomialSpace and
+ * FE_DGQ for details.
+ */
+template <int dim, int spacedim = dim>
+class FE_DGQLegendre : public FE_DGQArbitraryPolynomialSpace<dim, spacedim>
 {
 public:
   /**
