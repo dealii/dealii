@@ -431,6 +431,20 @@ inconvenience this causes.
 <ol>
 
  <li>
+  New: We introduced a new function
+  parallel::shared::Triangulation::communicate_coarsening_and_refinement_flags()
+  that communicates coarsen and refine flags among all MPI processes prior
+  to mesh refinement. Previously, this functionality was an inherent part of
+  parallel::shared::Triangulation::execute_coarsening_and_refinement()
+  and has now been moved into a separate helper function. Now, both functions
+  parallel::shared::Triangulation::prepare_coarsening_and_refinement() and
+  parallel::shared::Triangulation::execute_coarsening_and_refinement()
+  begin with communicating flags through the new helper function.
+  <br>
+  (Matthias Maier, 2026/08/01)
+ </li>
+
+ <li>
   Fixed: TriangulationDescription::Description now correctly sets material_ids
   of cells on finer levels.
   <br>
