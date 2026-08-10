@@ -8081,6 +8081,26 @@ CellAccessor<dim, spacedim>::is_artificial_on_level() const
 
 
 template <int dim, int spacedim>
+inline void
+CellAccessor<dim, spacedim>::set_neighbor(
+  const unsigned int                               face_no,
+  const TriaIterator<CellAccessor<dim, spacedim>> &neighbor) const
+{
+  AssertIndexRange(face_no, this->n_faces());
+
+  Assert(neighbor.state() != IteratorState::invalid,
+         ExcMessage("The provided neighbor must be either a valid iterator or "
+                    "an end iterator (to indicate a boundary face)"));
+  auto &level = this->tria->levels[this->level()];
+  level->set_neighbor(this->present_index,
+                      face_no,
+                      neighbor->level(),
+                      neighbor->index());
+}
+
+
+
+template <int dim, int spacedim>
 inline types::material_id
 CellAccessor<dim, spacedim>::material_id() const
 {

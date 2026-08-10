@@ -3604,9 +3604,8 @@ namespace internal
         // anisotropic refinement and more than one cell neighboring at a
         // given side of the face we will automatically get the active one on
         // the highest level as we loop over cells from lower levels first.
-        const typename Triangulation<dim, spacedim>::cell_iterator dummy;
         std::vector<typename Triangulation<dim, spacedim>::cell_iterator>
-          adjacent_cells(2 * triangulation.n_raw_faces(), dummy);
+          adjacent_cells(2 * triangulation.n_raw_faces(), triangulation.end());
 
         for (const auto &cell : triangulation.cell_iterators())
           for (auto f : cell->face_indices())
@@ -12784,7 +12783,7 @@ namespace internal
                                                              test.first,
                                                              test.second);
           else
-            return typename Triangulation<dim, spacedim>::cell_iterator();
+            return triangulation.end();
         };
 
         for (const auto &cell : triangulation.cell_iterators())
