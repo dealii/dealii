@@ -1839,7 +1839,8 @@ inline types::global_dof_index
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-types::global_dof_index DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
+inline types::global_dof_index
+  DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 {
   return number_cache.n_locally_owned_dofs;
 }
@@ -1848,7 +1849,7 @@ types::global_dof_index DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-const IndexSet &DoFHandler<dim, spacedim>::locally_owned_dofs() const
+inline const IndexSet &DoFHandler<dim, spacedim>::locally_owned_dofs() const
 {
   return number_cache.locally_owned_dofs;
 }
@@ -1857,7 +1858,7 @@ const IndexSet &DoFHandler<dim, spacedim>::locally_owned_dofs() const
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-const IndexSet &DoFHandler<dim, spacedim>::locally_owned_mg_dofs(
+inline const IndexSet &DoFHandler<dim, spacedim>::locally_owned_mg_dofs(
   const unsigned int level) const
 {
   Assert(level < this->get_triangulation().n_global_levels(),
