@@ -506,9 +506,7 @@ const Mapping<dim, spacedim> &
 ReferenceCell<dim>::get_default_linear_mapping() const
 {
   if (is_hyper_cube())
-    {
-      return StaticMappingQ1<dim, spacedim>::mapping;
-    }
+    return StaticMappingQ1<dim, spacedim>::mapping;
   else if (is_simplex())
     {
       static const MappingP1<dim, spacedim> mapping;
@@ -608,13 +606,9 @@ ReferenceCell<dim>::exodusii_vertex_to_deal_vertex(
   AssertIndexRange(vertex_n, n_vertices());
 
   if constexpr (dim == 0)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
-    {
-      return vertex_n;
-    }
+    return vertex_n;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -674,13 +668,9 @@ ReferenceCell<dim>::exodusii_face_to_deal_face(const unsigned int face_n) const
   AssertIndexRange(face_n, n_faces());
 
   if constexpr (dim == 0)
-    {
-      return 0;
-    }
+    return 0;
   else if constexpr (dim == 1)
-    {
-      return face_n;
-    }
+    return face_n;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -752,9 +742,7 @@ ReferenceCell<dim>::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
   // non-standard clockwise numbering scheme which starts at the bottom right
   // vertex.
   if (*this == ReferenceCells::Line)
-    {
-      return vertex_n;
-    }
+    return vertex_n;
   else if (*this == ReferenceCells::Quadrilateral)
     {
       constexpr std::array<unsigned int, 4> unv_to_deal{{1, 0, 2, 3}};
@@ -779,13 +767,9 @@ unsigned int
 ReferenceCell<dim>::vtk_linear_type() const
 {
   if constexpr (dim == 0)
-    {
-      return VTKCellType::VTK_VERTEX;
-    }
+    return VTKCellType::VTK_VERTEX;
   else if constexpr (dim == 1)
-    {
-      return VTKCellType::VTK_LINE;
-    }
+    return VTKCellType::VTK_LINE;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -831,13 +815,9 @@ unsigned int
 ReferenceCell<dim>::vtk_quadratic_type() const
 {
   if constexpr (dim == 0)
-    {
-      return VTKCellType::VTK_VERTEX;
-    }
+    return VTKCellType::VTK_VERTEX;
   else if constexpr (dim == 1)
-    {
-      return VTKCellType::VTK_QUADRATIC_EDGE;
-    }
+    return VTKCellType::VTK_QUADRATIC_EDGE;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -883,13 +863,9 @@ unsigned int
 ReferenceCell<dim>::vtk_lagrange_type() const
 {
   if constexpr (dim == 0)
-    {
-      return VTKCellType::VTK_VERTEX;
-    }
+    return VTKCellType::VTK_VERTEX;
   else if constexpr (dim == 1)
-    {
-      return VTKCellType::VTK_LAGRANGE_CURVE;
-    }
+    return VTKCellType::VTK_LAGRANGE_CURVE;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -1086,23 +1062,19 @@ ReferenceCell<dim>::vtk_lexicographic_to_node_index(
       if (nbdy == 1) // Face DOF
         {
           if (ibdy) // On i-normal face
-            {
-              return (j - 1) + ((nodes_per_direction[1] - 1) * (k - 1)) +
-                     (i != 0u ? (nodes_per_direction[1] - 1) *
-                                  (nodes_per_direction[2] - 1) :
-                                0) +
-                     offset;
-            }
+            return (j - 1) + ((nodes_per_direction[1] - 1) * (k - 1)) +
+                   (i != 0u ? (nodes_per_direction[1] - 1) *
+                                (nodes_per_direction[2] - 1) :
+                              0) +
+                   offset;
           offset +=
             2 * (nodes_per_direction[1] - 1) * (nodes_per_direction[2] - 1);
           if (jbdy) // On j-normal face
-            {
-              return (i - 1) + ((nodes_per_direction[0] - 1) * (k - 1)) +
-                     (j != 0u ? (nodes_per_direction[2] - 1) *
-                                  (nodes_per_direction[0] - 1) :
-                                0) +
-                     offset;
-            }
+            return (i - 1) + ((nodes_per_direction[0] - 1) * (k - 1)) +
+                   (j != 0u ? (nodes_per_direction[2] - 1) *
+                                (nodes_per_direction[0] - 1) :
+                              0) +
+                   offset;
           offset +=
             2 * (nodes_per_direction[2] - 1) * (nodes_per_direction[0] - 1);
           // kbdy, On k-normal face
@@ -1144,13 +1116,9 @@ ReferenceCell<dim>::vtk_vertex_to_deal_vertex(
   // For the ordering, see the VTK manual (for example at
   // http://www.princeton.edu/~efeibush/viscourse/vtk.pdf, page 9).
   if constexpr (dim == 0)
-    {
-      return vertex_index;
-    }
+    return vertex_index;
   else if constexpr (dim == 1)
-    {
-      return vertex_index;
-    }
+    return vertex_index;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -1267,13 +1235,9 @@ ReferenceCell<dim>::gmsh_element_type() const
   */
 
   if constexpr (dim == 0)
-    {
-      return 15;
-    }
+    return 15;
   else if constexpr (dim == 1)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -1570,13 +1534,8 @@ ReferenceCell<dim>::closest_point(const Point<dim> &p) const
       // point.
       if (!contains_point(result, 0.0))
         {
-          constexpr unsigned int x_index = 0;
-          constexpr unsigned int y_index = (dim >= 2 ? 1 : 0);
-          constexpr unsigned int z_index = (dim >= 3 ? 2 : 0);
           if constexpr (dim == 0)
-            {
-              DEAL_II_ASSERT_UNREACHABLE();
-            }
+            DEAL_II_ASSERT_UNREACHABLE();
           else if constexpr (dim == 1)
             {
               // the bounds for each dimension of a hypercube are mutually
@@ -1597,9 +1556,8 @@ ReferenceCell<dim>::closest_point(const Point<dim> &p) const
 
                   case ReferenceCells::Triangle:
                     // simplices can use the standard definition of a simplex:
-                    result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-                    result[y_index] =
-                      std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
+                    result[0] = std::clamp(result[0], 0.0, 1.0);
+                    result[1] = std::clamp(result[1], 0.0, 1.0 - result[0]);
                     break;
 
                   default:
@@ -1619,38 +1577,32 @@ ReferenceCell<dim>::closest_point(const Point<dim> &p) const
 
                   case ReferenceCells::Tetrahedron:
                     // simplices can use the standard definition of a simplex:
-                    result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-                    result[y_index] =
-                      std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-                    result[z_index] =
-                      std::clamp(result[z_index],
-                                 0.0,
-                                 1.0 - result[x_index] - result[y_index]);
+                    result[0] = std::clamp(result[0], 0.0, 1.0);
+                    result[1] = std::clamp(result[1], 0.0, 1.0 - result[0]);
+                    result[2] =
+                      std::clamp(result[2], 0.0, 1.0 - result[0] - result[1]);
                     break;
 
                     // wedges and pyramids are more ad-hoc:
                   case ReferenceCells::Wedge:
-                    result[x_index] = std::clamp(result[x_index], 0.0, 1.0);
-                    result[y_index] =
-                      std::clamp(result[y_index], 0.0, 1.0 - result[x_index]);
-                    result[z_index] = std::clamp(result[z_index], 0.0, 1.0);
+                    result[0] = std::clamp(result[0], 0.0, 1.0);
+                    result[1] = std::clamp(result[1], 0.0, 1.0 - result[0]);
+                    result[2] = std::clamp(result[2], 0.0, 1.0);
                     break;
 
                   case ReferenceCells::Pyramid:
                     {
-                      result[x_index] = std::clamp(result[x_index], -1.0, 1.0);
-                      result[y_index] = std::clamp(result[y_index], -1.0, 1.0);
+                      result[0] = std::clamp(result[0], -1.0, 1.0);
+                      result[1] = std::clamp(result[1], -1.0, 1.0);
                       // It suffices to transform everything to the first
                       // quadrant to adjust z:
-                      const auto x_abs = std::abs(result[x_index]);
-                      const auto y_abs = std::abs(result[y_index]);
+                      const auto x_abs = std::abs(result[0]);
+                      const auto y_abs = std::abs(result[1]);
 
                       if (y_abs <= x_abs)
-                        result[z_index] =
-                          std::clamp(result[z_index], 0.0, 1.0 - x_abs);
+                        result[2] = std::clamp(result[2], 0.0, 1.0 - x_abs);
                       else
-                        result[z_index] =
-                          std::clamp(result[z_index], 0.0, 1.0 - y_abs);
+                        result[2] = std::clamp(result[2], 0.0, 1.0 - y_abs);
                     }
                     break;
                   default:

@@ -1530,13 +1530,9 @@ ReferenceCell<dim>::faces_for_given_vertex(const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
   if constexpr (dim == 0)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
-    {
-      return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
-    }
+    return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -2200,13 +2196,9 @@ inline constexpr unsigned int
 ReferenceCell<dim>::n_vertices() const
 {
   if constexpr (dim == 0)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 1)
-    {
-      return 2;
-    }
+    return 2;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -2248,13 +2240,9 @@ inline constexpr unsigned int
 ReferenceCell<dim>::n_lines() const
 {
   if constexpr (dim == 0)
-    {
-      return 0;
-    }
+    return 0;
   else if constexpr (dim == 1)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -2425,13 +2413,9 @@ inline constexpr unsigned int
 ReferenceCell<dim>::n_faces() const
 {
   if constexpr (dim == 0)
-    {
-      return 0;
-    }
+    return 0;
   else if constexpr (dim == 1)
-    {
-      return 2;
-    }
+    return 2;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -2568,13 +2552,9 @@ inline constexpr unsigned int
 ReferenceCell<dim>::n_isotropic_refinement_choices() const
 {
   if constexpr (dim == 0)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 1)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -2631,13 +2611,7 @@ ReferenceCell<dim>::get_isotropic_refinement_choice(
     }
   else if constexpr (dim == 2)
     {
-      switch (this->kind)
-        {
-          default:
-            {
-              DEAL_II_NOT_IMPLEMENTED();
-            }
-        }
+      DEAL_II_NOT_IMPLEMENTED();
     }
   else if constexpr (dim == 3)
     {
@@ -2671,13 +2645,9 @@ inline constexpr unsigned int
 ReferenceCell<dim>::n_isotropic_children() const
 {
   if constexpr (dim == 0)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 1)
-    {
-      return 2;
-    }
+    return 2;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -2973,6 +2943,8 @@ ReferenceCell<dim>::child_cell_on_face(
   const unsigned int                 subface,
   const types::geometric_orientation combined_orientation) const
 {
+  (void)combined_orientation;
+
   AssertIndexRange(face, n_faces());
   AssertIndexRange(subface, face_reference_cell(face).n_isotropic_children());
 
@@ -3073,9 +3045,7 @@ ReferenceCell<dim>::standard_vertex_to_face_and_vertex_index(
   constexpr unsigned int X = numbers::invalid_unsigned_int;
 
   if constexpr (dim == 0)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
     {
       {
@@ -3244,13 +3214,9 @@ ReferenceCell<dim>::line_to_cell_vertices(const unsigned int line,
   AssertIndexRange(line, n_lines());
 
   if constexpr (dim == 0)
-    {
-      return vertex;
-    }
+    return vertex;
   else if constexpr (dim == 1)
-    {
-      return vertex;
-    }
+    return vertex;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -3353,6 +3319,8 @@ ReferenceCell<dim>::face_to_cell_lines(
   if constexpr (dim == 0)
     {
       {
+        (void)combined_face_orientation;
+
         // We can't get here based on the assertions above: vertices
         // have no faces.
         DEAL_II_ASSERT_UNREACHABLE();
@@ -3361,6 +3329,8 @@ ReferenceCell<dim>::face_to_cell_lines(
   else if constexpr (dim == 1)
     {
       {
+        (void)combined_face_orientation;
+
         // We can't get here based on the assertions above: lines
         // have vertices as faces, which have no bounding lines.
         DEAL_II_ASSERT_UNREACHABLE();
@@ -3368,6 +3338,8 @@ ReferenceCell<dim>::face_to_cell_lines(
     }
   else if constexpr (dim == 2)
     {
+      (void)combined_face_orientation;
+
       switch (this->kind)
         {
           case ReferenceCells::Triangle:
@@ -3458,77 +3430,81 @@ ReferenceCell<dim>::face_to_cell_vertices(
     // looking for is actually the face we were given:
     return face;
   else if constexpr (dim == 2)
-    switch (this->kind)
-      {
-        case ReferenceCells::Triangle:
-          {
-            static constexpr ndarray<unsigned int, 3, 2> table = {
-              {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            {
+              static constexpr ndarray<unsigned int, 3, 2> table = {
+                {{{0, 1}}, {{1, 2}}, {{2, 0}}}};
 
-            return table[face][combined_face_orientation ==
-                                   numbers::default_geometric_orientation ?
-                                 vertex :
-                                 (1 - vertex)];
-          }
-        case ReferenceCells::Quadrilateral:
-          {
-            const auto [face_orientation, face_rotation, face_flip] =
-              internal::split_face_orientation(combined_face_orientation);
+              return table[face][combined_face_orientation ==
+                                     numbers::default_geometric_orientation ?
+                                   vertex :
+                                   (1 - vertex)];
+            }
+          case ReferenceCells::Quadrilateral:
+            {
+              const auto [face_orientation, face_rotation, face_flip] =
+                internal::split_face_orientation(combined_face_orientation);
 
-            return GeometryInfo<2>::face_to_cell_vertices(
-              face, vertex, face_orientation, face_flip, face_rotation);
-          }
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
+              return GeometryInfo<2>::face_to_cell_vertices(
+                face, vertex, face_orientation, face_flip, face_rotation);
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
   else if constexpr (dim == 3)
-    switch (this->kind)
-      {
-        case ReferenceCells::Tetrahedron:
-          {
-            static constexpr ndarray<unsigned int, 4, 3> table = {
-              {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              static constexpr ndarray<unsigned int, 4, 3> table = {
+                {{{0, 1, 2}}, {{1, 0, 3}}, {{0, 2, 3}}, {{2, 1, 3}}}};
 
-            return table[face][standard_to_real_face_vertex(
-              vertex, face, combined_face_orientation)];
-          }
-        case ReferenceCells::Pyramid:
-          {
-            constexpr auto X = numbers::invalid_unsigned_int;
-            static constexpr ndarray<unsigned int, 5, 4> table = {
-              {{{0, 1, 2, 3}},
-               {{0, 2, 4, X}},
-               {{3, 1, 4, X}},
-               {{1, 0, 4, X}},
-               {{2, 3, 4, X}}}};
+              return table[face][standard_to_real_face_vertex(
+                vertex, face, combined_face_orientation)];
+            }
+          case ReferenceCells::Pyramid:
+            {
+              constexpr auto X = numbers::invalid_unsigned_int;
+              static constexpr ndarray<unsigned int, 5, 4> table = {
+                {{{0, 1, 2, 3}},
+                 {{0, 2, 4, X}},
+                 {{3, 1, 4, X}},
+                 {{1, 0, 4, X}},
+                 {{2, 3, 4, X}}}};
 
-            return table[face][standard_to_real_face_vertex(
-              vertex, face, combined_face_orientation)];
-          }
-        case ReferenceCells::Wedge:
-          {
-            constexpr auto X = numbers::invalid_unsigned_int;
-            static constexpr ndarray<unsigned int, 6, 4> table = {
-              {{{1, 0, 2, X}},
-               {{3, 4, 5, X}},
-               {{0, 1, 3, 4}},
-               {{1, 2, 4, 5}},
-               {{2, 0, 5, 3}}}};
+              return table[face][standard_to_real_face_vertex(
+                vertex, face, combined_face_orientation)];
+            }
+          case ReferenceCells::Wedge:
+            {
+              constexpr auto X = numbers::invalid_unsigned_int;
+              static constexpr ndarray<unsigned int, 6, 4> table = {
+                {{{1, 0, 2, X}},
+                 {{3, 4, 5, X}},
+                 {{0, 1, 3, 4}},
+                 {{1, 2, 4, 5}},
+                 {{2, 0, 5, 3}}}};
 
-            return table[face][standard_to_real_face_vertex(
-              vertex, face, combined_face_orientation)];
-          }
-        case ReferenceCells::Hexahedron:
-          {
-            const auto [face_orientation, face_rotation, face_flip] =
-              internal::split_face_orientation(combined_face_orientation);
+              return table[face][standard_to_real_face_vertex(
+                vertex, face, combined_face_orientation)];
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              const auto [face_orientation, face_rotation, face_flip] =
+                internal::split_face_orientation(combined_face_orientation);
 
-            return GeometryInfo<3>::face_to_cell_vertices(
-              face, vertex, face_orientation, face_flip, face_rotation);
-          }
-        default:
-          DEAL_II_NOT_IMPLEMENTED();
-      }
+              return GeometryInfo<3>::face_to_cell_vertices(
+                face, vertex, face_orientation, face_flip, face_rotation);
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
   else
     DEAL_II_NOT_IMPLEMENTED();
 
@@ -3731,20 +3707,12 @@ ReferenceCell<dim>::standard_to_real_face_line(
   AssertIndexRange(face_orientation, n_face_orientations(face));
 
   if constexpr (dim == 0)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 2)
     {
-      switch (this->kind)
-        {
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
-        }
+      DEAL_II_NOT_IMPLEMENTED();
     }
   else if constexpr (dim == 3)
     {
@@ -3869,10 +3837,8 @@ namespace ReferenceCells
         return ReferenceCells::Vertex;
 
     if constexpr (dim == 1)
-      {
-        if (n_vertices == 2)
-          return ReferenceCells::Line;
-      }
+      if (n_vertices == 2)
+        return ReferenceCells::Line;
 
     if constexpr (dim == 2)
       {
@@ -3961,26 +3927,22 @@ ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
 
   if constexpr (dim == 0)
     {
+      (void)xi;
       return 1.0;
     }
   else if constexpr (dim == 1)
     {
-      if constexpr (dim > 0)
-        return GeometryInfo<dim>::d_linear_shape_function(xi, i);
-      DEAL_II_ASSERT_UNREACHABLE();
-      // see also BarycentricPolynomials<2>::compute_value
+      return GeometryInfo<dim>::d_linear_shape_function(xi, i);
     }
   else if constexpr (dim == 2)
     {
       switch (this->kind)
         {
           case ReferenceCells::Quadrilateral:
-            if constexpr (dim > 0)
-              return GeometryInfo<dim>::d_linear_shape_function(xi, i);
-            DEAL_II_ASSERT_UNREACHABLE();
-            // see also BarycentricPolynomials<2>::compute_value
+            return GeometryInfo<dim>::d_linear_shape_function(xi, i);
           case ReferenceCells::Triangle:
             {
+              // see also BarycentricPolynomials<2>::compute_value
               switch (i)
                 {
                   case 0:
@@ -3994,7 +3956,6 @@ ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
                     DEAL_II_ASSERT_UNREACHABLE();
                 }
             }
-            // see also BarycentricPolynomials<3>::compute_value
           default:
             DEAL_II_NOT_IMPLEMENTED();
         }
@@ -4004,12 +3965,10 @@ ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
       switch (this->kind)
         {
           case ReferenceCells::Hexahedron:
-            if constexpr (dim > 0)
-              return GeometryInfo<dim>::d_linear_shape_function(xi, i);
-            DEAL_II_ASSERT_UNREACHABLE();
-            // see also BarycentricPolynomials<2>::compute_value
+            return GeometryInfo<dim>::d_linear_shape_function(xi, i);
           case ReferenceCells::Tetrahedron:
             {
+              // see also BarycentricPolynomials<3>::compute_value
               switch (i)
                 {
                   case 0:
@@ -4025,9 +3984,9 @@ ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
                     DEAL_II_ASSERT_UNREACHABLE();
                 }
             }
-            // see also ScalarLagrangePolynomialPyramid::compute_value()
           case ReferenceCells::Pyramid:
             {
+              // see also ScalarLagrangePolynomialPyramid::compute_value()
               const double Q14 = 0.25;
 
               const double r = xi[std::min(0, dim - 1)];
@@ -4048,8 +4007,8 @@ ReferenceCell<dim>::d_linear_shape_function(const Point<dim>  &xi,
               else
                 return t;
             }
-            // see also ScalarLagrangePolynomialWedge::compute_value()
           case ReferenceCells::Wedge:
+            // see also ScalarLagrangePolynomialWedge::compute_value()
             return ReferenceCells::Triangle.d_linear_shape_function(
                      Point<2>(xi[std::min(0, dim - 1)],
                               xi[std::min(1, dim - 1)]),
@@ -4074,15 +4033,11 @@ ReferenceCell<dim>::d_linear_shape_function_gradient(const Point<dim>  &xi,
                                                      const unsigned int i) const
 {
   if constexpr (dim == 0)
-    {
-      return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
-      // see also BarycentricPolynomials<2>::compute_grad()
-    }
+    return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
+  // see also BarycentricPolynomials<2>::compute_grad()
   else if constexpr (dim == 1)
-    {
-      return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
-      // see also BarycentricPolynomials<2>::compute_grad()
-    }
+    return GeometryInfo<dim>::d_linear_shape_function_gradient(xi, i);
+  // see also BarycentricPolynomials<2>::compute_grad()
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -4130,13 +4085,9 @@ inline double
 ReferenceCell<dim>::volume() const
 {
   if constexpr (dim == 0)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 1)
-    {
-      return 1;
-    }
+    return 1;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -4180,23 +4131,10 @@ ReferenceCell<dim>::face_measure(const unsigned int face_no) const
   AssertIndexRange(face_no, n_faces());
   constexpr double X = std::numeric_limits<double>::signaling_NaN();
 
-  static const std::array<double, 5> tri_faces{
-    {1.0, std::sqrt(2.0), 1.0, X, X}};
-  static const std::array<double, 5> tet_faces{
-    {0.5, 0.5, 0.5, std::sqrt(3.0) / 2.0, X}};
-  static const std::array<double, 5> pyramid_faces{
-    {4, std::sqrt(2.0), std::sqrt(2.0), std::sqrt(2.0), std::sqrt(2.0)}};
-  static const std::array<double, 5> wedge_faces{
-    {0.5, 0.5, 1.0, std::sqrt(2.0), 1.0}};
-
   if constexpr (dim == 0)
-    {
-      return 1.0;
-    }
+    return 1.0;
   else if constexpr (dim == 1)
-    {
-      return 1.0;
-    }
+    return 1.0;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -4204,6 +4142,8 @@ ReferenceCell<dim>::face_measure(const unsigned int face_no) const
           case ReferenceCells::Quadrilateral:
             return 1.0;
           case ReferenceCells::Triangle:
+            const std::array<double, 5> tri_faces{
+              {1.0, std::sqrt(2.0), 1.0, X, X}};
             return tri_faces[face_no];
         }
     }
@@ -4214,11 +4154,26 @@ ReferenceCell<dim>::face_measure(const unsigned int face_no) const
           case ReferenceCells::Hexahedron:
             return 1.0;
           case ReferenceCells::Tetrahedron:
-            return tet_faces[face_no];
+            {
+              const std::array<double, 5> tet_faces{
+                {0.5, 0.5, 0.5, std::sqrt(3.0) / 2.0, X}};
+              return tet_faces[face_no];
+            }
           case ReferenceCells::Pyramid:
-            return pyramid_faces[face_no];
+            {
+              const std::array<double, 5> pyramid_faces{{4,
+                                                         std::sqrt(2.0),
+                                                         std::sqrt(2.0),
+                                                         std::sqrt(2.0),
+                                                         std::sqrt(2.0)}};
+              return pyramid_faces[face_no];
+            }
           case ReferenceCells::Wedge:
-            return wedge_faces[face_no];
+            {
+              const std::array<double, 5> wedge_faces{
+                {0.5, 0.5, 1.0, std::sqrt(2.0), 1.0}};
+              return wedge_faces[face_no];
+            }
         }
     }
   else
@@ -4234,13 +4189,9 @@ inline Point<dim>
 ReferenceCell<dim>::barycenter() const
 {
   if constexpr (dim == 0)
-    {
-      return Point<dim>();
-    }
+    return Point<dim>();
   else if constexpr (dim == 1)
-    {
-      return Point<dim>(1. / 2.);
-    }
+    return Point<dim>(1. / 2.);
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -4282,13 +4233,6 @@ inline bool
 ReferenceCell<dim>::contains_point(const Point<dim> &p,
                                    const double      tolerance) const
 {
-  // Introduce abbreviations to silence compiler warnings about invalid
-  // array accesses (that can't happen, of course, but the compiler
-  // doesn't know that).
-  constexpr unsigned int x_coordinate = 0;
-  constexpr unsigned int y_coordinate = (dim >= 2 ? 1 : 0);
-  constexpr unsigned int z_coordinate = (dim >= 3 ? 2 : 0);
-
   if constexpr (dim == 0)
     {
       {
@@ -4382,11 +4326,11 @@ ReferenceCell<dim>::contains_point(const Point<dim> &p,
           case ReferenceCells::Pyramid:
             {
               // A pyramid only lives in the upper half-space:
-              if (p[z_coordinate] < -tolerance)
+              if (p[2] < -tolerance)
                 return false;
 
               // It also only lives in the space below z=1:
-              if (p[z_coordinate] > 1 + tolerance)
+              if (p[2] > 1 + tolerance)
                 return false;
 
               // Within what's left of the space, a pyramid is a cone that
@@ -4394,12 +4338,11 @@ ReferenceCell<dim>::contains_point(const Point<dim> &p,
               // to the axis in the max norm (this is the right norm because the
               // vertices of the pyramid are at points +/-1, +/-1):
               const double distance_from_axis =
-                std::max(std::fabs(p[x_coordinate]),
-                         std::fabs(p[y_coordinate]));
+                std::max(std::fabs(p[0]), std::fabs(p[1]));
 
               // We are inside the pyramid if the distance from the axis is less
               // than (1-z)
-              return (distance_from_axis <= 1 + tolerance - p[z_coordinate]);
+              return (distance_from_axis <= 1 + tolerance - p[2]);
             }
           case ReferenceCells::Wedge:
             {
@@ -4408,17 +4351,16 @@ ReferenceCell<dim>::contains_point(const Point<dim> &p,
               // triangles above (i.e., for the simplex above, using dim==2)
               // and then check the third dimension separately.
 
-              if ((p[x_coordinate] < -tolerance) ||
-                  (p[y_coordinate] < -tolerance))
+              if ((p[0] < -tolerance) || (p[1] < -tolerance))
                 return false;
 
-              const double sum = p[x_coordinate] + p[y_coordinate];
+              const double sum = p[0] + p[1];
               if (sum > 1 + tolerance * std::sqrt(2.0))
                 return false;
 
-              if (p[z_coordinate] < -tolerance)
+              if (p[2] < -tolerance)
                 return false;
-              if (p[z_coordinate] > 1 + tolerance)
+              if (p[2] > 1 + tolerance)
                 return false;
 
               return true;
@@ -4455,9 +4397,7 @@ ReferenceCell<dim>::face_tangent_vector(const unsigned int face_no,
   // Simplify the 1d case by setting tangents (which are used for boundary
   // forms and thus Jacobians) equal to the unit vector
   if constexpr (dim == 1)
-    {
-      return Tensor<1, dim>{{1.0}};
-    }
+    return Tensor<1, dim>{{1.0}};
 
   AssertIndexRange(i, dim - 1);
 
@@ -4597,10 +4537,8 @@ ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
       return cross_product_2d(face_tangent_vector(face_no, 0));
     }
   else if (dim == 3)
-    {
-      return cross_product_3d(face_tangent_vector(face_no, 0),
-                              face_tangent_vector(face_no, 1));
-    }
+    return cross_product_3d(face_tangent_vector(face_no, 0),
+                            face_tangent_vector(face_no, 1));
 
   DEAL_II_NOT_IMPLEMENTED();
 
@@ -4659,41 +4597,40 @@ ReferenceCell<dim>::face_to_cell_line_orientation(
   const types::geometric_orientation combined_face_orientation,
   const types::geometric_orientation line_orientation) const
 {
-  constexpr auto                D = numbers::default_geometric_orientation;
-  constexpr auto                R = numbers::reverse_line_orientation;
-  static constexpr unsigned int X = numbers::invalid_unsigned_int;
-
-  auto quad_face = [&]() {
-    static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
-      orientation_quad{
-        {{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
-    // We use face_line_no / 2 here since lines i and i + 1 are parallel
-    // and, on a given face, have the same relative orientations.
-    const bool match =
-      line_orientation ==
-      orientation_quad[face_line_no / 2][combined_face_orientation];
-
-    return match ? numbers::default_geometric_orientation :
-                   numbers::reverse_line_orientation;
-  };
-
-  static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
-    orientation_triangle{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
+  (void)face_line_no;
+  (void)face_no;
+  (void)combined_face_orientation;
+  (void)line_orientation;
 
   if constexpr (dim == 0)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 2)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 3)
     {
+      constexpr auto         D = numbers::default_geometric_orientation;
+      constexpr auto         R = numbers::reverse_line_orientation;
+      constexpr unsigned int X = numbers::invalid_unsigned_int;
+
+      auto quad_face = [&]() {
+        static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
+          orientation_quad{
+            {{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
+        // We use face_line_no / 2 here since lines i and i + 1 are parallel
+        // and, on a given face, have the same relative orientations.
+        const bool match =
+          (line_orientation ==
+           orientation_quad[face_line_no / 2][combined_face_orientation]);
+
+        return match ? numbers::default_geometric_orientation :
+                       numbers::reverse_line_orientation;
+      };
+
+      constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
+        orientation_triangle{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
+
       switch (this->kind)
         {
           case ReferenceCells::Tetrahedron:
@@ -4784,9 +4721,7 @@ ReferenceCell<dim>::opposite_face_index(const unsigned int face_no) const
 {
   AssertIndexRange(face_no, n_faces());
   if constexpr (dim == 0)
-    {
-      DEAL_II_NOT_IMPLEMENTED();
-    }
+    DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
     {
       {
@@ -5002,13 +4937,9 @@ ReferenceCell<dim>::get_combined_orientation(
   };
 
   if constexpr (dim == 0)
-    {
-      return compute_orientation(vertex_vertex_permutations, 1);
-    }
+    return compute_orientation(vertex_vertex_permutations, 1);
   else if constexpr (dim == 1)
-    {
-      return compute_orientation(line_vertex_permutations, 2);
-    }
+    return compute_orientation(line_vertex_permutations, 2);
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -5056,13 +4987,9 @@ ReferenceCell<dim>::permute_by_combined_orientation(
   };
 
   if constexpr (dim == 0)
-    {
-      permute(vertex_vertex_permutations, 1);
-    }
+    permute(vertex_vertex_permutations, 1);
   else if constexpr (dim == 1)
-    {
-      permute(line_vertex_permutations, 2);
-    }
+    permute(line_vertex_permutations, 2);
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -5099,16 +5026,12 @@ ReferenceCell<dim>::get_inverse_combined_orientation(
   const types::geometric_orientation orientation) const
 {
   if constexpr (dim == 0)
-    {
-      // Things are always default-oriented in 1D
-      return orientation;
-    }
+    // Things are always default-oriented in 1D
+    return orientation;
   else if constexpr (dim == 1)
-    {
-      // the 1d orientations are the identity and a flip: i.e., the
-      // identity and an involutory mapping
-      return orientation;
-    }
+    // the 1d orientations are the identity and a flip: i.e., the
+    // identity and an involutory mapping
+    return orientation;
   else if constexpr (dim == 2)
     {
       switch (this->kind)
@@ -5131,16 +5054,11 @@ ReferenceCell<dim>::get_inverse_combined_orientation(
             DEAL_II_NOT_IMPLEMENTED();
         }
     }
-  else if constexpr (dim == 3)
-    {
-      switch (this->kind)
-        {
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
-        }
-    }
   else
-    DEAL_II_NOT_IMPLEMENTED();
+    {
+      (void)orientation;
+      DEAL_II_NOT_IMPLEMENTED();
+    }
 
   return std::numeric_limits<types::geometric_orientation>::max();
 }
