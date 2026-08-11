@@ -75,6 +75,49 @@ $c(\cdot,\cdot)$. The formulation supports arbitrary hyper-elastic models via
 $W(F)$ and keeps the pressure physically meaningful only in the fluid region
 ($p=0$ in $\Omega^s_t$).
 
+<h3>Elasticity models and the semi-implicit scheme</h3>
+
+The elastic response of the solid is governed by a stored energy $W(F)$
+through the first Piola-Kirchhoff stress $P(F)=\partial W/\partial F$ and the
+internal force $N(w)$, whose components are
+@f[
+  N_i(w) = \int_B P(F) : \nabla \chi_i\, dX, \qquad F = I + \nabla w.
+@f]
+Three models are available through the parameter file:
+
+- <b>Linear elasticity</b> (default), with the operator
+  $a(w,v) = 2\mu_s \varepsilon(w):\varepsilon(v) + \lambda_s
+  \operatorname{div} w \operatorname{div} v$.
+- <b>Exponential hyperelasticity</b> (\cite{BoffiGastaldiHeltai-2018-a}),
+  $P(F) = \mu_s \exp(\lambda_s (F:F - \text{dim})) F$, which uses the same
+  Lamé parameters as the other models.
+- <b>Compressible neo-Hookean</b> with stored energy
+  @f[
+    W(F) = \tfrac{\mu_s}{2}(F:F - \text{dim}) - \mu_s \ln J +
+           \tfrac{\lambda_s}{2}(\ln J)^2,
+  @f]
+  whose stress $P(F) = \mu_s(F - F^{-T}) + \lambda_s \ln J\, F^{-T}$ uses the
+  same Lamé parameters as the linear model and reduces exactly to it at
+  $F=I$.
+
+Because the stress depends nonlinearly on the deformation gradient, the
+stiffness operator $K_s(w)$ (the derivative of the internal force) changes
+with the configuration. In the <b>semi-implicit</b> scheme we linearize the
+internal force around the current configuration $w^n$ (the last converged
+solution),
+@f[
+  N(w^{n+1}) \approx N(w^n) + K_s(w^n)(w^{n+1} - w^n),
+@f]
+so that each time step only requires a single linear solve with the tangent
+stiffness assembled at $w^n$, and all nonlinear terms of the elasticity part
+are moved to the right-hand side:
+@f[
+  K_s(w^n) w^{n+1} + \ldots = \text{rhs}(u^n, w^n) + K_s(w^n) w^n - N(w^n).
+@f]
+Each time step therefore requires a single linear solve, at the price of a
+first-order-in-time linearization error; this is the only scheme used to
+advance the nonlinear solid models in this program.
+
 
 <h3>What this tutorial covers</h3>
 
@@ -85,6 +128,8 @@ $W(F)$ and keeps the pressure physically meaningful only in the fluid region
   full solid mesh available for deformation.
 - Dimension-independent assembly of the coupled Navier-Stokes / compressible
   elasticity system, together with a Schur-complement based solver.
+- Linear, exponential-hyperelastic, and neo-Hookean solid models, advanced in
+  time with the semi-implicit linearization described above.
 - Time stepping that mirrors the semi-implicit scheme described above, in 2D or
   3D, with configurable material parameters and loading.
 

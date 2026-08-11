@@ -914,6 +914,382 @@ TEST(Step80, ElasticityManufacturedSolutionConvergence)
     }
 }
 
+
+
+namespace Step80
+{
+  // Pointwise internal force of the compressible neo-Hookean law used in the
+  // test below to check the tangent formulas by finite differences:
+  //   N(F) = (P(F), G),  P(F) = mu (F - F^{-T}) + lambda ln(J) F^{-T}.
+  template <int dim>
+  double pointwise_neohookean_force(const Tensor<2, dim> &F,
+                                    const Tensor<2, dim> &G,
+                                    const double          mu,
+                                    const double          lambda)
+  {
+    using namespace dealii;
+
+    const Tensor<2, dim> Q   = transpose(invert(F));
+    const double         lnJ = std::log(determinant(F));
+    return mu * scalar_product(F, G) +
+           (lambda * lnJ - mu) * scalar_product(Q, G);
+  }
+
+
+
+  // Pointwise internal force of the exponential law
+  // P(F) = mu exp(lambda (F:F - dim)) F.
+  template <int dim>
+  double pointwise_exponential_force(const Tensor<2, dim> &F,
+                                     const Tensor<2, dim> &G,
+                                     const double          mu,
+                                     const double          lambda)
+  {
+    using namespace dealii;
+
+    const double g =
+      mu * std::exp(lambda * (scalar_product(F, F) - static_cast<double>(dim)));
+    return g * scalar_product(F, G);
+  }
+
+
+
+  // Pointwise verification of the stress and material tangent of the two
+  // hyperelastic laws implemented in the tutorial, against finite differences
+  // of the internal force. The test is run both in 2D and in 3D.
+  template <int dim>
+  void check_hyperelastic_tangent_pointwise()
+  {
+    using namespace dealii;
+
+    const double mu      = 1.3;
+    const double lambda  = 2.7;
+    const double epsilon = 1e-6;
+
+    // Gradients used to contract the tangent. Keep H small so that the
+    // configuration F = I + H used by the right-hand side entry stays
+    // invertible.
+    Tensor<2, dim> G_a, G_b, H;
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = 0; j < dim; ++j)
+        {
+          G_a[i][j] = 0.3 + 0.2 * i - 0.1 * j;
+          G_b[i][j] = -0.2 + 0.15 * j + 0.25 * (i == j);
+          H[i][j]   = 0.03 * (i + 1) - 0.02 * j;
+        }
+
+    // Data evaluated from the displacement gradient H: F_data = I + H.
+    const HyperelasticPointData<dim> data_nh =
+      evaluate_hyperelastic_point_data(H, true, "neo_hookean", mu, lambda);
+    Tensor<2, dim> F_nh;
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = 0; j < dim; ++j)
+        F_nh[i][j] = (i == j ? 1. : 0.) + H[i][j];
+
+    for (unsigned int i = 0; i < dim; ++i)
+      for (unsigned int j = 0; j < dim; ++j)
+        EXPECT_NEAR(data_nh.F[i][j], F_nh[i][j], 1e-14);
+    EXPECT_NEAR(data_nh.ln_det_F, std::log(determinant(F_nh)), 1e-14);
+
+    // Tangent entry against central finite differences of the internal force:
+    // (dP/dF[G_b], G_a) ~ (N(F + eps G_b) - N(F - eps G_b)) / (2 eps).
+    const Tensor<2, dim> F_plus  = F_nh + epsilon * G_b;
+    const Tensor<2, dim> F_minus = F_nh - epsilon * G_b;
+    const double         fd_tangent =
+      (pointwise_neohookean_force(F_plus, G_a, mu, lambda) -
+       pointwise_neohookean_force(F_minus, G_a, mu, lambda)) /
+      (2. * epsilon);
+
+    const double tangent =
+      neohookean_tangent_entry(G_a, G_b, data_nh, mu, lambda);
+    EXPECT_NEAR(tangent, fd_tangent, 1e-7);
+
+    // Right-hand side entry: (K_s(w) w)_i - N_i, where the tangent is applied
+    // to H = grad(w) and the internal force is evaluated at F = I + H.
+    const double Ks_w = neohookean_tangent_entry(G_a, H, data_nh, mu, lambda);
+    const double N_i  = pointwise_neohookean_force(F_nh, G_a, mu, lambda);
+    EXPECT_NEAR(neohookean_rhs_entry(G_a, data_nh, H, mu, lambda),
+                Ks_w - N_i,
+                1e-14);
+
+    // At F = I the neo-Hookean tangent must reduce to the linear elastic
+    // operator 2 mu sym(G_a) : sym(G_b) + lambda div(G_a) div(G_b), and the
+    // internal force must vanish.
+    {
+      const Tensor<2, dim>             H_zero;
+      const HyperelasticPointData<dim> data_identity =
+        evaluate_hyperelastic_point_data(
+          H_zero, true, "neo_hookean", mu, lambda);
+      const double linear_entry =
+        2. * mu * scalar_product(symmetrize(G_a), symmetrize(G_b)) +
+        lambda * trace(G_a) * trace(G_b);
+      EXPECT_NEAR(neohookean_tangent_entry(G_a, G_b, data_identity, mu, lambda),
+                  linear_entry,
+                  1e-12);
+      EXPECT_NEAR(pointwise_neohookean_force(data_identity.F, G_a, mu, lambda),
+                  0.,
+                  1e-12);
+    }
+
+    // The same checks for the exponential law.
+    const HyperelasticPointData<dim> data_exp =
+      evaluate_hyperelastic_point_data(H, true, "exponential", mu, lambda);
+    const Tensor<2, dim> F_exp = F_nh;
+    const double         fd_tangent_exp =
+      (pointwise_exponential_force(F_exp + epsilon * G_b, G_a, mu, lambda) -
+       pointwise_exponential_force(F_exp - epsilon * G_b, G_a, mu, lambda)) /
+      (2. * epsilon);
+    EXPECT_NEAR(exponential_tangent_entry(G_a, G_b, data_exp, lambda),
+                fd_tangent_exp,
+                1e-7);
+    const double Ks_w_exp = exponential_tangent_entry(G_a, H, data_exp, lambda);
+    const double N_i_exp  = pointwise_exponential_force(F_exp, G_a, mu, lambda);
+    EXPECT_NEAR(exponential_rhs_entry(G_a, data_exp, H, lambda),
+                Ks_w_exp - N_i_exp,
+                1e-14);
+  }
+
+
+
+} // namespace Step80
+
+
+
+namespace Step80
+{
+  // Independent assembly of the nonlinear internal force
+  //   N_i(w) = int_B P(F) : grad(phi_i) dX
+  // on the solid mesh, with F = I + grad(w) and P(F) the first
+  // Piola-Kirchhoff stress of the law selected in par. The stress formulas
+  // are written out directly here, i.e. independently of the entry functions
+  // used by the tutorial assembly, so that the assembled tangent stiffness
+  // and right-hand side can be checked against a second implementation.
+  template <int dim, int spacedim>
+  LA::MPI::Vector assemble_internal_force(
+    const NavierStokesImmersedProblem<dim, spacedim> &problem)
+  {
+    using namespace dealii;
+
+    const auto &par = problem.par;
+
+    FEValues<spacedim> fe_values(*problem.solid_fe,
+                                 problem.solid_quadrature,
+                                 update_gradients | update_JxW_values);
+
+    const unsigned int dofs_per_cell = problem.solid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = problem.solid_quadrature.size();
+
+    std::vector<Tensor<2, spacedim>>     grad_w(n_q_points);
+    Vector<double>                       cell_rhs(dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    LA::MPI::BlockVector force(problem.solid_solution);
+    force = 0;
+
+    for (const auto &cell : problem.solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          fe_values.reinit(cell);
+          fe_values[problem.displacement].get_function_gradients(
+            problem.solid_locally_relevant_solution, grad_w);
+
+          cell_rhs = 0;
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              // Deformation gradient F = I + grad(w).
+              Tensor<2, spacedim> F = grad_w[q];
+              for (unsigned int d = 0; d < spacedim; ++d)
+                F[d][d] += 1.;
+
+              // First Piola-Kirchhoff stress of the selected law.
+              Tensor<2, spacedim> P;
+              if (par.nonlinear_solid_law == "neo_hookean")
+                {
+                  const Tensor<2, spacedim> Q   = transpose(invert(F));
+                  const double              lnJ = std::log(determinant(F));
+                  P = par.lame_mu * (F - Q) + par.lame_lambda * lnJ * Q;
+                }
+              else
+                {
+                  const double g =
+                    par.lame_mu *
+                    std::exp(par.lame_lambda * (scalar_product(F, F) -
+                                                static_cast<double>(spacedim)));
+                  P = g * F;
+                }
+
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                cell_rhs(i) +=
+                  scalar_product(P,
+                                 fe_values[problem.displacement].gradient(i,
+                                                                          q)) *
+                  fe_values.JxW(q);
+            }
+
+          cell->get_dof_indices(local_dof_indices);
+          problem.solid_constraints.distribute_local_to_global(
+            cell_rhs, local_dof_indices, force);
+        }
+
+    force.compress(VectorOperation::add);
+    return LA::MPI::Vector(force.block(0));
+  }
+} // namespace Step80
+
+
+
+TEST(Step80, HyperelasticStressAndTangent)
+{
+  using namespace Step80;
+
+  check_hyperelastic_tangent_pointwise<2>();
+  check_hyperelastic_tangent_pointwise<3>();
+}
+
+
+
+// End-to-end check of the assembled nonlinear solid terms for both
+// hyperelastic laws, against an independent assembly of the internal force:
+//
+//  1. The assembled tangent stiffness K_s(w) applied to a test direction x
+//     is compared with the centered finite difference of the independent
+//     internal force, (N(w + eps x) - N(w - eps x)) / (2 eps).
+//  2. With vanishing previous displacement and body force, the solid
+//     right-hand side assembled by assemble_elasticity_rhs() is
+//     R(w) = K_s(w) w - N(w), so it must match the matrix-vector product
+//     K_s(w) w minus the independently assembled N(w).
+TEST(Step80, NonlinearSolidAssemblyTangentMatchesRightHandSide)
+{
+  using namespace dealii;
+  using namespace Step80;
+
+  ParameterAcceptor::clear();
+
+  constexpr int dim      = 2;
+  constexpr int spacedim = 2;
+
+  std::ostringstream prm;
+  prm << "subsection Navier-Stokes Immersed Problem\n"
+      << "  subsection Grid generation\n"
+      << "    set Fluid grid generator           = hyper_cube\n"
+      << "    set Fluid grid generator arguments = -1: 1: false\n"
+      << "    set Initial fluid refinement       = 1\n"
+      << "    set Solid grid generator           = hyper_cube\n"
+      << "    set Solid grid generator arguments = -1: 1: false\n"
+      << "    set Initial solid refinement       = 3\n"
+      << "  end\n"
+      << "  subsection Physical properties\n"
+      << "    set Lame mu               = 2.5\n"
+      << "    set Lame lambda           = 3.7\n"
+      << "  end\n"
+      << "end\n";
+
+  const std::string prm_filename =
+    (std::filesystem::temp_directory_path() / "step-80-nonlinear-tangent.prm")
+      .string();
+  {
+    std::ofstream out(prm_filename);
+    out << prm.str();
+  }
+
+  const auto [file_dim, file_spacedim] =
+    get_dimension_and_spacedimension(prm_filename);
+  ASSERT_EQ(file_dim, static_cast<unsigned int>(dim));
+  ASSERT_EQ(file_spacedim, static_cast<unsigned int>(spacedim));
+
+  NavierStokesImmersedProblemParameters<dim, spacedim> par;
+  ParameterAcceptor::initialize(prm_filename);
+
+  const double alpha = 1.0;
+  const double eps   = 1e-6;
+
+  for (const std::string law : {"neo_hookean", "exponential"})
+    {
+      par.use_nonlinear_solid_model = true;
+      par.nonlinear_solid_law       = law;
+
+      NavierStokesImmersedProblem<dim, spacedim> problem(par);
+      problem.make_grid();
+      problem.initial_setup();
+      problem.setup_dofs();
+
+      // Deterministic test displacement w on the solid displacement block
+      // (the multiplier block stays at zero), small enough that the
+      // deformation gradient F = I + grad(w) remains invertible, and a test
+      // direction x for the finite difference.
+      LA::MPI::Vector w(problem.solid_owned_dofs[0], problem.mpi_communicator);
+      LA::MPI::Vector x(problem.solid_owned_dofs[0], problem.mpi_communicator);
+      for (auto i : w.locally_owned_elements())
+        {
+          w[i] = 0.02 * std::sin(0.37 * static_cast<double>(i) + 0.5);
+          x[i] = 0.01 * std::cos(0.23 * static_cast<double>(i) + 0.1);
+        }
+
+      auto set_displacement = [&](const LA::MPI::BlockVector &v) {
+        problem.solid_solution                  = v;
+        problem.solid_locally_relevant_solution = v;
+      };
+
+      // 1) Tangent stiffness at w against a finite difference of the
+      // independent internal force.
+      LA::MPI::BlockVector w_plus(problem.solid_solution);
+      LA::MPI::BlockVector w_minus(problem.solid_solution);
+      w_plus           = 0;
+      w_minus          = 0;
+      w_plus.block(0)  = w;
+      w_minus.block(0) = w;
+      w_plus.block(0).add(eps, x);
+      w_minus.block(0).add(-eps, x);
+
+      set_displacement(w_plus);
+      const LA::MPI::Vector N_plus = assemble_internal_force(problem);
+      set_displacement(w_minus);
+      const LA::MPI::Vector N_minus = assemble_internal_force(problem);
+
+      LA::MPI::Vector fd(problem.solid_owned_dofs[0], problem.mpi_communicator);
+      fd = N_plus;
+      fd.add(-1., N_minus);
+      fd *= 1. / (2. * eps);
+
+      LA::MPI::BlockVector w_0(problem.solid_solution);
+      w_0          = 0;
+      w_0.block(0) = w;
+      set_displacement(w_0);
+      problem.assemble_elasticity_system(alpha);
+      const auto &K = problem.solid_matrix.block(0, 0);
+
+      LA::MPI::Vector Kx(problem.solid_owned_dofs[0], problem.mpi_communicator);
+      K.vmult(Kx, x);
+      Kx.add(-1., fd);
+
+      const double tangent_error = Kx.l2_norm() / x.l2_norm();
+      EXPECT_LT(tangent_error, 1e-6)
+        << "Assembled tangent stiffness and finite difference of the "
+        << "internal force disagree for law '" << law << "': relative error "
+        << tangent_error;
+
+      // 2) Assembled right-hand side R(w) = K_s(w) w - N(w) against the
+      // matrix-vector product and the independent internal force.
+      problem.assemble_elasticity_rhs(alpha);
+      const LA::MPI::Vector R = problem.solid_system_rhs.block(0);
+      const LA::MPI::Vector N = assemble_internal_force(problem);
+
+      LA::MPI::Vector Kw(problem.solid_owned_dofs[0], problem.mpi_communicator);
+      K.vmult(Kw, w);
+
+      LA::MPI::Vector residual(problem.solid_owned_dofs[0],
+                               problem.mpi_communicator);
+      residual = R;
+      residual.add(-1., Kw);
+      residual.add(1., N);
+
+      const double rhs_error = residual.l2_norm() / w.l2_norm();
+      EXPECT_LT(rhs_error, 1e-9)
+        << "Assembled right-hand side does not match K_s(w) w - N(w) for law '"
+        << law << "': relative error " << rhs_error;
+    }
+}
+
 int main(int argc, char *argv[])
 {
   dealii::Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
