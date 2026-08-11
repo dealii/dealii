@@ -243,8 +243,8 @@ namespace Step80
 
     // bool use_ida = false;
 
-    unsigned int initial_fluid_refinement      = 5;
-    unsigned int initial_solid_refinement      = 5;
+    unsigned int initial_fluid_refinement = 5;
+    unsigned int initial_solid_refinement = 5;
 
     unsigned int fluid_rtree_extraction_level = 1;
 
@@ -2266,6 +2266,30 @@ namespace Step80
     block_system_solution.block(3) =
       fluid_locally_relevant_solution.block(1); // p
 
+    // Gather statistics on the number of iterations spent in the inner solves.
+    unsigned int inner_iteration_calls     = 0;
+    unsigned int inner_solves              = 0;
+    unsigned int augmented_iteration_calls = 0;
+    unsigned int augmented_solves          = 0;
+
+    const auto inner_iteration_connection = cg_solver.connect(
+      [&inner_iteration_calls,
+       &inner_solves](const unsigned int iteration, const double, const Vec &) {
+        ++inner_iteration_calls;
+        if (iteration == 0)
+          ++inner_solves;
+        return SolverControl::success;
+      });
+
+    const auto augmented_iteration_connection = cg_solver_lagrangian.connect(
+      [&augmented_iteration_calls, &augmented_solves](
+        const unsigned int iteration, const double, const Vec &) {
+        ++augmented_iteration_calls;
+        if (iteration == 0)
+          ++augmented_solves;
+        return SolverControl::success;
+      });
+
     SolverControl                      solver_control(par.outer_max_iterations,
                                  std::max(par.outer_tolerance, tolerance),
                                  true,
@@ -2280,8 +2304,31 @@ namespace Step80
     solid_solution.block(1) = block_system_solution.block(2);
     fluid_solution.block(1) = block_system_solution.block(3);
 
+    // Disconnect the iteration counters now that all inner solves are done.
+    inner_iteration_connection.disconnect();
+    augmented_iteration_connection.disconnect();
+
+    // Recover the exact iteration totals (see the note above the connections):
+    // the number of true iterations is the number of signal calls minus the
+    // number of solves (which accounts for the iteration-0 convergence check).
+    const unsigned int inner_iterations = inner_iteration_calls - inner_solves;
+    const unsigned int augmented_iterations =
+      augmented_iteration_calls - augmented_solves;
+
     pcout << "   Solved in " << solver_control.last_step() << " iterations."
           << std::endl;
+    pcout << "   Augmented-system solves: " << augmented_solves
+          << ", total iterations: " << augmented_iterations << " (avg "
+          << (augmented_solves > 0 ?
+                static_cast<double>(augmented_iterations) / augmented_solves :
+                0.0)
+          << " per solve)." << std::endl;
+    pcout << "   Inner mass-matrix solves: " << inner_solves
+          << ", total iterations: " << inner_iterations << " (avg "
+          << (inner_solves > 0 ?
+                static_cast<double>(inner_iterations) / inner_solves :
+                0.0)
+          << " per solve)." << std::endl;
 
     constraints.distribute(fluid_solution);
     solid_constraints.distribute(solid_solution);
