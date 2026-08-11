@@ -16688,18 +16688,21 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void Triangulation<dim, spacedim>::reset_cell_vertex_indices_cache()
 {
-  std::array<unsigned int, ReferenceCells::max_n_vertices<dim>()>
-    cell_vertices{};
   for (unsigned int l = 0; l < levels.size(); ++l)
     for (const auto &cell : cell_iterators_on_level(l))
       {
-        if constexpr (running_in_debug_mode())
-          cell_vertices.fill(numbers::invalid_unsigned_int);
+        const unsigned int n_vertices = cell->n_vertices();
 
-        const auto n_vertices = cell->n_vertices();
-        Assert(n_vertices <= cell_vertices.size(), ExcInternalError());
+        std_cxx26::inplace_vector<unsigned int,
+                                  ReferenceCells::max_n_vertices<dim>()>
+          cell_vertices(n_vertices);
+        if constexpr (running_in_debug_mode())
+          std::fill(cell_vertices.begin(),
+                    cell_vertices.end(),
+                    numbers::invalid_unsigned_int);
+
         GridTools::internal::extract_vertices_without_cache<dim, spacedim>(
-          cell, ArrayView<unsigned int>(cell_vertices.data(), n_vertices));
+          cell, cell_vertices);
         for (unsigned int vertex_no = 0; vertex_no < n_vertices; ++vertex_no)
           levels[l]->set_cached_vertex_index(cell->index(),
                                              vertex_no,
