@@ -256,11 +256,25 @@ namespace Step80
 
     bool include_convective_term = true;
 
-    // Nonlinear hyperelastic solid model. P(F) = gamma * exp(eta*(tr(F^T F) -
-    // dim)) * F, solved with Newton. See Boffi, et al. (2023).
-    bool   use_nonlinear_solid_model = false;
-    double nonlinear_solid_gamma     = 1.333;
-    double nonlinear_solid_eta       = 9.242;
+    // Nonlinear hyperelastic solid model. Two hyperelastic laws are
+    // implemented, selected by `nonlinear_solid_law`:
+    //
+    //  - "exponential": P(F) = mu * exp(lambda*(tr(F^T F) - dim)) * F, using
+    //    the same Lame parameters as the other models. See Boffi, et al.
+    //    (2023).
+    //  - "neo_hookean": compressible neo-Hookean law
+    //        W(F) = mu/2 (F:F - dim) - mu ln(J) + lambda/2 (ln J)^2,
+    //        P(F) = mu (F - F^{-T}) + lambda ln(J) F^{-T},
+    //    with the same Lame parameters used by the linear model.
+    //
+    // The nonlinear system is advanced semi-implicitly: the internal force is
+    // linearized around the current configuration and all nonlinear terms are
+    // moved to the right-hand side, so that each time step requires a single
+    // linear solve. Both nonlinear laws are expressed through the Lame
+    // parameters `lame_mu` and `lame_lambda`, so no additional material
+    // parameters are needed.
+    bool        use_nonlinear_solid_model = false;
+    std::string nonlinear_solid_law       = "exponential";
 
     bool particle_predictor = true;
 
@@ -294,9 +308,6 @@ namespace Step80
     bool         log_inner_lagrangian_iterations = false;
     bool         use_operator_augmentation       = false;
     SolverType   solver_type                     = SolverType::augmented_split;
-
-    unsigned int newton_max_iterations = 20;
-    double       newton_tolerance      = 1e-8;
 
     using PrmFunction =
       ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
@@ -393,10 +404,19 @@ namespace Step80
         "Use nonlinear solid model",
         use_nonlinear_solid_model,
         "If true, the immersed solid is governed by the nonlinear "
-        "hyperelastic law P(F) = gamma*exp(eta*(tr(F^T F) - dim))*F, solved "
-        "with Newton's method. If false, the linear elastic model is used.");
-      add_parameter("Nonlinear solid gamma", nonlinear_solid_gamma);
-      add_parameter("Nonlinear solid eta", nonlinear_solid_eta);
+        "hyperelastic law selected by 'Nonlinear solid law', advanced "
+        "semi-implicitly by linearizing the internal force around the "
+        "current configuration. If false, the linear elastic model is used.");
+      add_parameter(
+        "Nonlinear solid law",
+        nonlinear_solid_law,
+        "Hyperelastic law used when 'Use nonlinear solid model' is true: "
+        "'exponential' selects P(F) = mu*exp(lambda*(tr(F^T F) - dim))*F, "
+        "while 'neo_hookean' selects the compressible neo-Hookean law "
+        "P(F) = mu*(F - F^{-T}) + lambda*ln(J)*F^{-T}. Both laws use the "
+        "Lame parameters of the linear model.",
+        this->prm,
+        Patterns::Selection("exponential|neo_hookean"));
     }
     leave_subsection();
 
@@ -470,8 +490,6 @@ namespace Step80
                     log_inner_lagrangian_iterations);
       add_parameter("Use operator augmentation", use_operator_augmentation);
       add_parameter("Solver type", solver_type);
-      add_parameter("Newton maximum iterations", newton_max_iterations);
-      add_parameter("Newton tolerance", newton_tolerance);
     }
     leave_subsection();
 
@@ -557,6 +575,148 @@ namespace Step80
       FETools::get_fe_by_name<dim, spacedim>(displacement_fe_name);
     lagrange_multiplier_fe =
       FETools::get_fe_by_name<dim, spacedim>(lagrange_multiplier_fe_name);
+  }
+
+
+
+  // @sect3{Hyperelastic material response}
+  //
+  // Both nonlinear laws implemented in this tutorial share the same pointwise
+  // data: at a quadrature point with displacement gradient grad(w) the
+  // deformation gradient is F = I + grad(w). Besides F itself we cache its
+  // inverse transpose Q = F^{-T} and ln(J) = ln(det F), which enter the
+  // neo-Hookean stress and its tangent, and the scalar prefactor g of the
+  // exponential law.
+  template <int spacedim>
+  struct HyperelasticPointData
+  {
+    Tensor<2, spacedim> F;       // deformation gradient F = I + grad(w)
+    Tensor<2, spacedim> F_inv_T; // inverse transpose F^{-T}
+    double              ln_det_F = 0.;
+    double              g        = 0.;
+  };
+
+
+
+  template <int spacedim>
+  HyperelasticPointData<spacedim>
+  evaluate_hyperelastic_point_data(const Tensor<2, spacedim> &grad_w,
+                                   const bool         use_nonlinear_solid_model,
+                                   const std::string &nonlinear_solid_law,
+                                   const double       lame_mu,
+                                   const double       lame_lambda)
+  {
+    HyperelasticPointData<spacedim> data;
+    if (!use_nonlinear_solid_model)
+      return data;
+
+    data.F = grad_w;
+    for (unsigned int d = 0; d < spacedim; ++d)
+      data.F[d][d] += 1.;
+    data.F_inv_T  = transpose(invert(data.F));
+    data.ln_det_F = std::log(determinant(data.F));
+
+    if (nonlinear_solid_law == "exponential")
+      // g = mu exp(lambda (F:F - dim)) is the prefactor of the exponential
+      // law P(F) = g F, written with the same Lame parameters as the other
+      // solid models.
+      data.g = lame_mu * std::exp(lame_lambda *
+                                  (scalar_product(data.F, data.F) - spacedim));
+    else if (nonlinear_solid_law != "neo_hookean")
+      AssertThrow(false,
+                  ExcMessage("Unknown nonlinear solid law '" +
+                             nonlinear_solid_law + "'."));
+
+    return data;
+  }
+
+
+
+  // Entry (i, j) of the tangent stiffness K_s(w) at a quadrature point, i.e.
+  // the contraction (dP/dF[grad_j], grad_i), for the two hyperelastic laws.
+  template <int spacedim>
+  double exponential_tangent_entry(const Tensor<2, spacedim> &grad_i,
+                                   const Tensor<2, spacedim> &grad_j,
+                                   const HyperelasticPointData<spacedim> &data,
+                                   const double lame_lambda)
+  {
+    // dP/dF = g (I4 + 2 lambda F (x) F) with g = mu exp(lambda (F:F - dim)).
+    return data.g * (scalar_product(grad_i, grad_j) +
+                     2. * lame_lambda * scalar_product(data.F, grad_i) *
+                       scalar_product(data.F, grad_j));
+  }
+
+
+
+  template <int spacedim>
+  double neohookean_tangent_entry(const Tensor<2, spacedim>             &grad_i,
+                                  const Tensor<2, spacedim>             &grad_j,
+                                  const HyperelasticPointData<spacedim> &data,
+                                  const double lame_mu,
+                                  const double lame_lambda)
+  {
+    // For the compressible neo-Hookean law P(F) = mu (F - Q) +
+    // lambda ln(J) Q, Q = F^{-T}, the material tangent is
+    //   dP/dF = mu I4 + (mu - lambda ln J) Q (x) Q + lambda Q (x) Q,
+    // where the two tensor products contract the middle (k,J)-(i,L) and the
+    // outer (k,L)-(i,J) index pairs of (dP/dF)_{iJkL}. Contracting with the
+    // shape function gradients grad_i (indices i,J) and grad_j (indices k,L)
+    // gives
+    //   mu (grad_i : grad_j) + (mu - lambda ln J)(grad_j : Q grad_i^T Q)
+    //   + lambda (grad_i : Q)(grad_j : Q),
+    // which at F = I reduces exactly to the linear elastic operator
+    // 2 mu sym(grad_i) : sym(grad_j) + lambda div(grad_i) div(grad_j).
+    const Tensor<2, spacedim> Q = data.F_inv_T;
+    return lame_mu * scalar_product(grad_i, grad_j) +
+           (lame_mu - lame_lambda * data.ln_det_F) *
+             scalar_product(grad_j, Q * transpose(grad_i) * Q) +
+           lame_lambda * scalar_product(grad_i, Q) * scalar_product(grad_j, Q);
+  }
+
+
+
+  // Right-hand side entry (K_s(w) w)_i - N_i at a quadrature point: the
+  // tangent stiffness applied to the current displacement gradient H =
+  // grad(w), minus the internal force N_i = (P(F), grad_i). This is the term
+  // moved to the right-hand side when the nonlinear elasticity operator is
+  // linearized around the current configuration w.
+  template <int spacedim>
+  double exponential_rhs_entry(const Tensor<2, spacedim>             &grad_i,
+                               const HyperelasticPointData<spacedim> &data,
+                               const Tensor<2, spacedim>             &H,
+                               const double lame_lambda)
+  {
+    // (K_s w)_i = g (grad_i : H + 2 lambda (F : grad_i)(F : H)),
+    // N_i = g (F : grad_i).
+    return data.g * (scalar_product(grad_i, H) +
+                     2. * lame_lambda * scalar_product(data.F, grad_i) *
+                       scalar_product(data.F, H) -
+                     scalar_product(data.F, grad_i));
+  }
+
+
+
+  template <int spacedim>
+  double neohookean_rhs_entry(const Tensor<2, spacedim>             &grad_i,
+                              const HyperelasticPointData<spacedim> &data,
+                              const Tensor<2, spacedim>             &H,
+                              const double                           lame_mu,
+                              const double lame_lambda)
+  {
+    // (K_s w)_i = (dP/dF[H] : grad_i)
+    //   = mu (grad_i : H) + (mu - lambda ln J)(grad_i : Q H^T Q)
+    //     + lambda (H : Q)(grad_i : Q),
+    // N_i = P(F) : grad_i = mu (F : grad_i) + (lambda ln J - mu)(Q : grad_i).
+    const Tensor<2, spacedim> Q = data.F_inv_T;
+    const double              Ks_w_i =
+      lame_mu * scalar_product(grad_i, H) +
+      (lame_mu - lame_lambda * data.ln_det_F) *
+        scalar_product(grad_i, Q * transpose(H) * Q) +
+      lame_lambda * scalar_product(H, Q) * scalar_product(grad_i, Q);
+    const double N_i =
+      lame_mu * scalar_product(data.F, grad_i) +
+      (lame_lambda * data.ln_det_F - lame_mu) * scalar_product(Q, grad_i);
+    return Ks_w_i - N_i;
   }
 
 
@@ -1791,8 +1951,9 @@ namespace Step80
     std::vector<double>                       div_phi_w(dofs_per_cell);
     std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
 
-    // Gradient of the current displacement iterate w^{(k)}, needed to build
-    // the deformation gradient F = I + grad(w) for the nonlinear tangent.
+    // Gradient of the displacement w used to linearize the nonlinear laws:
+    // in the semi-implicit scheme this is the current configuration (the
+    // last converged solution).
     std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -1821,35 +1982,41 @@ namespace Step80
                   phi_lagrange[k] = fe_values[lagrange_multiplier].value(k, q);
                 }
 
-              // Nonlinear hyperelastic data at quadrature point. With
-              // F = I + grad(w^{(k)}) and g = gamma*exp(eta*(F:F - dim)), the
-              // stress is P(F) = g*F and the tangent is dP/dF = g*(I4 + 2*eta*F
-              // (x) F)
-              Tensor<2, spacedim> F;
-              double              g = 0.;
-              if (par.use_nonlinear_solid_model)
-                {
-                  F = grad_w_current[q];
-                  for (unsigned int d = 0; d < spacedim; ++d)
-                    F[d][d] += 1.;
-                  g = par.nonlinear_solid_gamma *
-                      std::exp(par.nonlinear_solid_eta *
-                               (scalar_product(F, F) - spacedim));
-                }
+              // Pointwise data of the selected hyperelastic law at the
+              // deformation gradient F = I + grad(w).
+              const HyperelasticPointData<spacedim> data =
+                evaluate_hyperelastic_point_data(grad_w_current[q],
+                                                 par.use_nonlinear_solid_model,
+                                                 par.nonlinear_solid_law,
+                                                 par.lame_mu,
+                                                 par.lame_lambda);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
                   for (unsigned int j = 0; j < dofs_per_cell; ++j)
                     {
-                      // Elastic bilinear form can be either for the linear
-                      // model or the tangent stiffness (nonlinear
-                      // model).
-                      const double elastic_ij =
-                        par.use_nonlinear_solid_model ?
-                          g * (scalar_product(grad_phi_w[i], grad_phi_w[j]) +
-                               2. * par.nonlinear_solid_eta *
-                                 scalar_product(F, grad_phi_w[i]) *
-                                 scalar_product(F, grad_phi_w[j])) :
+                      // Elastic bilinear form: the linear operator for the
+                      // linear model, or the tangent stiffness at the current
+                      // configuration for the nonlinear laws.
+                      double elastic_ij = 0.;
+                      if (par.use_nonlinear_solid_model)
+                        {
+                          if (par.nonlinear_solid_law == "neo_hookean")
+                            elastic_ij =
+                              neohookean_tangent_entry(grad_phi_w[i],
+                                                       grad_phi_w[j],
+                                                       data,
+                                                       par.lame_mu,
+                                                       par.lame_lambda);
+                          else
+                            elastic_ij =
+                              exponential_tangent_entry(grad_phi_w[i],
+                                                        grad_phi_w[j],
+                                                        data,
+                                                        par.lame_lambda);
+                        }
+                      else
+                        elastic_ij =
                           (2 * par.lame_mu *
                              scalar_product(grad_eps_phi_w[i],
                                             grad_eps_phi_w[j]) +
@@ -1937,8 +2104,8 @@ namespace Step80
     std::vector<Vector<double>>      solid_rhs_values(n_q_points,
                                                  Vector<double>(2 * spacedim));
 
-    // Gradient of the current displacement iterate w^{(k)}, used to evaluate
-    // the nonlinear internal force and the Newton right-hand side.
+    // Gradient of the displacement w used to linearize the nonlinear laws:
+    // the current configuration (the last converged solution).
     std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
 
     for (const auto &cell : solid_dh.active_cell_iterators())
@@ -1959,23 +2126,18 @@ namespace Step80
           cell_rhs = 0;
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
-              // Nonlinear hyperelastic data at this quadrature point. Because
-              // we solve for the full solution (not the Newton increment), the
-              // solid displacement row picks up the extra right-hand side
-              // K_s(w^{(k)}) w^{(k)} - N(w^{(k)}), with internal force
-              // N_i = (P(F), grad chi_i) and F = I + grad(w^{(k)}).
-              Tensor<2, spacedim> F, H;
-              double              g = 0.;
-              if (par.use_nonlinear_solid_model)
-                {
-                  H = grad_w_current[q];
-                  F = H;
-                  for (unsigned int d = 0; d < spacedim; ++d)
-                    F[d][d] += 1.;
-                  g = par.nonlinear_solid_gamma *
-                      std::exp(par.nonlinear_solid_eta *
-                               (scalar_product(F, F) - spacedim));
-                }
+              // Pointwise data of the selected hyperelastic law at the
+              // deformation gradient F = I + grad(w). Because we solve for
+              // the full solution (not for an increment), the solid
+              // displacement row picks up the extra right-hand side
+              // (K_s(w) w)_i - N_i, with internal force
+              // N_i = (P(F), grad chi_i).
+              const HyperelasticPointData<spacedim> data =
+                evaluate_hyperelastic_point_data(grad_w_current[q],
+                                                 par.use_nonlinear_solid_model,
+                                                 par.nonlinear_solid_law,
+                                                 par.lame_mu,
+                                                 par.lame_lambda);
 
               for (unsigned int i = 0; i < dofs_per_cell; ++i)
                 {
@@ -1994,15 +2156,20 @@ namespace Step80
                     {
                       const Tensor<2, spacedim> grad_phi_i =
                         fe_values_rhs[displacement].gradient(i, q);
-                      // (K_s w^{(k)})_i - N_i, where the second scalar_product
-                      // term is the internal force N_i = g * (F : grad chi_i).
-                      cell_rhs(i) += g *
-                                     (scalar_product(grad_phi_i, H) +
-                                      2. * par.nonlinear_solid_eta *
-                                        scalar_product(F, grad_phi_i) *
-                                        scalar_product(F, H) -
-                                      scalar_product(F, grad_phi_i)) *
-                                     fe_values_rhs.JxW(q);
+                      const Tensor<2, spacedim> H = grad_w_current[q];
+                      // (K_s(w) w)_i - N_i: after linearizing the internal
+                      // force around the current configuration, this is the
+                      // term that carries all nonlinearity of the elasticity
+                      // part to the right-hand side.
+                      const double nonlinear_rhs_ij =
+                        par.nonlinear_solid_law == "neo_hookean" ?
+                          neohookean_rhs_entry(
+                            grad_phi_i, data, H, par.lame_mu, par.lame_lambda) :
+                          exponential_rhs_entry(grad_phi_i,
+                                                data,
+                                                H,
+                                                par.lame_lambda);
+                      cell_rhs(i) += nonlinear_rhs_ij * fe_values_rhs.JxW(q);
                     }
                 }
             }
@@ -2027,29 +2194,37 @@ namespace Step80
                         fe_values_matrix[lagrange_multiplier].value(k, q);
                     }
 
-                  Tensor<2, spacedim> F;
-                  double              g = 0.;
-                  if (par.use_nonlinear_solid_model)
-                    {
-                      F = grad_w_current[q];
-                      for (unsigned int d = 0; d < spacedim; ++d)
-                        F[d][d] += 1.;
-                      g = par.nonlinear_solid_gamma *
-                          std::exp(par.nonlinear_solid_eta *
-                                   (scalar_product(F, F) - spacedim));
-                    }
+                  const HyperelasticPointData<spacedim> data =
+                    evaluate_hyperelastic_point_data(
+                      grad_w_current[q],
+                      par.use_nonlinear_solid_model,
+                      par.nonlinear_solid_law,
+                      par.lame_mu,
+                      par.lame_lambda);
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
                       for (unsigned int j = 0; j < dofs_per_cell; ++j)
                         {
-                          const double elastic_ij =
-                            par.use_nonlinear_solid_model ?
-                              g *
-                                (scalar_product(grad_phi_w[i], grad_phi_w[j]) +
-                                 2. * par.nonlinear_solid_eta *
-                                   scalar_product(F, grad_phi_w[i]) *
-                                   scalar_product(F, grad_phi_w[j])) :
+                          double elastic_ij = 0.;
+                          if (par.use_nonlinear_solid_model)
+                            {
+                              if (par.nonlinear_solid_law == "neo_hookean")
+                                elastic_ij =
+                                  neohookean_tangent_entry(grad_phi_w[i],
+                                                           grad_phi_w[j],
+                                                           data,
+                                                           par.lame_mu,
+                                                           par.lame_lambda);
+                              else
+                                elastic_ij =
+                                  exponential_tangent_entry(grad_phi_w[i],
+                                                            grad_phi_w[j],
+                                                            data,
+                                                            par.lame_lambda);
+                            }
+                          else
+                            elastic_ij =
                               (2 * par.lame_mu *
                                  scalar_product(grad_eps_phi_w[i],
                                                 grad_eps_phi_w[j]) +
@@ -2642,35 +2817,19 @@ namespace Step80
 
         if (par.use_nonlinear_solid_model)
           {
-            // The nonlinear hyperelastic solid model is solved with Newton's
-            // method. At each time step, all blocks stay the same, excecpt for
-            // the solid stiffness and its residual which are reassembled at
-            // each Newton iteration.
-            // Since we solve for the full solution (not the usual increment),
-            // the linear rows keep their usual right-hand side while the solid
-            // displacement row carries the extra term K_s(w^{(k)}) w^{(k)} -
-            // N(w^{(k)}).
-            for (unsigned int newton_iteration = 0;
-                 newton_iteration < par.newton_max_iterations;
-                 ++newton_iteration)
-              {
-                assemble_elasticity_system(1. / time_step);
-                assemble_elasticity_rhs(1. / time_step);
-                LA::MPI::BlockVector previous_solid_solution = solid_solution;
-                solve();
-                previous_solid_solution -= solid_solution;
-                const double increment =
-                  previous_solid_solution.block(0).l2_norm();
-                pcout << "   Newton iteration " << newton_iteration
-                      << ": displacement increment = " << increment
-                      << std::endl;
-                if (increment < par.newton_tolerance)
-                  break;
-              }
+            // Semi-implicit scheme: linearize the internal force around the
+            // current configuration w^n (the last converged solution), and
+            // move all nonlinear terms of the elasticity part,
+            // K_s(w^n) w^n - N(w^n), to the right-hand side. The tangent
+            // stiffness is reassembled at w^n once per time step, and the
+            // time advancement requires a single linear solve.
+            assemble_elasticity_system(1. / time_step);
+            assemble_elasticity_rhs(1. / time_step);
+            solve();
           }
         else
           {
-            // Linear model, no Newton
+            // Linear model: the stiffness is time-independent.
             if (cycle == 0 || update_timestep)
               assemble_elasticity_system(1. / time_step);
             assemble_elasticity_rhs(1. / time_step);
