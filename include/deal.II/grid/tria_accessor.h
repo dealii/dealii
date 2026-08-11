@@ -20,6 +20,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/point.h>
+#include <deal.II/base/std_cxx26/inplace_vector.h>
 #include <deal.II/base/template_constraints.h>
 
 #include <deal.II/grid/cell_id.h>
@@ -4402,70 +4403,76 @@ namespace internal
      */
     template <int dim, int spacedim>
     inline double
-    diameter(
-      const boost::container::small_vector<Point<spacedim>,
-                                           GeometryInfo<dim>::vertices_per_cell>
-        vertices)
+    diameter(const ArrayView<const Point<spacedim>> &vertices)
     {
       const ReferenceCell<dim> reference_cell =
         ReferenceCells::n_vertices_to_reference_cell<dim>(vertices.size());
 
-      if (reference_cell == ReferenceCells::Line)
-        // Return the distance between the two vertices
-        return (vertices[1] - vertices[0]).norm();
-      else if (reference_cell == ReferenceCells::Triangle)
-        // Return the longest of the three edges
-        return std::max({(vertices[1] - vertices[0]).norm(),
-                         (vertices[2] - vertices[1]).norm(),
-                         (vertices[2] - vertices[0]).norm()});
-      else if (reference_cell == ReferenceCells::Quadrilateral)
-        // Return the longer one of the two diagonals of the quadrilateral
-        return std::max({(vertices[3] - vertices[0]).norm(),
-                         (vertices[2] - vertices[1]).norm()});
-      else if (reference_cell == ReferenceCells::Tetrahedron)
-        // Return the longest of the six edges of the tetrahedron
-        return std::max({(vertices[1] - vertices[0]).norm(),
-                         (vertices[2] - vertices[0]).norm(),
-                         (vertices[2] - vertices[1]).norm(),
-                         (vertices[3] - vertices[0]).norm(),
-                         (vertices[3] - vertices[1]).norm(),
-                         (vertices[3] - vertices[2]).norm()});
-      else if (reference_cell == ReferenceCells::Pyramid)
-        // Return ...
-        return std::max({// the longest diagonal of the quadrilateral base
-                         // of the pyramid or ...
-                         (vertices[3] - vertices[0]).norm(),
-                         (vertices[2] - vertices[1]).norm(),
-                         // the longest edge connected with the apex of the
-                         // pyramid
-                         (vertices[4] - vertices[0]).norm(),
-                         (vertices[4] - vertices[1]).norm(),
-                         (vertices[4] - vertices[2]).norm(),
-                         (vertices[4] - vertices[3]).norm()});
-      else if (reference_cell == ReferenceCells::Wedge)
-        // Return ...
-        return std::max({// the longest of the 2*3=6 diagonals of the three
-                         // quadrilateral sides of the wedge or ...
-                         (vertices[4] - vertices[0]).norm(),
-                         (vertices[3] - vertices[1]).norm(),
-                         (vertices[5] - vertices[1]).norm(),
-                         (vertices[4] - vertices[2]).norm(),
-                         (vertices[5] - vertices[0]).norm(),
-                         (vertices[3] - vertices[2]).norm(),
-                         // the longest of the 3*2=6 edges of the two
-                         // triangular faces of the wedge
-                         (vertices[1] - vertices[0]).norm(),
-                         (vertices[2] - vertices[1]).norm(),
-                         (vertices[2] - vertices[0]).norm(),
-                         (vertices[4] - vertices[3]).norm(),
-                         (vertices[5] - vertices[4]).norm(),
-                         (vertices[5] - vertices[3]).norm()});
-      else if (reference_cell == ReferenceCells::Hexahedron)
-        // Return the longest of the four diagonals of the hexahedron
-        return std::max({(vertices[7] - vertices[0]).norm(),
-                         (vertices[6] - vertices[1]).norm(),
-                         (vertices[2] - vertices[5]).norm(),
-                         (vertices[3] - vertices[4]).norm()});
+      if constexpr (dim == 1)
+        {
+          Assert(reference_cell == ReferenceCells::Line, ExcInternalError());
+          // Return the distance between the two vertices
+          return (vertices[1] - vertices[0]).norm();
+        }
+      else if constexpr (dim == 2)
+        {
+          if (reference_cell == ReferenceCells::Triangle)
+            // Return the longest of the three edges
+            return std::max({(vertices[1] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             (vertices[2] - vertices[0]).norm()});
+          else if (reference_cell == ReferenceCells::Quadrilateral)
+            // Return the longer one of the two diagonals of the quadrilateral
+            return std::max({(vertices[3] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm()});
+        }
+      else if constexpr (dim == 3)
+        {
+          if (reference_cell == ReferenceCells::Tetrahedron)
+            // Return the longest of the six edges of the tetrahedron
+            return std::max({(vertices[1] - vertices[0]).norm(),
+                             (vertices[2] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             (vertices[3] - vertices[0]).norm(),
+                             (vertices[3] - vertices[1]).norm(),
+                             (vertices[3] - vertices[2]).norm()});
+          else if (reference_cell == ReferenceCells::Pyramid)
+            // Return ...
+            return std::max({// the longest diagonal of the quadrilateral base
+                             // of the pyramid or ...
+                             (vertices[3] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             // the longest edge connected with the apex of the
+                             // pyramid
+                             (vertices[4] - vertices[0]).norm(),
+                             (vertices[4] - vertices[1]).norm(),
+                             (vertices[4] - vertices[2]).norm(),
+                             (vertices[4] - vertices[3]).norm()});
+          else if (reference_cell == ReferenceCells::Wedge)
+            // Return ...
+            return std::max({// the longest of the 2*3=6 diagonals of the three
+                             // quadrilateral sides of the wedge or ...
+                             (vertices[4] - vertices[0]).norm(),
+                             (vertices[3] - vertices[1]).norm(),
+                             (vertices[5] - vertices[1]).norm(),
+                             (vertices[4] - vertices[2]).norm(),
+                             (vertices[5] - vertices[0]).norm(),
+                             (vertices[3] - vertices[2]).norm(),
+                             // the longest of the 3*2=6 edges of the two
+                             // triangular faces of the wedge
+                             (vertices[1] - vertices[0]).norm(),
+                             (vertices[2] - vertices[1]).norm(),
+                             (vertices[2] - vertices[0]).norm(),
+                             (vertices[4] - vertices[3]).norm(),
+                             (vertices[5] - vertices[4]).norm(),
+                             (vertices[5] - vertices[3]).norm()});
+          else if (reference_cell == ReferenceCells::Hexahedron)
+            // Return the longest of the four diagonals of the hexahedron
+            return std::max({(vertices[7] - vertices[0]).norm(),
+                             (vertices[6] - vertices[1]).norm(),
+                             (vertices[2] - vertices[5]).norm(),
+                             (vertices[3] - vertices[4]).norm()});
+        }
 
       DEAL_II_NOT_IMPLEMENTED();
       return -1e10;
@@ -6271,13 +6278,13 @@ template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
-  boost::container::small_vector<Point<spacedim>,
+  std_cxx26::inplace_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                                 ReferenceCells::max_n_vertices<structdim>()
+                            ReferenceCells::max_n_vertices<structdim>()
 #  else
-                                 GeometryInfo<structdim>::vertices_per_cell
+                            GeometryInfo<structdim>::vertices_per_cell
 #  endif
-                                 >
+                            >
     vertices(this->n_vertices());
 
   for (unsigned int v = 0; v < vertices.size(); ++v)
