@@ -4133,7 +4133,11 @@ public:
   point_inside(const Point<spacedim> &p) const;
 
   /**
-   * Set the neighbor @p i of this cell to the cell pointed to by @p pointer.
+   * Set the neighboring cell behind the given @p face_no of this cell
+   * to the cell described by @p neighbor. If the current cell does
+   * not have a neighbor behind this face (in other words: if that face
+   * is at the boundary of the domain), then provide an end iterator as
+   * argument.
    *
    * This function shouldn't really be public (but needs to for various
    * reasons in order not to make a long list of functions friends): it
@@ -4141,8 +4145,8 @@ public:
    * from application codes.
    */
   void
-  set_neighbor(const unsigned int                               i,
-               const TriaIterator<CellAccessor<dim, spacedim>> &pointer) const;
+  set_neighbor(const unsigned int                               face_no,
+               const TriaIterator<CellAccessor<dim, spacedim>> &neighbor) const;
 
 
   /**
