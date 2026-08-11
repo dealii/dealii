@@ -3337,16 +3337,14 @@ namespace internal
         // update lines and n_levels in number_cache. since we don't
         // access any of these numbers, we can do this in the
         // background
-        Threads::Task<void> update_lines = Threads::new_task(
-          static_cast<
-            void (*)(const Triangulation<dim, spacedim> &,
-                     const unsigned int,
-                     internal::TriangulationImplementation::NumberCache<1> &)>(
-            &compute_number_cache_dim<dim, spacedim>),
-          triangulation,
-          level_objects,
-          static_cast<internal::TriangulationImplementation::NumberCache<1> &>(
-            number_cache));
+        Threads::Task<void> update_lines = Threads::new_task([&]() {
+          compute_number_cache_dim(
+            triangulation,
+            level_objects,
+            // Select the 1d part of the cache:
+            static_cast<internal::TriangulationImplementation::NumberCache<1>
+                          &>(number_cache));
+        });
 
         using quad_iterator =
           typename Triangulation<dim, spacedim>::quad_iterator;
@@ -3444,16 +3442,14 @@ namespace internal
         // update quads, lines and n_levels in number_cache. since we
         // don't access any of these numbers, we can do this in the
         // background
-        Threads::Task<void> update_quads_and_lines = Threads::new_task(
-          static_cast<
-            void (*)(const Triangulation<dim, spacedim> &,
-                     const unsigned int,
-                     internal::TriangulationImplementation::NumberCache<2> &)>(
-            &compute_number_cache_dim<dim, spacedim>),
-          triangulation,
-          level_objects,
-          static_cast<internal::TriangulationImplementation::NumberCache<2> &>(
-            number_cache));
+        Threads::Task<void> update_quads_and_lines = Threads::new_task([&]() {
+          compute_number_cache_dim(
+            triangulation,
+            level_objects,
+            // Select the 1d and 2d part of the cache:
+            static_cast<internal::TriangulationImplementation::NumberCache<2>
+                          &>(number_cache));
+        });
 
         using hex_iterator =
           typename Triangulation<dim, spacedim>::hex_iterator;
