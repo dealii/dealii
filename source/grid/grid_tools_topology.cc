@@ -2072,7 +2072,7 @@ namespace GridTools
       // then lines, then vertices, we use a more low-level access method
       // for hexahedral cells, where we can streamline most of the logic
       const ReferenceCell<dim> ref_cell = cell->reference_cell();
-      if (ref_cell == ReferenceCells::Hexahedron)
+      if ((dim == 3) && (ref_cell == ReferenceCells::Hexahedron))
         for (unsigned int face = 4; face < 6; ++face)
           {
             const auto face_iter = cell->face(face);
@@ -2107,7 +2107,7 @@ namespace GridTools
             for (unsigned int i = 0; i < 4; ++i)
               vertex_indices[index + i] = raw_vertex_indices[vertex_order[i]];
           }
-      else if (ref_cell == ReferenceCells::Quadrilateral)
+      else if ((dim == 2) && (ref_cell == ReferenceCells::Quadrilateral))
         {
           const std::array<types::geometric_orientation, 2> line_orientations{
             {cell->line_orientation(0), cell->line_orientation(1)}};
@@ -2122,7 +2122,7 @@ namespace GridTools
           for (unsigned int i = 0; i < 4; ++i)
             vertex_indices[i] = raw_vertex_indices[i];
         }
-      else if (ref_cell == ReferenceCells::Line)
+      else if ((dim == 1) && (ref_cell == ReferenceCells::Line))
         {
           vertex_indices[0] = cell->vertex_index(0);
           vertex_indices[1] = cell->vertex_index(1);
