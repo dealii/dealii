@@ -1156,10 +1156,32 @@ public:
   operator==(const ReferenceCell<dim> &type) const;
 
   /**
+   * Operator for equality comparison against an object with a
+   * dimension other than `dim` (which the compiler would do
+   * with the overload of the operator above). Since the
+   * dimensions do not match, the comparison is necessarily
+   * `false`.
+   */
+  template <int dim2>
+  constexpr bool
+  operator==(const ReferenceCell<dim2> &type) const;
+
+  /**
    * Operator for inequality comparison.
    */
   constexpr bool
   operator!=(const ReferenceCell<dim> &type) const;
+
+  /**
+   * Operator for inequality comparison against an object with a
+   * dimension other than `dim` (which the compiler would do
+   * with the overload of the operator above). Since the
+   * dimensions do not match, the two objects cannot be the same
+   * and this overload consequently always returns `true`.
+   */
+  template <int dim2>
+  constexpr bool
+  operator!=(const ReferenceCell<dim2> &type) const;
 
   /**
    * Write and read the data of this object from a stream for the purpose
@@ -1331,10 +1353,30 @@ ReferenceCell<dim>::operator==(const ReferenceCell<dim> &type) const
 
 
 template <int dim>
+template <int dim2>
+inline constexpr bool
+ReferenceCell<dim>::operator==(const ReferenceCell<dim2> &) const
+{
+  return false;
+}
+
+
+
+template <int dim>
 inline constexpr bool
 ReferenceCell<dim>::operator!=(const ReferenceCell<dim> &type) const
 {
   return kind != type.kind;
+}
+
+
+
+template <int dim>
+template <int dim2>
+inline constexpr bool
+ReferenceCell<dim>::operator!=(const ReferenceCell<dim2> &) const
+{
+  return true;
 }
 
 
@@ -1954,7 +1996,8 @@ ReferenceCell<dim>::new_isotropic_child_cell_faces(
             {
               // Considerations that went into creating this table
               // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
-              //   centre wedge is rotated by 180° compared to the parent)
+              //   centre wedge is rotated by 180 degrees compared to the
+              //   parent)
               // - Order of children is similar to the order of a reference
               //   triangle in the x-y-plane (i.e. like the top triangle of the
               //   parent)
