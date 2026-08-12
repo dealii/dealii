@@ -350,7 +350,7 @@ namespace
     problem.interpolate_initial_conditions();
     problem.setup_coupling();
     problem.assemble_coupling();
-    problem.assemble_elasticity_system(1.0);
+    problem.assemble_elasticity_system<SolidModel::linear>(1.0);
 
     LA::MPI::Vector projected_rhs(problem.solid_owned_dofs[1],
                                   problem.mpi_communicator);
@@ -853,8 +853,8 @@ TEST(Step80, ElasticityManufacturedSolutionConvergence)
       const double alpha = 1.0;
 
       // call assemble functions from the problem
-      problem.assemble_elasticity_system(alpha);
-      problem.assemble_elasticity_rhs(alpha);
+      problem.assemble_elasticity_system<SolidModel::linear>(alpha);
+      problem.assemble_elasticity_rhs<SolidModel::linear>(alpha);
       solve_elasticity(problem);
 
       // L2 error of the displacement components only (no multiplier).
@@ -980,7 +980,7 @@ namespace Step80
 
     // Data evaluated from the displacement gradient H: F_data = I + H.
     const HyperelasticPointData<dim> data_nh =
-      evaluate_hyperelastic_point_data(H, true, "neo_hookean", mu, lambda);
+      evaluate_hyperelastic_point_data<SolidModel::neo_hookean>(H, mu, lambda);
     Tensor<2, dim> F_nh;
     for (unsigned int i = 0; i < dim; ++i)
       for (unsigned int j = 0; j < dim; ++j)
@@ -1001,14 +1001,15 @@ namespace Step80
       (2. * epsilon);
 
     const double tangent =
-      neohookean_tangent_entry(G_a, G_b, data_nh, mu, lambda);
+      tangent_entry<SolidModel::neo_hookean>(G_a, G_b, data_nh, mu, lambda);
     EXPECT_NEAR(tangent, fd_tangent, 1e-7);
 
     // Right-hand side entry: (K_s(w) w)_i - N_i, where the tangent is applied
     // to H = grad(w) and the internal force is evaluated at F = I + H.
-    const double Ks_w = neohookean_tangent_entry(G_a, H, data_nh, mu, lambda);
-    const double N_i  = pointwise_neohookean_force(F_nh, G_a, mu, lambda);
-    EXPECT_NEAR(neohookean_rhs_entry(G_a, data_nh, H, mu, lambda),
+    const double Ks_w =
+      tangent_entry<SolidModel::neo_hookean>(G_a, H, data_nh, mu, lambda);
+    const double N_i = pointwise_neohookean_force(F_nh, G_a, mu, lambda);
+    EXPECT_NEAR(rhs_entry<SolidModel::neo_hookean>(G_a, data_nh, H, mu, lambda),
                 Ks_w - N_i,
                 1e-14);
 
@@ -1018,14 +1019,16 @@ namespace Step80
     {
       const Tensor<2, dim>             H_zero;
       const HyperelasticPointData<dim> data_identity =
-        evaluate_hyperelastic_point_data(
-          H_zero, true, "neo_hookean", mu, lambda);
+        evaluate_hyperelastic_point_data<SolidModel::neo_hookean>(H_zero,
+                                                                  mu,
+                                                                  lambda);
       const double linear_entry =
         2. * mu * scalar_product(symmetrize(G_a), symmetrize(G_b)) +
         lambda * trace(G_a) * trace(G_b);
-      EXPECT_NEAR(neohookean_tangent_entry(G_a, G_b, data_identity, mu, lambda),
-                  linear_entry,
-                  1e-12);
+      EXPECT_NEAR(
+        tangent_entry<SolidModel::neo_hookean>(G_a, G_b, data_identity, mu, lambda),
+        linear_entry,
+        1e-12);
       EXPECT_NEAR(pointwise_neohookean_force(data_identity.F, G_a, mu, lambda),
                   0.,
                   1e-12);
@@ -1033,18 +1036,20 @@ namespace Step80
 
     // The same checks for the exponential law.
     const HyperelasticPointData<dim> data_exp =
-      evaluate_hyperelastic_point_data(H, true, "exponential", mu, lambda);
+      evaluate_hyperelastic_point_data<SolidModel::exponential>(H, mu, lambda);
     const Tensor<2, dim> F_exp = F_nh;
     const double         fd_tangent_exp =
       (pointwise_exponential_force(F_exp + epsilon * G_b, G_a, mu, lambda) -
        pointwise_exponential_force(F_exp - epsilon * G_b, G_a, mu, lambda)) /
       (2. * epsilon);
-    EXPECT_NEAR(exponential_tangent_entry(G_a, G_b, data_exp, lambda),
-                fd_tangent_exp,
-                1e-7);
-    const double Ks_w_exp = exponential_tangent_entry(G_a, H, data_exp, lambda);
+    EXPECT_NEAR(
+      tangent_entry<SolidModel::exponential>(G_a, G_b, data_exp, mu, lambda),
+      fd_tangent_exp,
+      1e-7);
+    const double Ks_w_exp =
+      tangent_entry<SolidModel::exponential>(G_a, H, data_exp, mu, lambda);
     const double N_i_exp  = pointwise_exponential_force(F_exp, G_a, mu, lambda);
-    EXPECT_NEAR(exponential_rhs_entry(G_a, data_exp, H, lambda),
+    EXPECT_NEAR(rhs_entry<SolidModel::exponential>(G_a, data_exp, H, mu, lambda),
                 Ks_w_exp - N_i_exp,
                 1e-14);
   }
@@ -1064,11 +1069,16 @@ namespace Step80
   // are written out directly here, i.e. independently of the entry functions
   // used by the tutorial assembly, so that the assembled tangent stiffness
   // and right-hand side can be checked against a second implementation.
-  template <int dim, int spacedim>
+  template <int dim, int spacedim, SolidModel model>
   LA::MPI::Vector assemble_internal_force(
     const NavierStokesImmersedProblem<dim, spacedim> &problem)
   {
     using namespace dealii;
+
+    static_assert(model == SolidModel::exponential ||
+                    model == SolidModel::neo_hookean,
+                  "The independent internal force is only assembled for the "
+                  "nonlinear solid models.");
 
     const auto &par = problem.par;
 
@@ -1103,7 +1113,7 @@ namespace Step80
 
               // First Piola-Kirchhoff stress of the selected law.
               Tensor<2, spacedim> P;
-              if (par.nonlinear_solid_law == "neo_hookean")
+              if constexpr (model == SolidModel::neo_hookean)
                 {
                   const Tensor<2, spacedim> Q   = transpose(invert(F));
                   const double              lnJ = std::log(determinant(F));
@@ -1205,13 +1215,37 @@ TEST(Step80, NonlinearSolidAssemblyTangentMatchesRightHandSide)
 
   for (const std::string law : {"neo_hookean", "exponential"})
     {
-      par.use_nonlinear_solid_model = true;
-      par.nonlinear_solid_law       = law;
+      par.solid_model = law == "neo_hookean" ? SolidModel::neo_hookean :
+                                               SolidModel::exponential;
 
       NavierStokesImmersedProblem<dim, spacedim> problem(par);
       problem.make_grid();
       problem.initial_setup();
       problem.setup_dofs();
+
+      // Dispatch to the compile-time instantiation selected by the runtime
+      // enum value.
+      auto assemble_system = [&]() {
+        if (par.solid_model == SolidModel::neo_hookean)
+          problem.assemble_elasticity_system<SolidModel::neo_hookean>(alpha);
+        else
+          problem.assemble_elasticity_system<SolidModel::exponential>(alpha);
+      };
+      auto assemble_rhs = [&]() {
+        if (par.solid_model == SolidModel::neo_hookean)
+          problem.assemble_elasticity_rhs<SolidModel::neo_hookean>(alpha);
+        else
+          problem.assemble_elasticity_rhs<SolidModel::exponential>(alpha);
+      };
+      auto internal_force = [&]() {
+        if (par.solid_model == SolidModel::neo_hookean)
+          return assemble_internal_force<dim,
+                                         spacedim,
+                                         SolidModel::neo_hookean>(problem);
+        return assemble_internal_force<dim,
+                                       spacedim,
+                                       SolidModel::exponential>(problem);
+      };
 
       // Deterministic test displacement w on the solid displacement block
       // (the multiplier block stays at zero), small enough that the
@@ -1242,9 +1276,9 @@ TEST(Step80, NonlinearSolidAssemblyTangentMatchesRightHandSide)
       w_minus.block(0).add(-eps, x);
 
       set_displacement(w_plus);
-      const LA::MPI::Vector N_plus = assemble_internal_force(problem);
+      const LA::MPI::Vector N_plus = internal_force();
       set_displacement(w_minus);
-      const LA::MPI::Vector N_minus = assemble_internal_force(problem);
+      const LA::MPI::Vector N_minus = internal_force();
 
       LA::MPI::Vector fd(problem.solid_owned_dofs[0], problem.mpi_communicator);
       fd = N_plus;
@@ -1255,7 +1289,7 @@ TEST(Step80, NonlinearSolidAssemblyTangentMatchesRightHandSide)
       w_0          = 0;
       w_0.block(0) = w;
       set_displacement(w_0);
-      problem.assemble_elasticity_system(alpha);
+      assemble_system();
       const auto &K = problem.solid_matrix.block(0, 0);
 
       LA::MPI::Vector Kx(problem.solid_owned_dofs[0], problem.mpi_communicator);
@@ -1270,9 +1304,9 @@ TEST(Step80, NonlinearSolidAssemblyTangentMatchesRightHandSide)
 
       // 2) Assembled right-hand side R(w) = K_s(w) w - N(w) against the
       // matrix-vector product and the independent internal force.
-      problem.assemble_elasticity_rhs(alpha);
+      assemble_rhs();
       const LA::MPI::Vector R = problem.solid_system_rhs.block(0);
-      const LA::MPI::Vector N = assemble_internal_force(problem);
+      const LA::MPI::Vector N = internal_force();
 
       LA::MPI::Vector Kw(problem.solid_owned_dofs[0], problem.mpi_communicator);
       K.vmult(Kw, w);
