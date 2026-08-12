@@ -1030,10 +1030,10 @@ namespace Step80
       const double linear_entry =
         2. * mu * scalar_product(symmetrize(G_a), symmetrize(G_b)) +
         lambda * trace(G_a) * trace(G_b);
-      EXPECT_NEAR(
-        tangent_entry<SolidModel::neo_hookean>(G_a, G_b, data_identity, mu, lambda),
-        linear_entry,
-        1e-12);
+      EXPECT_NEAR(tangent_entry<SolidModel::neo_hookean>(
+                    G_a, G_b, data_identity, mu, lambda),
+                  linear_entry,
+                  1e-12);
       EXPECT_NEAR(pointwise_neohookean_force(data_identity.F, G_a, mu, lambda),
                   0.,
                   1e-12);
@@ -1053,10 +1053,11 @@ namespace Step80
       1e-7);
     const double Ks_w_exp =
       tangent_entry<SolidModel::exponential>(G_a, H, data_exp, mu, lambda);
-    const double N_i_exp  = pointwise_exponential_force(F_exp, G_a, mu, lambda);
-    EXPECT_NEAR(rhs_entry<SolidModel::exponential>(G_a, data_exp, H, mu, lambda),
-                Ks_w_exp - N_i_exp,
-                1e-14);
+    const double N_i_exp = pointwise_exponential_force(F_exp, G_a, mu, lambda);
+    EXPECT_NEAR(
+      rhs_entry<SolidModel::exponential>(G_a, data_exp, H, mu, lambda),
+      Ks_w_exp - N_i_exp,
+      1e-14);
   }
 
 
@@ -1247,9 +1248,8 @@ TEST(Step80, NonlinearSolidAssemblyTangentMatchesRightHandSide)
           return assemble_internal_force<dim,
                                          spacedim,
                                          SolidModel::neo_hookean>(problem);
-        return assemble_internal_force<dim,
-                                       spacedim,
-                                       SolidModel::exponential>(problem);
+        return assemble_internal_force<dim, spacedim, SolidModel::exponential>(
+          problem);
       };
 
       // Deterministic test displacement w on the solid displacement block
