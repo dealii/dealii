@@ -96,9 +96,6 @@ namespace internal
 
     class TriaObjects;
 
-    template <int, int>
-    class Policy;
-
     /**
      * Forward declaration of a class into which we put much of the
      * implementation of the Triangulation class. See the .cc file for more
@@ -4196,12 +4193,20 @@ protected:
 
 private:
   /**
+   * A class that implements Triangulation-specific tasks related to creation,
+   * refinement, and coarsening. The class is only forward-declared here,
+   * and is used as a type-erase mechanism so that we don't have to
+   * declare the concrete implementation class members in the header file.
+   */
+  class Policy;
+  template <typename PolicyClass>
+  class PolicyWrapper;
+
+  /**
    * Policy with the Triangulation-specific tasks related to creation,
    * refinement, and coarsening.
    */
-  std::unique_ptr<
-    dealii::internal::TriangulationImplementation::Policy<dim, spacedim>>
-    policy;
+  std::unique_ptr<Policy> policy;
 
   /**
    * If add_periodicity() is called, this variable stores the given periodic
