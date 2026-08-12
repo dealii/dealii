@@ -1737,8 +1737,9 @@ namespace Step80
                     {
                       cell_fluid_matrix(i, j) +=
                         ((par.density * alpha) * phi_u[i] * phi_u[j] +
-                         par.viscosity * scalar_product(sym_grad_phi_u[i],
-                                                        sym_grad_phi_u[j]) -
+                         2. * par.viscosity *
+                           scalar_product(sym_grad_phi_u[i],
+                                          sym_grad_phi_u[j]) -
                          div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
                          (use_operator_augmentation() ?
                             par.gamma_AL_background * div_phi_u[i] *
@@ -1884,8 +1885,9 @@ namespace Step80
                         {
                           cell_matrix(i, j) +=
                             (par.density * alpha * phi_u[i] * phi_u[j] +
-                             par.viscosity * scalar_product(sym_grad_phi_u[i],
-                                                            sym_grad_phi_u[j]) -
+                             2. * par.viscosity *
+                               scalar_product(sym_grad_phi_u[i],
+                                              sym_grad_phi_u[j]) -
                              div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
                              (use_operator_augmentation() ?
                                 par.gamma_AL_background * div_phi_u[i] *
