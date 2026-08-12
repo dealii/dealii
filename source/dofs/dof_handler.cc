@@ -381,15 +381,16 @@ namespace internal
 
         // lines
         if (dim == 2 || dim == 3)
-          reserve_subentities(dof_handler,
-                              1,
-                              dof_handler.tria->n_raw_lines(),
-                              [&](const auto &cell, const auto &process) {
-                                for (const auto line_index :
-                                     cell->line_indices())
-                                  process(fe.n_dofs_per_line(),
-                                          cell->line(line_index)->index());
-                              });
+          reserve_subentities(
+            dof_handler,
+            1,
+            dof_handler.tria->n_raw_lines(),
+            [&](const auto &cell, const auto &process) {
+              const auto line_indices = internal::TriaAccessorImplementation::
+                Implementation::get_line_indices_of_cell(*cell);
+              for (const auto &line_no : cell->line_indices())
+                process(fe.n_dofs_per_line(), line_indices[line_no]);
+            });
 
         // quads
         if (dim == 3)
@@ -1144,9 +1145,14 @@ namespace internal
 
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (!cell->is_artificial())
-                for (const auto l : cell->line_indices())
-                  line_fe_association[cell->active_fe_index()]
-                                     [cell->line_index(l)] = true;
+                {
+                  const auto line_indices =
+                    internal::TriaAccessorImplementation::Implementation::
+                      get_line_indices_of_cell(*cell);
+                  for (const auto line_no : cell->line_indices())
+                    line_fe_association[cell->active_fe_index()]
+                                       [line_indices[line_no]] = true;
+                }
 
             // first check which of the lines is used at all,
             // i.e. is associated with a finite element. we do this
