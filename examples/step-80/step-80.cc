@@ -135,7 +135,7 @@ namespace Step80
 
   using AMGPreconditioner = LA::MPI::PreconditionAMG;
 
-  AMGPreconditioner::AdditionalData
+  inline AMGPreconditioner::AdditionalData
   make_amg_additional_data(const unsigned int degree,
                            const bool         symmetric_operator = false)
   {
@@ -181,6 +181,18 @@ namespace Step80
   {
     augmented_split,
     mumps
+  };
+
+  // Constitutive model of the immersed solid. The elasticity assembly
+  // functions are templated on this enum, so that the model-specific branch
+  // inside the quadrature loops is selected with `if constexpr` and resolved
+  // at compile time; the value read from the parameter file only picks the
+  // instantiation in run().
+  enum class SolidModel
+  {
+    linear,
+    exponential,
+    neo_hookean
   };
 
   // A free function to read the dimension and spacedimension from a parameter
@@ -256,25 +268,21 @@ namespace Step80
 
     bool include_convective_term = true;
 
-    // Nonlinear hyperelastic solid model. Two hyperelastic laws are
-    // implemented, selected by `nonlinear_solid_law`:
+    // Constitutive model of the immersed solid, see `SolidModel`. The two
+    // hyperelastic laws are expressed through the Lame parameters `lame_mu`
+    // and `lame_lambda`:
     //
-    //  - "exponential": P(F) = mu * exp(lambda*(tr(F^T F) - dim)) * F, using
-    //    the same Lame parameters as the other models. See Boffi, et al.
-    //    (2023).
-    //  - "neo_hookean": compressible neo-Hookean law
+    //  - exponential: P(F) = mu * exp(lambda*(tr(F^T F) - dim)) * F. See
+    //    Boffi, et al. (2023).
+    //  - neo_hookean: compressible neo-Hookean law
     //        W(F) = mu/2 (F:F - dim) - mu ln(J) + lambda/2 (ln J)^2,
-    //        P(F) = mu (F - F^{-T}) + lambda ln(J) F^{-T},
-    //    with the same Lame parameters used by the linear model.
+    //        P(F) = mu (F - F^{-T}) + lambda ln(J) F^{-T}.
     //
-    // The nonlinear system is advanced semi-implicitly: the internal force is
+    // The nonlinear laws are advanced semi-implicitly: the internal force is
     // linearized around the current configuration and all nonlinear terms are
     // moved to the right-hand side, so that each time step requires a single
-    // linear solve. Both nonlinear laws are expressed through the Lame
-    // parameters `lame_mu` and `lame_lambda`, so no additional material
-    // parameters are needed.
-    bool        use_nonlinear_solid_model = false;
-    std::string nonlinear_solid_law       = "exponential";
+    // linear solve.
+    SolidModel solid_model = SolidModel::linear;
 
     bool particle_predictor = true;
 
@@ -401,22 +409,15 @@ namespace Step80
         "to the Navier-Stokes right-hand side. Set to false to drop the "
         "convective term and recover the (unsteady Stokes) momentum equation.");
       add_parameter(
-        "Use nonlinear solid model",
-        use_nonlinear_solid_model,
-        "If true, the immersed solid is governed by the nonlinear "
-        "hyperelastic law selected by 'Nonlinear solid law', advanced "
-        "semi-implicitly by linearizing the internal force around the "
-        "current configuration. If false, the linear elastic model is used.");
-      add_parameter(
-        "Nonlinear solid law",
-        nonlinear_solid_law,
-        "Hyperelastic law used when 'Use nonlinear solid model' is true: "
-        "'exponential' selects P(F) = mu*exp(lambda*(tr(F^T F) - dim))*F, "
-        "while 'neo_hookean' selects the compressible neo-Hookean law "
-        "P(F) = mu*(F - F^{-T}) + lambda*ln(J)*F^{-T}. Both laws use the "
-        "Lame parameters of the linear model.",
-        this->prm,
-        Patterns::Selection("exponential|neo_hookean"));
+        "Solid model",
+        solid_model,
+        "Constitutive model of the immersed solid: 'linear' selects the "
+        "linear elastic operator, 'exponential' selects P(F) = "
+        "mu*exp(lambda*(tr(F^T F) - dim))*F, and 'neo_hookean' selects the "
+        "compressible neo-Hookean law P(F) = mu*(F - F^{-T}) + "
+        "lambda*ln(J)*F^{-T}. All models use the Lame parameters of the "
+        "linear model, and the nonlinear laws are advanced semi-implicitly "
+        "by linearizing the internal force around the current configuration.");
     }
     leave_subsection();
 
@@ -598,17 +599,21 @@ namespace Step80
 
 
 
-  template <int spacedim>
-  HyperelasticPointData<spacedim>
+  // Evaluate the pointwise data of a nonlinear hyperelastic law at the
+  // displacement gradient grad(w). The model is a template parameter, so the
+  // law-specific prefactor below is selected at compile time and the function
+  // is only instantiated for the two nonlinear laws.
+  template <SolidModel model, int spacedim>
+  inline HyperelasticPointData<spacedim>
   evaluate_hyperelastic_point_data(const Tensor<2, spacedim> &grad_w,
-                                   const bool         use_nonlinear_solid_model,
-                                   const std::string &nonlinear_solid_law,
-                                   const double       lame_mu,
-                                   const double       lame_lambda)
+                                   const double               lame_mu,
+                                   const double               lame_lambda)
   {
+    static_assert(model != SolidModel::linear,
+                  "Hyperelastic data is only assembled for the nonlinear "
+                  "solid models.");
+
     HyperelasticPointData<spacedim> data;
-    if (!use_nonlinear_solid_model)
-      return data;
 
     data.F = grad_w;
     for (unsigned int d = 0; d < spacedim; ++d)
@@ -616,16 +621,12 @@ namespace Step80
     data.F_inv_T  = transpose(invert(data.F));
     data.ln_det_F = std::log(determinant(data.F));
 
-    if (nonlinear_solid_law == "exponential")
+    if constexpr (model == SolidModel::exponential)
       // g = mu exp(lambda (F:F - dim)) is the prefactor of the exponential
       // law P(F) = g F, written with the same Lame parameters as the other
       // solid models.
       data.g = lame_mu * std::exp(lame_lambda *
                                   (scalar_product(data.F, data.F) - spacedim));
-    else if (nonlinear_solid_law != "neo_hookean")
-      AssertThrow(false,
-                  ExcMessage("Unknown nonlinear solid law '" +
-                             nonlinear_solid_law + "'."));
 
     return data;
   }
@@ -633,90 +634,98 @@ namespace Step80
 
 
   // Entry (i, j) of the tangent stiffness K_s(w) at a quadrature point, i.e.
-  // the contraction (dP/dF[grad_j], grad_i), for the two hyperelastic laws.
-  template <int spacedim>
-  double exponential_tangent_entry(const Tensor<2, spacedim> &grad_i,
-                                   const Tensor<2, spacedim> &grad_j,
-                                   const HyperelasticPointData<spacedim> &data,
-                                   const double lame_lambda)
-  {
-    // dP/dF = g (I4 + 2 lambda F (x) F) with g = mu exp(lambda (F:F - dim)).
-    return data.g * (scalar_product(grad_i, grad_j) +
-                     2. * lame_lambda * scalar_product(data.F, grad_i) *
-                       scalar_product(data.F, grad_j));
-  }
-
-
-
-  template <int spacedim>
-  double neohookean_tangent_entry(const Tensor<2, spacedim>             &grad_i,
-                                  const Tensor<2, spacedim>             &grad_j,
-                                  const HyperelasticPointData<spacedim> &data,
-                                  const double lame_mu,
-                                  const double lame_lambda)
-  {
-    // For the compressible neo-Hookean law P(F) = mu (F - Q) +
-    // lambda ln(J) Q, Q = F^{-T}, the material tangent is
-    //   dP/dF = mu I4 + (mu - lambda ln J) Q (x) Q + lambda Q (x) Q,
-    // where the two tensor products contract the middle (k,J)-(i,L) and the
-    // outer (k,L)-(i,J) index pairs of (dP/dF)_{iJkL}. Contracting with the
-    // shape function gradients grad_i (indices i,J) and grad_j (indices k,L)
-    // gives
-    //   mu (grad_i : grad_j) + (mu - lambda ln J)(grad_j : Q grad_i^T Q)
-    //   + lambda (grad_i : Q)(grad_j : Q),
-    // which at F = I reduces exactly to the linear elastic operator
-    // 2 mu sym(grad_i) : sym(grad_j) + lambda div(grad_i) div(grad_j).
-    const Tensor<2, spacedim> Q = data.F_inv_T;
-    return lame_mu * scalar_product(grad_i, grad_j) +
-           (lame_mu - lame_lambda * data.ln_det_F) *
-             scalar_product(grad_j, Q * transpose(grad_i) * Q) +
-           lame_lambda * scalar_product(grad_i, Q) * scalar_product(grad_j, Q);
-  }
-
-
-
-  // Right-hand side entry (K_s(w) w)_i - N_i at a quadrature point: the
-  // tangent stiffness applied to the current displacement gradient H =
-  // grad(w), minus the internal force N_i = (P(F), grad_i). This is the term
-  // moved to the right-hand side when the nonlinear elasticity operator is
-  // linearized around the current configuration w.
-  template <int spacedim>
-  double exponential_rhs_entry(const Tensor<2, spacedim>             &grad_i,
-                               const HyperelasticPointData<spacedim> &data,
-                               const Tensor<2, spacedim>             &H,
-                               const double lame_lambda)
-  {
-    // (K_s w)_i = g (grad_i : H + 2 lambda (F : grad_i)(F : H)),
-    // N_i = g (F : grad_i).
-    return data.g * (scalar_product(grad_i, H) +
-                     2. * lame_lambda * scalar_product(data.F, grad_i) *
-                       scalar_product(data.F, H) -
-                     scalar_product(data.F, grad_i));
-  }
-
-
-
-  template <int spacedim>
-  double neohookean_rhs_entry(const Tensor<2, spacedim>             &grad_i,
+  // the contraction (dP/dF[grad_j], grad_i), for the hyperelastic law
+  // selected by the template parameter `model`. As in the assembly functions,
+  // the `if constexpr` branch is resolved at compile time, so only the
+  // arithmetic of the requested law remains.
+  template <SolidModel model, int spacedim>
+  inline double tangent_entry(const Tensor<2, spacedim>             &grad_i,
+                              const Tensor<2, spacedim>             &grad_j,
                               const HyperelasticPointData<spacedim> &data,
-                              const Tensor<2, spacedim>             &H,
                               const double                           lame_mu,
-                              const double lame_lambda)
+                              const double                           lame_lambda)
   {
-    // (K_s w)_i = (dP/dF[H] : grad_i)
-    //   = mu (grad_i : H) + (mu - lambda ln J)(grad_i : Q H^T Q)
-    //     + lambda (H : Q)(grad_i : Q),
-    // N_i = P(F) : grad_i = mu (F : grad_i) + (lambda ln J - mu)(Q : grad_i).
-    const Tensor<2, spacedim> Q = data.F_inv_T;
-    const double              Ks_w_i =
-      lame_mu * scalar_product(grad_i, H) +
-      (lame_mu - lame_lambda * data.ln_det_F) *
-        scalar_product(grad_i, Q * transpose(H) * Q) +
-      lame_lambda * scalar_product(H, Q) * scalar_product(grad_i, Q);
-    const double N_i =
-      lame_mu * scalar_product(data.F, grad_i) +
-      (lame_lambda * data.ln_det_F - lame_mu) * scalar_product(Q, grad_i);
-    return Ks_w_i - N_i;
+    static_assert(model != SolidModel::linear,
+                  "The tangent entry is only assembled for the nonlinear "
+                  "solid models.");
+
+    if constexpr (model == SolidModel::exponential)
+      {
+        // dP/dF = g (I4 + 2 lambda F (x) F) with
+        // g = mu exp(lambda (F:F - dim)).
+        return data.g * (scalar_product(grad_i, grad_j) +
+                         2. * lame_lambda * scalar_product(data.F, grad_i) *
+                           scalar_product(data.F, grad_j));
+      }
+    else // neo_hookean
+      {
+        // For the compressible neo-Hookean law P(F) = mu (F - Q) +
+        // lambda ln(J) Q, Q = F^{-T}, the material tangent is
+        //   dP/dF = mu I4 + (mu - lambda ln J) Q (x) Q + lambda Q (x) Q,
+        // where the two tensor products contract the middle (k,J)-(i,L) and
+        // the outer (k,L)-(i,J) index pairs of (dP/dF)_{iJkL}. Contracting
+        // with the shape function gradients grad_i (indices i,J) and grad_j
+        // (indices k,L) gives
+        //   mu (grad_i : grad_j) + (mu - lambda ln J)(grad_j : Q grad_i^T Q)
+        //   + lambda (grad_i : Q)(grad_j : Q),
+        // which at F = I reduces exactly to the linear elastic operator
+        // 2 mu sym(grad_i) : sym(grad_j) + lambda div(grad_i) div(grad_j).
+        const Tensor<2, spacedim> Q = data.F_inv_T;
+        return lame_mu * scalar_product(grad_i, grad_j) +
+               (lame_mu - lame_lambda * data.ln_det_F) *
+                 scalar_product(grad_j, Q * transpose(grad_i) * Q) +
+               lame_lambda * scalar_product(grad_i, Q) *
+                 scalar_product(grad_j, Q);
+      }
+  }
+
+
+
+  // Right-hand side entry (K_s(w) w)_i - N_i at a quadrature point, for the
+  // hyperelastic law selected by the template parameter `model`: the tangent
+  // stiffness applied to the current displacement gradient H = grad(w),
+  // minus the internal force N_i = (P(F), grad_i). This is the term moved to
+  // the right-hand side when the nonlinear elasticity operator is linearized
+  // around the current configuration w.
+  template <SolidModel model, int spacedim>
+  inline double rhs_entry(const Tensor<2, spacedim>             &grad_i,
+                          const HyperelasticPointData<spacedim> &data,
+                          const Tensor<2, spacedim>             &H,
+                          const double                           lame_mu,
+                          const double                           lame_lambda)
+  {
+    static_assert(model != SolidModel::linear,
+                  "The right-hand side entry is only assembled for the "
+                  "nonlinear solid models.");
+
+    if constexpr (model == SolidModel::exponential)
+      {
+        // (K_s w)_i = g (grad_i : H + 2 lambda (F : grad_i)(F : H)),
+        // N_i = g (F : grad_i).
+        return data.g * (scalar_product(grad_i, H) +
+                         2. * lame_lambda * scalar_product(data.F, grad_i) *
+                           scalar_product(data.F, H) -
+                         scalar_product(data.F, grad_i));
+      }
+    else // neo_hookean
+      {
+        // (K_s w)_i = (dP/dF[H] : grad_i)
+        //   = mu (grad_i : H) + (mu - lambda ln J)(grad_i : Q H^T Q)
+        //     + lambda (H : Q)(grad_i : Q),
+        // N_i = P(F) : grad_i = mu (F : grad_i)
+        //     + (lambda ln J - mu)(Q : grad_i).
+        const Tensor<2, spacedim> Q = data.F_inv_T;
+        const double              Ks_w_i =
+          lame_mu * scalar_product(grad_i, H) +
+          (lame_mu - lame_lambda * data.ln_det_F) *
+            scalar_product(grad_i, Q * transpose(H) * Q) +
+          lame_lambda * scalar_product(H, Q) * scalar_product(grad_i, Q);
+        const double N_i =
+          lame_mu * scalar_product(data.F, grad_i) +
+          (lame_lambda * data.ln_det_F - lame_mu) *
+            scalar_product(Q, grad_i);
+        return Ks_w_i - N_i;
+      }
   }
 
 
@@ -771,7 +780,14 @@ namespace Step80
     void assemble_navier_stokes_rhs(const double &alpha);
 
 
+    // The solid constitutive model is a template parameter: the assembly
+    // kernels use `if constexpr` on `model`, so the model-specific branch is
+    // resolved at compile time and no runtime checks remain inside the
+    // quadrature loops. The value of `par.solid_model` selects the
+    // instantiation in run().
+    template <SolidModel model>
     void assemble_elasticity_system(const double &alpha);
+    template <SolidModel model>
     void assemble_elasticity_rhs(const double &alpha);
 
     void assemble_coupling();
@@ -922,7 +938,7 @@ namespace Step80
 
 
   template <int dim, int spacedim>
-  const AffineConstraints<double> &
+  inline const AffineConstraints<double> &
   NavierStokesImmersedProblem<dim, spacedim>::active_fluid_constraints() const
   {
     if (use_homogeneous_fluid_constraints)
@@ -1925,8 +1941,14 @@ namespace Step80
   }
 
 
+  // The solid constitutive model is passed as a template parameter, and the
+  // `if constexpr` branches below are resolved at compile time: the quadrature
+  // loop only contains the arithmetic of the requested law, and the runtime
+  // enum value `par.solid_model` only selects the instantiation in run().
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_system(
+  template <SolidModel model>
+  inline void
+  NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_system(
     const double &alpha)
   {
     solid_matrix         = 0;
@@ -1955,7 +1977,8 @@ namespace Step80
 
     // Gradient of the displacement w used to linearize the nonlinear laws:
     // in the semi-implicit scheme this is the current configuration (the
-    // last converged solution).
+    // last converged solution). Only the nonlinear models need it, so the
+    // call below is compiled out for the linear model.
     std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
 
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
@@ -1968,9 +1991,28 @@ namespace Step80
 
           fe_values.reinit(cell);
 
-          if (par.use_nonlinear_solid_model)
+          if constexpr (model != SolidModel::linear)
             fe_values[displacement].get_function_gradients(
               solid_locally_relevant_solution, grad_w_current);
+
+          // Add the elastic stiffness and the Lagrange-multiplier coupling
+          // entries of the local matrix, shared by all constitutive models.
+          const auto add_elastic_entries = [&](const unsigned int i,
+                                               const unsigned int j,
+                                               const double       elastic_ij,
+                                               const double       JxW) {
+            cell_matrix(i, j) +=
+              (elastic_ij -
+               // lagrange * disp
+               (phi_lagrange[i] * phi_w[j] * alpha) -
+               // disp * lagrange
+               (phi_w[i] * phi_lagrange[j])) *
+              // JxW
+              JxW;
+
+            cell_preconditioner(i, j) +=
+              phi_lagrange[i] * phi_lagrange[j] * JxW;
+          };
 
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
@@ -1984,58 +2026,42 @@ namespace Step80
                   phi_lagrange[k] = fe_values[lagrange_multiplier].value(k, q);
                 }
 
-              // Pointwise data of the selected hyperelastic law at the
-              // deformation gradient F = I + grad(w).
-              const HyperelasticPointData<spacedim> data =
-                evaluate_hyperelastic_point_data(grad_w_current[q],
-                                                 par.use_nonlinear_solid_model,
-                                                 par.nonlinear_solid_law,
-                                                 par.lame_mu,
-                                                 par.lame_lambda);
-
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+              // Elastic bilinear form of the selected model: the linear
+              // operator, or the tangent stiffness at the current
+              // configuration for the nonlinear laws. The `if constexpr`
+              // branches are resolved at compile time.
+              if constexpr (model == SolidModel::linear)
                 {
-                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                    {
-                      // Elastic bilinear form: the linear operator for the
-                      // linear model, or the tangent stiffness at the current
-                      // configuration for the nonlinear laws.
-                      double elastic_ij = 0.;
-                      if (par.use_nonlinear_solid_model)
-                        {
-                          if (par.nonlinear_solid_law == "neo_hookean")
-                            elastic_ij =
-                              neohookean_tangent_entry(grad_phi_w[i],
-                                                       grad_phi_w[j],
-                                                       data,
-                                                       par.lame_mu,
-                                                       par.lame_lambda);
-                          else
-                            elastic_ij =
-                              exponential_tangent_entry(grad_phi_w[i],
-                                                        grad_phi_w[j],
-                                                        data,
-                                                        par.lame_lambda);
-                        }
-                      else
-                        elastic_ij =
-                          (2 * par.lame_mu *
-                             scalar_product(grad_eps_phi_w[i],
-                                            grad_eps_phi_w[j]) +
-                           par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                      add_elastic_entries(
+                        i,
+                        j,
+                        2 * par.lame_mu *
+                            scalar_product(grad_eps_phi_w[i],
+                                           grad_eps_phi_w[j]) +
+                          par.lame_lambda * div_phi_w[i] * div_phi_w[j],
+                        fe_values.JxW(q));
+                }
+              else
+                {
+                  // Pointwise data of the selected hyperelastic law at the
+                  // deformation gradient F = I + grad(w).
+                  const HyperelasticPointData<spacedim> data =
+                    evaluate_hyperelastic_point_data<model>(
+                      grad_w_current[q], par.lame_mu, par.lame_lambda);
 
-                      cell_matrix(i, j) +=
-                        (elastic_ij -
-                         // lagrange * disp
-                         (phi_lagrange[i] * phi_w[j] * alpha) -
-                         // disp * lagrange
-                         (phi_w[i] * phi_lagrange[j])) *
-                        // JxW
-                        fe_values.JxW(q);
-
-                      cell_preconditioner(i, j) +=
-                        phi_lagrange[i] * phi_lagrange[j] * fe_values.JxW(q);
-                    }
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                      {
+                        const double elastic_ij =
+                          tangent_entry<model>(grad_phi_w[i],
+                                               grad_phi_w[j],
+                                               data,
+                                               par.lame_mu,
+                                               par.lame_lambda);
+                        add_elastic_entries(i, j, elastic_ij, fe_values.JxW(q));
+                      }
                 }
             }
 
@@ -2069,8 +2095,14 @@ namespace Step80
 
 
 
+  // Same compile-time model selection as assemble_elasticity_system(): the
+  // nonlinear extra right-hand side (K_s(w) w)_i - N_i, which carries all
+  // nonlinearity of the elasticity part after linearizing around the current
+  // configuration, is only assembled for the two hyperelastic laws.
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_rhs(
+  template <SolidModel model>
+  inline void
+  NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_rhs(
     const double &alpha)
   {
     solid_system_rhs = 0;
@@ -2107,7 +2139,9 @@ namespace Step80
                                                  Vector<double>(2 * spacedim));
 
     // Gradient of the displacement w used to linearize the nonlinear laws:
-    // the current configuration (the last converged solution).
+    // the current configuration (the last converged solution). Only the
+    // nonlinear models need it, so the call below is compiled out for the
+    // linear model.
     std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
 
     for (const auto &cell : solid_dh.active_cell_iterators())
@@ -2118,7 +2152,7 @@ namespace Step80
           fe_values_rhs[displacement].get_function_values(
             solid_locally_relevant_solution_old, w_old);
 
-          if (par.use_nonlinear_solid_model)
+          if constexpr (model != SolidModel::linear)
             fe_values_rhs[displacement].get_function_gradients(
               solid_locally_relevant_solution, grad_w_current);
 
@@ -2128,34 +2162,42 @@ namespace Step80
           cell_rhs = 0;
           for (unsigned int q = 0; q < n_q_points; ++q)
             {
-              // Pointwise data of the selected hyperelastic law at the
-              // deformation gradient F = I + grad(w). Because we solve for
-              // the full solution (not for an increment), the solid
-              // displacement row picks up the extra right-hand side
-              // (K_s(w) w)_i - N_i, with internal force
-              // N_i = (P(F), grad chi_i).
-              const HyperelasticPointData<spacedim> data =
-                evaluate_hyperelastic_point_data(grad_w_current[q],
-                                                 par.use_nonlinear_solid_model,
-                                                 par.nonlinear_solid_law,
-                                                 par.lame_mu,
-                                                 par.lame_lambda);
+              // Linear part of the right-hand side, shared by all models:
+              // the previous-displacement term and the solid body force.
+              const auto add_linear_rhs = [&](const unsigned int i) {
+                const auto &phi_lagrange =
+                  fe_values_rhs[lagrange_multiplier].value(i, q);
+                const auto comp_i =
+                  solid_fe->system_to_component_index(i).first;
 
-              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                cell_rhs(i) +=
+                  (-w_old[q] * alpha * phi_lagrange +
+                   solid_rhs_values[q](comp_i) *
+                     fe_values_rhs.shape_value(i, q)) *
+                  fe_values_rhs.JxW(q);
+              };
+
+              if constexpr (model == SolidModel::linear)
                 {
-                  const auto &phi_lagrange =
-                    fe_values_rhs[lagrange_multiplier].value(i, q);
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    add_linear_rhs(i);
+                }
+              else
+                {
+                  // Pointwise data of the selected hyperelastic law at the
+                  // deformation gradient F = I + grad(w). Because we solve
+                  // for the full solution (not for an increment), the solid
+                  // displacement row picks up the extra right-hand side
+                  // (K_s(w) w)_i - N_i, with internal force
+                  // N_i = (P(F), grad chi_i).
+                  const HyperelasticPointData<spacedim> data =
+                    evaluate_hyperelastic_point_data<model>(
+                      grad_w_current[q], par.lame_mu, par.lame_lambda);
 
-                  const auto comp_i =
-                    solid_fe->system_to_component_index(i).first;
-
-                  cell_rhs(i) += (-w_old[q] * alpha * phi_lagrange +
-                                  solid_rhs_values[q](comp_i) *
-                                    fe_values_rhs.shape_value(i, q)) *
-                                 fe_values_rhs.JxW(q);
-
-                  if (par.use_nonlinear_solid_model)
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
+                      add_linear_rhs(i);
+
                       const Tensor<2, spacedim> grad_phi_i =
                         fe_values_rhs[displacement].gradient(i, q);
                       const Tensor<2, spacedim> H = grad_w_current[q];
@@ -2164,13 +2206,11 @@ namespace Step80
                       // term that carries all nonlinearity of the elasticity
                       // part to the right-hand side.
                       const double nonlinear_rhs_ij =
-                        par.nonlinear_solid_law == "neo_hookean" ?
-                          neohookean_rhs_entry(
-                            grad_phi_i, data, H, par.lame_mu, par.lame_lambda) :
-                          exponential_rhs_entry(grad_phi_i,
-                                                data,
-                                                H,
-                                                par.lame_lambda);
+                        rhs_entry<model>(grad_phi_i,
+                                         data,
+                                         H,
+                                         par.lame_mu,
+                                         par.lame_lambda);
                       cell_rhs(i) += nonlinear_rhs_ij * fe_values_rhs.JxW(q);
                     }
                 }
@@ -2181,6 +2221,26 @@ namespace Step80
             {
               fe_values_matrix.reinit(cell);
               cell_matrix = 0;
+
+              // Add the elastic stiffness and the Lagrange-multiplier
+              // coupling entries of the boundary matrix, shared by all
+              // constitutive models.
+              const auto add_boundary_entries = [&](const unsigned int i,
+                                                    const unsigned int j,
+                                                    const double elastic_ij,
+                                                    const double JxW) {
+                cell_matrix(i, j) +=
+                  (elastic_ij -
+                   // lagrange * disp
+                   (phi_lagrange[i] * phi_w[j] * alpha) -
+                   // disp * lagrange
+                   (phi_w[i] * phi_lagrange[j]) +
+                   // lagr * lagr
+                   phi_lagrange[i] * phi_lagrange[j]) *
+                  // JxW
+                  JxW;
+              };
+
               for (unsigned int q = 0; q < n_q_points; ++q)
                 {
                   for (unsigned int k = 0; k < dofs_per_cell; ++k)
@@ -2196,53 +2256,39 @@ namespace Step80
                         fe_values_matrix[lagrange_multiplier].value(k, q);
                     }
 
-                  const HyperelasticPointData<spacedim> data =
-                    evaluate_hyperelastic_point_data(
-                      grad_w_current[q],
-                      par.use_nonlinear_solid_model,
-                      par.nonlinear_solid_law,
-                      par.lame_mu,
-                      par.lame_lambda);
-
-                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                  if constexpr (model == SolidModel::linear)
                     {
-                      for (unsigned int j = 0; j < dofs_per_cell; ++j)
-                        {
-                          double elastic_ij = 0.;
-                          if (par.use_nonlinear_solid_model)
-                            {
-                              if (par.nonlinear_solid_law == "neo_hookean")
-                                elastic_ij =
-                                  neohookean_tangent_entry(grad_phi_w[i],
-                                                           grad_phi_w[j],
-                                                           data,
-                                                           par.lame_mu,
-                                                           par.lame_lambda);
-                              else
-                                elastic_ij =
-                                  exponential_tangent_entry(grad_phi_w[i],
-                                                            grad_phi_w[j],
-                                                            data,
-                                                            par.lame_lambda);
-                            }
-                          else
-                            elastic_ij =
-                              (2 * par.lame_mu *
-                                 scalar_product(grad_eps_phi_w[i],
-                                                grad_eps_phi_w[j]) +
-                               par.lame_lambda * div_phi_w[i] * div_phi_w[j]);
+                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                          add_boundary_entries(
+                            i,
+                            j,
+                            2 * par.lame_mu *
+                                scalar_product(grad_eps_phi_w[i],
+                                               grad_eps_phi_w[j]) +
+                              par.lame_lambda * div_phi_w[i] * div_phi_w[j],
+                            fe_values_matrix.JxW(q));
+                    }
+                  else
+                    {
+                      const HyperelasticPointData<spacedim> data =
+                        evaluate_hyperelastic_point_data<model>(
+                          grad_w_current[q], par.lame_mu, par.lame_lambda);
 
-                          cell_matrix(i, j) +=
-                            (elastic_ij -
-                             // lagrange * disp
-                             (phi_lagrange[i] * phi_w[j] * alpha) -
-                             // disp * lagrange
-                             (phi_w[i] * phi_lagrange[j]) +
-                             // lagr * lagr
-                             phi_lagrange[i] * phi_lagrange[j]) *
-                            // JxW
-                            fe_values_matrix.JxW(q);
-                        }
+                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                          {
+                            const double elastic_ij =
+                              tangent_entry<model>(grad_phi_w[i],
+                                                   grad_phi_w[j],
+                                                   data,
+                                                   par.lame_mu,
+                                                   par.lame_lambda);
+                            add_boundary_entries(i,
+                                                 j,
+                                                 elastic_ij,
+                                                 fe_values_matrix.JxW(q));
+                          }
                     }
                 }
               solid_constraints.distribute_local_to_global(cell_rhs,
@@ -2817,26 +2863,39 @@ namespace Step80
         setup_coupling();
         assemble_coupling();
 
-        if (par.use_nonlinear_solid_model)
+        // Assemble the elasticity system and right-hand side for the
+        // constitutive model selected in the parameter file. The runtime
+        // enum value only picks one of the compile-time instantiations; the
+        // assembly kernels themselves contain no runtime branch on the model.
+        switch (par.solid_model)
           {
-            // Semi-implicit scheme: linearize the internal force around the
-            // current configuration w^n (the last converged solution), and
-            // move all nonlinear terms of the elasticity part,
-            // K_s(w^n) w^n - N(w^n), to the right-hand side. The tangent
-            // stiffness is reassembled at w^n once per time step, and the
-            // time advancement requires a single linear solve.
-            assemble_elasticity_system(1. / time_step);
-            assemble_elasticity_rhs(1. / time_step);
-            solve();
+            case SolidModel::linear:
+              // Linear model: the stiffness is time-independent.
+              if (cycle == 0 || update_timestep)
+                assemble_elasticity_system<SolidModel::linear>(1. / time_step);
+              assemble_elasticity_rhs<SolidModel::linear>(1. / time_step);
+              break;
+
+            // Semi-implicit scheme for the nonlinear laws: linearize the
+            // internal force around the current configuration w^n (the last
+            // converged solution), and move all nonlinear terms of the
+            // elasticity part, K_s(w^n) w^n - N(w^n), to the right-hand
+            // side. The tangent stiffness is reassembled at w^n once per
+            // time step, and the time advancement requires a single linear
+            // solve.
+            case SolidModel::exponential:
+              assemble_elasticity_system<SolidModel::exponential>(
+                1. / time_step);
+              assemble_elasticity_rhs<SolidModel::exponential>(1. / time_step);
+              break;
+
+            case SolidModel::neo_hookean:
+              assemble_elasticity_system<SolidModel::neo_hookean>(
+                1. / time_step);
+              assemble_elasticity_rhs<SolidModel::neo_hookean>(1. / time_step);
+              break;
           }
-        else
-          {
-            // Linear model: the stiffness is time-independent.
-            if (cycle == 0 || update_timestep)
-              assemble_elasticity_system(1. / time_step);
-            assemble_elasticity_rhs(1. / time_step);
-            solve();
-          }
+        solve();
 
         update_particle_positions();
 

@@ -83,7 +83,8 @@ internal force $N(w)$, whose components are
 @f[
   N_i(w) = \int_B P(F) : \nabla \chi_i\, dX, \qquad F = I + \nabla w.
 @f]
-Three models are available through the parameter file:
+Three models are available through the `Solid model` parameter in the
+`Physical properties` section:
 
 - <b>Linear elasticity</b> (default), with the operator
   $a(w,v) = 2\mu_s \varepsilon(w):\varepsilon(v) + \lambda_s

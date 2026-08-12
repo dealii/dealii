@@ -50,8 +50,7 @@ subsection Navier-Stokes Immersed Problem
     set Lame lambda               = 10
     set Lame mu                   = 10
     set Include convective term   = false
-    set Use nonlinear solid model = false
-    set Nonlinear solid law       = neo_hookean
+    set Solid model               = linear
     set Viscosity                 = 0.1
   end
   subsection Reference configuration and multiplier
