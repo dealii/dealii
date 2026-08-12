@@ -455,10 +455,29 @@ function(deal_ii_add_test _category _test_name _comparison_file)
       # fixture", see
       # https://cmake.org/cmake/help/latest/prop_test/FIXTURES_REQUIRED.html#prop_test:FIXTURES_REQUIRED
       #
+      # Note that whether the executable target is shared is a property of
+      # the target and not of the individual comparison file we are
+      # currently processing: all comparison files of a test map to the same
+      # executable target. It is therefore not sufficient to only check the
+      # annotation of the current comparison file. A test that has both a
+      # "foo.output" and a "foo.mpirun=N.output" comparison file does share
+      # its executable target, and the unannotated variant has to require
+      # the setup fixture as well. Otherwise it is run concurrently with the
+      # test building the shared target, and the two builds clobber the same
+      # object file.
+      #
       set(_shared_target FALSE)
       if(NOT "${_n_cpu}${_n_threads}" STREQUAL "00" OR "${_source_file}" MATCHES "(prm|json)$")
         set(_shared_target TRUE)
+      else()
+        file(GLOB _annotated_variants "${CMAKE_CURRENT_SOURCE_DIR}/${_test_name}.*")
+        list(FILTER _annotated_variants INCLUDE REGEX "\\.(mpirun|threads)=")
+        if(NOT "${_annotated_variants}" STREQUAL "")
+          set(_shared_target TRUE)
+        endif()
+      endif()
 
+      if(_shared_target)
         #
         # Build system-internal target name and final test name for the
         # "executable" test. We have to make sure that the target and test
