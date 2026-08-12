@@ -19,11 +19,16 @@
 
 #include <gtest/gtest.h>
 
+#include <any>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
+#include <memory>
 #include <sstream>
+#include <tuple>
+#include <variant>
 
 #if defined(__clang__)
 #  pragma clang diagnostic push
