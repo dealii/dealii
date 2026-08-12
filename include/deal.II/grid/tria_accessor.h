@@ -4133,23 +4133,6 @@ public:
   point_inside(const Point<spacedim> &p) const;
 
   /**
-   * Set the neighboring cell behind the given @p face_no of this cell
-   * to the cell described by @p neighbor. If the current cell does
-   * not have a neighbor behind this face (in other words: if that face
-   * is at the boundary of the domain), then provide an end iterator as
-   * argument.
-   *
-   * This function shouldn't really be public (but needs to for various
-   * reasons in order not to make a long list of functions friends): it
-   * modifies internal data structures and may leave things. Do not use it
-   * from application codes.
-   */
-  void
-  set_neighbor(const unsigned int                               face_no,
-               const TriaIterator<CellAccessor<dim, spacedim>> &neighbor) const;
-
-
-  /**
    * Return all cells adjacent to line @p i of this cell.
    *
    * @note This information is not computed by default, as the computation
@@ -4211,6 +4194,17 @@ public:
   DeclException0(ExcCellFlaggedForCoarsening);
 
 protected:
+  /**
+   * Set the neighboring cell behind the given @p face_no of this cell
+   * to the cell described by @p neighbor. If the current cell does
+   * not have a neighbor behind this face (in other words: if that face
+   * is at the boundary of the domain), then provide an end iterator as
+   * argument.
+   */
+  void
+  set_neighbor(const unsigned int                               face_no,
+               const TriaIterator<CellAccessor<dim, spacedim>> &neighbor) const;
+
   /**
    * This function assumes that the neighbor is not coarser than the current
    * cell. In this case it returns the neighbor_of_neighbor() value. If,
