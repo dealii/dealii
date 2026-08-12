@@ -19,8 +19,8 @@
 // @sect3{Include files}
 // We follow the step-70 documentation style: short section headers
 // that guide readers through the main components. The headers below
-// provide linear algebra back ends, particles, mappings, and CAD
-// support needed for the immersed compressible solid/fluid coupling.
+// provide linear algebra back ends, mappings, and CAD support needed
+// for the immersed compressible solid/fluid coupling.
 #include <deal.II/base/data_out_base.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -106,11 +106,6 @@ namespace LA
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/vector_tools.h>
-
-#include <deal.II/particles/data_out.h>
-#include <deal.II/particles/generators.h>
-#include <deal.II/particles/particle_handler.h>
-#include <deal.II/particles/utilities.h>
 
 #include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
@@ -258,8 +253,6 @@ namespace Step80
     unsigned int initial_fluid_refinement = 5;
     unsigned int initial_solid_refinement = 5;
 
-    unsigned int fluid_rtree_extraction_level = 1;
-
     double viscosity = 1.0;
     double density   = 1.0;
 
@@ -283,8 +276,6 @@ namespace Step80
     // moved to the right-hand side, so that each time step requires a single
     // linear solve.
     SolidModel solid_model = SolidModel::linear;
-
-    bool particle_predictor = true;
 
     std::list<types::boundary_id> dirichlet_ids{0};
     std::string                   name_of_fluid_grid       = "hyper_cube";
@@ -388,14 +379,6 @@ namespace Step80
 
     add_parameter("Final time", final_time);
 
-    add_parameter(
-      "Particle predictor",
-      particle_predictor,
-      "If true, tentatively displace solid particles using the current "
-      "fluid velocity before each solve, reducing the time step if any "
-      "particles would leave the fluid domain.");
-
-
     enter_subsection("Physical properties");
     {
       add_parameter("Viscosity", viscosity);
@@ -420,11 +403,6 @@ namespace Step80
         "by linearizing the internal force around the current configuration.");
     }
     leave_subsection();
-
-    add_parameter("Fluid bounding boxes extraction level",
-                  fluid_rtree_extraction_level,
-                  "Extraction level of the rtree used to construct global "
-                  "bounding boxes");
 
     add_parameter(
       "Dirichlet boundary ids",
@@ -731,9 +709,10 @@ namespace Step80
 
   // @sect3{The NavierStokesImmersedProblem class declaration}
   // The driver holds distributed triangulations for fluid and solid, mapping
-  // objects to deform the solid mesh, particle handlers for coupling quadrature
-  // transfer, and block matrices/vectors for the coupled Navier-Stokes /
-  // compressible elasticity system with a distributed Lagrange multiplier.
+  // objects to deform the solid mesh, a NonMatching::DoFHandlerCoupling object
+  // that owns all the particle machinery used for the non-matching transfer,
+  // and block matrices/vectors for the coupled Navier-Stokes / compressible
+  // elasticity system with a distributed Lagrange multiplier.
   template <int dim, int spacedim = dim>
   class NavierStokesImmersedProblem
   {
@@ -748,14 +727,12 @@ namespace Step80
 
     double compute_time_step() const;
 
-    void                    setup_solid_particles();
-    std::pair<bool, double> attempt_particle_displacement(const double dt);
-
     void                             initial_setup();
     void                             setup_dofs();
     void                             interpolate_initial_conditions();
     void                             update_solid_current_position();
     void                             check_immersed_mapping_is_valid() const;
+    void                             initialize_dof_handler_coupling();
     void                             setup_coupling();
     const AffineConstraints<double> &active_fluid_constraints() const;
 
@@ -796,12 +773,6 @@ namespace Step80
     void refine_and_transfer();
 
     void output_results(const unsigned int cycle, const double time) const;
-    void output_particles(const Particles::ParticleHandler<spacedim> &particles,
-                          const std::string                          &fprefix,
-                          const unsigned int                          iter,
-                          const double time) const;
-
-    void update_particle_positions();
 
     const NavierStokesImmersedProblemParameters<dim, spacedim> &par;
 
@@ -877,15 +848,9 @@ namespace Step80
     LA::MPI::BlockVector solid_reference_configuration;
     LA::MPI::BlockVector solid_current_position;
 
-    Particles::ParticleHandler<spacedim> solid_particle_handler;
-
-    IndexSet locally_owned_solid_particle_coordinates;
-    IndexSet locally_relevant_solid_particle_coordinates;
-
-    std::vector<std::vector<BoundingBox<spacedim>>> global_fluid_bounding_boxes;
-    Quadrature<spacedim>                            fluid_quadrature;
-    Quadrature<spacedim>                            solid_quadrature;
-    Quadrature<dim>                                 coupling_quadrature;
+    Quadrature<spacedim> fluid_quadrature;
+    Quadrature<spacedim> solid_quadrature;
+    Quadrature<dim>      coupling_quadrature;
 
     FEValuesExtractors::Vector velocity;
     FEValuesExtractors::Scalar pressure;
@@ -898,9 +863,9 @@ namespace Step80
 
   // @sect3{The NavierStokesImmersedProblem class implementation}
   // The following functions are organized in the same spirit as step-70:
-  // construction and mesh initialization, particle setup, DoF initialization,
-  // assembly of fluid/solid/coupling blocks, solver, refinement, output, and
-  // the main time loop.
+  // construction and mesh initialization, DoF initialization, assembly of
+  // fluid/solid/coupling blocks, solver, refinement, output, and the main
+  // time loop.
 
 
   // @sect4{Construction and mesh initialization}
@@ -1047,169 +1012,6 @@ namespace Step80
           << " cells, minimal cell diameter: " << solid_cell_diameter
           << std::endl;
   }
-
-
-  // @sect4{Particle initialization}
-  template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::setup_solid_particles()
-  {
-    const unsigned int n_properties = 0;
-    solid_particle_handler.initialize(fluid_tria,
-                                      StaticMappingQ1<spacedim>::mapping,
-                                      n_properties);
-
-    std::vector<BoundingBox<spacedim>> all_boxes;
-    all_boxes.reserve(fluid_tria.n_locally_owned_active_cells());
-    for (const auto &cell : fluid_tria.active_cell_iterators())
-      if (cell->is_locally_owned())
-        all_boxes.emplace_back(cell->bounding_box());
-
-    const auto tree = pack_rtree(all_boxes);
-    const auto local_boxes =
-      extract_rtree_level(tree, par.fluid_rtree_extraction_level);
-
-    global_fluid_bounding_boxes =
-      Utilities::MPI::all_gather(mpi_communicator, local_boxes);
-
-    std::vector<bool> components(2 * spacedim, false);
-    components[0] = true;
-
-    Particles::Generators::dof_support_points(solid_dh,
-                                              global_fluid_bounding_boxes,
-                                              solid_particle_handler,
-                                              *solid_mapping,
-                                              ComponentMask(components));
-
-    pcout << "   Number of particles (solid support points): "
-          << solid_particle_handler.n_global_particles() << " ("
-          << solid_particle_handler.n_global_particles() * spacedim
-          << " displacement dofs)" << std::endl;
-
-    AssertDimension(solid_particle_handler.n_global_particles() * spacedim,
-                    solid_solution.block(0).size());
-  }
-
-
-
-  // @sect4{Attempt particle displacement}
-  // This function estimates the future solid particle displacement using the
-  // current fluid velocity evaluated at each solid particle location. If any
-  // solid particles would leave the fluid domain after the tentative
-  // displacement, the time step is halved and the process is retried.
-  // Tentative positions are computed in a separate data structure and tested
-  // using a temporary ParticleHandler, so the real particles are never
-  // modified until the displacement is known to be safe. This ensures correct
-  // behavior in parallel where sort_particles_into_subdomains_and_cells()
-  // migrates particles across MPI ranks.
-  template <int dim, int spacedim>
-  std::pair<bool, double>
-  NavierStokesImmersedProblem<dim, spacedim>::attempt_particle_displacement(
-    const double dt)
-  {
-    // Evaluate the fluid velocity at each locally owned solid particle
-    // location and store it keyed by particle ID. This only needs to be done
-    // once since the starting positions don't change between retries.
-    std::map<types::particle_index, Tensor<1, spacedim>> particle_velocities;
-
-    {
-      const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
-      Vector<double>     local_dof_values(dofs_per_cell);
-
-      FEPointEvaluation<spacedim, spacedim> evaluator(
-        StaticMappingQ1<spacedim>::mapping, *fluid_fe, update_values);
-      std::vector<Point<spacedim>> particle_reference_positions;
-
-      auto particle = solid_particle_handler.begin();
-      while (particle != solid_particle_handler.end())
-        {
-          const auto cell = particle->get_surrounding_cell();
-          const auto dh_cell =
-            typename DoFHandler<spacedim>::cell_iterator(*cell, &fluid_dh);
-
-          dh_cell->get_dof_values(fluid_locally_relevant_solution,
-                                  local_dof_values);
-
-          const auto pic = solid_particle_handler.particles_in_cell(cell);
-          Assert(pic.begin() == particle, ExcInternalError());
-          particle_reference_positions.clear();
-          for (const auto &p : pic)
-            particle_reference_positions.push_back(p.get_reference_location());
-
-          evaluator.reinit(cell, particle_reference_positions);
-          evaluator.evaluate(make_array_view(local_dof_values),
-                             EvaluationFlags::values);
-
-          for (unsigned int particle_index = 0; particle != pic.end();
-               ++particle, ++particle_index)
-            {
-              particle_velocities[particle->get_id()] =
-                evaluator.get_value(particle_index);
-            }
-        }
-    }
-
-    double current_dt        = dt;
-    bool   time_step_changed = false;
-
-    // Use a temporary ParticleHandler to test if the tentative displacement
-    // would cause any particles to leave the fluid domain. We copy the real
-    // handler into it, displace the particles, and then sort — particles
-    // that leave the domain will be reported via the particle_lost signal.
-    // This leaves the real solid_particle_handler untouched during testing.
-    Particles::ParticleHandler<spacedim> test_particle_handler;
-    test_particle_handler.initialize(fluid_tria,
-                                     StaticMappingQ1<spacedim>::mapping);
-
-    types::particle_index n_locally_lost = 0;
-    test_particle_handler.signals.particle_lost.connect(
-      [&](const typename Particles::ParticleIterator<spacedim> & /*particle*/,
-          const typename Triangulation<spacedim>::active_cell_iterator
-            & /*cell*/) { ++n_locally_lost; });
-
-    while (true)
-      {
-        n_locally_lost = 0;
-
-        // Reset the test handler to the current state of the real handler
-        test_particle_handler.copy_from(solid_particle_handler);
-
-        // Displace each particle in the test handler by velocity * current_dt
-        for (auto &particle : test_particle_handler)
-          {
-            const auto it = particle_velocities.find(particle.get_id());
-            Assert(it != particle_velocities.end(), ExcInternalError());
-            particle.get_location() += it->second * current_dt;
-          }
-
-        // Sort — the particle_lost signal fires for any particle that left
-        test_particle_handler.sort_particles_into_subdomains_and_cells();
-
-        const auto n_global_lost =
-          Utilities::MPI::sum(n_locally_lost, mpi_communicator);
-
-        if (n_global_lost == 0)
-          break;
-
-        pcout << "   Solid particles would be lost (" << n_global_lost
-              << " outside domain). Halving time step from " << current_dt
-              << " to " << current_dt / 2.0 << std::endl;
-
-        current_dt /= 2.0;
-        time_step_changed = true;
-      }
-
-    // The time step is safe. Apply the displacement to the real particles.
-    for (auto &particle : solid_particle_handler)
-      {
-        const auto it = particle_velocities.find(particle.get_id());
-        Assert(it != particle_velocities.end(), ExcInternalError());
-        particle.get_location() += it->second * current_dt;
-      }
-    solid_particle_handler.sort_particles_into_subdomains_and_cells();
-
-    return {time_step_changed, current_dt};
-  }
-
 
 
   // @sect4{Finite element and DoF initialization}
@@ -1638,15 +1440,15 @@ namespace Step80
 
 
 
+  // The coupling object owns every particle-based data structure used to
+  // transfer information between the fluid and the immersed solid. Since it
+  // stores a reference to `*solid_mapping`, a MappingFEField built on top of
+  // `solid_current_position`, the particles it regenerates always sit at the
+  // current configuration of the solid.
   template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::setup_coupling()
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::initialize_dof_handler_coupling()
   {
-    const auto &constraints = active_fluid_constraints();
-
-    BlockDynamicSparsityPattern dsp(solid_dofs_per_block, fluid_dofs_per_block);
-    BlockDynamicSparsityPattern dsp_t(fluid_dofs_per_block,
-                                      solid_dofs_per_block);
-
     if (!dof_handler_coupling)
       dof_handler_coupling =
         std::make_unique<NonMatching::DoFHandlerCoupling<dim, spacedim>>(
@@ -1656,6 +1458,20 @@ namespace Step80
           ComponentMask(solid_fe->component_mask(lagrange_multiplier)),
           StaticMappingQ1<spacedim>::mapping,
           *solid_mapping);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::setup_coupling()
+  {
+    const auto &constraints = active_fluid_constraints();
+
+    BlockDynamicSparsityPattern dsp(solid_dofs_per_block, fluid_dofs_per_block);
+    BlockDynamicSparsityPattern dsp_t(fluid_dofs_per_block,
+                                      solid_dofs_per_block);
+
+    initialize_dof_handler_coupling();
 
     dof_handler_coupling->create_coupling_sparsity_pattern(coupling_quadrature,
                                                            dsp,
@@ -1785,15 +1601,7 @@ namespace Step80
     // coupling helper.
     if (use_operator_augmentation())
       {
-        if (!dof_handler_coupling)
-          dof_handler_coupling =
-            std::make_unique<NonMatching::DoFHandlerCoupling<dim, spacedim>>(
-              fluid_dh,
-              solid_dh,
-              ComponentMask(fluid_fe->component_mask(velocity)),
-              ComponentMask(solid_fe->component_mask(lagrange_multiplier)),
-              StaticMappingQ1<spacedim>::mapping,
-              *solid_mapping);
+        initialize_dof_handler_coupling();
 
         dof_handler_coupling->create_nitsche_restriction_matrix(
           coupling_quadrature,
@@ -2623,14 +2431,12 @@ namespace Step80
     fluid_tria.prepare_coarsening_and_refinement();
     transfer.prepare_for_coarsening_and_refinement(
       fluid_locally_relevant_solution);
-    solid_particle_handler.prepare_for_coarsening_and_refinement();
 
     fluid_tria.execute_coarsening_and_refinement();
 
     setup_dofs();
 
     transfer.interpolate(fluid_solution);
-    solid_particle_handler.unpack_after_coarsening_and_refinement();
 
     fluid_constraints.distribute(fluid_solution);
     fluid_locally_relevant_solution = fluid_solution;
@@ -2727,67 +2533,7 @@ namespace Step80
       std::ofstream ofile(par.output_directory + "/" + "solution-solid.pvd");
       DataOutBase::write_pvd_record(ofile, times_and_names);
     }
-    output_particles(solid_particle_handler,
-                     "solution-solid-particles",
-                     cycle,
-                     time);
   }
-
-
-  template <int dim, int spacedim>
-  void NavierStokesImmersedProblem<dim, spacedim>::output_particles(
-    const Particles::ParticleHandler<spacedim> &particles,
-    const std::string                          &fprefix,
-    const unsigned int                          iter,
-    const double                                time) const
-  {
-    Particles::DataOut<spacedim> particles_out;
-    particles_out.build_patches(particles);
-    const std::string filename =
-      (fprefix + "-" + Utilities::int_to_string(iter) + ".vtu");
-    particles_out.write_vtu_in_parallel(par.output_directory + "/" + filename,
-                                        mpi_communicator);
-
-
-    static std::map<std::string, std::vector<std::pair<double, std::string>>>
-      times_and_names;
-    if (times_and_names.find(fprefix) != times_and_names.end())
-      times_and_names[fprefix].emplace_back(std::make_pair(time, filename));
-    else
-      times_and_names[fprefix] = {std::make_pair(time, filename)};
-    std::ofstream ofile(par.output_directory + "/" + fprefix + ".pvd");
-    DataOutBase::write_pvd_record(ofile, times_and_names[fprefix]);
-  }
-
-  template <int dim, int spacedim>
-  inline void
-  NavierStokesImmersedProblem<dim, spacedim>::update_particle_positions()
-  {
-    // After the first time step, we displace the solid body to take
-    // into account the fact it has moved
-    pcout << "Number of particles "
-          << solid_particle_handler.n_global_particles() << std::endl;
-
-    update_solid_current_position();
-
-    // Create an intermediate vector to store particle positions
-    // The issue is that solid_current_position.block(0) is distributed
-    // according to the solid mesh, but particles are distributed according
-    // to the fluid mesh. We need an intermediate vector with locally_relevant
-    // index sets that match the particle distribution.
-    locally_owned_solid_particle_coordinates =
-      solid_particle_handler.locally_owned_particle_ids().tensor_product(
-        complete_index_set(spacedim));
-
-    LA::MPI::Vector particle_positions;
-    particle_positions.reinit(locally_owned_solid_particle_coordinates,
-                              mpi_communicator);
-
-    // Copy the current positions into the particle positions vector
-    particle_positions = solid_current_position.block(0);
-
-    solid_particle_handler.set_particle_positions(particle_positions, false);
-  };
 
 
 
@@ -2830,25 +2576,10 @@ namespace Step80
             initial_setup();
             setup_dofs();
             interpolate_initial_conditions();
-            setup_solid_particles();
             output_results(output_cycle, time);
           }
 
-        bool update_timestep = false;
-        if (par.particle_predictor)
-          {
-            auto [changed, new_time_step] =
-              attempt_particle_displacement(time_step);
-            update_timestep = changed;
-            if (update_timestep)
-              {
-                time_step = new_time_step;
-                pcout << "   Time step updated to " << time_step << " due to "
-                      << "particle displacement." << std::endl;
-              }
-          }
-
-        if (cycle == 0 || update_timestep || use_operator_augmentation())
+        if (cycle == 0 || use_operator_augmentation())
           assemble_navier_stokes_system(1. / time_step);
 
         assemble_navier_stokes_rhs(1. / time_step);
@@ -2865,7 +2596,7 @@ namespace Step80
           {
             case SolidModel::linear:
               // Linear model: the stiffness is time-independent.
-              if (cycle == 0 || update_timestep)
+              if (cycle == 0)
                 assemble_elasticity_system<SolidModel::linear>(1. / time_step);
               assemble_elasticity_rhs<SolidModel::linear>(1. / time_step);
               break;
@@ -2891,7 +2622,10 @@ namespace Step80
           }
         solve();
 
-        update_particle_positions();
+        // Move the solid to its new configuration. The immersed mapping is
+        // built on top of solid_current_position, so the coupling
+        // automatically sees the updated geometry.
+        update_solid_current_position();
 
         if (cycle % par.output_frequency == 0)
           {
