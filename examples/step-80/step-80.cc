@@ -643,7 +643,7 @@ namespace Step80
                               const Tensor<2, spacedim>             &grad_j,
                               const HyperelasticPointData<spacedim> &data,
                               const double                           lame_mu,
-                              const double                           lame_lambda)
+                              const double lame_lambda)
   {
     static_assert(model != SolidModel::linear,
                   "The tangent entry is only assembled for the nonlinear "
@@ -722,8 +722,7 @@ namespace Step80
           lame_lambda * scalar_product(H, Q) * scalar_product(grad_i, Q);
         const double N_i =
           lame_mu * scalar_product(data.F, grad_i) +
-          (lame_lambda * data.ln_det_F - lame_mu) *
-            scalar_product(Q, grad_i);
+          (lame_lambda * data.ln_det_F - lame_mu) * scalar_product(Q, grad_i);
         return Ks_w_i - N_i;
       }
   }
@@ -1274,7 +1273,7 @@ namespace Step80
     const unsigned int n_u = fluid_dofs_per_block[0],
                        n_p = fluid_dofs_per_block[1];
 
-    pcout << "   Number of degrees of freedom for Navie-Stokes equation: "
+    pcout << "   Number of degrees of freedom for Navier-Stokes equation: "
           << fluid_dh.n_dofs() << " (" << n_u << '+' << n_p << ')' << std::endl;
 
     fluid_owned_dofs.resize(2);
@@ -2001,14 +2000,13 @@ namespace Step80
                                                const unsigned int j,
                                                const double       elastic_ij,
                                                const double       JxW) {
-            cell_matrix(i, j) +=
-              (elastic_ij -
-               // lagrange * disp
-               (phi_lagrange[i] * phi_w[j] * alpha) -
-               // disp * lagrange
-               (phi_w[i] * phi_lagrange[j])) *
-              // JxW
-              JxW;
+            cell_matrix(i, j) += (elastic_ij -
+                                  // lagrange * disp
+                                  (phi_lagrange[i] * phi_w[j] * alpha) -
+                                  // disp * lagrange
+                                  (phi_w[i] * phi_lagrange[j])) *
+                                 // JxW
+                                 JxW;
 
             cell_preconditioner(i, j) +=
               phi_lagrange[i] * phi_lagrange[j] * JxW;
@@ -2048,8 +2046,9 @@ namespace Step80
                   // Pointwise data of the selected hyperelastic law at the
                   // deformation gradient F = I + grad(w).
                   const HyperelasticPointData<spacedim> data =
-                    evaluate_hyperelastic_point_data<model>(
-                      grad_w_current[q], par.lame_mu, par.lame_lambda);
+                    evaluate_hyperelastic_point_data<model>(grad_w_current[q],
+                                                            par.lame_mu,
+                                                            par.lame_lambda);
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     for (unsigned int j = 0; j < dofs_per_cell; ++j)
@@ -2170,11 +2169,10 @@ namespace Step80
                 const auto comp_i =
                   solid_fe->system_to_component_index(i).first;
 
-                cell_rhs(i) +=
-                  (-w_old[q] * alpha * phi_lagrange +
-                   solid_rhs_values[q](comp_i) *
-                     fe_values_rhs.shape_value(i, q)) *
-                  fe_values_rhs.JxW(q);
+                cell_rhs(i) += (-w_old[q] * alpha * phi_lagrange +
+                                solid_rhs_values[q](comp_i) *
+                                  fe_values_rhs.shape_value(i, q)) *
+                               fe_values_rhs.JxW(q);
               };
 
               if constexpr (model == SolidModel::linear)
@@ -2191,8 +2189,9 @@ namespace Step80
                   // (K_s(w) w)_i - N_i, with internal force
                   // N_i = (P(F), grad chi_i).
                   const HyperelasticPointData<spacedim> data =
-                    evaluate_hyperelastic_point_data<model>(
-                      grad_w_current[q], par.lame_mu, par.lame_lambda);
+                    evaluate_hyperelastic_point_data<model>(grad_w_current[q],
+                                                            par.lame_mu,
+                                                            par.lame_lambda);
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)
                     {
@@ -2205,12 +2204,8 @@ namespace Step80
                       // force around the current configuration, this is the
                       // term that carries all nonlinearity of the elasticity
                       // part to the right-hand side.
-                      const double nonlinear_rhs_ij =
-                        rhs_entry<model>(grad_phi_i,
-                                         data,
-                                         H,
-                                         par.lame_mu,
-                                         par.lame_lambda);
+                      const double nonlinear_rhs_ij = rhs_entry<model>(
+                        grad_phi_i, data, H, par.lame_mu, par.lame_lambda);
                       cell_rhs(i) += nonlinear_rhs_ij * fe_values_rhs.JxW(q);
                     }
                 }
@@ -2229,16 +2224,15 @@ namespace Step80
                                                     const unsigned int j,
                                                     const double elastic_ij,
                                                     const double JxW) {
-                cell_matrix(i, j) +=
-                  (elastic_ij -
-                   // lagrange * disp
-                   (phi_lagrange[i] * phi_w[j] * alpha) -
-                   // disp * lagrange
-                   (phi_w[i] * phi_lagrange[j]) +
-                   // lagr * lagr
-                   phi_lagrange[i] * phi_lagrange[j]) *
-                  // JxW
-                  JxW;
+                cell_matrix(i, j) += (elastic_ij -
+                                      // lagrange * disp
+                                      (phi_lagrange[i] * phi_w[j] * alpha) -
+                                      // disp * lagrange
+                                      (phi_w[i] * phi_lagrange[j]) +
+                                      // lagr * lagr
+                                      phi_lagrange[i] * phi_lagrange[j]) *
+                                     // JxW
+                                     JxW;
               };
 
               for (unsigned int q = 0; q < n_q_points; ++q)
@@ -2884,14 +2878,14 @@ namespace Step80
             // time step, and the time advancement requires a single linear
             // solve.
             case SolidModel::exponential:
-              assemble_elasticity_system<SolidModel::exponential>(
-                1. / time_step);
+              assemble_elasticity_system<SolidModel::exponential>(1. /
+                                                                  time_step);
               assemble_elasticity_rhs<SolidModel::exponential>(1. / time_step);
               break;
 
             case SolidModel::neo_hookean:
-              assemble_elasticity_system<SolidModel::neo_hookean>(
-                1. / time_step);
+              assemble_elasticity_system<SolidModel::neo_hookean>(1. /
+                                                                  time_step);
               assemble_elasticity_rhs<SolidModel::neo_hookean>(1. / time_step);
               break;
           }
