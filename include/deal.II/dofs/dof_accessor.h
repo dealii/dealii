@@ -3173,11 +3173,9 @@ namespace internal
         // reversed line orientations.
         if (structdim > 1 && fe.n_dofs_per_line() > 0)
           {
-            const auto line_indices = internal::TriaAccessorImplementation::
-              Implementation::get_line_indices_of_cell(accessor);
-            const auto line_orientations =
+            const auto [line_indices, line_orientations] =
               internal::TriaAccessorImplementation::Implementation::
-                get_line_orientations_of_cell(accessor);
+                get_line_indices_and_orientations_of_cell(accessor);
 
             for (const auto line : accessor.line_indices())
               {
