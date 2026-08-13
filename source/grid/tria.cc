@@ -2191,73 +2191,72 @@ public:
 };
 
 
-/**
- * A simple implementation of the interface Policy. It simply delegates the
- * task to the functions with the same name provided by class specified by
- * the template argument T.
- */
-template <int dim, int spacedim>
-DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
-template <typename T>
-class Triangulation<dim, spacedim>::PolicyWrapper
-  : public Triangulation<dim, spacedim>::Policy
-{
-public:
-  void
-  update_neighbors(Triangulation<dim, spacedim> &tria) override
-  {
-    T::update_neighbors(tria);
-  }
-
-  void
-  delete_children(Triangulation<dim, spacedim>                         &tria,
-                  typename Triangulation<dim, spacedim>::cell_iterator &cell,
-                  std::vector<unsigned int> &line_cell_count,
-                  std::vector<unsigned int> &quad_cell_count) override
-  {
-    T::delete_children(tria, cell, line_cell_count, quad_cell_count);
-  }
-
-  typename Triangulation<dim, spacedim>::DistortedCellList
-  execute_refinement(Triangulation<dim, spacedim> &triangulation,
-                     const bool check_for_distorted_cells) override
-  {
-    return T::execute_refinement(triangulation, check_for_distorted_cells);
-  }
-
-  void
-  prevent_distorted_boundary_cells(
-    Triangulation<dim, spacedim> &triangulation) override
-  {
-    T::prevent_distorted_boundary_cells(triangulation);
-  }
-
-  void
-  prepare_refinement_dim_dependent(
-    Triangulation<dim, spacedim> &triangulation) override
-  {
-    T::prepare_refinement_dim_dependent(triangulation);
-  }
-
-  bool
-  coarsening_allowed(
-    const typename Triangulation<dim, spacedim>::cell_iterator &cell) override
-  {
-    return T::template coarsening_allowed<dim, spacedim>(cell);
-  }
-
-  std::unique_ptr<typename Triangulation<dim, spacedim>::Policy>
-  clone() override
-  {
-    return std::make_unique<PolicyWrapper<T>>();
-  }
-};
-
-
 namespace internal
 {
   namespace TriangulationImplementation
   {
+
+    /**
+     * A simple implementation of the interface Policy. It simply delegates the
+     * task to the functions with the same name provided by class specified by
+     * the template argument T.
+     */
+    template <int dim, int spacedim, typename T>
+    class PolicyWrapper : public Triangulation<dim, spacedim>::Policy
+    {
+    public:
+      void
+      update_neighbors(Triangulation<dim, spacedim> &tria) override
+      {
+        T::update_neighbors(tria);
+      }
+
+      void
+      delete_children(
+        Triangulation<dim, spacedim>                         &tria,
+        typename Triangulation<dim, spacedim>::cell_iterator &cell,
+        std::vector<unsigned int>                            &line_cell_count,
+        std::vector<unsigned int> &quad_cell_count) override
+      {
+        T::delete_children(tria, cell, line_cell_count, quad_cell_count);
+      }
+
+      typename Triangulation<dim, spacedim>::DistortedCellList
+      execute_refinement(Triangulation<dim, spacedim> &triangulation,
+                         const bool check_for_distorted_cells) override
+      {
+        return T::execute_refinement(triangulation, check_for_distorted_cells);
+      }
+
+      void
+      prevent_distorted_boundary_cells(
+        Triangulation<dim, spacedim> &triangulation) override
+      {
+        T::prevent_distorted_boundary_cells(triangulation);
+      }
+
+      void
+      prepare_refinement_dim_dependent(
+        Triangulation<dim, spacedim> &triangulation) override
+      {
+        T::prepare_refinement_dim_dependent(triangulation);
+      }
+
+      bool
+      coarsening_allowed(
+        const typename Triangulation<dim, spacedim>::cell_iterator &cell)
+        override
+      {
+        return T::template coarsening_allowed<dim, spacedim>(cell);
+      }
+
+      std::unique_ptr<typename Triangulation<dim, spacedim>::Policy>
+      clone() override
+      {
+        return std::make_unique<PolicyWrapper<dim, spacedim, T>>();
+      }
+    };
+
 
     /**
      * A class that represents a (compressed) array of arrays. It is used to
@@ -13348,13 +13347,19 @@ void Triangulation<dim, spacedim>::reset_policy()
 {
   if (this->all_reference_cells_are_hyper_cube())
     {
-      this->policy = std::make_unique<
-        PolicyWrapper<internal::TriangulationImplementation::Implementation>>();
+      this->policy =
+        std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
+          dim,
+          spacedim,
+          internal::TriangulationImplementation::Implementation>>();
     }
   else
     {
-      this->policy = std::make_unique<PolicyWrapper<
-        internal::TriangulationImplementation::ImplementationMixedMesh>>();
+      this->policy =
+        std::make_unique<internal::TriangulationImplementation::PolicyWrapper<
+          dim,
+          spacedim,
+          internal::TriangulationImplementation::ImplementationMixedMesh>>();
     }
 }
 
