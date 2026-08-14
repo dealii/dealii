@@ -2119,8 +2119,11 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                   // In 3d, we need to look things up in the boundary_quads
                   // structure (which also stores boundary triangles) as well as
                   // for the edges
-                  std_cxx26::inplace_vector<unsigned int,
-                                            ReferenceCells::max_n_vertices<2>()>
+                  // Note: we are choosing size 16 instead of
+                  // ReferenceCells::max_n_vertices<2>() because of a gcc bug
+                  // that produces a warning about out-of-bound access inside
+                  // std::sort:
+                  std_cxx26::inplace_vector<unsigned int, 16>
                     face_vertex_indices(face->n_vertices());
                   for (unsigned int v = 0; v < face->n_vertices(); ++v)
                     face_vertex_indices[v] = face->vertex_index(v);
@@ -2142,7 +2145,10 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                     });
 
                   if ((p != subcelldata.boundary_quads.end()) &&
-                      (p->vertices == face_vertex_indices))
+                      (std::equal(p->vertices.begin(),
+                                  p->vertices.end(),
+                                  face_vertex_indices.begin(),
+                                  face_vertex_indices.end())))
                     {
                       face->set_boundary_id(p->boundary_id);
                     }
