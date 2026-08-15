@@ -126,7 +126,7 @@ namespace
         }
 
     GridTools::delete_unused_vertices(vertices, cells, subcelldata);
-    if (dim == spacedim)
+    if constexpr (dim == spacedim)
       GridTools::invert_cells_with_negative_measure(vertices, cells);
 
     if (is_only_hypercube)
@@ -333,7 +333,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
         }
 
 
-      if (dim == 3)
+      if constexpr (dim == 3)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
@@ -412,7 +412,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     "While reading VTK file, unknown cell type encountered"));
             }
         }
-      else if (dim == 2)
+      else if constexpr (dim == 2)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
@@ -478,7 +478,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                     "While reading VTK file, unknown cell type encountered"));
             }
         }
-      else if (dim == 1)
+      else if constexpr (dim == 1)
         {
           for (unsigned int count = 0; count < n_geometric_objects; ++count)
             {
@@ -635,7 +635,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                             DEAL_II_ASSERT_UNREACHABLE();
                         }
 
-                      if (dim == 3)
+                      if constexpr (dim == 3)
                         {
                           for (auto &boundary_quad : subcelldata.boundary_quads)
                             {
@@ -664,7 +664,7 @@ GridIn<dim, spacedim>::read_vtk(std::istream &in)
                                 DEAL_II_ASSERT_UNREACHABLE();
                             }
                         }
-                      else if (dim == 2)
+                      else if constexpr (dim == 2)
                         {
                           for (auto &boundary_line : subcelldata.boundary_lines)
                             {
@@ -1911,7 +1911,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
           if ((dim >= 3) &&
               ((object_name == "tet") || (object_name == "prism")))
             {
-              if (dim == 3)
+              if constexpr (dim == 3)
                 {
                   cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
@@ -1922,7 +1922,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
           else if ((dim >= 2) &&
                    ((object_name == "tri") || (object_name == "quad")))
             {
-              if (dim == 2)
+              if constexpr (dim == 2)
                 {
                   cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
@@ -1937,7 +1937,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             }
           else if (object_name == "edg")
             {
-              if (dim == 1)
+              if constexpr (dim == 1)
                 {
                   cells.emplace_back();
                   cells.back().vertices = vertices_for_this_element;
@@ -1982,7 +1982,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                 ; // do nothing
               else if (object_name == "edg")
                 {
-                  if (dim == 1)
+                  if constexpr (dim == 1)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
@@ -1994,7 +1994,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               else if ((dim >= 2) &&
                        ((object_name == "tri") || (object_name == "quad")))
                 {
-                  if (dim == 2)
+                  if constexpr (dim == 2)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
@@ -2006,7 +2006,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
               else if ((dim >= 3) &&
                        ((object_name == "tet") || (object_name == "prism")))
                 {
-                  if (dim == 3)
+                  if constexpr (dim == 3)
                     cells[cells.size() - n_elements + e].material_id =
                       geometric_entity_index;
                   else
@@ -2029,7 +2029,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
   // Now for the "fixing up" step mentioned above. To make things a bit
   // simpler, let us sort first normalize the order of vertices in edges
   // and triangles/quads, and then sort lexicographically:
-  if (dim >= 2)
+  if constexpr (dim >= 2)
     {
       for (auto &line : subcelldata.boundary_lines)
         {
@@ -2058,7 +2058,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
   // keep things in a specific order so that the vertices define a proper
   // coordinate system on the quad, but that's not our goal here so we just
   // sort.
-  if (dim >= 3)
+  if constexpr (dim >= 3)
     {
       for (auto &face : subcelldata.boundary_quads)
         {
@@ -2077,7 +2077,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
     }
 
   // OK, now we can finally go about fixing up edges and faces.
-  if (dim >= 2)
+  if constexpr (dim >= 2)
     {
       for (const auto &cell : tria->active_cell_iterators())
         for (const auto &face : cell->face_iterators())
@@ -2085,7 +2085,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
             {
               // We found a face at the boundary. Let us look up whether it
               // was listed in subcelldata
-              if (dim == 2)
+              if constexpr (dim == 2)
                 {
                   std::array<unsigned int, 2> face_vertex_indices = {
                     {face->vertex_index(0), face->vertex_index(1)}};
@@ -2114,7 +2114,7 @@ GridIn<dim, spacedim>::read_comsol_mphtxt(std::istream &in)
                       face->set_boundary_id(p->boundary_id);
                     }
                 }
-              else if (dim == 3)
+              else if constexpr (dim == 3)
                 {
                   // In 3d, we need to look things up in the boundary_quads
                   // structure (which also stores boundary triangles) as well as
@@ -2752,7 +2752,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
                                                           cell.vertices[i]));
 
                     const auto vertex = vertex_indices[cell.vertices[i]];
-                    if (dim == 1)
+                    if constexpr (dim == 1)
                       vertex_counts[vertex] += 1u;
                     cell.vertices[i] = vertex;
                   }
@@ -2870,7 +2870,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
                 // we only care about boundary indicators assigned to
                 // individual vertices in 1d (because otherwise the vertices
                 // are not faces)
-                if (dim == 1)
+                if constexpr (dim == 1)
                   boundary_ids_1d[vertex_indices[node_index]] = material_id;
               }
             else
@@ -2898,7 +2898,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
   // will delete duplicated or unused vertices). Get around this by storing
   // Points directly in that case so that the comparisons are valid.
   std::vector<std::pair<Point<spacedim>, types::boundary_id>> boundary_id_pairs;
-  if (dim == 1)
+  if constexpr (dim == 1)
     for (const auto &pair : vertex_counts)
       if (pair.second == 1u)
         boundary_id_pairs.emplace_back(vertices[pair.first],
@@ -2909,7 +2909,7 @@ GridIn<dim, spacedim>::read_msh(std::istream &input_stream)
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
   // currently work through the call above.
-  if (dim == 1)
+  if constexpr (dim == 1)
     assign_1d_boundary_ids(boundary_id_pairs, *tria);
 }
 
@@ -3092,7 +3092,7 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
                     {
                       cell.vertices[v] =
                         nodes[n_vertices * j + gmsh_to_dealii[type][v]] - 1;
-                      if (dim == 1)
+                      if constexpr (dim == 1)
                         vertex_counts[cell.vertices[v]] += 1u;
                     }
                   cell.manifold_id = manifold_id;
@@ -3135,7 +3135,7 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
   // will delete duplicated or unused vertices). Get around this by storing
   // Points directly in that case so that the comparisons are valid.
   std::vector<std::pair<Point<spacedim>, types::boundary_id>> boundary_id_pairs;
-  if (dim == 1)
+  if constexpr (dim == 1)
     for (const auto &pair : vertex_counts)
       if (pair.second == 1u)
         boundary_id_pairs.emplace_back(vertices[pair.first],
@@ -3146,7 +3146,7 @@ GridIn<dim, spacedim>::read_msh(const std::string &fname)
 
   // in 1d, we also have to attach boundary ids to vertices, which does not
   // currently work through the call above.
-  if (dim == 1)
+  if constexpr (dim == 1)
     assign_1d_boundary_ids(boundary_id_pairs, *tria);
 
   gmsh::clear();
@@ -3621,7 +3621,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
                   // we assume, that y contains
                   // zero data in 1d, so do
                   // nothing
-                  if (dim > 1)
+                  if constexpr (dim > 1)
                     tecplot2deal[1] = n_vars;
                 }
               else if (entries[i] == "\"Z\"")
@@ -3629,7 +3629,7 @@ GridIn<dim, spacedim>::parse_tecplot_header(
                   // we assume, that z contains
                   // zero data in 1d and 2d, so
                   // do nothing
-                  if (dim > 2)
+                  if constexpr (dim > 2)
                     tecplot2deal[2] = n_vars;
                 }
               ++n_vars;
@@ -4185,7 +4185,7 @@ GridIn<dim, spacedim>::read_ugrid(std::istream &in)
   unsigned int n_nodes, n_tris, n_quads, n_tets, n_pyramids, n_wedges, n_hexes;
   in >> n_nodes >> n_tris >> n_quads >> n_tets >> n_pyramids >> n_wedges >>
     n_hexes;
-  if (dim == 2)
+  if constexpr (dim == 2)
     AssertThrow(
       n_tris + n_quads > 0,
       ExcMessage(
@@ -4250,7 +4250,7 @@ GridIn<dim, spacedim>::read_ugrid(std::istream &in)
   // all 2d objects are at the boundary of the domain. We translate that
   // to material ids if we are dealing with 2d meshes.
   for (auto &object : objects_2d)
-    if (dim == 2)
+    if constexpr (dim == 2)
       in >> object.material_id;
     else
       in >> object.boundary_id;
@@ -4544,9 +4544,9 @@ namespace
                              });
                          });
 
-        if (dim == 2)
+        if constexpr (dim == 2)
           subcelldata.boundary_lines.reserve(face_id_to_sideset_ids.size());
-        else if (dim == 3)
+        else if constexpr (dim == 3)
           subcelldata.boundary_quads.reserve(face_id_to_sideset_ids.size());
         types::boundary_id current_b_or_m_id = 0;
         std::vector<int>   face_sideset_ids;
@@ -4595,7 +4595,7 @@ namespace
             // The orientation we pick doesn't matter here since when we
             // create the Triangulation we will sort the vertices for each
             // CellData object created here.
-            if (dim == 2)
+            if constexpr (dim == 2)
               {
                 CellData<1> boundary_line(face_reference_cell.n_vertices());
                 if (apply_all_indicators_to_manifolds)
@@ -4610,7 +4610,7 @@ namespace
 
                 subcelldata.boundary_lines.push_back(std::move(boundary_line));
               }
-            else if (dim == 3)
+            else if constexpr (dim == 3)
               {
                 CellData<2> boundary_quad(face_reference_cell.n_vertices());
                 if (apply_all_indicators_to_manifolds)
@@ -5609,7 +5609,7 @@ namespace
     // conceivably be erroneous.
     // TODO: Currently one test (2d unstructured mesh) in the test
     // suite fails, presumably because of an ordering issue.
-    if (dim == 2)
+    if constexpr (dim == 2)
       {
         if (face_cell_face_no == 1)
           {
@@ -5637,7 +5637,7 @@ namespace
                         ExcMessage("Invalid face number in 2d"));
           }
       }
-    else if (dim == 3)
+    else if constexpr (dim == 3)
       {
         if (face_cell_face_no == 1)
           {
