@@ -280,10 +280,35 @@ namespace Step80
     std::list<types::boundary_id> dirichlet_ids{0};
     std::string                   name_of_fluid_grid       = "hyper_cube";
     std::string                   arguments_for_fluid_grid = "-1: 1: false";
-    std::string                   name_of_solid_grid       = "hyper_rectangle";
-    std::string                   arguments_for_solid_grid = spacedim == 2 ?
-                                                               "-.5, -.1: .5, .1: false" :
-                                                               "-.5, -.1, -.1: .5, .1, .1: false";
+    // How a CAD manifold projects a new point onto the shape.
+    //
+    //  - "normal" uses OpenCASCADE::NormalProjectionManifold, i.e. the nearest
+    //    point on the shape. One OpenCASCADE call per point, and it cannot
+    //    fail: a nearest point always exists.
+    //  - "normal_to_mesh" uses OpenCASCADE::NormalToMeshProjectionManifold,
+    //    which estimates a normal from the surrounding mesh points and casts a
+    //    ray along it. It is more robust where several CAD surfaces meet, but
+    //    it costs about five OpenCASCADE calls per point, and if the ray misses
+    //    the shape OpenCASCADE::line_intersection() silently returns the
+    //    origin, which shows up as isolated vertices collapsed onto (0,0,0).
+    std::string cad_projection = "normal";
+
+    // Factor applied to the coordinates of a CAD file when it is read.
+    //
+    // Note that this deliberately does NOT use the deal.II default of 1e-3:
+    // OpenCASCADE::read_IGES() and read_STEP() assume a CAD file is in
+    // millimetres and rescale it to metres. Here the mesh and the CAD file
+    // normally come out of the same modeller and are already in the same
+    // units, and a silent factor of 1000 puts the shape nowhere near the mesh:
+    // every projection then returns nonsense, and the rays cast by
+    // "normal_to_mesh" miss the shape entirely, which lands new points on
+    // (0,0,0). Set this to 1e-3 only if the CAD really is in millimetres and
+    // the mesh really is in metres.
+    double      cad_scale_factor         = 1.0;
+    std::string name_of_solid_grid       = "hyper_rectangle";
+    std::string arguments_for_solid_grid = spacedim == 2 ?
+                                             "-.5, -.1: .5, .1: false" :
+                                             "-.5, -.1, -.1: .5, .1, .1: false";
 
     int          max_level_refinement = 8;
     int          min_level_refinement = 5;
@@ -298,10 +323,17 @@ namespace Step80
     std::string  coupling_quadrature_type       = "gauss_lobatto";
     unsigned int coupling_quadrature_iterations = 1;
 
-    unsigned int inner_max_iterations            = 100;
-    double       inner_tolerance                 = 1e-14;
-    unsigned int outer_max_iterations            = 1000;
-    double       outer_tolerance                 = 1e-5;
+    unsigned int inner_max_iterations = 100;
+    double       inner_tolerance      = 1e-14;
+    unsigned int outer_max_iterations = 1000;
+    double       outer_tolerance      = 1e-5;
+    // Size of the Krylov basis the outer FGMRES is allowed to build before it
+    // restarts. deal.II defaults to 30, which is far too small for the
+    // saddle-point system assembled here: restarting throws away exactly the
+    // information the augmented-Lagrangian preconditioner has accumulated, and
+    // convergence stagnates. Memory grows linearly in this number, so lower it
+    // if the outer solve runs out of memory.
+    unsigned int outer_max_basis_size            = 200;
     unsigned int inner_lagrangian_max_iterations = 1000;
     double       inner_lagrangian_tolerance      = 1e-4;
     bool         log_inner_lagrangian_iterations = false;
@@ -424,6 +456,22 @@ namespace Step80
 
       add_parameter("Solid grid generator", name_of_solid_grid);
       add_parameter("Solid grid generator arguments", arguments_for_solid_grid);
+
+      add_parameter("CAD projection",
+                    cad_projection,
+                    "How a CAD manifold places a new point on the shape: "
+                    "'normal' takes the nearest point on the shape, "
+                    "'normal_to_mesh' casts a ray along a normal estimated "
+                    "from the surrounding mesh points.",
+                    this->prm,
+                    Patterns::Selection("normal|normal_to_mesh"));
+
+      add_parameter("CAD scale factor",
+                    cad_scale_factor,
+                    "Factor applied to the coordinates of a CAD file when it "
+                    "is read. Use 1 when the CAD file and the mesh are in the "
+                    "same units, and 1e-3 for a CAD file in millimetres to be "
+                    "matched against a mesh in metres.");
     }
     leave_subsection();
 
@@ -461,6 +509,11 @@ namespace Step80
       add_parameter("Inner solver tolerance", inner_tolerance);
       add_parameter("Outer solver maximum iterations", outer_max_iterations);
       add_parameter("Outer solver tolerance", outer_tolerance);
+      add_parameter("Outer solver maximum Krylov vectors",
+                    outer_max_basis_size,
+                    "Size of the Krylov basis built by the outer FGMRES before "
+                    "it restarts. Larger values converge in fewer iterations "
+                    "but cost proportionally more memory.");
       add_parameter("Inner Lagrangian solver maximum iterations",
                     inner_lagrangian_max_iterations);
       add_parameter("Inner Lagrangian solver tolerance",
@@ -916,17 +969,67 @@ namespace Step80
   template <int dim, int spacedim>
   void read_grid_and_cad_files(const std::string &grid_file_name,
                                const std::string &ids_and_cad_file_names,
+                               const std::string &cad_projection,
+                               const double       cad_scale_factor,
                                Triangulation<dim, spacedim> &tria)
   {
     GridIn<dim, spacedim> grid_in;
     grid_in.attach_triangulation(tria);
     grid_in.read(grid_file_name);
 
+    // No CAD files were requested: the mesh as read from disk is all we need.
+    // This is the common case for a plain gmsh or ucd mesh, and it must work
+    // whether or not deal.II was configured with OpenCASCADE.
+    if (ids_and_cad_file_names.empty())
+      return;
+
 #ifdef DEAL_II_WITH_OPENCASCADE
     using map_type  = std::map<types::manifold_id, std::string>;
     using Converter = Patterns::Tools::Convert<map_type>;
 
-    for (const auto &pair : Converter::to_value(ids_and_cad_file_names))
+    const map_type ids_and_files = Converter::to_value(ids_and_cad_file_names);
+
+    // GridIn assigns boundary ids when reading a mesh file, but leaves every
+    // manifold id flat, whereas the CAD manifolds attached below are keyed on
+    // manifold ids. So the ids have to be handed out here.
+    //
+    // We hand them out as sparingly as possible: only the boundary faces whose
+    // boundary id a CAD file was actually given for. The interior, and every
+    // boundary we have no geometry for, keeps the flat manifold and does not
+    // move at all. For the nozzle that means the wall follows the CAD and the
+    // inlet and outlet discs stay exactly the planes they were meshed as.
+    for (const auto &cell : tria.active_cell_iterators())
+      for (const auto f : cell->face_indices())
+        if (cell->face(f)->at_boundary())
+          {
+            const auto face = cell->face(f);
+            const auto id =
+              static_cast<types::manifold_id>(face->boundary_id());
+            if (ids_and_files.count(id) == 0)
+              continue;
+
+            face->set_manifold_id(id);
+            if constexpr (dim >= 3)
+              for (unsigned int l = 0; l < face->n_lines(); ++l)
+                face->line(l)->set_manifold_id(id);
+          }
+
+    // The previous loop also claimed the edges where a CAD surface runs into a
+    // boundary we have no CAD for -- the inlet and outlet rims. Hand those
+    // back to the flat manifold: projecting them would drag the rim off the
+    // inlet and outlet planes, which both the geometry and the inflow boundary
+    // condition rely on being exactly flat.
+    if constexpr (dim >= 3)
+      for (const auto &cell : tria.active_cell_iterators())
+        for (const auto f : cell->face_indices())
+          if (cell->face(f)->at_boundary() &&
+              ids_and_files.count(static_cast<types::manifold_id>(
+                cell->face(f)->boundary_id())) == 0)
+            for (unsigned int l = 0; l < cell->face(f)->n_lines(); ++l)
+              cell->face(f)->line(l)->set_manifold_id(
+                numbers::flat_manifold_id);
+
+    for (const auto &pair : ids_and_files)
       {
         const auto &manifold_id   = pair.first;
         const auto &cad_file_name = pair.second;
@@ -936,9 +1039,9 @@ namespace Step80
 
         TopoDS_Shape shape;
         if (extension == "iges" || extension == "igs")
-          shape = OpenCASCADE::read_IGES(cad_file_name);
+          shape = OpenCASCADE::read_IGES(cad_file_name, cad_scale_factor);
         else if (extension == "step" || extension == "stp")
-          shape = OpenCASCADE::read_STEP(cad_file_name);
+          shape = OpenCASCADE::read_STEP(cad_file_name, cad_scale_factor);
         else
           AssertThrow(false,
                       ExcNotImplemented("We found an extension that we "
@@ -952,9 +1055,14 @@ namespace Step80
             OpenCASCADE::ArclengthProjectionLineManifold<dim, spacedim>(shape));
         else if constexpr (spacedim == 3)
           {
-            tria.set_manifold(
-              manifold_id,
-              OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(shape));
+            if (cad_projection == "normal_to_mesh")
+              tria.set_manifold(
+                manifold_id,
+                OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(shape));
+            else
+              tria.set_manifold(manifold_id,
+                                OpenCASCADE::NormalProjectionManifold<dim, 3>(
+                                  shape));
           }
         else
           tria.set_manifold(manifold_id,
@@ -962,8 +1070,10 @@ namespace Step80
                               TopoDS::Face(shape)));
       }
 #else
-    (void)ids_and_cad_file_names;
-    AssertThrow(false, ExcNotImplemented("Generation of the grid failed."));
+    AssertThrow(false,
+                ExcNotImplemented(
+                  "Attaching CAD manifolds to a grid requires "
+                  "deal.II to be configured with OpenCASCADE."));
 #endif
   }
 
@@ -984,6 +1094,8 @@ namespace Step80
               << "Trying to read from file name." << std::endl;
         read_grid_and_cad_files(par.name_of_fluid_grid,
                                 par.arguments_for_fluid_grid,
+                                par.cad_projection,
+                                par.cad_scale_factor,
                                 fluid_tria);
       }
     fluid_tria.refine_global(par.initial_fluid_refinement);
@@ -997,6 +1109,8 @@ namespace Step80
       {
         read_grid_and_cad_files(par.name_of_solid_grid,
                                 par.arguments_for_solid_grid,
+                                par.cad_projection,
+                                par.cad_scale_factor,
                                 solid_tria);
       }
 
@@ -2319,7 +2433,10 @@ namespace Step80
                                  std::max(par.outer_tolerance, tolerance),
                                  true,
                                  false);
-    SolverFGMRES<LA::MPI::BlockVector> solver(solver_control);
+    SolverFGMRES<LA::MPI::BlockVector> solver(
+      solver_control,
+      typename SolverFGMRES<LA::MPI::BlockVector>::AdditionalData(
+        par.outer_max_basis_size));
 
     constraints.set_zero(fluid_solution);
 
