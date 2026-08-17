@@ -90,10 +90,83 @@ namespace Portable
       const unsigned int               q_points_per_cell;
       const UpdateFlags               &update_flags;
       const unsigned int               padding_length;
+      const double                     jacobian_size;
       dealii::internal::MatrixFreeFunctions::HangingNodes<dim> hanging_nodes;
     };
 
+    template <int dim>
+    double
+    get_jacobian_size(const dealii::Triangulation<dim> &tria)
+    {
+      if (tria.n_cells() == 0)
+        return 1.;
+      else
+        return tria.begin()->diameter();
+    }
 
+    template <int dim>
+    ::dealii::internal::MatrixFreeFunctions::GeometryType
+    classify_cell_geometry(const FEValues<dim> &fe_values,
+                           const unsigned int   q_points_per_cell,
+                           const double         jacobian_size)
+    {
+      const DerivativeForm<1, dim, dim> jac_0 = fe_values.jacobian(0);
+
+      // Check whether the Jacobian is constant across the quadrature
+      // points.
+      bool jacobian_constant = true;
+      for (unsigned int q = 1; q < q_points_per_cell; ++q)
+        {
+          const DerivativeForm<1, dim, dim> jac = fe_values.jacobian(q);
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              if (std::abs(jac_0[d][e] - jac[d][e]) > jacobian_size * 1e-12)
+                jacobian_constant = false;
+          if (jacobian_constant == false)
+            break;
+        }
+
+      // Check whether the Jacobian is diagonal to machine accuracy. A
+      // Cartesian cell additionally requires a constant Jacobian.
+      bool cell_cartesian = jacobian_constant;
+      for (unsigned int d = 0; d < dim && cell_cartesian; ++d)
+        for (unsigned int e = 0; e < dim; ++e)
+          if (d != e)
+            if (std::abs(jac_0[d][e]) > jacobian_size * 1e-12)
+              {
+                cell_cartesian = false;
+                break;
+              }
+
+      // With only a single quadrature point, a non-constant Jacobian
+      // cannot be detected by comparing quadrature points. In that case
+      // inspect the gradient of the Jacobian (second derivatives)
+      // instead.
+      if (cell_cartesian == false && q_points_per_cell == 1 &&
+          (fe_values.get_update_flags() & update_jacobian_grads))
+        {
+          const DerivativeForm<2, dim, dim> jacobian_grad =
+            fe_values.jacobian_grad(0);
+          for (unsigned int d = 0; d < dim; ++d)
+            for (unsigned int e = 0; e < dim; ++e)
+              for (unsigned int f = 0; f < dim; ++f)
+                {
+                  double jac_grad_comp = jac_0[f][0] * jacobian_grad[d][e][0];
+                  for (unsigned int g = 1; g < dim; ++g)
+                    jac_grad_comp += jac_0[f][g] * jacobian_grad[d][e][g];
+                  if (std::abs(jac_grad_comp) > jacobian_size * 1e-12)
+                    jacobian_constant = false;
+                }
+        }
+
+      // Return the cell type, defaulting to the more general classification.
+      if (cell_cartesian == true)
+        return dealii::internal::MatrixFreeFunctions::cartesian;
+      else if (jacobian_constant == true)
+        return dealii::internal::MatrixFreeFunctions::affine;
+      else
+        return dealii::internal::MatrixFreeFunctions::general;
+    }
 
     template <int dim, typename Number>
     ReinitHelper<dim, Number>::ReinitHelper(
@@ -122,6 +195,7 @@ namespace Portable
       , q_points_per_cell(data->q_points_per_cell)
       , update_flags(update_flags)
       , padding_length(data->get_padding_length())
+      , jacobian_size(get_jacobian_size(dof_handler.get_triangulation()))
       , hanging_nodes(dof_handler.get_triangulation())
     {
       fe_values.always_allow_check_for_cell_similarity(true);
@@ -158,6 +232,110 @@ namespace Portable
       typename MatrixFree<dim, Number>::MappingInfo &mapping_info =
         data->mapping_info[0];
 
+      struct ScratchData
+      {
+        FEValues<dim>                        fe_values;
+        std::vector<types::global_dof_index> local_dof_indices;
+        std::vector<types::global_dof_index> lexicographic_dof_indices;
+
+        explicit ScratchData(const FEValues<dim> &fe_values)
+          : fe_values(fe_values.get_mapping(),
+                      fe_values.get_fe(),
+                      fe_values.get_quadrature(),
+                      fe_values.get_update_flags())
+          , local_dof_indices(fe_values.dofs_per_cell)
+          , lexicographic_dof_indices(fe_values.dofs_per_cell)
+        {}
+
+
+        ScratchData(const ScratchData &scratch)
+          : fe_values(scratch.fe_values.get_mapping(),
+                      scratch.fe_values.get_fe(),
+                      scratch.fe_values.get_quadrature(),
+                      scratch.fe_values.get_update_flags())
+          , local_dof_indices(scratch.local_dof_indices.size())
+          , lexicographic_dof_indices(scratch.lexicographic_dof_indices.size())
+        {}
+      };
+
+      // Classify the geometry of all cells. We need to know this before we
+      // create the compressed JxW and inv_jacobian views.
+      typename std::remove_reference_t<
+        decltype(mapping_info.cell_type[color])>::host_mirror_type
+        cell_type_host;
+      typename std::remove_reference_t<
+        decltype(mapping_info.data_index_offsets[color])>::host_mirror_type
+                   data_index_offsets_host;
+      unsigned int n_mapping_entries = 0;
+
+      if (dof_handler_index == 0)
+        {
+          mapping_info.cell_type[color] = Kokkos::View<
+            ::dealii::internal::MatrixFreeFunctions::GeometryType *,
+            MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("cell_type_" + std::to_string(color),
+                               Kokkos::WithoutInitializing),
+            n_cells);
+          mapping_info.data_index_offsets[color] =
+            Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space>(
+              Kokkos::view_alloc("data_index_offsets_" + std::to_string(color),
+                                 Kokkos::WithoutInitializing),
+              n_cells);
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+          cell_type_host =
+            Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                       mapping_info.cell_type[color]);
+          data_index_offsets_host =
+            Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
+                                       mapping_info.data_index_offsets[color]);
+#else
+          cell_type_host =
+            Kokkos::create_mirror_view(mapping_info.cell_type[color]);
+          data_index_offsets_host =
+            Kokkos::create_mirror_view(mapping_info.data_index_offsets[color]);
+#endif
+
+          auto classification_worker = [&](const unsigned int cell_id,
+                                           ScratchData       &scratch_data,
+                                           int & /*copy_data*/) {
+            const auto &triacell = graph[cell_id];
+            typename Triangulation<dim>::cell_iterator cell(
+              &(dof_data.dof_handler->get_triangulation()),
+              triacell->level(),
+              triacell->index());
+
+            scratch_data.fe_values.reinit(cell);
+            cell_type_host(cell_id) =
+              classify_cell_geometry(scratch_data.fe_values,
+                                     q_points_per_cell,
+                                     jacobian_size);
+          };
+
+          FEValues<dim> fe_values_classify(fe_values.get_mapping(),
+                                           fe_values.get_fe(),
+                                           fe_values.get_quadrature(),
+                                           update_jacobians |
+                                             (q_points_per_cell == 1 ?
+                                                update_jacobian_grads :
+                                                update_default));
+
+          WorkStream::run(0,
+                          graph.size(),
+                          classification_worker,
+                          std::function<void(const int)>(),
+                          ScratchData(fe_values_classify),
+                          0);
+
+          for (unsigned int cell = 0; cell < n_cells; ++cell)
+            {
+              data_index_offsets_host(cell) = n_mapping_entries;
+              n_mapping_entries +=
+                (cell_type_host(cell) ==
+                 dealii::internal::MatrixFreeFunctions::general) ?
+                  q_points_per_cell :
+                  1;
+            }
+        }
 
 
       // Create the Views
@@ -180,19 +358,17 @@ namespace Portable
 
       if ((update_flags & update_JxW_values) && dof_handler_index == 0)
         mapping_info.JxW[color] =
-          Kokkos::View<Number **, MemorySpace::Default::kokkos_space>(
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("JxW_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            q_points_per_cell,
-            n_cells);
+            n_mapping_entries);
 
       if ((update_flags & update_gradients) && dof_handler_index == 0)
         mapping_info.inv_jacobian[color] =
-          Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>(
+          Kokkos::View<Number *[dim][dim], MemorySpace::Default::kokkos_space>(
             Kokkos::view_alloc("inv_jacobian_" + std::to_string(color),
                                Kokkos::WithoutInitializing),
-            q_points_per_cell,
-            n_cells);
+            n_mapping_entries);
 
       // Initialize to zero, i.e., unconstrained cell
       dof_data.constraint_mask[color] =
@@ -238,31 +414,7 @@ namespace Portable
         inv_jacobian_host =
           Kokkos::create_mirror_view(mapping_info.inv_jacobian[color]);
 #endif
-      struct ScratchData
-      {
-        FEValues<dim>                        fe_values;
-        std::vector<types::global_dof_index> local_dof_indices;
-        std::vector<types::global_dof_index> lexicographic_dof_indices;
-
-        explicit ScratchData(const FEValues<dim> &fe_values)
-          : fe_values(fe_values.get_mapping(),
-                      fe_values.get_fe(),
-                      fe_values.get_quadrature(),
-                      fe_values.get_update_flags())
-          , local_dof_indices(fe_values.dofs_per_cell)
-          , lexicographic_dof_indices(fe_values.dofs_per_cell)
-        {}
-
-
-        ScratchData(const ScratchData &scratch)
-          : fe_values(scratch.fe_values.get_mapping(),
-                      scratch.fe_values.get_fe(),
-                      scratch.fe_values.get_quadrature(),
-                      scratch.fe_values.get_update_flags())
-          , local_dof_indices(scratch.local_dof_indices.size())
-          , lexicographic_dof_indices(scratch.lexicographic_dof_indices.size())
-        {}
-      };
+      const double first_q_weight = fe_values.get_quadrature().get_weights()[0];
 
       auto worker = [&](const unsigned int cell_id,
                         ScratchData       &scratch_data,
@@ -323,16 +475,30 @@ namespace Portable
 
         if ((update_flags & update_JxW_values) && dof_handler_index == 0)
           {
-            for (unsigned int i = 0; i < q_points_per_cell; ++i)
-              JxW_host(i, cell_id) = fe_values.JxW(i);
+            const unsigned int offset = data_index_offsets_host(cell_id);
+            if (cell_type_host(cell_id) ==
+                dealii::internal::MatrixFreeFunctions::general)
+              for (unsigned int i = 0; i < q_points_per_cell; ++i)
+                JxW_host(offset + i) = fe_values.JxW(i);
+            else
+              // For Cartesian and affine cells store the Jacobian
+              // determinant; JxW is recovered by multiplying with the
+              // quadrature weight of the respective quadrature point.
+              JxW_host(offset) = fe_values.JxW(0) / first_q_weight;
           }
 
         if ((update_flags & update_gradients) && dof_handler_index == 0)
           {
-            for (unsigned int i = 0; i < q_points_per_cell; ++i)
+            const unsigned int offset = data_index_offsets_host(cell_id);
+            const unsigned int n_stored_q_points =
+              (cell_type_host(cell_id) ==
+               dealii::internal::MatrixFreeFunctions::general) ?
+                q_points_per_cell :
+                1;
+            for (unsigned int i = 0; i < n_stored_q_points; ++i)
               for (unsigned int d = 0; d < dim; ++d)
                 for (unsigned int e = 0; e < dim; ++e)
-                  inv_jacobian_host(i, cell_id, d, e) =
+                  inv_jacobian_host(offset + i, d, e) =
                     fe_values.inverse_jacobian(i)[d][e];
           }
       };
@@ -362,6 +528,15 @@ namespace Portable
         Kokkos::deep_copy(exec_space,
                           mapping_info.inv_jacobian[color],
                           inv_jacobian_host);
+      if (dof_handler_index == 0)
+        {
+          Kokkos::deep_copy(exec_space,
+                            mapping_info.cell_type[color],
+                            cell_type_host);
+          Kokkos::deep_copy(exec_space,
+                            mapping_info.data_index_offsets[color],
+                            data_index_offsets_host);
+        }
     }
 
 
@@ -685,6 +860,12 @@ namespace Portable
       data_copy.inv_jacobian = mapping_info[mapping_index].inv_jacobian[color];
     if (mapping_info[mapping_index].JxW.size() > 0)
       data_copy.JxW = mapping_info[mapping_index].JxW[color];
+    if (mapping_info[mapping_index].cell_type.size() > 0)
+      data_copy.cell_type = mapping_info[mapping_index].cell_type[color];
+    if (mapping_info[mapping_index].data_index_offsets.size() > 0)
+      data_copy.data_index_offsets =
+        mapping_info[mapping_index].data_index_offsets[color];
+    data_copy.q_weights = mapping_info[mapping_index].q_weights;
 
     data_copy.local_to_global    = data.local_to_global[color];
     data_copy.constraint_mask    = data.constraint_mask[color];
@@ -946,12 +1127,22 @@ namespace Portable
                         MemoryConsumption::memory_consumption(level_graph);
 
     for (const auto &mapping_info : mapping_info)
-      for (unsigned int color = 0; color < n_colors; ++color)
-        {
-          bytes += mem(mapping_info.q_points[color]) +
-                   mem(mapping_info.inv_jacobian[color]) +
-                   mem(mapping_info.JxW[color]);
-        }
+      {
+        // The per-color vectors are only resized when the corresponding
+        // update flag was requested; guard against indexing empty vectors.
+        for (unsigned int color = 0; color < n_colors; ++color)
+          {
+            if (mapping_info.q_points.size() > 0)
+              bytes += mem(mapping_info.q_points[color]);
+            if (mapping_info.inv_jacobian.size() > 0)
+              bytes += mem(mapping_info.inv_jacobian[color]);
+            if (mapping_info.JxW.size() > 0)
+              bytes += mem(mapping_info.JxW[color]);
+            bytes += mem(mapping_info.cell_type[color]) +
+                     mem(mapping_info.data_index_offsets[color]);
+          }
+        bytes += mem(mapping_info.q_weights);
+      }
 
     for (const DoFInfo &pdhd : dof_handler_data)
       {
@@ -1202,6 +1393,25 @@ namespace Portable
         mapping_info[0].JxW.resize(n_colors);
       if (update_flags & update_gradients)
         mapping_info[0].inv_jacobian.resize(n_colors);
+      mapping_info[0].cell_type.resize(n_colors);
+      mapping_info[0].data_index_offsets.resize(n_colors);
+
+      // Quadrature weights of the reference cell, needed on the device to
+      // compute JxW from the Jacobian determinant stored for Cartesian and
+      // affine cells.
+      {
+        const Quadrature<dim>      quad_dim(quad);
+        const std::vector<double> &weights = quad_dim.get_weights();
+        mapping_info[0].q_weights =
+          Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+            Kokkos::view_alloc("q_weights", Kokkos::WithoutInitializing),
+            weights.size());
+        auto q_weights_host =
+          Kokkos::create_mirror_view(mapping_info[0].q_weights);
+        for (unsigned int q = 0; q < weights.size(); ++q)
+          q_weights_host(q) = weights[q];
+        Kokkos::deep_copy(mapping_info[0].q_weights, q_weights_host);
+      }
     }
 
 
