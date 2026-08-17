@@ -489,8 +489,7 @@ public:
   /**
    * This function assigns a scalar to the current object.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const Number scalar) &
   {
     data = scalar;
@@ -509,8 +508,7 @@ public:
    * Access operator (only valid with component 0 in the base class without
    * specialization).
    */
-  DEAL_II_ALWAYS_INLINE
-  Number &
+  DEAL_II_ALWAYS_INLINE inline Number &
   operator[](const unsigned int comp)
   {
     (void)comp;
@@ -522,8 +520,7 @@ public:
    * Constant access operator (only valid with component 0 in the base class
    * without specialization).
    */
-  DEAL_II_ALWAYS_INLINE
-  const Number &
+  DEAL_II_ALWAYS_INLINE inline const Number &
   operator[](const unsigned int comp) const
   {
     (void)comp;
@@ -534,8 +531,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     data += vec.data;
@@ -545,8 +541,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
     data -= vec.data;
@@ -556,8 +551,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
     data *= vec.data;
@@ -567,8 +561,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
     data /= vec.data;
@@ -582,7 +575,7 @@ public:
    * to VectorizedArray<double>*.
    */
   template <typename OtherNumber>
-  DEAL_II_ALWAYS_INLINE void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const OtherNumber *ptr)
   {
     data = *ptr;
@@ -595,7 +588,7 @@ public:
    * casting a double address to VectorizedArray<double>*.
    */
   template <typename OtherNumber>
-  DEAL_II_ALWAYS_INLINE void
+  DEAL_II_ALWAYS_INLINE inline void
   store(OtherNumber *ptr) const
   {
     *ptr = data;
@@ -647,8 +640,7 @@ public:
    * classes of VectorizedArray of type @p double or @p float, not in the
    * generic base class.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(Number *ptr) const
   {
     *ptr = data;
@@ -671,8 +663,7 @@ public:
    *     this->operator[](v) = base_ptr[offsets[v]];
    * @endcode
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const Number *base_ptr, const unsigned int *offsets)
   {
     this->operator=(Number(0));
@@ -695,8 +686,7 @@ public:
    *   base_ptr[offsets[v]] = this->operator[](v);
    * @endcode
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, Number *base_ptr) const
   {
     if (offsets[0] != numbers::invalid_unsigned_int)
@@ -707,8 +697,7 @@ public:
    * Returns sum over entries of the data field, $\sum_{i=1}^{\text{size}()}
    * this->data[i]$.
    */
-  DEAL_II_ALWAYS_INLINE
-  Number
+  DEAL_II_ALWAYS_INLINE inline Number
   sum() const
   {
     return data;
@@ -737,8 +726,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -750,8 +738,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     VectorizedArray res;
@@ -763,8 +750,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -776,8 +762,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -818,8 +803,8 @@ private:
 template <typename Number,
           std::size_t width =
             internal::VectorizedArrayWidthSpecifier<Number>::max_width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             make_vectorized_array(const Number &u)
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+make_vectorized_array(const Number &u)
 {
   VectorizedArray<Number, width> result = u;
   return result;
@@ -834,7 +819,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * @relatesalso VectorizedArray
  */
 template <typename VectorizedArrayType>
-inline DEAL_II_ALWAYS_INLINE VectorizedArrayType
+DEAL_II_ALWAYS_INLINE inline VectorizedArrayType
 make_vectorized_array(const typename VectorizedArrayType::value_type &u)
 {
   static_assert(
@@ -861,7 +846,7 @@ make_vectorized_array(const typename VectorizedArrayType::value_type &u)
  * @endcode
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 gather(VectorizedArray<Number, width>          &out,
        const std::array<const Number *, width> &ptrs,
        const unsigned int                       offset)
@@ -898,7 +883,7 @@ gather(VectorizedArray<Number, width>          &out,
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int              n_entries,
                               const Number                   *in,
                               const unsigned int             *offsets,
@@ -922,7 +907,7 @@ vectorized_load_and_transpose(const unsigned int              n_entries,
  * i.e., they can have their origin in different memory allocations.
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int n_entries,
                               const std::array<const Number *, width> &in,
                               VectorizedArray<Number, width>          *out)
@@ -973,7 +958,7 @@ vectorized_load_and_transpose(const unsigned int n_entries,
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                            add_into,
                                const unsigned int                    n_entries,
                                const VectorizedArray<Number, width> *in,
@@ -1003,7 +988,7 @@ vectorized_transpose_and_store(const bool                            add_into,
  * i.e., they can have their origin in different memory allocations.
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                            add_into,
                                const unsigned int                    n_entries,
                                const VectorizedArray<Number, width> *in,
@@ -1154,8 +1139,7 @@ public:
     data = vld1q_f64(ptr);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     DEAL_II_OPENMP_SIMD_PRAGMA
@@ -1175,8 +1159,7 @@ public:
     vst1q_f64(ptr, data);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     DEAL_II_OPENMP_SIMD_PRAGMA
@@ -1188,8 +1171,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 16 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
@@ -1458,8 +1440,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 16 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
@@ -1634,8 +1615,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const double x) &
   {
     data = _mm_set1_pd(x);
@@ -1653,8 +1633,7 @@ public:
   /**
    * Access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  double &
+  DEAL_II_ALWAYS_INLINE inline double &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 2);
@@ -1664,8 +1643,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const double &
+  DEAL_II_ALWAYS_INLINE inline const double &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 2);
@@ -1675,8 +1653,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -1690,8 +1667,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -1705,8 +1681,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -1720,8 +1695,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -1737,15 +1711,13 @@ public:
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const double *ptr)
   {
     data = _mm_loadu_pd(ptr);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     DEAL_II_OPENMP_SIMD_PRAGMA
@@ -1759,15 +1731,13 @@ public:
    * 16 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(double *ptr) const
   {
     _mm_storeu_pd(ptr, data);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     DEAL_II_OPENMP_SIMD_PRAGMA
@@ -1779,8 +1749,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 16 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
@@ -1791,8 +1760,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
     this->operator=(0.);
@@ -1804,8 +1772,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
@@ -1849,8 +1816,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -1862,8 +1828,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     // to compute the absolute value, perform
@@ -1880,8 +1845,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -1893,8 +1857,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -1925,7 +1888,7 @@ private:
  * Specialization for double and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int                   n_entries,
                               const std::array<const double *, 2> &in,
                               VectorizedArray<double, 2>          *out)
@@ -1951,7 +1914,7 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
  * Specialization for double and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int          n_entries,
                               const double               *in,
                               const unsigned int         *offsets,
@@ -1968,7 +1931,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  * Specialization for double and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 2> *in,
@@ -2019,7 +1982,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  * Specialization for double and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 2> *in,
@@ -2078,8 +2041,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const float x) &
   {
     data = _mm_set1_ps(x);
@@ -2097,8 +2059,7 @@ public:
   /**
    * Access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  float &
+  DEAL_II_ALWAYS_INLINE inline float &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
@@ -2108,8 +2069,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const float &
+  DEAL_II_ALWAYS_INLINE inline const float &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
@@ -2119,8 +2079,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2134,8 +2093,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2149,8 +2107,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2164,8 +2121,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2181,8 +2137,7 @@ public:
    * the given address. The memory need not be aligned by 16 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     data = _mm_loadu_ps(ptr);
@@ -2194,8 +2149,7 @@ public:
    * 16 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     _mm_storeu_ps(ptr, data);
@@ -2205,8 +2159,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 16 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 16 == 0,
@@ -2217,8 +2170,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
     this->operator=(0.f);
@@ -2230,8 +2182,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
@@ -2277,8 +2228,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -2290,8 +2240,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
@@ -2307,8 +2256,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -2320,8 +2268,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -2352,7 +2299,7 @@ private:
  * Specialization for float and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int                  n_entries,
                               const std::array<const float *, 4> &in,
                               VectorizedArray<float, 4>          *out)
@@ -2386,7 +2333,7 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
  * Specialization for float and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int         n_entries,
                               const float               *in,
                               const unsigned int        *offsets,
@@ -2404,7 +2351,7 @@ vectorized_load_and_transpose(const unsigned int         n_entries,
  * Specialization for float and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 4> *in,
@@ -2466,7 +2413,7 @@ vectorized_transpose_and_store(const bool                       add_into,
  * Specialization for float and SSE2.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 4> *in,
@@ -2530,8 +2477,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const double x) &
   {
     data = _mm256_set1_pd(x);
@@ -2549,8 +2495,7 @@ public:
   /**
    * Access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  double &
+  DEAL_II_ALWAYS_INLINE inline double &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
@@ -2560,8 +2505,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const double &
+  DEAL_II_ALWAYS_INLINE inline const double &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
@@ -2571,8 +2515,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     // if the compiler supports vector arithmetic, we can simply use +=
@@ -2591,8 +2534,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2605,8 +2547,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2620,8 +2561,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -2637,15 +2577,13 @@ public:
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const double *ptr)
   {
     data = _mm256_loadu_pd(ptr);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     data = _mm256_cvtps_pd(_mm_loadu_ps(ptr));
@@ -2657,15 +2595,13 @@ public:
    * 32 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(double *ptr) const
   {
     _mm256_storeu_pd(ptr, data);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     _mm_storeu_ps(ptr, _mm256_cvtpd_ps(data));
@@ -2675,8 +2611,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 32 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
@@ -2687,8 +2622,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
 #    if defined(__AVX2__) && defined(DEAL_II_USE_VECTORIZATION_GATHER)
@@ -2720,8 +2654,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     // no scatter operation in AVX/AVX2
@@ -2764,8 +2697,7 @@ private:
   /**
    * Extract lower half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m128d
+  DEAL_II_ALWAYS_INLINE inline __m128d
   get_lower() const
   {
     return _mm256_castpd256_pd128(data);
@@ -2774,8 +2706,7 @@ private:
   /**
    * Extract upper half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m128d
+  DEAL_II_ALWAYS_INLINE inline __m128d
   get_upper() const
   {
     return _mm256_extractf128_pd(data, 1);
@@ -2785,8 +2716,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -2798,8 +2728,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
@@ -2815,8 +2744,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -2828,8 +2756,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -2860,7 +2787,7 @@ private:
  * Specialization for double and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int                   n_entries,
                               const std::array<const double *, 4> &in,
                               VectorizedArray<double, 4>          *out)
@@ -2930,7 +2857,7 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
  * Specialization for double and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int          n_entries,
                               const double               *in,
                               const unsigned int         *offsets,
@@ -2948,7 +2875,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  * Specialization for double and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 4> *in,
@@ -3014,7 +2941,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  * Specialization for double and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 4> *in,
@@ -3074,8 +3001,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const float x) &
   {
     data = _mm256_set1_ps(x);
@@ -3093,8 +3019,7 @@ public:
   /**
    * Access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  float &
+  DEAL_II_ALWAYS_INLINE inline float &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 8);
@@ -3104,8 +3029,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const float &
+  DEAL_II_ALWAYS_INLINE inline const float &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 8);
@@ -3115,8 +3039,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     // if the compiler supports vector arithmetic, we can simply use +=
@@ -3135,8 +3058,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -3149,8 +3071,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -3164,8 +3085,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -3181,8 +3101,7 @@ public:
    * the given address. The memory need not be aligned by 32 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     data = _mm256_loadu_ps(ptr);
@@ -3194,8 +3113,7 @@ public:
    * 32 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     _mm256_storeu_ps(ptr, data);
@@ -3205,8 +3123,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 32 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 32 == 0,
@@ -3217,8 +3134,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
 #    if defined(__AVX2__) && defined(DEAL_II_USE_VECTORIZATION_GATHER)
@@ -3250,8 +3166,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     // no scatter operation in AVX/AVX2
@@ -3294,8 +3209,7 @@ private:
   /**
    * Extract lower half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m128
+  DEAL_II_ALWAYS_INLINE inline __m128
   get_lower() const
   {
     return _mm256_castps256_ps128(data);
@@ -3304,8 +3218,7 @@ private:
   /**
    * Extract upper half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m128
+  DEAL_II_ALWAYS_INLINE inline __m128
   get_upper() const
   {
     return _mm256_extractf128_ps(data, 1);
@@ -3315,8 +3228,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -3328,8 +3240,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
@@ -3345,8 +3256,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -3358,8 +3268,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -3390,7 +3299,7 @@ private:
  * Specialization for float and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int                  n_entries,
                               const std::array<const float *, 8> &in,
                               VectorizedArray<float, 8>          *out)
@@ -3479,7 +3388,7 @@ vectorized_load_and_transpose(const unsigned int                  n_entries,
  * Specialization for float and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int         n_entries,
                               const float               *in,
                               const unsigned int        *offsets,
@@ -3503,7 +3412,7 @@ vectorized_load_and_transpose(const unsigned int         n_entries,
  * Specialization for float and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 8> *in,
@@ -3584,7 +3493,7 @@ vectorized_transpose_and_store(const bool                       add_into,
  * Specialization for float and AVX.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                       add_into,
                                const unsigned int               n_entries,
                                const VectorizedArray<float, 8> *in,
@@ -3655,8 +3564,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const double x) &
   {
     data = _mm512_set1_pd(x);
@@ -3675,8 +3583,7 @@ public:
   /**
    * Access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  double &
+  DEAL_II_ALWAYS_INLINE inline double &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 8);
@@ -3686,8 +3593,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const double &
+  DEAL_II_ALWAYS_INLINE inline const double &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 8);
@@ -3697,8 +3603,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     // if the compiler supports vector arithmetic, we can simply use +=
@@ -3717,8 +3622,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -3731,8 +3635,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -3746,8 +3649,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -3763,15 +3665,13 @@ public:
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a double address to VectorizedArray<double>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const double *ptr)
   {
     data = _mm512_loadu_pd(ptr);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     data = _mm512_cvtps_pd(_mm256_loadu_ps(ptr));
@@ -3783,15 +3683,13 @@ public:
    * 64 bytes, as opposed to casting a double address to
    * VectorizedArray<double>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(double *ptr) const
   {
     _mm512_storeu_pd(ptr, data);
   }
 
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     _mm256_storeu_ps(ptr, _mm512_cvtpd_ps(data));
@@ -3801,8 +3699,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 64 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(double *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
@@ -3813,8 +3710,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
 #    ifdef DEAL_II_USE_VECTORIZATION_GATHER
@@ -3846,8 +3742,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
 #    ifdef DEAL_II_USE_VECTORIZATION_GATHER
@@ -3911,8 +3806,7 @@ private:
   /**
    * Extract lower half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m256d
+  DEAL_II_ALWAYS_INLINE inline __m256d
   get_lower() const
   {
     return _mm512_castpd512_pd256(data);
@@ -3921,8 +3815,7 @@ private:
   /**
    * Extract upper half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m256d
+  DEAL_II_ALWAYS_INLINE inline __m256d
   get_upper() const
   {
     return _mm512_extractf64x4_pd(data, 1);
@@ -3932,8 +3825,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -3945,8 +3837,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
@@ -3966,8 +3857,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -3979,8 +3869,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -4011,7 +3900,7 @@ private:
  * Specialization for double and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int                   n_entries,
                               const std::array<const double *, 8> &in,
                               VectorizedArray<double, 8>          *out)
@@ -4104,7 +3993,7 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
  * Specialization for double and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int          n_entries,
                               const double               *in,
                               const unsigned int         *offsets,
@@ -4128,7 +4017,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  * Specialization for double and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 8> *in,
@@ -4209,7 +4098,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  * Specialization for double and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<double, 8> *in,
@@ -4275,8 +4164,7 @@ public:
   /**
    * This function can be used to set all data fields to a given scalar.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const float x) &
   {
     data = _mm512_set1_ps(x);
@@ -4294,8 +4182,7 @@ public:
   /**
    * Access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  float &
+  DEAL_II_ALWAYS_INLINE inline float &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 16);
@@ -4305,8 +4192,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const float &
+  DEAL_II_ALWAYS_INLINE inline const float &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 16);
@@ -4316,8 +4202,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     // if the compiler supports vector arithmetic, we can simply use +=
@@ -4336,8 +4221,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -4350,8 +4234,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -4365,8 +4248,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
 #    ifdef DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
@@ -4382,8 +4264,7 @@ public:
    * the given address. The memory need not be aligned by 64 bytes, as opposed
    * to casting a float address to VectorizedArray<float>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     data = _mm512_loadu_ps(ptr);
@@ -4395,8 +4276,7 @@ public:
    * 64 bytes, as opposed to casting a float address to
    * VectorizedArray<float>*.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     _mm512_storeu_ps(ptr, data);
@@ -4406,8 +4286,7 @@ public:
    * @copydoc VectorizedArray<Number>::streaming_store()
    * @note Memory must be aligned by 64 bytes.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(float *ptr) const
   {
     Assert(reinterpret_cast<std::size_t>(ptr) % 64 == 0,
@@ -4418,8 +4297,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
 #    ifdef DEAL_II_USE_VECTORIZATION_GATHER
@@ -4449,8 +4327,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
 #    ifdef DEAL_II_USE_VECTORIZATION_GATHER
@@ -4492,8 +4369,7 @@ public:
   /**
    * Return the nearest integer not greater than x.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_floor() const
   {
     VectorizedArray res;
@@ -4512,8 +4388,7 @@ private:
   /**
    * Extract lower half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m256
+  DEAL_II_ALWAYS_INLINE inline __m256
   get_lower() const
   {
     return _mm512_castps512_ps256(data);
@@ -4522,8 +4397,7 @@ private:
   /**
    * Extract upper half of data field.
    */
-  DEAL_II_ALWAYS_INLINE
-  __m256
+  DEAL_II_ALWAYS_INLINE inline __m256
   get_upper() const
   {
     return _mm256_castpd_ps(_mm512_extractf64x4_pd(_mm512_castps_pd(data), 1));
@@ -4533,8 +4407,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -4546,8 +4419,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     // to compute the absolute value, perform bitwise andnot with -0. This
@@ -4567,8 +4439,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -4580,8 +4451,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -4612,7 +4482,7 @@ private:
  * Specialization for float and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int                   n_entries,
                               const std::array<const float *, 16> &in,
                               VectorizedArray<float, 16>          *out)
@@ -4741,7 +4611,7 @@ vectorized_load_and_transpose(const unsigned int                   n_entries,
  * Specialization for float and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_load_and_transpose(const unsigned int          n_entries,
                               const float                *in,
                               const unsigned int         *offsets,
@@ -4773,7 +4643,7 @@ vectorized_load_and_transpose(const unsigned int          n_entries,
  * Specialization for float and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<float, 16> *in,
@@ -4885,7 +4755,7 @@ vectorized_transpose_and_store(const bool                        add_into,
  * Specialization for float and AVX-512.
  */
 template <>
-inline DEAL_II_ALWAYS_INLINE void
+DEAL_II_ALWAYS_INLINE inline void
 vectorized_transpose_and_store(const bool                        add_into,
                                const unsigned int                n_entries,
                                const VectorizedArray<float, 16> *in,
@@ -4959,8 +4829,7 @@ public:
   /**
    * This function assigns a scalar to the current object.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const double x) &
   {
     data = vec_splats(x);
@@ -4983,8 +4852,7 @@ public:
   /**
    * Access operator. The component must be either 0 or 1.
    */
-  DEAL_II_ALWAYS_INLINE
-  double &
+  DEAL_II_ALWAYS_INLINE inline double &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 2);
@@ -4994,8 +4862,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const double &
+  DEAL_II_ALWAYS_INLINE inline const double &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 2);
@@ -5005,8 +4872,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     data = vec_add(data, vec.data);
@@ -5016,8 +4882,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
     data = vec_sub(data, vec.data);
@@ -5027,8 +4892,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
     data = vec_mul(data, vec.data);
@@ -5038,8 +4902,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
     data = vec_div(data, vec.data);
@@ -5050,8 +4913,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const double *ptr)
   {
     data = vec_vsx_ld(0, ptr);
@@ -5061,8 +4923,7 @@ public:
    * Write the content of the calling class into memory in form of @p
    * size() to the given address.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(double *ptr) const
   {
     vec_vsx_st(data, 0, ptr);
@@ -5071,8 +4932,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(double *ptr) const
   {
     store(ptr);
@@ -5081,8 +4941,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const double *base_ptr, const unsigned int *offsets)
   {
     this->operator=(0.);
@@ -5094,8 +4953,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, double *base_ptr) const
   {
     for (unsigned int i = 0; i < 2; ++i)
@@ -5115,8 +4973,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -5128,8 +4985,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     VectorizedArray res;
@@ -5141,8 +4997,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -5154,8 +5009,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -5223,8 +5077,7 @@ public:
   /**
    * This function assigns a scalar to the current object.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator=(const float x) &
   {
     data = vec_splats(x);
@@ -5247,8 +5100,7 @@ public:
   /**
    * Access operator. The component must be between 0 and 3.
    */
-  DEAL_II_ALWAYS_INLINE
-  float &
+  DEAL_II_ALWAYS_INLINE inline float &
   operator[](const unsigned int comp)
   {
     AssertIndexRange(comp, 4);
@@ -5258,8 +5110,7 @@ public:
   /**
    * Constant access operator.
    */
-  DEAL_II_ALWAYS_INLINE
-  const float &
+  DEAL_II_ALWAYS_INLINE inline const float &
   operator[](const unsigned int comp) const
   {
     AssertIndexRange(comp, 4);
@@ -5269,8 +5120,7 @@ public:
   /**
    * Element-wise addition of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator+=(const VectorizedArray &vec)
   {
     data = vec_add(data, vec.data);
@@ -5280,8 +5130,7 @@ public:
   /**
    * Element-wise subtraction of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator-=(const VectorizedArray &vec)
   {
     data = vec_sub(data, vec.data);
@@ -5291,8 +5140,7 @@ public:
   /**
    * Element-wise multiplication of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator*=(const VectorizedArray &vec)
   {
     data = vec_mul(data, vec.data);
@@ -5302,8 +5150,7 @@ public:
   /**
    * Element-wise division of two arrays of numbers.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray &
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray &
   operator/=(const VectorizedArray &vec)
   {
     data = vec_div(data, vec.data);
@@ -5314,8 +5161,7 @@ public:
    * Load @p size() from memory into the calling class, starting at
    * the given address.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   load(const float *ptr)
   {
     data = vec_vsx_ld(0, ptr);
@@ -5325,8 +5171,7 @@ public:
    * Write the content of the calling class into memory in form of @p
    * size() to the given address.
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   store(float *ptr) const
   {
     vec_vsx_st(data, 0, ptr);
@@ -5335,8 +5180,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::streaming_store()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   streaming_store(float *ptr) const
   {
     store(ptr);
@@ -5345,8 +5189,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::gather()
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   gather(const float *base_ptr, const unsigned int *offsets)
   {
     this->operator=(0.f);
@@ -5358,8 +5201,7 @@ public:
   /**
    * @copydoc VectorizedArray<Number>::scatter
    */
-  DEAL_II_ALWAYS_INLINE
-  void
+  DEAL_II_ALWAYS_INLINE inline void
   scatter(const unsigned int *offsets, float *base_ptr) const
   {
     for (unsigned int i = 0; i < 4; ++i)
@@ -5379,8 +5221,7 @@ private:
    * Return the square root of this field. Not for use in user code. Use
    * sqrt(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_sqrt() const
   {
     VectorizedArray res;
@@ -5392,8 +5233,7 @@ private:
    * Return the absolute value of this field. Not for use in user code. Use
    * abs(x) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_abs() const
   {
     VectorizedArray res;
@@ -5405,8 +5245,7 @@ private:
    * Return the component-wise maximum of this field and another one. Not for
    * use in user code. Use max(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_max(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -5418,8 +5257,7 @@ private:
    * Return the component-wise minimum of this field and another one. Not for
    * use in user code. Use min(x,y) instead.
    */
-  DEAL_II_ALWAYS_INLINE
-  VectorizedArray
+  DEAL_II_ALWAYS_INLINE inline VectorizedArray
   get_min(const VectorizedArray &other) const
   {
     VectorizedArray res;
@@ -5463,7 +5301,7 @@ private:
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE bool
+DEAL_II_ALWAYS_INLINE inline bool
 operator==(const VectorizedArray<Number, width> &lhs,
            const VectorizedArray<Number, width> &rhs)
 {
@@ -5481,8 +5319,8 @@ operator==(const VectorizedArray<Number, width> &lhs,
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator+(const VectorizedArray<Number, width> &u,
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+operator+(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5495,8 +5333,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator-(const VectorizedArray<Number, width> &u,
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+operator-(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5509,8 +5347,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator*(const VectorizedArray<Number, width> &u,
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+operator*(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5523,8 +5361,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator/(const VectorizedArray<Number, width> &u,
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+operator/(const VectorizedArray<Number, width> &u,
           const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5538,7 +5376,7 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator+(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5554,7 +5392,7 @@ operator+(const Number &u, const VectorizedArray<Number, width> &v)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator+(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = u;
@@ -5568,7 +5406,7 @@ operator+(const double u, const VectorizedArray<float, width> &v)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator+(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u + v;
@@ -5583,7 +5421,7 @@ operator+(const VectorizedArray<Number, width> &v, const Number &u)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator+(const VectorizedArray<float, width> &v, const double u)
 {
   return u + v;
@@ -5596,7 +5434,7 @@ operator+(const VectorizedArray<float, width> &v, const double u)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator-(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5612,7 +5450,7 @@ operator-(const Number &u, const VectorizedArray<Number, width> &v)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator-(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
@@ -5626,7 +5464,7 @@ operator-(const double u, const VectorizedArray<float, width> &v)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator-(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5642,7 +5480,7 @@ operator-(const VectorizedArray<Number, width> &v, const Number &u)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator-(const VectorizedArray<float, width> &v, const double u)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
@@ -5656,7 +5494,7 @@ operator-(const VectorizedArray<float, width> &v, const double u)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator*(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5672,7 +5510,7 @@ operator*(const Number &u, const VectorizedArray<Number, width> &v)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator*(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
@@ -5686,7 +5524,7 @@ operator*(const double u, const VectorizedArray<float, width> &v)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator*(const VectorizedArray<Number, width> &v, const Number &u)
 {
   return u * v;
@@ -5701,7 +5539,7 @@ operator*(const VectorizedArray<Number, width> &v, const Number &u)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator*(const VectorizedArray<float, width> &v, const double u)
 {
   return u * v;
@@ -5714,7 +5552,7 @@ operator*(const VectorizedArray<float, width> &v, const double u)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator/(const Number &u, const VectorizedArray<Number, width> &v)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5730,7 +5568,7 @@ operator/(const Number &u, const VectorizedArray<Number, width> &v)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator/(const double u, const VectorizedArray<float, width> &v)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
@@ -5744,7 +5582,7 @@ operator/(const double u, const VectorizedArray<float, width> &v)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
 operator/(const VectorizedArray<Number, width> &v, const Number &u)
 {
   VectorizedArray<Number, width> tmp = u;
@@ -5760,7 +5598,7 @@ operator/(const VectorizedArray<Number, width> &v, const Number &u)
  * @relatesalso VectorizedArray
  */
 template <std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<float, width>
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<float, width>
 operator/(const VectorizedArray<float, width> &v, const double u)
 {
   VectorizedArray<float, width> tmp = static_cast<float>(u);
@@ -5773,8 +5611,8 @@ operator/(const VectorizedArray<float, width> &v, const double u)
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator+(const VectorizedArray<Number, width> &u)
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+operator+(const VectorizedArray<Number, width> &u)
 {
   return u;
 }
@@ -5785,8 +5623,8 @@ inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
  * @relatesalso VectorizedArray
  */
 template <typename Number, std::size_t width>
-inline DEAL_II_ALWAYS_INLINE VectorizedArray<Number, width>
-                             operator-(const VectorizedArray<Number, width> &u)
+DEAL_II_ALWAYS_INLINE inline VectorizedArray<Number, width>
+operator-(const VectorizedArray<Number, width> &u)
 {
   // to get a negative sign, subtract the input from zero (could also
   // multiply by -1, but this one is slightly simpler)
