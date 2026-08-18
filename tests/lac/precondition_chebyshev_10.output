@@ -1,6 +1,66 @@
 
-DEAL::Exact inverse:     0.84 0.20 0.26 0.20 0.18 0.03 0.05 0.10 0.03 0.06 
-DEAL::Check  vmult orig: 0.57 0.13 0.18 0.14 0.12 0.02 0.03 0.07 0.02 0.04 
-DEAL::Check Tvmult orig: 0.57 0.13 0.18 0.14 0.12 0.02 0.03 0.07 0.02 0.04 
-DEAL::Check  vmult diag: 0.82 0.26 0.33 0.21 0.15 0.02 0.03 0.09 0.03 0.07 
-DEAL::Check Tvmult diag: 0.82 0.26 0.33 0.21 0.15 0.02 0.03 0.09 0.03 0.07 
+DEAL::Check operation of size 10
+DEAL::Computed residual norm vmult(): 0.0639611346
+DEAL::Actual residual norm vmult():   0.0639611346
+DEAL::Computed residual norm step():  0.0019476023
+DEAL::Actual residual norm step():    0.0019476023
+DEAL::Check operation of size 16
+DEAL::Computed residual norm vmult(): 0.0743764967
+DEAL::Actual residual norm vmult():   0.0743764967
+DEAL::Computed residual norm step():  0.0004882405
+DEAL::Actual residual norm step():    0.0004882405
+DEAL::Check operation of size 23
+DEAL::Computed residual norm vmult(): 0.0170785633
+DEAL::Actual residual norm vmult():   0.0170785633
+DEAL::Computed residual norm step():  0.0008336335
+DEAL::Actual residual norm step():    0.0008336335
+DEAL::Check operation of size 24
+DEAL::Computed residual norm vmult(): 0.0011529909
+DEAL::Actual residual norm vmult():   0.0011529909
+DEAL::Computed residual norm step():  0.0000664080
+DEAL::Actual residual norm step():    0.0000664080
+DEAL::Check operation of size 25
+DEAL::Computed residual norm vmult(): 0.0176757621
+DEAL::Actual residual norm vmult():   0.0176757621
+DEAL::Computed residual norm step():  0.0011747158
+DEAL::Actual residual norm step():    0.0011747158
+DEAL::Check operation of size 26
+DEAL::Computed residual norm vmult(): 0.0321998887
+DEAL::Actual residual norm vmult():   0.0321998887
+DEAL::Computed residual norm step():  0.0024268765
+DEAL::Actual residual norm step():    0.0024268765
+DEAL::Check operation of size 27
+DEAL::Computed residual norm vmult(): 0.0532936178
+DEAL::Actual residual norm vmult():   0.0532936178
+DEAL::Computed residual norm step():  0.0044926331
+DEAL::Actual residual norm step():    0.0044926331
+DEAL::Check operation of size 28
+DEAL::Computed residual norm vmult(): 0.0682695044
+DEAL::Actual residual norm vmult():   0.0682695044
+DEAL::Computed residual norm step():  0.0063646372
+DEAL::Actual residual norm step():    0.0063646372
+DEAL::Check operation of size 29
+DEAL::Computed residual norm vmult(): 0.1121673398
+DEAL::Actual residual norm vmult():   0.1121673398
+DEAL::Computed residual norm step():  0.0114562310
+DEAL::Actual residual norm step():    0.0114562310
+DEAL::Check operation of size 30
+DEAL::Computed residual norm vmult(): 0.1057147377
+DEAL::Actual residual norm vmult():   0.1057147377
+DEAL::Computed residual norm step():  0.0117348016
+DEAL::Actual residual norm step():    0.0117348016
+DEAL::Check operation of size 31
+DEAL::Computed residual norm vmult(): 0.1326508498
+DEAL::Actual residual norm vmult():   0.1326508498
+DEAL::Computed residual norm step():  0.0158944738
+DEAL::Actual residual norm step():    0.0158944738
+DEAL::Check operation of size 32
+DEAL::Computed residual norm vmult(): 0.1681473458
+DEAL::Actual residual norm vmult():   0.1681473458
+DEAL::Computed residual norm step():  0.0216196839
+DEAL::Actual residual norm step():    0.0216196839
+DEAL::Check operation of size 33
+DEAL::Computed residual norm vmult(): 0.1947396838
+DEAL::Actual residual norm vmult():   0.1947396838
+DEAL::Computed residual norm step():  0.0267292603
+DEAL::Actual residual norm step():    0.0267292603

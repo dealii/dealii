@@ -42,6 +42,7 @@ public:
 void
 check(const unsigned int size)
 {
+  deallog << "Check operation of size " << size << std::endl;
   FullMatrixModified m(size, size);
   for (unsigned int i = 0; i < size; ++i)
     m(i, i) = i + 1;
@@ -56,7 +57,7 @@ check(const unsigned int size)
   data.smoothing_range      = 1.5 * size;
   data.eig_cg_n_iterations  = 0;
   data.max_eigenvalue       = size + 1;
-  data.degree               = 6;
+  data.degree               = 8;
   data.eigenvalue_algorithm = internal::EigenvalueAlgorithm::power_iteration;
   prec.initialize(m, data);
 
@@ -89,13 +90,16 @@ main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
-  deallog << std::setprecision(8);
+  deallog << std::setprecision(10);
   deallog.attach(logfile);
 
   MultithreadInfo::set_thread_limit(1);
 
   check(10);
-  check(20);
+  check(16);
+  // Check a few sizes to ensure vectorization granularity is kept correct
+  for (unsigned int i = 23; i < 34; ++i)
+    check(i);
 
   return 0;
 }
