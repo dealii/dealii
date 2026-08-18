@@ -148,7 +148,7 @@ namespace Portable
                unconstrained))) !=
         dealii::internal::MatrixFreeFunctions::ConstraintKinds::unconstrained;
 
-      Number tmp[n_q_points];
+      Number tmp[n_q_points] = {};
       Kokkos::parallel_for(
         Kokkos::TeamThreadRange(team_member, n_q_points),
         [&](const int &q_point) {
@@ -162,7 +162,6 @@ namespace Portable
               dealii::internal::MatrixFreeFunctions::ConstraintKinds::subcell_y;
 
           const unsigned int interp_idx = (direction == 0) ? x_idx : y_idx;
-          tmp[q_point]                  = 0;
 
           // Flag is true if for the given direction, the dof is constrained
           // with the right type and is on the correct side (left (= 0) or right
@@ -174,6 +173,7 @@ namespace Portable
 
           if (constrained_face && constrained_dof)
             {
+              Number     sum  = 0.;
               const bool type = (constraint_mask & this_type) !=
                                 dealii::internal::MatrixFreeFunctions::
                                   ConstraintKinds::unconstrained;
@@ -190,7 +190,7 @@ namespace Portable
                         transpose ?
                           constraint_weights[i * n_q_points_1d + interp_idx] :
                           constraint_weights[interp_idx * n_q_points_1d + i];
-                      tmp[q_point] += w * values[real_idx];
+                      sum += w * values[real_idx];
                     }
                 }
               else
@@ -208,9 +208,10 @@ namespace Portable
                           constraint_weights[(fe_degree - interp_idx) *
                                                n_q_points_1d +
                                              fe_degree - i];
-                      tmp[q_point] += w * values[real_idx];
+                      sum += w * values[real_idx];
                     }
                 }
+              tmp[q_point] = sum;
             }
         });
 
@@ -294,7 +295,7 @@ namespace Portable
           dealii::internal::MatrixFreeFunctions::ConstraintKinds::edge_z;
       const auto constrained_face = constraint_mask & (face1 | face2 | edge);
 
-      Number tmp[n_q_points];
+      Number tmp[n_q_points] = {};
       Kokkos::parallel_for(
         Kokkos::TeamThreadRange(team_member, n_q_points),
         [&](const int &q_point) {
@@ -315,11 +316,11 @@ namespace Portable
                                                         face1,
                                                         face2,
                                                         edge);
-          tmp[q_point] = 0;
           if ((constrained_face != dealii::internal::MatrixFreeFunctions::
                                      ConstraintKinds::unconstrained) &&
               constrained_dof)
             {
+              Number     sum  = 0.;
               const bool type = (constraint_mask & this_type) !=
                                 dealii::internal::MatrixFreeFunctions::
                                   ConstraintKinds::unconstrained;
@@ -338,7 +339,7 @@ namespace Portable
                         transpose ?
                           constraint_weights[i * n_q_points_1d + interp_idx] :
                           constraint_weights[interp_idx * n_q_points_1d + i];
-                      tmp[q_point] += w * values[real_idx];
+                      sum += w * values[real_idx];
                     }
                 }
               else
@@ -359,9 +360,10 @@ namespace Portable
                           constraint_weights[(fe_degree - interp_idx) *
                                                n_q_points_1d +
                                              fe_degree - i];
-                      tmp[q_point] += w * values[real_idx];
+                      sum += w * values[real_idx];
                     }
                 }
+              tmp[q_point] = sum;
             }
         });
 

@@ -102,9 +102,11 @@ export
     using ::Kokkos::resize;
     using ::Kokkos::single;
     using ::Kokkos::subview;
+    using ::Kokkos::Sum;
     using ::Kokkos::TeamPolicy;
     using ::Kokkos::TeamThreadRange;
     using ::Kokkos::TeamVectorRange;
+    using ::Kokkos::ThreadVectorRange;
     using ::Kokkos::Unmanaged;
     using ::Kokkos::View;
     using ::Kokkos::view_alloc;
