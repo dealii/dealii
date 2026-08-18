@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2013 - 2022 by the deal.II authors
+// Copyright (C) 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -11,7 +11,8 @@
 // -----------------------------------------------------------------------------
 
 
-// Tests PreconditionChebyshev::vmult and PreconditionChebyshev::Tvmult
+// Tests PreconditionChebyshev::vmult_with_last_residual_norm() and
+// PreconditionChebyshev::step_with_last_residual_norm()
 
 
 #include <deal.II/lac/full_matrix.h>
@@ -39,59 +40,47 @@ public:
 
 
 void
-check()
+check(const unsigned int size)
 {
-  const unsigned int size = 10;
   FullMatrixModified m(size, size);
   for (unsigned int i = 0; i < size; ++i)
     m(i, i) = i + 1;
 
-  Vector<double> in(size), out(size);
+  Vector<double> in(size), out(size), tmp(size);
   for (unsigned int i = 0; i < size; ++i)
     in(i) = random_value<double>();
 
   PreconditionChebyshev<FullMatrixModified, Vector<double>> prec;
   PreconditionChebyshev<FullMatrixModified, Vector<double>>::AdditionalData
     data;
-  data.smoothing_range = 2 * size;
-  data.degree          = 4;
+  data.smoothing_range      = 1.5 * size;
+  data.eig_cg_n_iterations  = 0;
+  data.max_eigenvalue       = size + 1;
+  data.degree               = 6;
+  data.eigenvalue_algorithm = internal::EigenvalueAlgorithm::power_iteration;
   prec.initialize(m, data);
 
-  deallog << "Exact inverse:     ";
-  for (unsigned int i = 0; i < size; ++i)
-    deallog << in(i) / m(i, i) << ' ';
-  deallog << std::endl;
+  const double res_norm = prec.vmult_with_last_residual_norm(out, in);
+  deallog << "Computed residual norm vmult(): " << res_norm << std::endl;
 
-  deallog << "Check  vmult orig: ";
+  prec.set_degree(data.degree - 1);
   prec.vmult(out, in);
-  for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << ' ';
-  deallog << std::endl;
 
-  deallog << "Check Tvmult orig: ";
-  prec.Tvmult(out, in);
-  for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << ' ';
-  deallog << std::endl;
+  m.vmult(tmp, out);
+  tmp.sadd(-1.0, 1.0, in);
+  deallog << "Actual residual norm vmult():   " << tmp.l2_norm() << std::endl;
 
-  Vector<double> matrix_diagonal(size);
-  matrix_diagonal     = 1;
-  auto preconditioner = std::make_shared<DiagonalMatrix<Vector<double>>>();
-  preconditioner->reinit(matrix_diagonal);
-  data.preconditioner = std::move(preconditioner);
-  prec.initialize(m, data);
+  const double res_norm_step = prec.step_with_last_residual_norm(out, in);
+  deallog << "Computed residual norm step():  " << res_norm_step << std::endl;
 
-  deallog << "Check  vmult diag: ";
+  prec.set_degree(data.degree - 1);
   prec.vmult(out, in);
-  for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << ' ';
-  deallog << std::endl;
+  prec.set_degree(data.degree - 2);
+  prec.step(out, in);
 
-  deallog << "Check Tvmult diag: ";
-  prec.Tvmult(out, in);
-  for (unsigned int i = 0; i < size; ++i)
-    deallog << out(i) << ' ';
-  deallog << std::endl;
+  m.vmult(tmp, out);
+  tmp.sadd(-1.0, 1.0, in);
+  deallog << "Actual residual norm step():    " << tmp.l2_norm() << std::endl;
 }
 
 
@@ -100,10 +89,13 @@ main()
 {
   std::ofstream logfile("output");
   deallog << std::fixed;
-  deallog << std::setprecision(2);
+  deallog << std::setprecision(8);
   deallog.attach(logfile);
 
-  check();
+  MultithreadInfo::set_thread_limit(1);
+
+  check(10);
+  check(20);
 
   return 0;
 }
