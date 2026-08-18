@@ -246,6 +246,8 @@ jobs:
 
     name: jammy debug intel oneapi
     runs-on: [ubuntu-22.04]
+    container:
+      image: intel/oneapi:2026.1.0-devel-ubuntu22.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -257,22 +259,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v7
-    - uses: rscohn2/setup-oneapi@v0
-      with:
-        components: |
-          icx
-          impi
-          mkl
-          tbb
     - name: info
       run: |
-        source /opt/intel/oneapi/setvars.sh
         export I_MPI_CXX=icpx
         mpiicpc -v
         cmake --version
     - name: configure deal.II
       run: |
-        source /opt/intel/oneapi/setvars.sh
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
@@ -291,12 +284,10 @@ jobs:
       run: cat build/detailed.log
     - name: build
       run: |
-        source /opt/intel/oneapi/setvars.sh
         cd build
         make VERBOSE=1
     - name: test
       run: |
-        source /opt/intel/oneapi/setvars.sh
         cd build
         make \
           setup_tests_a-framework \
