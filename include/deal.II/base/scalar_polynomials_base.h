@@ -81,7 +81,7 @@ public:
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~ScalarPolynomialsBase() = default;
+  virtual ~ScalarPolynomialsBase();
 
   /**
    * Compute the value and the derivatives of the polynomials at
@@ -229,6 +229,23 @@ private:
    */
   const unsigned int n_pols;
 };
+
+
+//
+// We "default" the destructor out of line here to work around a sublety
+// when compiling with Clang in CUDA mode:
+//
+// A destructor defaulted on its *first* declaration is treated like an
+// *implicit* destructor and inferred to be __host__ __device__. That
+// inference would propagate to the implicit destructors of all derived
+// classes and fail "device" compilation, because Polynomials::Polynomial's
+// destructor is a host-only function.
+//
+// A destructor defaulted outside the class is user-provided and remains a
+// host function.
+//
+template <int dim>
+ScalarPolynomialsBase<dim>::~ScalarPolynomialsBase() = default;
 
 
 

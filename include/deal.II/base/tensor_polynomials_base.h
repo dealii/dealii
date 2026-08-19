@@ -80,7 +80,7 @@ public:
    * Virtual destructor. Makes sure that pointers to this class are deleted
    * properly.
    */
-  virtual ~TensorPolynomialsBase() = default;
+  virtual ~TensorPolynomialsBase();
 
   /**
    * Compute the value and the derivatives of the polynomials at
@@ -141,6 +141,17 @@ private:
    */
   const unsigned int n_pols;
 };
+
+
+
+//
+// We "default" the destructor out of line here to work around a sublety
+// when compiling with Clang in CUDA mode. See the comment on
+// ScalarPolynomialsBase<dim>::~ScalarPolynomialsBase() in
+// scalar_polynomials.h for details.
+//
+template <int dim>
+TensorPolynomialsBase<dim>::~TensorPolynomialsBase() = default;
 
 
 
