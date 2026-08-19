@@ -1192,7 +1192,7 @@ private:
    * be called by a function in an internal namespace that is a `friend`
    * of this class.
    */
-  constexpr ReferenceCell(const std::uint8_t kind);
+  explicit constexpr ReferenceCell(const std::uint8_t kind);
 
   /**
    * Table containing all 'vertex' permutations for a vertex. Defined
@@ -1354,7 +1354,7 @@ namespace internal
 
     // Call the private constructor, which we can from here because this
     // function is a 'friend'.
-    return {kind};
+    return ReferenceCell<dim>(kind);
   }
 } // namespace internal
 
@@ -1954,7 +1954,8 @@ ReferenceCell<dim>::new_isotropic_child_cell_faces(
             {
               // Considerations that went into creating this table
               // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
-              //   centre wedge is rotated by 180° compared to the parent)
+              //   centre wedge is rotated by 180 degrees compared to the
+              //   parent)
               // - Order of children is similar to the order of a reference
               //   triangle in the x-y-plane (i.e. like the top triangle of the
               //   parent)
