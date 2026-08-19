@@ -104,6 +104,7 @@ def main() -> None:
     dates, source_lines, test_lines = read_data(arguments.input)
 
     figure, axes = plt.subplots()
+    axes.set_title("deal.II code size over time")
     axes.plot(
         dates,
         source_lines,
@@ -133,7 +134,7 @@ def main() -> None:
 
     # Anchor five-year ticks at 1997 rather than at years divisible by five.
     axes.set_xlim(date(1997, 1, 1), date(2026, 12, 31))
-    axes.set_xlabel("Date")
+    axes.set_xlabel("Year")
     axes.set_ylabel("Lines of code")
     axes.set_xticks([date(year, 1, 1) for year in range(1997, 2027, 5)])
     axes.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
