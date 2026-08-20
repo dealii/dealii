@@ -1,0 +1,5 @@
+
+DEAL::degree 1: relative error < 1e-12: OK
+DEAL::degree 2: relative error < 1e-12: OK
+DEAL::degree 3: relative error < 1e-12: OK
+DEAL::OK
