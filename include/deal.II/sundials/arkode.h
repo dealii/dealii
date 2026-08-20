@@ -154,6 +154,59 @@ namespace SUNDIALS
     {
     public:
       /**
+       * Initialization parameters for ARKode. Some parameters are provided for
+       * interface backward compatibility and have been effectively moved to the
+       * AKRStepper additional parameters.
+       *
+       * Global parameters:
+       *
+       * @param initial_time Initial time
+       * @param final_time Final time
+       * @param initial_step_size Initial step size
+       * @param output_period Desired time interval between each output
+       *
+       * Run-control parameters:
+       *
+       * @param minimum_step_size Minimum step size
+       * @param maximum_order Maximum ARK order
+       * @param maximum_non_linear_iterations Maximum number of nonlinear
+       *   iterations
+       * @param implicit_function_is_linear Specifies that the implicit portion
+       *   of the problem is linear
+       * @param implicit_function_is_time_independent Specifies that the
+       *   implicit portion of the problem is linear and time independent
+       * @param mass_is_time_independent Specifies that the mass pre-factor is
+       *   independent of time
+       * @param anderson_acceleration_subspace The number of vectors to use for
+       *   Anderson acceleration within the packaged SUNDIALS solver.
+       *
+       * Error parameters:
+       *
+       * @param absolute_tolerance Absolute error tolerance
+       * @param relative_tolerance Relative error tolerance
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Use another constructor and ARKStepper::AdditionalData to initialize "
+        "with the ARKStepper relevant parameters instead.")
+      AdditionalData(
+        // Initial parameters
+        const double initial_time,
+        const double final_time,
+        const double initial_step_size,
+        const double output_period,
+        // Running parameters
+        const double       minimum_step_size,
+        const unsigned int maximum_order                         = 5,
+        const unsigned int maximum_non_linear_iterations         = 10,
+        const bool         implicit_function_is_linear           = false,
+        const bool         implicit_function_is_time_independent = false,
+        const bool         mass_is_time_independent              = false,
+        const int          anderson_acceleration_subspace        = 3,
+        // Error parameters
+        const double absolute_tolerance = 1e-6,
+        const double relative_tolerance = 1e-5);
+
+      /**
        * Initialization parameters for ARKode.
        *
        * Global parameters:
@@ -232,10 +285,73 @@ namespace SUNDIALS
       double relative_tolerance;
 
       /**
+       * Maximum order of ARK.
+       *
+       * @deprecated Provide ARKStepper::AdditionalData::order instead.
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Provide ARKStepper::AdditionalData::order instead.")
+      unsigned int maximum_order;
+
+      /**
        * Desired time period between each output. The actual output time period
        * may be adjusted by Arkode.
        */
       double output_period;
+
+      /**
+       * Maximum number of iterations for Newton or fixed point method during
+       * time advancement.
+       *
+       * @deprecated Provide ARKStepper::AdditionalData::maximum_non_linear_iterations instead.
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Provide ARKStepper::AdditionalData::maximum_non_linear_iterations "
+        "instead.")
+      unsigned int maximum_non_linear_iterations;
+
+      /**
+       * Provide whether the implicit portion of the problem is linear.
+       *
+       * @deprecated Provide ARKStepper::AdditionalData::implicit_function_is_linear instead.
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Provide ARKStepper::AdditionalData::implicit_function_is_linear "
+        "instead.")
+      bool implicit_function_is_linear;
+
+      /**
+       * Provide whether the implicit portion of the problem is linear and time
+       * independent.
+       *
+       * @deprecated Provide ARKStepper::AdditionalData::implicit_function_is_time_independent instead.
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Provide ARKStepper::AdditionalData::implicit_function_is_time_independent "
+        "instead.")
+      bool implicit_function_is_time_independent;
+
+      /**
+       * Provide whether the mass pre-factor is time independent. Has no effect
+       * if no mass is specified.
+       *
+       * @deprecated Provide ARKStepper::AdditionalData::mass_is_time_independent instead.
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Provide ARKStepper::AdditionalData::mass_is_time_independent "
+        "instead.")
+      bool mass_is_time_independent;
+
+      /**
+       * Number of subspace vectors to use for Anderson acceleration. Only
+       * meaningful if the packaged SUNDIALS fixed-point solver is used.
+       *
+       * @deprecated Provide ARKStepper::AdditionalData::anderson_acceleration_subspace instead.
+       */
+      DEAL_II_DEPRECATED_WITH_COMMENT(
+        "Provide ARKStepper::AdditionalData::anderson_acceleration_subspace "
+        "instead.")
+      int anderson_acceleration_subspace;
     };
 
     /**
@@ -745,6 +861,42 @@ namespace SUNDIALS
     const double initial_step_size,
     const double output_period,
     // Running parameters
+    const double       minimum_step_size,
+    const unsigned int maximum_order,
+    const unsigned int maximum_non_linear_iterations,
+    const bool         implicit_function_is_linear,
+    const bool         implicit_function_is_time_independent,
+    const bool         mass_is_time_independent,
+    const int          anderson_acceleration_subspace,
+    // Error parameters
+    const double absolute_tolerance,
+    const double relative_tolerance)
+    : initial_time(initial_time)
+    , final_time(final_time)
+    , initial_step_size(initial_step_size)
+    , minimum_step_size(minimum_step_size)
+    , absolute_tolerance(absolute_tolerance)
+    , relative_tolerance(relative_tolerance)
+    , maximum_order(maximum_order)
+    , output_period(output_period)
+    , maximum_non_linear_iterations(maximum_non_linear_iterations)
+    , implicit_function_is_linear(implicit_function_is_linear)
+    , implicit_function_is_time_independent(
+        implicit_function_is_time_independent)
+    , mass_is_time_independent(mass_is_time_independent)
+    , anderson_acceleration_subspace(anderson_acceleration_subspace)
+  {}
+
+
+
+  template <typename VectorType>
+  ARKode<VectorType>::AdditionalData::AdditionalData(
+    // Initial parameters
+    const double initial_time,
+    const double final_time,
+    const double initial_step_size,
+    const double output_period,
+    // Running parameters
     const double minimum_step_size,
     // Error parameters
     const double absolute_tolerance,
@@ -755,7 +907,13 @@ namespace SUNDIALS
     , minimum_step_size(minimum_step_size)
     , absolute_tolerance(absolute_tolerance)
     , relative_tolerance(relative_tolerance)
+    , maximum_order(5)
     , output_period(output_period)
+    , maximum_non_linear_iterations(10)
+    , implicit_function_is_linear(false)
+    , implicit_function_is_time_independent(false)
+    , mass_is_time_independent(false)
+    , anderson_acceleration_subspace(3)
   {}
 
 
@@ -770,6 +928,16 @@ namespace SUNDIALS
     prm.enter_subsection("Running parameters");
     prm.add_parameter("Initial step size", initial_step_size);
     prm.add_parameter("Minimum step size", minimum_step_size);
+    prm.add_parameter("Maximum order of ARK", maximum_order);
+    prm.add_parameter("Maximum number of nonlinear iterations",
+                      maximum_non_linear_iterations);
+    prm.add_parameter("Implicit function is linear",
+                      implicit_function_is_linear);
+    prm.add_parameter("Implicit function is time independent",
+                      implicit_function_is_time_independent);
+    prm.add_parameter("Mass is time independent", mass_is_time_independent);
+    prm.add_parameter("Anderson-acceleration subspace",
+                      anderson_acceleration_subspace);
     prm.leave_subsection();
     prm.enter_subsection("Error control");
     prm.add_parameter("Absolute error tolerance", absolute_tolerance);

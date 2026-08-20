@@ -9,5 +9,7 @@ end
 
 subsection Running parameters
   set Initial step size                      = 1e-6
+  set Maximum number of nonlinear iterations = 10
+  set Maximum order of ARK                   = 5
   set Minimum step size                      = 1e-7
 end

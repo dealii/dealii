@@ -47,7 +47,13 @@ namespace SUNDIALS
                              const MPI_Comm        mpi_comm)
     : data(data)
     , ark_stepper_storage(std::make_unique<ARKStepper<VectorType>>(
-        typename ARKStepper<VectorType>::AdditionalData{}))
+        typename ARKStepper<VectorType>::AdditionalData(
+          data.maximum_order,
+          data.maximum_non_linear_iterations,
+          data.implicit_function_is_linear,
+          data.implicit_function_is_time_independent,
+          data.mass_is_time_independent,
+          data.anderson_acceleration_subspace)))
     , stepper(*ark_stepper_storage)
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     , arkode_ctx(nullptr)
