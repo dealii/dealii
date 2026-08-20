@@ -1,0 +1,9 @@
+Fixed: The Triangulation class had code that checks that a mesh after
+mesh refinement does not have cells that are distorted (e.g.,
+inside-out). Such distorted cells typically happen when the new point
+in the middle of a boundary edge is placed too far inside its adjacent
+cell, for example because the boundary has a lot of curvature. This
+check, however, was lost in a refactoring step many years ago and was
+no longer run. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2026/08/12)
