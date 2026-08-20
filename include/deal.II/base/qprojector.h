@@ -350,30 +350,6 @@ public:
 
     /**
      * Static function to generate an offset object for a given face of a cell
-     * with the given face orientation, flip and rotation. This function of
-     * course is only allowed if <tt>dim>=2</tt>, and the face orientation,
-     * flip and rotation are ignored if the space dimension equals 2.
-     *
-     * The last argument denotes the number of quadrature points the
-     * lower-dimensional face quadrature formula (the one that has been
-     * projected onto the faces) has.
-     *
-     * @deprecated Use the version of this function which takes a
-     * combined_orientation argument instead.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT(
-      "Use the version of this function which takes a combined_orientation "
-      "argument instead.")
-    static DataSetDescriptor
-    face(const ReferenceCell<dim> &reference_cell,
-         const unsigned int        face_no,
-         const bool                face_orientation,
-         const bool                face_flip,
-         const bool                face_rotation,
-         const unsigned int        n_quadrature_points);
-
-    /**
-     * Static function to generate an offset object for a given face of a cell
      * with the given combined face orientation.
      *
      * @p n_quadrature_points is the number of quadrature points the
@@ -391,60 +367,12 @@ public:
      * taking into account the possibility of different quadrature rules being
      * used on each face.
      *
-     * @deprecated Use the version of this function which takes a
-     * combined_orientation argument instead.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT(
-      "Use the version of this function which takes a combined_orientation "
-      "argument instead.")
-    static DataSetDescriptor
-    face(const ReferenceCell<dim>       &reference_cell,
-         const unsigned int              face_no,
-         const bool                      face_orientation,
-         const bool                      face_flip,
-         const bool                      face_rotation,
-         const hp::QCollection<dim - 1> &quadrature);
-
-    /**
-     * Compute an offset object for the given face number and orientation,
-     * taking into account the possibility of different quadrature rules being
-     * used on each face.
-     *
      */
     static DataSetDescriptor
     face(const ReferenceCell<dim>          &reference_cell,
          const unsigned int                 face_no,
          const types::geometric_orientation combined_orientation,
          const hp::QCollection<dim - 1>    &quadrature);
-
-    /**
-     * Static function to generate an offset object for a given subface of a
-     * cell with the given face orientation, flip and rotation. This function
-     * of course is only allowed if <tt>dim>=2</tt>, and the face orientation,
-     * flip and rotation are ignored if the space dimension equals 2.
-     *
-     * The last but one argument denotes the number of quadrature points the
-     * lower-dimensional face quadrature formula (the one that has been
-     * projected onto the faces) has.
-     *
-     * Through the last argument anisotropic refinement can be respected.
-     *
-     * @deprecated Use the version of this function which takes a
-     * combined_orientation argument instead.
-     */
-    DEAL_II_DEPRECATED_WITH_COMMENT(
-      "Use the version of this function which takes a combined_orientation "
-      "argument instead.")
-    static DataSetDescriptor
-    subface(const ReferenceCell<dim>        &reference_cell,
-            const unsigned int               face_no,
-            const unsigned int               subface_no,
-            const bool                       face_orientation,
-            const bool                       face_flip,
-            const bool                       face_rotation,
-            const unsigned int               n_quadrature_points,
-            const internal::SubfaceCase<dim> ref_case =
-              internal::SubfaceCase<dim>::case_isotropic);
 
     /**
      * Static function to generate an offset object for a given subface of a

@@ -106,9 +106,9 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
                 (QProjector<2>::DataSetDescriptor::face(
                   ReferenceCells::Quadrilateral,
                   f,
-                  cell->face_orientation(f),
-                  cell->face_flip(f),
-                  cell->face_rotation(f),
+                  internal::combined_face_orientation(cell->face_orientation(f),
+                                                      cell->face_flip(f),
+                                                      cell->face_rotation(f)),
                   quad.size()));
               fe_v_face.reinit(cell, f);
 
@@ -120,9 +120,10 @@ evaluate_normal_component(const DoFHandler<2> &dof_handler,
                 (QProjector<2>::DataSetDescriptor::face(
                   cell_n->reference_cell(),
                   neighbor,
-                  cell_n->face_orientation(neighbor),
-                  cell_n->face_flip(neighbor),
-                  cell_n->face_rotation(neighbor),
+                  internal::combined_face_orientation(
+                    cell_n->face_orientation(neighbor),
+                    cell_n->face_flip(neighbor),
+                    cell_n->face_rotation(neighbor)),
                   quad.size()));
 
               // Get values from solution vector (For Trap.Rule)

@@ -635,26 +635,6 @@ QProjector<dim>::project_to_line(const ReferenceCell<dim> &reference_cell,
 template <int dim>
 typename QProjector<dim>::DataSetDescriptor
 QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell<dim> &reference_cell,
-  const unsigned int        face_no,
-  const bool                face_orientation,
-  const bool                face_flip,
-  const bool                face_rotation,
-  const unsigned int        n_quadrature_points)
-{
-  return face(reference_cell,
-              face_no,
-              internal::combined_face_orientation(face_orientation,
-                                                  face_rotation,
-                                                  face_flip),
-              n_quadrature_points);
-}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::face(
   const ReferenceCell<dim>          &reference_cell,
   const unsigned int                 face_no,
   const types::geometric_orientation combined_orientation,
@@ -669,26 +649,6 @@ QProjector<dim>::DataSetDescriptor::face(
   return {(reference_cell.n_face_orientations(face_no) * face_no +
            combined_orientation) *
           n_quadrature_points};
-}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::face(
-  const ReferenceCell<dim>       &reference_cell,
-  const unsigned int              face_no,
-  const bool                      face_orientation,
-  const bool                      face_flip,
-  const bool                      face_rotation,
-  const hp::QCollection<dim - 1> &quadrature)
-{
-  return face(reference_cell,
-              face_no,
-              internal::combined_face_orientation(face_orientation,
-                                                  face_rotation,
-                                                  face_flip),
-              quadrature);
 }
 
 
@@ -713,31 +673,6 @@ QProjector<dim>::DataSetDescriptor::face(
 
   return {offset + combined_orientation *
                      quadrature[quadrature.size() == 1 ? 0 : face_no].size()};
-}
-
-
-
-template <int dim>
-typename QProjector<dim>::DataSetDescriptor
-QProjector<dim>::DataSetDescriptor::subface(
-  const ReferenceCell<dim>        &reference_cell,
-  const unsigned int               face_no,
-  const unsigned int               subface_no,
-  const bool                       face_orientation,
-  const bool                       face_flip,
-  const bool                       face_rotation,
-  const unsigned int               n_quadrature_points,
-  const internal::SubfaceCase<dim> ref_case)
-{
-  return QProjector<dim>::DataSetDescriptor::subface(
-    reference_cell,
-    face_no,
-    subface_no,
-    internal::combined_face_orientation(face_orientation,
-                                        face_rotation,
-                                        face_flip),
-    n_quadrature_points,
-    ref_case);
 }
 
 
