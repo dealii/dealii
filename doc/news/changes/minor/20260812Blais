@@ -1,0 +1,11 @@
+Fixed: A test that provides both an unannotated comparison file
+(`foo.output`) and one carrying an `.mpirun=N.` annotation
+(`foo.mpirun=N.output`) shares a single executable target between all of its
+variants. Only the annotated variants required the setup fixture that builds
+this shared target, so the unannotated variant could be scheduled
+concurrently with it by `ctest -j`. Both then invoked a build of the same
+target, and the two concurrent builds could clobber the same object file,
+letting the test fail with a linker error. All variants of such a test now
+require the setup fixture. This regularly crashed the CI in Lethe.
+<br>
+(Bruno Blais, 2026/08/12)
