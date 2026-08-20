@@ -455,8 +455,8 @@ namespace Portable
                   eval.template co_gradients<0, false, true, false>(
                     Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
                 else
-                  eval.template co_gradients<2, false, false, false>(
-                    Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
+                  eval.template co_gradients<0, false, false, false>(
+                    Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
               }
             else if constexpr (dim == 2)
               {
@@ -601,8 +601,8 @@ namespace Portable
                       eval.template co_gradients<0, false, true, false>(
                         Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
                     else
-                      eval.template co_gradients<2, false, false, false>(
-                        Kokkos::subview(grad_u, Kokkos::ALL, 2), u);
+                      eval.template co_gradients<0, false, false, false>(
+                        Kokkos::subview(grad_u, Kokkos::ALL, 0), u);
                   }
                 else if constexpr (dim == 2)
                   {
