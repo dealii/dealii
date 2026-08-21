@@ -1,0 +1,4 @@
+New: Added ITK as an optional dependency for
+image analysis.
+<br>
+(Jonas Plank, 2026/08/06)
