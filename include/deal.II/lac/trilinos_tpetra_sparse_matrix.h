@@ -363,7 +363,7 @@ namespace LinearAlgebra
       /**
        * This function is similar to the other initialization function above,
        * but now also reassigns the matrix rows and columns according to two
-       * user-supplied index sets.  To be used for rectangular matrices. The
+       * user-supplied index sets. To be used for rectangular matrices. The
        * optional argument @p exchange_data can be used for reinitialization
        * with a sparsity pattern that is not fully constructed. This feature is
        * only implemented for input sparsity patterns of type
