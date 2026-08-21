@@ -1,0 +1,5 @@
+Fixed: Portable::FEEvaluation 1D integration kernels
+were causing build time illegal access error. This
+has been fixed and associate 1D test added.
+<br>
+(Ivan Prusak, 2026/08/21)
