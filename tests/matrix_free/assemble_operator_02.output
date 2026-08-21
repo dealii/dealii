@@ -1,0 +1,4 @@
+
+DEAL::n = 256
+DEAL::n_vmults = 7
+DEAL::true
