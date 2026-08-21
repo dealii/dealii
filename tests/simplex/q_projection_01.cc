@@ -45,15 +45,14 @@ test<2>(const unsigned int n_points)
     deallog << "face_no=" << face_no
             << " face_orientation=" << (face_orientation ? "true" : "false")
             << ':' << std::endl;
-    for (unsigned int
-           q = 0,
-           i =
-             QProjector<dim>::DataSetDescriptor::face(ReferenceCells::Triangle,
-                                                      face_no,
-                                                      face_orientation,
-                                                      false,
-                                                      false,
-                                                      quad_ref.size());
+    for (unsigned int q = 0,
+                      i = QProjector<dim>::DataSetDescriptor::face(
+                        ReferenceCells::Triangle,
+                        face_no,
+                        internal::combined_face_orientation(face_orientation,
+                                                            false,
+                                                            false),
+                        quad_ref.size());
          q < quad_ref.size();
          ++q, ++i)
       {
@@ -96,9 +95,9 @@ test<3>(const unsigned int n_points)
                       i = QProjector<dim>::DataSetDescriptor::face(
                         ReferenceCells::Tetrahedron,
                         face_no,
-                        face_orientation,
-                        face_flip,
-                        face_rotation,
+                        internal::combined_face_orientation(face_orientation,
+                                                            face_rotation,
+                                                            face_flip),
                         quad_ref.size());
          q < quad_ref.size();
          ++q, ++i)

@@ -142,9 +142,6 @@ transfer(std::ostream &out)
   dgq_data_out.write_gnuplot(out);
 
   // test b): with coarsening
-  q_soltrans.clear();
-  dgq_soltrans.clear();
-
   cell = tria.begin_active(tria.n_levels() - 1);
   endc = tria.end(tria.n_levels() - 1);
   cell->set_refine_flag();
