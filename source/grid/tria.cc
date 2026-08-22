@@ -6074,306 +6074,315 @@ namespace internal
 
         // First check whether we can get away with isotropic refinement, or
         // whether we need to run through the full anisotropic algorithm
-        {
-          bool do_isotropic_refinement = true;
-          for (const auto &cell : triangulation.active_cell_iterators())
-            if (cell->refine_flag_set() == RefinementCase<dim>::cut_x ||
-                cell->refine_flag_set() == RefinementCase<dim>::cut_y)
-              {
-                do_isotropic_refinement = false;
-                break;
-              }
-
-          if (do_isotropic_refinement)
-            return execute_refinement_isotropic(triangulation,
-                                                check_for_distorted_cells);
-        }
-
-        // If we get here, we are doing anisotropic refinement.
-
-        // Check whether a new level is needed. We have to check for
-        // this on the highest level only
-        for (const auto &cell : triangulation.active_cell_iterators_on_level(
-               triangulation.levels.size() - 1))
-          if (cell->refine_flag_set())
+        bool do_isotropic_refinement = true;
+        for (const auto &cell : triangulation.active_cell_iterators())
+          if (cell->refine_flag_set() == RefinementCase<dim>::cut_x ||
+              cell->refine_flag_set() == RefinementCase<dim>::cut_y)
             {
-              triangulation.levels.push_back(
-                std::make_unique<internal::TriangulationImplementation::
-                                   TriaLevel<dim, spacedim>>(
-                  triangulation.strides.max_children_per_cell,
-                  triangulation.strides.max_faces_per_cell,
-                  triangulation.strides.max_vertices_per_cell));
+              do_isotropic_refinement = false;
               break;
             }
 
-        // TODO[WB]: we clear user flags and pointers of lines; we're going
-        // to use them to flag which lines need refinement
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
+        if (do_isotropic_refinement)
+          return execute_refinement_isotropic(triangulation,
+                                              check_for_distorted_cells);
+        else
           {
-            line->clear_user_flag();
-            line->clear_user_data();
-          }
+            // If we get here, we are doing anisotropic refinement.
 
-        // running over all cells and lines count the number
-        // n_single_lines of lines which can be stored as single
-        // lines, e.g. inner lines
-        unsigned int n_single_lines = 0;
-
-        // New lines to be created: number lines which are stored in
-        // pairs (the children of lines must be stored in pairs)
-        unsigned int n_lines_in_pairs = 0;
-
-        // check how much space is needed on every level. We need not
-        // check the highest level since either - on the highest level
-        // no cells are flagged for refinement - there are, but
-        // prepare_refinement added another empty level
-        unsigned int needed_vertices = 0;
-
-        const bool orientation_needed =
-          !triangulation.all_reference_cells_are_hyper_cube();
-
-        for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
-             --level_no)
-          {
-            // count number of flagged cells on this level and compute
-            // how many new vertices and new lines will be needed
-            std::size_t needed_cells = 0;
-
+            // Check whether a new level is needed. We have to check for
+            // this on the highest level only
             for (const auto &cell :
-                 triangulation.active_cell_iterators_on_level(level_no))
+                 triangulation.active_cell_iterators_on_level(
+                   triangulation.levels.size() - 1))
               if (cell->refine_flag_set())
                 {
-                  Assert(cell->reference_cell().is_hyper_cube(),
-                         ExcNotImplemented());
-                  if (cell->refine_flag_set() == RefinementCase<dim>::cut_xy)
+                  triangulation.levels.push_back(
+                    std::make_unique<internal::TriangulationImplementation::
+                                       TriaLevel<dim, spacedim>>(
+                      triangulation.strides.max_children_per_cell,
+                      triangulation.strides.max_faces_per_cell,
+                      triangulation.strides.max_vertices_per_cell));
+                  break;
+                }
+
+            // TODO[WB]: we clear user flags and pointers of lines; we're going
+            // to use them to flag which lines need refinement
+            for (typename Triangulation<dim, spacedim>::line_iterator line =
+                   triangulation.begin_line();
+                 line != triangulation.end_line();
+                 ++line)
+              {
+                line->clear_user_flag();
+                line->clear_user_data();
+              }
+
+            // running over all cells and lines count the number
+            // n_single_lines of lines which can be stored as single
+            // lines, e.g. inner lines
+            unsigned int n_single_lines = 0;
+
+            // New lines to be created: number lines which are stored in
+            // pairs (the children of lines must be stored in pairs)
+            unsigned int n_lines_in_pairs = 0;
+
+            // check how much space is needed on every level. We need not
+            // check the highest level since either - on the highest level
+            // no cells are flagged for refinement - there are, but
+            // prepare_refinement added another empty level
+            unsigned int needed_vertices = 0;
+
+            const bool orientation_needed =
+              !triangulation.all_reference_cells_are_hyper_cube();
+
+            for (int level_no = triangulation.levels.size() - 2; level_no >= 0;
+                 --level_no)
+              {
+                // count number of flagged cells on this level and compute
+                // how many new vertices and new lines will be needed
+                std::size_t needed_cells = 0;
+
+                for (const auto &cell :
+                     triangulation.active_cell_iterators_on_level(level_no))
+                  if (cell->refine_flag_set())
                     {
-                      needed_cells += 4;
-
-                      // new vertex at center of cell is needed in any
-                      // case
-                      ++needed_vertices;
-
-                      // the four inner lines can be stored as singles
-                      n_single_lines += 4;
-                    }
-                  else // cut_x || cut_y
-                    {
-                      // set the flag showing that anisotropic
-                      // refinement is used for at least one cell
-                      triangulation.anisotropic_refinement = true;
-
-                      needed_cells += 2;
-                      // no vertex at center
-
-                      // the inner line can be stored as single
-                      n_single_lines += 1;
-                    }
-
-                  // mark all faces (lines) for refinement; checking
-                  // locally whether the neighbor would also like to
-                  // refine them is rather difficult for lines so we
-                  // only flag them and after visiting all cells, we
-                  // decide which lines need refinement;
-                  for (const unsigned int line_no :
-                       GeometryInfo<dim>::face_indices())
-                    {
-                      if (GeometryInfo<dim>::face_refinement_case(
-                            cell->refine_flag_set(), line_no) ==
-                          RefinementCase<1>::cut_x)
+                      Assert(cell->reference_cell().is_hyper_cube(),
+                             ExcNotImplemented());
+                      if (cell->refine_flag_set() ==
+                          RefinementCase<dim>::cut_xy)
                         {
-                          typename Triangulation<dim, spacedim>::line_iterator
-                            line = cell->line(line_no);
-                          if (line->has_children() == false)
-                            line->set_user_flag();
+                          needed_cells += 4;
+
+                          // new vertex at center of cell is needed in any
+                          // case
+                          ++needed_vertices;
+
+                          // the four inner lines can be stored as singles
+                          n_single_lines += 4;
+                        }
+                      else // cut_x || cut_y
+                        {
+                          // set the flag showing that anisotropic
+                          // refinement is used for at least one cell
+                          triangulation.anisotropic_refinement = true;
+
+                          needed_cells += 2;
+                          // no vertex at center
+
+                          // the inner line can be stored as single
+                          n_single_lines += 1;
+                        }
+
+                      // mark all faces (lines) for refinement; checking
+                      // locally whether the neighbor would also like to
+                      // refine them is rather difficult for lines so we
+                      // only flag them and after visiting all cells, we
+                      // decide which lines need refinement;
+                      for (const unsigned int line_no :
+                           GeometryInfo<dim>::face_indices())
+                        {
+                          if (GeometryInfo<dim>::face_refinement_case(
+                                cell->refine_flag_set(), line_no) ==
+                              RefinementCase<1>::cut_x)
+                            {
+                              typename Triangulation<dim,
+                                                     spacedim>::line_iterator
+                                line = cell->line(line_no);
+                              if (line->has_children() == false)
+                                line->set_user_flag();
+                            }
                         }
                     }
-                }
 
-            auto      &next_level = *triangulation.levels[level_no + 1];
-            const auto used_cells = std::count(next_level.cells.used.begin(),
-                                               next_level.cells.used.end(),
-                                               true);
-            if (used_cells + needed_cells > next_level.size())
-              next_level.allocate_end((used_cells + needed_cells) -
-                                        next_level.size(),
-                                      orientation_needed,
-                                      // We are in 2d so there are no tetrahedra
-                                      false);
+                auto      &next_level = *triangulation.levels[level_no + 1];
+                const auto used_cells =
+                  std::count(next_level.cells.used.begin(),
+                             next_level.cells.used.end(),
+                             true);
+                if (used_cells + needed_cells > next_level.size())
+                  next_level.allocate_end(
+                    (used_cells + needed_cells) - next_level.size(),
+                    orientation_needed,
+                    // We are in 2d so there are no tetrahedra
+                    false);
 
-            // TODO: perhaps we can merge this with TriaLevel::allocate_end()
-            next_level.cells.allocate_end(needed_cells, 0);
-          }
-
-        // now count the lines which were flagged for refinement
-        for (typename Triangulation<dim, spacedim>::line_iterator line =
-               triangulation.begin_line();
-             line != triangulation.end_line();
-             ++line)
-          if (line->user_flag_set())
-            {
-              Assert(line->has_children() == false, ExcInternalError());
-              n_lines_in_pairs += 2;
-              needed_vertices += 1;
-            }
-        // reserve space for n_lines_in_pairs new lines.  note, that
-        // we can't reserve space for the single lines here as well,
-        // as all the space reserved for lines in pairs would be
-        // counted as unused and we would end up with too little space
-        // to store all lines. memory reservation for n_single_lines
-        // can only be done AFTER we refined the lines of the current
-        // cells
-        triangulation.faces->lines.allocate_end(n_lines_in_pairs, 0);
-
-        // add to needed vertices how many vertices are already in use
-        needed_vertices += std::count(triangulation.vertices_used.begin(),
-                                      triangulation.vertices_used.end(),
-                                      true);
-        // if we need more vertices: create them, if not: leave the
-        // array as is, since shrinking is not really possible because
-        // some of the vertices at the end may be in use
-        if (needed_vertices > triangulation.vertices.size())
-          {
-            triangulation.vertices.resize(needed_vertices, Point<spacedim>());
-            triangulation.vertices_used.resize(needed_vertices, false);
-          }
-
-
-        // Do REFINEMENT on every level; exclude highest level as
-        // above
-
-        //  index of next unused vertex
-        unsigned int next_unused_vertex = 0;
-
-        // first the refinement of lines.  children are stored
-        // pairwise
-        {
-          // only active objects can be refined further
-          typename Triangulation<dim, spacedim>::active_line_iterator
-            line = triangulation.begin_active_line(),
-            endl = triangulation.end_line();
-          typename Triangulation<dim, spacedim>::raw_line_iterator
-            next_unused_line = triangulation.begin_raw_line();
-
-          for (; line != endl; ++line)
-            if (line->user_flag_set())
-              {
-                // this line needs to be refined
-
-                // find the next unused vertex and set it
-                // appropriately
-                while (triangulation.vertices_used[next_unused_vertex] == true)
-                  ++next_unused_vertex;
-                Assert(
-                  next_unused_vertex < triangulation.vertices.size(),
-                  ExcMessage(
-                    "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
-                triangulation.vertices_used[next_unused_vertex] = true;
-
-                triangulation.vertices[next_unused_vertex] = line->center(true);
-
-                // now that we created the right point, make up the
-                // two child lines.  To this end, find a pair of
-                // unused lines
-                bool pair_found = false;
-                for (; next_unused_line != endl; ++next_unused_line)
-                  if (!next_unused_line->used() &&
-                      !(++next_unused_line)->used())
-                    {
-                      // go back to the first of the two unused
-                      // lines
-                      --next_unused_line;
-                      pair_found = true;
-                      break;
-                    }
-                Assert(pair_found, ExcInternalError());
-
-                // there are now two consecutive unused lines, such
-                // that the children of a line will be consecutive.
-                // then set the child pointer of the present line
-                line->set_children(0, next_unused_line->index());
-
-                // set the two new lines
-                const typename Triangulation<dim, spacedim>::raw_line_iterator
-                  children[2] = {next_unused_line, ++next_unused_line};
-                // some tests; if any of the iterators should be
-                // invalid, then already dereferencing will fail
-                AssertIsNotUsed(children[0]);
-                AssertIsNotUsed(children[1]);
-
-                children[0]->set_bounding_object_indices(
-                  {line->vertex_index(0), next_unused_vertex});
-                children[1]->set_bounding_object_indices(
-                  {next_unused_vertex, line->vertex_index(1)});
-
-                children[0]->set_used_flag();
-                children[1]->set_used_flag();
-                children[0]->clear_children();
-                children[1]->clear_children();
-                children[0]->clear_user_data();
-                children[1]->clear_user_data();
-                children[0]->clear_user_flag();
-                children[1]->clear_user_flag();
-
-
-                children[0]->set_boundary_id_internal(line->boundary_id());
-                children[1]->set_boundary_id_internal(line->boundary_id());
-
-                children[0]->set_manifold_id(line->manifold_id());
-                children[1]->set_manifold_id(line->manifold_id());
-
-                // finally clear flag indicating the need for
-                // refinement
-                line->clear_user_flag();
+                // TODO: perhaps we can merge this with
+                // TriaLevel::allocate_end()
+                next_level.cells.allocate_end(needed_cells, 0);
               }
-        }
 
-
-        // Now set up the new cells
-
-        // reserve space for inner lines (can be stored as single
-        // lines)
-        triangulation.faces->lines.allocate_end(0, n_single_lines);
-
-        typename Triangulation<2, spacedim>::DistortedCellList
-          cells_with_distorted_children;
-
-        // reset next_unused_line, as now also single empty places in
-        // the vector can be used
-        typename Triangulation<dim, spacedim>::raw_line_iterator
-          next_unused_line = triangulation.begin_raw_line();
-
-        for (int level = 0;
-             level < static_cast<int>(triangulation.levels.size()) - 1;
-             ++level)
-          {
-            typename Triangulation<dim, spacedim>::raw_cell_iterator
-              next_unused_cell = triangulation.begin_raw(level + 1);
-
-            for (const auto &cell :
-                 triangulation.active_cell_iterators_on_level(level))
-              if (cell->refine_flag_set())
+            // now count the lines which were flagged for refinement
+            for (typename Triangulation<dim, spacedim>::line_iterator line =
+                   triangulation.begin_line();
+                 line != triangulation.end_line();
+                 ++line)
+              if (line->user_flag_set())
                 {
-                  // actually set up the children and update neighbor
-                  // information
-                  create_children(triangulation,
-                                  next_unused_vertex,
-                                  next_unused_line,
-                                  next_unused_cell,
-                                  cell);
-
-                  if (check_for_distorted_cells &&
-                      has_distorted_children<dim, spacedim>(cell))
-                    cells_with_distorted_children.distorted_cells.push_back(
-                      cell);
-                  // inform all listeners that cell refinement is done
-                  triangulation.signals.post_refinement_on_cell(cell);
+                  Assert(line->has_children() == false, ExcInternalError());
+                  n_lines_in_pairs += 2;
+                  needed_vertices += 1;
                 }
-          }
+            // reserve space for n_lines_in_pairs new lines.  note, that
+            // we can't reserve space for the single lines here as well,
+            // as all the space reserved for lines in pairs would be
+            // counted as unused and we would end up with too little space
+            // to store all lines. memory reservation for n_single_lines
+            // can only be done AFTER we refined the lines of the current
+            // cells
+            triangulation.faces->lines.allocate_end(n_lines_in_pairs, 0);
 
-        return cells_with_distorted_children;
+            // add to needed vertices how many vertices are already in use
+            needed_vertices += std::count(triangulation.vertices_used.begin(),
+                                          triangulation.vertices_used.end(),
+                                          true);
+            // if we need more vertices: create them, if not: leave the
+            // array as is, since shrinking is not really possible because
+            // some of the vertices at the end may be in use
+            if (needed_vertices > triangulation.vertices.size())
+              {
+                triangulation.vertices.resize(needed_vertices,
+                                              Point<spacedim>());
+                triangulation.vertices_used.resize(needed_vertices, false);
+              }
+
+
+            // Do REFINEMENT on every level; exclude highest level as
+            // above
+
+            //  index of next unused vertex
+            unsigned int next_unused_vertex = 0;
+
+            // first the refinement of lines.  children are stored
+            // pairwise
+            {
+              // only active objects can be refined further
+              typename Triangulation<dim, spacedim>::active_line_iterator
+                line = triangulation.begin_active_line(),
+                endl = triangulation.end_line();
+              typename Triangulation<dim, spacedim>::raw_line_iterator
+                next_unused_line = triangulation.begin_raw_line();
+
+              for (; line != endl; ++line)
+                if (line->user_flag_set())
+                  {
+                    // this line needs to be refined
+
+                    // find the next unused vertex and set it
+                    // appropriately
+                    while (triangulation.vertices_used[next_unused_vertex] ==
+                           true)
+                      ++next_unused_vertex;
+                    Assert(
+                      next_unused_vertex < triangulation.vertices.size(),
+                      ExcMessage(
+                        "Internal error: During refinement, the triangulation wants to access an element of the 'vertices' array but it turns out that the array is not large enough."));
+                    triangulation.vertices_used[next_unused_vertex] = true;
+
+                    triangulation.vertices[next_unused_vertex] =
+                      line->center(true);
+
+                    // now that we created the right point, make up the
+                    // two child lines.  To this end, find a pair of
+                    // unused lines
+                    bool pair_found = false;
+                    for (; next_unused_line != endl; ++next_unused_line)
+                      if (!next_unused_line->used() &&
+                          !(++next_unused_line)->used())
+                        {
+                          // go back to the first of the two unused
+                          // lines
+                          --next_unused_line;
+                          pair_found = true;
+                          break;
+                        }
+                    Assert(pair_found, ExcInternalError());
+
+                    // there are now two consecutive unused lines, such
+                    // that the children of a line will be consecutive.
+                    // then set the child pointer of the present line
+                    line->set_children(0, next_unused_line->index());
+
+                    // set the two new lines
+                    const typename Triangulation<dim,
+                                                 spacedim>::raw_line_iterator
+                      children[2] = {next_unused_line, ++next_unused_line};
+                    // some tests; if any of the iterators should be
+                    // invalid, then already dereferencing will fail
+                    AssertIsNotUsed(children[0]);
+                    AssertIsNotUsed(children[1]);
+
+                    children[0]->set_bounding_object_indices(
+                      {line->vertex_index(0), next_unused_vertex});
+                    children[1]->set_bounding_object_indices(
+                      {next_unused_vertex, line->vertex_index(1)});
+
+                    children[0]->set_used_flag();
+                    children[1]->set_used_flag();
+                    children[0]->clear_children();
+                    children[1]->clear_children();
+                    children[0]->clear_user_data();
+                    children[1]->clear_user_data();
+                    children[0]->clear_user_flag();
+                    children[1]->clear_user_flag();
+
+
+                    children[0]->set_boundary_id_internal(line->boundary_id());
+                    children[1]->set_boundary_id_internal(line->boundary_id());
+
+                    children[0]->set_manifold_id(line->manifold_id());
+                    children[1]->set_manifold_id(line->manifold_id());
+
+                    // finally clear flag indicating the need for
+                    // refinement
+                    line->clear_user_flag();
+                  }
+            }
+
+
+            // Now set up the new cells
+
+            // reserve space for inner lines (can be stored as single
+            // lines)
+            triangulation.faces->lines.allocate_end(0, n_single_lines);
+
+            typename Triangulation<2, spacedim>::DistortedCellList
+              cells_with_distorted_children;
+
+            // reset next_unused_line, as now also single empty places in
+            // the vector can be used
+            typename Triangulation<dim, spacedim>::raw_line_iterator
+              next_unused_line = triangulation.begin_raw_line();
+
+            for (int level = 0;
+                 level < static_cast<int>(triangulation.levels.size()) - 1;
+                 ++level)
+              {
+                typename Triangulation<dim, spacedim>::raw_cell_iterator
+                  next_unused_cell = triangulation.begin_raw(level + 1);
+
+                for (const auto &cell :
+                     triangulation.active_cell_iterators_on_level(level))
+                  if (cell->refine_flag_set())
+                    {
+                      // actually set up the children and update neighbor
+                      // information
+                      create_children(triangulation,
+                                      next_unused_vertex,
+                                      next_unused_line,
+                                      next_unused_cell,
+                                      cell);
+
+                      if (check_for_distorted_cells &&
+                          has_distorted_children<dim, spacedim>(cell))
+                        cells_with_distorted_children.distorted_cells.push_back(
+                          cell);
+                      // inform all listeners that cell refinement is done
+                      triangulation.signals.post_refinement_on_cell(cell);
+                    }
+              }
+
+            return cells_with_distorted_children;
+          }
       }
 
 
