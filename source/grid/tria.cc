@@ -12727,30 +12727,25 @@ namespace internal
       {}
 
       template <int dim, int spacedim>
-      void static update_neighbors(Triangulation<dim, spacedim> &triangulation)
+      static void
+      update_neighbors(Triangulation<dim, spacedim> &triangulation)
       {
-        std::vector<std::pair<unsigned int, unsigned int>> adjacent_cells(
-          2 * triangulation.n_raw_faces(),
-          {numbers::invalid_unsigned_int, numbers::invalid_unsigned_int});
+        std::vector<std::pair<int, int>> adjacent_cells(
+          2 * triangulation.n_raw_faces(), {-1, -1});
 
         const auto set_entry = [&](const auto &face_index, const auto &cell) {
-          const std::pair<unsigned int, unsigned int> cell_pair = {
-            cell->level(), cell->index()};
-          unsigned int index;
+          const std::pair<int, int> cell_pair = {cell->level(), cell->index()};
 
-          if (adjacent_cells[2 * face_index].first ==
-                numbers::invalid_unsigned_int &&
-              adjacent_cells[2 * face_index].second ==
-                numbers::invalid_unsigned_int)
+          int index = numbers::invalid_unsigned_int;
+          if (adjacent_cells[2 * face_index].first == -1 &&
+              adjacent_cells[2 * face_index].second == -1)
             {
               index = 2 * face_index + 0;
             }
           else
             {
-              Assert(((adjacent_cells[2 * face_index + 1].first ==
-                       numbers::invalid_unsigned_int) &&
-                      (adjacent_cells[2 * face_index + 1].second ==
-                       numbers::invalid_unsigned_int)),
+              Assert(((adjacent_cells[2 * face_index + 1].first == -1) &&
+                      (adjacent_cells[2 * face_index + 1].second == -1)),
                      ExcNotImplemented());
               index = 2 * face_index + 1;
             }
@@ -12763,17 +12758,12 @@ namespace internal
               const auto &cell) -> TriaIterator<CellAccessor<dim, spacedim>> {
           auto test = adjacent_cells[2 * face_index];
 
-          if (test == std::pair<unsigned int, unsigned int>(cell->level(),
-                                                            cell->index()))
+          if (test == std::make_pair(cell->level(), cell->index()))
             test = adjacent_cells[2 * face_index + 1];
 
-          if ((test.first != numbers::invalid_unsigned_int) &&
-              (test.second != numbers::invalid_unsigned_int))
-            return TriaIterator<CellAccessor<dim, spacedim>>(&triangulation,
-                                                             test.first,
-                                                             test.second);
-          else
-            return triangulation.end();
+          return TriaIterator<CellAccessor<dim, spacedim>>(&triangulation,
+                                                           test.first,
+                                                           test.second);
         };
 
         for (const auto &cell : triangulation.cell_iterators())
