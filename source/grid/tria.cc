@@ -2113,77 +2113,82 @@ namespace internal
                                   tria_object.children.size()));
         }
     }
+  } // namespace TriangulationImplementation
+} // namespace internal
 
 
+/**
+ * An interface for algorithms that implement Triangulation-specific tasks
+ * related to creation, refinement, and coarsening.
+ */
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+class Triangulation<dim, spacedim>::Policy
+{
+public:
+  /**
+   * Destructor.
+   */
+  virtual ~Policy() = default;
 
-    /**
-     * An interface for algorithms that implement Triangulation-specific tasks
-     * related to creation, refinement, and coarsening.
-     */
-    template <int dim, int spacedim>
-    class Policy
-    {
-    public:
-      /**
-       * Destructor.
-       */
-      virtual ~Policy() = default;
+  /**
+   * Update neighbors.
+   */
+  virtual void
+  update_neighbors(Triangulation<dim, spacedim> &tria) = 0;
 
-      /**
-       * Update neighbors.
-       */
-      virtual void
-      update_neighbors(Triangulation<dim, spacedim> &tria) = 0;
+  /**
+   * Delete children of given cell.
+   */
+  virtual void
+  delete_children(Triangulation<dim, spacedim> &triangulation,
+                  typename Triangulation<dim, spacedim>::cell_iterator &cell,
+                  std::vector<unsigned int> &line_cell_count,
+                  std::vector<unsigned int> &quad_cell_count) = 0;
 
-      /**
-       * Delete children of given cell.
-       */
-      virtual void
-      delete_children(
-        Triangulation<dim, spacedim>                         &triangulation,
-        typename Triangulation<dim, spacedim>::cell_iterator &cell,
-        std::vector<unsigned int>                            &line_cell_count,
-        std::vector<unsigned int> &quad_cell_count) = 0;
+  /**
+   * Execute refinement.
+   */
+  virtual typename Triangulation<dim, spacedim>::DistortedCellList
+  execute_refinement(Triangulation<dim, spacedim> &triangulation,
+                     const bool check_for_distorted_cells) = 0;
 
-      /**
-       * Execute refinement.
-       */
-      virtual typename Triangulation<dim, spacedim>::DistortedCellList
-      execute_refinement(Triangulation<dim, spacedim> &triangulation,
-                         const bool check_for_distorted_cells) = 0;
+  /**
+   * Prevent distorted boundary cells.
+   */
+  virtual void
+  prevent_distorted_boundary_cells(
+    Triangulation<dim, spacedim> &triangulation) = 0;
 
-      /**
-       * Prevent distorted boundary cells.
-       */
-      virtual void
-      prevent_distorted_boundary_cells(
-        Triangulation<dim, spacedim> &triangulation) = 0;
+  /**
+   * Prepare refinement.
+   */
+  virtual void
+  prepare_refinement_dim_dependent(
+    Triangulation<dim, spacedim> &triangulation) = 0;
 
-      /**
-       * Prepare refinement.
-       */
-      virtual void
-      prepare_refinement_dim_dependent(
-        Triangulation<dim, spacedim> &triangulation) = 0;
+  /**
+   * Check if coarsening is allowed for the given cell.
+   */
+  virtual bool
+  coarsening_allowed(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell) = 0;
 
-      /**
-       * Check if coarsening is allowed for the given cell.
-       */
-      virtual bool
-      coarsening_allowed(
-        const typename Triangulation<dim, spacedim>::cell_iterator &cell) = 0;
-
-      /**
-       * A sort of virtual copy constructor, this function returns a copy of
-       * the policy object. Derived classes need to override the function here
-       * in this base class and return an object of the same type as the derived
-       * class.
-       */
-      virtual std::unique_ptr<Policy<dim, spacedim>>
-      clone() = 0;
-    };
+  /**
+   * A sort of virtual copy constructor, this function returns a copy of
+   * the policy object. Derived classes need to override the function here
+   * in this base class and return an object of the same type as the derived
+   * class.
+   */
+  virtual std::unique_ptr<Policy>
+  clone() = 0;
+};
 
 
+namespace internal
+{
+  namespace TriangulationImplementation
+  {
 
     /**
      * A simple implementation of the interface Policy. It simply delegates the
@@ -2191,7 +2196,7 @@ namespace internal
      * the template argument T.
      */
     template <int dim, int spacedim, typename T>
-    class PolicyWrapper : public Policy<dim, spacedim>
+    class PolicyWrapper : public Triangulation<dim, spacedim>::Policy
     {
     public:
       void
@@ -2239,7 +2244,7 @@ namespace internal
         return T::template coarsening_allowed<dim, spacedim>(cell);
       }
 
-      std::unique_ptr<Policy<dim, spacedim>>
+      std::unique_ptr<typename Triangulation<dim, spacedim>::Policy>
       clone() override
       {
         return std::make_unique<PolicyWrapper<dim, spacedim, T>>();

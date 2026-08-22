@@ -96,9 +96,6 @@ namespace internal
 
     class TriaObjects;
 
-    template <int, int>
-    class Policy;
-
     /**
      * Forward declaration of a class into which we put much of the
      * implementation of the Triangulation class. See the .cc file for more
@@ -4116,6 +4113,24 @@ public:
                  << " is not defined in this Triangulation!");
   /** @} */
 
+  /**
+   * A class that implements Triangulation-specific tasks related to creation,
+   * refinement, and coarsening. The class is only forward-declared here,
+   * and is used as a type-erasure mechanism so that we don't have to
+   * declare the concrete implementation class members in the header file.
+   *
+   * @note This class should really be `private`, but that would require
+   *   concrete implementations of this class to also be member classes so
+   *   that they can derive from this base class. It turns out that this leads
+   *   to compiler errors with MS Visual Studio 2022 and 2025, so we make
+   *   these derived classes non-members and then need to have this class
+   *   be a `public` class. Since it's only actually declared in the .cc file,
+   *   there is no harm -- no other entity outside the tria.cc file sees
+   *   what this class actually is, and so can't use it even though it's
+   *   declared as `public`.
+   */
+  class Policy;
+
 protected:
   /**
    * Do some smoothing in the process of refining the triangulation. See the
@@ -4182,15 +4197,12 @@ protected:
   void
   update_periodic_face_map();
 
-
 private:
   /**
    * Policy with the Triangulation-specific tasks related to creation,
    * refinement, and coarsening.
    */
-  std::unique_ptr<
-    dealii::internal::TriangulationImplementation::Policy<dim, spacedim>>
-    policy;
+  std::unique_ptr<Policy> policy;
 
   /**
    * If add_periodicity() is called, this variable stores the given periodic
