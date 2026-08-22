@@ -1334,7 +1334,8 @@ namespace
 
     std::vector<double>
     get_global_node_numbers(const int face_cell_no,
-                            const int face_cell_face_no) const;
+                            const int face_cell_face_no,
+                            const int n_vertices_per_face) const;
 
     // NL: Stored as [ global node-id (int), x-coord, y-coord, z-coord ]
     std::vector<std::vector<double>> node_list;
@@ -1346,6 +1347,10 @@ namespace
     // ELSET: Stored as [ (std::string) elset_name = (std::vector) of cells
     // numbers]
     std::map<std::string, std::vector<int>> elsets_list;
+
+    ReferenceCell<dim> get_reference_cell_from_element_type(const std::string &type_string);
+
+    ReferenceCell<dim> ref_cell = ReferenceCells::Invalid;
   };
 } // namespace
 
@@ -5261,6 +5266,51 @@ namespace
     return number;
   }
 
+  // helper function
+  // extract everything between a target string and the next comma
+  std::string extractValue(const std::string& line, const std::string& target) {
+    size_t pos = line.find(target);
+    
+    // If the target is found
+    if (pos != std::string::npos) {
+        size_t value_start = pos + target.length();
+        size_t comma_pos = line.find(',', value_start);
+        
+        // Return up to the comma, or to the end of the line if no comma exists
+        if (comma_pos != std::string::npos) {
+            return line.substr(value_start, comma_pos - value_start);
+        } else {
+            return line.substr(value_start);
+        }
+    }
+    
+    // Return an empty string if the target isn't found on this line
+    return ""; 
+}
+
+  template <int dim, int spacedim>
+  ReferenceCell<dim>
+  Abaqus_to_UCD<dim, spacedim>::get_reference_cell_from_element_type(const std::string &type_string)
+  {
+    if (type_string == "C3D8")  return ReferenceCells::Hexahedron;
+    if (type_string == "C3D8I") return ReferenceCells::Hexahedron;
+    if (type_string == "C3D8R") return ReferenceCells::Hexahedron;
+    if (type_string == "C3D4")  return ReferenceCells::Tetrahedron;
+    if (type_string == "C3D6")  return ReferenceCells::Wedge;
+    if (type_string == "S3")    return ReferenceCells::Triangle;
+    if (type_string == "S4")    return ReferenceCells::Quadrilateral;
+    if (type_string == "S4R")   return ReferenceCells::Quadrilateral;
+    if (type_string == "CPS3")  return ReferenceCells::Triangle;
+    if (type_string == "CPS4")  return ReferenceCells::Quadrilateral;
+    if (type_string == "CPS4R") return ReferenceCells::Quadrilateral;
+    if (type_string == "CPE3")  return ReferenceCells::Triangle;
+    if (type_string == "CPE4")  return ReferenceCells::Quadrilateral;
+    if (type_string == "CPE4R") return ReferenceCells::Quadrilateral;
+    if (type_string == "B31")   return ReferenceCells::Line;
+    if (type_string == "B31R")  return ReferenceCells::Line;
+    return return ReferenceCells::Invalid;
+  }
+
 
 
   template <int dim, int spacedim>
@@ -5328,6 +5378,14 @@ namespace
             // Elements itself (n=4 or n=8):
             // Index, i[0], ..., i[n]
 
+            // scan for element ID
+            const std::string element_type_name = "TYPE=";
+            std::string element_name = extractValue(line, element_type_name);
+            ref_cell = get_reference_cell_from_element_type(element_name);
+
+            AssertThrow(ref_cell.dimension() == dim, 
+            ExcMessage("Element dimension does not match Triangulation dimension."));
+
             int material = 0;
             // Scan for material id
             {
@@ -5341,6 +5399,8 @@ namespace
                 }
             }
 
+            const unsigned int n_data_per_cell =
+                  1 + ref_cell.n_vertices();
             // Read ELEMENT definition
             while (std::getline(input_stream, line))
               {
@@ -5353,12 +5413,10 @@ namespace
                 // We will store the material id in the zeroth entry of the
                 // vector and the rest of the elements represent the global
                 // node numbers
-                const unsigned int n_data_per_cell =
-                  1 + GeometryInfo<dim>::vertices_per_cell;
+                
                 std::vector<double> cell(n_data_per_cell);
                 for (unsigned int i = 0; i < n_data_per_cell; ++i)
                   iss >> cell[i] >> comma;
-
                 // Overwrite cell index from file by material
                 cell[0] = static_cast<double>(material);
                 cell_list.push_back(cell);
@@ -5425,7 +5483,7 @@ namespace
                       {
                         el_idx = cell;
                         quad_node_list =
-                          get_global_node_numbers(el_idx, face_number);
+                          get_global_node_numbers(el_idx, face_number, ref_cell.);
                         quad_node_list.insert(quad_node_list.begin(),
                                               b_indicator);
 
@@ -5438,7 +5496,7 @@ namespace
                     char comma;
                     iss >> el_idx >> comma >> temp >> face_number;
                     quad_node_list =
-                      get_global_node_numbers(el_idx, face_number);
+                      get_global_node_numbers(el_idx, face_number, GeometryInfo<dim>::vertices_per_face);
                     quad_node_list.insert(quad_node_list.begin(), b_indicator);
 
                     face_list.push_back(quad_node_list);
@@ -5603,7 +5661,7 @@ namespace
     const int face_cell_no,
     const int face_cell_face_no) const
   {
-    std::vector<double> quad_node_list(GeometryInfo<dim>::vertices_per_face);
+    std::vector<double> quad_node_list(ref_cell.);
 
     // Given the indexing below, face_cell_no-1 must be a valid index:
     Assert((face_cell_no >= 1) &&
