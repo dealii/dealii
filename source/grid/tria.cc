@@ -13594,6 +13594,16 @@ void Triangulation<dim, spacedim>::create_triangulation(
             while (cell_info->id != cell->id().template to_binary<dim>())
               ++cell;
 
+            if (level == 0)
+              {
+                Assert(cell->material_id() == cell_info->material_id,
+                       ExcMessage(
+                         "The coarsest level material_ids must match."));
+                Assert(cell->manifold_id() == cell_info->manifold_id,
+                       ExcMessage(
+                         "The coarsest level manifold_ids must match."));
+              }
+
             cell->set_material_id(cell_info->material_id);
             if (dim == 2)
               for (const auto face : cell->face_indices())
