@@ -1,0 +1,9 @@
+
+DEAL::FE_RaviartThomasNodal<2,3>(0)
+DEAL::  n_components  = 3
+DEAL::  dofs_per_cell = 4
+DEAL::  tangential (max|shape.n| < 1e-10): yes
+DEAL::FE_RaviartThomasNodal<2,3>(1)
+DEAL::  n_components  = 3
+DEAL::  dofs_per_cell = 12
+DEAL::  tangential (max|shape.n| < 1e-10): yes
