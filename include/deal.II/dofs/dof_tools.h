@@ -2143,6 +2143,47 @@ namespace DoFTools
                           const std::vector<unsigned int> &target_block =
                             std::vector<unsigned int>());
 
+
+  /**
+   * Count the degrees of freedom in each block. It does the same thing as
+   * above function except the argument defining finite element blocks can be
+   * a braced initializer list containing FEValuesExtractors (or anything else
+   * that can be converted into the required `std::vector` type).
+   *
+   * The following two snippets are equivalent:
+   * @code{.cpp}
+   * std::vector<unsigned int> block_component(dim + 1, 0);
+   * block_component[dim] = 1;
+   * std::vector<types::global_dof_index> dofs_per_block =
+   *   DoFTools::count_dofs_per_fe_block(dof_handler, block_component);
+   * @endcode
+   *
+   * @code{.cpp}
+   * const FEValuesExtractors::Vector velocities(0);
+   * const FEValuesExtractors::Scalar pressure(dim);
+   * std::vector<types::global_dof_index> dofs_per_block =
+   *   DoFTools::count_dofs_per_fe_block(dof_handler, {velocities, pressure});
+   * @endcode
+   *
+   * Calling the function with `{velocities, pressure}` is equivalent to calling
+   * the above function with `std::vector<unsigned int>{0, 0, 1}` for dim=2,
+   * while calling with `{pressure, velocities}` would result in a call to above
+   * function with `std::vector<unsigned int>{1, 1, 0}` as the
+   * `block_component` argument. Components attributed to each of the
+   * extractors are blocked together.
+   *
+   *
+   * The initializer list of extractors must cover all finite-element
+   * components, and each component must be covered by exactly one extractor.
+   * Any missing or duplicate assignment to finite-element components will
+   * produce an error.
+   */
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  count_dofs_per_fe_block(
+    const DoFHandler<dim, spacedim>                     &dof_handler,
+    const std::vector<FEValuesExtractors::AnyExtractor> &order);
+
   /**
    * Count how many degrees of freedom live on a set of cells (i.e., a patch)
    * described by the argument.
