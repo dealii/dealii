@@ -902,7 +902,7 @@ namespace Portable
             const ViewTypeMatrix shape_data,
             const ViewTypeIn     in,
             ViewTypeOut          out,
-            const int            n_elements_in_current_batch = 1)
+            const int            batch_size = 1)
       {
         static_assert(direction >= 0 && direction < dim,
                       "direction must be in [0, dim)");
@@ -923,22 +923,19 @@ namespace Portable
         constexpr int n_out_per_elmt = n_blocks1 * nn * n_blocks2;
 
         // Unlike apply_1d()/apply_2d()/apply_3d() above (one cell per call),
-        // this is the batched variant -- n_elements_in_current_batch cells'
+        // this is the batched variant -- batch_size cells'
         // worth of data, laid out contiguously per element, share one in/out
         // view, so the required size scales with the batch size too.
         Assert(in.size() >=
-                 static_cast<std::size_t>(n_elements_in_current_batch) *
-                   n_in_per_elmt,
+                 static_cast<std::size_t>(batch_size) * n_in_per_elmt,
                ExcInternalError());
         Assert(out.size() >=
-                 static_cast<std::size_t>(n_elements_in_current_batch) *
-                   n_out_per_elmt,
+                 static_cast<std::size_t>(batch_size) * n_out_per_elmt,
                ExcInternalError());
 
         Kokkos::parallel_for(
           Kokkos::TeamVectorRange(team_member,
-                                  n_elements_in_current_batch * n_blocks1 *
-                                    n_blocks2),
+                                  batch_size * n_blocks1 * n_blocks2),
           [&](const int tid) {
             const int e   = tid / (n_blocks1 * n_blocks2);
             const int rem = tid % (n_blocks1 * n_blocks2);
@@ -1047,7 +1044,7 @@ namespace Portable
                                ShapeDataType     shape_gradients,
                                ShapeDataType     co_shape_gradients,
                                SharedView        temp,
-                               const int         n_elements_in_current_batch);
+                               const int         batch_size);
 
         /**
          * Evaluate/integrate the values of a finite element function at the
@@ -1115,7 +1112,7 @@ namespace Portable
         ShapeDataType     shape_gradients;
         ShapeDataType     co_shape_gradients;
         SharedView        temp;
-        const int         n_elements_in_current_batch;
+        const int         batch_size;
       };
 
       template <int dim,
@@ -1124,24 +1121,24 @@ namespace Portable
                 typename Number,
                 typename ShapeDataType>
       DEAL_II_HOST_DEVICE
-      EvaluatorTensorProduct<evaluate_general,
-                             dim,
-                             n_rows,
-                             n_columns,
-                             Number,
-                             ShapeDataType>::
-        EvaluatorTensorProduct(const TeamHandle &team_member,
-                               ShapeDataType     shape_values,
-                               ShapeDataType     shape_gradients,
-                               ShapeDataType     co_shape_gradients,
-                               SharedView        temp,
-                               const int         n_elements_in_current_batch)
+      EvaluatorTensorProduct<
+        evaluate_general,
+        dim,
+        n_rows,
+        n_columns,
+        Number,
+        ShapeDataType>::EvaluatorTensorProduct(const TeamHandle &team_member,
+                                               ShapeDataType     shape_values,
+                                               ShapeDataType shape_gradients,
+                                               ShapeDataType co_shape_gradients,
+                                               SharedView    temp,
+                                               const int     batch_size)
         : team_member(team_member)
         , shape_values(shape_values)
         , shape_gradients(shape_gradients)
         , co_shape_gradients(co_shape_gradients)
         , temp(temp)
-        , n_elements_in_current_batch(n_elements_in_current_batch)
+        , batch_size(batch_size)
       {}
 
       template <int dim,
@@ -1167,7 +1164,7 @@ namespace Portable
         if constexpr (in_place)
           {
             apply<dim, direction, n_rows, n_columns, dof_to_quad, false>(
-              team_member, shape_values, in, temp, n_elements_in_current_batch);
+              team_member, shape_values, in, temp, batch_size);
 
             constexpr int nn        = dof_to_quad ? n_columns : n_rows;
             constexpr int n_blocks1 = Utilities::pow(n_columns, direction);
@@ -1177,13 +1174,12 @@ namespace Portable
             populate_view<add>(team_member,
                                out,
                                temp,
-                               n_elements_in_current_batch * n_blocks1 * nn *
-                                 n_blocks2);
+                               batch_size * n_blocks1 * nn * n_blocks2);
           }
         else
           {
             apply<dim, direction, n_rows, n_columns, dof_to_quad, add>(
-              team_member, shape_values, in, out, n_elements_in_current_batch);
+              team_member, shape_values, in, out, batch_size);
           }
       }
 
@@ -1210,11 +1206,7 @@ namespace Portable
         if constexpr (in_place)
           {
             apply<dim, direction, n_rows, n_columns, dof_to_quad, false>(
-              team_member,
-              shape_gradients,
-              in,
-              temp,
-              n_elements_in_current_batch);
+              team_member, shape_gradients, in, temp, batch_size);
 
             constexpr int nn        = dof_to_quad ? n_columns : n_rows;
             constexpr int n_blocks1 = Utilities::pow(n_columns, direction);
@@ -1224,17 +1216,12 @@ namespace Portable
             populate_view<add>(team_member,
                                out,
                                temp,
-                               n_elements_in_current_batch * n_blocks1 * nn *
-                                 n_blocks2);
+                               batch_size * n_blocks1 * nn * n_blocks2);
           }
         else
           {
             apply<dim, direction, n_rows, n_columns, dof_to_quad, add>(
-              team_member,
-              shape_gradients,
-              in,
-              out,
-              n_elements_in_current_batch);
+              team_member, shape_gradients, in, out, batch_size);
           }
       }
 
@@ -1261,11 +1248,7 @@ namespace Portable
         if constexpr (in_place)
           {
             apply<dim, direction, n_columns, n_columns, dof_to_quad, false>(
-              team_member,
-              co_shape_gradients,
-              in,
-              temp,
-              n_elements_in_current_batch);
+              team_member, co_shape_gradients, in, temp, batch_size);
 
             constexpr int n_blocks1 = Utilities::pow(n_columns, direction);
             constexpr int n_blocks2 =
@@ -1274,17 +1257,12 @@ namespace Portable
             populate_view<add>(team_member,
                                out,
                                temp,
-                               n_elements_in_current_batch * n_blocks1 *
-                                 n_columns * n_blocks2);
+                               batch_size * n_blocks1 * n_columns * n_blocks2);
           }
         else
           {
             apply<dim, direction, n_columns, n_columns, dof_to_quad, add>(
-              team_member,
-              co_shape_gradients,
-              in,
-              out,
-              n_elements_in_current_batch);
+              team_member, co_shape_gradients, in, out, batch_size);
           }
       }
 
@@ -1322,9 +1300,7 @@ namespace Portable
         constexpr int co_dimension_size = Utilities::pow(n_columns, dim - 1);
 
         Kokkos::parallel_for(
-          Kokkos::TeamVectorRange(team_member,
-                                  n_elements_in_current_batch *
-                                    co_dimension_size),
+          Kokkos::TeamVectorRange(team_member, batch_size * co_dimension_size),
           [&](const int tid) {
             const int elmnt_idx = tid / co_dimension_size;
             const int reminder  = tid % co_dimension_size;
