@@ -29,13 +29,13 @@ namespace LinearAlgebra
     template void
     PreconditionFROSch<float, dealii::MemorySpace::Host>::initialize<2, 2>(
       const SparseMatrix<float, dealii::MemorySpace::Host> &,
-      DoFHandler<2, 2> &,
+      const DoFHandler<2, 2> &,
       const PreconditionFROSch<float, dealii::MemorySpace::Host>::AdditionalData
         &);
     template void
     PreconditionFROSch<float, dealii::MemorySpace::Host>::initialize<3, 3>(
       const SparseMatrix<float, dealii::MemorySpace::Host> &,
-      DoFHandler<3, 3> &,
+      const DoFHandler<3, 3> &,
       const PreconditionFROSch<float, dealii::MemorySpace::Host>::AdditionalData
         &);
 #    endif
@@ -84,7 +84,7 @@ namespace LinearAlgebra
         const DoFHandler<2, 2> &,
         const PreconditionFROSch<std::complex<double>,
                                  dealii::MemorySpace::Host>::AdditionalData &);
-    template void template class PreconditionFROSch<std::complex<double>>;
+    template void
     PreconditionFROSch<std::complex<double>, dealii::MemorySpace::Host>::
       initialize<3, 3>(
         const SparseMatrix<std::complex<double>, dealii::MemorySpace::Host> &,
