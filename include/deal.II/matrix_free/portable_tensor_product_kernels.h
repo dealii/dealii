@@ -1001,12 +1001,7 @@ namespace Portable
                 int              dim,
                 int              n_rows,
                 int              n_columns,
-                typename Number,
-                typename ShapeDataType =
-                  Kokkos::View<Number *,
-                               MemorySpace::Default::kokkos_space::
-                                 execution_space::scratch_memory_space,
-                               Kokkos::MemoryTraits<Kokkos::Unmanaged>>>
+                typename Number>
       struct EvaluatorTensorProduct
       {};
 
@@ -1015,21 +1010,22 @@ namespace Portable
        * Internal evaluator for 1d-3d shape function using the tensor product
        * form of the basis functions.
        */
-      template <int dim,
-                int n_rows,
-                int n_columns,
-                typename Number,
-                typename ShapeDataType>
+      template <int dim, int n_rows, int n_columns, typename Number>
       struct EvaluatorTensorProduct<evaluate_general,
                                     dim,
                                     n_rows,
                                     n_columns,
-                                    Number,
-                                    ShapeDataType>
+                                    Number>
       {
       public:
         using TeamHandle = Kokkos::TeamPolicy<
           MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
+        using ShapeDataType =
+          Kokkos::View<Number *,
+                       MemorySpace::Default::kokkos_space::execution_space::
+                         scratch_memory_space,
+                       Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
         using SharedView =
           Kokkos::View<Number *,
@@ -1115,24 +1111,15 @@ namespace Portable
         const int         batch_size;
       };
 
-      template <int dim,
-                int n_rows,
-                int n_columns,
-                typename Number,
-                typename ShapeDataType>
+      template <int dim, int n_rows, int n_columns, typename Number>
       DEAL_II_HOST_DEVICE
-      EvaluatorTensorProduct<
-        evaluate_general,
-        dim,
-        n_rows,
-        n_columns,
-        Number,
-        ShapeDataType>::EvaluatorTensorProduct(const TeamHandle &team_member,
-                                               ShapeDataType     shape_values,
-                                               ShapeDataType shape_gradients,
-                                               ShapeDataType co_shape_gradients,
-                                               SharedView    temp,
-                                               const int     batch_size)
+      EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
+        EvaluatorTensorProduct(const TeamHandle &team_member,
+                               ShapeDataType     shape_values,
+                               ShapeDataType     shape_gradients,
+                               ShapeDataType     co_shape_gradients,
+                               SharedView        temp,
+                               const int         batch_size)
         : team_member(team_member)
         , shape_values(shape_values)
         , shape_gradients(shape_gradients)
@@ -1141,11 +1128,7 @@ namespace Portable
         , batch_size(batch_size)
       {}
 
-      template <int dim,
-                int n_rows,
-                int n_columns,
-                typename Number,
-                typename ShapeDataType>
+      template <int dim, int n_rows, int n_columns, typename Number>
       template <int  direction,
                 bool dof_to_quad,
                 bool add,
@@ -1153,13 +1136,8 @@ namespace Portable
                 typename ViewTypeIn,
                 typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      EvaluatorTensorProduct<evaluate_general,
-                             dim,
-                             n_rows,
-                             n_columns,
-                             Number,
-                             ShapeDataType>::values(const ViewTypeIn in,
-                                                    ViewTypeOut      out) const
+      EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
+        values(const ViewTypeIn in, ViewTypeOut out) const
       {
         if constexpr (in_place)
           {
@@ -1183,11 +1161,7 @@ namespace Portable
           }
       }
 
-      template <int dim,
-                int n_rows,
-                int n_columns,
-                typename Number,
-                typename ShapeDataType>
+      template <int dim, int n_rows, int n_columns, typename Number>
       template <int  direction,
                 bool dof_to_quad,
                 bool add,
@@ -1195,13 +1169,8 @@ namespace Portable
                 typename ViewTypeIn,
                 typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      EvaluatorTensorProduct<evaluate_general,
-                             dim,
-                             n_rows,
-                             n_columns,
-                             Number,
-                             ShapeDataType>::gradients(const ViewTypeIn in,
-                                                       ViewTypeOut out) const
+      EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
+        gradients(const ViewTypeIn in, ViewTypeOut out) const
       {
         if constexpr (in_place)
           {
@@ -1225,11 +1194,7 @@ namespace Portable
           }
       }
 
-      template <int dim,
-                int n_rows,
-                int n_columns,
-                typename Number,
-                typename ShapeDataType>
+      template <int dim, int n_rows, int n_columns, typename Number>
       template <int  direction,
                 bool dof_to_quad,
                 bool add,
@@ -1237,13 +1202,8 @@ namespace Portable
                 typename ViewTypeIn,
                 typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      EvaluatorTensorProduct<evaluate_general,
-                             dim,
-                             n_rows,
-                             n_columns,
-                             Number,
-                             ShapeDataType>::co_gradients(const ViewTypeIn in,
-                                                          ViewTypeOut out) const
+      EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
+        co_gradients(const ViewTypeIn in, ViewTypeOut out) const
       {
         if constexpr (in_place)
           {
@@ -1266,23 +1226,14 @@ namespace Portable
           }
       }
 
-      template <int dim,
-                int n_rows,
-                int n_columns,
-                typename Number,
-                typename ShapeDataType>
+      template <int dim, int n_rows, int n_columns, typename Number>
       template <bool transpose,
                 bool add,
                 typename ViewTypeIn,
                 typename ViewTypeOut>
       DEAL_II_HOST_DEVICE void
-      EvaluatorTensorProduct<evaluate_general,
-                             dim,
-                             n_rows,
-                             n_columns,
-                             Number,
-                             ShapeDataType>::co_gradients(const ViewTypeIn in,
-                                                          ViewTypeOut out) const
+      EvaluatorTensorProduct<evaluate_general, dim, n_rows, n_columns, Number>::
+        co_gradients(const ViewTypeIn in, ViewTypeOut out) const
       {
         static_assert(dim >= 1, "dim must be at least 1");
         static_assert(
