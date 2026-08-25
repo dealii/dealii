@@ -1,0 +1,7 @@
+Fixed: When importing a Tpetra vector with VectorOperation::min,
+ReadWriteVector assigned the value from the Kokkos view without converting it
+to the vector's number type, unlike the surrounding insert, add and max
+branches. This made deal.II fail to compile whenever the Kokkos scalar type
+differed from the ReadWriteVector number type.
+<br>
+(Ernesto Ismail, 2026/08/25)
