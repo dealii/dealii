@@ -138,6 +138,13 @@ inconvenience this causes.
  </li>
 
  <li>
+  Changed: The ReferenceCell class now has a template argument `dim` like
+  many of the other classes that have to do with meshes.
+  <br>
+  (Wolfgang Bangerth, 2026/03/27)
+ </li>
+
+ <li>
   Deprecated: Overloads for TrilinosWrappers sparse matrix classes allowing a default number of
   entries per row have been deprecated. The respective overloads for TpetraWrappers
   classes have been removed.
