@@ -1495,54 +1495,70 @@ inline ArrayView<const unsigned int>
 ReferenceCell<dim>::faces_for_given_vertex(const unsigned int vertex) const
 {
   AssertIndexRange(vertex, n_vertices());
-  switch (this->kind)
+  if constexpr (dim == 0)
+    DEAL_II_NOT_IMPLEMENTED();
+  else if constexpr (dim == 1)
+    return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Line:
-        return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
-      case ReferenceCells::Quadrilateral:
-        return {&GeometryInfo<2>::vertex_to_face[vertex][0], 2};
-      case ReferenceCells::Triangle:
+      switch (this->kind)
         {
-          static constexpr ndarray<unsigned int, 3, 2> table = {
-            {{{0, 2}}, {{0, 1}}, {{1, 2}}}};
-          return table[vertex];
+          case ReferenceCells::Quadrilateral:
+            return {&GeometryInfo<2>::vertex_to_face[vertex][0], 2};
+          case ReferenceCells::Triangle:
+            {
+              static constexpr ndarray<unsigned int, 3, 2> table = {
+                {{{0, 2}}, {{0, 1}}, {{1, 2}}}};
+              return table[vertex];
+            }
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
         }
-      case ReferenceCells::Tetrahedron:
-        {
-          static constexpr ndarray<unsigned int, 4, 3> table = {
-            {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
-
-          return table[vertex];
-        }
-      case ReferenceCells::Pyramid:
-        {
-          static constexpr unsigned int X = numbers::invalid_unsigned_int;
-          static constexpr ndarray<unsigned int, 5, 4> table = {
-            {{{0, 1, 3, X}},
-             {{0, 2, 3, X}},
-             {{0, 1, 4, X}},
-             {{0, 2, 4, X}},
-             {{1, 2, 3, 4}}}};
-
-          return {&table[vertex][0], vertex == 4 ? 4u : 3u};
-        }
-      case ReferenceCells::Wedge:
-        {
-          AssertIndexRange(vertex, 6);
-          static constexpr ndarray<unsigned int, 6, 3> table = {{{{0, 2, 4}},
-                                                                 {{0, 2, 3}},
-                                                                 {{0, 3, 4}},
-                                                                 {{1, 2, 4}},
-                                                                 {{1, 2, 3}},
-                                                                 {{1, 3, 4}}}};
-
-          return table[vertex];
-        }
-      case ReferenceCells::Hexahedron:
-        return {&GeometryInfo<3>::vertex_to_face[vertex][0], 3};
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
     }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              static constexpr ndarray<unsigned int, 4, 3> table = {
+                {{{0, 1, 2}}, {{0, 1, 3}}, {{0, 2, 3}}, {{1, 2, 3}}}};
+
+              return table[vertex];
+            }
+          case ReferenceCells::Pyramid:
+            {
+              static constexpr unsigned int X = numbers::invalid_unsigned_int;
+              static constexpr ndarray<unsigned int, 5, 4> table = {
+                {{{0, 1, 3, X}},
+                 {{0, 2, 3, X}},
+                 {{0, 1, 4, X}},
+                 {{0, 2, 4, X}},
+                 {{1, 2, 3, 4}}}};
+
+              return {&table[vertex][0], vertex == 4 ? 4u : 3u};
+            }
+          case ReferenceCells::Wedge:
+            {
+              AssertIndexRange(vertex, 6);
+              static constexpr ndarray<unsigned int, 6, 3> table = {
+                {{{0, 2, 4}},
+                 {{0, 2, 3}},
+                 {{0, 3, 4}},
+                 {{1, 2, 4}},
+                 {{1, 2, 3}},
+                 {{1, 3, 4}}}};
+
+              return table[vertex];
+            }
+          case ReferenceCells::Hexahedron:
+            return {&GeometryInfo<3>::vertex_to_face[vertex][0], 3};
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return {};
 }
@@ -1558,133 +1574,135 @@ ReferenceCell<dim>::new_isotropic_child_face_lines(
 
   const unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
-    switch (this->kind)
-      {
-        case ReferenceCells::Tetrahedron:
-          switch (refinement_choice)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            switch (refinement_choice)
+              {
+                case 0:
+                  {
+                    // new line is (6,8)
+                    static constexpr ndarray<unsigned int, 13, 4> table_68 = {
+                      {{{2, 3, 8, X}},
+                       {{0, 9, 5, X}},
+                       {{1, 6, 11, X}},
+                       {{4, 10, 7, X}},
+                       {{2, 12, 5, X}},
+                       {{1, 9, 12, X}},
+                       {{4, 8, 12, X}},
+                       {{6, 12, 10, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}}}};
+                    return table_68;
+                  }
+                case 1:
+                  {
+                    // new line is (5,7)
+                    static constexpr ndarray<unsigned int, 13, 4> table_57 = {
+                      {{{2, 3, 8, X}},
+                       {{0, 9, 5, X}},
+                       {{1, 6, 11, X}},
+                       {{4, 10, 7, X}},
+                       {{0, 3, 12, X}},
+                       {{1, 12, 8, X}},
+                       {{4, 12, 9, X}},
+                       {{7, 11, 12, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}}}};
+                    return table_57;
+                  }
+                case 2:
+                  {
+                    // new line is (4,9)
+                    static constexpr ndarray<unsigned int, 13, 4> table_49 = {
+                      {{{2, 3, 8, X}},
+                       {{0, 9, 5, X}},
+                       {{1, 6, 11, X}},
+                       {{4, 10, 7, X}},
+                       {{0, 12, 11, X}},
+                       {{2, 6, 12, X}},
+                       {{3, 12, 7, X}},
+                       {{5, 10, 12, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}},
+                       {{X, X, X, X}}}};
+                    return table_49;
+                  }
+                default:
+                  DEAL_II_ASSERT_UNREACHABLE();
+              }
+
+          case ReferenceCells::Pyramid:
             {
-              case 0:
-                {
-                  // new line is (6,8)
-                  static constexpr ndarray<unsigned int, 13, 4> table_68 = {
-                    {{{2, 3, 8, X}},
-                     {{0, 9, 5, X}},
-                     {{1, 6, 11, X}},
-                     {{4, 10, 7, X}},
-                     {{2, 12, 5, X}},
-                     {{1, 9, 12, X}},
-                     {{4, 8, 12, X}},
-                     {{6, 12, 10, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}}}};
-                  return table_68;
-                }
-              case 1:
-                {
-                  // new line is (5,7)
-                  static constexpr ndarray<unsigned int, 13, 4> table_57 = {
-                    {{{2, 3, 8, X}},
-                     {{0, 9, 5, X}},
-                     {{1, 6, 11, X}},
-                     {{4, 10, 7, X}},
-                     {{0, 3, 12, X}},
-                     {{1, 12, 8, X}},
-                     {{4, 12, 9, X}},
-                     {{7, 11, 12, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}}}};
-                  return table_57;
-                }
-              case 2:
-                {
-                  // new line is (4,9)
-                  static constexpr ndarray<unsigned int, 13, 4> table_49 = {
-                    {{{2, 3, 8, X}},
-                     {{0, 9, 5, X}},
-                     {{1, 6, 11, X}},
-                     {{4, 10, 7, X}},
-                     {{0, 12, 11, X}},
-                     {{2, 6, 12, X}},
-                     {{3, 12, 7, X}},
-                     {{5, 10, 12, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}},
-                     {{X, X, X, X}}}};
-                  return table_49;
-                }
-              default:
-                DEAL_II_ASSERT_UNREACHABLE();
+              static constexpr ndarray<unsigned int, 13, 4>
+                new_quad_lines_pyramid = {
+                  {{{0, 10, 16, X}}, // child 0
+                   {{2, 16, 6, X}},
+                   {{0, 17, 12, X}}, // child 1
+                   {{3, 7, 17, X}},
+                   {{1, 18, 15, X}}, // child 2
+                   {{2, 4, 18, X}},
+                   {{1, 13, 19, X}}, // child 3
+                   {{3, 19, 9, X}},
+                   {{5, 8, 11, 14}},  // child 9 (top)
+                   {{11, 17, 16, X}}, // child 8 (upside down)
+                   {{14, 18, 19, X}},
+                   {{5, 16, 18, X}},
+                   {{8, 19, 17, X}}}};
+              return new_quad_lines_pyramid;
             }
 
-        case ReferenceCells::Pyramid:
-          {
-            static constexpr ndarray<unsigned int, 13, 4>
-              new_quad_lines_pyramid = {
-                {{{0, 10, 16, X}}, // child 0
-                 {{2, 16, 6, X}},
-                 {{0, 17, 12, X}}, // child 1
-                 {{3, 7, 17, X}},
-                 {{1, 18, 15, X}}, // child 2
-                 {{2, 4, 18, X}},
-                 {{1, 13, 19, X}}, // child 3
-                 {{3, 19, 9, X}},
-                 {{5, 8, 11, 14}},  // child 9 (top)
-                 {{11, 17, 16, X}}, // child 8 (upside down)
-                 {{14, 18, 19, X}},
-                 {{5, 16, 18, X}},
-                 {{8, 19, 17, X}}}};
-            return new_quad_lines_pyramid;
-          }
+          case ReferenceCells::Wedge:
+            {
+              static constexpr ndarray<unsigned int, 13, 4>
+                new_quad_lines_wedge = {{{{2, 20, 11, X}}, // mid tri
+                                         {{3, 6, 18, X}},
+                                         {{19, 7, 10, X}},
+                                         {{18, 19, 20, X}},
+                                         {{4, 0, 14, 18}}, // lower
+                                         {{0, 8, 12, 20}},
+                                         {{8, 4, 13, 19}},
+                                         {{5, 1, 18, 15}}, // upper
+                                         {{1, 9, 20, 17}},
+                                         {{9, 5, 19, 16}},
+                                         {{X, X, X, X}},
+                                         {{X, X, X, X}},
+                                         {{X, X, X, X}}}};
+              return new_quad_lines_wedge;
+            }
 
-        case ReferenceCells::Wedge:
-          {
-            static constexpr ndarray<unsigned int, 13, 4> new_quad_lines_wedge =
-              {{{{2, 20, 11, X}}, // mid tri
-                {{3, 6, 18, X}},
-                {{19, 7, 10, X}},
-                {{18, 19, 20, X}},
-                {{4, 0, 14, 18}}, // lower
-                {{0, 8, 12, 20}},
-                {{8, 4, 13, 19}},
-                {{5, 1, 18, 15}}, // upper
-                {{1, 9, 20, 17}},
-                {{9, 5, 19, 16}},
-                {{X, X, X, X}},
-                {{X, X, X, X}},
-                {{X, X, X, X}}}};
-            return new_quad_lines_wedge;
-          }
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr ndarray<unsigned int, 13, 4> new_quad_lines_hex =
+                {{{{10, 28, 16, 24}},
+                  {{28, 14, 17, 25}},
+                  {{11, 29, 24, 20}},
+                  {{29, 15, 25, 21}},
+                  {{18, 26, 0, 28}},
+                  {{26, 22, 1, 29}},
+                  {{19, 27, 28, 4}},
+                  {{27, 23, 29, 5}},
+                  {{2, 24, 8, 26}},
+                  {{24, 6, 9, 27}},
+                  {{3, 25, 26, 12}},
+                  {{25, 7, 27, 13}},
+                  {{X, X, X, X}}}};
+              return new_quad_lines_hex;
+            }
 
-        case ReferenceCells::Hexahedron:
-          {
-            static constexpr ndarray<unsigned int, 13, 4> new_quad_lines_hex = {
-              {{{10, 28, 16, 24}},
-               {{28, 14, 17, 25}},
-               {{11, 29, 24, 20}},
-               {{29, 15, 25, 21}},
-               {{18, 26, 0, 28}},
-               {{26, 22, 1, 29}},
-               {{19, 27, 28, 4}},
-               {{27, 23, 29, 5}},
-               {{2, 24, 8, 26}},
-               {{24, 6, 9, 27}},
-               {{3, 25, 26, 12}},
-               {{25, 7, 27, 13}},
-               {{X, X, X, X}}}};
-            return new_quad_lines_hex;
-          }
-
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
   else
     // We should never get here except in the 3d case.
     DEAL_II_ASSERT_UNREACHABLE();
@@ -1704,143 +1722,145 @@ ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
 
   const unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
-    switch (this->kind)
-      {
-        case ReferenceCells::Tetrahedron:
-          switch (refinement_choice)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            switch (refinement_choice)
+              {
+                case 0:
+                  {
+                    // new line is (6, 8)
+                    static constexpr ndarray<unsigned int, 13, 4, 2> table_68 =
+                      {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                        {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                        {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                        {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                        {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
+                        {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
+                        {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
+                        {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+                    return table_68;
+                  }
+                case 1:
+                  {
+                    // new line is (5, 7)
+                    static constexpr ndarray<unsigned int, 13, 4, 2> table_57 =
+                      {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                        {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                        {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                        {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                        {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
+                        {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
+                        {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
+                        {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+                    return table_57;
+                  }
+                case 2:
+                  {
+                    // new line is (4, 9)
+                    static constexpr ndarray<unsigned int, 13, 4, 2> table_49 =
+                      {{{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
+                        {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
+                        {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
+                        {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
+                        {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
+                        {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
+                        {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
+                        {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                        {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+                    return table_49;
+                  }
+                default:
+                  DEAL_II_ASSERT_UNREACHABLE();
+              }
+
+          case ReferenceCells::Pyramid:
             {
-              case 0:
-                {
-                  // new line is (6, 8)
-                  static constexpr ndarray<unsigned int, 13, 4, 2> table_68 = {
-                    {{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                     {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                     {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                     {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                     {{{{4, 6}}, {{6, 8}}, {{8, 4}}, {{X, X}}}},
-                     {{{{6, 5}}, {{5, 8}}, {{8, 6}}, {{X, X}}}},
-                     {{{{8, 7}}, {{7, 6}}, {{6, 8}}, {{X, X}}}},
-                     {{{{9, 6}}, {{6, 8}}, {{8, 9}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-                  return table_68;
-                }
-              case 1:
-                {
-                  // new line is (5, 7)
-                  static constexpr ndarray<unsigned int, 13, 4, 2> table_57 = {
-                    {{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                     {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                     {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                     {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                     {{{{5, 4}}, {{4, 7}}, {{7, 5}}, {{X, X}}}},
-                     {{{{6, 5}}, {{5, 7}}, {{7, 6}}, {{X, X}}}},
-                     {{{{8, 7}}, {{7, 5}}, {{5, 8}}, {{X, X}}}},
-                     {{{{7, 9}}, {{9, 5}}, {{5, 7}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-                  return table_57;
-                }
-              case 2:
-                {
-                  // new line is (4, 9)
-                  static constexpr ndarray<unsigned int, 13, 4, 2> table_49 = {
-                    {{{{{6, 4}}, {{4, 7}}, {{7, 6}}, {{X, X}}}},
-                     {{{{4, 5}}, {{5, 8}}, {{8, 4}}, {{X, X}}}},
-                     {{{{5, 6}}, {{6, 9}}, {{9, 5}}, {{X, X}}}},
-                     {{{{7, 8}}, {{8, 9}}, {{9, 7}}, {{X, X}}}},
-                     {{{{5, 4}}, {{4, 9}}, {{9, 5}}, {{X, X}}}},
-                     {{{{4, 6}}, {{6, 9}}, {{9, 4}}, {{X, X}}}},
-                     {{{{7, 4}}, {{4, 9}}, {{9, 7}}, {{X, X}}}},
-                     {{{{4, 8}}, {{8, 9}}, {{9, 4}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                     {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-                  return table_49;
-                }
-              default:
-                DEAL_II_ASSERT_UNREACHABLE();
+              static constexpr ndarray<unsigned int, 13, 4, 2>
+                quad_lines_vertices_pyramid = {
+                  {// child 0
+                   {{{{13, 7}}, {{7, 9}}, {{9, 13}}, {{X, X}}}},
+                   {{{{5, 13}}, {{13, 9}}, {{9, 5}}, {{X, X}}}},
+                   // child 1
+                   {{{{7, 13}}, {{13, 10}}, {{10, 7}}, {{X, X}}}},
+                   {{{{13, 6}}, {{6, 10}}, {{10, 13}}, {{X, X}}}},
+                   // child 2
+                   {{{{8, 13}}, {{13, 11}}, {{11, 8}}, {{X, X}}}},
+                   {{{{13, 5}}, {{5, 11}}, {{11, 13}}, {{X, X}}}},
+                   // child 3
+                   {{{{13, 8}}, {{8, 12}}, {{12, 13}}, {{X, X}}}},
+                   {{{{6, 13}}, {{13, 12}}, {{12, 6}}, {{X, X}}}},
+                   // child 9 (top)
+                   {{{{9, 11}}, {{10, 12}}, {{9, 10}}, {{11, 12}}}},
+                   // child 8 (upside down)
+                   {{{{9, 10}}, {{10, 13}}, {{13, 9}}, {{X, X}}}},
+                   {{{{12, 11}}, {{11, 13}}, {{13, 12}}, {{X, X}}}},
+                   {{{{11, 9}}, {{9, 13}}, {{13, 11}}, {{X, X}}}},
+                   {{{{10, 12}}, {{12, 13}}, {{13, 10}}, {{X, X}}}}}};
+              return quad_lines_vertices_pyramid;
             }
 
-        case ReferenceCells::Pyramid:
-          {
-            static constexpr ndarray<unsigned int, 13, 4, 2>
-              quad_lines_vertices_pyramid = {
-                {// child 0
-                 {{{{13, 7}}, {{7, 9}}, {{9, 13}}, {{X, X}}}},
-                 {{{{5, 13}}, {{13, 9}}, {{9, 5}}, {{X, X}}}},
-                 // child 1
-                 {{{{7, 13}}, {{13, 10}}, {{10, 7}}, {{X, X}}}},
-                 {{{{13, 6}}, {{6, 10}}, {{10, 13}}, {{X, X}}}},
-                 // child 2
-                 {{{{8, 13}}, {{13, 11}}, {{11, 8}}, {{X, X}}}},
-                 {{{{13, 5}}, {{5, 11}}, {{11, 13}}, {{X, X}}}},
-                 // child 3
-                 {{{{13, 8}}, {{8, 12}}, {{12, 13}}, {{X, X}}}},
-                 {{{{6, 13}}, {{13, 12}}, {{12, 6}}, {{X, X}}}},
-                 // child 9 (top)
-                 {{{{9, 11}}, {{10, 12}}, {{9, 10}}, {{11, 12}}}},
-                 // child 8 (upside down)
-                 {{{{9, 10}}, {{10, 13}}, {{13, 9}}, {{X, X}}}},
-                 {{{{12, 11}}, {{11, 13}}, {{13, 12}}, {{X, X}}}},
-                 {{{{11, 9}}, {{9, 13}}, {{13, 11}}, {{X, X}}}},
-                 {{{{10, 12}}, {{12, 13}}, {{13, 10}}, {{X, X}}}}}};
-            return quad_lines_vertices_pyramid;
-          }
+          case ReferenceCells::Wedge:
+            {
+              static constexpr ndarray<unsigned int, 13, 4, 2>
+                quad_lines_vertices_wedge = {
+                  {// mid tri
+                   {{{{12, 15}}, {{15, 17}}, {{17, 12}}, {{X, X}}}},
+                   {{{{15, 13}}, {{13, 16}}, {{16, 15}}, {{X, X}}}},
+                   {{{{17, 16}}, {{16, 14}}, {{14, 17}}, {{X, X}}}},
+                   {{{{15, 16}}, {{16, 17}}, {{17, 15}}, {{X, X}}}},
+                   // lower
+                   {{{{7, 16}}, {{6, 15}}, {{7, 6}}, {{16, 15}}}},
+                   {{{{6, 15}}, {{8, 17}}, {{6, 8}}, {{15, 17}}}},
+                   {{{{8, 17}}, {{7, 16}}, {{8, 7}}, {{17, 16}}}},
+                   // upper
+                   {{{{16, 10}}, {{15, 9}}, {{16, 15}}, {{10, 9}}}},
+                   {{{{15, 9}}, {{17, 11}}, {{15, 17}}, {{9, 11}}}},
+                   {{{{17, 11}}, {{16, 10}}, {{17, 16}}, {{11, 10}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+              return quad_lines_vertices_wedge;
+            }
 
-        case ReferenceCells::Wedge:
-          {
-            static constexpr ndarray<unsigned int, 13, 4, 2>
-              quad_lines_vertices_wedge = {
-                {// mid tri
-                 {{{{12, 15}}, {{15, 17}}, {{17, 12}}, {{X, X}}}},
-                 {{{{15, 13}}, {{13, 16}}, {{16, 15}}, {{X, X}}}},
-                 {{{{17, 16}}, {{16, 14}}, {{14, 17}}, {{X, X}}}},
-                 {{{{15, 16}}, {{16, 17}}, {{17, 15}}, {{X, X}}}},
-                 // lower
-                 {{{{7, 16}}, {{6, 15}}, {{7, 6}}, {{16, 15}}}},
-                 {{{{6, 15}}, {{8, 17}}, {{6, 8}}, {{15, 17}}}},
-                 {{{{8, 17}}, {{7, 16}}, {{8, 7}}, {{17, 16}}}},
-                 // upper
-                 {{{{16, 10}}, {{15, 9}}, {{16, 15}}, {{10, 9}}}},
-                 {{{{15, 9}}, {{17, 11}}, {{15, 17}}, {{9, 11}}}},
-                 {{{{17, 11}}, {{16, 10}}, {{17, 16}}, {{11, 10}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-            return quad_lines_vertices_wedge;
-          }
-
-        case ReferenceCells::Hexahedron:
-          {
-            static constexpr ndarray<unsigned int, 13, 4, 2>
-              quad_lines_vertices_hex = {
-                {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
-                 {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
-                 {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
-                 {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
-                 {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
-                 {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
-                 {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
-                 {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
-                 {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
-                 {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
-                 {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
-                 {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}},
-                 {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
-            return quad_lines_vertices_hex;
-          }
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr ndarray<unsigned int, 13, 4, 2>
+                quad_lines_vertices_hex = {
+                  {{{{{10, 22}}, {{24, 26}}, {{10, 24}}, {{22, 26}}}},
+                   {{{{24, 26}}, {{11, 23}}, {{24, 11}}, {{26, 23}}}},
+                   {{{{22, 14}}, {{26, 25}}, {{22, 26}}, {{14, 25}}}},
+                   {{{{26, 25}}, {{23, 15}}, {{26, 23}}, {{25, 15}}}},
+                   {{{{8, 24}}, {{20, 26}}, {{8, 20}}, {{24, 26}}}},
+                   {{{{20, 26}}, {{12, 25}}, {{20, 12}}, {{26, 25}}}},
+                   {{{{24, 9}}, {{26, 21}}, {{24, 26}}, {{9, 21}}}},
+                   {{{{26, 21}}, {{25, 13}}, {{26, 25}}, {{21, 13}}}},
+                   {{{{16, 20}}, {{22, 26}}, {{16, 22}}, {{20, 26}}}},
+                   {{{{22, 26}}, {{17, 21}}, {{22, 17}}, {{26, 21}}}},
+                   {{{{20, 18}}, {{26, 23}}, {{20, 26}}, {{18, 23}}}},
+                   {{{{26, 23}}, {{21, 19}}, {{26, 21}}, {{23, 19}}}},
+                   {{{{X, X}}, {{X, X}}, {{X, X}}, {{X, X}}}}}};
+              return quad_lines_vertices_hex;
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
   else
     // We should never get here except in the 3d case.
     DEAL_II_ASSERT_UNREACHABLE();
@@ -1860,126 +1880,130 @@ ReferenceCell<dim>::new_isotropic_child_cell_faces(
 
   const unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
-    switch (this->kind)
-      {
-        case ReferenceCells::Tetrahedron:
-          switch (refinement_choice)
-            {
-              case 0:
-                {
-                  // new line is (6, 8)
-                  static constexpr ndarray<unsigned int, 10, 6> table_68 = {{
-                    {{8, 13, 16, 0, X, X}},
-                    {{9, 12, 1, 21, X, X}},
-                    {{10, 2, 17, 20, X, X}},
-                    {{3, 14, 18, 22, X, X}},
-                    {{11, 1, 4, 5, X, X}},
-                    {{15, 0, 4, 6, X, X}},
-                    {{19, 7, 6, 3, X, X}},
-                    {{23, 5, 2, 7, X, X}},
-                    {{X, X, X, X, X, X}},
-                    {{X, X, X, X, X, X}},
-                  }};
-                  return table_68;
-                }
-              case 1:
-                {
-                  // new line is (5, 7)
-                  static constexpr ndarray<unsigned int, 10, 6> table_57 = {{
-                    {{8, 13, 16, 0, X, X}},
-                    {{9, 12, 1, 21, X, X}},
-                    {{10, 2, 17, 20, X, X}},
-                    {{3, 14, 18, 22, X, X}},
-                    {{11, 4, 0, 5, X, X}},
-                    {{15, 4, 1, 6, X, X}},
-                    {{19, 2, 5, 7, X, X}},
-                    {{23, 6, 7, 3, X, X}},
-                    {{X, X, X, X, X, X}},
-                    {{X, X, X, X, X, X}},
-                  }};
-                  return table_57;
-                }
-              case 2:
-                {
-                  // new line is (4, 9)
-                  static constexpr ndarray<unsigned int, 10, 6> table_49 = {{
-                    {{8, 13, 16, 0, X, X}},
-                    {{9, 12, 1, 21, X, X}},
-                    {{10, 2, 17, 20, X, X}},
-                    {{3, 14, 18, 22, X, X}},
-                    {{11, 4, 5, 2, X, X}},
-                    {{15, 6, 7, 3, X, X}},
-                    {{19, 5, 0, 6, X, X}},
-                    {{23, 1, 4, 7, X, X}},
-                    {{X, X, X, X, X, X}},
-                    {{X, X, X, X, X, X}},
-                  }};
-                  return table_49;
-                }
-              default:
-                DEAL_II_ASSERT_UNREACHABLE();
-            }
-        case ReferenceCells::Pyramid:
-          {
-            static constexpr ndarray<unsigned int, 10, 6> cell_quads_pyramid = {
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            switch (refinement_choice)
               {
-                {{13, 17, 0, 26, 1, X}}, // bottom pyramids
-                {{14, 2, 22, 25, 3, X}}, //
-                {{15, 18, 4, 5, 29, X}}, //
-                {{16, 6, 21, 7, 30, X}}, //
-                {{5, 1, 20, 11, X, X}},  // bottom wedges
-                {{7, 3, 12, 24, X, X}},  //
-                {{0, 2, 28, 9, X, X}},   //
-                {{4, 6, 10, 32, X, X}},  //
-                {{8, 9, 10, 11, 12, X}}, // upside down pyramid
-                {{8, 19, 23, 27, 31, X}} // top pyramid
+                case 0:
+                  {
+                    // new line is (6, 8)
+                    static constexpr ndarray<unsigned int, 10, 6> table_68 = {{
+                      {{8, 13, 16, 0, X, X}},
+                      {{9, 12, 1, 21, X, X}},
+                      {{10, 2, 17, 20, X, X}},
+                      {{3, 14, 18, 22, X, X}},
+                      {{11, 1, 4, 5, X, X}},
+                      {{15, 0, 4, 6, X, X}},
+                      {{19, 7, 6, 3, X, X}},
+                      {{23, 5, 2, 7, X, X}},
+                      {{X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X}},
+                    }};
+                    return table_68;
+                  }
+                case 1:
+                  {
+                    // new line is (5, 7)
+                    static constexpr ndarray<unsigned int, 10, 6> table_57 = {{
+                      {{8, 13, 16, 0, X, X}},
+                      {{9, 12, 1, 21, X, X}},
+                      {{10, 2, 17, 20, X, X}},
+                      {{3, 14, 18, 22, X, X}},
+                      {{11, 4, 0, 5, X, X}},
+                      {{15, 4, 1, 6, X, X}},
+                      {{19, 2, 5, 7, X, X}},
+                      {{23, 6, 7, 3, X, X}},
+                      {{X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X}},
+                    }};
+                    return table_57;
+                  }
+                case 2:
+                  {
+                    // new line is (4, 9)
+                    static constexpr ndarray<unsigned int, 10, 6> table_49 = {{
+                      {{8, 13, 16, 0, X, X}},
+                      {{9, 12, 1, 21, X, X}},
+                      {{10, 2, 17, 20, X, X}},
+                      {{3, 14, 18, 22, X, X}},
+                      {{11, 4, 5, 2, X, X}},
+                      {{15, 6, 7, 3, X, X}},
+                      {{19, 5, 0, 6, X, X}},
+                      {{23, 1, 4, 7, X, X}},
+                      {{X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X}},
+                    }};
+                    return table_49;
+                  }
+                default:
+                  DEAL_II_ASSERT_UNREACHABLE();
+              }
+
+          case ReferenceCells::Pyramid:
+            {
+              static constexpr ndarray<unsigned int, 10, 6> cell_quads_pyramid =
+                {{
+                  {{13, 17, 0, 26, 1, X}}, // bottom pyramids
+                  {{14, 2, 22, 25, 3, X}}, //
+                  {{15, 18, 4, 5, 29, X}}, //
+                  {{16, 6, 21, 7, 30, X}}, //
+                  {{5, 1, 20, 11, X, X}},  // bottom wedges
+                  {{7, 3, 12, 24, X, X}},  //
+                  {{0, 2, 28, 9, X, X}},   //
+                  {{4, 6, 10, 32, X, X}},  //
+                  {{8, 9, 10, 11, 12, X}}, // upside down pyramid
+                  {{8, 19, 23, 27, 31, X}} // top pyramid
+                }};
+              return cell_quads_pyramid;
+            }
+
+          case ReferenceCells::Wedge:
+            {
+              // Considerations that went into creating this table
+              // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
+              //   centre wedge is rotated by 180 degrees compared to the
+              //   parent)
+              // - Order of children is similar to the order of a reference
+              //   triangle in the x-y-plane (i.e. like the top triangle of the
+              //   parent)
+              static constexpr ndarray<unsigned int, 10, 6> cell_quads_wedge = {
+                {
+                  {{23, 0, 10, 5, 19, X}}, // bottom children
+                  {{22, 1, 11, 14, 4, X}}, //
+                  {{24, 2, 6, 15, 18, X}}, //
+                  {{25, 3, 6, 5, 4, X}},   //
+                  {{0, 26, 12, 8, 21, X}}, // top children
+                  {{1, 27, 13, 16, 7, X}}, //
+                  {{2, 28, 9, 17, 20, X}}, //
+                  {{3, 29, 9, 8, 7, X}},   //
+                  {{X, X, X, X, X, X}},
+                  {{X, X, X, X, X, X}},
+                }};
+              return cell_quads_wedge;
+            }
+
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr ndarray<unsigned int, 10, 6> cell_quads_hex = {{
+                {{12, 0, 20, 4, 28, 8}},  // bottom children
+                {{0, 16, 22, 6, 29, 9}},  //
+                {{13, 1, 4, 24, 30, 10}}, //
+                {{1, 17, 6, 26, 31, 11}}, //
+                {{14, 2, 21, 5, 8, 32}},  // top children
+                {{2, 18, 23, 7, 9, 33}},  //
+                {{15, 3, 5, 25, 10, 34}}, //
+                {{3, 19, 7, 27, 11, 35}}, //
+                {{X, X, X, X, X, X}},
+                {{X, X, X, X, X, X}},
               }};
-            return cell_quads_pyramid;
-          }
-
-        case ReferenceCells::Wedge:
-          {
-            // Considerations that went into creating this table
-            // - Keep aspect ratio of 1.0 if parent had 1.0 (this is why the
-            //   centre wedge is rotated by 180 degrees compared to the
-            //   parent)
-            // - Order of children is similar to the order of a reference
-            //   triangle in the x-y-plane (i.e. like the top triangle of the
-            //   parent)
-            static constexpr ndarray<unsigned int, 10, 6> cell_quads_wedge = {{
-              {{23, 0, 10, 5, 19, X}}, // bottom children
-              {{22, 1, 11, 14, 4, X}}, //
-              {{24, 2, 6, 15, 18, X}}, //
-              {{25, 3, 6, 5, 4, X}},   //
-              {{0, 26, 12, 8, 21, X}}, // top children
-              {{1, 27, 13, 16, 7, X}}, //
-              {{2, 28, 9, 17, 20, X}}, //
-              {{3, 29, 9, 8, 7, X}},   //
-              {{X, X, X, X, X, X}},
-              {{X, X, X, X, X, X}},
-            }};
-            return cell_quads_wedge;
-          }
-
-        case ReferenceCells::Hexahedron:
-          {
-            static constexpr ndarray<unsigned int, 10, 6> cell_quads_hex = {{
-              {{12, 0, 20, 4, 28, 8}},  // bottom children
-              {{0, 16, 22, 6, 29, 9}},  //
-              {{13, 1, 4, 24, 30, 10}}, //
-              {{1, 17, 6, 26, 31, 11}}, //
-              {{14, 2, 21, 5, 8, 32}},  // top children
-              {{2, 18, 23, 7, 9, 33}},  //
-              {{15, 3, 5, 25, 10, 34}}, //
-              {{3, 19, 7, 27, 11, 35}}, //
-              {{X, X, X, X, X, X}},
-              {{X, X, X, X, X, X}},
-            }};
-            return cell_quads_hex;
-          }
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
+              return cell_quads_hex;
+            }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
   else
     // We should never get here except in the 3d case.
     DEAL_II_ASSERT_UNREACHABLE();
@@ -1999,122 +2023,125 @@ ReferenceCell<dim>::new_isotropic_child_cell_vertices(
 
   constexpr unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
-    switch (this->kind)
-      {
-        case ReferenceCells::Tetrahedron:
-          switch (refinement_choice)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            switch (refinement_choice)
+              {
+                case 0:
+                  {
+                    // new line is (6,8)
+                    static constexpr ndarray<unsigned int, 10, 8> table_68 = {{
+                      {{0, 4, 6, 7, X, X, X, X}},
+                      {{4, 1, 5, 8, X, X, X, X}},
+                      {{6, 5, 2, 9, X, X, X, X}},
+                      {{7, 8, 9, 3, X, X, X, X}},
+                      {{4, 5, 6, 8, X, X, X, X}},
+                      {{4, 7, 8, 6, X, X, X, X}},
+                      {{6, 9, 7, 8, X, X, X, X}},
+                      {{5, 8, 9, 6, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                    }};
+                    return table_68;
+                  }
+                case 1:
+                  {
+                    // new line is (5,7)
+                    static constexpr ndarray<unsigned int, 10, 8> table_57 = {{
+                      {{0, 4, 6, 7, X, X, X, X}},
+                      {{4, 1, 5, 8, X, X, X, X}},
+                      {{6, 5, 2, 9, X, X, X, X}},
+                      {{7, 8, 9, 3, X, X, X, X}},
+                      {{4, 5, 6, 7, X, X, X, X}},
+                      {{4, 7, 8, 5, X, X, X, X}},
+                      {{6, 9, 7, 5, X, X, X, X}},
+                      {{5, 8, 9, 7, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                    }};
+                    return table_57;
+                  }
+                case 2:
+                  {
+                    // new line is (4,9)
+                    static constexpr ndarray<unsigned int, 10, 8> table_49 = {{
+                      {{0, 4, 6, 7, X, X, X, X}},
+                      {{4, 1, 5, 8, X, X, X, X}},
+                      {{6, 5, 2, 9, X, X, X, X}},
+                      {{7, 8, 9, 3, X, X, X, X}},
+                      {{4, 5, 6, 9, X, X, X, X}},
+                      {{4, 7, 8, 9, X, X, X, X}},
+                      {{6, 9, 7, 4, X, X, X, X}},
+                      {{5, 8, 9, 4, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                      {{X, X, X, X, X, X, X, X}},
+                    }};
+                    return table_49;
+                  }
+
+                default:
+                  DEAL_II_ASSERT_UNREACHABLE();
+              }
+          case ReferenceCells::Pyramid:
             {
-              case 0:
-                {
-                  // new line is (6,8)
-                  static constexpr ndarray<unsigned int, 10, 8> table_68 = {{
-                    {{0, 4, 6, 7, X, X, X, X}},
-                    {{4, 1, 5, 8, X, X, X, X}},
-                    {{6, 5, 2, 9, X, X, X, X}},
-                    {{7, 8, 9, 3, X, X, X, X}},
-                    {{4, 5, 6, 8, X, X, X, X}},
-                    {{4, 7, 8, 6, X, X, X, X}},
-                    {{6, 9, 7, 8, X, X, X, X}},
-                    {{5, 8, 9, 6, X, X, X, X}},
-                    {{X, X, X, X, X, X, X, X}},
-                    {{X, X, X, X, X, X, X, X}},
-                  }};
-                  return table_68;
-                }
-              case 1:
-                {
-                  // new line is (5,7)
-                  static constexpr ndarray<unsigned int, 10, 8> table_57 = {{
-                    {{0, 4, 6, 7, X, X, X, X}},
-                    {{4, 1, 5, 8, X, X, X, X}},
-                    {{6, 5, 2, 9, X, X, X, X}},
-                    {{7, 8, 9, 3, X, X, X, X}},
-                    {{4, 5, 6, 7, X, X, X, X}},
-                    {{4, 7, 8, 5, X, X, X, X}},
-                    {{6, 9, 7, 5, X, X, X, X}},
-                    {{5, 8, 9, 7, X, X, X, X}},
-                    {{X, X, X, X, X, X, X, X}},
-                    {{X, X, X, X, X, X, X, X}},
-                  }};
-                  return table_57;
-                }
-              case 2:
-                {
-                  // new line is (4,9)
-                  static constexpr ndarray<unsigned int, 10, 8> table_49 = {{
-                    {{0, 4, 6, 7, X, X, X, X}},
-                    {{4, 1, 5, 8, X, X, X, X}},
-                    {{6, 5, 2, 9, X, X, X, X}},
-                    {{7, 8, 9, 3, X, X, X, X}},
-                    {{4, 5, 6, 9, X, X, X, X}},
-                    {{4, 7, 8, 9, X, X, X, X}},
-                    {{6, 9, 7, 4, X, X, X, X}},
-                    {{5, 8, 9, 4, X, X, X, X}},
-                    {{X, X, X, X, X, X, X, X}},
-                    {{X, X, X, X, X, X, X, X}},
-                  }};
-                  return table_49;
-                }
-
-              default:
-                DEAL_II_ASSERT_UNREACHABLE();
+              static constexpr ndarray<unsigned int, 10, 8>
+                cell_vertices_pyramid = {{
+                  {{0, 7, 5, 13, 9, X, X, X}},    // bottom pyramid
+                  {{7, 1, 13, 6, 10, X, X, X}},   //
+                  {{5, 13, 2, 8, 11, X, X, X}},   //
+                  {{13, 6, 8, 3, 12, X, X, X}},   //
+                  {{5, 13, 11, 9, X, X, X, X}},   // bottom wedges
+                  {{13, 6, 12, 10, X, X, X, X}},  //
+                  {{7, 13, 9, 10, X, X, X, X}},   //
+                  {{13, 8, 11, 12, X, X, X, X}},  //
+                  {{9, 11, 10, 12, 13, X, X, X}}, // upside down pyramid
+                  {{9, 10, 11, 12, 4, X, X, X}},  // top pyramid
+                }};
+              return cell_vertices_pyramid;
             }
-        case ReferenceCells::Pyramid:
-          {
-            static constexpr ndarray<unsigned int, 10, 8>
-              cell_vertices_pyramid = {{
-                {{0, 7, 5, 13, 9, X, X, X}},    // bottom pyramid
-                {{7, 1, 13, 6, 10, X, X, X}},   //
-                {{5, 13, 2, 8, 11, X, X, X}},   //
-                {{13, 6, 8, 3, 12, X, X, X}},   //
-                {{5, 13, 11, 9, X, X, X, X}},   // bottom wedges
-                {{13, 6, 12, 10, X, X, X, X}},  //
-                {{7, 13, 9, 10, X, X, X, X}},   //
-                {{13, 8, 11, 12, X, X, X, X}},  //
-                {{9, 11, 10, 12, 13, X, X, X}}, // upside down pyramid
-                {{9, 10, 11, 12, 4, X, X, X}},  // top pyramid
-              }};
-            return cell_vertices_pyramid;
-          }
 
-        case ReferenceCells::Wedge:
-          {
-            static constexpr ndarray<unsigned int, 10, 8> cell_vertices_wedge =
-              {{
-                {{0, 6, 8, 12, 15, 17, X, X}},   // bottom children
-                {{6, 1, 7, 15, 13, 16, X, X}},   //
-                {{8, 7, 2, 17, 16, 14, X, X}},   //
-                {{7, 8, 6, 16, 17, 15, X, X}},   //
-                {{12, 15, 17, 3, 9, 11, X, X}},  // top children
-                {{15, 13, 16, 9, 4, 10, X, X}},  //
-                {{17, 16, 14, 11, 10, 5, X, X}}, //
-                {{16, 17, 15, 10, 11, 9, X, X}}, //
-                {{X, X, X, X, X, X, X, X}},
-                {{X, X, X, X, X, X, X, X}},
-              }};
-            return cell_vertices_wedge;
-          }
+          case ReferenceCells::Wedge:
+            {
+              static constexpr ndarray<unsigned int, 10, 8>
+                cell_vertices_wedge = {{
+                  {{0, 6, 8, 12, 15, 17, X, X}},   // bottom children
+                  {{6, 1, 7, 15, 13, 16, X, X}},   //
+                  {{8, 7, 2, 17, 16, 14, X, X}},   //
+                  {{7, 8, 6, 16, 17, 15, X, X}},   //
+                  {{12, 15, 17, 3, 9, 11, X, X}},  // top children
+                  {{15, 13, 16, 9, 4, 10, X, X}},  //
+                  {{17, 16, 14, 11, 10, 5, X, X}}, //
+                  {{16, 17, 15, 10, 11, 9, X, X}}, //
+                  {{X, X, X, X, X, X, X, X}},
+                  {{X, X, X, X, X, X, X, X}},
+                }};
+              return cell_vertices_wedge;
+            }
 
-        case ReferenceCells::Hexahedron:
-          {
-            static constexpr ndarray<unsigned int, 10, 8> cell_vertices_hex = {{
-              {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
-              {{10, 1, 24, 9, 22, 17, 26, 21}},  //
-              {{8, 24, 2, 11, 20, 26, 18, 23}},  //
-              {{24, 9, 11, 3, 26, 21, 23, 19}},  //
-              {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
-              {{22, 17, 26, 21, 14, 5, 25, 13}}, //
-              {{20, 26, 18, 23, 12, 25, 6, 15}}, //
-              {{26, 21, 23, 19, 25, 13, 15, 7}}, //
-              {{X, X, X, X, X, X, X, X}},
-              {{X, X, X, X, X, X, X, X}},
-            }};
-            return cell_vertices_hex;
-          }
+          case ReferenceCells::Hexahedron:
+            {
+              static constexpr ndarray<unsigned int, 10, 8> cell_vertices_hex =
+                {{
+                  {{0, 10, 8, 24, 16, 22, 20, 26}},  // bottom children
+                  {{10, 1, 24, 9, 22, 17, 26, 21}},  //
+                  {{8, 24, 2, 11, 20, 26, 18, 23}},  //
+                  {{24, 9, 11, 3, 26, 21, 23, 19}},  //
+                  {{16, 22, 20, 26, 4, 14, 12, 25}}, // top children
+                  {{22, 17, 26, 21, 14, 5, 25, 13}}, //
+                  {{20, 26, 18, 23, 12, 25, 6, 15}}, //
+                  {{26, 21, 23, 19, 25, 13, 15, 7}}, //
+                  {{X, X, X, X, X, X, X, X}},
+                  {{X, X, X, X, X, X, X, X}},
+                }};
+              return cell_vertices_hex;
+            }
 
-        default:
-          DEAL_II_ASSERT_UNREACHABLE();
-      }
+          default:
+            DEAL_II_ASSERT_UNREACHABLE();
+        }
+    }
   else
     // We should never get here except in the 3d case.
     DEAL_II_ASSERT_UNREACHABLE();
@@ -2170,27 +2197,42 @@ template <int dim>
 inline constexpr unsigned int
 ReferenceCell<dim>::n_vertices() const
 {
-  switch (this->kind)
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+
+  if constexpr (dim == 0)
+    return 1;
+  else if constexpr (dim == 1)
+    return 2;
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        return 1;
-      case ReferenceCells::Line:
-        return 2;
-      case ReferenceCells::Triangle:
-        return 3;
-      case ReferenceCells::Quadrilateral:
-        return 4;
-      case ReferenceCells::Tetrahedron:
-        return 4;
-      case ReferenceCells::Pyramid:
-        return 5;
-      case ReferenceCells::Wedge:
-        return 6;
-      case ReferenceCells::Hexahedron:
-        return 8;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return 3;
+          case ReferenceCells::Quadrilateral:
+            return 4;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
     }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return 4;
+          case ReferenceCells::Pyramid:
+            return 5;
+          case ReferenceCells::Wedge:
+            return 6;
+          case ReferenceCells::Hexahedron:
+            return 8;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -2201,27 +2243,42 @@ template <int dim>
 inline constexpr unsigned int
 ReferenceCell<dim>::n_lines() const
 {
-  switch (this->kind)
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+
+  if constexpr (dim == 0)
+    return 0;
+  else if constexpr (dim == 1)
+    return 1;
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        return 0;
-      case ReferenceCells::Line:
-        return 1;
-      case ReferenceCells::Triangle:
-        return 3;
-      case ReferenceCells::Quadrilateral:
-        return 4;
-      case ReferenceCells::Tetrahedron:
-        return 6;
-      case ReferenceCells::Pyramid:
-        return 8;
-      case ReferenceCells::Wedge:
-        return 9;
-      case ReferenceCells::Hexahedron:
-        return 12;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return 3;
+          case ReferenceCells::Quadrilateral:
+            return 4;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
     }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return 6;
+          case ReferenceCells::Pyramid:
+            return 8;
+          case ReferenceCells::Wedge:
+            return 9;
+          case ReferenceCells::Hexahedron:
+            return 12;
+          default:
+            DEAL_II_NOT_IMPLEMENTED();
+        }
+    }
+  else
+    DEAL_II_NOT_IMPLEMENTED();
 
   return numbers::invalid_unsigned_int;
 }
@@ -2233,113 +2290,101 @@ Point<dim>
 ReferenceCell<dim>::vertex(const unsigned int v) const
 {
   AssertIndexRange(v, n_vertices());
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
 
-  switch (dim)
+  if constexpr (dim == 0)
+    return Point<dim>();
+  else if constexpr (dim == 1)
     {
-      case 0:
+      static const Point<dim> vertices[2] = {
+        Point<dim>(),              // the origin
+        Point<dim>::unit_vector(0) // unit point along x-axis
+      };
+      return vertices[v];
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
         {
-          if (*this == ReferenceCells::Vertex)
-            return Point<dim>();
-          break;
-        }
-      case 1:
-        {
-          static const Point<dim> vertices[2] = {
-            Point<dim>(),              // the origin
-            Point<dim>::unit_vector(0) // unit point along x-axis
-          };
-          if (*this == ReferenceCells::Line)
-            return vertices[v];
-          break;
-        }
-      case 2:
-        {
-          switch (this->kind)
+          case ReferenceCells::Triangle:
             {
-              case ReferenceCells::Triangle:
-                {
-                  static const Point<dim> vertices[3] = {
-                    Point<dim>(),               // the origin
-                    Point<dim>::unit_vector(0), // unit point along x-axis
-                    Point<dim>::unit_vector(1)  // unit point along y-axis
-                  };
-                  return vertices[v];
-                }
-              case ReferenceCells::Quadrilateral:
-                {
-                  static const Point<dim> vertices[4] = {
-                    // First the two points on the x-axis
-                    Point<dim>(),
-                    Point<dim>::unit_vector(0),
-                    // Then these two points shifted in the y-direction
-                    Point<dim>() + Point<dim>::unit_vector(1),
-                    Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1)};
-                  return vertices[v];
-                }
+              static const Point<dim> vertices[3] = {
+                Point<dim>(),               // the origin
+                Point<dim>::unit_vector(0), // unit point along x-axis
+                Point<dim>::unit_vector(1)  // unit point along y-axis
+              };
+              return vertices[v];
             }
-          break;
-        }
-      case 3:
-        {
-          switch (this->kind)
+          case ReferenceCells::Quadrilateral:
             {
-              case ReferenceCells::Tetrahedron:
-                {
-                  static const Point<dim> vertices[4] = {
-                    Point<dim>(),               // the origin
-                    Point<dim>::unit_vector(0), // unit point along x-axis
-                    Point<dim>::unit_vector(1), // unit point along y-axis
-                    Point<dim>::unit_vector(2)  // unit point along z-axis
-                  };
-                  return vertices[v];
-                }
-              case ReferenceCells::Pyramid:
-                {
-                  static const Point<dim> vertices[5] = {
-                    Point<dim>{-1.0, -1.0, 0.0},
-                    Point<dim>{+1.0, -1.0, 0.0},
-                    Point<dim>{-1.0, +1.0, 0.0},
-                    Point<dim>{+1.0, +1.0, 0.0},
-                    Point<dim>{+0.0, +0.0, 1.0}};
-                  return vertices[v];
-                }
-              case ReferenceCells::Wedge:
-                {
-                  static const Point<dim> vertices[6] = {
-                    // First the three points on the triangular base of the
-                    // wedge:
-                    Point<dim>(),
-                    Point<dim>::unit_vector(0),
-                    Point<dim>::unit_vector(1),
-                    // And now everything shifted in the z-direction again
-                    Point<dim>() + Point<dim>::unit_vector(2),
-                    Point<dim>::unit_vector(0) + Point<dim>::unit_vector(2),
-                    Point<dim>::unit_vector(1) + Point<dim>::unit_vector(2)};
-                  return vertices[v];
-                }
-              case ReferenceCells::Hexahedron:
-                {
-                  static const Point<dim> vertices[8] = {
-                    // First the two points on the x-axis
-                    Point<dim>(),
-                    Point<dim>::unit_vector(0),
-                    // Then these two points shifted in the y-direction
-                    Point<dim>() + Point<dim>::unit_vector(1),
-                    Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1),
-                    // And now all four points shifted in the z-direction
-                    Point<dim>() + Point<dim>::unit_vector(2),
-                    Point<dim>::unit_vector(0) + Point<dim>::unit_vector(2),
-                    Point<dim>() + Point<dim>::unit_vector(1) +
-                      Point<dim>::unit_vector(2),
-                    Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1) +
-                      Point<dim>::unit_vector(2)};
-                  return vertices[v];
-                }
+              static const Point<dim> vertices[4] = {
+                // First the two points on the x-axis
+                Point<dim>(),
+                Point<dim>::unit_vector(0),
+                // Then these two points shifted in the y-direction
+                Point<dim>() + Point<dim>::unit_vector(1),
+                Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1)};
+              return vertices[v];
             }
-          break;
         }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              static const Point<dim> vertices[4] = {
+                Point<dim>(),               // the origin
+                Point<dim>::unit_vector(0), // unit point along x-axis
+                Point<dim>::unit_vector(1), // unit point along y-axis
+                Point<dim>::unit_vector(2)  // unit point along z-axis
+              };
+              return vertices[v];
+            }
+          case ReferenceCells::Pyramid:
+            {
+              static const Point<dim> vertices[5] = {
+                Point<dim>{-1.0, -1.0, 0.0},
+                Point<dim>{+1.0, -1.0, 0.0},
+                Point<dim>{-1.0, +1.0, 0.0},
+                Point<dim>{+1.0, +1.0, 0.0},
+                Point<dim>{+0.0, +0.0, 1.0}};
+              return vertices[v];
+            }
+          case ReferenceCells::Wedge:
+            {
+              static const Point<dim> vertices[6] = {
+                // First the three points on the triangular base of the
+                // wedge:
+                Point<dim>(),
+                Point<dim>::unit_vector(0),
+                Point<dim>::unit_vector(1),
+                // And now everything shifted in the z-direction again
+                Point<dim>() + Point<dim>::unit_vector(2),
+                Point<dim>::unit_vector(0) + Point<dim>::unit_vector(2),
+                Point<dim>::unit_vector(1) + Point<dim>::unit_vector(2)};
+              return vertices[v];
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              static const Point<dim> vertices[8] = {
+                // First the two points on the x-axis
+                Point<dim>(),
+                Point<dim>::unit_vector(0),
+                // Then these two points shifted in the y-direction
+                Point<dim>() + Point<dim>::unit_vector(1),
+                Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1),
+                // And now all four points shifted in the z-direction
+                Point<dim>() + Point<dim>::unit_vector(2),
+                Point<dim>::unit_vector(0) + Point<dim>::unit_vector(2),
+                Point<dim>() + Point<dim>::unit_vector(1) +
+                  Point<dim>::unit_vector(2),
+                Point<dim>::unit_vector(0) + Point<dim>::unit_vector(1) +
+                  Point<dim>::unit_vector(2)};
+              return vertices[v];
+            }
+        }
     }
 
   DEAL_II_NOT_IMPLEMENTED();
@@ -2352,28 +2397,38 @@ template <int dim>
 inline constexpr unsigned int
 ReferenceCell<dim>::n_faces() const
 {
-  switch (this->kind)
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+
+  if constexpr (dim == 0)
+    return 0;
+  else if constexpr (dim == 1)
+    return 2;
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        return 0;
-      case ReferenceCells::Line:
-        return 2;
-      case ReferenceCells::Triangle:
-        return 3;
-      case ReferenceCells::Quadrilateral:
-        return 4;
-      case ReferenceCells::Tetrahedron:
-        return 4;
-      case ReferenceCells::Pyramid:
-        return 5;
-      case ReferenceCells::Wedge:
-        return 5;
-      case ReferenceCells::Hexahedron:
-        return 6;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return 3;
+          case ReferenceCells::Quadrilateral:
+            return 4;
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            return 4;
+          case ReferenceCells::Pyramid:
+            return 5;
+          case ReferenceCells::Wedge:
+            return 5;
+          case ReferenceCells::Hexahedron:
+            return 6;
+        }
     }
 
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
 
@@ -2394,65 +2449,64 @@ inline std_cxx20::ranges::iota_view<unsigned int, unsigned int>
 ReferenceCell<dim>::face_indices_by_type(
   const ReferenceCell<dim - 1> &face_ref_type) const
 {
-  switch (this->kind)
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+  Assert(face_ref_type != ReferenceCells::Invalid<dim - 1>,
+         ExcNotImplemented());
+
+  if constexpr (dim == 0)
     {
-      case ReferenceCells::Vertex:
-        return this->face_indices(); // no faces
-      case ReferenceCells::Line:
-        if (face_ref_type == ReferenceCells::Vertex)
-          return this->face_indices();
-        else
-          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
-                                                                          0U);
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Quadrilateral:
-        if (face_ref_type == ReferenceCells::Line)
-          return this->face_indices();
-        else
-          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
-                                                                          0U);
-      case ReferenceCells::Tetrahedron:
-        if (face_ref_type == ReferenceCells::Triangle)
-          return this->face_indices();
-        else
-          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
-                                                                          0U);
-      case ReferenceCells::Pyramid:
-        switch (face_ref_type)
-          {
-            case ReferenceCells::Triangle:
-              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
-                1U, 5U);
-            case ReferenceCells::Quadrilateral:
-              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
-                0U, 1U);
-            default:
-              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
-                0U, 0U);
-          }
-      case ReferenceCells::Wedge:
-        switch (face_ref_type)
-          {
-            case ReferenceCells::Triangle:
-              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
-                0U, 2U);
-            case ReferenceCells::Quadrilateral:
-              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
-                2U, 5U);
-            default:
-              return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
-                0U, 0U);
-          }
-      case ReferenceCells::Hexahedron:
-        if (face_ref_type == ReferenceCells::Quadrilateral)
-          return this->face_indices();
-        else
-          return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U,
-                                                                          0U);
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      return this->face_indices(); // no faces
+    }
+  else if constexpr (dim == 1)
+    {
+      return this->face_indices();
+    }
+  else if constexpr (dim == 2)
+    {
+      return this->face_indices();
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              if (face_ref_type == ReferenceCells::Triangle)
+                return this->face_indices();
+              else
+                return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                  0U, 0U);
+            }
+          case ReferenceCells::Pyramid:
+            {
+              if (face_ref_type == ReferenceCells::Triangle)
+                return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                  1U, 5U);
+              else
+                return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                  0U, 1U);
+            }
+          case ReferenceCells::Wedge:
+            {
+              if (face_ref_type == ReferenceCells::Triangle)
+                return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                  0U, 2U);
+              else
+                return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                  2U, 5U);
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              if (face_ref_type == ReferenceCells::Quadrilateral)
+                return this->face_indices();
+              else
+                return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(
+                  0U, 0U);
+            }
+        }
     }
 
+  DEAL_II_NOT_IMPLEMENTED();
   return std_cxx20::ranges::iota_view<unsigned int, unsigned int>(0U, 0U);
 }
 
