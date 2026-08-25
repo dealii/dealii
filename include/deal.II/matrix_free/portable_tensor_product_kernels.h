@@ -935,13 +935,11 @@ namespace Portable
                    n_out_per_elmt,
                ExcInternalError());
 
-        const int thread_id  = team_member.team_rank();
-        const int block_size = team_member.team_size();
-
-        for (int tid = thread_id;
-             tid < n_elements_in_current_batch * n_blocks1 * n_blocks2;
-             tid += block_size)
-          {
+        Kokkos::parallel_for(
+          Kokkos::TeamVectorRange(team_member,
+                                  n_elements_in_current_batch * n_blocks1 *
+                                    n_blocks2),
+          [&](const int tid) {
             const int e   = tid / (n_blocks1 * n_blocks2);
             const int rem = tid % (n_blocks1 * n_blocks2);
             const int i2  = rem / n_blocks1;
@@ -964,7 +962,7 @@ namespace Portable
               Kokkos::subview(out,
                               Kokkos::make_pair(
                                 out_offset, static_cast<int>(out.extent(0)))));
-          }
+          });
 
         team_member.team_barrier();
       }
@@ -987,16 +985,13 @@ namespace Portable
         const ViewTypeIn src,
         const int        N)
       {
-        const int thread_id  = team_member.team_rank();
-        const int block_size = team_member.team_size();
-
-        for (int tid = thread_id; tid < N; tid += block_size)
-          {
-            if constexpr (add)
-              dst(tid) += src(tid);
-            else
-              dst(tid) = src(tid);
-          }
+        Kokkos::parallel_for(Kokkos::TeamVectorRange(team_member, N),
+                             [&](const int tid) {
+                               if constexpr (add)
+                                 dst(tid) += src(tid);
+                               else
+                                 dst(tid) = src(tid);
+                             });
 
         team_member.team_barrier();
       }
@@ -1326,21 +1321,16 @@ namespace Portable
         constexpr int n_q_points        = Utilities::pow(n_columns, dim);
         constexpr int co_dimension_size = Utilities::pow(n_columns, dim - 1);
 
-        const int thread_id  = team_member.team_rank();
-        const int block_size = team_member.team_size();
-
-        for (int tid = thread_id;
-             tid < n_elements_in_current_batch * co_dimension_size;
-             tid += block_size)
-          {
+        Kokkos::parallel_for(
+          Kokkos::TeamVectorRange(team_member,
+                                  n_elements_in_current_batch *
+                                    co_dimension_size),
+          [&](const int tid) {
             const int elmnt_idx = tid / co_dimension_size;
             const int reminder  = tid % co_dimension_size;
 
-            // Sized [dim], not [dim - 1], purely to keep the array valid at
-            // dim == 1 (where the d-loops below never execute) without a
-            // separate dim == 1 code path. The extra slot is never touched.
-            int    idx_d[dim], stride_d[dim];
-            Number reg[dim][n_columns];
+            Kokkos::Array<int, dim - 1> idx_d, stride_d;
+            Number                      reg[dim][n_columns];
 
             for (int d = 0; d < dim - 1; ++d)
               {
@@ -1424,7 +1414,7 @@ namespace Portable
                       out(elmnt_idx * n_q_points + q_point) = result;
                   }
               }
-          }
+          });
 
         team_member.team_barrier();
       }
