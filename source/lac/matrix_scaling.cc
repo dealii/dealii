@@ -275,11 +275,12 @@ MatrixScaling::find_scaling_and_scale_linear_system(Matrix     &matrix,
       Assert(matrix.locally_owned_range_indices() ==
                rhs.locally_owned_elements(),
              ExcMessage("Matrix and vector must have the same partitioning"));
-      std::vector<double> local_updates(row_scaling.size());
+      using Number = typename VectorType::value_type;
+      std::vector<Number> local_updates(row_scaling.size());
       for (auto i : locally_owned_rows)
         {
           auto local_idx           = partitioner.global_to_local(i);
-          local_updates[local_idx] = rhs[i] * row_scaling[local_idx];
+          local_updates[local_idx] = Number(rhs[i]) * row_scaling[local_idx];
         }
       rhs.set(locally_owned_rows.get_index_vector(), local_updates);
       rhs.compress(VectorOperation::insert);
@@ -320,11 +321,12 @@ MatrixScaling::scale_system_solution(VectorType &sol) const
     {
       Assert(locally_owned_cols == sol.locally_owned_elements(),
              ExcMessage("Matrix and vector must have the same partitioning"));
-      std::vector<double> local_updates(column_scaling.size());
+      using Number = typename VectorType::value_type;
+      std::vector<Number> local_updates(column_scaling.size());
       for (auto i : locally_owned_cols)
         {
           auto local_idx           = partitioner.global_to_local(i);
-          local_updates[local_idx] = sol[i] * column_scaling[local_idx];
+          local_updates[local_idx] = Number(sol[i]) * column_scaling[local_idx];
         }
       sol.set(locally_owned_cols.get_index_vector(), local_updates);
       sol.compress(VectorOperation::insert);
@@ -644,6 +646,8 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
 #endif
     false)
     {
+      using Number = typename Matrix::value_type;
+
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
       std::map<types::global_dof_index, double>
@@ -727,7 +731,7 @@ MatrixScaling::do_l1_scaling(Matrix &matrix, const unsigned int nsteps)
             {
               auto local_row_idx = partitioner.global_to_local(row);
               auto row_size      = matrix.row_length(row);
-              std::vector<double>                  values(row_size);
+              std::vector<Number>                  values(row_size);
               std::vector<types::global_dof_index> columns(row_size);
               unsigned int                         idx = 0;
               for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
@@ -828,6 +832,8 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
 #endif
     false)
     {
+      using Number = typename Matrix::value_type;
+
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
       std::map<types::global_dof_index, double>
@@ -915,7 +921,7 @@ MatrixScaling::do_linfty_scaling(Matrix &matrix, const unsigned int nsteps)
             {
               auto local_row_idx = partitioner.global_to_local(row);
               auto row_size      = matrix.row_length(row);
-              std::vector<double>                  values(row_size);
+              std::vector<Number>                  values(row_size);
               std::vector<types::global_dof_index> columns(row_size);
               unsigned int                         idx = 0;
               for (auto it = matrix.begin(row); it != matrix.end(row); ++it)
@@ -1095,6 +1101,8 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
 #endif
     false)
     {
+      using Number = typename Matrix::value_type;
+
       Vector<double> local_row_norms(locally_owned_rows.n_elements());
       Vector<double> local_col_norms(locally_owned_cols.n_elements());
       std::map<types::global_dof_index, double>
@@ -1123,7 +1131,7 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     {
                       auto local_row_idx = partitioner.global_to_local(row);
                       auto row_size      = matrix.row_length(row);
-                      std::vector<double>                  values(row_size);
+                      std::vector<Number>                  values(row_size);
                       std::vector<types::global_dof_index> columns(row_size);
                       unsigned int                         idx = 0;
                       for (auto it = matrix.begin(row); it != matrix.end(row);
@@ -1213,7 +1221,7 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     {
                       auto local_row_idx = partitioner.global_to_local(row);
                       auto row_size      = matrix.row_length(row);
-                      std::vector<double>                  values(row_size);
+                      std::vector<Number>                  values(row_size);
                       std::vector<types::global_dof_index> columns(row_size);
                       unsigned int                         idx = 0;
                       for (auto it = matrix.begin(row); it != matrix.end(row);
@@ -1290,7 +1298,7 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     {
                       auto local_row_idx = partitioner.global_to_local(row);
                       auto row_size      = matrix.row_length(row);
-                      std::vector<double>                  values(row_size);
+                      std::vector<Number>                  values(row_size);
                       std::vector<types::global_dof_index> columns(row_size);
                       unsigned int                         idx = 0;
                       for (auto it = matrix.begin(row); it != matrix.end(row);
@@ -1383,7 +1391,7 @@ MatrixScaling::do_sk_scaling(Matrix &matrix, const unsigned int nsteps)
                     {
                       auto local_row_idx = partitioner.global_to_local(row);
                       auto row_size      = matrix.row_length(row);
-                      std::vector<double>                  values(row_size);
+                      std::vector<Number>                  values(row_size);
                       std::vector<types::global_dof_index> columns(row_size);
                       unsigned int                         idx = 0;
                       for (auto it = matrix.begin(row); it != matrix.end(row);
