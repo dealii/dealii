@@ -1,0 +1,7 @@
+Fixed: MatrixScaling assumed that the scalar type of a distributed matrix or
+vector is double. As a consequence deal.II failed to compile against a PETSc
+configured with complex scalars, because PetscScalar is then
+std::complex<double>. The arrays passed to the matrix and vector set()
+functions now use the scalar type of the matrix and vector respectively.
+<br>
+(Ernesto Ismail, 2026/08/25)
