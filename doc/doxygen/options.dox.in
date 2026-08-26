@@ -138,6 +138,7 @@ HTML_COLORSTYLE_SAT    = 200
 HTML_COLORSTYLE        = LIGHT
 HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/doxygen-awesome.css \
                          @CMAKE_CURRENT_SOURCE_DIR@/custom.css
+HTML_EXTRA_FILES       = @CMAKE_CURRENT_SOURCE_DIR@/doxygen-awesome-darkmode-toggle.js
 
 # disable the navigation column
 DISABLE_INDEX          = NO
