@@ -1,12 +1,26 @@
 /*
- * Set primary color equal to the main webpage.
+ * Set primary color equal to the main webpage. --primary-color is defined
+ * by doxygen-awesome.css; the --dealii-* variables below are our own.
+ *
+ * Colors that differ between light and dark mode are declared here as
+ * variables and overridden in the html.dark-mode block at the end of this
+ * file. doxygen-awesome-darkmode-toggle.js always sets either the light-mode
+ * or the dark-mode class on <html>, so the class selector is sufficient and no
+ * prefers-color-scheme query is needed.
  */
 html {
     --primary-color: #546d78;
+
+    --dealii-link-color: #1779c4;
+    --dealii-box-foreground: black;
+    --dealii-box-background: #f9f9f9;
+    --dealii-box-border-color: #aaa;
+    --dealii-table-header-background: #D6E2FA;
+    --dealii-table-header-foreground: #000000;
 }
 
 a:link, a:visited, a:hover, a:focus, a:active {
-    color: #1779c4 !important;
+    color: var(--dealii-link-color) !important;
 }
 
 /*
@@ -35,26 +49,24 @@ a:link, a:visited, a:hover, a:focus, a:active {
     border-bottom: none;
 }
 
-@media (prefers-color-scheme: light) {
-  table.tutorial {
-    color: black;
-    border: 1px solid #aaa;
-    background-color: #f9f9f9;
+table.tutorial {
+    color: var(--dealii-box-foreground);
+    border: 1px solid var(--dealii-box-border-color);
+    background-color: var(--dealii-box-background);
     padding: 5px;
     font-size: 95%;
-  }
 }
 div.tutorial {
-    color: black;
-    border: 1px solid #aaa;
-    background-color: #f9f9f9;
+    color: var(--dealii-box-foreground);
+    border: 1px solid var(--dealii-box-border-color);
+    background-color: var(--dealii-box-background);
     padding: 50px;
     font-size: 95%;
 }
 div.doxygen-generated-exception-message {
-    color: black;
-    border: 1px solid #aaa;
-    background-color: #f9f9f9;
+    color: var(--dealii-box-foreground);
+    border: 1px solid var(--dealii-box-border-color);
+    background-color: var(--dealii-box-background);
     padding: 5px;
     font-size: 95%;
 }
@@ -66,8 +78,8 @@ div.doxygen-generated-exception-message {
  * would no longer be visible).
  */
 table.doxtable th {
-    background-color: #D6E2FA;
-    color: #000000;
+    background-color: var(--dealii-table-header-background);
+    color: var(--dealii-table-header-foreground);
 }
 
 div.image img[src="fe_enriched_1d.png"] {
@@ -136,4 +148,27 @@ div.image img[src="fe_enriched_h-refinement.png"] {
  */
 .CodeFragmentInTutorialComment {
     /* background-color: #FF33F0; */
+}
+
+/*
+ * Dark mode overrides.
+ */
+html.dark-mode {
+    --primary-color: #8ba3ae;
+
+    --dealii-link-color: #5ca8e2;
+    --dealii-box-foreground: var(--page-foreground-color);
+    --dealii-box-background: #232529;
+    --dealii-box-border-color: #4a4d52;
+    --dealii-table-header-background: #2b3b55;
+    --dealii-table-header-foreground: var(--page-foreground-color);
+}
+
+/*
+ * Formula images generated with USE_MATHJAX = NO have black glyphs on a
+ * transparent background and are not covered by the image inversion rules in
+ * doxygen-awesome.css, so they are inverted here as well.
+ */
+html.dark-mode img.formulaDsp, html.dark-mode img.formulaInl {
+    filter: invert();
 }
