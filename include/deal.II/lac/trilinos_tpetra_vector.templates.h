@@ -1171,15 +1171,42 @@ namespace LinearAlgebra
     Number
     Vector<Number, MemorySpace>::max() const
     {
-      Assert(numbers::NumberTraits<Number>::is_complex == false,
-             ExcMessage(
-               "Not implemented for complex number types at the moment."));
+      // The body below cannot be compiled for complex numbers: it compares
+      // entries with operator> and initialises the running maximum with
+      // std::numeric_limits<Number>::lowest(), neither of which is defined
+      // for complex types. Guarding with `if constexpr` keeps that code out
+      // of instantiations for complex Number.
+      if constexpr (numbers::NumberTraits<Number>::is_complex == false)
+        {
+          // Make sure we have a view available to access the vector entries.
+          if (!vector_1d_view)
+            {
+              auto vector_2d_view =
+                vector->template getLocalView<Kokkos::HostSpace>(
+                  Tpetra::Access::ReadWriteStruct{});
 
-      // Reset our cached vector view so that trilinos operations on device do
-      // not detect an existing host view.
-      vector_1d_view.reset();
+              vector_1d_view =
+                Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+            }
 
-      return vector->normInf();
+          Number max_value = std::numeric_limits<Number>::lowest();
+
+          const size_t this_local_length = vector->getLocalLength();
+
+          for (size_type i = 0; i < this_local_length; ++i)
+            if ((*vector_1d_view)(i) > max_value)
+              max_value = (*vector_1d_view)(i);
+
+          return Utilities::MPI::max(max_value, get_mpi_communicator());
+        }
+      else
+        {
+          Assert(false,
+                 ExcMessage(
+                   "The 'max' operation is not defined for complex numbers, "
+                   "and so cannot be used on vectors over complex values."));
+          return Number();
+        }
     }
 
 
