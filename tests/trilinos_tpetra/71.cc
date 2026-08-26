@@ -65,9 +65,27 @@ test()
   const double eps =
     typeid(typename VectorType::value_type) == typeid(double) ? 1e-14 : 1e-5;
 
-  Assert(std::fabs(vector_ghosted.min()) < eps, ExcInternalError());
-  Assert(std::fabs(vector_ghosted.max() - (vector_ghosted.size() - 1)) < eps,
-         ExcInternalError());
+  AssertThrow(std::fabs(vector_ghosted.min()) < eps, ExcInternalError());
+  AssertThrow(std::fabs(vector_ghosted.max() - (vector_ghosted.size() - 1)) <
+                eps,
+              ExcInternalError());
+
+  // Check again with a vector all of whose entries are negative. This is the
+  // case that distinguishes the maximal element from the infinity norm: for
+  // the vector above the two happen to coincide, so a max() implemented as
+  // the infinity norm passes unnoticed.
+  for (unsigned int i = 0; i < vector_distributed.size(); ++i)
+    {
+      vector_distributed(i) = -1.0 * (i + 1);
+    }
+  vector_distributed.compress(VectorOperation::insert);
+
+  vector_ghosted = vector_distributed;
+
+  AssertThrow(std::fabs(vector_ghosted.min() + 1.0 * vector_ghosted.size()) <
+                eps,
+              ExcInternalError());
+  AssertThrow(std::fabs(vector_ghosted.max() + 1.0) < eps, ExcInternalError());
 }
 
 
