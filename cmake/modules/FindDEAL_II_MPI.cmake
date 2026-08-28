@@ -14,13 +14,14 @@
 # Find MPI
 #
 # This module exports:
-#   MPI_LIBRARIES
-#   MPI_INCLUDE_DIRS
 #   MPI_CXX_FLAGS
+#   MPI_INCLUDE_DIRS
+#   MPI_LIBRARIES
 #   MPI_LINKER_FLAGS
 #   MPI_VERSION
 #   MPI_VERSION_MAJOR
 #   MPI_VERSION_MINOR
+#   MPI_WITH_DEVICE_SUPPORT
 #   OMPI_VERSION
 #
 
@@ -105,6 +106,48 @@ if(NOT DEFINED MPI_VERSION OR MPI_VERSION STREQUAL ".")
 endif()
 
 #
+# Check whether the MPI implementation is able to work with buffers that
+# reside in device memory directly, instead of requiring an explicit copy to
+# host memory first (known as "device-aware" or "CUDA-aware" MPI).
+#
+# There is no portable way of querying this at configure time. But the two
+# major MPI implementations both advertise the capability with preprocessor
+# symbols exported by the (non standard) mpi-ext.h header.
+#
+# Should the heuristic fail for a given MPI implementation the check can
+# always be overridden on the command line by configuring with
+# -DDEAL_II_MPI_WITH_DEVICE_SUPPORT=ON.
+#
+
+clear_cmake_required()
+set(CMAKE_REQUIRED_FLAGS "${DEAL_II_CXX_FLAGS_SAVED} ${MPI_CXX_COMPILE_FLAGS}")
+set(CMAKE_REQUIRED_INCLUDES ${MPI_CXX_INCLUDE_PATH} ${MPI_C_INCLUDE_PATH})
+
+unset_if_changed(CHECK_MPI_DEVICE_SUPPORT_SAVED
+  "${MPI_CXX_COMPILER}${CMAKE_REQUIRED_INCLUDES}"
+  MPI_WITH_DEVICE_SUPPORT
+  )
+
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <mpi.h>
+  #include <mpi-ext.h>
+
+  #if !defined(MPIX_CUDA_AWARE_SUPPORT) || MPIX_CUDA_AWARE_SUPPORT == 0
+  #  if !defined(MPIX_ROCM_AWARE_SUPPORT) || MPIX_ROCM_AWARE_SUPPORT == 0
+  #    error \"This MPI library does not advertise device support.\"
+  #  endif
+  #endif
+
+  int main()
+  {
+  }
+  "
+  MPI_WITH_DEVICE_SUPPORT)
+
+reset_cmake_required()
+
+#
 # Make sure that we do not run into underlinking on Debian/Ubuntu systems with
 # lld / ld.gold and missing libopen-pal.so on the link line:
 #
@@ -155,6 +198,8 @@ process_feature(MPI
   CXX_FLAGS OPTIONAL MPI_CXX_COMPILE_FLAGS
   LINKER_FLAGS OPTIONAL MPI_CXX_LINK_FLAGS
   CLEAR
+    CHECK_MPI_DEVICE_SUPPORT_SAVED
+    MPI_WITH_DEVICE_SUPPORT
     MPI_C_COMPILER
     MPI_CXX_COMPILER
     MPIEXEC

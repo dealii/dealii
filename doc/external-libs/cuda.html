@@ -25,16 +25,23 @@
       Several MPI implementations are able to perform MPI operations with data
       located in device memory directly without the need to copy to CPU memory
       explicitly first. This feature is commonly known as "CUDA-aware MPI".
-      In case deal.II is compiled with MPI support and the MPI implementation
-      supports this feature, you can tell deal.II to use it by configuring with
+      If deal.II is configured with <code>-DDEAL_II_WITH_MPI=ON</code> then
+      the configuration system queries the MPI library for this capability and
+      sets <code>DEAL_II_MPI_WITH_DEVICE_SUPPORT</code> accordingly.
+      </p>
+
+      <p>
+      The check is a heuristic based on preprocessor symbols exported by the
+      <code>mpi-ext.h</code> header, which not every MPI implementation
+      provides. If the detection fails for your MPI library you can override
+      the result by configuring with
       <pre>
 
         -DDEAL_II_WITH_MPI=ON
         -DDEAL_II_MPI_WITH_DEVICE_SUPPORT=ON
       </pre>
-      Note, that there is no check that detects if the MPI implementation
-      really is CUDA-aware. Activating this flag for incompatible MPI libraries
-      will lead to segmentation faults in MPI calls.
+      Note, that this bypasses the check. Setting the flag for an MPI library
+      that is not CUDA-aware will lead to segmentation faults in MPI calls.
     </p>
 
     <p>
