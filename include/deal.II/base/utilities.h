@@ -951,12 +951,12 @@ namespace Utilities
       return T(1.);
     else if (N < 0)
       // For negative exponents, turn things into a positive exponent
-      return T(1.) / fixed_power<-N>(x);
+      return T(1.) / fixed_power<-N, T>(x);
     else
       // If we get here, we have a positive exponent. Compute the result
       // by repeated squaring:
-      return ((N % 2 == 1) ? x * fixed_power<N / 2>(x * x) :
-                             fixed_power<N / 2>(x * x));
+      return ((N % 2 == 1) ? x * fixed_power<N / 2, T>(x * x) :
+                             fixed_power<N / 2, T>(x * x));
   }
 
 

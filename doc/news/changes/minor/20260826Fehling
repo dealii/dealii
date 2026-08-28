@@ -1,0 +1,6 @@
+Fixed: The recursion in Utilities::fixed_power now explicitly specifies
+the template parameter for the value type. Previously, template argument
+deduction failed during compilation for data types enabling automatic
+differentiation.
+<br>
+(Marc Fehling, 2026/08/26)
