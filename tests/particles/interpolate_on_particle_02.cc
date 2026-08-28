@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2020 - 2024 by the deal.II authors
+// Copyright (C) 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,6 +12,12 @@
 
 // Test that a Monomial function interpolated to a field
 // can be interpolated at the particle position correctly
+// using the fast implementation of the method which requires
+// knowing the number of components at compile time.
+// This tests for the case of one or multiple components.
+// When more than one component is used, odd components are false
+// and even components are true. For example n_components = 3 leads to a
+// mask that is [true, false, true].
 
 #include <deal.II/base/function_lib.h>
 #include <deal.II/base/point.h>
@@ -38,9 +44,9 @@
 #include "../tests.h"
 
 
-template <int dim, int spacedim>
+template <int n_components, int dim, int spacedim>
 void
-test()
+test(const bool odd_to_false)
 {
   const unsigned int my_mpi_id =
     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -57,11 +63,23 @@ test()
   Particles::Generators::regular_reference_locations<dim, spacedim>(
     tria, QGauss<dim>(2).get_points(), particle_handler);
 
+  FESystem<dim, spacedim> fe(FE_Q<dim, spacedim>(1) ^ n_components);
 
-  FE_Q<dim, spacedim> fe(1);
+  ComponentMask mask(n_components, true);
+  if (odd_to_false)
+    {
+      // Set odd components to false
+      for (int c = 1; c < n_components; c += 2)
+        mask.set(c, false);
+    }
+  else
+    {
+      // Otherwise set even components to false
+      for (int c = 0; c < n_components; c += 2)
+        mask.set(c, false);
+    }
 
-  ComponentMask mask(fe.n_components(), true);
-  const auto    n_comps = mask.n_selected_components();
+  const auto n_comps = mask.n_selected_components();
 
   DoFHandler<dim, spacedim> space_dh(tria);
   space_dh.distribute_dofs(fe);
@@ -110,8 +128,13 @@ test()
   // Interpolate function to vector than interpolate field to particles
   VectorTools::interpolate(space_dh, linear, field_owned);
   field_relevant = field_owned;
-  Particles::Utilities::interpolate_field_on_particles(
-    space_dh, particle_handler, field_relevant, interpolation_on_particles);
+  Particles::Utilities::
+    interpolate_field_on_particles<n_components, dim, spacedim>(
+      space_dh,
+      particle_handler,
+      field_relevant,
+      interpolation_on_particles,
+      mask);
 
   Vector<double> values(mask.size());
 
@@ -135,13 +158,34 @@ main(int argc, char **argv)
 
   MPILogInitAll init;
 
-  deallog.push("2d/2d");
-  test<2, 2>();
+  deallog.push("1c/2d/2d/odd-false");
+  test<1, 2, 2>(true);
   deallog.pop();
-  deallog.push("2d/3d");
-  test<2, 3>();
+  deallog.push("1c/2d/3d/odd-false");
+  test<1, 2, 3>(true);
   deallog.pop();
-  deallog.push("3d/3d");
-  test<3, 3>();
+  deallog.push("1c/3d/3d/odd-false");
+  test<1, 3, 3>(true);
+  deallog.pop();
+
+
+  deallog.push("3c/2d/2d/odd-false");
+  test<3, 2, 2>(true);
+  deallog.pop();
+  deallog.push("3c/2d/3d/odd-false");
+  test<3, 2, 3>(true);
+  deallog.pop();
+  deallog.push("3c/3d/3d/odd-false");
+  test<3, 3, 3>(true);
+  deallog.pop();
+
+  deallog.push("1c/2d/2d/odd-true");
+  test<1, 2, 2>(false);
+  deallog.pop();
+  deallog.push("1c/2d/3d/odd-true");
+  test<1, 2, 3>(false);
+  deallog.pop();
+  deallog.push("1c/3d/3d/odd-true");
+  test<1, 3, 3>(false);
   deallog.pop();
 }
