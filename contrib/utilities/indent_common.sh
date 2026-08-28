@@ -71,9 +71,11 @@ checks() {
   #
   # For commits already in the history, please see .mailmap in the root directory.
   #
-  # Note that we currently allow email addresses of the form
-  # Luca Heltai <luca-heltai@users.noreply.github.com>
-  # as these are generated when using the website to commit.
+  # Anonymized github addresses of the form
+  # John Smith <12345678+JohnSmith@users.noreply.github.com>
+  # carry no contact information and are rejected as well. Such addresses
+  # that are already part of the history are grandfathered in by way of a
+  # later cutoff date; map them to a real address in .mailmap instead.
   #
   # Finally, to stay sane, just go back until the beginning of 2019 for now.
   #
@@ -91,7 +93,6 @@ checks() {
 
   # now emails:
   git log --since "2019-01-01" --format="%aE" --no-merges | sort -u | while read email ; do
-      words=($name)
       if ! echo "$email" | grep -q "\."; then
 	  echo "invalid email '$email'"
           echo ""
@@ -105,6 +106,25 @@ checks() {
           echo "hint: for possible solutions, consult the webpage:"
           echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
 	  exit 3
+      fi
+  done || exit 3
+
+  # now the anonymized github addresses. These are only rejected for commits
+  # that were added after the following cutoff date:
+  git log --since "2026-09-01" --format="%aE" --no-merges | sort -u | while read email ; do
+      # bot accounts do not have a real address to begin with:
+      case "$email" in *"[bot]@users.noreply.github.com") continue ;; esac
+      if echo "$email" | grep -q "users\.noreply\.github\.com"; then
+          echo "invalid email '$email'"
+          echo ""
+          echo "hint: anonymized github addresses are not accepted. Turn off"
+          echo "      'Keep my email address private' in your github settings,"
+          echo "      or set a real address with 'git config user.email', and"
+          echo "      then amend or rebase the commits of this pull request."
+          echo ""
+          echo "hint: for possible solutions, consult the webpage:"
+          echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
+          exit 3
       fi
   done || exit 3
 
