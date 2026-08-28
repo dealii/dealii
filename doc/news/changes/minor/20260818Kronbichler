@@ -1,0 +1,11 @@
+New: There are two new functions,
+PreconditionChebyshev::vmult_with_last_residual_norm() and
+PreconditionChebyshev::step_with_last_residual_norm() that, as a byproduct of
+the last iteration step in the respective PreconditionChebyshev::vmult() and
+PreconditionChebyshev::step(), also compute the norm of the residual appearing
+in that step. While this quantity is not the final residual after completion
+of the respective operation, the new option nonetheless gives the
+order-of-magnitude of the error remaining after the Chebyshev iteration
+without requiring an additional matrix-vector product.
+<br>
+(Martin Kronbichler, 2026/08/18)

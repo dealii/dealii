@@ -1,0 +1,5 @@
+New: The function PreconditionChebyshev::set_degree() allows to change the
+number of iterations, i.e., the underlying degree of the Chebyshev polynomial,
+after the preconditioner has been initialized.
+<br>
+(Martin Kronbichler, 2026/08/18)
