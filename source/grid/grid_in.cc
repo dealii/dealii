@@ -1334,8 +1334,7 @@ namespace
 
     std::vector<double>
     get_global_node_numbers(const int face_cell_no,
-                            const int face_cell_face_no,
-                            const int n_vertices_per_face) const;
+                            const int face_cell_face_no) const;
 
     // NL: Stored as [ global node-id (int), x-coord, y-coord, z-coord ]
     std::vector<std::vector<double>> node_list;
@@ -1350,7 +1349,7 @@ namespace
 
     ReferenceCell<dim> get_reference_cell_from_element_type(const std::string &type_string);
 
-    ReferenceCell<dim> ref_cell = ReferenceCells::Invalid;
+    ReferenceCell<dim> ref_cell = ReferenceCells::Invalid<dim>;
   };
 } // namespace
 
@@ -5292,23 +5291,34 @@ namespace
   ReferenceCell<dim>
   Abaqus_to_UCD<dim, spacedim>::get_reference_cell_from_element_type(const std::string &type_string)
   {
-    if (type_string == "C3D8")  return ReferenceCells::Hexahedron;
-    if (type_string == "C3D8I") return ReferenceCells::Hexahedron;
-    if (type_string == "C3D8R") return ReferenceCells::Hexahedron;
-    if (type_string == "C3D4")  return ReferenceCells::Tetrahedron;
-    if (type_string == "C3D6")  return ReferenceCells::Wedge;
-    if (type_string == "S3")    return ReferenceCells::Triangle;
-    if (type_string == "S4")    return ReferenceCells::Quadrilateral;
-    if (type_string == "S4R")   return ReferenceCells::Quadrilateral;
-    if (type_string == "CPS3")  return ReferenceCells::Triangle;
-    if (type_string == "CPS4")  return ReferenceCells::Quadrilateral;
-    if (type_string == "CPS4R") return ReferenceCells::Quadrilateral;
-    if (type_string == "CPE3")  return ReferenceCells::Triangle;
-    if (type_string == "CPE4")  return ReferenceCells::Quadrilateral;
-    if (type_string == "CPE4R") return ReferenceCells::Quadrilateral;
-    if (type_string == "B31")   return ReferenceCells::Line;
-    if (type_string == "B31R")  return ReferenceCells::Line;
-    return return ReferenceCells::Invalid;
+    if constexpr (dim == 1)
+    {
+      if (type_string == "B31")   return ReferenceCells::Line;
+      if (type_string == "B31R")  return ReferenceCells::Line;
+      return ReferenceCells::Invalid<1>;
+    }
+    else if constexpr (dim == 2)
+    {
+      if (type_string == "S3")    return ReferenceCells::Triangle;
+      if (type_string == "S4")    return ReferenceCells::Quadrilateral;
+      if (type_string == "S4R")   return ReferenceCells::Quadrilateral;
+      if (type_string == "CPS3")  return ReferenceCells::Triangle;
+      if (type_string == "CPS4")  return ReferenceCells::Quadrilateral;
+      if (type_string == "CPS4R") return ReferenceCells::Quadrilateral;
+      if (type_string == "CPE3")  return ReferenceCells::Triangle;
+      if (type_string == "CPE4")  return ReferenceCells::Quadrilateral;
+      if (type_string == "CPE4R") return ReferenceCells::Quadrilateral;
+      return ReferenceCells::Invalid<2>;
+    }
+    else if constexpr (dim == 3)
+    {
+      if (type_string == "C3D8")  return ReferenceCells::Hexahedron;
+      if (type_string == "C3D8I") return ReferenceCells::Hexahedron;
+      if (type_string == "C3D8R") return ReferenceCells::Hexahedron;
+      if (type_string == "C3D4")  return ReferenceCells::Tetrahedron;
+      if (type_string == "C3D6")  return ReferenceCells::Wedge; 
+      return ReferenceCells::Invalid<3>;
+    }
   }
 
 
@@ -5379,11 +5389,12 @@ namespace
             // Index, i[0], ..., i[n]
 
             // scan for element ID
+            // get the respective reference cell
             const std::string element_type_name = "TYPE=";
             std::string element_name = extractValue(line, element_type_name);
             ref_cell = get_reference_cell_from_element_type(element_name);
 
-            AssertThrow(ref_cell.dimension() == dim, 
+            AssertThrow(ref_cell.get_dimension() == dim, 
             ExcMessage("Element dimension does not match Triangulation dimension."));
 
             int material = 0;
@@ -5470,7 +5481,7 @@ namespace
 
                 // Get relevant faces, taking into account the element
                 // orientation
-                std::vector<double> quad_node_list;
+                std::vector<double> face_node_list;
                 const std::string   elset_name = line.substr(0, line.find(','));
                 if (elsets_list.count(elset_name) != 0)
                   {
@@ -5482,12 +5493,12 @@ namespace
                     for (const int cell : cells)
                       {
                         el_idx = cell;
-                        quad_node_list =
-                          get_global_node_numbers(el_idx, face_number, ref_cell.);
-                        quad_node_list.insert(quad_node_list.begin(),
+                        face_node_list =
+                          get_global_node_numbers(el_idx, face_number);
+                        face_node_list.insert(face_node_list.begin(),
                                               b_indicator);
 
-                        face_list.push_back(quad_node_list);
+                        face_list.push_back(face_node_list);
                       }
                   }
                 else
@@ -5495,11 +5506,11 @@ namespace
                     // Surface refers directly to elements
                     char comma;
                     iss >> el_idx >> comma >> temp >> face_number;
-                    quad_node_list =
-                      get_global_node_numbers(el_idx, face_number, GeometryInfo<dim>::vertices_per_face);
-                    quad_node_list.insert(quad_node_list.begin(), b_indicator);
+                    face_node_list =
+                      get_global_node_numbers(el_idx, face_number);
+                    face_node_list.insert(face_node_list.begin(), b_indicator);
 
-                    face_list.push_back(quad_node_list);
+                    face_list.push_back(face_node_list);
                   }
               }
           }
@@ -5661,103 +5672,89 @@ namespace
     const int face_cell_no,
     const int face_cell_face_no) const
   {
-    std::vector<double> quad_node_list(ref_cell.);
 
     // Given the indexing below, face_cell_no-1 must be a valid index:
-    Assert((face_cell_no >= 1) &&
-             (static_cast<typename decltype(cell_list)::size_type>(
-                face_cell_no) <= cell_list.size()),
-           ExcInternalError());
+  Assert((face_cell_no >= 1) &&
+           (static_cast<typename decltype(cell_list)::size_type>(
+              face_cell_no) <= cell_list.size()),
+         ExcInternalError());
 
-    // These orderings were reverse engineered by hand and may
-    // conceivably be erroneous.
-    // TODO: Currently one test (2d unstructured mesh) in the test
-    // suite fails, presumably because of an ordering issue.
-    if constexpr (dim == 2)
-      {
-        if (face_cell_face_no == 1)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][1];
-            quad_node_list[1] = cell_list[face_cell_no - 1][2];
-          }
-        else if (face_cell_face_no == 2)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][2];
-            quad_node_list[1] = cell_list[face_cell_no - 1][3];
-          }
-        else if (face_cell_face_no == 3)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][3];
-            quad_node_list[1] = cell_list[face_cell_no - 1][4];
-          }
-        else if (face_cell_face_no == 4)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][4];
-            quad_node_list[1] = cell_list[face_cell_no - 1][1];
-          }
-        else
-          {
-            AssertThrow(face_cell_face_no <= 4,
-                        ExcMessage("Invalid face number in 2d"));
-          }
-      }
-    else if constexpr (dim == 3)
-      {
-        if (face_cell_face_no == 1)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][1];
-            quad_node_list[1] = cell_list[face_cell_no - 1][4];
-            quad_node_list[2] = cell_list[face_cell_no - 1][3];
-            quad_node_list[3] = cell_list[face_cell_no - 1][2];
-          }
-        else if (face_cell_face_no == 2)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][5];
-            quad_node_list[1] = cell_list[face_cell_no - 1][8];
-            quad_node_list[2] = cell_list[face_cell_no - 1][7];
-            quad_node_list[3] = cell_list[face_cell_no - 1][6];
-          }
-        else if (face_cell_face_no == 3)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][1];
-            quad_node_list[1] = cell_list[face_cell_no - 1][2];
-            quad_node_list[2] = cell_list[face_cell_no - 1][6];
-            quad_node_list[3] = cell_list[face_cell_no - 1][5];
-          }
-        else if (face_cell_face_no == 4)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][2];
-            quad_node_list[1] = cell_list[face_cell_no - 1][3];
-            quad_node_list[2] = cell_list[face_cell_no - 1][7];
-            quad_node_list[3] = cell_list[face_cell_no - 1][6];
-          }
-        else if (face_cell_face_no == 5)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][3];
-            quad_node_list[1] = cell_list[face_cell_no - 1][4];
-            quad_node_list[2] = cell_list[face_cell_no - 1][8];
-            quad_node_list[3] = cell_list[face_cell_no - 1][7];
-          }
-        else if (face_cell_face_no == 6)
-          {
-            quad_node_list[0] = cell_list[face_cell_no - 1][1];
-            quad_node_list[1] = cell_list[face_cell_no - 1][5];
-            quad_node_list[2] = cell_list[face_cell_no - 1][8];
-            quad_node_list[3] = cell_list[face_cell_no - 1][4];
-          }
-        else
-          {
-            AssertThrow(face_cell_no <= 6,
-                        ExcMessage("Invalid face number in 3d"));
-          }
-      }
-    else
-      {
-        AssertThrow(dim == 2 || dim == 3, ExcNotImplemented());
-      }
+  const auto &cell_data = cell_list[face_cell_no - 1];
+  
+  // Subtract 1 because index 0 is the material ID
+  const unsigned int n_vertices = cell_data.size() - 1; 
 
-    return quad_node_list;
-  }
+  std::vector<double> face_nodes;
+
+  if constexpr (dim == 2)
+    {
+      if (n_vertices == 3) 
+        {
+          face_nodes.resize(2);
+          if      (face_cell_face_no == 1) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[2]; }
+          else if (face_cell_face_no == 2) { face_nodes[0] = cell_data[2]; face_nodes[1] = cell_data[3]; }
+          else if (face_cell_face_no == 3) { face_nodes[0] = cell_data[3]; face_nodes[1] = cell_data[1]; }
+          else AssertThrow(false, ExcMessage("Invalid face number for Triangle in 2d"));
+        }
+      else if (n_vertices == 4) 
+        {
+          face_nodes.resize(2);
+          if      (face_cell_face_no == 1) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[2]; }
+          else if (face_cell_face_no == 2) { face_nodes[0] = cell_data[2]; face_nodes[1] = cell_data[3]; }
+          else if (face_cell_face_no == 3) { face_nodes[0] = cell_data[3]; face_nodes[1] = cell_data[4]; }
+          else if (face_cell_face_no == 4) { face_nodes[0] = cell_data[4]; face_nodes[1] = cell_data[1]; }
+          else AssertThrow(false, ExcMessage("Invalid face number for Quad in 2d"));
+        }
+      else AssertThrow(false, ExcMessage("Unsupported 2D element node count"));
+    }
+  else if constexpr (dim == 3)
+    {
+      if (n_vertices == 4) 
+        {
+          face_nodes.resize(3);
+          if      (face_cell_face_no == 1) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[2]; face_nodes[2] = cell_data[3]; }
+          else if (face_cell_face_no == 2) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[4]; face_nodes[2] = cell_data[2]; }
+          else if (face_cell_face_no == 3) { face_nodes[0] = cell_data[2]; face_nodes[1] = cell_data[4]; face_nodes[2] = cell_data[3]; }
+          else if (face_cell_face_no == 4) { face_nodes[0] = cell_data[3]; face_nodes[1] = cell_data[4]; face_nodes[2] = cell_data[1]; }
+          else AssertThrow(false, ExcMessage("Invalid face number for Tet in 3d"));
+        }
+      else if (n_vertices == 6) 
+        {
+          if (face_cell_face_no == 1 || face_cell_face_no == 2) 
+            {
+              face_nodes.resize(3);
+              if      (face_cell_face_no == 1) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[2]; face_nodes[2] = cell_data[3]; }
+              else if (face_cell_face_no == 2) { face_nodes[0] = cell_data[4]; face_nodes[1] = cell_data[6]; face_nodes[2] = cell_data[5]; }
+            }
+          else if (face_cell_face_no >= 3 && face_cell_face_no <= 5)
+            {
+              face_nodes.resize(4);
+              if      (face_cell_face_no == 3) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[2]; face_nodes[2] = cell_data[5]; face_nodes[3] = cell_data[4]; }
+              else if (face_cell_face_no == 4) { face_nodes[0] = cell_data[2]; face_nodes[1] = cell_data[3]; face_nodes[2] = cell_data[6]; face_nodes[3] = cell_data[5]; }
+              else if (face_cell_face_no == 5) { face_nodes[0] = cell_data[3]; face_nodes[1] = cell_data[1]; face_nodes[2] = cell_data[4]; face_nodes[3] = cell_data[6]; }
+            }
+          else AssertThrow(false, ExcMessage("Invalid face number for Wedge in 3d"));
+        }
+      else if (n_vertices == 8) 
+        {
+          face_nodes.resize(4);
+          if      (face_cell_face_no == 1) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[4]; face_nodes[2] = cell_data[3]; face_nodes[3] = cell_data[2]; }
+          else if (face_cell_face_no == 2) { face_nodes[0] = cell_data[5]; face_nodes[1] = cell_data[8]; face_nodes[2] = cell_data[7]; face_nodes[3] = cell_data[6]; }
+          else if (face_cell_face_no == 3) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[2]; face_nodes[2] = cell_data[6]; face_nodes[3] = cell_data[5]; }
+          else if (face_cell_face_no == 4) { face_nodes[0] = cell_data[2]; face_nodes[1] = cell_data[3]; face_nodes[2] = cell_data[7]; face_nodes[3] = cell_data[6]; }
+          else if (face_cell_face_no == 5) { face_nodes[0] = cell_data[3]; face_nodes[1] = cell_data[4]; face_nodes[2] = cell_data[8]; face_nodes[3] = cell_data[7]; }
+          else if (face_cell_face_no == 6) { face_nodes[0] = cell_data[1]; face_nodes[1] = cell_data[5]; face_nodes[2] = cell_data[8]; face_nodes[3] = cell_data[4]; }
+          else AssertThrow(false, ExcMessage("Invalid face number for Hex in 3d"));
+        }
+      else AssertThrow(false, ExcMessage("Unsupported 3D element node count"));
+    }
+  else
+    {
+      AssertThrow(dim == 2 || dim == 3, ExcNotImplemented());
+    }
+
+  return face_nodes;
+}
 
   template <int dim, int spacedim>
   void
@@ -5839,9 +5836,10 @@ namespace
     // Write out cell node numbers
     for (unsigned int ii = 0; ii < cell_list.size(); ++ii)
       {
+        int n_vertices_per_cell = cell_list[ii].size()-1;
         output << ii + 1 << "\t" << cell_list[ii][0] << "\t"
-               << (dim == 2 ? "quad" : "hex") << "\t";
-        for (unsigned int jj = 1; jj < GeometryInfo<dim>::vertices_per_cell + 1;
+               << (ref_cell.n_vertices_to_type(dim, n_vertices_per_cell).to_string()) << "\t"; //will not work, need a different string
+        for (unsigned int jj = 1; jj < n_vertices_per_cell + 1;
              ++jj)
           output << cell_list[ii][jj] << "\t";
 
@@ -5851,9 +5849,10 @@ namespace
     // Write out quad node numbers
     for (unsigned int ii = 0; ii < face_list.size(); ++ii)
       {
+        int n_vertices_per_cell = face_list[ii].size()-1;
         output << ii + 1 << "\t" << face_list[ii][0] << "\t"
-               << (dim == 2 ? "line" : "quad") << "\t";
-        for (unsigned int jj = 1; jj < GeometryInfo<dim>::vertices_per_face + 1;
+               << (ref_cell.n_vertices_to_type(dim, n_vertices_per_cell).to_string()) << "\t";
+        for (unsigned int jj = 1; jj < n_vertices_per_cell + 1;
              ++jj)
           output << face_list[ii][jj] << "\t";
 
