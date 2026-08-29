@@ -4703,15 +4703,14 @@ namespace internal
                               // now we have to copy
                               // all information of the
                               // two quads
-                              const int switch_1_lines[4] = {
-                                static_cast<signed int>(
-                                  switch_1->line_index(0)),
-                                static_cast<signed int>(
-                                  switch_1->line_index(1)),
-                                static_cast<signed int>(
-                                  switch_1->line_index(2)),
-                                static_cast<signed int>(
-                                  switch_1->line_index(3))};
+                              int switch_1_lines[4], switch_2_lines[4];
+                              for (int i = 0; i < 4; ++i)
+                                {
+                                  switch_1_lines[i] =
+                                    switch_1->line(i)->index();
+                                  switch_2_lines[i] =
+                                    switch_2->line(i)->index();
+                                }
                               const types::geometric_orientation
                                 switch_1_line_orientations[4] = {
                                   switch_1->line_orientation(0),
@@ -4726,10 +4725,10 @@ namespace internal
                                 switch_1->user_flag_set();
 
                               switch_1->set_bounding_object_indices(
-                                {switch_2->line_index(0),
-                                 switch_2->line_index(1),
-                                 switch_2->line_index(2),
-                                 switch_2->line_index(3)});
+                                {switch_2_lines[0],
+                                 switch_2_lines[1],
+                                 switch_2_lines[2],
+                                 switch_2_lines[3]});
                               switch_1->set_line_orientation(
                                 0, switch_2->line_orientation(0));
                               switch_1->set_line_orientation(
@@ -7432,12 +7431,9 @@ namespace internal
                     // ReferenceCell, update it there).
 
                     std::array<raw_line_iterator, max_relevant_lines>
-                      relevant_lines;
-                    std::array<unsigned int, max_relevant_lines>
-                      relevant_line_indices;
-
+                                                        relevant_lines;
+                    std::array<int, max_relevant_lines> relevant_line_indices;
                     unsigned int relevant_lines_counter = 0;
-
                     // 1. Get relevant lines from quads
                     for (auto f : cell_reference_cell.face_indices_by_type(
                            ReferenceCells::Quadrilateral))
@@ -8788,11 +8784,12 @@ namespace internal
                                   }
                             // now we have to copy all information of
                             // the two quads
-                            const unsigned int switch_1_lines[4] = {
-                              switch_1->line_index(0),
-                              switch_1->line_index(1),
-                              switch_1->line_index(2),
-                              switch_1->line_index(3)};
+                            int switch_1_lines[4], switch_2_lines[4];
+                            for (int i = 0; i < 4; ++i)
+                              {
+                                switch_1_lines[i] = switch_1->line(i)->index();
+                                switch_2_lines[i] = switch_2->line(i)->index();
+                              }
                             const types::geometric_orientation
                               switch_1_line_orientations[4] = {
                                 switch_1->line_orientation(0),
@@ -8819,10 +8816,10 @@ namespace internal
                                  -1);
 
                             switch_1->set_bounding_object_indices(
-                              {switch_2->line_index(0),
-                               switch_2->line_index(1),
-                               switch_2->line_index(2),
-                               switch_2->line_index(3)});
+                              {switch_2_lines[0],
+                               switch_2_lines[1],
+                               switch_2_lines[2],
+                               switch_2_lines[3]});
                             switch_1->set_line_orientation(
                               0, switch_2->line_orientation(0));
                             switch_1->set_line_orientation(
@@ -9601,7 +9598,7 @@ namespace internal
                                   3) // 3
                             };
 
-                          unsigned int line_indices[4];
+                          int line_indices[4];
                           for (unsigned int i = 0; i < 4; ++i)
                             line_indices[i] = lines[i]->index();
 
@@ -9829,7 +9826,7 @@ namespace internal
                                   3) // 3
                             };
 
-                          unsigned int line_indices[4];
+                          int line_indices[4];
                           for (unsigned int i = 0; i < 4; ++i)
                             line_indices[i] = lines[i]->index();
 
@@ -10059,7 +10056,7 @@ namespace internal
                                   3) // 3
                             };
 
-                          unsigned int line_indices[4];
+                          int line_indices[4];
                           for (unsigned int i = 0; i < 4; ++i)
                             line_indices[i] = lines[i]->index();
 
@@ -10374,7 +10371,7 @@ namespace internal
                             new_lines[0] // 12
                           };
 
-                          unsigned int line_indices[13];
+                          int line_indices[13];
                           for (unsigned int i = 0; i < 13; ++i)
                             line_indices[i] = lines[i]->index();
 
@@ -10812,7 +10809,7 @@ namespace internal
                             new_lines[0] // 12
                           };
 
-                          unsigned int line_indices[13];
+                          int line_indices[13];
                           for (unsigned int i = 0; i < 13; ++i)
                             line_indices[i] = lines[i]->index();
 
@@ -11264,8 +11261,7 @@ namespace internal
                             new_lines[0] // 12
                           };
 
-                          unsigned int line_indices[13];
-
+                          int line_indices[13];
                           for (unsigned int i = 0; i < 13; ++i)
                             line_indices[i] = lines[i]->index();
 
@@ -11858,7 +11854,7 @@ namespace internal
                             new_lines[5]  // 29
                           };
 
-                          unsigned int line_indices[30];
+                          int line_indices[30];
                           for (unsigned int i = 0; i < 30; ++i)
                             line_indices[i] = lines[i]->index();
 
