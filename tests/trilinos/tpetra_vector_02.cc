@@ -15,6 +15,7 @@
 
 #include <deal.II/lac/read_write_vector.h>
 #include <deal.II/lac/trilinos_tpetra_vector.h>
+#include <deal.II/lac/vector.h>
 
 #include <iostream>
 #include <vector>
@@ -201,6 +202,23 @@ test()
   a.import_elements(read_write_1, VectorOperation::insert);
   const Number val = a.add_and_dot(2., a, b);
   AssertThrow(val == Number(1530.), ExcMessage("Problem in add_and_dot"));
+
+  Vector<Number> reference(a.size());
+  for (unsigned int i = 0; i < reference.size(); ++i)
+    {
+      reference[i] = i % 2 == 0 ? Number(i + 1) : -Number(i + 1);
+      if (read_write_index_set.is_element(i))
+        read_write_1[i] = reference[i];
+    }
+  a.import_elements(read_write_1, VectorOperation::insert);
+
+  for (const double p : {1., 2., 3., 4., 2.5})
+    {
+      const double reference_norm = reference.lp_norm(p);
+      AssertThrow(std::fabs(a.lp_norm(p) - reference_norm) <
+                    eps * reference_norm,
+                  ExcMessage("Problem in lp_norm."));
+    }
 }
 
 

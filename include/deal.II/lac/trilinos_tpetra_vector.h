@@ -754,6 +754,13 @@ namespace LinearAlgebra
       l2_norm() const;
 
       /**
+       * $l_p$-norm of the vector. The pth root of the sum of the pth powers of
+       * the absolute values of the elements.
+       */
+      real_type
+      lp_norm(const real_type p) const;
+
+      /**
        * Return the maximum norm of the vector (i.e., the maximum absolute value
        * among all entries and among all processors).
        */
