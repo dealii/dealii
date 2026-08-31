@@ -467,8 +467,8 @@ namespace Particles
         else
           {
             const typename particle_container::iterator
-              particles_in_current_cell =
-                cells_to_particle_cache[active_cell_index];
+                                                  particles_in_current_cell =
+                                                    cells_to_particle_cache[active_cell_index];
             typename particle_container::iterator particles_in_next_cell =
               particles_in_current_cell;
             ++particles_in_next_cell;
@@ -1467,6 +1467,14 @@ namespace Particles
                 const_iterator candidate_cell = candidate_cells.begin();
 
               std::advance(candidate_cell, scratch.search_order[i]);
+
+              // We can not use artificial cells as a target since we
+              // can only send particles to owned or ghost cells.
+              // Skip them here so that the particle
+              // is reported as lost instead of being silently dropped later.
+              if ((*candidate_cell)->is_artificial())
+                continue;
+
               mapping->transform_points_real_to_unit_cell(
                 *candidate_cell,
                 scratch.real_locations,
@@ -1517,6 +1525,11 @@ namespace Particles
               for (const auto &cell :
                    vertex_to_cells[closest_vertex_index_in_domain])
                 {
+                  // See the comment above: artificial cells are not valid
+                  // targets for a particle. We skip them.
+                  if (cell->is_artificial())
+                    continue;
+
                   mapping->transform_points_real_to_unit_cell(
                     cell, scratch.real_locations, scratch.reference_locations);
 
