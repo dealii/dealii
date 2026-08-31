@@ -1,0 +1,5 @@
+Added: LinearAlgebra::TpetraWrappers::Vector now provides the lp_norm()
+function, bringing it in line with the other distributed vector
+implementations.
+<br>
+(Álvaro Borrás, 2026/08/31)
