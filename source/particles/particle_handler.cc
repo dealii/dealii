@@ -467,8 +467,8 @@ namespace Particles
         else
           {
             const typename particle_container::iterator
-                                                  particles_in_current_cell =
-                                                    cells_to_particle_cache[active_cell_index];
+              particles_in_current_cell =
+                cells_to_particle_cache[active_cell_index];
             typename particle_container::iterator particles_in_next_cell =
               particles_in_current_cell;
             ++particles_in_next_cell;
