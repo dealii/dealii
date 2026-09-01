@@ -1498,7 +1498,7 @@ ReferenceCell<dim>::faces_for_given_vertex(const unsigned int vertex) const
   if constexpr (dim == 0)
     DEAL_II_NOT_IMPLEMENTED();
   else if constexpr (dim == 1)
-    return {&GeometryInfo<2>::vertex_to_face[vertex][0], 1};
+    return {&GeometryInfo<1>::vertex_to_face[vertex][0], 1};
   else if constexpr (dim == 2)
     {
       switch (this->kind)
