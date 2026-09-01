@@ -4676,34 +4676,37 @@ ReferenceCell<dim>::permute_by_combined_orientation(
 {
   Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
   AssertDimension(vertices.size(), n_vertices());
-  boost::container::small_vector<T, 8> result(n_vertices());
 
-  const auto permute = [&](const auto &table, unsigned int n_vertices) {
-    AssertIndexRange(orientation, table.size());
-    for (unsigned int j = 0; j < n_vertices; ++j)
-      result[j] = vertices[table[orientation][j]];
-  };
+  const auto permute =
+    [this, &vertices](const auto                        &table,
+                      const types::geometric_orientation orientation) {
+      AssertIndexRange(orientation, table.size());
+
+      boost::container::small_vector<T, 8> result(this->n_vertices());
+      for (unsigned int j = 0; j < result.size(); ++j)
+        result[j] = vertices[table[orientation][j]];
+      return result;
+    };
 
   if constexpr (dim == 0)
-    permute(vertex_vertex_permutations, 1);
+    return permute(vertex_vertex_permutations, orientation);
   else if constexpr (dim == 1)
-    permute(line_vertex_permutations, 2);
+    return permute(line_vertex_permutations, orientation);
   else if constexpr (dim == 2)
     {
       switch (this->kind)
         {
           case ReferenceCells::Triangle:
-            permute(triangle_vertex_permutations, 3);
-            break;
+            return permute(triangle_vertex_permutations, orientation);
           case ReferenceCells::Quadrilateral:
-            permute(quadrilateral_vertex_permutations, 4);
-            break;
+            return permute(quadrilateral_vertex_permutations, orientation);
         }
     }
   else if constexpr (dim == 3)
     DEAL_II_NOT_IMPLEMENTED();
 
-  return result;
+  DEAL_II_NOT_IMPLEMENTED();
+  return {};
 }
 
 
