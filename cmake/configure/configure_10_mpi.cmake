@@ -40,6 +40,7 @@ macro(feature_mpi_find_external var)
 endmacro()
 
 macro(feature_mpi_configure_external)
+  set_if_empty(DEAL_II_MPI_WITH_DEVICE_SUPPORT ${MPI_WITH_DEVICE_SUPPORT})
 
   #
   # We must convert the MPIEXEC_(PRE|POST)FLAGS strings to lists in order
@@ -47,13 +48,6 @@ macro(feature_mpi_configure_external)
   #
   separate_arguments(MPIEXEC_PREFLAGS)
   separate_arguments(MPIEXEC_POSTFLAGS)
-
-  #
-  # TODO: We might consider refactoring this option into an automatic check
-  # (in Modules/FindMPI.cmake) at some point. For the time being this is an
-  # advanced configuration option.
-  option(DEAL_II_MPI_WITH_DEVICE_SUPPORT "Enable MPI Device support" OFF)
-  mark_as_advanced(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
 endmacro()
 
 macro(feature_mpi_error_message)
@@ -73,12 +67,3 @@ endmacro()
 
 
 configure_feature(MPI)
-
-
-if(NOT DEAL_II_WITH_MPI)
-  #
-  # Disable and hide the DEAL_II_MPI_WITH_DEVICE_SUPPORT option
-  #
-  set(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-  unset(DEAL_II_MPI_WITH_DEVICE_SUPPORT CACHE)
-endif()
