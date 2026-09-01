@@ -300,8 +300,8 @@ jobs:
   debug-cuda-12:
     # simple parallel debug build using cuda-12
 
-    name: jammy debug cuda-12
-    runs-on: [ubuntu-22.04]
+    name: noble debug cuda-12
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -318,21 +318,19 @@ jobs:
     - uses: actions/checkout@v7
     - name: modules
       run: |
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
-        sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
-        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+        sudo dpkg -i cuda-keyring_1.1-1_all.deb
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:ginggs/deal.ii-9.6.0-backports
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.7.1-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            cuda-toolkit-12-3 \
+            cuda-toolkit-12-8 \
             libp4est-dev \
             libopenmpi-dev \
             numdiff \
             openmpi-bin \
             libboost-all-dev
-    # https://github.com/apache/flink/blob/master/tools/azure-pipelines/free_disk_space.sh
+    # https://github.com/apache/flink/blob/master/tools/ci/free_disk_space.sh
     - name: remove unused large packages
       run : |
         echo "=============================================================================="
@@ -354,9 +352,9 @@ jobs:
         # deleting 15GB
         rm -rf /usr/share/dotnet/
         df -h
-    - uses: lukka/get-cmake@v4.3.2
+    - uses: lukka/get-cmake@v4.4.2
       with:
-        cmakeVersion: 3.27.9
+        cmakeVersion: 3.28.3
     - name: info
       run: |
         mpicc -v
@@ -414,8 +412,8 @@ jobs:
   debug-cuda-12-clang:
     # simple parallel debug build using cuda-12 and clang
 
-    name: jammy debug cuda-12 clang
-    runs-on: [ubuntu-22.04]
+    name: noble debug cuda-12 clang
+    runs-on: ubuntu-24.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -434,28 +432,26 @@ jobs:
       run: |
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 19
-        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
-        sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-        sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
-        sudo add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /"
+        sudo ./llvm.sh 22
+        wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+        sudo dpkg -i cuda-keyring_1.1-1_all.deb
         sudo apt-get install -y software-properties-common
-        sudo add-apt-repository ppa:ginggs/deal.ii-9.6.0-backports
+        sudo add-apt-repository ppa:ginggs/deal.ii-9.7.1-backports
         sudo apt-get update
         sudo apt-get install -yq --no-install-recommends \
-            cuda-toolkit-12-3 \
+            cuda-toolkit-12-8 \
             libp4est-dev \
             libopenmpi-dev \
             numdiff \
             openmpi-bin \
             libboost-all-dev
-    - uses: lukka/get-cmake@v4.3.2
+    - uses: lukka/get-cmake@v4.4.2
       with:
-        cmakeVersion: 3.27.9
+        cmakeVersion: 3.28.3
     - name: info
       run: |
         mpicc -v
-        clang++-19 -v
+        clang++-22 -v
         cmake --version
     - uses: actions/checkout@v7
       with:
@@ -468,7 +464,7 @@ jobs:
         mkdir build
         cd build
         cmake -D BUILD_SHARED_LIBS=ON \
-              -D CMAKE_CXX_COMPILER=clang++-19 \
+              -D CMAKE_CXX_COMPILER=clang++-22 \
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               -D Kokkos_ENABLE_CUDA=ON \
               -D Kokkos_ARCH_NATIVE=ON \
@@ -480,9 +476,8 @@ jobs:
         mkdir build
         cd build
         cmake -D CMAKE_BUILD_TYPE=Debug \
-              -D CMAKE_CXX_COMPILER=clang++-19 \
+              -D CMAKE_CXX_COMPILER=clang++-22 \
               -D DEAL_II_FORCE_BUNDLED_BOOST=ON \
-              -D DEAL_II_CXX_FLAGS="-std=c++17" \
               -D DEAL_II_EARLY_DEPRECATIONS=ON \
               -D DEAL_II_WITH_KOKKOS="ON" \
               -D KOKKOS_DIR=${GITHUB_WORKSPACE}/../kokkos-install \
