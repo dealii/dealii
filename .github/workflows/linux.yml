@@ -49,8 +49,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - ubuntu_version: jammy
-            os: ubuntu-22.04
           - ubuntu_version: noble
             os: ubuntu-24.04
           - ubuntu_version: resolute
@@ -106,13 +104,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy, noble, resolute]
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
+        ubuntu_version: [noble, resolute]
+        os: [ubuntu-26.04, ubuntu-26.04-arm]
         include:
-          - os: ubuntu-24.04
+          - os: ubuntu-26.04
             architecture: amd64
             flags:
-          - os: ubuntu-24.04-arm
+          - os: ubuntu-26.04-arm
             architecture: arm64
             flags: -mno-outline-atomics
 
@@ -180,7 +178,7 @@ jobs:
     # simple parallel debug build using g++ and trilinos+tpetra
 
     name: ${{ matrix.ubuntu_version }} debug parallel tpetra
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -193,7 +191,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [jammy, noble, resolute]
+        ubuntu_version: [noble, resolute]
 
     container:
       image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
@@ -244,10 +242,10 @@ jobs:
     # Based on https://github.com/oneapi-src/oneapi-ci
     # For a list of Intel packages see https://oneapi-src.github.io/oneapi-ci/#linux-apt
 
-    name: jammy debug intel oneapi
-    runs-on: [ubuntu-22.04]
+    name: resolute debug intel oneapi
+    runs-on: ubuntu-26.04
     container:
-      image: intel/oneapi:2026.1.0-devel-ubuntu22.04
+      image: intel/oneapi:2026.1.0-devel-ubuntu26.04
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -512,8 +510,8 @@ jobs:
   clang-22-modules:
     # simple build testing C++20 modules
 
-    name: noble clang-22 modules
-    runs-on: [ubuntu-latest]
+    name: resolute clang-22 modules
+    runs-on: ubuntu-26.04
     container:
       image: dealii/dependencies:noble-v9.7.1
 
