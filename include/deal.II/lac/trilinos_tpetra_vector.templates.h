@@ -1216,6 +1216,32 @@ namespace LinearAlgebra
 
     template <typename Number, typename MemorySpace>
     typename Vector<Number, MemorySpace>::real_type
+    Vector<Number, MemorySpace>::lp_norm(const real_type p) const
+    {
+      if (p == 1.)
+        return l1_norm();
+      else if (p == 2.)
+        return l2_norm();
+
+      Assert(!has_ghost_elements(), ExcGhostsPresent());
+
+      vector_1d_view.reset();
+      const auto local_view = vector->template getLocalView<Kokkos::HostSpace>(
+        Tpetra::Access::ReadOnlyStruct{});
+
+      using std::abs;
+      real_type local_sum = 0.;
+      for (size_type i = 0; i < vector->getLocalLength(); ++i)
+        local_sum += std::pow(abs(local_view(i, 0)), p);
+
+      return std::pow(Utilities::MPI::sum(local_sum, get_mpi_communicator()),
+                      static_cast<real_type>(1. / p));
+    }
+
+
+
+    template <typename Number, typename MemorySpace>
+    typename Vector<Number, MemorySpace>::real_type
     Vector<Number, MemorySpace>::linfty_norm() const
     {
       Assert(!has_ghost_elements(), ExcGhostsPresent());
