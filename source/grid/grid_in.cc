@@ -3396,8 +3396,6 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
               for (unsigned int j = 0; j < element_ids[i].size(); ++j)
                 {
                   CellData<dim> cell(n_vertices);
-
-                  cell.material_id = numbers::invalid_material_id;
                   if (auto it = entity_to_material.find({dim, entity_tag});
                       it != entity_to_material.end())
                     cell.material_id = it->second;
@@ -3428,7 +3426,7 @@ GridIn<dim, spacedim>::read_partitioned_msh(const std::string &file_prefix,
                     cell_info.subdomain_id = rank;
 
                   cell_info.level_subdomain_id = cell_info.subdomain_id;
-
+                  cell_info.material_id        = cell.material_id;
 
                   // --- Universal boundary ID assignment for faces ---
                   if constexpr (dim > 0)
