@@ -1493,7 +1493,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric(
 
   eigenvectors->property = property;
   // number of eigenvalues to be returned from psyevx; upon successful exit ev
-  // contains the m seclected eigenvalues in ascending order set to all
+  // contains the m selected eigenvalues in ascending order set to all
   // eigenvaleus in case we will be using psyev.
   int                     m = n_rows;
   std::vector<NumberType> ev(n_rows);
@@ -1834,7 +1834,7 @@ ScaLAPACKMatrix<NumberType>::eigenpairs_symmetric_MRRR(
 
   eigenvectors->property = property;
   // Number of eigenvalues to be returned from psyevr; upon successful exit ev
-  // contains the m seclected eigenvalues in ascending order.
+  // contains the m selected eigenvalues in ascending order.
   int                     m = n_rows;
   std::vector<NumberType> ev(n_rows);
 
