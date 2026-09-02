@@ -1408,30 +1408,30 @@ namespace ReferenceCells
   n_vertices_to_reference_cell(const unsigned int n_vertices);
 
   /**
-   * Return the maximum number of vertices an object of dimension `structdim`
+   * Return the maximum number of vertices an object of dimension `dim`
    * can have. This is always the number of vertices of a
-   * `structdim`-dimensional hypercube.
+   * `dim`-dimensional hypercube.
    *
    * @see ReferenceCells::max_n_faces()
    */
-  template <int structdim>
+  template <int dim>
   constexpr unsigned int
   max_n_vertices();
 
   /**
-   * Return the maximum number of lines an object of dimension `structdim` can
-   * have. This is always the number of lines of a `structdim`-dimensional
+   * Return the maximum number of lines an object of dimension `dim` can
+   * have. This is always the number of lines of a `dim`-dimensional
    * hypercube.
    *
    * @see ReferenceCells::max_n_faces()
    */
-  template <int structdim>
+  template <int dim>
   constexpr unsigned int
   max_n_lines();
 
   /**
-   * Return the maximum number of faces an object of dimension `structdim` can
-   * have. This is always the number of faces of a `structdim`-dimensional
+   * Return the maximum number of faces an object of dimension `dim` can
+   * have. This is always the number of faces of a `dim`-dimensional
    * hypercube.
    *
    * @note The primary use case of this and the other maxima functions is to
@@ -1444,12 +1444,12 @@ namespace ReferenceCells
    *
    * is a unique index to the `face_no`th face of the current cell.
    */
-  template <int structdim>
+  template <int dim>
   constexpr unsigned int
   max_n_faces();
 
   /**
-   * Return the maximum number of children an object of dimension `structdim`
+   * Return the maximum number of children an object of dimension `dim`
    * can have.
    *
    * @note If a cell is refined anisotropically, the actual number of children
@@ -1457,7 +1457,7 @@ namespace ReferenceCells
    *
    * @see ReferenceCells::max_n_faces()
    */
-  template <int structdim>
+  template <int dim>
   constexpr unsigned int
   max_n_children();
 } // namespace ReferenceCells
@@ -3665,39 +3665,39 @@ namespace ReferenceCells
 
 
 
-  template <int structdim>
+  template <int dim>
   inline constexpr unsigned int
   max_n_vertices()
   {
-    return GeometryInfo<structdim>::vertices_per_cell;
+    return GeometryInfo<dim>::vertices_per_cell;
   }
 
 
 
-  template <int structdim>
+  template <int dim>
   inline constexpr unsigned int
   max_n_lines()
   {
-    return GeometryInfo<structdim>::lines_per_cell;
+    return GeometryInfo<dim>::lines_per_cell;
   }
 
 
 
-  template <int structdim>
+  template <int dim>
   inline constexpr unsigned int
   max_n_faces()
   {
-    return GeometryInfo<structdim>::faces_per_cell;
+    return GeometryInfo<dim>::faces_per_cell;
   }
 
 
 
-  template <int structdim>
+  template <int dim>
   inline constexpr unsigned int
   max_n_children()
   {
     // Pyramids (3D) have 10 children.
-    return structdim == 3 ? 10 : GeometryInfo<structdim>::max_children_per_cell;
+    return dim == 3 ? 10 : GeometryInfo<dim>::max_children_per_cell;
   }
 } // namespace ReferenceCells
 
