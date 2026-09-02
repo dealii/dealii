@@ -3135,7 +3135,7 @@ namespace internal
      * functionality of the Triangulation class. The main reason for this
      * class is as follows: the majority of the functions in Triangulation
      * need to be implemented differently for dim==1, dim==2, and
-     * dim==3. However, their implementation is largly independent of the
+     * dim==3. However, their implementation is largely independent of the
      * spacedim template parameter. So we would like to write things like
      *
      * @code
