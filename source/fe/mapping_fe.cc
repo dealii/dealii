@@ -146,22 +146,26 @@ MappingFE<dim, spacedim>::InternalData::initialize_face(
       aux.resize(dim - 1,
                  std::vector<Tensor<1, spacedim>>(n_original_q_points));
 
-      // Compute tangentials to the unit cell.
-      const auto reference_cell = this->fe.reference_cell();
-      const auto n_faces        = reference_cell.n_faces();
-
-      for (unsigned int i = 0; i < n_faces; ++i)
+      // Compute tangentials to the faces of the unit cell. In 1d, a
+      // face is a point, so there is no tangent space.
+      if constexpr (dim > 1)
         {
-          unit_tangentials[i].resize(n_original_q_points);
-          std::fill(unit_tangentials[i].begin(),
-                    unit_tangentials[i].end(),
-                    reference_cell.face_tangent_vector(i, 0));
-          if (dim > 2)
+          const auto reference_cell = this->fe.reference_cell();
+          const auto n_faces        = reference_cell.n_faces();
+
+          for (unsigned int i = 0; i < n_faces; ++i)
             {
-              unit_tangentials[n_faces + i].resize(n_original_q_points);
-              std::fill(unit_tangentials[n_faces + i].begin(),
-                        unit_tangentials[n_faces + i].end(),
-                        reference_cell.face_tangent_vector(i, 1));
+              unit_tangentials[i].resize(n_original_q_points);
+              std::fill(unit_tangentials[i].begin(),
+                        unit_tangentials[i].end(),
+                        reference_cell.face_tangent_vector(i, 0));
+              if constexpr (dim > 2)
+                {
+                  unit_tangentials[n_faces + i].resize(n_original_q_points);
+                  std::fill(unit_tangentials[n_faces + i].begin(),
+                            unit_tangentials[n_faces + i].end(),
+                            reference_cell.face_tangent_vector(i, 1));
+                }
             }
         }
     }

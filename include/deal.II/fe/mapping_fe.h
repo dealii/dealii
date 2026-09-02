@@ -320,10 +320,16 @@ public:
      * Unit tangential vectors. Used for the computation of boundary forms and
      * normal vectors.
      *
+     * In 1d, faces are just points and while cells in 1d (=lines) have *normal*
+     * vectors at their faces (namely, vectors with a single component that is
+     * +1 or -1), they do not have tangent vectors. As a consequence, the
+     * current member variable is an array of size zero in 1d to ensure that
+     * it cannot accidentally be used.
+     *
      * Filled once.
      */
     std::array<std::vector<Tensor<1, dim>>,
-               ReferenceCells::max_n_faces<dim>() * 2>
+               (dim > 1 ? ReferenceCells::max_n_faces<dim>() * 2 : 0)>
       unit_tangentials;
 
     /**
