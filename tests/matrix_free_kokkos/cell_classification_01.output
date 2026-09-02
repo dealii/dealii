@@ -1,0 +1,22 @@
+
+DEAL::dim=2 degree=1
+DEAL::hyper_cube: cartesian=16 affine=0 general=0
+DEAL::sheared: cartesian=0 affine=16 general=0
+DEAL::warped: cartesian=0 affine=0 general=16
+DEAL::hyper_ball: cartesian=1 affine=0 general=4
+DEAL::dim=2 degree=2
+DEAL::hyper_cube: cartesian=16 affine=0 general=0
+DEAL::sheared: cartesian=0 affine=16 general=0
+DEAL::warped: cartesian=0 affine=0 general=16
+DEAL::hyper_ball: cartesian=1 affine=0 general=4
+DEAL::dim=3 degree=1
+DEAL::hyper_cube: cartesian=8 affine=0 general=0
+DEAL::sheared: cartesian=0 affine=8 general=0
+DEAL::warped: cartesian=0 affine=0 general=8
+DEAL::hyper_ball: cartesian=1 affine=0 general=6
+DEAL::dim=3 degree=2
+DEAL::hyper_cube: cartesian=8 affine=0 general=0
+DEAL::sheared: cartesian=0 affine=8 general=0
+DEAL::warped: cartesian=0 affine=0 general=8
+DEAL::hyper_ball: cartesian=1 affine=0 general=6
+DEAL::OK

@@ -34,6 +34,7 @@
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/la_parallel_vector.h>
 
+#include <deal.II/matrix_free/mapping_info_storage.h>
 #include <deal.II/matrix_free/shape_info.h>
 
 #include <Kokkos_Array.hpp>
@@ -288,15 +289,46 @@ namespace Portable
         local_to_global;
 
       /**
-       * Kokkos::View of the inverse Jacobian.
+       * Kokkos::View of the inverse Jacobian, stored in compressed form: for
+       * a cell classified as Cartesian or affine only a single inverse
+       * Jacobian is stored (at index data_index_offsets(cell)), while for a
+       * general cell one inverse Jacobian per quadrature point is stored
+       * (starting at index data_index_offsets(cell)).
        */
-      Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>
+      Kokkos::View<Number *[dim][dim], MemorySpace::Default::kokkos_space>
         inv_jacobian;
 
       /**
-       * Kokkos::View of the Jacobian times the weights.
+       * Kokkos::View of the determinant of the mapping Jacobian times
+       * quadrature weights, stored in compressed form: for a cell classified as
+       * Cartesian or affine only the (constant) Jacobian determinant is stored
+       * (at index data_index_offsets(cell)), which must be multiplied by the
+       * quadrature weight of the respective quadrature point to obtain JxW,
+       * while for a general cell the JxW values of all quadrature points are
+       * stored (starting at index data_index_offsets(cell)). Use JxW_value() to
+       * access the data.
        */
-      Kokkos::View<Number **, MemorySpace::Default::kokkos_space> JxW;
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> JxW;
+
+      /**
+       * Geometric classification (Cartesian, affine, or general) of each cell.
+       */
+      Kokkos::View<::dealii::internal::MatrixFreeFunctions::GeometryType *,
+                   MemorySpace::Default::kokkos_space>
+        cell_type;
+
+      /**
+       * Index of the first entry of each cell within the compressed
+       * inv_jacobian and JxW storage.
+       */
+      Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space>
+        data_index_offsets;
+
+      /**
+       * Quadrature weights of the reference cell, used to compute JxW on
+       * Cartesian and affine cells from the stored Jacobian determinant.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> q_weights;
 
       /**
        * Mask deciding where constraints are set on a given cell.
@@ -365,6 +397,34 @@ namespace Portable
        * Size of the scratch pad for temporary storage in shared memory.
        */
       unsigned int scratch_pad_size;
+
+      /**
+       * Return the index into the compressed inv_jacobian storage for the
+       * given cell and quadrature point.
+       */
+      DEAL_II_HOST_DEVICE unsigned int
+      inv_jacobian_index(const int cell, const int q_point) const
+      {
+        return data_index_offsets(cell) +
+               ((cell_type(cell) ==
+                 ::dealii::internal::MatrixFreeFunctions::general) ?
+                  q_point :
+                  0);
+      }
+
+      /**
+       * Return the mapped JxW for the given cell and
+       * quadrature point, taking the compressed storage into account.
+       */
+      DEAL_II_HOST_DEVICE Number
+      JxW_value(const int cell, const int q_point) const
+      {
+        const unsigned int offset = data_index_offsets(cell);
+        return (cell_type(cell) ==
+                ::dealii::internal::MatrixFreeFunctions::general) ?
+                 JxW(offset + q_point) :
+                 JxW(offset) * q_weights(q_point);
+      }
     };
 
 
@@ -824,19 +884,42 @@ namespace Portable
         q_points;
 
       /**
-       * Vector of Kokkos::View of the inverse Jacobian associated with the
-       * cells of each color.
+       * Vector of Kokkos::View of the compressed (see PrecomputedData) inverse
+       * Jacobian associated with the cells of each color.
        */
       std::vector<
-        Kokkos::View<Number **[dim][dim], MemorySpace::Default::kokkos_space>>
+        Kokkos::View<Number *[dim][dim], MemorySpace::Default::kokkos_space>>
         inv_jacobian;
 
       /**
-       * Vector of Kokkos::View to the Jacobian times the weights associated
-       * with the cells of each color.
+       * Vector of Kokkos::View to the compressed (see PrecomputedData) Jacobian
+       * times the weights associated with the cells of each color.
        */
-      std::vector<Kokkos::View<Number **, MemorySpace::Default::kokkos_space>>
+      std::vector<Kokkos::View<Number *, MemorySpace::Default::kokkos_space>>
         JxW;
+
+      /**
+       * Vector of Kokkos::View to the geometry types associated with the cells
+       * of each color.
+       */
+      std::vector<
+        Kokkos::View<::dealii::internal::MatrixFreeFunctions::GeometryType *,
+                     MemorySpace::Default::kokkos_space>>
+        cell_type;
+
+      /**
+       * Vector of Kokkos::View to the corresponding index of the first entry
+       * for each cell within the compressed JxW and inv_jacobian storages for
+       * each color.
+       */
+      std::vector<
+        Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space>>
+        data_index_offsets;
+
+      /**
+       * Quadrature weights of the reference cell.
+       */
+      Kokkos::View<Number *, MemorySpace::Default::kokkos_space> q_weights;
     };
 
     /**
@@ -1079,18 +1162,43 @@ namespace Portable
       local_to_global;
 
     /**
-     * Kokkos::View of inverse Jacobians on the host.
+     * Kokkos::View of inverse Jacobians on the host in compressed (see
+     * PrecomputedData) form.
      */
-    typename Kokkos::View<Number **[dim][dim],
+    typename Kokkos::View<Number *[dim][dim],
                           MemorySpace::Default::kokkos_space>::host_mirror_type
       inv_jacobian;
 
     /**
-     * Kokkos::View of Jacobian times the weights on the host.
+     * Kokkos::View of Jacobian times the weights on the host in compressed (see
+     * PrecomputedData) form.
      */
-    typename Kokkos::View<Number **,
+    typename Kokkos::View<Number *,
                           MemorySpace::Default::kokkos_space>::host_mirror_type
       JxW;
+
+    /**
+     * Geometric classification (Cartesian, affine, or general) of each cell
+     * on the host.
+     */
+    typename Kokkos::View<
+      ::dealii::internal::MatrixFreeFunctions::GeometryType *,
+      MemorySpace::Default::kokkos_space>::host_mirror_type cell_type;
+
+    /**
+     * Index of the first entry of each cell within the compressed
+     * inv_jacobian and JxW storage on the host.
+     */
+    typename Kokkos::View<unsigned int *,
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+      data_index_offsets;
+
+    /**
+     * Quadrature weights of the reference cell on the host.
+     */
+    typename Kokkos::View<Number *,
+                          MemorySpace::Default::kokkos_space>::host_mirror_type
+      q_weights;
 
     /**
      * Number of cells.
@@ -1144,6 +1252,34 @@ namespace Portable
     {
       return q_points(q_point, cell);
     }
+
+    /**
+     * This function is the host version of
+     * PrecomputedData::inv_jacobian_index().
+     */
+    unsigned int
+    inv_jacobian_index(const unsigned int cell,
+                       const unsigned int q_point) const
+    {
+      return data_index_offsets(cell) +
+             ((cell_type(cell) ==
+               ::dealii::internal::MatrixFreeFunctions::general) ?
+                q_point :
+                0);
+    }
+
+    /**
+     * This function is the host version of PrecomputedData::JxW_value().
+     */
+    Number
+    JxW_value(const unsigned int cell, const unsigned int q_point) const
+    {
+      const unsigned int offset = data_index_offsets(cell);
+      return (cell_type(cell) ==
+              ::dealii::internal::MatrixFreeFunctions::general) ?
+               JxW(offset + q_point) :
+               JxW(offset) * q_weights(q_point);
+    }
   };
 
 
@@ -1168,29 +1304,56 @@ namespace Portable
     data_host.row_start      = data.row_start;
     data_host.use_coloring   = data.use_coloring;
 
+    const auto create_mirror_without_initializing = [](const auto &view) {
+#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+      return Kokkos::create_mirror(Kokkos::WithoutInitializing, view);
+#else
+      return Kokkos::create_mirror(view);
+#endif
+    };
+
+    MemorySpace::Default::kokkos_space::execution_space exec;
+
     if (update_flags & update_quadrature_points)
       {
-        data_host.q_points = Kokkos::create_mirror(data.q_points);
-        Kokkos::deep_copy(data_host.q_points, data.q_points);
+        data_host.q_points = create_mirror_without_initializing(data.q_points);
+        Kokkos::deep_copy(exec, data_host.q_points, data.q_points);
       }
 
-    data_host.local_to_global = Kokkos::create_mirror(data.local_to_global);
-    Kokkos::deep_copy(data_host.local_to_global, data.local_to_global);
+    data_host.local_to_global =
+      create_mirror_without_initializing(data.local_to_global);
+    Kokkos::deep_copy(exec, data_host.local_to_global, data.local_to_global);
 
     if (update_flags & update_gradients)
       {
-        data_host.inv_jacobian = Kokkos::create_mirror(data.inv_jacobian);
-        Kokkos::deep_copy(data_host.inv_jacobian, data.inv_jacobian);
+        data_host.inv_jacobian =
+          create_mirror_without_initializing(data.inv_jacobian);
+        Kokkos::deep_copy(exec, data_host.inv_jacobian, data.inv_jacobian);
       }
 
     if (update_flags & update_JxW_values)
       {
-        data_host.JxW = Kokkos::create_mirror(data.JxW);
-        Kokkos::deep_copy(data_host.JxW, data.JxW);
+        data_host.JxW = create_mirror_without_initializing(data.JxW);
+        Kokkos::deep_copy(exec, data_host.JxW, data.JxW);
       }
 
-    data_host.constraint_mask = Kokkos::create_mirror(data.constraint_mask);
-    Kokkos::deep_copy(data_host.constraint_mask, data.constraint_mask);
+    data_host.cell_type = create_mirror_without_initializing(data.cell_type);
+    Kokkos::deep_copy(exec, data_host.cell_type, data.cell_type);
+
+    data_host.data_index_offsets =
+      create_mirror_without_initializing(data.data_index_offsets);
+    Kokkos::deep_copy(exec,
+                      data_host.data_index_offsets,
+                      data.data_index_offsets);
+
+    data_host.q_weights = create_mirror_without_initializing(data.q_weights);
+    Kokkos::deep_copy(exec, data_host.q_weights, data.q_weights);
+
+    data_host.constraint_mask =
+      create_mirror_without_initializing(data.constraint_mask);
+    Kokkos::deep_copy(exec, data_host.constraint_mask, data.constraint_mask);
+
+    exec.fence();
 
     return data_host;
   }

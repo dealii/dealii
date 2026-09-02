@@ -287,6 +287,52 @@ namespace Portable
     const typename MatrixFree<dim, Number>::PrecomputedData *precomputed_data;
     SharedData<dim, Number>                                 *shared_data;
     int                                                      cell_id;
+
+
+    /**
+     * Geometry classification of the current cell, loaded once at
+     * construction so that the per-quadrature-point accessors do not read it
+     * from global memory repeatedly.
+     */
+    ::dealii::internal::MatrixFreeFunctions::GeometryType cell_type;
+
+    /**
+     * Index of the first entry of the current cell in the compressed
+     * inv_jacobian and JxW storage, loaded once at construction.
+     */
+    unsigned int mapping_data_offset;
+
+    /**
+     * For Cartesian and affine cells, the (constant) Jacobian determinant of
+     * the current cell, loaded once at construction; JxW values are
+     * reconstructed as cell_determinant * q_weights(q_point).
+     */
+    Number cell_determinant;
+
+    /**
+     * Return the index of the given quadrature point of the current cell in
+     * the compressed inv_jacobian storage.
+     */
+    DEAL_II_HOST_DEVICE unsigned int
+    inv_jacobian_index(const int q_point) const
+    {
+      return mapping_data_offset +
+             ((cell_type == ::dealii::internal::MatrixFreeFunctions::general) ?
+                q_point :
+                0);
+    }
+
+    /**
+     * Return the mapped quadrature weight (JxW) at the given quadrature
+     * point of the current cell.
+     */
+    DEAL_II_HOST_DEVICE Number
+    JxW_value(const int q_point) const
+    {
+      return (cell_type == ::dealii::internal::MatrixFreeFunctions::general) ?
+               precomputed_data->JxW(mapping_data_offset + q_point) :
+               cell_determinant * precomputed_data->q_weights(q_point);
+    }
   };
 
 
@@ -304,6 +350,13 @@ namespace Portable
     , precomputed_data(&data->precomputed_data[dof_handler_index])
     , shared_data(&data->shared_data[dof_handler_index])
     , cell_id(data->team_member.league_rank())
+    , cell_type(precomputed_data->cell_type(cell_id))
+    , mapping_data_offset(precomputed_data->data_index_offsets(cell_id))
+    , cell_determinant(
+        (cell_type != ::dealii::internal::MatrixFreeFunctions::general &&
+         precomputed_data->JxW.size() > 0) ?
+          precomputed_data->JxW(mapping_data_offset) :
+          Number())
   {
     AssertIndexRange(dof_handler_index, data->n_dof_handler);
 
@@ -601,16 +654,15 @@ namespace Portable
     AssertIndexRange(q_point, n_q_points);
     Assert(precomputed_data->JxW.size() > 0,
            ExcMessage("submit_value() requires precomputed JxW"));
+    const Number JxW = JxW_value(q_point);
     if constexpr (n_components_ == 1)
       {
-        shared_data->values(q_point, 0) =
-          value * precomputed_data->JxW(q_point, cell_id);
+        shared_data->values(q_point, 0) = value * JxW;
       }
     else
       {
         for (unsigned int c = 0; c < n_components; ++c)
-          shared_data->values(q_point, c) =
-            value[c] * precomputed_data->JxW(q_point, cell_id);
+          shared_data->values(q_point, c) = value[c] * JxW;
       }
   }
 
@@ -657,15 +709,31 @@ namespace Portable
            ExcMessage("get_gradient() requires precomputed inv_jacobian"));
     gradient_type grad;
 
-    if constexpr (n_components_ == 1)
+    const unsigned int inv_jac_idx = inv_jacobian_index(q_point);
+    if (cell_type == ::dealii::internal::MatrixFreeFunctions::cartesian)
+      {
+        if constexpr (n_components_ == 1)
+          {
+            for (unsigned int d = 0; d < dim; ++d)
+              grad[d] = precomputed_data->inv_jacobian(inv_jac_idx, d, d) *
+                        shared_data->gradients(q_point, d, 0);
+          }
+        else
+          {
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int d = 0; d < dim; ++d)
+                grad[c][d] = precomputed_data->inv_jacobian(inv_jac_idx, d, d) *
+                             shared_data->gradients(q_point, d, c);
+          }
+      }
+    else if constexpr (n_components_ == 1)
       {
         for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
           {
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-              tmp +=
-                precomputed_data->inv_jacobian(q_point, cell_id, d_2, d_1) *
-                shared_data->gradients(q_point, d_2, 0);
+              tmp += precomputed_data->inv_jacobian(inv_jac_idx, d_2, d_1) *
+                     shared_data->gradients(q_point, d_2, 0);
             grad[d_1] = tmp;
           }
       }
@@ -676,9 +744,8 @@ namespace Portable
             {
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-                tmp +=
-                  precomputed_data->inv_jacobian(q_point, cell_id, d_2, d_1) *
-                  shared_data->gradients(q_point, d_2, c);
+                tmp += precomputed_data->inv_jacobian(inv_jac_idx, d_2, d_1) *
+                       shared_data->gradients(q_point, d_2, c);
               grad[c][d_1] = tmp;
             }
       }
@@ -703,17 +770,35 @@ namespace Portable
     Assert(precomputed_data->JxW.size() > 0,
            ExcMessage("submit_gradient() requires precomputed JxW"));
 
-    if constexpr (n_components_ == 1)
+    const unsigned int inv_jac_idx = inv_jacobian_index(q_point);
+    const Number       JxW         = JxW_value(q_point);
+    if (cell_type == ::dealii::internal::MatrixFreeFunctions::cartesian)
+      {
+        if constexpr (n_components_ == 1)
+          {
+            for (unsigned int d = 0; d < dim; ++d)
+              shared_data->gradients(q_point, d, 0) =
+                precomputed_data->inv_jacobian(inv_jac_idx, d, d) *
+                gradient[d] * JxW;
+          }
+        else
+          {
+            for (unsigned int c = 0; c < n_components; ++c)
+              for (unsigned int d = 0; d < dim; ++d)
+                shared_data->gradients(q_point, d, c) =
+                  precomputed_data->inv_jacobian(inv_jac_idx, d, d) *
+                  gradient[c][d] * JxW;
+          }
+      }
+    else if constexpr (n_components_ == 1)
       {
         for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
           {
             Number tmp = 0.;
             for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-              tmp +=
-                precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
-                gradient[d_2];
-            shared_data->gradients(q_point, d_1, 0) =
-              tmp * precomputed_data->JxW(q_point, cell_id);
+              tmp += precomputed_data->inv_jacobian(inv_jac_idx, d_1, d_2) *
+                     gradient[d_2];
+            shared_data->gradients(q_point, d_1, 0) = tmp * JxW;
           }
       }
     else
@@ -723,11 +808,9 @@ namespace Portable
             {
               Number tmp = 0.;
               for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-                tmp +=
-                  precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
-                  gradient[c][d_2];
-              shared_data->gradients(q_point, d_1, c) =
-                tmp * precomputed_data->JxW(q_point, cell_id);
+                tmp += precomputed_data->inv_jacobian(inv_jac_idx, d_1, d_2) *
+                       gradient[c][d_2];
+              shared_data->gradients(q_point, d_1, c) = tmp * JxW;
             }
       }
   }
@@ -771,10 +854,11 @@ namespace Portable
     Assert(precomputed_data->inv_jacobian.size() > 0,
            ExcMessage("get_divergence() requires precomputed inv_jacobian"));
 
-    Number divergence = 0.;
+    const unsigned int inv_jac_idx = inv_jacobian_index(q_point);
+    Number             divergence  = 0.;
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d = 0; d < dim; ++d)
-        divergence += precomputed_data->inv_jacobian(q_point, cell_id, d, c) *
+        divergence += precomputed_data->inv_jacobian(inv_jac_idx, d, c) *
                       shared_data->gradients(q_point, d, c);
     return divergence;
   }
@@ -800,11 +884,12 @@ namespace Portable
     Assert(precomputed_data->JxW.size() > 0,
            ExcMessage("submit_divergence() requires precomputed JxW"));
 
+    const unsigned int inv_jac_idx = inv_jacobian_index(q_point);
+    const Number       JxW         = JxW_value(q_point);
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
         shared_data->gradients(q_point, d_1, c) =
-          precomputed_data->inv_jacobian(q_point, cell_id, d_1, c) * div_in *
-          precomputed_data->JxW(q_point, cell_id);
+          precomputed_data->inv_jacobian(inv_jac_idx, d_1, c) * div_in * JxW;
   }
 
 
@@ -830,15 +915,16 @@ namespace Portable
     Assert(precomputed_data->JxW.size() > 0,
            ExcMessage("submit_symmetric_gradient() requires precomputed JxW"));
 
+    const unsigned int inv_jac_idx = inv_jacobian_index(q_point);
+    const Number       JxW         = JxW_value(q_point);
     for (unsigned int c = 0; c < dim; ++c)
       for (unsigned int d_1 = 0; d_1 < dim; ++d_1)
         {
           Number tmp = 0.;
           for (unsigned int d_2 = 0; d_2 < dim; ++d_2)
-            tmp += precomputed_data->inv_jacobian(q_point, cell_id, d_1, d_2) *
+            tmp += precomputed_data->inv_jacobian(inv_jac_idx, d_1, d_2) *
                    sym_grad[c][d_2];
-          shared_data->gradients(q_point, d_1, c) =
-            tmp * precomputed_data->JxW(q_point, cell_id);
+          shared_data->gradients(q_point, d_1, c) = tmp * JxW;
         }
   }
 
