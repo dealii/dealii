@@ -35,6 +35,7 @@ set(_unity_include_src
   manifold.cc
   manifold_lib.cc
   persistent_tria.cc
+  refinement_choice.cc
   reference_cell.cc
   tria_accessor.cc
   tria_description.cc
