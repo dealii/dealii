@@ -1456,17 +1456,17 @@ void
 TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
   const std::initializer_list<int> &new_indices) const
 {
-  const ArrayView<int> bounding_object_index_ref =
+  ArrayView<int> bounding_object_index_ref =
     this->objects().get_bounding_object_indices(this->present_index);
 
-  AssertIndexRange(new_indices.size(), bounding_object_index_ref.size() + 1);
+  if constexpr (running_in_debug_mode())
+    for (const auto &v : new_indices)
+      Assert(v >= 0, ExcInternalError());
 
-  unsigned int i = 0;
-  for (const auto &new_index : new_indices)
-    {
-      bounding_object_index_ref[i] = new_index;
-      ++i;
-    }
+  AssertIndexRange(new_indices.size(), bounding_object_index_ref.size() + 1);
+  std::copy(new_indices.begin(),
+            new_indices.end(),
+            bounding_object_index_ref.begin());
 }
 
 
@@ -1480,13 +1480,9 @@ TriaAccessor<structdim, dim, spacedim>::set_bounding_object_indices(
     this->objects().get_bounding_object_indices(this->present_index);
 
   AssertIndexRange(new_indices.size(), bounding_object_index_ref.size() + 1);
-
-  unsigned int i = 0;
-  for (const auto &new_index : new_indices)
-    {
-      bounding_object_index_ref[i] = new_index;
-      ++i;
-    }
+  std::copy(new_indices.begin(),
+            new_indices.end(),
+            bounding_object_index_ref.begin());
 }
 
 
