@@ -3322,6 +3322,16 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
       internal::MatrixFreeFunctions::DoFInfo::dof_access_cell &&
     this->is_interior_face() == false;
 
+  // Whether the n_components copies of a vector-valued quantity live in
+  // n_components separate (typically scalar) vectors, one component per
+  // vector -- as opposed to all components being interleaved within a
+  // single vector that belongs to an FESystem with n_fe_components ==
+  // n_components. This distinction recurs throughout this function
+  // because the two cases require different index computations; we
+  // evaluate it once here rather than at each use.
+  const bool separate_vectors =
+    (n_components == 1 || this->n_fe_components == 1);
+
   // Simple case: We have contiguous storage, so we can simply copy out the
   // data
   if (dof_info.index_storage_variants[ind][this->cell] ==
@@ -3335,7 +3345,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             ->component_dof_indices_offset[this->active_fe_index]
                                           [this->first_selected_component] *
           n_lanes;
-      if (n_components == 1 || this->n_fe_components == 1)
+      if (separate_vectors)
         for (unsigned int comp = 0; comp < n_components; ++comp)
           operation.process_dofs_vectorized(dofs_per_component,
                                             dof_index,
@@ -3409,54 +3419,47 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
       if (use_vectorized_path)
         {
-          if (n_components == 1 || this->n_fe_components == 1)
+          // If the components live in separate vectors, gather each one
+          // with its own transposed access. If instead all components
+          // come from a single FESystem-based vector, their DoFs are
+          // contiguous per cell in both the source vector and
+          // values_dofs, so we can process all of them with a single
+          // bulk transposed access instead -- one loop iteration with a
+          // correspondingly larger block size.
+          const unsigned int n_blocks   = separate_vectors ? n_components : 1;
+          const unsigned int block_size = separate_vectors ?
+                                            dofs_per_component :
+                                            dofs_per_component * n_components;
+          for (unsigned int comp = 0; comp < n_blocks; ++comp)
             {
-              for (unsigned int comp = 0; comp < n_components; ++comp)
-                {
-                  auto vector_ptrs = compute_vector_ptrs(comp);
-                  operation.process_dofs_vectorized_transpose(
-                    dofs_per_component,
-                    vector_ptrs,
-                    values_dofs[comp],
-                    vector_selector);
-                }
-            }
-          else
-            {
-              auto vector_ptrs = compute_vector_ptrs(0);
-              operation.process_dofs_vectorized_transpose(dofs_per_component *
-                                                            n_components,
+              auto vector_ptrs =
+                compute_vector_ptrs(separate_vectors ? comp : 0);
+              operation.process_dofs_vectorized_transpose(block_size,
                                                           vector_ptrs,
-                                                          &values_dofs[0][0],
+                                                          separate_vectors ?
+                                                            values_dofs[comp] :
+                                                            &values_dofs[0][0],
                                                           vector_selector);
             }
         }
       else
         for (unsigned int comp = 0; comp < n_components; ++comp)
           {
-            auto vector_ptrs = compute_vector_ptrs(
-              (n_components == 1 || this->n_fe_components == 1) ? comp : 0);
+            auto vector_ptrs = compute_vector_ptrs(separate_vectors ? comp : 0);
 
             for (unsigned int i = 0; i < dofs_per_component; ++i)
               operation.process_empty(values_dofs[comp][i]);
 
-            if (n_components == 1 || this->n_fe_components == 1)
-              {
-                for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                  if (mask[v] == true)
-                    for (unsigned int i = 0; i < dofs_per_component; ++i)
-                      operation.process_dof(vector_ptrs[v][i],
-                                            values_dofs[comp][i][v]);
-              }
-            else
-              {
-                for (unsigned int v = 0; v < n_filled_lanes; ++v)
-                  if (mask[v] == true)
-                    for (unsigned int i = 0; i < dofs_per_component; ++i)
-                      operation.process_dof(
-                        vector_ptrs[v][i + comp * dofs_per_component],
-                        values_dofs[comp][i][v]);
-              }
+            // As above: with separate vectors, component comp's DoFs sit
+            // at the start of vector_ptrs; with a single FESystem-based
+            // vector, they are offset by the preceding components' DoFs.
+            const unsigned int comp_offset =
+              separate_vectors ? 0 : comp * dofs_per_component;
+            for (unsigned int v = 0; v < n_filled_lanes; ++v)
+              if (mask[v] == true)
+                for (unsigned int i = 0; i < dofs_per_component; ++i)
+                  operation.process_dof(vector_ptrs[v][i + comp_offset],
+                                        values_dofs[comp][i][v]);
           }
       return;
     }
@@ -3485,7 +3488,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
             contiguous)
         {
-          if (n_components == 1 || this->n_fe_components == 1)
+          if (separate_vectors)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               operation.process_dofs_vectorized_transpose(dofs_per_component,
                                                           dof_indices.data(),
@@ -3506,7 +3509,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         {
           std::array<typename VectorType::value_type *, n_components> src_ptrs{
             {nullptr}};
-          if (n_components == 1 || this->n_fe_components == 1)
+          if (separate_vectors)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
                 src[comp]->begin());
@@ -3514,7 +3517,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
             src_ptrs[0] =
               const_cast<typename VectorType::value_type *>(src[0]->begin());
 
-          if (n_components == 1 || this->n_fe_components == 1)
+          if (separate_vectors)
             for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -3546,7 +3549,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                  ExcNotImplemented());
           std::array<typename VectorType::value_type *, n_components> src_ptrs{
             {nullptr}};
-          if (n_components == 1 || this->n_fe_components == 1)
+          if (separate_vectors)
             for (unsigned int comp = 0; comp < n_components; ++comp)
               src_ptrs[comp] = const_cast<typename VectorType::value_type *>(
                 src[comp]->begin());
@@ -3556,7 +3559,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
           const unsigned int *offsets =
             &dof_info.dof_indices_interleave_strides[ind][n_lanes * this->cell];
-          if (n_components == 1 || this->n_fe_components == 1)
+          if (separate_vectors)
             for (unsigned int i = 0; i < dofs_per_component; ++i)
               {
                 for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -3601,7 +3604,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                       internal::MatrixFreeFunctions::DoFInfo::
                         IndexStorageVariants::contiguous)
                     {
-                      if (n_components == 1 || this->n_fe_components == 1)
+                      if (separate_vectors)
                         {
                           for (unsigned int i = 0; i < dofs_per_component; ++i)
                             operation.process_dof(dof_indices[v] + i,
@@ -3622,7 +3625,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                       const unsigned int offset =
                         dof_info.dof_indices_interleave_strides[ind][cells[v]];
                       AssertIndexRange(offset, VectorizedArrayType::size() + 1);
-                      if (n_components == 1 || this->n_fe_components == 1)
+                      if (separate_vectors)
                         {
                           for (unsigned int i = 0; i < dofs_per_component; ++i)
                             operation.process_dof(dof_indices[v] + i * offset,
@@ -3647,7 +3650,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                 internal::MatrixFreeFunctions::DoFInfo::IndexStorageVariants::
                   contiguous)
               {
-                if (n_components == 1 || this->n_fe_components == 1)
+                if (separate_vectors)
                   {
                     for (unsigned int v = 0; v < n_filled_lanes; ++v)
                       if (mask[v] == true)
@@ -3674,7 +3677,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
                      [ind][VectorizedArrayType::size() * this->cell];
                 for (unsigned int v = 0; v < n_filled_lanes; ++v)
                   AssertIndexRange(offsets[v], VectorizedArrayType::size() + 1);
-                if (n_components == 1 || this->n_fe_components == 1)
+                if (separate_vectors)
                   for (unsigned int v = 0; v < n_filled_lanes; ++v)
                     {
                       if (mask[v] == true)
