@@ -1,0 +1,2855 @@
+/* ---------------------------------------------------------------------
+ *
+ * Copyright (C) 2025 by the deal.II authors
+ *
+ * This file is part of the deal.II library.
+ *
+ * The deal.II library is free software; you can use it, redistribute
+ * it, and/or modify it under the terms of the GNU Lesser General
+ * Public License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * The full text of the license can be found in the file LICENSE.md at
+ * the top level directory of deal.II.
+ *
+ * ---------------------------------------------------------------------
+ *
+ * Authors: Luca Heltai, Bruno Blais, 2024
+ */
+
+// @sect3{Include files}
+// We follow the step-70 documentation style: short section headers
+// that guide readers through the main components. The headers below
+// provide linear algebra back ends, mappings, and CAD support needed
+// for the immersed compressible solid/fluid coupling.
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/function.h>
+#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/quadrature_selector.h>
+#include <deal.II/base/timer.h>
+
+#include <deal.II/grid/grid_tools_geometry.h>
+#include <deal.II/lac/generic_linear_algebra.h>
+#include <deal.II/lac/linear_operator.h>
+#include <deal.II/lac/linear_operator_tools.h>
+#include <deal.II/lac/block_linear_operator.h>
+
+#include <deal.II/lac/affine_constraints.templates.h>
+#include <deal.II/fe/mapping_fe_field.h>
+
+#include <boost/algorithm/string.hpp>
+#include <deal.II/non_matching/dof_handler_coupling.h>
+#include <deal.II/numerics/vector_tools_interpolate.h>
+
+#include <filesystem>
+
+
+#define FORCE_USE_OF_TRILINOS
+
+namespace LA
+{
+#if defined(DEAL_II_WITH_PETSC) && !defined(DEAL_II_PETSC_WITH_COMPLEX) && \
+  !(defined(DEAL_II_WITH_TRILINOS) && defined(FORCE_USE_OF_TRILINOS))
+  using namespace dealii::LinearAlgebraPETSc;
+#  define USE_PETSC_LA
+#elif defined(DEAL_II_WITH_TRILINOS)
+  using namespace dealii::LinearAlgebraTrilinos;
+#else
+#  error DEAL_II_WITH_PETSC or DEAL_II_WITH_TRILINOS required
+#endif
+} // namespace LA
+
+#include <deal.II/base/conditional_ostream.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/base/parameter_acceptor.h>
+#include <deal.II/base/parsed_function.h>
+#include <deal.II/base/utilities.h>
+
+#include <deal.II/distributed/grid_refinement.h>
+#include <deal.II/distributed/solution_transfer.h>
+#include <deal.II/distributed/tria.h>
+
+#include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_renumbering.h>
+#include <deal.II/dofs/dof_tools.h>
+
+#include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_dgp.h>
+#include <deal.II/fe/fe_dgp_nonparametric.h>
+#include <deal.II/fe/fe_system.h>
+#include <deal.II/fe/fe_values.h>
+#include <deal.II/fe/mapping_fe_field.h>
+#include <deal.II/fe/mapping_q.h>
+
+#include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_in.h>
+#include <deal.II/grid/grid_tools.h>
+#include <deal.II/grid/manifold_lib.h>
+
+#include <deal.II/lac/affine_constraints.h>
+#include <deal.II/lac/dynamic_sparsity_pattern.h>
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_solver.h>
+#include <deal.II/lac/petsc_sparse_matrix.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/read_write_vector.h>
+#include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/solver_cg.h>
+#include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_minres.h>
+#include <deal.II/lac/sparsity_tools.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+#include <deal.II/lac/vector.h>
+#include <deal.II/lac/block_linear_operator.h>
+
+#include <deal.II/numerics/data_out.h>
+#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/vector_tools.h>
+
+#include <deal.II/opencascade/manifold_lib.h>
+#include <deal.II/opencascade/utilities.h>
+#ifdef DEAL_II_WITH_OPENCASCADE
+#  include <TopoDS.hxx>
+#endif
+
+
+#include <iostream>
+#include <map>
+#include <memory>
+
+// @sect3{Run-time parameter handling}
+// Helper functions and a ParameterAcceptor-derived structure collect all user
+// options (dimensions, material properties, boundary data, mesh generators) and
+// keep them synchronized with the parameter file, following the approach used
+// in step-70.
+
+namespace Step80
+{
+  using namespace dealii;
+
+  using AMGPreconditioner = LA::MPI::PreconditionAMG;
+
+  inline AMGPreconditioner::AdditionalData
+  make_amg_additional_data(const unsigned int degree,
+                           const bool         symmetric_operator = false)
+  {
+    using AdditionalData = AMGPreconditioner::AdditionalData;
+
+#ifdef USE_PETSC_LA
+    if (degree > 1)
+      return AdditionalData(symmetric_operator,
+                            0.75,
+                            0.9,
+                            0,
+                            false,
+                            AdditionalData::RelaxationType::Chebyshev,
+                            AdditionalData::RelaxationType::Chebyshev,
+                            AdditionalData::RelaxationType::GaussianElimination,
+                            1,
+                            0.0,
+                            3,
+                            false);
+
+    return AdditionalData(symmetric_operator);
+#else
+    AdditionalData data;
+    (void)symmetric_operator;
+    data.elliptic = true;
+    if (degree > 1)
+      data.higher_order_elements = true;
+    return data;
+#endif
+  }
+
+
+
+  std::pair<unsigned int, unsigned int>
+  get_dimension_and_spacedimension(const ParameterHandler &prm)
+  {
+    auto dim      = prm.get_integer("dimension");
+    auto spacedim = prm.get_integer("space dimension");
+    return {dim, spacedim};
+  }
+
+  enum class SolverType
+  {
+    augmented_split,
+    mumps
+  };
+
+  // Constitutive model of the immersed solid. The elasticity assembly
+  // functions are templated on this enum, so that the model-specific branch
+  // inside the quadrature loops is selected with `if constexpr` and resolved
+  // at compile time; the value read from the parameter file only picks the
+  // instantiation in run().
+  enum class SolidModel
+  {
+    linear,
+    exponential,
+    neo_hookean
+  };
+
+  // A free function to read the dimension and spacedimension from a parameter
+  // file
+  std::pair<unsigned int, unsigned int>
+  get_dimension_and_spacedimension(const std::string &prm_file)
+  {
+    ParameterAcceptor::prm.declare_entry("dimension",
+                                         "2",
+                                         Patterns::Integer(2, 3));
+    ParameterAcceptor::prm.declare_entry("space dimension",
+                                         "2",
+                                         Patterns::Integer(2, 3));
+    // If reading of the input file fails, run by default in 2D-2D
+    try
+      {
+        ParameterAcceptor::prm.parse_input(prm_file, "", true);
+      }
+    catch (std::exception &exc)
+      {
+        return {2, 2};
+        throw;
+      }
+    return get_dimension_and_spacedimension(ParameterAcceptor::prm);
+  }
+
+
+  // @sect4{Parameter container}
+  // NavierStokesImmersedProblemParameters bundles all inputs needed by the
+  // coupled fluid/solid solver: polynomial degrees, material properties,
+  // time-stepping controls, mesh generators, and right-hand sides. The class
+  // mirrors the layout from step-70 but adds solid material constants and
+  // multiple configuration fields for the immersed structure.
+
+  template <int dim, int spacedim = dim>
+  class NavierStokesImmersedProblemParameters : public ParameterAcceptor
+  {
+  public:
+    NavierStokesImmersedProblemParameters();
+
+    void set_time(const double &time) const;
+    void initialize_finite_elements_from_names();
+
+    std::string output_directory = ".";
+
+    std::string velocity_fe_name;
+    std::string pressure_fe_name;
+    std::string displacement_fe_name;
+    std::string lagrange_multiplier_fe_name;
+
+    std::unique_ptr<FiniteElement<spacedim>>      velocity_fe;
+    std::unique_ptr<FiniteElement<spacedim>>      pressure_fe;
+    std::unique_ptr<FiniteElement<dim, spacedim>> displacement_fe;
+    std::unique_ptr<FiniteElement<dim, spacedim>> lagrange_multiplier_fe;
+
+    unsigned int number_of_time_steps = 501;
+    double       final_time           = 1.0;
+
+    unsigned int output_frequency = 1;
+
+    // bool use_ida = false;
+
+    unsigned int initial_fluid_refinement = 5;
+    unsigned int initial_solid_refinement = 5;
+
+    double viscosity = 1.0;
+    double density   = 1.0;
+
+    double lame_mu     = 1.0;
+    double lame_lambda = 1.0;
+
+    bool include_convective_term = true;
+
+    // Constitutive model of the immersed solid, see `SolidModel`. The two
+    // hyperelastic laws are expressed through the Lame parameters `lame_mu`
+    // and `lame_lambda`:
+    //
+    //  - exponential: P(F) = mu * exp(lambda*(tr(F^T F) - dim)) * F. See
+    //    Boffi, et al. (2023).
+    //  - neo_hookean: compressible neo-Hookean law
+    //        W(F) = mu/2 (F:F - dim) - mu ln(J) + lambda/2 (ln J)^2,
+    //        P(F) = mu (F - F^{-T}) + lambda ln(J) F^{-T}.
+    //
+    // The nonlinear laws are advanced semi-implicitly: the internal force is
+    // linearized around the current configuration and all nonlinear terms are
+    // moved to the right-hand side, so that each time step requires a single
+    // linear solve.
+    SolidModel solid_model = SolidModel::linear;
+
+    std::list<types::boundary_id> dirichlet_ids{0};
+    std::string                   name_of_fluid_grid       = "hyper_cube";
+    std::string                   arguments_for_fluid_grid = "-1: 1: false";
+    // How a CAD manifold projects a new point onto the shape.
+    //
+    //  - "normal" uses OpenCASCADE::NormalProjectionManifold, i.e. the nearest
+    //    point on the shape. One OpenCASCADE call per point, and it cannot
+    //    fail: a nearest point always exists.
+    //  - "normal_to_mesh" uses OpenCASCADE::NormalToMeshProjectionManifold,
+    //    which estimates a normal from the surrounding mesh points and casts a
+    //    ray along it. It is more robust where several CAD surfaces meet, but
+    //    it costs about five OpenCASCADE calls per point, and if the ray misses
+    //    the shape OpenCASCADE::line_intersection() silently returns the
+    //    origin, which shows up as isolated vertices collapsed onto (0,0,0).
+    std::string cad_projection = "normal";
+
+    // Factor applied to the coordinates of a CAD file when it is read.
+    //
+    // Note that this deliberately does NOT use the deal.II default of 1e-3:
+    // OpenCASCADE::read_IGES() and read_STEP() assume a CAD file is in
+    // millimetres and rescale it to metres. Here the mesh and the CAD file
+    // normally come out of the same modeller and are already in the same
+    // units, and a silent factor of 1000 puts the shape nowhere near the mesh:
+    // every projection then returns nonsense, and the rays cast by
+    // "normal_to_mesh" miss the shape entirely, which lands new points on
+    // (0,0,0). Set this to 1e-3 only if the CAD really is in millimetres and
+    // the mesh really is in metres.
+    double      cad_scale_factor         = 1.0;
+    std::string name_of_solid_grid       = "hyper_rectangle";
+    std::string arguments_for_solid_grid = spacedim == 2 ?
+                                             "-.5, -.1: .5, .1: false" :
+                                             "-.5, -.1, -.1: .5, .1, .1: false";
+
+    int          max_level_refinement = 8;
+    int          min_level_refinement = 5;
+    std::string  refinement_strategy  = "fixed_fraction";
+    double       coarsening_fraction  = 0.3;
+    double       refinement_fraction  = 0.3;
+    unsigned int max_cells            = 20000;
+    int          refinement_frequency = 5;
+
+    double       gamma_AL_background            = 100;
+    double       gamma_AL_immersed              = 1e-2;
+    std::string  coupling_quadrature_type       = "gauss_lobatto";
+    unsigned int coupling_quadrature_iterations = 1;
+
+    unsigned int inner_max_iterations = 100;
+    double       inner_tolerance      = 1e-14;
+    unsigned int outer_max_iterations = 1000;
+    double       outer_tolerance      = 1e-5;
+    // Size of the Krylov basis the outer FGMRES is allowed to build before it
+    // restarts. deal.II defaults to 30, which is far too small for the
+    // saddle-point system assembled here: restarting throws away exactly the
+    // information the augmented-Lagrangian preconditioner has accumulated, and
+    // convergence stagnates. Memory grows linearly in this number, so lower it
+    // if the outer solve runs out of memory.
+    unsigned int outer_max_basis_size            = 200;
+    unsigned int inner_lagrangian_max_iterations = 1000;
+    double       inner_lagrangian_tolerance      = 1e-4;
+    bool         log_inner_lagrangian_iterations = false;
+    bool         use_operator_augmentation       = false;
+    SolverType   solver_type                     = SolverType::augmented_split;
+
+    using PrmFunction =
+      ParameterAcceptorProxy<Functions::ParsedFunction<spacedim>>;
+
+    // These functions depend on time, so we need to be able to set their
+    // internal time. Make them mutable for that reason.
+    mutable PrmFunction navier_stokes_rhs;
+    mutable PrmFunction solid_rhs;
+    mutable PrmFunction navier_stokes_bc;
+
+    // The analytical solution of the Navier-Stokes problem, used for
+    // verification with the method of manufactured solutions. It has the same
+    // number of components as the fluid solution (velocity + pressure) and it
+    // is time dependent, hence mutable.
+    mutable PrmFunction navier_stokes_analytical_solution;
+
+    // These functions do not depend on time, so they don't need to be mutable
+    PrmFunction navier_stokes_initial_conditions;
+    PrmFunction solid_initial_displacement;
+    PrmFunction solid_reference_configuration;
+  };
+
+
+
+  template <int dim, int spacedim>
+  NavierStokesImmersedProblemParameters<dim, spacedim>::
+    NavierStokesImmersedProblemParameters()
+    : ParameterAcceptor("Navier-Stokes Immersed Problem/")
+    , navier_stokes_rhs("Navier-Stokes right hand side", spacedim + 1)
+    , solid_rhs("Solid right hand side", 2 * spacedim)
+    , navier_stokes_bc("Navier-Stokes boundary conditions", spacedim + 1)
+    , navier_stokes_analytical_solution("Navier-Stokes analytical solution",
+                                        spacedim + 1)
+    , navier_stokes_initial_conditions("Navier-Stokes initial conditions",
+                                       spacedim + 1)
+    , solid_initial_displacement("Initial displacement and multiplier",
+                                 2 * spacedim)
+    , solid_reference_configuration("Reference configuration and multiplier",
+                                    2 * spacedim)
+  {
+    velocity_fe_name            = "FE_Q<" + std::to_string(spacedim) + ">(2)";
+    pressure_fe_name            = "FE_DGP<" + std::to_string(spacedim) + ">(1)";
+    displacement_fe_name        = "FE_Q<" + std::to_string(dim) + ">(1)";
+    lagrange_multiplier_fe_name = "FE_DGQ<" + std::to_string(dim) + ">(0)";
+    initialize_finite_elements_from_names();
+
+    enter_subsection("Finite element spaces");
+    {
+      add_parameter("Velocity",
+                    velocity_fe_name,
+                    "Finite element used for the fluid velocity (scalar FE "
+                    "description)");
+      add_parameter("Pressure",
+                    pressure_fe_name,
+                    "Finite element used for the fluid pressure (scalar FE "
+                    "description)");
+      add_parameter("Displacement",
+                    displacement_fe_name,
+                    "Finite element used for the solid displacement");
+      add_parameter("Lagrange multiplier",
+                    lagrange_multiplier_fe_name,
+                    "Finite element used for the solid Lagrange multiplier");
+    }
+    leave_subsection();
+
+    add_parameter("Number of time steps", number_of_time_steps);
+    add_parameter("Output frequency", output_frequency);
+
+    add_parameter("Output directory", output_directory);
+
+    add_parameter("Final time", final_time);
+
+    enter_subsection("Physical properties");
+    {
+      add_parameter("Viscosity", viscosity);
+      add_parameter("Density", density);
+      add_parameter("Lame mu", lame_mu);
+      add_parameter("Lame lambda", lame_lambda);
+      add_parameter(
+        "Include convective term",
+        include_convective_term,
+        "If true, the explicit convective term rho*(u^n * grad) u^n is added "
+        "to the Navier-Stokes right-hand side. Set to false to drop the "
+        "convective term and recover the (unsteady Stokes) momentum equation.");
+      add_parameter(
+        "Solid model",
+        solid_model,
+        "Constitutive model of the immersed solid: 'linear' selects the "
+        "linear elastic operator, 'exponential' selects P(F) = "
+        "mu*exp(lambda*(tr(F^T F) - dim))*F, and 'neo_hookean' selects the "
+        "compressible neo-Hookean law P(F) = mu*(F - F^{-T}) + "
+        "lambda*ln(J)*F^{-T}. All models use the Lame parameters of the "
+        "linear model, and the nonlinear laws are advanced semi-implicitly "
+        "by linearizing the internal force around the current configuration.");
+    }
+    leave_subsection();
+
+    add_parameter(
+      "Dirichlet boundary ids",
+      dirichlet_ids,
+      "Boundary Ids over which Dirichlet boundary conditions are applied");
+
+    enter_subsection("Grid generation");
+    {
+      add_parameter("Initial fluid refinement",
+                    initial_fluid_refinement,
+                    "Initial mesh refinement used for the fluid domain Omega");
+
+      add_parameter("Initial solid refinement",
+                    initial_solid_refinement,
+                    "Initial mesh refinement used for the solid domain Gamma");
+
+      add_parameter("Fluid grid generator", name_of_fluid_grid);
+      add_parameter("Fluid grid generator arguments", arguments_for_fluid_grid);
+
+      add_parameter("Solid grid generator", name_of_solid_grid);
+      add_parameter("Solid grid generator arguments", arguments_for_solid_grid);
+
+      add_parameter("CAD projection",
+                    cad_projection,
+                    "How a CAD manifold places a new point on the shape: "
+                    "'normal' takes the nearest point on the shape, "
+                    "'normal_to_mesh' casts a ray along a normal estimated "
+                    "from the surrounding mesh points.",
+                    this->prm,
+                    Patterns::Selection("normal|normal_to_mesh"));
+
+      add_parameter("CAD scale factor",
+                    cad_scale_factor,
+                    "Factor applied to the coordinates of a CAD file when it "
+                    "is read. Use 1 when the CAD file and the mesh are in the "
+                    "same units, and 1e-3 for a CAD file in millimetres to be "
+                    "matched against a mesh in metres.");
+    }
+    leave_subsection();
+
+
+
+    enter_subsection("Refinement and remeshing");
+    {
+      add_parameter("Refinement step frequency", refinement_frequency);
+      add_parameter("Refinement maximal level", max_level_refinement);
+      add_parameter("Refinement minimal level", min_level_refinement);
+      add_parameter("Refinement strategy",
+                    refinement_strategy,
+                    "",
+                    this->prm,
+                    Patterns::Selection("fixed_fraction|fixed_number"));
+      add_parameter("Refinement coarsening fraction", coarsening_fraction);
+      add_parameter("Refinement fraction", refinement_fraction);
+      add_parameter("Maximum number of cells", max_cells);
+    }
+    leave_subsection();
+
+    enter_subsection("Solver parameters");
+    {
+      add_parameter("Gamma AL background", gamma_AL_background);
+      add_parameter("Gamma AL immersed", gamma_AL_immersed);
+      add_parameter("Coupling quadrature type",
+                    coupling_quadrature_type,
+                    "",
+                    this->prm,
+                    Patterns::Selection(
+                      QuadratureSelector<dim>::get_quadrature_names()));
+      add_parameter("Coupling quadrature iterations",
+                    coupling_quadrature_iterations);
+      add_parameter("Inner solver maximum iterations", inner_max_iterations);
+      add_parameter("Inner solver tolerance", inner_tolerance);
+      add_parameter("Outer solver maximum iterations", outer_max_iterations);
+      add_parameter("Outer solver tolerance", outer_tolerance);
+      add_parameter("Outer solver maximum Krylov vectors",
+                    outer_max_basis_size,
+                    "Size of the Krylov basis built by the outer FGMRES before "
+                    "it restarts. Larger values converge in fewer iterations "
+                    "but cost proportionally more memory.");
+      add_parameter("Inner Lagrangian solver maximum iterations",
+                    inner_lagrangian_max_iterations);
+      add_parameter("Inner Lagrangian solver tolerance",
+                    inner_lagrangian_tolerance);
+      add_parameter("Log inner Lagrangian iterations",
+                    log_inner_lagrangian_iterations);
+      add_parameter("Use operator augmentation", use_operator_augmentation);
+      add_parameter("Solver type", solver_type);
+    }
+    leave_subsection();
+
+    // Make sure that dim and spacedim are actually declared also in the
+    // application
+    declare_parameters_call_back.connect([&]() {
+      this->leave_my_subsection(this->prm);
+      this->prm.declare_entry("dimension", "2", Patterns::Integer(2, 3));
+      this->prm.declare_entry("space dimension", "2", Patterns::Integer(2, 3));
+      this->enter_my_subsection(this->prm);
+    });
+
+
+
+    // And make sure we check that the dimension and space dimension in the file
+    // match the ones of the application
+    parse_parameters_call_back.connect([&]() {
+      this->leave_my_subsection(this->prm);
+      const auto [dim_, spacedim_] =
+        get_dimension_and_spacedimension(this->prm);
+      AssertThrow(dim_ == dim && spacedim_ == spacedim,
+                  ExcMessage(
+                    "The dimension and space dimension in the parameter "
+                    "file do not match the ones of the running application."
+                    " This should not happen: aborting."));
+      this->enter_my_subsection(this->prm);
+      initialize_finite_elements_from_names();
+    });
+
+    // We need to provide adequate default parameters for all of the functions
+    // of problem that have different number of components, but also potentially
+    // non-zero default values.
+    auto reset_function = [this](const std::string &expression) {
+      const unsigned int n_components =
+        Utilities::split_string_list(expression, ";").size();
+      this->prm.declare_entry(
+        "Function expression",
+        expression,
+        Patterns::List(Patterns::Anything(), n_components, n_components, ";"));
+    };
+
+    auto helper = [&](auto &function, const std::string expression) {
+      function.declare_parameters_call_back.connect(
+        [reset_function, expression]() { reset_function(expression); });
+    };
+
+    // We now use these two functions to set the correct default values for all
+    // of the functions used in this step.
+    helper(solid_initial_displacement,
+           spacedim == 2 ? "0; 0; 0; 0" : "0; 0; 0; 0; 0; 0");
+    helper(solid_reference_configuration,
+           spacedim == 2 ? "x; y; 0; 0" : "x; y; z; 0; 0; 0");
+    helper(solid_rhs, spacedim == 2 ? "0; 0; 0; 0 " : "0; 0; 0; 0; 0; 0");
+    helper(navier_stokes_initial_conditions,
+           spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
+    helper(navier_stokes_rhs, spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
+    helper(navier_stokes_bc, spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
+    helper(navier_stokes_analytical_solution,
+           spacedim == 2 ? "0; 0; 0" : "0; 0; 0; 0");
+  }
+
+
+
+  template <int dim, int spacedim>
+  inline void NavierStokesImmersedProblemParameters<dim, spacedim>::set_time(
+    const double &time) const
+  {
+    navier_stokes_rhs.set_time(time);
+    solid_rhs.set_time(time);
+    navier_stokes_bc.set_time(time);
+    navier_stokes_analytical_solution.set_time(time);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblemParameters<dim, spacedim>::
+    initialize_finite_elements_from_names()
+  {
+    velocity_fe = FETools::get_fe_by_name<spacedim>(velocity_fe_name);
+    pressure_fe = FETools::get_fe_by_name<spacedim>(pressure_fe_name);
+    displacement_fe =
+      FETools::get_fe_by_name<dim, spacedim>(displacement_fe_name);
+    lagrange_multiplier_fe =
+      FETools::get_fe_by_name<dim, spacedim>(lagrange_multiplier_fe_name);
+  }
+
+
+
+  // @sect3{Hyperelastic material response}
+  //
+  // Both nonlinear laws implemented in this tutorial share the same pointwise
+  // data: at a quadrature point with displacement gradient grad(w) the
+  // deformation gradient is F = I + grad(w). Besides F itself we cache its
+  // inverse transpose Q = F^{-T} and ln(J) = ln(det F), which enter the
+  // neo-Hookean stress and its tangent, and the scalar prefactor g of the
+  // exponential law.
+  template <int spacedim>
+  struct HyperelasticPointData
+  {
+    Tensor<2, spacedim> F;       // deformation gradient F = I + grad(w)
+    Tensor<2, spacedim> F_inv_T; // inverse transpose F^{-T}
+    double              ln_det_F = 0.;
+    double              g        = 0.;
+  };
+
+
+
+  // Evaluate the pointwise data of a nonlinear hyperelastic law at the
+  // displacement gradient grad(w). The model is a template parameter, so the
+  // law-specific prefactor below is selected at compile time and the function
+  // is only instantiated for the two nonlinear laws.
+  template <SolidModel model, int spacedim>
+  inline HyperelasticPointData<spacedim>
+  evaluate_hyperelastic_point_data(const Tensor<2, spacedim> &grad_w,
+                                   const double               lame_mu,
+                                   const double               lame_lambda)
+  {
+    static_assert(model != SolidModel::linear,
+                  "Hyperelastic data is only assembled for the nonlinear "
+                  "solid models.");
+
+    HyperelasticPointData<spacedim> data;
+
+    data.F = grad_w;
+    for (unsigned int d = 0; d < spacedim; ++d)
+      data.F[d][d] += 1.;
+    data.F_inv_T  = transpose(invert(data.F));
+    data.ln_det_F = std::log(determinant(data.F));
+
+    if constexpr (model == SolidModel::exponential)
+      // g = mu exp(lambda (F:F - dim)) is the prefactor of the exponential
+      // law P(F) = g F, written with the same Lame parameters as the other
+      // solid models.
+      data.g = lame_mu * std::exp(lame_lambda *
+                                  (scalar_product(data.F, data.F) - spacedim));
+
+    return data;
+  }
+
+
+
+  // Entry (i, j) of the tangent stiffness K_s(w) at a quadrature point, i.e.
+  // the contraction (dP/dF[grad_j], grad_i), for the hyperelastic law
+  // selected by the template parameter `model`. As in the assembly functions,
+  // the `if constexpr` branch is resolved at compile time, so only the
+  // arithmetic of the requested law remains.
+  template <SolidModel model, int spacedim>
+  inline double tangent_entry(const Tensor<2, spacedim>             &grad_i,
+                              const Tensor<2, spacedim>             &grad_j,
+                              const HyperelasticPointData<spacedim> &data,
+                              const double                           lame_mu,
+                              const double lame_lambda)
+  {
+    static_assert(model != SolidModel::linear,
+                  "The tangent entry is only assembled for the nonlinear "
+                  "solid models.");
+
+    if constexpr (model == SolidModel::exponential)
+      {
+        // dP/dF = g (I4 + 2 lambda F (x) F) with
+        // g = mu exp(lambda (F:F - dim)).
+        return data.g * (scalar_product(grad_i, grad_j) +
+                         2. * lame_lambda * scalar_product(data.F, grad_i) *
+                           scalar_product(data.F, grad_j));
+      }
+    else // neo_hookean
+      {
+        // For the compressible neo-Hookean law P(F) = mu (F - Q) +
+        // lambda ln(J) Q, Q = F^{-T}, the material tangent is
+        //   dP/dF = mu I4 + (mu - lambda ln J) Q (x) Q + lambda Q (x) Q,
+        // where the two tensor products contract the middle (k,J)-(i,L) and
+        // the outer (k,L)-(i,J) index pairs of (dP/dF)_{iJkL}. Contracting
+        // with the shape function gradients grad_i (indices i,J) and grad_j
+        // (indices k,L) gives
+        //   mu (grad_i : grad_j) + (mu - lambda ln J)(grad_j : Q grad_i^T Q)
+        //   + lambda (grad_i : Q)(grad_j : Q),
+        // which at F = I reduces exactly to the linear elastic operator
+        // 2 mu sym(grad_i) : sym(grad_j) + lambda div(grad_i) div(grad_j).
+        const Tensor<2, spacedim> Q = data.F_inv_T;
+        return lame_mu * scalar_product(grad_i, grad_j) +
+               (lame_mu - lame_lambda * data.ln_det_F) *
+                 scalar_product(grad_j, Q * transpose(grad_i) * Q) +
+               lame_lambda * scalar_product(grad_i, Q) *
+                 scalar_product(grad_j, Q);
+      }
+  }
+
+
+
+  // Right-hand side entry (K_s(w) w)_i - N_i at a quadrature point, for the
+  // hyperelastic law selected by the template parameter `model`: the tangent
+  // stiffness applied to the current displacement gradient H = grad(w),
+  // minus the internal force N_i = (P(F), grad_i). This is the term moved to
+  // the right-hand side when the nonlinear elasticity operator is linearized
+  // around the current configuration w.
+  template <SolidModel model, int spacedim>
+  inline double rhs_entry(const Tensor<2, spacedim>             &grad_i,
+                          const HyperelasticPointData<spacedim> &data,
+                          const Tensor<2, spacedim>             &H,
+                          const double                           lame_mu,
+                          const double                           lame_lambda)
+  {
+    static_assert(model != SolidModel::linear,
+                  "The right-hand side entry is only assembled for the "
+                  "nonlinear solid models.");
+
+    if constexpr (model == SolidModel::exponential)
+      {
+        // (K_s w)_i = g (grad_i : H + 2 lambda (F : grad_i)(F : H)),
+        // N_i = g (F : grad_i).
+        return data.g * (scalar_product(grad_i, H) +
+                         2. * lame_lambda * scalar_product(data.F, grad_i) *
+                           scalar_product(data.F, H) -
+                         scalar_product(data.F, grad_i));
+      }
+    else // neo_hookean
+      {
+        // (K_s w)_i = (dP/dF[H] : grad_i)
+        //   = mu (grad_i : H) + (mu - lambda ln J)(grad_i : Q H^T Q)
+        //     + lambda (H : Q)(grad_i : Q),
+        // N_i = P(F) : grad_i = mu (F : grad_i)
+        //     + (lambda ln J - mu)(Q : grad_i).
+        const Tensor<2, spacedim> Q = data.F_inv_T;
+        const double              Ks_w_i =
+          lame_mu * scalar_product(grad_i, H) +
+          (lame_mu - lame_lambda * data.ln_det_F) *
+            scalar_product(grad_i, Q * transpose(H) * Q) +
+          lame_lambda * scalar_product(H, Q) * scalar_product(grad_i, Q);
+        const double N_i =
+          lame_mu * scalar_product(data.F, grad_i) +
+          (lame_lambda * data.ln_det_F - lame_mu) * scalar_product(Q, grad_i);
+        return Ks_w_i - N_i;
+      }
+  }
+
+
+
+  // @sect3{The NavierStokesImmersedProblem class declaration}
+  // The driver holds distributed triangulations for fluid and solid, mapping
+  // objects to deform the solid mesh, a NonMatching::DoFHandlerCoupling object
+  // that owns all the particle machinery used for the non-matching transfer,
+  // and block matrices/vectors for the coupled Navier-Stokes / compressible
+  // elasticity system with a distributed Lagrange multiplier.
+  template <int dim, int spacedim = dim>
+  class NavierStokesImmersedProblem
+  {
+  public:
+    NavierStokesImmersedProblem(
+      const NavierStokesImmersedProblemParameters<dim, spacedim> &par);
+
+    void run();
+
+  private:
+    void make_grid();
+
+    double compute_time_step() const;
+
+    void                             initial_setup();
+    void                             setup_dofs();
+    void                             interpolate_initial_conditions();
+    void                             update_solid_current_position();
+    void                             check_immersed_mapping_is_valid() const;
+    void                             initialize_dof_handler_coupling();
+    void                             setup_coupling();
+    const AffineConstraints<double> &active_fluid_constraints() const;
+
+    // Augmentation is always disabled when solving with MUMPS, regardless of
+    // the "Use operator augmentation" parameter. The augmentation is only a
+    // preconditioning device for "augmented_split" solver: that solver adds the
+    // matching compensating off-diagonal blocks and right-hand-side terms that
+    // keep the augmented system equivalent to the original saddle point. The
+    // direct MUMPS solver instead assembles and factorizes the monolithic
+    // saddle point as-is
+    bool use_operator_augmentation() const
+    {
+      if (!par.use_operator_augmentation)
+        return false;
+      if (par.solver_type == SolverType::mumps)
+        return false;
+      return true;
+    }
+
+    void assemble_navier_stokes_system(const double &alpha);
+    void assemble_navier_stokes_rhs(const double &alpha);
+
+
+    // The solid constitutive model is a template parameter: the assembly
+    // kernels use `if constexpr` on `model`, so the model-specific branch is
+    // resolved at compile time and no runtime checks remain inside the
+    // quadrature loops. The value of `par.solid_model` selects the
+    // instantiation in run().
+    template <SolidModel model>
+    void assemble_elasticity_system(const double &alpha);
+    template <SolidModel model>
+    void assemble_elasticity_rhs(const double &alpha);
+
+    void assemble_coupling();
+
+    void solve(double tolerance = 0.0);
+
+    void refine_and_transfer();
+
+    void output_results(const unsigned int cycle, const double time) const;
+
+    const NavierStokesImmersedProblemParameters<dim, spacedim> &par;
+
+    MPI_Comm mpi_communicator;
+
+    ConditionalOStream pcout;
+
+    mutable TimerOutput computing_timer;
+
+    parallel::distributed::Triangulation<spacedim>      fluid_tria;
+    parallel::distributed::Triangulation<dim, spacedim> solid_tria;
+
+    std::unique_ptr<FiniteElement<spacedim>>      fluid_fe;
+    std::unique_ptr<FiniteElement<dim, spacedim>> solid_fe;
+
+    DoFHandler<spacedim>      fluid_dh;
+    DoFHandler<dim, spacedim> solid_dh;
+
+    double solid_cell_diameter = 0.0;
+    double fluid_cell_diameter = 0.0;
+
+    std::unique_ptr<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>
+      solid_mapping;
+    std::unique_ptr<NonMatching::DoFHandlerCoupling<dim, spacedim>>
+      dof_handler_coupling;
+
+    std::vector<types::global_dof_index> fluid_dofs_per_block;
+    std::vector<types::global_dof_index> solid_dofs_per_block;
+
+    std::vector<IndexSet> fluid_owned_dofs;
+    std::vector<IndexSet> solid_owned_dofs;
+
+    std::vector<IndexSet> fluid_relevant_dofs;
+    std::vector<IndexSet> solid_relevant_dofs;
+
+    AffineConstraints<double> fluid_constraints;
+    AffineConstraints<double> fluid_homogeneous_constraints;
+    AffineConstraints<double> solid_constraints;
+    bool                      use_homogeneous_fluid_constraints = false;
+
+    LA::MPI::BlockSparseMatrix fluid_matrix; // velocity and pressure
+    LA::MPI::BlockSparseMatrix fluid_mass_matrix;
+    AMGPreconditioner          fluid_velocity_preconditioner;
+    AMGPreconditioner          fluid_pressure_preconditioner;
+
+    LA::MPI::BlockSparseMatrix
+      solid_matrix; // displacement and Lagrange multiplier
+    LA::MPI::BlockSparseMatrix solid_preconditioner; // Preconditioner matrix
+
+    AMGPreconditioner solid_displacement_preconditioner;
+    AMGPreconditioner solid_lagrange_preconditioner;
+    LA::MPI::BlockSparseMatrix
+      coupling_matrix; // direct velocity-to-lagrange coupling mass matrix
+    LA::MPI::BlockSparseMatrix
+      coupling_transpose_matrix; // direct lagrange-to-velocity coupling matrix
+
+    LA::MPI::BlockVector fluid_solution;
+    LA::MPI::BlockVector fluid_locally_relevant_solution;
+    LA::MPI::BlockVector fluid_locally_relevant_solution_dot;
+    LA::MPI::BlockVector fluid_locally_relevant_solution_old;
+    LA::MPI::BlockVector fluid_system_rhs;
+    LA::MPI::BlockVector fluid_dual_of_constant_pressure;
+    LA::MPI::BlockVector fluid_constant_pressure;
+
+    bool fluid_has_open_boundary = false;
+
+    LA::MPI::BlockVector solid_solution;
+    LA::MPI::BlockVector solid_locally_relevant_solution;
+    LA::MPI::BlockVector solid_locally_relevant_solution_dot;
+    LA::MPI::BlockVector solid_locally_relevant_solution_old;
+    LA::MPI::BlockVector solid_system_rhs;
+
+    LA::MPI::BlockVector solid_reference_configuration;
+    LA::MPI::BlockVector solid_current_position;
+
+    Quadrature<spacedim> fluid_quadrature;
+    Quadrature<spacedim> solid_quadrature;
+    Quadrature<dim>      coupling_quadrature;
+
+    FEValuesExtractors::Vector velocity;
+    FEValuesExtractors::Scalar pressure;
+
+    FEValuesExtractors::Vector displacement;
+    FEValuesExtractors::Vector lagrange_multiplier;
+  };
+
+
+
+  // @sect3{The NavierStokesImmersedProblem class implementation}
+  // The following functions are organized in the same spirit as step-70:
+  // construction and mesh initialization, DoF initialization, assembly of
+  // fluid/solid/coupling blocks, solver, refinement, output, and the main
+  // time loop.
+
+
+  // @sect4{Construction and mesh initialization}
+  template <int dim, int spacedim>
+  NavierStokesImmersedProblem<dim, spacedim>::NavierStokesImmersedProblem(
+    const NavierStokesImmersedProblemParameters<dim, spacedim> &par)
+    : par(par)
+    , mpi_communicator(MPI_COMM_WORLD)
+    , pcout(std::cout,
+            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0))
+    , computing_timer(mpi_communicator,
+                      pcout,
+                      TimerOutput::summary,
+                      TimerOutput::wall_times)
+    , fluid_tria(mpi_communicator,
+                 typename Triangulation<spacedim>::MeshSmoothing(
+                   Triangulation<spacedim>::smoothing_on_refinement |
+                   Triangulation<spacedim>::smoothing_on_coarsening))
+    , solid_tria(mpi_communicator,
+                 typename Triangulation<dim, spacedim>::MeshSmoothing(
+                   Triangulation<dim, spacedim>::smoothing_on_refinement |
+                   Triangulation<dim, spacedim>::smoothing_on_coarsening))
+    , fluid_dh(fluid_tria)
+    , solid_dh(solid_tria)
+    , velocity(0)
+    , pressure(spacedim)
+    , displacement(0)
+    , lagrange_multiplier(spacedim)
+  {
+    // Verify that the output folder exists, if it does not, create it
+    if (!std::filesystem::exists(par.output_directory))
+      std::filesystem::create_directory(par.output_directory);
+  }
+
+
+  template <int dim, int spacedim>
+  inline const AffineConstraints<double> &
+  NavierStokesImmersedProblem<dim, spacedim>::active_fluid_constraints() const
+  {
+    if (use_homogeneous_fluid_constraints)
+      return fluid_homogeneous_constraints;
+
+    return fluid_constraints;
+  }
+
+
+
+  template <int dim, int spacedim>
+  void read_grid_and_cad_files(const std::string &grid_file_name,
+                               const std::string &ids_and_cad_file_names,
+                               const std::string &cad_projection,
+                               const double       cad_scale_factor,
+                               Triangulation<dim, spacedim> &tria)
+  {
+    GridIn<dim, spacedim> grid_in;
+    grid_in.attach_triangulation(tria);
+    grid_in.read(grid_file_name);
+
+    // No CAD files were requested: the mesh as read from disk is all we need.
+    // This is the common case for a plain gmsh or ucd mesh, and it must work
+    // whether or not deal.II was configured with OpenCASCADE.
+    if (ids_and_cad_file_names.empty())
+      return;
+
+#ifdef DEAL_II_WITH_OPENCASCADE
+    using map_type  = std::map<types::manifold_id, std::string>;
+    using Converter = Patterns::Tools::Convert<map_type>;
+
+    const map_type ids_and_files = Converter::to_value(ids_and_cad_file_names);
+
+    // GridIn assigns boundary ids when reading a mesh file, but leaves every
+    // manifold id flat, whereas the CAD manifolds attached below are keyed on
+    // manifold ids. So the ids have to be handed out here.
+    //
+    // We hand them out as sparingly as possible: only the boundary faces whose
+    // boundary id a CAD file was actually given for. The interior, and every
+    // boundary we have no geometry for, keeps the flat manifold and does not
+    // move at all. For the nozzle that means the wall follows the CAD and the
+    // inlet and outlet discs stay exactly the planes they were meshed as.
+    for (const auto &cell : tria.active_cell_iterators())
+      for (const auto f : cell->face_indices())
+        if (cell->face(f)->at_boundary())
+          {
+            const auto face = cell->face(f);
+            const auto id =
+              static_cast<types::manifold_id>(face->boundary_id());
+            if (ids_and_files.count(id) == 0)
+              continue;
+
+            face->set_manifold_id(id);
+            if constexpr (dim >= 3)
+              for (unsigned int l = 0; l < face->n_lines(); ++l)
+                face->line(l)->set_manifold_id(id);
+          }
+
+    // The previous loop also claimed the edges where a CAD surface runs into a
+    // boundary we have no CAD for -- the inlet and outlet rims. Hand those
+    // back to the flat manifold: projecting them would drag the rim off the
+    // inlet and outlet planes, which both the geometry and the inflow boundary
+    // condition rely on being exactly flat.
+    if constexpr (dim >= 3)
+      for (const auto &cell : tria.active_cell_iterators())
+        for (const auto f : cell->face_indices())
+          if (cell->face(f)->at_boundary() &&
+              ids_and_files.count(static_cast<types::manifold_id>(
+                cell->face(f)->boundary_id())) == 0)
+            for (unsigned int l = 0; l < cell->face(f)->n_lines(); ++l)
+              cell->face(f)->line(l)->set_manifold_id(
+                numbers::flat_manifold_id);
+
+    for (const auto &pair : ids_and_files)
+      {
+        const auto &manifold_id   = pair.first;
+        const auto &cad_file_name = pair.second;
+
+        const auto extension = boost::algorithm::to_lower_copy(
+          cad_file_name.substr(cad_file_name.find_last_of('.') + 1));
+
+        TopoDS_Shape shape;
+        if (extension == "iges" || extension == "igs")
+          shape = OpenCASCADE::read_IGES(cad_file_name, cad_scale_factor);
+        else if (extension == "step" || extension == "stp")
+          shape = OpenCASCADE::read_STEP(cad_file_name, cad_scale_factor);
+        else
+          AssertThrow(false,
+                      ExcNotImplemented("We found an extension that we "
+                                        "do not recognize as a CAD file "
+                                        "extension. Bailing out."));
+
+        const auto n_elements = OpenCASCADE::count_elements(shape);
+        if ((std::get<0>(n_elements) == 0))
+          tria.set_manifold(
+            manifold_id,
+            OpenCASCADE::ArclengthProjectionLineManifold<dim, spacedim>(shape));
+        else if constexpr (spacedim == 3)
+          {
+            if (cad_projection == "normal_to_mesh")
+              tria.set_manifold(
+                manifold_id,
+                OpenCASCADE::NormalToMeshProjectionManifold<dim, 3>(shape));
+            else
+              tria.set_manifold(manifold_id,
+                                OpenCASCADE::NormalProjectionManifold<dim, 3>(
+                                  shape));
+          }
+        else
+          tria.set_manifold(manifold_id,
+                            OpenCASCADE::NURBSPatchManifold<dim, spacedim>(
+                              TopoDS::Face(shape)));
+      }
+#else
+    AssertThrow(false,
+                ExcNotImplemented(
+                  "Attaching CAD manifolds to a grid requires "
+                  "deal.II to be configured with OpenCASCADE."));
+#endif
+  }
+
+
+
+  // @sect4{Mesh generation}
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::make_grid()
+  {
+    try
+      {
+        GridGenerator::generate_from_name_and_arguments(
+          fluid_tria, par.name_of_fluid_grid, par.arguments_for_fluid_grid);
+      }
+    catch (...)
+      {
+        pcout << "Generating from name and argument failed." << std::endl
+              << "Trying to read from file name." << std::endl;
+        read_grid_and_cad_files(par.name_of_fluid_grid,
+                                par.arguments_for_fluid_grid,
+                                par.cad_projection,
+                                par.cad_scale_factor,
+                                fluid_tria);
+      }
+    fluid_tria.refine_global(par.initial_fluid_refinement);
+
+    try
+      {
+        GridGenerator::generate_from_name_and_arguments(
+          solid_tria, par.name_of_solid_grid, par.arguments_for_solid_grid);
+      }
+    catch (...)
+      {
+        read_grid_and_cad_files(par.name_of_solid_grid,
+                                par.arguments_for_solid_grid,
+                                par.cad_projection,
+                                par.cad_scale_factor,
+                                solid_tria);
+      }
+
+    solid_tria.refine_global(par.initial_solid_refinement);
+
+    fluid_cell_diameter = GridTools::minimal_cell_diameter(fluid_tria);
+    solid_cell_diameter = GridTools::minimal_cell_diameter(solid_tria);
+
+    pcout << "   Fluid mesh: " << fluid_tria.n_global_active_cells()
+          << " cells, minimal cell diameter: " << fluid_cell_diameter
+          << std::endl;
+    pcout << "   Solid mesh: " << solid_tria.n_global_active_cells()
+          << " cells, minimal cell diameter: " << solid_cell_diameter
+          << std::endl;
+  }
+
+
+  // @sect4{Finite element and DoF initialization}
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::initial_setup()
+  {
+    TimerOutput::Scope t(computing_timer, "Initial setup");
+
+    fluid_fe = std::make_unique<FESystem<spacedim>>(*par.velocity_fe,
+                                                    spacedim,
+                                                    *par.pressure_fe,
+                                                    1);
+
+    // Solid displacement and Lagrange multiplier (same degree for both)
+    solid_fe = std::make_unique<FESystem<spacedim>>(*par.displacement_fe,
+                                                    spacedim,
+                                                    *par.lagrange_multiplier_fe,
+                                                    spacedim);
+  }
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::setup_dofs()
+  {
+    TimerOutput::Scope t(computing_timer, "Setup dofs");
+
+    dof_handler_coupling.reset();
+    coupling_matrix.clear();
+    coupling_transpose_matrix.clear();
+    fluid_quadrature = QGauss<spacedim>(fluid_fe->degree + 1);
+    solid_quadrature = QGauss<spacedim>(solid_fe->degree + 1);
+
+    const unsigned int required_degree = fluid_fe->degree + solid_fe->degree;
+    if (par.coupling_quadrature_type == "gauss_lobatto")
+      {
+        // 2n-3 >= required_degree  =>  n >= (required_degree + 3) / 2.
+        const unsigned int coupling_order = required_degree / 2 + 2;
+        coupling_quadrature =
+          QIterated<dim>(QGaussLobatto<1>(coupling_order),
+                         par.coupling_quadrature_iterations);
+      }
+    else
+      {
+        // 2n-1 >= required_degree  =>  n >= (required_degree + 1) / 2.
+        const unsigned int coupling_order = required_degree / 2 + 1;
+        coupling_quadrature =
+          QIterated<dim>(QuadratureSelector<1>(par.coupling_quadrature_type,
+                                               coupling_order),
+                         par.coupling_quadrature_iterations);
+      }
+
+    fluid_dh.distribute_dofs(*fluid_fe);
+
+    std::vector<unsigned int> navier_stokes_sub_blocks(spacedim + 1, 0);
+    navier_stokes_sub_blocks[spacedim] = 1;
+    DoFRenumbering::component_wise(fluid_dh, navier_stokes_sub_blocks);
+
+    fluid_dofs_per_block =
+      DoFTools::count_dofs_per_fe_block(fluid_dh, navier_stokes_sub_blocks);
+
+    const unsigned int n_u = fluid_dofs_per_block[0],
+                       n_p = fluid_dofs_per_block[1];
+
+    pcout << "   Number of degrees of freedom for Navier-Stokes equation: "
+          << fluid_dh.n_dofs() << " (" << n_u << '+' << n_p << ')' << std::endl;
+
+    fluid_owned_dofs.resize(2);
+    fluid_owned_dofs[0] = fluid_dh.locally_owned_dofs().get_view(0, n_u);
+    fluid_owned_dofs[1] =
+      fluid_dh.locally_owned_dofs().get_view(n_u, n_u + n_p);
+
+    const IndexSet locally_relevant_fluid_dofs =
+      DoFTools::extract_locally_relevant_dofs(fluid_dh);
+    fluid_relevant_dofs.resize(2);
+    fluid_relevant_dofs[0] = locally_relevant_fluid_dofs.get_view(0, n_u);
+    fluid_relevant_dofs[1] =
+      locally_relevant_fluid_dofs.get_view(n_u, n_u + n_p);
+
+    {
+      fluid_constraints.reinit(locally_relevant_fluid_dofs,
+                               locally_relevant_fluid_dofs);
+      fluid_homogeneous_constraints.reinit(locally_relevant_fluid_dofs,
+                                           locally_relevant_fluid_dofs);
+
+      DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
+      DoFTools::make_hanging_node_constraints(fluid_dh,
+                                              fluid_homogeneous_constraints);
+      const Functions::ZeroFunction<spacedim> zero_bc(spacedim + 1);
+      for (const auto id : par.dirichlet_ids)
+        {
+          VectorTools::interpolate_boundary_values(fluid_dh,
+                                                   id,
+                                                   par.navier_stokes_bc,
+                                                   fluid_constraints,
+                                                   fluid_fe->component_mask(
+                                                     velocity));
+          VectorTools::interpolate_boundary_values(
+            fluid_dh,
+            id,
+            zero_bc,
+            fluid_homogeneous_constraints,
+            fluid_fe->component_mask(velocity));
+        }
+      fluid_constraints.close();
+      fluid_homogeneous_constraints.close();
+    }
+
+
+    {
+      const std::set<types::boundary_id> dirichlet_set(
+        par.dirichlet_ids.begin(), par.dirichlet_ids.end());
+      bool local_open = false;
+      for (const auto &cell : fluid_dh.active_cell_iterators())
+        if (cell->is_locally_owned() && cell->at_boundary())
+          for (const auto f : cell->face_indices())
+            if (cell->face(f)->at_boundary())
+              {
+                const auto bid = cell->face(f)->boundary_id();
+                if (dirichlet_set.count(bid) == 0)
+                  local_open = true;
+              }
+      fluid_has_open_boundary =
+        Utilities::MPI::logical_or(local_open, mpi_communicator);
+    }
+
+
+    auto locally_owned_fluid_dofs_per_processor =
+      Utilities::MPI::all_gather(mpi_communicator,
+                                 fluid_dh.locally_owned_dofs());
+    {
+      fluid_matrix.clear();
+
+      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+      for (unsigned int c = 0; c < spacedim + 1; ++c)
+        for (unsigned int d = 0; d < spacedim + 1; ++d)
+          if (c == spacedim && d == spacedim)
+            coupling[c][d] = DoFTools::none;
+          else if (c == spacedim || d == spacedim || c == d)
+            coupling[c][d] = DoFTools::always;
+          else if (c < spacedim && d < spacedim)
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
+
+      BlockDynamicSparsityPattern dsp(fluid_dofs_per_block,
+                                      fluid_dofs_per_block);
+
+      DoFTools::make_sparsity_pattern(
+        fluid_dh, coupling, dsp, fluid_constraints, false);
+
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        locally_owned_fluid_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_fluid_dofs);
+
+      fluid_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+    }
+
+    {
+      fluid_mass_matrix.clear();
+
+      Table<2, DoFTools::Coupling> coupling(spacedim + 1, spacedim + 1);
+      for (unsigned int c = 0; c < spacedim + 1; ++c)
+        for (unsigned int d = 0; d < spacedim + 1; ++d)
+          if (c == d)
+            coupling[c][d] = DoFTools::always;
+          else
+            coupling[c][d] = DoFTools::none;
+
+      BlockDynamicSparsityPattern dsp(fluid_dofs_per_block,
+                                      fluid_dofs_per_block);
+
+      DoFTools::make_sparsity_pattern(
+        fluid_dh, coupling, dsp, fluid_constraints, false);
+
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        locally_owned_fluid_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_fluid_dofs);
+
+      fluid_mass_matrix.reinit(fluid_owned_dofs, dsp, mpi_communicator);
+    }
+
+
+
+    fluid_locally_relevant_solution.reinit(fluid_owned_dofs,
+                                           fluid_relevant_dofs,
+                                           mpi_communicator);
+    fluid_locally_relevant_solution_dot.reinit(fluid_owned_dofs,
+                                               fluid_relevant_dofs,
+                                               mpi_communicator);
+    fluid_locally_relevant_solution_old.reinit(fluid_owned_dofs,
+                                               fluid_relevant_dofs,
+                                               mpi_communicator);
+    fluid_system_rhs.reinit(fluid_owned_dofs, mpi_communicator);
+    fluid_solution.reinit(fluid_owned_dofs, mpi_communicator);
+    fluid_dual_of_constant_pressure.reinit(fluid_owned_dofs, mpi_communicator);
+
+    VectorTools::create_right_hand_side(
+      fluid_dh,
+      fluid_quadrature,
+      ComponentSelectFunction<spacedim>(spacedim, 1.0, spacedim + 1),
+      fluid_dual_of_constant_pressure,
+      fluid_constraints);
+
+
+    // Setup system for the solid mechanics component
+    {
+      solid_dh.distribute_dofs(*solid_fe);
+
+      std::vector<unsigned int> solid_sub_blocks(2 * spacedim, 0);
+      for (unsigned int d = spacedim; d < 2 * spacedim; ++d)
+        solid_sub_blocks[d] = 1;
+      DoFRenumbering::component_wise(solid_dh, solid_sub_blocks);
+      solid_dofs_per_block =
+        DoFTools::count_dofs_per_fe_block(solid_dh, solid_sub_blocks);
+
+      const unsigned int n_disp = solid_dofs_per_block[0],
+                         n_lag  = solid_dofs_per_block[1];
+
+      pcout << "   Number of degrees of freedom for solid mechanics: "
+            << solid_dh.n_dofs() << " (" << n_disp << '+' << n_lag << ')'
+            << std::endl;
+
+      solid_owned_dofs.resize(2);
+      solid_owned_dofs[0] = solid_dh.locally_owned_dofs().get_view(0, n_disp);
+      solid_owned_dofs[1] =
+        solid_dh.locally_owned_dofs().get_view(n_disp, n_disp + n_lag);
+
+      const IndexSet locally_relevant_solid_dofs =
+        DoFTools::extract_locally_relevant_dofs(solid_dh);
+      solid_relevant_dofs.resize(2);
+      solid_relevant_dofs[0] = locally_relevant_solid_dofs.get_view(0, n_disp);
+      solid_relevant_dofs[1] =
+        locally_relevant_solid_dofs.get_view(n_disp, n_disp + n_lag);
+
+      solid_constraints.reinit(locally_relevant_solid_dofs,
+                               locally_relevant_solid_dofs);
+
+
+      solid_locally_relevant_solution.reinit(solid_owned_dofs,
+                                             solid_relevant_dofs,
+                                             mpi_communicator);
+
+      solid_locally_relevant_solution_dot.reinit(solid_owned_dofs,
+                                                 solid_relevant_dofs,
+                                                 mpi_communicator);
+
+      solid_locally_relevant_solution_old.reinit(solid_owned_dofs,
+                                                 solid_relevant_dofs,
+                                                 mpi_communicator);
+
+      solid_system_rhs.reinit(solid_owned_dofs, mpi_communicator);
+      solid_solution.reinit(solid_owned_dofs, mpi_communicator);
+
+      DoFTools::make_hanging_node_constraints(solid_dh, solid_constraints);
+      solid_constraints.close();
+
+      BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
+                                      solid_dofs_per_block);
+
+      DoFTools::make_sparsity_pattern(solid_dh, dsp, solid_constraints, false);
+
+      auto locally_owned_solid_dofs_per_processor =
+        Utilities::MPI::all_gather(mpi_communicator,
+                                   solid_dh.locally_owned_dofs());
+
+      SparsityTools::distribute_sparsity_pattern(
+        dsp,
+        locally_owned_solid_dofs_per_processor,
+        mpi_communicator,
+        locally_relevant_solid_dofs);
+
+      solid_matrix.reinit(solid_owned_dofs, dsp, mpi_communicator);
+      solid_reference_configuration.reinit(solid_locally_relevant_solution);
+      solid_current_position.reinit(solid_locally_relevant_solution);
+
+      // Setup system for the solid preconditioner
+      {
+        solid_preconditioner.clear();
+
+        Table<2, DoFTools::Coupling> coupling(2 * spacedim, 2 * spacedim);
+        for (unsigned int c = 0; c < spacedim; ++c)
+          for (unsigned int d = 0; d < spacedim; ++d)
+            coupling[c][d] = DoFTools::none;
+
+        for (unsigned int c = spacedim; c < 2 * spacedim; ++c)
+          for (unsigned int d = spacedim; d < 2 * spacedim; ++d)
+            if (c == d)
+              coupling[c][d] = DoFTools::always;
+            else
+              coupling[c][d] = DoFTools::none;
+
+        BlockDynamicSparsityPattern dsp(solid_dofs_per_block,
+                                        solid_dofs_per_block);
+
+        DoFTools::make_sparsity_pattern(
+          solid_dh, coupling, dsp, solid_constraints, false);
+        SparsityTools::distribute_sparsity_pattern(
+          dsp,
+          locally_owned_solid_dofs_per_processor,
+          mpi_communicator,
+          locally_relevant_solid_dofs);
+        solid_preconditioner.reinit(solid_owned_dofs, dsp, mpi_communicator);
+      }
+    }
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::update_solid_current_position()
+  {
+    LA::MPI::BlockVector owned_current_position;
+    owned_current_position.reinit(solid_solution);
+    owned_current_position.block(0) = solid_reference_configuration.block(0);
+    owned_current_position.block(1) = solid_reference_configuration.block(1);
+    owned_current_position.block(0) += solid_solution.block(0);
+    solid_current_position = owned_current_position;
+  }
+
+
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::check_immersed_mapping_is_valid()
+    const
+  {
+    Assert(solid_mapping != nullptr,
+           ExcMessage("The immersed mapping has not been initialized yet."));
+
+    FEValues<dim, spacedim> fe_values(*solid_mapping,
+                                      *solid_fe,
+                                      coupling_quadrature,
+                                      update_jacobians |
+                                        update_quadrature_points);
+
+    double                   min_detJ = std::numeric_limits<double>::max();
+    bool                     inverted = false;
+    Point<spacedim>          bad_point;
+    types::global_cell_index bad_cell = numbers::invalid_unsigned_int;
+
+    for (const auto &cell : solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          fe_values.reinit(cell);
+          for (unsigned int q = 0; q < coupling_quadrature.size(); ++q)
+            {
+              const double detJ = fe_values.jacobian(q).determinant();
+              if (detJ < min_detJ)
+                {
+                  min_detJ  = detJ;
+                  bad_point = fe_values.quadrature_point(q);
+                  bad_cell  = cell->active_cell_index();
+                }
+              if (detJ <= 0.)
+                inverted = true;
+            }
+        }
+
+    const double global_min_detJ =
+      Utilities::MPI::min(min_detJ, mpi_communicator);
+    const bool global_inverted =
+      Utilities::MPI::logical_or(inverted, mpi_communicator);
+
+    AssertThrow(
+      !global_inverted,
+      ExcMessage(
+        "The immersed solid mesh has inverted: the Jacobian determinant of "
+        "the deformation map x = X + u(X) is non-positive (minimum value "
+        "det(J) = " +
+        std::to_string(global_min_detJ) +
+        ") at a coupling quadrature point (near " +
+        std::to_string(bad_point[0]) + ", " + std::to_string(bad_point[1]) +
+        " on local solid cell " + std::to_string(bad_cell) +
+        "). This means the solid has folded over itself and the coupling "
+        "operators are no longer meaningful."));
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::interpolate_initial_conditions()
+  {
+    VectorTools::interpolate(fluid_dh,
+                             par.navier_stokes_initial_conditions,
+                             fluid_solution,
+                             ComponentMask(fluid_fe->component_mask(velocity)));
+    fluid_constraints.distribute(fluid_solution);
+    fluid_locally_relevant_solution_old = fluid_solution;
+    fluid_locally_relevant_solution     = fluid_solution;
+
+    VectorTools::interpolate(solid_dh,
+                             par.solid_reference_configuration,
+                             solid_solution,
+                             ComponentMask(
+                               solid_fe->component_mask(displacement)));
+    solid_reference_configuration = solid_solution;
+
+    // auto v = solid_solution;
+    // VectorTools::interpolate(
+    //   solid_dh,
+    //   ComponentSelectFunction<spacedim>(0, 1.0, 2 * spacedim),
+    //   solid_locally_relevant_solution_dot,
+    //   ComponentMask(solid_fe->component_mask(displacement)));
+    // solid_locally_relevant_solution_dot.block(0) = v.block(0);
+
+    VectorTools::interpolate(solid_dh,
+                             par.solid_initial_displacement,
+                             solid_solution,
+                             ComponentMask(
+                               solid_fe->component_mask(displacement)));
+    solid_locally_relevant_solution_old = solid_solution;
+    solid_locally_relevant_solution     = solid_solution;
+
+    update_solid_current_position();
+    solid_mapping =
+      std::make_unique<MappingFEField<dim, spacedim, LA::MPI::BlockVector>>(
+        solid_dh,
+        solid_current_position,
+        ComponentMask(solid_fe->component_mask(displacement)));
+  }
+
+
+
+  // The coupling object owns every particle-based data structure used to
+  // transfer information between the fluid and the immersed solid. Since it
+  // stores a reference to `*solid_mapping`, a MappingFEField built on top of
+  // `solid_current_position`, the particles it regenerates always sit at the
+  // current configuration of the solid.
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::initialize_dof_handler_coupling()
+  {
+    if (!dof_handler_coupling)
+      dof_handler_coupling =
+        std::make_unique<NonMatching::DoFHandlerCoupling<dim, spacedim>>(
+          fluid_dh,
+          solid_dh,
+          ComponentMask(fluid_fe->component_mask(velocity)),
+          ComponentMask(solid_fe->component_mask(lagrange_multiplier)),
+          StaticMappingQ1<spacedim>::mapping,
+          *solid_mapping);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::setup_coupling()
+  {
+    const auto &constraints = active_fluid_constraints();
+
+    BlockDynamicSparsityPattern dsp(solid_dofs_per_block, fluid_dofs_per_block);
+    BlockDynamicSparsityPattern dsp_t(fluid_dofs_per_block,
+                                      solid_dofs_per_block);
+
+    initialize_dof_handler_coupling();
+
+    dof_handler_coupling->create_coupling_sparsity_pattern(coupling_quadrature,
+                                                           dsp,
+                                                           constraints,
+                                                           solid_constraints);
+    dof_handler_coupling->create_coupling_sparsity_pattern(
+      coupling_quadrature, dsp_t, constraints, solid_constraints, true, true);
+
+    coupling_matrix.clear();
+    coupling_matrix.reinit(solid_dofs_per_block.size(),
+                           fluid_dofs_per_block.size());
+    for (unsigned int i = 0; i < solid_dofs_per_block.size(); ++i)
+      for (unsigned int j = 0; j < fluid_dofs_per_block.size(); ++j)
+        coupling_matrix.block(i, j).reinit(solid_owned_dofs[i],
+                                           fluid_owned_dofs[j],
+                                           dsp.block(i, j),
+                                           mpi_communicator,
+                                           true);
+    coupling_matrix.collect_sizes();
+
+    coupling_transpose_matrix.clear();
+    coupling_transpose_matrix.reinit(fluid_dofs_per_block.size(),
+                                     solid_dofs_per_block.size());
+    for (unsigned int i = 0; i < fluid_dofs_per_block.size(); ++i)
+      for (unsigned int j = 0; j < solid_dofs_per_block.size(); ++j)
+        coupling_transpose_matrix.block(i, j).reinit(fluid_owned_dofs[i],
+                                                     solid_owned_dofs[j],
+                                                     dsp_t.block(i, j),
+                                                     mpi_communicator,
+                                                     true);
+    coupling_transpose_matrix.collect_sizes();
+  }
+
+
+
+  // @sect4{Assembly of fluid, solid, and coupling blocks}
+  template <int dim, int spacedim>
+  void
+  NavierStokesImmersedProblem<dim, spacedim>::assemble_navier_stokes_system(
+    const double &alpha)
+  {
+    const auto &constraints = active_fluid_constraints();
+
+    fluid_matrix      = 0;
+    fluid_mass_matrix = 0;
+
+    TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes terms");
+
+    FEValues<spacedim> fe_values(*fluid_fe,
+                                 fluid_quadrature,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = fluid_quadrature.size();
+
+    FullMatrix<double> cell_fluid_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_fluid_mass_matrix(dofs_per_cell, dofs_per_cell);
+
+    std::vector<Tensor<1, spacedim>>          phi_u(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_u(dofs_per_cell);
+    std::vector<SymmetricTensor<2, spacedim>> sym_grad_phi_u(dofs_per_cell);
+    std::vector<double>                       div_phi_u(dofs_per_cell);
+    std::vector<double>                       phi_p(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          u(n_q_points);
+    std::vector<Tensor<2, spacedim>>          grad_u(n_q_points);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    for (const auto &cell : fluid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_fluid_matrix      = 0;
+          cell_fluid_mass_matrix = 0;
+
+          fe_values.reinit(cell);
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
+                {
+                  phi_u[k]      = fe_values[velocity].value(k, q);
+                  grad_phi_u[k] = fe_values[velocity].gradient(k, q);
+                  sym_grad_phi_u[k] =
+                    fe_values[velocity].symmetric_gradient(k, q);
+                  div_phi_u[k] = fe_values[velocity].divergence(k, q);
+
+                  phi_p[k] = fe_values[pressure].value(k, q);
+                }
+
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                    {
+                      cell_fluid_matrix(i, j) +=
+                        ((par.density * alpha) * phi_u[i] * phi_u[j] +
+                         2. * par.viscosity *
+                           scalar_product(sym_grad_phi_u[i],
+                                          sym_grad_phi_u[j]) -
+                         div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
+                         (use_operator_augmentation() ?
+                            par.gamma_AL_background * div_phi_u[i] *
+                              div_phi_u[j] :
+                            0.)) *
+                        fe_values.JxW(q);
+
+                      cell_fluid_mass_matrix(i, j) +=
+                        (par.density * phi_p[i] * phi_p[j] +
+                         phi_u[i] * phi_u[j]) *
+                        fe_values.JxW(q);
+                    }
+                }
+            }
+
+
+          cell->get_dof_indices(local_dof_indices);
+          constraints.distribute_local_to_global(cell_fluid_matrix,
+                                                 local_dof_indices,
+                                                 fluid_matrix);
+
+          constraints.distribute_local_to_global(cell_fluid_mass_matrix,
+                                                 local_dof_indices,
+                                                 fluid_mass_matrix);
+        }
+
+    // Add augmented Lagrangian penalty on the immersed domain through the
+    // coupling helper.
+    if (use_operator_augmentation())
+      {
+        initialize_dof_handler_coupling();
+
+        dof_handler_coupling->create_nitsche_restriction_matrix(
+          coupling_quadrature,
+          par.gamma_AL_background / (solid_cell_diameter * solid_cell_diameter),
+          fluid_matrix,
+          constraints,
+          true);
+      }
+
+    fluid_matrix.compress(VectorOperation::add);
+    fluid_mass_matrix.compress(VectorOperation::add);
+
+    // Provide the constant (near-null-space) modes to the velocity and
+    // pressure AMG preconditioners. For the velocity block this yields one
+    // constant mode per spatial component; for the pressure block a single
+    // constant mode. Without these, Trilinos aggregation across MPI partition
+    // boundaries can degenerate.
+    auto velocity_amg_data = make_amg_additional_data(fluid_fe->degree, true);
+    const auto velocity_constant_modes =
+      DoFTools::extract_constant_modes(fluid_dh,
+                                       fluid_fe->component_mask(velocity));
+    velocity_amg_data.constant_modes = velocity_constant_modes;
+
+    fluid_velocity_preconditioner.initialize(fluid_matrix.block(0, 0),
+                                             velocity_amg_data);
+
+    auto pressure_amg_data = make_amg_additional_data(fluid_fe->degree, true);
+    const auto pressure_constant_modes =
+      DoFTools::extract_constant_modes(fluid_dh,
+                                       fluid_fe->component_mask(pressure));
+    pressure_amg_data.constant_modes = pressure_constant_modes;
+
+    fluid_pressure_preconditioner.initialize(fluid_mass_matrix.block(1, 1),
+                                             pressure_amg_data);
+  }
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::assemble_navier_stokes_rhs(
+    const double &alpha)
+  {
+    const auto &constraints = active_fluid_constraints();
+
+    fluid_system_rhs = 0;
+
+    TimerOutput::Scope t(computing_timer, "Assemble Navier-Stokes rhs terms");
+
+    FEValues<spacedim> fe_values(*fluid_fe,
+                                 fluid_quadrature,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    const unsigned int dofs_per_cell = fluid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = fluid_quadrature.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
+
+    std::vector<Vector<double>> rhs_values(n_q_points,
+                                           Vector<double>(spacedim + 1));
+
+    std::vector<Tensor<1, spacedim>>          phi_u(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_u(dofs_per_cell);
+    std::vector<SymmetricTensor<2, spacedim>> sym_grad_phi_u(dofs_per_cell);
+    std::vector<double>                       div_phi_u(dofs_per_cell);
+    std::vector<double>                       phi_p(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          u(n_q_points);
+    std::vector<Tensor<2, spacedim>>          grad_u(n_q_points);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    for (const auto &cell : fluid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_matrix = 0;
+          cell_rhs    = 0;
+
+          fe_values.reinit(cell);
+          par.navier_stokes_rhs.vector_value_list(
+            fe_values.get_quadrature_points(), rhs_values);
+          fe_values[velocity].get_function_values(
+            fluid_locally_relevant_solution_old, u);
+          fe_values[velocity].get_function_gradients(
+            fluid_locally_relevant_solution_old, grad_u);
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
+                {
+                  phi_u[k]      = fe_values[velocity].value(k, q);
+                  grad_phi_u[k] = fe_values[velocity].gradient(k, q);
+                  sym_grad_phi_u[k] =
+                    fe_values[velocity].symmetric_gradient(k, q);
+                  div_phi_u[k] = fe_values[velocity].divergence(k, q);
+
+                  phi_p[k] = fe_values[pressure].value(k, q);
+                }
+
+              for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                {
+                  if (cell->at_boundary())
+                    {
+                      for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                        {
+                          cell_matrix(i, j) +=
+                            (par.density * alpha * phi_u[i] * phi_u[j] +
+                             2. * par.viscosity *
+                               scalar_product(sym_grad_phi_u[i],
+                                              sym_grad_phi_u[j]) -
+                             div_phi_u[i] * phi_p[j] - phi_p[i] * div_phi_u[j] +
+                             (use_operator_augmentation() ?
+                                par.gamma_AL_background * div_phi_u[i] *
+                                  div_phi_u[j] :
+                                0.)) *
+                            fe_values.JxW(q);
+                        }
+                    }
+
+                  const unsigned int component_i =
+                    fluid_fe->system_to_component_index(i).first;
+
+                  // The explicit convective term -rho*(u^n . grad) u^n is only
+                  // included when 'Include convective term' is true.
+                  const Tensor<1, spacedim> convective =
+                    par.include_convective_term ? grad_u[q] * u[q] :
+                                                  Tensor<1, spacedim>();
+                  cell_rhs(i) +=
+                    (par.density *
+                     (fe_values.shape_value(i, q) * rhs_values[q](component_i) +
+                      (u[q] * alpha - convective) * phi_u[i])) *
+                    fe_values.JxW(q);
+                }
+            }
+
+
+          cell->get_dof_indices(local_dof_indices);
+          constraints.distribute_local_to_global(cell_rhs,
+                                                 local_dof_indices,
+                                                 fluid_system_rhs,
+                                                 cell_matrix);
+        }
+
+    fluid_system_rhs.compress(VectorOperation::add);
+  }
+
+
+  // The solid constitutive model is passed as a template parameter, and the
+  // `if constexpr` branches below are resolved at compile time: the quadrature
+  // loop only contains the arithmetic of the requested law, and the runtime
+  // enum value `par.solid_model` only selects the instantiation in run().
+  template <int dim, int spacedim>
+  template <SolidModel model>
+  inline void
+  NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_system(
+    const double &alpha)
+  {
+    solid_matrix         = 0;
+    solid_preconditioner = 0;
+
+    TimerOutput::Scope t(computing_timer, "Assemble Elasticity terms");
+
+    FEValues<spacedim> fe_values(*solid_fe,
+                                 solid_quadrature,
+                                 update_values | update_gradients |
+                                   update_quadrature_points |
+                                   update_JxW_values);
+
+    const unsigned int dofs_per_cell = solid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = solid_quadrature.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    FullMatrix<double> cell_preconditioner(dofs_per_cell, dofs_per_cell);
+
+
+    std::vector<SymmetricTensor<2, spacedim>> grad_eps_phi_w(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_w(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          phi_w(dofs_per_cell);
+    std::vector<double>                       div_phi_w(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
+
+    // Gradient of the displacement w used to linearize the nonlinear laws:
+    // in the semi-implicit scheme this is the current configuration (the
+    // last converged solution). Only the nonlinear models need it, so the
+    // call below is compiled out for the linear model.
+    std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    for (const auto &cell : solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          cell_matrix         = 0;
+          cell_preconditioner = 0;
+
+          fe_values.reinit(cell);
+
+          if constexpr (model != SolidModel::linear)
+            fe_values[displacement].get_function_gradients(
+              solid_locally_relevant_solution, grad_w_current);
+
+          // Add the elastic stiffness and the Lagrange-multiplier coupling
+          // entries of the local matrix, shared by all constitutive models.
+          const auto add_elastic_entries = [&](const unsigned int i,
+                                               const unsigned int j,
+                                               const double       elastic_ij,
+                                               const double       JxW) {
+            cell_matrix(i, j) += (elastic_ij -
+                                  // lagrange * disp
+                                  (phi_lagrange[i] * phi_w[j] * alpha) -
+                                  // disp * lagrange
+                                  (phi_w[i] * phi_lagrange[j])) *
+                                 // JxW
+                                 JxW;
+
+            cell_preconditioner(i, j) +=
+              phi_lagrange[i] * phi_lagrange[j] * JxW;
+          };
+
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              for (unsigned int k = 0; k < dofs_per_cell; ++k)
+                {
+                  grad_eps_phi_w[k] =
+                    fe_values[displacement].symmetric_gradient(k, q);
+                  grad_phi_w[k]   = fe_values[displacement].gradient(k, q);
+                  div_phi_w[k]    = fe_values[displacement].divergence(k, q);
+                  phi_w[k]        = fe_values[displacement].value(k, q);
+                  phi_lagrange[k] = fe_values[lagrange_multiplier].value(k, q);
+                }
+
+              // Elastic bilinear form of the selected model: the linear
+              // operator, or the tangent stiffness at the current
+              // configuration for the nonlinear laws. The `if constexpr`
+              // branches are resolved at compile time.
+              if constexpr (model == SolidModel::linear)
+                {
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                      add_elastic_entries(
+                        i,
+                        j,
+                        2 * par.lame_mu *
+                            scalar_product(grad_eps_phi_w[i],
+                                           grad_eps_phi_w[j]) +
+                          par.lame_lambda * div_phi_w[i] * div_phi_w[j],
+                        fe_values.JxW(q));
+                }
+              else
+                {
+                  // Pointwise data of the selected hyperelastic law at the
+                  // deformation gradient F = I + grad(w).
+                  const HyperelasticPointData<spacedim> data =
+                    evaluate_hyperelastic_point_data<model>(grad_w_current[q],
+                                                            par.lame_mu,
+                                                            par.lame_lambda);
+
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                      {
+                        const double elastic_ij =
+                          tangent_entry<model>(grad_phi_w[i],
+                                               grad_phi_w[j],
+                                               data,
+                                               par.lame_mu,
+                                               par.lame_lambda);
+                        add_elastic_entries(i, j, elastic_ij, fe_values.JxW(q));
+                      }
+                }
+            }
+
+          cell->get_dof_indices(local_dof_indices);
+          solid_constraints.distribute_local_to_global(cell_matrix,
+                                                       local_dof_indices,
+                                                       solid_matrix);
+          solid_constraints.distribute_local_to_global(cell_preconditioner,
+                                                       local_dof_indices,
+                                                       solid_preconditioner);
+        }
+    solid_matrix.compress(VectorOperation::add);
+    solid_preconditioner.compress(VectorOperation::add);
+
+
+    // Provide the rigid-body translational modes (near-null-space) to the
+    // elasticity AMG preconditioner. Without these, Trilinos aggregation
+    // across MPI partition boundaries can degenerate
+    auto       disp_amg_data = make_amg_additional_data(solid_fe->degree, true);
+    const auto constant_modes =
+      DoFTools::extract_constant_modes(solid_dh,
+                                       solid_fe->component_mask(displacement));
+    disp_amg_data.constant_modes = constant_modes;
+
+    solid_displacement_preconditioner.initialize(solid_matrix.block(0, 0),
+                                                 disp_amg_data);
+    solid_lagrange_preconditioner.initialize(
+      solid_preconditioner.block(1, 1),
+      make_amg_additional_data(solid_fe->degree, true));
+  }
+
+
+
+  // Same compile-time model selection as assemble_elasticity_system(): the
+  // nonlinear extra right-hand side (K_s(w) w)_i - N_i, which carries all
+  // nonlinearity of the elasticity part after linearizing around the current
+  // configuration, is only assembled for the two hyperelastic laws.
+  template <int dim, int spacedim>
+  template <SolidModel model>
+  inline void
+  NavierStokesImmersedProblem<dim, spacedim>::assemble_elasticity_rhs(
+    const double &alpha)
+  {
+    solid_system_rhs = 0;
+
+    TimerOutput::Scope t(computing_timer, "Assemble Elastic rhs terms");
+
+    FEValues<spacedim> fe_values_rhs(*solid_fe,
+                                     solid_quadrature,
+                                     update_values | update_gradients |
+                                       update_quadrature_points |
+                                       update_JxW_values);
+
+    FEValues<spacedim> fe_values_matrix(*solid_fe,
+                                        solid_quadrature,
+                                        update_values | update_gradients |
+                                          update_JxW_values);
+
+    const unsigned int dofs_per_cell = solid_fe->n_dofs_per_cell();
+    const unsigned int n_q_points    = solid_quadrature.size();
+
+    FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
+    Vector<double>     cell_rhs(dofs_per_cell);
+
+    std::vector<SymmetricTensor<2, spacedim>> grad_eps_phi_w(dofs_per_cell);
+    std::vector<Tensor<2, spacedim>>          grad_phi_w(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          phi_w(dofs_per_cell);
+    std::vector<double>                       div_phi_w(dofs_per_cell);
+    std::vector<Tensor<1, spacedim>>          phi_lagrange(dofs_per_cell);
+
+    std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
+
+    std::vector<Tensor<1, spacedim>> w_old(n_q_points);
+    std::vector<Vector<double>>      solid_rhs_values(n_q_points,
+                                                 Vector<double>(2 * spacedim));
+
+    // Gradient of the displacement w used to linearize the nonlinear laws:
+    // the current configuration (the last converged solution). Only the
+    // nonlinear models need it, so the call below is compiled out for the
+    // linear model.
+    std::vector<Tensor<2, spacedim>> grad_w_current(n_q_points);
+
+    for (const auto &cell : solid_dh.active_cell_iterators())
+      if (cell->is_locally_owned())
+        {
+          fe_values_rhs.reinit(cell);
+
+          fe_values_rhs[displacement].get_function_values(
+            solid_locally_relevant_solution_old, w_old);
+
+          if constexpr (model != SolidModel::linear)
+            fe_values_rhs[displacement].get_function_gradients(
+              solid_locally_relevant_solution, grad_w_current);
+
+          par.solid_rhs.vector_value_list(fe_values_rhs.get_quadrature_points(),
+                                          solid_rhs_values);
+
+          cell_rhs = 0;
+          for (unsigned int q = 0; q < n_q_points; ++q)
+            {
+              // Linear part of the right-hand side, shared by all models:
+              // the previous-displacement term and the solid body force.
+              const auto add_linear_rhs = [&](const unsigned int i) {
+                const auto &phi_lagrange =
+                  fe_values_rhs[lagrange_multiplier].value(i, q);
+                const auto comp_i =
+                  solid_fe->system_to_component_index(i).first;
+
+                cell_rhs(i) += (-w_old[q] * alpha * phi_lagrange +
+                                solid_rhs_values[q](comp_i) *
+                                  fe_values_rhs.shape_value(i, q)) *
+                               fe_values_rhs.JxW(q);
+              };
+
+              if constexpr (model == SolidModel::linear)
+                {
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    add_linear_rhs(i);
+                }
+              else
+                {
+                  // Pointwise data of the selected hyperelastic law at the
+                  // deformation gradient F = I + grad(w). Because we solve
+                  // for the full solution (not for an increment), the solid
+                  // displacement row picks up the extra right-hand side
+                  // (K_s(w) w)_i - N_i, with internal force
+                  // N_i = (P(F), grad chi_i).
+                  const HyperelasticPointData<spacedim> data =
+                    evaluate_hyperelastic_point_data<model>(grad_w_current[q],
+                                                            par.lame_mu,
+                                                            par.lame_lambda);
+
+                  for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                    {
+                      add_linear_rhs(i);
+
+                      const Tensor<2, spacedim> grad_phi_i =
+                        fe_values_rhs[displacement].gradient(i, q);
+                      const Tensor<2, spacedim> H = grad_w_current[q];
+                      // (K_s(w) w)_i - N_i: after linearizing the internal
+                      // force around the current configuration, this is the
+                      // term that carries all nonlinearity of the elasticity
+                      // part to the right-hand side.
+                      const double nonlinear_rhs_ij = rhs_entry<model>(
+                        grad_phi_i, data, H, par.lame_mu, par.lame_lambda);
+                      cell_rhs(i) += nonlinear_rhs_ij * fe_values_rhs.JxW(q);
+                    }
+                }
+            }
+          cell->get_dof_indices(local_dof_indices);
+
+          if (cell->at_boundary())
+            {
+              fe_values_matrix.reinit(cell);
+              cell_matrix = 0;
+
+              // Add the elastic stiffness and the Lagrange-multiplier
+              // coupling entries of the boundary matrix, shared by all
+              // constitutive models.
+              const auto add_boundary_entries = [&](const unsigned int i,
+                                                    const unsigned int j,
+                                                    const double elastic_ij,
+                                                    const double JxW) {
+                cell_matrix(i, j) += (elastic_ij -
+                                      // lagrange * disp
+                                      (phi_lagrange[i] * phi_w[j] * alpha) -
+                                      // disp * lagrange
+                                      (phi_w[i] * phi_lagrange[j]) +
+                                      // lagr * lagr
+                                      phi_lagrange[i] * phi_lagrange[j]) *
+                                     // JxW
+                                     JxW;
+              };
+
+              for (unsigned int q = 0; q < n_q_points; ++q)
+                {
+                  for (unsigned int k = 0; k < dofs_per_cell; ++k)
+                    {
+                      grad_eps_phi_w[k] =
+                        fe_values_matrix[displacement].symmetric_gradient(k, q);
+                      grad_phi_w[k] =
+                        fe_values_matrix[displacement].gradient(k, q);
+                      div_phi_w[k] =
+                        fe_values_matrix[displacement].divergence(k, q);
+                      phi_w[k] = fe_values_matrix[displacement].value(k, q);
+                      phi_lagrange[k] =
+                        fe_values_matrix[lagrange_multiplier].value(k, q);
+                    }
+
+                  if constexpr (model == SolidModel::linear)
+                    {
+                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                          add_boundary_entries(
+                            i,
+                            j,
+                            2 * par.lame_mu *
+                                scalar_product(grad_eps_phi_w[i],
+                                               grad_eps_phi_w[j]) +
+                              par.lame_lambda * div_phi_w[i] * div_phi_w[j],
+                            fe_values_matrix.JxW(q));
+                    }
+                  else
+                    {
+                      const HyperelasticPointData<spacedim> data =
+                        evaluate_hyperelastic_point_data<model>(
+                          grad_w_current[q], par.lame_mu, par.lame_lambda);
+
+                      for (unsigned int i = 0; i < dofs_per_cell; ++i)
+                        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+                          {
+                            const double elastic_ij =
+                              tangent_entry<model>(grad_phi_w[i],
+                                                   grad_phi_w[j],
+                                                   data,
+                                                   par.lame_mu,
+                                                   par.lame_lambda);
+                            add_boundary_entries(i,
+                                                 j,
+                                                 elastic_ij,
+                                                 fe_values_matrix.JxW(q));
+                          }
+                    }
+                }
+              solid_constraints.distribute_local_to_global(cell_rhs,
+                                                           local_dof_indices,
+                                                           solid_system_rhs,
+                                                           cell_matrix);
+            }
+          else
+            {
+              solid_constraints.distribute_local_to_global(cell_rhs,
+                                                           local_dof_indices,
+                                                           solid_system_rhs);
+            }
+        }
+    solid_system_rhs.compress(VectorOperation::add);
+  }
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::assemble_coupling()
+  {
+    TimerOutput::Scope t(computing_timer, "Assemble Coupling terms");
+    Assert(dof_handler_coupling,
+           ExcMessage(
+             "setup_coupling() must be called before assemble_coupling()."));
+    // const auto &constraints = active_fluid_constraints();
+
+    coupling_matrix           = 0;
+    coupling_transpose_matrix = 0;
+    dof_handler_coupling->create_coupling_mass_matrix(
+      coupling_quadrature,
+      coupling_matrix,
+      // constraints,
+      // solid_constraints,
+      AffineConstraints<double>(),
+      AffineConstraints<double>(),
+      false,
+      true);
+    dof_handler_coupling->create_coupling_mass_matrix(
+      coupling_quadrature,
+      coupling_transpose_matrix,
+      AffineConstraints<double>(),
+      AffineConstraints<double>(),
+      // constraints,
+      // solid_constraints,
+      true,
+      true);
+  }
+
+
+
+  // @sect4{Solving the coupled system}
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::solve(double tolerance)
+  {
+    TimerOutput::Scope t(computing_timer, "Solve");
+    const auto        &constraints = active_fluid_constraints();
+
+    if (par.solver_type == SolverType::mumps)
+      {
+        // The monolithic direct MUMPS solver has been removed from this
+        // program. Only the augmented-split iterative solver is available.
+        DEAL_II_NOT_IMPLEMENTED();
+        return;
+      }
+
+    using Vec   = LA::MPI::Vector;
+    using LinOp = LinearOperator<Vec>;
+
+    const auto A  = LinOp(fluid_matrix.block(0, 0));
+    const auto Bt = LinOp(fluid_matrix.block(0, 1));
+    const auto B  = LinOp(fluid_matrix.block(1, 0));
+    const auto Z6 = 0.0 * LinOp(fluid_matrix.block(1, 1));
+    const auto Mp = LinOp(fluid_mass_matrix.block(1, 1));
+
+    const auto K = LinOp(solid_matrix.block(0, 0));
+    const auto Dt =
+      LinOp(solid_matrix.block(0, 1)); // C2^T (minus sign already included)
+    const auto D = LinOp(
+      solid_matrix.block(1, 0)); // alpha * C2 (minus sign already included)
+    const auto M = LinOp(solid_preconditioner.block(1, 1));
+
+    const auto C   = 1.0 * LinOp(coupling_matrix.block(1, 0));
+    const auto Ct  = 1.0 * LinOp(coupling_transpose_matrix.block(0, 1));
+    const auto Z2t = 0.0 * LinOp(coupling_transpose_matrix.block(1, 0));
+    const auto Z2  = 0.0 * LinOp(coupling_matrix.block(0, 1));
+    const auto Z3  = 0.0 * LinOp(coupling_matrix.block(1, 1));
+    const auto Z3t = 0.0 * LinOp(coupling_transpose_matrix.block(1, 1));
+
+    const auto Z4 = 0.0 * M;
+    using BVec    = typename LA::MPI::BlockVector;
+
+    // Inversion of the mass matrices
+    SolverControl inner_solver_control(par.inner_max_iterations,
+                                       par.inner_tolerance,
+                                       false,
+                                       false);
+    SolverCG<Vec> cg_solver(inner_solver_control);
+
+    auto invMp = inverse_operator(Mp, cg_solver, fluid_pressure_preconditioner);
+    auto invW  = inverse_operator(M, cg_solver, solid_lagrange_preconditioner);
+
+    // scale by h^2 to match the scaling of the Lagrange multiplier duality
+    // pairing
+    invW *= 1.0 / (solid_cell_diameter * solid_cell_diameter);
+
+    const auto gamma1 = par.gamma_AL_background;
+    const auto gamma2 = par.gamma_AL_immersed;
+
+    auto A11_aug = null_operator(A);
+    if (use_operator_augmentation())
+      A11_aug = A;
+    else
+      A11_aug = A + gamma1 * Ct * invW * C + gamma1 * Bt * invMp * B;
+
+
+    const auto Dtr = transpose_operator(D); // D^T = -alpha*M_s (M_s symmetric)
+    auto       A22_aug = K + gamma2 * Dtr * invW * D;
+    auto       A12_aug = gamma1 * Ct * invW * D;
+    auto       A21_aug = gamma2 * Dtr * invW * C;
+
+    SolverControl inner_solver_control_lagrangian(
+      par.inner_lagrangian_max_iterations,
+      par.inner_lagrangian_tolerance,
+      false,
+      par.log_inner_lagrangian_iterations);
+    SolverCG<Vec> cg_solver_lagrangian(inner_solver_control_lagrangian);
+
+    auto A11_aug_inv =
+      inverse_operator(A11_aug,
+                       cg_solver_lagrangian,
+                       fluid_velocity_preconditioner); // inverse of fluid
+                                                       // velocity block
+
+    auto A22_aug_inv =
+      inverse_operator(A22_aug,
+                       cg_solver_lagrangian,
+                       solid_displacement_preconditioner); // inverse of solid
+                                                           // displacement block
+
+
+    // std::array<std::array<LinOp, 4>, 4> system_array = {
+    //   {{{A, Z1t, CtM, Bt}},  // vel
+    //    {{Z1, K, Dt, Z2t}},   // disp
+    //    {{MC, D, Z4, Z3}},    // lagr
+    //    {{B, Z2, Z3t, Z6}}}}; // pres
+
+    std::array<std::array<LinOp, 4>, 4> system_array = {
+      {{{A11_aug, A12_aug, Ct, Bt}},  // vel
+       {{A21_aug, A22_aug, Dt, Z2t}}, // disp
+       {{C, D, Z4, Z3}},              // lagr
+       {{B, Z2, Z3t, Z6}}}};          // pres
+
+    const auto system  = block_operator<4, 4, BVec>(system_array);
+    auto       prec_AL = system;
+
+    prec_AL.vmult = [&](auto &v, const auto &u) {
+      v.block(0) = 0.;
+      v.block(1) = 0.;
+      v.block(2) = 0.;
+      v.block(3) = 0.;
+
+      v.block(3) = -gamma1 * invMp * u.block(3);
+      v.block(2) = -gamma1 * invW * u.block(2);
+      v.block(1) = A22_aug_inv * (u.block(1) - Dt * v.block(2));
+      v.block(0) = A11_aug_inv * (u.block(0) - A12_aug * v.block(1) -
+                                  Ct * v.block(2) - Bt * v.block(3));
+    };
+
+
+
+    const std::vector<IndexSet> block_partitioning = {fluid_owned_dofs[0],
+                                                      solid_owned_dofs[0],
+                                                      solid_owned_dofs[1],
+                                                      fluid_owned_dofs[1]};
+    BVec                        block_system_rhs, block_system_solution;
+    block_system_rhs.reinit(block_partitioning, mpi_communicator);
+    block_system_rhs.block(0) = fluid_system_rhs.block(0);
+    block_system_rhs.block(1) = solid_system_rhs.block(0);
+    block_system_rhs.block(2) = solid_system_rhs.block(1);
+    block_system_rhs.block(3) = fluid_system_rhs.block(1);
+
+    // Augment the RHS consistently with the operator augmentation above so the
+    // solution is unchanged. The w-row uses D^T (Dtr), matching
+    // A21_aug/A22_aug.
+    block_system_rhs.block(0) += gamma1 * Ct * invW * block_system_rhs.block(2);
+    block_system_rhs.block(1) +=
+      gamma2 * Dtr * invW * block_system_rhs.block(2);
+
+
+    block_system_solution.reinit(block_system_rhs);
+    block_system_solution.block(0) =
+      fluid_locally_relevant_solution.block(0); // u
+    block_system_solution.block(1) =
+      solid_locally_relevant_solution.block(0); // w
+    block_system_solution.block(2) =
+      solid_locally_relevant_solution.block(1); // lambda
+    block_system_solution.block(3) =
+      fluid_locally_relevant_solution.block(1); // p
+
+    // Gather statistics on the number of iterations spent in the inner solves.
+    unsigned int inner_iteration_calls     = 0;
+    unsigned int inner_solves              = 0;
+    unsigned int augmented_iteration_calls = 0;
+    unsigned int augmented_solves          = 0;
+
+    const auto inner_iteration_connection = cg_solver.connect(
+      [&inner_iteration_calls,
+       &inner_solves](const unsigned int iteration, const double, const Vec &) {
+        ++inner_iteration_calls;
+        if (iteration == 0)
+          ++inner_solves;
+        return SolverControl::success;
+      });
+
+    const auto augmented_iteration_connection = cg_solver_lagrangian.connect(
+      [&augmented_iteration_calls, &augmented_solves](
+        const unsigned int iteration, const double, const Vec &) {
+        ++augmented_iteration_calls;
+        if (iteration == 0)
+          ++augmented_solves;
+        return SolverControl::success;
+      });
+
+    SolverControl                      solver_control(par.outer_max_iterations,
+                                 std::max(par.outer_tolerance, tolerance),
+                                 true,
+                                 false);
+    SolverFGMRES<LA::MPI::BlockVector> solver(
+      solver_control,
+      typename SolverFGMRES<LA::MPI::BlockVector>::AdditionalData(
+        par.outer_max_basis_size));
+
+    constraints.set_zero(fluid_solution);
+
+    solver.solve(system, block_system_solution, block_system_rhs, prec_AL);
+    fluid_solution.block(0) = block_system_solution.block(0);
+    solid_solution.block(0) = block_system_solution.block(1);
+    solid_solution.block(1) = block_system_solution.block(2);
+    fluid_solution.block(1) = block_system_solution.block(3);
+
+    // Disconnect the iteration counters now that all inner solves are done.
+    inner_iteration_connection.disconnect();
+    augmented_iteration_connection.disconnect();
+
+    // Recover the exact iteration totals (see the note above the connections):
+    // the number of true iterations is the number of signal calls minus the
+    // number of solves (which accounts for the iteration-0 convergence check).
+    const unsigned int inner_iterations = inner_iteration_calls - inner_solves;
+    const unsigned int augmented_iterations =
+      augmented_iteration_calls - augmented_solves;
+
+    pcout << "   Solved in " << solver_control.last_step() << " iterations."
+          << std::endl;
+    pcout << "   Augmented-system solves: " << augmented_solves
+          << ", total iterations: " << augmented_iterations << " (avg "
+          << (augmented_solves > 0 ?
+                static_cast<double>(augmented_iterations) / augmented_solves :
+                0.0)
+          << " per solve)." << std::endl;
+    pcout << "   Inner mass-matrix solves: " << inner_solves
+          << ", total iterations: " << inner_iterations << " (avg "
+          << (inner_solves > 0 ?
+                static_cast<double>(inner_iterations) / inner_solves :
+                0.0)
+          << " per solve)." << std::endl;
+
+    constraints.distribute(fluid_solution);
+    solid_constraints.distribute(solid_solution);
+
+    // Normalize the pressure to zero mean only when the fluid domain is fully
+    // enclosed by Dirichlet boundaries: in that case the pressure is defined
+    // only up to an additive constant.
+    if (!fluid_has_open_boundary)
+      {
+        if (fluid_constant_pressure.size() == 0)
+          {
+            fluid_constant_pressure.reinit(fluid_solution);
+            fluid_constant_pressure.block(1) =
+              invMp * fluid_dual_of_constant_pressure.block(1);
+          }
+
+        const auto avg_pressure =
+          fluid_dual_of_constant_pressure * fluid_solution;
+
+        fluid_solution.block(1).add(-avg_pressure,
+                                    fluid_constant_pressure.block(1));
+      }
+
+    fluid_locally_relevant_solution = fluid_solution;
+    solid_locally_relevant_solution = solid_solution;
+  }
+
+
+
+  // @sect4{Mesh refinement}
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::refine_and_transfer()
+  {
+    TimerOutput::Scope t(computing_timer, "Refine");
+
+    Vector<float> error_per_cell(fluid_tria.n_active_cells());
+    KellyErrorEstimator<spacedim>::estimate(fluid_dh,
+                                            QGauss<spacedim - 1>(
+                                              fluid_fe->degree + 1),
+                                            {},
+                                            fluid_locally_relevant_solution,
+                                            error_per_cell,
+                                            fluid_fe->component_mask(velocity));
+
+    if (par.refinement_strategy == "fixed_fraction")
+      {
+        parallel::distributed::GridRefinement::
+          refine_and_coarsen_fixed_fraction(fluid_tria,
+                                            error_per_cell,
+                                            par.refinement_fraction,
+                                            par.coarsening_fraction);
+      }
+    else if (par.refinement_strategy == "fixed_number")
+      {
+        parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
+          fluid_tria,
+          error_per_cell,
+          par.refinement_fraction,
+          par.coarsening_fraction,
+          par.max_cells);
+      }
+
+    for (const auto &cell : fluid_tria.active_cell_iterators())
+      {
+        if (cell->refine_flag_set() &&
+            cell->level() == par.max_level_refinement)
+          cell->clear_refine_flag();
+        if (cell->coarsen_flag_set() &&
+            cell->level() == par.min_level_refinement)
+          cell->clear_coarsen_flag();
+      }
+
+    SolutionTransfer<spacedim, LA::MPI::BlockVector> transfer(fluid_dh);
+
+    fluid_tria.prepare_coarsening_and_refinement();
+    transfer.prepare_for_coarsening_and_refinement(
+      fluid_locally_relevant_solution);
+
+    fluid_tria.execute_coarsening_and_refinement();
+
+    setup_dofs();
+
+    transfer.interpolate(fluid_solution);
+
+    fluid_constraints.distribute(fluid_solution);
+    fluid_locally_relevant_solution = fluid_solution;
+  }
+
+
+
+  // @sect4{Output and visualization}
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::output_results(
+    const unsigned int cycle,
+    double             time) const
+  {
+    DataOutBase::VtkFlags flags;
+    flags.write_higher_order_cells = true;
+
+    // Fluid solution
+    {
+      TimerOutput::Scope t(computing_timer, "Output fluid");
+
+      std::vector<std::string> solution_names(spacedim, "velocity");
+      solution_names.emplace_back("pressure");
+      std::vector<DataComponentInterpretation::DataComponentInterpretation>
+        data_component_interpretation(
+          spacedim, DataComponentInterpretation::component_is_part_of_vector);
+      data_component_interpretation.push_back(
+        DataComponentInterpretation::component_is_scalar);
+
+      DataOut<spacedim> data_out;
+      data_out.attach_dof_handler(fluid_dh);
+      data_out.add_data_vector(fluid_locally_relevant_solution,
+                               solution_names,
+                               DataOut<spacedim>::type_dof_data,
+                               data_component_interpretation);
+      data_out.set_flags(flags);
+
+
+      Vector<float> subdomain(fluid_tria.n_active_cells());
+      for (unsigned int i = 0; i < subdomain.size(); ++i)
+        subdomain(i) = fluid_tria.locally_owned_subdomain();
+      data_out.add_data_vector(subdomain, "subdomain");
+
+      data_out.build_patches();
+
+      const std::string filename =
+        "solution-" + Utilities::int_to_string(cycle) + ".vtu";
+      data_out.write_vtu_in_parallel(par.output_directory + "/" + filename,
+                                     mpi_communicator);
+
+      static std::vector<std::pair<double, std::string>> times_and_names;
+      times_and_names.emplace_back(std::make_pair(time, filename));
+      std::ofstream ofile(par.output_directory + "/" + "solution.pvd");
+      DataOutBase::write_pvd_record(ofile, times_and_names);
+    }
+
+    // Solid solution
+    {
+      TimerOutput::Scope t(computing_timer, "Output solid");
+
+      std::vector<std::string> solution_names(2 * spacedim);
+      for (unsigned int i = 0; i < spacedim; ++i)
+        solution_names[i] = "displacement";
+      for (unsigned int i = spacedim; i < 2 * spacedim; ++i)
+        solution_names[i] = "lagrange_multiplier";
+
+      std::vector<DataComponentInterpretation::DataComponentInterpretation>
+        data_component_interpretation(
+          2 * spacedim,
+          DataComponentInterpretation::component_is_part_of_vector);
+
+      DataOut<spacedim> data_out;
+      data_out.attach_dof_handler(solid_dh);
+      data_out.add_data_vector(solid_locally_relevant_solution,
+                               solution_names,
+                               DataOut<spacedim>::type_dof_data,
+                               data_component_interpretation);
+
+      data_out.set_flags(flags);
+
+      Vector<float> subdomain(solid_tria.n_active_cells());
+      for (unsigned int i = 0; i < subdomain.size(); ++i)
+        subdomain(i) = solid_tria.locally_owned_subdomain();
+      data_out.add_data_vector(subdomain, "subdomain");
+
+      data_out.build_patches();
+
+      const std::string filename =
+        "solution-solid-" + Utilities::int_to_string(cycle) + ".vtu";
+      data_out.write_vtu_in_parallel(par.output_directory + "/" + filename,
+                                     mpi_communicator);
+
+      static std::vector<std::pair<double, std::string>> times_and_names;
+      times_and_names.emplace_back(std::make_pair(time, filename));
+      std::ofstream ofile(par.output_directory + "/" + "solution-solid.pvd");
+      DataOutBase::write_pvd_record(ofile, times_and_names);
+    }
+  }
+
+
+
+  // @sect4{Time loop}
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::run()
+  {
+#ifdef USE_PETSC_LA
+    pcout << "Running NavierStokesImmersedProblem<"
+          << Utilities::dim_string(dim, spacedim) << "> using PETSc."
+          << std::endl;
+#else
+    pcout << "Running NavierStokesImmersedProblem<"
+          << Utilities::dim_string(dim, spacedim) << "> using Trilinos."
+          << std::endl;
+#endif
+    // Verify that the output folder exists, if it does not, create it
+    if (!std::filesystem::exists(par.output_directory))
+      std::filesystem::create_directory(par.output_directory);
+
+    par.prm.print_parameters(par.output_directory + "/" + "used_parameters_" +
+                               std::to_string(dim) + std::to_string(spacedim) +
+                               ".prm",
+                             ParameterHandler::Short);
+
+    double       time_step    = par.final_time / (par.number_of_time_steps - 1);
+    double       time         = 0;
+    unsigned int output_cycle = 0;
+
+    for (unsigned int cycle = 0; time < par.final_time;
+         ++cycle, time += time_step)
+      {
+        par.set_time(time);
+        pcout << "Cycle " << cycle << ':' << std::endl
+              << "Time : " << time << ", time step: " << time_step << std::endl;
+
+        if (cycle == 0)
+          {
+            make_grid();
+            initial_setup();
+            setup_dofs();
+            interpolate_initial_conditions();
+            output_results(output_cycle, time);
+          }
+
+        if (cycle == 0 || use_operator_augmentation())
+          assemble_navier_stokes_system(1. / time_step);
+
+        assemble_navier_stokes_rhs(1. / time_step);
+
+        check_immersed_mapping_is_valid();
+        setup_coupling();
+        assemble_coupling();
+
+        // Assemble the elasticity system and right-hand side for the
+        // constitutive model selected in the parameter file. The runtime
+        // enum value only picks one of the compile-time instantiations; the
+        // assembly kernels themselves contain no runtime branch on the model.
+        switch (par.solid_model)
+          {
+            case SolidModel::linear:
+              // Linear model: the stiffness is time-independent.
+              if (cycle == 0)
+                assemble_elasticity_system<SolidModel::linear>(1. / time_step);
+              assemble_elasticity_rhs<SolidModel::linear>(1. / time_step);
+              break;
+
+            // Semi-implicit scheme for the nonlinear laws: linearize the
+            // internal force around the current configuration w^n (the last
+            // converged solution), and move all nonlinear terms of the
+            // elasticity part, K_s(w^n) w^n - N(w^n), to the right-hand
+            // side. The tangent stiffness is reassembled at w^n once per
+            // time step, and the time advancement requires a single linear
+            // solve.
+            case SolidModel::exponential:
+              assemble_elasticity_system<SolidModel::exponential>(1. /
+                                                                  time_step);
+              assemble_elasticity_rhs<SolidModel::exponential>(1. / time_step);
+              break;
+
+            case SolidModel::neo_hookean:
+              assemble_elasticity_system<SolidModel::neo_hookean>(1. /
+                                                                  time_step);
+              assemble_elasticity_rhs<SolidModel::neo_hookean>(1. / time_step);
+              break;
+          }
+        solve();
+
+        // Move the solid to its new configuration. The immersed mapping is
+        // built on top of solid_current_position, so the coupling
+        // automatically sees the updated geometry.
+        update_solid_current_position();
+
+        if (cycle % par.output_frequency == 0)
+          {
+            output_results(output_cycle + 1, time + time_step);
+            ++output_cycle;
+          }
+        // if (cycle % par.refinement_frequency == 0 &&
+        //     cycle != par.number_of_time_steps - 1)
+        //   refine_and_transfer();
+
+        fluid_locally_relevant_solution_old = fluid_locally_relevant_solution;
+        solid_locally_relevant_solution_old = solid_locally_relevant_solution;
+      }
+  }
+} // namespace Step80
+
+
+
+// @sect3{The main() function}
+#ifndef STEP_80_WITHOUT_MAIN
+int main(int argc, char *argv[])
+{
+  using namespace Step80;
+  using namespace dealii;
+  try
+    {
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+      deallog.depth_console(
+        Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0 ? 10 : 0);
+
+      std::string prm_file, output_prm, short_prm;
+      if (argc > 1)
+        prm_file = argv[1];
+      else
+        prm_file = "parameters.prm";
+
+      if (argc > 2)
+        output_prm = argv[2];
+      else
+        output_prm = "";
+
+      if (argc > 3)
+        short_prm = argv[3];
+      else
+        short_prm = "";
+
+      // Extract the dimension from the parameter file.
+      auto [dim, spacedim] = get_dimension_and_spacedimension(prm_file);
+
+      if (dim == 2 && spacedim == 2)
+        {
+          NavierStokesImmersedProblemParameters<2> par;
+          ParameterAcceptor::initialize(prm_file, output_prm);
+          if (short_prm != "")
+            ParameterAcceptor::prm.print_parameters(
+              short_prm, ParameterHandler::KeepOnlyChanged);
+
+          NavierStokesImmersedProblem<2> problem(par);
+          problem.run();
+        }
+      else if (dim == 3 && spacedim == 3)
+        {
+          NavierStokesImmersedProblemParameters<3> par;
+          ParameterAcceptor::initialize(prm_file, output_prm);
+          if (short_prm != "")
+            ParameterAcceptor::prm.print_parameters(
+              short_prm, ParameterHandler::KeepOnlyChanged);
+
+          NavierStokesImmersedProblem<3> problem(par);
+          problem.run();
+        }
+      else
+        {
+          AssertThrow(false,
+                      ExcNotImplemented(
+                        "The combination of dimension " + std::to_string(dim) +
+                        " and spacedimension " + std::to_string(spacedim) +
+                        " is not implemented."));
+        }
+    }
+  catch (std::exception &exc)
+    {
+      std::cerr << std::endl
+                << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Exception on processing: " << std::endl
+                << exc.what() << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+
+      return 1;
+    }
+  catch (...)
+    {
+      std::cerr << std::endl
+                << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      std::cerr << "Unknown exception!" << std::endl
+                << "Aborting!" << std::endl
+                << "----------------------------------------------------"
+                << std::endl;
+      return 1;
+    }
+
+  return 0;
+}
+#endif
