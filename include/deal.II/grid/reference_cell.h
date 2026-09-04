@@ -4628,9 +4628,13 @@ ReferenceCell<dim>::get_combined_orientation(
       {
         bool match = true;
         for (unsigned int j = 0; j < n_vertices; ++j)
-          match = (match && vertices_0[j] == vertices_1[table[o][j]]);
+          {
+            match &= (vertices_0[j] == vertices_1[table[o][j]]);
+            if (match == false)
+              break;
+          }
 
-        if (match)
+        if (match == true)
           return o;
       }
 
