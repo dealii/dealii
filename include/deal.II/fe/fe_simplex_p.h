@@ -17,6 +17,7 @@
 
 #include <deal.II/base/mutex.h>
 #include <deal.II/base/polynomials_barycentric.h>
+#include <deal.II/base/polynomials_simplex.h>
 #include <deal.II/base/types.h>
 
 #include <deal.II/fe/fe_poly.h>
@@ -37,6 +38,18 @@ class FE_SimplexPoly : public dealii::FE_Poly<dim, spacedim>
 public:
   /**
    * Constructor.
+   */
+  FE_SimplexPoly(
+    const ScalarLagrangePolynomialSimplex<dim>    &polynomials,
+    const FiniteElementData<dim>                  &fe_data,
+    const bool                                     prolongation_is_additive,
+    const std::vector<Point<dim>>                 &unit_support_points,
+    const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
+    const FullMatrix<double>                      &interface_constraints);
+
+  /**
+   * Similar to the other constructor but takes barycentric polynomials as an
+   * argument. Needed for FE_SimplexP_Bubbles.
    */
   FE_SimplexPoly(
     const BarycentricPolynomials<dim>              polynomials,
