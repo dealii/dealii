@@ -74,16 +74,6 @@ public:
   compute_value(const unsigned int i, const Point<dim> &p) const override;
 
   /**
-   * @copydoc ScalarPolynomialsBase::compute_derivative()
-   *
-   * @note Implemented for first derivative, for simplices also the second
-   * derivative is implemented.
-   */
-  template <int order>
-  Tensor<order, dim>
-  compute_derivative(const unsigned int i, const Point<dim> &p) const;
-
-  /**
    * @copydoc ScalarPolynomialsBase::compute_1st_derivative()
    */
   Tensor<1, dim>
@@ -102,7 +92,7 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_3rd_derivative()
    *
-   * @note Not implemented yet.
+   * @note Only implemented for simplices.
    */
   Tensor<3, dim>
   compute_3rd_derivative(const unsigned int i,
@@ -111,7 +101,7 @@ public:
   /**
    * @copydoc ScalarPolynomialsBase::compute_4th_derivative()
    *
-   * @note Not implemented yet.
+   * @note Only implemented for simplices.
    */
   Tensor<4, dim>
   compute_4th_derivative(const unsigned int i,
@@ -205,39 +195,26 @@ protected:
   virtual Tensor<2, dim>
   evaluate_orthogonal_basis_2nd_derivative(const unsigned int i,
                                            const Point<dim>  &p) const;
+
+  /**
+   * Evaluate the 3rd derivative of the orthogonal basis function @p i at point
+   * @p p. This function determines the corresponding indices for the Jacobi
+   * polynomials and calls the function taking all indices as arguments.
+   */
+  virtual Tensor<3, dim>
+  evaluate_orthogonal_basis_3rd_derivative(const unsigned int i,
+                                           const Point<dim>  &p) const;
+
+  /**
+   * Evaluate the 4th derivative of the orthogonal basis function @p i at point
+   * @p p. This function determines the corresponding indices for the Jacobi
+   * polynomials and calls the function taking all indices as arguments.
+   */
+  virtual Tensor<4, dim>
+  evaluate_orthogonal_basis_4th_derivative(const unsigned int i,
+                                           const Point<dim>  &p) const;
 };
 
-
-
-template <int dim>
-template <int order>
-Tensor<order, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  Tensor<order, dim> der;
-
-  if constexpr (order == 1)
-    {
-      const auto grad = compute_grad(i, p);
-
-      for (unsigned int i = 0; i < dim; ++i)
-        der[i] = grad[i];
-    }
-  else if (order == 2)
-    {
-      const auto grad_grad = compute_grad_grad(i, p);
-
-      for (unsigned int i = 0; i < dim; ++i)
-        for (unsigned int e = 0; e < dim; ++e)
-          der[i][e] = grad_grad[i][e];
-    }
-  else
-    DEAL_II_NOT_IMPLEMENTED();
-
-  return der;
-}
 
 DEAL_II_NAMESPACE_CLOSE
 
