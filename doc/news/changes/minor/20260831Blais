@@ -1,0 +1,10 @@
+Fixed: Particles::ParticleHandler::sort_particles_into_subdomains_and_cells()
+also searched artificial cells when looking for the new cell of a particle. A
+particle found in such a cell was then scheduled to be sent to
+numbers::artificial_subdomain_id, which triggered an assertion in debug mode
+and silently deleted the particle in release mode without emitting the
+particle_lost signal. Artificial cells are now skipped, so that these
+particles are correctly reported as lost. This behavior is checked by the new
+test particles/particle_handler_sort_03.
+<br>
+(Bruno Blais, 2026/08/31)
