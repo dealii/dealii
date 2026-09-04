@@ -131,6 +131,7 @@ set(_inst
   fe_values_base.inst.in
   fe_values_views.inst.in
   fe_values_views_internal.inst.in
+  fe_values_extractors.inst.in
   fe_values.inst.in
   fe_wedge_p.inst.in
   mapping_c1.inst.in

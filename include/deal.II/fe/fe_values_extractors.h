@@ -385,7 +385,28 @@ namespace FEValuesExtractors
     const Extractor &extractor)
     : extractor(extractor)
   {}
+
+
+  namespace internal
+  {
+
+    /**
+     * @internal
+     * Utility function used to construct a `component_order` vector by
+     * processing a vector of FEValuesExtractors in given order. Supported
+     * extractors are listed in FEValueExtractors::AnyExtractor.
+     */
+    template <int dim, int spacedim>
+    std::vector<unsigned int>
+    generate_component_order(
+      const std::vector<FEValuesExtractors::AnyExtractor> &extractors,
+      const unsigned int                                   fe_n_components);
+
+  } // namespace internal
+
+
 } // namespace FEValuesExtractors
+
 
 
 DEAL_II_NAMESPACE_CLOSE
