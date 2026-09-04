@@ -1,0 +1,8 @@
+Changed: LinearAlgebra::TpetraWrappers::Vector::max() returned the infinity
+norm of the vector rather than the maximal value of its elements, so for a
+vector whose largest-magnitude entry is negative it returned a positive
+number. It now returns the maximal element, as documented and as
+TrilinosWrappers::MPI::Vector::max() has always done. Code relying on the
+previous behaviour should call linfty_norm() instead.
+<br>
+(Ernesto Ismail, 2026/08/26)
