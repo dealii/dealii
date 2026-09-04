@@ -4257,26 +4257,23 @@ template <int dim>
 inline Tensor<1, dim>
 ReferenceCell<dim>::face_normal_vector(const unsigned int face_no) const
 {
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+  AssertIndexRange(face_no, n_faces());
+
   if (is_hyper_cube())
-    {
-      AssertIndexRange(face_no, GeometryInfo<dim>::faces_per_cell);
-      return GeometryInfo<dim>::unit_normal_vector[face_no];
-    }
-  else if (dim == 2)
+    return GeometryInfo<dim>::unit_normal_vector[face_no];
+  else if constexpr (dim == 2)
     {
       Assert(*this == ReferenceCells::Triangle, ExcInternalError());
 
       // Return the rotated vector
       return cross_product_2d(face_tangent_vector(face_no, 0));
     }
-  else if (dim == 3)
-    {
-      return cross_product_3d(face_tangent_vector(face_no, 0),
-                              face_tangent_vector(face_no, 1));
-    }
+  else if constexpr (dim == 3)
+    return cross_product_3d(face_tangent_vector(face_no, 0),
+                            face_tangent_vector(face_no, 1));
 
   DEAL_II_NOT_IMPLEMENTED();
-
   return {};
 }
 
@@ -4286,6 +4283,7 @@ template <int dim>
 inline unsigned int
 ReferenceCell<dim>::n_face_orientations(const unsigned int face_no) const
 {
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
   AssertIndexRange(face_no, n_faces());
 
   switch (face_reference_cell(face_no))
@@ -4316,96 +4314,118 @@ ReferenceCell<dim>::face_to_cell_line_orientation(
   const types::geometric_orientation combined_face_orientation,
   const types::geometric_orientation line_orientation) const
 {
-  constexpr auto                D = numbers::default_geometric_orientation;
-  constexpr auto                R = numbers::reverse_line_orientation;
-  static constexpr unsigned int X = numbers::invalid_unsigned_int;
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+  (void)face_line_no;
+  (void)face_no;
+  (void)combined_face_orientation;
+  (void)line_orientation;
 
-  auto quad_face = [&]() {
-    static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
-      orientation_quad{
-        {{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
-    // We use face_line_no / 2 here since lines i and i + 1 are parallel
-    // and, on a given face, have the same relative orientations.
-    const bool match =
-      line_orientation ==
-      orientation_quad[face_line_no / 2][combined_face_orientation];
-
-    return match ? numbers::default_geometric_orientation :
-                   numbers::reverse_line_orientation;
-  };
-
-  static constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
-    orientation_triangle{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
-
-  switch (this->kind)
+  if constexpr (dim == 0)
+    DEAL_II_NOT_IMPLEMENTED();
+  else if constexpr (dim == 1)
+    DEAL_II_NOT_IMPLEMENTED();
+  else if constexpr (dim == 2)
+    DEAL_II_NOT_IMPLEMENTED();
+  else if constexpr (dim == 3)
     {
-      case ReferenceCells::Tetrahedron:
+      constexpr auto         D = numbers::default_geometric_orientation;
+      constexpr auto         R = numbers::reverse_line_orientation;
+      constexpr unsigned int X = numbers::invalid_unsigned_int;
+
+      auto quad_face = [=]() {
+        static constexpr dealii::ndarray<types::geometric_orientation, 2, 8>
+          orientation_quad{
+            {{{D, D, D, R, R, R, R, D}}, {{D, D, R, D, R, R, D, R}}}};
+        // We use face_line_no / 2 here since lines i and i + 1 are parallel
+        // and, on a given face, have the same relative orientations.
+        const bool match =
+          (line_orientation ==
+           orientation_quad[face_line_no / 2][combined_face_orientation]);
+
+        return match ? numbers::default_geometric_orientation :
+                       numbers::reverse_line_orientation;
+      };
+
+      constexpr dealii::ndarray<types::geometric_orientation, 2, 6>
+        orientation_triangle{{{{D, R, D, R, D, R}}, {{R, D, R, D, R, D}}}};
+
+      switch (this->kind)
         {
-          static constexpr dealii::ndarray<unsigned int, 4, 3> combined_lines{
-            {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
-          const auto combined_line = combined_lines[face_no][face_line_no];
+          case ReferenceCells::Tetrahedron:
+            {
+              static constexpr dealii::ndarray<unsigned int, 4, 3>
+                combined_lines{
+                  {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
+              const auto combined_line = combined_lines[face_no][face_line_no];
 
-          Assert(combined_line != X,
-                 ExcMessage(
-                   "This function can only be called for following face-line "
-                   "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1)"));
+              Assert(
+                combined_line != X,
+                ExcMessage(
+                  "This function can only be called for following face-line "
+                  "combinations: (0,0), (0,1), (0,2), (1,1), (1,2), (2,1)"));
 
-          const bool match =
-            line_orientation ==
-            orientation_triangle[combined_line][combined_face_orientation];
-          return match ? numbers::default_geometric_orientation :
-                         numbers::reverse_line_orientation;
+              const bool match =
+                (line_orientation ==
+                 orientation_triangle[combined_line]
+                                     [combined_face_orientation]);
+              return match ? numbers::default_geometric_orientation :
+                             numbers::reverse_line_orientation;
+            }
+          case ReferenceCells::Wedge:
+            if (face_no < 2)
+              {
+                // lines 0,1,2 (face 0, face_line_no 0,1,2) are not
+                // oriented the same way in the cell and on the face
+                // lines 4,5,6 (face 1, face_line 0,1,2) are
+                // oriented the same way in the cell and on the faces
+                static constexpr dealii::ndarray<unsigned int, 2, 3>
+                           combined_lines{{{{1, 1, 1}}, {{0, 0, 0}}}};
+                const auto combined_line =
+                  combined_lines[face_no][face_line_no];
+
+                const bool match =
+                  (line_orientation ==
+                   orientation_triangle[combined_line]
+                                       [combined_face_orientation]);
+                return match ? numbers::default_geometric_orientation :
+                               numbers::reverse_line_orientation;
+              }
+            else
+              return quad_face();
+          case ReferenceCells::Pyramid:
+            if (face_no == 0)
+              return quad_face();
+            else
+              {
+                // face_line_no 0 already done above
+                Assert(face_line_no == 1 || face_line_no == 2,
+                       ExcMessage(
+                         "Invalid face line number for the triangular faces"));
+
+                // face 0 with lines 0-3 already done above
+                // lines 6 (face 1, face_line_no 1) and 5 (face 2, face_line_no
+                // 1) are oriented the same way in the cell and on the faces
+                // lines 4 (face 1, face_line 2) and 7 (face 2, face_line 2) are
+                // not oriented the same way in the cell and on the faces
+                static constexpr dealii::ndarray<unsigned int, 3, 3>
+                  combined_lines{{{{X, X, X}}, {{X, 0, 1}}, {{X, 0, 1}}}};
+
+                const auto combined_line =
+                  combined_lines[face_no][face_line_no];
+
+                const bool match =
+                  (line_orientation ==
+                   orientation_triangle[combined_line]
+                                       [combined_face_orientation]);
+                return match ? numbers::default_geometric_orientation :
+                               numbers::reverse_line_orientation;
+              }
+          case ReferenceCells::Hexahedron:
+            return quad_face();
         }
-      case ReferenceCells::Wedge:
-        if (face_no < 2)
-          {
-            // lines 0,1,2 (face 0, face_line_no 0,1,2) are not
-            // oriented the same way in the cell and on the face
-            // lines 4,5,6 (face 1, face_line 0,1,2) are
-            // oriented the same way in the cell and on the faces
-            static constexpr dealii::ndarray<unsigned int, 2, 3> combined_lines{
-              {{{1, 1, 1}}, {{0, 0, 0}}}};
-            const auto combined_line = combined_lines[face_no][face_line_no];
-
-            const bool match =
-              line_orientation ==
-              orientation_triangle[combined_line][combined_face_orientation];
-            return match ? numbers::default_geometric_orientation :
-                           numbers::reverse_line_orientation;
-          }
-        else
-          return quad_face();
-      case ReferenceCells::Pyramid:
-        if (face_no == 0)
-          return quad_face();
-        else
-          {
-            // face_line_no 0 already done above
-            Assert(face_line_no == 1 || face_line_no == 2,
-                   ExcMessage(
-                     "Invalid face line number for the triangular faces"));
-
-            // face 0 with lines 0-3 already done above
-            // lines 6 (face 1, face_line_no 1) and 5 (face 2, face_line_no 1)
-            // are oriented the same way in the cell and on the faces lines 4
-            // (face 1, face_line 2) and 7 (face 2, face_line 2) are not
-            // oriented the same way in the cell and on the faces
-            static constexpr dealii::ndarray<unsigned int, 3, 3> combined_lines{
-              {{{X, X, X}}, {{X, 0, 1}}, {{X, 0, 1}}}};
-
-            const auto combined_line = combined_lines[face_no][face_line_no];
-
-            const bool match =
-              line_orientation ==
-              orientation_triangle[combined_line][combined_face_orientation];
-            return match ? numbers::default_geometric_orientation :
-                           numbers::reverse_line_orientation;
-          }
-      case ReferenceCells::Hexahedron:
-        return quad_face();
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
     }
+
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_geometric_orientation;
 }
 
@@ -4415,66 +4435,77 @@ template <int dim>
 inline unsigned int
 ReferenceCell<dim>::opposite_face_index(const unsigned int face_no) const
 {
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
   AssertIndexRange(face_no, n_faces());
-  switch (this->kind)
+
+  if constexpr (dim == 0)
+    DEAL_II_NOT_IMPLEMENTED();
+  else if constexpr (dim == 1)
+    return (face_no + 1) % (this->get_dimension() + 1);
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        DEAL_II_NOT_IMPLEMENTED();
-      case ReferenceCells::Quadrilateral:
+      switch (this->kind)
         {
-          return GeometryInfo<2>::opposite_face[face_no];
+          case ReferenceCells::Quadrilateral:
+            return GeometryInfo<2>::opposite_face[face_no];
+          case ReferenceCells::Triangle:
+            return (face_no + 1) % (this->get_dimension() + 1);
         }
-      case ReferenceCells::Hexahedron:
-        {
-          return GeometryInfo<3>::opposite_face[face_no];
-        }
-      case ReferenceCells::Line:
-      case ReferenceCells::Triangle:
-      case ReferenceCells::Tetrahedron:
-        {
-          return (face_no + 1) % (this->get_dimension() + 1);
-        }
-      case ReferenceCells::Pyramid:
-        {
-          switch (face_no)
-            {
-              case 0:
-                return 0;
-              case 1:
-                return 2;
-              case 2:
-                return 1;
-              case 3:
-                return 4;
-              case 4:
-                return 3;
-              default:
-                return numbers::invalid_unsigned_int;
-            }
-        }
-      case ReferenceCells::Wedge:
-        {
-          switch (face_no)
-            {
-              case 0:
-                return 1;
-              case 1:
-                return 0;
-              case 2:
-                return 3;
-              case 3:
-                return 4;
-              case 4:
-                return 2;
-              default:
-                return numbers::invalid_unsigned_int;
-            }
-        }
-      default:
-        DEAL_II_ASSERT_UNREACHABLE();
     }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Hexahedron:
+            return GeometryInfo<3>::opposite_face[face_no];
+          case ReferenceCells::Tetrahedron:
+            return (face_no + 1) % (this->get_dimension() + 1);
+          case ReferenceCells::Pyramid:
+            {
+              switch (face_no)
+                {
+                  case 0:
+                    return 0;
+                  case 1:
+                    return 2;
+                  case 2:
+                    return 1;
+                  case 3:
+                    return 4;
+                  case 4:
+                    return 3;
+                  default:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                    return numbers::invalid_unsigned_int;
+                }
+            }
+          case ReferenceCells::Wedge:
+            {
+              switch (face_no)
+                {
+                  case 0:
+                    return 1;
+                  case 1:
+                    return 0;
+                  case 2:
+                    return 3;
+                  case 3:
+                    return 4;
+                  case 4:
+                    return 2;
+                  default:
+                    DEAL_II_ASSERT_UNREACHABLE();
+                    return numbers::invalid_unsigned_int;
+                }
+            }
+        }
+    }
+
+  DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
 }
+
+
 
 namespace internal
 {
@@ -4557,6 +4588,7 @@ ReferenceCell<dim>::compute_orientation(
   const std::array<T, N> &vertices_0,
   const std::array<T, N> &vertices_1) const
 {
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
   Assert(N >= n_vertices(),
          ExcMessage("The number of array elements must be equal to or "
                     "greater than the number of vertices of the cell "
@@ -4580,6 +4612,7 @@ ReferenceCell<dim>::get_combined_orientation(
   const ArrayView<const T> &vertices_0,
   const ArrayView<const T> &vertices_1) const
 {
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
   Assert(vertices_0.size() == n_vertices(),
          ExcMessage("The number of array elements must be equal to "
                     "the number of vertices of the cell "
@@ -4610,19 +4643,22 @@ ReferenceCell<dim>::get_combined_orientation(
     return std::numeric_limits<types::geometric_orientation>::max();
   };
 
-  switch (this->kind)
+  if constexpr (dim == 0)
+    return compute_orientation(vertex_vertex_permutations, 1);
+  else if constexpr (dim == 1)
+    return compute_orientation(line_vertex_permutations, 2);
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        return compute_orientation(vertex_vertex_permutations, 1);
-      case ReferenceCells::Line:
-        return compute_orientation(line_vertex_permutations, 2);
-      case ReferenceCells::Triangle:
-        return compute_orientation(triangle_vertex_permutations, 3);
-      case ReferenceCells::Quadrilateral:
-        return compute_orientation(quadrilateral_vertex_permutations, 4);
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return compute_orientation(triangle_vertex_permutations, 3);
+          case ReferenceCells::Quadrilateral:
+            return compute_orientation(quadrilateral_vertex_permutations, 4);
+        }
     }
+  else if constexpr (dim == 3)
+    DEAL_II_NOT_IMPLEMENTED();
 
   Assert(false,
          (internal::NoPermutation<dim, T>(*this, vertices_0, vertices_1)));
@@ -4638,32 +4674,34 @@ ReferenceCell<dim>::permute_by_combined_orientation(
   const ArrayView<const T>          &vertices,
   const types::geometric_orientation orientation) const
 {
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
   AssertDimension(vertices.size(), n_vertices());
   boost::container::small_vector<T, 8> result(n_vertices());
 
-  auto permute = [&](const auto &table, unsigned int n_vertices) {
+  const auto permute = [&](const auto &table, unsigned int n_vertices) {
     AssertIndexRange(orientation, table.size());
     for (unsigned int j = 0; j < n_vertices; ++j)
       result[j] = vertices[table[orientation][j]];
   };
 
-  switch (this->kind)
+  if constexpr (dim == 0)
+    permute(vertex_vertex_permutations, 1);
+  else if constexpr (dim == 1)
+    permute(line_vertex_permutations, 2);
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        permute(vertex_vertex_permutations, 1);
-        break;
-      case ReferenceCells::Line:
-        permute(line_vertex_permutations, 2);
-        break;
-      case ReferenceCells::Triangle:
-        permute(triangle_vertex_permutations, 3);
-        break;
-      case ReferenceCells::Quadrilateral:
-        permute(quadrilateral_vertex_permutations, 4);
-        break;
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            permute(triangle_vertex_permutations, 3);
+            break;
+          case ReferenceCells::Quadrilateral:
+            permute(quadrilateral_vertex_permutations, 4);
+            break;
+        }
     }
+  else if constexpr (dim == 3)
+    DEAL_II_NOT_IMPLEMENTED();
 
   return result;
 }
@@ -4675,35 +4713,42 @@ inline types::geometric_orientation
 ReferenceCell<dim>::get_inverse_combined_orientation(
   const types::geometric_orientation orientation) const
 {
-  switch (this->kind)
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+
+  if constexpr (dim == 0)
+    // Things are always default-oriented in 1D
+    return orientation;
+  else if constexpr (dim == 1)
+    // the 1d orientations are the identity and a flip: i.e., the
+    // identity and an involutory mapping
+    return orientation;
+  else if constexpr (dim == 2)
     {
-      case ReferenceCells::Vertex:
-        // Things are always default-oriented in 1D
-        return orientation;
-
-      case ReferenceCells::Line:
-        // the 1d orientations are the identity and a flip: i.e., the identity
-        // and an involutory mapping
-        return orientation;
-
-      case ReferenceCells::Triangle:
+      switch (this->kind)
         {
-          AssertIndexRange(orientation, 6);
-          constexpr std::array<types::geometric_orientation, 6> inverses{
-            {0, 1, 4, 3, 2, 5}};
-          return inverses[orientation];
+          case ReferenceCells::Triangle:
+            {
+              AssertIndexRange(orientation, 6);
+              constexpr std::array<types::geometric_orientation, 6> inverses{
+                {0, 1, 4, 3, 2, 5}};
+              return inverses[orientation];
+            }
+          case ReferenceCells::Quadrilateral:
+            {
+              AssertIndexRange(orientation, 8);
+              constexpr std::array<types::geometric_orientation, 8> inverses{
+                {0, 1, 6, 3, 4, 5, 2, 7}};
+              return inverses[orientation];
+            }
         }
-      case ReferenceCells::Quadrilateral:
-        {
-          AssertIndexRange(orientation, 8);
-          constexpr std::array<types::geometric_orientation, 8> inverses{
-            {0, 1, 6, 3, 4, 5, 2, 7}};
-          return inverses[orientation];
-        }
-      default:
-        DEAL_II_NOT_IMPLEMENTED();
+    }
+  else
+    {
+      (void)orientation;
+      DEAL_II_NOT_IMPLEMENTED();
     }
 
+  DEAL_II_NOT_IMPLEMENTED();
   return std::numeric_limits<types::geometric_orientation>::max();
 }
 
