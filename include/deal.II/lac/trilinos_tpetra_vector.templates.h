@@ -1140,29 +1140,43 @@ namespace LinearAlgebra
     Number
     Vector<Number, MemorySpace>::min() const
     {
-      Assert(numbers::NumberTraits<Number>::is_complex == false,
-             ExcMessage(
-               "Not implemented for complex number types at the moment."));
-
-      // Make sure we have a view available to access the vector entries.
-      if (!vector_1d_view)
+      // The body below cannot be compiled for complex numbers: it compares
+      // entries with operator< and initialises the running minimum with
+      // std::numeric_limits<Number>::max(), neither of which is defined for
+      // complex types. Guarding with `if constexpr` keeps that code out of
+      // instantiations for complex Number, rather than relying on a run-time
+      // assertion in a body that still has to compile.
+      if constexpr (numbers::NumberTraits<Number>::is_complex == false)
         {
-          auto vector_2d_view =
-            vector->template getLocalView<Kokkos::HostSpace>(
-              Tpetra::Access::ReadWriteStruct{});
+          // Make sure we have a view available to access the vector entries.
+          if (!vector_1d_view)
+            {
+              auto vector_2d_view =
+                vector->template getLocalView<Kokkos::HostSpace>(
+                  Tpetra::Access::ReadWriteStruct{});
 
-          vector_1d_view = Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+              vector_1d_view =
+                Kokkos::subview(vector_2d_view, Kokkos::ALL(), 0);
+            }
+
+          Number min_value = std::numeric_limits<Number>::max();
+
+          const size_t this_local_length = vector->getLocalLength();
+
+          for (size_type i = 0; i < this_local_length; ++i)
+            if ((*vector_1d_view)(i) < min_value)
+              min_value = (*vector_1d_view)(i);
+
+          return Utilities::MPI::min(min_value, get_mpi_communicator());
         }
-
-      Number min_value = std::numeric_limits<Number>::max();
-
-      const size_t this_local_length = vector->getLocalLength();
-
-      for (size_type i = 0; i < this_local_length; ++i)
-        if ((*vector_1d_view)(i) < min_value)
-          min_value = (*vector_1d_view)(i);
-
-      return Utilities::MPI::min(min_value, get_mpi_communicator());
+      else
+        {
+          Assert(false,
+                 ExcMessage(
+                   "The 'min' operation is not defined for complex numbers, "
+                   "and so cannot be used on vectors over complex values."));
+          return Number();
+        }
     }
 
 
