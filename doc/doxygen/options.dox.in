@@ -132,8 +132,13 @@ MATHJAX_RELPATH        = @_mathjax_relpath@
 MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 200
+# Required by doxygen-awesome.css for Doxygen >= 1.9.5: without it Doxygen
+# emits its own dark-mode rules guarded by html:not(.dark-mode), which
+# conflict with the html:not(.light-mode) rules in the theme.
+HTML_COLORSTYLE        = LIGHT
 HTML_EXTRA_STYLESHEET  = @CMAKE_CURRENT_SOURCE_DIR@/doxygen-awesome.css \
                          @CMAKE_CURRENT_SOURCE_DIR@/custom.css
+HTML_EXTRA_FILES       = @CMAKE_CURRENT_SOURCE_DIR@/doxygen-awesome-darkmode-toggle.js
 
 # disable the navigation column
 DISABLE_INDEX          = NO
