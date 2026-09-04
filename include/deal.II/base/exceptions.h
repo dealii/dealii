@@ -1127,7 +1127,6 @@ namespace deal_II_exceptions
                    const char *function,
                    const char *msg)
     {
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       (void)file;
       (void)line;
       (void)function;
@@ -1142,18 +1141,6 @@ namespace deal_II_exceptions
                              nullptr,
                              ::dealii::StandardExceptions::ExcMessage(msg));
       }))
-#else
-      // KOKKOS_IF_ON_DEVICE is only supported in 3.6 or newer. We require 3.7
-      // on device though, so this means we won't be on device here:
-      issue_error_noreturn(::dealii::deal_II_exceptions::internals::
-                             ExceptionHandling::abort_or_throw_on_exception,
-                           file,
-                           line,
-                           function,
-                           nullptr,
-                           nullptr,
-                           ::dealii::StandardExceptions::ExcMessage(msg));
-#endif
       // This workaround is necessary, otherwise nvcc will complain that we
       // might return from this function, even though we will never get here (we
       // will throw or abort above).
@@ -1171,7 +1158,6 @@ namespace deal_II_exceptions
     [[noreturn]] DEAL_II_HOST_DEVICE inline void
     do_not_implemented(const char *file, int line, const char *function)
     {
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       (void)file;
       (void)line;
       (void)function;
@@ -1187,18 +1173,6 @@ namespace deal_II_exceptions
                              nullptr,
                              ::dealii::StandardExceptions::ExcNotImplemented());
       }))
-#else
-      // KOKKOS_IF_ON_DEVICE is only supported in 3.6 or newer. We require 3.7
-      // on device though, so this means we won't be on device here:
-      issue_error_noreturn(::dealii::deal_II_exceptions::internals::
-                             ExceptionHandling::abort_or_throw_on_exception,
-                           file,
-                           line,
-                           function,
-                           nullptr,
-                           nullptr,
-                           ::dealii::StandardExceptions::ExcNotImplemented());
-#endif
       // This workaround is necessary, otherwise nvcc will complain that we
       // might return from this function, even though we will never get here (we
       // will throw or abort above).

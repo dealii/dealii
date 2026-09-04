@@ -838,15 +838,9 @@ private:
    * a rank-1 tensor, then we simply need an array of scalars.
    * Otherwise, it is an array of tensors one rank lower.
    */
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
   std::conditional_t<rank_ == 1,
                      Kokkos::Array<Number, dim>,
                      Kokkos::Array<Tensor<rank_ - 1, dim, Number>, dim>>
-#else
-  std::conditional_t<rank_ == 1,
-                     std::array<Number, dim>,
-                     std::array<Tensor<rank_ - 1, dim, Number>, dim>>
-#endif
     values;
 
   /**
@@ -1103,7 +1097,6 @@ namespace internal
     constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE void
     multiply_assign_scalar(std::complex<Number> &val, const OtherNumber &s)
     {
-#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
       KOKKOS_IF_ON_HOST((val *= s;))
       KOKKOS_IF_ON_DEVICE(({
         (void)val;
@@ -1111,10 +1104,6 @@ namespace internal
         Kokkos::abort(
           "This function is not implemented for std::complex<Number>!\n");
       }))
-#  else
-      // We do not support device code for Kokkos < 3.7:
-      val *= s;
-#  endif
     }
   } // namespace ComplexWorkaround
 } // namespace internal
@@ -1321,11 +1310,7 @@ namespace internal
   namespace TensorInitialization
   {
     template <int rank, int dim, typename Number, std::size_t... I>
-#    if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
     constexpr Kokkos::Array<typename Tensor<rank, dim, Number>::value_type, dim>
-#    else
-    constexpr std::array<typename Tensor<rank, dim, Number>::value_type, dim>
-#    endif
     make_zero_array(const std::index_sequence<I...> &)
     {
       static_assert(sizeof...(I) == dim, "This is bad.");

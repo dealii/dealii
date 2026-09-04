@@ -140,13 +140,9 @@ namespace LinearAlgebra
         {
           if (comm_shared == MPI_COMM_SELF)
             {
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
               Kokkos::resize(Kokkos::WithoutInitializing,
                              data.values,
                              new_alloc_size);
-#else
-              Kokkos::resize(data.values, new_alloc_size);
-#endif
 
               allocated_size = new_alloc_size;
 
@@ -365,13 +361,9 @@ namespace LinearAlgebra
                       data.values.size() == 0),
                      ExcInternalError());
 
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
               Kokkos::resize(Kokkos::WithoutInitializing,
                              data.values,
                              new_alloc_size);
-#else
-              Kokkos::resize(data.values, new_alloc_size);
-#endif
 
               allocated_size = new_alloc_size;
             }
@@ -508,12 +500,7 @@ namespace LinearAlgebra
               ::dealii::MemorySpace::Default::kokkos_space::execution_space>(
               exec, 0, size),
             KOKKOS_LAMBDA(size_type i, RealType & update) {
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
               update = Kokkos::fmax(update, Kokkos::abs(data.values(i)));
-#else
-              update = Kokkos::Experimental::fmax(
-                update, Kokkos::Experimental::fabs(data.values(i)));
-#endif
             },
             Kokkos::Max<RealType, Kokkos::HostSpace>(result));
         }
@@ -1045,27 +1032,17 @@ namespace LinearAlgebra
           if (std::is_same_v<MemorySpaceType, dealii::MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
-#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values_host_buffer,
                                partitioner->n_import_indices());
-#    else
-                Kokkos::resize(import_data.values_host_buffer,
-                               partitioner->n_import_indices());
-#    endif
             }
           else
 #  endif
             {
               if (import_data.values.size() == 0)
-#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values,
                                partitioner->n_import_indices());
-#  else
-              Kokkos::resize(import_data.values,
-                             partitioner->n_import_indices());
-#  endif
             }
         }
 
@@ -1076,13 +1053,9 @@ namespace LinearAlgebra
           // device. We use values to store the elements because the function
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
-#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
           Kokkos::resize(Kokkos::WithoutInitializing,
                          data.values_host_buffer,
                          data.values.size());
-#    else
-          Kokkos::resize(data.values_host_buffer, data.values.size());
-#    endif
           Kokkos::deep_copy(data.values_host_buffer, data.values);
 
           partitioner->import_from_ghosted_array_start(
@@ -1206,27 +1179,17 @@ namespace LinearAlgebra
           if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             {
               if (import_data.values_host_buffer.size() == 0)
-#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values_host_buffer,
                                partitioner->n_import_indices());
-#    else
-                Kokkos::resize(import_data.values_host_buffer,
-                               partitioner->n_import_indices());
-#    endif
             }
           else
 #  endif
             {
               if (import_data.values.size() == 0)
-#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
                 Kokkos::resize(Kokkos::WithoutInitializing,
                                import_data.values,
                                partitioner->n_import_indices());
-#  else
-              Kokkos::resize(import_data.values,
-                             partitioner->n_import_indices());
-#  endif
             }
         }
 
@@ -1237,13 +1200,9 @@ namespace LinearAlgebra
           // device. We use values to store the elements because the function
           // uses a view of the array and thus we need the data on the host to
           // outlive the scope of the function.
-#    if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
           Kokkos::resize(Kokkos::WithoutInitializing,
                          data.values_host_buffer,
                          data.values.size());
-#    else
-          Kokkos::resize(data.values_host_buffer, data.values.size());
-#    endif
           Kokkos::deep_copy(data.values_host_buffer, data.values);
 
           partitioner->export_to_ghosted_array_start<Number, MemorySpace::Host>(
