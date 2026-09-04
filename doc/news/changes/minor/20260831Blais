@@ -4,6 +4,7 @@ particle found in such a cell was then scheduled to be sent to
 numbers::artificial_subdomain_id, which triggered an assertion in debug mode
 and silently deleted the particle in release mode without emitting the
 particle_lost signal. Artificial cells are now skipped, so that these
-particles are correctly reported as lost.
+particles are correctly reported as lost. This behavior is checked by the new
+test particles/particle_handler_sort_03.
 <br>
 (Bruno Blais, 2026/08/31)
