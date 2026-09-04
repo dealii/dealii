@@ -6713,6 +6713,7 @@ namespace internal
                 continue;
 
               const auto reference_face_type = face->reference_cell();
+              const auto n_lines_per_face    = reference_face_type.n_lines();
 
               // 1) Create new lines (property is set later).
               // Maximum of 4 new lines (4 quadrilateral, 3 triangle).
@@ -6787,8 +6788,8 @@ namespace internal
               for (const auto i : face->vertex_indices())
                 vertex_indices[k++] = face->vertex_index(i);
 
-              for (const auto i : face->line_indices())
-                vertex_indices[k++] = face->line(i)->child(0)->vertex_index(1);
+              for (unsigned int l = 0; l < n_lines_per_face; ++l)
+                vertex_indices[k++] = face->line(l)->child(0)->vertex_index(1);
 
               if (reference_face_type == ReferenceCells::Quadrilateral)
                 {
@@ -6806,12 +6807,12 @@ namespace internal
               // created in step 3).
               std::array<raw_line_iterator, 12> lines;
               unsigned int                      n_lines = 0;
-              for (unsigned int l = 0; l < face->n_lines(); ++l)
+              for (unsigned int l = 0; l < n_lines_per_face; ++l)
                 for (unsigned int c = 0; c < 2; ++c)
                   lines[n_lines++] = face->line(l)->child(
                     child_line_index(c, face->line_orientation(l)));
 
-              for (unsigned int l = 0; l < face->n_lines(); ++l)
+              for (unsigned int l = 0; l < n_lines_per_face; ++l)
                 lines[n_lines++] = new_lines[l];
 
               std::array<int, 12> line_indices;
@@ -6896,8 +6897,8 @@ namespace internal
               // The first 2*face->n_lines() lines are already created by
               // refining the original lines on the face. Therefore, only the
               // subsequent face->n_lines() lines need to be processed now.
-              for (unsigned int i = 0, j = 2 * face->n_lines();
-                   i < face->n_lines();
+              for (unsigned int i = 0, j = 2 * n_lines_per_face;
+                   i < n_lines_per_face;
                    ++i, ++j)
                 {
                   auto &new_line = new_lines[i];
