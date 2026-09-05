@@ -460,7 +460,15 @@ namespace Portable
       local_q_point_id(const unsigned int cell,
                        const unsigned int q_point) const
       {
-        AssertIndexRange(cell, precomputed_data[0].n_cells);
+        const unsigned int color_shift =
+          precomputed_data[0].row_start / precomputed_data[0].padding_length;
+        Assert(cell >= color_shift,
+               ExcMessage(
+                 "The cell index is smaller than the first cell of the "
+                 "current color."));
+
+        AssertIndexRange(cell - color_shift, precomputed_data[0].n_cells);
+
         AssertIndexRange(q_point, n_q_points);
 
         Assert(precomputed_data[0].n_cells ==
@@ -469,11 +477,7 @@ namespace Portable
         Assert(n_q_points == precomputed_data[0].q_points.extent(0),
                ExcInternalError("q_points array has wrong size"));
 
-        return (precomputed_data[0].row_start /
-                  precomputed_data[0].padding_length +
-                cell) *
-                 n_q_points +
-               q_point;
+        return cell * n_q_points + q_point;
       }
 
 
@@ -486,14 +490,21 @@ namespace Portable
       get_quadrature_point(const unsigned int cell,
                            const unsigned int q_point) const
       {
+        const unsigned int color_shift =
+          precomputed_data[0].row_start / precomputed_data[0].padding_length;
+        Assert(cell >= color_shift,
+               ExcMessage(
+                 "The cell index is smaller than the first cell of the "
+                 "current color."));
+        const unsigned int local_cell = cell - color_shift;
         Assert(precomputed_data[0].n_cells ==
                  precomputed_data[0].q_points.extent(1),
                ExcInternalError());
-        AssertIndexRange(cell, precomputed_data[0].n_cells);
+        AssertIndexRange(local_cell, precomputed_data[0].n_cells);
         AssertIndexRange(q_point, n_q_points);
         Assert(n_q_points == precomputed_data[0].q_points.extent(0),
                ExcInternalError());
-        return precomputed_data[0].q_points(q_point, cell);
+        return precomputed_data[0].q_points(q_point, local_cell);
       }
 
       /**
@@ -1238,7 +1249,7 @@ namespace Portable
                      const unsigned int n_q_points,
                      const unsigned int q_point) const
     {
-      return (row_start / padding_length + cell) * n_q_points + q_point;
+      return cell * n_q_points + q_point;
     }
 
 
@@ -1250,7 +1261,7 @@ namespace Portable
     get_quadrature_point(const unsigned int cell,
                          const unsigned int q_point) const
     {
-      return q_points(q_point, cell);
+      return q_points(q_point, cell - row_start / padding_length);
     }
 
     /**
