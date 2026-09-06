@@ -24,7 +24,7 @@ set(_deal_ii_trilinos_optional_modules
   Amesos EpetraExt Ifpack AztecOO ML
 
   # Tpetra-based:
-  Amesos2 Ifpack2 MueLu
+  Amesos2 Anasazi Ifpack2 MueLu
 
   # Independent:
   Belos Kokkos NOX ROL Sacado ShyLU_DDFROSch SEACAS Teuchos Xpetra Zoltan
@@ -77,7 +77,7 @@ macro(feature_trilinos_find_external var)
     item_matches(DEAL_II_TRILINOS_WITH_TPETRA Tpetra ${Trilinos_PACKAGE_LIST})
     if (DEAL_II_TRILINOS_WITH_TPETRA)
       foreach(_module
-        Amesos2 Belos Ifpack2 Tpetra
+        Amesos2 Anasazi Belos Ifpack2 Tpetra
       )
         item_matches(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
         if(_module_found)
