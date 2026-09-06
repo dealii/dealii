@@ -1,0 +1,4 @@
+New: Add a wrapper to the eigensolver Anasazi from the 
+Trilinos library.
+<br>
+(Jonas Plank, 2026/10/14)
