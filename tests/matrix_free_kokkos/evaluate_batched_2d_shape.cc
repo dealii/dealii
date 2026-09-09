@@ -1,0 +1,310 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2017 - 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+
+// this function tests the correctness of the 2d evaluation functions used in
+// Portable::internal::batched::EvaluatorTensorProduct -- the batched
+// counterpart of Portable::internal::EvaluatorTensorProduct already checked
+// in evaluate_2d_shape.cc, where n_cells "elements" share one team and are
+// all transformed by the same shape matrix in a single apply() call, laid
+// out contiguously per element.
+
+#include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/read_write_vector.h>
+
+#include <deal.II/matrix_free/portable_tensor_product_kernels.h>
+
+#include <fstream>
+#include <iostream>
+
+#include "../tests.h"
+
+
+using TeamHandle = Kokkos::TeamPolicy<
+  MemorySpace::Default::kokkos_space::execution_space>::member_type;
+
+template <int M, int N, int type, bool add, bool dof_to_quad>
+struct EvaluateTensorProduct
+{
+  DEAL_II_HOST_DEVICE void
+  operator()(const TeamHandle &team_member) const
+  {
+    using ScratchView = Kokkos::View<
+      double *,
+      MemorySpace::Default::kokkos_space::execution_space::scratch_memory_space,
+      Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
+    // Copy the shape matrices into team scratch memory
+    ScratchView s_shape_values(team_member.team_shmem(), M * N);
+    ScratchView s_shape_gradients(team_member.team_shmem(), M * N);
+    ScratchView s_co_shape_gradients(team_member.team_shmem(), M * N);
+
+    for (int tid = team_member.team_rank(); tid < M * N;
+         tid += team_member.team_size())
+      {
+        s_shape_values(tid)       = shape_values(tid);
+        s_shape_gradients(tid)    = shape_gradients(tid);
+        s_co_shape_gradients(tid) = co_shape_gradients(tid);
+      }
+    team_member.team_barrier();
+
+    ScratchView dummy_scratch(team_member.team_shmem(), 0);
+
+    Portable::internal::batched::EvaluatorTensorProduct<
+      Portable::internal::evaluate_general,
+      2,
+      M,
+      N,
+      double>
+      evaluator(team_member,
+                s_shape_values,
+                s_shape_gradients,
+                s_co_shape_gradients,
+                dummy_scratch,
+                n_cells);
+
+    constexpr int d0 = dof_to_quad ? 0 : 1;
+    constexpr int d1 = dof_to_quad ? 1 : 0;
+
+    if (type == 0)
+      {
+        evaluator.template values<d0, dof_to_quad, false, false>(src, tmp);
+        team_member.team_barrier();
+        evaluator.template values<d1, dof_to_quad, add, false>(tmp, dst);
+      }
+    if (type == 1)
+      {
+        evaluator.template gradients<d0, dof_to_quad, false, false>(src, tmp);
+        team_member.team_barrier();
+        evaluator.template gradients<d1, dof_to_quad, add, false>(tmp, dst);
+      }
+  }
+
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> dst;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> src;
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> tmp;
+  int                                                        n_cells;
+};
+
+template <int M, int N, int type, bool add>
+void
+test(const int n_cells)
+{
+  deallog << "Test " << M << " x " << N << ", n_cells = " << n_cells
+          << std::endl;
+  unsigned int                           size_shape_values = M * N;
+  LinearAlgebra::ReadWriteVector<double> shape_host(size_shape_values);
+  for (unsigned int i = 0; i < (M + 1) / 2; ++i)
+    for (unsigned int j = 0; j < N; ++j)
+      {
+        shape_host[i * N + j] =
+          -1. + 2. * static_cast<double>(Testing::rand()) / RAND_MAX;
+        if (type == 1)
+          shape_host[(M - 1 - i) * N + N - 1 - j] = -shape_host[i * N + j];
+        else
+          shape_host[(M - 1 - i) * N + N - 1 - j] = shape_host[i * N + j];
+      }
+  if (type == 0 && M % 2 == 1 && N % 2 == 1)
+    {
+      for (unsigned int i = 0; i < M; ++i)
+        shape_host[i * N + N / 2] = 0.;
+      shape_host[M / 2 * N + N / 2] = 1.;
+    }
+  if (type == 1 && M % 2 == 1 && N % 2 == 1)
+    shape_host[M / 2 * N + N / 2] = 0.;
+
+  constexpr int                          M_2d    = M * M;
+  constexpr int                          N_2d    = N * N;
+  constexpr int                          MN      = M * N;
+  const unsigned int                     N_batch = n_cells * N_2d;
+  const unsigned int                     M_batch = n_cells * M_2d;
+  LinearAlgebra::ReadWriteVector<double> x_ref(N_batch), y_ref(M_batch);
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> x_dev(
+    Kokkos::view_alloc("x_dev", Kokkos::WithoutInitializing), N_batch);
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> y_dev(
+    Kokkos::view_alloc("y_dev", Kokkos::WithoutInitializing), M_batch);
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> tmp_dev(
+    Kokkos::view_alloc("tmp_dev", Kokkos::WithoutInitializing), n_cells * MN);
+  auto x_host = Kokkos::create_mirror_view(x_dev);
+  auto y_host = Kokkos::create_mirror_view(y_dev);
+
+  for (unsigned int i = 0; i < N_batch; ++i)
+    x_host(i) = static_cast<double>(Testing::rand()) / RAND_MAX;
+
+  FullMatrix<double> shape_2d(M_2d, N_2d);
+  for (unsigned int i = 0; i < M; ++i)
+    {
+      for (unsigned int j = 0; j < N; ++j)
+        {
+          const double shape_val = shape_host[i * N + j];
+          for (unsigned int m = 0; m < M; ++m)
+            for (unsigned int n = 0; n < N; ++n)
+              shape_2d(i * M + m, j * N + n) =
+                shape_val * shape_host[m * N + n];
+        }
+    }
+
+  // Compute reference: each of the n_cells is transformed
+  // independently by the same 2d shape matrix.
+  for (int e = 0; e < n_cells; ++e)
+    for (unsigned int i = 0; i < M_2d; ++i)
+      {
+        y_host(e * M_2d + i) = 1.;
+        y_ref[e * M_2d + i]  = add ? y_host(e * M_2d + i) : 0.;
+        for (unsigned int j = 0; j < N_2d; ++j)
+          y_ref[e * M_2d + i] += shape_2d(i, j) * x_host(e * N_2d + j);
+      }
+
+  // Copy data to the GPU.
+  Kokkos::deep_copy(x_dev, x_host);
+  Kokkos::deep_copy(y_dev, y_host);
+
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_values(
+    Kokkos::view_alloc("shape_values", Kokkos::WithoutInitializing),
+    size_shape_values);
+  Kokkos::View<double *,
+               MemorySpace::Host::kokkos_space,
+               Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    shape_host_view(shape_host.begin(), size_shape_values);
+  Kokkos::deep_copy(shape_values, shape_host_view);
+
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> shape_gradients(
+    Kokkos::view_alloc("shape_gradients", Kokkos::WithoutInitializing),
+    size_shape_values);
+  Kokkos::deep_copy(shape_gradients, shape_host_view);
+
+  Kokkos::View<double *, MemorySpace::Default::kokkos_space> co_shape_gradients(
+    Kokkos::view_alloc("co_shape_gradients", Kokkos::WithoutInitializing),
+    size_shape_values);
+  Kokkos::deep_copy(co_shape_gradients, shape_host_view);
+
+  // Launch the kernel
+  MemorySpace::Default::kokkos_space::execution_space exec;
+  Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>
+    team_policy(exec, 1, Kokkos::AUTO);
+  // Scratch for the 3 staged shape matrices (shape_values/shape_gradients/
+  // co_shape_gradients)
+  team_policy.set_scratch_size(0, Kokkos::PerTeam(3 * M * N * sizeof(double)));
+  EvaluateTensorProduct<M, N, type, add, false> functor_to_dof{
+    shape_values,
+    shape_gradients,
+    co_shape_gradients,
+    y_dev,
+    x_dev,
+    tmp_dev,
+    n_cells};
+  Kokkos::parallel_for(team_policy, functor_to_dof);
+
+  // Check the results on the host
+  Kokkos::deep_copy(y_host, y_dev);
+  deallog << "Errors no transpose: ";
+
+  for (unsigned int i = 0; i < M_batch; ++i)
+    deallog << y_host(i) - y_ref[i] << " ";
+  deallog << std::endl;
+
+  for (unsigned int i = 0; i < M_batch; ++i)
+    y_host(i) = static_cast<double>(Testing::rand()) / RAND_MAX;
+
+  // Copy y_host to the device
+  Kokkos::deep_copy(y_dev, y_host);
+
+  // Compute reference
+  for (int e = 0; e < n_cells; ++e)
+    for (unsigned int i = 0; i < N_2d; ++i)
+      {
+        x_host(e * N_2d + i) = 2.;
+        x_ref[e * N_2d + i]  = add ? x_host(e * N_2d + i) : 0.;
+        for (unsigned int j = 0; j < M_2d; ++j)
+          x_ref[e * N_2d + i] += shape_2d(j, i) * y_host(e * M_2d + j);
+      }
+
+  // Copy x_host to the device
+  Kokkos::deep_copy(x_dev, x_host);
+
+  // Launch the kernel
+  EvaluateTensorProduct<M, N, type, add, true> functor_to_quad{
+    shape_values,
+    shape_gradients,
+    co_shape_gradients,
+    x_dev,
+    y_dev,
+    tmp_dev,
+    n_cells};
+  Kokkos::parallel_for(team_policy, functor_to_quad);
+
+  // Check the results on the host
+  Kokkos::deep_copy(x_host, x_dev);
+  deallog << "Errors transpose:    ";
+  for (unsigned int i = 0; i < N_batch; ++i)
+    deallog << x_host(i) - x_ref[i] << " ";
+  deallog << std::endl;
+}
+
+template <int M, int N, int type, bool add>
+void
+test_n_cells()
+{
+  // test a batch with 1 cell
+  test<M, N, type, add>(1);
+  // test a batch with 3 cells
+  test<M, N, type, add>(3);
+}
+
+int
+main()
+{
+  std::ofstream logfile("output");
+  deallog.attach(logfile);
+
+  Kokkos::initialize();
+
+  deallog.push("values");
+  test_n_cells<4, 4, 0, false>();
+  test_n_cells<3, 3, 0, false>();
+  test_n_cells<3, 4, 0, false>();
+  test_n_cells<3, 5, 0, false>();
+  deallog.pop();
+
+  deallog.push("gradients");
+  test_n_cells<4, 4, 1, false>();
+  test_n_cells<3, 3, 1, false>();
+  test_n_cells<3, 4, 1, false>();
+  test_n_cells<3, 5, 1, false>();
+  deallog.pop();
+
+  deallog.push("add");
+
+  deallog.push("values");
+  test_n_cells<4, 4, 0, true>();
+  test_n_cells<3, 3, 0, true>();
+  test_n_cells<3, 4, 0, true>();
+  test_n_cells<3, 5, 0, true>();
+  deallog.pop();
+
+  deallog.push("gradients");
+  test_n_cells<4, 4, 1, true>();
+  test_n_cells<3, 3, 1, true>();
+  test_n_cells<3, 4, 1, true>();
+  test_n_cells<3, 5, 1, true>();
+  deallog.pop();
+
+  deallog.pop();
+
+  Kokkos::finalize();
+
+  return 0;
+}

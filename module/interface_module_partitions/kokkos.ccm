@@ -80,6 +80,7 @@ export
     using ::Kokkos::is_finalized;
 #endif
     using ::Kokkos::is_initialized;
+    using ::Kokkos::is_view;
 #if DEAL_II_KOKKOS_VERSION_GTE(4, 3, 0)
     using ::Kokkos::kokkos_swap;
 #endif
