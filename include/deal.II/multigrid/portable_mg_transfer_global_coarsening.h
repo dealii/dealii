@@ -52,11 +52,11 @@ namespace Portable
    */
 
   /**
-   * Class for transfer between two multigrid levels for p-multigrid or global
-   * coarsening. It relies on a list of DoF indices associated with the cells on
-   * the coarse and fine side of the transfer, and implements a cell-by-cell
-   * (matrix-free) interpolation setup with the reference-cell embedding
-   * matrices.
+   * Class for transfer between two multigrid levels for geometric or
+   * polynomial coarsening strategies. It relies on a list of DoF indices
+   * associated with the cells on the coarse and fine side of the transfer,
+   * and implements a cell-by-cell (matrix-free) interpolation setup with the
+   * reference-cell embedding matrices.
    *
    * The implementation of this class is similar to MGTwoLevelTransfer which is
    * explained in detail in @cite munch2022gc.
@@ -86,8 +86,11 @@ namespace Portable
 
     /**
      * Set up global coarsening between the given DoFHandler objects (
-     * @p dof_handler_fine and @p dof_handler_coarse). The transfer
-     * can only be performed on active levels.
+     * @p dof_handler_fine and @p dof_handler_coarse). In case the optional
+     * arguments @p mg_level_fine and @p mg_level_coarse are set, a
+     * local-smoothing multigrid approach is possible, otherwise a
+     * global-coarsening approach connecting two different triangulations
+     * on active cells is selected.
      */
     void
     reinit_geometric_transfer(

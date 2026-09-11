@@ -341,11 +341,11 @@ namespace internal
 
 
 /**
- * Class for transfer between two multigrid levels for p- or global
- * coarsening. It relies on a list of DoF indices associated with the cells on
- * the coarse and fine side of the transfer, and implements a cell-by-cell
- * (matrix-free) interpolation setup with the reference-cell embedding
- * matrices.
+ * Class for transfer between two multigrid levels for geometric or polynomial
+ * coarsening strategies. It relies on a list of DoF indices associated with
+ * the cells on the coarse and fine side of the transfer, and implements a
+ * cell-by-cell (matrix-free) interpolation setup with the reference-cell
+ * embedding matrices.
  *
  * The implementation of this class is explained in detail in @cite munch2022gc.
  *
@@ -359,11 +359,12 @@ namespace internal
  * (p-coarsening) from two MatrixFree objects that might already exist from
  * other parts of the code. In this case, we require that both objects share
  * the same triangulation (but differ through their DoFHandler descriptions)
- * and are described by the respective DoFHandler/AffineConstraints pair. This
- * second variant is more efficient because no queries to the DoFHandler need
- * to be made, reducing both the setup time and the overall memory
- * consumption. Note that not all options are supported for the second entry
- * point, and we fall back to the first option in such a case.
+ * and are described by the respective DoFHandler/AffineConstraints pair used
+ * for constructing the MatrixFree object. This second variant is more
+ * efficient because no queries to the DoFHandler need to be made, reducing
+ * both the setup time and the overall memory consumption. Note that not all
+ * options are supported for the second entry point, and we fall back to the
+ * first option in such a case.
  */
 template <int dim, typename VectorType>
 class MGTwoLevelTransfer
@@ -395,8 +396,11 @@ public:
 
   /**
    * Set up global coarsening between the given DoFHandler objects (
-   * @p dof_handler_fine and @p dof_handler_coarse). The transfer
-   * can be only performed on active levels.
+   * @p dof_handler_fine and @p dof_handler_coarse). In case the optional
+   * arguments @p mg_level_fine and @p mg_level_coarse are set, a
+   * local-smoothing multigrid approach is possible, otherwise a
+   * global-coarsening approach connecting two different triangulations
+   * on active cells is selected.
    */
   void
   reinit_geometric_transfer(
@@ -432,8 +436,8 @@ public:
   /**
    * Set up the transfer operator between the given DoFHandler objects (
    * @p dof_handler_fine and @p dof_handler_coarse). Depending on the
-   * underlying Triangulation objects polynomial or geometrical global
-   * coarsening is performed.
+   * underlying Triangulation objects, either a polynomial or geometric global
+   * coarsening algorithm is selected.
    *
    * @note While geometric transfer can be only performed on active levels
    *   (`numbers::invalid_unsigned_int`), polynomial transfers can also be
