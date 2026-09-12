@@ -34,6 +34,7 @@
 #  include <arkode/arkode_erkstep.h>
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
 #    include <arkode/arkode_lsrkstep.h>
+#    include <arkode/arkode_splittingstep.h>
 #  endif
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
 #    include <sundomeigest/sundomeigest_power.h>
@@ -910,6 +911,113 @@ namespace SUNDIALS
   template <typename VectorType>
   void *
   LSRKStepperSSP<VectorType>::get_arkode_memory() const
+  {
+    return arkode_mem.get();
+  }
+
+
+  // ---------------------------------------------------------------------------
+  // SplittingStepper implementation
+  // ---------------------------------------------------------------------------
+
+  template <typename VectorType>
+  SplittingStepper<VectorType>::SplittingStepper(
+    const std::vector<std::shared_ptr<ARKodeStepper<VectorType>>> &sub_steppers,
+    const AdditionalData                                          &data)
+    : sub_steppers(sub_steppers)
+    , arkode_mem(nullptr,
+                 [](void *mem) {
+                   if (mem)
+                     ARKodeFree(&mem);
+                 })
+    , data(data)
+  {
+    AssertThrow(data.step_size > 0,
+                ExcMessage("SplittingStepper requires a positive step size."));
+
+    AssertThrow(sub_steppers.size() > 1,
+                ExcMessage(
+                  "SplittingStepper requires at least two sub-steppers."));
+  }
+
+
+  template <typename VectorType>
+  void
+  SplittingStepper<VectorType>::reinit(double                      t0,
+                                       const VectorType           &y0,
+                                       internal::InvocationContext inv_ctx)
+  {
+    arkode_mem.reset();
+    sun_steppers.clear();
+
+    // Initialize each partition sub-stepper.
+    for (const auto &sub : sub_steppers)
+      {
+        Assert(sub != nullptr, ExcInternalError());
+        sub->reinit(t0, y0, inv_ctx);
+      }
+
+    // Wrap each sub-stepper's ARKODE memory block in a SUNStepper object.
+    for (const auto &sub : sub_steppers)
+      {
+        SUNStepper raw = nullptr;
+        const int  status =
+          ARKodeCreateSUNStepper(sub->get_arkode_memory(), &raw);
+        AssertARKode(status);
+        sun_steppers.emplace_back(raw, [](SUNStepper s) {
+          if (s)
+            SUNStepper_Destroy(&s);
+        });
+      }
+
+    // Collect raw handles for the C API call.
+    std::vector<SUNStepper> raw_sun_steppers(sun_steppers.size());
+    std::transform(sun_steppers.begin(),
+                   sun_steppers.end(),
+                   raw_sun_steppers.begin(),
+                   [](const auto &ptr) { return ptr.get(); });
+
+    auto initial_condition_nvector =
+      internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
+
+    arkode_mem.reset(SplittingStepCreate(raw_sun_steppers.data(),
+                                         raw_sun_steppers.size(),
+                                         t0,
+                                         initial_condition_nvector,
+                                         inv_ctx.arkode_ctx));
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    if (data.step_size > 0.0)
+      {
+        const int status = ARKodeSetFixedStep(arkode_mem.get(), data.step_size);
+        AssertARKode(status);
+      }
+
+    if (!data.method_name.empty())
+      {
+        SplittingStepCoefficients coeffs =
+          SplittingStepCoefficients_LoadCoefficientsByName(
+            data.method_name.c_str());
+        AssertThrow(
+          coeffs != nullptr,
+          ExcMessage(
+            "SplittingStepCoefficients_LoadCoefficientsByName could not load "
+            "coefficients named '" +
+            data.method_name + "'."));
+        const int status =
+          SplittingStepSetCoefficients(arkode_mem.get(), coeffs);
+        SplittingStepCoefficients_Destroy(&coeffs);
+        AssertARKode(status);
+      }
+
+    if (custom_setup)
+      custom_setup(arkode_mem.get());
+  }
+
+
+  template <typename VectorType>
+  void *
+  SplittingStepper<VectorType>::get_arkode_memory() const
   {
     return arkode_mem.get();
   }
