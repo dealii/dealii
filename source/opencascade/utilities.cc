@@ -463,17 +463,17 @@ namespace OpenCASCADE
   TopoDS_Edge
   join_edges(const TopoDS_Shape &in_shape, const double tolerance)
   {
-    TopoDS_Edge                           out_shape;
-    const TopoDS_Shape                   &edges = in_shape;
-    std::vector<Handle_Geom_BoundedCurve> intersections;
-    TopLoc_Location                       L;
-    Standard_Real                         First;
-    Standard_Real                         Last;
-    gp_Pnt                                PIn(0.0, 0.0, 0.0);
-    gp_Pnt                                PFin(0.0, 0.0, 0.0);
-    gp_Pnt                                PMid(0.0, 0.0, 0.0);
-    TopExp_Explorer                       edgeExplorer(edges, TopAbs_EDGE);
-    TopoDS_Edge                           edge;
+    TopoDS_Edge                                         out_shape;
+    const TopoDS_Shape                                 &edges = in_shape;
+    std::vector<opencascade::handle<Geom_BoundedCurve>> intersections;
+    TopLoc_Location                                     L;
+    Standard_Real                                       First;
+    Standard_Real                                       Last;
+    gp_Pnt                                              PIn(0.0, 0.0, 0.0);
+    gp_Pnt                                              PFin(0.0, 0.0, 0.0);
+    gp_Pnt                                              PMid(0.0, 0.0, 0.0);
+    TopExp_Explorer edgeExplorer(edges, TopAbs_EDGE);
+    TopoDS_Edge     edge;
     while (edgeExplorer.More())
       {
         edge                     = TopoDS::Edge(edgeExplorer.Current());
