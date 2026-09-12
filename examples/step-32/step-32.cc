@@ -36,6 +36,7 @@
 #include <deal.II/lac/solver_gmres.h>
 #include <deal.II/lac/affine_constraints.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_tools.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
@@ -1670,11 +1671,6 @@ namespace Step32
   {
     stokes_matrix.clear();
 
-    TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning,
-                                              stokes_partitioning,
-                                              stokes_relevant_partitioning,
-                                              MPI_COMM_WORLD);
-
     Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
     for (unsigned int c = 0; c < dim + 1; ++c)
       for (unsigned int d = 0; d < dim + 1; ++d)
@@ -1683,16 +1679,27 @@ namespace Step32
         else
           coupling[c][d] = DoFTools::none;
 
+    const IndexSet stokes_locally_relevant =
+      DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
+
+    BlockDynamicSparsityPattern dsp(stokes_relevant_partitioning);
+
     DoFTools::make_sparsity_pattern(stokes_dof_handler,
                                     coupling,
-                                    sp,
+                                    dsp,
                                     stokes_constraints,
                                     false,
                                     Utilities::MPI::this_mpi_process(
                                       MPI_COMM_WORLD));
-    sp.compress();
 
-    stokes_matrix.reinit(sp);
+
+    SparsityTools::distribute_sparsity_pattern(
+      dsp,
+      stokes_dof_handler.locally_owned_dofs(),
+      MPI_COMM_WORLD,
+      stokes_locally_relevant);
+
+    stokes_matrix.reinit(stokes_partitioning, dsp, MPI_COMM_WORLD);
   }
 
 
@@ -1707,11 +1714,6 @@ namespace Step32
 
     stokes_preconditioner_matrix.clear();
 
-    TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning,
-                                              stokes_partitioning,
-                                              stokes_relevant_partitioning,
-                                              MPI_COMM_WORLD);
-
     Table<2, DoFTools::Coupling> coupling(dim + 1, dim + 1);
     for (unsigned int c = 0; c < dim + 1; ++c)
       for (unsigned int d = 0; d < dim + 1; ++d)
@@ -1720,16 +1722,28 @@ namespace Step32
         else
           coupling[c][d] = DoFTools::none;
 
+    BlockDynamicSparsityPattern dsp(stokes_relevant_partitioning);
+
     DoFTools::make_sparsity_pattern(stokes_dof_handler,
                                     coupling,
-                                    sp,
+                                    dsp,
                                     stokes_constraints,
                                     false,
                                     Utilities::MPI::this_mpi_process(
                                       MPI_COMM_WORLD));
-    sp.compress();
 
-    stokes_preconditioner_matrix.reinit(sp);
+    const IndexSet stokes_locally_relevant =
+      DoFTools::extract_locally_relevant_dofs(stokes_dof_handler);
+
+    SparsityTools::distribute_sparsity_pattern(
+      dsp,
+      stokes_dof_handler.locally_owned_dofs(),
+      MPI_COMM_WORLD,
+      stokes_locally_relevant);
+
+    stokes_preconditioner_matrix.reinit(stokes_partitioning,
+                                        dsp,
+                                        MPI_COMM_WORLD);
   }
 
 
@@ -1757,15 +1771,13 @@ namespace Step32
       MPI_COMM_WORLD,
       temperature_relevant_partitioner);
 
-    TrilinosWrappers::SparsityPattern sp;
-    sp.reinit(temperature_partitioner,
-              temperature_partitioner,
-              dsp,
-              MPI_COMM_WORLD);
-
-    temperature_matrix.reinit(sp);
-    temperature_mass_matrix.reinit(sp);
-    temperature_stiffness_matrix.reinit(sp);
+    temperature_matrix.reinit(temperature_partitioner, dsp, MPI_COMM_WORLD);
+    temperature_mass_matrix.reinit(temperature_partitioner,
+                                   dsp,
+                                   MPI_COMM_WORLD);
+    temperature_stiffness_matrix.reinit(temperature_partitioner,
+                                        dsp,
+                                        MPI_COMM_WORLD);
   }
 
 
