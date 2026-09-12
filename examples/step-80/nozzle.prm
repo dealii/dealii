@@ -1,0 +1,119 @@
+# Immersed sphere in a convergent-divergent nozzle.
+#
+# Fluid domain: nozzle.msh (gmsh, all-hex, 1824 cells). Units are millimetres.
+#   axis = z, flow in +z, z in [0, 145]
+#   inlet  disk at z = 0,   R = 10 -> boundary id 2, Poiseuille inflow
+#   outlet disk at z = 145, R = 10 -> boundary id 3, do-nothing (omitted below)
+#   wall                           -> boundary id 4, no-slip
+#
+# Solid domain: a sphere of radius 4 at (0, 0, 15), i.e. on the axis halfway
+# down the inlet cylinder -- downstream of the inflow plane but still well
+# upstream of the contraction.
+#
+# Scaling: rho = 1, nu = 1 mm^2/s, U_max = 1 mm/s => Re_D = U_mean D / nu
+# = 0.5 * 20 / 1 = 10 at the inlet, ~20 at the throat. Note that step-80's
+# solver tolerances below are ABSOLUTE, so keeping the velocity O(1) matters:
+# with U_max = 100 the initial FGMRES residual is ~4e5 and no absolute
+# tolerance of 1e-6 is reachable.
+
+set dimension       = 3
+set space dimension = 3
+subsection Navier-Stokes Immersed Problem
+  # 2 = inlet (Poiseuille), 4 = wall (no-slip).
+  # 3 = outlet is deliberately absent -> natural "do-nothing" outflow.
+  set Dirichlet boundary ids                = 2, 4
+  set Final time                            = 100
+  set Number of time steps                  = 1001
+  set Output directory                      = ./nozzle_test/
+  set Output frequency                      = 2
+  subsection Finite element spaces
+    set Velocity            = FE_Q<3>(2)
+    set Pressure            = FE_Q<3>(1)
+    set Displacement        = FE_Q<3>(1)
+    set Lagrange multiplier = FE_Q<3>(1)
+  end
+  subsection Grid generation
+    # Unknown to GridGenerator::generate_from_name_and_arguments, so step-80
+    # falls back to reading it as a mesh file. The arguments are the
+    # manifold-id -> CAD-file map: id 4 is the nozzle wall, which gets snapped
+    # onto the exact STEP geometry on every refinement. Ids 2 and 3 (the inlet
+    # and outlet disks) are left flat, which is exact for a plane anyway.
+    # Clear the arguments to read the mesh without any CAD projection.
+    set Fluid grid generator                     = nozzle.msh
+    set Fluid grid generator arguments           = 4: nozzle.iges
+    set Initial fluid refinement                 = 1
+    set Solid grid generator                     = hyper_ball
+    set Solid grid generator arguments           = 0, 0, 15 : 4 : false
+    set Initial solid refinement                 = 2
+  end
+  subsection Initial displacement and multiplier
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Navier-Stokes boundary conditions
+    # Poiseuille on the inlet plane only. The z < 1e-6 guard keeps the wall
+    # (boundary id 4, same function, same call) at exactly zero: the inlet
+    # plane is the only place where z vanishes identically. On the inlet rim
+    # the parabola is zero anyway, so the two conditions agree there.
+    set Function constants  = Umax=1, R=10
+    set Function expression = 0; 0; z < 1e-6 ? Umax*(1 - (x^2 + y^2)/(R*R)) : 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Navier-Stokes initial conditions
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Navier-Stokes right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Physical properties
+    set Density                   = 1
+    set Viscosity                 = 1
+    set Include convective term   = true
+    set Solid model               = linear
+    # Stiff enough that the sphere stays essentially rigid: the fluid stress
+    # scale here is mu_f * U / L ~ 1 * 1 / 10 = 0.1.
+    set Lame lambda               = 5
+    set Lame mu                   = 5
+  end
+  subsection Reference configuration and multiplier
+    set Function constants  =
+    set Function expression = x; y; z; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Refinement and remeshing
+    # Adaptive refinement is currently disabled in step-80.cc; these values are
+    # inert but kept sane for when it is re-enabled.
+    set Maximum number of cells        = 500000
+    set Refinement coarsening fraction = 0.3
+    set Refinement fraction            = 0.3
+    set Refinement maximal level       = 3
+    set Refinement minimal level       = 1
+    set Refinement step frequency      = 5
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Solid right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Solver parameters
+    set Solver type                                = augmented_split
+    set Use operator augmentation                  = true
+    set Coupling quadrature type                   = gauss
+    set Gamma AL background                        = 1
+    set Gamma AL immersed                          = 0.01
+    set Inner Lagrangian solver maximum iterations = 500
+    set Inner Lagrangian solver tolerance          = 1e-2
+    set Log inner Lagrangian iterations            = false
+    set Inner solver maximum iterations            = 100
+    set Inner solver tolerance                     = 1e-14
+    set Outer solver maximum iterations            = 1000
+    set Outer solver tolerance                     = 1e-1
+    set Outer solver maximum Krylov vectors        = 1000
+  end
+end
