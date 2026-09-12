@@ -13,7 +13,7 @@
 
 // Check TriaAccessor::real_to_unit_cell_affine_approximation
 
-#include <deal.II/fe/mapping_q.h>
+#include <deal.II/fe/mapping.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_in.h>
@@ -24,26 +24,30 @@
 #include "../tests.h"
 
 
-template <int dim, int spacedim>
+template <int dim, int spacedim, typename ExactTransform>
 void
-do_test(const Triangulation<dim, spacedim> &tria, const Point<spacedim> &p)
+do_test(const Triangulation<dim, spacedim> &tria,
+        const Point<spacedim>              &p,
+        const ExactTransform               &exact_transform)
 {
-  MappingQ<dim, spacedim> mapping(1);
-
   for (typename Triangulation<dim, spacedim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
     {
+      const Point<dim> affine_point =
+        cell->real_to_unit_cell_affine_approximation(p);
+
       deallog << "Point p=(" << p << ") on cell with id " << cell->id() << ": "
-              << cell->real_to_unit_cell_affine_approximation(p) << std::endl;
-      Point<dim> mapping_point;
+              << affine_point << std::endl;
+
       try
         {
-          mapping_point = mapping.transform_real_to_unit_cell(cell, p);
-          mapping_point -= cell->real_to_unit_cell_affine_approximation(p);
+          Point<dim> exact_point = exact_transform(cell, p);
+          exact_point -= affine_point;
+
           deallog << "Distance to mapping point: ";
           for (unsigned int d = 0; d < dim; ++d)
-            deallog << mapping_point[d] << ' ';
+            deallog << exact_point[d] << ' ';
           deallog << std::endl;
         }
       catch (const typename Mapping<dim, spacedim>::ExcTransformationFailed &)
@@ -52,6 +56,36 @@ do_test(const Triangulation<dim, spacedim> &tria, const Point<spacedim> &p)
                   << std::endl;
         }
     }
+}
+
+
+
+template <int dim, int spacedim>
+void
+do_test(const Triangulation<dim, spacedim> &tria, const Point<spacedim> &p)
+{
+  const auto &mapping = get_default_linear_mapping(tria);
+
+  do_test(tria, p, [&](const auto &cell, const auto &point) {
+    return mapping.transform_real_to_unit_cell(cell, point);
+  });
+}
+
+
+
+template <int dim>
+void
+test_reference_cell(const ReferenceCell<dim> &reference_cell,
+                    const Point<dim>         &p,
+                    const char               *name)
+{
+  Triangulation<dim> tria;
+  GridGenerator::reference_cell(tria, reference_cell);
+
+  deallog << name << std::endl;
+  do_test(tria, p, [](const auto &, const auto &point) {
+    return Point<dim>(point);
+  });
 }
 
 
@@ -124,6 +158,19 @@ main()
 
   test2<2>();
   test2<3>();
+
+  test_reference_cell<2>(ReferenceCells::Triangle,
+                         Point<2>(0.2, 0.3),
+                         "Triangle");
+  test_reference_cell<3>(ReferenceCells::Tetrahedron,
+                         Point<3>(0.1, 0.2, 0.3),
+                         "Tetrahedron");
+  test_reference_cell<3>(ReferenceCells::Wedge,
+                         Point<3>(0.2, 0.3, 0.4),
+                         "Wedge");
+  test_reference_cell<3>(ReferenceCells::Pyramid,
+                         Point<3>(0.1, -0.2, 0.3),
+                         "Pyramid");
 
   test3<1, 2>();
   test3<2, 3>();
