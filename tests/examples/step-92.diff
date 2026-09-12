@@ -1,0 +1,29 @@
+418c418,419
+<             std::string geofilename = problem_parameters.mesh_filename + ".geo";
+---
+>             std::string geofilename = "../../../source/step-92/" +
+>                                       problem_parameters.mesh_filename + ".geo";
+419a421
+>             gmsh::option::setNumber("General.Terminal", 0);
+471,472c473,480
+<     pcout << "setup: number of degrees of freedom: " << dof_handler.n_dofs()
+<           << std::endl;
+---
+>     /* removed:
+>      * pcout << "setup: number of degrees of freedom: " << dof_handler.n_dofs()
+>      *       << std::endl;
+>      *
+>      * for the testsuite,
+>      * as it seems that gmsh generates slightly different number
+>      * of degrees of freedom on different systems.
+>      */
+934c942
+<     computing_timer.print_summary();
+---
+>     //computing_timer.print_summary();
+965,966c973,974
+<       ParameterAcceptor::initialize(argc < 2 ? "example-1.prm" : argv[1]);
+< 
+---
+>       ParameterAcceptor::initialize("../../../source/step-92/example-1.prm");
+>       
