@@ -20,7 +20,7 @@
 // external packages into partitions that we can 'import' wherever we
 // need.
 
-// This is the file that wraps everything we need from ADOL-C into one
+// This is the file that wraps everything we need from OpenCASCADE into one
 // module partition.
 
 
