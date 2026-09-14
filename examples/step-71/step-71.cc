@@ -318,7 +318,7 @@ namespace Step71
       // structures (with the result type `double`) to store the derivatives
       // (noting that all derivatives are returned at once, and not
       // individually)...
-      Vector<double>     Df(ad_helper.n_dependent_variables());
+      Vector<double>     Df(ad_helper.n_independent_variables());
       FullMatrix<double> D2f(ad_helper.n_dependent_variables(),
                              ad_helper.n_independent_variables());
 
