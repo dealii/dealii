@@ -1,0 +1,8 @@
+Fixed: The explicit instantiations of
+LinearAlgebra::TpetraWrappers::PreconditionFROSch::initialize() for the float
+scalar type declared a non-const DoFHandler argument and therefore did not
+match the declaration, and one instantiation in the complex-double block was
+malformed. As a consequence deal.II failed to compile against a Trilinos
+configured with Tpetra_INST_FLOAT=ON and ShyLU_DDFROSch.
+<br>
+(Ernesto Ismail, 2026/08/25)
