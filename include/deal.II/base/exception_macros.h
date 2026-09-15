@@ -517,32 +517,10 @@
  * @ingroup Exceptions
  */
 #ifdef DEBUG
-#  if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
-#    define Assert(cond, exc)                                                \
-      do                                                                     \
-        {                                                                    \
-          KOKKOS_IF_ON_HOST(({                                               \
-            if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
-              ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
-                ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
-                  abort_or_throw_on_exception,                               \
-                __FILE__,                                                    \
-                __LINE__,                                                    \
-                __PRETTY_FUNCTION__,                                         \
-                #cond,                                                       \
-                #exc,                                                        \
-                exc);                                                        \
-          }))                                                                \
-          KOKKOS_IF_ON_DEVICE(({                                             \
-            if (!(cond))                                                     \
-              Kokkos::abort(#cond);                                          \
-          }))                                                                \
-        }                                                                    \
-      while (false)
-#  else /*if DEAL_II_KOKKOS_VERSION_GTE(3,6,0), no device support: */
-#    define Assert(cond, exc)                                              \
-      do                                                                   \
-        {                                                                  \
+#  define Assert(cond, exc)                                                \
+    do                                                                     \
+      {                                                                    \
+        KOKKOS_IF_ON_HOST(({                                               \
           if (DEAL_II_BUILTIN_EXPECT(!(cond), false))                      \
             ::dealii::deal_II_exceptions::internals::issue_error_noreturn( \
               ::dealii::deal_II_exceptions::internals::ExceptionHandling:: \
@@ -553,10 +531,14 @@
               #cond,                                                       \
               #exc,                                                        \
               exc);                                                        \
-        }                                                                  \
-      while (false)
-#  endif /*DEAL_II_KOKKOS_VERSION_GTE(3,6,0)*/
-#else    /*ifdef DEBUG*/
+        }))                                                                \
+        KOKKOS_IF_ON_DEVICE(({                                             \
+          if (!(cond))                                                     \
+            Kokkos::abort(#cond);                                          \
+        }))                                                                \
+      }                                                                    \
+    while (false)
+#else /*ifdef DEBUG*/
 #  define Assert(cond, exc) \
     do                      \
       {                     \
