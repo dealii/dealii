@@ -2011,8 +2011,10 @@ MappingFEField<dim, spacedim, VectorType>::transform(
 {
   AssertDimension(input.size(), output.size());
 
-  const auto &data =
-    dynamic_cast<const typename MappingFEField<dim, spacedim, VectorType>::InternalData &>(mapping_data);
+  Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
+         ExcInternalError());
+  const InternalData &data =
+    static_cast<const InternalData &>(mapping_data);
 
   switch (mapping_kind)
     {
@@ -2049,9 +2051,9 @@ MappingFEField<dim, spacedim, VectorType>::transform(
                   output[q][i][j] = 0.0;
                   for (unsigned int k = 0; k < dim; ++k)
                     for (unsigned int l = 0; l < dim; ++l)
-                      output[q][i][j] += data.covariant[q][i][k]
+                      output[q][i][j] += data.contravariant[q][i][k]
                                        * input[q][k][l]
-                                       * data.contravariant[q][j][l];
+                                       * data.covariant[q][j][l];
                 }
           return;
         }
