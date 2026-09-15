@@ -258,6 +258,7 @@ PREDEFINED             = DOXYGEN=1 \
                          DEAL_II_WITH_TRILINOS=1 \
                          DEAL_II_TRILINOS_WITH_AMESOS=1 \
                          DEAL_II_TRILINOS_WITH_AMESOS2=1 \
+                         DEAL_II_TRILINOS_WITH_ANASAZI=1 \
                          DEAL_II_TRILINOS_WITH_AZTECOO=1 \
                          DEAL_II_TRILINOS_WITH_BELOS=1 \
                          DEAL_II_TRILINOS_WITH_EPETRA=1 \

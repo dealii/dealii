@@ -232,6 +232,7 @@ tbb_includes = ["tbb/.*"]
 
 trilinos_includes = [
     "Amesos.*",
+    "Anasazi.*",
     "AztecOO.h",
     "Belos.*",
     "Epetra.*",
