@@ -46,6 +46,19 @@ function bdie () {
         exit 1
 }
 
+function check_zlib () {
+        local build_dir="$1"
+        local config_file
+
+        while IFS= read -r -d '' config_file ; do
+                if grep -q "P4EST_HAVE_ZLIB *1" "$config_file" ; then
+                        return 0
+                fi
+        done < <(find "$build_dir" -name "p4est_config.h" -type f -print0)
+
+        return 1
+}
+
 if test -z "$CFLAGS" -a -z "$P4EST_CFLAGS_FAST" ; then
         export CFLAGS_FAST="-O2"
 else
@@ -125,9 +138,7 @@ cd "$BUILD_FAST"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
 # ensure that we built p4est with zlib
-find "$BUILD_FAST" -name "p4est_config.h" -type f -exec \
-    grep -q "P4EST_HAVE_ZLIB *1" {} \; \
-    || bdie "$MISSING_ZLIB_MESSAGE"
+check_zlib "$BUILD_FAST" || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "FAST version installed in $INSTALL_FAST"
 
@@ -144,9 +155,7 @@ cd "$BUILD_DEBUG"
 make -C sc -j 8 > make.output || bdie "Error in make sc"
 make -j 8 >> make.output || bdie "Error in make p4est"
 # ensure that we built p4est with zlib
-find "$BUILD_DEBUG" -name "p4est_config.h" -type f -exec \
-    grep -q "P4EST_HAVE_ZLIB *1" {} \; \
-    || bdie "$MISSING_ZLIB_MESSAGE"
+check_zlib "$BUILD_DEBUG" || bdie "$MISSING_ZLIB_MESSAGE"
 make install >> make.output || bdie "Error in make install"
 echo "DEBUG version installed in $INSTALL_DEBUG"
 echo
