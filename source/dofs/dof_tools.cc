@@ -2450,6 +2450,19 @@ namespace DoFTools
   }
 
 
+  template <int dim, int spacedim>
+  std::vector<types::global_dof_index>
+  count_dofs_per_fe_block(
+    const DoFHandler<dim, spacedim>                     &dof_handler,
+    const std::vector<FEValuesExtractors::AnyExtractor> &order)
+  {
+    const std::vector<unsigned int> component_order =
+      FEValuesExtractors::internal::generate_component_order<dim, spacedim>(
+        order, dof_handler.get_fe().n_components());
+    return count_dofs_per_fe_block(dof_handler, component_order);
+  }
+
+
 
   template <int dim, int spacedim>
   void
