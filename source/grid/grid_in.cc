@@ -5230,7 +5230,7 @@ namespace
     : tolerance(5e-16) // Used to offset Cubit tolerance error when outputting
                        // value close to zero
   {
-    AssertThrow(spacedim == 2 || spacedim == 3, ExcNotImplemented());
+    AssertThrow(spacedim == 1 | spacedim == 2 || spacedim == 3, ExcNotImplemented());
   }
 
 
@@ -5756,6 +5756,51 @@ namespace
   return face_nodes;
 }
 
+  std::string
+   n_vertices_to_ucd_string(unsigned int dim, int n_vertices_per_cell)
+  {
+    // still need fallbacks in case it fails
+    if (dim == 0 &&)
+    {
+      return "pt";
+    }
+    else if (dim == 1)
+    {
+      if(n_vertices_per_cell == 2)
+      {
+        return "line";
+      }
+    }
+    else if (dim == 2)
+    {
+      if(n_vertices_per_cell == 3)
+      {
+        //std::string tet_string = "tet";
+        //return tet_string;
+        return "tri";
+      }
+      else if (n_vertices_per_cell == 4)
+      {
+        return "quad";
+      }
+    }
+    else if (dim == 3)
+    {
+      if(n_vertices_per_cell == 4)
+      {
+        return "tet";
+      }
+      else if(n_vertices_per_cell == 6)
+      {
+        return "prism";
+      }
+      else if (n_vertices_per_cell == 8)
+      {
+        return "hex";
+      }
+    }
+  }
+
   template <int dim, int spacedim>
   void
   Abaqus_to_UCD<dim, spacedim>::write_out_avs_ucd(std::ostream &output) const
@@ -5838,7 +5883,7 @@ namespace
       {
         int n_vertices_per_cell = cell_list[ii].size()-1;
         output << ii + 1 << "\t" << cell_list[ii][0] << "\t"
-               << (ref_cell.n_vertices_to_type(dim, n_vertices_per_cell).to_string()) << "\t"; //will not work, need a different string
+               << (n_vertices_to_ucd_string(dim, n_vertices_per_cell)) << "\t"; //will not work, need a different string
         for (unsigned int jj = 1; jj < n_vertices_per_cell + 1;
              ++jj)
           output << cell_list[ii][jj] << "\t";
@@ -5851,7 +5896,7 @@ namespace
       {
         int n_vertices_per_cell = face_list[ii].size()-1;
         output << ii + 1 << "\t" << face_list[ii][0] << "\t"
-               << (ref_cell.n_vertices_to_type(dim, n_vertices_per_cell).to_string()) << "\t";
+               << (n_vertices_to_ucd_string(dim-1, n_vertices_per_cell)) << "\t";
         for (unsigned int jj = 1; jj < n_vertices_per_cell + 1;
              ++jj)
           output << face_list[ii][jj] << "\t";
