@@ -86,8 +86,7 @@ test()
   // Use a nontrivial affine geometry so that the gradient transformations
   // involve a non-identity Jacobian.
   GridTools::transform(
-    [](const Point<dim> &p)
-    {
+    [](const Point<dim> &p) {
       Point<dim> x;
 
       for (unsigned int d = 0; d < dim; ++d)
@@ -123,10 +122,7 @@ test()
   const UpdateFlags flags =
     update_covariant_transformation | update_contravariant_transformation;
 
-  FEValues2<dim> fe_values_q(mapping_q,
-                             position_fe,
-                             quadrature,
-                             flags);
+  FEValues2<dim> fe_values_q(mapping_q, position_fe, quadrature, flags);
 
   FEValues2<dim> fe_values_fe_field(mapping_fe_field,
                                     position_fe,
@@ -147,32 +143,29 @@ test()
           for (unsigned int j = 0; j < dim; ++j)
             input[q][i][j] = 1.0 + q + 0.1 * i + 0.01 * j;
 
-      const auto test_mapping =
-        [&](const MappingKind mapping_kind, const std::string &name)
-        {
-          std::vector<Tensor<2, dim>> output_q(quadrature.size());
-          std::vector<Tensor<2, dim>> output_fe_field(quadrature.size());
+      const auto test_mapping = [&](const MappingKind  mapping_kind,
+                                    const std::string &name) {
+        std::vector<Tensor<2, dim>> output_q(quadrature.size());
+        std::vector<Tensor<2, dim>> output_fe_field(quadrature.size());
 
-          mapping_q.transform(make_array_view(input),
-                              mapping_kind,
-                              fe_values_q.get_mapping_data(),
-                              make_array_view(output_q));
+        mapping_q.transform(make_array_view(input),
+                            mapping_kind,
+                            fe_values_q.get_mapping_data(),
+                            make_array_view(output_q));
 
-          mapping_fe_field.transform(
-            make_array_view(input),
-            mapping_kind,
-            fe_values_fe_field.get_mapping_data(),
-            make_array_view(output_fe_field));
+        mapping_fe_field.transform(make_array_view(input),
+                                   mapping_kind,
+                                   fe_values_fe_field.get_mapping_data(),
+                                   make_array_view(output_fe_field));
 
-          for (unsigned int q = 0; q < input.size(); ++q)
-            AssertThrow((output_q[q] - output_fe_field[q]).norm() < 1e-12,
-                        ExcInternalError());
+        for (unsigned int q = 0; q < input.size(); ++q)
+          AssertThrow((output_q[q] - output_fe_field[q]).norm() < 1e-12,
+                      ExcInternalError());
 
-          deallog << name << ": OK" << std::endl;
-        };
+        deallog << name << ": OK" << std::endl;
+      };
 
-      test_mapping(mapping_covariant_gradient,
-                   "mapping_covariant_gradient");
+      test_mapping(mapping_covariant_gradient, "mapping_covariant_gradient");
 
       test_mapping(mapping_contravariant_gradient,
                    "mapping_contravariant_gradient");
