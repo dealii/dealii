@@ -555,8 +555,7 @@ namespace Step43
 #ifdef DEAL_II_TRILINOS_WITH_EPETRA
     using PreconditionType = TrilinosWrappers::PreconditionIC;
 #else
-    // IC is not available in TpetraWrappers. Use a custom Ifpack preconditioner
-    // instead.
+    // For Tpetra, IC is only available through Ifpack.
     using PreconditionType =
       LinearAlgebra::TpetraWrappers::PreconditionIfpack<double>;
 #endif
