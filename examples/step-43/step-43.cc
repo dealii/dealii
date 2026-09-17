@@ -58,6 +58,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_parallel_block_vector.h>
 #include <deal.II/lac/trilinos_precondition.h>
+#include <deal.II/lac/trilinos_tpetra_precondition.h>
 
 #include <iostream>
 #include <fstream>
@@ -551,9 +552,15 @@ namespace Step43
     const double porosity;
     const double AOS_threshold;
 
-    std::shared_ptr<TrilinosWrappers::PreconditionIC> top_left_preconditioner;
-    std::shared_ptr<TrilinosWrappers::PreconditionIC>
-      bottom_right_preconditioner;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    using PreconditionType = TrilinosWrappers::PreconditionIC;
+#else
+    // For Tpetra, IC is only available through Ifpack.
+    using PreconditionType =
+      LinearAlgebra::TpetraWrappers::PreconditionIfpack<double>;
+#endif
+    std::shared_ptr<PreconditionType> top_left_preconditioner;
+    std::shared_ptr<PreconditionType> bottom_right_preconditioner;
 
     bool rebuild_saturation_matrix;
 
@@ -903,6 +910,8 @@ namespace Step43
         darcy_preconditioner_constraints.distribute_local_to_global(
           local_matrix, local_dof_indices, darcy_preconditioner_matrix);
       }
+
+    darcy_preconditioner_matrix.compress(VectorOperation::add);
   }
 
 
@@ -928,13 +937,19 @@ namespace Step43
   {
     assemble_darcy_preconditioner();
 
-    top_left_preconditioner =
-      std::make_shared<TrilinosWrappers::PreconditionIC>();
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    top_left_preconditioner = std::make_shared<PreconditionType>();
+#else
+    top_left_preconditioner     = std::make_shared<PreconditionType>("FAST_IC");
+#endif
     top_left_preconditioner->initialize(
       darcy_preconditioner_matrix.block(0, 0));
 
-    bottom_right_preconditioner =
-      std::make_shared<TrilinosWrappers::PreconditionIC>();
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+    bottom_right_preconditioner = std::make_shared<PreconditionType>();
+#else
+    bottom_right_preconditioner = std::make_shared<PreconditionType>("FAST_IC");
+#endif
     bottom_right_preconditioner->initialize(
       darcy_preconditioner_matrix.block(1, 1));
   }
@@ -1134,6 +1149,9 @@ namespace Step43
         darcy_constraints.distribute_local_to_global(
           local_matrix, local_rhs, local_dof_indices, darcy_matrix, darcy_rhs);
       }
+
+    darcy_matrix.compress(VectorOperation::add);
+    darcy_rhs.compress(VectorOperation::add);
   }
 
 
@@ -1211,6 +1229,8 @@ namespace Step43
                                                           local_dof_indices,
                                                           saturation_matrix);
       }
+
+    saturation_matrix.compress(VectorOperation::add);
   }
 
 
@@ -1298,6 +1318,8 @@ namespace Step43
                                                     local_dof_indices);
             }
       }
+
+    saturation_rhs.compress(VectorOperation::add);
   }
 
 
@@ -1473,13 +1495,12 @@ namespace Step43
 
         {
           const LinearSolvers::InverseMatrix<TrilinosWrappers::SparseMatrix,
-                                             TrilinosWrappers::PreconditionIC>
+                                             PreconditionType>
             mp_inverse(darcy_preconditioner_matrix.block(1, 1),
                        *bottom_right_preconditioner);
 
-          const LinearSolvers::BlockSchurPreconditioner<
-            TrilinosWrappers::PreconditionIC,
-            TrilinosWrappers::PreconditionIC>
+          const LinearSolvers::BlockSchurPreconditioner<PreconditionType,
+                                                        PreconditionType>
             preconditioner(darcy_matrix, mp_inverse, *top_left_preconditioner);
 
           SolverControl solver_control(darcy_matrix.m(),
@@ -1580,7 +1601,11 @@ namespace Step43
                                    1e-16 * saturation_rhs.l2_norm());
       SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
 
-      TrilinosWrappers::PreconditionIC preconditioner;
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+      PreconditionType preconditioner;
+#else
+      PreconditionType preconditioner("FAST_IC");
+#endif
       preconditioner.initialize(saturation_matrix);
 
       cg.solve(saturation_matrix,
