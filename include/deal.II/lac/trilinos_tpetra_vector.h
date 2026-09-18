@@ -855,9 +855,13 @@ namespace LinearAlgebra
        * stored locally. If this is a sequential vector, then the result will be
        * the pair <code>(0,N)</code>, otherwise it will be a pair
        * <code>(i,i+n)</code>, where <code>n</code> is the number of elements
-       * stored on this processor and and <code>i</code> is the first element of
+       * stored on this processor and <code>i</code> is the first element of
        * the vector stored on this processor, corresponding to the half open
-       * interval $[i,i+n)$
+       * interval $[i,i+n)$.
+       *
+       * The range includes ghost entries and does not require knowledge of
+       * which entries are locally owned. If no entries are stored on this
+       * processor, the returned pair is <code>(0,0)</code>.
        *
        * @note The description above is true most of the time, but not always.
        * In particular, Trilinos vectors need not store contiguous ranges of
