@@ -30,3 +30,10 @@ for (SCALAR : REAL_SCALARS)
     template class GrowingVectorMemory<
       LinearAlgebra::distributed::Vector<SCALAR, MemorySpace::Default>>;
   }
+
+
+// PSCToolkit
+for (V : PSCTOOLKIT_VECTORS)
+  {
+    template class GrowingVectorMemory<V>;
+  }
