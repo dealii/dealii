@@ -12,7 +12,7 @@
 
 #include <deal.II/lac/trilinos_solver.h>
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 #  include <deal.II/base/conditional_ostream.h>
 
@@ -35,11 +35,11 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 #  include <memory>
 
 
-#endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_TRILINOS_WITH_EPETRA
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 namespace TrilinosWrappers
 {
@@ -994,5 +994,5 @@ namespace TrilinosWrappers
 } // namespace TrilinosWrappers
 
 
-#endif // DEAL_II_WITH_PETSC
+#endif // DEAL_II_TRILINOS_WITH_EPETRA
 DEAL_II_NAMESPACE_CLOSE
