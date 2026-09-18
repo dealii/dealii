@@ -90,6 +90,12 @@ namespace LinearAlgebra::TpetraWrappers
   template <typename Number, typename MemorySpace>
   class SolverDirect;
 } // namespace LinearAlgebra::TpetraWrappers
+
+template <typename VectorType>
+class SolverCG;
+
+template <typename VectorType>
+class SolverGMRES;
 #  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_TPETRA
@@ -185,8 +191,26 @@ namespace TrilinosWrappers
 #  ifndef DEAL_II_TRILINOS_WITH_EPETRA
   using SolverDirect = ::dealii::LinearAlgebra::TpetraWrappers::
     SolverDirect<double, ::dealii::MemorySpace::Host>;
+
+  /**
+   * Typedef for the CG solver type used. This is a temporary solution
+   * until we have a proper TpetraWrappers::SolverCG class that works
+   * with Tpetra matrices and vectors.
+   */
+  using SolverCG = dealii::SolverCG<
+    LinearAlgebra::TpetraWrappers::Vector<double, ::dealii::MemorySpace::Host>>;
+
+  /**
+   * Typedef for the GMRES solver type used. This is a temporary solution
+   * until we have a proper TpetraWrappers::SolverGMRES class that works
+   * with Tpetra matrices and vectors.
+   */
+  using SolverGMRES = dealii::SolverGMRES<
+    LinearAlgebra::TpetraWrappers::Vector<double, ::dealii::MemorySpace::Host>>;
 #  else
   class SolverDirect;
+  class SolverCG;
+  class SolverGMRES;
 #  endif
 } // namespace TrilinosWrappers
 
