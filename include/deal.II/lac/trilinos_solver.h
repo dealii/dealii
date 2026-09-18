@@ -21,7 +21,7 @@
 #  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 #endif
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/base/template_constraints.h>
 
 #  include <deal.II/lac/exceptions.h>
@@ -31,17 +31,21 @@
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 
-// for AztecOO solvers
-#  include <Amesos.h>
-#  include <AztecOO.h>
-#  include <Epetra_LinearProblem.h>
-#  include <Epetra_Operator.h>
+// for Epetra-based AztecOO and Amesos solvers
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#    include <Amesos.h>
+#    include <AztecOO.h>
+#    include <Epetra_LinearProblem.h>
+#    include <Epetra_Operator.h>
+#  endif
 
 // for Belos solvers
 #  ifdef DEAL_II_TRILINOS_WITH_BELOS
 #    include <BelosBlockCGSolMgr.hpp>
 #    include <BelosBlockGmresSolMgr.hpp>
-#    include <BelosEpetraAdapter.hpp>
+#    ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#      include <BelosEpetraAdapter.hpp>
+#    endif
 #    include <BelosIteration.hpp>
 #    include <BelosMultiVec.hpp>
 #    include <BelosOperator.hpp>
@@ -57,9 +61,10 @@ DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 DEAL_II_NAMESPACE_OPEN
 
-#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
+#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
 
 
   /**
@@ -706,6 +711,8 @@ namespace TrilinosWrappers
   };
 
 
+
+#  endif // DEAL_II_TRILINOS_WITH_EPETRA
 
 #  ifdef DEAL_II_TRILINOS_WITH_BELOS
   /**

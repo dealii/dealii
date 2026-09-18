@@ -645,6 +645,11 @@ macro(feature_trilinos_configure_external)
       set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_DOUBLE
         "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Host>"
         "LinearAlgebra::TpetraWrappers::BlockVector<double, MemorySpace::Default>")
+      list (APPEND DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES
+        "LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::SparseMatrix<double, MemorySpace::Default>"
+        "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<double, MemorySpace::Default>")
     endif()
 
     if(DEAL_II_TRILINOS_WITH_TPETRA_INST_FLOAT)
@@ -655,6 +660,11 @@ macro(feature_trilinos_configure_external)
       set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_FLOAT
         "LinearAlgebra::TpetraWrappers::BlockVector<float, MemorySpace::Host>"
         "LinearAlgebra::TpetraWrappers::BlockVector<float, MemorySpace::Default>")
+      list (APPEND DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES
+        "LinearAlgebra::TpetraWrappers::SparseMatrix<float, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::SparseMatrix<float, MemorySpace::Default>"
+        "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<float, MemorySpace::Host>"
+        "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<float, MemorySpace::Default>")
     endif()
 
     if(${DEAL_II_WITH_COMPLEX_NUMBERS})
@@ -666,6 +676,11 @@ macro(feature_trilinos_configure_external)
         set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_DOUBLE
           "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Host>"
           "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<double>, MemorySpace::Default>")
+        list (APPEND DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES
+          "LinearAlgebra::TpetraWrappers::SparseMatrix<std::complex<double>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::SparseMatrix<std::complex<double>, MemorySpace::Default>"
+          "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<std::complex<double>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<std::complex<double>, MemorySpace::Default>")
       endif()
 
       if(DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_FLOAT)
@@ -676,6 +691,11 @@ macro(feature_trilinos_configure_external)
         set(DEAL_II_EXPAND_TPETRA_BLOCKVECTOR_COMPLEX_FLOAT
           "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<float>, MemorySpace::Host>"
           "LinearAlgebra::TpetraWrappers::BlockVector<std::complex<float>, MemorySpace::Default>")
+        list (APPEND DEAL_II_EXPAND_TRILINOS_SPARSE_MATRICES
+          "LinearAlgebra::TpetraWrappers::SparseMatrix<std::complex<float>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::SparseMatrix<std::complex<float>, MemorySpace::Default>"
+          "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<std::complex<float>, MemorySpace::Host>"
+          "LinearAlgebra::TpetraWrappers::BlockSparseMatrix<std::complex<float>, MemorySpace::Default>")
       endif()
     endif()
   endif()

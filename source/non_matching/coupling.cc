@@ -29,8 +29,16 @@
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/sparsity_pattern_base.h>
-#include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#include <deal.II/lac/trilinos_sparse_matrix.h>
+
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#  endif
+#endif
 
 #include <deal.II/non_matching/coupling.h>
 
