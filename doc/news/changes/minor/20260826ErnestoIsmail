@@ -1,0 +1,8 @@
+Fixed: LinearAlgebra::TpetraWrappers::Vector::min() guarded complex number
+types with a run-time assertion, but its body still had to compile for every
+instantiated type and used operator< as well as std::numeric_limits::max(),
+neither of which is defined for complex numbers. The body is now guarded with
+if constexpr, so that deal.II can be compiled against a Trilinos providing
+complex Tpetra instantiations.
+<br>
+(Ernesto Ismail, 2026/08/26)
