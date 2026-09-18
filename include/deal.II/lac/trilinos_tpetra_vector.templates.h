@@ -135,15 +135,10 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     Vector<Number, MemorySpace>::Vector(const IndexSet &parallel_partitioner,
                                         const MPI_Comm  communicator)
-      : compressed(true)
-      , has_ghost(false)
-      , last_action(VectorOperation::unknown)
-      , vector(Utilities::Trilinos::internal::make_rcp<
-               TpetraTypes::VectorType<Number, MemorySpace>>(
-          parallel_partitioner.make_tpetra_map_rcp<
-            TpetraTypes::NodeType<MemorySpace>>(communicator, true)))
-      , local_entries(parallel_partitioner)
-    {}
+      : Vector()
+    {
+      reinit(parallel_partitioner, communicator);
+    }
 
 
 
@@ -243,15 +238,34 @@ namespace LinearAlgebra
       nonlocal_cached_values.clear();
       tpetra_comm_pattern = Teuchos::null;
 
-      compressed    = true;
-      has_ghost     = false;
-      last_action   = VectorOperation::unknown;
-      local_entries = parallel_partitioner;
-      vector        = Utilities::Trilinos::internal::make_rcp<
+      const bool overlapping =
+        !parallel_partitioner.is_ascending_and_one_to_one(communicator);
+
+      vector = Utilities::Trilinos::internal::make_rcp<
         TpetraTypes::VectorType<Number, MemorySpace>>(
         parallel_partitioner
           .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
-            communicator, true));
+            communicator, overlapping));
+
+      has_ghost = !vector->getMap()->isOneToOne();
+
+      // Overlapping index sets do not identify which process owns each entry.
+      // Use a size-zero index set to mark ownership as unknown.
+      if (has_ghost)
+        local_entries = IndexSet();
+      else
+        local_entries = parallel_partitioner;
+
+      if constexpr (running_in_debug_mode())
+        {
+          const size_type n_elements_global =
+            Utilities::MPI::sum(local_entries.n_elements(), communicator);
+
+          Assert(has_ghost || n_elements_global == size(), ExcInternalError());
+        }
+
+      compressed  = true;
+      last_action = VectorOperation::unknown;
     }
 
 
@@ -1415,6 +1429,11 @@ namespace LinearAlgebra
     IndexSet
     Vector<Number, MemorySpace>::locally_owned_elements() const
     {
+      Assert(local_entries.size() == size(),
+             ExcMessage(
+               "The locally owned elements have not been properly initialized!"
+               " This happens for example if this object has been initialized"
+               " with exactly one overlapping IndexSet."));
       return local_entries;
     }
 
