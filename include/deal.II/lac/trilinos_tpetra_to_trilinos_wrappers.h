@@ -92,9 +92,11 @@ namespace LinearAlgebra::TpetraWrappers
 } // namespace LinearAlgebra::TpetraWrappers
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverCG;
 
 template <typename VectorType>
+DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
 class SolverGMRES;
 #  endif
 
