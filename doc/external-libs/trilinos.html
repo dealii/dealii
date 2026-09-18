@@ -62,6 +62,7 @@
       <ul>
         <li> Amesos (Epetra stack),
         <li> Amesos2 (Tpetra stack),
+        <li> Anasazi (optional, required for TrilinosWrappers::AnasaziSolver),
         <li> AztecOO (Epetra stack),
         <li> Belos (Tpetra stack),
         <li> Epetra (Epetra stack),
@@ -92,6 +93,7 @@
 
     cmake                                            \
     -DTrilinos_ENABLE_Amesos=ON                      \
+    -DTrilinos_ENABLE_Anasazi=ON                     \
     -DTrilinos_ENABLE_Epetra=ON                      \
     -DTrilinos_ENABLE_EpetraExt=ON                   \
     -DTrilinos_ENABLE_Ifpack=ON                      \
