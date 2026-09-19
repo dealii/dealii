@@ -46,9 +46,9 @@ main()
   gp_Ax2        axis(center, z_axis);
   Standard_Real radius(1.);
 
-  GC_MakeCircle make_circle(axis, radius);
-  Handle(Geom_Circle) circle = make_circle.Value();
-  TopoDS_Edge edge           = BRepBuilderAPI_MakeEdge(circle);
+  GC_MakeCircle                    make_circle(axis, radius);
+  opencascade::handle<Geom_Circle> circle = make_circle.Value();
+  TopoDS_Edge                      edge   = BRepBuilderAPI_MakeEdge(circle);
 
   // Now get a few points and project
   // them on the circle

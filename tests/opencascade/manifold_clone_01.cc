@@ -45,9 +45,9 @@ main()
     gp_Ax2        axis(center, z_axis);
     Standard_Real radius(std::sqrt(2.) / 2.);
 
-    GC_MakeCircle make_circle(axis, radius);
-    Handle(Geom_Circle) circle = make_circle.Value();
-    TopoDS_Edge edge           = BRepBuilderAPI_MakeEdge(circle);
+    GC_MakeCircle                    make_circle(axis, radius);
+    opencascade::handle<Geom_Circle> circle = make_circle.Value();
+    TopoDS_Edge                      edge   = BRepBuilderAPI_MakeEdge(circle);
 
     NormalProjectionManifold<2, 3>  manifold_m(edge);
     std::unique_ptr<Manifold<2, 3>> clone_m       = manifold_m.clone();
