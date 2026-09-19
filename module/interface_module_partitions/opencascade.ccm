@@ -20,7 +20,7 @@
 // external packages into partitions that we can 'import' wherever we
 // need.
 
-// This is the file that wraps everything we need from ADOL-C into one
+// This is the file that wraps everything we need from OpenCASCADE into one
 // module partition.
 
 
@@ -43,6 +43,7 @@ module;
 #    include <Handle_Adaptor3d_HCurve.hxx>
 #  endif
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+#    include <Standard_Handle.hxx>
 #    include <Standard_Transient.hxx>
 #  else
 #    include <Handle_Standard_Transient.hxx>
@@ -150,9 +151,16 @@ export
   using ::gp_Trsf;
   using ::gp_Vec;
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
-  using ::Handle_Adaptor3d_Curve;
+  using ::Adaptor3d_Curve;
 #  else
   using ::Handle_Adaptor3d_HCurve;
+  using ::Handle_Geom_BoundedCurve;
+  using ::Handle_Geom_BSplineCurve;
+  using ::Handle_Geom_Curve;
+  using ::Handle_Geom_Plane;
+  using ::Handle_Geom_Surface;
+  using ::Handle_Poly_Triangulation;
+  using ::Handle_TColgp_HArray1OfPnt;
 #  endif
   using ::BRepAdaptor_Curve;
 #  if !DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
@@ -166,16 +174,7 @@ export
   using ::Handle_BRepAdaptor_HCurve;
 #  endif
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
-  using ::Handle_BRepAdaptor_CompCurve;
-  using ::Handle_BRepAdaptor_Curve;
 #  endif
-  using ::Handle_Geom_BoundedCurve;
-  using ::Handle_Geom_BSplineCurve;
-  using ::Handle_Geom_Curve;
-  using ::Handle_Geom_Plane;
-  using ::Handle_Geom_Surface;
-  using ::Handle_Poly_Triangulation;
-  using ::Handle_TColgp_HArray1OfPnt;
   using ::IFSelect_PrintCount;
   using ::IFSelect_ReturnStatus;
   using ::IGESControl_Controller;
@@ -221,6 +220,13 @@ export
   using ::TopoDS_Vertex;
   using ::TopoDS_Wire;
 }
+
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 10, 0)
+export namespace opencascade
+{
+  using ::opencascade::handle;
+}
+#  endif
 
 // Deal with non-exportable entities like for all
 // of the other external libraries:
