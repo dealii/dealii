@@ -997,6 +997,12 @@ public:
   exodusii_face_to_deal_face(const unsigned int face_n) const;
 
   /**
+   * Map a UCD vertex number to a deal.II vertex number.
+   */
+  unsigned int
+  ucd_vertex_to_deal_vertex(const unsigned int vertex_n) const;
+
+  /**
    * Map a UNV vertex number to a deal.II vertex number.
    */
   unsigned int
