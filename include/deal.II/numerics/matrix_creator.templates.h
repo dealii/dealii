@@ -53,6 +53,13 @@
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_block_vector.h>
+#    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#    include <deal.II/lac/trilinos_tpetra_vector.h>
+#  endif
 #endif
 
 

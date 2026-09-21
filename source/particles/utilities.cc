@@ -14,6 +14,11 @@
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#  include <deal.II/lac/trilinos_tpetra_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#endif
+
 #include <deal.II/particles/utilities.h>
 
 #include <vector>
