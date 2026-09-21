@@ -56,7 +56,12 @@ test()
   const int is_linear_index_set =
     locally_owned_dofs.is_ascending_and_one_to_one(mpi_communicator);
 
-  const int is_linear_map = vector_linear.trilinos_vector().Map().LinearMap();
+  const int is_linear_map =
+#ifndef DEAL_II_TRILINOS_WITH_EPETRA
+    vector_linear.trilinos_vector().getMap()->isContiguous();
+#else
+    vector_linear.trilinos_vector().Map().LinearMap();
+#endif
 
   if (is_linear_index_set == 1 && is_linear_map == 1)
     {
