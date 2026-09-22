@@ -500,6 +500,11 @@ for (M : PSCTOOLKIT_MATRICES)
       std::bool_constant<false>) const;
   }
 
+for (V : PSCTOOLKIT_VECTORS)
+  {
+    template void AffineConstraints<double>::distribute<V>(V &) const;
+  }
+
 
 //
 // FIXME: These mixed variants are needed for multigrid and matrix free.

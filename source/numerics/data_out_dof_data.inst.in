@@ -97,6 +97,47 @@ for (VEC : VECTOR_TYPES; deal_II_dimension : DIMENSIONS)
 
 
 
+// PSCToolkit
+for (VEC : PSCTOOLKIT_VECTORS; deal_II_dimension : DIMENSIONS)
+  {
+    template void DataOut_DoFData<deal_II_dimension, deal_II_dimension>::
+      add_data_vector_internal<VEC>(
+        const DoFHandler<deal_II_dimension> *,
+        const VEC &,
+        const std::vector<std::string> &,
+        const DataVectorType,
+        const std::vector<
+          DataComponentInterpretation::DataComponentInterpretation> &,
+        const bool);
+
+    template void DataOut_DoFData<deal_II_dimension,
+                                  deal_II_dimension - 1,
+                                  deal_II_dimension,
+                                  deal_II_dimension>::
+      add_data_vector_internal<VEC>(
+        const DoFHandler<deal_II_dimension> *,
+        const VEC &,
+        const std::vector<std::string> &,
+        const DataVectorType,
+        const std::vector<
+          DataComponentInterpretation::DataComponentInterpretation> &,
+        const bool);
+
+#if deal_II_dimension < 3
+    template void DataOut_DoFData<deal_II_dimension, deal_II_dimension + 1>::
+      add_data_vector_internal<VEC>(
+        const DoFHandler<deal_II_dimension> *,
+        const VEC &,
+        const std::vector<std::string> &,
+        const DataVectorType,
+        const std::vector<
+          DataComponentInterpretation::DataComponentInterpretation> &,
+        const bool);
+#endif
+  }
+
+
+
 for (deal_II_dimension : DIMENSIONS)
   {
     template class DataOut_DoFData<deal_II_dimension, deal_II_dimension>;
