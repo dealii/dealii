@@ -18,7 +18,7 @@ set Power iteration tolerance = 1e-12
 set Refinement cycles         = 12
 @endcode
 The output of this program then consists of the console output, a file
-named `convergence_table' to record main results of mesh iteration,
+named `convergence_table` to record main results of mesh iteration,
 and the graphical output in vtu format.
 
 The console output looks like this:
@@ -59,7 +59,7 @@ Iter number:33 k_eff=0.906834736551 flux_ratio=4.384846081798 max_thermal=0.0084
 
 We see that power iteration does converge faster after cycle 0 due to the initialization
 with solution from last mesh iteration.
-The contents of `convergence_table' are,
+The contents of `convergence_table` are,
 @code
 0 4761 4761 0.906841960371 4.38405602258
 1 4761 10667 0.906837901031 4.38548908776
@@ -97,7 +97,7 @@ Then we plot the convergence data with polynomial order being equal to 1,2 and 3
 
 <img src="https://dealii.org/images/steps/developer/step-28.convergence.png" alt="">
 
-The estimated `exact' k-effective = 0.906834721253 which is simply from last
+The estimated ``exact'' k-effective = 0.906834721253 which is simply from last
 mesh iteration of polynomial order 3 minus 2e-10. We see that h-adaptive calculations
 deliver an algebraic convergence. And the higher polynomial order is, the faster mesh
 iteration converges. In our problem, we need smaller number of DoFs to achieve same
