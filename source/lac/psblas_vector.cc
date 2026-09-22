@@ -30,9 +30,11 @@ namespace PSCToolkitWrappers
     : psblas_vector(nullptr)
     , psblas_context(InitFinalize::get_psblas_context())
     , psblas_descriptor(nullptr)
+    , communicator(MPI_COMM_NULL)
     , ghosted(false)
     , state(internal::State::Default)
     , last_action(VectorOperation::unknown)
+    , remote_entries_pending(false)
   {}
 
 
@@ -89,17 +91,33 @@ namespace PSCToolkitWrappers
                  const MPI_Comm  comm,
                  const bool      omit_zeroing_entries)
   {
-    Assert(communicator != MPI_COMM_NULL,
+    Assert(comm != MPI_COMM_NULL,
            ExcMessage("MPI_COMM_NULL passed to Vector::reinit()."));
-    communicator                 = comm;
-    ghosted                      = false;
-    const bool is_vector_changed = size() != local_partitioning.size();
-    owned_elements               = local_partitioning;
+
+    // A PSBLAS descriptor describes the parallel partitioning, so it can only
+    // be recycled if that partitioning stays the same. Note: comparing global
+    // sizes is not enough because two **different** partitionings can have the
+    // same global size.
+    const bool partitioning_changes_locally =
+      (psblas_descriptor.get() == nullptr) || (ghosted == true) ||
+      (communicator != comm) ||
+      (owned_elements.size() != local_partitioning.size()) ||
+      (owned_elements != local_partitioning);
+
+    // Creating a descriptor is a collective operation, so the processes have to
+    // agree on whether one is built. If changes are only on some
+    // of the processes, we must therefore  trigger the rebuild everywhere.
+    const bool partitioning_will_change =
+      Utilities::MPI::logical_or(partitioning_changes_locally, comm);
+
+    communicator   = comm;
+    ghosted        = false;
+    owned_elements = local_partitioning;
+    // index_within_set() requires a compressed index set
+    owned_elements.compress();
 
     int ierr;
-    // we do not need to create a new descriptor if the existing one has already
-    // been assembled
-    if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
+    if (partitioning_will_change == true)
       {
         psblas_descriptor.reset(psb_c_new_descriptor(),
                                 internal::DescriptorDeleter());
@@ -146,8 +164,9 @@ namespace PSCToolkitWrappers
                ExcCallingPSBLASFunction(ierr, "psb_c_dvect_set_scal"));
       }
 
-    state       = internal::State::Assembled;
-    last_action = VectorOperation::unknown;
+    state                  = internal::State::Assembled;
+    last_action            = VectorOperation::unknown;
+    remote_entries_pending = false;
   }
 
 
@@ -159,16 +178,36 @@ namespace PSCToolkitWrappers
   {
     Assert(comm != MPI_COMM_NULL,
            ExcMessage("MPI_COMM_NULL passed to Vector::reinit()."));
-    communicator                 = comm;
-    ghosted                      = true;
-    const bool is_vector_changed = size() != local_partitioning.size();
 
+    IndexSet new_ghost_indices = ghosts;
+    new_ghost_indices.subtract_set(local_partitioning);
+
+    // A descriptor describes the parallel partitioning including the halo, so
+    // it can only be recycled if both stay the same. Note: comparing global
+    // sizes is not enough because two **different** partitionings can have the
+    // same global size.
+    const bool partitioning_changes_locally =
+      (psblas_descriptor.get() == nullptr) || (ghosted == false) ||
+      (communicator != comm) ||
+      (owned_elements.size() != local_partitioning.size()) ||
+      (owned_elements != local_partitioning) ||
+      (ghost_indices.size() != new_ghost_indices.size()) ||
+      (ghost_indices != new_ghost_indices);
+
+    // Creating a descriptor is a collective operation, so the processes have to
+    // agree on whether one is built.
+    const bool partitioning_will_change =
+      Utilities::MPI::logical_or(partitioning_changes_locally, comm);
+
+    communicator   = comm;
+    ghosted        = true;
     owned_elements = local_partitioning;
-    ghost_indices  = ghosts;
-    ghost_indices.subtract_set(local_partitioning);
+    ghost_indices  = std::move(new_ghost_indices);
+    // index_within_set() requires a  compressed index set
+    owned_elements.compress();
 
     int ierr;
-    if (psblas_descriptor.get() == nullptr || is_vector_changed == true)
+    if (partitioning_will_change == true)
       {
         psblas_descriptor.reset(psb_c_new_descriptor(),
                                 internal::DescriptorDeleter());
@@ -238,8 +277,11 @@ namespace PSCToolkitWrappers
 
     // Assemble the descriptor first so that the halo (ghost) information is
     // known before the vector is allocated and assembled.
-    ierr = psb_c_cdasb(psblas_descriptor.get());
-    Assert(ierr == 0, ExcAssemblePSBLASDescriptor(ierr));
+    if (!psb_c_cd_is_asb(psblas_descriptor.get()))
+      {
+        ierr = psb_c_cdasb(psblas_descriptor.get());
+        Assert(ierr == 0, ExcAssemblePSBLASDescriptor(ierr));
+      }
 
     // Create a new PSBLAS vector and allocate mem space for it
     psblas_vector = psb_c_new_dvector();
@@ -258,8 +300,9 @@ namespace PSCToolkitWrappers
                                 PSB_DUPL_DEF);
     Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
 
-    state       = internal::State::Assembled;
-    last_action = VectorOperation::unknown;
+    state                  = internal::State::Assembled;
+    last_action            = VectorOperation::unknown;
+    remote_entries_pending = false;
   }
 
 
@@ -337,7 +380,8 @@ namespace PSCToolkitWrappers
     if (has_ghost_elements())
       update_ghost_values();
 
-    state = internal::State::Assembled;
+    state                  = internal::State::Assembled;
+    remote_entries_pending = false;
 
     return *this;
   }
@@ -394,8 +438,9 @@ namespace PSCToolkitWrappers
         owned_elements.set_size(0);
         ghost_indices.clear();
         owned_elements.set_size(0);
-        state       = internal::State::Default;
-        last_action = VectorOperation::unknown;
+        state                  = internal::State::Default;
+        last_action            = VectorOperation::unknown;
+        remote_entries_pending = false;
       }
   }
 
@@ -539,29 +584,16 @@ namespace PSCToolkitWrappers
     Assert(state != internal::State::Default, ExcInvalidState(state));
     AssertDimension(indices.size(), values.size());
 
-    psb_i_t nz = indices.size(); // Number of non-zero entries
+    value_type *const local_values = psb_c_dvect_f_get_pnt(psblas_vector);
 
-    // Allocate memory for row indices and values. We need to subtract the
-    // current value in order to set the value.
-    std::vector<psb_l_t> irw(nz);
-    std::vector<psb_d_t> val(nz);
-    for (psb_i_t i = 0; i < nz; ++i)
+    for (std::size_t i = 0; i < indices.size(); ++i)
       {
-        const auto psblas_index = static_cast<psb_l_t>(indices[i]);
-        AssertIntegerConversion(psblas_index, indices[i]);
-        irw[i] = psblas_index;
-        val[i] = values[i] -
-                 psb_c_dgetelem(psblas_vector, irw[i], psblas_descriptor.get());
+        Assert(owned_elements.is_element(indices[i]),
+               ExcMessage("You are trying to write to an element of the vector "
+                          "that is not locally owned. This is not allowed for "
+                          "the current interface to PSBLAS vectors."));
+        local_values[owned_elements.index_within_set(indices[i])] = values[i];
       }
-
-    int ierr = psb_c_dgeins(nz /*nz*/,
-                            irw.data(),
-                            val.data(),
-                            psblas_vector,
-                            psblas_descriptor.get());
-
-    // Free allocated memory
-    Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
   }
 
 
@@ -575,26 +607,35 @@ namespace PSCToolkitWrappers
     Assert(indices.size() == values.size(),
            ExcMessage("Indices and values size mismatch."));
 
-    psb_i_t nz = indices.size(); // Number of non-zero entries
+    value_type *const local_values = psb_c_dvect_f_get_pnt(psblas_vector);
 
-    // Allocate memory for row indices and values
-    std::vector<psb_l_t> irw(nz);
-    std::vector<psb_d_t> val(nz);
-    for (psb_i_t i = 0; i < nz; ++i)
+    // Contributions to entries owned by another process cannot be applied
+    // locally; hand them to PSBLAS, which exchanges them in compress().
+    std::vector<psb_l_t> irw;
+    std::vector<psb_d_t> val;
+
+    for (std::size_t i = 0; i < indices.size(); ++i)
+      if (owned_elements.is_element(indices[i]))
+        local_values[owned_elements.index_within_set(indices[i])] += values[i];
+      else
+        {
+          const auto psblas_index = static_cast<psb_l_t>(indices[i]);
+          AssertIntegerConversion(psblas_index, indices[i]);
+          irw.push_back(psblas_index);
+          val.push_back(values[i]);
+        }
+
+    if (irw.empty() == false)
       {
-        const auto psblas_index = static_cast<psb_l_t>(indices[i]);
-        AssertIntegerConversion(psblas_index, indices[i]);
-        irw[i] = psblas_index;
-        val[i] = values[i];
+        const auto nz = static_cast<psb_i_t>(irw.size());
+        AssertIntegerConversion(nz, irw.size());
+
+        const int ierr = psb_c_dgeins(
+          nz, irw.data(), val.data(), psblas_vector, psblas_descriptor.get());
+        Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
+
+        remote_entries_pending = true;
       }
-
-    int ierr = psb_c_dgeins(nz /*nz*/,
-                            irw.data(),
-                            val.data(),
-                            psblas_vector,
-                            psblas_descriptor.get());
-
-    Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
   }
 
 
@@ -694,6 +735,10 @@ namespace PSCToolkitWrappers
     std::swap(psblas_descriptor, v.psblas_descriptor);
     std::swap(ghosted, v.ghosted);
     std::swap(this->last_action, v.last_action);
+    std::swap(communicator, v.communicator);
+    std::swap(state, v.state);
+    std::swap(remote_entries_pending, v.remote_entries_pending);
+    std::swap(owned_elements, v.owned_elements);
     // We use a temp variable to swap the IndexSets
     IndexSet temp(ghost_indices);
     ghost_indices   = v.ghost_indices;
@@ -728,19 +773,62 @@ namespace PSCToolkitWrappers
         Assert(ierr == 0, ExcAssemblePSBLASDescriptor(ierr));
       }
 
-    // finally, we perform the assemble operation
-    if (operation == VectorOperation::add)
-      ierr = psb_c_dgeasb_options(psblas_vector,
-                                  psblas_descriptor.get(),
-                                  PSB_DUPL_ADD);
-    else if (operation == VectorOperation::insert)
-      ierr = psb_c_dgeasb_options(psblas_vector,
-                                  psblas_descriptor.get(),
-                                  PSB_DUPL_DEF);
-    else
-      DEAL_II_NOT_IMPLEMENTED();
+    // Entries belonging to this process have already been written into the
+    // local storage, so only contributions destined for other processes
+    // require an assembly step. Since the assembly is a collective, all
+    // processes must agree on whether it is performed.
+    if (Utilities::MPI::logical_or(remote_entries_pending, communicator))
+      {
+        Assert(operation == VectorOperation::add ||
+                 operation == VectorOperation::insert,
+               ExcNotImplemented());
 
-    Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
+#  ifdef FALSE
+        // Uncomment this path when psb_c_dgereinit() is available in the PSBLAS
+
+        // Move the vector into update state, in which psb_geasb() only
+        // exchanges the pending remote contributions and leaves the entries
+        // we already hold alone.
+        ierr = psb_c_dgereinit(psblas_vector, psblas_descriptor.get(), false);
+        Assert(ierr == 0, ExcCallingPSBLASFunction(ierr, "psb_c_dgereinit"));
+#  else
+        // Without psb_c_dgereinit() the vector stays in build state, where
+        // psb_geasb() rebuilds it from the list of inserted coefficients. The
+        // entries we already hold therefore have to be put onto that list in
+        // order to survive.
+        const std::vector<types::global_dof_index> &indices =
+          owned_elements.get_index_vector();
+        const value_type *const local_values =
+          psb_c_dvect_f_get_pnt(psblas_vector);
+
+        std::vector<psb_l_t> irw(indices.size());
+        std::vector<psb_d_t> val(indices.size());
+        for (std::size_t i = 0; i < indices.size(); ++i)
+          {
+            const auto psblas_index = static_cast<psb_l_t>(indices[i]);
+            AssertIntegerConversion(psblas_index, indices[i]);
+            irw[i] = psblas_index;
+            val[i] = local_values[i];
+          }
+
+        const auto nz = static_cast<psb_i_t>(irw.size());
+        AssertIntegerConversion(nz, irw.size());
+
+        ierr = psb_c_dgeins(
+          nz, irw.data(), val.data(), psblas_vector, psblas_descriptor.get());
+        Assert(ierr == 0, ExcInsertionInPSBLASVector(ierr));
+#  endif
+
+        ierr = psb_c_dgeasb_options(psblas_vector,
+                                    psblas_descriptor.get(),
+                                    operation == VectorOperation::add ?
+                                      PSB_DUPL_ADD :
+                                      PSB_DUPL_DEF);
+        Assert(ierr == 0, ExcAssemblePSBLASVector(ierr));
+
+        remote_entries_pending = false;
+      }
+
     state       = internal::State::Assembled;
     last_action = VectorOperation::unknown;
   }
