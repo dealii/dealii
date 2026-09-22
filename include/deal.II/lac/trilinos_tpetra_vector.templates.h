@@ -1155,7 +1155,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::min() const
     {
       // The body below cannot be compiled for complex numbers: it compares
-      // entries with operator< and initialises the running minimum with
+      // entries with operator< and initializes the running minimum with
       // std::numeric_limits<Number>::max(), neither of which is defined for
       // complex types. Guarding with `if constexpr` keeps that code out of
       // instantiations for complex Number, rather than relying on a run-time
@@ -1200,7 +1200,7 @@ namespace LinearAlgebra
     Vector<Number, MemorySpace>::max() const
     {
       // The body below cannot be compiled for complex numbers: it compares
-      // entries with operator> and initialises the running maximum with
+      // entries with operator> and initializes the running maximum with
       // std::numeric_limits<Number>::lowest(), neither of which is defined
       // for complex types. Guarding with `if constexpr` keeps that code out
       // of instantiations for complex Number.
