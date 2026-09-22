@@ -231,12 +231,12 @@ it over integrals of *faces* of cells, and then applying quadrature:
   \\
   &=
   \sum_K
-  \sum_{f \in \text{faces of $K$}, f\subset\partial\Omega}
+  \sum_{\substack{f\,\in \text{ faces of } K\\f\,\subset\,\partial\Omega}}
   \int_f \nabla u_h(\mathbf x) \cdot \mathbf n(\mathbf x) \; dx
   \\
   &=
   \sum_K
-  \sum_{f \in \text{faces of $K$}, f\subset\partial\Omega}
+  \sum_{\substack{f\,\in \text{ faces of } K\\f\,\subset\,\partial\Omega}}
   \sum_q \nabla u_h(\mathbf x_q^f) \cdot \mathbf n(\mathbf x_q^f) w_q^f,
 @f}
 where now $\mathbf x_q^f$ are the quadrature points located on face $f$,

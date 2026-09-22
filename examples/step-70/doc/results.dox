@@ -274,7 +274,7 @@ tracer particles.
 On one core, the output of the program will look like the following:
 
 @code
-bash$ mpirun -np 1 ./step-70 test.prm
+bash> mpirun -np 1 ./step-70 test.prm
 Running StokesImmersedProblem<2> using Trilinos.
 Cycle 0:
 Time : 0, time step: 0.002
