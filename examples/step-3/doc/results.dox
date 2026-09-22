@@ -424,8 +424,9 @@ filename
 3 point_value H5I_DATASET FLOAT   1
 4 solution    H5I_DATASET FLOAT    x 1089
 @endcode
-The datasets can be accessed by <code>h5f\$name</code>. The function
-<code>dim(h5f\$cells)</code> gives us the dimensions of the matrix
+The datasets can be accessed by <code>h5f\$name</code> or
+<code>h5f[["name"]]</code>. The function
+<code>dim(h5f[["cells"]])</code> gives us the dimensions of the matrix
 that is used to store our cells.
 We can see the following three matrices, as well as the two
 additional data points we added.
@@ -443,12 +444,12 @@ The following code wraps all the data into one dataframe for plotting our grid:
 @code{.r}
 # Counting in R starts at 1 instead of 0, so we need to increment all
 # vertex indices by one:
-cell_ids <- h5f$cells+1
+cell_ids <- h5f[["cells"]]+1
 
 # Store the x and y positions of each vertex in one big vector in a
 # cell by cell fashion (every 4 entries belong to one cell):
-cells_x <- h5f$nodes[1,][cell_ids]
-cells_y <- h5f$nodes[2,][cell_ids]
+cells_x <- h5f[["nodes"]][1,][cell_ids]
+cells_y <- h5f[["nodes"]][2,][cell_ids]
 
 # Construct a vector that stores the matching cell by cell grouping
 # (1,1,1,1,2,2,2,2,...):
@@ -489,7 +490,7 @@ Luckily our data at this point is structured in the right way.
 The following code plots a pseudocolor representation of our surface into a new PDF:
 @code{.r}
 pdf (paste("pseudocolor_",refinement,".pdf",sep=""),width = 5,height = 4.2) # Open new PDF file
-colordata <- data.frame(x = h5f$nodes[1,],y = h5f$nodes[2,] , solution = h5f$solution[1,])
+colordata <- data.frame(x = h5f[["nodes"]][1,],y = h5f[["nodes"]][2,] , solution = h5f[["solution"]][1,])
 plt <- ggplot(colordata,aes(x=x,y=y,fill=solution))
 plt <- plt + geom_raster(interpolate=TRUE)
 plt <- plt + scale_fill_viridis()
@@ -516,17 +517,17 @@ n_ref <- 8   # Maximum refinement level for which results are existing
 
 # First we initiate all vectors with the results of the first level
 h5f   <- H5Fopen("solution_1.h5")
-dofs  <- dim(h5f$solution)[2]
-mean  <- h5f$mean_value
-point <- h5f$point_value
+dofs  <- dim(h5f[["solution"]])[2]
+mean  <- h5f[["mean_value"]]
+point <- h5f[["point_value"]]
 H5Fclose(h5f)
 
 for (reflevel in 2:n_ref)
 {
    h5f   <- H5Fopen(paste("solution_",reflevel,".h5",sep=""))
-   dofs  <- c(dofs,dim(h5f\$solution)[2])
-   mean  <- c(mean,h5f\$mean_value)
-   point <- c(point,h5f\$point_value)
+   dofs  <- c(dofs,dim(h5f[["solution"]])[2])
+   mean  <- c(mean,h5f[["mean_value"]])
+   point <- c(point,h5f[["point_value"]])
    H5Fclose(h5f)
 }
 @endcode
