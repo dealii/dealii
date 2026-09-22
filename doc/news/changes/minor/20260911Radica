@@ -1,6 +1,6 @@
 New: DoFTools::make_periodicity_constraints_on_level() constructs periodic
 constraints for multigrid level degrees of freedom, including transformations
-of vector-valued components. A new overload of MGConstrainedDoFs::initialize()
+of vector-valued components. An optional argument of MGConstrainedDoFs::initialize()
 can skip the default identity periodicity constraints so that such constraints
 can be supplied through MGConstrainedDoFs::add_user_constraints(). Existing
 initialization calls retain their behavior.

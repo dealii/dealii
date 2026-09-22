@@ -62,9 +62,14 @@ public:
    * current implementation of periodicity constraints in this class does
    * not support rotation matrices in the periodicity definition, i.e., the
    * respective argument in the GridTools::collect_periodic_faces() may not
-   * be different from the identity matrix. Use the overload with an explicit
-   * @p initialize_periodicity_constraints argument to disable these constraints
+   * be different from the identity matrix. Set
+   * @p initialize_periodicity_constraints to false to skip these constraints
    * before supplying rotational constraints through add_user_constraints().
+   * The refinement-edge indices and all other data are still initialized.
+   * This allows the caller to construct periodic constraints with
+   * DoFTools::make_periodicity_constraints_on_level(), for example when vector
+   * components must be rotated across a periodic boundary.
+   *
    * If no level_relevant_dofs are passed as the second argument, the function
    * uses the locally relevant level DoFs, extracted by
    * DoFTools::extract_locally_relevant_level_dofs(). Otherwise, the
@@ -76,25 +81,8 @@ public:
   void
   initialize(const DoFHandler<dim, spacedim> &dof,
              const MGLevelObject<IndexSet>   &level_relevant_dofs =
-               MGLevelObject<IndexSet>());
-
-  /**
-   * Initialize the level constraints as described above. If
-   * @p initialize_periodicity_constraints is false, skip the identity
-   * periodicity constraints normally created from the triangulation. The
-   * refinement-edge indices and all other data are still initialized.
-   *
-   * This allows the caller to construct periodic constraints with
-   * DoFTools::make_periodicity_constraints_on_level() and provide them through
-   * add_user_constraints(), for example when vector components must be rotated
-   * across a periodic boundary. Passing true is equivalent to the overload
-   * without this argument.
-   */
-  template <int dim, int spacedim>
-  void
-  initialize(const DoFHandler<dim, spacedim> &dof,
-             const MGLevelObject<IndexSet>   &level_relevant_dofs,
-             const bool initialize_periodicity_constraints);
+               MGLevelObject<IndexSet>(),
+             const bool initialize_periodicity_constraints = true);
 
   /**
    * Fill the internal data structures with information

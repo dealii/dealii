@@ -28,17 +28,6 @@ template <int dim, int spacedim>
 void
 MGConstrainedDoFs::initialize(
   const DoFHandler<dim, spacedim> &dof,
-  const MGLevelObject<IndexSet>   &level_relevant_dofs)
-{
-  initialize(dof, level_relevant_dofs, true);
-}
-
-
-
-template <int dim, int spacedim>
-void
-MGConstrainedDoFs::initialize(
-  const DoFHandler<dim, spacedim> &dof,
   const MGLevelObject<IndexSet>   &level_relevant_dofs,
   const bool                       initialize_periodicity_constraints)
 {

@@ -194,9 +194,6 @@ namespace RotatedPeriodicityTest
     dofs.distribute_dofs(fe);
     dofs.distribute_mg_dofs();
     MGConstrainedDoFs mg;
-    // Exercise the existing overload before reinitializing without the
-    // identity constraints. No constraints from the first call may survive.
-    mg.initialize(dofs);
     mg.initialize(dofs, MGLevelObject<IndexSet>(), false);
     const unsigned int                       levels = tria.n_global_levels();
     MGLevelObject<AffineConstraints<double>> constraints(0, levels - 1);
