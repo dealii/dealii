@@ -729,6 +729,66 @@ ReferenceCell<dim>::exodusii_face_to_deal_face(const unsigned int face_n) const
 
 template <int dim>
 unsigned int
+ReferenceCell<dim>::ucd_vertex_to_deal_vertex(const unsigned int vertex_n) const
+{
+  AssertIndexRange(vertex_n, n_vertices());
+  // Information on this file format can be found here
+  //
+  // https://lanl.github.io/LaGriT/pages/docs/read_avs.html
+  //
+  // http://www.hnware.de/rismo/dokumente/anwenderdoku/formate/avs_ucd.html
+
+  if constexpr (dim == 1)
+    {
+      return GeometryInfo<1>::ucd_to_deal[vertex_n];
+    }
+  else if constexpr (dim == 2)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Triangle:
+            return vertex_n;
+          case ReferenceCells::Quadrilateral:
+            return GeometryInfo<2>::ucd_to_deal[vertex_n];
+        }
+    }
+  else if constexpr (dim == 3)
+    {
+      switch (this->kind)
+        {
+          case ReferenceCells::Tetrahedron:
+            {
+              constexpr std::array<unsigned int, 4> ucd_to_deal_tet{
+                {0, 3, 1, 2}};
+              return ucd_to_deal_tet[vertex_n];
+            }
+          case ReferenceCells::Pyramid:
+            {
+              constexpr std::array<unsigned int, 5> ucd_to_deal_pyr{
+                {4, 0, 1, 3, 2}};
+              return ucd_to_deal_pyr[vertex_n];
+            }
+          case ReferenceCells::Wedge:
+            {
+              constexpr std::array<unsigned int, 6> ucd_to_deal_wedge{
+                {1, 2, 0, 4, 5, 3}};
+              return ucd_to_deal_wedge[vertex_n];
+            }
+          case ReferenceCells::Hexahedron:
+            {
+              return GeometryInfo<3>::ucd_to_deal[vertex_n];
+            }
+        }
+    }
+  // All of the other cases not listed above:
+  DEAL_II_NOT_IMPLEMENTED();
+  return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim>
+unsigned int
 ReferenceCell<dim>::unv_vertex_to_deal_vertex(const unsigned int vertex_n) const
 {
   AssertIndexRange(vertex_n, n_vertices());
