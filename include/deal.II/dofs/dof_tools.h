@@ -967,6 +967,42 @@ namespace DoFTools
 
 
   /**
+   * Insert periodicity constraints for degrees of freedom on a multigrid
+   * level into @p constraints.
+   *
+   * This function is the level counterpart of the low-level
+   * make_periodicity_constraints() function. The two faces must belong to
+   * cells on the same multigrid @p level. Unlike the active-cell variant,
+   * this function does not recurse over children: it directly constrains the
+   * level degrees of freedom on the two supplied faces.
+   *
+   * The meanings of @p component_mask, @p combined_orientation, @p matrix,
+   * @p first_vector_components, and @p periodicity_factor are the same as for
+   * make_periodicity_constraints(). In particular, @p matrix may describe a
+   * rotation of vector-valued components. The function does not assume any
+   * particular boundary indicators; selecting matching faces is the
+   * responsibility of the caller.
+   *
+   * The DoFHandler must have distributed multigrid degrees of freedom. As with
+   * multigrid DoF distribution, hp-adaptive DoFHandlers are not supported.
+   */
+  template <typename FaceIterator, typename number>
+  void
+  make_periodicity_constraints_on_level(
+    const FaceIterator                             &face_1,
+    const std_cxx20::type_identity_t<FaceIterator> &face_2,
+    const unsigned int                              level,
+    AffineConstraints<number>                      &constraints,
+    const ComponentMask                            &component_mask = {},
+    const types::geometric_orientation              combined_orientation =
+      numbers::default_geometric_orientation,
+    const FullMatrix<double>        &matrix = FullMatrix<double>(),
+    const std::vector<unsigned int> &first_vector_components =
+      std::vector<unsigned int>(),
+    const number periodicity_factor = 1.);
+
+
+  /**
    * Insert the (algebraic) constraints due to periodic boundary conditions
    * into an AffineConstraints object @p constraints.
    *

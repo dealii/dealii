@@ -3817,6 +3817,83 @@ namespace DoFTools
 
 
 
+  template <typename FaceIterator, typename number>
+  void
+  make_periodicity_constraints_on_level(
+    const FaceIterator                             &face_1,
+    const std_cxx20::type_identity_t<FaceIterator> &face_2,
+    const unsigned int                              level,
+    AffineConstraints<number>                      &affine_constraints,
+    const ComponentMask                            &component_mask,
+    const types::geometric_orientation              combined_orientation,
+    const FullMatrix<double>                       &matrix,
+    const std::vector<unsigned int>                &first_vector_components,
+    const number                                    periodicity_factor)
+  {
+    static const int dim      = FaceIterator::AccessorType::dimension;
+    static const int spacedim = FaceIterator::AccessorType::space_dimension;
+
+    if constexpr (running_in_debug_mode())
+      {
+        const auto [orientation, rotation, flip] =
+          ::dealii::internal::split_face_orientation(combined_orientation);
+        Assert((dim != 1) ||
+                 (orientation == true && flip == false && rotation == false),
+               ExcMessage("The supplied face orientation is invalid for 1d."));
+        Assert((dim != 2) || (flip == false && rotation == false),
+               ExcMessage("The supplied face orientation is invalid for 2d."));
+      }
+
+    Assert(face_1 != face_2,
+           ExcMessage("face_1 and face_2 are equal! Cannot constrain DoFs "
+                      "on the very same face"));
+    Assert(face_1->at_boundary() && face_2->at_boundary(),
+           ExcMessage("Faces for periodicity constraints must be on the "
+                      "boundary"));
+    Assert(&face_1->get_dof_handler() == &face_2->get_dof_handler(),
+           ExcMessage("The two faces must belong to the same DoFHandler."));
+    AssertIndexRange(
+      level, face_1->get_dof_handler().get_triangulation().n_global_levels());
+    Assert(face_1->get_dof_handler().has_hp_capabilities() == false,
+           ExcNotImplemented());
+    Assert(matrix.m() == matrix.n(),
+           ExcMessage("The supplied rotation or interpolation matrix must "
+                      "be square."));
+    Assert(first_vector_components.empty() || matrix.m() == spacedim,
+           ExcMessage("If first_vector_components is nonempty, matrix must "
+                      "be a rotation matrix of size spacedim."));
+
+    const FiniteElement<dim, spacedim> &fe = face_1->get_dof_handler().get_fe();
+    const FullMatrix<double>            transformation =
+      compute_transformation(fe, matrix, first_vector_components);
+
+    if (first_vector_components.empty() && matrix.m() == 0)
+      internal::set_periodicity_constraints(face_2,
+                                            face_1,
+                                            transformation,
+                                            affine_constraints,
+                                            component_mask,
+                                            combined_orientation,
+                                            periodicity_factor,
+                                            level);
+    else
+      {
+        FullMatrix<double> inverse(transformation.m());
+        inverse.invert(transformation);
+
+        internal::set_periodicity_constraints(face_2,
+                                              face_1,
+                                              inverse,
+                                              affine_constraints,
+                                              component_mask,
+                                              combined_orientation,
+                                              periodicity_factor,
+                                              level);
+      }
+  }
+
+
+
   template <int dim, int spacedim, typename number>
   void
   make_periodicity_constraints(

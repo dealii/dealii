@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2013 - 2025 by the deal.II authors
+// Copyright (C) 2013 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -19,6 +19,19 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
                        deal_II_space_dimension>::face_iterator &,
       const DoFHandler<deal_II_dimension,
                        deal_II_space_dimension>::face_iterator &,
+      AffineConstraints<S> &,
+      const ComponentMask &,
+      const types::geometric_orientation,
+      const FullMatrix<double> &,
+      const std::vector<unsigned int> &,
+      const S);
+
+    template void DoFTools::make_periodicity_constraints_on_level(
+      const DoFHandler<deal_II_dimension,
+                       deal_II_space_dimension>::level_face_iterator &,
+      const DoFHandler<deal_II_dimension,
+                       deal_II_space_dimension>::level_face_iterator &,
+      const unsigned int,
       AffineConstraints<S> &,
       const ComponentMask &,
       const types::geometric_orientation,

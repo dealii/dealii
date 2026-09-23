@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2023 - 2025 by the deal.II authors
+// Copyright (C) 2023 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -28,7 +28,8 @@ template <int dim, int spacedim>
 void
 MGConstrainedDoFs::initialize(
   const DoFHandler<dim, spacedim> &dof,
-  const MGLevelObject<IndexSet>   &level_relevant_dofs)
+  const MGLevelObject<IndexSet>   &level_relevant_dofs,
+  const bool                       initialize_periodicity_constraints)
 {
   boundary_indices.clear();
   refinement_edge_indices.clear();
@@ -63,35 +64,38 @@ MGConstrainedDoFs::initialize(
         }
     }
 
-  // TODO: currently we only consider very basic periodic constraints
-  const IdentityMatrix transformation(dof.get_fe().n_dofs_per_face());
-  const ComponentMask  component_mask;
-  const double         periodicity_factor = 1.0;
-
-  for (const auto &[first_cell, second_cell] :
-       dof.get_triangulation().get_periodic_face_map())
+  if (initialize_periodicity_constraints)
     {
-      // only consider non-artificial cells
-      if (first_cell.first->is_artificial_on_level())
-        continue;
-      if (second_cell.first.first->is_artificial_on_level())
-        continue;
+      // TODO: currently we only consider very basic periodic constraints
+      const IdentityMatrix transformation(dof.get_fe().n_dofs_per_face());
+      const ComponentMask  component_mask;
+      const double         periodicity_factor = 1.0;
 
-      // consider cell pairs with the same level
-      if (first_cell.first->level() != second_cell.first.first->level())
-        continue;
+      for (const auto &[first_cell, second_cell] :
+           dof.get_triangulation().get_periodic_face_map())
+        {
+          // only consider non-artificial cells
+          if (first_cell.first->is_artificial_on_level())
+            continue;
+          if (second_cell.first.first->is_artificial_on_level())
+            continue;
 
-      DoFTools::internal::set_periodicity_constraints(
-        first_cell.first->as_dof_handler_level_iterator(dof)->face(
-          first_cell.second),
-        second_cell.first.first->as_dof_handler_level_iterator(dof)->face(
-          second_cell.first.second),
-        transformation,
-        level_constraints[first_cell.first->level()],
-        component_mask,
-        second_cell.second,
-        periodicity_factor,
-        first_cell.first->level());
+          // consider cell pairs with the same level
+          if (first_cell.first->level() != second_cell.first.first->level())
+            continue;
+
+          DoFTools::internal::set_periodicity_constraints(
+            first_cell.first->as_dof_handler_level_iterator(dof)->face(
+              first_cell.second),
+            second_cell.first.first->as_dof_handler_level_iterator(dof)->face(
+              second_cell.first.second),
+            transformation,
+            level_constraints[first_cell.first->level()],
+            component_mask,
+            second_cell.second,
+            periodicity_factor,
+            first_cell.first->level());
+        }
     }
 
   for (unsigned int l = min_level; l <= max_level; ++l)
