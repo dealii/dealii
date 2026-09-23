@@ -26,7 +26,12 @@
 set(PSBLAS_DIR "" CACHE PATH "An optional hint to a PSBLAS installation containing the PSBLAS include directory and libraries")
 set_if_empty(PSBLAS_DIR "$ENV{PSBLAS_DIR}")
 
-set(_psblas_libs "psb_base;psb_cbind;psb_linsolve;psb_prec;psb_ext;psb_util")
+#
+# Listed in dependency order, dependents first, the same way PSBLAS links its own tests
+#
+#   -lpsb_cbind -lpsb_util -lpsb_linsolve -lpsb_prec -lpsb_ext -lpsb_base
+#
+set(_psblas_libs "psb_cbind;psb_util;psb_linsolve;psb_prec;psb_ext;psb_base")
 set(_psblas_library_variables "")
 
 foreach(_lib ${_psblas_libs})
