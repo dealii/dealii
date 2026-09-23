@@ -1,0 +1,47 @@
+
+DEAL::Reference cells before refinement given by tria.get_reference_cells():
+DEAL::Tet, 
+DEAL::Reference cells before refinement from cells:
+DEAL::Tet, 
+DEAL::
+DEAL::Reference cells after refinement given by tria.get_reference_cells():
+DEAL::Tet, 
+DEAL::Reference cells after refinement from cells:
+DEAL::Tet, Tet, Tet, Tet, Tet, Tet, Tet, Tet, 
+DEAL::
+DEAL::======================================
+DEAL::
+DEAL::Reference cells before refinement given by tria.get_reference_cells():
+DEAL::Pyramid, 
+DEAL::Reference cells before refinement from cells:
+DEAL::Pyramid, 
+DEAL::
+DEAL::Reference cells after refinement given by tria.get_reference_cells():
+DEAL::Tet, Pyramid, 
+DEAL::Reference cells after refinement from cells:
+DEAL::Pyramid, Pyramid, Pyramid, Pyramid, Tet, Tet, Tet, Tet, Pyramid, Pyramid, 
+DEAL::
+DEAL::======================================
+DEAL::
+DEAL::Reference cells before refinement given by tria.get_reference_cells():
+DEAL::Wedge, 
+DEAL::Reference cells before refinement from cells:
+DEAL::Wedge, 
+DEAL::
+DEAL::Reference cells after refinement given by tria.get_reference_cells():
+DEAL::Wedge, 
+DEAL::Reference cells after refinement from cells:
+DEAL::Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, 
+DEAL::
+DEAL::======================================
+DEAL::
+DEAL::Reference cells before refinement given by tria.get_reference_cells():
+DEAL::Hex, 
+DEAL::Reference cells before refinement from cells:
+DEAL::Hex, 
+DEAL::
+DEAL::Reference cells after refinement given by tria.get_reference_cells():
+DEAL::Hex, 
+DEAL::Reference cells after refinement from cells:
+DEAL::Hex, Hex, Hex, Hex, Hex, Hex, Hex, Hex, 
+DEAL::
