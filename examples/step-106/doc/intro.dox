@@ -1,6 +1,3 @@
-/**
-
-@page step_106-Intro Introduction
 <i>This program was contributed by Arthur Bawin (Polytechnique Montréal).
 <br>
 This material is based upon work partly supported by the Natural Sciences and Engineering Research Council of Canada (NSERC) through
@@ -259,5 +256,3 @@ We observe, however, that \f$(i)\f$ the no-slip condition is still enforced exac
 (i.e., the fluid forces) converges with the expected rate nonetheless.
 Thus, the example program below uses an equal-order \f$Q^2\f$ approximation for the Lagrange multiplier by default,
 but you should feel free to try different pair combinations.
-
-*/
