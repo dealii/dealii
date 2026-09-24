@@ -66,6 +66,7 @@ namespace LA
 
 #include <fstream>
 #include <iostream>
+#include <filesystem>
 
 namespace Step106
 {
@@ -593,6 +594,7 @@ namespace Step106
     ConditionalOStream pcout;
     TimerOutput        computing_timer;
 
+    const std::string                           output_directory = "./results/";
     std::vector<std::pair<double, std::string>> visualization_times_and_names;
 
     AffineConstraints<double> lambda_constraints;
@@ -642,7 +644,12 @@ namespace Step106
                       pcout,
                       TimerOutput::summary,
                       TimerOutput::wall_times)
-  {}
+  {
+    // Create output directory if it does not exist
+    if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
+      if (!std::filesystem::exists(output_directory))
+        std::filesystem::create_directory(output_directory);
+  }
 
   // @sect4{NavierStokesWithWeakNoSlip<dim>::create_grid}
 
@@ -1320,8 +1327,6 @@ namespace Step106
   void NavierStokesWithWeakNoSlip<dim>::output_results()
   {
     TimerOutput::Scope t(computing_timer, "Write outputs");
-
-    std::string output_directory = "./results/";
 
     // ID of the partition
     Vector<float> subdomain(triangulation.n_active_cells());
