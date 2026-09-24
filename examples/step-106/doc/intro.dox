@@ -1,7 +1,7 @@
 <i>This program was contributed by Arthur Bawin (Polytechnique Montréal).
 <br>
 This material is based upon work partly supported by the Natural Sciences and Engineering Research Council of Canada (NSERC) through
-Discovery Grant RGPIN-2025-05020. 
+Discovery Grant RGPIN-2025-05020.
 </i>
 
 // @dealiiTutorialDOI{}
@@ -21,11 +21,11 @@ In this tutorial, we are interested in solving the unsteady incompressible Navie
 equations in a domain \f$\Omega \subset \mathbb{R}^{d}, d=2,3 \f$.
 Instead of enforcing no-slip boundary conditions as Dirichlet conditions as usual,
 we would instead like to enforce these constraints weakly, using a Lagrange multiplier
-defined on the relevant boundaries. By doing so, the Lagrange multiplier is identified to the flux 
+defined on the relevant boundaries. By doing so, the Lagrange multiplier is identified to the flux
 of the associated variable, which for the Stokes or Navier-Stokes equations allows
 to recover the fluid force on those boundaries.
 
-We consider the Navier-Stokes system, and the problem of finding 
+We consider the Navier-Stokes system, and the problem of finding
 a velocity \f$\textbf{u}(\textbf{x}, t)\f$ and a pressure \f$\textbf{p}(\textbf{x}, t)\f$ fields
 satisfying
 @f{align}{
@@ -63,7 +63,7 @@ the boundary condition \f$\mathbf{u} = \mathbf{g}\f$ is a constraint that become
 a part of the system of PDEs, and we introduce on \f$\Gamma_D\f$ an
 auxiliary variable \f$\boldsymbol{\lambda}(\mathbf{x},t)\f$, whose role is to enforce this constraint.
 The constraint equation is then also multiplied by the Lagrange multiplier test function
-\f$\hat{\boldsymbol{\lambda}}\f$, and 
+\f$\hat{\boldsymbol{\lambda}}\f$, and
 the modified system takes the form
 
 @f{align}{
@@ -166,7 +166,7 @@ thus involve only the shape functions, not the solution itself.
 
 To obtain a fully discrete scheme, it remains to approximate the velocity time derivative.
 We consider a time discretization using
-a backward differentiation formula (BDF) method, which for an order \f$p\f$ method 
+a backward differentiation formula (BDF) method, which for an order \f$p\f$ method
 uses the solutions at times \f$t_n\f$ (i.e., the current solution) to \f$t_{n-p}\f$:
 
 @f{equation}{
