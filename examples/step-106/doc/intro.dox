@@ -217,7 +217,7 @@ and will only allow for problems with a modest number of degrees of freedom, esp
 The considered testcase is the well-known incompressible flow around a circular cylinder, in 2D and 3D,
 and without source term \f$(\mathbf{f} = 0)\f$.
 The computational domain is a cylinder of diameter \f$D\f$
-inside a rectangular box of dimensions \f$[(8 + 1 + 16)D, (8 + 1 + 8)D]\f$.
+inside a rectangular box of dimensions \f$[(8 + 1 + 24)D, (8 + 1 + 8)D]\f$.
 We consider a Newtonian fluid with constant density \f$\rho\f$ and viscosity \f$\mu\f$,
 and to simplify, we divide the momentum equation by \f$\rho\f$.
 As a result, both the pressure and the Lagrange multiplier are scaled by the density,

@@ -4,203 +4,171 @@
 
 <h1>Results</h1>
 
-<h1>Flow around a 2D cylinder</h1>
+<h2>Flow around a 2D cylinder</h2>
 
-When you run the program on one or more processors, you should get output like this:
+When you run the program on one or more processors, you should get an output similar to this:
 @code
 Running on 8 MPI rank(s)...
-Number of degrees of freedom: 33275
+Number of degrees of freedom: 44907
 Checking no-slip enforcement on cylinder:
-||uh||_L2   = 1.77245
-||uh||_Linf = 1
+||uh||_L2   = 1.77254
+||uh||_Linf = 1.00005
 
-Time step 1 : time = 0.1
-Newton iter.  0: nonlinear residual = 4.13834423e-01
-Newton iter.  1: nonlinear residual = 1.55128898e-01
-Newton iter.  2: nonlinear residual = 5.05801309e-03
-Newton iter.  3: nonlinear residual = 2.07694142e-05
-Newton iter.  4: nonlinear residual = 3.42588486e-10
-Newton iter.  5: nonlinear residual = 8.13635956e-15
+Time step 1 : time = 0.05
+Newton iter.  0:  nonlinear residual = 4.19804040e-01
+Newton iter.  1:  nonlinear residual = 1.62384047e-01
+Newton iter.  2:  nonlinear residual = 2.46070592e-03
+Newton iter.  3:  nonlinear residual = 2.95946157e-06
+Newton iter.  4:  nonlinear residual = 3.26622040e-12
 Stopping because residual is below prescribed tolerance (1.00e-10)
 Checking no-slip enforcement on cylinder:
-||uh||_L2   = 6.00e-24
-||uh||_Linf = 2.48e-23
+||uh||_L2   = 6.16e-20
+||uh||_Linf = 1.88e-19
 
-Time step 2 : time = 2.00e-01
-Newton iter.  0: nonlinear residual = 1.17697850e+00
-Newton iter.  1: nonlinear residual = 1.69109811e-03
-Newton iter.  2: nonlinear residual = 2.40585267e-06
-Newton iter.  3: nonlinear residual = 4.83205689e-12
+Time step 2 : time = 1.00e-01
+Newton iter.  0:  nonlinear residual = 3.06157361e+00
+Newton iter.  1:  nonlinear residual = 1.09536818e-03
+Newton iter.  2:  nonlinear residual = 4.07793944e-07
+Newton iter.  3:  nonlinear residual = 7.90742372e-14
 Stopping because residual is below prescribed tolerance (1.00e-10)
 Checking no-slip enforcement on cylinder:
-||uh||_L2   = 3.54e-20
-||uh||_Linf = 1.23e-19
+||uh||_L2   = 9.60e-21
+||uh||_Linf = 2.83e-20
 
-Time step 3 : time = 3.00e-01
-Newton iter.  0: nonlinear residual = 6.02425442e-02
-Newton iter.  1: nonlinear residual = 1.11047425e-03
-Newton iter.  2: nonlinear residual = 6.73778063e-07
-Newton iter.  3: nonlinear residual = 3.01348075e-13
+Time step 3 : time = 1.50e-01
+Newton iter.  0:  nonlinear residual = 8.05773329e-02
+Newton iter.  1:  nonlinear residual = 5.46615098e-04
+Newton iter.  2:  nonlinear residual = 9.87374839e-08
+Newton iter.  3:  nonlinear residual = 1.56679516e-14
 Stopping because residual is below prescribed tolerance (1.00e-10)
 Checking no-slip enforcement on cylinder:
-||uh||_L2   = 1.49e-20
-||uh||_Linf = 6.05e-20
+||uh||_L2   = 1.76e-21
+||uh||_Linf = 5.73e-21
+
 
 ... and so on until time integration finishes.
 
 @endcode
 
+In particular, the significant numbers of the Newton residual should be the same
+as this output, regardless of the number of processes used to run the computation.
 Notice that the no-slip constraint is not satisfied for the initial condition,
-since at that point no computation has been run yet.
+since at that point no computation has been run yet, and the Lagrange multiplier
+have not yet been set to satisfy the constraint.
 Aside from the first time step for which Newton's method needs
 to find a Lagrange multiplier coming from a zero candidate,
 almost all subsequent time steps converge in 3 nonlinear iterations,
 which is optimal (the 0-th iteration shows the norm of the RHS,
 but does not solve any linear system).
 
-Here is the velocity norm at different times:
-
-<img src="../figures/foo.svg" width="25%" alt="Pressure solution">
-
-This of course is not different from the flow around a cylinder obtained by
-applying a strong no-slip condition, which is reassuring.
-
-<h1>Flow around a 3D cylinder</h1>
-
-%%%%
-
-The exact numbers differ, depending on how many processors we use;
-this is due to the fact that the preconditioner depends on the
-partitioning of the problem, the solution then differs in the last few
-digits, and consequently the mesh refinement differs slightly.
-The primary thing to notice here, though, is that the number of
-iterations does not increase with the size of the problem. This
-guarantees that we can efficiently solve even the largest problems.
-
-When run on a sufficiently large number of machines (say a few
-thousand), this program can relatively easily solve problems with well
-over one billion unknowns in less than a minute. On the other hand,
-such big problems can no longer be visualized, so we also ran the
-program on only 16 processors. Here are a mesh, along with its
-partitioning onto the 16 processors, and the corresponding solution:
+To limit the run time and the number of outputs, the example program only runs
+for 5 seconds. If we run it for \f$t_\text{end} = 200\f$ seconds instead, we see that the Von Karman streets
+instability starts appearing at around \f$t = 30\f$.
+The time the instabilitiy triggers
+typically depends on a few factors, such as the spatial and temporal accuracy,
+and the symmetry (or lack thereof) in the mesh and initial and boundary conditions.
+The velocity magnitude at \f$t = 10\f$ and 100 looks like this:
 
 <table width="100%">
 <tr>
 <td>
-  <img src="figures/foo.svg" alt="">
+  <img src="../figures/t10.svg" width="100%" alt="Velocity magnitude at t = 10s">
 </td>
 <td>
-  <img src="https://dealii.org/images/steps/developer/step-40.solution.png" alt="">
+  <img src="../figures/t100.svg" width="100%" alt="Pressure solution">
 </td>
 </tr>
 </table>
 
-The mesh on the left has a mere 7,069 cells. This is of course a
-problem we would easily have been able to solve already on a single
-processor using step-6, but the point of the program was to show how
-to write a program that scales to many more machines. For example,
-here are two graphs that show how the run time of a large number of parts
-of the program scales on problems with around 52 and 375 million degrees of
-freedom if we take more and more processors (these and the next couple of
-graphs are taken from an earlier version of the
-@ref distributed_paper "Distributed Computing paper"; updated graphs showing
-data of runs on even larger numbers of processors, and a lot
-more interpretation can be found in the final version of the paper):
+This is, at least visually, not different from the flow around a cylinder obtained by
+applying a strong no-slip condition, which is reassuring, especially
+since the no-slip is enforced exactly in this case.
 
-<table width="100%">
+From the force file written at each time step, we can postprocess the nondimensional quantities
+which are typically presented for this benchmark, that is, the force (drag and lift) coefficients,
+and the Strouhal number, which is the nondimensional vortex shedding frequency:
+
+@f{equation}
+C_D = \frac{F_x}{\frac{1}{2}\rho U_\infty D}, ~~~~~ C_L = \frac{F_y}{\frac{1}{2}\rho U_\infty D}
+~~~~~ St = \frac{fD}{U}.
+@f}
+
+The two signals for \f$t \in [0, 200]\f$ look like the figure below,
+and we can compare their mean values and amplitudes after reaching the periodic
+regime with the values available in the literature.
+
+<img src="../figures/forces.png" width="50%" alt="Velocity magnitude at t = 10s">
+
+From the last 100 seconds of simulation, we obtain the indicators in the table below.
+The results are compared with those of Mendes et al. (see the table for the reference),
+and with the same benchmark of the Lethe project, a CFD-DEM solver based on deal.II.
+The vortex shedding frequency \f$f\f$ is obtained through a fast Fourier transform on the periodic part of the signal.
+The obtained values (especially the amplitudes) differ from the ones from the literature,
+likely because our simulation is neither converged in time nor in space,
+and would benefit from a finer mesh (before and around the cylinder, and in the wake),
+and either a finer time step or a more accurate
+time stepping method, such as a BDF2 scheme.
+Nevertheless, the obtained signals and velocity field qualitatively match the expected
+results for this problem, and the vortex-shedding frequency is on par with the available results.
+
+<table align="center" class="doxtable">
 <tr>
-<td>
-  <img src="https://dealii.org/images/steps/developer/step-40.strong2.png" alt="">
-</td>
-<td>
-  <img src="https://dealii.org/images/steps/developer/step-40.strong.png" alt="">
-</td>
+  <th>Source</th>
+  <th>\f$C_D\f$</th>
+  <th>\f$C_L\f$</th>
+  <th>\f$St\f$</th>
 </tr>
-</table>
-
-As can clearly be seen, the program scales nicely to very large
-numbers of processors.
-(For a discussion of what we consider "scalable" programs, see
-@ref GlossParallelScaling "this glossary entry".)
-The curves, in particular the linear solver, become a
-bit wobbly at the right end of the graphs since each processor has too little
-to do to offset the cost of communication (the part of the whole problem each
-processor has to solve in the above two examples is only 13,000 and 90,000
-degrees of freedom when 4,096 processors are used; a good rule of thumb is that
-parallel programs work well if each processor has at least 100,000 unknowns).
-
-While the strong scaling graphs above show that we can solve a problem of
-fixed size faster and faster if we take more and more processors, the more
-interesting question may be how big problems can become so that they can still
-be solved within a reasonable time on a machine of a particular size. We show
-this in the following two graphs for 256 and 4096 processors:
-
-<table width="100%">
 <tr>
-<td>
-  <img src="https://dealii.org/images/steps/developer/step-40.256.png" alt="">
-</td>
-<td>
-  <img src="https://dealii.org/images/steps/developer/step-40.4096.png" alt="">
-</td>
+  <td>This example</td>
+  <td>\f$1.317 \pm 0.032\f$</td>
+  <td>\f$5.63 \times 10^{-4} \pm 0.596\f$</td>
+  <td>\f$0.19\f$</td>
+</tr>
+<tr>
+  <td><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/(SICI)1097-0363(19990815)30:7%3C897::AID-FLD871%3E3.0.CO;2-U" target="_top">Mendes et al.</a></td>
+  <td>\f$1.399 \pm 0.049\f$</td>
+  <td>\f$\pm 0.726\f$</td>
+  <td>\f$0.20\f$</td>
+</tr>
+<tr>
+  <td><a href="https://chaos-polymtl.github.io/lethe/documentation/examples/incompressible-flow/2d-transient-flow-around-cylinder/2d-transient-flow-around-cylinder.html" target="_top">Lethe</a></td>
+  <td>\f$1.396 \pm 0.048\f$</td>
+  <td>\f$-0.003 \pm 0.72\f$</td>
+  <td>\f$0.20\f$</td>
 </tr>
 </table>
 
-What these graphs show is that all parts of the program scale linearly with
-the number of degrees of freedom. This time, lines are wobbly at the left as
-the size of local problems is too small. For more discussions of these results
-we refer to the @ref distributed_paper "Distributed Computing paper".
+<h2>Flow around a 3D cylinder</h2>
 
-So how large are the largest problems one can solve? At the time of writing
-this problem, the
-limiting factor is that the program uses the BoomerAMG algebraic
-multigrid method from the <a
-href="http://acts.nersc.gov/hypre/" target="_top">Hypre package</a> as
-a preconditioner, which unfortunately uses signed 32-bit integers to
-index the elements of a %distributed matrix. This limits the size of
-problems to $2^{31}-1=2,147,483,647$ degrees of freedom. From the graphs
-above it is obvious that the scalability would extend beyond this
-number, and one could expect that given more than the 4,096 machines
-shown above would also further reduce the compute time. That said, one
-can certainly expect that this limit will eventually be lifted by the
-hypre developers.
+@note Running the 3D example requires substantially more memory than in 2D.
+By default, MUMPS allocates a fixed-size memory pool for its internal use, and this example
+likely exceeds it, which causes MUMPS to fail with an error code -9.
+However, the <code>SparseDirectMUMPS</code> solver currently does not check the return code
+from MUMPS, which then returns a solution with NaNs.
+To bypass this, you can run the solver while asking MUMPS to extend this memory pool by 100%,
+which can be done by passing the PETSc runtime flag <code>-mat_mumps_icntl_14 100</code>.
+Your call would then look like:
+<code>mpirun -n <np> step-106 -mat_mumps_icntl_14 100</code>.
 
-On the other hand, this does not mean that deal.II cannot solve bigger
-problems. Indeed, step-37 shows how one can solve problems that are not
-just a little, but very substantially larger than anything we have shown
-here.
+TODO: quite slow.
 
+<a name="step-106-extensions"></a>
+<h2>Possibilities for extensions</h2>
 
+<h3>Move to an iterative solver</h3>
+The most obvious improvement to this program would be to use an efficient preconditioner,
+to move away from the direct solver, which greatly limits the 3D capabilities of the current example.
+Possible solutions could involve a block Schur preconditioner for the monolithic system,
+or a geometric multigrid method.
 
-<a name="step-40-extensions"></a>
-<h3>Possibilities for extensions</h3>
-
-In a sense, this program is the ultimate solver for the Laplace
-equation: it can essentially solve the equation to whatever accuracy
-you want, if only you have enough processors available. Since the
-Laplace equation by itself is not terribly interesting at this level
-of accuracy, the more interesting possibilities for extension
-therefore concern not so much this program but what comes beyond
-it. For example, several of the other programs in this tutorial have
-significant run times, especially in 3d. It would therefore be
-interesting to use the techniques explained here to extend other
-programs to support parallel distributed computations. We have done
-this for step-31 in the step-32 tutorial program, but the same would
-apply to, for example, step-23 and step-25 for hyperbolic time
-dependent problems, step-33 for gas dynamics, or step-35 for the
-Navier-Stokes equations.
-
-Maybe equally interesting is the problem of postprocessing. As
-mentioned above, we only show pictures of the solution and the mesh
-for 16 processors because 4,096 processors solving 1 billion unknowns
-would produce graphical output on the order of several 10
-gigabyte. Currently, no program is able to visualize this amount of
-data in any reasonable way unless it also runs on at least several
-hundred processors. There are, however, approaches where visualization
-programs directly communicate with solvers on each processor with each
-visualization process rendering the part of the scene computed by the
-solver on this processor. Implementing such an interface would allow
-to quickly visualize things that are otherwise not amenable to
-graphical display.
+<h3>Define the Lagrange multiplier only on the boundary</h3>
+The second obvious improvement is to get rid of all the unused Lagrange multiplier dofs,
+which are costly in memory and solve time. As mentioned in the introduction, a quite elegant way
+of achieving this while still manipulating a single <code>DoFHandler</code> is to leverage
+the \f$hp\f$-machinery, and define different <code>FESystem</code>s on the mesh cells, depending
+on whether they touch the cylinder or not. On cells that do not touch the cylinder, we can set
+the Lagrange multiplier space to a <code>FENothing</code>, which does not add any additional dof.
+Although this still adds unused volume dofs in cells adjacent to the cylinder, this greatly reduces
+the overall number of unused degrees of freedom.
 
 */

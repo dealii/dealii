@@ -90,12 +90,42 @@ namespace Step106
                               Vector<double> &values) const override
     {
       for (unsigned int d = 0; d < dim; ++d)
-        values[u_lower + d] = 0.;
+        // Small perturbation to trigger the Von Karman streets earlier
+        values[u_lower + d] = 0;
       values[u_lower] = 1.;
     }
 
   public:
     // Lower bound (first component) of the velocity variable
+    const unsigned int u_lower;
+  };
+
+  // @sect3{Velocity initial condition}
+  //
+  // This class is not strictly required, as we could simply reuse the inlet
+  // boundary condition to set the initial velocity, but this allows us to
+  // cheat a little beat and give an initial vertical velocity. This creates
+  // a slight asymmetry in the flow, and helps trigger the Von Karman streets
+  // earlier.
+  template <int dim>
+  class InitialVelocity : public Function<dim>
+  {
+  public:
+    InitialVelocity(const unsigned int u_lower, const unsigned int n_components)
+      : Function<dim>(n_components)
+      , u_lower(u_lower)
+    {}
+
+    virtual void vector_value(const Point<dim> & /*p*/,
+                              Vector<double> &values) const override
+    {
+      for (unsigned int d = 0; d < dim; ++d)
+        // Perturbation
+        values[u_lower + d] = 0.01;
+      values[u_lower] = 1.;
+    }
+
+  public:
     const unsigned int u_lower;
   };
 
@@ -445,8 +475,8 @@ namespace Step106
     const double kinematic_viscosity = 0.005;
 
     const double start_time = 0.;
-    const double end_time   = 10.;
-    const double time_step  = 0.1;
+    const double end_time   = 1.;
+    const double time_step  = 0.05;
 
     const unsigned int max_iterations       = 20;
     const double       tolerance            = 1e-10;
@@ -458,14 +488,15 @@ namespace Step106
   // The main class is similar to the main class in step-57, which solves the
   // steady Navier-Stokes equations using Newton's method. The
   // principal differences are:
+  //
   // - Instead of block preconditioning, we simply use a direct solver (Mumps).
-  // Since we solve the problem in parallel, we use standard
-  // <code>LA::MPI::Vector<code>s instead of deal.II's serial
-  // <code>BlockVector<code>s.
-  // - Since we solve the unsteady Navier-Stokes equations, we start from an
-  // initial velocity condition rather than from an educated initial guess, as
-  // one would when solving the steady-state solution (e.g., from the solution
-  // of the Stokes equations for the same boundary conditions).
+  // Since we additionally solve the problem in parallel, we use PETSc
+  // <code>LA::MPI::Vector</code>s instead of deal.II's serial
+  // <code>BlockVector</code>s.
+  // - Since we solve the <i>unsteady</i> Navier-Stokes equations, we start from
+  // an initial velocity condition rather than from an educated initial guess,
+  // as one would when solving the steady-state solution (e.g., from the
+  // solution of the Stokes equations for the same boundary conditions).
   // - We need to store additional constraints for the Lagrange multiplier, to
   // specify that the lambda dofs not on the cylinder will be set to zero.
   // - For clarity, the set up functions for numbering the degrees of freedom,
@@ -625,13 +656,13 @@ namespace Step106
   {
     TimerOutput::Scope t(computing_timer, "Create mesh");
 
-    const std::vector<unsigned int> lengths_and_heights = {8, 16, 8, 8};
+    const std::vector<unsigned int> lengths_and_heights = {8, 24, 8, 8};
 
     // Use the default settings of the grid genarator, except that we would like
     // to color the boundary entities, to assign the boundary conditions.
     // This assigns the boundary id 2 to the cylinder.
     GridGenerator::uniform_channel_with_cylinder(
-      triangulation, lengths_and_heights, 2, 4, 0.75, 2, 2, false, true);
+      triangulation, lengths_and_heights, 2, 3, 0.75, 2, 2, false, true);
 
     weak_no_slip_boundary_id = 2;
 
@@ -839,12 +870,10 @@ namespace Step106
                                             6,
                                             /* direction = */ 2,
                                             periodicity_vector);
-          
-          // FIXME: Should all fields be periodic?
-          const ComponentMask velocity_and_lambda_mask =
-            velocity_mask | lambda_mask;
-          DoFTools::make_periodicity_constraints<dim, dim>(
-            periodicity_vector, constraints, velocity_and_lambda_mask);
+
+          // Set all fields as periodic (by not providing any component mask)
+          DoFTools::make_periodicity_constraints<dim, dim>(periodicity_vector,
+                                                           constraints);
         }
     }
 
@@ -863,101 +892,44 @@ namespace Step106
 
   // @sect4{NavierStokesWithWeakNoSlip<dim>::create_sparsity_pattern}
 
-  // Instead of using the default coupling returned by
-  // DoFTools::make_sparsity_pattern, we split the couplings between volume and
-  // faces. In the volume, we use a coupling table for velocity and pressure
-  // dofs, and on the cylinder faces we manually add the velocity-lambda
-  // couplings.
-
-  // FIXME: using the default DoFTools::make_sparsity_pattern does actually
-  // yield a similar number of nonzeros... Probably because the cosntrained
-  // lambda dofs are not kept? If that's the case let's just use this and keep
-  // the function simple.
+  // We use a coupling table to create the sparsity pattern. By setting
+  // <code>keep_constrained_dofs</code> to false, we also eliminate the
+  // couplings from all the constrained lambda dofs in the volume.
   template <int dim>
   void NavierStokesWithWeakNoSlip<dim>::create_sparsity_pattern()
   {
     DynamicSparsityPattern dsp(locally_relevant_dofs);
 
-    // Velocity-pressure couplings in the volume
-    Table<2, DoFTools::Coupling> volume_coupling_table(n_components,
-                                                       n_components);
+    Table<2, DoFTools::Coupling> coupling_table(n_components, n_components);
     for (unsigned int c = 0; c < n_components; ++c)
       for (unsigned int d = 0; d < n_components; ++d)
         {
-          volume_coupling_table[c][d] = DoFTools::none;
+          coupling_table[c][d] = DoFTools::none;
 
-          // u couples to u and p
-          if (is_velocity(c) && (is_velocity(d) || is_pressure(d)))
-            volume_coupling_table[c][d] = DoFTools::always;
+          // u couples to all variables
+          if (is_velocity(c))
+            coupling_table[c][d] = DoFTools::always;
           // p couples to u only
           else if (is_pressure(c) && is_velocity(d))
-            volume_coupling_table[c][d] = DoFTools::always;
+            coupling_table[c][d] = DoFTools::always;
+          // lambda couples to u only
+          else if (is_lambda(c) && is_velocity(d))
+            coupling_table[c][d] = DoFTools::always;
         }
 
     DoFTools::make_sparsity_pattern(dof_handler,
-                                    volume_coupling_table,
+                                    coupling_table,
                                     dsp,
                                     nonzero_constraints,
                                     /* keep_constrained_dofs = */ false);
-
-    // Manually add the lambda coupling on the relevant boundary faces
-    {
-      const unsigned int n_dofs_per_cell = fe.n_dofs_per_cell();
-      std::vector<types::global_dof_index> cell_dofs(n_dofs_per_cell);
-      for (const auto &cell : dof_handler.active_cell_iterators())
-        if (cell->is_locally_owned() || cell->is_ghost())
-          for (const auto i_face : cell->face_indices())
-            {
-              const auto &face = cell->face(i_face);
-              if (!(face->at_boundary() &&
-                    face->boundary_id() == weak_no_slip_boundary_id))
-                continue;
-
-              // Add coupling based on cell, rather than based on faces.
-              // This is because in the assembly, we loop on the cell dofs
-              // even for face terms, as the FEFaceValues functions run from
-              // 0 to n_dofs_per_cell even on faces.
-              cell->get_dof_indices(cell_dofs);
-
-              for (unsigned int i = 0; i < n_dofs_per_cell; ++i)
-                {
-                  const unsigned int comp_i =
-                    fe.system_to_component_index(i).first;
-
-                  if (is_lambda(comp_i))
-                    for (unsigned int j = 0; j < n_dofs_per_cell; ++j)
-                      {
-                        const unsigned int comp_j =
-                          fe.system_to_component_index(j).first;
-
-                        // Lambda couples to u and x on faces where no-slip is
-                        // enforced weakly
-                        if (is_velocity(comp_j))
-                          {
-                            // Lambda couples to u and vice versa
-                            dsp.add(cell_dofs[i], cell_dofs[j]);
-                            dsp.add(cell_dofs[j], cell_dofs[i]);
-                          }
-                      }
-                }
-            }
-    }
-
     SparsityTools::distribute_sparsity_pattern(dsp,
                                                locally_owned_dofs,
                                                mpi_communicator,
                                                locally_relevant_dofs);
-
     system_matrix.reinit(locally_owned_dofs,
                          locally_owned_dofs,
                          dsp,
                          mpi_communicator);
-
-    // FIXME: This can be removed after deciding whether to simply use the
-    // standard coupling, or the one manually added on the faces.
-    // pcout << "Matrix has " << system_matrix.n_nonzero_elements()
-    //                << " nnz and size " << system_matrix.m() << " x "
-    //                << system_matrix.n() << std::endl;
   }
 
   // @sect4{NavierStokesWithWeakNoSlip<dim>::set_initial_conditions}
@@ -977,8 +949,7 @@ namespace Step106
     const FEValuesExtractors::Vector velocity(u_lower);
     const ComponentMask velocity_mask = fe.component_mask(velocity);
 
-    // Initial velocity is also described by the Inlet class template
-    Inlet<dim> initial_velocity(u_lower, n_components);
+    InitialVelocity<dim> initial_velocity(u_lower, n_components);
     VectorTools::interpolate(mapping,
                              dof_handler,
                              initial_velocity,
@@ -1350,7 +1321,7 @@ namespace Step106
   {
     TimerOutput::Scope t(computing_timer, "Write outputs");
 
-    std::string output_directory = "./";
+    std::string output_directory = "./results/";
 
     // ID of the partition
     Vector<float> subdomain(triangulation.n_active_cells());
@@ -1502,8 +1473,8 @@ namespace Step106
     // Reduce each component, and take the negative to get the force
     Tensor<1, dim> forces;
     for (unsigned int d = 0; d < dim; ++d)
-      forces[d] =
-        - param.density * Utilities::MPI::sum(lambda_integral_local[d], mpi_communicator);
+      forces[d] = -param.density * Utilities::MPI::sum(lambda_integral_local[d],
+                                                       mpi_communicator);
 
     // Write forces to table
     std::vector<std::string> dim_str = {"x", "y", "z"};
@@ -1516,7 +1487,7 @@ namespace Step106
       }
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
       {
-        std::ofstream out("forces.txt");
+        std::ofstream out("./results/forces.txt");
         out << std::scientific << std::setprecision(3);
         forces_table.write_text(out);
       }
@@ -1587,9 +1558,6 @@ int main(int argc, char *argv[])
 
       NavierStokesWithWeakNoSlip<2> flow;
       flow.run();
-
-      // NavierStokesWithWeakNoSlip<3> flow;
-      // flow.run();
     }
   catch (std::exception &exc)
     {
