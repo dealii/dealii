@@ -679,7 +679,7 @@ namespace LinearAlgebra
                 ExcMessage(
                   "VectorOperation::min is not defined if there is an imaginary part!)"));
               if (std::real(Number(new_values(i))) - std::real(values[i]) < 0.0)
-                values[i] = new_values(i);
+                values[i] = Number(new_values(i));
             }
           break;
 
