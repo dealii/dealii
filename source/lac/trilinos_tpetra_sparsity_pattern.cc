@@ -285,18 +285,14 @@ namespace LinearAlgebra
         graph.reset();
         column_space_map = col_map;
 
-        // for more than one processor, need to specify only row map first and
-        // let the matrix entries decide about the column map (which says which
-        // columns are present in the matrix, not to be confused with the
-        // col_map that tells how the domain dofs of the matrix will be
-        // distributed). for only one processor, we can directly assign the
-        // columns as well. If we use a recent Trilinos version, we can also
-        // require building a non-local graph which gives us thread-safe
-        // initialization.
+        // We only specify the row map and let the sparsity pattern entries
+        // decide about the column map (which says which columns are present
+        // locally, not to be confused with the col_map that tells how the
+        // domain dofs of the matrix will be distributed). If we use a recent
+        // Trilinos version, we can also require building a non-local graph
+        // which gives us thread-safe initialization.
         graph = Utilities::Trilinos::internal::make_rcp<
-          TpetraTypes::GraphType<MemorySpace>>(row_map,
-                                               row_map,
-                                               n_entries_per_row);
+          TpetraTypes::GraphType<MemorySpace>>(row_map, n_entries_per_row);
       }
 
 
@@ -357,9 +353,7 @@ namespace LinearAlgebra
             "You are requesting to store more elements than global ordinal type allows."));
 
         graph = Utilities::Trilinos::internal::make_rcp<
-          TpetraTypes::GraphType<MemorySpace>>(row_map,
-                                               col_map,
-                                               local_entries_per_row);
+          TpetraTypes::GraphType<MemorySpace>>(row_map, local_entries_per_row);
       }
 
 
@@ -415,14 +409,8 @@ namespace LinearAlgebra
             "that. Either use more MPI processes or recompile Trilinos "
             "with 'local ordinate = long long' "));
 
-        if (row_map->getComm()->getSize() > 1)
-          graph = Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(row_map, n_entries_per_row);
-        else
-          graph = Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(row_map,
-                                                 col_map,
-                                                 n_entries_per_row);
+        graph = Utilities::Trilinos::internal::make_rcp<
+          TpetraTypes::GraphType<MemorySpace>>(row_map, n_entries_per_row);
 
         // We can't check for equality of sp.n_cols() and
         // graph->getGlobalNumCols() here since we don't necessarily have a
