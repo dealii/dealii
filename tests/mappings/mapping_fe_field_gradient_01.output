@@ -1,0 +1,7 @@
+
+DEAL::dim = 2
+DEAL::mapping_covariant_gradient: OK
+DEAL::mapping_contravariant_gradient: OK
+DEAL::dim = 3
+DEAL::mapping_covariant_gradient: OK
+DEAL::mapping_contravariant_gradient: OK
