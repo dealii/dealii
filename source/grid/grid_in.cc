@@ -1164,9 +1164,9 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
         >> material_id;
       in >> cell_type;
 
-      if (((cell_type == "line") && (dim == 1)) ||
-          ((cell_type == "quad") && (dim == 2)) ||
-          ((cell_type == "hex") && (dim == 3)))
+      if (((dim == 1) && (cell_type == "line")) ||
+          ((dim == 2) && (cell_type == "quad")) ||
+          ((dim == 3) && (cell_type == "hex")))
         // found a cell
         {
           // allocate and read indices
@@ -1206,7 +1206,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                 cells.back().vertices[i] = numbers::invalid_unsigned_int;
               }
         }
-      else if ((cell_type == "line") && ((dim == 2) || (dim == 3)))
+      else if (((dim == 2) || (dim == 3)) && (cell_type == "line"))
         // boundary info
         {
           subcelldata.boundary_lines.emplace_back();
@@ -1255,7 +1255,7 @@ GridIn<dim, spacedim>::read_ucd(std::istream &in,
                 vertex = numbers::invalid_unsigned_int;
               }
         }
-      else if ((cell_type == "quad") && (dim == 3))
+      else if ((dim == 3) && (cell_type == "quad"))
         // boundary info
         {
           subcelldata.boundary_quads.emplace_back();
