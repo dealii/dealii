@@ -756,6 +756,12 @@ namespace PSCToolkitWrappers
      */
     VectorOperation::values last_action;
 
+    /**
+     * Whether contributions to entries owned by other processes have been
+     * handed to PSBLAS and still need to be exchanged by compress().
+     */
+    bool remote_entries_pending;
+
     friend class SparseMatrix;
 
     friend class PreconditionAMG;
