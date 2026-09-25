@@ -12,23 +12,23 @@
 
 
 
-for (S : TRILINOS_SCALARS)
+for (S : TRILINOS_SCALARS; MEMORY_SPACE : MEMORY_SPACES)
   {
     namespace LinearAlgebra
     \{
       namespace TpetraWrappers
       \{
-        template class SparseMatrix<S, MemorySpace::Host>;
+        template class SparseMatrix<S, MEMORY_SPACE>;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::reinit(
+        SparseMatrix<S, MEMORY_SPACE>::reinit(
           const IndexSet                       &parallel_partitioning,
           const dealii::DynamicSparsityPattern &sparsity_pattern,
           const MPI_Comm                        communicator,
           const bool                            exchange_data);
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::reinit(
+        SparseMatrix<S, MEMORY_SPACE>::reinit(
           const IndexSet                       &row_parallel_partitioning,
           const IndexSet                       &col_parallel_partitioning,
           const dealii::DynamicSparsityPattern &sparsity_pattern,
@@ -36,131 +36,58 @@ for (S : TRILINOS_SCALARS)
           const bool                            exchange_data);
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::reinit(
+        SparseMatrix<S, MEMORY_SPACE>::reinit(
           const dealii::DynamicSparsityPattern &);
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::reinit(
-          const dealii::SparsityPattern &);
+        SparseMatrix<S, MEMORY_SPACE>::reinit(const dealii::SparsityPattern &);
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::vmult(
-          Vector<S, MemorySpace::Host>       &dst,
-          const Vector<S, MemorySpace::Host> &src) const;
+        SparseMatrix<S, MEMORY_SPACE>::vmult(
+          Vector<S, MEMORY_SPACE>       &dst,
+          const Vector<S, MEMORY_SPACE> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::Tvmult(
-          Vector<S, MemorySpace::Host>       &dst,
-          const Vector<S, MemorySpace::Host> &src) const;
+        SparseMatrix<S, MEMORY_SPACE>::Tvmult(
+          Vector<S, MEMORY_SPACE>       &dst,
+          const Vector<S, MEMORY_SPACE> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::vmult_add(
-          Vector<S, MemorySpace::Host>       &dst,
-          const Vector<S, MemorySpace::Host> &src) const;
+        SparseMatrix<S, MEMORY_SPACE>::vmult_add(
+          Vector<S, MEMORY_SPACE>       &dst,
+          const Vector<S, MEMORY_SPACE> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::Tvmult_add(
-          Vector<S, MemorySpace::Host>       &dst,
-          const Vector<S, MemorySpace::Host> &src) const;
+        SparseMatrix<S, MEMORY_SPACE>::Tvmult_add(
+          Vector<S, MEMORY_SPACE>       &dst,
+          const Vector<S, MEMORY_SPACE> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::vmult(
+        SparseMatrix<S, MEMORY_SPACE>::vmult(
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::Tvmult(
+        SparseMatrix<S, MEMORY_SPACE>::Tvmult(
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::vmult_add(
+        SparseMatrix<S, MEMORY_SPACE>::vmult_add(
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::Tvmult_add(
+        SparseMatrix<S, MEMORY_SPACE>::Tvmult_add(
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
 
         template void
-        SparseMatrix<S, MemorySpace::Host>::set(const size_type,
-                                                const size_type,
-                                                const size_type *,
-                                                const S *,
-                                                bool);
-
-        template class SparseMatrix<S, MemorySpace::Default>;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::reinit(
-          const IndexSet                       &parallel_partitioning,
-          const dealii::DynamicSparsityPattern &sparsity_pattern,
-          const MPI_Comm                        communicator,
-          const bool                            exchange_data);
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::reinit(
-          const IndexSet                       &row_parallel_partitioning,
-          const IndexSet                       &col_parallel_partitioning,
-          const dealii::DynamicSparsityPattern &sparsity_pattern,
-          const MPI_Comm                        communicator,
-          const bool                            exchange_data);
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::reinit(
-          const dealii::DynamicSparsityPattern &);
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::reinit(
-          const dealii::SparsityPattern &);
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::vmult(
-          Vector<S, MemorySpace::Default>       &dst,
-          const Vector<S, MemorySpace::Default> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::Tvmult(
-          Vector<S, MemorySpace::Default>       &dst,
-          const Vector<S, MemorySpace::Default> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::vmult_add(
-          Vector<S, MemorySpace::Default>       &dst,
-          const Vector<S, MemorySpace::Default> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::Tvmult_add(
-          Vector<S, MemorySpace::Default>       &dst,
-          const Vector<S, MemorySpace::Default> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::vmult(
-          ::dealii::Vector<S>       &dst,
-          const ::dealii::Vector<S> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::Tvmult(
-          ::dealii::Vector<S>       &dst,
-          const ::dealii::Vector<S> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::vmult_add(
-          ::dealii::Vector<S>       &dst,
-          const ::dealii::Vector<S> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::Tvmult_add(
-          ::dealii::Vector<S>       &dst,
-          const ::dealii::Vector<S> &src) const;
-
-        template void
-        SparseMatrix<S, MemorySpace::Default>::set(const size_type,
-                                                   const size_type,
-                                                   const size_type *,
-                                                   const S *,
-                                                   bool);
+        SparseMatrix<S, MEMORY_SPACE>::set(const size_type,
+                                           const size_type,
+                                           const size_type *,
+                                           const S *,
+                                           bool);
       \}
     \}
   }
