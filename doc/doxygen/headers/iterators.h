@@ -61,7 +61,7 @@ As mentioned above, iterators in deal.II can be considered as iterating over
 all the objects that constitute a mesh. (These objects are lines, quads, and
 hexes, and are represented by the type of Accessor class given as template argument to the iterator.) This suggests to view a triangulation as a
 collection of cells and other objects that are held together by a certain data
-structure that links all these objects, in the same was as a linked list is
+structure that links all these objects, in the same way as a linked list is
 the data structure that connects objects in a linear fashion.
 
 Triangulations in deal.II can indeed be considered in this way. In particular,
