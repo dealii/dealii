@@ -283,6 +283,32 @@ for (S : TRILINOS_SCALARS)
       LinearAlgebra::TpetraWrappers::SparseMatrix<S> &) const;
 
     template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Host>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Host> &)
+      const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default> &)
+      const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default>>(
+      const FullMatrix<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      const AffineConstraints<S> &,
+      const std::vector<AffineConstraints<S>::size_type> &,
+      LinearAlgebra::TpetraWrappers::SparseMatrix<S, MemorySpace::Default> &)
+      const;
+
+    template void AffineConstraints<S>::distribute_local_to_global<
       LinearAlgebra::TpetraWrappers::SparseMatrix<S>,
       Vector<S>>(const FullMatrix<S> &,
                  const Vector<S> &,
