@@ -16,6 +16,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
   {
     namespace TriangulationDescription
     \{
+#if deal_II_dimension <= deal_II_space_dimension
+      template struct Description<deal_II_dimension, deal_II_space_dimension>;
+#endif
+
       namespace Utilities
       \{
 #if deal_II_dimension <= deal_II_space_dimension
