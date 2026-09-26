@@ -460,6 +460,118 @@ namespace Functions
       return q_perp / r;
     }
 
+#ifdef DEAL_II_WITH_ITK
+    template <int dim>
+    ArbitraryLevelSet<dim>::ArbitraryLevelSet(
+      const std::string &filename,
+      const float        level_set_quantity_cut_off_lower_bound,
+      const float        level_set_quantity_cut_off_upper_bound)
+      : Function<dim>()
+    {
+      // we need those otherwise linking fails.
+      // we essentially register some images one could ask for.
+      // If needed other image types can later be added the same way.
+      itk::NiftiImageIOFactory::RegisterOneFactory();
+      itk::PNGImageIOFactory::RegisterOneFactory();
+      itk::JPEGImageIOFactory::RegisterOneFactory();
+
+
+      // read the Image
+      using ReaderType = itk::ImageFileReader<InputImageType>;
+      auto reader      = ReaderType::New();
+      reader->SetFileName(filename);
+
+      // Threshold to create the level set mask
+      using ThresholdFilterType =
+        itk::BinaryThresholdImageFilter<InputImageType, MaskImageType>;
+      auto thresholdFilter = ThresholdFilterType::New();
+
+      // we change some settings of the image
+      using ChangeInfoType = itk::ChangeInformationImageFilter<InputImageType>;
+      auto changeInfo      = ChangeInfoType::New();
+      changeInfo->SetInput(reader->GetOutput());
+
+      // this sets everything to cartesian coordinates.
+      changeInfo->ChangeDirectionOn();
+      changeInfo->SetOutputDirection(
+        itk::Matrix<double, dim, dim>::GetIdentity());
+
+      // we change the origin
+      changeInfo->ChangeOriginOn();
+
+      // we change the origin to (0)^dim, as this makes it easy to work with.
+      itk::Point<double, dim> standard_origin;
+      standard_origin.Fill(0.0);
+      changeInfo->SetOutputOrigin(standard_origin);
+
+      // the threshold filter takes care of the level set generation.
+      thresholdFilter->SetInput(changeInfo->GetOutput());
+      thresholdFilter->SetLowerThreshold(
+        level_set_quantity_cut_off_lower_bound);
+      thresholdFilter->SetUpperThreshold(
+        level_set_quantity_cut_off_upper_bound);
+      thresholdFilter->SetInsideValue(255); // The foreground
+      thresholdFilter->SetOutsideValue(0);  // The background
+
+      // Configure Maurer Distance
+      using DistanceFilterType =
+        itk::SignedMaurerDistanceMapImageFilter<MaskImageType, OutputImageType>;
+      auto distanceFilter = DistanceFilterType::New();
+      distanceFilter->SetInput(thresholdFilter->GetOutput());
+      distanceFilter->SetSquaredDistance(
+        false); // we want the actual distance to distinguish between inside and
+                // outside
+      distanceFilter->SetUseImageSpacing(
+        true); // this basically gives us the information that we use equal
+               // spacing of the pixels and that the y-pixel length is not
+               // different than the x-pixel length
+      distanceFilter->SetInsideIsPositive(
+        false); // same as deal.II, if we are inside we have negative values.
+
+      try
+        {
+          // execute the pipeline once during initialization
+          distanceFilter->Update();
+        }
+      catch (const itk::ExceptionObject &error)
+        {
+          AssertThrow(false,
+                      ExcMessage(
+                        std::string(
+                          "ITK Error during distance map computation: ") +
+                        error.what()));
+        }
+
+      // Store the output map and set up the interpolator for fast querying
+      this->distanceMap  = distanceFilter->GetOutput();
+      this->interpolator = InterpolatorType::New();
+      this->interpolator->SetInputImage(this->distanceMap);
+    }
+
+    template <int dim>
+    double
+    ArbitraryLevelSet<dim>::value(const Point<dim>  &point,
+                                  const unsigned int component) const
+    {
+      // we need to make it an itk point for evaluation
+      itk::Point<double, dim> itk_point;
+      for (unsigned int i = 0; i < dim; ++i)
+        {
+          itk_point[i] = point[i];
+        }
+
+      // if we are inside, then evaluate.
+      if (interpolator->IsInsideBuffer(itk_point))
+        {
+          return interpolator->Evaluate(itk_point);
+        }
+      else
+        {
+          return std::numeric_limits<double>::max();
+        }
+    }
+
+#endif
   } // namespace SignedDistance
 } // namespace Functions
 
