@@ -409,6 +409,23 @@ for (M : PSCTOOLKIT_MATRICES)
       const AffineConstraints<double> &,
       const std::vector<AffineConstraints<double>::size_type> &,
       M &) const;
+
+    // Required to create the Vector dummy object in the variants of the
+    // function that do not take a vector argument.
+    template void
+    AffineConstraints<double>::distribute_local_to_global<M, Vector<double>>(
+      const FullMatrix<double> &,
+      const Vector<double> &,
+      const std::vector<AffineConstraints<double>::size_type> &,
+      M &,
+      Vector<double> &,
+      bool,
+      std::bool_constant<false>) const;
+  }
+
+for (V : PSCTOOLKIT_VECTORS)
+  {
+    template void AffineConstraints<double>::distribute<V>(V &) const;
   }
 
 

@@ -2701,6 +2701,24 @@ namespace internal
 
 
 
+#ifdef DEAL_II_WITH_PSBLAS
+  inline void
+  import_vector_with_ghost_elements(
+    const PSCToolkitWrappers::Vector &vec,
+    const IndexSet                   &locally_owned_elements,
+    const IndexSet                   &needed_elements,
+    PSCToolkitWrappers::Vector       &output,
+    const std::bool_constant<false> /*is_block_vector*/)
+  {
+    output.reinit(locally_owned_elements,
+                  needed_elements,
+                  vec.get_mpi_communicator());
+    output = vec;
+  }
+#endif
+
+
+
   template <typename number>
   void
   import_vector_with_ghost_elements(
