@@ -21,6 +21,7 @@
 #  include <deal.II/lac/solver_gmres.h>
 #  include <deal.II/lac/trilinos_tpetra_solver_direct.h>
 #  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
+#  include <deal.II/lac/trilinos_tpetra_vector.h>
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -711,6 +712,23 @@ namespace TrilinosWrappers
      */
     AdditionalData additional_data;
   };
+#  else
+
+  /**
+   * Typedef for the CG solver type used. This is a temporary solution
+   * until we have a proper TpetraWrappers::SolverCG class that works
+   * with Tpetra matrices and vectors.
+   */
+  using SolverCG = dealii::SolverCG<
+    LinearAlgebra::TpetraWrappers::Vector<double, ::dealii::MemorySpace::Host>>;
+
+  /**
+   * Typedef for the GMRES solver type used. This is a temporary solution
+   * until we have a proper TpetraWrappers::SolverGMRES class that works
+   * with Tpetra matrices and vectors.
+   */
+  using SolverGMRES = dealii::SolverGMRES<
+    LinearAlgebra::TpetraWrappers::Vector<double, ::dealii::MemorySpace::Host>>;
 
 
 
