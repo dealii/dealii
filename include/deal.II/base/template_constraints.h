@@ -969,6 +969,18 @@ namespace concepts
         true;
 #endif
 
+#ifdef DEAL_II_TRILINOS_WITH_TPETRA
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_distributed_vector_type<
+      dealii::LinearAlgebra::TpetraWrappers::Vector<Number, MemorySpace>> =
+      true;
+
+    template <typename Number, typename MemorySpace>
+    inline constexpr bool is_distributed_vector_type<
+      dealii::LinearAlgebra::TpetraWrappers::BlockVector<Number, MemorySpace>> =
+      true;
+#endif
+
 #ifdef DEAL_II_WITH_PETSC
     template <>
     inline constexpr bool
