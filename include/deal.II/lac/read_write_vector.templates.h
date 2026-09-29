@@ -39,6 +39,11 @@ DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 #    include <Epetra_Import.h>
 #  endif
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
+
+#  ifdef DEAL_II_TRILINOS_WITH_TPETRA
+#    include <deal.II/lac/trilinos_tpetra_communication_pattern.h>
+#    include <deal.II/lac/trilinos_tpetra_vector.h>
+#  endif
 #endif
 
 #include <boost/io/ios_state.hpp>
@@ -900,6 +905,18 @@ namespace LinearAlgebra
                     operation,
                     trilinos_vec.get_mpi_communicator(),
                     communication_pattern);
+  }
+
+
+
+  template <typename Number>
+  template <typename MemorySpace, typename OtherNumber>
+  std::enable_if_t<dealii::is_tpetra_type<OtherNumber>::value>
+  ReadWriteVector<Number>::import_elements(
+    const TpetraWrappers::BlockVector<OtherNumber, MemorySpace> &src,
+    const VectorOperation::values                                operation)
+  {
+    internal::import_elements_from_block_vector(*this, src, operation);
   }
 #  endif
 
