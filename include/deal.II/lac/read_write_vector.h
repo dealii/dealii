@@ -368,6 +368,17 @@ namespace LinearAlgebra
       const std::shared_ptr<const Utilities::MPI::CommunicationPatternBase>
         &communication_pattern = {});
 
+    /**
+     * Imports the elements in this vector's IndexSet from @p src, using
+     * global indices across all blocks. The @p operation determines how
+     * imported values are combined with the existing entries.
+     */
+    template <typename MemorySpace, typename OtherNumber>
+    std::enable_if_t<dealii::is_tpetra_type<OtherNumber>::value>
+    import_elements(
+      const TpetraWrappers::BlockVector<OtherNumber, MemorySpace> &src,
+      const VectorOperation::values                                operation);
+
 #  endif
 
 #  if defined(DEAL_II_TRILINOS_WITH_EPETRA)
