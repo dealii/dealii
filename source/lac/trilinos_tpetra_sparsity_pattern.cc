@@ -589,7 +589,8 @@ namespace LinearAlgebra
               .template make_tpetra_map_rcp<TpetraTypes::NodeType<MemorySpace>>(
                 communicator, true);
           nonlocal_graph = Utilities::Trilinos::internal::make_rcp<
-            TpetraTypes::GraphType<MemorySpace>>(nonlocal_map, col_map, 0);
+            TpetraTypes::GraphType<MemorySpace>>(nonlocal_map,
+                                                 n_entries_per_row);
         }
       else
         Assert(nonlocal_partitioner.n_elements() == 0, ExcInternalError());
@@ -747,48 +748,14 @@ namespace LinearAlgebra
       Assert(column_space_map.get(), ExcInternalError());
       if (nonlocal_graph.get() != nullptr)
         {
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-          if (nonlocal_graph->getRowMap()->getLocalNumElements() > 0 &&
-              column_space_map->getGlobalNumElements() > 0)
-#  else
-          if (nonlocal_graph->getRowMap()->getNodeNumElements() > 0 &&
-              column_space_map->getGlobalNumElements() > 0)
-#  endif
-            {
-              // Insert dummy element at (row, column) that corresponds to row 0
-              // in local index counting.
-              TrilinosWrappers::types::int_type row =
-                nonlocal_graph->getRowMap()->getGlobalElement(0);
-              TrilinosWrappers::types::int_type column = 0;
-
-              // in case we have a square sparsity pattern, add the entry on the
-              // diagonal
-              if (column_space_map->getGlobalNumElements() ==
-                  graph->getRangeMap()->getGlobalNumElements())
-                column = row;
-                // if not, take a column index that we have ourselves since we
-                // know for sure it is there (and it will not create spurious
-                // messages to many ranks like putting index 0 on many
-                // processors)
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-              else if (column_space_map->getLocalNumElements() > 0)
-#  else
-              else if (column_space_map->getNodeNumElements() > 0)
-#  endif
-                column = column_space_map->getGlobalElement(0);
-              nonlocal_graph->insertGlobalIndices(row, 1, &column);
-            }
-#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
-          Assert(nonlocal_graph->getRowMap()->getLocalNumElements() == 0 ||
-                   column_space_map->getGlobalNumElements() == 0,
-                 ExcInternalError());
-#  else
-          Assert(nonlocal_graph->getRowMap()->getNodeNumElements() == 0 ||
-                   column_space_map->getGlobalNumElements() == 0,
-                 ExcInternalError());
-#  endif
-
+          // Finalize the nonlocal graph. Note that in contrast to Epetra,
+          // Tpetra can finalize empty graphs without inserting dummy entries.
           nonlocal_graph->fillComplete(column_space_map, graph->getRowMap());
+
+          // Export the nonlocal entries to their owners in the main graph.
+          const TpetraTypes::ExportType<MemorySpace> exporter(
+            nonlocal_graph->getRowMap(), graph->getRowMap());
+          graph->doExport(*nonlocal_graph, exporter, Tpetra::ADD);
         }
       graph->fillComplete(column_space_map, graph->getRowMap());
 
