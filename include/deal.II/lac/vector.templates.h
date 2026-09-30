@@ -190,14 +190,15 @@ Vector<Number>::Vector(
       // Copy the distributed vector to
       // a local one at all processors
       // that know about the original vector.
+      const auto local_tpetra_map =
+        complete_index_set(size())
+          .template make_tpetra_map_rcp<
+            LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace>>(
+            v.get_mpi_communicator(), true);
+
       LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
                                                              MemorySpace>
-        localized_vector(
-          complete_index_set(size())
-            .template make_tpetra_map_rcp<
-              LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<
-                MemorySpace>>(),
-          v.get_mpi_communicator());
+        localized_vector(local_tpetra_map, v.get_mpi_communicator());
 
       Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
         MemorySpace>>
@@ -870,14 +871,15 @@ Vector<Number>::operator=(
       // Copy the distributed vector to
       // a local one at all processors
       // that know about the original vector.
+      const auto local_tpetra_map =
+        complete_index_set(size())
+          .template make_tpetra_map_rcp<
+            LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<MemorySpace>>(
+            v.get_mpi_communicator(), true);
+
       LinearAlgebra::TpetraWrappers::TpetraTypes::VectorType<OtherNumber,
                                                              MemorySpace>
-        localized_vector(
-          complete_index_set(size())
-            .template make_tpetra_map_rcp<
-              LinearAlgebra::TpetraWrappers::TpetraTypes::NodeType<
-                MemorySpace>>(),
-          v.get_mpi_communicator());
+        localized_vector(local_tpetra_map, v.get_mpi_communicator());
 
       Teuchos::RCP<const LinearAlgebra::TpetraWrappers::TpetraTypes::ImportType<
         MemorySpace>>
