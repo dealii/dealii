@@ -2004,17 +2004,62 @@ MappingFEField<dim, spacedim, VectorType>::transform(
 template <int dim, int spacedim, typename VectorType>
 void
 MappingFEField<dim, spacedim, VectorType>::transform(
-  const ArrayView<const Tensor<2, dim>> &input,
-  const MappingKind,
+  const ArrayView<const Tensor<2, dim>>                   &input,
+  const MappingKind                                        mapping_kind,
   const typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   const ArrayView<Tensor<2, spacedim>>                    &output) const
 {
-  (void)input;
-  (void)output;
-  (void)mapping_data;
   AssertDimension(input.size(), output.size());
 
-  AssertThrow(false, ExcNotImplemented());
+  Assert(dynamic_cast<const InternalData *>(&mapping_data) != nullptr,
+         ExcInternalError());
+  const InternalData &data = static_cast<const InternalData &>(mapping_data);
+
+  switch (mapping_kind)
+    {
+      case mapping_covariant_gradient:
+        {
+          Assert(data.update_each & update_covariant_transformation,
+                 ExcInternalError());
+
+          for (unsigned int q = 0; q < input.size(); ++q)
+            for (unsigned int i = 0; i < spacedim; ++i)
+              for (unsigned int j = 0; j < spacedim; ++j)
+                {
+                  output[q][i][j] = 0.0;
+                  for (unsigned int K = 0; K < dim; ++K)
+                    for (unsigned int J = 0; J < dim; ++J)
+                      output[q][i][j] += data.covariant[q][i][K] *
+                                         input[q][K][J] *
+                                         data.covariant[q][j][J];
+                }
+          return;
+        }
+
+      case mapping_contravariant_gradient:
+        {
+          Assert(data.update_each & update_contravariant_transformation,
+                 ExcInternalError());
+          Assert(data.update_each & update_covariant_transformation,
+                 ExcInternalError());
+
+          for (unsigned int q = 0; q < input.size(); ++q)
+            for (unsigned int i = 0; i < spacedim; ++i)
+              for (unsigned int j = 0; j < spacedim; ++j)
+                {
+                  output[q][i][j] = 0.0;
+                  for (unsigned int k = 0; k < dim; ++k)
+                    for (unsigned int l = 0; l < dim; ++l)
+                      output[q][i][j] += data.contravariant[q][i][k] *
+                                         input[q][k][l] *
+                                         data.covariant[q][j][l];
+                }
+          return;
+        }
+
+      default:
+        AssertThrow(false, ExcNotImplemented());
+    }
 }
 
 
