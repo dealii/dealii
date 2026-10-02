@@ -1,0 +1,7 @@
+
+DEAL::n_dofs: 262144
+DEAL::consecutive: true
+DEAL::0 1 2 3 
+DEAL::4 5 6 7 
+DEAL::8 9 10 11 
+DEAL::12 13 14 15 

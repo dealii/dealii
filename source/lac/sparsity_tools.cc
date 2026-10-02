@@ -519,50 +519,24 @@ namespace SparsityTools
     /**
      * Given a connectivity graph and a list of indices (where
      * invalid_size_type indicates that a node has not been numbered yet),
-     * pick a valid starting index among the as-yet unnumbered one.
+     * pick a valid starting index among the as-yet unnumbered ones.
+     *
+     * @p rows_by_coordination holds all rows sorted by coordination
+     * number; @p next_candidate is advanced past already numbered rows.
      */
     DynamicSparsityPattern::size_type
     find_unnumbered_starting_index(
-      const DynamicSparsityPattern                         &sparsity,
-      const std::vector<DynamicSparsityPattern::size_type> &new_indices)
+      const std::vector<DynamicSparsityPattern::size_type> &new_indices,
+      const std::vector<std::pair<DynamicSparsityPattern::size_type,
+                                  DynamicSparsityPattern::size_type>>
+                  &rows_by_coordination,
+      std::size_t &next_candidate)
     {
-      DynamicSparsityPattern::size_type starting_point =
-        numbers::invalid_size_type;
-      DynamicSparsityPattern::size_type min_coordination = sparsity.n_rows();
-      for (DynamicSparsityPattern::size_type row = 0; row < sparsity.n_rows();
-           ++row)
-        // look over all as-yet unnumbered indices
-        if (new_indices[row] == numbers::invalid_size_type)
-          {
-            if (sparsity.row_length(row) < min_coordination)
-              {
-                min_coordination = sparsity.row_length(row);
-                starting_point   = row;
-              }
-          }
+      while (new_indices[rows_by_coordination[next_candidate].second] !=
+             numbers::invalid_size_type)
+        ++next_candidate;
 
-      // now we still have to care for the case that no unnumbered dof has a
-      // coordination number less than sparsity.n_rows(). this rather exotic
-      // case only happens if we only have one cell, as far as I can see,
-      // but there may be others as well.
-      //
-      // if that should be the case, we can chose an arbitrary dof as
-      // starting point, e.g. the first unnumbered one
-      if (starting_point == numbers::invalid_size_type)
-        {
-          for (DynamicSparsityPattern::size_type i = 0; i < new_indices.size();
-               ++i)
-            if (new_indices[i] == numbers::invalid_size_type)
-              {
-                starting_point = i;
-                break;
-              }
-
-          Assert(starting_point != numbers::invalid_size_type,
-                 ExcInternalError());
-        }
-
-      return starting_point;
+      return rows_by_coordination[next_candidate].second;
     }
   } // namespace internal
 
@@ -607,8 +581,22 @@ namespace SparsityTools
     // if no starting indices were given: find dof with lowest coordination
     // number
     if (last_round_dofs.empty())
-      last_round_dofs.push_back(
-        internal::find_unnumbered_starting_index(sparsity, new_indices));
+      {
+        DynamicSparsityPattern::size_type starting_index = 0;
+        for (DynamicSparsityPattern::size_type row = 1; row < sparsity.n_rows();
+             ++row)
+          if (sparsity.row_length(row) < sparsity.row_length(starting_index))
+            starting_index = row;
+        last_round_dofs.push_back(starting_index);
+      }
+
+    // all rows sorted by coordination number (and row index). We only set
+    // up and use this vector when renumbering with sparsity patterns that
+    // have more than one component in the connectivity graph.
+    std::vector<std::pair<DynamicSparsityPattern::size_type,
+                          DynamicSparsityPattern::size_type>>
+                rows_by_coordination;
+    std::size_t next_candidate = 0;
 
     // store next free dof index
     DynamicSparsityPattern::size_type next_free_number = 0;
@@ -656,9 +644,7 @@ namespace SparsityTools
         // that we would then have to do next
         if (next_round_dofs.empty())
           {
-            if (std::find(new_indices.begin(),
-                          new_indices.end(),
-                          numbers::invalid_size_type) == new_indices.end())
+            if (next_free_number == sparsity.n_rows())
               // no unnumbered indices, so we can leave now
               break;
 
@@ -674,8 +660,23 @@ namespace SparsityTools
                               "starting indices are given. The function was "
                               "called with starting indices, however."));
 
-            next_round_dofs.push_back(
-              internal::find_unnumbered_starting_index(sparsity, new_indices));
+            if (rows_by_coordination.empty())
+              {
+                // We have more than one component in the connectivity
+                // graph of the sparsity pattern. Set up rows_by_coordination:
+
+                rows_by_coordination.reserve(sparsity.n_rows());
+                for (DynamicSparsityPattern::size_type row = 0;
+                     row < sparsity.n_rows();
+                     ++row)
+                  rows_by_coordination.emplace_back(sparsity.row_length(row),
+                                                    row);
+                std::sort(rows_by_coordination.begin(),
+                          rows_by_coordination.end());
+              }
+
+            next_round_dofs.push_back(internal::find_unnumbered_starting_index(
+              new_indices, rows_by_coordination, next_candidate));
           }
 
 
