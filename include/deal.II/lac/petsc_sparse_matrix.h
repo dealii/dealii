@@ -434,6 +434,7 @@ namespace PETScWrappers
        * efficient to get memory allocation right from the start.
        */
       template <typename SparsityPatternType>
+      DEAL_II_DEPRECATED_EARLY
       SparseMatrix(const MPI_Comm                communicator,
                    const SparsityPatternType    &sparsity_pattern,
                    const std::vector<size_type> &local_rows_per_process,
@@ -481,7 +482,7 @@ namespace PETScWrappers
        * efficient to get memory allocation right from the start.
        */
       template <typename SparsityPatternType>
-      void
+      DEAL_II_DEPRECATED_EARLY void
       reinit(const MPI_Comm                communicator,
              const SparsityPatternType    &sparsity_pattern,
              const std::vector<size_type> &local_rows_per_process,
@@ -627,7 +628,7 @@ namespace PETScWrappers
        * Same as previous functions.
        */
       template <typename SparsityPatternType>
-      void
+      DEAL_II_DEPRECATED_EARLY void
       do_reinit(const MPI_Comm                comm,
                 const SparsityPatternType    &sparsity_pattern,
                 const std::vector<size_type> &local_rows_per_process,
