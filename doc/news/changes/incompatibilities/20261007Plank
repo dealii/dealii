@@ -1,0 +1,7 @@
+Deprecated: The constructor and the respective reinit functions that allowed
+to use a PETScWrappers::MPI::SparseMatrix using std::vectors that
+are indexed by rank to determine the local size of the matrix
+are deprecated. Please use the reinit() functions that take in an
+IndexSet instead.
+<br>
+(Jonas Plank, 2026/10/07)
