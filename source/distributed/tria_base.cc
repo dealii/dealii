@@ -570,11 +570,34 @@ namespace parallel
     for (unsigned int d = 0; d < spacedim; ++d)
       invalid_point[d] = std::numeric_limits<double>::quiet_NaN();
 
+    //
+    // Our goal is to receive the position of all moved vertices for our
+    // locally owned cells and the ghost layer.
+    //
+    // In a first pass, we communicate all locally owned and moved vertices
+    // from *locally owned* cells to *ghost cells* on neighboring ranks.
+    // This is done internally with
+    // GridTools::exchange_cell_data_to_ghosts() or
+    // GridTools::exchange_cell_data_to_level_ghosts().
+    //
+    // However, this only ensures that (after the exchange), the vertices
+    // on *locally owned* cells of a rank are correct. (Not a typo: a
+    // vertex of a locally owned cell might be owned by the rank owning a
+    // neighboring ghost cell.)
+    //
+    // Thus, in a second pass, we simply send *all* vertices of locally
+    // owned cells to the neighbor rank (that holds our cell as a ghost
+    // cell). This ensures that the position of vertices on the entire
+    // ghost layer is now correct on all ranks.
+    //
+
+    bool pack_all_vertices = false;
+
     const auto pack = [&](const auto &cell) {
       std::vector<Point<spacedim>> vertices(cell->n_vertices());
 
       for (const auto v : cell->vertex_indices())
-        if (vertex_locally_moved[cell->vertex_index(v)])
+        if (pack_all_vertices || vertex_locally_moved[cell->vertex_index(v)])
           vertices[v] = cell->vertex(v);
         else
           vertices[v] = invalid_point;
@@ -588,17 +611,22 @@ namespace parallel
           cell->vertex(v) = vertices[v];
     };
 
-    if (this->is_multilevel_hierarchy_constructed())
-      GridTools::exchange_cell_data_to_level_ghosts<
-        std::vector<Point<spacedim>>>(
-        static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
-        pack,
-        unpack);
-    else
-      GridTools::exchange_cell_data_to_ghosts<std::vector<Point<spacedim>>>(
-        static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
-        pack,
-        unpack);
+
+    for (const bool all : {false, true})
+      {
+        pack_all_vertices = all;
+        if (this->is_multilevel_hierarchy_constructed())
+          GridTools::exchange_cell_data_to_level_ghosts<
+            std::vector<Point<spacedim>>>(
+            static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
+            pack,
+            unpack);
+        else
+          GridTools::exchange_cell_data_to_ghosts<std::vector<Point<spacedim>>>(
+            static_cast<dealii::Triangulation<dim, spacedim> &>(*this),
+            pack,
+            unpack);
+      }
   }
 
 
