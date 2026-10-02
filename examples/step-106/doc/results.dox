@@ -1,0 +1,168 @@
+<h1>Results</h1>
+
+<h2>Flow around a 2D cylinder</h2>
+
+When you run the program on one or more processors, you should get an output similar to this:
+@code
+Running on 8 MPI rank(s)...
+Number of degrees of freedom: 44907
+Checking no-slip enforcement on cylinder:
+||uh||_L2   = 1.77254
+||uh||_Linf = 1.00005
+
+Time step 1 : time = 0.05
+Newton iter.  0:  nonlinear residual = 4.19804040e-01
+Newton iter.  1:  nonlinear residual = 1.62384047e-01
+Newton iter.  2:  nonlinear residual = 2.46070592e-03
+Newton iter.  3:  nonlinear residual = 2.95946157e-06
+Newton iter.  4:  nonlinear residual = 3.26622040e-12
+Stopping because residual is below prescribed tolerance (1.00e-10)
+Checking no-slip enforcement on cylinder:
+||uh||_L2   = 6.16e-20
+||uh||_Linf = 1.88e-19
+
+Time step 2 : time = 1.00e-01
+Newton iter.  0:  nonlinear residual = 3.06157361e+00
+Newton iter.  1:  nonlinear residual = 1.09536818e-03
+Newton iter.  2:  nonlinear residual = 4.07793944e-07
+Newton iter.  3:  nonlinear residual = 7.90742372e-14
+Stopping because residual is below prescribed tolerance (1.00e-10)
+Checking no-slip enforcement on cylinder:
+||uh||_L2   = 9.60e-21
+||uh||_Linf = 2.83e-20
+
+Time step 3 : time = 1.50e-01
+Newton iter.  0:  nonlinear residual = 8.05773329e-02
+Newton iter.  1:  nonlinear residual = 5.46615098e-04
+Newton iter.  2:  nonlinear residual = 9.87374839e-08
+Newton iter.  3:  nonlinear residual = 1.56679516e-14
+Stopping because residual is below prescribed tolerance (1.00e-10)
+Checking no-slip enforcement on cylinder:
+||uh||_L2   = 1.76e-21
+||uh||_Linf = 5.73e-21
+
+
+... and so on until time integration finishes.
+
+@endcode
+
+In particular, the significant numbers of the Newton residual should be the same
+as this output, regardless of the number of processes used to run the computation.
+Notice that the no-slip constraint is not satisfied for the initial condition,
+since at that point no computation has been run yet, and the Lagrange multiplier
+have not yet been set to satisfy the constraint.
+Aside from the first time step for which Newton's method needs
+to find a Lagrange multiplier coming from a zero candidate,
+almost all subsequent time steps converge in 3 nonlinear iterations,
+which is optimal (the 0-th iteration shows the norm of the RHS,
+but does not solve any linear system).
+
+To limit the run time and the number of outputs, the example program only runs
+for 5 seconds. If we run it for \f$t_\text{end} = 200\f$ seconds instead, we see that the Von Karman streets
+instability starts appearing at around \f$t = 30\f$.
+The time the instabilitiy triggers
+typically depends on a few factors, such as the spatial and temporal accuracy,
+and the symmetry (or lack thereof) in the mesh and initial and boundary conditions.
+The velocity magnitude at \f$t = 10\f$ and 100 looks like this:
+
+<table width="100%">
+<tr>
+<td>
+  <img src="https://dealii.org/images/steps/developer/step-106.t10.svg" width="100%" alt="">
+</td>
+<td>
+  <img src="https://dealii.org/images/steps/developer/step-106.t100.svg" width="100%" alt="">
+</td>
+</tr>
+</table>
+
+This is, at least visually, not different from the flow around a cylinder obtained by
+applying a strong no-slip condition, which is reassuring, especially
+since the no-slip is enforced exactly in this case.
+
+From the force file written at each time step, we can postprocess the nondimensional quantities
+which are typically presented for this benchmark, that is, the force (drag and lift) coefficients,
+and the Strouhal number, which is the nondimensional vortex shedding frequency:
+
+@f{equation}
+C_D = \frac{F_x}{\frac{1}{2}\rho U_\infty D}, ~~~~~ C_L = \frac{F_y}{\frac{1}{2}\rho U_\infty D}
+~~~~~ St = \frac{fD}{U}.
+@f}
+
+The two signals for \f$t \in [0, 200]\f$ look like the figure below,
+and we can compare their mean values and amplitudes after reaching the periodic
+regime with the values available in the literature.
+
+<img src="https://dealii.org/images/steps/developer/step-106.forces.png" width="50%" alt="">
+
+From the last 100 seconds of simulation, we obtain the indicators in the table below.
+The results are compared with those of Mendes et al. (see the table for the reference),
+and with the same benchmark of the Lethe project, a CFD-DEM solver based on deal.II.
+The vortex shedding frequency \f$f\f$ is obtained through a fast Fourier transform on the periodic part of the signal.
+The obtained values (especially the amplitudes) differ from the ones from the literature,
+likely because our simulation is neither converged in time nor in space,
+and would benefit from a finer mesh (before and around the cylinder, and in the wake),
+and either a finer time step or a more accurate
+time stepping method, such as a BDF2 scheme.
+Nevertheless, the obtained signals and velocity field qualitatively match the expected
+results for this problem, and the vortex-shedding frequency is on par with the available results.
+
+<table align="center" class="doxtable">
+<tr>
+  <th>Source</th>
+  <th>\f$C_D\f$</th>
+  <th>\f$C_L\f$</th>
+  <th>\f$St\f$</th>
+</tr>
+<tr>
+  <td>This example</td>
+  <td>\f$1.317 \pm 0.032\f$</td>
+  <td>\f$5.63 \times 10^{-4} \pm 0.596\f$</td>
+  <td>\f$0.19\f$</td>
+</tr>
+<tr>
+  <td><a href="https://onlinelibrary.wiley.com/doi/abs/10.1002/(SICI)1097-0363(19990815)30:7%3C897::AID-FLD871%3E3.0.CO;2-U" target="_top">Mendes et al.</a></td>
+  <td>\f$1.399 \pm 0.049\f$</td>
+  <td>\f$\pm 0.726\f$</td>
+  <td>\f$0.20\f$</td>
+</tr>
+<tr>
+  <td><a href="https://chaos-polymtl.github.io/lethe/documentation/examples/incompressible-flow/2d-transient-flow-around-cylinder/2d-transient-flow-around-cylinder.html" target="_top">Lethe</a></td>
+  <td>\f$1.396 \pm 0.048\f$</td>
+  <td>\f$-0.003 \pm 0.72\f$</td>
+  <td>\f$0.20\f$</td>
+</tr>
+</table>
+
+<h2>Flow around a 3D cylinder</h2>
+
+@note Running the 3D example requires substantially more memory than in 2D.
+By default, MUMPS allocates a fixed-size memory pool for its internal use, and this example
+likely exceeds it, which causes MUMPS to fail with an error code -9.
+However, the <code>SparseDirectMUMPS</code> solver currently does not check the return code
+from MUMPS, which then returns a solution with NaNs.
+To bypass this, you can run the solver while asking MUMPS to extend this memory pool by 100%,
+which can be done by passing the PETSc runtime flag <code>-mat_mumps_icntl_14 100</code>.
+Your call would then look like:
+<code>mpirun -n <np> step-106 -mat_mumps_icntl_14 100</code>.
+
+TODO: quite slow.
+
+<a name="step-106-extensions"></a>
+<h2>Possibilities for extensions</h2>
+
+<h3>Move to an iterative solver</h3>
+The most obvious improvement to this program would be to use an efficient preconditioner,
+to move away from the direct solver, which greatly limits the 3D capabilities of the current example.
+Possible solutions could involve a block Schur preconditioner for the monolithic system,
+or a geometric multigrid method.
+
+<h3>Define the Lagrange multiplier only on the boundary</h3>
+The second obvious improvement is to get rid of all the unused Lagrange multiplier dofs,
+which are costly in memory and solve time. As mentioned in the introduction, a quite elegant way
+of achieving this while still manipulating a single <code>DoFHandler</code> is to leverage
+the \f$hp\f$-machinery, and define different <code>FESystem</code>s on the mesh cells, depending
+on whether they touch the cylinder or not. On cells that do not touch the cylinder, we can set
+the Lagrange multiplier space to a <code>FENothing</code>, which does not add any additional dof.
+Although this still adds unused volume dofs in cells adjacent to the cylinder, this greatly reduces
+the overall number of unused degrees of freedom.
