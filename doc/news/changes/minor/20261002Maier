@@ -1,0 +1,5 @@
+Fixed: parallel::TriangulationBase::communicate_locally_moved_vertices()
+could leave stale vertex positions on ghost cells that do not neighbor any
+cell of the owner of the moved vertex.
+<br>
+(Matthias Maier, 2026/10/02)
