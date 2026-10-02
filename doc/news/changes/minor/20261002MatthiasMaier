@@ -1,0 +1,7 @@
+Fixed: SparsityTools::reorder_Cuthill_McKee() and therefore
+DoFRenumbering::Cuthill_McKee() had an accidental quadratic complexity in
+the number of connected components of the graph. This led to a severe
+slowdown for block-diagonal sparsity patterns, for example for
+discontinuous elements without flux couplings. This has been fixed.
+<br>
+(Matthias Maier, 2026/10/02)
