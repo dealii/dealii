@@ -154,9 +154,18 @@ export
   using ::MatZeroRowsColumnsIS;
   using ::MatZeroRowsIS;
   using ::PC;
+  using ::PC_ASM_BASIC;
+  using ::PC_ASM_INTERPOLATE;
+  using ::PC_ASM_NONE;
+  using ::PC_ASM_RESTRICT;
   using ::PC_RIGHT;
   using ::PCApply;
   using ::PCApplyTranspose;
+  using ::PCASMGetSubKSP;
+  using ::PCASMSetLocalSubdomains;
+  using ::PCASMSetOverlap;
+  using ::PCASMSetType;
+  using ::PCASMType;
   using ::PCCreate;
   using ::PCDestroy;
   using ::PCFactorGetMatrix;
@@ -635,6 +644,10 @@ EXPORT_PREPROCESSOR_SYMBOL(NORM_FROBENIUS)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(NORM_INFINITY)
 #  undef NORM_INFINITY
 EXPORT_PREPROCESSOR_SYMBOL(NORM_INFINITY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCASM)
+#  undef PCASM
+EXPORT_PREPROCESSOR_SYMBOL(PCASM)
 
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCBDDC)
 #  undef PCBDDC
