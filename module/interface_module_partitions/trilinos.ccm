@@ -126,6 +126,24 @@ module;
 #      include <Amesos2.hpp>
 #    endif
 
+// remove the bits we later don't use.
+#   if defined(DEAL_II_TRILINOS_WITH_ANASAZI) && \
+      defined(DEAL_II_TRILINOS_WITH_EPETRA)
+#      include <AnasaziBasicEigenproblem.hpp>
+#      include <AnasaziBlockKrylovSchur.hpp>
+#      include <AnasaziBlockKrylovSchurSolMgr.hpp>
+#      include <AnasaziConfigDefs.hpp>
+#      include <AnasaziEpetraAdapter.hpp>
+#      include <AnasaziFactory.hpp>
+#      include <AnasaziMultiVec.hpp>
+#      include <AnasaziMultiVecTraits.hpp>
+#      include <AnasaziOperator.hpp>
+#      include <AnasaziOperatorTraits.hpp>
+#      include <AnasaziSolverManager.hpp>
+#      include <AnasaziTpetraAdapter.hpp>
+#      include <AnasaziTypes.hpp>
+#   endif
+
 #    if defined(DEAL_II_TRILINOS_WITH_IFPACK2) && \
       defined(DEAL_II_TRILINOS_WITH_TPETRA)
 #      include <Ifpack2_Factory.hpp>
