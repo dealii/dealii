@@ -670,7 +670,8 @@ namespace Utilities
                      InitializeLibrary::MPI | InitializeLibrary::Kokkos |
                        InitializeLibrary::SLEPc | InitializeLibrary::PETSc |
                        InitializeLibrary::Zoltan | InitializeLibrary::P4EST |
-                       InitializeLibrary::PSBLAS | InitializeLibrary::GMSH,
+                       InitializeLibrary::PSBLAS | InitializeLibrary::GMSH |
+                       InitializeLibrary::T8CODE,
                      max_num_threads)
     {}
 
