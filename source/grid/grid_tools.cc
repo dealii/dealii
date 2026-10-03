@@ -1991,6 +1991,203 @@ namespace GridTools
   }
 
 
+
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int            n_partitions,
+                          Triangulation<dim, spacedim> &triangulation,
+                          std::unique_ptr<Zoltan>      &zz)
+  {
+    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+              &triangulation) == nullptr),
+           ExcMessage("Objects of type parallel::distributed::Triangulation "
+                      "are already partitioned implicitly and can not be "
+                      "partitioned again explicitly."));
+
+    std::vector<unsigned int> cell_weights;
+
+    // Get cell weighting if a signal has been attached to the triangulation
+    if (!triangulation.signals.weight.empty())
+      {
+        cell_weights.resize(triangulation.n_active_cells(), 0U);
+
+        // In a first step, obtain the weights of the locally owned
+        // cells. For all others, the weight remains at the zero the
+        // vector was initialized with above.
+        for (const auto &cell : triangulation.active_cell_iterators())
+          if (cell->is_locally_owned())
+            cell_weights[cell->active_cell_index()] =
+              triangulation.signals.weight(cell, CellStatus::cell_will_persist);
+
+        // If this is a parallel triangulation, we then need to also
+        // get the weights for all other cells. We have asserted above
+        // that this function can't be used for
+        // parallel::distributed::Triangulation objects, so the only
+        // ones we have to worry about here are
+        // parallel::shared::Triangulation
+        if (const auto shared_tria =
+              dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
+                &triangulation))
+          Utilities::MPI::sum(cell_weights,
+                              shared_tria->get_communicator(),
+                              cell_weights);
+
+        // verify that the global sum of weights is larger than 0
+        Assert(std::accumulate(cell_weights.begin(),
+                               cell_weights.end(),
+                               std::uint64_t(0)) > 0,
+               ExcMessage("The global sum of weights over all active cells "
+                          "is zero. Please verify how you generate weights."));
+      }
+
+    // Call the other more general function
+    partition_triangulation(n_partitions, cell_weights, triangulation, zz);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int               n_partitions,
+                          const std::vector<unsigned int> &cell_weights,
+                          Triangulation<dim, spacedim>    &triangulation,
+                          std::unique_ptr<Zoltan>         &zz)
+  {
+    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+              &triangulation) == nullptr),
+           ExcMessage("Objects of type parallel::distributed::Triangulation "
+                      "are already partitioned implicitly and can not be "
+                      "partitioned again explicitly."));
+    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+
+    // check for an easy return
+    if (n_partitions == 1)
+      {
+        for (const auto &cell : triangulation.active_cell_iterators())
+          cell->set_subdomain_id(0);
+        return;
+      }
+
+    // we decompose the domain by first
+    // generating the connection graph of all
+    // cells with their neighbors, and then
+    // passing this graph off to METIS.
+    // finally defer to the other function for
+    // partitioning and assigning subdomain ids
+    DynamicSparsityPattern cell_connectivity;
+    get_face_connectivity_of_cells(triangulation, cell_connectivity);
+
+    SparsityPattern sp_cell_connectivity;
+    sp_cell_connectivity.copy_from(cell_connectivity);
+    partition_triangulation(
+      n_partitions, cell_weights, sp_cell_connectivity, triangulation, zz);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int            n_partitions,
+                          const SparsityPattern        &cell_connection_graph,
+                          Triangulation<dim, spacedim> &triangulation,
+                          std::unique_ptr<Zoltan>      &zz)
+  {
+    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+              &triangulation) == nullptr),
+           ExcMessage("Objects of type parallel::distributed::Triangulation "
+                      "are already partitioned implicitly and can not be "
+                      "partitioned again explicitly."));
+
+    std::vector<unsigned int> cell_weights;
+
+    // Get cell weighting if a signal has been attached to the triangulation
+    if (!triangulation.signals.weight.empty())
+      {
+        cell_weights.resize(triangulation.n_active_cells(), 0U);
+
+        // In a first step, obtain the weights of the locally owned
+        // cells. For all others, the weight remains at the zero the
+        // vector was initialized with above.
+        for (const auto &cell : triangulation.active_cell_iterators() |
+                                  IteratorFilters::LocallyOwnedCell())
+          cell_weights[cell->active_cell_index()] =
+            triangulation.signals.weight(cell, CellStatus::cell_will_persist);
+
+        // If this is a parallel triangulation, we then need to also
+        // get the weights for all other cells. We have asserted above
+        // that this function can't be used for
+        // parallel::distribute::Triangulation objects, so the only
+        // ones we have to worry about here are
+        // parallel::shared::Triangulation
+        if (const auto shared_tria =
+              dynamic_cast<parallel::shared::Triangulation<dim, spacedim> *>(
+                &triangulation))
+          Utilities::MPI::sum(cell_weights,
+                              shared_tria->get_communicator(),
+                              cell_weights);
+
+        // verify that the global sum of weights is larger than 0
+        Assert(std::accumulate(cell_weights.begin(),
+                               cell_weights.end(),
+                               std::uint64_t(0)) > 0,
+               ExcMessage("The global sum of weights over all active cells "
+                          "is zero. Please verify how you generate weights."));
+      }
+
+    // Call the other more general function
+    partition_triangulation(
+      n_partitions, cell_weights, cell_connection_graph, triangulation, zz);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  partition_triangulation(const unsigned int               n_partitions,
+                          const std::vector<unsigned int> &cell_weights,
+                          const SparsityPattern        &cell_connection_graph,
+                          Triangulation<dim, spacedim> &triangulation,
+                          std::unique_ptr<Zoltan>      &zz)
+  {
+    Assert((dynamic_cast<parallel::distributed::Triangulation<dim, spacedim> *>(
+              &triangulation) == nullptr),
+           ExcMessage("Objects of type parallel::distributed::Triangulation "
+                      "are already partitioned implicitly and can not be "
+                      "partitioned again explicitly."));
+    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+    Assert(cell_connection_graph.n_rows() == triangulation.n_active_cells(),
+           ExcMessage("Connectivity graph has wrong size"));
+    Assert(cell_connection_graph.n_cols() == triangulation.n_active_cells(),
+           ExcMessage("Connectivity graph has wrong size"));
+
+    // signal that partitioning is going to happen
+    triangulation.signals.pre_partition();
+
+    // check for an easy return
+    if (n_partitions == 1)
+      {
+        for (const auto &cell : triangulation.active_cell_iterators())
+          cell->set_subdomain_id(0);
+        return;
+      }
+
+    // partition this connection graph and get
+    // back a vector of indices, one per degree
+    // of freedom (which is associated with a
+    // cell)
+    std::vector<unsigned int> partition_indices(triangulation.n_active_cells());
+    SparsityTools::partition(
+      cell_connection_graph, cell_weights, n_partitions, partition_indices, zz);
+
+    // finally loop over all cells and set the subdomain ids
+    for (const auto &cell : triangulation.active_cell_iterators())
+      cell->set_subdomain_id(partition_indices[cell->active_cell_index()]);
+  }
+#endif
+
+
+
   namespace internal
   {
     /**
