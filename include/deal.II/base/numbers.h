@@ -561,7 +561,6 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   {
     // Make things work with AD types and device code
 
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
     if constexpr (std::is_same_v<number, double> ||
                   std::is_same_v<number, float>)
       {
@@ -569,7 +568,6 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
         // with SYCL.
         return Kokkos::abs(x);
       }
-#endif
 
     using std::abs;
 

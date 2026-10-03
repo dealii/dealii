@@ -340,11 +340,7 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
           argv_new.push_back(arg);
 
       std::stringstream threads_flag;
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 7, 0)
       threads_flag << "--kokkos-num-threads=" << MultithreadInfo::n_threads();
-#else
-      threads_flag << "--kokkos-threads=" << MultithreadInfo::n_threads();
-#endif
       const std::string threads_flag_string = threads_flag.str();
       argv_new.push_back(const_cast<char *>(threads_flag_string.c_str()));
       argv_new.push_back(nullptr);
