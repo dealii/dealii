@@ -46,11 +46,7 @@ struct CellCenterKernel
              const Portable::DeviceVector<double> &,
              Portable::DeviceVector<double> &) const
   {
-    const unsigned int cell_id = data->cell_index;
-    const unsigned int global_cell_id =
-      data->precomputed_data[0].row_start /
-        data->precomputed_data[0].padding_length +
-      cell_id;
+    const unsigned int global_cell_id = data->cell_index;
 
     Point<dim, double> cell_center;
     for (unsigned int d = 0; d < dim; ++d)
@@ -60,7 +56,7 @@ struct CellCenterKernel
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
         const Point<dim, double> &q_point =
-          data->get_quadrature_point(cell_id, q);
+          data->get_quadrature_point(global_cell_id, q);
         for (unsigned int d = 0; d < dim; ++d)
           cell_center[d] += q_point[d];
       }
