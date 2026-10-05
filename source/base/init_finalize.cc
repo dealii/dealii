@@ -1,17 +1,14 @@
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
 // Copyright (C) 2023 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
-// The deal.II library is free software; you can use it, redistribute
-// it, and/or modify it under the terms of the GNU Lesser General
-// Public License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-// The full text of the license can be found in the file LICENSE.md at
-// the top level directory of deal.II.
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 #include <deal.II/base/init_finalize.h>
 #include <deal.II/base/mpi.h>
