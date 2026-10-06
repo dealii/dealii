@@ -23,6 +23,7 @@
 
 #  include <deal.II/lac/dynamic_sparsity_pattern.h>
 #  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/la_parallel_vector.h>
 #  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_tpetra_sparsity_pattern.h>
 
@@ -144,6 +145,89 @@ namespace LinearAlgebra
 
         M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
         Kokkos::deep_copy(kokkos_view_dst, mirror_view_dst);
+      }
+
+
+
+      template <typename Number, typename MemorySpace>
+      void
+      apply(const SparseMatrix<Number, MemorySpace>        &M,
+            const distributed::Vector<Number, MemorySpace> &src,
+            distributed::Vector<Number, MemorySpace>       &dst,
+            Teuchos::ETransp mode  = Teuchos::NO_TRANS,
+            Number           alpha = Teuchos::ScalarTraits<Number>::one(),
+            Number           beta  = Teuchos::ScalarTraits<Number>::zero())
+      {
+        using MatrixType = SparseMatrix<Number, MemorySpace>;
+        Assert(&src != &dst,
+               (typename MatrixType::ExcSourceEqualsDestination()));
+        Assert(M.trilinos_matrix().isFillComplete(),
+               (typename MatrixType::ExcMatrixNotCompressed()));
+
+        const bool transpose = mode != Teuchos::NO_TRANS;
+        const auto src_map   = transpose ? M.trilinos_matrix().getRangeMap() :
+                                           M.trilinos_matrix().getDomainMap();
+        const auto dst_map   = transpose ? M.trilinos_matrix().getDomainMap() :
+                                           M.trilinos_matrix().getRangeMap();
+        AssertDimension(src.size(), src_map->getGlobalNumElements());
+        AssertDimension(dst.size(), dst_map->getGlobalNumElements());
+#  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
+        AssertDimension(src.locally_owned_size(),
+                        src_map->getLocalNumElements());
+        AssertDimension(dst.locally_owned_size(),
+                        dst_map->getLocalNumElements());
+#  else
+        AssertDimension(src.locally_owned_size(),
+                        src_map->getNodeNumElements());
+        AssertDimension(dst.locally_owned_size(),
+                        dst_map->getNodeNumElements());
+#  endif
+        // Empty maps have invalid minimum and maximum global indices, so do
+        // not construct an IndexSet from them.
+        Assert(src.locally_owned_size() == 0 ||
+                 src.locally_owned_elements() == IndexSet(src_map),
+               (typename MatrixType::ExcColMapMismatch()));
+        Assert(dst.locally_owned_size() == 0 ||
+                 dst.locally_owned_elements() == IndexSet(dst_map),
+               (typename MatrixType::ExcDomainMapMismatch()));
+
+        // Expose only locally owned entries. Tpetra imports the off-process
+        // entries needed by the matrix, independently of the vectors' ghosts.
+        using DualView   = TpetraTypes::DualViewType<Number, MemorySpace>;
+        using VectorView = typename DualView::t_dev;
+        using value_type = typename VectorView::value_type;
+        // Tpetra represents std::complex values with Kokkos::complex.
+        static_assert((numbers::NumberTraits<Number>::is_complex &&
+                       sizeof(value_type) == sizeof(Number)) ||
+                      (!numbers::NumberTraits<Number>::is_complex &&
+                       std::is_same_v<value_type, Number>));
+
+        VectorView view_src(reinterpret_cast<value_type *>(
+                              const_cast<Number *>(src.begin())),
+                            src.locally_owned_size(),
+                            1);
+        VectorView view_dst(reinterpret_cast<value_type *>(dst.begin()),
+                            dst.locally_owned_size(),
+                            1);
+
+        // Tpetra views the vector data directly in the shared memory space.
+        // Host mirrors are required by its DualView interface and are only
+        // synchronized if Tpetra needs host access.
+        DualView dual_src(view_src, Kokkos::create_mirror_view(view_src));
+        DualView dual_dst(view_dst, Kokkos::create_mirror_view(view_dst));
+        dual_src.modify_device();
+        dual_dst.modify_device();
+        TpetraTypes::VectorType<Number, MemorySpace> tpetra_src(src_map,
+                                                                dual_src);
+        TpetraTypes::VectorType<Number, MemorySpace> tpetra_dst(dst_map,
+                                                                dual_dst);
+
+        M.trilinos_matrix().apply(tpetra_src, tpetra_dst, mode, alpha, beta);
+        // Ensure the result is available in the vector's memory space before
+        // returning, including when Tpetra used the host mirror internally.
+        tpetra_dst.template getLocalView<typename MemorySpace::kokkos_space>(
+          Tpetra::Access::ReadOnly);
+        Kokkos::fence();
       }
 
 
