@@ -135,6 +135,24 @@ namespace SUNDIALS
            const VectorType           &y0,
            internal::InvocationContext inv_ctx) = 0;
 
+    /**
+     * Adapt the stepper to a state vector whose size or layout has changed
+     * (e.g. after mesh refinement) while keeping the time stepping history
+     * (step size, adaptivity state, counters) intact.
+     *
+     * @param t0 Current time
+     * @param y0 Current state vector with the new size
+     * @param hscale Factor by which the upcoming step size is rescaled; values
+     *   less or equal to zero are treated as one
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    virtual void
+    resize(double                      t0,
+           const VectorType           &y0,
+           double                      hscale,
+           internal::InvocationContext inv_ctx) = 0;
+
   protected:
     /**
      * This struct stores the pointers to the stepper and the exception pointer
@@ -971,6 +989,24 @@ namespace SUNDIALS
            internal::InvocationContext inv_ctx) override;
 
     /**
+     * Resize the ARKODE memory in place via `ARKodeResize()`/`ARKStepResize()`
+     * and re-attach the linear solvers, whose internal vectors are not resized
+     * by ARKODE.
+     *
+     * @param t0 Current time
+     * @param y0 Current state vector with the new size
+     * @param hscale Factor by which the upcoming step size is rescaled; values
+     *   less or equal to zero are treated as one
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    void
+    resize(double                      t0,
+           const VectorType           &y0,
+           double                      hscale,
+           internal::InvocationContext inv_ctx) override;
+
+    /**
      * Set up the (non)linear solver and preconditioners in the ARKODE memory
      * object based on the user-specified functions.
      *
@@ -1282,6 +1318,22 @@ namespace SUNDIALS
            internal::InvocationContext inv_ctx) override;
 
     /**
+     * Resize the ARKODE memory in place via `ARKodeResize()`/`ERKStepResize()`.
+     *
+     * @param t0 Current time
+     * @param y0 Current state vector with the new size
+     * @param hscale Factor by which the upcoming step size is rescaled; values
+     *   less or equal to zero are treated as one
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    void
+    resize(double                      t0,
+           const VectorType           &y0,
+           double                      hscale,
+           internal::InvocationContext inv_ctx) override;
+
+    /**
      * ERKStepper configuration data.
      */
     AdditionalData data;
@@ -1583,6 +1635,24 @@ namespace SUNDIALS
            internal::InvocationContext inv_ctx) override;
 
     /**
+     * Resize the ARKODE memory in place via `ARKodeResize()` and, if the
+     * built-in dominant-eigenvalue estimator is used, rebuild it for the new
+     * vector size.
+     *
+     * @param t0 Current time
+     * @param y0 Current state vector with the new size
+     * @param hscale Factor by which the upcoming step size is rescaled; values
+     *   less or equal to zero are treated as one
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    void
+    resize(double                      t0,
+           const VectorType           &y0,
+           double                      hscale,
+           internal::InvocationContext inv_ctx) override;
+
+    /**
      * LSRKStepperSTS configuration data.
      */
     AdditionalData data;
@@ -1790,6 +1860,22 @@ namespace SUNDIALS
     void
     reinit(double                      t0,
            const VectorType           &y0,
+           internal::InvocationContext inv_ctx) override;
+
+    /**
+     * Resize the ARKODE memory in place via `ARKodeResize()`.
+     *
+     * @param t0 Current time
+     * @param y0 Current state vector with the new size
+     * @param hscale Factor by which the upcoming step size is rescaled; values
+     *   less or equal to zero are treated as one
+     * @param inv_ctx Invocation context that provides access to the SUNContext
+     *   object and the exception pointer managed by the caller
+     */
+    void
+    resize(double                      t0,
+           const VectorType           &y0,
+           double                      hscale,
            internal::InvocationContext inv_ctx) override;
 
     /**

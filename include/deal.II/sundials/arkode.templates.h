@@ -272,12 +272,20 @@ namespace SUNDIALS
 
         AssertARKode(status);
 
-        // Then reflect this time advancement in our own DiscreteTime object:
+        // Then reflect this time advancement in our own DiscreteTime object
         time.set_next_step_size(actual_next_time - time.get_current_time());
         time.advance_time();
 
-        // Finally check whether resets or output calls are desired at this
-        // time:
+        // Check whether resizes, resets or output calls are desired
+        double hscale;
+        do
+          {
+            hscale = solver_should_resize(time.get_current_time(), solution);
+            if (hscale > 0)
+              resize(time.get_current_time(), hscale, solution);
+          }
+        while (hscale > 0);
+
         while (solver_should_restart(time.get_current_time(), solution))
           {
             n_steps_total += get_last_num_steps(stepper);
@@ -344,6 +352,49 @@ namespace SUNDIALS
 
     auto *arkode_mem = stepper.get_arkode_memory();
 
+    set_tolerances();
+
+    status = ARKStepSetInitStep(arkode_mem, current_time_step);
+    AssertARKode(status);
+
+    status = ARKStepSetStopTime(arkode_mem, data.final_time);
+    AssertARKode(status);
+
+    if (custom_setup)
+      custom_setup(arkode_mem);
+  }
+
+
+  template <typename VectorType>
+  void
+  ARKode<VectorType>::resize(const double      current_time,
+                             const double      hscale,
+                             const VectorType &solution)
+  {
+    last_end_time = current_time;
+
+    stepper.resize(
+      current_time, solution, hscale, internal::InvocationContext {
+        pending_exception
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+          ,
+          arkode_ctx
+#  endif
+      });
+
+    // The vector tolerances have the old size and need to be set again.
+    set_tolerances();
+  }
+
+
+  template <typename VectorType>
+  void
+  ARKode<VectorType>::set_tolerances()
+  {
+    auto *arkode_mem = stepper.get_arkode_memory();
+    int   status;
+    (void)status;
+
     if (get_local_tolerances)
       {
         const auto abs_tols = internal::make_nvector_view(get_local_tolerances()
@@ -363,15 +414,6 @@ namespace SUNDIALS
                                      data.absolute_tolerance);
         AssertARKode(status);
       }
-
-    status = ARKStepSetInitStep(arkode_mem, current_time_step);
-    AssertARKode(status);
-
-    status = ARKStepSetStopTime(arkode_mem, data.final_time);
-    AssertARKode(status);
-
-    if (custom_setup)
-      custom_setup(arkode_mem);
   }
 
 
@@ -381,6 +423,10 @@ namespace SUNDIALS
   {
     solver_should_restart = [](const double, VectorType &) -> bool {
       return false;
+    };
+
+    solver_should_resize = [](const double, VectorType &) -> double {
+      return 0.0;
     };
   }
 
