@@ -1,0 +1,37 @@
+
+DEAL::
+DEAL:: ======================================
+DEAL:: Serial Tria in 3D
+DEAL::
+DEAL::Ref-Cells pre ref. given by tria.get_reference_cells():  Tet, 
+DEAL::Reference cells pre refinement from cells:               Tet, 
+DEAL::
+DEAL::Ref-Cells post ref. given by tria.get_reference_cells(): Tet, 
+DEAL::Reference cells post refinement from cells:              Tet, Tet, Tet, Tet, Tet, Tet, Tet, Tet, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Serial Tria in 3D
+DEAL::
+DEAL::Ref-Cells pre ref. given by tria.get_reference_cells():  Pyramid, 
+DEAL::Reference cells pre refinement from cells:               Pyramid, 
+DEAL::
+DEAL::Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Pyramid, 
+DEAL::Reference cells post refinement from cells:              Pyramid, Pyramid, Pyramid, Pyramid, Tet, Tet, Tet, Tet, Pyramid, Pyramid, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Serial Tria in 3D
+DEAL::
+DEAL::Ref-Cells pre ref. given by tria.get_reference_cells():  Wedge, 
+DEAL::Reference cells pre refinement from cells:               Wedge, 
+DEAL::
+DEAL::Ref-Cells post ref. given by tria.get_reference_cells(): Wedge, 
+DEAL::Reference cells post refinement from cells:              Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Serial Tria in 3D
+DEAL::
+DEAL::Ref-Cells pre ref. given by tria.get_reference_cells():  Hex, 
+DEAL::Reference cells pre refinement from cells:               Hex, 
+DEAL::
+DEAL::Ref-Cells post ref. given by tria.get_reference_cells(): Hex, 
+DEAL::Reference cells post refinement from cells:              Hex, Hex, Hex, Hex, Hex, Hex, Hex, Hex, 
