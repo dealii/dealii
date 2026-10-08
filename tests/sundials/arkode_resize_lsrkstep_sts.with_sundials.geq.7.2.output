@@ -1,0 +1,4 @@
+
+DEAL::LSRKStepperSTS: resizes 1, final size 4
+DEAL::LSRKStepperSTS: step count is within one of the run without resize: yes
+DEAL::LSRKStepperSTS: error is small: yes
