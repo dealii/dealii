@@ -10,6 +10,11 @@
 //
 // -----------------------------------------------------------------------------
 
+
+// Tests whether the `reference_cells` vector inside the triangulation is
+// updated in case of refinement (Note: Refinement of pyramids introduces Tets.)
+
+
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/mpi.h>
@@ -29,50 +34,39 @@
 #include "./simplex_grids.h"
 
 template <typename TriaType>
-void
-log_reference_cells(const TriaType &tria, const std::string &prefix)
+std::string
+get_all_ref_cell_types_from_cells(const TriaType    &tria,
+                                  const std::string &pre_post)
 {
-  deallog << prefix;
-  for (const auto &r : tria.get_reference_cells())
-    deallog << r.to_string() << ", ";
-  deallog << std::endl;
+  std::ostringstream oss;
+  oss << "Reference cells " << std::setw(4) << std::left << pre_post
+      << " refinement from cells:" << std::setw(14) << " ";
+  for (const auto &cell : tria.active_cell_iterators())
+    oss << cell->reference_cell().to_string() << ", ";
+  return oss.str();
 }
 
 template <typename TriaType>
 std::string
-get_active_cell_ref_types(const TriaType &tria)
+get_ref_cells_in_tria(const TriaType &tria, const std::string &pre_post)
 {
   std::ostringstream oss;
-  for (const auto &cell : tria.active_cell_iterators())
-    {
-      if constexpr (std::is_same_v<
-                      TriaType,
-                      dealii::parallel::fullydistributed::Triangulation<3>>)
-        {
-          if (cell->is_artificial())
-            continue;
-        }
-      oss << cell->reference_cell().to_string() << ", ";
-    }
+  oss << "Ref-Cells " << std::setw(4) << std::left << pre_post
+      << " ref. given by tria.get_reference_cells(): ";
+  for (const auto &r : tria.get_reference_cells())
+    oss << r.to_string() << ", ";
   return oss.str();
 }
 
 void
-log_gathered_string(const std::string &local_msg,
-                    const MPI_Comm    &comm,
-                    const std::string &header)
+log_gathered_string(const std::string &local_msg, const MPI_Comm &comm)
 {
   const unsigned int mpi_process =
     dealii::Utilities::MPI::this_mpi_process(comm);
   const auto process_logs = dealii::Utilities::MPI::all_gather(comm, local_msg);
 
-  if (mpi_process == 0)
-    {
-      if (!header.empty())
-        deallog << header << std::endl;
-      for (unsigned int r = 0; r < process_logs.size(); ++r)
-        deallog << r << ": " << process_logs[r] << std::endl;
-    }
+  for (unsigned int r = 0; r < process_logs.size(); ++r)
+    deallog << r << ": " << process_logs[r] << std::endl;
 }
 
 template <unsigned int dim>
@@ -82,18 +76,28 @@ test_serial(const ReferenceCell<dim> ref_cell)
   dealii::Triangulation<dim> tria;
   dealii::GridGenerator::reference_cell(tria, ref_cell);
 
-  log_reference_cells(
-    tria, "Ref-Cells pre ref. given by tria.get_reference_cells():  ");
-  deallog << "Reference cells pre refinement from cells:" << std::setw(15)
-          << " " << get_active_cell_ref_types(tria) << std::endl
-          << std::endl;
+  const auto log_ref_cells = [&tria](const std::string &pre_post) {
+    deallog << " Ref-Cells " << std::setw(4) << std::left << pre_post
+            << " ref. given by tria.get_reference_cells(): ";
+    for (const auto &r : tria.get_reference_cells())
+      deallog << r.to_string() << ", ";
+    deallog << std::endl;
+  };
+
+  const auto log_cells = [&tria](const std::string &pre_post) {
+    deallog << " " << get_all_ref_cell_types_from_cells(tria, pre_post)
+            << std::endl;
+  };
+
+  log_ref_cells("pre");
+  log_cells("pre");
+
+  deallog << std::endl;
 
   tria.refine_global(1);
 
-  log_reference_cells(
-    tria, "Ref-Cells post ref. given by tria.get_reference_cells(): ");
-  deallog << "Reference cells post refinement from cells:" << std::setw(14)
-          << " " << get_active_cell_ref_types(tria) << std::endl;
+  log_ref_cells("post");
+  log_cells("post");
 }
 
 template <unsigned int dim>
@@ -105,29 +109,15 @@ test_shared(const ReferenceCell<dim> ref_cell)
 
   const MPI_Comm comm = tria.get_mpi_communicator();
 
-  std::ostringstream msg;
-  msg << "Ref-Cells pre ref. given by tria.get_reference_cells():  ";
-  for (const auto &r : tria.get_reference_cells())
-    msg << r.to_string() << ", ";
-  log_gathered_string(msg.str(), comm, "");
+  log_gathered_string(get_ref_cells_in_tria(tria, "pre"), comm);
+  log_gathered_string(get_all_ref_cell_types_from_cells(tria, "pre"), comm);
 
-  msg.str("");
-  msg << "Reference cells pre refinement from cells:" << std::setw(15) << " "
-      << get_active_cell_ref_types(tria);
-  log_gathered_string(msg.str(), comm, "");
+  deallog << std::endl;
 
   tria.refine_global(1);
 
-  msg.str("");
-  msg << "Ref-Cells post ref. given by tria.get_reference_cells(): ";
-  for (const auto &r : tria.get_reference_cells())
-    msg << r.to_string() << ", ";
-  log_gathered_string(msg.str(), comm, " ");
-
-  msg.str("");
-  msg << "Reference cells post refinement from cells:" << std::setw(14) << " "
-      << get_active_cell_ref_types(tria);
-  log_gathered_string(msg.str(), comm, "");
+  log_gathered_string(get_ref_cells_in_tria(tria, "post"), comm);
+  log_gathered_string(get_all_ref_cell_types_from_cells(tria, "post"), comm);
 }
 
 template <unsigned int dim>
@@ -170,31 +160,18 @@ test_fully_distributed(const ReferenceCell<dim> ref_cell)
   tria.create_triangulation(make_description());
 
   std::ostringstream msg;
-  msg << "Ref-Cells pre ref. given by tria.get_reference_cells():  ";
-  for (const auto &r : tria.get_reference_cells())
-    msg << r.to_string() << ", ";
-  log_gathered_string(msg.str(), comm, "");
+  log_gathered_string(get_ref_cells_in_tria(tria, "pre"), comm);
+  log_gathered_string(get_all_ref_cell_types_from_cells(tria, "pre"), comm);
 
-  msg.str("");
-  msg << "Reference cells pre refinement from cells:" << std::setw(15) << " "
-      << get_active_cell_ref_types(tria);
-  log_gathered_string(msg.str(), comm, "");
+  deallog << std::endl;
 
   // Post-refinement test
   tria.clear();
   refinements = 1; // implicitly handed to lambda
   tria.create_triangulation(make_description());
 
-  msg.str("");
-  msg << "Ref-Cells post ref. given by tria.get_reference_cells(): ";
-  for (const auto &r : tria.get_reference_cells())
-    msg << r.to_string() << ", ";
-  log_gathered_string(msg.str(), comm, " ");
-
-  msg.str("");
-  msg << "Reference cells post refinement from cells:" << std::setw(14) << " "
-      << get_active_cell_ref_types(tria);
-  log_gathered_string(msg.str(), comm, "");
+  log_gathered_string(get_ref_cells_in_tria(tria, "post"), comm);
+  log_gathered_string(get_all_ref_cell_types_from_cells(tria, "post"), comm);
 }
 
 enum class TestModes
@@ -224,16 +201,12 @@ run()
 
   const auto cells = ReferenceCells::get_reference_cells_in_dim<dim>();
 
-  const unsigned int mpi_process =
-    dealii::Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
-
   for (size_t i = 0; i < cells.size(); ++i)
     {
-      if (mpi_process == 0)
-        deallog << std::endl
-                << " ======================================" << std::endl
-                << " " << name << " in " << dim << "D" << std::endl
-                << std::endl;
+      deallog << std::endl
+              << " ======================================" << std::endl
+              << " " << name << " in " << dim << "D" << std::endl
+              << std::endl;
       test(cells[i]);
     }
 }
@@ -241,7 +214,7 @@ run()
 int
 main(int argc, char **argv)
 {
-  initlog();
+  mpi_initlog();
 
   dealii::Utilities::MPI::MPI_InitFinalize mpi(argc, argv, 1);
 

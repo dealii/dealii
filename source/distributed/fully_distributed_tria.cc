@@ -13,6 +13,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_large_count.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
