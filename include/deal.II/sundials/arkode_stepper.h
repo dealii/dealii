@@ -116,24 +116,40 @@ namespace SUNDIALS
 
   private:
     /**
+     * Bind the stepper to the ARKode object that drives it. This is called
+     * once by the constructor of ARKode. All objects the stepper creates for
+     * SUNDIALS use @p context, which the stepper keeps alive for as long as it
+     * lives, and callbacks store exceptions in @p pending_exception.
+     *
+     * @note A stepper can be attached to a single ARKode object only.
+     */
+    void
+    attach(std::exception_ptr &pending_exception
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+           ,
+           const internal::SharedSUNContext &context
+#  endif
+    )
+    {
+      Assert(pending_exception_ptr == nullptr,
+             ExcMessage("This stepper is already attached to an ARKode "
+                        "object."));
+      pending_exception_ptr = &pending_exception;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+      sundials_context = context;
+#  endif
+    }
+
+    /**
      * Rebuild the stepper at a given time instance and for a given state
      * vector.
-     *
-     * To transport exceptions and maintain context across C boundaries, the
-     * code uses `internal::InvocationContext` (see `invocation_context.h`)
-     * which carries an `std::exception_ptr` that is inspected after a callback
-     * returns.
      *
      * @param t0 Time instance that serves as starting time
      * @param y0 Initial state vector whose layout is used for initialization of
      *   the internal ARKODE vectors
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     virtual void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) = 0;
+    reinit(double t0, const VectorType &y0) = 0;
 
     /**
      * Adapt the stepper to a state vector whose size or layout has changed
@@ -144,14 +160,9 @@ namespace SUNDIALS
      * @param y0 Current state vector with the new size
      * @param hscale Factor by which the upcoming step size is rescaled; values
      *   less or equal to zero are treated as one
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     virtual void
-    resize(double                      t0,
-           const VectorType           &y0,
-           double                      hscale,
-           internal::InvocationContext inv_ctx) = 0;
+    resize(double t0, const VectorType &y0, double hscale) = 0;
 
   protected:
     /**
@@ -174,6 +185,41 @@ namespace SUNDIALS
      * underlying object is supplied to the native ARKODE functions.
      */
     using ARKodeMemoryPtr = std::unique_ptr<void, void (*)(void *)>;
+
+    /**
+     * The context that the ARKode object, to which this stepper is attached,
+     * provides to create SUNDIALS objects and to transport exceptions across
+     * C boundaries (see `invocation_context.h`).
+     */
+    internal::InvocationContext
+    invocation_context() const
+    {
+      Assert(pending_exception_ptr != nullptr,
+             ExcMessage("This stepper is not attached to an ARKode object."));
+      return internal::InvocationContext
+      {
+        *pending_exception_ptr
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+          ,
+          sundials_context
+#  endif
+      };
+    }
+
+  private:
+    /**
+     * Exception pointer of the ARKode object this stepper is attached to.
+     */
+    std::exception_ptr *pending_exception_ptr = nullptr;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /**
+     * Base class members are destroyed after those of derived classes, so the
+     * context outlives the ARKODE memory and everything else a derived stepper
+     * created with it.
+     */
+    internal::SharedSUNContext sundials_context;
+#  endif
   };
 
   /**
@@ -980,13 +1026,9 @@ namespace SUNDIALS
      * @param t0 Time instance that serves as starting time
      * @param y0 Initial state vector whose layout is used for initialization of
      *   the internal ARKODE vectors
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) override;
+    reinit(double t0, const VectorType &y0) override;
 
     /**
      * Resize the ARKODE memory in place via `ARKodeResize()`/`ARKStepResize()`
@@ -997,14 +1039,9 @@ namespace SUNDIALS
      * @param y0 Current state vector with the new size
      * @param hscale Factor by which the upcoming step size is rescaled; values
      *   less or equal to zero are treated as one
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    resize(double                      t0,
-           const VectorType           &y0,
-           double                      hscale,
-           internal::InvocationContext inv_ctx) override;
+    resize(double t0, const VectorType &y0, double hscale) override;
 
     /**
      * Set up the (non)linear solver and preconditioners in the ARKODE memory
@@ -1012,12 +1049,9 @@ namespace SUNDIALS
      *
      * @param solution The solution vector which is used as a template to create
      *   new vectors.
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    setup_system_solver(const VectorType           &solution,
-                        internal::InvocationContext inv_ctx);
+    setup_system_solver(const VectorType &solution);
 
     /**
      * Set up the solver and preconditioner for a non-identity @ref GlossMassMatrix
@@ -1026,12 +1060,9 @@ namespace SUNDIALS
      *
      * @param solution The solution vector which is used as a template to create
      *   new vectors.
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    setup_mass_solver(const VectorType           &solution,
-                      internal::InvocationContext inv_ctx);
+    setup_mass_solver(const VectorType &solution);
 
     /**
      * ARKStepper configuration data.
@@ -1309,13 +1340,9 @@ namespace SUNDIALS
      * @param t0 Time instance that serves as starting time
      * @param y0 Initial state vector whose layout is used for initialization of
      *   the internal ARKODE vectors
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) override;
+    reinit(double t0, const VectorType &y0) override;
 
     /**
      * Resize the ARKODE memory in place via `ARKodeResize()`/`ERKStepResize()`.
@@ -1324,14 +1351,9 @@ namespace SUNDIALS
      * @param y0 Current state vector with the new size
      * @param hscale Factor by which the upcoming step size is rescaled; values
      *   less or equal to zero are treated as one
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    resize(double                      t0,
-           const VectorType           &y0,
-           double                      hscale,
-           internal::InvocationContext inv_ctx) override;
+    resize(double t0, const VectorType &y0, double hscale) override;
 
     /**
      * ERKStepper configuration data.
@@ -1626,13 +1648,9 @@ namespace SUNDIALS
      * @param t0 Time instance that serves as starting time
      * @param y0 Initial state vector whose layout is used for initialization of
      *   the internal ARKODE vectors
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) override;
+    reinit(double t0, const VectorType &y0) override;
 
     /**
      * Resize the ARKODE memory in place via `ARKodeResize()` and, if the
@@ -1643,14 +1661,9 @@ namespace SUNDIALS
      * @param y0 Current state vector with the new size
      * @param hscale Factor by which the upcoming step size is rescaled; values
      *   less or equal to zero are treated as one
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    resize(double                      t0,
-           const VectorType           &y0,
-           double                      hscale,
-           internal::InvocationContext inv_ctx) override;
+    resize(double t0, const VectorType &y0, double hscale) override;
 
     /**
      * LSRKStepperSTS configuration data.
@@ -1854,13 +1867,9 @@ namespace SUNDIALS
      * @param t0 Time instance that serves as starting time
      * @param y0 Initial state vector whose layout is used for initialization of
      *   the internal ARKODE vectors
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) override;
+    reinit(double t0, const VectorType &y0) override;
 
     /**
      * Resize the ARKODE memory in place via `ARKodeResize()`.
@@ -1869,14 +1878,9 @@ namespace SUNDIALS
      * @param y0 Current state vector with the new size
      * @param hscale Factor by which the upcoming step size is rescaled; values
      *   less or equal to zero are treated as one
-     * @param inv_ctx Invocation context that provides access to the SUNContext
-     *   object and the exception pointer managed by the caller
      */
     void
-    resize(double                      t0,
-           const VectorType           &y0,
-           double                      hscale,
-           internal::InvocationContext inv_ctx) override;
+    resize(double t0, const VectorType &y0, double hscale) override;
 
     /**
      * LSRKStepperSSP configuration data.

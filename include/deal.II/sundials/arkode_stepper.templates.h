@@ -82,10 +82,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ARKStepper<VectorType>::reinit(double                      t0,
-                                 const VectorType           &y0,
-                                 internal::InvocationContext inv_ctx)
+  ARKStepper<VectorType>::reinit(double t0, const VectorType &y0)
   {
+    const auto inv_ctx = this->invocation_context();
+
     arkode_mem.reset();
 
     Assert(explicit_function || implicit_function,
@@ -153,9 +153,9 @@ namespace SUNDIALS
     int status   = ARKStepSetUserData(arkode_mem.get(), &callback_ctx);
     AssertARKode(status);
 
-    setup_system_solver(y0, inv_ctx);
+    setup_system_solver(y0);
 
-    setup_mass_solver(y0, inv_ctx);
+    setup_mass_solver(y0);
 
     if (data.order != 0)
       {
@@ -190,10 +190,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ARKStepper<VectorType>::resize(double                      t0,
-                                 const VectorType           &y0,
-                                 double                      hscale,
-                                 internal::InvocationContext inv_ctx)
+  ARKStepper<VectorType>::resize(double t0, const VectorType &y0, double hscale)
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
 
@@ -201,7 +198,7 @@ namespace SUNDIALS
       internal::make_nvector_view(y0
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                   ,
-                                  inv_ctx.arkode_ctx
+                                  this->invocation_context().arkode_ctx
 #  endif
       );
 
@@ -217,22 +214,22 @@ namespace SUNDIALS
     // ARKODE does not resize the vectors held by its linear solver interface
     // and by user-attached nonlinear solvers; attaching the solvers again
     // reallocates them.
-    setup_system_solver(y0, inv_ctx);
+    setup_system_solver(y0);
 
-    setup_mass_solver(y0, inv_ctx);
+    setup_mass_solver(y0);
   }
 
 
 
   template <typename VectorType>
   void
-  ARKStepper<VectorType>::setup_system_solver(
-    const VectorType           &solution,
-    internal::InvocationContext inv_ctx)
+  ARKStepper<VectorType>::setup_system_solver(const VectorType &solution)
   {
     // no point in setting up a solver when there is no linear system
     if (!implicit_function)
       return;
+
+    const auto inv_ctx = this->invocation_context();
 
     int status;
     (void)status;
@@ -438,9 +435,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ARKStepper<VectorType>::setup_mass_solver(const VectorType &solution,
-                                            internal::InvocationContext inv_ctx)
+  ARKStepper<VectorType>::setup_mass_solver(const VectorType &solution)
   {
+    const auto inv_ctx = this->invocation_context();
+
     int status;
     (void)status;
 
@@ -618,10 +616,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ERKStepper<VectorType>::reinit(double                      t0,
-                                 const VectorType           &y0,
-                                 internal::InvocationContext inv_ctx)
+  ERKStepper<VectorType>::reinit(double t0, const VectorType &y0)
   {
+    const auto inv_ctx = this->invocation_context();
+
     arkode_mem.reset();
 
     Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
@@ -691,10 +689,7 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  ERKStepper<VectorType>::resize(double                      t0,
-                                 const VectorType           &y0,
-                                 double                      hscale,
-                                 internal::InvocationContext inv_ctx)
+  ERKStepper<VectorType>::resize(double t0, const VectorType &y0, double hscale)
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
 
@@ -702,7 +697,7 @@ namespace SUNDIALS
       internal::make_nvector_view(y0
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                                   ,
-                                  inv_ctx.arkode_ctx
+                                  this->invocation_context().arkode_ctx
 #  endif
       );
 
@@ -754,10 +749,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  LSRKStepperSTS<VectorType>::reinit(double                      t0,
-                                     const VectorType           &y0,
-                                     internal::InvocationContext inv_ctx)
+  LSRKStepperSTS<VectorType>::reinit(double t0, const VectorType &y0)
   {
+    const auto inv_ctx = this->invocation_context();
+
     arkode_mem.reset();
 
     Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
@@ -893,12 +888,13 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  LSRKStepperSTS<VectorType>::resize(double                      t0,
-                                     const VectorType           &y0,
-                                     double                      hscale,
-                                     internal::InvocationContext inv_ctx)
+  LSRKStepperSTS<VectorType>::resize(double            t0,
+                                     const VectorType &y0,
+                                     double            hscale)
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
+
+    const auto inv_ctx = this->invocation_context();
 
     const auto y0_nvector = internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
 
@@ -964,10 +960,10 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  LSRKStepperSSP<VectorType>::reinit(double                      t0,
-                                     const VectorType           &y0,
-                                     internal::InvocationContext inv_ctx)
+  LSRKStepperSSP<VectorType>::reinit(double t0, const VectorType &y0)
   {
+    const auto inv_ctx = this->invocation_context();
+
     arkode_mem.reset();
 
     Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
@@ -1022,12 +1018,13 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  LSRKStepperSSP<VectorType>::resize(double                      t0,
-                                     const VectorType           &y0,
-                                     double                      hscale,
-                                     internal::InvocationContext inv_ctx)
+  LSRKStepperSSP<VectorType>::resize(double            t0,
+                                     const VectorType &y0,
+                                     double            hscale)
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
+
+    const auto inv_ctx = this->invocation_context();
 
     const auto y0_nvector = internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
 
