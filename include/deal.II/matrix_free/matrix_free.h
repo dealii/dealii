@@ -4374,7 +4374,9 @@ namespace internal
     const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
-      vec.compress(VectorOperation::add);
+      {
+        // do nothing, everything will be done in the _finish() call
+      }
     else
       for (unsigned int i = 0; i < vec.n_blocks(); ++i)
         compress_start(vec.block(i), exchanger, channel + i);
@@ -4458,10 +4460,7 @@ namespace internal
     const unsigned int                                    channel = 0)
   {
     if (get_communication_block_size(vec) < vec.n_blocks())
-      {
-        // do nothing, everything has already been completed in the _start()
-        // call
-      }
+      vec.compress(VectorOperation::add);
     else
       for (unsigned int i = 0; i < vec.n_blocks(); ++i)
         compress_finish(vec.block(i), exchanger, channel + i);
