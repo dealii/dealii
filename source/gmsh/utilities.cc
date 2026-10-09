@@ -20,8 +20,10 @@
 #include <deal.II/opencascade/utilities.h>
 
 #ifdef DEAL_II_WITH_GMSH
-#  include <boost/process/io.hpp>
-#  include <boost/process/system.hpp>
+// Boost.Process is only used in this implementation and is not exported by
+// the Boost module wrapper. Keep these includes in the global module fragment.
+#  include <boost/process/io.hpp>     // Do not convert for module purposes
+#  include <boost/process/system.hpp> // Do not convert for module purposes
 #endif
 
 #include <cstdio>
