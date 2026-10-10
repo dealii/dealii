@@ -18525,6 +18525,36 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
       //    coarsening or none of the children is
       fix_coarsen_flags();
 
+      //------------------------------------
+      // Match refinement and coarsening decisions across periodic
+      // faces if requested. In a distributed triangulation, only
+      // modify locally owned cells; changes to ghost cells are made
+      // by their owners after flags are exchanged.
+      if (smooth_grid & match_refinement_across_periodic_boundaries)
+        for (const auto &cell : active_cell_iterators())
+          if (cell->is_locally_owned())
+            for (const unsigned int face : cell->face_indices())
+              if (cell->has_periodic_neighbor(face))
+                {
+                  const auto periodic_neighbor = cell->periodic_neighbor(face);
+
+                  const int periodic_neighbor_future_level =
+                    periodic_neighbor->level() +
+                    (periodic_neighbor->refine_flag_set() ? 1 : 0) -
+                    (periodic_neighbor->coarsen_flag_set() ? 1 : 0);
+
+                  if (cell->level() < periodic_neighbor_future_level)
+                    {
+                      if (cell->coarsen_flag_set())
+                        cell->clear_coarsen_flag();
+                      else if (!cell->refine_flag_set())
+                        cell->set_refine_flag();
+                    }
+                  else if (cell->level() == periodic_neighbor_future_level &&
+                           cell->coarsen_flag_set())
+                    cell->clear_coarsen_flag();
+                }
+
       // get the refinement and coarsening flags
       auto coarsen_flags_after_loop =
         internal::extract_raw_coarsen_flags(levels);

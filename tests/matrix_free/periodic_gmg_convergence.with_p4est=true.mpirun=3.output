@@ -1,0 +1,4 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Number of degrees of freedom: 301
+DEAL:2d::converged in 26 iterations
