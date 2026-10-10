@@ -1,0 +1,13 @@
+
+DEAL::ARKStepper explicit: restarts 4
+DEAL::ARKStepper explicit: same number of steps as without restarts: yes
+DEAL::ARKStepper explicit: error is small: yes
+DEAL::ARKStepper implicit: restarts 4
+DEAL::ARKStepper implicit: same number of steps as without restarts: yes
+DEAL::ARKStepper implicit: error is small: yes
+DEAL::ARKStepper implicit with SUNDIALS linear solver: restarts 4
+DEAL::ARKStepper implicit with SUNDIALS linear solver: same number of steps as without restarts: yes
+DEAL::ARKStepper implicit with SUNDIALS linear solver: error is small: yes
+DEAL::ARKStepper implicit with fixed-point solver: restarts 4
+DEAL::ARKStepper implicit with fixed-point solver: same number of steps as without restarts: yes
+DEAL::ARKStepper implicit with fixed-point solver: error is small: yes

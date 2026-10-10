@@ -1,0 +1,4 @@
+
+DEAL::ERKStepper: restarts 4
+DEAL::ERKStepper: same number of steps as without restarts: yes
+DEAL::ERKStepper: error is small: yes

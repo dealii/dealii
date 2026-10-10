@@ -1,0 +1,4 @@
+
+DEAL::LSRKStepperSTS: restarts 4
+DEAL::LSRKStepperSTS: same number of steps as without restarts: yes
+DEAL::LSRKStepperSTS: error is small: yes
