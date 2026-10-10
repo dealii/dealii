@@ -1,0 +1,8 @@
+
+DEAL::refinement: 1 n_dofs: 2910
+DEAL::converged in 9 iterations.
+DEAL::Error: 0.00895884
+DEAL::refinement: 2 n_dofs: 20790
+DEAL::converged in 10 iterations.
+DEAL::Error: 0.00357759
+DEAL::OK
