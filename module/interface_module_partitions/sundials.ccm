@@ -121,13 +121,41 @@ export
   using ::IDAGetLastStep;
   using ::IDAGetNumSteps;
   using ::IDAInit;
+  using ::IDASetConstraints;
+  using ::IDASetEpsLin;
   using ::IDASetId;
+  using ::IDASetIncrementFactor;
   using ::IDASetInitStep;
   using ::IDASetJacFn;
+  using ::IDASetLinearSolutionScaling;
   using ::IDASetLinearSolver;
+  using ::IDASetLineSearchOffIC;
   using ::IDASetLSNormFactor;
+  using ::IDASetMaxBacksIC;
+  using ::IDASetMaxConvFails;
+  using ::IDASetMaxErrTestFails;
   using ::IDASetMaxNonlinIters;
   using ::IDASetMaxNumItersIC;
+  using ::IDASetMaxNumJacsIC;
+  using ::IDASetMaxNumSteps;
+  using ::IDASetMaxNumStepsIC;
+  using ::IDASetMaxStep;
+  using ::IDASetNonlinConvCoef;
+  using ::IDASetNonlinConvCoefIC;
+  using ::IDASetStepToleranceIC;
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+  using ::IDASetDeltaCjLSetup;
+  using ::IDASetEtaConvFail;
+  using ::IDASetEtaFixedStepBounds;
+  using ::IDASetEtaLow;
+  using ::IDASetEtaMax;
+  using ::IDASetEtaMin;
+  using ::IDASetEtaMinErrFail;
+  using ::IDASetMinStep;
+#  endif
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
+  using ::IDASetMaxNumConstraintFails;
+#  endif
   using ::IDASetMaxOrd;
   using ::IDASetStopTime;
   using ::IDASetSuppressAlg;
@@ -169,11 +197,13 @@ export
   using ::LSRKStepSetSSPMethodByName;
   using ::LSRKStepSetSTSMethodByName;
 #  endif
+  using ::N_VClone;
   using ::N_VCopyOps;
   using ::N_VDestroy;
   using ::N_Vector;
   using ::N_Vector_ID;
   using ::N_VFreeEmpty;
+  using ::N_VMaxNorm;
   using ::N_VNewEmpty;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   using ::SUNATimesFn;

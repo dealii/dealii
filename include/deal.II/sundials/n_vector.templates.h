@@ -375,6 +375,18 @@ namespace SUNDIALS
       SUNDIALS::realtype
       max_norm(N_Vector x);
 
+      template <typename VectorType>
+      void
+      compare(SUNDIALS::realtype c, N_Vector x, N_Vector z);
+
+      template <typename VectorType>
+      SUNDIALS::booltype
+      constraint_mask(N_Vector c, N_Vector x, N_Vector m);
+
+      template <typename VectorType>
+      SUNDIALS::realtype
+      min_quotient(N_Vector numerator, N_Vector denominator);
+
       template <typename VectorType,
                 std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
       SUNDIALS::realtype
@@ -1018,6 +1030,101 @@ namespace SUNDIALS
       }
 
 
+      template <typename VectorType>
+      void
+      compare(const SUNDIALS::realtype c, N_Vector x, N_Vector z)
+      {
+        const auto *src = unwrap_nvector_const<VectorType>(x);
+        auto       *dst = unwrap_nvector<VectorType>(z);
+        AssertDimension(src->size(), dst->size());
+        *dst = 0.0;
+        if constexpr (is_serial_vector<VectorType>::value)
+          for (unsigned int i = 0; i < src->size(); ++i)
+            (*dst)[i] = std::fabs((*src)[i]) >= c ? 1.0 : 0.0;
+        else
+          for (unsigned int b = 0; b < n_blocks(*src); ++b)
+            {
+              const auto &src_block = block(*src, b);
+              auto       &dst_block = block(*dst, b);
+              for (const auto i : src_block.locally_owned_elements())
+                dst_block[i] = std::fabs(src_block[i]) >= c ? 1.0 : 0.0;
+            }
+        dst->compress(VectorOperation::insert);
+      }
+
+
+      template <typename VectorType>
+      SUNDIALS::booltype
+      constraint_mask(N_Vector c, N_Vector x, N_Vector m)
+      {
+        const auto *constraints = unwrap_nvector_const<VectorType>(c);
+        const auto *value       = unwrap_nvector_const<VectorType>(x);
+        auto       *mask        = unwrap_nvector<VectorType>(m);
+        AssertDimension(constraints->size(), value->size());
+        AssertDimension(constraints->size(), mask->size());
+        *mask               = 0.0;
+        const auto violates = [](const double ci, const double xi) {
+          if (ci == 0.0)
+            return false;
+          const double product = ci * xi;
+          return std::fabs(ci) > 1.0 ? product <= 0.0 : product < 0.0;
+        };
+        if constexpr (is_serial_vector<VectorType>::value)
+          for (unsigned int i = 0; i < value->size(); ++i)
+            (*mask)[i] = violates((*constraints)[i], (*value)[i]) ? 1.0 : 0.0;
+        else
+          for (unsigned int b = 0; b < n_blocks(*value); ++b)
+            {
+              const auto &c_block = block(*constraints, b);
+              const auto &x_block = block(*value, b);
+              auto       &m_block = block(*mask, b);
+              for (const auto i : x_block.locally_owned_elements())
+                m_block[i] = violates(c_block[i], x_block[i]) ? 1.0 : 0.0;
+            }
+        mask->compress(VectorOperation::insert);
+        return max_norm<VectorType>(m) == 0.0 ? SUNTRUE : SUNFALSE;
+      }
+
+
+      template <typename VectorType>
+      SUNDIALS::realtype
+      min_quotient(N_Vector numerator, N_Vector denominator)
+      {
+        const auto *num = unwrap_nvector_const<VectorType>(numerator);
+        const auto *den = unwrap_nvector_const<VectorType>(denominator);
+        AssertDimension(num->size(), den->size());
+        auto local_min = std::numeric_limits<SUNDIALS::realtype>::max();
+        if constexpr (is_serial_vector<VectorType>::value)
+          {
+            for (unsigned int i = 0; i < num->size(); ++i)
+              if ((*den)[i] != 0.0)
+                local_min = std::min(local_min,
+                                     static_cast<SUNDIALS::realtype>(
+                                       (*num)[i] / (*den)[i]));
+            return local_min;
+          }
+        else
+          {
+            const auto update =
+              [&](const auto &n, const auto &d, const auto &indices) {
+                for (const auto i : indices)
+                  if (d[i] != 0.0)
+                    local_min =
+                      std::min(local_min,
+                               static_cast<SUNDIALS::realtype>(n[i] / d[i]));
+              };
+            for (unsigned int b = 0; b < n_blocks(*num); ++b)
+              {
+                const auto &n_block = block(*num, b);
+                const auto &d_block = block(*den, b);
+                update(n_block, d_block, n_block.locally_owned_elements());
+              }
+            return Utilities::MPI::min(
+              local_min, get_mpi_communicator<VectorType>(numerator));
+          }
+      }
+
+
 
       template <typename VectorType,
                 std::enable_if_t<is_serial_vector<VectorType>::value, int>>
@@ -1304,10 +1411,10 @@ namespace SUNDIALS
       /* The following are declared as standard by SUNDIALS but were not
        * necessary so far.
        */
-      v->ops->nvcompare     = nullptr;
+      v->ops->nvcompare     = &NVectorOperations::compare<VectorType>;
       v->ops->nvinvtest     = nullptr;
-      v->ops->nvconstrmask  = nullptr;
-      v->ops->nvminquotient = nullptr;
+      v->ops->nvconstrmask  = &NVectorOperations::constraint_mask<VectorType>;
+      v->ops->nvminquotient = &NVectorOperations::min_quotient<VectorType>;
 
       /* fused and vector array operations are disabled by default */
 

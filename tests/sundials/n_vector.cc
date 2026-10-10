@@ -25,6 +25,8 @@
 #include <deal.II/sundials/n_vector.h>
 #include <deal.II/sundials/n_vector.templates.h>
 
+#include <limits>
+
 #include "../tests.h"
 
 using namespace SUNDIALS::internal;
@@ -1063,6 +1065,62 @@ test_scale()
 }
 
 
+template <typename VectorType>
+void
+test_constraint_operations()
+{
+  auto x  = create_test_vector<VectorType>(2.0);
+  auto z  = create_test_vector<VectorType>(0.0);
+  auto c  = create_test_vector<VectorType>(1.0);
+  auto n  = create_test_vector<VectorType>(6.0);
+  auto d  = create_test_vector<VectorType>(2.0);
+  auto nx = make_nvector_view(x
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                              ,
+                              global_nvector_context
+#endif
+  );
+  auto nz = make_nvector_view(z
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                              ,
+                              global_nvector_context
+#endif
+  );
+  auto nc = make_nvector_view(c
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                              ,
+                              global_nvector_context
+#endif
+  );
+  auto nn = make_nvector_view(n
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                              ,
+                              global_nvector_context
+#endif
+  );
+  auto nd = make_nvector_view(d
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                              ,
+                              global_nvector_context
+#endif
+  );
+
+  N_VCompare(1.5, nx, nz);
+  Assert(N_VMin(nz) == 1.0, NVectorTestError());
+  Assert(N_VMinQuotient(nn, nd) == 3.0, NVectorTestError());
+  d = 0.0;
+  Assert(N_VMinQuotient(nn, nd) ==
+           std::numeric_limits<SUNDIALS::realtype>::max(),
+         NVectorTestError());
+  d = 2.0;
+  Assert(N_VConstrMask(nc, nx, nz) == SUNTRUE, NVectorTestError());
+
+  x = -2.0;
+  Assert(N_VConstrMask(nc, nx, nz) == SUNFALSE, NVectorTestError());
+  Assert(N_VMaxNorm(nz) == 1.0, NVectorTestError());
+}
+
+
 
 template <typename VectorType>
 void
@@ -1095,6 +1153,7 @@ run_all_tests(const std::string &prefix)
   test_l1_norm<VectorType>();
   test_min_element<VectorType>();
   test_scale<VectorType>();
+  test_constraint_operations<VectorType>();
 }
 
 int
