@@ -13,6 +13,7 @@
 
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/mpi.h>
+#include <deal.II/base/mpi.templates.h>
 #include <deal.II/base/mpi_large_count.h>
 
 #include <deal.II/distributed/fully_distributed_tria.h>
@@ -213,6 +214,15 @@ namespace parallel
 
       this->update_number_cache();
       this->update_cell_relations();
+
+      // We need to sync the reference_cell vector of the integrated
+      // triangulations. It might fell out of sync due to operations inside the
+      // serial grid generator introducing or removing types of reference cells.
+      // One such example is the refinement and coarsening of pyramids
+      // introducing or potentially removing tets form the triangulation.
+      this->reference_cells =
+        Utilities::MPI::compute_set_union(this->reference_cells,
+                                          this->mpi_communicator);
     }
 
 

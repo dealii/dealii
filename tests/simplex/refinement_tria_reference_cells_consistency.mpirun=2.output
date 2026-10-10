@@ -1,0 +1,105 @@
+
+DEAL::
+DEAL:: ======================================
+DEAL:: Shared Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Tet, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Tet, 
+DEAL::0: Reference cells pre  refinement from cells:              Tet, 
+DEAL::1: Reference cells pre  refinement from cells:              Tet, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, 
+DEAL::0: Reference cells post refinement from cells:              Tet, Tet, Tet, Tet, Tet, Tet, Tet, Tet, 
+DEAL::1: Reference cells post refinement from cells:              Tet, Tet, Tet, Tet, Tet, Tet, Tet, Tet, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Shared Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Pyramid, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Pyramid, 
+DEAL::0: Reference cells pre  refinement from cells:              Pyramid, 
+DEAL::1: Reference cells pre  refinement from cells:              Pyramid, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Pyramid, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Pyramid, 
+DEAL::0: Reference cells post refinement from cells:              Pyramid, Pyramid, Pyramid, Pyramid, Tet, Tet, Tet, Tet, Pyramid, Pyramid, 
+DEAL::1: Reference cells post refinement from cells:              Pyramid, Pyramid, Pyramid, Pyramid, Tet, Tet, Tet, Tet, Pyramid, Pyramid, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Shared Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Wedge, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Wedge, 
+DEAL::0: Reference cells pre  refinement from cells:              Wedge, 
+DEAL::1: Reference cells pre  refinement from cells:              Wedge, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Wedge, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Wedge, 
+DEAL::0: Reference cells post refinement from cells:              Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, 
+DEAL::1: Reference cells post refinement from cells:              Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Shared Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Hex, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Hex, 
+DEAL::0: Reference cells pre  refinement from cells:              Hex, 
+DEAL::1: Reference cells pre  refinement from cells:              Hex, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Hex, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Hex, 
+DEAL::0: Reference cells post refinement from cells:              Hex, Hex, Hex, Hex, Hex, Hex, Hex, Hex, 
+DEAL::1: Reference cells post refinement from cells:              Hex, Hex, Hex, Hex, Hex, Hex, Hex, Hex, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Fully-Distributed Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Tet, Hex, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Tet, Hex, 
+DEAL::0: Reference cells pre  refinement from cells:              Hex, 
+DEAL::1: Reference cells pre  refinement from cells:              Tet, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Hex, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Hex, 
+DEAL::0: Reference cells post refinement from cells:              Tet, Tet, Tet, Tet, Tet, Tet, Tet, Tet, 
+DEAL::1: Reference cells post refinement from cells:              Hex, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Fully-Distributed Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Pyramid, Hex, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Pyramid, Hex, 
+DEAL::0: Reference cells pre  refinement from cells:              Hex, 
+DEAL::1: Reference cells pre  refinement from cells:              Pyramid, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Pyramid, Hex, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Tet, Pyramid, Hex, 
+DEAL::0: Reference cells post refinement from cells:              Pyramid, Pyramid, Pyramid, Pyramid, Tet, Tet, Tet, Tet, Pyramid, Pyramid, 
+DEAL::1: Reference cells post refinement from cells:              Hex, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Fully-Distributed Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Wedge, Hex, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Wedge, Hex, 
+DEAL::0: Reference cells pre  refinement from cells:              Hex, 
+DEAL::1: Reference cells pre  refinement from cells:              Wedge, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Wedge, Hex, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Wedge, Hex, 
+DEAL::0: Reference cells post refinement from cells:              Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, Wedge, 
+DEAL::1: Reference cells post refinement from cells:              Hex, 
+DEAL::
+DEAL:: ======================================
+DEAL:: Fully-Distributed Tria in 3D
+DEAL::
+DEAL::0: Ref-Cells pre  ref. given by tria.get_reference_cells(): Hex, 
+DEAL::1: Ref-Cells pre  ref. given by tria.get_reference_cells(): Hex, 
+DEAL::0: Reference cells pre  refinement from cells:              Hex, 
+DEAL::1: Reference cells pre  refinement from cells:              Hex, 
+DEAL::
+DEAL::0: Ref-Cells post ref. given by tria.get_reference_cells(): Hex, 
+DEAL::1: Ref-Cells post ref. given by tria.get_reference_cells(): Hex, 
+DEAL::0: Reference cells post refinement from cells:              Hex, Hex, Hex, Hex, Hex, Hex, Hex, Hex, 
+DEAL::1: Reference cells post refinement from cells:              Hex, 
