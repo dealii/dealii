@@ -64,6 +64,26 @@ for (S : TRILINOS_SCALARS; MEMORY_SPACE : MEMORY_SPACES)
 
         template void
         SparseMatrix<S, MEMORY_SPACE>::vmult(
+          distributed::Vector<S, MEMORY_SPACE>       &dst,
+          const distributed::Vector<S, MEMORY_SPACE> &src) const;
+
+        template void
+        SparseMatrix<S, MEMORY_SPACE>::Tvmult(
+          distributed::Vector<S, MEMORY_SPACE>       &dst,
+          const distributed::Vector<S, MEMORY_SPACE> &src) const;
+
+        template void
+        SparseMatrix<S, MEMORY_SPACE>::vmult_add(
+          distributed::Vector<S, MEMORY_SPACE>       &dst,
+          const distributed::Vector<S, MEMORY_SPACE> &src) const;
+
+        template void
+        SparseMatrix<S, MEMORY_SPACE>::Tvmult_add(
+          distributed::Vector<S, MEMORY_SPACE>       &dst,
+          const distributed::Vector<S, MEMORY_SPACE> &src) const;
+
+        template void
+        SparseMatrix<S, MEMORY_SPACE>::vmult(
           ::dealii::Vector<S>       &dst,
           const ::dealii::Vector<S> &src) const;
 
