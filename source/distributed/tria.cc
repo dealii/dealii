@@ -2725,17 +2725,75 @@ namespace parallel
     DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
     bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
     {
-      // First exchange coarsen/refinement flags on ghost cells. After this
-      // collective communication call all flags on ghost cells match the
-      // flags set by the user on the owning rank.
+      const bool match_periodic_levels =
+        this->smooth_grid & dealii::Triangulation<dim, spacedim>::
+                              match_refinement_across_periodic_boundaries;
+      const bool has_periodic_faces = !this->get_periodic_face_map().empty();
+
+      if (!match_periodic_levels || !has_periodic_faces)
+        {
+          // Without handling periodic faces we run a single
+          // communication step and return.
+          dealii::internal::parallel::distributed::TriangulationImplementation::
+            exchange_refinement_flags(*this);
+
+          return this->dealii::Triangulation<dim, spacedim>::
+            prepare_coarsening_and_refinement();
+        }
+
+      const auto get_locally_owned_flags = [this]() {
+        std::vector<std::uint8_t> flags;
+        for (const auto &cell : this->active_cell_iterators())
+          if (cell->is_locally_owned())
+            {
+              flags.push_back(
+                static_cast<std::uint8_t>(cell->refine_flag_set()));
+              flags.push_back(cell->coarsen_flag_set() ? 1 : 0);
+            }
+        return flags;
+      };
+
+      const std::vector<std::uint8_t> flags_before = get_locally_owned_flags();
+      bool                            flags_changed_globally = false;
+      unsigned int                    n_iterations           = 0;
+      do
+        {
+          AssertThrow(n_iterations <= 10,
+                      ExcMessage(
+                        "The distributed refinement and coarsening flags "
+                        "did not converge after 10 iterations."));
+
+          // First get correct flags from the owner of the cells in
+          // each iteration:
+          dealii::internal::parallel::distributed::TriangulationImplementation::
+            exchange_refinement_flags(*this);
+
+          const std::vector<std::uint8_t> flags_before_pass =
+            get_locally_owned_flags();
+
+          // Apply the sequential smoothing algorithms:
+          this->dealii::Triangulation<dim, spacedim>::
+            prepare_coarsening_and_refinement();
+
+          const bool flags_changed_locally =
+            flags_before_pass != get_locally_owned_flags();
+
+          flags_changed_globally =
+            Utilities::MPI::logical_or(flags_changed_locally,
+                                       this->get_mpi_communicator());
+
+          ++n_iterations;
+        }
+      while (flags_changed_globally);
+
+      // The sequential pass may have modified ghost copies while applying
+      // smoothing. Restore the owner values before returning.
       dealii::internal::parallel::distributed::TriangulationImplementation::
         exchange_refinement_flags(*this);
 
-      // Now we can call the sequential version to apply mesh smoothing and
-      // other modifications:
-      const bool any_changes = this->dealii::Triangulation<dim, spacedim>::
-                                 prepare_coarsening_and_refinement();
-      return any_changes;
+      return Utilities::MPI::logical_or(flags_before !=
+                                          get_locally_owned_flags(),
+                                        this->get_mpi_communicator());
     }
 
 
@@ -3493,6 +3551,25 @@ namespace parallel
 
       this->update_periodic_face_map();
       this->update_number_cache();
+
+      if (this->smooth_grid & dealii::Triangulation<dim, spacedim>::
+                                match_refinement_across_periodic_boundaries)
+        {
+          unsigned int n_mismatched_periodic_faces = 0;
+          for (const auto &cell : this->active_cell_iterators())
+            if (cell->is_locally_owned())
+              for (const unsigned int face : cell->face_indices())
+                if (cell->has_periodic_neighbor(face) &&
+                    cell->level() != cell->periodic_neighbor(face)->level())
+                  ++n_mismatched_periodic_faces;
+
+          AssertThrow(
+            Utilities::MPI::sum(n_mismatched_periodic_faces,
+                                this->get_mpi_communicator()) == 0,
+            ExcMessage(
+              "p4est produced periodic neighbors at different levels despite the"
+              "match_refinement_across_periodic_boundaries smoothing flag."));
+        }
 
       // signal that refinement is finished
       this->signals.post_distributed_refinement();
