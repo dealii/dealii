@@ -329,6 +329,22 @@ namespace SUNDIALS
     status = IDASetStopTime(ida_mem, data.final_time);
     AssertIDA(status);
 
+    status = IDASetMaxNumSteps(ida_mem, data.maximum_number_of_steps);
+    AssertIDA(status);
+    status = IDASetMaxStep(ida_mem, data.maximum_step_size);
+    AssertIDA(status);
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+    status = IDASetMinStep(ida_mem, data.minimum_step_size);
+    AssertIDA(status);
+#  endif
+    status = IDASetMaxErrTestFails(ida_mem, data.maximum_error_test_failures);
+    AssertIDA(status);
+    status = IDASetMaxConvFails(ida_mem, data.maximum_convergence_failures);
+    AssertIDA(status);
+    status =
+      IDASetNonlinConvCoef(ida_mem, data.nonlinear_convergence_coefficient);
+    AssertIDA(status);
+
     status = IDASetMaxNonlinIters(ida_mem, data.maximum_non_linear_iterations);
     AssertIDA(status);
 
@@ -436,6 +452,16 @@ namespace SUNDIALS
 
     status = IDASetLSNormFactor(ida_mem, data.ls_norm_factor);
     AssertIDA(status);
+    status = IDASetEpsLin(ida_mem, data.linear_tolerance_factor);
+    AssertIDA(status);
+    status = IDASetIncrementFactor(ida_mem, data.increment_factor);
+    AssertIDA(status);
+    status = IDASetLinearSolutionScaling(ida_mem, data.linear_solution_scaling);
+    AssertIDA(status);
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+    status = IDASetDeltaCjLSetup(ida_mem, data.delta_cj_lsetup);
+    AssertIDA(status);
+#  endif
     // Finally tell IDA about
     // it as well. The manual says that this must happen *after*
     // calling IDASetLinearSolver
@@ -469,6 +495,39 @@ namespace SUNDIALS
     status = IDASetMaxOrd(ida_mem, data.maximum_order);
     AssertIDA(status);
 
+    if (get_constraint_vector)
+      {
+        const auto constraints =
+          internal::make_nvector_view(get_constraint_vector()
+#  if !DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+                                        ,
+                                      ida_ctx
+#  endif
+          );
+        // IDA rejects a non-null all-zero vector. Treat it as no constraints.
+        if (N_VMaxNorm(constraints) > 0.0)
+          {
+            status = IDASetConstraints(ida_mem, constraints);
+            AssertIDA(status);
+          }
+      }
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+    status =
+      IDASetEtaFixedStepBounds(ida_mem, data.eta_min_fixed, data.eta_max_fixed);
+    AssertIDA(status);
+    status = IDASetEtaMin(ida_mem, data.eta_min);
+    AssertIDA(status);
+    status = IDASetEtaMax(ida_mem, data.eta_max);
+    AssertIDA(status);
+    status = IDASetEtaLow(ida_mem, data.eta_low);
+    AssertIDA(status);
+    status = IDASetEtaMinErrFail(ida_mem, data.eta_min_err_fail);
+    AssertIDA(status);
+    status = IDASetEtaConvFail(ida_mem, data.eta_conv_fail);
+    AssertIDA(status);
+#  endif
+
     typename AdditionalData::InitialConditionCorrection type;
     if (first_step)
       type = data.ic_type;
@@ -478,6 +537,27 @@ namespace SUNDIALS
     status =
       IDASetMaxNumItersIC(ida_mem, data.maximum_non_linear_iterations_ic);
     AssertIDA(status);
+    status = IDASetNonlinConvCoefIC(ida_mem,
+                                    data.nonlinear_convergence_coefficient_ic);
+    AssertIDA(status);
+    status = IDASetMaxNumStepsIC(ida_mem, data.maximum_number_of_steps_ic);
+    AssertIDA(status);
+    status = IDASetMaxNumJacsIC(ida_mem, data.maximum_number_of_jacobians_ic);
+    AssertIDA(status);
+    status = IDASetMaxBacksIC(ida_mem, data.maximum_number_of_backtracks_ic);
+    AssertIDA(status);
+    status = IDASetLineSearchOffIC(ida_mem, !data.line_search_enabled_ic);
+    AssertIDA(status);
+    status = IDASetStepToleranceIC(ida_mem, data.step_tolerance_ic);
+    AssertIDA(status);
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
+    status =
+      IDASetMaxNumConstraintFails(ida_mem, data.maximum_constraint_failures);
+    AssertIDA(status);
+#  endif
+
+    if (custom_setup)
+      custom_setup(ida_mem);
 
     if (type == AdditionalData::use_y_dot)
       {
@@ -533,6 +613,24 @@ namespace SUNDIALS
       return v->locally_owned_elements();
     };
   }
+
+
+  template <typename VectorType>
+  void *
+  IDA<VectorType>::get_ida_memory() const
+  {
+    return ida_mem;
+  }
+
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+  template <typename VectorType>
+  SUNContext
+  IDA<VectorType>::get_sun_context() const
+  {
+    return ida_ctx;
+  }
+#  endif
 
   template class IDA<Vector<double>>;
   template class IDA<BlockVector<double>>;
