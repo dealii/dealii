@@ -296,28 +296,6 @@ namespace SUNDIALS
     int status;
     (void)status;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
-    status = SUNContext_Free(&arkode_ctx);
-    AssertARKode(status);
-
-    // Same comment applies as in class constructor:
-    status =
-      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
-                                                            mpi_communicator,
-                        &arkode_ctx);
-    AssertARKode(status);
-#  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    status = SUNContext_Free(&arkode_ctx);
-    AssertARKode(status);
-
-    // Same comment applies as in class constructor:
-    status =
-      SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
-                                                            &mpi_communicator,
-                        &arkode_ctx);
-    AssertARKode(status);
-#  endif
-
     stepper.reinit(
       current_time, solution, internal::InvocationContext {
         pending_exception
