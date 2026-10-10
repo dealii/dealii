@@ -49,4 +49,25 @@ main()
         solver_cg.solve(op, x, b, PreconditionIdentity());
       };
   });
+
+  // SUNDIALS' own SPGMR linear solver and fixed-point nonlinear solver are
+  // created and destroyed by the stepper.
+  run_resize_test<Stepper>("ARKStepper implicit with SUNDIALS linear solver",
+                           [](Stepper &stepper) {
+                             stepper.implicit_function     = rhs;
+                             stepper.jacobian_times_vector =
+                               [](const VectorType &v,
+                                  VectorType       &Jv,
+                                  double,
+                                  const VectorType &,
+                                  const VectorType &) {
+                                 Jv = v;
+                                 Jv *= -1.;
+                               };
+                           });
+
+  run_resize_test<Stepper>("ARKStepper implicit with fixed-point solver",
+                           [](Stepper &stepper) {
+                             stepper.implicit_function = rhs;
+                           });
 }
