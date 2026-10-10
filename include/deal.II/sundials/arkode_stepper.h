@@ -47,6 +47,7 @@
 
 #  include <sundials/sundials_linearsolver.h>
 #  include <sundials/sundials_math.h>
+#  include <sundials/sundials_nonlinearsolver.h>
 
 #  include <complex>
 #  include <exception>
@@ -1081,10 +1082,48 @@ namespace SUNDIALS
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
 
     /**
-     * ARKODE memory object. Declared after linear_solver and mass_solver so
-     * that it is destroyed first (C++ destroys members in reverse declaration
-     * order), ensuring ARKStepFree is called before the solver wrappers free
-     * their SUNLinearSolver objects.
+     * Smart pointers to SUNDIALS linear and nonlinear solvers that this class
+     * creates and that ARKODE does not take ownership of.
+     */
+    using SUNLinearSolverPtr =
+      std::unique_ptr<std::remove_pointer_t<SUNLinearSolver>,
+                      void (*)(SUNLinearSolver)>;
+    using SUNNonlinearSolverPtr =
+      std::unique_ptr<std::remove_pointer_t<SUNNonlinearSolver>,
+                      void (*)(SUNNonlinearSolver)>;
+
+    /**
+     * Deleters for SUNLinearSolverPtr and SUNNonlinearSolverPtr.
+     */
+    static void
+    free_linear_solver(SUNLinearSolver solver);
+
+    static void
+    free_nonlinear_solver(SUNNonlinearSolver solver);
+
+    /**
+     * SUNDIALS' default linear solver for the Jacobian system. This is used if
+     * the user provides jacobian_times_vector() but not
+     * solve_linearized_system().
+     */
+    SUNLinearSolverPtr default_linear_solver;
+
+    /**
+     * SUNDIALS' default linear solver for the mass system. This is used if the
+     * user provides mass_times_vector() but not solve_mass().
+     */
+    SUNLinearSolverPtr default_mass_solver;
+
+    /**
+     * SUNDIALS' fixed-point solver. This is used if the user provides
+     * implicit_function() but not jacobian_times_vector().
+     */
+    SUNNonlinearSolverPtr fixed_point_solver;
+
+    /**
+     * ARKODE memory object. Declared after the solvers above so that it is
+     * destroyed first (C++ destroys members in reverse declaration order),
+     * ensuring ARKStepFree is called before the solvers are freed.
      */
     ARKodeMemoryPtr arkode_mem;
 
