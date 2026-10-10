@@ -17,8 +17,6 @@
 #include <deal.II/opencascade/manifold_lib.h>
 #include <deal.II/opencascade/utilities.h>
 
-#include <Standard_Stream.hxx>
-#include <TopTools.hxx>
 #include <TopoDS_Shape.hxx>
 
 #include "../tests.h"

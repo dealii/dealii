@@ -17,7 +17,6 @@
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
-
 #  include <BRepAdaptor_CompCurve.hxx>
 #  include <BRepAdaptor_Curve.hxx>
 #  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
@@ -32,22 +31,6 @@
 #  include <TopoDS.hxx>
 #  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
 #    include <Handle_Adaptor3d_HCurve.hxx>
-#  endif
-
-// OpenCASCADE defines a macro that creates class names. When building
-// modules, we don't #include any of the OpenCASCADE header files, and
-// we can't export macros, so the macro is not available. Re-declare
-// it here if it is not defined. (And if it is defined, we have a
-// problem: Apparently some header #include above is left in the file
-// by accident. Error out in that case so we get alerted to the
-// problem.)
-#  ifdef DEAL_II_BUILDING_CXX20_MODULE
-#    ifndef HANDLE
-#      define Handle(ClassName) Handle_##ClassName
-#    else
-#      error \
-        "Some OpenCASCADE header file is apparently included even when building modules!"
-#    endif
 #  endif
 
 #endif
@@ -67,38 +50,61 @@ namespace OpenCASCADE
      * not of topological dimension one.
      */
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
-    Handle_Adaptor3d_Curve
+    opencascade::handle<Adaptor3d_Curve>
     curve_adaptor(const TopoDS_Shape &shape)
     {
       Assert((shape.ShapeType() == TopAbs_WIRE) ||
                (shape.ShapeType() == TopAbs_EDGE),
              ExcUnsupportedShape());
       if (shape.ShapeType() == TopAbs_WIRE)
-        return Handle(BRepAdaptor_CompCurve)(
+        return opencascade::handle<BRepAdaptor_CompCurve>(
           new BRepAdaptor_CompCurve(TopoDS::Wire(shape)));
       else if (shape.ShapeType() == TopAbs_EDGE)
-        return Handle(BRepAdaptor_Curve)(
+        return opencascade::handle<BRepAdaptor_Curve>(
           new BRepAdaptor_Curve(TopoDS::Edge(shape)));
 
       DEAL_II_ASSERT_UNREACHABLE();
-      return Handle(BRepAdaptor_Curve)(new BRepAdaptor_Curve());
+      return opencascade::handle<BRepAdaptor_Curve>(new BRepAdaptor_Curve());
     }
 #  else
-    Handle_Adaptor3d_HCurve
+
+
+
+#    if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+    opencascade::handle<Adaptor3d_HCurve>
+#    else
+    Handle_Adaptor3d_HCurve;
+#    endif
     curve_adaptor(const TopoDS_Shape &shape)
     {
       Assert((shape.ShapeType() == TopAbs_WIRE) ||
                (shape.ShapeType() == TopAbs_EDGE),
              ExcUnsupportedShape());
       if (shape.ShapeType() == TopAbs_WIRE)
-        return Handle(BRepAdaptor_HCompCurve)(
-          new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
-      else if (shape.ShapeType() == TopAbs_EDGE)
-        return Handle(BRepAdaptor_HCurve)(
-          new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
+        return
+#    if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+          opencascade::handle<BRepAdaptor_HCompCurve>(
+            new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
+#    else
+          Handle_BRepAdaptor_HCompCurve(
+            new BRepAdaptor_HCompCurve(TopoDS::Wire(shape)));
+#    endif
 
+      else if (shape.ShapeType() == TopAbs_EDGE)
+        return
+#    if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+          opencascade::handle<BRepAdaptor_HCurve>(
+            new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
+#    else
+          Handle_BRepAdaptor_HCurve(
+            new BRepAdaptor_HCurve(TopoDS::Edge(shape)));
+#    endif
       DEAL_II_ASSERT_UNREACHABLE();
-      return Handle(BRepAdaptor_HCurve)(new BRepAdaptor_HCurve());
+#    if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+      return opencascade::handle<BRepAdaptor_HCurve>(new BRepAdaptor_HCurve());
+#    else
+      return Handle_BRepAdaptor_HCurve(new BRepAdaptor_HCurve());
+#    endif
     }
 #  endif
 
@@ -109,10 +115,16 @@ namespace OpenCASCADE
     shape_length(const TopoDS_Shape &sh)
     {
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
-      Handle_Adaptor3d_Curve adapt = curve_adaptor(sh);
+      opencascade::handle<Adaptor3d_Curve> adapt = curve_adaptor(sh);
       return GCPnts_AbscissaPoint::Length(*adapt);
 #  else
+
+#    if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+      opencascade::handle<Adaptor3d_HCurve> adapt = curve_adaptor(sh);
+#    else
       Handle_Adaptor3d_HCurve adapt = curve_adaptor(sh);
+#    endif
+
       return GCPnts_AbscissaPoint::Length(adapt->GetCurve());
 #  endif
     }
@@ -495,7 +507,7 @@ namespace OpenCASCADE
     GCPnts_AbscissaPoint AP(curve->GetCurve(),
                             chart_point[0],
                             curve->GetCurve().FirstParameter());
-    gp_Pnt               P = curve->GetCurve().Value(AP.Parameter());
+    gp_Pnt               P          = curve->GetCurve().Value(AP.Parameter());
 #  endif
 
     return point<spacedim>(P);
@@ -525,7 +537,12 @@ namespace OpenCASCADE
   NURBSPatchManifold<dim, spacedim>::pull_back(
     const Point<spacedim> &space_point) const
   {
-    Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+    opencascade::handle<Geom_Surface> SurfToProj = BRep_Tool::Surface(face);
+#  else
+    Handle_Geom_Surface  SurfToProj = BRep_Tool::Surface(face);
+#  endif
+
 
     ShapeAnalysis_Surface projector(SurfToProj);
     gp_Pnt2d proj_params = projector.ValueOfUV(point(space_point), tolerance);
@@ -552,7 +569,12 @@ namespace OpenCASCADE
     const Point<2> &chart_point) const
   {
     DerivativeForm<1, 2, spacedim> DX;
-    Handle(Geom_Surface) surf = BRep_Tool::Surface(face);
+
+#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
+    opencascade::handle<Geom_Surface> surf = BRep_Tool::Surface(face);
+#  else
+    Handle_Geom_Surface  surf       = BRep_Tool::Surface(face);
+#  endif
 
     gp_Pnt q;
     gp_Vec Du, Dv;
