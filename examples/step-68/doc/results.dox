@@ -8,7 +8,7 @@ will execute the code.
 On any number of cores, the simulation output will look like:
 
 @code
-bash$ mpirun -np 4 ./step-68 parameters.prm
+bash> mpirun -np 4 ./step-68 parameters.prm
 Number of particles inserted: 384
 Repartitioning triangulation after particle generation
 Writing particle output file: analytical-particles-0

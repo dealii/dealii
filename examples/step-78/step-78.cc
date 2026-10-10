@@ -632,9 +632,9 @@ namespace BlackScholesSolver
     convergence_table.set_scientific("Linfty", true);
     convergence_table.set_tex_caption("cells", "\\# cells");
     convergence_table.set_tex_caption("dofs", "\\# dofs");
-    convergence_table.set_tex_caption("L2", "@f$L^2@f$-error");
-    convergence_table.set_tex_caption("H1", "@f$H^1@f$-error");
-    convergence_table.set_tex_caption("Linfty", "@f$L^\\infty@f$-error");
+    convergence_table.set_tex_caption("L2", "\\(L^2\\)-error");
+    convergence_table.set_tex_caption("H1", "\\(H^1\\)-error");
+    convergence_table.set_tex_caption("Linfty", "\\(L^\\infty\\)-error");
     convergence_table.set_tex_format("cells", "r");
     convergence_table.set_tex_format("dofs", "r");
     std::cout << std::endl;
