@@ -1,0 +1,5 @@
+Fixed: When running MatrixFree::cell_loop() with BlockVector types and more
+than 20 components, the setting to zero out vectors would yield wrong
+results. This is now fixed.
+<br>
+(Jason Landini, Timo Heister, Martin Kronbichler, 2026/10/09)

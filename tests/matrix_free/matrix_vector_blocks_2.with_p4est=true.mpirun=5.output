@@ -1,0 +1,15 @@
+
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Average value with 5 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:2d::Average value with 10 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:2d::Average value with 20 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:2d::Average value with 40 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:2d::Average value with 80 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Average value with 5 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:3d::Average value with 10 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:3d::Average value with 20 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:3d::Average value with 40 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:3d::Average value with 80 blocks: 1.000 2.000 3.000 4.000 5.000 6.000 7.000 8.000 9.000 10.000
+DEAL:3d::
