@@ -216,6 +216,21 @@ namespace SUNDIALS
 #  endif
     );
 
+    // Accumulate the total number of steps taken by the solver
+    int n_steps_total = 0;
+
+    // Get current number of steps
+    auto get_last_num_steps = [](const auto &stepper) {
+      long int   n_steps;
+      const auto status =
+        ARKStepGetNumSteps(stepper.get_arkode_memory(), &n_steps);
+
+      (void)status;
+      AssertARKode(status);
+
+      return n_steps;
+    };
+
     while (!time.is_at_end())
       {
         time.set_desired_next_step_size(data.output_period);
@@ -264,9 +279,13 @@ namespace SUNDIALS
         // Finally check whether resets or output calls are desired at this
         // time:
         while (solver_should_restart(time.get_current_time(), solution))
-          reset(time.get_current_time(),
-                time.get_previous_step_size(),
-                solution);
+          {
+            n_steps_total += get_last_num_steps(stepper);
+
+            reset(time.get_current_time(),
+                  time.get_previous_step_size(),
+                  solution);
+          }
 
         if (output_step)
           output_step(time.get_current_time(),
@@ -275,13 +294,9 @@ namespace SUNDIALS
       }
     last_end_time = time.get_current_time();
 
-    long int   n_steps;
-    const auto status =
-      ARKStepGetNumSteps(stepper.get_arkode_memory(), &n_steps);
-    (void)status;
-    AssertARKode(status);
+    n_steps_total += get_last_num_steps(stepper);
 
-    return n_steps;
+    return n_steps_total;
   }
 
 
