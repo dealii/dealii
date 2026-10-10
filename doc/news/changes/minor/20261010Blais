@@ -1,0 +1,7 @@
+Improved: The step-100 tutorial program now assigns the
+LAPACKSupport::symmetric property to the local Gram matrix and to the condensed
+interior matrix, which are both symmetric positive definite. As a consequence,
+LAPACKFullMatrix::invert() uses a Cholesky factorization instead of an LU
+factorization to invert them.
+<br>
+(Bruno Blais, 2026/10/10)
