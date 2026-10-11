@@ -87,24 +87,25 @@ integrate(SUNDIALS::ARKode<VectorType> &ode, const bool with_resize)
 }
 
 
-// Integrate with and without resize using a StepperType that is set up by
-// `configure` and log the comparison under `name`.
-template <typename StepperType, typename Configure>
+// Integrate with and without resize using the stepper that `make_stepper`
+// returns, as a `std::unique_ptr`, and log the comparison under `name`.
+template <typename MakeStepper>
 void
-run_resize_test(const std::string &name, Configure configure)
+run_resize_test_with(const std::string &name,
+                     MakeStepper        make_stepper,
+                     const double       initial_step_size = 1e-4)
 {
   const auto run = [&](const bool with_resize) {
     SUNDIALS::ARKode<VectorType>::AdditionalData data;
     data.initial_time       = 0.0;
     data.final_time         = 2.0;
-    data.initial_step_size  = 1e-4;
+    data.initial_step_size  = initial_step_size;
     data.output_period      = 0.5;
     data.absolute_tolerance = 1e-8;
     data.relative_tolerance = 1e-6;
 
-    StepperType stepper;
-    configure(stepper);
-    SUNDIALS::ARKode<VectorType> ode(stepper, data);
+    const auto                   stepper = make_stepper();
+    SUNDIALS::ARKode<VectorType> ode(*stepper, data);
 
     return integrate(ode, with_resize);
   };
@@ -123,6 +124,20 @@ run_resize_test(const std::string &name, Configure configure)
   deallog << name
           << ": error is small: " << (resized.max_error < 1e-4 ? "yes" : "no")
           << std::endl;
+}
+
+
+// Same as above for a default-constructible StepperType that is set up by
+// `configure`.
+template <typename StepperType, typename Configure>
+void
+run_resize_test(const std::string &name, Configure configure)
+{
+  run_resize_test_with(name, [&] {
+    auto stepper = std::make_unique<StepperType>();
+    configure(*stepper);
+    return stepper;
+  });
 }
 
 
