@@ -323,6 +323,34 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const SparsityTools::Partitioner);
 
       template void
+      partition_triangulation(
+        const unsigned int,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        std::unique_ptr<Zoltan> &);
+
+      template void
+      partition_triangulation(
+        const unsigned int,
+        const std::vector<unsigned int> &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        std::unique_ptr<Zoltan> &);
+
+      template void
+      partition_triangulation(
+        const unsigned int,
+        const SparsityPattern &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        std::unique_ptr<Zoltan> &);
+
+      template void
+      partition_triangulation(
+        const unsigned int,
+        const std::vector<unsigned int> &,
+        const SparsityPattern &,
+        Triangulation<deal_II_dimension, deal_II_space_dimension> &,
+        std::unique_ptr<Zoltan> &);
+
+      template void
       partition_triangulation_zorder(
         const unsigned int,
         Triangulation<deal_II_dimension, deal_II_space_dimension> &,
