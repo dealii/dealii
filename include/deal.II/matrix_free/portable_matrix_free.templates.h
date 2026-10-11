@@ -281,19 +281,12 @@ namespace Portable
               Kokkos::view_alloc("data_index_offsets_" + std::to_string(color),
                                  Kokkos::WithoutInitializing),
               n_cells);
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
           cell_type_host =
             Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                        mapping_info.cell_type[color]);
           data_index_offsets_host =
             Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                        mapping_info.data_index_offsets[color]);
-#else
-          cell_type_host =
-            Kokkos::create_mirror_view(mapping_info.cell_type[color]);
-          data_index_offsets_host =
-            Kokkos::create_mirror_view(mapping_info.data_index_offsets[color]);
-#endif
 
           auto classification_worker = [&](const unsigned int cell_id,
                                            ScratchData       &scratch_data,
@@ -386,8 +379,7 @@ namespace Portable
         decltype(mapping_info.JxW[color])>::host_mirror_type JxW_host;
       typename std::remove_reference_t<
         decltype(mapping_info.inv_jacobian[color])>::host_mirror_type
-        inv_jacobian_host;
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
+           inv_jacobian_host;
       auto local_to_global_host =
         Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                    dof_data.local_to_global[color]);
@@ -402,18 +394,6 @@ namespace Portable
         inv_jacobian_host =
           Kokkos::create_mirror_view(Kokkos::WithoutInitializing,
                                      mapping_info.inv_jacobian[color]);
-#else
-      auto local_to_global_host =
-        Kokkos::create_mirror_view(dof_data.local_to_global[color]);
-      if (update_flags & update_quadrature_points && dof_handler_index == 0)
-        q_points_host =
-          Kokkos::create_mirror_view(mapping_info.q_points[color]);
-      if ((update_flags & update_JxW_values) && dof_handler_index == 0)
-        JxW_host = Kokkos::create_mirror_view(mapping_info.JxW[color]);
-      if ((update_flags & update_gradients) && dof_handler_index == 0)
-        inv_jacobian_host =
-          Kokkos::create_mirror_view(mapping_info.inv_jacobian[color]);
-#endif
       const double first_q_weight = fe_values.get_quadrature().get_weights()[0];
 
       auto worker = [&](const unsigned int cell_id,
@@ -1635,11 +1615,7 @@ namespace Portable
           }
       }
 
-#if DEAL_II_KOKKOS_VERSION_GTE(3, 6, 0)
     exec_space.fence("MatrixFree::internal_reinit(): end");
-#else
-    exec_space.fence();
-#endif
   }
 
 
