@@ -614,6 +614,17 @@ namespace Step100
   // results during matrix–matrix and matrix–vector products. These temporary
   // objects are labeled with a "tmp" prefix.
 
+  // Two of these local matrices are inverted on every cell: the Gram matrix
+  // $G$ and the condensed matrix $M_1$. The former stems from the inner
+  // product of the test space, while the latter reads $B^\dagger G^{-1} B$
+  // with $B$ of full column rank. Both are thus symmetric positive definite.
+  // By default, LAPACKFullMatrix considers a matrix to be general and inverts
+  // it using an LU factorization with partial pivoting. We assign
+  // the LAPACKSupport::symmetric property to these two matrices, in which
+  // case LAPACKFullMatrix::invert() relies on a Cholesky factorization
+  // instead. Since a Cholesky factorization is used, the matrix must
+  // be positive definite.
+
   // Finally, we define the local cell matrix and right-hand side vector
   // associated with the skeleton degrees of freedom that will be used to solve
   // our system, together with a local-to-global DoF index map used for
@@ -724,6 +735,9 @@ namespace Step100
     LAPACKFullMatrix<double> M5_matrix(dofs_per_cell_trial_skeleton,
                                        dofs_per_cell_test);
 
+    G_matrix.set_property(LAPACKSupport::symmetric);
+    M1_matrix.set_property(LAPACKSupport::symmetric);
+
     LAPACKFullMatrix<double> tmp_matrix(dofs_per_cell_trial_skeleton,
                                         dofs_per_cell_trial_interior);
     LAPACKFullMatrix<double> tmp_matrix2(dofs_per_cell_trial_skeleton,
@@ -760,7 +774,8 @@ namespace Step100
     // of each cell loop. In addition, we need to reset the local condensation
     // matrix $M_1$ because LAPACKFullMatrix keeps track of its inverse status
     // between iterations and forbids to invert it again if it has the inverted
-    // status.
+    // status. These resets do not alter the symmetric property of $G$ and
+    // $M_1$, which is why we only need to set it once before the loop.
 
     // At each quadrature point, we evaluate
     // and cache the values, gradients, and divergences of the test functions
@@ -1361,7 +1376,9 @@ namespace Step100
         // $M_5 = \hat{B}^\dagger G^{-1}$. These are then used to construct the
         // condensed blocks $M_1 = B^\dagger G^{-1} B$,
         // $M_2 = B^\dagger G^{-1} \hat{B}$ and
-        // $M_3 = \hat{B}^\dagger G^{-1} \hat{B} - D$. Then, if
+        // $M_3 = \hat{B}^\dagger G^{-1} \hat{B} - D$. The matrix $M_1$ is then
+        // inverted as well. As both $G$ and $M_1$ were flagged as symmetric,
+        // the two inversions rely on a Cholesky factorization. Then, if
         // <code>solve_interior</code> is <code>true</code>, the skeleton
         // solution $\hat{u}_h$ is assumed known and we recover the interior
         // unknowns on each cell by solving
