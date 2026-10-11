@@ -257,6 +257,7 @@ namespace Step86
     , dof_handler(triangulation)
     , time_stepper_data("",
                         "beuler",
+                        "linear",
                         /* start time */ 0.0,
                         /* end time */ 1.0,
                         /* initial time step */ 0.025)

@@ -59,6 +59,7 @@ namespace PETScWrappers
      *
      * @param options_prefix The string indicating the options prefix for command line customization.
      * @param ts_type The string indicating the PETSc solver type.
+     * @param problem_type The string indicating the PETSc problem type.
      * @param initial_time Initial simulation time.
      * @param final_time Final simulation time.
      * @param initial_step_size Initial step size.
@@ -90,6 +91,7 @@ namespace PETScWrappers
       // Running parameters
       const std::string &options_prefix    = "",
       const std::string &ts_type           = "",
+      const std::string &problem_type      = "nonlinear",
       const real_type    initial_time      = 0.0,
       const real_type    final_time        = 0.0,
       const real_type    initial_step_size = 0.0,
@@ -105,6 +107,7 @@ namespace PETScWrappers
       const bool         ignore_algebraic_lte = true)
       : options_prefix(options_prefix)
       , ts_type(ts_type)
+      , problem_type(problem_type)
       , initial_time(initial_time)
       , final_time(final_time)
       , initial_step_size(initial_step_size)
@@ -134,6 +137,11 @@ namespace PETScWrappers
      * PETSc solver type.
      */
     std::string ts_type;
+
+    /**
+     * PETSc problem type.
+     */
+    std::string problem_type;
 
     /**
      * Initial time for the DAE.
