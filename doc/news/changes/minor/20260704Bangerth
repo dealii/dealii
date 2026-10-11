@@ -1,0 +1,7 @@
+Fixed: The Abaqus file format reader in GridIn::read_abaqus() got
+itself into all sorts of troubles when reading files that had
+DOS/Windows line endings, producing error messages that did not at all
+help in diagnosing the underlying cause. This has now been fixed: The
+reader can deal with such files without errors now.
+<br>
+(Wolfgang Bangerth, Dongchen Li, 2026/07/04)
