@@ -33,9 +33,9 @@
 
 #include "./simplex_grids.h"
 
-template <typename TriaType>
+template <int dim, int spacedim>
 std::string
-get_all_ref_cell_types_from_cells(const TriaType    &tria,
+get_all_ref_cell_types_from_cells(const Triangulation<dim, spacedim> &tria,
                                   const std::string &pre_post)
 {
   std::ostringstream oss;
@@ -46,9 +46,9 @@ get_all_ref_cell_types_from_cells(const TriaType    &tria,
   return oss.str();
 }
 
-template <typename TriaType>
+template <int dim, int spacedim>
 std::string
-get_ref_cells_in_tria(const TriaType &tria, const std::string &pre_post)
+get_ref_cells_in_tria(const Triangulation<dim, spacedim> &tria, const std::string &pre_post)
 {
   std::ostringstream oss;
   oss << "Ref-Cells " << std::setw(4) << std::left << pre_post
