@@ -1,0 +1,14 @@
+
+DEAL::Particles (IDs) in parent cell at level 1 (CellId: 0_1:0): 
+DEAL::
+DEAL::Particles (IDs) in parent cell at level 1 (CellId: 0_1:1): 
+DEAL::2 0 
+DEAL::Particles (IDs) in parent cell at level 1 (CellId: 0_1:2): 
+DEAL::9 4 6 5 3 
+DEAL::Particles (IDs) in parent cell at level 1 (CellId: 0_1:3): 
+DEAL::8 1 7 
+DEAL::Cells and Particles on Level 1: 
+DEAL::CellId: 0_1:0, Particles (IDs): 
+DEAL::CellId: 0_1:1, Particles (IDs): 2 0 
+DEAL::CellId: 0_1:2, Particles (IDs): 9 4 6 5 3 
+DEAL::CellId: 0_1:3, Particles (IDs): 8 1 7 
