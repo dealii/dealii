@@ -1,13 +1,14 @@
-//-----------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-//    Copyright (C) 2023 by the deal.II authors
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2023 by the deal.II authors
 //
-//    This file is subject to LGPL and may not be distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// This file is part of the deal.II library.
 //
-//-----------------------------------------------------------
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
 
 // Test map_boundary_to_bulk_dof_iterators
 
