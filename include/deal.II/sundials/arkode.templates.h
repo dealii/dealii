@@ -217,7 +217,7 @@ namespace SUNDIALS
     );
 
     // Accumulate the total number of steps taken by the solver
-    int n_steps_total = 0;
+    int n_total_steps = 0;
 
     // Get current number of steps
     auto get_last_num_steps = [](const auto &stepper) {
@@ -280,7 +280,7 @@ namespace SUNDIALS
         // time:
         while (solver_should_restart(time.get_current_time(), solution))
           {
-            n_steps_total += get_last_num_steps(stepper);
+            n_total_steps += get_last_num_steps(stepper);
 
             reset(time.get_current_time(),
                   time.get_previous_step_size(),
@@ -294,9 +294,9 @@ namespace SUNDIALS
       }
     last_end_time = time.get_current_time();
 
-    n_steps_total += get_last_num_steps(stepper);
+    n_total_steps += get_last_num_steps(stepper);
 
-    return n_steps_total;
+    return n_total_steps;
   }
 
 
