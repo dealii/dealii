@@ -21,6 +21,17 @@ GetOptions("prefix:s" => \$prefix);
 if ($ARGV[0] =~ /step-\d+[a-z]?.cc/)
 {
   $_ = <>;
+
+  # The license header is a "//" comment block enclosed by two lines of
+  # dashes:
+  if (m!^// -+$!) {
+      do {
+          $_ = <>;
+      } until (!defined($_) || m!^// -+$!);
+      $_ = <>;
+  }
+
+  # It may be followed by a "/* ... */" comment listing the authors:
   while ( m!^/\*!  ||  m!\s*\*! || m/^$/ ) {
       $_ = <>;
   }
