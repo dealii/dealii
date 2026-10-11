@@ -1,0 +1,7 @@
+New: The new class SolutionSerialization allows to serialize/deserialize
+vectors similarily to as how SolutionTransfer it does. The output is 
+significantly smaller since the data is not stored in a DG format, however,
+meshes during deserialization need to be partitioned the same way as during
+serialization.
+<br>
+(Peter Munch, Vladimir Ivannikov, 2022/09/13)
