@@ -529,6 +529,66 @@ namespace DoFTools
                         SparsityPatternBase             &sparsity);
 
   /**
+   * Compute which entries of a matrix built on the given @p dof_row and @p dof_col may
+   * possibly be nonzero, and create a sparsity pattern object that represents
+   * these nonzero locations. This function is a variation of the
+   * make_sparsity_pattern() functions above, that allows the
+   * bilinear form you want to use to generate the matrix to have different
+   * trial and test spaces. The main application for such a function is to
+   * generate a block of a block sparsity pattern. To avoid confusion with the
+   * make_sparsity_pattern() function with a similar signature we therefore call
+   * it after its main application.
+   *
+   * @param[in] dof_row The DoFHandler object that describes which
+   * degrees of freedom are associated to the test space.
+   *
+   * @param[in] dof_col The DoFHandler object that describes which
+   * degrees of freedom are associated to the trial space.
+   *
+   * @param[out] sparsity_pattern The sparsity pattern to be filled with
+   * entries.
+   *
+   * @param[in] constraints_row The constraints on the rows.
+   *
+   * @param[in] constraints_col The constraints on the columns.
+   *
+   * @param[in] keep_constrained_dofs Same meaning as in the
+   * make_sparsity_pattern() functions.
+   *
+   * @param[in] subdomain_id Same meaning as in the make_sparsity_pattern()
+   * functions.
+   *
+   * @note The actual type of the sparsity pattern may be SparsityPattern,
+   * DynamicSparsityPattern or any other class that satisfies similar
+   * requirements. Sparsity patterns of type BlockSparsityPattern and similar
+   * types are not targeted by this function. It is assumed that the size of
+   * the sparsity pattern matches the number of degrees of freedom and that
+   * enough unused nonzero entries are left to fill the sparsity pattern if the
+   * sparsity pattern is of "static" kind (see
+   * @ref Sparsity
+   * for more information on what this means). The nonzero entries generated
+   * by this function are added to possible previous content of the object,
+   * i.e., previously added entries are not removed.
+   *
+   * @note If the sparsity pattern is represented by an object of type
+   * SparsityPattern (as opposed to, for example, DynamicSparsityPattern), you
+   * need to remember using SparsityPattern::compress() after generating the
+   * pattern.
+   *
+   * @ingroup constraints
+   */
+  template <int dim, int spacedim, typename number = double>
+  void
+  make_block_sparsity_pattern_block(
+    const DoFHandler<dim, spacedim> &dof_row,
+    const DoFHandler<dim, spacedim> &dof_col,
+    SparsityPatternBase             &sparsity_pattern,
+    const AffineConstraints<number> &constraints_row,
+    const AffineConstraints<number> &constraints_col,
+    const bool                       keep_constrained_dofs = true,
+    const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
+
+  /**
    * Compute which entries of a matrix built on the given @p dof_handler may
    * possibly be nonzero, and create a sparsity pattern object that represents
    * these nonzero locations. This function is a variation of the
