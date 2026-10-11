@@ -22,6 +22,7 @@ set(_separate_src
   dof_accessor.cc
   dof_accessor_get.cc
   dof_accessor_set.cc
+  agglomeration_handler.cc
   dof_handler_policy.cc
   dof_renumbering.cc
   dof_tools.cc
@@ -39,6 +40,7 @@ setup_source_list("${_unity_include_src}"
   )
 
 set(_inst
+  agglomeration_handler.inst.in
   block_info.inst.in
   dof_accessor_get.inst.in
   dof_accessor.inst.in
