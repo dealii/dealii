@@ -89,7 +89,6 @@ namespace Portable
       const unsigned int               dofs_per_cell;
       const unsigned int               q_points_per_cell;
       const UpdateFlags               &update_flags;
-      const unsigned int               padding_length;
       const double                     jacobian_size;
       dealii::internal::MatrixFreeFunctions::HangingNodes<dim> hanging_nodes;
     };
@@ -194,7 +193,6 @@ namespace Portable
       , dofs_per_cell(data->dof_handler_data[dof_handler_index].dofs_per_cell)
       , q_points_per_cell(data->q_points_per_cell)
       , update_flags(update_flags)
-      , padding_length(data->get_padding_length())
       , jacobian_size(get_jacobian_size(dof_handler.get_triangulation()))
       , hanging_nodes(dof_handler.get_triangulation())
     {
@@ -681,7 +679,8 @@ namespace Portable
                                 Functor::n_q_points,
                                 precomputed_data[d]);
 
-        const int cell_index = team_member.league_rank();
+        const int cell_index =
+          precomputed_data[0].first_cell + team_member.league_rank();
 
         typename MatrixFree<dim, Number>::Data data{team_member,
                                                     Functor::n_q_points,
@@ -710,7 +709,6 @@ namespace Portable
   MatrixFree<dim, Number>::MatrixFree()
     : my_id(-1)
     , mg_level(numbers::invalid_unsigned_int)
-    , padding_length(0)
   {}
 
 
@@ -875,8 +873,7 @@ namespace Portable
     data_copy.constraint_weights = data.constraint_weights;
     data_copy.n_cells            = n_cells[color];
     data_copy.n_components       = data.n_components;
-    data_copy.padding_length     = padding_length;
-    data_copy.row_start          = row_start[color];
+    data_copy.first_cell         = first_cell[color];
     data_copy.use_coloring       = use_coloring;
     data_copy.element_type       = data.element_type;
     data_copy.scratch_pad_size   = data.scratch_pad_size;
@@ -1033,15 +1030,6 @@ namespace Portable
 
 
   template <int dim, typename Number>
-  unsigned int
-  MatrixFree<dim, Number>::get_padding_length() const
-  {
-    return padding_length;
-  }
-
-
-
-  template <int dim, typename Number>
   template <typename Functor, typename VectorType>
   void
   MatrixFree<dim, Number>::cell_loop(const Functor    &func,
@@ -1090,7 +1078,8 @@ namespace Portable
               Kokkos::parallel_for(
                 Kokkos::TeamVectorRange(team_member, n_q_points),
                 [&](const int q_point) {
-                  const int cell_index = team_member.league_rank();
+                  const int cell_index =
+                    colored_data[0].first_cell + team_member.league_rank();
 
                   Kokkos::Array<SharedData<dim, Number>, n_max_dof_handlers>
                     shared_data;
@@ -1122,7 +1111,7 @@ namespace Portable
     };
 
     std::size_t bytes = sizeof(*this) +
-                        MemoryConsumption::memory_consumption(row_start) +
+                        MemoryConsumption::memory_consumption(first_cell) +
                         MemoryConsumption::memory_consumption(graph) +
                         MemoryConsumption::memory_consumption(level_graph);
 
@@ -1241,10 +1230,6 @@ namespace Portable
     this->mg_level = additional_data.mg_level;
 
     const unsigned int n_q_points_1d = quad.size();
-    // Set padding length to the closest power of two larger than or equal to
-    // the number of threads.
-    padding_length    = 1 << static_cast<unsigned int>(std::ceil(
-                       dim * std::log2(static_cast<float>(n_q_points_1d))));
     q_points_per_cell = Utilities::fixed_power<dim>(n_q_points_1d);
 
 
@@ -1415,15 +1400,14 @@ namespace Portable
     }
 
 
-    { // Setup row starts
+    { // Setup the global index of the first cell of each color
 
-      row_start.resize(n_colors);
+      first_cell.resize(n_colors);
 
       if (n_colors > 0)
-        row_start[0] = 0;
+        first_cell[0] = 0;
       for (unsigned int color = 1; color < n_colors; ++color)
-        row_start[color] =
-          row_start[color - 1] + n_cells[color - 1] * get_padding_length();
+        first_cell[color] = first_cell[color - 1] + n_cells[color - 1];
     }
 
 

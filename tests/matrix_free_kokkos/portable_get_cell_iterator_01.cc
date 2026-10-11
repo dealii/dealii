@@ -36,10 +36,9 @@
 template <int dim>
 struct CellCenterKernel
 {
-  // Store computed centers: centers_out[color * max_cells_per_color * dim +
-  // cell_id * dim + d]
+  // Store computed centers: centers_out[cell_index * dim + d], indexed by
+  // the global cell index
   Kokkos::View<double *, MemorySpace::Default::kokkos_space> centers_out;
-  unsigned int max_cells_per_color;
 
   static constexpr unsigned int n_q_points = (1u << dim);
 
@@ -48,9 +47,7 @@ struct CellCenterKernel
              const Portable::DeviceVector<double> &,
              Portable::DeviceVector<double> &) const
   {
-    const unsigned int cell_id = data->cell_index;
-    const unsigned int color   = data->precomputed_data[0].row_start /
-                               data->precomputed_data[0].padding_length;
+    const unsigned int cell_index = data->cell_index;
 
     Point<dim, double> cell_center;
     for (unsigned int d = 0; d < dim; ++d)
@@ -60,7 +57,7 @@ struct CellCenterKernel
     for (unsigned int q = 0; q < n_q_points; ++q)
       {
         const Point<dim, double> &q_point =
-          data->get_quadrature_point(cell_id, q);
+          data->get_quadrature_point(cell_index, q);
         for (unsigned int d = 0; d < dim; ++d)
           cell_center[d] += q_point[d];
       }
@@ -69,8 +66,7 @@ struct CellCenterKernel
       cell_center[d] /= n_q_points;
 
     // Store in output array
-    const unsigned int base_idx =
-      color * max_cells_per_color * dim + cell_id * dim;
+    const unsigned int base_idx = cell_index * dim;
     for (unsigned int d = 0; d < dim; ++d)
       centers_out[base_idx + d] = cell_center[d];
   }
@@ -113,17 +109,16 @@ test(const unsigned int level = numbers::invalid_unsigned_int)
 
   deallog << "Number of colors: " << n_colors << std::endl;
 
-  // Find maximum cells per color for array allocation
-  unsigned int max_cells_per_color = 0;
+  // Count the total number of cells over all colors for array allocation
+  unsigned int n_total_cells = 0;
   for (unsigned int color = 0; color < n_colors; ++color)
-    max_cells_per_color =
-      std::max(max_cells_per_color, mf_data.n_cells_per_color(color));
+    n_total_cells += mf_data.n_cells_per_color(color);
 
   // Allocate device array to store GPU-computed centers
-  // Layout: centers[color * max_cells_per_color * dim + cell_id * dim + d]
+  // Layout: centers[global_cell_index * dim + d]
   using double_view =
     Kokkos::View<double *, MemorySpace::Default::kokkos_space>;
-  double_view centers_gpu("centers_gpu", n_colors * max_cells_per_color * dim);
+  double_view centers_gpu("centers_gpu", n_total_cells * dim);
 
   // Run kernel to compute centers on GPU
   using device_vector_type =
@@ -132,7 +127,7 @@ test(const unsigned int level = numbers::invalid_unsigned_int)
   mf_data.initialize_dof_vector(src);
   mf_data.initialize_dof_vector(dst);
 
-  CellCenterKernel<dim> kernel{centers_gpu, max_cells_per_color};
+  CellCenterKernel<dim> kernel{centers_gpu};
   mf_data.cell_loop(kernel, src, dst);
 
   // Copy GPU results to host
@@ -143,6 +138,7 @@ test(const unsigned int level = numbers::invalid_unsigned_int)
   unsigned int n_matches    = 0;
   unsigned int n_mismatches = 0;
 
+  unsigned int first_cell = 0;
   for (unsigned int color = 0; color < n_colors; ++color)
     {
       const unsigned int n_cells = mf_data.n_cells_per_color(color);
@@ -155,9 +151,8 @@ test(const unsigned int level = numbers::invalid_unsigned_int)
           auto               cell = mf_data.get_cell_iterator(color, cell_id);
           Point<dim, double> center_host = cell->center();
 
-          // Get GPU-computed center
-          const unsigned int base_idx =
-            color * max_cells_per_color * dim + cell_id * dim;
+          // Get GPU-computed center, stored at the global cell index
+          const unsigned int base_idx = (first_cell + cell_id) * dim;
           Point<dim, double> center_gpu;
           for (unsigned int d = 0; d < dim; ++d)
             center_gpu[d] = centers_gpu_host[base_idx + d];
@@ -167,6 +162,8 @@ test(const unsigned int level = numbers::invalid_unsigned_int)
           else
             ++n_mismatches;
         }
+
+      first_cell += n_cells;
     }
 
   deallog << "Total cells: " << tria.n_active_cells() << std::endl;

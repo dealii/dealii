@@ -383,7 +383,7 @@ namespace Portable
   FEEvaluation<dim, fe_degree, n_q_points_1d, n_components_, Number>::
     get_current_cell_index()
   {
-    return cell_id;
+    return precomputed_data->first_cell + cell_id;
   }
 
 
