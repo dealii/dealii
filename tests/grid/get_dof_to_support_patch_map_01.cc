@@ -1,5 +1,3 @@
-
-
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
@@ -11,7 +9,6 @@
 // can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
-
 
 // Test GridTools::map_dof_to_support_patch () using a quadratic FE_Q<dim>
 // space.  We output the barycenter of each cell in the patch around the dof

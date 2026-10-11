@@ -1,4 +1,3 @@
-
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
@@ -10,8 +9,6 @@
 // can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
-
-
 
 // Check SparsityPattern::copy_from(FullMatrix). The peer review of
 // the original patch uncovered a case where we would segfault with

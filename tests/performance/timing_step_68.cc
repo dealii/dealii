@@ -1,15 +1,16 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2023 - 2025 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2023 - 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
 
+/*
  * This test is based on a modified version of step-68. Modifications were
  * made to ensure that particles were more evenly distributed
  * between the cells to ensure that the computational load could be
@@ -19,7 +20,6 @@
  * the displacement of particles and their localizaton within subdomains
  * and cells.
  */
-
 
 #include <deal.II/base/bounding_box.h>
 #include <deal.II/base/conditional_ostream.h>

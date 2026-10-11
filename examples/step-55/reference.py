@@ -1,3 +1,15 @@
+## -----------------------------------------------------------------------------
+##
+## SPDX-License-Identifier: LGPL-2.1-or-later
+## Copyright (C) 2016 - 2025 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## Detailed license information governing the source code and contributions
+## can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+##
+## -----------------------------------------------------------------------------
+
 from sympy import *
 from sympy.printing import print_ccode
 from sympy.physics.vector import ReferenceFrame, gradient, divergence

@@ -1,4 +1,4 @@
-//------------------  interpolate_functions_common.h  ------------------------
+// -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
 // Copyright (C) 2018 - 2023 by the deal.II authors
@@ -8,8 +8,7 @@
 // Detailed license information governing the source code and contributions
 // can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
-//------------------  interpolate_functions_common.h  ------------------------
-
+// -----------------------------------------------------------------------------
 
 // this is a template for getting the function values and comparing them with
 // an analytical function for different meshes

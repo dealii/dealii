@@ -1,3 +1,4 @@
+// -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
 // Copyright (C) 2015 - 2018 by the deal.II authors

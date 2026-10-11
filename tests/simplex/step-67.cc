@@ -1,15 +1,16 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2020 - 2024 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
- *
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2020 - 2024 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+/*
  * step-67 on a simplex mesh (only testcase = 0 is tested). The major
  * modifications are:
  * - Since MatrixFreeOperators::CellwiseInverseMassMatrix cannot be used, the
@@ -22,11 +23,7 @@
  * - The function GridGenerator::hyper_rectangle() is only working for hypercube
  * meshes. Use it to create a temporary mesh and then convert it to a simplex
  * mesh.
- *
- *
  */
-
-
 
 // #define HEX
 
