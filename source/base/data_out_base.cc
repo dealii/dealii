@@ -436,7 +436,6 @@ namespace DataOutBase
       for (const auto &patch : patches)
         {
           const unsigned int n_subdivisions = patch.n_subdivisions;
-          (void)n_subdivisions;
 
           Assert((patch.data.n_rows() == n_data_sets &&
                   !patch.points_are_available) ||
@@ -1780,13 +1779,11 @@ namespace
 
   template <int dim>
   void
-  VtkStream::write_cell_single(const unsigned int        index,
+  VtkStream::write_cell_single(const unsigned int /*index*/,
                                const unsigned int        start,
                                const unsigned int        n_points,
                                const ReferenceCell<dim> &reference_cell)
   {
-    (void)index;
-
     static const std::array<unsigned int, 5> table = {{0, 1, 3, 2, 4}};
 
     stream << '\t' << n_points;
@@ -4046,12 +4043,10 @@ namespace DataOutBase
       if (patches.empty())
         return;
 #endif
-      constexpr int dim = 2;
-      (void)dim;
+      constexpr int dim      = 2;
       constexpr int spacedim = 2;
 
       const unsigned int n_data_sets = data_names.size();
-      (void)n_data_sets;
 
       // write preamble
       {
@@ -5332,7 +5327,6 @@ namespace DataOutBase
     // trust the user that whatever they provide makes sense somehow.
     for (const auto &unit : flags.physical_units)
       {
-        (void)unit;
         Assert(
           unit.second.find('\"') == std::string::npos,
           ExcMessage(
@@ -6171,7 +6165,6 @@ namespace DataOutBase
     // trust the user that whatever they provide makes sense somehow.
     for (const auto &unit : flags.physical_units)
       {
-        (void)unit;
         Assert(
           unit.second.find('\"') == std::string::npos,
           ExcMessage(
@@ -8853,7 +8846,6 @@ DataOutBase::write_hdf5_parallel(
 #else
 
   const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
-  (void)n_ranks;
 
   // If HDF5 is not parallel and we're using multiple processes, abort:
 #  ifndef H5_HAVE_PARALLEL

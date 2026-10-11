@@ -38,7 +38,6 @@ namespace Functions
                        const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       return point.distance(center) - radius;
     }
@@ -51,7 +50,6 @@ namespace Functions
                           const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       const Tensor<1, dim> center_to_point = point - center;
       const Tensor<1, dim> grad = center_to_point / center_to_point.norm();
@@ -66,7 +64,6 @@ namespace Functions
                          const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       const Tensor<1, dim> center_to_point = point - center;
       const double         distance        = center_to_point.norm();
@@ -97,7 +94,6 @@ namespace Functions
                       const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       return normal * (point - point_in_plane);
     }
@@ -109,7 +105,6 @@ namespace Functions
     Plane<dim>::gradient(const Point<dim> &, const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       return normal;
     }
@@ -121,7 +116,6 @@ namespace Functions
     Plane<dim>::hessian(const Point<dim> &, const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       return SymmetricTensor<2, dim>();
     }
@@ -150,7 +144,6 @@ namespace Functions
                           const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       if (dim == 1)
         return point.distance(center) - radii[0];
@@ -170,7 +163,6 @@ namespace Functions
                              const unsigned int component) const
     {
       AssertIndexRange(component, this->n_components);
-      (void)component;
 
       Tensor<1, dim> grad;
       if (dim == 1)
@@ -353,7 +345,6 @@ namespace Functions
                           const unsigned int component) const
     {
       AssertDimension(component, 0);
-      (void)component;
 
       return bounding_box.signed_distance(p);
     }
@@ -404,7 +395,6 @@ namespace Functions
     ZalesakDisk<dim>::value(const Point<dim>  &p,
                             const unsigned int component) const
     {
-      (void)component;
       AssertDimension(component, 0);
 
       // calculate the set difference between the level set functions of the
