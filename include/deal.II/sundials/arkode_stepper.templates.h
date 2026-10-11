@@ -1127,10 +1127,26 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
-  SplittingStepper<VectorType>::reinit(double                      t0,
-                                       const VectorType           &y0,
-                                       internal::InvocationContext inv_ctx)
+  SplittingStepper<VectorType>::attach(
+    std::exception_ptr               &pending_exception,
+    const internal::SharedSUNContext &context)
   {
+    ARKodeStepper<VectorType>::attach(pending_exception, context);
+
+    for (const auto &sub : sub_steppers)
+      {
+        Assert(sub != nullptr, ExcInternalError());
+        sub->attach(pending_exception, context);
+      }
+  }
+
+
+  template <typename VectorType>
+  void
+  SplittingStepper<VectorType>::reinit(double t0, const VectorType &y0)
+  {
+    const auto inv_ctx = this->invocation_context();
+
     arkode_mem.reset();
     sun_steppers.clear();
 
@@ -1138,7 +1154,7 @@ namespace SUNDIALS
     for (const auto &sub : sub_steppers)
       {
         Assert(sub != nullptr, ExcInternalError());
-        sub->reinit(t0, y0, inv_ctx);
+        sub->reinit(t0, y0);
       }
 
     // Wrap each sub-stepper's ARKODE memory block in a SUNStepper object.
@@ -1196,6 +1212,32 @@ namespace SUNDIALS
 
     if (custom_setup)
       custom_setup(arkode_mem.get());
+  }
+
+
+  template <typename VectorType>
+  void
+  SplittingStepper<VectorType>::resize(double            t0,
+                                       const VectorType &y0,
+                                       double            hscale)
+  {
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    // The sub-steppers are reset to the outer state at every step, so their
+    // size has to match before the outer stepper is used again.
+    for (const auto &sub : sub_steppers)
+      {
+        Assert(sub != nullptr, ExcInternalError());
+        sub->resize(t0, y0, hscale);
+      }
+
+    const auto y0_nvector =
+      internal::make_nvector_view(y0, this->invocation_context().arkode_ctx);
+
+    const int status =
+      ARKodeResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+    (void)status;
+    AssertARKode(status);
   }
 
 

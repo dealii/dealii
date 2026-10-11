@@ -100,8 +100,8 @@ namespace SUNDIALS
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 2, 0)
     /**
-     * Make SplittingStepper a friend so that it can call reinit() on its
-     * sub-steppers.
+     * Make SplittingStepper a friend so that it can call attach(), reinit() and
+     * resize() on its sub-steppers.
      */
     friend class SplittingStepper<VectorType>;
 #  endif
@@ -140,7 +140,7 @@ namespace SUNDIALS
      *
      * @note A stepper can be attached to a single ARKode object only.
      */
-    void
+    virtual void
     attach(std::exception_ptr &pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
            ,
@@ -2127,10 +2127,39 @@ namespace SUNDIALS
     using SUNStepperPtr =
       std::unique_ptr<std::remove_pointer_t<SUNStepper>, void (*)(SUNStepper)>;
 
+    /**
+     * Attach this stepper and all of its sub-steppers to the ARKode object
+     * that drives them, so that they all share its SUNContext. Required by the
+     * ARKodeStepper interface.
+     */
     void
-    reinit(double                      t0,
-           const VectorType           &y0,
-           internal::InvocationContext inv_ctx) override;
+    attach(std::exception_ptr               &pending_exception,
+           const internal::SharedSUNContext &context) override;
+
+    /**
+     * Rebuild the sub-steppers and the SplittingStep ARKODE memory. Required
+     * by the ARKodeStepper interface.
+     *
+     * @param t0 Time instance that serves as starting time
+     * @param y0 Initial state vector whose layout is used for initialization of
+     *   the internal ARKODE vectors
+     */
+    void
+    reinit(double t0, const VectorType &y0) override;
+
+    /**
+     * Resize the sub-steppers and then the SplittingStep ARKODE memory in
+     * place via `ARKodeResize()`. The SUNStepper wrappers only refer to the
+     * ARKODE memory of the sub-steppers and stay valid. The outer step size is
+     * fixed, so @p hscale only affects the sub-steppers.
+     *
+     * @param t0 Current time
+     * @param y0 Current state vector with the new size
+     * @param hscale Factor by which the upcoming step size is rescaled; values
+     *   less or equal to zero are treated as one
+     */
+    void
+    resize(double t0, const VectorType &y0, double hscale) override;
 
     /**
      * Shared pointers to the sub-steppers, one per partition.
