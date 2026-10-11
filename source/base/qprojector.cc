@@ -311,7 +311,6 @@ QProjector<dim>::project_to_child(const ReferenceCell<dim> &reference_cell,
 {
   Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
-  (void)reference_cell;
 
   AssertIndexRange(child_no, GeometryInfo<dim>::max_children_per_cell);
 
@@ -343,7 +342,6 @@ QProjector<dim>::project_to_all_children(
 {
   Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
-  (void)reference_cell;
 
   const unsigned int n_points   = quadrature.size(),
                      n_children = GeometryInfo<dim>::max_children_per_cell;
@@ -377,7 +375,6 @@ QProjector<dim>::project_to_line(const ReferenceCell<dim> &reference_cell,
 {
   Assert(reference_cell == ReferenceCells::get_hypercube<dim>(),
          ExcNotImplemented());
-  (void)reference_cell;
 
   const unsigned int      n = quadrature.size();
   std::vector<Point<dim>> points(n);
