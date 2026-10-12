@@ -16,18 +16,36 @@
 # easy substitutions that are confined to a single line; later
 # do some multi-line substitutions as well
 
+$in_code_block = 0;
+
 while (<>)
 {
+    ########################################################
+    # Step 0: are we in a code block?
+    ########################################################
+
+    # Some substitutions may be skipped inside code blocks
+    # e.g. $ ... $ to math
+
+    $in_code_block = 1 if /\s*\@code\b/;
+    if ($in_code_block)
+    {
+        $in_code_block = 0 if /\s*\@endcode\b/;
+    }
+
     ########################################################
     # Step 1: substitutions within a single line
     ########################################################
 
-
-    # Make sure we can just write $...$ for formulas, except if
-    # the dollar sign was escaped with a backslash (use negative
+    # Make sure we can just write $...$ for formulas, except if:
+    # 1. the dollar sign was escaped with a backslash (use negative
     # look-behind to detect that case, using (?<!\\) to make sure
-    # the preceding character -- if there is any -- is not a backslash):
-    s#(?<!\\)\$#\@f\$#g;
+    # the preceding character -- if there is any -- is not a backslash)
+    # 2. we are in a code block
+    unless ($in_code_block)
+    {
+        s#(?<!\\)\$#\@f\$#g;
+    }
 
     # We don't let doxygen put everything into a namespace
     # dealii. consequently, doxygen can't link references that contain an
