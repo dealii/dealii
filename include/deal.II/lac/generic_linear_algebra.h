@@ -154,6 +154,11 @@ namespace LinearAlgebraPETSc
      */
     using PreconditionSSOR = PETScWrappers::PreconditionSSOR;
 
+    /**
+     * Typedef for the ASM preconditioner from PCASM.
+     */
+    using PreconditionASM = PETScWrappers::PreconditionASM;
+
   } // namespace MPI
 
 } // namespace LinearAlgebraPETSc
