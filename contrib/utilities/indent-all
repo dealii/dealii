@@ -21,7 +21,8 @@
 # endings.
 #
 # Before that, the script checks that the authors of all commits in the
-# history have a proper name and email address.
+# history have a proper name and email address. Finally, it checks that all
+# source files, CMake files and scripts start with our license header.
 #
 # The script needs to be executed as
 #   ./contrib/utilities/indent-all
@@ -112,3 +113,17 @@ process "tests include source examples cmake/scripts contrib/python-bindings doc
 process "doc/news/*/*" "doc/news/.*/.*/[0-9].*" ensure_single_trailing_newline
 
 process "tests include source examples contrib" ".*\.py" ensure_single_trailing_newline
+
+#
+# Check license headers:
+#
+
+setup_license_header_exceptions || exit 1
+
+process "CMakeLists.txt CTestConfig.cmake cmake contrib doc examples include module source tests" \
+  "(.*\.(h|cc|ccm|cu|cuh|inst\.in|cmake|py|sh|pl)|(.*/)?CMakeLists\.txt)" check_license_header
+
+if [ $? -ne 0 ]; then
+  print_license_header_template
+  exit 4
+fi
