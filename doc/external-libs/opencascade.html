@@ -5,7 +5,7 @@
   <head>
     <title>The deal.II Readme on interfacing to OpenCASCADE</title>
     <link href="../screen.css" rel="StyleSheet">
-    <meta name="copyright" content="Copyright (C) 2010 - 2023 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2010 - 2026 by the deal.II authors">
     <meta name="keywords" content="deal.II">
   </head>
   <body>
@@ -13,39 +13,70 @@
 
     <h2>Installation of <acronym>OpenCASCADE</acronym></h2>
 
-    <p> <a href="https://www.opencascade.org/">OpenCASCADE</a> is a
-      software development kit (SDK) intended for development of
+    <p>
+      <a href="https://occt3d.com/open-cascade-technology/">OpenCASCADE</a>
+      is a software development kit (SDK) intended for development of
       applications dealing with 3D CAD data, freely available in open
       source. It includes a set of C++ class libraries providing
       services for 3D surface and solid modeling, visualization, data
-      exchange and rapid application development.</p>
-
-    <p> Below is a short summary of instructions on how to compile and
-      install <acronym>OpenCASCADE</acronym> community edition by hand
-      (for the case you wish to do so).  </p>
-
-    <h3>How to compile and install <acronym>OpenCASCADE</acronym>
-     </h3>
+      exchange and rapid application development.
+    </p>
 
     <p>
-Get a clone of the OCE repository:
-<pre>
-git clone git://github.com/tpaviot/oce.git
-</pre>
+      Below is a short summary of instructions on how to compile and
+      install the official <acronym>OpenCASCADE</acronym> releases by hand.
+      Alternatively, <acronym>deal.II</acronym> can be configured with
+      <acronym>OpenCASCADE</acronym> packages available in standard Linux
+      repositories.
+    </p>
 
-It is a good practice to build in a separate directory:
-<pre>
-mkdir build
-cd build
-cmake -D OCE_INSTALL_PREFIX=/path/to/where/you/want/oce \
-      -D OCE_TESTING=OFF \
-      -D OCE_VISUALISATION=OFF \
-      -D OCE_DISABLE_X11=ON \
-      ..
-make install
-</pre>
+    <h3>How to compile and install <acronym>OpenCASCADE</acronym></h3>
 
-This will turn off some packages we don't need. The default package options also work, though.
+    <p>
+      You can download the official releases from the <a href=
+      "https://github.com/Open-Cascade-SAS/OCCT/releases">Open CASCADE
+      Technology (OCCT) repository</a>. deal.II is compatible with
+      <acronym>OpenCASCADE</acronym> starting with version 7.0.0.
+    </p>
+
+    <p>
+      Of all seven core modules in <acronym>OpenCASCADE</acronym>, only
+      four are required for <acronym>deal.II</acronym>. When compiling
+      from scratch, it is recommended to disable the optional ones as
+      indicated below.
+    </p>
+
+    <p>
+      It is a good practice to build in a separate directory after
+      unpacking the source code. (Here, OCCT-x.y.z is the version-specific
+      path into which the OCCT .tar.gz will extract):
+      <pre>
+
+    cd OCCT-x.y.z
+    mkdir build
+    cd build
+    cmake -D CMAKE_INSTALL_PREFIX=/path/to/where/you/want/opencascade \
+          -D CMAKE_BUILD_TYPE=Release              \
+          -D BUILD_MODULE_DataExchange=ON          \
+          -D BUILD_MODULE_FoundationClasses=ON     \
+          -D BUILD_MODULE_ModelingAlgorithms=ON    \
+          -D BUILD_MODULE_ModelingData=ON          \
+          -D BUILD_MODULE_ApplicationFramework=OFF \
+          -D BUILD_MODULE_Draw=OFF                 \
+          -D BUILD_MODULE_Visualization=OFF        \
+          ..
+    make install
+      </pre>
+      During configuration, third party dependencies that are available
+      on your system will be autodetected and enabled.
+    </p>
+
+    <p>
+      For a full list of CMake configuration options, please consult the
+      <a href="https://occt3d.com/dev/doc/overview/html/build_upgrade__building_occt.html#build_cmake_conf">
+      OCCT building instructions</a>.
+    </p>
+
 
     <h2>Interfacing <acronym>deal.II</acronym>
       to <acronym>OpenCASCADE</acronym></h2>
@@ -57,19 +88,20 @@ This will turn off some packages we don't need. The default package options also
       To use a self compiled version, specify
       <pre>
 
-    -DOPENCASCADE_DIR=/path/to/opencascade/or/oce
+    -DOPENCASCADE_DIR=/path/to/opencascade
       </pre>
       when invoking <code>cmake</code>. Alternatively, you can also set an environment
       variable <code>OPENCASCADE_DIR</code> (valid alternatives are
-      also <code>OCC_DIR</code> and <code>OCE_DIR</code>) and cmake
+      also <code>OCC_DIR</code> and <code>CASROOT</code>) and cmake
       will pick up this path.
     </p>
+
     <p>
-      You can override the autodetection by manually setting
+      You can override the autodetection by manually setting:
       <pre>
 
     -DDEAL_II_WITH_OPENCASCADE=OFF|ON
-      </pre>.
+      </pre>
     </p>
 
     <hr />

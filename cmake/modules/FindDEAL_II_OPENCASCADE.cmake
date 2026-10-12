@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2014 - 2024 by the deal.II authors
+## Copyright (C) 2014 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -12,10 +12,7 @@
 
 
 #
-# Try to find the OpenCASCADE (OCC) library. This scripts supports the
-# OpenCASCADE Community Edition (OCE) library, which is a cmake based
-# OCC library. You might try the original OpenCASCADE library, but your
-# mileage may vary.
+# Try to find the OpenCASCADE (OCC) library.
 #
 # This module exports:
 #
@@ -32,13 +29,12 @@
 set(OPENCASCADE_DIR "" CACHE PATH "An optional hint to a OpenCASCADE installation")
 set_if_empty(OPENCASCADE_DIR "$ENV{OPENCASCADE_DIR}")
 set_if_empty(OPENCASCADE_DIR "$ENV{OCC_DIR}")
-set_if_empty(OPENCASCADE_DIR "$ENV{OCE_DIR}")
 set_if_empty(OPENCASCADE_DIR "$ENV{CASROOT}")
 
 
 deal_ii_find_path(OPENCASCADE_INCLUDE_DIR Standard_Version.hxx
   HINTS ${OPENCASCADE_DIR}
-  PATH_SUFFIXES include include/oce include/opencascade inc
+  PATH_SUFFIXES include include/opencascade inc
   )
 
 if(EXISTS ${OPENCASCADE_INCLUDE_DIR}/Standard_Version.hxx)
