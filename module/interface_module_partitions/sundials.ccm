@@ -80,10 +80,13 @@ export
   using ::ARKLsPrecSetupFn;
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
   using ::ARKodeFree;
+  using ::ARKodeSetFixedStep;
   using ::ARKodeSetOrder;
   using ::ARKodeSetUserData;
 #  else
+  using ::ARKStepSetFixedStep;
   using ::ARKStepSetOrder;
+  using ::ERKStepSetFixedStep;
   using ::ERKStepSetOrder;
 #  endif
   using ::ARKRhsFn;
