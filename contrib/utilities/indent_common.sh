@@ -259,7 +259,7 @@ export -f format_file
 #
 format_python_file()
 {
-  if which black > /dev/null ; then
+  if which black > /dev/null 2>&1 ; then
     file="${1}"
     if test "$file" = "contrib/utilities/dotgdbinit.py" ; then
       return ;
