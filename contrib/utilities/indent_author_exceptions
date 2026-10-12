@@ -1,0 +1,50 @@
+## -----------------------------------------------------------------------------
+##
+## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+## Copyright (C) 2026 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## Detailed license information governing the source code and contributions
+## can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+##
+## -----------------------------------------------------------------------------
+
+#
+# Commit authors that are exempt from the checks of commit author names and
+# email addresses in contrib/utilities/indent_common.sh.
+#
+# Each line is a POSIX extended regular expression that has to match
+# "Name <email>" as reported by git log --format="%aN <%aE>" (as a whole).
+# Characters with a special meaning in regular expressions (in particular
+# ".", "+", "[" and "]") have to be escaped with a backslash.
+#
+# Before adding an entry here, please try to fix the author by adding an
+# entry to .mailmap in the root directory.
+#
+
+# Commits from the time of the subversion repository:
+.* <.*@0785d39b-7218-0410-832d-ea1e28bc413d>
+
+# Bots:
+dependabot\[bot\] <.*>
+
+# Authors with a single name, for which we do not know the full name:
+AlexanderBlank <alexanderblank@hotmail\.com>
+Ariel <ibarr041@umn\.edu>
+bartniday <29292740\+bartniday@users\.noreply\.github\.com>
+inkstink <kvanvel@yahoo\.com>
+kbzowski <bzowski\.k@gmail\.com>
+Lisa <lisa@nat-172-18-66-156\.tamulink\.tamu\.edu>
+mrak1990 <gmrak1990@gmail\.com>
+Nitesh <nitesh\.nama@gmail\.com>
+YY <yytamu@gmail\.com>
+
+# Authors with anonymized github addresses, for which we do not know a real
+# email address:
+Adam Lee <adam4130@users\.noreply\.github\.com>
+Quentin Viville <34856132\+a412h@users\.noreply\.github\.com>
+Raghunandan Pratoori <58669729\+rnpratoori@users\.noreply\.github\.com>
+Ran Zhang <132633746\+rzhang20@users\.noreply\.github\.com>
+Santiago Ospina <SoilRos@users\.noreply\.github\.com>
+Yingli Li <142116485\+liyli26@users\.noreply\.github\.com>
