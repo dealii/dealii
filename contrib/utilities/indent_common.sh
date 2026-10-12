@@ -29,6 +29,12 @@
 export DEAL_II_CLANG_FORMAT="${DEAL_II_CLANG_FORMAT:-clang-format}"
 
 checks() {
+  if ${DEBUG_OUTPUT}; then
+    local TIMEFORMAT="DEBUG_OUTPUT: checks: %Rs"
+    time DEBUG_OUTPUT=false checks "$@"
+    return
+  fi
+
   if test ! -d source -o ! -d include -o ! -d examples ; then
     echo "*** This script must be run from the top-level directory of deal.II."
     exit 1
@@ -73,6 +79,12 @@ checks() {
 
 feature_branch_base()
 {
+  if ${DEBUG_OUTPUT}; then
+    local TIMEFORMAT="DEBUG_OUTPUT: feature_branch_base: %Rs"
+    time DEBUG_OUTPUT=false feature_branch_base "$@"
+    return
+  fi
+
   #
   # We need to use a heuristic here:
   #
@@ -147,6 +159,12 @@ construct_exception_regex()
 
 check_commit_authors()
 {
+  if ${DEBUG_OUTPUT}; then
+    local TIMEFORMAT="DEBUG_OUTPUT: check_commit_authors [${1}]: %Rs"
+    time DEBUG_OUTPUT=false check_commit_authors "$@"
+    return
+  fi
+
   exceptions="$(construct_exception_regex contrib/utilities/indent_author_exceptions)" || return 1
 
   failed="$(
@@ -202,6 +220,8 @@ check_commit_authors()
 export TMPDIR="${TMPDIR:-/tmp}"
 
 export REPORT_ONLY="${REPORT_ONLY:-false}"
+
+export DEBUG_OUTPUT="${DEBUG_OUTPUT:-false}"
 
 #
 # If REPORT_ONLY is set to "true", this function reports a formatting issue
@@ -392,6 +412,12 @@ export -f fix_permissions
 
 process()
 {
+  if ${DEBUG_OUTPUT}; then
+    local TIMEFORMAT="DEBUG_OUTPUT: process ${3} [${1}] [${2}]: %Rs"
+    time DEBUG_OUTPUT=false process "$@"
+    return
+  fi
+
   directories=$1
   case "${OSTYPE}" in
     darwin*)
@@ -415,6 +441,12 @@ process()
 
 process_changed()
 {
+  if ${DEBUG_OUTPUT}; then
+    local TIMEFORMAT="DEBUG_OUTPUT: process_changed ${3} [${1}] [${2}]: %Rs"
+    time DEBUG_OUTPUT=false process_changed "$@"
+    return
+  fi
+
   BASE="$(feature_branch_base)"
 
   case "${OSTYPE}" in
