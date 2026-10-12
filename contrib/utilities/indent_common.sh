@@ -62,72 +62,137 @@ checks() {
     echo "***   to install a compatible binary into './contrib/utilities/programs'."
     exit 1
   fi
+}
 
+#
+# Print the commit number at which the current feature branch forked off
+# from the branch "master" branch (or any other branch given by
+# DEAL_II_BASE_BRANCH). We use this commit in process_changed() to identify
+# all changed files on the feature branch.
+#
 
-  # check formatting of usernames and email addresses, examples that will be detected:
-  # not-using-a-name <a@b.com>
-  # John Doe <doe@macbook.local>
-  # Jane Doe <a@nodomain>
+feature_branch_base()
+{
   #
-  # For commits already in the history, please see .mailmap in the root directory.
+  # We need to use a heuristic here:
   #
-  # Anonymized github addresses of the form
-  # John Smith <12345678+JohnSmith@users.noreply.github.com>
-  # carry no contact information and are rejected as well. Such addresses
-  # that are already part of the history are grandfathered in by way of a
-  # later cutoff date; map them to a real address in .mailmap instead.
+  # We want to identify a reasonable base commit, but this is not as easy
+  # as it seems. We, collect *every* local and remote branch called
+  # "master" (or DEAL_II_BASE_BRANCH) and compute the "merge base" (see
+  # $ man git-merge-base) between our current branch and the candidate
+  # "master" branch. We then use the "most recent" one as determined by
+  # $ git merge-base --is-ancestor.
   #
-  # Finally, to stay sane, just go back until the beginning of 2019 for now.
-  #
-  # first user names:
-  git log --since "2019-01-01" --format="%aN" --no-merges | sort -u | while read name ; do
-      words=($name)
-      if [ "${#words[@]}" -lt "2" -a "$name" != "dependabot[bot]" ]; then
-	  echo "Invalid author '$name' without firstname and lastname"
-	  echo ""
-	  echo "For possible solutions, consult the following page:"
-	  echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
-	  exit 2
-      fi
-  done || exit 2
+  BASE=""
+  for ref in $(git for-each-ref --format="%(refname)" \
+                 "refs/heads/${DEAL_II_BASE_BRANCH:-master}" \
+                 "refs/remotes/*/${DEAL_II_BASE_BRANCH:-master}"); do
 
-  # now emails:
-  git log --since "2019-01-01" --format="%aE" --no-merges | sort -u | while read email ; do
-      if ! echo "$email" | grep -q "\."; then
-	  echo "invalid email '$email'"
-          echo ""
-          echo "hint: for possible solutions, consult the webpage:"
-          echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
-	  exit 3
-      fi
-      if ! echo "$email" | grep -q -v -e "\.local$"; then
-	  echo "invalid email '$email'"
-          echo ""
-          echo "hint: for possible solutions, consult the webpage:"
-          echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
-	  exit 3
-      fi
-  done || exit 3
+    # Determine the most recent merge commit:
+    LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 "${ref}")"
+    [ -n "${LAST_MERGE_COMMIT}" ] || continue
 
-  # now the anonymized github addresses. These are only rejected for commits
-  # that were added after the following cutoff date:
-  git log --since "2026-09-01" --format="%aE" --no-merges | sort -u | while read email ; do
-      # bot accounts do not have a real address to begin with:
-      case "$email" in *"[bot]@users.noreply.github.com") continue ;; esac
-      if echo "$email" | grep -q "users\.noreply\.github\.com"; then
-          echo "invalid email '$email'"
-          echo ""
-          echo "hint: anonymized github addresses are not accepted. Turn off"
-          echo "      'Keep my email address private' in your github settings,"
-          echo "      or set a real address with 'git config user.email', and"
-          echo "      then amend or rebase the commits of this pull request."
-          echo ""
-          echo "hint: for possible solutions, consult the webpage:"
-          echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
-          exit 3
-      fi
-  done || exit 3
+    # Compute merge base with HEAD:
+    CANDIDATE="$(git merge-base "${LAST_MERGE_COMMIT}" HEAD)" || continue
 
+    # All candidates are ancestors of HEAD. Keep the most recent one.
+    if [ -z "${BASE}" ] || git merge-base --is-ancestor "${BASE}" "${CANDIDATE}"; then
+      BASE="${CANDIDATE}"
+    fi
+  done
+  echo "${BASE}"
+}
+
+#
+# Print a regular expression that matches a string if (and only if) the
+# whole string matches one of the POSIX extended regular expressions
+# listed in file "${1}", one per line. Empty lines and lines starting with
+# "#" are ignored. Return 1 if one of the expressions is invalid.
+#
+
+construct_exception_regex()
+{
+  regex=""
+  while read -r entry; do
+    case "${entry}" in
+      ""|"#"*) continue ;;
+    esac
+    # Test the entry: bash returns 2 for an invalid regular expression
+    { [[ "" =~ ${entry} ]]; } 2>/dev/null
+    if [ "$?" -eq 2 ]; then
+      echo "*** Invalid regular expression '${entry}' in ${1}" >&2
+      return 1
+    fi
+    regex="${regex:+${regex}|}(${entry})"
+  done < "${1}"
+  echo "^(${regex:-})$"
+}
+
+#
+# Check that commit authors have a proper name (consisting of at least two
+# words) and a proper email address for all commits given by the git log
+# arguments "${@}". Examples that will be detected:
+#   not-using-a-name <a@b.com>
+#   John Doe <doe@macbook.local>
+#   Jane Doe <a@nodomain>
+#   John Smith <12345678+JohnSmith@users.noreply.github.com>
+#
+# Anonymized github addresses carry no contact information and are thus
+# rejected as well.
+#
+# Commit authors in the history can be fixed by an entry in .mailmap in
+# the root directory. Authors that cannot be fixed this way are listed in
+# contrib/utilities/indent_author_exceptions.
+#
+
+check_commit_authors()
+{
+  exceptions="$(construct_exception_regex contrib/utilities/indent_author_exceptions)" || return 1
+
+  failed="$(
+    git log --no-merges --format="%aN <%aE>" "${@}" | sort -u | while read -r identity; do
+      # Skip if we match an exception from "indent_author_exceptions":
+      if [[ "${identity}" =~ ${exceptions} ]]; then
+        continue
+      fi
+
+      name="${identity% <*}"
+      email="${identity##*<}"
+      email="${email%>}"
+
+      read -r -a words <<< "${name}"
+      if [ "${#words[@]}" -lt "2" ]; then
+        echo "    invalid author '${name}' without firstname and lastname"
+      fi
+
+      case "${email}" in
+        *.*) ;;
+        *) echo "    invalid email '${email}'" ;;
+      esac
+
+      case "${email}" in
+        *.local)
+          echo "    invalid email '${email}'" ;;
+        *users.noreply.github.com)
+          echo "    invalid email '${email}' (anonymized github address)" ;;
+      esac
+    done
+  )"
+
+  if [ -n "${failed}" ]; then
+    echo "*** The following commit authors are invalid:"
+    echo ""
+    echo "${failed}"
+    echo ""
+    echo "hint: anonymized github addresses are not accepted. Turn off"
+    echo "      'Keep my email address private' in your github settings,"
+    echo "      or set a real address with 'git config user.email', and"
+    echo "      then amend or rebase the commits of this pull request."
+    echo ""
+    echo "hint: for possible solutions, consult the webpage:"
+    echo "      https://github.com/dealii/dealii/wiki/Commit-authorship"
+    return 1
+  fi
 }
 
 #
@@ -342,16 +407,15 @@ process()
 
 #
 # Variant of above function that only processes files that have changed
-# since the last merge commit to master. For this, we collect all files
-# that
+# in the current feature branch (see feature_branch_base()). For this, we
+# collect all files that
 #  - are new
-#  - have changed since the last merge commit to master
+#  - have changed since the feature branch forked off
 #
 
 process_changed()
 {
-  LAST_MERGE_COMMIT="$(git log --format="%H" --merges --max-count=1 master)"
-  COMMON_ANCESTOR_WITH_MASTER="$(git merge-base "${LAST_MERGE_COMMIT}" HEAD)"
+  BASE="$(feature_branch_base)"
 
   case "${OSTYPE}" in
     darwin*)
@@ -363,7 +427,7 @@ process_changed()
   esac
 
   ( git ls-files --others --exclude-standard -- ${1};
-    git diff --name-only $COMMON_ANCESTOR_WITH_MASTER -- ${1} )|
+    git diff --name-only ${BASE} -- ${1} )|
       sort -u |
       xargs -n 1 ls -d 2>/dev/null |
       grep -E "^${2}$" |
