@@ -86,75 +86,6 @@ namespace internal
   namespace TriaAccessorImplementation
   {
     struct Implementation;
-
-    /**
-     * Store either the level on which an object is defined or nothing.
-     *
-     * Only cells (i.e., accessors with dim == structdim) have levels. This
-     * class either stores an integer or nothing.
-     *
-     * @tparam access Whether or not the present class stores an integer for the
-     * level.
-     *
-     * @note Since this class stores nothing in the dim != structdim case, it
-     * ultimately requires no additional space when used with TriaAccessor due
-     * to the empty base class optimization.
-     */
-    template <bool level_access>
-    class LevelAccessor
-    {};
-
-    /**
-     * Specialization of LevelAccessor which stores the level.
-     */
-    template <>
-    class LevelAccessor<true>
-    {
-    public:
-      LevelAccessor(const int level)
-        : present_level(level)
-      {}
-
-      void
-      set_level(const int level)
-      {
-        present_level = level;
-      }
-
-      int
-      get_level() const
-      {
-        return present_level;
-      }
-
-    private:
-      int present_level;
-    };
-
-    /**
-     * Specialization of LevelAccessor which does not store the level.
-     */
-    template <>
-    class LevelAccessor<false>
-    {
-    public:
-      LevelAccessor(const int level)
-      {
-        Assert(level == 0, ExcInternalError());
-      }
-
-      static void
-      set_level(const int level)
-      {
-        Assert(level == 0, ExcInternalError());
-      }
-
-      static int
-      get_level()
-      {
-        return 0;
-      }
-    };
   } // namespace TriaAccessorImplementation
 } // namespace internal
 template <int structdim, int dim, int spacedim>
@@ -317,8 +248,6 @@ namespace TriaAccessorExceptions
  */
 template <int structdim, int dim, int spacedim = dim>
 class TriaAccessorBase
-  : private internal::TriaAccessorImplementation::LevelAccessor<structdim ==
-                                                                dim>
 {
 public:
   /**
@@ -375,6 +304,13 @@ protected:
    * Copy constructor. Creates an object with exactly the same data.
    */
   TriaAccessorBase(const TriaAccessorBase &);
+
+  /**
+   * If `structdim == dim` then this stores the level: otherwise it asserts that
+   * it is zero (as lower-dimensional objects are always on the zeroth level).
+   */
+  void
+  set_level(const int level);
 
   /**
    * Copy operator. Since this is only called from iterators, do not return
@@ -534,6 +470,19 @@ public:
    * @}
    */
 protected:
+  /**
+   * Rather than pull in the variant header, use our own version of
+   * std::monostate internally. Once we require C++26 we can rely on the version
+   * in utility instead.
+   */
+  struct Empty
+  {};
+
+  /**
+   * Level of the object.
+   */
+  std::conditional_t<structdim == dim, int, Empty> present_level;
+
   /**
    * Used to store the index of the element presently pointed to on the level
    * presently used.
@@ -4487,11 +4436,11 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   const int                           level,
   const int                           index,
   const AccessorData *)
-  : internal::TriaAccessorImplementation::LevelAccessor<dim == structdim>(
-      (structdim == dim) ? level : 0)
+  : present_level()
   , present_index(index)
   , tria(tria)
 {
+  set_level(structdim == dim ? level : 0);
   // non-cells have no level, so a 0 should have been passed, or a -1 for an
   // end-iterator, or -2 for an invalid (default constructed) iterator
   if (structdim != dim)
@@ -4499,14 +4448,30 @@ inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
 }
 
 
+
 template <int structdim, int dim, int spacedim>
 inline TriaAccessorBase<structdim, dim, spacedim>::TriaAccessorBase(
   const TriaAccessorBase<structdim, dim, spacedim> &a)
-  : internal::TriaAccessorImplementation::LevelAccessor<dim == structdim>(
-      a.level())
+  : present_level()
   , present_index(a.present_index)
   , tria(a.tria)
-{}
+{
+  set_level(a.level());
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+inline void
+TriaAccessorBase<structdim, dim, spacedim>::set_level(const int level)
+{
+  if constexpr (structdim == dim)
+    this->present_level = level;
+  else
+    Assert(level == 0,
+           ExcMessage("Lower-dimensional objects must be on level 0."));
+}
+
 
 
 template <int structdim, int dim, int spacedim>
@@ -4585,9 +4550,10 @@ template <int structdim, int dim, int spacedim>
 inline int
 TriaAccessorBase<structdim, dim, spacedim>::level() const
 {
-  // This is always zero or invalid
-  // if the object is not a cell
-  return this->get_level();
+  if constexpr (structdim == dim)
+    return this->present_level;
+  else
+    return 0;
 }
 
 
