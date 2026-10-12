@@ -22,12 +22,14 @@
 
 #  include <deal.II/grid/tria_description.h>
 
+#  include <BRepAdaptor_Curve.hxx>
 #  include <IGESControl_Controller.hxx>
 #  include <IGESControl_Reader.hxx>
 #  include <IGESControl_Writer.hxx>
 #  include <STEPControl_Controller.hxx>
 #  include <STEPControl_Reader.hxx>
 #  include <STEPControl_Writer.hxx>
+#  include <Standard_Transient.hxx>
 #  include <TopExp_Explorer.hxx>
 #  include <TopoDS.hxx>
 #  include <TopoDS_Edge.hxx>
@@ -36,13 +38,6 @@
 
 #  include <cstdio>
 #  include <iostream>
-#  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 0, 0)
-#    include <Standard_Transient.hxx>
-#  else
-#    include <Handle_Standard_Transient.hxx>
-#  endif
-
-#  include <BRepAdaptor_Curve.hxx>
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
 #    include <BRepAlgoAPI_Section.hxx>
 #  else
@@ -82,21 +77,6 @@
 #  include <algorithm>
 #  include <vector>
 
-// OpenCASCADE defines a macro that creates class names. When building
-// modules, we don't #include any of the OpenCASCADE header files, and
-// we can't export macros, so the macro is not available. Re-declare
-// it here if it is not defined. (And if it is defined, we have a
-// problem: Apparently some header #include above is left in the file
-// by accident. Error out in that case so we get alerted to the
-// problem.)
-#  ifdef DEAL_II_BUILDING_CXX20_MODULE
-#    ifndef HANDLE
-#      define Handle(ClassName) Handle_##ClassName
-#    else
-#      error \
-        "Some OpenCASCADE header file is apparently included even when building modules!"
-#    endif
-#  endif
 
 #endif
 
@@ -325,8 +305,9 @@ namespace OpenCASCADE
     OpenCASCADE::extract_geometrical_shapes(shape, faces, edges, vertices);
     const bool mesh_is_present =
       std::none_of(faces.begin(), faces.end(), [&Loc](const TopoDS_Face &face) {
-        Handle(Poly_Triangulation) theTriangulation =
+        opencascade::handle<Poly_Triangulation> theTriangulation =
           BRep_Tool::Triangulation(face, Loc);
+
         return theTriangulation.IsNull();
       });
     TopoDS_Shape shape_to_be_written = shape;
@@ -353,23 +334,18 @@ namespace OpenCASCADE
 
     StlAPI_Writer writer;
 
-#  if DEAL_II_OPENCASCADE_VERSION_GTE(6, 9, 0)
+
     // opencascade versions 6.9.0 onwards return an error status
     const auto error = writer.Write(shape_to_be_written, filename.c_str());
 
     // which is a custom type between 6.9.0 and 7.1.0
-#    if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 2, 0)
+#  if !DEAL_II_OPENCASCADE_VERSION_GTE(7, 2, 0)
     AssertThrow(error == StlAPI_StatusOK,
-                ExcMessage("Error writing STL from shape."));
-#    else
+                ExcMessage("Error writing STL from shape. Status: " +
+                           std::to_string(static_cast<int>(error))));
+#  else
     // and a boolean from version 7.2.0 onwards
     AssertThrow(error == true, ExcMessage("Error writing STL from shape."));
-#    endif
-
-#  else
-
-    // for opencascade versions 6.8.0 and older the return value is void
-    writer.Write(shape_to_be_written, filename.c_str());
 #  endif
   }
 
@@ -450,7 +426,8 @@ namespace OpenCASCADE
                   const double        c,
                   const double /*tolerance*/)
   {
-    Handle(Geom_Plane) plane = new Geom_Plane(c_x, c_y, c_z, c);
+    opencascade::handle<Geom_Plane> plane = new Geom_Plane(c_x, c_y, c_z, c);
+
 #  if DEAL_II_OPENCASCADE_VERSION_GTE(7, 6, 0)
     BRepAlgoAPI_Section section(in_shape, plane);
 #  else
@@ -463,22 +440,27 @@ namespace OpenCASCADE
   TopoDS_Edge
   join_edges(const TopoDS_Shape &in_shape, const double tolerance)
   {
-    TopoDS_Edge                           out_shape;
-    const TopoDS_Shape                   &edges = in_shape;
-    std::vector<Handle_Geom_BoundedCurve> intersections;
-    TopLoc_Location                       L;
-    Standard_Real                         First;
-    Standard_Real                         Last;
-    gp_Pnt                                PIn(0.0, 0.0, 0.0);
-    gp_Pnt                                PFin(0.0, 0.0, 0.0);
-    gp_Pnt                                PMid(0.0, 0.0, 0.0);
-    TopExp_Explorer                       edgeExplorer(edges, TopAbs_EDGE);
-    TopoDS_Edge                           edge;
+    TopoDS_Edge         out_shape;
+    const TopoDS_Shape &edges = in_shape;
+
+    std::vector<opencascade::handle<Geom_BoundedCurve>> intersections;
+
+    TopLoc_Location L;
+    Standard_Real   First;
+    Standard_Real   Last;
+    gp_Pnt          PIn(0.0, 0.0, 0.0);
+    gp_Pnt          PFin(0.0, 0.0, 0.0);
+    gp_Pnt          PMid(0.0, 0.0, 0.0);
+    TopExp_Explorer edgeExplorer(edges, TopAbs_EDGE);
+    TopoDS_Edge     edge;
     while (edgeExplorer.More())
       {
-        edge                     = TopoDS::Edge(edgeExplorer.Current());
-        Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, L, First, Last);
-        intersections.push_back(Handle(Geom_BoundedCurve)::DownCast(curve));
+        edge = TopoDS::Edge(edgeExplorer.Current());
+        opencascade::handle<Geom_Curve> curve =
+          BRep_Tool::Curve(edge, L, First, Last);
+        intersections.push_back(
+          opencascade::handle<Geom_BoundedCurve>::DownCast(curve));
+
         edgeExplorer.Next();
       }
 
@@ -499,16 +481,20 @@ namespace OpenCASCADE
         for (unsigned int i = 1; i < numIntersEdges; ++i)
           if (added[i] == false)
             {
-              Handle(Geom_Curve) curve = intersections[i];
-              Handle(Geom_BoundedCurve) bcurve =
-                Handle(Geom_BoundedCurve)::DownCast(curve);
+              opencascade::handle<Geom_Curve> curve = intersections[i];
+
+              opencascade::handle<Geom_BoundedCurve> bcurve =
+                opencascade::handle<Geom_BoundedCurve>::DownCast(curve);
+
               check = convert_bspline.Add(bcurve, tolerance, false, true, 0);
               if (check ==
                   false) // If we failed, try again with the reversed curve
                 {
                   curve->Reverse();
-                  Handle(Geom_BoundedCurve) bcurve =
-                    Handle(Geom_BoundedCurve)::DownCast(curve);
+
+                  opencascade::handle<Geom_BoundedCurve> bcurve =
+                    opencascade::handle<Geom_BoundedCurve>::DownCast(curve);
+
                   check =
                     convert_bspline.Add(bcurve, tolerance, false, true, 0);
                 }
@@ -521,7 +507,7 @@ namespace OpenCASCADE
     Assert(one_failed == false,
            ExcMessage("Joining some of the Edges failed."));
 
-    Handle(Geom_Curve) bspline = convert_bspline.BSplineCurve();
+    opencascade::handle<Geom_Curve> bspline = convert_bspline.BSplineCurve();
 
     out_shape = BRepBuilderAPI_MakeEdge(bspline);
     return out_shape;
@@ -595,21 +581,22 @@ namespace OpenCASCADE
       }
 
     // set up array of vertices
-    Handle(TColgp_HArray1OfPnt) vertices =
+    opencascade::handle<TColgp_HArray1OfPnt> vertices =
       new TColgp_HArray1OfPnt(1, n_vertices);
+
+
     for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
       {
         vertices->SetValue(vertex + 1, point(curve_points[vertex]));
       }
-
 
     GeomAPI_Interpolate bspline_generator(vertices, closed, tolerance);
     bspline_generator.Perform();
     Assert((bspline_generator.IsDone()),
            ExcMessage("Interpolated bspline generation failed"));
 
-    Handle(Geom_BSplineCurve) bspline = bspline_generator.Curve();
-    TopoDS_Edge out_shape             = BRepBuilderAPI_MakeEdge(bspline);
+    opencascade::handle<Geom_BSplineCurve> bspline = bspline_generator.Curve();
+    TopoDS_Edge out_shape = BRepBuilderAPI_MakeEdge(bspline);
     out_shape.Closed(closed);
     return out_shape;
   }
@@ -744,9 +731,8 @@ namespace OpenCASCADE
 
         // the projection function needs a surface, so we obtain the
         // surface upon which the face is defined
-        Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
-
-        ShapeAnalysis_Surface projector(SurfToProj);
+        opencascade::handle<Geom_Surface> SurfToProj = BRep_Tool::Surface(face);
+        ShapeAnalysis_Surface             projector(SurfToProj);
         gp_Pnt2d proj_params = projector.ValueOfUV(point(origin), tolerance);
 
         SurfToProj->D0(proj_params.X(), proj_params.Y(), tmp_proj);
@@ -780,7 +766,7 @@ namespace OpenCASCADE
 
               // the projection function needs a Curve, so we obtain the
               // curve upon which the edge is defined
-              Handle(Geom_Curve) CurveToProj =
+              opencascade::handle<Geom_Curve> CurveToProj =
                 BRep_Tool::Curve(edge, L, First, Last);
 
               GeomAPI_ProjectPointOnCurve Proj(point(origin), CurveToProj);
@@ -876,9 +862,9 @@ namespace OpenCASCADE
                                       const double       v,
                                       const double /*tolerance*/)
   {
-    Handle(Geom_Surface) SurfToProj = BRep_Tool::Surface(face);
-    GeomLProp_SLProps props(SurfToProj, u, v, 1, 1e-7);
-    gp_Pnt            Value = props.Value();
+    opencascade::handle<Geom_Surface> SurfToProj = BRep_Tool::Surface(face);
+    GeomLProp_SLProps                 props(SurfToProj, u, v, 1, 1e-7);
+    gp_Pnt                            Value = props.Value();
     Assert(props.IsNormalDefined(), ExcMessage("Normal is not well defined!"));
     gp_Dir Normal = props.Normal();
     Assert(props.IsCurvatureDefined(),
