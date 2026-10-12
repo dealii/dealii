@@ -1,18 +1,20 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2023 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
- *
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2023 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+/*
  * Test that when copy_triangulation is used also the information about
  * periodic faces is copied.
  */
+
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 

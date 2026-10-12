@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2025 - by the deal.II authors
+// Copyright (C) 2025 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -9,8 +9,6 @@
 // can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
-
-
 
 // This program tests that we ignore a trailing comma in function constants
 // and a trailing semicolon in function expressions.

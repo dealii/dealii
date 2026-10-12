@@ -1,15 +1,16 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2015 - 2025 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2015 - 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
 
+/*
  * This file tests the non-symmetric interface to PARPACK for an
  advection-diffusion
  * operator with Trilinos mpi vectors.

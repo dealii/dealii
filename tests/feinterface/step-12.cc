@@ -1,16 +1,16 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2019 - 2024 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2019 - 2024 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
 
- *
+/*
  * Author: Guido Kanschat, Texas A&M University, 2009
  * Timo Heister, Clemson University, 2019
  */

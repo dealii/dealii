@@ -1,20 +1,19 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2018 - 2025 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2018 - 2025 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
 
- *
+/*
  * a light modification of step-37 tutorial to test MappingFEField
  * in parallel with non-zero BC and zero body load.
  */
-
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>

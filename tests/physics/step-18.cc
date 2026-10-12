@@ -1,15 +1,14 @@
-/* -----------------------------------------------------------------------------
- *
- * SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
- * Copyright (C) 2017 - 2024 by the deal.II authors
- *
- * This file is part of the deal.II library.
- *
- * Detailed license information governing the source code and contributions
- * can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
- *
- * -----------------------------------------------------------------------------
- */
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2017 - 2024 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
 
 // This is a copy of step-18 (git rev ecafd3f), but with a corrected rotation
 // matrix, to use as a base-line for results produced via different approaches

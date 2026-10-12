@@ -1,4 +1,3 @@
-
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
@@ -10,7 +9,6 @@
 // can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
 //
 // -----------------------------------------------------------------------------
-
 
 // Test that some cases that we expect to fail do in fact do so:
 // Registering more than one dependent variable

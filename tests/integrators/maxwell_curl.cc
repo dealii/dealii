@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
 // Copyright (C) 2016 - 2020 by the deal.II authors
 //
-// Author: Jihuan Tian <jihuan_tian@hotmail.com>
-//
 // This file is part of the deal.II library.
 //
 // Detailed license information governing the source code and contributions
@@ -12,6 +10,7 @@
 //
 // -----------------------------------------------------------------------------
 
+// Author: Jihuan Tian <jihuan_tian@hotmail.com>
 
 // Test curl related functions in integrators/maxwell.h
 
