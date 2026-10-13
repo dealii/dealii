@@ -1650,6 +1650,16 @@ namespace SUNDIALS
            double                      hscale,
            internal::InvocationContext inv_ctx) override;
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+    /**
+     * Create a SUNDIALS power-iteration dominant-eigenvalue estimator for the
+     * vector layout of @p y, attach it to the LSRKStep module, and take
+     * ownership of it in dom_eig_estimator (releasing the previous one).
+     */
+    void
+    attach_default_dom_eig_estimator(N_Vector y, SUNContext context);
+#    endif
+
     /**
      * LSRKStepperSTS configuration data.
      */

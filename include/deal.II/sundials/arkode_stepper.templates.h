@@ -835,16 +835,8 @@ namespace SUNDIALS
         // explicit right-hand side), so no further user input is required.
         // The state vector y0 is only used to determine the vector layout for
         // the initial guess; the estimator clones it internally.
-        SUNDomEigEstimator estimator =
-          SUNDomEigEstimator_Power(initial_condition_nvector,
-                                   data.dom_eig_estimator_max_iters,
-                                   data.dom_eig_estimator_rel_tol,
-                                   inv_ctx.arkode_ctx);
-        Assert(estimator != nullptr, ExcInternalError());
-        dom_eig_estimator.reset(static_cast<void *>(estimator));
-
-        status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
-        AssertARKode(status);
+        attach_default_dom_eig_estimator(initial_condition_nvector,
+                                         inv_ctx.arkode_ctx);
 
         if (data.dom_eig_estimator_num_warmups != numbers::invalid_unsigned_int)
           {
@@ -887,6 +879,31 @@ namespace SUNDIALS
   }
 
 
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+  template <typename VectorType>
+  void
+  LSRKStepperSTS<VectorType>::attach_default_dom_eig_estimator(
+    N_Vector   y,
+    SUNContext context)
+  {
+    SUNDomEigEstimator estimator =
+      SUNDomEigEstimator_Power(y,
+                               data.dom_eig_estimator_max_iters,
+                               data.dom_eig_estimator_rel_tol,
+                               context);
+    Assert(estimator != nullptr, ExcInternalError());
+
+    const int status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
+    AssertARKode(status);
+    (void)status;
+
+    // On resize the previous estimator is released here; LSRKStep no longer
+    // references it.
+    dom_eig_estimator.reset(static_cast<void *>(estimator));
+  }
+#    endif
+
+
   template <typename VectorType>
   void
   LSRKStepperSTS<VectorType>::resize(double                      t0,
@@ -907,30 +924,7 @@ namespace SUNDIALS
     // LSRKStep only initializes the estimator on the first initialization, not
     // on a resize, so this has to be done here.
     if (!dominant_eigenvalue_function)
-      {
-        SUNDomEigEstimator estimator =
-          SUNDomEigEstimator_Power(y0_nvector,
-                                   data.dom_eig_estimator_max_iters,
-                                   data.dom_eig_estimator_rel_tol,
-                                   inv_ctx.arkode_ctx);
-        Assert(estimator != nullptr, ExcInternalError());
-
-        status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
-        AssertARKode(status);
-
-        // Releases the previous estimator, which LSRKStep no longer references.
-        dom_eig_estimator.reset(static_cast<void *>(estimator));
-
-        status = SUNDomEigEstimator_Initialize(estimator);
-        AssertARKode(status);
-
-        if (data.dom_eig_estimator_num_warmups != numbers::invalid_unsigned_int)
-          {
-            status = SUNDomEigEstimator_SetNumPreprocessIters(
-              estimator, static_cast<int>(data.dom_eig_estimator_num_warmups));
-            AssertARKode(status);
-          }
-      }
+      attach_default_dom_eig_estimator(y0_nvector, inv_ctx.arkode_ctx);
 #    endif
     (void)status;
   }
