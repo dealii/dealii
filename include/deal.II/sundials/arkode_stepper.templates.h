@@ -195,13 +195,12 @@ namespace SUNDIALS
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
 
-    const auto y0_nvector =
-      internal::make_nvector_view(y0
+    const auto y0_nvector = internal::make_nvector_view(y0
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                                  ,
-                                  inv_ctx.arkode_ctx
+                                                        ,
+                                                        inv_ctx.arkode_ctx
 #  endif
-      );
+    );
 
     const int status =
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
@@ -696,13 +695,12 @@ namespace SUNDIALS
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
 
-    const auto y0_nvector =
-      internal::make_nvector_view(y0
+    const auto y0_nvector = internal::make_nvector_view(y0
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                                  ,
-                                  inv_ctx.arkode_ctx
+                                                        ,
+                                                        inv_ctx.arkode_ctx
 #  endif
-      );
+    );
 
     const int status =
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
