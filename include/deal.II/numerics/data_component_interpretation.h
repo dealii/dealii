@@ -59,7 +59,16 @@ namespace DataComponentInterpretation
      * Indicates that a component of a data set is part of a tensor-valued
      * (2nd order) quantity.
      */
-    component_is_part_of_tensor
+    component_is_part_of_tensor,
+
+    /**
+     * Indicates that a component is not to be written by DataOut_DoFData
+     * and its derived classes. A name must still be supplied for this
+     * component, but neither the name nor its values appear in the output.
+     * All components of a logical vector or tensor must either be retained
+     * or ignored.
+     */
+    component_is_ignored
   };
 } // namespace DataComponentInterpretation
 

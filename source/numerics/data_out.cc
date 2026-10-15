@@ -792,6 +792,8 @@ DataOut<dim, spacedim>::build_one_patch(
                               dataset->data_component_interpretation[component])
                               {
                                 case DataComponentInterpretation::
+                                  component_is_ignored:
+                                case DataComponentInterpretation::
                                   component_is_scalar:
                                   {
                                     // OK, a scalar component. Put all of the
@@ -884,6 +886,8 @@ DataOut<dim, spacedim>::build_one_patch(
                             switch (
                               dataset->data_component_interpretation[component])
                               {
+                                case DataComponentInterpretation::
+                                  component_is_ignored:
                                 case DataComponentInterpretation::
                                   component_is_scalar:
                                   {
@@ -1259,6 +1263,8 @@ DataOut<dim, spacedim>::build_patches(
                     // @ref workstream_paper, on 32 cores) and if
                     8 * MultithreadInfo::n_threads(),
                     64);
+
+  this->remove_ignored_components();
 }
 
 
