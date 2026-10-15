@@ -1,0 +1,40 @@
+## -----------------------------------------------------------------------------
+##
+## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+## Copyright (C) 2026 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## Detailed license information governing the source code and contributions
+## can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+##
+## -----------------------------------------------------------------------------
+
+#
+# Files that are exempt from the license header check in
+# contrib/utilities/indent_common.sh. Each line is a POSIX extended regular
+# expression that has to match the path of a file relative to the top-level
+# directory as a whole. Characters with a special meaning in regular
+# expressions (in particular ".") have to be escaped with a backslash.
+#
+
+# Files that are licensed under LGPL-2.1-or-later only:
+include/deal\.II/fe/fe_nedelec\.h
+include/deal\.II/fe/fe_nedelec\.templates\.h
+source/fe/fe_nedelec\.cc
+source/fe/fe_nedelec\.inst\.in
+
+# A script that is licensed under GPL-2.0-or-later:
+doc/external-libs/p4est-setup\.sh
+
+# Third-party programs installed by download_clang_format and
+# compile_clang_format:
+contrib/utilities/programs/.*
+
+# Tutorial programs that are licensed under LGPL-2.1-or-later only. (New
+# tutorial programs have to use the dual license header.)
+examples/doxygen/step_3_(mixed|simplex)\.cc
+examples/step-[0-9]+/step-([1-9]|[1-46][0-9]|5[013-9]|7[0-24-9]|8[1-35-79]|9[03578]|100)\.cc
+examples/step-25/doc/animate\.sh
+examples/step-39/postprocess\.pl
+examples/step-55/reference\.py

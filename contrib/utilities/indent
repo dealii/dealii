@@ -17,7 +17,8 @@
 # staged/committed) in the current feature branch, i.e., since the last
 # merge commit to the master branch (or the branch given by
 # DEAL_II_BASE_BRANCH). Similarly, it only checks the authors of the
-# commits of the feature branch.
+# commits of the feature branch, and the license headers of the changed
+# files.
 #
 # The script needs to be executed as
 #   ./contrib/utilities/indent
@@ -108,3 +109,17 @@ process_changed "tests include source examples cmake/scripts contrib/python-bind
 process_changed "doc/news/*/*" "doc/news/.*/.*/[0-9].*" ensure_single_trailing_newline
 
 process_changed "tests include source examples contrib" ".*\.py" ensure_single_trailing_newline
+
+#
+# Check license headers:
+#
+
+setup_license_header_exceptions || exit 1
+
+process_changed "CMakeLists.txt CTestConfig.cmake cmake contrib doc examples include module source tests" \
+  "(.*\.(h|cc|ccm|cu|cuh|inst\.in|cmake|py|sh|pl)|(.*/)?CMakeLists\.txt)" check_license_header
+
+if [ $? -ne 0 ]; then
+  print_license_header_template
+  exit 4
+fi

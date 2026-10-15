@@ -214,6 +214,163 @@ check_commit_authors()
 }
 
 #
+# Check that file "${1}" starts with our license header, using the comment
+# prefix "${2}" ("//" or "##"). If "${3}" is "true" the header may be
+# preceded by a "#!" line, optionally followed by a single empty line. The
+# header has to match exactly, except that additional "Copyright (C) ..."
+# lines may follow the one of the deal.II authors. The function prints the
+# first line that does not match.
+#
+# This is written in plain awk without regex intervals so that it works
+# with the awk variants found on Linux and Mac OS.
+#
+
+check_license_header_of_file()
+{
+  awk -v p="${2}" -v allow_shebang="${3}" -v file="${1}" '
+    BEGIN {
+      dashes = "-----------------------------------------------------------------------------"
+      n = 0
+      want[++n] = p " " dashes
+      want[++n] = p
+      want[++n] = p " SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later"
+      want[++n] = p " Copyright (C) YYYY - YYYY by the deal.II authors"
+      copyright_line = n
+      want[++n] = p
+      want[++n] = p " This file is part of the deal.II library."
+      want[++n] = p
+      want[++n] = p " Detailed license information governing the source code and contributions"
+      want[++n] = p " can be found in LICENSE.md and CONTRIBUTING.md at the top level directory."
+      want[++n] = p
+      want[++n] = p " " dashes
+
+      year = "[0-9][0-9][0-9][0-9]"
+      dealii_copyright = "^" p " Copyright [(]C[)] " year "( - " year ")? by the deal[.]II authors$"
+      other_copyright = "^" p " Copyright [(]C[)] ."
+
+      i = 1
+      done = 0
+      line = 0
+      shebang = 0
+    }
+    {
+      sub(/\r$/, "")
+    }
+    NR == 1 && allow_shebang == "true" && /^#!/ {
+      shebang = 1
+      next
+    }
+    NR == 2 && shebang && $0 == "" {
+      next
+    }
+    {
+      if (i == copyright_line) {
+        if ($0 !~ dealii_copyright) {
+          line = NR
+          exit
+        }
+      } else if (i == copyright_line + 1 && $0 ~ other_copyright) {
+        next
+      } else if ($0 != want[i]) {
+        line = NR
+        exit
+      }
+      if (++i > n) {
+        done = 1
+        exit
+      }
+    }
+    END {
+      if (!done) {
+        # If we ran out of lines, the expected line is the one after the last:
+        if (line == 0)
+          line = NR + 1
+        printf "    %s:%d: expected \"%s\"\n", file, line, want[i]
+        exit 1
+      }
+    }' "${1}"
+}
+export -f check_license_header_of_file
+
+
+#
+# Check that file "${1}" starts with our license header (see
+# check_license_header_of_file() above). The comment prefix is determined
+# from the file name. Files that match one of the regular expressions in
+# contrib/utilities/indent_license_exceptions are skipped. The function
+# expects these regular expressions to be combined in the variable
+# LICENSE_HEADER_EXCEPTIONS (see setup_license_header_exceptions() below).
+#
+
+check_license_header()
+{
+  file="${1}"
+
+  if [ -z "${LICENSE_HEADER_EXCEPTIONS:-}" ]; then
+    echo "*** check_license_header: LICENSE_HEADER_EXCEPTIONS is not set" >&2
+    return 1
+  fi
+
+  # Intentionally unquoted so that ${LICENSE_HEADER_EXCEPTIONS} is used as
+  # regular expression:
+  if [[ "${file}" =~ ${LICENSE_HEADER_EXCEPTIONS} ]]; then
+    return 0
+  fi
+
+  case "${file}" in
+    *.h|*.cc|*.ccm|*.cu|*.cuh|*.inst.in)
+      check_license_header_of_file "${file}" "//" "false" ;;
+    *.cmake|CMakeLists.txt|*/CMakeLists.txt)
+      check_license_header_of_file "${file}" "##" "false" ;;
+    *.py|*.sh|*.pl)
+      check_license_header_of_file "${file}" "##" "true" ;;
+  esac
+}
+export -f check_license_header
+
+#
+# Read the regular expressions in contrib/utilities/indent_license_exceptions
+# once and export them combined into a single regular expression for
+# check_license_header(), which runs in separate processes:
+#
+
+setup_license_header_exceptions()
+{
+  LICENSE_HEADER_EXCEPTIONS="$(construct_exception_regex contrib/utilities/indent_license_exceptions)" || return 1
+  export LICENSE_HEADER_EXCEPTIONS
+}
+
+#
+# Print the license header that check_license_header() expects:
+#
+
+print_license_header_template()
+{
+  echo ""
+  echo "*** The files listed above do not start with a valid license header."
+  echo "*** All files have to start with the following header (with \"##\""
+  echo "*** instead of \"//\" for CMake, Python, Perl and shell scripts, where a"
+  echo "*** \"#!\" line, optionally followed by an empty line, may come first),"
+  echo "*** where YYYY are the years of creation and last modification, or only"
+  echo "*** a single year:"
+  echo ""
+  echo "// -----------------------------------------------------------------------------"
+  echo "//"
+  echo "// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later"
+  echo "// Copyright (C) YYYY - YYYY by the deal.II authors"
+  echo "//"
+  echo "// This file is part of the deal.II library."
+  echo "//"
+  echo "// Detailed license information governing the source code and contributions"
+  echo "// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory."
+  echo "//"
+  echo "// -----------------------------------------------------------------------------"
+  echo ""
+  echo "*** Additional \"// Copyright (C) ...\" lines may follow the line for the"
+  echo "*** deal.II authors."
+}
+
+#
 # Mac OSX's mktemp doesn't know the --tmpdir option without argument. So,
 # let's do all of that by hand:
 #
