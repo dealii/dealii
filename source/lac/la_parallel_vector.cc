@@ -30,17 +30,20 @@ namespace LinearAlgebra
   {
 #ifndef DOXYGEN
 
-#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)               \
-    template Vector<S1, ::dealii::MemorySpace::Host> & \
-    Vector<S1, ::dealii::MemorySpace::Host>::operator= \
-      <S2>(const Vector<S2, ::dealii::MemorySpace::Host> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2, MemorySpaceType)         \
+    template Vector<S1, ::dealii::MemorySpace::MemorySpaceType> & \
+    Vector<S1, ::dealii::MemorySpace::MemorySpaceType>::operator= \
+      <S2>(const Vector<S2, ::dealii::MemorySpace::MemorySpaceType> &)
 
-    TEMPL_COPY_CONSTRUCTOR(double, float);
-    TEMPL_COPY_CONSTRUCTOR(float, double);
+    TEMPL_COPY_CONSTRUCTOR(double, float, Host);
+    TEMPL_COPY_CONSTRUCTOR(float, double, Host);
 #  ifdef DEAL_II_WITH_COMPLEX_VALUES
-    TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>);
-    TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>);
+    TEMPL_COPY_CONSTRUCTOR(std::complex<double>, std::complex<float>, Host);
+    TEMPL_COPY_CONSTRUCTOR(std::complex<float>, std::complex<double>, Host);
 #  endif
+
+    TEMPL_COPY_CONSTRUCTOR(double, float, Default);
+    TEMPL_COPY_CONSTRUCTOR(float, double, Default);
 
 #  undef TEMPL_COPY_CONSTRUCTOR
 
