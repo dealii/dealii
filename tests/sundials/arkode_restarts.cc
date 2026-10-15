@@ -16,6 +16,10 @@
 
 #include <deal.II/sundials/arkode.h>
 
+#if DEAL_II_SUNDIALS_VERSION_LT(7, 1, 0)
+#  include <arkode/arkode_arkstep.h>
+#endif
+
 #include "../tests.h"
 
 // Test that ARKode::solve_ode() returns the total number of steps taken, also
