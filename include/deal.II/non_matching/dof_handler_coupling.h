@@ -1426,7 +1426,7 @@ namespace NonMatching
           dynamic_cast<const parallel::distributed::Triangulation<spacedim> *>(
             &(*tria1)))
       {
-        communicator = tr->get_communicator();
+        communicator = tr->get_mpi_communicator();
         mpi_proc     = Utilities::MPI::this_mpi_process(communicator);
         n_mpi_procs  = Utilities::MPI::n_mpi_processes(communicator);
 
