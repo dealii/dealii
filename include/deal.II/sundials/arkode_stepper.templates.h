@@ -694,6 +694,7 @@ namespace SUNDIALS
                                  internal::InvocationContext inv_ctx)
   {
     Assert(arkode_mem != nullptr, ExcInternalError());
+    (void)inv_ctx;
 
     const auto y0_nvector = internal::make_nvector_view(y0
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
