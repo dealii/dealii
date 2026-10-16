@@ -438,6 +438,62 @@ TEST(Step80, MPIIsInitialized)
   EXPECT_EQ(dealii::Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD), 1U);
 }
 
+TEST(Step80, InletStartsFromRestAndConstraintsFollowRamp)
+{
+  using namespace dealii;
+  using namespace Step80;
+
+  NavierStokesImmersedProblemParameters<2> par;
+  ParameterAcceptor::initialize(
+    (std::filesystem::path(__FILE__).parent_path() / "turek_hron_fsi2_2d.prm")
+      .string());
+
+  // Use a small mesh with an inlet support point at y=H/2.
+  par.name_of_fluid_grid       = "hyper_rectangle";
+  par.arguments_for_fluid_grid = "0, 0: 1, 0.41: true";
+  par.initial_fluid_refinement = 1;
+  par.initial_solid_refinement = 0;
+  par.dirichlet_ids            = {0};
+  par.set_time(0.);
+
+  NavierStokesImmersedProblem<2> problem(par);
+  problem.make_grid();
+  problem.initial_setup();
+  problem.setup_dofs();
+  problem.interpolate_initial_conditions();
+  EXPECT_DOUBLE_EQ(problem.fluid_solution.l2_norm(), 0.);
+
+  const Point<2> inlet_center(0., 0.205);
+  const unsigned int n_homogeneous =
+    problem.fluid_homogeneous_constraints.n_constraints();
+  for (const double time : {0., 0.5, 1., 1.5, 2., 3.})
+    {
+      par.set_time(time);
+      problem.update_fluid_constraints();
+      const double ramp =
+        time < 2. ? (1. - std::cos(numbers::PI * time / 2.)) / 2. : 1.;
+      EXPECT_NEAR(par.navier_stokes_bc.value(inlet_center, 0),
+                  1.5 * ramp,
+                  1e-14);
+
+      // The largest inlet nodal value is at the midpoint. Check the actual
+      // rebuilt constraints, including their return to zero after the ramp.
+      double max_inhomogeneity = 0.;
+      for (const auto &line : problem.fluid_constraints.get_lines())
+        max_inhomogeneity = std::max(max_inhomogeneity, line.inhomogeneity);
+      EXPECT_NEAR(max_inhomogeneity, 1.5 * ramp, 1e-14);
+      EXPECT_EQ(problem.fluid_homogeneous_constraints.n_constraints(),
+                n_homogeneous);
+      for (const auto &line : problem.fluid_homogeneous_constraints.get_lines())
+        EXPECT_DOUBLE_EQ(line.inhomogeneity, 0.);
+    }
+
+  par.set_time(0.);
+  problem.update_fluid_constraints();
+  for (const auto &line : problem.fluid_constraints.get_lines())
+    EXPECT_DOUBLE_EQ(line.inhomogeneity, 0.);
+}
+
 // This test exercises the actual step-80 coupling operators. We interpolate a
 // manufactured velocity field into the fluid velocity space, apply the
 // velocity-to-Lagrange-multiplier coupling matrix to obtain the corresponding

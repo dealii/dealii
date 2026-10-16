@@ -65,7 +65,6 @@ namespace LA
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/distributed/grid_refinement.h>
-#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/distributed/tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
@@ -105,6 +104,7 @@ namespace LA
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/opencascade/manifold_lib.h>
@@ -782,6 +782,8 @@ namespace Step80
 
     void                             initial_setup();
     void                             setup_dofs();
+    void                             create_homogeneous_constraints();
+    void                             update_fluid_constraints();
     void                             interpolate_initial_conditions();
     void                             update_solid_current_position();
     void                             check_immersed_mapping_is_valid() const;
@@ -1204,34 +1206,8 @@ namespace Step80
     fluid_relevant_dofs[1] =
       locally_relevant_fluid_dofs.get_view(n_u, n_u + n_p);
 
-    {
-      fluid_constraints.reinit(locally_relevant_fluid_dofs,
-                               locally_relevant_fluid_dofs);
-      fluid_homogeneous_constraints.reinit(locally_relevant_fluid_dofs,
-                                           locally_relevant_fluid_dofs);
-
-      DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
-      DoFTools::make_hanging_node_constraints(fluid_dh,
-                                              fluid_homogeneous_constraints);
-      const Functions::ZeroFunction<spacedim> zero_bc(spacedim + 1);
-      for (const auto id : par.dirichlet_ids)
-        {
-          VectorTools::interpolate_boundary_values(fluid_dh,
-                                                   id,
-                                                   par.navier_stokes_bc,
-                                                   fluid_constraints,
-                                                   fluid_fe->component_mask(
-                                                     velocity));
-          VectorTools::interpolate_boundary_values(
-            fluid_dh,
-            id,
-            zero_bc,
-            fluid_homogeneous_constraints,
-            fluid_fe->component_mask(velocity));
-        }
-      fluid_constraints.close();
-      fluid_homogeneous_constraints.close();
-    }
+    create_homogeneous_constraints();
+    update_fluid_constraints();
 
 
     {
@@ -1439,6 +1415,53 @@ namespace Step80
 
 
   template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::create_homogeneous_constraints()
+  {
+    const IndexSet locally_relevant_fluid_dofs =
+      DoFTools::extract_locally_relevant_dofs(fluid_dh);
+
+    fluid_homogeneous_constraints.reinit(locally_relevant_fluid_dofs,
+                                         locally_relevant_fluid_dofs);
+
+    DoFTools::make_hanging_node_constraints(fluid_dh,
+                                            fluid_homogeneous_constraints);
+    const Functions::ZeroFunction<spacedim> zero_bc(spacedim + 1);
+    for (const auto id : par.dirichlet_ids)
+      VectorTools::interpolate_boundary_values(
+        fluid_dh,
+        id,
+        zero_bc,
+        fluid_homogeneous_constraints,
+        fluid_fe->component_mask(velocity));
+    fluid_homogeneous_constraints.close();
+  }
+
+
+
+  template <int dim, int spacedim>
+  void NavierStokesImmersedProblem<dim, spacedim>::update_fluid_constraints()
+  {
+    const IndexSet locally_relevant_fluid_dofs =
+      DoFTools::extract_locally_relevant_dofs(fluid_dh);
+
+    // Rebuild the constraints since interpolate_boundary_values() skips DoFs
+    // that are already constrained, including homogeneous boundary values.
+    fluid_constraints.reinit(locally_relevant_fluid_dofs,
+                             locally_relevant_fluid_dofs);
+    DoFTools::make_hanging_node_constraints(fluid_dh, fluid_constraints);
+    for (const auto id : par.dirichlet_ids)
+      VectorTools::interpolate_boundary_values(
+        fluid_dh,
+        id,
+        par.navier_stokes_bc,
+        fluid_constraints,
+        fluid_fe->component_mask(velocity));
+    fluid_constraints.close();
+  }
+
+
+
+  template <int dim, int spacedim>
   void
   NavierStokesImmersedProblem<dim, spacedim>::update_solid_current_position()
   {
@@ -1517,6 +1540,8 @@ namespace Step80
                              par.navier_stokes_initial_conditions,
                              fluid_solution,
                              ComponentMask(fluid_fe->component_mask(velocity)));
+    // Enforce hanging-node constraints and the prescribed boundary values on
+    // the initial profile before saving it as the previous time-step solution.
     fluid_constraints.distribute(fluid_solution);
     fluid_locally_relevant_solution_old = fluid_solution;
     fluid_locally_relevant_solution     = fluid_solution;
@@ -2684,6 +2709,8 @@ namespace Step80
          ++cycle, time += time_step)
       {
         par.set_time(time);
+        if (cycle > 0)
+          update_fluid_constraints();
         pcout << "Cycle " << cycle << ':' << std::endl
               << "Time : " << time << ", time step: " << time_step << std::endl;
 
