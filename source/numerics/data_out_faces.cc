@@ -418,6 +418,8 @@ DataOutFaces<dim, spacedim>::build_patches(
     },
     thread_data,
     sample_patch);
+
+  this->remove_ignored_components();
 }
 
 

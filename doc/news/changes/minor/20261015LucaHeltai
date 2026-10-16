@@ -1,0 +1,7 @@
+New: DataComponentInterpretation::component_is_ignored allows DataOut and
+related classes to omit selected components of a data vector. Each call to
+add_data_vector() can select a different subset of components, even when the
+vectors share a DoFHandler, for example to output two velocities and a pressure
+from three different vectors in the same mixed finite element space.
+<br>
+(Luca Heltai, 2026/10/15)

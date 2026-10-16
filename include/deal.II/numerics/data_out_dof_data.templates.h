@@ -2026,8 +2026,10 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_dataset_names()
     if (input_data->is_complex_valued() == false ||
         (input_data->postprocessor != nullptr))
       {
-        for (const auto &name : input_data->names)
-          names.push_back(name);
+        for (unsigned int i = 0; i < input_data->names.size(); ++i)
+          if (input_data->data_component_interpretation[i] !=
+              DataComponentInterpretation::component_is_ignored)
+            names.push_back(input_data->names[i]);
       }
     else
       {
@@ -2038,6 +2040,10 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_dataset_names()
           {
             switch (input_data->data_component_interpretation[i])
               {
+                case DataComponentInterpretation::component_is_ignored:
+                  ++i;
+                  break;
+
                 case DataComponentInterpretation::component_is_scalar:
                   {
                     // It's a scalar. Just output real and imaginary parts one
@@ -2099,6 +2105,9 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_dataset_names()
   for (const auto &input_data : cell_data)
     {
       Assert(input_data->names.size() == 1, ExcInternalError());
+      if (input_data->data_component_interpretation[0] ==
+          DataComponentInterpretation::component_is_ignored)
+        continue;
       if ((input_data->is_complex_valued() == false) ||
           (input_data->postprocessor != nullptr))
         names.push_back(input_data->names[0]);
@@ -2139,6 +2148,10 @@ DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
       // current function all we care about is vector data
       switch (input_data->data_component_interpretation[i])
         {
+          case DataComponentInterpretation::component_is_ignored:
+            ++i;
+            break;
+
           case DataComponentInterpretation::component_is_scalar:
             {
               // Just move component forward by one (or two if the
@@ -2315,6 +2328,53 @@ const std::vector<dealii::DataOutBase::Patch<patch_dim, patch_spacedim>> &
 DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::get_patches() const
 {
   return patches;
+}
+
+
+
+template <int dim, int patch_dim, int spacedim, int patch_spacedim>
+void
+DataOut_DoFData<dim, patch_dim, spacedim, patch_spacedim>::
+  remove_ignored_components()
+{
+  // Patch builders use the original component numbering. Ignored complex
+  // components occupy two consecutive rows, just like scalar components.
+  std::vector<bool> keep;
+  const auto        append_components = [&keep](const auto &entries) {
+    for (const auto &entry : entries)
+      for (const auto interpretation : entry->data_component_interpretation)
+        {
+          const bool selected =
+            interpretation != DataComponentInterpretation::component_is_ignored;
+          keep.push_back(selected);
+          if (entry->is_complex_valued() && entry->postprocessor == nullptr)
+            keep.push_back(selected);
+        }
+  };
+  append_components(dof_data);
+  append_components(cell_data);
+
+  const unsigned int n_selected = std::count(keep.begin(), keep.end(), true);
+  if (n_selected == keep.size())
+    return;
+
+  for (auto &patch : patches)
+    {
+      const unsigned int n_coordinates =
+        patch.points_are_available ? patch_spacedim : 0;
+      AssertDimension(patch.data.n_rows(), keep.size() + n_coordinates);
+      decltype(patch.data) data(n_selected + n_coordinates,
+                                patch.data.n_cols());
+      unsigned int         destination = 0;
+      for (unsigned int source = 0; source < patch.data.n_rows(); ++source)
+        if (source >= keep.size() || keep[source])
+          {
+            for (unsigned int q = 0; q < patch.data.n_cols(); ++q)
+              data(destination, q) = patch.data(source, q);
+            ++destination;
+          }
+      patch.data = std::move(data);
+    }
 }
 
 

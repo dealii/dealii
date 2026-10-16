@@ -548,6 +548,8 @@ DataOutRotation<dim, spacedim>::build_patches(
     },
     thread_data,
     new_patches);
+
+  this->remove_ignored_components();
 }
 
 

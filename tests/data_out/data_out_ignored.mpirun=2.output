@@ -1,0 +1,20 @@
+
+DEAL::<VTKFile type="PUnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <PUnstructuredGrid GhostLevel="0">
+    <PPointData Scalars="scalars">
+    <PDataArray type="Float32" Name="velocity_a" NumberOfComponents="3" format="ascii"/>
+    <PDataArray type="Float32" Name="velocity_b" NumberOfComponents="3" format="ascii"/>
+    <PDataArray type="Float32" Name="pressure" format="ascii"/>
+    </PPointData>
+    <PPoints>
+      <PDataArray type="Float32" NumberOfComponents="3"/>
+    </PPoints>
+    <Piece Source="selected_0.0.vtu"/>
+    <Piece Source="selected_0.1.vtu"/>
+  </PUnstructuredGrid>
+</VTKFile>
+
+DEAL::selected_0.0.vtu: 8 points, all field values verified
+DEAL::First values: 10.0000 20.0000 110.000 120.000 230.000
+DEAL::selected_0.1.vtu: 8 points, all field values verified
+DEAL::First values: 10.5000 21.0000 110.500 121.000 231.500
