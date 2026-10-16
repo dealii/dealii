@@ -188,6 +188,41 @@ namespace SUNDIALS
 
   template <typename VectorType>
   void
+  ARKStepper<VectorType>::resize(double                      t0,
+                                 const VectorType           &y0,
+                                 double                      hscale,
+                                 internal::InvocationContext inv_ctx)
+  {
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    const auto y0_nvector = internal::make_nvector_view(y0
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                        ,
+                                                        inv_ctx.arkode_ctx
+#  endif
+    );
+
+    const int status =
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
+      ARKodeResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+#  else
+      ARKStepResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+#  endif
+    (void)status;
+    AssertARKode(status);
+
+    // ARKODE does not resize the vectors held by its linear solver interface
+    // and by user-attached nonlinear solvers; attaching the solvers again
+    // reallocates them.
+    setup_system_solver(y0, inv_ctx);
+
+    setup_mass_solver(y0, inv_ctx);
+  }
+
+
+
+  template <typename VectorType>
+  void
   ARKStepper<VectorType>::setup_system_solver(
     const VectorType           &solution,
     internal::InvocationContext inv_ctx)
@@ -652,6 +687,34 @@ namespace SUNDIALS
 
 
   template <typename VectorType>
+  void
+  ERKStepper<VectorType>::resize(double                      t0,
+                                 const VectorType           &y0,
+                                 double                      hscale,
+                                 internal::InvocationContext inv_ctx)
+  {
+    Assert(arkode_mem != nullptr, ExcInternalError());
+    (void)inv_ctx;
+
+    const auto y0_nvector = internal::make_nvector_view(y0
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                                                        ,
+                                                        inv_ctx.arkode_ctx
+#  endif
+    );
+
+    const int status =
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 1, 0)
+      ARKodeResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+#  else
+      ERKStepResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+#  endif
+    (void)status;
+    AssertARKode(status);
+  }
+
+
+  template <typename VectorType>
   void *
   ERKStepper<VectorType>::get_arkode_memory() const
   {
@@ -773,16 +836,8 @@ namespace SUNDIALS
         // explicit right-hand side), so no further user input is required.
         // The state vector y0 is only used to determine the vector layout for
         // the initial guess; the estimator clones it internally.
-        SUNDomEigEstimator estimator =
-          SUNDomEigEstimator_Power(initial_condition_nvector,
-                                   data.dom_eig_estimator_max_iters,
-                                   data.dom_eig_estimator_rel_tol,
-                                   inv_ctx.arkode_ctx);
-        Assert(estimator != nullptr, ExcInternalError());
-        dom_eig_estimator.reset(static_cast<void *>(estimator));
-
-        status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
-        AssertARKode(status);
+        attach_default_dom_eig_estimator(initial_condition_nvector,
+                                         inv_ctx.arkode_ctx);
 
         if (data.dom_eig_estimator_num_warmups != numbers::invalid_unsigned_int)
           {
@@ -822,6 +877,57 @@ namespace SUNDIALS
 
     if (custom_setup)
       custom_setup(arkode_mem.get());
+  }
+
+
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+  template <typename VectorType>
+  void
+  LSRKStepperSTS<VectorType>::attach_default_dom_eig_estimator(
+    N_Vector   y,
+    SUNContext context)
+  {
+    SUNDomEigEstimator estimator =
+      SUNDomEigEstimator_Power(y,
+                               data.dom_eig_estimator_max_iters,
+                               data.dom_eig_estimator_rel_tol,
+                               context);
+    Assert(estimator != nullptr, ExcInternalError());
+
+    const int status = LSRKStepSetDomEigEstimator(arkode_mem.get(), estimator);
+    AssertARKode(status);
+    (void)status;
+
+    // On resize the previous estimator is released here; LSRKStep no longer
+    // references it.
+    dom_eig_estimator.reset(static_cast<void *>(estimator));
+  }
+#    endif
+
+
+  template <typename VectorType>
+  void
+  LSRKStepperSTS<VectorType>::resize(double                      t0,
+                                     const VectorType           &y0,
+                                     double                      hscale,
+                                     internal::InvocationContext inv_ctx)
+  {
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    const auto y0_nvector = internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
+
+    int status =
+      ARKodeResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+    AssertARKode(status);
+
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+    // The built-in estimator holds vectors cloned from the old state vector.
+    // LSRKStep only initializes the estimator on the first initialization, not
+    // on a resize, so this has to be done here.
+    if (!dominant_eigenvalue_function)
+      attach_default_dom_eig_estimator(y0_nvector, inv_ctx.arkode_ctx);
+#    endif
+    (void)status;
   }
 
 
@@ -902,6 +1008,24 @@ namespace SUNDIALS
 
     if (custom_setup)
       custom_setup(arkode_mem.get());
+  }
+
+
+  template <typename VectorType>
+  void
+  LSRKStepperSSP<VectorType>::resize(double                      t0,
+                                     const VectorType           &y0,
+                                     double                      hscale,
+                                     internal::InvocationContext inv_ctx)
+  {
+    Assert(arkode_mem != nullptr, ExcInternalError());
+
+    const auto y0_nvector = internal::make_nvector_view(y0, inv_ctx.arkode_ctx);
+
+    const int status =
+      ARKodeResize(arkode_mem.get(), y0_nvector, hscale, t0, nullptr, nullptr);
+    (void)status;
+    AssertARKode(status);
   }
 
 

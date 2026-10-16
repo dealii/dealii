@@ -1,0 +1,4 @@
+
+DEAL::ERKStepper: resizes 1, final size 4
+DEAL::ERKStepper: step count is within one of the run without resize: yes
+DEAL::ERKStepper: error is small: yes
