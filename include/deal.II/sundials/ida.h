@@ -44,6 +44,8 @@
 #  include <sundials/sundials_config.h>
 #  include <sundials/sundials_math.h>
 
+#  include <cmath>
+#  include <limits>
 #  include <memory>
 
 #endif // DEAL_II_WITH_SUNDIALS
@@ -74,6 +76,15 @@ namespace SUNDIALS
    *  - solver_should_restart;
    *  - differential_components;
    *  - get_local_tolerances;
+   *  - get_constraint_vector;
+   *  - custom_setup;
+   *
+   * AdditionalData exposes the scalar integration, nonlinear, linear-solver,
+   * initial-condition, and (with SUNDIALS 6.2 or newer) adaptivity options.
+   * Inequality constraints may be configured by providing the
+   * get_constraint_vector() function; in such vector the entries should be 0
+   * (unconstrained), +1/-1 (nonnegative/nonpositive), or +2/-2 (strictly
+   * positive/negative).
    *
    * To output steps, connect a function to the signal
    *  - output_step;
@@ -535,7 +546,16 @@ namespace SUNDIALS
        * iterations
        * @param ls_norm_factor Converting factor from the integrator tolerance
        * to the linear solver tolerance
-       * iterations
+       * @param maximum_step_size Largest allowed integration step
+       * @param maximum_number_of_steps Maximum internal steps between outputs
+       * @param maximum_error_test_failures Maximum local error test failures
+       * @param maximum_convergence_failures Maximum nonlinear convergence failures
+       * @param nonlinear_convergence_coefficient Nonlinear convergence test coefficient
+       * @param linear_tolerance_factor Linear solver tolerance scale
+       * @param increment_factor Difference-quotient increment factor
+       * @param linear_solution_scaling Whether to scale linear solutions
+       * @param delta_cj_lsetup Jacobian setup threshold for Cj changes
+       * (SUNDIALS 6.2+)
        *
        * Error parameters:
        *
@@ -550,6 +570,20 @@ namespace SUNDIALS
        * @param reset_type Initial condition correction type after restart
        * @param maximum_non_linear_iterations_ic Initial condition Newton max
        * iterations
+       * @param maximum_number_of_steps_ic Maximum IC correction steps
+       * @param maximum_number_of_jacobians_ic Maximum IC Jacobian evaluations
+       * @param maximum_number_of_backtracks_ic Maximum IC line-search backtracks
+       * @param line_search_enabled_ic Whether to use the IC line search
+       * @param step_tolerance_ic Minimum Newton correction for IC convergence
+       * @param nonlinear_convergence_coefficient_ic IC convergence coefficient
+       * @param eta_min Minimum adaptive step reduction factor (SUNDIALS 6.2+)
+       * @param eta_max Maximum adaptive step growth factor (SUNDIALS 6.2+)
+       * @param eta_low Low-order step reduction factor (SUNDIALS 6.2+)
+       * @param eta_min_err_fail Minimum factor after error failure (SUNDIALS 6.2+)
+       * @param eta_conv_fail Factor after convergence failure (SUNDIALS 6.2+)
+       * @param eta_min_fixed Minimum fixed-step growth factor (SUNDIALS 6.2+)
+       * @param eta_max_fixed Maximum fixed-step growth factor (SUNDIALS 6.2+)
+       * @param maximum_constraint_failures Constraint failures per step (SUNDIALS 7.6+)
        */
       AdditionalData( // Initial parameters
         const double initial_time      = 0.0,
@@ -557,7 +591,7 @@ namespace SUNDIALS
         const double initial_step_size = 1e-2,
         const double output_period     = 1e-1,
         // Running parameters
-        const double       minimum_step_size             = 1e-6,
+        const double       minimum_step_size             = 1e-15,
         const unsigned int maximum_order                 = 5,
         const unsigned int maximum_non_linear_iterations = 10,
         const double       ls_norm_factor                = 0,
@@ -568,11 +602,74 @@ namespace SUNDIALS
         // Initial conditions parameters
         const InitialConditionCorrection &ic_type    = use_y_diff,
         const InitialConditionCorrection &reset_type = use_y_diff,
-        const unsigned int                maximum_non_linear_iterations_ic = 5)
+        const unsigned int                maximum_non_linear_iterations_ic = 5,
+        // Additional running and nonlinear solver parameters
+        const double       maximum_step_size                 = 0.0,
+        const long int     maximum_number_of_steps           = 500,
+        const unsigned int maximum_error_test_failures       = 10,
+        const unsigned int maximum_convergence_failures      = 10,
+        const double       nonlinear_convergence_coefficient = 0.33,
+        // Additional initial-condition correction parameters
+        const unsigned int maximum_number_of_steps_ic      = 5,
+        const unsigned int maximum_number_of_jacobians_ic  = 4,
+        const unsigned int maximum_number_of_backtracks_ic = 100,
+        const bool         line_search_enabled_ic          = true,
+        const double       step_tolerance_ic =
+          std::pow(std::numeric_limits<double>::epsilon(), 2.0 / 3.0),
+        const double nonlinear_convergence_coefficient_ic = 0.0033,
+        // Additional linear solver parameters
+        const double linear_tolerance_factor = 0.05,
+        const double increment_factor        = 1.0,
+        const bool   linear_solution_scaling = true
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+        ,
+        const double delta_cj_lsetup = 0.25,
+        // Step adaptivity parameters
+        const double eta_min          = 0.5,
+        const double eta_max          = 2.0,
+        const double eta_low          = 0.9,
+        const double eta_min_err_fail = 0.25,
+        const double eta_conv_fail    = 0.25,
+        const double eta_min_fixed    = 1.0,
+        const double eta_max_fixed    = 2.0
+#  endif
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
+        ,
+        const unsigned int maximum_constraint_failures = 10
+#  endif
+        )
         : initial_time(initial_time)
         , final_time(final_time)
         , initial_step_size(initial_step_size)
         , minimum_step_size(minimum_step_size)
+        , maximum_step_size(maximum_step_size)
+        , maximum_number_of_steps(maximum_number_of_steps)
+        , maximum_error_test_failures(maximum_error_test_failures)
+        , maximum_convergence_failures(maximum_convergence_failures)
+        , nonlinear_convergence_coefficient(nonlinear_convergence_coefficient)
+        , maximum_number_of_steps_ic(maximum_number_of_steps_ic)
+        , maximum_number_of_jacobians_ic(maximum_number_of_jacobians_ic)
+        , maximum_number_of_backtracks_ic(maximum_number_of_backtracks_ic)
+        , line_search_enabled_ic(line_search_enabled_ic)
+        , step_tolerance_ic(step_tolerance_ic)
+        , nonlinear_convergence_coefficient_ic(
+            nonlinear_convergence_coefficient_ic)
+        , linear_tolerance_factor(linear_tolerance_factor)
+        , increment_factor(increment_factor)
+        , linear_solution_scaling(linear_solution_scaling)
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+        , delta_cj_lsetup(delta_cj_lsetup)
+        , eta_min(eta_min)
+        , eta_max(eta_max)
+        , eta_low(eta_low)
+        , eta_min_err_fail(eta_min_err_fail)
+        , eta_conv_fail(eta_conv_fail)
+        , eta_min_fixed(eta_min_fixed)
+        , eta_max_fixed(eta_max_fixed)
+#  endif
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
+        , maximum_constraint_failures(maximum_constraint_failures)
+#  endif
         , absolute_tolerance(absolute_tolerance)
         , relative_tolerance(relative_tolerance)
         , maximum_order(maximum_order)
@@ -636,10 +733,34 @@ namespace SUNDIALS
 
         prm.enter_subsection("Running parameters");
         prm.add_parameter("Initial step size", initial_step_size);
-        prm.add_parameter("Minimum step size", minimum_step_size);
+        prm.add_parameter("Minimum step size",
+                          minimum_step_size,
+                          "Smallest allowed integration step.");
+        prm.add_parameter(
+          "Maximum step size",
+          maximum_step_size,
+          "Largest allowed integration step; zero is unlimited.");
+        prm.add_parameter("Maximum number of steps",
+                          maximum_number_of_steps,
+                          "Maximum internal steps between output times.");
+        prm.add_parameter(
+          "Maximum error test failures",
+          maximum_error_test_failures,
+          "Stops a solve after repeated local error test rejections.");
+        prm.add_parameter(
+          "Maximum nonlinear convergence failures",
+          maximum_convergence_failures,
+          "Stops a solve after repeated nonlinear solver failures.");
         prm.add_parameter("Maximum order of BDF", maximum_order);
         prm.add_parameter("Maximum number of nonlinear iterations",
                           maximum_non_linear_iterations);
+        prm.leave_subsection();
+
+        prm.enter_subsection("Nonlinear solver");
+        prm.add_parameter(
+          "Convergence coefficient",
+          nonlinear_convergence_coefficient,
+          "Controls when Newton corrections count as converged.");
         prm.leave_subsection();
 
         prm.enter_subsection("Error control");
@@ -653,10 +774,9 @@ namespace SUNDIALS
         prm.leave_subsection();
 
         prm.enter_subsection("Initial condition correction parameters");
-        static std::string ic_type_str = "use_y_diff";
         prm.add_parameter(
           "Correction type at initial time",
-          ic_type_str,
+          ic_type,
           "This is one of the following three options for the "
           "initial condition calculation. \n"
           " none: do not try to make initial conditions consistent. \n"
@@ -664,24 +784,10 @@ namespace SUNDIALS
           "    components of y_dot, given the differential components of y. \n"
           "    This option requires that the user specifies differential and \n"
           "    algebraic components in the function differential_components().\n"
-          " use_y_dot: compute all components of y, given y_dot.",
-          Patterns::Selection("none|use_y_diff|use_y_dot"));
-        prm.add_action("Correction type at initial time",
-                       [&](const std::string &value) {
-                         if (value == "use_y_diff")
-                           ic_type = use_y_diff;
-                         else if (value == "use_y_dot")
-                           ic_type = use_y_dot;
-                         else if (value == "none")
-                           ic_type = none;
-                         else
-                           AssertThrow(false, ExcInternalError());
-                       });
-
-        static std::string reset_type_str = "use_y_diff";
+          " use_y_dot: compute all components of y, given y_dot.");
         prm.add_parameter(
           "Correction type after restart",
-          reset_type_str,
+          reset_type,
           "This is one of the following three options for the "
           "initial condition calculation. \n"
           " none: do not try to make initial conditions consistent. \n"
@@ -689,25 +795,92 @@ namespace SUNDIALS
           "    components of y_dot, given the differential components of y. \n"
           "    This option requires that the user specifies differential and \n"
           "    algebraic components in the function differential_components().\n"
-          " use_y_dot: compute all components of y, given y_dot.",
-          Patterns::Selection("none|use_y_diff|use_y_dot"));
-        prm.add_action("Correction type after restart",
-                       [&](const std::string &value) {
-                         if (value == "use_y_diff")
-                           reset_type = use_y_diff;
-                         else if (value == "use_y_dot")
-                           reset_type = use_y_dot;
-                         else if (value == "none")
-                           reset_type = none;
-                         else
-                           AssertThrow(false, ExcInternalError());
-                       });
+          " use_y_dot: compute all components of y, given y_dot.");
         prm.add_parameter("Maximum number of nonlinear iterations",
                           maximum_non_linear_iterations_ic);
         prm.add_parameter(
           "Factor to use when converting from the integrator tolerance to the linear solver tolerance",
           ls_norm_factor);
+        prm.add_parameter(
+          "Maximum number of steps",
+          maximum_number_of_steps_ic,
+          "Bounds work while making the initial values consistent.");
+        prm.add_parameter(
+          "Maximum number of Jacobians",
+          maximum_number_of_jacobians_ic,
+          "Bounds Jacobian refresh attempts during IC correction.");
+        prm.add_parameter("Maximum number of backtracks",
+                          maximum_number_of_backtracks_ic,
+                          "Limits trial reductions in the IC line search.");
+        prm.add_parameter("Line search enabled",
+                          line_search_enabled_ic,
+                          "Enable backtracking when adjusting initial values.");
+        prm.add_parameter(
+          "Step tolerance",
+          step_tolerance_ic,
+          "Treats a sufficiently small Newton correction as convergence.");
+        prm.add_parameter(
+          "Nonlinear convergence coefficient",
+          nonlinear_convergence_coefficient_ic,
+          "Sets the Newton convergence test used by IDACalcIC.");
         prm.leave_subsection();
+
+        prm.enter_subsection("Linear solver");
+        prm.add_parameter(
+          "Linear tolerance factor",
+          linear_tolerance_factor,
+          "Relates linear solve accuracy to the nonlinear tolerance.");
+        prm.add_parameter(
+          "Difference quotient increment factor",
+          increment_factor,
+          "Scales finite-difference perturbations in Jacobian products.");
+        prm.add_parameter(
+          "Linear solution scaling",
+          linear_solution_scaling,
+          "Compensates for changes in Cj between linear solves.");
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+        prm.add_parameter(
+          "Cj setup difference factor",
+          delta_cj_lsetup,
+          "Rebuilds linear setup when Cj changes by this fraction.");
+#  endif
+        prm.leave_subsection();
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+        prm.enter_subsection("Step adaptivity");
+        prm.add_parameter(
+          "Minimum step growth factor",
+          eta_min,
+          "Prevents overly aggressive reductions in step size.");
+        prm.add_parameter("Maximum step growth factor",
+                          eta_max,
+                          "Caps step growth after a successful step.");
+        prm.add_parameter("Low step growth factor",
+                          eta_low,
+                          "Applies when IDA takes a lower-order step.");
+        prm.add_parameter("Minimum growth factor after error failure",
+                          eta_min_err_fail,
+                          "Limits step reduction after a failed error test.");
+        prm.add_parameter(
+          "Growth factor after convergence failure",
+          eta_conv_fail,
+          "Sets the next-step reduction after nonlinear failure.");
+        prm.add_parameter("Minimum fixed step growth factor",
+                          eta_min_fixed,
+                          "Lower growth bound for fixed-step adaptivity.");
+        prm.add_parameter("Maximum fixed step growth factor",
+                          eta_max_fixed,
+                          "Upper growth bound for fixed-step adaptivity.");
+        prm.leave_subsection();
+#  endif
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
+        prm.enter_subsection("Constraints");
+        prm.add_parameter(
+          "Maximum constraint failures",
+          maximum_constraint_failures,
+          "Rejects a step after this many constraint violations.");
+        prm.leave_subsection();
+#  endif
       }
 
       /**
@@ -729,6 +902,132 @@ namespace SUNDIALS
        * Minimum step size.
        */
       double minimum_step_size;
+
+      /**
+       * Maximum integration step size. A value of zero keeps means unlimited.
+       */
+      double maximum_step_size = 0.0;
+
+      /**
+       * Maximum internal steps per IDASolve call (SUNDIALS default: 500). The
+       * counter is reset whenever an output step is accepted. If your
+       * simulation needs to take small time steps, but you only need output at
+       * very large time steps, you may want to increase this value.
+       */
+      long int maximum_number_of_steps = 500;
+
+      /**
+       * Maximum local error test failures (SUNDIALS default: 10).
+       */
+      unsigned int maximum_error_test_failures = 10;
+
+      /**
+       * Maximum nonlinear convergence failures (SUNDIALS default: 10).
+       */
+      unsigned int maximum_convergence_failures = 10;
+
+      /**
+       * Nonlinear convergence coefficient (SUNDIALS default: 0.33).
+       */
+      double nonlinear_convergence_coefficient = 0.33;
+
+      /**
+       * Maximum number of IC solve steps (SUNDIALS default: 5).
+       */
+      unsigned int maximum_number_of_steps_ic = 5;
+
+      /**
+       * Maximum number of IC Jacobian evaluations (SUNDIALS default: 4).
+       */
+      unsigned int maximum_number_of_jacobians_ic = 4;
+
+      /**
+       * Maximum number of IC line-search backtracks (SUNDIALS default: 100).
+       */
+      unsigned int maximum_number_of_backtracks_ic = 100;
+
+      /**
+       * Whether to use the IC line search (SUNDIALS default: true).
+       */
+      bool line_search_enabled_ic = true;
+
+      /**
+       * IC step tolerance (SUNDIALS default: unit roundoff^(2/3)).
+       */
+      double step_tolerance_ic =
+        std::pow(std::numeric_limits<double>::epsilon(), 2.0 / 3.0);
+
+      /**
+       * IC nonlinear convergence coefficient (SUNDIALS default: 0.0033).
+       */
+      double nonlinear_convergence_coefficient_ic = 0.0033;
+
+      /**
+       * Linear solver tolerance factor (SUNDIALS default: 0.05; zero selects
+       * this default).
+       */
+      double linear_tolerance_factor = 0.05;
+
+      /**
+       * Difference quotient increment factor (SUNDIALS default: 1.0).
+       */
+      double increment_factor = 1.0;
+
+      /**
+       * Whether to apply linear solution scaling. The deal.II IDA wrapper uses
+       * a matrix-iterative SUNLinearSolver, whose SUNDIALS default is true.
+       */
+      bool linear_solution_scaling = true;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
+
+      /**
+       * Cj setup difference factor (SUNDIALS default: 0.25).
+       */
+      double delta_cj_lsetup = 0.25;
+
+      /**
+       * Minimum adaptivity step reduction factor (SUNDIALS default: 0.5).
+       */
+      double eta_min = 0.5;
+
+      /**
+       * Maximum adaptivity step growth factor (SUNDIALS default: 2.0).
+       */
+      double eta_max = 2.0;
+
+      /**
+       * Adaptivity step reduction factor (SUNDIALS default: 0.9).
+       */
+      double eta_low = 0.9;
+
+      /**
+       * Minimum adaptivity factor after an error failure (default: 0.25).
+       */
+      double eta_min_err_fail = 0.25;
+
+      /**
+       * Adaptivity factor after a convergence failure (default: 0.25).
+       */
+      double eta_conv_fail = 0.25;
+
+      /**
+       * Minimum fixed-step growth factor (SUNDIALS default: 1.0).
+       */
+      double eta_min_fixed = 1.0;
+
+      /**
+       * Maximum fixed-step growth factor (SUNDIALS default: 2.0).
+       */
+      double eta_max_fixed = 2.0;
+#  endif
+#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
+
+      /**
+       * Maximum inequality constraint failures per step (default: 10).
+       */
+      unsigned int maximum_constraint_failures = 10;
+#  endif
 
       /**
        * Absolute error tolerance for adaptive time stepping.
@@ -1060,6 +1359,34 @@ namespace SUNDIALS
      * all ones.
      */
     std::function<VectorType &()> get_local_tolerances;
+
+    /**
+     * Return the IDA inequality constraint vector, if used. Entries follow
+     * SUNDIALS' encoding: 0 (unconstrained), +/-1 (non-negative, non-positive),
+     * +/-2 (positive, negative).
+     */
+    std::function<VectorType &()> get_constraint_vector;
+
+    /**
+     * Access the underlying IDA memory for upstream IDAGet* calls. This is
+     * null before the first reset and is invalidated whenever reset() rebuilds
+     * the IDA memory. Do not replace wrapper-owned user data or callbacks.
+     */
+    void *
+    get_ida_memory() const;
+
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    /** Return the SUNContext, invalidated and recreated by reset(). */
+    SUNContext
+    get_sun_context() const;
+#  endif
+
+    /**
+     * Expert hook called after all deal.II configuration and linear solver
+     * callbacks are installed, and before IDACalcIC(). It is called on every
+     * reset. Replacing wrapper-owned user data or callbacks can break IDA.
+     */
+    std::function<void(void *ida_mem)> custom_setup;
 
   private:
     /**
