@@ -1,0 +1,6 @@
+New: The Triangulation::match_refinement_across_periodic_boundaries
+smoothing flag keeps periodic neighbors on the same refinement level by
+matching refinement and coarsening decisions across periodic faces. This also
+works with parallel::distributed::Triangulation and is required to use local smoothing GMG on periodic domains.
+<br>
+(Timo Heister, 2026/10/12)
