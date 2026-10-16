@@ -14,6 +14,7 @@
 
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/polynomials_barycentric.h>
+#include <deal.II/base/polynomials_simplex.h>
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/types.h>
 
@@ -252,7 +253,8 @@ namespace
     FullMatrix<double> interface_constraints(n_dofs_constrained,
                                              n_dofs_per_face);
 
-    const auto poly = BarycentricPolynomials<dim - 1>::get_fe_p_basis(degree);
+    const ScalarLagrangePolynomialSimplex<dim - 1> poly(
+      degree, unit_support_points_fe_p<dim - 1>(degree));
 
     for (unsigned int i = 0; i < n_dofs_constrained; ++i)
       for (unsigned int j = 0; j < n_dofs_per_face; ++j)
@@ -326,6 +328,28 @@ namespace
       }
   }
 } // namespace
+
+
+
+template <int dim, int spacedim>
+FE_SimplexPoly<dim, spacedim>::FE_SimplexPoly(
+  const ScalarLagrangePolynomialSimplex<dim>    &polynomials,
+  const FiniteElementData<dim>                  &fe_data,
+  const bool                                     prolongation_is_additive,
+  const std::vector<Point<dim>>                 &unit_support_points,
+  const std::vector<std::vector<Point<dim - 1>>> unit_face_support_points,
+  const FullMatrix<double>                      &interface_constraints)
+  : dealii::FE_Poly<dim, spacedim>(
+      polynomials,
+      fe_data,
+      std::vector<bool>(fe_data.dofs_per_cell, prolongation_is_additive),
+      std::vector<ComponentMask>(fe_data.dofs_per_cell,
+                                 ComponentMask(std::vector<bool>(1, true))))
+{
+  this->unit_support_points      = unit_support_points;
+  this->unit_face_support_points = unit_face_support_points;
+  this->interface_constraints    = interface_constraints;
+}
 
 
 
@@ -763,7 +787,9 @@ FE_SimplexPoly<dim, spacedim>::
 template <int dim, int spacedim>
 FE_SimplexP<dim, spacedim>::FE_SimplexP(const unsigned int degree)
   : FE_SimplexPoly<dim, spacedim>(
-      BarycentricPolynomials<dim>::get_fe_p_basis(degree),
+      ScalarLagrangePolynomialSimplex<dim>(degree,
+                                           unit_support_points_fe_p<dim>(
+                                             degree)),
       FiniteElementData<dim>(get_dpo_vector_fe_p(dim, degree),
                              ReferenceCells::get_simplex<dim>(),
                              1,
@@ -1130,7 +1156,9 @@ FE_SimplexP<dim, spacedim>::hp_quad_dof_identities(
 template <int dim, int spacedim>
 FE_SimplexDGP<dim, spacedim>::FE_SimplexDGP(const unsigned int degree)
   : FE_SimplexPoly<dim, spacedim>(
-      BarycentricPolynomials<dim>::get_fe_p_basis(degree),
+      ScalarLagrangePolynomialSimplex<dim>(degree,
+                                           unit_support_points_fe_p<dim>(
+                                             degree)),
       FiniteElementData<dim>(get_dpo_vector_fe_dgp(dim, degree),
                              ReferenceCells::get_simplex<dim>(),
                              1,
