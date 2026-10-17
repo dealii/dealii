@@ -12,11 +12,10 @@
 
 
 
-// Like the _02 test, but check that we can read files that have DOS
-// line endings. To this end, we read the files from the _02 test, and
-// convert them to ones that have DOS line endings. Then pass those on
-// to the reader. This used to cause total chaos with error messages
-// that were really not useful.
+// Check that the Abaqus reader accepts DOS line endings. The mesh is reduced
+// from ellipsoid_cavity.inp to two cells, with an explicit ELSET referenced by
+// a SURFACE. Without stripping the trailing '\r', the ELSET name contains it,
+// so the SURFACE reference fails to match and is misread as a cell number.
 
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/grid_out.h>
@@ -94,8 +93,7 @@ main()
 
   try
     {
-      abaqus_grid<3, 3>(SOURCE_DIR "/grids/abaqus/3d/ellipsoid_cavity.inp",
-                        false);
+      abaqus_grid<3, 3>(SOURCE_DIR "/grids/abaqus/3d/ellipsoid_cavity.inp");
     }
   catch (const std::exception &exc)
     {
