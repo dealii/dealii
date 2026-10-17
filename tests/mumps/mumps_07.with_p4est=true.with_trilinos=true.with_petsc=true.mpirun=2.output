@@ -1,0 +1,71 @@
+
+DEAL:0::Trilinos block matrices and vectors
+DEAL:0::2d
+DEAL:0::Number of dofs = 3778 (1889 + 1889)
+DEAL:0::relative norm distance = 4.70784e-16
+DEAL:0::absolute norms = 6.30930e-11 134017.
+DEAL:0::relative norm distance = 4.50873e-16
+DEAL:0::absolute norms = 1.51062e-10 335042.
+DEAL:0::relative norm distance = 4.50873e-16
+DEAL:0::absolute norms = 3.02123e-10 670085.
+DEAL:0::3d
+DEAL:0::Number of dofs = 2666 (1333 + 1333)
+DEAL:0::relative norm distance = 1.39130e-15
+DEAL:0::absolute norms = 1.10511e-10 79430.1
+DEAL:0::relative norm distance = 1.21668e-15
+DEAL:0::absolute norms = 2.41603e-10 198575.
+DEAL:0::relative norm distance = 1.21668e-15
+DEAL:0::absolute norms = 4.83206e-10 397151.
+DEAL:0::PETSc block matrices and vectors
+DEAL:0::2d
+DEAL:0::Number of dofs = 3778 (1889 + 1889)
+DEAL:0::relative norm distance = 4.09725e-16
+DEAL:0::absolute norms = 5.49101e-11 134017.
+DEAL:0::relative norm distance = 4.21333e-16
+DEAL:0::absolute norms = 1.41164e-10 335042.
+DEAL:0::relative norm distance = 4.21333e-16
+DEAL:0::absolute norms = 2.82329e-10 670085.
+DEAL:0::3d
+DEAL:0::Number of dofs = 2666 (1333 + 1333)
+DEAL:0::relative norm distance = 9.67728e-16
+DEAL:0::absolute norms = 7.68667e-11 79430.1
+DEAL:0::relative norm distance = 9.74352e-16
+DEAL:0::absolute norms = 1.93482e-10 198575.
+DEAL:0::relative norm distance = 9.74352e-16
+DEAL:0::absolute norms = 3.86965e-10 397151.
+
+DEAL:1::Trilinos block matrices and vectors
+DEAL:1::2d
+DEAL:1::Number of dofs = 3778 (1889 + 1889)
+DEAL:1::relative norm distance = 4.70784e-16
+DEAL:1::absolute norms = 6.30930e-11 134017.
+DEAL:1::relative norm distance = 4.50873e-16
+DEAL:1::absolute norms = 1.51062e-10 335042.
+DEAL:1::relative norm distance = 4.50873e-16
+DEAL:1::absolute norms = 3.02123e-10 670085.
+DEAL:1::3d
+DEAL:1::Number of dofs = 2666 (1333 + 1333)
+DEAL:1::relative norm distance = 1.39130e-15
+DEAL:1::absolute norms = 1.10511e-10 79430.1
+DEAL:1::relative norm distance = 1.21668e-15
+DEAL:1::absolute norms = 2.41603e-10 198575.
+DEAL:1::relative norm distance = 1.21668e-15
+DEAL:1::absolute norms = 4.83206e-10 397151.
+DEAL:1::PETSc block matrices and vectors
+DEAL:1::2d
+DEAL:1::Number of dofs = 3778 (1889 + 1889)
+DEAL:1::relative norm distance = 4.09725e-16
+DEAL:1::absolute norms = 5.49101e-11 134017.
+DEAL:1::relative norm distance = 4.21333e-16
+DEAL:1::absolute norms = 1.41164e-10 335042.
+DEAL:1::relative norm distance = 4.21333e-16
+DEAL:1::absolute norms = 2.82329e-10 670085.
+DEAL:1::3d
+DEAL:1::Number of dofs = 2666 (1333 + 1333)
+DEAL:1::relative norm distance = 9.67728e-16
+DEAL:1::absolute norms = 7.68667e-11 79430.1
+DEAL:1::relative norm distance = 9.74352e-16
+DEAL:1::absolute norms = 1.93482e-10 198575.
+DEAL:1::relative norm distance = 9.74352e-16
+DEAL:1::absolute norms = 3.86965e-10 397151.
+
