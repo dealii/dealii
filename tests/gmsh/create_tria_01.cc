@@ -17,6 +17,9 @@
 #include <deal.II/grid/grid_in.h>
 #include <deal.II/grid/tria.h>
 
+#include <boost/process/io.hpp>
+#include <boost/process/system.hpp>
+
 #include "../tests.h"
 
 template <int dim>
@@ -70,8 +73,13 @@ main()
 
   geo.close();
 
-  const int ierr = std::system(DEAL_II_GMSH_EXECUTABLE_PATH
-                               " -2 file.geo 1>file.log 2>file_warn.log");
+  namespace bp = boost::process;
+
+  const int ierr = bp::system(DEAL_II_GMSH_EXECUTABLE_PATH,
+                              "-2",
+                              "file.geo",
+                              bp::std_out > "file.log",
+                              bp::std_err > "file_warn.log");
   Assert(ierr == 0, ExcInternalError());
   gmsh_grid<2>("file.msh");
   cat_file("file.msh");
