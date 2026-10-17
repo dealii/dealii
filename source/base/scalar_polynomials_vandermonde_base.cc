@@ -107,8 +107,9 @@ ScalarPolynomialsVandermondeBase<dim>::compute_value(const unsigned int i,
 
 template <int dim>
 Tensor<1, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_grad(const unsigned int i,
-                                                    const Point<dim>  &p) const
+ScalarPolynomialsVandermondeBase<dim>::compute_1st_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
 {
   AssertIndexRange(i, vandermonde_matrix_inverse.m());
 
@@ -131,7 +132,7 @@ ScalarPolynomialsVandermondeBase<dim>::compute_grad(const unsigned int i,
 
 template <int dim>
 Tensor<2, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_grad_grad(
+ScalarPolynomialsVandermondeBase<dim>::compute_2nd_derivative(
   const unsigned int i,
   const Point<dim>  &p) const
 {
@@ -151,6 +152,61 @@ ScalarPolynomialsVandermondeBase<dim>::compute_grad_grad(
           grad_grad[d][e] = 0.0;
 
   return grad_grad;
+}
+
+
+
+template <int dim>
+Tensor<3, dim>
+ScalarPolynomialsVandermondeBase<dim>::compute_3rd_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i, vandermonde_matrix_inverse.m());
+
+  Tensor<3, dim> deriv;
+
+  deriv = 0.;
+  for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
+    deriv += vandermonde_matrix_inverse[i][j] *
+             evaluate_orthogonal_basis_3rd_derivative(j, p);
+
+  if constexpr (dim > 0)
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
+        for (unsigned int f = 0; f < dim; ++f)
+          if (std::fabs(deriv[d][e][f]) < 1e-14)
+            deriv[d][e][f] = 0.0;
+
+  return deriv;
+}
+
+
+
+template <int dim>
+Tensor<4, dim>
+ScalarPolynomialsVandermondeBase<dim>::compute_4th_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  AssertIndexRange(i, vandermonde_matrix_inverse.m());
+
+  Tensor<4, dim> deriv;
+
+  deriv = 0.;
+  for (unsigned int j = 0; j < vandermonde_matrix_inverse.n(); ++j)
+    deriv += vandermonde_matrix_inverse[i][j] *
+             evaluate_orthogonal_basis_4th_derivative(j, p);
+
+  if constexpr (dim > 0)
+    for (unsigned int d = 0; d < dim; ++d)
+      for (unsigned int e = 0; e < dim; ++e)
+        for (unsigned int f = 0; f < dim; ++f)
+          for (unsigned int g = 0; g < dim; ++g)
+            if (std::fabs(deriv[d][e][f][g]) < 1e-14)
+              deriv[d][e][f][g] = 0.0;
+
+  return deriv;
 }
 
 
@@ -182,54 +238,21 @@ ScalarPolynomialsVandermondeBase<dim>::evaluate(
 
 template <int dim>
 Tensor<1, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_1st_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
+ScalarPolynomialsVandermondeBase<dim>::compute_grad(const unsigned int i,
+                                                    const Point<dim>  &p) const
 {
-  return compute_grad(i, p);
+  return compute_1st_derivative(i, p);
 }
 
 
 
 template <int dim>
 Tensor<2, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_2nd_derivative(
+ScalarPolynomialsVandermondeBase<dim>::compute_grad_grad(
   const unsigned int i,
   const Point<dim>  &p) const
 {
-  return compute_grad_grad(i, p);
-}
-
-
-
-template <int dim>
-Tensor<3, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_3rd_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-
-  return {};
-}
-
-
-
-template <int dim>
-Tensor<4, dim>
-ScalarPolynomialsVandermondeBase<dim>::compute_4th_derivative(
-  const unsigned int i,
-  const Point<dim>  &p) const
-{
-  (void)i;
-  (void)p;
-
-  DEAL_II_NOT_IMPLEMENTED();
-
-  return {};
+  return compute_2nd_derivative(i, p);
 }
 
 
@@ -257,6 +280,38 @@ ScalarPolynomialsVandermondeBase<dim>::
 template <int dim>
 Tensor<2, dim>
 ScalarPolynomialsVandermondeBase<dim>::evaluate_orthogonal_basis_2nd_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  (void)i;
+  (void)p;
+
+  DEAL_II_NOT_IMPLEMENTED();
+
+  return {};
+}
+
+
+
+template <int dim>
+Tensor<3, dim>
+ScalarPolynomialsVandermondeBase<dim>::evaluate_orthogonal_basis_3rd_derivative(
+  const unsigned int i,
+  const Point<dim>  &p) const
+{
+  (void)i;
+  (void)p;
+
+  DEAL_II_NOT_IMPLEMENTED();
+
+  return {};
+}
+
+
+
+template <int dim>
+Tensor<4, dim>
+ScalarPolynomialsVandermondeBase<dim>::evaluate_orthogonal_basis_4th_derivative(
   const unsigned int i,
   const Point<dim>  &p) const
 {
