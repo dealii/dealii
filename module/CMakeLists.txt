@@ -160,6 +160,7 @@ if(DEAL_II_WITH_CXX20_MODULE)
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/boost.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/cgal.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/hdf5.ccm"
+    "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/itk.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/kokkos.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mumps.ccm"
     "${CMAKE_CURRENT_SOURCE_DIR}/interface_module_partitions/mpi.ccm"
