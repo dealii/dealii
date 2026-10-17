@@ -64,10 +64,10 @@ test()
   auto v1 = create_curves_from_triangulation_boundary(tria1);
   auto v3 = create_curves_from_triangulation_boundary(tria3);
 
-  if (spacedim == 3)
+  if constexpr (spacedim == 3)
     {
       Triangulation<2, 3> tria4;
-      GridGenerator::hyper_sphere(tria4);
+      GridGenerator::hyper_sphere<spacedim>(tria4);
       auto v4 = create_curves_from_triangulation_boundary(tria4);
 
       if (v4.size() != 0)
