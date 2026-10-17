@@ -13,8 +13,9 @@ subsection Running parameters
   set initial time            = 0
   set match final time        = false
   set maximum number of steps = -1
-  set options prefix          = 
-  set solver type             = 
+  set options prefix          =
+  set problem type            = nonlinear
+  set solver type             =
 end
 # Testing Parameters
 subsection Error control
@@ -31,7 +32,8 @@ subsection Running parameters
   set initial time            = 1.0
   set match final time        = false
   set maximum number of steps = -1
-  set options prefix          = 
+  set options prefix          =
+  set problem type            = nonlinear
   set solver type             = bdf
 end
 # Test explicit interface (J 0)
