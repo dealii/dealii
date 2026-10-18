@@ -161,6 +161,10 @@ DataOutResample<dim, patch_dim, spacedim>::build_patches(
       for (unsigned int comp = 0; comp < dh.get_fe_collection().n_components();
            ++comp)
         {
+          if (data->data_component_interpretation[comp] ==
+              DataComponentInterpretation::component_is_ignored)
+            continue;
+
           const auto values = VectorTools::point_values<1>(
             rpe, dh, data_ptr->vector, VectorTools::EvaluationFlags::avg, comp);
 

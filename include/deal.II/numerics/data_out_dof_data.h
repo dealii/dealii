@@ -367,6 +367,8 @@ namespace internal
        * components in vector valued function / data vector or number of
        * computed quantities, if DataPostprocessor is applied). This variable
        * is determined via and thus equivalent to <tt>names.size()</tt>.
+       * It includes components marked as ignored, which are removed after
+       * evaluating the data and constructing the patches.
        */
       unsigned int n_output_variables;
     };
@@ -714,6 +716,18 @@ public:
    * DataComponentInterpretation::component_is_part_of_vector,
    * DataComponentInterpretation::component_is_scalar) for (u,v,p).
    *
+   * Components marked DataComponentInterpretation::component_is_ignored are
+   * omitted from the output. The @p names and @p data_component_interpretation
+   * vectors must still contain an entry for every component, including ignored
+   * ones. For example, to output only the velocity from the Stokes vector
+   * above, use (component_is_part_of_vector, component_is_part_of_vector,
+   * component_is_ignored). To output only the pressure, use
+   * (component_is_ignored, component_is_ignored, component_is_scalar).
+   * The selection applies independently to each call: the same DoFHandler
+   * can be used to add two different solution vectors with velocity-only
+   * interpretations, followed by a third vector with a pressure-only
+   * interpretation.
+   *
    * The names of a data vector shall only contain characters which are
    * letters, underscore and a few other ones. Refer to the
    * ExcInvalidCharacter exception declared in this class to see which
@@ -1006,6 +1020,15 @@ protected:
   get_nonscalar_data_ranges() const override;
 
 protected:
+  /**
+   * Remove ignored components from the completed patches. Patch builders
+   * initially store all components, including ignored ones. This function
+   * compacts their data rows, preserving any trailing point coordinates.
+   * Call this once after building the patches.
+   */
+  void
+  remove_ignored_components();
+
   /**
    * Extracts the finite elements stored in the dof_data object, including a
    * dummy object of FE_DGQ<dim>(0) in case only the triangulation is used.

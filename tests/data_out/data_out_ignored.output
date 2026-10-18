@@ -1,0 +1,78 @@
+
+DEAL::DataOut 2d:
+DEAL::Fields: 5
+DEAL::velocity_a = 1.
+DEAL::velocity_a = 2.
+DEAL::velocity_b = 11.
+DEAL::velocity_b = 12.
+DEAL::pressure = 23.
+DEAL::Nonscalar ranges: 2
+DEAL::0 1 velocity_a
+DEAL::2 3 velocity_b
+DEAL::All ignored:
+DEAL::Fields: 0
+DEAL::Nonscalar ranges: 0
+DEAL::DataOutFaces 2d:
+DEAL::Fields: 5
+DEAL::velocity_a = 1.
+DEAL::velocity_a = 2.
+DEAL::velocity_b = 11.
+DEAL::velocity_b = 12.
+DEAL::pressure = 23.
+DEAL::Nonscalar ranges: 2
+DEAL::0 1 velocity_a
+DEAL::2 3 velocity_b
+DEAL::All ignored:
+DEAL::Fields: 0
+DEAL::Nonscalar ranges: 0
+DEAL::DataOut 3d:
+DEAL::Fields: 7
+DEAL::velocity_a = 1.
+DEAL::velocity_a = 2.
+DEAL::velocity_a = 3.
+DEAL::velocity_b = 11.
+DEAL::velocity_b = 12.
+DEAL::velocity_b = 13.
+DEAL::pressure = 24.
+DEAL::Nonscalar ranges: 2
+DEAL::0 2 velocity_a
+DEAL::3 5 velocity_b
+DEAL::All ignored:
+DEAL::Fields: 0
+DEAL::Nonscalar ranges: 0
+DEAL::DataOutFaces 3d:
+DEAL::Fields: 7
+DEAL::velocity_a = 1.
+DEAL::velocity_a = 2.
+DEAL::velocity_a = 3.
+DEAL::velocity_b = 11.
+DEAL::velocity_b = 12.
+DEAL::velocity_b = 13.
+DEAL::pressure = 24.
+DEAL::Nonscalar ranges: 2
+DEAL::0 2 velocity_a
+DEAL::3 5 velocity_b
+DEAL::All ignored:
+DEAL::Fields: 0
+DEAL::Nonscalar ranges: 0
+DEAL::Tensor and cell data:
+DEAL::Fields: 5
+DEAL::tensor = 2.
+DEAL::tensor = 3.
+DEAL::tensor = 4.
+DEAL::tensor = 5.
+DEAL::cell = 42.
+DEAL::Nonscalar ranges: 1
+DEAL::0 3 tensor
+DEAL::Postprocessor:
+DEAL::Fields: 1
+DEAL::processed = 4.
+DEAL::Nonscalar ranges: 0
+DEAL::DataOutRotation:
+DEAL::Fields: 4
+DEAL::scalar_1 = 2.
+DEAL::scalar_2 = 3.
+DEAL::scalar_3 = 4.
+DEAL::scalar_4 = 5.
+DEAL::Nonscalar ranges: 0
+DEAL::OK
