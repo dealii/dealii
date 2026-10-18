@@ -17,6 +17,8 @@
 #include <deal.II/base/qprojector.h>
 #include <deal.II/base/quadrature_lib.h>
 
+#include <deal.II/distributed/tria_base.h>
+
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nedelec.h>
@@ -709,6 +711,13 @@ namespace VectorTools
             mapping, dof, boundary_functions, boundary_values, ComponentMask());
           return;
         }
+
+      AssertThrow(
+        (dynamic_cast<
+           const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+           &dof.get_triangulation()) == nullptr),
+        ExcMessage("VectorTools::project_boundary_values() is not "
+                   "implemented for distributed triangulations."));
 
       // TODO:[?] In project_boundary_values, no condensation of sparsity
       //    structures, matrices and right hand sides or distribution of
