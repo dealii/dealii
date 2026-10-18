@@ -48,7 +48,7 @@ solve_and_check(const SparseMatrix<double> &M,
                 const Vector<double>       &solution)
 {
   {
-    int                              *icntl = nullptr;
+    types::mumps_index               *icntl = nullptr;
     SparseDirectMUMPS::AdditionalData data;
     data.output_details = false;
     SparseDirectMUMPS solver(data);

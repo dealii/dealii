@@ -1538,7 +1538,7 @@ SparseDirectMUMPS::Tvmult(VectorType &dst, const VectorType &src) const
 
 
 
-int *
+types::mumps_index *
 SparseDirectMUMPS::get_icntl()
 {
   return id.icntl;

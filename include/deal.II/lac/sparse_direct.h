@@ -618,6 +618,7 @@ public:
    * Return the ICNTL integer array from MUMPS.
    *
    * The ICNTL array contains integer control parameters for the MUMPS solver.
+   * Its entries use the integer type of the MUMPS installation.
    * Keep in mind that MUMPS is a fortran library and the documentation refers
    * to indices into this array starting from one rather than from zero. To
    * select the correct index one can use a macro like this:
@@ -628,7 +629,7 @@ public:
    * that ownership of the array remains in the current class rather than with
    * the caller of this function.
    */
-  int *
+  types::mumps_index *
   get_icntl();
 
 private:
