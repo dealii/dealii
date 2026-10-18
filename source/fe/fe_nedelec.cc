@@ -3937,7 +3937,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                        ++q_point)
                     {
                       double tmp =
-                        support_point_values[q_point +
+                        support_point_values[face * n_face_points + q_point +
                                              GeometryInfo<dim>::lines_per_cell *
                                                n_edge_points]
                                             [face_coordinates[face][0]];
@@ -3950,8 +3950,9 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                             this->shape_value_component(
                               edge_indices[face][i] * this->degree + j,
                               this->generalized_support_points
-                                [q_point + GeometryInfo<dim>::lines_per_cell *
-                                             n_edge_points],
+                                [face * n_face_points + q_point +
+                                 GeometryInfo<dim>::lines_per_cell *
+                                   n_edge_points],
                               face_coordinates[face][0]);
 
                       for (unsigned int i = 0; i <= deg; ++i)
@@ -3986,7 +3987,7 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                        ++q_point)
                     {
                       double tmp =
-                        support_point_values[q_point +
+                        support_point_values[face * n_face_points + q_point +
                                              GeometryInfo<dim>::lines_per_cell *
                                                n_edge_points]
                                             [face_coordinates[face][1]];
@@ -4001,8 +4002,9 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                             this->shape_value_component(
                               edge_indices[face][i] * this->degree + j,
                               this->generalized_support_points
-                                [q_point + GeometryInfo<dim>::lines_per_cell *
-                                             n_edge_points],
+                                [face * n_face_points + q_point +
+                                 GeometryInfo<dim>::lines_per_cell *
+                                   n_edge_points],
                               face_coordinates[face][1]);
 
                       for (unsigned int i = 0; i <= deg; ++i)
@@ -4107,50 +4109,20 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               for (unsigned int q_point = 0; q_point < n_interior_points;
                    ++q_point)
                 {
-                  double tmp =
-                    support_point_values[q_point +
-                                         GeometryInfo<dim>::lines_per_cell *
-                                           n_edge_points +
-                                         GeometryInfo<dim>::faces_per_cell *
-                                           n_face_points][0];
+                  const unsigned int point_index =
+                    q_point +
+                    GeometryInfo<dim>::lines_per_cell * n_edge_points +
+                    GeometryInfo<dim>::faces_per_cell * n_face_points;
+                  double tmp = support_point_values[point_index][0];
 
-                  for (unsigned int i = 0; i <= deg; ++i)
-                    {
-                      for (unsigned int j = 0; j < 2; ++j)
-                        for (unsigned int k = 0; k < 2; ++k)
-                          tmp -=
-                            nodal_values[i + (j + 4 * k + 2) * this->degree] *
-                            this->shape_value_component(
-                              i + (j + 4 * k + 2) * this->degree,
-                              this->generalized_support_points
-                                [q_point +
-                                 GeometryInfo<dim>::lines_per_cell *
-                                   n_edge_points +
-                                 GeometryInfo<dim>::faces_per_cell *
-                                   n_face_points],
-                              0);
-
-                      for (unsigned int j = 0; j < deg; ++j)
-                        for (unsigned int k = 0; k < 4; ++k)
-                          tmp -=
-                            nodal_values[(i + 2 * (k + 2) * this->degree +
-                                          GeometryInfo<dim>::lines_per_cell) *
-                                           deg +
-                                         j +
-                                         GeometryInfo<dim>::lines_per_cell] *
-                            this->shape_value_component(
-                              (i + 2 * (k + 2) * this->degree +
-                               GeometryInfo<dim>::lines_per_cell) *
-                                  deg +
-                                j + GeometryInfo<dim>::lines_per_cell,
-                              this->generalized_support_points
-                                [q_point +
-                                 GeometryInfo<dim>::lines_per_cell *
-                                   n_edge_points +
-                                 GeometryInfo<dim>::faces_per_cell *
-                                   n_face_points],
-                              0);
-                    }
+                  // Subtract the complete, already determined boundary
+                  // interpolant before projecting onto interior functions.
+                  for (unsigned int i = 0; i < this->get_first_hex_index(); ++i)
+                    if (nodal_values[i] != 0.)
+                      tmp -=
+                        nodal_values[i] *
+                        this->shape_value_component(
+                          i, this->generalized_support_points[point_index], 0);
 
                   for (unsigned int i = 0; i <= deg; ++i)
                     for (unsigned int j = 0; j < deg; ++j)
@@ -4191,13 +4163,9 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                 for (unsigned int j = 0; j < deg; ++j)
                   for (unsigned int k = 0; k < deg; ++k)
                     if (std::abs(solution((i * deg + j) * deg + k)) > 1e-14)
-                      nodal_values
-                        [((i + 2 * GeometryInfo<dim>::faces_per_cell) * deg +
-                          j + GeometryInfo<dim>::lines_per_cell +
-                          2 * GeometryInfo<dim>::faces_per_cell) *
-                           deg +
-                         k + GeometryInfo<dim>::lines_per_cell] =
-                          solution((i * deg + j) * deg + k);
+                      nodal_values[this->get_first_hex_index() +
+                                   (i * deg + j) * deg + k] =
+                        solution((i * deg + j) * deg + k);
 
               // Set up the right hand side.
               system_rhs = 0;
@@ -4205,63 +4173,20 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               for (unsigned int q_point = 0; q_point < n_interior_points;
                    ++q_point)
                 {
-                  double tmp =
-                    support_point_values[q_point +
-                                         GeometryInfo<dim>::lines_per_cell *
-                                           n_edge_points +
-                                         GeometryInfo<dim>::faces_per_cell *
-                                           n_face_points][1];
+                  const unsigned int point_index =
+                    q_point +
+                    GeometryInfo<dim>::lines_per_cell * n_edge_points +
+                    GeometryInfo<dim>::faces_per_cell * n_face_points;
+                  double tmp = support_point_values[point_index][1];
 
-                  for (unsigned int i = 0; i <= deg; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                      {
-                        for (unsigned int k = 0; k < 2; ++k)
-                          tmp -= nodal_values[i + (4 * j + k) * this->degree] *
-                                 this->shape_value_component(
-                                   i + (4 * j + k) * this->degree,
-                                   this->generalized_support_points
-                                     [q_point +
-                                      GeometryInfo<dim>::lines_per_cell *
-                                        n_edge_points +
-                                      GeometryInfo<dim>::faces_per_cell *
-                                        n_face_points],
-                                   1);
-
-                        for (unsigned int k = 0; k < deg; ++k)
-                          tmp -=
-                            nodal_values[(i + 2 * j * this->degree +
-                                          GeometryInfo<dim>::lines_per_cell) *
-                                           deg +
-                                         k +
-                                         GeometryInfo<dim>::lines_per_cell] *
-                              this->shape_value_component(
-                                (i + 2 * j * this->degree +
-                                 GeometryInfo<dim>::lines_per_cell) *
-                                    deg +
-                                  k + GeometryInfo<dim>::lines_per_cell,
-                                this->generalized_support_points
-                                  [q_point +
-                                   GeometryInfo<dim>::lines_per_cell *
-                                     n_edge_points +
-                                   GeometryInfo<dim>::faces_per_cell *
-                                     n_face_points],
-                                1) +
-                            nodal_values[i +
-                                         ((2 * j + 9) * deg + k +
-                                          GeometryInfo<dim>::lines_per_cell) *
-                                           this->degree] *
-                              this->shape_value_component(
-                                i + ((2 * j + 9) * deg + k +
-                                     GeometryInfo<dim>::lines_per_cell) *
-                                      this->degree,
-                                this->generalized_support_points
-                                  [q_point +
-                                   GeometryInfo<dim>::lines_per_cell *
-                                     n_edge_points +
-                                   GeometryInfo<dim>::faces_per_cell *
-                                     n_face_points],
-                                1);
-                      }
+                  // Subtract the complete, already determined boundary
+                  // interpolant before projecting onto interior functions.
+                  for (unsigned int i = 0; i < this->get_first_hex_index(); ++i)
+                    if (nodal_values[i] != 0.)
+                      tmp -=
+                        nodal_values[i] *
+                        this->shape_value_component(
+                          i, this->generalized_support_points[point_index], 1);
 
                   for (unsigned int i = 0; i <= deg; ++i)
                     for (unsigned int j = 0; j < deg; ++j)
@@ -4301,13 +4226,9 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                 for (unsigned int j = 0; j < deg; ++j)
                   for (unsigned int k = 0; k < deg; ++k)
                     if (std::abs(solution((i * deg + j) * deg + k)) > 1e-14)
-                      nodal_values[((i + this->degree +
-                                     2 * GeometryInfo<dim>::faces_per_cell) *
-                                      deg +
-                                    j + GeometryInfo<dim>::lines_per_cell +
-                                    2 * GeometryInfo<dim>::faces_per_cell) *
-                                     deg +
-                                   k + GeometryInfo<dim>::lines_per_cell] =
+                      nodal_values[this->get_first_hex_index() +
+                                   this->degree * deg * deg +
+                                   (j * this->degree + i) * deg + k] =
                         solution((i * deg + j) * deg + k);
 
               // Set up the right hand side.
@@ -4316,45 +4237,20 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
               for (unsigned int q_point = 0; q_point < n_interior_points;
                    ++q_point)
                 {
-                  double tmp =
-                    support_point_values[q_point +
-                                         GeometryInfo<dim>::lines_per_cell *
-                                           n_edge_points +
-                                         GeometryInfo<dim>::faces_per_cell *
-                                           n_face_points][2];
+                  const unsigned int point_index =
+                    q_point +
+                    GeometryInfo<dim>::lines_per_cell * n_edge_points +
+                    GeometryInfo<dim>::faces_per_cell * n_face_points;
+                  double tmp = support_point_values[point_index][2];
 
-                  for (unsigned int i = 0; i <= deg; ++i)
-                    for (unsigned int j = 0; j < 4; ++j)
-                      {
-                        tmp -= nodal_values[i + (j + 8) * this->degree] *
-                               this->shape_value_component(
-                                 i + (j + 8) * this->degree,
-                                 this->generalized_support_points
-                                   [q_point +
-                                    GeometryInfo<dim>::lines_per_cell *
-                                      n_edge_points +
-                                    GeometryInfo<dim>::faces_per_cell *
-                                      n_face_points],
-                                 2);
-
-                        for (unsigned int k = 0; k < deg; ++k)
-                          tmp -=
-                            nodal_values[i +
-                                         ((2 * j + 1) * deg + k +
-                                          GeometryInfo<dim>::lines_per_cell) *
-                                           this->degree] *
-                            this->shape_value_component(
-                              i + ((2 * j + 1) * deg + k +
-                                   GeometryInfo<dim>::lines_per_cell) *
-                                    this->degree,
-                              this->generalized_support_points
-                                [q_point +
-                                 GeometryInfo<dim>::lines_per_cell *
-                                   n_edge_points +
-                                 GeometryInfo<dim>::faces_per_cell *
-                                   n_face_points],
-                              2);
-                      }
+                  // Subtract the complete, already determined boundary
+                  // interpolant before projecting onto interior functions.
+                  for (unsigned int i = 0; i < this->get_first_hex_index(); ++i)
+                    if (nodal_values[i] != 0.)
+                      tmp -=
+                        nodal_values[i] *
+                        this->shape_value_component(
+                          i, this->generalized_support_points[point_index], 2);
 
                   for (unsigned int i = 0; i <= deg; ++i)
                     for (unsigned int j = 0; j < deg; ++j)
@@ -4394,12 +4290,10 @@ FE_Nedelec<dim>::convert_generalized_support_point_values_to_dof_values(
                 for (unsigned int j = 0; j < deg; ++j)
                   for (unsigned int k = 0; k < deg; ++k)
                     if (std::abs(solution((i * deg + j) * deg + k)) > 1e-14)
-                      nodal_values
-                        [i +
-                         ((j + 2 * (deg + GeometryInfo<dim>::faces_per_cell)) *
-                            deg +
-                          k + GeometryInfo<dim>::lines_per_cell) *
-                           this->degree] = solution((i * deg + j) * deg + k);
+                      nodal_values[this->get_first_hex_index() +
+                                   2 * this->degree * deg * deg +
+                                   (k * deg + j) * this->degree + i] =
+                        solution((i * deg + j) * deg + k);
             }
 
           break;

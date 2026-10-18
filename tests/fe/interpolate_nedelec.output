@@ -8,5 +8,28 @@ DEAL::FE_Nedelec<2>(3) 32  vector 7.56830e-16
 DEAL::FE_Nedelec<2>(1) 12  vector 5.55112e-17
 DEAL::FE_Nedelec<2>(2) 21  vector 4.44089e-16
 DEAL::FE_Nedelec<2>(3) 32  vector 1.60288e-15
+DEAL::FE_Nedelec<3>(0) 12  vector 1.11022e-16
 DEAL::FE_Nedelec<3>(1) 56  vector 2.77556e-17
 DEAL::FE_Nedelec<3>(2) 117  vector 1.66533e-16
+DEAL::FE_Nedelec<3>(2) 117  vector 2.63515e-16
+DEAL::FE_Nedelec<3>(3) 208  vector 6.22770e-16
+DEAL::Trace 0 1 FE_Nedelec<3>(1) 56  vector 1.11022e-16
+DEAL::Trace 0 2 FE_Nedelec<3>(1) 56  vector 1.11022e-16
+DEAL::Trace 1 0 FE_Nedelec<3>(1) 56  vector 1.11022e-16
+DEAL::Trace 1 2 FE_Nedelec<3>(1) 56  vector 1.11022e-16
+DEAL::Trace 2 0 FE_Nedelec<3>(1) 56  vector 1.11022e-16
+DEAL::Trace 2 1 FE_Nedelec<3>(1) 56  vector 1.11022e-16
+DEAL::Trace 0 1 FE_Nedelec<3>(2) 117  vector 9.36751e-17
+DEAL::Trace 0 2 FE_Nedelec<3>(2) 117  vector 9.49761e-17
+DEAL::Trace 1 0 FE_Nedelec<3>(2) 117  vector 9.36751e-17
+DEAL::Trace 1 2 FE_Nedelec<3>(2) 117  vector 9.45424e-17
+DEAL::Trace 2 0 FE_Nedelec<3>(2) 117  vector 9.45424e-17
+DEAL::Trace 2 1 FE_Nedelec<3>(2) 117  vector 9.45424e-17
+DEAL::Trace 0 1 FE_Nedelec<3>(3) 208  vector 1.45690e-16
+DEAL::Trace 0 2 FE_Nedelec<3>(3) 208  vector 1.63931e-16
+DEAL::Trace 1 0 FE_Nedelec<3>(3) 208  vector 1.65205e-16
+DEAL::Trace 1 2 FE_Nedelec<3>(3) 208  vector 1.42247e-16
+DEAL::Trace 2 0 FE_Nedelec<3>(3) 208  vector 1.41732e-16
+DEAL::Trace 2 1 FE_Nedelec<3>(3) 208  vector 1.61736e-16
+DEAL::Interior basis FE_Nedelec<3>(2) OK
+DEAL::Interior basis FE_Nedelec<3>(3) OK
