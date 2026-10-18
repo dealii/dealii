@@ -1,0 +1,7 @@
+
+DEAL::ARKStepper explicit: resizes 1, final size 4
+DEAL::ARKStepper explicit: step count is within one of the run without resize: yes
+DEAL::ARKStepper explicit: error is small: yes
+DEAL::ARKStepper implicit: resizes 1, final size 4
+DEAL::ARKStepper implicit: step count is within one of the run without resize: yes
+DEAL::ARKStepper implicit: error is small: yes

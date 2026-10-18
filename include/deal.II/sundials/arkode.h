@@ -91,6 +91,8 @@ namespace SUNDIALS
    *  - custom_setup() to set up additional ARKODE settings,
    *  - solver_should_restart() to control whether the solver has to be
    * reconstructed at the current time step,
+   *  - solver_should_resize() to adapt the solver to a changed vector size
+   * without losing the time stepping history,
    *  - get_local_tolerances() to set up individual tolerances for the vector
    * components being integrated by ARKODE,
    *  - output_step() to produce output at fixed steps.
@@ -463,6 +465,22 @@ namespace SUNDIALS
     reset(const double t, const double h, const VectorType &y);
 
     /**
+     * Adapt the internal objects to a solution vector of a different size
+     * while preserving the time stepping history (step size, adaptivity state
+     * and step counters). This function is called when the user returns a
+     * positive value from a call to solver_should_resize().
+     *
+     * Compared to reset(), the SUNDIALS context is kept and the stepper is
+     * resized in place via `ARKodeResize()`. The tolerances are applied again.
+     *
+     * @param t  The current time
+     * @param hscale  Factor by which the upcoming time step is rescaled
+     * @param y  The current solution with the new size
+     */
+    void
+    resize(const double t, const double hscale, const VectorType &y);
+
+    /**
      * Provides user access to the internally used ARKODE memory.
      *
      * This functionality is intended for users who wish to query additional
@@ -730,6 +748,26 @@ namespace SUNDIALS
     std::function<bool(const double t, VectorType &sol)> solver_should_restart;
 
     /**
+     * A function object that users may supply and that is intended to adapt
+     * the solver to a change of the size of the solution vector (for example
+     * after mesh refinement) without discarding the time stepping history.
+     *
+     * Like solver_should_restart(), this function is supposed to perform all
+     * operations in `sol` that are necessary to make it consistent and of the
+     * correct final size. It returns the factor by which the upcoming time step
+     * should be rescaled (use `1.0` to keep it), in which case resize() is
+     * called. Returning zero means that no resize is required. Like
+     * solver_should_restart(), it is called repeatedly until it returns zero.
+     *
+     * This function is checked before solver_should_restart(). Use the latter
+     * if the dynamics change so much that the time stepping history should be
+     * discarded.
+     *
+     * By default this function is not set, i.e., no resize is performed.
+     */
+    std::function<double(const double t, VectorType &sol)> solver_should_resize;
+
+    /**
      * A function object that users may supply and that is intended to return a
      * vector whose components are the weights used by ARKode to compute the
      * vector norm. The implementation of this function is optional, and it is
@@ -788,6 +826,13 @@ namespace SUNDIALS
      */
     void
     set_functions_to_trigger_an_assert();
+
+    /**
+     * Apply the tolerances from AdditionalData or get_local_tolerances() to
+     * the ARKODE memory of the stepper.
+     */
+    void
+    set_tolerances();
 
     /**
      * This function is executed at construction time to initialize the
