@@ -233,8 +233,7 @@ For solving the eigenvalue problem with ARPACK, we finally need to modify
     ArpackSolver::AdditionalData additional_data(num_arnoldi_vectors);
 
     ArpackSolver eigensolver(solver_control, additional_data);
-    eigensolver.solve(stiffness_matrix,
-                      mass_matrix,
+    eigensolver.solve(mass_matrix,
                       inverse,
                       eigenvalues,
                       eigenfunctions,
