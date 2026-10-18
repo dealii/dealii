@@ -1495,6 +1495,11 @@
  * degrees of freedom on a locally owned cell are also locally owned degrees
  * of freedom.
  *
+ * This ownership describes the index partition maintained by DoFHandler.
+ * Distributed vectors and matrices specify ownership of their entries or
+ * rows separately and may use a different compatible partition. See the
+ * @ref distributed topic for the distinction between these concepts.
+ *
  * Locally owned DoFs are a subset of the
  * @ref GlossLocallyActiveDof "locally active DoFs".
  * </dd>

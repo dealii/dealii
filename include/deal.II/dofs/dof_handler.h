@@ -1167,6 +1167,13 @@ public:
    * Return an IndexSet describing the set of locally owned DoFs as a subset
    * of 0..n_dofs(). The number of elements of this set equals
    * n_locally_owned_dofs().
+   *
+   * This set describes the DoFHandler's assignment of DoF indices to MPI
+   * processes. It is commonly used to initialize distributed vectors and
+   * matrices, but these objects specify their own ownership of entries or
+   * rows. Choosing a different compatible partition for such an object does
+   * not change the set returned here. See the @ref distributed topic for the
+   * distinction between DoF ownership and linear algebra ownership.
    */
   const IndexSet &
   locally_owned_dofs() const;

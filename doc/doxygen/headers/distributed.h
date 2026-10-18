@@ -208,6 +208,25 @@
  * using the functions in namespace DoFRenumbering.
  *
  *
+ * <h4>DoF ownership and linear algebra ownership</h4>
+ *
+ * The locally owned DoFs returned by DoFHandler::locally_owned_dofs() describe
+ * an assignment of global DoF indices to MPI processes. Each index has one
+ * owning process, even when its shape function is supported on cells owned by
+ * several processes. This assignment is part of the DoFHandler's bookkeeping;
+ * it does not by itself allocate entries of a solution vector or matrix.
+ *
+ * A distributed vector or matrix has its own partition that determines which
+ * process owns each vector entry or matrix row. Applications usually choose
+ * the DoFHandler's locally owned index set for this partition, since this
+ * keeps storage close to the cells on which values are used and assembled.
+ * A different partition can also be chosen if it satisfies the requirements
+ * of the linear algebra backend and the algorithms using the object. For
+ * example, MatrixFree requires vectors with a partitioner compatible with
+ * its data layout. Changing the partition of a linear algebra object does
+ * not renumber the DoFs or change DoFHandler::locally_owned_dofs().
+ *
+ *
  * <h4>Linear systems for %distributed computations</h4>
  *
  * One thing one learns very quickly when working with very large
