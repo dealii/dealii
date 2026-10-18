@@ -76,12 +76,6 @@ namespace Step15
   //   conditions to be used for the residual and solution updates, while the
   //   latter contains the correct boundary conditions for the solution. Both
   //   objects also contain the hanging nodes constraints.
-  // - The <code>setup_system</code> function takes an argument that denotes
-  //   whether this is the first time it is called or not. The difference is
-  //   that the first time around we need to distribute the degrees of freedom
-  //   and set the solution vector for $u^n$ to the correct size. The following
-  //   times, the function is called after we have already done these steps as
-  //   part of refining the mesh in <code>refine_mesh</code>.
   // - We then also need a few new functions:
   //   <code>compute_residual()</code> is a function that computes
   //   the norm of the nonlinear (discrete) residual. We use this function to
@@ -167,7 +161,7 @@ namespace Step15
 
   // As always in the setup-system function, we set up the variables of the
   // finite element method. There are some differences to step-6, because
-  // we need to construct two AffineConstraint<> objects.
+  // we need to construct two AffineConstraints<> objects.
   template <int dim>
   void MinimalSurfaceProblem<dim>::setup_system()
   {
@@ -538,7 +532,7 @@ namespace Step15
 
     // The Newton iteration starts next. We iterate until the (norm of the)
     // residual computed at the end of the previous iteration is less than
-    // $10^{-3}$, as checked at the end of the `do { ... } while` loop that
+    // $10^{-2}$, as checked at the end of the `do { ... } while` loop that
     // starts here. Because we don't have a reasonable value to initialize
     // the variable, we just use the largest value that can be represented
     // as a `double`.
