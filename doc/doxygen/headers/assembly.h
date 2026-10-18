@@ -36,8 +36,11 @@
  * their insertion into global objects. A worker uses scratch data to compute
  * each cell's contribution and stores the result in copy data. A copier then
  * inserts that result into the global matrix and right hand side. This
- * separation allows local work to run on multiple threads while serializing
- * insertion into shared objects. The local finite element calculations can
+ * separation allows local work to run on multiple threads. For the
+ * iterator-range overload, insertion into shared objects is serialized.
+ * The colored overload can also run copiers concurrently: its coloring must
+ * ensure that copiers within one color do not write to the same memory.
+ * The local finite element calculations can
  * remain the same as in an explicit cell loop. See step-9 and the
  * @ref threads "shared-memory parallelism documentation" for examples and
  * details of the WorkStream model.
