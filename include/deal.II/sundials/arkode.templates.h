@@ -55,15 +55,13 @@ namespace SUNDIALS
           data.mass_is_time_independent,
           data.anderson_acceleration_subspace)))
     , stepper(*ark_stepper_storage)
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    , arkode_ctx(nullptr)
-#  endif
     , mpi_communicator(mpi_comm)
     , last_end_time(data.initial_time)
     , pending_exception(nullptr)
   {
     set_functions_to_trigger_an_assert();
     initialize_context();
+    attach_stepper();
 
     // Set up the proxy objects to provide backwards compatibility with the old
     // interface
@@ -98,27 +96,19 @@ namespace SUNDIALS
                              const MPI_Comm             mpi_comm)
     : data(data)
     , stepper(stepper)
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    , arkode_ctx(nullptr)
-#  endif
     , mpi_communicator(mpi_comm)
     , last_end_time(data.initial_time)
     , pending_exception(nullptr)
   {
     set_functions_to_trigger_an_assert();
     initialize_context();
+    attach_stepper();
   }
 
 
   template <typename VectorType>
   ARKode<VectorType>::~ARKode()
   {
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    const int status = SUNContext_Free(&arkode_ctx);
-    (void)status;
-    AssertARKode(status);
-#  endif
-
     Assert(pending_exception == nullptr, ExcInternalError());
   }
 
@@ -133,20 +123,39 @@ namespace SUNDIALS
     // initialized. Hence, work around that by just not providing a
     // communicator in that case.
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 0, 0)
+    SUNContext context;
+
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? SUN_COMM_NULL :
                                                             mpi_communicator,
-                        &arkode_ctx);
+                        &context);
     (void)status;
     AssertARKode(status);
+    arkode_ctx = internal::SharedSUNContext(context);
 #  elif DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+    SUNContext context;
+
     const int status =
       SUNContext_Create(mpi_communicator == MPI_COMM_SELF ? nullptr :
                                                             &mpi_communicator,
-                        &arkode_ctx);
+                        &context);
     (void)status;
     AssertARKode(status);
+    arkode_ctx = internal::SharedSUNContext(context);
 #  endif
+  }
+
+
+  template <typename VectorType>
+  void
+  ARKode<VectorType>::attach_stepper()
+  {
+    stepper.attach(pending_exception
+#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
+                   ,
+                   arkode_ctx
+#  endif
+    );
   }
 
 
@@ -319,14 +328,7 @@ namespace SUNDIALS
     int status;
     (void)status;
 
-    stepper.reinit(
-      current_time, solution, internal::InvocationContext {
-        pending_exception
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-          ,
-          arkode_ctx
-#  endif
-      });
+    stepper.reinit(current_time, solution);
 
     auto *arkode_mem = stepper.get_arkode_memory();
 
@@ -351,14 +353,7 @@ namespace SUNDIALS
   {
     last_end_time = current_time;
 
-    stepper.resize(
-      current_time, solution, hscale, internal::InvocationContext {
-        pending_exception
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-          ,
-          arkode_ctx
-#  endif
-      });
+    stepper.resize(current_time, solution, hscale);
 
     // The vector tolerances have the old size and need to be set again.
     set_tolerances();

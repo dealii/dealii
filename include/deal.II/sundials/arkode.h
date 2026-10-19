@@ -842,6 +842,12 @@ namespace SUNDIALS
     initialize_context();
 
     /**
+     * Attach the stepper to this object, see ARKodeStepper::attach().
+     */
+    void
+    attach_stepper();
+
+    /**
      * ARKode configuration data.
      */
     AdditionalData data;
@@ -860,9 +866,10 @@ namespace SUNDIALS
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
-     * A context object associated with the ARKode solver.
+     * A context object associated with the ARKode solver. It is shared with
+     * the stepper, so it is freed after the last of them is gone.
      */
-    SUNContext arkode_ctx;
+    internal::SharedSUNContext arkode_ctx;
 #  endif
 
     /**
