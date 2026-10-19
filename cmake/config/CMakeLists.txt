@@ -197,6 +197,16 @@ set(CONFIG_BUILD_DIR TRUE)
 #
 string(REPLACE "-Wno-deprecated-declarations" "" DEAL_II_WARNING_FLAGS "${DEAL_II_WARNING_FLAGS}")
 
+#
+# Filter out -fuse-ld=mold and -fuse-ld=lld: The linker we found to be
+# usable when configuring deal.II might not be available (or not work) in
+# the environment of a user project.
+#
+foreach(_flags DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_DEBUG DEAL_II_LINKER_FLAGS_RELEASE)
+  strip_flag(${_flags} "-fuse-ld=mold")
+  strip_flag(${_flags} "-fuse-ld=lld")
+endforeach()
+
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
   ${CMAKE_BINARY_DIR}/${DEAL_II_PROJECT_CONFIG_RELDIR}/${DEAL_II_PROJECT_CONFIG_NAME}Config.cmake
