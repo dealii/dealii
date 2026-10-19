@@ -1047,11 +1047,18 @@ namespace SUNDIALS
 
         auto local_elements = vector->locally_owned_elements();
 
-        const auto local_min = *std::min_element(local_elements.begin(),
-                                                 local_elements.end(),
-                                                 indexed_less_than);
+        const auto local_min_element = std::min_element(local_elements.begin(),
+                                                        local_elements.end(),
+                                                        indexed_less_than);
+
+        // Empty ranks must still participate in the global minimum reduction.
+        SUNDIALS::realtype local_min =
+          std::numeric_limits<SUNDIALS::realtype>::max();
+        if (local_min_element != local_elements.end())
+          local_min = (*vector)[*local_min_element];
+
         return ::dealii::Utilities::MPI::min(
-          (*vector)[local_min], get_mpi_communicator<VectorType>(x));
+          local_min, get_mpi_communicator<VectorType>(x));
       }
 
 

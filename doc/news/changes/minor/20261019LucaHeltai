@@ -1,0 +1,5 @@
+Fixed: SUNDIALS vector minimum operations now handle MPI ranks with no
+locally owned entries. This avoids invalid vector accesses during IDA
+consistent initialization on meshes with empty partitions.
+<br>
+(Luca Heltai, 2026/10/19)
