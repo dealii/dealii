@@ -81,7 +81,7 @@ foreach(_library ${_opencascade_libraries})
   deal_ii_find_library(OPENCASCADE_${_library}
     NAMES ${_library}
     HINTS ${OPENCASCADE_DIR}
-    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib mac64/clang/lib mac32/clang/lib lin64/gcc/lib lin32/gcc/lib
+    PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib mac64/clang/lib mac32/clang/lib lin64/gcc/lib lin32/gcc/lib win64/vc14/lib
     )
 endforeach()
 
