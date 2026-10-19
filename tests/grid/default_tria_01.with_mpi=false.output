@@ -1,0 +1,9 @@
+
+DEAL:1d::globally active cells: 12
+DEAL:1d::active cells (rank 0): 12
+DEAL:1d::locally owned cells (rank 0): 12
+DEAL:1d::mpi size: 1
+DEAL:2d::globally active cells: 112
+DEAL:2d::active cells (rank 0): 112
+DEAL:2d::locally owned cells (rank 0): 112
+DEAL:2d::mpi size: 1

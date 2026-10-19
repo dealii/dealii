@@ -909,6 +909,10 @@ class DoFHandler;
 
 namespace parallel
 {
+  template <int dim, int spacedim>
+  DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+  class DefaultTriangulation;
+
   namespace distributed
   {
     template <int dim, int spacedim>
@@ -1009,6 +1013,10 @@ namespace concepts
     template <int dim, int spacedim>
     inline constexpr bool is_triangulation_or_dof_handler<
       parallel::fullydistributed::Triangulation<dim, spacedim>> = true;
+
+    template <int dim, int spacedim>
+    inline constexpr bool is_triangulation_or_dof_handler<
+      parallel::DefaultTriangulation<dim, spacedim>> = true;
 
     template <int dim, int spacedim>
     inline constexpr bool
