@@ -41,10 +41,98 @@ template <int dim, typename VectorType, int spacedim>
 MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
   const DoFHandler<dim, spacedim> &shiftmap_dof_handler,
   const VectorType                &euler_transform_vectors)
+  : MappingQ1Eulerian(shiftmap_dof_handler,
+                      euler_transform_vectors,
+                      ComponentMask())
+{}
+
+
+
+template <int dim, typename VectorType, int spacedim>
+MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
+  const DoFHandler<dim, spacedim> &shiftmap_dof_handler,
+  const VectorType                &euler_transform_vectors,
+  const ComponentMask             &component_mask)
   : MappingQ<dim, spacedim>(1)
   , euler_transform_vectors(&euler_transform_vectors)
   , shiftmap_dof_handler(&shiftmap_dof_handler)
-{}
+  , component_mask(component_mask)
+{
+  // The finite element may only be supplied later by distribute_dofs().
+  if (shiftmap_dof_handler.get_fe_collection().size() != 0)
+    get_vertex_dof_indices();
+}
+
+
+
+template <int dim, typename VectorType, int spacedim>
+const std::array<unsigned int, spacedim> &
+MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertex_dof_indices() const
+{
+  std::scoped_lock lock(vertex_dof_indices_mutex);
+  const auto      &fe = shiftmap_dof_handler->get_fe();
+  if (cached_fe_collection.size() != 0 && &cached_fe_collection[0] == &fe)
+    return this->vertex_dof_indices;
+
+  const unsigned int                 n_vertex_dofs = fe.n_dofs_per_vertex();
+  std::array<unsigned int, spacedim> vertex_dof_indices{};
+  if (component_mask.represents_the_all_selected_mask())
+    {
+      AssertDimension(n_vertex_dofs, spacedim);
+      AssertDimension(fe.n_components(), spacedim);
+      for (unsigned int d = 0; d < spacedim; ++d)
+        vertex_dof_indices[d] = d;
+    }
+  else
+    {
+      AssertThrow(component_mask.size() == fe.n_components(),
+                  ExcDimensionMismatch(component_mask.size(),
+                                       fe.n_components()));
+      AssertThrow(component_mask.n_selected_components() == spacedim,
+                  ExcMessage(
+                    "Select exactly spacedim displacement components."));
+      unsigned int d = 0;
+      for (unsigned int c = 0; c < fe.n_components(); ++c)
+        if (component_mask[c])
+          {
+            unsigned int index = numbers::invalid_unsigned_int;
+            for (unsigned int j = 0; j < n_vertex_dofs; ++j)
+              if (fe.get_nonzero_components(j)[c])
+                {
+                  AssertThrow(
+                    fe.is_primitive(j) &&
+                      index == numbers::invalid_unsigned_int,
+                    ExcMessage(
+                      "Each selected component must have one primitive vertex DoF."));
+                  index = j;
+                }
+            AssertThrow(
+              index != numbers::invalid_unsigned_int,
+              ExcMessage(
+                "Each selected component must have one primitive vertex DoF."));
+            // Sampling vertex coefficients is valid only if other selected
+            // shape functions do not contribute at vertices (FE_Q_DG0, for
+            // example, also has a cell-constant mode).
+            for (unsigned int j =
+                   fe.reference_cell().n_vertices() * n_vertex_dofs;
+                 j < fe.n_dofs_per_cell();
+                 ++j)
+              if (fe.get_nonzero_components(j)[c])
+                for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+                  AssertThrow(
+                    fe.shape_value_component(
+                      j, GeometryInfo<dim>::unit_cell_vertex(v), c) == 0.,
+                    ExcMessage(
+                      "Selected nonvertex shape functions must vanish at vertices."));
+            vertex_dof_indices[d++] = index;
+          }
+    }
+
+  cached_fe_collection =
+    hp::FECollection<dim, spacedim>(shiftmap_dof_handler->get_fe_collection());
+  this->vertex_dof_indices = vertex_dof_indices;
+  return this->vertex_dof_indices;
+}
 
 
 
@@ -66,14 +154,10 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
                                  GeometryInfo<dim>::vertices_per_cell
 #endif
                                  >
-    vertices(cell->n_vertices());
-  // The assertions can not be in the constructor, since this would
-  // require to call dof_handler.distribute_dofs(fe) *before* the mapping
-  // object is constructed, which is not necessarily what we want.
-
-  // TODO: Only one of these two assertions should be relevant
-  AssertDimension(spacedim, shiftmap_dof_handler->get_fe().n_dofs_per_vertex());
-  AssertDimension(shiftmap_dof_handler->get_fe(0).n_components(), spacedim);
+                     vertices(cell->n_vertices());
+  const auto        &vertex_dof_indices = get_vertex_dof_indices();
+  const unsigned int n_vertex_dofs =
+    shiftmap_dof_handler->get_fe().n_dofs_per_vertex();
 
   AssertDimension(shiftmap_dof_handler->n_dofs(),
                   euler_transform_vectors->size());
@@ -101,7 +185,8 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
       // vertex. since vertex dofs are always numbered first, we can
       // access them easily
       for (unsigned int j = 0; j < spacedim; ++j)
-        shift_vector[j] = mapping_values(i * spacedim + j);
+        shift_vector[j] =
+          mapping_values(i * n_vertex_dofs + vertex_dof_indices[j]);
 
       // compute new support point by old (reference) value and added
       // shift
@@ -128,7 +213,8 @@ template <int dim, typename VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(*this);
+  return std::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(
+    *shiftmap_dof_handler, *euler_transform_vectors, component_mask);
 }
 
 

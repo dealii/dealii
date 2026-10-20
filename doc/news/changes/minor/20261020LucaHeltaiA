@@ -1,0 +1,5 @@
+New: MappingQ1Eulerian and MappingQEulerian accept a ComponentMask to
+select displacement components from a mixed finite element field. Existing
+constructors retain their default component selection.
+<br>
+(Luca Heltai, 2026/10/20)
