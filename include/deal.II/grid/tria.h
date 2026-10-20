@@ -1251,6 +1251,14 @@ namespace internal
  * computers that aren't very reliable (e.g. on very large clusters where
  * individual nodes occasionally fail and then bring down an entire MPI job).
  *
+ * This archive describes the state of this class, not additional state of
+ * derived classes. In particular, it does not include the p4est forest of a
+ * parallel::distributed::Triangulation and cannot reconstruct such an object.
+ * For distributed checkpointing, use
+ * parallel::distributed::Triangulation::save() and
+ * parallel::distributed::Triangulation::load(), which store refinement and
+ * attached cell data; their documentation explains the geometry limitations.
+ *
  * For technical reasons, writing and restoring a Triangulation object is not
  * trivial. The primary reason is that unlike many other objects,
  * triangulations rely on many other objects to which they store pointers or

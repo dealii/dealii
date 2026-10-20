@@ -675,7 +675,7 @@ namespace parallel
       get_checksum() const;
 
       /**
-       * Save the mesh and associated information into a number of files
+       * Save the refinement state and attached cell data into a number of files
        * that all use the provided basename as a starting prefix, plus some
        * suffixes that indicate the specific use of that file. These files all
        * need to be reachable from all nodes in the
@@ -683,14 +683,27 @@ namespace parallel
        * class on how to store solution vectors into this file. Additional
        * cell-based data can be saved using
        * DistributedTriangulationBase::DataTransfer::register_data_attach().
+       *
+       * This is not the archive-based serialization described in
+       * dealii::Triangulation. In particular, changes to vertex positions are
+       * not saved automatically. Before load(), recreate the reference coarse
+       * mesh from which the triangulation was originally constructed and
+       * attach its manifold descriptions. The refined geometry is reconstructed
+       * from this reference mesh. To restart on a displaced mesh, save the
+       * total displacement from the reference configuration as a solution
+       * vector. After load(), restore this vector and apply it to the
+       * reconstructed mesh.
        */
       virtual void
       save(const std::string &file_basename) const override;
 
       /**
-       * Load the refinement information saved with save() back in. The mesh
-       * must contain the same coarse mesh that was used in save() before
-       * calling this function.
+       * Load the refinement state and attached cell data saved with save().
+       * Before calling this function, the triangulation must consist only of
+       * the original reference coarse mesh described in save(), with the
+       * required manifold descriptions attached. Vertex positions changed
+       * after mesh creation
+       * are not restored automatically; see the discussion in save().
        *
        * You do not need to load with the same number of MPI processes that
        * you saved with. Rather, if a mesh is loaded with a different number
