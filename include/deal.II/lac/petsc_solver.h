@@ -755,9 +755,19 @@ namespace PETScWrappers
    * symmetric, you can use this class as follows:
    * @code
    *   SolverControl cn;
-   *   PETScWrappers::SparseDirectMUMPS solver(cn, mpi_communicator);
+   *   PETScWrappers::SparseDirectMUMPS solver(cn);
    *   solver.set_symmetric_mode(true);
    *   solver.solve(system_matrix, solution, system_rhs);
+   * @endcode
+   *
+   * Calling solve(A, x, b) factorizes A on every call. To solve for several
+   * right-hand sides with the same factorization, call initialize(A) once and
+   * then solve(x, b) for each right-hand side. Call initialize() again if the
+   * matrix entries or the symmetric mode change.
+   * @code
+   *   solver.initialize(system_matrix);
+   *   solver.solve(solution, first_rhs);
+   *   solver.solve(other_solution, second_rhs);
    * @endcode
    *
    * @note The class internally calls KSPSetFromOptions thus you are able to
@@ -781,8 +791,29 @@ namespace PETScWrappers
     SparseDirectMUMPS(SolverControl        &cn,
                       const AdditionalData &data = AdditionalData());
 
+    using SolverBase::initialize;
+
     /**
-     * The method to solve the linear system.
+     * Factorize @p A, replacing any previously stored factorization. The
+     * matrix must remain unchanged while using solve(x, b). This operation
+     * is collective over the matrix communicator.
+     */
+    void
+    initialize(const MatrixBase &A);
+
+    /**
+     * Solve the linear system with the factorization computed by initialize()
+     * or the most recent solve(A, x, b). This function reuses the factorization
+     * and can be called with different right-hand sides. This operation is
+     * collective over the matrix communicator.
+     */
+    void
+    solve(VectorBase &x, const VectorBase &b);
+
+    /**
+     * Factorize @p A and solve the linear system. This function always uses
+     * the supplied matrix, including on repeated calls with a different matrix
+     * or modified entries. Equivalent to initialize(A) followed by solve(x, b).
      */
     void
     solve(const MatrixBase &A, VectorBase &x, const VectorBase &b);
