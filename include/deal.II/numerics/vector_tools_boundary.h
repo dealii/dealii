@@ -407,6 +407,11 @@ namespace VectorTools
    * @f}
    * where $\vec{n}$ is an outward normal vector.
    *
+   * For dim > 1, this function is not implemented for distributed
+   * triangulations derived from parallel::DistributedTriangulationBase.
+   * This requirement is checked by an assertion in debug mode. In one
+   * dimension, the projection reduces to interpolation.
+   *
    * This function throws an exception if used with $H_\text{curl}$ conforming
    * elements, so the project_boundary_values_curl_conforming_l2() should be
    * used instead.
