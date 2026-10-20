@@ -1,6 +1,0 @@
-Fixed: VectorTools::project_boundary_values() now throws an explanatory
-exception for distributed triangulations in dimensions greater than one,
-instead of accessing unavailable DoF indices while assembling a serial
-boundary mass matrix.
-<br>
-(Luca Heltai, 2026/10/19)

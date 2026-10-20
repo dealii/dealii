@@ -712,7 +712,7 @@ namespace VectorTools
           return;
         }
 
-      AssertThrow(
+      Assert(
         (dynamic_cast<
            const parallel::DistributedTriangulationBase<dim, spacedim> *>(
            &dof.get_triangulation()) == nullptr),
