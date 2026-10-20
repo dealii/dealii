@@ -1,0 +1,6 @@
+Fixed: FE_Nedelec interpolation in three dimensions now uses the support points
+of each face and correctly subtracts boundary contributions and orders interior
+coefficients. In particular, higher-order tensor-product polynomials from the finite element space are
+now reproduced by interpolation.
+<br>
+(Luca Heltai, 2026/10/18)
