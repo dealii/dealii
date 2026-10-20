@@ -712,12 +712,11 @@ namespace VectorTools
           return;
         }
 
-      Assert(
-        (dynamic_cast<
-           const parallel::DistributedTriangulationBase<dim, spacedim> *>(
-           &dof.get_triangulation()) == nullptr),
-        ExcMessage("VectorTools::project_boundary_values() is not "
-                   "implemented for distributed triangulations."));
+      Assert((dynamic_cast<
+                const parallel::DistributedTriangulationBase<dim, spacedim> *>(
+                &dof.get_triangulation()) == nullptr),
+             ExcMessage("VectorTools::project_boundary_values() is not "
+                        "implemented for distributed triangulations."));
 
       // TODO:[?] In project_boundary_values, no condensation of sparsity
       //    structures, matrices and right hand sides or distribution of
