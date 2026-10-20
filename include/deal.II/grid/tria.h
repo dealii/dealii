@@ -1582,6 +1582,13 @@ public:
     do_not_produce_unrefined_islands = 0x400,
 
     /**
+     * Ensure that cells adjacent across periodic faces are refined or
+     * coarsened consistently. This avoids hanging nodes across periodic
+     * boundaries.
+     */
+    match_refinement_across_periodic_boundaries = 0x800,
+
+    /**
      * This flag sums up all smoothing algorithms which may be performed upon
      * refinement by flagging some more cells for refinement.
      */
