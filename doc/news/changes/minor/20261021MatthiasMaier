@@ -1,0 +1,7 @@
+Fixed: deal.II now strips link-time optimization flags (<code>-flto*</code>
+and <code>-ffat-lto-objects</code>) from the compile and link flags reported
+by the MPI compiler wrappers. Previously, for example, MPICH on Ubuntu 24.04
+silently enabled LTO for deal.II and user projects. Use DEAL_II_USE_LTO to
+enable link-time optimization.
+<br>
+(Matthias Maier, 2026/10/21)
