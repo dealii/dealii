@@ -136,7 +136,7 @@ dseupd_(int          *rvec,
  * @code
  * SolverControl solver_control(1000, 1e-9);
  * ArpackSolver solver(solver_control);
- * solver.solve(A, B, OP, lambda, x, size_of_spectrum);
+ * solver.solve(B, OP, lambda, x, size_of_spectrum);
  * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the variable
  * <code>size_of_spectrum</code> tells ARPACK the number of
@@ -296,17 +296,15 @@ public:
    * n-th eigenvalue has a nonzero imaginary part, Arpack needs in total n+1
    * real-valued vectors to store real and imaginary parts of the eigenvectors.
    *
-   * @param A The operator for which we want to compute eigenvalues. Actually,
-   * this parameter is entirely unused.
-   *
    * @param B The inner product of the underlying space, typically the mass
    * matrix. For constrained problems, it can be a partial @ref GlossMassMatrix "mass matrix", like
    * for instance the velocity mass matrix of a Stokes problem. Only its
    * function <code>vmult()</code> is used.
    *
-   * @param inverse This is the possibly shifted inverse that is actually used
-   * instead of <code>A</code>. Only its function <code>vmult()</code> is
-   * used.
+   * @param inverse The possibly shifted inverse operator. For a real shift
+   * $\sigma$, this is the inverse of $A-\sigma B$, with the shift specified
+   * by set_shift(). The system matrix $A$ enters the algorithm only through
+   * this operator. Only its function <code>vmult()</code> is used.
    *
    * @param eigenvalues is a vector of complex numbers in which the
    * eigenvalues are returned.
@@ -328,17 +326,32 @@ public:
    * Leave it at its default zero, which will be reset to the size of
    * <code>eigenvalues</code> internally.
    */
-  template <typename VectorType,
-            typename MatrixType1,
-            typename MatrixType2,
-            typename INVERSE>
+  template <typename VectorType, typename MatrixType, typename INVERSE>
   void
-  solve(const MatrixType1                 &A,
-        const MatrixType2                 &B,
+  solve(const MatrixType                  &B,
         const INVERSE                     &inverse,
         std::vector<std::complex<double>> &eigenvalues,
         std::vector<VectorType>           &eigenvectors,
         const unsigned int                 n_eigenvalues = 0);
+
+  /**
+   * Compatibility overload whose first argument is unused.
+   *
+   * @deprecated Use solve() without the system matrix argument. The system
+   * matrix is already represented by the inverse operator.
+   */
+  template <typename VectorType,
+            typename MatrixType1,
+            typename MatrixType2,
+            typename INVERSE>
+  DEAL_II_DEPRECATED_WITH_COMMENT(
+    "Use solve() without the system matrix argument.")
+  void solve(const MatrixType1                 &A,
+             const MatrixType2                 &B,
+             const INVERSE                     &inverse,
+             std::vector<std::complex<double>> &eigenvalues,
+             std::vector<VectorType>           &eigenvectors,
+             const unsigned int                 n_eigenvalues = 0);
 
 protected:
   /**
@@ -536,6 +549,19 @@ template <typename VectorType,
 inline void
 ArpackSolver::solve(const MatrixType1 & /*system_matrix*/,
                     const MatrixType2                 &mass_matrix,
+                    const INVERSE                     &inverse,
+                    std::vector<std::complex<double>> &eigenvalues,
+                    std::vector<VectorType>           &eigenvectors,
+                    const unsigned int                 n_eigenvalues)
+{
+  solve(mass_matrix, inverse, eigenvalues, eigenvectors, n_eigenvalues);
+}
+
+
+
+template <typename VectorType, typename MatrixType, typename INVERSE>
+inline void
+ArpackSolver::solve(const MatrixType                  &mass_matrix,
                     const INVERSE                     &inverse,
                     std::vector<std::complex<double>> &eigenvalues,
                     std::vector<VectorType>           &eigenvectors,

@@ -1,0 +1,5 @@
+Improved: ArpackSolver::solve() has an overload that omits the unused
+system matrix argument. The existing overload remains available for
+compatibility and is deprecated.
+<br>
+(Luca Heltai, 2026/10/19)
