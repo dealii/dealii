@@ -36,7 +36,7 @@
 template <int dim, int spacedim>
 std::string
 get_all_ref_cell_types_from_cells(const Triangulation<dim, spacedim> &tria,
-                                  const std::string &pre_post)
+                                  const std::string                  &pre_post)
 {
   std::ostringstream oss;
   oss << "Reference cells " << std::setw(4) << std::left << pre_post
@@ -48,7 +48,8 @@ get_all_ref_cell_types_from_cells(const Triangulation<dim, spacedim> &tria,
 
 template <int dim, int spacedim>
 std::string
-get_ref_cells_in_tria(const Triangulation<dim, spacedim> &tria, const std::string &pre_post)
+get_ref_cells_in_tria(const Triangulation<dim, spacedim> &tria,
+                      const std::string                  &pre_post)
 {
   std::ostringstream oss;
   oss << "Ref-Cells " << std::setw(4) << std::left << pre_post
