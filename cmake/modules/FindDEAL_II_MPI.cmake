@@ -59,6 +59,26 @@ endif()
 find_package(MPI)
 
 #
+# Strip link-time optimization flags. Some MPI implementations (for
+# example MPICH on Ubuntu 24.04) record the compiler flags they were built
+# with in the compiler wrapper, which FindMPI.cmake then passes on to us.
+# We do not want to silently enable LTO for deal.II and user projects this
+# way; LTO is controlled by DEAL_II_USE_LTO instead.
+#
+
+set(_lto_regex "^-flto($|=|-)|^-f(no-)?fat-lto-objects$")
+foreach(_variable MPI_CXX_COMPILE_FLAGS MPI_CXX_LINK_FLAGS)
+  separate_arguments(_flags UNIX_COMMAND "${${_variable}}")
+  set(_removed ${_flags})
+  list(FILTER _removed INCLUDE REGEX "${_lto_regex}")
+  if(NOT "${_removed}" STREQUAL "")
+    message(STATUS "Stripping LTO flags from ${_variable}: ${_removed}")
+    list(FILTER _flags EXCLUDE REGEX "${_lto_regex}")
+    string(JOIN " " ${_variable} ${_flags})
+  endif()
+endforeach()
+
+#
 # Newer versions of FindMPI.cmake only populate MPI_CXX_* (and MPI_C_*,
 # MPI_Fortran_*) variables. Let's rename these version names
 #
