@@ -36,7 +36,18 @@ set (_mpi_version ${MPI_VERSION})
 set (_mpi_version_major ${MPI_VERSION_MAJOR})
 set (_mpi_version_minor ${MPI_VERSION_MINOR})
 
-find_package(VTK 9.0.0 QUIET HINTS ${VTK_DIR})
+# Only request the VTK modules we actually use.
+#
+# Without an explicit list of components VTK_LIBRARIES contains every
+# module of the VTK installation, including the Python wrapping libraries
+# that leave the Python symbols unresolved and thus lead to underlinkage.
+#
+find_package(VTK 9.0.0 QUIET HINTS ${VTK_DIR}
+  COMPONENTS
+    CommonCore CommonDataModel CommonExecutionModel FiltersCore IOCore IOLegacy IOXML
+  OPTIONAL_COMPONENTS
+    FiltersGeneral
+  )
 
 set (MPI_VERSION ${_mpi_version})
 set (MPI_VERSION_MAJOR ${_mpi_version_major})
@@ -51,19 +62,37 @@ if(VTK_FOUND)
   set(VTK_INCLUDE_DIR
     ${VTK_PREFIX_PATH}/include/vtk-${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION})
 
-  # Try to find full paths from targets contained in VTK_LIBRARIES.
-  set(_libraries)
-  foreach(_library ${VTK_LIBRARIES})
-    if(NOT ${_library} MATCHES "Python"
-	AND NOT ${_library} MATCHES "MPI4Py")
-      get_target_property(_configurations ${_library} IMPORTED_CONFIGURATIONS)
+  #
+  # Collect the requested modules together with the VTK modules they depend on:
+  #
+  set(_targets)
+  set(_queue ${VTK_LIBRARIES})
+  while(_queue)
+    list(POP_FRONT _queue _target)
+    if(NOT TARGET ${_target} OR "${_target}" IN_LIST _targets)
+      continue()
+    endif()
+    list(APPEND _targets ${_target})
+    get_target_property(_dependencies ${_target} INTERFACE_LINK_LIBRARIES)
+    if(_dependencies)
+      foreach(_dependency ${_dependencies})
+        if(_dependency MATCHES "^VTK::")
+          list(APPEND _queue ${_dependency})
+        endif()
+      endforeach()
+    endif()
+  endwhile()
 
-      if(_configurations)
-	foreach(_configuration ${_configurations})
-          get_target_property(_imported_location ${_library} IMPORTED_LOCATION_${_configuration})
-          list(APPEND _libraries ${_imported_location})
-	endforeach()
-      endif()
+  # Try to find full paths from the collected targets.
+  set(_libraries)
+  foreach(_library ${_targets})
+    get_target_property(_configurations ${_library} IMPORTED_CONFIGURATIONS)
+
+    if(_configurations)
+      foreach(_configuration ${_configurations})
+        get_target_property(_imported_location ${_library} IMPORTED_LOCATION_${_configuration})
+        list(APPEND _libraries ${_imported_location})
+      endforeach()
     endif()
   endforeach()
 endif()
@@ -71,5 +100,5 @@ endif()
 process_feature(VTK
   LIBRARIES REQUIRED _libraries
   INCLUDE_DIRS REQUIRED VTK_INCLUDE_DIR
-  CLEAR VTK_INCLUDE_DIR VTK_LIBRARIES _libraries
+  CLEAR VTK_INCLUDE_DIR VTK_LIBRARIES _libraries _targets _queue
 )

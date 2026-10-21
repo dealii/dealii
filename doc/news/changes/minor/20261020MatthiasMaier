@@ -1,0 +1,6 @@
+Fixed: deal.II now only links against the VTK modules it uses (and their
+VTK dependencies) instead of every module of the VTK installation. This
+fixes link errors in user projects caused by the VTK Python wrapping
+libraries when linking without --as-needed.
+<br>
+(Matthias Maier, 2026/10/20)
