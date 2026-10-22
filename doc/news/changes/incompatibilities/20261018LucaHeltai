@@ -1,0 +1,6 @@
+Changed: SparseDirectMUMPS::get_icntl() now returns a pointer to
+types::mumps_index instead of int, matching the integer type of the MUMPS
+installation. Code that explicitly stores the returned pointer as int * must
+use types::mumps_index * or auto * to also support 64-bit MUMPS integers.
+<br>
+(Luca Heltai, 2026/10/18)
