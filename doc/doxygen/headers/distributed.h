@@ -210,21 +210,29 @@
  *
  * <h4>DoF ownership and linear algebra ownership</h4>
  *
- * The locally owned DoFs returned by DoFHandler::locally_owned_dofs() describe
- * an assignment of global DoF indices to MPI processes. Each index has one
- * owning process, even when its shape function is supported on cells owned by
- * several processes. This assignment is part of the DoFHandler's bookkeeping;
- * it does not by itself allocate entries of a solution vector or matrix.
+ * The locally owned DoFs returned by DoFHandler::locally_owned_dofs()
+ * describe an assignment of global DoF indices to MPI processes. Each
+ * index has one owning process, even when its shape function is
+ * supported on cells owned by several processes -- typically because
+ * the DoF lives on a vertex, line, or face that is shared by adjacent
+ * cells that are owned by more than one MPI process. The assignment
+ * of DoFs to processes is part of the DoFHandler's bookkeeping; it
+ * does not by itself allocate entries of a solution vector or matrix.
  *
- * A distributed vector or matrix has its own partition that determines which
- * process owns each vector entry or matrix row. Applications usually choose
- * the DoFHandler's locally owned index set for this partition, since this
- * keeps storage close to the cells on which values are used and assembled.
- * A different partition can also be chosen if it satisfies the requirements
- * of the linear algebra backend and the algorithms using the object. For
- * example, MatrixFree requires vectors with a partitioner compatible with
- * its data layout. Changing the partition of a linear algebra object does
- * not renumber the DoFs or change DoFHandler::locally_owned_dofs().
+ * A distributed vector or matrix has its own partition that
+ * determines which process owns each vector entry or matrix
+ * row. Applications usually _choose_ the DoFHandler's locally owned
+ * index set for this partition, since this keeps storage close to the
+ * cells on which values are used and assembled.  But one could also
+ * choose a different partition if that satisfies the requirements of
+ * the linear algebra backend and the algorithms using the object. For
+ * example, the MatrixFree system requires vectors with a partitioner
+ * compatible with its data layout. Changing the partition of a linear
+ * algebra object does not renumber the DoFs or change
+ * DoFHandler::locally_owned_dofs(). In other words, what
+ * DoFHandler::locally_owned_dofs() should be seen as a _suggestion_
+ * of how vectors and matrices partition their storage, not as a
+ * requirement.
  *
  *
  * <h4>Linear systems for %distributed computations</h4>
