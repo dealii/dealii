@@ -185,8 +185,8 @@ namespace SUNDIALS
     using ARKodeMemoryPtr = std::unique_ptr<void, void (*)(void *)>;
 
     /**
-     * The context that the ARKode object, to which this stepper is attached,
-     * provides to create SUNDIALS objects and to transport exceptions across
+     * The context that the ARKode object, to which this stepper is attached.
+     * It is used to create SUNDIALS objects and to propagate exceptions across
      * C boundaries (see `invocation_context.h`).
      */
     internal::InvocationContext

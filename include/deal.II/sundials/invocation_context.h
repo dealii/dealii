@@ -43,9 +43,14 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
     /**
      * A SUNContext that is freed when the last copy of this object is
-     * destroyed. SUNDIALS objects refer to the context they were created with,
-     * even while they are freed, so everything that owns such objects also has
-     * to own the context. The object converts to the plain SUNContext that
+     * destroyed.
+     *
+     * SUNDIALS objects retain a reference to the context with which they were
+     * created, including during their destruction. Therefore, any object that
+     * owns such SUNDIALS objects must also keep the corresponding context
+     * alive.
+     *
+     * This object implicitly converts to the plain SUNContext that
      * SUNDIALS functions expect.
      */
     class SharedSUNContext
@@ -69,7 +74,7 @@ namespace SUNDIALS
       {}
 
       /**
-       * Access the underlying SUNContext.
+       * Return the underlying SUNContext.
        */
       operator SUNContext() const
       {
