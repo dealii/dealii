@@ -33,8 +33,8 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <array>
 #include <memory>
-
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -46,9 +46,26 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
   const DoFHandler<dim, spacedim> &euler_dof_handler,
   const VectorType                &euler_vector,
   const unsigned int               level)
+  : MappingQEulerian(degree,
+                     euler_dof_handler,
+                     euler_vector,
+                     ComponentMask(),
+                     level)
+{}
+
+
+
+template <int dim, typename VectorType, int spacedim>
+MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
+  const unsigned int               degree,
+  const DoFHandler<dim, spacedim> &euler_dof_handler,
+  const VectorType                &euler_vector,
+  const ComponentMask             &component_mask,
+  const unsigned int               level)
   : MappingQ<dim, spacedim>(degree)
   , euler_vector(&euler_vector)
   , euler_dof_handler(&euler_dof_handler)
+  , component_mask(component_mask)
   , level(level)
   , support_quadrature(degree)
   , mapping_q(degree)
@@ -65,7 +82,11 @@ std::unique_ptr<Mapping<dim, spacedim>>
 MappingQEulerian<dim, VectorType, spacedim>::clone() const
 {
   return std::make_unique<MappingQEulerian<dim, VectorType, spacedim>>(
-    this->get_degree(), *euler_dof_handler, *euler_vector, this->level);
+    this->get_degree(),
+    *euler_dof_handler,
+    *euler_vector,
+    component_mask,
+    this->level);
 }
 
 
@@ -146,17 +167,28 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
   // the given displacement field at these points to determine the shift
   // vector that maps the support points to the deformed configuration.
 
-  // We assume that the given field contains dim displacement components, but
-  // that there may be other solution components as well (e.g. pressures).
-  // this class therefore assumes that the first dim components represent the
-  // actual shift vector we need, and simply ignores any components after
-  // that. This implies that the user should order components appropriately,
-  // or create a separate dof handler for the displacements.
   const unsigned int n_support_pts = support_quadrature.size();
   const unsigned int n_components = euler_dof_handler->get_fe(0).n_components();
-
-  Assert(n_components >= spacedim,
-         ExcDimensionMismatch(n_components, spacedim));
+  std::array<unsigned int, spacedim> components{};
+  if (component_mask.represents_the_all_selected_mask())
+    {
+      Assert(n_components >= spacedim,
+             ExcDimensionMismatch(n_components, spacedim));
+      for (unsigned int d = 0; d < spacedim; ++d)
+        components[d] = d;
+    }
+  else
+    {
+      AssertThrow(component_mask.size() == n_components,
+                  ExcDimensionMismatch(component_mask.size(), n_components));
+      AssertThrow(component_mask.n_selected_components() == spacedim,
+                  ExcMessage(
+                    "Select exactly spacedim displacement components."));
+      unsigned int d = 0;
+      for (unsigned int c = 0; c < n_components; ++c)
+        if (component_mask[c])
+          components[d++] = c;
+    }
 
   std::vector<Vector<typename VectorType::value_type>> shift_vector(
     n_support_pts, Vector<typename VectorType::value_type>(n_components));
@@ -183,7 +215,7 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
     {
       points[q] = fe_values.quadrature_point(q);
       for (unsigned int d = 0; d < spacedim; ++d)
-        points[q][d] += shift_vector[q][d];
+        points[q][d] += shift_vector[q][components[d]];
     }
 }
 
