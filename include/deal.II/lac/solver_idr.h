@@ -23,10 +23,14 @@
 
 #include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/full_matrix.h>
+#include <deal.II/lac/la_parallel_vector.h>
 #include <deal.II/lac/solver.h>
 #include <deal.II/lac/solver_control.h>
 
+#include <Kokkos_Random.hpp>
+
 #include <cmath>
+#include <cstdint>
 #include <random>
 
 DEAL_II_NAMESPACE_OPEN
@@ -273,6 +277,44 @@ namespace internal
       return vector.block(b);
     }
 
+
+
+    template <typename Number>
+    void
+    initialize_random_vector(
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> &vector,
+      std::mt19937                                                     &rng,
+      std::normal_distribution<> &)
+    {
+      using ExecutionSpace = Kokkos::DefaultExecutionSpace;
+      std::uniform_int_distribution<std::uint64_t>   distribution;
+      const std::uint64_t                            seed = distribution(rng);
+      Kokkos::Random_XorShift64_Pool<ExecutionSpace> random_pool(seed);
+
+      Number *values = vector.get_values();
+      Kokkos::parallel_for(
+        "SolverIDR initialize random vector",
+        Kokkos::RangePolicy<ExecutionSpace>(0, vector.locally_owned_size()),
+        KOKKOS_LAMBDA(const types::global_dof_index i) {
+          auto random_state = random_pool.get_state();
+          values[i]         = random_state.normal();
+          random_pool.free_state(random_state);
+        });
+      ExecutionSpace().fence();
+    }
+
+
+
+    template <typename VectorType>
+    void
+    initialize_random_vector(VectorType                 &vector,
+                             std::mt19937               &rng,
+                             std::normal_distribution<> &normal_distribution)
+    {
+      for (const auto index : vector.locally_owned_elements())
+        vector(index) = normal_distribution(rng);
+    }
+
   } // namespace SolverIDRImplementation
 } // namespace internal
 
@@ -379,10 +421,10 @@ void SolverIDR<VectorType>::solve(const MatrixType         &A,
           for (unsigned int b = 0;
                b < internal::SolverIDRImplementation::n_blocks(tmp_q);
                ++b)
-            for (auto index : internal::SolverIDRImplementation::block(tmp_q, b)
-                                .locally_owned_elements())
-              internal::SolverIDRImplementation::block(tmp_q, b)(index) =
-                normal_distribution(rng);
+            internal::SolverIDRImplementation::initialize_random_vector(
+              internal::SolverIDRImplementation::block(tmp_q, b),
+              rng,
+              normal_distribution);
           tmp_q.compress(VectorOperation::insert);
         }
       else
