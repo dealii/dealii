@@ -1519,7 +1519,7 @@ DEAL:Basic:All:3d:Multigrid:level 2:Reordered:Component DoF Order::Expected: 4 5
 DEAL:Basic:All:3d:Multigrid:level 2:Reordered:Component DoF Order::Obtained: 4 5 6 7 8 9 10 11 12 0 13 14 15 16 17 18 1 2 3
 DEAL:Basic:All:3d:Multigrid:level 2:Reordered:Component DoF Order::Correct:  true
 DEAL:Basic:Invalid input:2d::Missing extractors.
-    All entries in component_order must contain valid indices, no numbers::invalid_unsigned_int must be present after processing all given extractors. This error typically occurs when the component_wise function is passed fewer extractors than needed or when the set of extractors provided in the extractor_order argument doesn't cover all required components.
+    All entries in component_order must contain valid indices, no numbers::invalid_unsigned_int must be present after processing all given extractors. This error typically occurs when the component_wise function is passed fewer extractors than needed or when the set of extractors provided in the extractor_order argument doesn't cover all required components or when passed total number of components f_n_components is incorrect.
 DEAL:Basic:Invalid input:2d::Duplicate extractors.
     A component which has already been assigned a block index is trying to be overwritten. This indicates that the component_wise function is being called with an invalid set of extractors in the extractor_order argument that overlap in component indices.
 DEAL:Basic:Invalid input:2d::Overlapping extractors.
