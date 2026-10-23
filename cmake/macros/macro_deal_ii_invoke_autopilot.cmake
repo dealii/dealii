@@ -109,55 +109,6 @@ macro(deal_ii_invoke_autopilot)
     deal_ii_setup_target(${TARGET})
   endif()
 
-  #
-  # Use 'mold' or 'lld' linker if possible, given that either of them is
-  # substantially faster. deal.II does not export the -fuse-ld=mold or
-  # -fuse-ld=lld linker flags it was configured with, so we have to check
-  # for linker support again in the environment of the user project.
-  #
-  # We have to try to link a full executable with -fuse-ld=mold or
-  # -fuse-ld=lld to check whether "ld.mold" or "ld.lld" is actually
-  # available. Clang always reports "argument unused during compilation",
-  # but fails at link time for an unsupported linker. ICC also emits a
-  # warning but passes for unsupported linkers unless we turn diagnostic
-  # warnings into errors.
-  #
-  if(NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    include(CheckCXXSourceCompiles)
-
-    set(_cmake_required_flags_saved "${CMAKE_REQUIRED_FLAGS}")
-    set(_flags "-Werror")
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-      string(APPEND _flags " -Wno-unused-command-line-argument")
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-      string(APPEND _flags " -diag-error warn")
-    endif()
-
-    set(CMAKE_REQUIRED_FLAGS "${_flags} -fuse-ld=mold")
-    CHECK_CXX_SOURCE_COMPILES(
-      "
-      #include <iostream>
-      int main() { std::cout << \"Hello, world!\" << std::endl; }
-      "
-      DEAL_II_AUTOPILOT_HAS_FUSE_LD_MOLD)
-
-    set(CMAKE_REQUIRED_FLAGS "${_flags} -fuse-ld=lld")
-    CHECK_CXX_SOURCE_COMPILES(
-      "
-      #include <iostream>
-      int main() { std::cout << \"Hello, world!\" << std::endl; }
-      "
-      DEAL_II_AUTOPILOT_HAS_FUSE_LD_LLD)
-
-    set(CMAKE_REQUIRED_FLAGS "${_cmake_required_flags_saved}")
-
-    if(DEAL_II_AUTOPILOT_HAS_FUSE_LD_MOLD)
-      target_link_options(${TARGET} PRIVATE "-fuse-ld=mold")
-    elseif(DEAL_II_AUTOPILOT_HAS_FUSE_LD_LLD)
-      target_link_options(${TARGET} PRIVATE "-fuse-ld=lld")
-    endif()
-  endif()
-
   # Generator specific values:
   if(CMAKE_GENERATOR MATCHES "Ninja")
     set(_make_command "$ ninja")
