@@ -23,6 +23,7 @@ if (DEAL_II_WITH_SUNDIALS)
     kinsol.cc
     n_vector.cc
     sunlinsol_wrapper.cc
+    sunnonlinsol_wrapper.cc
     )
 
   set(_inst

@@ -36,9 +36,6 @@
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
 #    include <sundomeigest/sundomeigest_power.h>
 #  endif
-#  include <sunlinsol/sunlinsol_spgmr.h>
-#  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
-
 #  include <iostream>
 
 #endif // DEAL_II_WITH_SUNDIALS
@@ -52,9 +49,6 @@ namespace SUNDIALS
   template <typename VectorType>
   ARKStepper<VectorType>::ARKStepper(const AdditionalData &data)
     : data(data)
-    , default_linear_solver(nullptr, free_linear_solver)
-    , default_mass_solver(nullptr, free_linear_solver)
-    , fixed_point_solver(nullptr, free_nonlinear_solver)
     , arkode_mem(nullptr, [](void *mem) {
       if (mem)
         ARKStepFree(&mem);
@@ -77,26 +71,6 @@ namespace SUNDIALS
       ExcMessage(
         "Either the order of accuracy or the Butcher table names may be "
         "specified, but not both."));
-  }
-
-
-
-  template <typename VectorType>
-  void
-  ARKStepper<VectorType>::free_linear_solver(SUNLinearSolver solver)
-  {
-    if (solver)
-      SUNLinSolFree(solver);
-  }
-
-
-
-  template <typename VectorType>
-  void
-  ARKStepper<VectorType>::free_nonlinear_solver(SUNNonlinearSolver solver)
-  {
-    if (solver)
-      SUNNonlinSolFree(solver);
   }
 
 
@@ -272,9 +246,8 @@ namespace SUNDIALS
         // The solvers of the previous setup are only replaced after ARKODE
         // uses the new ones.
         std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
-                           new_linear_solver;
-        SUNLinearSolverPtr new_default_linear_solver(nullptr,
-                                                     free_linear_solver);
+                                                    new_linear_solver;
+        std::optional<internal::SundialsLinearSolver> new_default_linear_solver;
         if (solve_linearized_system)
           {
             new_linear_solver =
@@ -298,17 +271,9 @@ namespace SUNDIALS
                                                           inv_ctx.arkode_ctx
 #  endif
             );
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-            new_default_linear_solver.reset(SUNLinSol_SPGMR(
-              y_template, PREC_NONE, 0 /*krylov subvectors, 0 uses default*/));
-#  else
-            new_default_linear_solver.reset(
-              SUNLinSol_SPGMR(y_template,
-                              SUN_PREC_NONE,
-                              0 /*krylov subvectors, 0 uses default*/,
-                              inv_ctx.arkode_ctx));
-#  endif
-            sun_linear_solver = new_default_linear_solver.get();
+            new_default_linear_solver.emplace(
+              internal::make_spgmr_linear_solver(y_template, inv_ctx));
+            sun_linear_solver = *new_default_linear_solver;
           }
         status =
           ARKStepSetLinearSolver(arkode_mem.get(), sun_linear_solver, nullptr);
@@ -449,21 +414,12 @@ namespace SUNDIALS
 #  endif
         );
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        SUNNonlinearSolverPtr new_fixed_point_solver(
-          SUNNonlinSol_FixedPoint(y_template,
-                                  data.anderson_acceleration_subspace),
-          free_nonlinear_solver);
-#  else
-        SUNNonlinearSolverPtr new_fixed_point_solver(
-          SUNNonlinSol_FixedPoint(y_template,
-                                  data.anderson_acceleration_subspace,
-                                  inv_ctx.arkode_ctx),
-          free_nonlinear_solver);
-#  endif
+        auto new_fixed_point_solver =
+          internal::make_fixed_point_nonlinear_solver(
+            y_template, data.anderson_acceleration_subspace, inv_ctx);
 
-        status = ARKStepSetNonlinearSolver(arkode_mem.get(),
-                                           new_fixed_point_solver.get());
+        status =
+          ARKStepSetNonlinearSolver(arkode_mem.get(), new_fixed_point_solver);
         AssertARKode(status);
 
         fixed_point_solver = std::move(new_fixed_point_solver);
@@ -492,8 +448,8 @@ namespace SUNDIALS
         // The solvers of the previous setup are only replaced after ARKODE
         // uses the new ones.
         std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
-                           new_mass_solver;
-        SUNLinearSolverPtr new_default_mass_solver(nullptr, free_linear_solver);
+                                                    new_mass_solver;
+        std::optional<internal::SundialsLinearSolver> new_default_mass_solver;
         if (solve_mass)
           {
             new_mass_solver =
@@ -516,17 +472,9 @@ namespace SUNDIALS
                                                           inv_ctx.arkode_ctx
 #  endif
             );
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-            new_default_mass_solver.reset(SUNLinSol_SPGMR(
-              y_template, PREC_NONE, 0 /*krylov subvectors, 0 uses default*/));
-#  else
-            new_default_mass_solver.reset(
-              SUNLinSol_SPGMR(y_template,
-                              SUN_PREC_NONE,
-                              0 /*krylov subvectors, 0 uses default*/,
-                              inv_ctx.arkode_ctx));
-#  endif
-            sun_mass_linear_solver = new_default_mass_solver.get();
+            new_default_mass_solver.emplace(
+              internal::make_spgmr_linear_solver(y_template, inv_ctx));
+            sun_mass_linear_solver = *new_default_mass_solver;
           }
 
         SUNDIALS::booltype mass_time_dependent =

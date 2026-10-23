@@ -54,7 +54,7 @@ main()
   // created and destroyed by the stepper.
   run_resize_test<Stepper>("ARKStepper implicit with SUNDIALS linear solver",
                            [](Stepper &stepper) {
-                             stepper.implicit_function     = rhs;
+                             stepper.implicit_function = rhs;
                              stepper.jacobian_times_vector =
                                [](const VectorType &v,
                                   VectorType       &Jv,
