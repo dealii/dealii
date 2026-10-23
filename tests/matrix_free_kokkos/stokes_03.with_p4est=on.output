@@ -11,4 +11,16 @@ DEAL::velocity error: 0.0051 pressure error: 0.011
 DEAL::refinement: 4, n_dofs: 2467
 DEAL::converged in 20 iterations.
 DEAL::velocity error: 0.00065 pressure error: 0.0013
+DEAL:mixed::refinement: 1, n_dofs: 59
+DEAL:mixed::converged in 4 iterations.
+DEAL:mixed::velocity error: 0.19 pressure error: 0.092
+DEAL:mixed::refinement: 2, n_dofs: 187
+DEAL:mixed::converged in 8 iterations.
+DEAL:mixed::velocity error: 0.039 pressure error: 0.14
+DEAL:mixed::refinement: 3, n_dofs: 659
+DEAL:mixed::converged in 16 iterations.
+DEAL:mixed::velocity error: 0.0051 pressure error: 0.011
+DEAL:mixed::refinement: 4, n_dofs: 2467
+DEAL:mixed::converged in 20 iterations.
+DEAL:mixed::velocity error: 0.00065 pressure error: 0.0013
 DEAL::OK

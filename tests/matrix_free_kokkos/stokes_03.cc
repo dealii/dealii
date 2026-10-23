@@ -14,6 +14,11 @@
 
 // Solve a Stokes problem with Portable::MatrixFree and a good block
 // preconditioner. Otherwise, like stokes_02.cc
+//
+// The test is run once fully in double, and once with the geometric
+// multigrid preconditioner for the velocity block (level matrices, smoothers,
+// transfers) in float while the outer GMRES solver and the remaining operators
+// stay in double.
 
 #include <deal.II/distributed/fully_distributed_tria.h>
 #include <deal.II/distributed/repartitioning_policy_tools.h>
@@ -48,6 +53,8 @@
 
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/vector_tools_integrate_difference.h>
+
+#include <type_traits>
 
 #include "../tests.h"
 
@@ -230,13 +237,13 @@ public:
              Portable::DeviceVector<Number>                         &dst) const;
 };
 
-template <int dim, int fe_degree>
+template <int dim, int fe_degree, typename Number = double>
 class VelocityOperatorQuad
 {
 public:
   DEAL_II_HOST_DEVICE void
   operator()(
-    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, dim, double> *fe_eval,
+    Portable::FEEvaluation<dim, fe_degree, fe_degree + 1, dim, Number> *fe_eval,
     const int q_point) const
   {
     const auto gradient_u = fe_eval->get_gradient(q_point);
@@ -255,13 +262,13 @@ operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
            const Portable::DeviceVector<Number>                   &src,
            Portable::DeviceVector<Number>                         &dst) const
 {
-  Portable::FEEvaluation<dim, degree_u, n_q_points_1d, dim, double> fe_u(data,
+  Portable::FEEvaluation<dim, degree_u, n_q_points_1d, dim, Number> fe_u(data,
                                                                          0);
 
   fe_u.read_dof_values(src);
   fe_u.evaluate(EvaluationFlags::gradients);
 
-  VelocityOperatorQuad<dim, degree_u> quad_operation;
+  VelocityOperatorQuad<dim, degree_u, Number> quad_operation;
 
   data->for_each_quad_point(
     [&](const int q_point) { quad_operation(&fe_u, q_point); });
@@ -275,7 +282,7 @@ template <int dim,
           int degree_p,
           typename Number = double,
           typename VectorType =
-            LinearAlgebra::distributed::Vector<double, MemorySpace::Default>,
+            LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>,
           int n_q_points_1d = degree_u + 1>
 class PortableMFVelocityOperator : public EnableObserverPointer
 
@@ -310,7 +317,7 @@ public:
 
 
   std::shared_ptr<DiagonalMatrix<
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>>
   get_matrix_diagonal_inverse() const
   {
     return inverse_diagonal_entries;
@@ -354,13 +361,13 @@ public:
 
     this->inverse_diagonal_entries.reset(
       new DiagonalMatrix<
-        LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>());
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>());
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>
       &inverse_diagonal = inverse_diagonal_entries->get_vector();
     data->initialize_dof_vector(inverse_diagonal, 0 /* velocity */);
-    VelocityOperatorQuad<dim, degree_u> velocity_operator_quad;
+    VelocityOperatorQuad<dim, degree_u, Number> velocity_operator_quad;
 
-    MatrixFreeTools::compute_diagonal<dim, degree_u, degree_u + 1, dim, double>(
+    MatrixFreeTools::compute_diagonal<dim, degree_u, degree_u + 1, dim, Number>(
       *data.get(),
       inverse_diagonal,
       velocity_operator_quad,
@@ -368,7 +375,7 @@ public:
       EvaluationFlags::gradients,
       0 /*velocity*/);
 
-    double *raw_diagonal = inverse_diagonal.get_values();
+    Number *raw_diagonal = inverse_diagonal.get_values();
 
     Kokkos::parallel_for(
       "invert A diagonal",
@@ -377,14 +384,14 @@ public:
         Assert(raw_diagonal[i] > 0.,
                ExcMessage("No diagonal entry in a positive definite operator "
                           "should be zero"));
-        raw_diagonal[i] = 1. / raw_diagonal[i];
+        raw_diagonal[i] = Number(1.) / raw_diagonal[i];
       });
   }
 
 private:
   std::shared_ptr<Portable::MatrixFree<dim, Number>> data;
   std::shared_ptr<DiagonalMatrix<
-    LinearAlgebra::distributed::Vector<double, MemorySpace::Default>>>
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>>
     inverse_diagonal_entries;
 };
 
@@ -794,7 +801,7 @@ BlockSchurPreconditioner<AInvOperator, SInvOperator, BTOperator, VectorType>::
 
 
 
-template <int dim, int degree_p>
+template <int dim, int degree_p, typename LevelNumber>
 void
 test(unsigned int n_refinements)
 {
@@ -880,14 +887,15 @@ test(unsigned int n_refinements)
     typename SolverGMRES<BlockVectorType>::AdditionalData(30, true));
 
   using VectorType =
-    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>;
-  using LevelMatrixType = PortableMFVelocityOperator<dim, degree_u, degree_p>;
+    LinearAlgebra::distributed::Vector<LevelNumber, MemorySpace::Default>;
+  using LevelMatrixType =
+    PortableMFVelocityOperator<dim, degree_u, degree_p, LevelNumber>;
   using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
   using SmootherType               = PreconditionChebyshev<LevelMatrixType,
                                              VectorType,
                                              SmootherPreconditionerType>;
   using MGTransferType =
-    MGTransferMatrixFree<dim, Number, MemorySpace::Default>;
+    MGTransferMatrixFree<dim, LevelNumber, MemorySpace::Default>;
 
   const auto coarse_grid_triangulations =
     MGTransferGlobalCoarseningTools::create_geometric_coarsening_sequence(tria);
@@ -898,13 +906,14 @@ test(unsigned int n_refinements)
   const unsigned int min_level = std::min(2U, max_level - 1);
 
   MGLevelObject<DoFHandler<dim>> mg_dof_handlers(min_level, max_level);
-  MGLevelObject<AffineConstraints<Number>> mg_constraints(min_level, max_level);
-  MGLevelObject<LevelMatrixType>           mg_matrices(min_level, max_level);
+  MGLevelObject<AffineConstraints<LevelNumber>> mg_constraints(min_level,
+                                                               max_level);
+  MGLevelObject<LevelMatrixType> mg_matrices(min_level, max_level);
 
   MGLevelObject<MGTwoLevelTransferCopyToHost<dim, VectorType>> mg_transfers(
     min_level, max_level);
 
-  std::vector<std::shared_ptr<Portable::MatrixFree<dim, Number>>>
+  std::vector<std::shared_ptr<Portable::MatrixFree<dim, LevelNumber>>>
     mf_data_levels;
 
   // level operators
@@ -922,16 +931,24 @@ test(unsigned int n_refinements)
       DoFTools::make_zero_boundary_constraints(dof_handler, constraint);
       constraint.close();
 
-      typename Portable::MatrixFree<dim, Number>::AdditionalData
+      typename Portable::MatrixFree<dim, LevelNumber>::AdditionalData
         additional_data;
       additional_data.mapping_update_flags =
         update_JxW_values | update_gradients;
-      if (level == max_level)
-        mf_data_levels.emplace_back(mf_data);
-      else
+      // On the finest level we can reuse the MatrixFree object of the Stokes
+      // operator, but only if the multigrid runs in the same precision.
+      bool can_reuse_mf_data = false;
+      if constexpr (std::is_same_v<LevelNumber, Number>)
+        if (level == max_level)
+          {
+            mf_data_levels.emplace_back(mf_data);
+            can_reuse_mf_data = true;
+          }
+
+      if (!can_reuse_mf_data)
         {
           mf_data_levels.emplace_back(
-            std::make_shared<Portable::MatrixFree<dim, Number>>());
+            std::make_shared<Portable::MatrixFree<dim, LevelNumber>>());
           mf_data_levels.back()->reinit(
             mapping, dof_handler, constraint, quad, additional_data);
         }
@@ -1079,7 +1096,12 @@ main(int argc, char **argv)
   initlog();
 
   for (int ref = 1; ref <= 4; ++ref)
-    test<2, 1>(ref);
+    test<2, 1, double>(ref);
+
+  deallog.push("mixed");
+  for (int ref = 1; ref <= 4; ++ref)
+    test<2, 1, float>(ref);
+  deallog.pop();
 
   deallog << "OK" << std::endl;
 }
