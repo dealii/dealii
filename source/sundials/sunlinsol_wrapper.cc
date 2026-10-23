@@ -53,15 +53,13 @@ namespace SUNDIALS
   namespace internal
   {
     SundialsLinearSolver
-    make_spgmr_linear_solver(N_Vector                  y_template,
+    make_spgmr_linear_solver(N_Vector                 y_template,
                              const InvocationContext &inv_ctx)
     {
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
       (void)inv_ctx;
-      return SundialsLinearSolver(
-        SUNLinSol_SPGMR(y_template,
-                        PREC_NONE,
-                        0 /*krylov subvectors, 0 uses default*/));
+      return SundialsLinearSolver(SUNLinSol_SPGMR(
+        y_template, PREC_NONE, 0 /*krylov subvectors, 0 uses default*/));
 #  else
       return SundialsLinearSolver(
         SUNLinSol_SPGMR(y_template,

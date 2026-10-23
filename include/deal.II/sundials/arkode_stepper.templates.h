@@ -246,7 +246,7 @@ namespace SUNDIALS
         // The solvers of the previous setup are only replaced after ARKODE
         // uses the new ones.
         std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
-                                                    new_linear_solver;
+                                                      new_linear_solver;
         std::optional<internal::SundialsLinearSolver> new_default_linear_solver;
         if (solve_linearized_system)
           {
@@ -448,7 +448,7 @@ namespace SUNDIALS
         // The solvers of the previous setup are only replaced after ARKODE
         // uses the new ones.
         std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
-                                                    new_mass_solver;
+                                                      new_mass_solver;
         std::optional<internal::SundialsLinearSolver> new_default_mass_solver;
         if (solve_mass)
           {

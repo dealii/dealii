@@ -39,10 +39,8 @@ namespace SUNDIALS
       return SundialsNonlinearSolver(
         SUNNonlinSol_FixedPoint(y_template, anderson_acceleration_subspace));
 #  else
-      return SundialsNonlinearSolver(
-        SUNNonlinSol_FixedPoint(y_template,
-                                anderson_acceleration_subspace,
-                                inv_ctx.arkode_ctx));
+      return SundialsNonlinearSolver(SUNNonlinSol_FixedPoint(
+        y_template, anderson_acceleration_subspace, inv_ctx.arkode_ctx));
 #  endif
     }
   } // namespace internal

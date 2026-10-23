@@ -18,7 +18,11 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
+#  include <deal.II/sundials/invocation_context.h>
+#  include <deal.II/sundials/sundials_handle.h>
+
 #  include <sundials/sundials_linearsolver.h>
+#  include <sundials/sundials_nvector.h>
 
 #  include <exception>
 #  include <functional>
@@ -288,7 +292,7 @@ namespace SUNDIALS
      *   (for SUNDIALS 6.0 and newer) to create the solver with.
      */
     SundialsLinearSolver
-    make_spgmr_linear_solver(N_Vector                  y_template,
+    make_spgmr_linear_solver(N_Vector                 y_template,
                              const InvocationContext &inv_ctx);
   } // namespace internal
 } // namespace SUNDIALS
