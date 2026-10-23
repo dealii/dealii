@@ -603,85 +603,74 @@ namespace PETScWrappers
                            VectorBase       &x,
                            const VectorBase &b)
   {
+    initialize(A);
+    solve(x, b);
+  }
+
+
+
+  void
+  SparseDirectMUMPS::initialize(const MatrixBase &A)
+  {
 #  ifdef DEAL_II_PETSC_WITH_MUMPS
-    /*
-     * creating a solver object if this is necessary
-     */
-    if (ksp == nullptr)
-      {
-        initialize_ksp_with_comm(A.get_mpi_communicator());
-
-        /*
-         * setting the solver type
-         */
-        set_solver_type(ksp);
-
-        /*
-         * set the matrices involved. the last argument is irrelevant here,
-         * since we use the solver only once anyway
-         */
-        AssertPETSc(KSPSetOperators(ksp, A, A));
-
-        /*
-         * getting the associated preconditioner context
-         */
-        PC pc;
-        AssertPETSc(KSPGetPC(ksp, &pc));
-
-        /*
-         * build PETSc PC for particular PCLU or PCCHOLESKY preconditioner
-         * depending on whether the symmetric mode has been set
-         */
-        if (symmetric_mode)
-          AssertPETSc(PCSetType(pc, PCCHOLESKY));
-        else
-          AssertPETSc(PCSetType(pc, PCLU));
-
-          /*
-           * set the software that is to be used to perform the lu
-           * factorization here we start to see differences with the base
-           * class solve function
-           */
-#    if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
-        AssertPETSc(PCFactorSetMatSolverPackage(pc, MATSOLVERMUMPS));
-#    else
-        AssertPETSc(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-#    endif
-
-        /*
-         * set up the package to call for the factorization
-         */
-#    if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
-        AssertPETSc(PCFactorSetUpMatSolverPackage(pc));
-#    else
-        AssertPETSc(PCFactorSetUpMatSolverType(pc));
-#    endif
-
-        /*
-         * get the factored matrix F from the preconditioner context.
-         */
-        Mat F;
-        AssertPETSc(PCFactorGetMatrix(pc, &F));
-
-        /*
-         * pass control parameters to MUMPS.
-         * Setting entry 7 of MUMPS ICNTL array to a value
-         * of 2. This sets use of Approximate Minimum Fill (AMF)
-         */
-        AssertPETSc(MatMumpsSetIcntl(F, 7, 2));
-
-        /*
-         * by default we set up the preconditioner only once.
-         * this can be overridden by command line.
-         */
-        AssertPETSc(KSPSetReusePreconditioner(ksp, PETSC_TRUE));
-      }
+    // Start afresh so a previous factorization cannot be reused for A.
+    reset();
+    initialize_ksp_with_comm(A.get_mpi_communicator());
 
     /*
-     * set the matrices involved. the last argument is irrelevant here,
-     * since we use the solver only once anyway
+     * setting the solver type
      */
+    set_solver_type(ksp);
+
+    // Associate the matrix before configuring its factorization.
     AssertPETSc(KSPSetOperators(ksp, A, A));
+
+    /*
+     * getting the associated preconditioner context
+     */
+    PC pc;
+    AssertPETSc(KSPGetPC(ksp, &pc));
+
+    /*
+     * build PETSc PC for particular PCLU or PCCHOLESKY preconditioner
+     * depending on whether the symmetric mode has been set
+     */
+    if (symmetric_mode)
+      AssertPETSc(PCSetType(pc, PCCHOLESKY));
+    else
+      AssertPETSc(PCSetType(pc, PCLU));
+
+      // Select MUMPS for the LU or Cholesky factorization.
+#    if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
+    AssertPETSc(PCFactorSetMatSolverPackage(pc, MATSOLVERMUMPS));
+#    else
+    AssertPETSc(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+#    endif
+
+    /*
+     * set up the package to call for the factorization
+     */
+#    if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
+    AssertPETSc(PCFactorSetUpMatSolverPackage(pc));
+#    else
+    AssertPETSc(PCFactorSetUpMatSolverType(pc));
+#    endif
+
+    /*
+     * get the factored matrix F from the preconditioner context.
+     */
+    Mat F;
+    AssertPETSc(PCFactorGetMatrix(pc, &F));
+
+    /*
+     * pass control parameters to MUMPS.
+     * Setting entry 7 of MUMPS ICNTL array to a value
+     * of 2. This sets use of Approximate Minimum Fill (AMF)
+     */
+    AssertPETSc(MatMumpsSetIcntl(F, 7, 2));
+
+    // The two-vector solve() overload reuses this factorization.
+    AssertPETSc(KSPSetReusePreconditioner(ksp, PETSC_TRUE));
 
     /*
      * set the command line option prefix name
@@ -694,9 +683,27 @@ namespace PETScWrappers
      */
     AssertPETSc(KSPSetFromOptions(ksp));
 
-    /*
-     * solve the linear system
-     */
+    AssertPETSc(KSPSetUp(ksp));
+
+#  else // DEAL_II_PETSC_WITH_MUMPS
+    Assert(
+      false,
+      ExcMessage(
+        "Your PETSc installation does not include a copy of "
+        "the MUMPS package necessary for this solver. You will need to configure "
+        "PETSc so that it includes MUMPS, recompile it, and then re-configure "
+        "and recompile deal.II as well."));
+    (void)A;
+#  endif
+  }
+
+
+
+  void
+  SparseDirectMUMPS::solve(VectorBase &x, const VectorBase &b)
+  {
+#  ifdef DEAL_II_PETSC_WITH_MUMPS
+    Assert(ksp != nullptr, ExcNotInitialized());
     AssertPETSc(KSPSolve(ksp, b, x));
 
     /*
@@ -709,16 +716,8 @@ namespace PETScWrappers
                     SolverControl::NoConvergence(solver_control->last_step(),
                                                  solver_control->last_value()));
       }
-
-#  else // DEAL_II_PETSC_WITH_MUMPS
-    Assert(
-      false,
-      ExcMessage(
-        "Your PETSc installation does not include a copy of "
-        "the MUMPS package necessary for this solver. You will need to configure "
-        "PETSc so that it includes MUMPS, recompile it, and then re-configure "
-        "and recompile deal.II as well."));
-    (void)A;
+#  else
+    Assert(false, ExcMessage("This solver requires PETSc with MUMPS support."));
     (void)x;
     (void)b;
 #  endif

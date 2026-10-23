@@ -1,0 +1,5 @@
+Fixed: PETScWrappers::SparseDirectMUMPS::solve(A, x, b) now always
+factorizes the supplied matrix. Use initialize(A) followed by solve(x, b)
+to reuse a factorization for multiple right-hand sides.
+<br>
+(Luca Heltai, 2026/10/20)
