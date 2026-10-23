@@ -42,15 +42,18 @@
 #  include <deal.II/sundials/n_vector.h>
 #  include <deal.II/sundials/sundials_types.h>
 #  include <deal.II/sundials/sunlinsol_wrapper.h>
+#  include <deal.II/sundials/sunnonlinsol_wrapper.h>
 
 #  include <boost/signals2.hpp>
 
 #  include <sundials/sundials_linearsolver.h>
 #  include <sundials/sundials_math.h>
+#  include <sundials/sundials_nonlinearsolver.h>
 
 #  include <complex>
 #  include <exception>
 #  include <memory>
+#  include <optional>
 #  include <string>
 
 #endif // DEAL_II_WITH_SUNDIALS
@@ -1081,10 +1084,28 @@ namespace SUNDIALS
     std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
 
     /**
-     * ARKODE memory object. Declared after linear_solver and mass_solver so
-     * that it is destroyed first (C++ destroys members in reverse declaration
-     * order), ensuring ARKStepFree is called before the solver wrappers free
-     * their SUNLinearSolver objects.
+     * SUNDIALS' default linear solver for the Jacobian system. This is used if
+     * the user provides jacobian_times_vector() but not
+     * solve_linearized_system().
+     */
+    std::optional<internal::SundialsLinearSolver> default_linear_solver;
+
+    /**
+     * SUNDIALS' default linear solver for the mass system. This is used if the
+     * user provides mass_times_vector() but not solve_mass().
+     */
+    std::optional<internal::SundialsLinearSolver> default_mass_solver;
+
+    /**
+     * SUNDIALS' fixed-point solver. This is used if the user provides
+     * implicit_function() but not jacobian_times_vector().
+     */
+    std::optional<internal::SundialsNonlinearSolver> fixed_point_solver;
+
+    /**
+     * ARKODE memory object. Declared after the solvers above so that it is
+     * destroyed first (C++ destroys members in reverse declaration order),
+     * ensuring ARKStepFree is called before the solvers are freed.
      */
     ARKodeMemoryPtr arkode_mem;
 

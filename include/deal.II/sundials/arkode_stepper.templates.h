@@ -36,9 +36,6 @@
 #  if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
 #    include <sundomeigest/sundomeigest_power.h>
 #  endif
-#  include <sunlinsol/sunlinsol_spgmr.h>
-#  include <sunnonlinsol/sunnonlinsol_fixedpoint.h>
-
 #  include <iostream>
 
 #endif // DEAL_II_WITH_SUNDIALS
@@ -84,7 +81,14 @@ namespace SUNDIALS
   {
     const auto inv_ctx = this->invocation_context();
 
+    // All objects of the previous invocation have to be destroyed before new
+    // ones are created with the same context.
     arkode_mem.reset();
+    fixed_point_solver.reset();
+    default_mass_solver.reset();
+    default_linear_solver.reset();
+    mass_solver.reset();
+    linear_solver.reset();
 
     Assert(explicit_function || implicit_function,
            ExcFunctionNotProvided("explicit_function || implicit_function"));
@@ -238,9 +242,15 @@ namespace SUNDIALS
     if (jacobian_times_vector)
       {
         SUNLinearSolver sun_linear_solver;
+
+        // The solvers of the previous setup are only replaced after ARKODE
+        // uses the new ones.
+        std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
+                                                      new_linear_solver;
+        std::optional<internal::SundialsLinearSolver> new_default_linear_solver;
         if (solve_linearized_system)
           {
-            linear_solver =
+            new_linear_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
                 solve_linearized_system,
                 inv_ctx.pending_exception
@@ -249,7 +259,7 @@ namespace SUNDIALS
                 inv_ctx.arkode_ctx
 #  endif
               );
-            sun_linear_solver = *linear_solver;
+            sun_linear_solver = *new_linear_solver;
           }
         else
           {
@@ -261,22 +271,16 @@ namespace SUNDIALS
                                                           inv_ctx.arkode_ctx
 #  endif
             );
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-            sun_linear_solver =
-              SUNLinSol_SPGMR(y_template,
-                              PREC_NONE,
-                              0 /*krylov subvectors, 0 uses default*/);
-#  else
-            sun_linear_solver =
-              SUNLinSol_SPGMR(y_template,
-                              SUN_PREC_NONE,
-                              0 /*krylov subvectors, 0 uses default*/,
-                              inv_ctx.arkode_ctx);
-#  endif
+            new_default_linear_solver.emplace(
+              internal::make_spgmr_linear_solver(y_template, inv_ctx));
+            sun_linear_solver = *new_default_linear_solver;
           }
         status =
           ARKStepSetLinearSolver(arkode_mem.get(), sun_linear_solver, nullptr);
         AssertARKode(status);
+
+        linear_solver         = std::move(new_linear_solver);
+        default_linear_solver = std::move(new_default_linear_solver);
 
         auto jacobian_times_vector_callback = [](N_Vector           v,
                                                  N_Vector           Jv,
@@ -410,20 +414,15 @@ namespace SUNDIALS
 #  endif
         );
 
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-        SUNNonlinearSolver fixed_point_solver =
-          SUNNonlinSol_FixedPoint(y_template,
-                                  data.anderson_acceleration_subspace);
-#  else
-        SUNNonlinearSolver fixed_point_solver =
-          SUNNonlinSol_FixedPoint(y_template,
-                                  data.anderson_acceleration_subspace,
-                                  inv_ctx.arkode_ctx);
-#  endif
+        auto new_fixed_point_solver =
+          internal::make_fixed_point_nonlinear_solver(
+            y_template, data.anderson_acceleration_subspace, inv_ctx);
 
         status =
-          ARKStepSetNonlinearSolver(arkode_mem.get(), fixed_point_solver);
+          ARKStepSetNonlinearSolver(arkode_mem.get(), new_fixed_point_solver);
         AssertARKode(status);
+
+        fixed_point_solver = std::move(new_fixed_point_solver);
       }
 
     status = ARKStepSetMaxNonlinIters(arkode_mem.get(),
@@ -445,9 +444,15 @@ namespace SUNDIALS
     if (mass_times_vector)
       {
         SUNLinearSolver sun_mass_linear_solver;
+
+        // The solvers of the previous setup are only replaced after ARKODE
+        // uses the new ones.
+        std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
+                                                      new_mass_solver;
+        std::optional<internal::SundialsLinearSolver> new_default_mass_solver;
         if (solve_mass)
           {
-            mass_solver =
+            new_mass_solver =
               std::make_unique<internal::LinearSolverWrapper<VectorType>>(
                 solve_mass,
 
@@ -457,7 +462,7 @@ namespace SUNDIALS
                 inv_ctx.arkode_ctx
 #  endif
               );
-            sun_mass_linear_solver = *mass_solver;
+            sun_mass_linear_solver = *new_mass_solver;
           }
         else
           {
@@ -467,18 +472,9 @@ namespace SUNDIALS
                                                           inv_ctx.arkode_ctx
 #  endif
             );
-#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
-            sun_mass_linear_solver =
-              SUNLinSol_SPGMR(y_template,
-                              PREC_NONE,
-                              0 /*krylov subvectors, 0 uses default*/);
-#  else
-            sun_mass_linear_solver =
-              SUNLinSol_SPGMR(y_template,
-                              SUN_PREC_NONE,
-                              0 /*krylov subvectors, 0 uses default*/,
-                              inv_ctx.arkode_ctx);
-#  endif
+            new_default_mass_solver.emplace(
+              internal::make_spgmr_linear_solver(y_template, inv_ctx));
+            sun_mass_linear_solver = *new_default_mass_solver;
           }
 
         SUNDIALS::booltype mass_time_dependent =
@@ -489,6 +485,9 @@ namespace SUNDIALS
                                             nullptr,
                                             mass_time_dependent);
         AssertARKode(status);
+
+        mass_solver         = std::move(new_mass_solver);
+        default_mass_solver = std::move(new_default_mass_solver);
 
         auto mass_matrix_times_vector_setup_callback =
           [](SUNDIALS::realtype t, void *mtimes_data) -> int {
@@ -755,7 +754,12 @@ namespace SUNDIALS
   {
     const auto inv_ctx = this->invocation_context();
 
+    // The estimator of the previous invocation has to be destroyed before new
+    // objects are created with the same context.
     arkode_mem.reset();
+#    if DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)
+    dom_eig_estimator.reset();
+#    endif
 
     Assert(explicit_function, ExcFunctionNotProvided("explicit_function"));
 #    if !DEAL_II_SUNDIALS_VERSION_GTE(7, 5, 0)

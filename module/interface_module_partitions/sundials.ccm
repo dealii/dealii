@@ -213,6 +213,7 @@ export
   using ::SUNMatrix_ID;
   using ::SUNNonlinearSolver;
   using ::SUNNonlinSol_FixedPoint;
+  using ::SUNNonlinSolFree;
 
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
   using ::SUNPSetupFn;

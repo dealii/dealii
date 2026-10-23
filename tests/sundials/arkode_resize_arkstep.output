@@ -5,3 +5,9 @@ DEAL::ARKStepper explicit: error is small: yes
 DEAL::ARKStepper implicit: resizes 1, final size 4
 DEAL::ARKStepper implicit: step count is within one of the run without resize: yes
 DEAL::ARKStepper implicit: error is small: yes
+DEAL::ARKStepper implicit with SUNDIALS linear solver: resizes 1, final size 4
+DEAL::ARKStepper implicit with SUNDIALS linear solver: step count is within one of the run without resize: yes
+DEAL::ARKStepper implicit with SUNDIALS linear solver: error is small: yes
+DEAL::ARKStepper implicit with fixed-point solver: resizes 1, final size 4
+DEAL::ARKStepper implicit with fixed-point solver: step count is within one of the run without resize: yes
+DEAL::ARKStepper implicit with fixed-point solver: error is small: yes
