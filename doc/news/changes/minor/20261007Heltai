@@ -1,0 +1,7 @@
+Improved: The SUNDIALS::IDA wrapper now exposes additional IDA integration,
+initial-condition, linear-solver, and adaptivity controls. It also supports
+typed inequality constraints, provides the N_Vector operations required by
+IDA, and adds raw IDA memory and SUNContext access together with a custom
+setup callback.
+<br>
+(Luca Heltai, 2026/10/07)
