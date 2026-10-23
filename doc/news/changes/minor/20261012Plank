@@ -1,0 +1,4 @@
+New: GridIn::read_abaqus() and GridIn::read_ucd() have been generalized to support
+meshes with all types of cells that are not dimension-reduced.
+<br>
+(Jonas Plank, 2026/10/12)
