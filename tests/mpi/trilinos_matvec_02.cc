@@ -115,8 +115,23 @@ test()
   for (unsigned int i = 0; i < col_partitioning.n_elements(); ++i)
     {
       const unsigned int global_index = col_partitioning.nth_index_in_set(i);
-      Assert(dx(global_index) == x(global_index), ExcInternalError());
+      AssertThrow(dx(global_index) == x(global_index), ExcInternalError());
     }
+
+  // Also exercise Tvmult_add with distributed vectors, which requires its own
+  // template instantiation. Initialize both destinations with identical
+  // nonzero values to compare how the two vector types preserve the existing
+  // destination values when adding the transposed matrix-vector product.
+  x  = 3.;
+  dx = 3.;
+  A.Tvmult_add(x, y);
+  A.Tvmult_add(dx, dy);
+  for (unsigned int i = 0; i < col_partitioning.n_elements(); ++i)
+    {
+      const unsigned int global_index = col_partitioning.nth_index_in_set(i);
+      AssertThrow(dx(global_index) == x(global_index), ExcInternalError());
+    }
+
   if (my_id == 0)
     deallog << "OK" << std::endl;
 }

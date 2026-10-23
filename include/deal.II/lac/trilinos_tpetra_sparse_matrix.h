@@ -820,7 +820,8 @@ namespace LinearAlgebra
        * @name Multiplications
        */
       /** @{ */
-      /*
+
+      /**
        * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>
        * being this matrix.
        *
@@ -830,12 +831,17 @@ namespace LinearAlgebra
        * used for the row indices of the matrix and the vector @p src has to be
        * initialized with the same IndexSet that was used for the column indices
        * of the matrix.
+       *
+       * Supported vector types are LinearAlgebra::TpetraWrappers::Vector,
+       * dealii::Vector, and dealii::LinearAlgebra::distributed::Vector with the
+       * same scalar type as the matrix. Distributed vectors must use the same
+       * memory space as the matrix (MemorySpace::Host or MemorySpace::Default).
        */
       template <typename InputVectorType>
       void
       vmult(InputVectorType &dst, const InputVectorType &src) const;
 
-      /*
+      /**
        * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
        * <i>M</i> being this matrix. This function does the same as vmult() but
        * takes the transposed matrix.
