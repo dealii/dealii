@@ -289,7 +289,7 @@ foreach(_flag LINKER_FLAGS LINKER_FLAGS_DEBUG LINKER_FLAGS_RELEASE)
     message(STATUS
       "Prepending \${CMAKE_SHARED_${_flag}} to \${DEAL_II_${_flag}}"
       )
-    set(DEAL_II_${_flag} "${CMAKE_${_flag}} ${DEAL_II_${_flag}}")
+    set(DEAL_II_${_flag} "${CMAKE_SHARED_${_flag}} ${DEAL_II_${_flag}}")
   endif()
 endforeach()
 

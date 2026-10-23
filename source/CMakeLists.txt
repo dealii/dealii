@@ -221,21 +221,27 @@ add_dependencies(library ${DEAL_II_TARGET_NAME})
 #
 # We start with the configuration independent bits...
 #
-# Filter out -fuse-ld=mold and -fuse-ld=lld: The linker we found to be
-# usable when configuring deal.II might not be available (or not work) in
-# the environment of a user project. The deal_ii_invoke_autopilot() macro
-# runs its own check for a user project.
+# Filter out -fuse-ld=mold and -fuse-ld=lld (unless supplied by the user)
+# from the installed interface: The linker we found to be usable when
+# configuring deal.II might not be available (or not work) in the
+# environment of a user project. The deal_ii_invoke_autopilot() macro runs
+# its own check for a user project. The build directory interface keeps
+# the flags.
 #
 
 foreach(_flags DEAL_II_LINKER_FLAGS DEAL_II_LINKER_FLAGS_DEBUG DEAL_II_LINKER_FLAGS_RELEASE)
-  strip_flag(${_flags} "-fuse-ld=mold")
-  strip_flag(${_flags} "-fuse-ld=lld")
+  strip_detected_linker_flags(${_flags})
 endforeach()
 
 target_compile_flags(${DEAL_II_TARGET_NAME} INTERFACE
   "$<COMPILE_LANGUAGE:CXX>" "${DEAL_II_CXX_FLAGS}"
   )
 target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE "${DEAL_II_LINKER_FLAGS}")
+foreach(_flag ${DEAL_II_LINKER_FLAGS_DETECTED})
+  target_link_options(${DEAL_II_TARGET_NAME} INTERFACE
+    "$<BUILD_INTERFACE:${_flag}>"
+    )
+endforeach()
 
 
 foreach(build ${DEAL_II_BUILD_TYPES})
@@ -260,6 +266,11 @@ foreach(build ${DEAL_II_BUILD_TYPES})
   target_link_flags(${DEAL_II_TARGET_NAME} INTERFACE
     "$<CONFIG:${build_camelcase}>" "${DEAL_II_LINKER_FLAGS_${build}}"
     )
+  foreach(_flag ${DEAL_II_LINKER_FLAGS_${build}_DETECTED})
+    target_link_options(${DEAL_II_TARGET_NAME} INTERFACE
+      "$<BUILD_INTERFACE:$<$<CONFIG:${build_camelcase}>:${_flag}>>"
+      )
+  endforeach()
 
   #
   # Attach the debug and release libraries:

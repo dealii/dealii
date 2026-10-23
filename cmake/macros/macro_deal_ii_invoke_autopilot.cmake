@@ -111,9 +111,10 @@ macro(deal_ii_invoke_autopilot)
 
   #
   # Use 'mold' or 'lld' linker if possible, given that either of them is
-  # substantially faster. deal.II does not export the -fuse-ld=mold or
-  # -fuse-ld=lld linker flags it was configured with, so we have to check
-  # for linker support again in the environment of the user project.
+  # substantially faster. An installed deal.II does not export the
+  # -fuse-ld=mold or -fuse-ld=lld linker flags it was configured with, so
+  # we have to check for linker support again in the environment of the
+  # user project.
   #
   # We have to try to link a full executable with -fuse-ld=mold or
   # -fuse-ld=lld to check whether "ld.mold" or "ld.lld" is actually

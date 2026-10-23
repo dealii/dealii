@@ -1,0 +1,5 @@
+Changed: The automatically detected <code>-fuse-ld=mold</code> or
+<code>-fuse-ld=lld</code> linker flag is no longer exported in the installed
+project configuration. User supplied linker flags are always preserved.
+<br>
+(Matthias Maier, 2026/10/23)
