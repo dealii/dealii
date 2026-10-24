@@ -1,0 +1,37 @@
+
+DEAL:0::files identical: true
+<?xml version="1.0" ?> 
+<!-- 
+# vtk DataFile Version 3.0
+#This file was generated 
+-->
+<VTKFile type="UnstructuredGrid" version="0.1" compressor="vtkZLibDataCompressor" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="64" NumberOfCells="16" >
+  <Points>
+    <DataArray type="Float32" NumberOfComponents="3" format="binary">
+AQAAAAADAAAAAwAAegAAAA==eNqFUEEOwCAM8mWDp/Xpi03W0I6oFxEpImvpimfZ894V10LX1h26zvnofHI4+6gmd/wzEN37m+XAlWvM1lvwGTj4720O7HxUE+i5XQ+adfPEuQfVbI4XH/1/dn7xUU12gnMPOsuBXQ+qCfgMHHxo5xcf1UThFyk7O3E=
+    </DataArray>
+  </Points>
+
+  <Cells>
+    <DataArray type="Int32" Name="connectivity" format="binary">
+AQAAAAABAAAAAQAAaQAAAA==eNoNwwVSAkAAAMADpaQ7pEGluyT//yt2ZzaEECJ+GPXTmAnjJk2Z9suMWfPmLFi0bMmKVevWbNj025ZtO/bs2nfgyKFjf/zz14lT585cuHTtyo1b9+48ePTsyYv/3rx69+HLp2+r3gfh
+    </DataArray>
+    <DataArray type="Int32" Name="offsets" format="binary">
+AQAAAEAAAABAAAAAMQAAAA==eNpjYWBg4ABiHiAWAGIRIJYAYhkgVgBiFSDWAGIdIDYAYhMgtgBiGyB2AGIAM0ACIQ==
+    </DataArray>
+    <DataArray type="UInt8" Name="types" format="binary">
+AQAAABAAAAAQAAAACwAAAA==eNrj5EQFAATYAJE=
+    </DataArray>
+  </Cells>
+  <PointData Scalars="scalars">
+    <DataArray type="Float32" Name="x" format="binary">
+AQAAAAABAAAAAQAAXQAAAA==eNpNjMENwDAIAxkhI2SRQkfoSDzz7AgZp2NVro1KJEvHBWyGlwdjLnby9uY1l/846EdwnkHOIK/msXs1D97x9w79Ve/UTvnUXfml++pF7tYLfprfmssjdr5IMCcr
+    </DataArray>
+  </PointData>
+ </Piece>
+ </UnstructuredGrid>
+</VTKFile>
+
+DEAL:0::OK
