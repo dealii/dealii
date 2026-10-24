@@ -1,0 +1,5 @@
+
+DEAL::refinement: 3 n_dofs: 162
+DEAL::Solver stopped within 5 - 20 iterations
+DEAL::Error: 0.000708805
+DEAL::OK

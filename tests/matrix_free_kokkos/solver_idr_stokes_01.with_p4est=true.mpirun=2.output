@@ -1,0 +1,9 @@
+
+DEAL:0:0::n_cells = 16 dofs = 187
+DEAL:0:0::Solver stopped within 10 - 30 iterations
+DEAL:0:0::OK
+
+DEAL:1:1::n_cells = 16 dofs = 187
+DEAL:1:1::Solver stopped within 10 - 30 iterations
+DEAL:1:1::OK
+
