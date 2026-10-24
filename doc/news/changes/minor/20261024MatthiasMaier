@@ -1,0 +1,9 @@
+New: DataOutInterface::write_vtu_in_parallel() and
+DataOutInterface::write_vtu_with_pvtu_record() now take an additional
+parameter <code>use_mpi_io</code>. If set to false (the new default), all
+participating ranks send their data in sequence to rank 0, which then
+writes the file. This avoids severe performance problems on network file
+systems that do not properly support MPI IO. Set the parameter to true to
+use the previous MPI IO based implementation.
+<br>
+(Matthias Maier, 2026/10/24)
