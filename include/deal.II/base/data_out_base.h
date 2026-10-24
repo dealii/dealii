@@ -2844,14 +2844,24 @@ public:
    * Collective MPI call to write the solution from all participating nodes
    * (those in the given communicator) to a single compressed .vtu file on a
    * shared file system.  The communicator can be a sub communicator of the
-   * one used by the computation. This routine uses MPI I/O to achieve high
-   * performance on parallel filesystems. In order to use this function,
-   * you need to be using a file system that supports parallel MPI I/O,
-   * and you will get error messages about failed MPI calls if you do not.
-   * Also see DataOutInterface::write_vtu().
+   * one used by the computation. Also see DataOutInterface::write_vtu().
+   *
+   * If @p use_mpi_io is set to false (the default), all participating
+   * ranks send their data one after another to rank 0, which is the only
+   * rank writing to the file. This works on every file system, but rank 0
+   * has to hold the data of one rank at a time in memory in addition to its
+   * own.
+   *
+   * If @p use_mpi_io is set to true, this routine uses MPI I/O to achieve
+   * high performance on parallel filesystems. In this case you need to be
+   * using a file system that supports parallel MPI I/O. Note that MPI I/O
+   * can be very slow on network file systems that do not properly support
+   * it.
    */
   void
-  write_vtu_in_parallel(const std::string &filename, const MPI_Comm comm) const;
+  write_vtu_in_parallel(const std::string &filename,
+                        const MPI_Comm     comm,
+                        const bool         use_mpi_io = false) const;
 
   /**
    * Some visualization programs, such as ParaView and VisIt, can read several
@@ -2927,14 +2937,13 @@ public:
    * (see parameter @p mpi_communicator), and a
    * specified number of @p n_groups with default value 0. The background is that
    * VTU file output supports grouping files from several CPUs into a given
-   * number of files using MPI I/O when writing on a parallel filesystem. The
+   * number of files. The
    * default value of @p n_groups is 0, meaning that every MPI rank will write one
    * file. A value of 1 will generate one big file containing the solution over
    * the whole domain, while a larger value will create @p n_groups files (but not
    * more than there are MPI ranks). For all values other than `n_groups==0`,
-   * this function calls write_vtu_in_parallel(); for this function to work you
-   * need to be using a file system that supports parallel MPI I/O, and you will
-   * get error messages about failed MPI calls if you do not.
+   * this function calls write_vtu_in_parallel() and passes @p use_mpi_io
+   * along; see there for a discussion of this parameter.
    *
    * Note that only one processor needs to
    * generate the .pvtu file, where processor zero is chosen to take over this
@@ -2958,7 +2967,8 @@ public:
     const unsigned int counter,
     const MPI_Comm     mpi_communicator,
     const unsigned int n_digits_for_counter = numbers::invalid_unsigned_int,
-    const unsigned int n_groups             = 0) const;
+    const unsigned int n_groups             = 0,
+    const bool         use_mpi_io           = false) const;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
