@@ -2919,35 +2919,35 @@ public:
    * processes grouped together, and the `.1.vtu` the data from the remaining
    * half.
    *
-   * A specified @p directory and a @p filename_without_extension
-   * form the first part of the filename. The filename is then extended with
-   * a @p counter labeling the current timestep/iteration/etc., the processor ID,
-   * and finally the .vtu/.pvtu ending. Since the number of timesteps to be
-   * written depends on the application, the number of digits to be reserved in
-   * the filename can be specified as parameter @p n_digits_for_counter, and the number
-   * is not padded with leading zeros if this parameter is left at its default
-   * value numbers::invalid_unsigned_int. If more than one file identifier
-   * is needed (e.g. time step number and iteration counter of solver), the
-   * last identifier is used as @p counter, while all other identifiers have to be
-   * added to @p filename_without_extension when calling this function.
+   * A specified @p directory and a @p filename_without_extension form the
+   * first part of the filename. The filename is then extended with a
+   * @p counter labeling the current timestep/iteration/etc., the processor
+   * ID, and finally the .vtu/.pvtu ending. Since the number of timesteps
+   * to be written depends on the application, the number of digits to be
+   * reserved in the filename can be specified as parameter @p
+   * n_digits_for_counter, and the number is not padded with leading zeros
+   * if this parameter is left at its default value
+   * numbers::invalid_unsigned_int. If more than one file identifier is
+   * needed (e.g. time step number and iteration counter of solver), the
+   * last identifier is used as @p counter, while all other identifiers
+   * have to be added to @p filename_without_extension when calling this
+   * function.
    *
-   * In a
-   * parallel setting, several files are typically written per time step. The
-   * number of files written in parallel depends on the number of MPI processes
-   * (see parameter @p mpi_communicator), and a
-   * specified number of @p n_groups with default value 0. The background is that
-   * VTU file output supports grouping files from several CPUs into a given
-   * number of files. The
-   * default value of @p n_groups is 0, meaning that every MPI rank will write one
-   * file. A value of 1 will generate one big file containing the solution over
-   * the whole domain, while a larger value will create @p n_groups files (but not
-   * more than there are MPI ranks). For all values other than `n_groups==0`,
-   * this function calls write_vtu_in_parallel() and passes @p use_mpi_io
-   * along; see there for a discussion of this parameter.
+   * In a parallel setting, several files are typically written per time
+   * step. The number of files written in parallel depends on the number of
+   * MPI processes (see parameter @p mpi_communicator), and a specified
+   * number of @p n_groups with default value 0. The background is that VTU
+   * file output supports grouping files from several CPUs into a given
+   * number of files. The default value of @p n_groups is 0, meaning that
+   * every MPI rank will write one file. A value of 1 will generate one big
+   * file containing the solution over the whole domain, while a larger
+   * value will create @p n_groups files (but not more than there are MPI
+   * ranks). For all values other than `n_groups==0`, this function calls
+   * write_vtu_in_parallel() and passes @p use_mpi_io along; see there for
+   * a discussion of this parameter.
    *
-   * Note that only one processor needs to
-   * generate the .pvtu file, where processor zero is chosen to take over this
-   * job.
+   * Note that only one processor needs to generate the .pvtu file, where
+   * processor zero is chosen to take over this job.
    *
    * The return value is the filename of the centralized file for the pvtu
    * record.
