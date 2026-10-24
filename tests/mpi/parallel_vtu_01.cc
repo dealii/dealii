@@ -70,7 +70,9 @@ test()
   data_out.build_patches();
   data_out.set_flags(vtk_flags);
 
-  data_out.write_vtu_in_parallel("output.vtu", MPI_COMM_WORLD);
+  data_out.write_vtu_in_parallel("output.vtu",
+                                 MPI_COMM_WORLD,
+                                 DataOutBase::ParallelWriteMode::mpi_io);
   MPI_Barrier(MPI_COMM_WORLD);
 
   if (myid == 0)
