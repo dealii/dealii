@@ -146,6 +146,9 @@ namespace Utilities
 
           // GridTools::internal::distributed_compute_point_locations
           distributed_compute_point_locations,
+
+          // DataOutInterface::write_vtu_in_parallel()
+          data_out_write_vtu_in_parallel,
         };
       } // namespace Tags
     }   // namespace internal

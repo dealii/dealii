@@ -7792,12 +7792,14 @@ DataOutInterface<dim, spacedim>::write_svg(std::ostream &out) const
 template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
-  const std::string &filename,
-  const MPI_Comm     comm) const
+  const std::string                   &filename,
+  const MPI_Comm                       comm,
+  const DataOutBase::ParallelWriteMode mode) const
 {
 #ifndef DEAL_II_WITH_MPI
   // without MPI fall back to the normal way to write a vtu file:
   (void)comm;
+  (void)mode;
 
   std::ofstream f(filename);
   AssertThrow(f, ExcFileNotOpen(filename));
@@ -7830,6 +7832,61 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
     DataOutBase::write_vtu_footer(ss);
 
   const std::string chunk = ss.str();
+
+  if (mode == DataOutBase::ParallelWriteMode::send_to_rank_0)
+    {
+      // Send all chunks in sequence to rank 0, which is the only rank
+      // writing to the file.
+      const int tag =
+        Utilities::MPI::internal::Tags::data_out_write_vtu_in_parallel;
+
+      // Let all ranks know whether rank 0 could open the file so that we
+      // throw everywhere instead of deadlocking.
+      std::ofstream file;
+      if (myrank == 0)
+        file.open(filename);
+      AssertThrow(Utilities::MPI::broadcast(comm, static_cast<bool>(file)),
+                  ExcFileNotOpen(filename));
+
+      if (myrank == 0)
+        {
+          file << chunk;
+
+          std::string buffer;
+          for (unsigned int rank = 1; rank < n_ranks; ++rank)
+            {
+              MPI_Status status;
+              MPI_Count  size = 0;
+              int        ierr = MPI_Probe(rank, tag, comm, &status);
+              AssertThrowMPI(ierr);
+
+              ierr = Utilities::MPI::LargeCount::Get_count_c(&status,
+                                                             MPI_CHAR,
+                                                             &size);
+              AssertThrowMPI(ierr);
+
+              buffer.resize(size);
+              ierr = Utilities::MPI::LargeCount::Recv_c(buffer.data(),
+                                                        size,
+                                                        MPI_CHAR,
+                                                        rank,
+                                                        tag,
+                                                        comm,
+                                                        MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr);
+              file << buffer;
+            }
+        }
+      else
+        {
+          const int ierr = Utilities::MPI::LargeCount::Send_c(
+            chunk.data(), chunk.size(), MPI_CHAR, 0, tag, comm);
+          AssertThrowMPI(ierr);
+        }
+      return;
+    }
+
+  Assert(mode == DataOutBase::ParallelWriteMode::mpi_io, ExcNotImplemented());
 
   // Use prefix sum to find specific offset to write at.
   const std::uint64_t size_on_proc = chunk.size();
@@ -7894,12 +7951,13 @@ DataOutInterface<dim, spacedim>::write_pvtu_record(
 template <int dim, int spacedim>
 std::string
 DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
-  const std::string &directory,
-  const std::string &filename_without_extension,
-  const unsigned int counter,
-  const MPI_Comm     mpi_communicator,
-  const unsigned int n_digits_for_counter,
-  const unsigned int n_groups) const
+  const std::string                   &directory,
+  const std::string                   &filename_without_extension,
+  const unsigned int                   counter,
+  const MPI_Comm                       mpi_communicator,
+  const unsigned int                   n_digits_for_counter,
+  const unsigned int                   n_groups,
+  const DataOutBase::ParallelWriteMode mode) const
 {
   const unsigned int rank = Utilities::MPI::this_mpi_process(mpi_communicator);
   const unsigned int n_ranks =
@@ -7929,7 +7987,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   else if (n_groups == 1)
     {
       // write only a single data file in parallel
-      this->write_vtu_in_parallel(filename, mpi_communicator);
+      this->write_vtu_in_parallel(filename, mpi_communicator, mode);
     }
   else
     {
@@ -7938,7 +7996,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
       MPI_Comm comm_group;
       int ierr = MPI_Comm_split(mpi_communicator, color, rank, &comm_group);
       AssertThrowMPI(ierr);
-      this->write_vtu_in_parallel(filename, comm_group);
+      this->write_vtu_in_parallel(filename, comm_group, mode);
       Utilities::MPI::free_communicator(comm_group);
 #else
       AssertThrow(false, ExcMessage("Logical error. Should not arrive here."));

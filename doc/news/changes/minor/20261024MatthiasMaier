@@ -1,0 +1,9 @@
+New: DataOutInterface::write_vtu_in_parallel() and
+DataOutInterface::write_vtu_with_pvtu_record() now take an additional
+parameter of type DataOutBase::ParallelWriteMode. If set to
+DataOutBase::ParallelWriteMode::send_to_rank_0, all participating ranks
+send their data in sequence to rank 0, which then writes the file. This
+avoids severe performance problems on network file systems that do not
+properly support MPI IO.
+<br>
+(Matthias Maier, 2026/10/24)
