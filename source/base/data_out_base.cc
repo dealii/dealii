@@ -7793,11 +7793,13 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   const std::string &filename,
-  const MPI_Comm     comm) const
+  const MPI_Comm     comm,
+  const bool         use_mpi_io) const
 {
 #ifndef DEAL_II_WITH_MPI
   // without MPI fall back to the normal way to write a vtu file:
   (void)comm;
+  (void)use_mpi_io;
 
   std::ofstream f(filename);
   AssertThrow(f, ExcFileNotOpen(filename));
@@ -7806,12 +7808,112 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
 
   const unsigned int myrank  = Utilities::MPI::this_mpi_process(comm);
   const unsigned int n_ranks = Utilities::MPI::n_mpi_processes(comm);
-  MPI_Info           info;
-  int                ierr = MPI_Info_create(&info);
+
+  const auto                   &patches      = get_patches();
+  const types::global_dof_index my_n_patches = patches.size();
+  const types::global_dof_index global_n_patches =
+    Utilities::MPI::sum(my_n_patches, comm);
+
+  // Every rank assembles a contiguous chunk of the final file: Rank 0
+  // prepends the header and the last rank appends the footer.
+  std::stringstream ss;
+  if (myrank == 0)
+    DataOutBase::write_vtu_header(ss, vtk_flags);
+
+  // Do not write pieces with 0 cells as this will crash paraview if this is
+  // the first piece written. But if nobody has any pieces to write (file is
+  // empty), let processor 0 write their empty data, otherwise the vtk file is
+  // invalid.
+  if (my_n_patches > 0 || (global_n_patches == 0 && myrank == 0))
+    DataOutBase::write_vtu_main(
+      patches, get_dataset_names(), get_nonscalar_data_ranges(), vtk_flags, ss);
+
+  if (myrank == n_ranks - 1)
+    DataOutBase::write_vtu_footer(ss);
+
+  const std::string chunk = ss.str();
+
+  if (!use_mpi_io)
+    {
+      // Send all chunks in sequence to rank 0, which is the only rank
+      // writing to the file.
+      const int tag =
+        Utilities::MPI::internal::Tags::data_out_write_vtu_in_parallel;
+
+      // Let all ranks know whether rank 0 could open the file so that we
+      // throw everywhere instead of deadlocking.
+      std::ofstream file;
+      if (myrank == 0)
+        file.open(filename);
+      AssertThrow(Utilities::MPI::broadcast(comm, static_cast<bool>(file)),
+                  ExcFileNotOpen(filename));
+
+      if (myrank == 0)
+        {
+          file << chunk;
+
+          std::string buffer;
+          for (unsigned int rank = 1; rank < n_ranks; ++rank)
+            {
+              std::uint64_t size = 0;
+              int           ierr =
+                MPI_Recv(&size,
+                         1,
+                         Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                         rank,
+                         tag,
+                         comm,
+                         MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr);
+
+              buffer.resize(size);
+              ierr = Utilities::MPI::LargeCount::Recv_c(buffer.data(),
+                                                        size,
+                                                        MPI_CHAR,
+                                                        rank,
+                                                        tag,
+                                                        comm,
+                                                        MPI_STATUS_IGNORE);
+              AssertThrowMPI(ierr);
+              file << buffer;
+            }
+        }
+      else
+        {
+          const std::uint64_t size = chunk.size();
+          int                 ierr =
+            MPI_Send(&size,
+                     1,
+                     Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                     0,
+                     tag,
+                     comm);
+          AssertThrowMPI(ierr);
+
+          ierr = Utilities::MPI::LargeCount::Send_c(
+            chunk.data(), size, MPI_CHAR, 0, tag, comm);
+          AssertThrowMPI(ierr);
+        }
+      return;
+    }
+
+  // Use prefix sum to find specific offset to write at.
+  const std::uint64_t size_on_proc = chunk.size();
+  std::uint64_t       offset       = 0;
+  int                 ierr         = MPI_Exscan(&size_on_proc,
+                        &offset,
+                        1,
+                        Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
+                        MPI_SUM,
+                        comm);
   AssertThrowMPI(ierr);
+
   MPI_File fh;
-  ierr = MPI_File_open(
-    comm, filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, info, &fh);
+  ierr = MPI_File_open(comm,
+                       filename.c_str(),
+                       MPI_MODE_CREATE | MPI_MODE_WRONLY,
+                       MPI_INFO_NULL,
+                       &fh);
   AssertThrow(ierr == MPI_SUCCESS, ExcFileNotOpen(filename));
 
   ierr = MPI_File_set_size(fh, 0); // delete the file contents
@@ -7820,87 +7922,10 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   // while one core is still setting the size to zero.
   ierr = MPI_Barrier(comm);
   AssertThrowMPI(ierr);
-  ierr = MPI_Info_free(&info);
+
+  ierr = Utilities::MPI::LargeCount::File_write_at_all_c(
+    fh, offset, chunk.data(), chunk.size(), MPI_CHAR, MPI_STATUS_IGNORE);
   AssertThrowMPI(ierr);
-
-  // Define header size so we can broadcast later.
-  unsigned int  header_size;
-  std::uint64_t footer_offset;
-
-  // write header
-  if (myrank == 0)
-    {
-      std::stringstream ss;
-      DataOutBase::write_vtu_header(ss, vtk_flags);
-      header_size = ss.str().size();
-      // Write the header on rank 0 at the start of a file, i.e., offset 0.
-      ierr = Utilities::MPI::LargeCount::File_write_at_c(
-        fh, 0, ss.str().c_str(), header_size, MPI_CHAR, MPI_STATUS_IGNORE);
-      AssertThrowMPI(ierr);
-    }
-
-  ierr = MPI_Bcast(&header_size, 1, MPI_UNSIGNED, 0, comm);
-  AssertThrowMPI(ierr);
-
-  {
-    const auto                   &patches      = get_patches();
-    const types::global_dof_index my_n_patches = patches.size();
-    const types::global_dof_index global_n_patches =
-      Utilities::MPI::sum(my_n_patches, comm);
-
-    // Do not write pieces with 0 cells as this will crash paraview if this is
-    // the first piece written. But if nobody has any pieces to write (file is
-    // empty), let processor 0 write their empty data, otherwise the vtk file is
-    // invalid.
-    std::stringstream ss;
-    if (my_n_patches > 0 || (global_n_patches == 0 && myrank == 0))
-      DataOutBase::write_vtu_main(patches,
-                                  get_dataset_names(),
-                                  get_nonscalar_data_ranges(),
-                                  vtk_flags,
-                                  ss);
-
-    // Use prefix sum to find specific offset to write at.
-    const std::uint64_t size_on_proc = ss.str().size();
-    std::uint64_t       prefix_sum   = 0;
-    ierr                             = MPI_Exscan(&size_on_proc,
-                      &prefix_sum,
-                      1,
-                      Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
-                      MPI_SUM,
-                      comm);
-    AssertThrowMPI(ierr);
-
-    // Locate specific offset for each processor.
-    const MPI_Offset offset = static_cast<MPI_Offset>(header_size) + prefix_sum;
-
-    ierr = Utilities::MPI::LargeCount::File_write_at_all_c(fh,
-                                                           offset,
-                                                           ss.str().c_str(),
-                                                           ss.str().size(),
-                                                           MPI_CHAR,
-                                                           MPI_STATUS_IGNORE);
-    AssertThrowMPI(ierr);
-
-    if (myrank == n_ranks - 1)
-      {
-        // Locating Footer with offset on last rank.
-        footer_offset = size_on_proc + offset;
-
-        std::stringstream ss;
-        DataOutBase::write_vtu_footer(ss);
-        const unsigned int footer_size = ss.str().size();
-
-        // Writing footer:
-        ierr = Utilities::MPI::LargeCount::File_write_at_c(fh,
-                                                           footer_offset,
-                                                           ss.str().c_str(),
-                                                           footer_size,
-                                                           MPI_CHAR,
-                                                           MPI_STATUS_IGNORE);
-        AssertThrowMPI(ierr);
-      }
-  }
 
   // Make sure we sync to disk. As written in the standard,
   // MPI_File_close() actually already implies a sync but there seems
@@ -7940,7 +7965,8 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   const unsigned int counter,
   const MPI_Comm     mpi_communicator,
   const unsigned int n_digits_for_counter,
-  const unsigned int n_groups) const
+  const unsigned int n_groups,
+  const bool         use_mpi_io) const
 {
   const unsigned int rank = Utilities::MPI::this_mpi_process(mpi_communicator);
   const unsigned int n_ranks =
@@ -7970,7 +7996,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
   else if (n_groups == 1)
     {
       // write only a single data file in parallel
-      this->write_vtu_in_parallel(filename, mpi_communicator);
+      this->write_vtu_in_parallel(filename, mpi_communicator, use_mpi_io);
     }
   else
     {
@@ -7979,7 +8005,7 @@ DataOutInterface<dim, spacedim>::write_vtu_with_pvtu_record(
       MPI_Comm comm_group;
       int ierr = MPI_Comm_split(mpi_communicator, color, rank, &comm_group);
       AssertThrowMPI(ierr);
-      this->write_vtu_in_parallel(filename, comm_group);
+      this->write_vtu_in_parallel(filename, comm_group, use_mpi_io);
       Utilities::MPI::free_communicator(comm_group);
 #else
       AssertThrow(false, ExcMessage("Logical error. Should not arrive here."));

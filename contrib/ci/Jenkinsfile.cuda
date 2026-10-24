@@ -107,7 +107,7 @@ pipeline
                       -D DEAL_II_MPI_WITH_DEVICE_SUPPORT=OFF \
                       -G Ninja \
                       $WORKSPACE/
-                    ninja -j 14
+                    ninja -j 10 # 14 gives OOM
                     ninja setup_tests_matrix_free_kokkos
                     ctest -j 14 --output-on-failure --schedule-random --no-compress-output -T test
                  '''
