@@ -1,0 +1,4 @@
+Fixed: SolverIDR now initializes its random subspace vectors with Kokkos kernels
+when using vectors in MemorySpace::Default. This also supports block vectors.
+<br>
+(Timo Heister, 2026/10/23)

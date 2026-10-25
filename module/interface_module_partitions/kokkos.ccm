@@ -27,6 +27,7 @@ module;
 #include <deal.II/base/config.h>
 
 #include <Kokkos_Macros.hpp>
+#include <Kokkos_Random.hpp>
 #if DEAL_II_KOKKOS_VERSION_GTE(4, 2, 0)
 #  include <Kokkos_Abort.hpp>
 #else
@@ -97,6 +98,7 @@ export
     using ::Kokkos::PerTeam;
     using ::Kokkos::pow;
     using ::Kokkos::push_finalize_hook;
+    using ::Kokkos::Random_XorShift64_Pool;
     using ::Kokkos::RangePolicy;
     using ::Kokkos::Rank;
     using ::Kokkos::realloc;
