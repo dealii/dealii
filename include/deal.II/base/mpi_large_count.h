@@ -223,6 +223,28 @@ namespace Utilities
       }
 
       /**
+       * Return the (possibly large) number of entries of type @p datatype
+       * received in the message described by @p status, for example after
+       * an MPI_Probe() call. @p datatype must be a basic MPI datatype.
+       *
+       * See the MPI 4.x standard for details.
+       */
+      inline int
+      Get_count_c(const MPI_Status *status,
+                  MPI_Datatype      datatype,
+                  MPI_Count        *count)
+      {
+#  if MPI_VERSION >= 4
+        return MPI_Get_count_c(status, datatype, count);
+#  else
+        // For a basic datatype the number of elements equals the count, and
+        // in contrast to MPI_Get_count() this also works if the message was
+        // sent with a large derived datatype as done in Send_c().
+        return MPI_Get_elements_x(status, datatype, count);
+#  endif
+      }
+
+      /**
        * Broadcast a message of possibly large @p count of data from
        * the process with rank "root" to all other processes.
        *
