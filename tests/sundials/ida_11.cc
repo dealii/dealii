@@ -15,6 +15,10 @@
 
 #include "../tests.h"
 
+// Check optional IDA settings, custom setup before consistent initialization
+// and after reset, access to solver statistics, and inequality constraints for
+// the scalar problems y' = 0 and y' = -1.
+
 int
 main()
 {
@@ -33,18 +37,25 @@ main()
   data.nonlinear_convergence_coefficient = 0.33;
   data.maximum_error_test_failures       = 7;
 
+  data.eta_max = 1.5;
   ParameterHandler prm;
   data.add_parameters(prm);
+  // These inputs must also be accepted by older SUNDIALS versions, which
+  // ignore options they do not support.
+  prm.parse_input_from_string("subsection Step adaptivity\n"
+                              "  set Maximum step growth factor = 2.0\n"
+                              "end\n"
+                              "subsection Constraints\n"
+                              "  set Maximum constraint failures = 8\n"
+                              "end\n");
+  Assert(data.eta_max == 2.0, ExcInternalError());
+  Assert(data.maximum_constraint_failures == 8, ExcInternalError());
 
   VectorType y(1), yp(1), constraints(1);
   y[0]           = 1.0;
   yp[0]          = 1.0;
   constraints[0] = 0.0;
   SUNDIALS::IDA<VectorType> ida(data);
-  Assert(ida.get_ida_memory() == nullptr, ExcInternalError());
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-  Assert(ida.get_sun_context() != nullptr, ExcInternalError());
-#endif
 
   ida.reinit_vector        = [](VectorType &v) { v.reinit(1); };
   unsigned int setup_count = 0;
@@ -92,14 +103,12 @@ main()
   Assert(IDAGetLastStep(ida.get_ida_memory(), &last_step) == IDA_SUCCESS,
          ExcInternalError());
   Assert(last_step >= data.minimum_step_size, ExcInternalError());
+  Assert(last_step <= data.maximum_step_size, ExcInternalError());
 #endif
 
   ida.reset(0.1, 0.01, y, yp);
   Assert(setup_count == 2, ExcInternalError());
   Assert(ida.get_ida_memory() != nullptr, ExcInternalError());
-#if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-  Assert(ida.get_sun_context() != nullptr, ExcInternalError());
-#endif
 
   auto constrained_data       = data;
   constrained_data.ic_type    = SUNDIALS::IDA<VectorType>::AdditionalData::none;

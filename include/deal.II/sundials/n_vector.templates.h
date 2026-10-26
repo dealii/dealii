@@ -375,17 +375,33 @@ namespace SUNDIALS
       SUNDIALS::realtype
       max_norm(N_Vector x);
 
+      /**
+       * Set each entry of z to one if the absolute value of the corresponding
+       * entry of x is at least c, and to zero otherwise (N_VCompare).
+       */
       template <typename VectorType>
       void
-      compare(SUNDIALS::realtype c, N_Vector x, N_Vector z);
+      compare(SUNDIALS::realtype c, const N_Vector x, N_Vector z);
 
+      /**
+       * Mark entries of x violating the constraints c with one in m, and all
+       * other entries with zero (N_VConstrMask). Constraint values 0, +/-1,
+       * and +/-2 encode no constraint, a non-strict sign constraint, and a
+       * strict sign constraint, respectively. Return SUNTRUE if all constraints
+       * are satisfied, including on other MPI processes.
+       */
       template <typename VectorType>
       SUNDIALS::booltype
-      constraint_mask(N_Vector c, N_Vector x, N_Vector m);
+      constraint_mask(const N_Vector c, const N_Vector x, N_Vector m);
 
+      /**
+       * Return the global minimum of numerator[i]/denominator[i], ignoring
+       * entries with a zero denominator (N_VMinQuotient). Return the largest
+       * representable SUNDIALS::realtype if all denominators are zero.
+       */
       template <typename VectorType>
       SUNDIALS::realtype
-      min_quotient(N_Vector numerator, N_Vector denominator);
+      min_quotient(const N_Vector numerator, const N_Vector denominator);
 
       template <typename VectorType,
                 std::enable_if_t<is_serial_vector<VectorType>::value, int> = 0>
@@ -1032,7 +1048,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       void
-      compare(const SUNDIALS::realtype c, N_Vector x, N_Vector z)
+      compare(const SUNDIALS::realtype c, const N_Vector x, N_Vector z)
       {
         const auto *src = unwrap_nvector_const<VectorType>(x);
         auto       *dst = unwrap_nvector<VectorType>(z);
@@ -1055,7 +1071,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       SUNDIALS::booltype
-      constraint_mask(N_Vector c, N_Vector x, N_Vector m)
+      constraint_mask(const N_Vector c, const N_Vector x, N_Vector m)
       {
         const auto *constraints = unwrap_nvector_const<VectorType>(c);
         const auto *value       = unwrap_nvector_const<VectorType>(x);
@@ -1088,7 +1104,7 @@ namespace SUNDIALS
 
       template <typename VectorType>
       SUNDIALS::realtype
-      min_quotient(N_Vector numerator, N_Vector denominator)
+      min_quotient(const N_Vector numerator, const N_Vector denominator)
       {
         const auto *num = unwrap_nvector_const<VectorType>(numerator);
         const auto *den = unwrap_nvector_const<VectorType>(denominator);

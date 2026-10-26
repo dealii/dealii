@@ -493,6 +493,8 @@ namespace SUNDIALS
   public:
     /**
      * Additional parameters that can be passed to the IDA class.
+     * Parameters are available independently of the SUNDIALS version. Options
+     * requiring a newer version are ignored when it is unavailable.
      */
     class AdditionalData
     {
@@ -529,7 +531,8 @@ namespace SUNDIALS
       };
 
       /**
-       * Initialization parameters for IDA.
+       * Initialization parameters for IDA. Parameters requiring a newer
+       * SUNDIALS version are ignored when that version is unavailable.
        *
        * Global parameters:
        *
@@ -620,24 +623,17 @@ namespace SUNDIALS
         // Additional linear solver parameters
         const double linear_tolerance_factor = 0.05,
         const double increment_factor        = 1.0,
-        const bool   linear_solution_scaling = true
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-        ,
-        const double delta_cj_lsetup = 0.25,
+        const bool   linear_solution_scaling = true,
+        const double delta_cj_lsetup         = 0.25,
         // Step adaptivity parameters
-        const double eta_min          = 0.5,
-        const double eta_max          = 2.0,
-        const double eta_low          = 0.9,
-        const double eta_min_err_fail = 0.25,
-        const double eta_conv_fail    = 0.25,
-        const double eta_min_fixed    = 1.0,
-        const double eta_max_fixed    = 2.0
-#  endif
-#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
-        ,
-        const unsigned int maximum_constraint_failures = 10
-#  endif
-        )
+        const double       eta_min                     = 0.5,
+        const double       eta_max                     = 2.0,
+        const double       eta_low                     = 0.9,
+        const double       eta_min_err_fail            = 0.25,
+        const double       eta_conv_fail               = 0.25,
+        const double       eta_min_fixed               = 1.0,
+        const double       eta_max_fixed               = 2.0,
+        const unsigned int maximum_constraint_failures = 10)
         : initial_time(initial_time)
         , final_time(final_time)
         , initial_step_size(initial_step_size)
@@ -657,7 +653,6 @@ namespace SUNDIALS
         , linear_tolerance_factor(linear_tolerance_factor)
         , increment_factor(increment_factor)
         , linear_solution_scaling(linear_solution_scaling)
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
         , delta_cj_lsetup(delta_cj_lsetup)
         , eta_min(eta_min)
         , eta_max(eta_max)
@@ -666,10 +661,7 @@ namespace SUNDIALS
         , eta_conv_fail(eta_conv_fail)
         , eta_min_fixed(eta_min_fixed)
         , eta_max_fixed(eta_max_fixed)
-#  endif
-#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
         , maximum_constraint_failures(maximum_constraint_failures)
-#  endif
         , absolute_tolerance(absolute_tolerance)
         , relative_tolerance(relative_tolerance)
         , maximum_order(maximum_order)
@@ -838,15 +830,12 @@ namespace SUNDIALS
           "Linear solution scaling",
           linear_solution_scaling,
           "Compensates for changes in Cj between linear solves.");
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
         prm.add_parameter(
           "Cj setup difference factor",
           delta_cj_lsetup,
           "Rebuilds linear setup when Cj changes by this fraction.");
-#  endif
         prm.leave_subsection();
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
         prm.enter_subsection("Step adaptivity");
         prm.add_parameter(
           "Minimum step growth factor",
@@ -865,22 +854,21 @@ namespace SUNDIALS
           "Growth factor after convergence failure",
           eta_conv_fail,
           "Sets the next-step reduction after nonlinear failure.");
-        prm.add_parameter("Minimum fixed step growth factor",
-                          eta_min_fixed,
-                          "Lower growth bound for fixed-step adaptivity.");
-        prm.add_parameter("Maximum fixed step growth factor",
-                          eta_max_fixed,
-                          "Upper growth bound for fixed-step adaptivity.");
+        prm.add_parameter(
+          "Minimum fixed step growth factor",
+          eta_min_fixed,
+          "Lower step-size ratio bound for retaining the current step size.");
+        prm.add_parameter(
+          "Maximum fixed step growth factor",
+          eta_max_fixed,
+          "Upper step-size ratio bound for retaining the current step size.");
         prm.leave_subsection();
-#  endif
-#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
         prm.enter_subsection("Constraints");
         prm.add_parameter(
           "Maximum constraint failures",
           maximum_constraint_failures,
           "Rejects a step after this many constraint violations.");
         prm.leave_subsection();
-#  endif
       }
 
       /**
@@ -899,12 +887,12 @@ namespace SUNDIALS
       double initial_step_size;
 
       /**
-       * Minimum step size.
+       * Minimum step size. Ignored with SUNDIALS versions older than 6.2.
        */
       double minimum_step_size;
 
       /**
-       * Maximum integration step size. A value of zero keeps means unlimited.
+       * Maximum integration step size. A value of zero means unlimited.
        */
       double maximum_step_size = 0.0;
 
@@ -979,55 +967,63 @@ namespace SUNDIALS
        */
       bool linear_solution_scaling = true;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 2, 0)
-
       /**
        * Cj setup difference factor (SUNDIALS default: 0.25).
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double delta_cj_lsetup = 0.25;
 
       /**
        * Minimum adaptivity step reduction factor (SUNDIALS default: 0.5).
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_min = 0.5;
 
       /**
        * Maximum adaptivity step growth factor (SUNDIALS default: 2.0).
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_max = 2.0;
 
       /**
        * Adaptivity step reduction factor (SUNDIALS default: 0.9).
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_low = 0.9;
 
       /**
        * Minimum adaptivity factor after an error failure (default: 0.25).
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_min_err_fail = 0.25;
 
       /**
        * Adaptivity factor after a convergence failure (default: 0.25).
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_conv_fail = 0.25;
 
       /**
-       * Minimum fixed-step growth factor (SUNDIALS default: 1.0).
+       * Lower bound of the step-size ratio interval in which IDA keeps the
+       * current step size (SUNDIALS default: 1.0). This does not enable fixed
+       * time stepping.
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_min_fixed = 1.0;
 
       /**
-       * Maximum fixed-step growth factor (SUNDIALS default: 2.0).
+       * Upper bound of the step-size ratio interval in which IDA keeps the
+       * current step size (SUNDIALS default: 2.0). This does not enable fixed
+       * time stepping.
+       * Ignored with SUNDIALS versions older than 6.2.
        */
       double eta_max_fixed = 2.0;
-#  endif
-#  if DEAL_II_SUNDIALS_VERSION_GTE(7, 6, 0)
 
       /**
        * Maximum inequality constraint failures per step (default: 10).
+       * Ignored with SUNDIALS versions older than 7.6.
        */
       unsigned int maximum_constraint_failures = 10;
-#  endif
 
       /**
        * Absolute error tolerance for adaptive time stepping.
@@ -1190,6 +1186,8 @@ namespace SUNDIALS
 
     /**
      * Reinit vector to have the right size, MPI communicator, etc.
+     * This required function is a
+     * @ref GlossUserProvidedCallBack "user provided callback".
      */
     std::function<void(VectorType &)> reinit_vector;
 
@@ -1337,6 +1335,8 @@ namespace SUNDIALS
       solver_should_restart;
 
     /**
+     * This function is a @ref GlossUserProvidedCallBack "user provided callback".
+     *
      * Return an index set containing the differential components.
      * Implementation of this function is optional. The default is to return a
      * complete index set. If your equation is also algebraic (i.e., it
@@ -1353,6 +1353,8 @@ namespace SUNDIALS
     std::function<IndexSet()> differential_components;
 
     /**
+     * This function is a @ref GlossUserProvidedCallBack "user provided callback".
+     *
      * Return a vector whose components are the weights used by IDA to compute
      * the vector norm. The implementation of this function is optional. If the
      * user does not provide an implementation, the weights are assumed to be
@@ -1361,7 +1363,12 @@ namespace SUNDIALS
     std::function<VectorType &()> get_local_tolerances;
 
     /**
-     * Return the IDA inequality constraint vector, if used. Entries follow
+     * This function is an optional
+     * @ref GlossUserProvidedCallBack "user provided callback". If it is not set,
+     * no inequality constraints are imposed. An all-zero vector also disables
+     * constraints.
+     *
+     * Return the IDA inequality constraint vector. Entries follow
      * SUNDIALS' encoding: 0 (unconstrained), +/-1 (non-negative, non-positive),
      * +/-2 (positive, negative).
      */
@@ -1375,13 +1382,11 @@ namespace SUNDIALS
     void *
     get_ida_memory() const;
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-    /** Return the SUNContext, invalidated and recreated by reset(). */
-    SUNContext
-    get_sun_context() const;
-#  endif
-
     /**
+     * This function is an optional
+     * @ref GlossUserProvidedCallBack "user provided callback". By default, no
+     * additional setup is performed.
+     *
      * Expert hook called after all deal.II configuration and linear solver
      * callbacks are installed, and before IDACalcIC(). It is called on every
      * reset. Replacing wrapper-owned user data or callbacks can break IDA.

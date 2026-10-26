@@ -450,6 +450,8 @@ namespace SUNDIALS
     status = IDASetLinearSolver(ida_mem, LS, J);
     AssertIDA(status);
 
+    // IDASetLinearSolver initializes the linear solver options to their
+    // defaults, so apply the user settings only after attaching the solver.
     status = IDASetLSNormFactor(ida_mem, data.ls_norm_factor);
     AssertIDA(status);
     status = IDASetEpsLin(ida_mem, data.linear_tolerance_factor);
@@ -623,14 +625,6 @@ namespace SUNDIALS
   }
 
 
-#  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-  template <typename VectorType>
-  SUNContext
-  IDA<VectorType>::get_sun_context() const
-  {
-    return ida_ctx;
-  }
-#  endif
 
   template class IDA<Vector<double>>;
   template class IDA<BlockVector<double>>;
