@@ -63,6 +63,13 @@
 #          * "medium": workstation, >=8 physical cores, >=32GB RAM
 #          * "heavy":  compute node, >=32 physical cores, >=128GB RAM
 #
+#     TEST_BUILD_FIXTURE
+#       - If set to true (the default), an additional test
+#         "test_dependency/compile_test_executables" builds all test
+#         executables (via the compile_test_executables target) before any
+#         other test is run. Otherwise, the test executables have to be
+#         built prior to invoking ctest.
+#
 # numdiff is used for the comparison of test results. Its location can be
 # specified with NUMDIFF_DIR.
 #
@@ -113,6 +120,20 @@ macro(deal_ii_pickup_tests)
   # Initialize the test counter to zero:
   #
   set(_number_of_tests 0)
+
+  #
+  # Every test records its name, the target it depends on, and the binary
+  # directory of the target (relative to CMAKE_BINARY_DIR) in the file
+  # CMakeFiles/test_targets.txt. This allows to build only the
+  # targets of a subset of tests. Clear the file once per configure run:
+  #
+  get_property(_test_targets_initialized GLOBAL PROPERTY
+    DEAL_II_TEST_TARGETS_INITIALIZED
+    )
+  if(NOT _test_targets_initialized)
+    file(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/test_targets.txt "")
+    set_property(GLOBAL PROPERTY DEAL_II_TEST_TARGETS_INITIALIZED TRUE)
+  endif()
 
   #
   # Ensure that this macro is not called internally:
@@ -231,11 +252,41 @@ macro(deal_ii_pickup_tests)
   set_if_empty(TESTING_ENVIRONMENT "$ENV{TESTING_ENVIRONMENT}")
   set_if_empty(TESTING_ENVIRONMENT "light")
 
+  set_if_empty(TEST_BUILD_FIXTURE "$ENV{TEST_BUILD_FIXTURE}")
+  set_if_empty(TEST_BUILD_FIXTURE ON)
+
   #
   # ... and finally pick up tests:
   #
 
   enable_testing()
+
+  #
+  # Tests do not build their executables. Unless disabled, add a single
+  # test that builds all test executables of the project and that all
+  # tests require as a setup fixture. This test keeps going on errors and
+  # always succeeds: build failures are reported by the corresponding
+  # tests.
+  #
+  get_property(_build_fixture_defined GLOBAL PROPERTY
+    DEAL_II_TEST_BUILD_FIXTURE_DEFINED
+    )
+  if(TEST_BUILD_FIXTURE AND NOT _build_fixture_defined)
+    add_test(NAME test_dependency/compile_test_executables
+      COMMAND ${CMAKE_COMMAND}
+        -DBINARY_DIR=${CMAKE_BINARY_DIR}
+        -DGENERATOR=${CMAKE_GENERATOR}
+        -DCONFIG=$<CONFIG>
+        -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/build_tests.cmake
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      )
+    set_tests_properties(test_dependency/compile_test_executables PROPERTIES
+      LABEL "test_dependency"
+      TIMEOUT 0
+      FIXTURES_SETUP deal_ii_test_executables
+      )
+    set_property(GLOBAL PROPERTY DEAL_II_TEST_BUILD_FIXTURE_DEFINED TRUE)
+  endif()
 
   set(DEAL_II_SOURCE_DIR) # avoid a bogus warning
 

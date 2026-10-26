@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2013 - 2025 by the deal.II authors
+## Copyright (C) 2013 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -509,10 +509,16 @@ if("${_res}" STREQUAL "0")
           )
       endif()
 
-      set(_target setup_tests_performance)
+      set(_target build_tests_performance)
     else()
-      set(_target setup_tests)
+      set(_target build_tests)
     endif()
+
+    #
+    # The build_tests target sets up all testsuite subprojects and builds
+    # all test executables. Failing test executables do not cause the
+    # target to fail; they are reported by the corresponding test instead.
+    #
 
     message("-- Running ${_target}")
     execute_process(COMMAND ${CMAKE_COMMAND}
@@ -525,7 +531,7 @@ if("${_res}" STREQUAL "0")
 
     if(NOT "${_res}" STREQUAL "0")
       message(FATAL_ERROR "
-\"setup_tests\" target exited with an error. Bailing out.
+\"${_target}\" target exited with an error. Bailing out.
 "
         )
     endif()

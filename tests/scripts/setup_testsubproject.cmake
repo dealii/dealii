@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2013 - 2025 by the deal.II authors
+## Copyright (C) 2013 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -25,6 +25,13 @@ foreach(_var
 endforeach()
 
 project(TESTSUITE CXX)
+
+#
+# The test executables of the testsuite are built by the build_tests and
+# build_tests_<category> targets of the main project. Do not build them
+# from within ctest:
+#
+set(TEST_BUILD_FIXTURE OFF)
 
 #
 # A custom target that does absolutely nothing. It is used in the main

@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2013 - 2025 by the deal.II authors
+## Copyright (C) 2013 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,8 +15,13 @@
 #
 # We define toplevel targets:
 #    setup_tests    - set up testsuite subprojects
+#    build_tests    - set up testsuite subprojects and build all test
+#                     executables
 #    prune_tests    - remove all testsuite subprojects
 #    test           - run all quick_tests
+#
+# as well as setup_tests_<category>, build_tests_<category>, and
+# prune_tests_<category> for every test category.
 #
 
 cmake_minimum_required(VERSION 3.13.4)
@@ -87,6 +92,21 @@ foreach(_var
 endforeach()
 
 #
+# Configure the testsuite subprojects with the same generator as the main
+# project:
+#
+list(APPEND _options "-G${CMAKE_GENERATOR}")
+if(NOT "${CMAKE_GENERATOR_PLATFORM}" STREQUAL "")
+  list(APPEND _options "-A${CMAKE_GENERATOR_PLATFORM}")
+endif()
+if(NOT "${CMAKE_GENERATOR_TOOLSET}" STREQUAL "")
+  list(APPEND _options "-T${CMAKE_GENERATOR_TOOLSET}")
+endif()
+if(CMAKE_GENERATOR MATCHES "Makefiles|Ninja")
+  list(APPEND _options "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}")
+endif()
+
+#
 # Find all testsuite subprojects, i.e., every directory that contains a
 # CMakeLists.txt file.
 #
@@ -117,6 +137,9 @@ add_custom_target(setup_tests
   COMMENT "Setting up tests and printing test summary"
   )
 
+# Set up all tests and build all test executables:
+add_custom_target(build_tests)
+
 # Remove all tests and also remove all test summary files:
 add_custom_target(prune_tests
   COMMAND ${CMAKE_COMMAND}
@@ -131,12 +154,8 @@ foreach(_category ${_categories})
   file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${_category})
 
   if(DEAL_II_MSVC)
-    set(_command ${CMAKE_COMMAND} -G${CMAKE_GENERATOR} ${_options} ${_category_dir})
+    set(_command ${CMAKE_COMMAND} ${_options} ${_category_dir})
   else()
-    # Do not pass the generator with -G so that we use make instead of ninja
-    # for the test projects. This is because calling ninja several times in
-    # parallel for the same project will break the configuration.
-
     set(_command ${CMAKE_COMMAND} ${_options} ${_category_dir} > "${_summary_files_prefix}_${_category}")
   endif()
 
@@ -146,6 +165,24 @@ foreach(_category ${_categories})
     COMMENT "Processing tests/${_category}"
     )
   add_dependencies(setup_tests setup_tests_${_category})
+
+  #
+  # Build all test executables of the category. Test executables that fail
+  # to build do not stop the build, their failure is reported by the
+  # corresponding test. We run only one such build at a time (via the
+  # console pool) because every build is already parallel.
+  #
+  add_custom_target(build_tests_${_category}
+    COMMAND ${CMAKE_COMMAND}
+      -DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}/${_category}
+      -DGENERATOR=${CMAKE_GENERATOR}
+      -DCONFIG=$<CONFIG>
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/../cmake/scripts/build_tests.cmake
+    COMMENT "Building tests/${_category}"
+    USES_TERMINAL
+    )
+  add_dependencies(build_tests_${_category} setup_tests_${_category})
+  add_dependencies(build_tests build_tests_${_category})
 
   add_custom_target(prune_tests_${_category}
     COMMAND ${CMAKE_COMMAND} -E remove_directory
@@ -171,17 +208,31 @@ add_custom_target(test
   COMMENT "Running quicktests..."
   USES_TERMINAL
   )
-add_dependencies(test setup_tests_quick_tests)
+
+#
+# The run_quick_tests.cmake script runs all tests in the a-framework,
+# examples, and quick_tests categories. Make sure that they are set up and
+# built:
+#
+foreach(_category a-framework examples quick_tests)
+  if(TARGET build_tests_${_category})
+    add_dependencies(test build_tests_${_category})
+  endif()
+endforeach()
 
 if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   #
-  # Depend on the library targets (to ensure that deal.II is actually
-  # compiled), as well as on the setup_tests_quick_tests target to ensure
-  # that quick tests are actually available.
+  # Building the test executables requires the library targets and the
+  # test driver:
   #
-  foreach(_build ${DEAL_II_BUILD_TYPES})
-    string(TOLOWER ${_build} _build_lowercase)
-    add_dependencies(test ${DEAL_II_TARGET_NAME}_${_build_lowercase})
+  foreach(_category ${_categories})
+    foreach(_build ${DEAL_II_BUILD_TYPES})
+      string(TOLOWER ${_build} _build_lowercase)
+      add_dependencies(build_tests_${_category}
+        ${DEAL_II_TARGET_NAME}_${_build_lowercase}
+        )
+    endforeach()
+    add_dependencies(build_tests_${_category} deal_ii_test_driver)
   endforeach()
 
   #

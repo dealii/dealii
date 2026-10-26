@@ -118,6 +118,9 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
           --build-only
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
+      file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/test_targets.txt
+        "${_test} ${_target} .\n"
+        )
       set_tests_properties(${_test} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}

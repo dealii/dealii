@@ -517,10 +517,24 @@ function(deal_ii_add_test _category _test_name _comparison_file)
         COMMAND ${DEAL_II_TEST_DRIVER} run ${_driver_args} -- ${_run_args}
         WORKING_DIRECTORY ${_test_directory}
         )
+      get_target_property(_target_dir ${_target} BINARY_DIR)
+      file(RELATIVE_PATH _target_dir ${CMAKE_BINARY_DIR} ${_target_dir})
+      if("${_target_dir}" STREQUAL "")
+        set(_target_dir ".")
+      endif()
+      file(APPEND ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/test_targets.txt
+        "${_test_full} ${_target} ${_target_dir}\n"
+        )
       set_tests_properties(${_test_full} PROPERTIES
         LABEL "${_category}"
         TIMEOUT ${TEST_TIME_LIMIT}
         )
+
+      if(TEST_BUILD_FIXTURE)
+        set_tests_properties(${_test_full} PROPERTIES
+          FIXTURES_REQUIRED deal_ii_test_executables
+          )
+      endif()
 
       if(_exclusive)
         #
