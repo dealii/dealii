@@ -65,7 +65,7 @@ jobs:
         cmake --build build --target install
     - name: test
       run: |
-        cmake --build build --target setup_tests_a-framework setup_tests_examples setup_tests_quick_tests
+        cmake --build build --target build_tests_a-framework build_tests_examples build_tests_quick_tests
         ctest --test-dir build --build-config Debug --extra-verbose -E "step-100.debug|step-100.release"
     - name: show largest files
       # we are nearly at the limit (4 GB) for what a .lib can contain on Windows. Monitor the size by printing out the largest

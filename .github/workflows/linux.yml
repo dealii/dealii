@@ -78,9 +78,9 @@ jobs:
       run: |
         cd build
         make \
-          setup_tests_a-framework \
-          setup_tests_examples \
-          setup_tests_quick_tests
+          build_tests_a-framework \
+          build_tests_examples \
+          build_tests_quick_tests
         ctest -VV
 
   ##################
@@ -165,9 +165,9 @@ jobs:
 
         cd build
         make \
-          setup_tests_a-framework \
-          setup_tests_examples \
-          setup_tests_quick_tests
+          build_tests_a-framework \
+          build_tests_examples \
+          build_tests_quick_tests
         ctest -VV
 
   #########################
@@ -229,7 +229,7 @@ jobs:
         export OMPI_MCA_btl_base_warn_component_unused='0'
 
         cd build
-        make setup_tests_trilinos_tpetra
+        make build_tests_trilinos_tpetra
         ctest -VV
 
   ######################
@@ -288,9 +288,9 @@ jobs:
       run: |
         cd build
         make \
-          setup_tests_a-framework \
-          setup_tests_examples \
-          setup_tests_quick_tests
+          build_tests_a-framework \
+          build_tests_examples \
+          build_tests_quick_tests
         ctest -VV
 
   #################

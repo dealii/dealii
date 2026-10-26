@@ -110,7 +110,7 @@ pipeline
                     $WORKSPACE/
                   time ninja -j 10 # 12 gives OOM
                   time ninja test # quicktests
-                  time ninja setup_tests
+                  time env CMAKE_BUILD_PARALLEL_LEVEL=10 ninja build_tests
                   time ctest --schedule-random --output-on-failure -j $NP --no-compress-output -T test
                  '''
               githubNotify context: 'Jenkins: serial', description: 'OK',  status: 'SUCCESS'

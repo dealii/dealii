@@ -110,7 +110,7 @@ pipeline
                   time ninja -j 10 # 12 gives OOM
                   time ninja test # quicktests
                   time ctest --rerun-failed --output-on-failure -R quick_tests/
-                  time ninja setup_tests
+                  time env CMAKE_BUILD_PARALLEL_LEVEL=10 TEST_BUILD_REGEX="all-headers|mpirun" ninja build_tests
                   time ctest -R "all-headers|mpirun" --output-on-failure --schedule-random -j $NP --no-compress-output -T test
                  '''
               githubNotify context: 'Jenkins: MPI', description: 'OK',  status: 'SUCCESS'

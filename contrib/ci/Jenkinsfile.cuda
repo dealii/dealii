@@ -108,7 +108,7 @@ pipeline
                       -G Ninja \
                       $WORKSPACE/
                     ninja -j 14
-                    ninja setup_tests_matrix_free_kokkos
+                    ninja build_tests_matrix_free_kokkos
                     ctest -j 14 --output-on-failure --schedule-random --no-compress-output -T test
                  '''
               githubNotify context: 'Jenkins: CUDA', description: 'OK',  status: 'SUCCESS'
