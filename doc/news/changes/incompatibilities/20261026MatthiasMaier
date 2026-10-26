@@ -1,0 +1,15 @@
+Changed: Tests no longer build their executables while running. In the
+deal.II testsuite, all test executables have to be built before invoking
+ctest, for example via the new <code>build_tests</code> and
+<code>build_tests_&lt;category&gt;</code> targets. The environment variable
+TEST_BUILD_REGEX restricts <code>build_tests</code> to the executables of
+matching tests. In user projects that use deal_ii_pickup_tests(), a single
+setup test "test_dependency/compile_test_executables" builds all test
+executables before the tests run (this can be disabled with
+TEST_BUILD_FIXTURE). Build failures are still reported per test. Each test
+is now run by a single driver program (deal_ii_test_driver) that replaces
+the previously used shell, perl, and CMake scripts; bash and perl are no
+longer required for running the testsuite. Testsuite subprojects now use
+the same CMake generator as the main project.
+<br>
+(Matthias Maier, 2026/10/26)

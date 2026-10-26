@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998 - 2023 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2026 by the deal.II Authors">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -327,7 +327,15 @@ TEST_THREAD_LIMIT
     (via .threads=N. in the output file) than this limit the test will be
     dropped. Note that individual tests might exceed this limit by calling
     MultithreadInfo::set_thread_limit(), or by manually creating additional
-    threads. The special value 0 enforces no limit. Defaults to 0.</pre>
+    threads. The special value 0 enforces no limit. Defaults to 0.
+
+TEST_BUILD_FIXTURE
+  - If set to true (the default), the test
+    "test_dependency/compile_test_executables" builds all test executables
+    (via the compile_test_executables target) before any other test is
+    run. Build failures are reported by the corresponding tests. If set to
+    false, the test executables have to be built (for example via
+    "make compile_test_executables") before running ctest.</pre>
     <hr />
     <div class="right">
       <a href="https://validator.w3.org/check?uri=referer" target="_top">

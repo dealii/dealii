@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>The deal.II Testsuite</title>
   <link href="../screen.css" rel="StyleSheet">
-  <meta name="copyright" content="Copyright (C) 1998 - 2024 by the deal.II Authors">
+  <meta name="copyright" content="Copyright (C) 1998 - 2026 by the deal.II Authors">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -89,16 +89,43 @@ $ git clone https://github.com/dealii/dealii
 $ make setup_tests
 </pre>
       This will set up all tests supported by the current configuration.
-      The testsuite can now be run in the current <i>build directory</i> as
+      Each test category (a subdirectory of <code>tests</code>) is set up as
+      a separate CMake project in <code>tests/&lt;category&gt;</code> of the
+      build directory. Before the testsuite can be run, the test
+      executables have to be built:
+<pre>
+$ make build_tests
+</pre>
+      The <code>build_tests</code> target sets up all tests (i.e., it
+      depends on <code>setup_tests</code>) and builds all test executables.
+      A test executable that fails to compile or link does not stop the
+      build; the error is reported by the corresponding test instead. The
+      testsuite can now be run in the current <i>build directory</i> as
       described below.
     </p>
 
     <p>
       The setup can be fine-tuned using the following commands:
 <pre>
-
+$ make setup_tests_&lt;category&gt; - only set up the given category
+$ make build_tests_&lt;category&gt; - only set up and build the given category
 $ make prune_tests - removes all testsuite subprojects
 </pre>
+      A single test executable can also be built directly in the build
+      directory of its category, for example
+<pre>
+$ make -C tests/base base.thread_validity_08.debug
+</pre>
+      (or <code>ninja -C tests/base base.thread_validity_08.debug</code>
+      when using Ninja). In order to build only the executables of tests
+      whose name matches a regular expression (in the same way as
+      <code>ctest -R</code> selects tests, see below), set the
+      <code>TEST_BUILD_REGEX</code> environment variable:
+<pre>
+$ TEST_BUILD_REGEX="all-headers|mpirun" make build_tests
+$ ctest -R "all-headers|mpirun"
+</pre>
+    </p>
 
     <p>
       In addition, when setting up the testsuite, the following environment
@@ -157,7 +184,8 @@ $ cmake -DDEAL_II_DIR=/path/to/installed/dealii /path/to/dealii_source/tests
     <h2>Running the testsuite</h2>
 
     <p>
-      The testsuite can now be run in the <i>build directory</i> via
+      After building the test executables (see above), the testsuite can
+      be run in the <i>build directory</i> via
 <pre>
 $ ctest [-j N]
 </pre>
@@ -175,6 +203,16 @@ $ ctest [-j N]
 $ ctest [-j N] -R '&lt;positive regular expression&gt;'
 $ ctest [-j N] -E '&lt;negative regular expression&gt;'
 </pre>
+    </p>
+
+    <p>
+      <b>Note:</b>
+      <code>ctest</code> only runs the test executables but never builds
+      them. If you modify a test (or the library) you have to rebuild the
+      test executables (for example via <code>make build_tests</code>, or
+      <code>make build_tests_&lt;category&gt;</code>) before rerunning
+      <code>ctest</code>. A test whose executable has not been built is
+      reported as failed in the <code>BUILD</code> stage.
     </p>
 
     <p>
@@ -240,18 +278,15 @@ test 1077
 1077: Test timeout computed to be: 600
 1077: Test base/thread_validity_08.debug: RUN
 1077: ===============================   OUTPUT BEGIN  ===============================
-1077: Built target thread_validity_08.debug
-1077: Generating thread_validity_08.debug/output
-1077: terminate called without an active exception
-1077: /bin/sh: line 1: 18030 Aborted [...]/thread_validity_08.debug
 1077: base/thread_validity_08.debug: BUILD successful.
-1077: base/thread_validity_08.debug: RUN failed. Output:
+1077: base/thread_validity_08.debug: RUN failed. ------ Return code 134
+1077: base/thread_validity_08.debug: RUN failed. ------ Result: [...]/failing_output
+1077: base/thread_validity_08.debug: RUN failed. ------ Partial output:
 1077: DEAL::OK.
-1077: gmake[3]: *** [thread_validity_08.debug/output] Error 1
-1077: gmake[2]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/all] Error 2
-1077: gmake[1]: *** [CMakeFiles/thread_validity_08.debug.diff.dir/rule] Error 2
-1077: gmake: *** [thread_validity_08.debug.diff] Error 2
 1077:
+1077: base/thread_validity_08.debug: RUN failed. ------ Additional output on stdout/stderr:
+1077:
+1077: terminate called without an active exception
 1077:
 1077: base/thread_validity_08.debug: ******    RUN failed    *******
 1077:
@@ -285,11 +320,8 @@ xx: ===============================    OUTPUT END   ============================
       test failed:
       <ul>
         <li>
-          <code>CONFIGURE</code>: only for test in the "build_tests"
-          category: The test project failed in the configuration stage
-        </li>
-        <li>
-          <code>BUILD</code>: compilation error occurred
+          <code>BUILD</code>: compilation or linking error occurred (or the
+          test executable has not been built)
         </li>
         <li>
           <code>RUN</code>: the test executable could not be run / aborted
@@ -714,10 +746,10 @@ category/my_new_test.output
 </pre>
       Now, rerun
 <pre>
-$ make setup_tests
+$ make build_tests_category
 </pre>
-      so that your new test is picked up. After that it is possible to
-      invoke it with
+      so that your new test is picked up and built. After that it is
+      possible to invoke it with
 <pre>
 $ ctest -V -R "category/my_new_test"
 </pre>
@@ -740,7 +772,8 @@ $ ctest -V -R "category/my_new_test"
 <pre>
 category/my_new_test.output
 </pre>
-      At this point running the test again should be successful:
+      At this point running the test again should be successful (note that
+      you do not have to rebuild the test executable for this):
 <pre>
 $ ctest -V -R "category/my_new_test"
 </pre>
