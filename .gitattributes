@@ -28,7 +28,6 @@ Jenkinsfile export-ignore
 # MSVC compatiblity
 #
 
-/cmake/scripts/run_test.sh text eol=lf
 /tests/**/*.output* text eol=lf
 
 #

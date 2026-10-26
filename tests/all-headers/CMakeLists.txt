@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2013 - 2025 by the deal.II authors
+## Copyright (C) 2013 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -36,6 +36,10 @@ endif()
 # to compile a simple worker (test_header.cc) that only includes the given
 # header file. We omit linking to save some time.
 #
+
+if(NOT TARGET compile_test_executables)
+  add_custom_target(compile_test_executables)
+endif()
 
 set(_category all-headers)
 
@@ -87,38 +91,31 @@ foreach(_build ${DEAL_II_BUILD_TYPES})
         _test MATCHES "${TEST_PICKUP_REGEX}" )
 
       #
-      # Add a "guard file" rule: The purpose of interrupt_guard.cc is to
-      # force a complete rerun of this test (BUILD stage) if
-      # interrupt_guard.cc is removed by run_test.cmake due to an
-      # interruption.
+      # Add an object library for each header file and build
+      # configuration. Compile commands are run through the test driver
+      # that records the output of failing commands in a build log
+      # directory (see deal_ii_add_test()).
       #
-      add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
-        COMMAND touch ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
-        )
+      set(_build_log_dir "${CMAKE_CURRENT_BINARY_DIR}/build-logs/${_target}")
 
-      # Add an object library for each header file and build configuration:
-      add_library(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc
-        ${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
-        )
+      add_library(${_target} OBJECT EXCLUDE_FROM_ALL test_header.cc)
       deal_ii_setup_target(${_target} ${_build})
       set_property(TARGET ${_target} APPEND PROPERTY
         COMPILE_DEFINITIONS HEADER=<deal.II/${_header}>
         )
-
-      add_custom_target(${_target}.build
-        COMMAND
-             echo "${_test}: BUILD successful."
-          && echo "${_test}: PASSED."
+      set_target_properties(${_target} PROPERTIES
+        RULE_LAUNCH_COMPILE
+          "\"${DEAL_II_TEST_DRIVER}\" launch --log-dir \"${_build_log_dir}\" --name <OBJECT> --"
         )
-      add_dependencies(${_target}.build ${_target})
+      add_dependencies(compile_test_executables ${_target})
 
       # And finally add the test:
       add_test(NAME ${_test}
-        COMMAND ${CMAKE_COMMAND} -DTRGT=${_target}.build -DTEST=${_test}
-          -DBINARY_DIR=${CMAKE_BINARY_DIR}
-          -DGUARD_FILE=${CMAKE_CURRENT_BINARY_DIR}/${_target}_interrupt_guard.cc
-          -P ${DEAL_II_PATH}/${DEAL_II_SHARE_RELDIR}/scripts/run_test.cmake
+        COMMAND ${DEAL_II_TEST_DRIVER} run
+          --test ${_test}
+          --log-dir ${_build_log_dir}
+          --require "$<TARGET_OBJECTS:${_target}>"
+          --build-only
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         )
       set_tests_properties(${_test} PROPERTIES

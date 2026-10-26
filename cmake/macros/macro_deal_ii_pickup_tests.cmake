@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2013 - 2024 by the deal.II authors
+## Copyright (C) 2013 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -17,9 +17,9 @@
 # If TEST_PICKUP_REGEX is set, only tests matching the regex will be
 # processed.
 #
-# Furthermore, the macro sets up (if necessary) deal.II, bash, perl,
-# numdiff, and the following variables, that can be overwritten by
-# environment or command line:
+# Furthermore, the macro sets up (if necessary) deal.II, numdiff, and the
+# following variables, that can be overwritten by environment or command
+# line:
 #
 #     TEST_LIBRARIES
 #     TEST_LIBRARIES_DEBUG
@@ -110,17 +110,9 @@ endfunction()
 
 macro(deal_ii_pickup_tests)
   #
-  # Initialize two counters to zero:
+  # Initialize the test counter to zero:
   #
   set(_number_of_tests 0)
-  set(_number_of_test_dependencies 0)
-
-  #
-  # Find bash and perl interpreter:
-  #
-
-  find_package(UnixCommands REQUIRED)
-  find_package(Perl REQUIRED)
 
   #
   # Ensure that this macro is not called internally:
@@ -373,7 +365,6 @@ Comparison operator \"=\" expected for boolean match.\n"
     # category (namely, 'multigrid-global-coarsening'). Pad numbers to 4 digits
     pad_string_right(_category ${_category} 27)
     pad_string_left(_number_of_tests ${_number_of_tests} 4)
-    pad_string_left(_number_of_test_dependencies ${_number_of_test_dependencies} 4)
-    message(STATUS "Test category ${_category}: ${_number_of_tests} tests (and ${_number_of_test_dependencies} test dependencies)")
+    message(STATUS "Test category ${_category}: ${_number_of_tests} tests")
   endif()
 endmacro()

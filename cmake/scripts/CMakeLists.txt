@@ -56,9 +56,6 @@ install(TARGETS deal_ii_test_driver
   )
 
 set(_scripts
-  ${CMAKE_CURRENT_SOURCE_DIR}/normalize.pl
-  ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/run_test.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_closest_tag.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_latest_tag.sh
   ${CMAKE_CURRENT_SOURCE_DIR}/get_fancy_tag.sh
