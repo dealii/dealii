@@ -229,6 +229,24 @@ namespace DataOutBase
     plain_text
   };
 
+  /**
+   * An enum for the different strategies
+   * DataOutInterface::write_vtu_in_parallel() and
+   * DataOutInterface::write_vtu_with_pvtu_record() can use to write a single
+   * file from several MPI ranks.
+   */
+  enum class ParallelWriteMode
+  {
+    /**
+     * All ranks write to the file directly using MPI I/O.
+     */
+    mpi_io,
+    /**
+     * All ranks send their data in sequence to rank 0, which writes the file.
+     */
+    send_to_rank_0
+  };
+
 
   /**
    * Data structure describing a patch of data in <tt>dim</tt> space
@@ -2844,14 +2862,25 @@ public:
    * Collective MPI call to write the solution from all participating nodes
    * (those in the given communicator) to a single compressed .vtu file on a
    * shared file system.  The communicator can be a sub communicator of the
-   * one used by the computation. This routine uses MPI I/O to achieve high
-   * performance on parallel filesystems. In order to use this function,
-   * you need to be using a file system that supports parallel MPI I/O,
-   * and you will get error messages about failed MPI calls if you do not.
-   * Also see DataOutInterface::write_vtu().
+   * one used by the computation. Also see DataOutInterface::write_vtu().
+   *
+   * If @p mode is set to DataOutBase::ParallelWriteMode::mpi_io (the
+   * default), this routine uses MPI I/O to achieve high performance on parallel
+   * filesystems. In this case you need to be using a file system that supports
+   * parallel MPI I/O. Note that MPI I/O can be very slow on network file
+   * systems that do not properly support it.
+   *
+   * If @p mode is set to DataOutBase::ParallelWriteMode::send_to_rank_0,
+   * all participating ranks send their data one after another to rank 0,
+   * which is the only rank writing to the file. This works on every file
+   * system, but rank 0 has to hold the data of one rank at a time in memory
+   * in addition to its own.
    */
   void
-  write_vtu_in_parallel(const std::string &filename, const MPI_Comm comm) const;
+  write_vtu_in_parallel(const std::string                   &filename,
+                        const MPI_Comm                       comm,
+                        const DataOutBase::ParallelWriteMode mode =
+                          DataOutBase::ParallelWriteMode::mpi_io) const;
 
   /**
    * Some visualization programs, such as ParaView and VisIt, can read several
@@ -2909,36 +2938,35 @@ public:
    * processes grouped together, and the `.1.vtu` the data from the remaining
    * half.
    *
-   * A specified @p directory and a @p filename_without_extension
-   * form the first part of the filename. The filename is then extended with
-   * a @p counter labeling the current timestep/iteration/etc., the processor ID,
-   * and finally the .vtu/.pvtu ending. Since the number of timesteps to be
-   * written depends on the application, the number of digits to be reserved in
-   * the filename can be specified as parameter @p n_digits_for_counter, and the number
-   * is not padded with leading zeros if this parameter is left at its default
-   * value numbers::invalid_unsigned_int. If more than one file identifier
-   * is needed (e.g. time step number and iteration counter of solver), the
-   * last identifier is used as @p counter, while all other identifiers have to be
-   * added to @p filename_without_extension when calling this function.
+   * A specified @p directory and a @p filename_without_extension form the
+   * first part of the filename. The filename is then extended with a
+   * @p counter labeling the current timestep/iteration/etc., the processor
+   * ID, and finally the .vtu/.pvtu ending. Since the number of timesteps
+   * to be written depends on the application, the number of digits to be
+   * reserved in the filename can be specified as parameter @p
+   * n_digits_for_counter, and the number is not padded with leading zeros
+   * if this parameter is left at its default value
+   * numbers::invalid_unsigned_int. If more than one file identifier is
+   * needed (e.g. time step number and iteration counter of solver), the
+   * last identifier is used as @p counter, while all other identifiers
+   * have to be added to @p filename_without_extension when calling this
+   * function.
    *
-   * In a
-   * parallel setting, several files are typically written per time step. The
-   * number of files written in parallel depends on the number of MPI processes
-   * (see parameter @p mpi_communicator), and a
-   * specified number of @p n_groups with default value 0. The background is that
-   * VTU file output supports grouping files from several CPUs into a given
-   * number of files using MPI I/O when writing on a parallel filesystem. The
-   * default value of @p n_groups is 0, meaning that every MPI rank will write one
-   * file. A value of 1 will generate one big file containing the solution over
-   * the whole domain, while a larger value will create @p n_groups files (but not
-   * more than there are MPI ranks). For all values other than `n_groups==0`,
-   * this function calls write_vtu_in_parallel(); for this function to work you
-   * need to be using a file system that supports parallel MPI I/O, and you will
-   * get error messages about failed MPI calls if you do not.
+   * In a parallel setting, several files are typically written per time
+   * step. The number of files written in parallel depends on the number of
+   * MPI processes (see parameter @p mpi_communicator), and a specified
+   * number of @p n_groups with default value 0. The background is that VTU
+   * file output supports grouping files from several CPUs into a given
+   * number of files. The default value of @p n_groups is 0, meaning that
+   * every MPI rank will write one file. A value of 1 will generate one big
+   * file containing the solution over the whole domain, while a larger
+   * value will create @p n_groups files (but not more than there are MPI
+   * ranks). For all values other than `n_groups==0`, this function calls
+   * write_vtu_in_parallel() and passes @p mode along; see there for
+   * a discussion of this parameter.
    *
-   * Note that only one processor needs to
-   * generate the .pvtu file, where processor zero is chosen to take over this
-   * job.
+   * Note that only one processor needs to generate the .pvtu file, where
+   * processor zero is chosen to take over this job.
    *
    * The return value is the filename of the centralized file for the pvtu
    * record.
@@ -2958,7 +2986,9 @@ public:
     const unsigned int counter,
     const MPI_Comm     mpi_communicator,
     const unsigned int n_digits_for_counter = numbers::invalid_unsigned_int,
-    const unsigned int n_groups             = 0) const;
+    const unsigned int n_groups             = 0,
+    const DataOutBase::ParallelWriteMode mode =
+      DataOutBase::ParallelWriteMode::mpi_io) const;
 
   /**
    * Obtain data through get_patches() and write it to <tt>out</tt> in SVG
