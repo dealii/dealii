@@ -5,6 +5,9 @@
 //
 // This file is part of the deal.II library.
 //
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
 // -----------------------------------------------------------------------------
 
 #include <deal.II/base/parameter_handler.h>
