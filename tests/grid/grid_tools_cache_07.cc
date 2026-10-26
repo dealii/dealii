@@ -50,7 +50,7 @@ test(unsigned int ref)
 
   deallog << "Query point: " << point << std::endl;
 
-  for (const auto p : tree | bgi::adaptors::queried(bgi::intersects(point)))
+  for (const auto &p : tree | bgi::adaptors::queried(bgi::intersects(point)))
     deallog << "Processor " << p.second << " may own the point " << point
             << ": it is within " << p.first.get_boundary_points().first << "; "
             << p.first.get_boundary_points().second << std::endl;
