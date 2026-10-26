@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ##
 ## SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-## Copyright (C) 2012 - 2025 by the deal.II authors
+## Copyright (C) 2012 - 2026 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -27,6 +27,33 @@ if (DEAL_II_MSVC)
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
     )
 endif()
+
+#
+# The driver program of the testsuite. It is installed alongside the
+# library because the deal_ii_pickup_tests() macro is also used in user
+# projects.
+#
+
+add_executable(deal_ii_test_driver test_driver.cc)
+
+set_target_properties(deal_ii_test_driver PROPERTIES
+  LINK_FLAGS "${DEAL_II_LINKER_FLAGS}"
+  LINKER_LANGUAGE "CXX"
+  COMPILE_FLAGS "${DEAL_II_CXX_FLAGS}"
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}
+  )
+
+if (DEAL_II_MSVC)
+  set_target_properties(deal_ii_test_driver PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/${DEAL_II_EXECUTABLE_RELDIR}"
+    )
+endif()
+
+install(TARGETS deal_ii_test_driver
+  RUNTIME DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
+  COMPONENT library
+  )
 
 set(_scripts
   ${CMAKE_CURRENT_SOURCE_DIR}/normalize.pl
