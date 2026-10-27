@@ -51,7 +51,7 @@ test(unsigned int ref)
   deallog << "Query box: " << box.get_boundary_points().first << "; "
           << box.get_boundary_points().second << std::endl;
 
-  for (const auto p : tree | bgi::adaptors::queried(bgi::intersects(box)))
+  for (const auto &p : tree | bgi::adaptors::queried(bgi::intersects(box)))
     deallog << "Cell " << p.second << " intersects box with "
             << p.first.get_boundary_points().first << "; "
             << p.first.get_boundary_points().second << std::endl;
