@@ -781,6 +781,9 @@ namespace internal
 
                       if (subface_no != numbers::invalid_unsigned_int)
                         {
+                          // This ratio concerns reference-face measures.
+                          // Physical scaling is in the boundary form at
+                          // each projected subface quadrature point.
                           const double area_ratio =
                             GeometryInfo<dim>::subface_ratio(
                               cell->subface_case(face_no), subface_no);
