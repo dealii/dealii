@@ -336,6 +336,8 @@ namespace Step22
 
     {
       constraints.clear();
+      constraints.reinit(dof_handler.locally_owned_dofs(),
+                         DoFTools::extract_locally_relevant_dofs(dof_handler));
 
       const FEValuesExtractors::Vector velocities(0);
       const FEValuesExtractors::Scalar pressure(dim);
