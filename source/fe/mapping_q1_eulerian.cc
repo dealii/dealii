@@ -57,34 +57,23 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::MappingQ1Eulerian(
   , euler_transform_vectors(&euler_transform_vectors)
   , shiftmap_dof_handler(&shiftmap_dof_handler)
   , component_mask(component_mask)
-{}
+{
+  // The finite element may only be supplied later by distribute_dofs().
+  if (shiftmap_dof_handler.get_fe_collection().size() != 0)
+    get_vertex_dof_indices();
+}
 
 
 
 template <int dim, typename VectorType, int spacedim>
-boost::container::small_vector<Point<spacedim>,
-#ifndef _MSC_VER
-                               ReferenceCells::max_n_vertices<dim>()
-#else
-                               GeometryInfo<dim>::vertices_per_cell
-#endif
-                               >
-MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
-  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+const std::array<unsigned int, spacedim> &
+MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertex_dof_indices() const
 {
-  boost::container::small_vector<Point<spacedim>,
-#ifndef _MSC_VER
-                                 ReferenceCells::max_n_vertices<dim>()
-#else
-                                 GeometryInfo<dim>::vertices_per_cell
-#endif
-                                 >
-    vertices(cell->n_vertices());
-  // The assertions can not be in the constructor, since this would
-  // require to call dof_handler.distribute_dofs(fe) *before* the mapping
-  // object is constructed, which is not necessarily what we want.
+  std::scoped_lock lock(vertex_dof_indices_mutex);
+  const auto      &fe = shiftmap_dof_handler->get_fe();
+  if (cached_fe_collection.size() != 0 && &cached_fe_collection[0] == &fe)
+    return this->vertex_dof_indices;
 
-  const auto                        &fe = shiftmap_dof_handler->get_fe();
   const unsigned int                 n_vertex_dofs = fe.n_dofs_per_vertex();
   std::array<unsigned int, spacedim> vertex_dof_indices{};
   if (component_mask.represents_the_all_selected_mask())
@@ -124,7 +113,8 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
             // Sampling vertex coefficients is valid only if other selected
             // shape functions do not contribute at vertices (FE_Q_DG0, for
             // example, also has a cell-constant mode).
-            for (unsigned int j = cell->n_vertices() * n_vertex_dofs;
+            for (unsigned int j =
+                   fe.reference_cell().n_vertices() * n_vertex_dofs;
                  j < fe.n_dofs_per_cell();
                  ++j)
               if (fe.get_nonzero_components(j)[c])
@@ -137,6 +127,37 @@ MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
             vertex_dof_indices[d++] = index;
           }
     }
+
+  cached_fe_collection =
+    hp::FECollection<dim, spacedim>(shiftmap_dof_handler->get_fe_collection());
+  this->vertex_dof_indices = vertex_dof_indices;
+  return this->vertex_dof_indices;
+}
+
+
+
+template <int dim, typename VectorType, int spacedim>
+boost::container::small_vector<Point<spacedim>,
+#ifndef _MSC_VER
+                               ReferenceCells::max_n_vertices<dim>()
+#else
+                               GeometryInfo<dim>::vertices_per_cell
+#endif
+                               >
+MappingQ1Eulerian<dim, VectorType, spacedim>::get_vertices(
+  const typename Triangulation<dim, spacedim>::cell_iterator &cell) const
+{
+  boost::container::small_vector<Point<spacedim>,
+#ifndef _MSC_VER
+                                 ReferenceCells::max_n_vertices<dim>()
+#else
+                                 GeometryInfo<dim>::vertices_per_cell
+#endif
+                                 >
+                     vertices(cell->n_vertices());
+  const auto        &vertex_dof_indices = get_vertex_dof_indices();
+  const unsigned int n_vertex_dofs =
+    shiftmap_dof_handler->get_fe().n_dofs_per_vertex();
 
   AssertDimension(shiftmap_dof_handler->n_dofs(),
                   euler_transform_vectors->size());
@@ -192,7 +213,8 @@ template <int dim, typename VectorType, int spacedim>
 std::unique_ptr<Mapping<dim, spacedim>>
 MappingQ1Eulerian<dim, VectorType, spacedim>::clone() const
 {
-  return std::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(*this);
+  return std::make_unique<MappingQ1Eulerian<dim, VectorType, spacedim>>(
+    *shiftmap_dof_handler, *euler_transform_vectors, component_mask);
 }
 
 

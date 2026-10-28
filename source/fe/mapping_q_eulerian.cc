@@ -33,7 +33,6 @@
 
 #include <boost/container/small_vector.hpp>
 
-#include <array>
 #include <memory>
 
 DEAL_II_NAMESPACE_OPEN
@@ -73,7 +72,28 @@ MappingQEulerian<dim, VectorType, spacedim>::MappingQEulerian(
               euler_dof_handler.get_fe(),
               support_quadrature,
               update_values | update_quadrature_points)
-{}
+{
+  const unsigned int n_components = euler_dof_handler.get_fe().n_components();
+  if (component_mask.represents_the_all_selected_mask())
+    {
+      Assert(n_components >= spacedim,
+             ExcDimensionMismatch(n_components, spacedim));
+      for (unsigned int d = 0; d < spacedim; ++d)
+        components[d] = d;
+    }
+  else
+    {
+      AssertThrow(component_mask.size() == n_components,
+                  ExcDimensionMismatch(component_mask.size(), n_components));
+      AssertThrow(component_mask.n_selected_components() == spacedim,
+                  ExcMessage(
+                    "Select exactly spacedim displacement components."));
+      unsigned int d = 0;
+      for (unsigned int c = 0; c < n_components; ++c)
+        if (component_mask[c])
+          components[d++] = c;
+    }
+}
 
 
 
@@ -169,26 +189,6 @@ MappingQEulerian<dim, VectorType, spacedim>::compute_mapping_support_points(
 
   const unsigned int n_support_pts = support_quadrature.size();
   const unsigned int n_components = euler_dof_handler->get_fe(0).n_components();
-  std::array<unsigned int, spacedim> components{};
-  if (component_mask.represents_the_all_selected_mask())
-    {
-      Assert(n_components >= spacedim,
-             ExcDimensionMismatch(n_components, spacedim));
-      for (unsigned int d = 0; d < spacedim; ++d)
-        components[d] = d;
-    }
-  else
-    {
-      AssertThrow(component_mask.size() == n_components,
-                  ExcDimensionMismatch(component_mask.size(), n_components));
-      AssertThrow(component_mask.n_selected_components() == spacedim,
-                  ExcMessage(
-                    "Select exactly spacedim displacement components."));
-      unsigned int d = 0;
-      for (unsigned int c = 0; c < n_components; ++c)
-        if (component_mask[c])
-          components[d++] = c;
-    }
 
   std::vector<Vector<typename VectorType::value_type>> shift_vector(
     n_support_pts, Vector<typename VectorType::value_type>(n_components));

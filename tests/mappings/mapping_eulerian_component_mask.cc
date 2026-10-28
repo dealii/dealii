@@ -106,22 +106,6 @@ check(const Mapping<dim, spacedim>             &mapping,
     }
 }
 
-template <typename Callable>
-void
-must_throw(const Callable &call)
-{
-  bool caught = false;
-  try
-    {
-      call();
-    }
-  catch (const ExceptionBase &)
-    {
-      caught = true;
-    }
-  AssertThrow(caught, ExcInternalError());
-}
-
 template <int dim, int spacedim>
 void
 test()
@@ -151,6 +135,7 @@ test()
       MappingQ1Eulerian<dim, Vector<double>, spacedim> q1(dofs,
                                                           displacement,
                                                           mask);
+      const auto deferred_clone = q1.clone();
       dofs.distribute_dofs(fe);
       displacement.reinit(dofs.n_dofs());
       Field<spacedim> field(fe.n_components(), degree);
@@ -163,6 +148,10 @@ test()
       check<dim, spacedim>(*q.clone(), tria, field, selected);
       if (degree == 1)
         {
+          check<dim, spacedim>(*deferred_clone, tria, field, selected);
+          MappingQ1Eulerian<dim, Vector<double>, spacedim> initialized(
+            dofs, displacement, mask);
+          check<dim, spacedim>(initialized, tria, field, selected);
           check<dim, spacedim>(q1, tria, field, selected);
           check<dim, spacedim>(*q1.clone(), tria, field, selected);
         }
@@ -186,19 +175,59 @@ test()
       check<dim, spacedim>(legacy, tria, field, first);
       check<dim, spacedim>(empty, tria, field, first);
     }
+  for (const bool deferred : {false, true})
+    {
+      // This element's cell-constant mode contributes at every vertex.
+      // Silently ignoring it would produce incorrect displaced geometry.
+      FESystem<dim, spacedim> unsupported(FE_Q_DG0<dim, spacedim>(1), spacedim);
+      DoFHandler<dim, spacedim> dofs(tria);
+      Vector<double>            displacement;
+      if (!deferred)
+        dofs.distribute_dofs(unsupported);
+      bool caught = false;
+      try
+        {
+          MappingQ1Eulerian<dim, Vector<double>, spacedim> bad(
+            dofs,
+            displacement,
+            ComponentMask(std::vector<bool>(spacedim, true)));
+          if (deferred)
+            dofs.distribute_dofs(unsupported);
+          displacement.reinit(dofs.n_dofs());
+          displacement = 1.;
+          bad.get_vertices(tria.begin_active());
+        }
+      catch (const ExceptionBase &)
+        {
+          caught = true;
+        }
+      AssertThrow(caught, ExcInternalError());
+    }
   {
-    // This element's cell-constant mode contributes at every vertex.
-    // Silently ignoring it would produce incorrect displaced geometry.
-    FESystem<dim, spacedim>   unsupported(FE_Q_DG0<dim, spacedim>(1), spacedim);
+    // Redistributing DoFs with a different element changes the vertex indices.
+    FESystem<dim, spacedim>   mixed(FE_DGQ<dim, spacedim>(0),
+                                  1,
+                                  FE_Q<dim, spacedim>(1),
+                                  spacedim);
+    FESystem<dim, spacedim>   continuous(FE_Q<dim, spacedim>(1), spacedim + 1);
     DoFHandler<dim, spacedim> dofs(tria);
-    dofs.distribute_dofs(unsupported);
-    Vector<double> displacement(dofs.n_dofs());
-    displacement = 1.;
-    must_throw([&]() {
-      MappingQ1Eulerian<dim, Vector<double>, spacedim> bad(
-        dofs, displacement, ComponentMask(std::vector<bool>(spacedim, true)));
-      bad.get_vertices(tria.begin_active());
-    });
+    Vector<double>            displacement;
+    std::vector<bool>         selection(spacedim + 1, true);
+    selection[0] = false;
+    std::array<unsigned int, spacedim> components;
+    for (unsigned int d = 0; d < spacedim; ++d)
+      components[d] = d + 1;
+    MappingQ1Eulerian<dim, Vector<double>, spacedim> mapping(
+      dofs, displacement, ComponentMask(selection));
+    for (const auto *element : {&mixed, &continuous})
+      {
+        dofs.distribute_dofs(*element);
+        displacement.reinit(dofs.n_dofs());
+        Field<spacedim> field(element->n_components(), 1);
+        VectorTools::interpolate(dofs, field, displacement);
+        check<dim, spacedim>(mapping, tria, field, components);
+        check<dim, spacedim>(*mapping.clone(), tria, field, components);
+      }
   }
   FESystem<dim, spacedim>   fe(FE_Q<dim, spacedim>(1), spacedim);
   DoFHandler<dim, spacedim> dofs(tria);

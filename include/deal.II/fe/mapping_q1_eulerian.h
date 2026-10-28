@@ -15,12 +15,15 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q.h>
+
+#include <deal.II/hp/fe_collection.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -207,6 +210,30 @@ protected:
 
   /** Selected displacement components; an empty mask preserves the default. */
   const ComponentMask component_mask;
+
+private:
+  /**
+   * Return the cached vertex DoF indices, computing them on first use.
+   */
+  const std::array<unsigned int, spacedim> &
+  get_vertex_dof_indices() const;
+
+  /**
+   * Selected vertex DoF indices. Initialized on first use if no finite element
+   * was available at construction, with thread-safe access from get_vertices().
+   */
+  mutable std::array<unsigned int, spacedim> vertex_dof_indices{};
+
+  /**
+   * Keep the finite element used for the cached indices alive, so its address
+   * can identify changes to the DoFHandler's finite element.
+   */
+  mutable hp::FECollection<dim, spacedim> cached_fe_collection;
+
+  /**
+   * Guard initialization of vertex_dof_indices and cached_fe_collection.
+   */
+  mutable Threads::Mutex vertex_dof_indices_mutex;
 };
 
 /** @} */

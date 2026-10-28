@@ -30,6 +30,8 @@
 
 #include <boost/container/small_vector.hpp>
 
+#include <array>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -210,6 +212,11 @@ protected:
   const ComponentMask component_mask;
 
 private:
+  /**
+   * Indices of the selected displacement components, set at construction.
+   */
+  std::array<unsigned int, spacedim> components;
+
   /**
    * Multigrid level at which the mapping is to be used.
    */
