@@ -148,7 +148,7 @@ test(const unsigned int mapping_degree,
 
           points[point_idx][0] +=
             displacement(points[point_idx], 0, mapping_factor) +
-            (tolerance * 0.1) * (-0.5 + (rand() / (double)RAND_MAX));
+            (tolerance * 0.1) * (-0.5 + (Testing::rand() / (double)RAND_MAX));
 
           point_idx += 1;
         }

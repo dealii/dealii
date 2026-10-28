@@ -115,7 +115,7 @@ test_dg_ecl(const unsigned int degree, const bool curved_mesh)
   LinearAlgebra::distributed::Vector<double> src, dst, dst2;
   matrix_free.initialize_dof_vector(src);
   for (auto &v : src)
-    v = static_cast<double>(rand()) / RAND_MAX;
+    v = static_cast<double>(Testing::rand()) / RAND_MAX;
 
   matrix_free.initialize_dof_vector(dst);
   matrix_free.initialize_dof_vector(dst2);
