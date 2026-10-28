@@ -19,6 +19,9 @@
 
 #  include <deal.II/base/exceptions.h>
 
+#  ifdef DEAL_II_HAVE_CXX20
+#    include <concepts>
+#  endif
 #  include <utility>
 
 #endif
@@ -30,13 +33,28 @@ namespace SUNDIALS
 {
   namespace internal
   {
+#  if defined(DEAL_II_HAVE_CXX20)
+    /**
+     * A concept that checks whether the type @p T can be used as the
+     * `Traits` template argument of SundialsHandle. Such a type has to
+     * define
+     * - a type `Handle` (the SUNDIALS pointer type), and
+     * - a static function `free(Handle)` returning `void` that releases the
+     *   object behind the handle.
+     */
+    template <typename T>
+    concept SundialsTraits = requires(typename T::Handle h) {
+      {
+        T::free(h)
+      } -> std::same_as<void>;
+    };
+#  endif
+
     /**
      * An owning handle for a C object created by SUNDIALS, for example a
      * SUNLinearSolver or a SUNNonlinearSolver. The object is freed in the
      * destructor by the function provided by the @p Traits class, which has to
-     * define
-     * - a type `Handle` (the SUNDIALS pointer type), and
-     * - a static function `free(Handle)` that releases the object.
+     * satisfy the SundialsTraits concept (when compiling with C++20).
      *
      * The handle takes ownership of the object passed to the constructor, so
      * any SUNDIALS creation function can be used:
@@ -45,8 +63,13 @@ namespace SUNDIALS
      * @endcode
      *
      * The handle can be moved but not copied.
+     *
+     * @tparam Traits A class that defines the type `Handle` (the SUNDIALS
+     *   pointer type) and the static function `free(Handle)` that releases the
+     *   object. See SundialsTraits.
      */
     template <typename Traits>
+    DEAL_II_CXX20_REQUIRES(SundialsTraits<Traits>)
     class SundialsHandle
     {
     public:
