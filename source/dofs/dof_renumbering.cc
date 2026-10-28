@@ -2734,11 +2734,16 @@ namespace DoFRenumbering
     my_mf_data.tasks_parallel_scheme = AdditionalDataType::none;
 
     typename AdditionalDataType::MatrixFreeType separate_matrix_free;
-    separate_matrix_free.reinit(dealii::MappingQ1<dim>(),
-                                dof_handler,
-                                constraints,
-                                dealii::QGauss<1>(2),
-                                my_mf_data);
+    const auto                                 &reference_cells =
+      dof_handler.get_triangulation().get_reference_cells();
+    AssertThrow(reference_cells.size() == 1, ExcNotImplemented());
+    const auto reference_cell = reference_cells[0];
+    separate_matrix_free.reinit(
+      reference_cell.template get_default_linear_mapping<spacedim>(),
+      dof_handler,
+      constraints,
+      reference_cell.get_gauss_type_quadrature(2),
+      my_mf_data);
     return compute_matrix_free_data_locality(dof_handler, separate_matrix_free);
   }
 
