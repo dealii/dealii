@@ -109,33 +109,41 @@ namespace Utilities
       // kernel launched. The indices are expanded the first time the function
       // is called.
       if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
-            import_indices_plain_dev.empty()))
+            import_indices_plain_dev.size() != n_import_indices()))
         initialize_import_indices_plain_dev();
+#    endif
+
+#    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
+      // Pack the data for all import targets with a single kernel. The data
+      // for the different targets is stored one after the other, so the
+      // send buffers below are contiguous slices of the temporary storage.
+      if constexpr (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
+        if (n_import_indices() > 0)
+          {
+            const auto n_indices = import_indices_plain_dev.size();
+            using IndexType      = decltype(n_indices);
+
+            auto import_indices           = import_indices_plain_dev;
+            auto locally_owned_array_data = locally_owned_array.data();
+            MemorySpace::Default::kokkos_space::execution_space exec;
+            Kokkos::parallel_for(
+              "dealii::fill temp_array_ptr",
+              Kokkos::RangePolicy<
+                MemorySpace::Default::kokkos_space::execution_space>(exec,
+                                                                     0,
+                                                                     n_indices),
+              KOKKOS_LAMBDA(IndexType idx) {
+                temp_array_ptr[idx] =
+                  locally_owned_array_data[import_indices[idx]];
+              });
+            exec.fence();
+          }
 #    endif
 
       for (unsigned int i = 0; i < n_import_targets; ++i)
         {
 #    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-          if constexpr (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
-            {
-              const auto chunk_size = import_indices_plain_dev[i].size();
-              using IndexType       = decltype(chunk_size);
-
-              auto import_indices           = import_indices_plain_dev[i];
-              auto locally_owned_array_data = locally_owned_array.data();
-              MemorySpace::Default::kokkos_space::execution_space exec;
-              Kokkos::parallel_for(
-                "dealii::fill temp_array_ptr",
-                Kokkos::RangePolicy<
-                  MemorySpace::Default::kokkos_space::execution_space>(
-                  exec, 0, chunk_size),
-                KOKKOS_LAMBDA(IndexType idx) {
-                  temp_array_ptr[idx] =
-                    locally_owned_array_data[import_indices[idx]];
-                });
-              exec.fence();
-            }
-          else
+          if constexpr (!std::is_same_v<MemorySpaceType, MemorySpace::Default>)
 #    endif
             {
               // copy the data to be sent to the import_data field
@@ -574,7 +582,7 @@ namespace Utilities
       // kernel launched. The indices are expanded the first time the function
       // is called.
       if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
-            import_indices_plain_dev.empty()))
+            import_indices_plain_dev.size() != n_import_indices()))
         initialize_import_indices_plain_dev();
 #    endif
 
@@ -592,95 +600,68 @@ namespace Utilities
 #    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
           if constexpr (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
             {
+              // An owned entry may receive contributions from several import
+              // targets. Each thread handles one distinct owned entry and
+              // applies its contributions in the order of the import targets,
+              // i.e., in the same order as the host code.
+              const auto n_entries  = import_entries_dev.size();
+              using IndexType       = decltype(n_entries);
+              const auto entries    = import_entries_dev;
+              const auto offsets    = import_entry_offsets_dev;
+              const auto positions  = import_entry_positions_dev;
+              const auto owned_data = locally_owned_array.data();
+              MemorySpace::Default::kokkos_space::execution_space exec;
               if (vector_operation == VectorOperation::add)
                 {
-                  for (const auto &import_indices_plain :
-                       import_indices_plain_dev)
-                    {
-                      const auto chunk_size = import_indices_plain.size();
-
-                      using IndexType = decltype(chunk_size);
-                      MemorySpace::Default::kokkos_space::execution_space exec;
-                      Kokkos::parallel_for(
-                        "dealii::fill locally_owned_array, add",
-                        Kokkos::RangePolicy<
-                          MemorySpace::Default::kokkos_space::execution_space>(
-                          exec, 0, chunk_size),
-                        KOKKOS_LAMBDA(IndexType idx) {
-                          locally_owned_array
-                            .data()[import_indices_plain(idx)] +=
-                            read_position[idx];
-                        });
-                      exec.fence();
-
-                      read_position += chunk_size;
-                    }
+                  Kokkos::parallel_for(
+                    "dealii::fill locally_owned_array, add",
+                    Kokkos::RangePolicy<
+                      MemorySpace::Default::kokkos_space::execution_space>(
+                      exec, 0, n_entries),
+                    KOKKOS_LAMBDA(IndexType i) {
+                      Number value = owned_data[entries(i)];
+                      for (unsigned int p = offsets(i); p < offsets(i + 1); ++p)
+                        value += read_position[positions(p)];
+                      owned_data[entries(i)] = value;
+                    });
+                  exec.fence();
                 }
               else if (vector_operation == VectorOperation::min)
                 {
-                  for (const auto &import_indices_plain :
-                       import_indices_plain_dev)
-                    {
-                      const auto chunk_size = import_indices_plain.size();
-
-                      using IndexType = decltype(chunk_size);
-                      MemorySpace::Default::kokkos_space::execution_space exec;
-                      Kokkos::parallel_for(
-                        "dealii::fill locally_owned_array, min",
-                        Kokkos::RangePolicy<
-                          MemorySpace::Default::kokkos_space::execution_space>(
-                          exec, 0, chunk_size),
-                        KOKKOS_LAMBDA(IndexType idx) {
-                          locally_owned_array
-                            .data()[import_indices_plain(idx)] =
-                            internal::get_min(
-                              locally_owned_array
-                                .data()[import_indices_plain(idx)],
-                              read_position[idx]);
-                        });
-                      exec.fence();
-
-                      read_position += chunk_size;
-                    }
+                  Kokkos::parallel_for(
+                    "dealii::fill locally_owned_array, min",
+                    Kokkos::RangePolicy<
+                      MemorySpace::Default::kokkos_space::execution_space>(
+                      exec, 0, n_entries),
+                    KOKKOS_LAMBDA(IndexType i) {
+                      Number value = owned_data[entries(i)];
+                      for (unsigned int p = offsets(i); p < offsets(i + 1); ++p)
+                        value =
+                          internal::get_min(value, read_position[positions(p)]);
+                      owned_data[entries(i)] = value;
+                    });
+                  exec.fence();
                 }
               else if (vector_operation == VectorOperation::max)
                 {
-                  for (const auto &import_indices_plain :
-                       import_indices_plain_dev)
-                    {
-                      const auto chunk_size = import_indices_plain.size();
-
-                      using IndexType = decltype(chunk_size);
-                      MemorySpace::Default::kokkos_space::execution_space exec;
-                      Kokkos::parallel_for(
-                        "dealii::fill locally_owned_array, max",
-                        Kokkos::RangePolicy<
-                          MemorySpace::Default::kokkos_space::execution_space>(
-                          exec, 0, chunk_size),
-                        KOKKOS_LAMBDA(IndexType idx) {
-                          locally_owned_array
-                            .data()[import_indices_plain(idx)] =
-                            internal::get_max(
-                              locally_owned_array
-                                .data()[import_indices_plain(idx)],
-                              read_position[idx]);
-                        });
-                      exec.fence();
-
-                      read_position += chunk_size;
-                    }
+                  Kokkos::parallel_for(
+                    "dealii::fill locally_owned_array, max",
+                    Kokkos::RangePolicy<
+                      MemorySpace::Default::kokkos_space::execution_space>(
+                      exec, 0, n_entries),
+                    KOKKOS_LAMBDA(IndexType i) {
+                      Number value = owned_data[entries(i)];
+                      for (unsigned int p = offsets(i); p < offsets(i + 1); ++p)
+                        value =
+                          internal::get_max(value, read_position[positions(p)]);
+                      owned_data[entries(i)] = value;
+                    });
+                  exec.fence();
                 }
-              else
-                {
-                  for (const auto &import_indices_plain :
-                       import_indices_plain_dev)
-                    {
-                      // We can't easily assert here, so we just move the
-                      // pointer matching the host code.
-                      const auto chunk_size = import_indices_plain.size();
-                      read_position += chunk_size;
-                    }
-                }
+
+              // For insert, we can't easily assert here, so we just move the
+              // pointer matching the host code.
+              read_position += n_import_indices();
             }
           else
 #    endif
