@@ -423,7 +423,7 @@ LaplaceProblem<dim>::postprocess()
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    cell->set_active_fe_index(rand() % fe_collection.size());
+    cell->set_active_fe_index(Testing::rand() % fe_collection.size());
 }
 
 

@@ -31,12 +31,11 @@ void
 positive_negative_split_test()
 {
   SymmetricTensor<2, dim> random_tensor;
-  srand(time(0));
 
   for (unsigned int i = 0; i < dim; i++)
     for (unsigned int j = 0; j <= i; j++)
       {
-        random_tensor[i][j] = ((double)rand() / (RAND_MAX));
+        random_tensor[i][j] = ((double)Testing::rand() / (RAND_MAX));
         if (j != i)
           random_tensor[j][i] = random_tensor[i][j];
       }

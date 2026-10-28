@@ -28,7 +28,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <vector>
 
@@ -68,7 +67,7 @@ check(const unsigned int refinement_1, const unsigned int refinement_2)
   Vector<double> u_1(dof_handler_1.n_dofs()), u_2(dof_handler_2.n_dofs()),
     u_1_back(dof_handler_1.n_dofs()), d(dof_handler_1.n_dofs());
   for (unsigned int i1 = 0; i1 < u_1.size(); ++i1)
-    u_1[i1] = 2. * rand() / RAND_MAX - 1.;
+    u_1[i1] = 2. * Testing::rand() / RAND_MAX - 1.;
 
   VectorTools::interpolate_to_different_mesh(dof_handler_1,
                                              u_1,
@@ -89,8 +88,6 @@ int
 main(int argc, char **argv)
 {
   initlog();
-
-  srand(static_cast<unsigned int>(clock()));
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 

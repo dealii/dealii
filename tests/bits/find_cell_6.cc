@@ -79,8 +79,8 @@ check1()
       for (int j = 0; j < 1000; ++j)
         {
           Point<3> p((Testing::rand() % 1000) / 1000.0,
-                     (rand() % 1000) / 1000.0,
-                     (rand() % 1000) / 1000.0);
+                     (Testing::rand() % 1000) / 1000.0,
+                     (Testing::rand() % 1000) / 1000.0);
           if (!inside(tria, p))
             deallog << "NOT INSIDE" << std::endl;
           GridTools::find_active_cell_around_point(tria, p);

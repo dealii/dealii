@@ -994,13 +994,13 @@ namespace StokesClass
   {
     sinker.problem_dim = dim;
     sinker.n_sinkers   = n_sinkers;
-    std::srand(171);
+    Testing::srand(171);
     for (unsigned int s = 0; s < sinker.n_sinkers; ++s)
       {
         std::vector<double> coords(dim);
         if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
           for (unsigned int i = 0; i < dim; ++i)
-            coords[i] = std::rand() / (double)RAND_MAX;
+            coords[i] = Testing::rand() / (double)RAND_MAX;
 
         MPI_Bcast(&(coords[0]), dim, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
