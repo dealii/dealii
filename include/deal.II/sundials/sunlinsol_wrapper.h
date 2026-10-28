@@ -18,7 +18,11 @@
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
+#  include <deal.II/sundials/invocation_context.h>
+#  include <deal.II/sundials/sundials_handle.h>
+
 #  include <sundials/sundials_linearsolver.h>
+#  include <sundials/sundials_nvector.h>
 
 #  include <exception>
 #  include <functional>
@@ -251,6 +255,45 @@ namespace SUNDIALS
       SUNLinearSolver                                  sun_linear_solver;
       std::unique_ptr<LinearSolverContent<VectorType>> content;
     };
+
+
+
+    /**
+     * Traits for SundialsHandle that free a SUNLinearSolver with
+     * SUNLinSolFree().
+     */
+    struct SundialsLinearSolverTraits
+    {
+      using Handle = SUNLinearSolver;
+
+      static void
+      free(Handle solver)
+      {
+        SUNLinSolFree(solver);
+      }
+    };
+
+    /**
+     * Owning handle for any SUNLinearSolver created by SUNDIALS, for example
+     * by SUNLinSol_SPGMR() or SUNLinSol_PCG().
+     *
+     * @note This is not suitable for the solver created by
+     *   LinearSolverWrapper, whose content is not owned by SUNDIALS.
+     */
+    using SundialsLinearSolver = SundialsHandle<SundialsLinearSolverTraits>;
+
+    /**
+     * Create SUNDIALS' own SPGMR linear solver without preconditioning.
+     *
+     * @param y_template A vector that is used as a template to create the
+     *   internal vectors of the solver. It is not needed after this function
+     *   returns.
+     * @param inv_ctx The invocation context that provides the SUNDIALS context
+     *   (for SUNDIALS 6.0 and newer) to create the solver with.
+     */
+    SundialsLinearSolver
+    make_spgmr_linear_solver(N_Vector                 y_template,
+                             const InvocationContext &inv_ctx);
   } // namespace internal
 } // namespace SUNDIALS
 

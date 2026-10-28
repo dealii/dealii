@@ -31,6 +31,8 @@
 #    include <deal.II/lac/petsc_vector.h>
 #  endif
 
+#  include <sunlinsol/sunlinsol_spgmr.h>
+
 
 #endif
 
@@ -45,6 +47,29 @@ DEAL_II_NAMESPACE_OPEN
 #  ifndef DOXYGEN
 #    include "sundials/sunlinsol_wrapper.inst"
 #  endif
+
+namespace SUNDIALS
+{
+  namespace internal
+  {
+    SundialsLinearSolver
+    make_spgmr_linear_solver(N_Vector                 y_template,
+                             const InvocationContext &inv_ctx)
+    {
+#  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
+      (void)inv_ctx;
+      return SundialsLinearSolver(SUNLinSol_SPGMR(
+        y_template, PREC_NONE, 0 /*krylov subvectors, 0 uses default*/));
+#  else
+      return SundialsLinearSolver(
+        SUNLinSol_SPGMR(y_template,
+                        SUN_PREC_NONE,
+                        0 /*krylov subvectors, 0 uses default*/,
+                        inv_ctx.arkode_ctx));
+#  endif
+    }
+  } // namespace internal
+} // namespace SUNDIALS
 
 
 #endif
