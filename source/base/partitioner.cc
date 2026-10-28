@@ -19,7 +19,11 @@
 
 #include <Kokkos_Core.hpp>
 
+#include <algorithm>
 #include <limits>
+#include <string>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -192,6 +196,13 @@ namespace Utilities
                ghost_indices_in.size() == locally_owned_range_data.size(),
              ExcDimensionMismatch(ghost_indices_in.size(),
                                   locally_owned_range_data.size()));
+
+      // The expanded import indices for device-aware MPI are set up lazily
+      // on first use. Discard them as the communication pattern changes.
+      import_indices_plain_dev   = {};
+      import_entries_dev         = {};
+      import_entry_offsets_dev   = {};
+      import_entry_positions_dev = {};
 
       ghost_indices_data = ghost_indices_in;
       if (ghost_indices_data.size() != locally_owned_range_data.size())
@@ -496,8 +507,13 @@ namespace Utilities
       memory += MemoryConsumption::memory_consumption(ghost_targets_data);
       memory += MemoryConsumption::memory_consumption(import_indices_data);
       memory += sizeof(import_indices_plain_dev) +
-                sizeof(*import_indices_plain_dev.begin()) *
-                  import_indices_plain_dev.capacity();
+                sizeof(unsigned int) * import_indices_plain_dev.size();
+      memory += sizeof(import_entries_dev) +
+                sizeof(unsigned int) * import_entries_dev.size();
+      memory += sizeof(import_entry_offsets_dev) +
+                sizeof(unsigned int) * import_entry_offsets_dev.size();
+      memory += sizeof(import_entry_positions_dev) +
+                sizeof(unsigned int) * import_entry_positions_dev.size();
       memory += MemoryConsumption::memory_consumption(n_import_indices_data);
       memory += MemoryConsumption::memory_consumption(import_targets_data);
       memory += MemoryConsumption::memory_consumption(
@@ -520,34 +536,61 @@ namespace Utilities
     void
     Partitioner::initialize_import_indices_plain_dev() const
     {
-      const unsigned int n_import_targets = import_targets_data.size();
-      import_indices_plain_dev.reserve(n_import_targets);
-      for (unsigned int i = 0; i < n_import_targets; ++i)
-        {
-          // Expand the indices on the host
-          std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-            my_imports = import_indices_data.begin() +
-                         import_indices_chunks_by_rank_data[i],
-            end_my_imports = import_indices_data.begin() +
-                             import_indices_chunks_by_rank_data[i + 1];
-          std::vector<unsigned int> import_indices_plain_host;
-          for (; my_imports != end_my_imports; ++my_imports)
-            {
-              const unsigned int chunk_size =
-                my_imports->second - my_imports->first;
-              for (unsigned int j = 0; j < chunk_size; ++j)
-                import_indices_plain_host.push_back(my_imports->first + j);
-            }
+      // Expand the indices of all import targets on the host. The ranges in
+      // import_indices_data are sorted by import target, so the expanded
+      // indices are in the same order as the data in the temporary storage
+      // used for communication.
+      std::vector<unsigned int> import_indices_plain_host;
+      import_indices_plain_host.reserve(n_import_indices_data);
+      for (const auto &import_range : import_indices_data)
+        for (unsigned int j = import_range.first; j < import_range.second; ++j)
+          import_indices_plain_host.push_back(j);
+      AssertDimension(import_indices_plain_host.size(), n_import_indices_data);
 
-          // Move the indices to the device
-          const auto chunk_size = import_indices_plain_host.size();
-          import_indices_plain_dev.emplace_back("import_indices_plain_dev" +
-                                                  std::to_string(i),
-                                                chunk_size);
-          Kokkos::deep_copy(import_indices_plain_dev.back(),
-                            Kokkos::View<unsigned int *, Kokkos::HostSpace>(
-                              import_indices_plain_host.data(), chunk_size));
+      // An index can be a ghost on several processors. Sort the positions
+      // by index, keeping the positions of the same index in increasing
+      // order, i.e., in the order of the import targets.
+      std::vector<std::pair<unsigned int, unsigned int>> index_and_position;
+      index_and_position.reserve(import_indices_plain_host.size());
+      for (unsigned int p = 0; p < import_indices_plain_host.size(); ++p)
+        index_and_position.emplace_back(import_indices_plain_host[p], p);
+      std::sort(index_and_position.begin(), index_and_position.end());
+
+      std::vector<unsigned int> import_entries_host;
+      std::vector<unsigned int> import_entry_offsets_host;
+      std::vector<unsigned int> import_entry_positions_host;
+      import_entry_positions_host.reserve(index_and_position.size());
+      for (const auto &[index, position] : index_and_position)
+        {
+          if (import_entries_host.empty() ||
+              import_entries_host.back() != index)
+            {
+              import_entries_host.push_back(index);
+              import_entry_offsets_host.push_back(
+                import_entry_positions_host.size());
+            }
+          import_entry_positions_host.push_back(position);
         }
+      import_entry_offsets_host.push_back(import_entry_positions_host.size());
+
+      // Move the indices to the device
+      const auto copy_to_device = [](const std::vector<unsigned int> &host,
+                                     const std::string               &name) {
+        Kokkos::View<unsigned int *, MemorySpace::Default::kokkos_space> device(
+          Kokkos::view_alloc(name, Kokkos::WithoutInitializing), host.size());
+        Kokkos::deep_copy(device,
+                          Kokkos::View<const unsigned int *, Kokkos::HostSpace>(
+                            host.data(), host.size()));
+        return device;
+      };
+      import_indices_plain_dev =
+        copy_to_device(import_indices_plain_host, "import_indices_plain_dev");
+      import_entries_dev =
+        copy_to_device(import_entries_host, "import_entries_dev");
+      import_entry_offsets_dev =
+        copy_to_device(import_entry_offsets_host, "import_entry_offsets_dev");
+      import_entry_positions_dev = copy_to_device(import_entry_positions_host,
+                                                  "import_entry_positions_dev");
     }
 
   } // namespace MPI

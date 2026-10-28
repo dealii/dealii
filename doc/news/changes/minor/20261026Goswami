@@ -1,0 +1,10 @@
+Improved: With device-aware MPI, Utilities::MPI::Partitioner now packs the
+data for all import targets in export_to_ghosted_array_start(), and applies
+the data from all import targets in import_from_ghosted_array_finish(), with
+a single kernel and a single fence instead of one kernel and one fence per
+target. The imported data is applied in the same order as before, so the
+results do not change. This reduces the latency of
+LinearAlgebra::distributed::Vector::update_ghost_values() and compress() for
+vectors in MemorySpace::Default.
+<br>
+(Shubham Goswami, 2026/10/26)
