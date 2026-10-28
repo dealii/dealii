@@ -18,12 +18,13 @@
 #include <deal.II/base/convergence_table.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/function_parser.h>
-#include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/quadrature.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
 #include <deal.II/fe/mapping.h>
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/tria.h>
 
 #include <deal.II/lac/vector.h>
@@ -609,7 +610,9 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
           Vector<float> difference_per_cell(
             dh.get_triangulation().n_global_active_cells());
 
-          QGauss<dim> q_gauss((dh.get_fe().degree + 1) * 2);
+          const auto q_gauss =
+            dh.get_fe().reference_cell().get_gauss_type_quadrature(
+              (dh.get_fe().degree + 1) * 2);
 
           for (const auto &norm : norms)
             {
