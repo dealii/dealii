@@ -13,6 +13,7 @@
 #include <deal.II/base/quadrature.h>
 
 #include <deal.II/dofs/dof_accessor.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_bernstein.h>
 #include <deal.II/fe/fe_q.h>
@@ -85,6 +86,64 @@ namespace NonMatching
 
 
 
+      /*
+       * Type trait to identify a LinearAlgebra::distributed::Vector on the
+       * host, whose ghost entries are described by a
+       * Utilities::MPI::Partitioner.
+       */
+      template <typename VectorType>
+      struct IsHostDistributedVector : std::false_type
+      {};
+
+      template <typename Number>
+      struct IsHostDistributedVector<
+        LinearAlgebra::distributed::Vector<Number, MemorySpace::Host>>
+        : std::true_type
+      {};
+
+
+
+      /*
+       * Check that the incoming level set vector contains all locally relevant
+       * DoFs of the incoming DoFHandler, either as locally owned or as ghost
+       * entries. This is required since MeshClassifier::reclassify() reads the
+       * level set values on the faces of all non-artificial cells, i.e., also
+       * on the ghost cells. The check is only performed for
+       * LinearAlgebra::distributed::Vector, for which the ghost entries might
+       * be a subset of the locally relevant DoFs, e.g., if the vector was
+       * initialized by MatrixFree.
+       */
+      template <int dim, typename VectorType>
+      void
+      assert_locally_relevant_dofs_are_accessible(
+        [[maybe_unused]] const DoFHandler<dim> &dof_handler,
+        [[maybe_unused]] const VectorType      &level_set)
+      {
+        if constexpr (IsHostDistributedVector<VectorType>::value)
+          {
+            IndexSet required_ghost_dofs =
+              DoFTools::extract_locally_relevant_dofs(dof_handler);
+            required_ghost_dofs.subtract_set(
+              level_set.locally_owned_elements());
+
+            Assert(
+              required_ghost_dofs.is_subset_of(
+                level_set.get_partitioner()->ghost_indices()),
+              ExcMessage(
+                "The level set vector does not contain all locally relevant "
+                "DoFs of the DoFHandler as locally owned or ghost entries. "
+                "However, the MeshClassifier needs to access the level set "
+                "values on the faces of all ghost cells. This typically "
+                "happens if the vector was initialized via "
+                "MatrixFree::initialize_dof_vector(), whose ghost entries only "
+                "cover the DoFs of the locally owned cells. Copy the level set "
+                "field into a vector whose ghost entries are given by "
+                "DoFTools::extract_locally_relevant_dofs()."));
+          }
+      }
+
+
+
       /**
        * The concrete LevelSetDescription used when the level set function is
        * described as a (DoFHandler, Vector)-pair.
@@ -122,6 +181,29 @@ namespace NonMatching
           const typename Triangulation<dim>::active_cell_iterator &cell,
           const unsigned int                                       face_index,
           Vector<double> &local_levelset_values) override;
+
+        /**
+         * Check that the level set vector gives access to the values of all
+         * locally relevant DoFs, that is, all DoFs on locally owned and ghost
+         * cells. MeshClassifier::reclassify() reads the level set values on
+         * all of these cells, so the ghost entries of the vector need to
+         * cover all locally relevant DoFs. This is, for example, not the case
+         * for a LinearAlgebra::distributed::Vector initialized by
+         * MatrixFree::initialize_dof_vector(), whose ghost entries typically
+         * only include the DoFs of locally owned cells. Such a vector should
+         * instead be set up with the result of
+         * DoFTools::extract_locally_relevant_dofs() as ghost entries.
+         *
+         * In debug mode, an assertion fails if not all locally relevant DoFs
+         * are accessible. In release mode, this function does nothing.
+         *
+         * This function is called at the beginning of
+         * MeshClassifier::reclassify() rather than in the constructor,
+         * because at construction time the triangulation, the DoFs, and the
+         * vector may not set up yet.
+         */
+        void
+        check_consistency() const override;
 
       private:
         /**
@@ -179,6 +261,15 @@ namespace NonMatching
                                                              dof_indices[i]);
       }
 
+
+
+      template <int dim, typename VectorType>
+      void
+      DiscreteLevelSetDescription<dim, VectorType>::check_consistency() const
+      {
+        if constexpr (running_in_debug_mode())
+          assert_locally_relevant_dofs_are_accessible(*dof_handler, *level_set);
+      }
 
 
       template <int dim, typename VectorType>
@@ -360,6 +451,7 @@ namespace NonMatching
   void
   MeshClassifier<dim>::reclassify()
   {
+    level_set_description->check_consistency();
     initialize();
     cell_locations.assign(triangulation->n_active_cells(),
                           LocationToLevelSet::unassigned);

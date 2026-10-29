@@ -1,0 +1,11 @@
+
+DEAL:0::locally active DoFs as ghosts
+DEAL:0::Exception caught
+DEAL:0::locally relevant DoFs as ghosts
+DEAL:0::Classification succeeded
+
+DEAL:1::locally active DoFs as ghosts
+DEAL:1::Exception caught
+DEAL:1::locally relevant DoFs as ghosts
+DEAL:1::Classification succeeded
+

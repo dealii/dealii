@@ -166,6 +166,15 @@ namespace NonMatching
      * Constructor. Takes a level set function described as a DoFHandler and a
      * Vector. The triangulation attached to DoFHandler is the one that will be
      * classified.
+     *
+     * @note Since reclassify() also classifies the ghost cells, the level set
+     * values on all faces of the ghost cells need to be accessible. Thus, a
+     * distributed vector has to contain all locally relevant DoFs, see
+     * DoFTools::extract_locally_relevant_dofs(), as locally owned or ghost
+     * entries. In particular, this is not the case for vectors initialized
+     * via MatrixFree::initialize_dof_vector(), whose ghost entries only cover
+     * the DoFs of the locally owned cells. For
+     * LinearAlgebra::distributed::Vector, this is checked in debug mode.
      */
     template <typename VectorType>
     MeshClassifier(const DoFHandler<dim> &level_set_dof_handler,
@@ -309,6 +318,17 @@ namespace NonMatching
           const typename Triangulation<dim>::active_cell_iterator &cell,
           const unsigned int                                       face_index,
           Vector<double> &local_dofs) = 0;
+
+        /**
+         * Check that the level set is consistent with the current state of
+         * the mesh, e.g., that all entries of the level set vector needed
+         * on locally relevant cells are accessible. Called at the beginning
+         * of MeshClassifier::reclassify(). The default implementation does
+         * nothing.
+         */
+        virtual void
+        check_consistency() const
+        {}
       };
 
     } // namespace MeshClassifierImplementation
