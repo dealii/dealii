@@ -17,9 +17,9 @@ DEAL::   Number of active cells:       8192
 DEAL::   Number of degrees of freedom: 4225
 DEAL::
 cycle cells dofs    L2        H1      Linfty   
-0     512   289  1.335e-01 3.062e+00 8.074e-01 
-1     2048  1089 4.205e-02 1.878e+00 3.744e-01 
-2     8192  4225 1.131e-02 9.927e-01 1.125e-01 
+0     512   289  1.293e-01 2.670e+00 3.740e-01 
+1     2048  1089 4.260e-02 1.592e+00 1.783e-01 
+2     8192  4225 1.158e-02 8.205e-01 4.774e-02 
 \documentclass[10pt]{report}
 \usepackage{float}
 
@@ -29,18 +29,18 @@ cycle cells dofs    L2        H1      Linfty
 \begin{center}
 \begin{tabular}{|c|r|r|c|c|c|} \hline
 cycle & \# cells & \# dofs & $L^2$-error & $H^1$-error & $L^\infty$-error\\ \hline
-0 & 512 & 289 & 1.335e-01 & 3.062e+00 & 8.074e-01\\ \hline
-1 & 2048 & 1089 & 4.205e-02 & 1.878e+00 & 3.744e-01\\ \hline
-2 & 8192 & 4225 & 1.131e-02 & 9.927e-01 & 1.125e-01\\ \hline
+0 & 512 & 289 & 1.293e-01 & 2.670e+00 & 3.740e-01\\ \hline
+1 & 2048 & 1089 & 4.260e-02 & 1.592e+00 & 1.783e-01\\ \hline
+2 & 8192 & 4225 & 1.158e-02 & 8.205e-01 & 4.774e-02\\ \hline
 \end{tabular}
 \end{center}
 \end{table}
 \end{document}
 DEAL::
 n cells         H1                  L2          
-0 512   3.062e+00 -    -    1.335e-01 -    -    
-1 2048  1.878e+00 1.63 0.71 4.205e-02 3.17 1.67 
-2 8192  9.927e-01 1.89 0.92 1.131e-02 3.72 1.89 
+0 512   2.670e+00 -    -    1.293e-01 -    -    
+1 2048  1.592e+00 1.68 0.75 4.260e-02 3.04 1.60 
+2 8192  8.205e-01 1.94 0.96 1.158e-02 3.68 1.88 
 DEAL::
 DEAL::Solving with P2 elements, global refinement
 DEAL::===========================================
@@ -56,9 +56,9 @@ DEAL::   Number of active cells:       8192
 DEAL::   Number of degrees of freedom: 16641
 DEAL::
 cycle cells dofs     L2        H1      Linfty   
-0     512   1089  6.841e-02 1.940e+00 8.066e-01 
-1     2048  4225  1.537e-02 7.758e-01 2.471e-01 
-2     8192  16641 2.177e-03 2.177e-01 3.643e-02 
+0     512   1089  3.582e-02 1.447e+00 2.722e-01 
+1     2048  4225  5.991e-03 4.543e-01 6.037e-02 
+2     8192  16641 7.688e-04 1.175e-01 7.145e-03 
 \documentclass[10pt]{report}
 \usepackage{float}
 
@@ -68,18 +68,18 @@ cycle cells dofs     L2        H1      Linfty
 \begin{center}
 \begin{tabular}{|c|r|r|c|c|c|} \hline
 cycle & \# cells & \# dofs & $L^2$-error & $H^1$-error & $L^\infty$-error\\ \hline
-0 & 512 & 1089 & 6.841e-02 & 1.940e+00 & 8.066e-01\\ \hline
-1 & 2048 & 4225 & 1.537e-02 & 7.758e-01 & 2.471e-01\\ \hline
-2 & 8192 & 16641 & 2.177e-03 & 2.177e-01 & 3.643e-02\\ \hline
+0 & 512 & 1089 & 3.582e-02 & 1.447e+00 & 2.722e-01\\ \hline
+1 & 2048 & 4225 & 5.991e-03 & 4.543e-01 & 6.037e-02\\ \hline
+2 & 8192 & 16641 & 7.688e-04 & 1.175e-01 & 7.145e-03\\ \hline
 \end{tabular}
 \end{center}
 \end{table}
 \end{document}
 DEAL::
 n cells         H1                  L2          
-0 512   1.940e+00 -    -    6.841e-02 -    -    
-1 2048  7.758e-01 2.50 1.32 1.537e-02 4.45 2.15 
-2 8192  2.177e-01 3.56 1.83 2.177e-03 7.06 2.82 
+0 512   1.447e+00 -    -    3.582e-02 -    -    
+1 2048  4.543e-01 3.19 1.67 5.991e-03 5.98 2.58 
+2 8192  1.175e-01 3.87 1.95 7.688e-04 7.79 2.96 
 DEAL::
 DEAL::Solving with P2 elements, adaptive refinement
 DEAL::===========================================
