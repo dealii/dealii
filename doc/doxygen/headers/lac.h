@@ -21,6 +21,15 @@
  * The description of individual groups of classes can be found in
  * sub-topics.
  *
+ * The header generic_linear_algebra.h provides aliases for commonly used
+ * types in LinearAlgebraDealII, LinearAlgebraPETSc, and LinearAlgebraTrilinos.
+ * The latter two namespaces are available when the corresponding external
+ * library is enabled. LinearAlgebraDealII provides serial types, while the
+ * MPI subnamespaces of LinearAlgebraPETSc and LinearAlgebraTrilinos provide
+ * distributed vector and matrix types. The aliases retain each backend's
+ * initialization, communication, and solver options; applications choose the
+ * namespace appropriate to their problem.
+ *
  * The files implementing linear algebra functionality are in the
  * <code>lac</code> subdirectory, an abbreviation for <em>L</em>inear
  * <em>A</em>lgebra <em>C</em>lasses.
