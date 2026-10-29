@@ -199,7 +199,7 @@ namespace
                     {{V0, 0.5 * V(0), 0.5 * V(1)}},
                     {{0.5 * V(0), V(0), 0.5 * (V(0) + V(1))}},
                     {{0.5 * V(1), 0.5 * V(0) + 0.5 * V(1), V(1)}},
-                    {{0.5 * V(0), 0.5 * V(0) + 0.5 * V(1), 0.5 * V(1)}},
+                    {{0.5 * V(0) + 0.5 * V(1), 0.5 * V(1), 0.5 * V(0)}},
                   }};
                 return isotropic_child_vertices[child_no][vertex_no];
               }
@@ -285,13 +285,16 @@ ReferenceCell<dim>::subface_vertex_location(
   Point<dim> p;
   for (const unsigned int vertex_no :
        face_reference_cell(face_no).vertex_indices())
-    p += face_vertex_location(face_no, vertex_no) *
-         face_reference_cell(face_no).d_linear_shape_function(
-           child_vertex(face_reference_cell(face_no),
-                        subface_no,
-                        subface_vertex_no,
-                        face_refinement_case),
-           vertex_no);
+    p +=
+      /* coordinate of vertex in ref config */
+      face_vertex_location(face_no, vertex_no) *
+      /* evaluate the linear shape functions */
+      face_reference_cell(face_no).d_linear_shape_function(
+        child_vertex(face_reference_cell(face_no),
+                     subface_no,
+                     subface_vertex_no,
+                     face_refinement_case),
+        vertex_no);
 
   return p;
 }
