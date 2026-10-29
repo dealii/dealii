@@ -448,7 +448,19 @@
  * system of linear equations $A\,x=b$. The matrix $C$ describes the
  * homogeneous part of the linear constraints stored in an
  * AffineConstraints object and the vector $k$ is the vector of
- * corresponding inhomogeneities. More precisely, the
+ * corresponding inhomogeneities. Here, $C$ is a square operator on the full
+ * vector of degrees of freedom, not the rectangular matrix of constraint
+ * weights. For closed constraints, with unconstrained degrees of freedom
+ * ordered first and constrained ones last, these objects have the block form
+ * @f[
+ *   C = \begin{pmatrix} I & 0 \\ W & 0 \end{pmatrix},
+ *   \qquad k = \begin{pmatrix} 0 \\ g \end{pmatrix},
+ *   \qquad Id_c = \begin{pmatrix} 0 & 0 \\ 0 & I \end{pmatrix}.
+ * @f]
+ * The matrix $W$ contains the constraint weights, and $g$ the inhomogeneities
+ * of the constrained degrees of freedom. Thus $C$ leaves unconstrained entries
+ * unchanged, replaces constrained entries by weighted unconstrained entries,
+ * and ignores the input values at constrained indices. More precisely, the
  * AffineConstraints::distribute() operation applied on a vector $x$ is the
  * operation
  * @f[
