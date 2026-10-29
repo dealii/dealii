@@ -244,15 +244,31 @@ namespace SUNDIALS
 #  endif
       );
 
+      /**
+       * Destructor. Frees the SUNLinearSolver object.
+       */
       ~LinearSolverWrapper();
+
+      /**
+       * The object owns the SUNLinearSolver and can therefore not be copied.
+       * It can be moved: the SUNLinearSolver and its content live on the heap,
+       * so the pointers that SUNDIALS holds stay valid after the move.
+       */
+      LinearSolverWrapper(const LinearSolverWrapper &) = delete;
+      LinearSolverWrapper &
+      operator=(const LinearSolverWrapper &) = delete;
+
+      LinearSolverWrapper(LinearSolverWrapper &&other) noexcept;
+      LinearSolverWrapper &
+      operator=(LinearSolverWrapper &&other) noexcept;
 
       /**
        * Implicit conversion to SUNLinearSolver.
        */
-      operator SUNLinearSolver();
+      operator SUNLinearSolver() const;
 
     private:
-      SUNLinearSolver                                  sun_linear_solver;
+      SUNLinearSolver sun_linear_solver = nullptr;
       std::unique_ptr<LinearSolverContent<VectorType>> content;
     };
 

@@ -1075,13 +1075,13 @@ namespace SUNDIALS
      * nonlinear solver. This is used if the user provides both
      * jacobian_times_vector() and solve_linearized_system().
      */
-    std::unique_ptr<internal::LinearSolverWrapper<VectorType>> linear_solver;
+    std::optional<internal::LinearSolverWrapper<VectorType>> linear_solver;
 
     /**
      * Linear solver for applying the mass matrix. This is used if the user
      * provides both mass_times_vector() and solve_mass().
      */
-    std::unique_ptr<internal::LinearSolverWrapper<VectorType>> mass_solver;
+    std::optional<internal::LinearSolverWrapper<VectorType>> mass_solver;
 
     /**
      * SUNDIALS' default linear solver for the Jacobian system. This is used if
