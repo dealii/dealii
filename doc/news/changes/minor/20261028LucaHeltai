@@ -1,0 +1,5 @@
+Fixed: ParsedConvergenceTable::error_from_exact() and
+ParsedConvergenceTable::difference() now select a quadrature matching the
+finite element's reference cell, allowing error computation on simplex meshes.
+<br>
+(Luca Heltai, 2026/10/28)
