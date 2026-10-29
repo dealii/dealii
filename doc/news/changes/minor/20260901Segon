@@ -1,0 +1,5 @@
+New: Added a `DoFTools::count_dofs_per_fe_block()` overload that accepts a braced
+initializer list of `FEValuesExtractors` (or anything else convertible to the required
+`std::vector` type).
+<br>
+(Gordan Segon, 2026/09/01)

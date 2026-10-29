@@ -86,6 +86,10 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
         const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
         const std::vector<unsigned int> &);
 
+      template std::vector<types::global_dof_index>
+      count_dofs_per_fe_block<deal_II_dimension, deal_II_space_dimension>(
+        const DoFHandler<deal_II_dimension, deal_II_space_dimension> &,
+        const std::vector<FEValuesExtractors::AnyExtractor> &);
 
       template unsigned int
       count_dofs_on_patch<deal_II_dimension, deal_II_space_dimension>(
