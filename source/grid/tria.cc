@@ -11,6 +11,7 @@
 // -----------------------------------------------------------------------------
 
 
+#include "deal.II/base/types.h"
 #include <deal.II/base/array_view.h>
 #include <deal.II/base/geometry_info.h>
 #include <deal.II/base/memory_consumption.h>
@@ -5594,12 +5595,6 @@ namespace internal
             {
               lmin = 6;
               lmax = 9;
-              // For triangles, the innermost faces are always reversed for the
-              // first three children and are in the standard orientation for
-              // the last one.
-              std::fill(inherited_orientations.begin() + lmin,
-                        inherited_orientations.begin() + lmax,
-                        numbers::reverse_line_orientation);
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
@@ -5646,18 +5641,37 @@ namespace internal
                 std::swap(new_lines[2 * face_no], new_lines[2 * face_no + 1]);
             }
 
+          // TODO: put them into new_isotropic_child_face_lines and rename
+          // function to new_isotropic_child_face_bounding_objects (this makes
+          // the function more like the 3D counterpart)
+
           // set up lines which do not have parents:
           if (cell->reference_cell() == ReferenceCells::Triangle)
             {
+              // This is different than in 3D (keep this and modify 3D version!)
+              //  2                *                *             .
+              //  |\               |\               |\            .
+              //  v  ^             4  3             |  \          .
+              //  |    \           |    \           | 2  \        .
+              //  5-->--4          *--7--*          *-----*       .
+              //  |\    |\         |\    |\         |\  3 |\      .
+              //  v  ^  v  ^       5  8  6  2       |  \  |  \    .
+              //  |    \|    \     |    \|    \     | 0  \| 1  \  .
+              //  0-->--3-->--1    *--0--*--1--*    *-----*-----* .
               new_lines[6]->set_bounding_object_indices(
-                {new_vertices[3], new_vertices[4]});
+                {new_vertices[4], new_vertices[3]});
               new_lines[7]->set_bounding_object_indices(
-                {new_vertices[4], new_vertices[5]});
+                {new_vertices[5], new_vertices[4]});
               new_lines[8]->set_bounding_object_indices(
-                {new_vertices[5], new_vertices[3]});
+                {new_vertices[3], new_vertices[5]});
             }
           else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
             {
+              // 2---7---3   .-6-.-7-.   .---.---.
+              // |   |   |   1   9   3   | 2 | 3 |
+              // 4---8---5   .-10.11-.   .---.---.
+              // |   |   |   0   8   2   | 0 | 1 |
+              // 0---6---1   .-4-.-5-.   .---.---.
               new_lines[8]->set_bounding_object_indices(
                 {new_vertices[6], new_vertices[8]});
               new_lines[9]->set_bounding_object_indices(
@@ -5689,13 +5703,8 @@ namespace internal
           while (next_unused_cell->used() == true)
             ++next_unused_cell;
 
-          unsigned int n_children = 0;
-          if (cell->reference_cell() == ReferenceCells::Triangle)
-            n_children = 4;
-          else if (cell->reference_cell() == ReferenceCells::Quadrilateral)
-            n_children = 4;
-          else
-            AssertThrow(false, ExcNotImplemented());
+          const unsigned int n_children =
+            cell->reference_cell().n_isotropic_children();
 
           for (unsigned int i = 0; i < n_children; ++i)
             {
@@ -5713,7 +5722,7 @@ namespace internal
             {{{0, 8, 5, X}}, //
              {{1, 2, 6, X}}, //
              {{7, 3, 4, X}}, //
-             {{6, 7, 8, X}}}};
+             {{7, 8, 6, X}}}};
           constexpr dealii::ndarray<unsigned int, 4, 4> quad_child_lines = {
             {{{0, 8, 4, 10}},
              {{8, 2, 5, 11}},
@@ -5777,11 +5786,11 @@ namespace internal
             }
 
           // Unlike the same lines on other children, the innermost triangle's
-          // faces are all in the default orientation:
+          // faces are all in the reversed orientation:
           if (cell->reference_cell() == ReferenceCells::Triangle)
             for (unsigned int face_no : cell->face_indices())
               subcells[3]->set_combined_face_orientation(
-                face_no, numbers::default_geometric_orientation);
+                face_no, numbers::reverse_line_orientation);
 
           for (unsigned int i = 0; i < n_children / 2; ++i)
             cell->set_children(2 * i, subcells[2 * i]->index());
@@ -6881,7 +6890,7 @@ namespace internal
                  {{5, 0}},
                  {{3, 4}},
                  {{4, 5}},
-                 {{3, 5}},
+                 {{3, 5}}, // TODO: make equal to 2D (5 -> 3)
                  {{X, X}},
                  {{X, X}},
                  {{X, X}}}};
@@ -6890,7 +6899,7 @@ namespace internal
                 {{{0, 8, 5, X}},
                  {{1, 2, 6, X}},
                  {{7, 3, 4, X}},
-                 {{6, 7, 8, X}}}};
+                 {{7, 8, 6, X}}}};
 
               // The defined lines in `line_vertices_tri` do not satisfy the
               // expected orientations of all the children's reference cells.
@@ -6901,7 +6910,7 @@ namespace internal
                   {{{{{0, 3}}, {{3, 5}}, {{5, 0}}, {{X, X}}}},
                    {{{{3, 1}}, {{1, 4}}, {{4, 3}}, {{X, X}}}},
                    {{{{5, 4}}, {{4, 2}}, {{2, 5}}, {{X, X}}}},
-                   {{{{3, 4}}, {{4, 5}}, {{5, 3}}, {{X, X}}}}}};
+                   {{{{4, 5}}, {{5, 3}}, {{3, 4}}, {{X, X}}}}}};
 
               // Select lookup table according to reference cell of parent.
               const auto &line_vertices =
@@ -7541,12 +7550,12 @@ namespace internal
                               // the table below relating the lines of the
                               // oriented face to their counterparts on the
                               // reference cell face.
-                              tri_line_perm = {{{{0, 1, 2}}, // 0
-                                                {{1, 0, 2}},
-                                                {{2, 0, 1}}, // 2
+                              tri_line_perm = {{{{2, 0, 1}}, // 0
                                                 {{0, 2, 1}},
-                                                {{1, 2, 0}}, // 4
-                                                {{2, 1, 0}}}};
+                                                {{1, 2, 0}}, // 2
+                                                {{2, 1, 0}},
+                                                {{0, 1, 2}}, // 4
+                                                {{1, 0, 2}}}};
 
                             const auto combined_orientation =
                               cell->combined_face_orientation(f);
