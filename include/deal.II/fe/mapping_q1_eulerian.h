@@ -15,11 +15,15 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/mutex.h>
 #include <deal.II/base/observer_pointer.h>
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q.h>
+
+#include <deal.II/hp/fe_collection.h>
 
 #include <boost/container/small_vector.hpp>
 
@@ -45,7 +49,7 @@ class Vector;
  *
  * <h3>Usage</h3>
  *
- * The constructor of this class takes two arguments: a reference to the
+ * The two-argument constructor of this class takes a reference to the
  * vector that defines the mapping from the reference configuration to the
  * current configuration and a reference to the DoFHandler. The vector should
  * then represent a (flattened out version of a) vector valued field defined
@@ -57,17 +61,13 @@ class Vector;
  * object only evaluates the finite element field at the vertices, the values
  * of all other degrees of freedom (not associated to vertices) are ignored.
  * These requirements are met if the finite element which the given DoFHandler
- * operates on is constructed as a system element (FESystem) from @p dim
+ * operates on is constructed as a system element (FESystem) from @p spacedim
  * continuous FE_Q() objects.
  *
- * In many cases, the shift vector will also be the solution vector of the
- * problem under investigation. If this is not the case (i.e. the number of
- * components of the solution variable is not equal to the space dimension,
- * e.g. for scalar problems in <tt>dim>1</tt> where the Eulerian coordinates
- * only give a background field) or for coupled problems where more variables
- * are computed than just the flow field), then a different DoFHandler has to
- * be set up on the given triangulation, and the shift vector has then to be
- * associated to it.
+ * A ComponentMask can select the displacement components from a coupled
+ * solution with additional fields. The selected components must satisfy the
+ * vertex requirements above; the other components can use different elements.
+ * Alternatively, a separate DoFHandler can describe the displacement field.
  *
  * An example is shown below:
  * @code
@@ -104,12 +104,27 @@ public:
    * This DoFHandler must be based on a <code>FESystem(FE_Q(1),dim)</code>
    * finite element.
    * @param[in] euler_vector A finite element function in the space defined by
-   * the first argument. The dim components of this function will be
+   * the first argument. The spacedim components of this function will be
    * interpreted as the displacement we use in defining the mapping, relative
    * to the location of cells of the underlying triangulation.
    */
   MappingQ1Eulerian(const DoFHandler<dim, spacedim> &euler_dof_handler,
                     const VectorType                &euler_vector);
+
+  /**
+   * Construct a mapping using the @p spacedim components selected by
+   * @p component_mask, in increasing component order. Each selected component
+   * must have exactly one primitive degree of freedom at each vertex. Other
+   * components are ignored. Selected shape functions associated with DoFs
+   * away from vertices must vanish at vertices.
+   * An empty mask retains the requirements of the two-argument constructor.
+   * The DoFHandler need not have distributed degrees of freedom at
+   * construction.
+   */
+  MappingQ1Eulerian(const DoFHandler<dim, spacedim> &euler_dof_handler,
+                    const VectorType                &euler_vector,
+                    const ComponentMask             &component_mask);
+
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -192,6 +207,33 @@ protected:
   ObserverPointer<const DoFHandler<dim, spacedim>,
                   MappingQ1Eulerian<dim, VectorType, spacedim>>
     shiftmap_dof_handler;
+
+  /** Selected displacement components; an empty mask preserves the default. */
+  const ComponentMask component_mask;
+
+private:
+  /**
+   * Return the cached vertex DoF indices, computing them on first use.
+   */
+  const std::array<unsigned int, spacedim> &
+  get_vertex_dof_indices() const;
+
+  /**
+   * Selected vertex DoF indices. Initialized on first use if no finite element
+   * was available at construction, with thread-safe access from get_vertices().
+   */
+  mutable std::array<unsigned int, spacedim> vertex_dof_indices{};
+
+  /**
+   * Keep the finite element used for the cached indices alive, so its address
+   * can identify changes to the DoFHandler's finite element.
+   */
+  mutable hp::FECollection<dim, spacedim> cached_fe_collection;
+
+  /**
+   * Guard initialization of vertex_dof_indices and cached_fe_collection.
+   */
+  mutable Threads::Mutex vertex_dof_indices_mutex;
 };
 
 /** @} */
