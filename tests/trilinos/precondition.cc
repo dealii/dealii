@@ -327,6 +327,7 @@ Step4<dim>::solve(int cycle)
     deallog.pop();
   }
 
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
   {
     deallog.push("IC");
     static constexpr std::array<unsigned int, 2> lower{{48, 62}};
@@ -342,6 +343,7 @@ Step4<dim>::solve(int cycle)
       lower[cycle] + 10);
     deallog.pop();
   }
+#endif
 
   {
     static constexpr std::array<unsigned int, 2> lower{{30, 56}};
