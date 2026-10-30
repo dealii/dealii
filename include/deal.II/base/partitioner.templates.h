@@ -373,78 +373,85 @@ namespace Utilities
       // move the data to send to the front of the array
       AssertIndexRange(n_ghost_indices(), n_ghost_indices_in_larger_set + 1);
       Number *ghost_array_ptr = ghost_array.data();
-      for (unsigned int i = 0; i < n_ghost_targets; ++i)
-        {
-          // in case we only sent a subset of indices, we now need to move the
-          // data to the correct positions and delete the old content
-          if (n_ghost_indices_in_larger_set > n_ghost_indices() &&
-              ghost_array.size() == n_ghost_indices_in_larger_set)
-            {
-              std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-                my_ghosts = ghost_indices_subset_data.begin() +
-                            ghost_indices_subset_chunks_by_rank_data[i],
-                end_my_ghosts = ghost_indices_subset_data.begin() +
-                                ghost_indices_subset_chunks_by_rank_data[i + 1];
-              unsigned int offset = 0;
-              for (; my_ghosts != end_my_ghosts; ++my_ghosts)
-                {
-                  const unsigned int chunk_size =
-                    my_ghosts->second - my_ghosts->first;
-                  if (ghost_array_ptr + offset !=
-                      ghost_array.data() + my_ghosts->first)
-                    {
-                      if constexpr (std::is_same_v<MemorySpaceType,
-                                                   MemorySpace::Host>)
-                        {
-                          if (offset > my_ghosts->first)
-                            std::copy_backward(ghost_array.data() +
-                                                 my_ghosts->first,
-                                               ghost_array_ptr +
-                                                 my_ghosts->second,
-                                               ghost_array.data() + offset);
-                          else
-                            std::copy(ghost_array.data() + my_ghosts->first,
-                                      ghost_array.data() + my_ghosts->second,
-                                      ghost_array_ptr + offset);
-                          std::fill(
+      if (n_ghost_indices_in_larger_set > n_ghost_indices() &&
+          ghost_array.size() == n_ghost_indices_in_larger_set)
+        for (unsigned int i = 0; i < n_ghost_targets; ++i)
+          {
+            // in case we only sent a subset of indices, we now need to move
+            // the data to the correct positions and delete the old content
+            std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
+              my_ghosts = ghost_indices_subset_data.begin() +
+                          ghost_indices_subset_chunks_by_rank_data[i],
+              end_my_ghosts = ghost_indices_subset_data.begin() +
+                              ghost_indices_subset_chunks_by_rank_data[i + 1];
+            unsigned int offset = 0;
+            for (; my_ghosts != end_my_ghosts; ++my_ghosts)
+              {
+                const unsigned int chunk_size =
+                  my_ghosts->second - my_ghosts->first;
+                if (ghost_array_ptr + offset !=
+                    ghost_array.data() + my_ghosts->first)
+                  {
+                    if constexpr (std::is_same_v<MemorySpaceType,
+                                                 MemorySpace::Host>)
+                      {
+                        if (offset > my_ghosts->first)
+                          std::copy_backward(ghost_array.data() +
+                                               my_ghosts->first,
+                                             ghost_array_ptr +
+                                               my_ghosts->second,
+                                             ghost_array.data() + offset);
+                        else
+                          std::copy(ghost_array.data() + my_ghosts->first,
+                                    ghost_array.data() + my_ghosts->second,
+                                    ghost_array_ptr + offset);
+                        std::fill(
+                          std::max(ghost_array.data() + my_ghosts->first,
+                                   ghost_array_ptr + offset + chunk_size),
+                          ghost_array.data() + my_ghosts->second,
+                          Number{});
+                      }
+                    else
+                      {
+                        Kokkos::View<Number *,
+                                     MemorySpace::Default::kokkos_space>
+                          copy("copy", chunk_size);
+                        Kokkos::deep_copy(
+                          copy,
+                          Kokkos::View<Number *,
+                                       MemorySpace::Default::kokkos_space>(
+                            ghost_array.data() + my_ghosts->first, chunk_size));
+                        Kokkos::deep_copy(
+                          Kokkos::View<Number *,
+                                       MemorySpace::Default::kokkos_space>(
+                            ghost_array_ptr + offset, chunk_size),
+                          copy);
+                        Kokkos::deep_copy(
+                          Kokkos::View<Number *,
+                                       MemorySpace::Default::kokkos_space>(
                             std::max(ghost_array.data() + my_ghosts->first,
                                      ghost_array_ptr + offset + chunk_size),
-                            ghost_array.data() + my_ghosts->second,
-                            Number{});
-                        }
-                      else
-                        {
-                          Kokkos::View<Number *,
-                                       MemorySpace::Default::kokkos_space>
-                            copy("copy", chunk_size);
-                          Kokkos::deep_copy(
-                            copy,
-                            Kokkos::View<Number *,
-                                         MemorySpace::Default::kokkos_space>(
-                              ghost_array.data() + my_ghosts->first,
-                              chunk_size));
-                          Kokkos::deep_copy(
-                            Kokkos::View<Number *,
-                                         MemorySpace::Default::kokkos_space>(
-                              ghost_array_ptr + offset, chunk_size),
-                            copy);
-                          Kokkos::deep_copy(
-                            Kokkos::View<Number *,
-                                         MemorySpace::Default::kokkos_space>(
-                              std::max(ghost_array.data() + my_ghosts->first,
-                                       ghost_array_ptr + offset + chunk_size),
-                              (ghost_array.data() + my_ghosts->second -
-                               std::max(ghost_array.data() + my_ghosts->first,
-                                        ghost_array_ptr + offset +
-                                          chunk_size))),
-                            0);
-                        }
-                    }
-                  offset += chunk_size;
-                }
-              AssertDimension(offset, ghost_targets_data[i].second);
-            }
+                            (ghost_array.data() + my_ghosts->second -
+                             std::max(ghost_array.data() + my_ghosts->first,
+                                      ghost_array_ptr + offset + chunk_size))),
+                          0);
+                      }
+                  }
+                offset += chunk_size;
+              }
+            AssertDimension(offset, ghost_targets_data[i].second);
+            ghost_array_ptr += ghost_targets_data[i].second;
+          }
 
+      // the data in the ghost array must be ready before MPI reads it. A
+      // single fence for all ghost targets is enough.
+      if (std::is_same_v<MemorySpaceType, MemorySpace::Default> &&
+          n_ghost_targets > 0)
+        Kokkos::fence();
+
+      ghost_array_ptr = ghost_array.data();
+      for (unsigned int i = 0; i < n_ghost_targets; ++i)
+        {
           AssertThrow(
             static_cast<std::size_t>(ghost_targets_data[i].second) *
                 sizeof(Number) <
@@ -452,8 +459,6 @@ namespace Utilities
             ExcMessage("Index overflow: Maximum message size in MPI is 2GB. "
                        "The number of ghost entries times the size of 'Number' "
                        "exceeds this value. This is not supported."));
-          if (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
-            Kokkos::fence();
           const int ierr =
             MPI_Isend(ghost_array_ptr,
                       ghost_targets_data[i].second * sizeof(Number),
@@ -624,7 +629,6 @@ namespace Utilities
                         value += read_position[positions(p)];
                       owned_data[entries(i)] = value;
                     });
-                  exec.fence();
                 }
               else if (vector_operation == VectorOperation::min)
                 {
@@ -640,7 +644,6 @@ namespace Utilities
                           internal::get_min(value, read_position[positions(p)]);
                       owned_data[entries(i)] = value;
                     });
-                  exec.fence();
                 }
               else if (vector_operation == VectorOperation::max)
                 {
@@ -656,8 +659,11 @@ namespace Utilities
                           internal::get_max(value, read_position[positions(p)]);
                       owned_data[entries(i)] = value;
                     });
-                  exec.fence();
                 }
+
+              // The kernel is not fenced here: the fence after clearing the
+              // ghost array below, on the same execution space instance,
+              // also waits for it.
 
               // For insert, we can't easily assert here, so we just move the
               // pointer matching the host code.
@@ -744,25 +750,29 @@ namespace Utilities
 
       // clear the ghost array in case we did not yet do that in the _start
       // function
-      if (ghost_array.size() > 0)
-        {
-          Assert(ghost_array.begin() != nullptr, ExcInternalError());
-
+      Assert(ghost_array.size() == 0 || ghost_array.begin() != nullptr,
+             ExcInternalError());
 #    if defined(DEAL_II_MPI_WITH_DEVICE_SUPPORT)
-          if constexpr (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
-            {
-              Kokkos::deep_copy(
-                Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
-                  ghost_array.data(), n_ghost_indices()),
-                Number(0));
-            }
-          else
+      if constexpr (std::is_same_v<MemorySpaceType, MemorySpace::Default>)
+        {
+          MemorySpace::Default::kokkos_space::execution_space exec;
+          if (ghost_array.size() > 0)
+            Kokkos::deep_copy(
+              exec,
+              Kokkos::View<Number *, MemorySpace::Default::kokkos_space>(
+                ghost_array.data(), n_ghost_indices()),
+              Number(0));
+          // wait for this and for the kernel that applied the imported data
+          // above
+          exec.fence();
+        }
+      else
 #    endif
-            {
-              std::fill(ghost_array.data(),
-                        ghost_array.data() + n_ghost_indices(),
-                        Number(0));
-            }
+        {
+          if (ghost_array.size() > 0)
+            std::fill(ghost_array.data(),
+                      ghost_array.data() + n_ghost_indices(),
+                      Number(0));
         }
 
       // clear the compress requests
