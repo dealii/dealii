@@ -25,6 +25,9 @@
  * classes, and details of the implementation is found in the
  * documentation of namespaces in this group.
  *
+ * See the @ref assembly "assembly overview" for a comparison of explicit
+ * cell loops, WorkStream, MeshWorker, and matrix-free operator application.
+ *
  * <h3>Integration on finite element meshes</h3>
  *
  * When we integrate a function or a functional on a finite element
