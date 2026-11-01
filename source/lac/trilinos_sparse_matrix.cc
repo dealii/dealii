@@ -2677,8 +2677,9 @@ namespace TrilinosWrappers
           GrowingVectorMemory<GVMVectorType>   vector_memory;
           VectorMemory<GVMVectorType>::Pointer i(vector_memory);
 
-          // Initialize intermediate vector
-          const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
+          // The second summand writes its output to tril_int. Both summands
+          // have the same range map, which also describes tril_dst.
+          const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
                     /*bool omit_zeroing_entries =*/true);
@@ -2686,7 +2687,7 @@ namespace TrilinosWrappers
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
-          const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
+          const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -2716,7 +2717,9 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialize intermediate vector
+          // After transposing, both summands output vectors in the current
+          // range maps (the original domain maps). tril_int holds the second
+          // summand's output.
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -2752,8 +2755,9 @@ namespace TrilinosWrappers
           GrowingVectorMemory<GVMVectorType>   vector_memory;
           VectorMemory<GVMVectorType>::Pointer i(vector_memory);
 
-          // Initialize intermediate vector
-          const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
+          // Add the supplied inverse actions; this is not an inverse of the
+          // sum. Both actions output vectors in their operators' domain maps.
+          const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
                     /*bool omit_zeroing_entries =*/true);
@@ -2761,7 +2765,7 @@ namespace TrilinosWrappers
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
-          const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
+          const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -2791,7 +2795,8 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialize intermediate vector
+          // Add the transposed inverse actions. Their outputs use the current
+          // domain maps, which are the original range maps.
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -2849,7 +2854,9 @@ namespace TrilinosWrappers
           GrowingVectorMemory<GVMVectorType>   vector_memory;
           VectorMemory<GVMVectorType>::Pointer i(vector_memory);
 
-          // Initialize intermediate vector
+          // Compute first_op * (second_op * tril_src). The intermediate is
+          // an output of second_op and an input of first_op, so its map is
+          // both second_op's range map and first_op's domain map.
           const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -2886,7 +2893,9 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialize intermediate vector
+          // Compute second_op^T * (first_op^T * tril_src). After transposing,
+          // the intermediate uses first_op's range map and second_op's domain
+          // map, which describe the same space.
           const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
@@ -2919,8 +2928,9 @@ namespace TrilinosWrappers
           GrowingVectorMemory<GVMVectorType>   vector_memory;
           VectorMemory<GVMVectorType>::Pointer i(vector_memory);
 
-          // Initialize intermediate vector
-          const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
+          // Apply first_op's inverse action, then second_op's inverse action.
+          // The intermediate is in first_op's domain and second_op's range.
+          const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
                     /*bool omit_zeroing_entries =*/true);
@@ -2928,7 +2938,7 @@ namespace TrilinosWrappers
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
-          const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
+          const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           Intermediate tril_int(View,
                                 first_op_init_map,
@@ -2956,8 +2966,10 @@ namespace TrilinosWrappers
           const_cast<TrilinosPayload &>(first_op).transpose();
           const_cast<TrilinosPayload &>(second_op).transpose();
 
-          // Initialize intermediate vector
-          const Epetra_Map &first_op_init_map = first_op.OperatorDomainMap();
+          // Apply second_op's transposed inverse action, then first_op's.
+          // After transposing, the intermediate is in second_op's domain and
+          // first_op's range.
+          const Epetra_Map &first_op_init_map = first_op.OperatorRangeMap();
           i->reinit(IndexSet(first_op_init_map),
                     first_op.get_mpi_communicator(),
                     /*bool omit_zeroing_entries =*/true);
@@ -2965,7 +2977,7 @@ namespace TrilinosWrappers
           // Duplicated from TrilinosWrappers::SparseMatrix::vmult
           const size_type i_local_size = i->end() - i->begin();
           AssertDimension(i_local_size, first_op_init_map.NumMyPoints());
-          const Epetra_Map &second_op_init_map = second_op.OperatorRangeMap();
+          const Epetra_Map &second_op_init_map = second_op.OperatorDomainMap();
           AssertDimension(i_local_size, second_op_init_map.NumMyPoints());
           Intermediate tril_int(View,
                                 first_op_init_map,

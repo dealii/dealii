@@ -1,0 +1,6 @@
+Fixed: Trilinos linear operator payloads use the correct intermediate vector
+maps for sums and products, including supplied inverse actions and their
+transposes. Inverse actions map from an operator's range to its domain and can
+be supplied for rectangular operators.
+<br>
+(Luca Heltai, 2026/11/01)
