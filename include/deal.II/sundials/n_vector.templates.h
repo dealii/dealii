@@ -1046,7 +1046,9 @@ namespace SUNDIALS
       }
 
 
-      // Set z[i] to one if |x[i]| >= c, and to zero otherwise (N_VCompare).
+      /**
+       * Set z[i] to one if |x[i]| >= c, and to zero otherwise (N_VCompare).
+       */
       template <typename VectorType>
       void
       compare(const SUNDIALS::realtype c, const N_Vector x, N_Vector z)
@@ -1070,9 +1072,11 @@ namespace SUNDIALS
       }
 
 
-      // Mark violated sign constraints c[i] with one in m[i], and satisfied
-      // constraints with zero. Return SUNTRUE if all constraints are satisfied
-      // across all MPI processes (N_VConstrMask).
+      /**
+       * Mark violated sign constraints c[i] with one in m[i], and satisfied
+       * constraints with zero. Return SUNTRUE if all constraints are satisfied
+       * across all MPI processes (N_VConstrMask).
+       */
       template <typename VectorType>
       SUNDIALS::booltype
       constraint_mask(const N_Vector c, const N_Vector x, N_Vector m)
@@ -1106,9 +1110,11 @@ namespace SUNDIALS
       }
 
 
-      // Return the global minimum numerator[i]/denominator[i], ignoring zero
-      // denominators. Return the largest SUNDIALS::realtype if all denominators
-      // are zero (N_VMinQuotient).
+      /**
+       * Return the global minimum numerator[i]/denominator[i], ignoring zero
+       * denominators. Return the largest SUNDIALS::realtype if all denominators
+       * are zero (N_VMinQuotient).
+       */
       template <typename VectorType>
       SUNDIALS::realtype
       min_quotient(const N_Vector numerator, const N_Vector denominator)
