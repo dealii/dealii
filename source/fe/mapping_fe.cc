@@ -33,6 +33,8 @@
 
 #include <deal.II/lac/full_matrix.h>
 
+#include <deal.II/physics/transformations.h>
+
 #include <boost/container/small_vector.hpp>
 
 #include <algorithm>
@@ -1801,13 +1803,17 @@ namespace internal
                 Assert(rank == 2, ExcMessage("Only for rank 2"));
 
                 for (unsigned int i = 0; i < output.size(); ++i)
-                  {
-                    const DerivativeForm<1, spacedim, dim> A =
-                      apply_transformation(data.covariant[i],
-                                           transpose(input[i]));
-                    output[i] =
-                      apply_transformation(data.covariant[i], A.transpose());
-                  }
+                  if constexpr (dim == spacedim)
+                    output[i] = Physics::Transformations::basis_transformation(
+                      input[i], static_cast<Tensor<2, dim>>(data.covariant[i]));
+                  else
+                    {
+                      const DerivativeForm<1, spacedim, dim> A =
+                        apply_transformation(data.covariant[i],
+                                             transpose(input[i]));
+                      output[i] =
+                        apply_transformation(data.covariant[i], A.transpose());
+                    }
 
                 return;
               }

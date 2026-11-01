@@ -1,0 +1,6 @@
+Improved: MappingQ, MappingFE, MappingManifold, MappingP1, and MappingFEField
+use Physics::Transformations for covariant gradient transformations when the
+mesh and space dimensions agree. The existing transformations are retained
+for meshes of positive codimension.
+<br>
+(Luca Heltai, 2026/11/01)

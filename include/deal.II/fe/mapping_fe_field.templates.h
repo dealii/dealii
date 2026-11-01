@@ -49,6 +49,8 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
+#include <deal.II/physics/transformations.h>
+
 #include <fstream>
 #include <memory>
 #include <numeric>
@@ -2023,16 +2025,20 @@ MappingFEField<dim, spacedim, VectorType>::transform(
                  ExcInternalError());
 
           for (unsigned int q = 0; q < input.size(); ++q)
-            for (unsigned int i = 0; i < spacedim; ++i)
-              for (unsigned int j = 0; j < spacedim; ++j)
-                {
-                  output[q][i][j] = 0.0;
-                  for (unsigned int K = 0; K < dim; ++K)
-                    for (unsigned int J = 0; J < dim; ++J)
-                      output[q][i][j] += data.covariant[q][i][K] *
-                                         input[q][K][J] *
-                                         data.covariant[q][j][J];
-                }
+            if constexpr (dim == spacedim)
+              output[q] = Physics::Transformations::basis_transformation(
+                input[q], static_cast<Tensor<2, dim>>(data.covariant[q]));
+            else
+              for (unsigned int i = 0; i < spacedim; ++i)
+                for (unsigned int j = 0; j < spacedim; ++j)
+                  {
+                    output[q][i][j] = 0.0;
+                    for (unsigned int K = 0; K < dim; ++K)
+                      for (unsigned int J = 0; J < dim; ++J)
+                        output[q][i][j] += data.covariant[q][i][K] *
+                                           input[q][K][J] *
+                                           data.covariant[q][j][J];
+                  }
           return;
         }
 
