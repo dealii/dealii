@@ -319,11 +319,25 @@
  * require read-only access to vectors, and ghosted vectors are therefore
  * usable in these contexts.
  *
- * On the other hand, vectors without ghost entries are used in all
- * other places like assembling, solving, or any other form of
- * manipulation. These are typically write-only operations and
- * therefore need not have read access to vector elements that may be
- * owned by another processor.
+ * Assembly instead needs writable entries, including contributions to degrees
+ * of freedom owned by other processors. How these contributions are stored
+ * depends on the vector backend; allocating nonlocal entries is not the same
+ * as making ghost values readable.
+ *
+ * For LinearAlgebra::distributed::Vector, initialize the vector with its
+ * locally owned indices and the nonlocal indices to which assembly may
+ * contribute. Keep the vector in its writable state while assembling, then
+ * communicate the contributions with compress(VectorOperation::add). Calling
+ * update_ghost_values() makes the ghost values readable; call
+ * zero_out_ghost_values() before writing new contributions to those entries.
+ *
+ * TrilinosWrappers::MPI::Vector can buffer nonlocal additions even when
+ * initialized with locally owned indices only, as in step-40. Alternatively,
+ * its reinit() overload taking owned and ghost index sets and the flag
+ * \c vector_writable allows the writable nonlocal entries to be specified in
+ * advance. This differs from the default, read-only ghosted Trilinos layout.
+ * In either assembly layout, finish additions with
+ * compress(VectorOperation::add).
  *
  * You can copy between vectors with and without ghost
  * elements (you can see this in step-40, step-55, and step-32) using operator=.
