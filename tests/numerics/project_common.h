@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2006 - 2024 by the deal.II authors
+// Copyright (C) 2006 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -45,6 +45,7 @@
 
 #include <deal.II/numerics/vector_tools.h>
 
+#include <cmath>
 #include <fstream>
 #include <vector>
 
@@ -99,7 +100,8 @@ void
 do_project(const Triangulation<dim> &triangulation,
            const FiniteElement<dim> &fe,
            const unsigned int        p,
-           const unsigned int        order_difference)
+           const unsigned int        order_difference,
+           const bool                verify_exact_projection = false)
 {
   DoFHandler<dim> dof_handler(triangulation);
   dof_handler.distribute_dofs(fe);
@@ -135,6 +137,16 @@ do_project(const Triangulation<dim> &triangulation,
       deallog << fe.get_name() << ", P_" << q
               << ", rel. error=" << error.l2_norm() / projection.l2_norm()
               << std::endl;
+
+      if (verify_exact_projection)
+        {
+          AssertThrow(std::isfinite(error.l2_norm()) &&
+                        std::isfinite(projection.l2_norm()),
+                      ExcInternalError());
+          if (q <= p - order_difference)
+            AssertThrow(error.l2_norm() <= 1e-10 * projection.l2_norm(),
+                        ExcInternalError());
+        }
 
       if (q <= p - order_difference)
         if (error.l2_norm() > 1e-10 * projection.l2_norm())
@@ -197,7 +209,8 @@ template <int dim>
 void
 test_with_wrong_face_orientation(const FiniteElement<dim> &fe,
                                  const unsigned int        p,
-                                 const unsigned int        order_difference = 0)
+                                 const unsigned int        order_difference = 0,
+                                 const bool verify_exact_projection = false)
 {
   if (dim != 3)
     return;
@@ -213,7 +226,8 @@ test_with_wrong_face_orientation(const FiniteElement<dim> &fe,
       cell->set_refine_flag();
       triangulation.execute_coarsening_and_refinement();
 
-      do_project(triangulation, fe, p, order_difference);
+      do_project(
+        triangulation, fe, p, order_difference, verify_exact_projection);
     }
 }
 
