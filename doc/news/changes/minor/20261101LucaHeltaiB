@@ -1,0 +1,5 @@
+Fixed: Three-dimensional FE_ABF elements of order greater than zero now use
+a complete set of divergence moments, preventing singular node matrices during
+construction.
+<br>
+(Luca Heltai, 2026/11/01)
