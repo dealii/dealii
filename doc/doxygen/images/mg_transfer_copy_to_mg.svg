@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="490" viewBox="0 0 680 490" role="img" aria-labelledby="title desc">
+  <!-- SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later -->
+  <!-- Copyright (C) 2026 by the deal.II authors -->
+  <title id="title">copy_to_mg copies active-cell values to their own levels</title>
+  <desc id="desc">One degree of freedom per cell. The four fine active-cell values 1 to 4 are copied to level 1, and the coarse active-cell value 5 is copied to level 0. No value is restricted onto the inactive coarse parent.</desc>
+  <rect width="680" height="490" fill="#ffffff"/>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#34495e"/></marker>
+    <g id="fine">
+      <path d="M0 0h60v60H0z" fill="#b7e4c7"/>
+      <path d="M60 0h60v60H60z" fill="#95d5b2"/>
+      <path d="M0 60h60v60H0z" fill="#74c69d"/>
+      <path d="M60 60h60v60H60z" fill="#52b788"/>
+      <path d="M0 0h120v120H0zM60 0v120M0 60h120" fill="none" stroke="#263746" stroke-width="1.5"/>
+      <g font-size="22" text-anchor="middle" dominant-baseline="middle"><text x="30" y="30">3</text><text x="90" y="30">4</text><text x="30" y="90">1</text><text x="90" y="90">2</text></g>
+    </g>
+    <g id="coarse">
+      <path d="M0 0h120v120H0z" fill="#c7dbef" stroke="#263746" stroke-width="1.5"/>
+      <text x="60" y="60" font-size="22" text-anchor="middle" dominant-baseline="middle">5</text>
+    </g>
+  </defs>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#17212b">
+    <text x="340" y="29" font-size="19" text-anchor="middle">Active global vector</text>
+    <text x="340" y="51" font-size="14" text-anchor="middle">DGQ(0): one DoF per cell; labels are values</text>
+    <g transform="translate(220 70)"><use href="#fine"/><use href="#coarse" x="120"/></g>
+    <g fill="none" stroke="#34495e" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M280 198C250 238 130 245 100 300"/>
+      <path d="M400 198C430 238 550 245 580 300"/>
+    </g>
+    <text x="130" y="238" font-size="14" text-anchor="middle">copy values 1-4</text>
+    <text x="550" y="238" font-size="14" text-anchor="middle">copy value 5</text>
+    <text x="160" y="290" font-size="18" text-anchor="middle">Level 1</text>
+    <text x="520" y="290" font-size="18" text-anchor="middle">Level 0</text>
+    <g transform="translate(40 310)">
+      <use href="#fine"/>
+      <rect x="120" width="120" height="120" fill="none" stroke="#9aa4ad" stroke-dasharray="5 4"/>
+      <g font-size="13" text-anchor="middle" fill="#58636e"><text x="180" y="55">no level-1</text><text x="180" y="75">cell here</text></g>
+    </g>
+    <g transform="translate(400 310)">
+      <rect width="120" height="120" fill="#f1f3f5" stroke="#9aa4ad" stroke-dasharray="5 4"/>
+      <g font-size="13" text-anchor="middle" fill="#58636e"><text x="60" y="45">inactive</text><text x="60" y="65">parent:</text><text x="60" y="85">no value copied</text></g>
+      <use href="#coarse" x="120"/>
+    </g>
+    <text x="340" y="464" font-size="15" text-anchor="middle">No restriction from level 1 to level 0 is performed.</text>
+  </g>
+</svg>
