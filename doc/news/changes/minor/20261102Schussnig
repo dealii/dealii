@@ -1,0 +1,5 @@
+Fixed: MGTwoLevelTransfer::reinit() with geometric coarsening computed wrong
+prolongation, restriction, and interpolation operators for finite elements
+with more than one component and without tensor-product structure.
+<br>
+(Richard Schussnig, 2026/11/02)
