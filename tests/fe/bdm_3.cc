@@ -47,10 +47,9 @@ test(const unsigned int degree)
 int
 main()
 {
-  std::ofstream logfile("output");
   deallog << std::setprecision(PRECISION);
   deallog << std::fixed;
-  deallog.attach(logfile);
+  initlog();
 
   for (unsigned int degree = 1; degree < 4; ++degree)
     {
