@@ -265,8 +265,17 @@ public:
   /**
    * Transfer from a vector on the global grid to vectors defined on each of
    * the levels separately for the active degrees of freedom. In particular,
-   * for a globally refined mesh only the finest level in @p dst is filled as a
-   * plain copy of @p src. All the other level objects are left untouched.
+   * for a globally refined mesh only the finest level in @p dst receives
+   * entries from @p src. This copy may reorder entries if the global and level
+   * DoF numberings differ. No restriction from finer to coarser levels is
+   * performed.
+   *
+   * The following locally refined example uses FE_DGQ(0), with one degree of
+   * freedom per cell. Labels denote vector values, not DoF indices. Values on
+   * active cells are copied to their respective levels; the inactive parent
+   * on level zero receives no entry from the global vector.
+   *
+   * @image html mg_transfer_copy_to_mg.svg
    */
   template <int dim, class InVector, int spacedim>
   void
