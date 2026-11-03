@@ -22,6 +22,8 @@
 
 #include <deal.II/grid/tria_iterator.h>
 
+#include <deal.II/physics/transformations.h>
+
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -661,11 +663,15 @@ MappingP1<dim, spacedim>::transform(
                    "update_covariant_transformation"));
 
           for (unsigned int i = 0; i < output.size(); ++i)
-            {
-              const DerivativeForm<1, spacedim, dim> A =
-                apply_transformation(data.covariant, transpose(input[i]));
-              output[i] = apply_transformation(data.covariant, A.transpose());
-            }
+            if constexpr (dim == spacedim)
+              output[i] = Physics::Transformations::basis_transformation(
+                input[i], static_cast<Tensor<2, dim>>(data.covariant));
+            else
+              {
+                const DerivativeForm<1, spacedim, dim> A =
+                  apply_transformation(data.covariant, transpose(input[i]));
+                output[i] = apply_transformation(data.covariant, A.transpose());
+              }
           return;
         }
 

@@ -38,6 +38,8 @@
 #include <deal.II/matrix_free/shape_info.h>
 #include <deal.II/matrix_free/tensor_product_point_kernels.h>
 
+#include <deal.II/physics/transformations.h>
+
 #include <algorithm>
 #include <array>
 #include <limits>
@@ -2282,9 +2284,16 @@ namespace internal
                 {
                   const DerivativeForm<1, dim, spacedim> covariant =
                     data.output_data->inverse_jacobians[i].transpose();
-                  const DerivativeForm<1, spacedim, dim> A =
-                    apply_transformation(covariant, transpose(input[i]));
-                  output[i] = apply_transformation(covariant, A.transpose());
+                  if constexpr (dim == spacedim)
+                    output[i] = Physics::Transformations::basis_transformation(
+                      input[i], static_cast<Tensor<2, dim>>(covariant));
+                  else
+                    {
+                      const DerivativeForm<1, spacedim, dim> A =
+                        apply_transformation(covariant, transpose(input[i]));
+                      output[i] =
+                        apply_transformation(covariant, A.transpose());
+                    }
                 }
 
               return;
