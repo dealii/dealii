@@ -331,13 +331,12 @@
  * update_ghost_values() makes the ghost values readable; call
  * zero_out_ghost_values() before writing new contributions to those entries.
  *
- * TrilinosWrappers::MPI::Vector can buffer nonlocal additions even when
- * initialized with locally owned indices only, as in step-40. Alternatively,
- * its reinit() overload taking owned and ghost index sets and the flag
- * \c vector_writable allows the writable nonlocal entries to be specified in
- * advance. This differs from the default, read-only ghosted Trilinos layout.
- * In either assembly layout, finish additions with
- * compress(VectorOperation::add).
+ * For the other parallel vector classes, such as TrilinosWrappers::MPI::Vector
+ * and PETScWrappers::MPI::Vector, initialize a writable assembly vector with
+ * its locally owned indices, as in step-40. These vectors buffer contributions
+ * to entries owned by other processors. Finish assembly with
+ * compress(VectorOperation::add) to communicate these contributions to their
+ * owners.
  *
  * You can copy between vectors with and without ghost
  * elements (you can see this in step-40, step-55, and step-32) using operator=.
