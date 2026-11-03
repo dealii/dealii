@@ -200,6 +200,9 @@ related to [assembly line](https://en.wikipedia.org/wiki/Assembly_line),
 meaning ["the act of putting together a set of pieces, fragments, or
 elements"](https://en.wiktionary.org/wiki/assembly).
 
+For a comparison of explicit cell loops, WorkStream, MeshWorker, and
+matrix-free operator application, see the @ref assembly "assembly overview".
+
 FEValues really is the central class in the assembly process. One way you can
 view it is as follows: The FiniteElement and derived classes describe shape
 <i>functions</i>, i.e., infinite dimensional objects: functions have values at
