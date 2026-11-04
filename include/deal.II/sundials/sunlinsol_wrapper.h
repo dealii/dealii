@@ -268,7 +268,7 @@ namespace SUNDIALS
       operator SUNLinearSolver() const;
 
     private:
-      SUNLinearSolver sun_linear_solver = nullptr;
+      SUNLinearSolver                                  sun_linear_solver;
       std::unique_ptr<LinearSolverContent<VectorType>> content;
     };
 
