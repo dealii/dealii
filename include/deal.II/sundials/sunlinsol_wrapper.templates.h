@@ -28,6 +28,8 @@
 #  include <sundials/sundials_iterative.h>
 #  include <sundials/sundials_linearsolver.h>
 
+#  include <utility>
+
 #endif
 
 DEAL_II_NAMESPACE_OPEN
@@ -349,6 +351,8 @@ namespace SUNDIALS
 #  else
     sun_linear_solver = SUNLinSolNewEmpty();
 #  endif
+    AssertThrow(sun_linear_solver != nullptr,
+                ExcMessage("SUNDIALS failed to allocate a linear solver."));
 
     sun_linear_solver->ops->gettype    = arkode_linsol_get_type;
     sun_linear_solver->ops->solve      = arkode_linsol_solve<VectorType>;
@@ -372,13 +376,42 @@ namespace SUNDIALS
     template <typename VectorType>
     LinearSolverWrapper<VectorType>::~LinearSolverWrapper()
     {
-      SUNLinSolFreeEmpty(sun_linear_solver);
+      // Do not use SUNLinSolFree() here: it would free() the content, which is
+      // owned by the unique_ptr member.
+      if (sun_linear_solver != nullptr)
+        SUNLinSolFreeEmpty(sun_linear_solver);
     }
 
 
 
     template <typename VectorType>
-    LinearSolverWrapper<VectorType>::operator SUNLinearSolver()
+    LinearSolverWrapper<VectorType>::LinearSolverWrapper(
+      LinearSolverWrapper &&other) noexcept
+      : sun_linear_solver(std::exchange(other.sun_linear_solver, nullptr))
+      , content(std::move(other.content))
+    {}
+
+
+
+    template <typename VectorType>
+    LinearSolverWrapper<VectorType> &
+    LinearSolverWrapper<VectorType>::operator=(
+      LinearSolverWrapper &&other) noexcept
+    {
+      if (this != &other)
+        {
+          if (sun_linear_solver != nullptr)
+            SUNLinSolFreeEmpty(sun_linear_solver);
+          sun_linear_solver = std::exchange(other.sun_linear_solver, nullptr);
+          content           = std::move(other.content);
+        }
+      return *this;
+    }
+
+
+
+    template <typename VectorType>
+    LinearSolverWrapper<VectorType>::operator SUNLinearSolver() const
     {
       return sun_linear_solver;
     }

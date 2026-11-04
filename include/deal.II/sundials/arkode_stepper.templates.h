@@ -245,20 +245,18 @@ namespace SUNDIALS
 
         // The solvers of the previous setup are only replaced after ARKODE
         // uses the new ones.
-        std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
+        std::optional<internal::LinearSolverWrapper<VectorType>>
                                                       new_linear_solver;
         std::optional<internal::SundialsLinearSolver> new_default_linear_solver;
         if (solve_linearized_system)
           {
-            new_linear_solver =
-              std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_linearized_system,
-                inv_ctx.pending_exception
+            new_linear_solver.emplace(solve_linearized_system,
+                                      inv_ctx.pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                ,
-                inv_ctx.arkode_ctx
+                                      ,
+                                      inv_ctx.arkode_ctx
 #  endif
-              );
+            );
             sun_linear_solver = *new_linear_solver;
           }
         else
@@ -447,21 +445,18 @@ namespace SUNDIALS
 
         // The solvers of the previous setup are only replaced after ARKODE
         // uses the new ones.
-        std::unique_ptr<internal::LinearSolverWrapper<VectorType>>
+        std::optional<internal::LinearSolverWrapper<VectorType>>
                                                       new_mass_solver;
         std::optional<internal::SundialsLinearSolver> new_default_mass_solver;
         if (solve_mass)
           {
-            new_mass_solver =
-              std::make_unique<internal::LinearSolverWrapper<VectorType>>(
-                solve_mass,
-
-                inv_ctx.pending_exception
+            new_mass_solver.emplace(solve_mass,
+                                    inv_ctx.pending_exception
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-                ,
-                inv_ctx.arkode_ctx
+                                    ,
+                                    inv_ctx.arkode_ctx
 #  endif
-              );
+            );
             sun_mass_linear_solver = *new_mass_solver;
           }
         else
