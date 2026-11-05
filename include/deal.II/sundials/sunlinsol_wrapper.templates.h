@@ -343,7 +343,8 @@ namespace SUNDIALS
     SUNContext linsol_ctx
 #  endif
     )
-    : content(
+    : sun_linear_solver(nullptr)
+    , content(
         std::make_unique<LinearSolverContent<VectorType>>(pending_exception))
   {
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
