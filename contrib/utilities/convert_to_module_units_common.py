@@ -81,6 +81,7 @@ petsc_includes = [
     "petscsf.h",
     "petscsnes.h",
     "petscsys.h",
+    "petsctao.h",
     "petscts.h",
     "petscvec.h",
     "petsc/.*.h",
