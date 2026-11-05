@@ -55,7 +55,7 @@ jobs:
             os: ubuntu-26.04
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: info
       run: |
         g++ -v
@@ -108,18 +108,32 @@ jobs:
         os: [ubuntu-26.04, ubuntu-26.04-arm]
         include:
           - os: ubuntu-26.04
+            ubuntu_version: noble
             architecture: amd64
+            image: dealii/dependencies:noble-v9.7.1@sha256:badc6aa7d57df142b58d2ea594b427336a9790903dcd052cfa7302f84f327daa
+            flags:
+          - os: ubuntu-26.04
+            ubuntu_version: resolute
+            architecture: amd64
+            image: dealii/dependencies:resolute-v9.7.1@sha256:cca811a4dd1f42976b698470f27812d1564c84f4d70dd6f95cc2fa48f3c5d9b8
             flags:
           - os: ubuntu-26.04-arm
+            ubuntu_version: noble
             architecture: arm64
+            image: dealii/dependencies:noble-v9.7.1@sha256:caa5adcfad050ccc429adb359309a0fe1dd0649b360834f7e494482fffd8bdd1
+            flags: -mno-outline-atomics
+          - os: ubuntu-26.04-arm
+            ubuntu_version: resolute
+            architecture: arm64
+            image: dealii/dependencies:resolute-v9.7.1@sha256:79de90043f44644c41eedbc368fdae34211d659198752fa96d5fab5d0d967b82
             flags: -mno-outline-atomics
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
+      image: ${{ matrix.image }}
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: info
       run: |
         python --version
@@ -192,13 +206,18 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_version: [noble, resolute]
+        include:
+          - ubuntu_version: noble
+            image: dealii/dependencies:noble-v9.7.1@sha256:badc6aa7d57df142b58d2ea594b427336a9790903dcd052cfa7302f84f327daa
+          - ubuntu_version: resolute
+            image: dealii/dependencies:resolute-v9.7.1@sha256:cca811a4dd1f42976b698470f27812d1564c84f4d70dd6f95cc2fa48f3c5d9b8
 
     container:
-      image: dealii/dependencies:${{ matrix.ubuntu_version }}-v9.7.1
+      image: ${{ matrix.image }}
       options: --user root --env OMPI_ALLOW_RUN_AS_ROOT=1 --env OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: info
       run: |
         mpicc -v
@@ -245,7 +264,7 @@ jobs:
     name: resolute debug intel oneapi
     runs-on: ubuntu-26.04
     container:
-      image: intel/oneapi:2026.1.0-devel-ubuntu26.04
+      image: intel/oneapi:2026.1.0-devel-ubuntu26.04@sha256:45de6b5bf2083179b420f01bd68781da218d6b72dcba7f1e35aa0c108526f819
 
     #
     # The following condition only runs the workflow on 'push' or if the
@@ -256,7 +275,7 @@ jobs:
     # if: ${{ github.event_name == 'push' || !github.event.pull_request.draft }}
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: info
       run: |
         export I_MPI_CXX=icpx
@@ -315,7 +334,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: modules
       run: |
         wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
@@ -359,7 +378,7 @@ jobs:
       run: |
         mpicc -v
         cmake --version
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       with:
         repository: kokkos/kokkos
         ref: 4.0.01
@@ -427,7 +446,7 @@ jobs:
       CUDA_ROOT: /usr/local/cuda
 
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: modules
       run: |
         wget https://apt.llvm.org/llvm.sh
@@ -453,7 +472,7 @@ jobs:
         mpicc -v
         clang++-22 -v
         cmake --version
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       with:
         repository: kokkos/kokkos
         ref: 4.0.01
@@ -508,7 +527,7 @@ jobs:
     name: resolute clang-22 modules
     runs-on: ubuntu-26.04
     container:
-      image: dealii/dependencies:noble-v9.7.1
+      image: dealii/dependencies:noble-v9.7.1@sha256:badc6aa7d57df142b58d2ea594b427336a9790903dcd052cfa7302f84f327daa
 
     # The following condition only runs the workflow on 'push' or if the
     # 'pull_request' is not a draft. This is only useful for hackathons or
@@ -526,7 +545,7 @@ jobs:
         sudo apt-get install -yq --no-install-recommends \
             ninja-build wget lsb-release gnupg g++-15
         sudo wget https://apt.llvm.org/llvm.sh && sudo chmod +x llvm.sh && sudo ./llvm.sh 22
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       with:
         repository: kokkos/kokkos
         ref: 5.0.1
@@ -543,7 +562,7 @@ jobs:
               -D CMAKE_INSTALL_PREFIX=${GITHUB_WORKSPACE}/../kokkos-install \
               ..
         ninja install
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
     - name: configure deal.II
       run: |
         mkdir build
