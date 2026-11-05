@@ -227,7 +227,6 @@ namespace LinearAlgebra
         // returning, including when Tpetra used the host mirror internally.
         tpetra_dst.template getLocalView<typename MemorySpace::kokkos_space>(
           Tpetra::Access::ReadOnly);
-        Kokkos::fence();
       }
 
 
