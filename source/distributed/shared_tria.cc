@@ -160,6 +160,48 @@ namespace parallel
           !(settings & partition_custom_signal))
         dealii::GridTools::partition_multigrid_levels(*this);
 
+      mark_artificial_cells();
+
+      if constexpr (running_in_debug_mode())
+        {
+          {
+            // Assert that each cell is owned by a processor
+            const unsigned int n_my_cells = std::count_if(
+              this->begin_active(),
+              typename Triangulation<dim, spacedim>::active_cell_iterator(
+                this->end()),
+              [](const auto &i) { return (i.is_locally_owned()); });
+
+            const unsigned int total_cells =
+              Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
+            Assert(total_cells == this->n_active_cells(),
+                   ExcMessage("Not all cells are assigned to a processor."));
+          }
+
+          // If running with multigrid, assert that each level
+          // cell is owned by a processor
+          if (settings & construct_multigrid_hierarchy)
+            {
+              const unsigned int n_my_cells =
+                std::count_if(this->begin(), this->end(), [](const auto &i) {
+                  return (i.is_locally_owned_on_level());
+                });
+
+
+              const unsigned int total_cells =
+                Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
+              Assert(total_cells == this->n_cells(),
+                     ExcMessage("Not all cells are assigned to a processor."));
+            }
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::mark_artificial_cells()
+    {
       true_subdomain_ids_of_cells.resize(this->n_active_cells());
 
       // loop over all cells and mark artificial:
@@ -278,39 +320,6 @@ namespace parallel
           // just store true subdomain ids
           for (unsigned int index = 0; cell != endc; cell++, index++)
             true_subdomain_ids_of_cells[index] = cell->subdomain_id();
-        }
-
-      if constexpr (running_in_debug_mode())
-        {
-          {
-            // Assert that each cell is owned by a processor
-            const unsigned int n_my_cells = std::count_if(
-              this->begin_active(),
-              typename Triangulation<dim, spacedim>::active_cell_iterator(
-                this->end()),
-              [](const auto &i) { return (i.is_locally_owned()); });
-
-            const unsigned int total_cells =
-              Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
-            Assert(total_cells == this->n_active_cells(),
-                   ExcMessage("Not all cells are assigned to a processor."));
-          }
-
-          // If running with multigrid, assert that each level
-          // cell is owned by a processor
-          if (settings & construct_multigrid_hierarchy)
-            {
-              const unsigned int n_my_cells =
-                std::count_if(this->begin(), this->end(), [](const auto &i) {
-                  return (i.is_locally_owned_on_level());
-                });
-
-
-              const unsigned int total_cells =
-                Utilities::MPI::sum(n_my_cells, this->get_mpi_communicator());
-              Assert(total_cells == this->n_cells(),
-                     ExcMessage("Not all cells are assigned to a processor."));
-            }
         }
     }
 
@@ -498,6 +507,46 @@ namespace parallel
       dealii::parallel::TriangulationBase<dim, spacedim>::copy_triangulation(
         other_tria);
       partition();
+      this->update_number_cache();
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::add_periodicity(
+      const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>>
+        &periodicity_vector)
+    {
+      dealii::Triangulation<dim, spacedim>::add_periodicity(periodicity_vector);
+
+      if (!allow_artificial_cells)
+        return;
+
+      //
+      // The purpose of Triangulation::add_periodicity() is to ensure that
+      // periodic neighbors become part of the ghost layer (of the current
+      // rank). Unfortunately, we might have already marked such cells as
+      // artificial during the original call to mark_artificial_cells()
+      // which happens early during the call to partition() (and prior to
+      // this call to add_periodicity()).
+      //
+      // Let us simply restore the true subdomain ids and let
+      // mark_artificial_cells() reclassify all artificial cells as it can
+      // now see periodic neighbors.
+      //
+
+      for (const auto &cell : this->active_cell_iterators())
+        cell->set_subdomain_id(
+          true_subdomain_ids_of_cells[cell->active_cell_index()]);
+
+      if (settings & construct_multigrid_hierarchy)
+        for (unsigned int lvl = 0; lvl < this->n_levels(); ++lvl)
+          for (const auto &cell : this->cell_iterators_on_level(lvl))
+            cell->set_level_subdomain_id(
+              true_level_subdomain_ids_of_cells[lvl][cell->index()]);
+
+      mark_artificial_cells();
       this->update_number_cache();
     }
   } // namespace shared

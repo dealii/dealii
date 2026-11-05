@@ -333,6 +333,20 @@ namespace parallel
       copy_triangulation(
         const dealii::Triangulation<dim, spacedim> &other_tria) override;
 
+      /**
+       * Add periodicity to the triangulation, see
+       * dealii::Triangulation::add_periodicity().
+       *
+       * @note If this triangulation was constructed with artificial cells
+       * allowed, then this function reclassifies all artificial cells so
+       * that the ghost layer contains the neighbors across periodic faces.
+       * The partition of the triangulation does not change.
+       */
+      virtual void
+      add_periodicity(
+        const std::vector<dealii::GridTools::PeriodicFacePair<cell_iterator>> &)
+        override;
+
 #  ifdef DOXYGEN
       /**
        * Write and read the data of this object from a stream for the purpose
@@ -422,6 +436,14 @@ namespace parallel
        */
       void
       partition();
+
+      /**
+       * Store the true subdomain ids of all cells and, if requested in the
+       * constructor of the class, mark all cells that are neither locally
+       * owned nor part of the ghost layer as artificial.
+       */
+      void
+      mark_artificial_cells();
 
       /**
        * Synchronize the refinement and coarsening flags over all MPI
