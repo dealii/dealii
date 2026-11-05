@@ -1,0 +1,5 @@
+Fixed: GridTools::compute_active_cell_halo_layer() added cells at periodic
+boundaries to the halo layer that are not connected to the given subdomain.
+This could result in a deadlock with parallel::shared::Triangulation.
+<br>
+(Matthias Maier, 2026/11/05)

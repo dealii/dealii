@@ -839,9 +839,12 @@ namespace GridTools
         for (const auto v : cell->vertex_indices())
           {
             locally_active_vertices_on_subdomain[cell->vertex_index(v)] = true;
-            for (const auto vv : coinciding_vertex_groups
-                   [vertex_to_coinciding_vertex_group[cell->vertex_index(v)]])
-              locally_active_vertices_on_subdomain[vv] = true;
+
+            const auto group =
+              vertex_to_coinciding_vertex_group.find(cell->vertex_index(v));
+            if (group != vertex_to_coinciding_vertex_group.end())
+              for (const auto vv : coinciding_vertex_groups[group->second])
+                locally_active_vertices_on_subdomain[vv] = true;
           }
 
     // Find the cells that do not conform to the predicate
