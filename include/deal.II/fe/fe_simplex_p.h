@@ -65,6 +65,16 @@ public:
       RefinementCase<dim>::isotropic_refinement) const override;
 
   /**
+   * Return whether the shape function @p shape_index has non-zero values
+   * somewhere on the face @p face_index.
+   *
+   * @see FiniteElement::has_support_on_face()
+   */
+  virtual bool
+  has_support_on_face(const unsigned int shape_index,
+                      const unsigned int face_index) const override;
+
+  /**
    * @see FiniteElement::face_to_cell_index()
    */
   virtual unsigned int

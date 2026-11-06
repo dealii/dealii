@@ -1,0 +1,85 @@
+
+DEAL::FE_SimplexP<1>(1)
+DEAL::face 0: 1 0
+DEAL::face 1: 0 1
+DEAL::FE_SimplexP<1>(2)
+DEAL::face 0: 1 0 0
+DEAL::face 1: 0 1 0
+DEAL::FE_SimplexDGP<1>(1)
+DEAL::face 0: 1 0
+DEAL::face 1: 0 1
+DEAL::FE_SimplexDGP<1>(2)
+DEAL::face 0: 1 0 0
+DEAL::face 1: 0 1 0
+DEAL::FE_SimplexP<2>(1)
+DEAL::face 0: 1 1 0
+DEAL::face 1: 0 1 1
+DEAL::face 2: 1 0 1
+DEAL::FE_SimplexP<2>(2)
+DEAL::face 0: 1 1 0 1 0 0
+DEAL::face 1: 0 1 1 0 1 0
+DEAL::face 2: 1 0 1 0 0 1
+DEAL::FE_SimplexP<2>(3)
+DEAL::face 0: 1 1 0 1 1 0 0 0 0 0
+DEAL::face 1: 0 1 1 0 0 1 1 0 0 0
+DEAL::face 2: 1 0 1 0 0 0 0 1 1 0
+DEAL::FE_SimplexDGP<2>(1)
+DEAL::face 0: 1 1 0
+DEAL::face 1: 0 1 1
+DEAL::face 2: 1 0 1
+DEAL::FE_SimplexDGP<2>(2)
+DEAL::face 0: 1 1 0 1 0 0
+DEAL::face 1: 0 1 1 0 1 0
+DEAL::face 2: 1 0 1 0 0 1
+DEAL::FE_SimplexDGP<2>(3)
+DEAL::face 0: 1 1 0 1 1 0 0 0 0 0
+DEAL::face 1: 0 1 1 0 0 1 1 0 0 0
+DEAL::face 2: 1 0 1 0 0 0 0 1 1 0
+DEAL::FE_SimplexP_Bubbles<2>(1)
+DEAL::face 0: 1 1 0
+DEAL::face 1: 0 1 1
+DEAL::face 2: 1 0 1
+DEAL::FE_SimplexP_Bubbles<2>(2)
+DEAL::face 0: 1 1 0 1 0 0 0
+DEAL::face 1: 0 1 1 0 1 0 0
+DEAL::face 2: 1 0 1 0 0 1 0
+DEAL::FE_SimplexP<3>(1)
+DEAL::face 0: 1 1 1 0
+DEAL::face 1: 1 1 0 1
+DEAL::face 2: 1 0 1 1
+DEAL::face 3: 0 1 1 1
+DEAL::FE_SimplexP<3>(2)
+DEAL::face 0: 1 1 1 0 1 1 1 0 0 0
+DEAL::face 1: 1 1 0 1 1 0 0 1 1 0
+DEAL::face 2: 1 0 1 1 0 0 1 1 0 1
+DEAL::face 3: 0 1 1 1 0 1 0 0 1 1
+DEAL::FE_SimplexP<3>(3)
+DEAL::face 0: 1 1 1 0 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0
+DEAL::face 1: 1 1 0 1 1 1 0 0 0 0 1 1 1 1 0 0 0 1 0 0
+DEAL::face 2: 1 0 1 1 0 0 0 0 1 1 1 1 0 0 1 1 0 0 1 0
+DEAL::face 3: 0 1 1 1 0 0 1 1 0 0 0 0 1 1 1 1 0 0 0 1
+DEAL::FE_SimplexDGP<3>(1)
+DEAL::face 0: 1 1 1 0
+DEAL::face 1: 1 1 0 1
+DEAL::face 2: 1 0 1 1
+DEAL::face 3: 0 1 1 1
+DEAL::FE_SimplexDGP<3>(2)
+DEAL::face 0: 1 1 1 0 1 1 1 0 0 0
+DEAL::face 1: 1 1 0 1 1 0 0 1 1 0
+DEAL::face 2: 1 0 1 1 0 0 1 1 0 1
+DEAL::face 3: 0 1 1 1 0 1 0 0 1 1
+DEAL::FE_SimplexDGP<3>(3)
+DEAL::face 0: 1 1 1 0 1 1 1 1 1 1 0 0 0 0 0 0 1 0 0 0
+DEAL::face 1: 1 1 0 1 1 1 0 0 0 0 1 1 1 1 0 0 0 1 0 0
+DEAL::face 2: 1 0 1 1 0 0 0 0 1 1 1 1 0 0 1 1 0 0 1 0
+DEAL::face 3: 0 1 1 1 0 0 1 1 0 0 0 0 1 1 1 1 0 0 0 1
+DEAL::FE_SimplexP_Bubbles<3>(1)
+DEAL::face 0: 1 1 1 0
+DEAL::face 1: 1 1 0 1
+DEAL::face 2: 1 0 1 1
+DEAL::face 3: 0 1 1 1
+DEAL::FE_SimplexP_Bubbles<3>(2)
+DEAL::face 0: 1 1 1 0 1 1 1 0 0 0 1 0 0 0 0
+DEAL::face 1: 1 1 0 1 1 0 0 1 1 0 0 1 0 0 0
+DEAL::face 2: 1 0 1 1 0 0 1 1 0 1 0 0 1 0 0
+DEAL::face 3: 0 1 1 1 0 1 0 0 1 1 0 0 0 1 0
