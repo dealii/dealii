@@ -270,9 +270,11 @@ seen above, interesting behavior only starts after quite a long time
 requiring more CPU hours than is available on a typical
 cluster. Consequently, rather than showing a complete simulation here,
 let us simply show a couple of pictures we have obtained using the
-successor to this program, called <i>ASPECT</i> (short for <i>Advanced
-%Solver for Problems in Earth's ConvecTion</i>), that is being
-developed independently of deal.II and that already incorporates some
+successor to this program, the
+<i>Advanced Solver for Planetary Evolution,
+Convection, and Tectonics (ASPECT)</i> (see
+http://aspect.geodynamics.org/), that is being
+developed based on deal.II and that incorporates many
 of the extensions discussed below. The following two pictures show
 isocontours of the temperature and the partition of the domain (along
 with the mesh) onto 512 processors:
@@ -288,11 +290,12 @@ with the mesh) onto 512 processors:
 <h3>Possibilities for extensions</h3>
 
 There are many directions in which this program could be extended. As
-mentioned at the end of the introduction, most of these are under active
-development in the <i>ASPECT</i> (short for <i>Advanced %Solver for Problems
-in Earth's ConvecTion</i>) code at the time this tutorial program is being
-finished. Specifically, the following are certainly topics that one should
-address to make the program more useful:
+mentioned at the end of the introduction, many of the points below are
+part of the
+<i>Advanced Solver for Planetary Evolution,
+Convection, and Tectonics (ASPECT)</i> (see
+http://aspect.geodynamics.org/). But, from the perspective of this
+program, it is still useful to mention what natural next steps would be:
 
 <ul>
   <li> <b>Adiabatic heating/cooling:</b>
