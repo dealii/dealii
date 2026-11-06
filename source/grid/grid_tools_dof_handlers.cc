@@ -2227,6 +2227,13 @@ namespace GridTools
     static const int space_dim = MeshType::space_dimension;
     AssertIndexRange(direction, space_dim);
     Assert(dim == space_dim, ExcNotImplemented());
+    Assert(
+      mesh.get_triangulation().all_reference_cells_are_hyper_cube(),
+      ExcMessage(
+        "This function identifies faces by the local face indices "
+        "2*direction and 2*direction+1, which is only meaningful on "
+        "hypercube cells. Please use the variant of this function that takes "
+        "two boundary ids instead."));
 
     // Loop over all cells on the highest level and collect all boundary
     // faces 2*direction and 2*direction*1:
