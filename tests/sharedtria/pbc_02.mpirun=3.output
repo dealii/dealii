@@ -1,0 +1,77 @@
+
+DEAL:0::partition unchanged: 1
+DEAL:0::artificial periodic partners: 0
+DEAL:0::ghost cells: 2
+DEAL:0::constrained dofs: 1
+DEAL:0::partition unchanged: 1
+DEAL:0::artificial periodic partners: 0
+DEAL:0::ghost cells: 23
+DEAL:0::constrained dofs: 17
+DEAL:0::partition unchanged: 1
+DEAL:0::artificial periodic partners: 0
+DEAL:0::ghost cells: 184
+DEAL:0::constrained dofs: 217
+DEAL:0::partition unchanged: 1
+DEAL:0::artificial periodic partners: 0
+DEAL:0::ghost cells: 2
+DEAL:0::constrained dofs: 1
+DEAL:0::partition unchanged: 1
+DEAL:0::artificial periodic partners: 0
+DEAL:0::ghost cells: 23
+DEAL:0::constrained dofs: 17
+DEAL:0::partition unchanged: 1
+DEAL:0::artificial periodic partners: 0
+DEAL:0::ghost cells: 184
+DEAL:0::constrained dofs: 217
+
+DEAL:1::partition unchanged: 1
+DEAL:1::artificial periodic partners: 0
+DEAL:1::ghost cells: 2
+DEAL:1::constrained dofs: 1
+DEAL:1::partition unchanged: 1
+DEAL:1::artificial periodic partners: 0
+DEAL:1::ghost cells: 28
+DEAL:1::constrained dofs: 17
+DEAL:1::partition unchanged: 1
+DEAL:1::artificial periodic partners: 0
+DEAL:1::ghost cells: 256
+DEAL:1::constrained dofs: 217
+DEAL:1::partition unchanged: 1
+DEAL:1::artificial periodic partners: 0
+DEAL:1::ghost cells: 2
+DEAL:1::constrained dofs: 1
+DEAL:1::partition unchanged: 1
+DEAL:1::artificial periodic partners: 0
+DEAL:1::ghost cells: 28
+DEAL:1::constrained dofs: 17
+DEAL:1::partition unchanged: 1
+DEAL:1::artificial periodic partners: 0
+DEAL:1::ghost cells: 256
+DEAL:1::constrained dofs: 217
+
+
+DEAL:2::partition unchanged: 1
+DEAL:2::artificial periodic partners: 0
+DEAL:2::ghost cells: 2
+DEAL:2::constrained dofs: 1
+DEAL:2::partition unchanged: 1
+DEAL:2::artificial periodic partners: 0
+DEAL:2::ghost cells: 22
+DEAL:2::constrained dofs: 17
+DEAL:2::partition unchanged: 1
+DEAL:2::artificial periodic partners: 0
+DEAL:2::ghost cells: 184
+DEAL:2::constrained dofs: 217
+DEAL:2::partition unchanged: 1
+DEAL:2::artificial periodic partners: 0
+DEAL:2::ghost cells: 2
+DEAL:2::constrained dofs: 1
+DEAL:2::partition unchanged: 1
+DEAL:2::artificial periodic partners: 0
+DEAL:2::ghost cells: 22
+DEAL:2::constrained dofs: 17
+DEAL:2::partition unchanged: 1
+DEAL:2::artificial periodic partners: 0
+DEAL:2::ghost cells: 184
+DEAL:2::constrained dofs: 217
+

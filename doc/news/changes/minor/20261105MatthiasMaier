@@ -1,0 +1,5 @@
+Fixed: parallel::shared::Triangulation::add_periodicity() now reclassifies
+all artificial cells so that the ghost layer contains the neighbors across
+periodic faces. Previously, this only happened after the next refinement.
+<br>
+(Matthias Maier, 2026/11/05)
