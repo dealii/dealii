@@ -330,16 +330,22 @@ namespace internal
 
   template <int dim>
   std::vector<std::vector<unsigned int>>
-  get_child_offsets_general(const unsigned int n_dofs_per_cell_coarse)
+  get_child_offsets_general(const unsigned int n_dofs_per_cell_coarse,
+                            const unsigned int n_components)
   {
+    // the fine data is stored component by component, each holding the
+    // scalar dofs of all children, see prolongate_and_add_internal()
+    const unsigned int n_scalar_dofs = n_dofs_per_cell_coarse / n_components;
     std::vector<std::vector<unsigned int>> cell_local_children_indices(
       GeometryInfo<dim>::max_children_per_cell,
       std::vector<unsigned int>(n_dofs_per_cell_coarse));
-    for (unsigned int c = 0, k = 0;
-         c < GeometryInfo<dim>::max_children_per_cell;
-         c++)
-      for (unsigned int d = 0; d < n_dofs_per_cell_coarse; ++d, ++k)
-        cell_local_children_indices[c][d] = k;
+    for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; c++)
+      for (unsigned int comp = 0; comp < n_components; ++comp)
+        for (unsigned int i = 0; i < n_scalar_dofs; ++i)
+          cell_local_children_indices[c][comp * n_scalar_dofs + i] =
+            (comp * GeometryInfo<dim>::max_children_per_cell + c) *
+              n_scalar_dofs +
+            i;
     return cell_local_children_indices;
   }
 
@@ -1830,7 +1836,7 @@ namespace internal
                                  is_feq ? fe_fine.degree : (fe_fine.degree + 1),
                                  fe_fine.degree) :
           get_child_offsets_general<dim>(
-            transfer.schemes[0].n_dofs_per_cell_coarse);
+            transfer.schemes[0].n_dofs_per_cell_coarse, fe_fine.n_components());
 
       std::vector<unsigned int> n_dof_indices_fine(transfer.schemes.size() + 1);
       std::vector<unsigned int> n_dof_indices_coarse(transfer.schemes.size() +
