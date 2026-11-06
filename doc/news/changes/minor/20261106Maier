@@ -1,0 +1,5 @@
+Fixed: FE_SimplexP, FE_SimplexDGP, and FE_SimplexP_Bubbles now implement
+FiniteElement::has_support_on_face(). Previously, the default implementation
+returned true for all shape functions and faces.
+<br>
+(Matthias Maier, 2026/11/06)
