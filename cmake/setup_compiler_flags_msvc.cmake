@@ -48,6 +48,10 @@ list(APPEND DEAL_II_DEFINITIONS "NOMINMAX")
 # happening in debug mode with visual studio 2015
 enable_if_supported(DEAL_II_CXX_FLAGS "/bigobj")
 
+# Ensure that the __cplusplus macro has the correct value corresponding to the /std versions used.
+# If the flag is not used, the value of the __cplusplus macro defaults to a value of 199711L.
+enable_if_supported(DEAL_II_CXX_FLAGS "/Zc:__cplusplus")
+
 add_flags(DEAL_II_WARNING_FLAGS "/W3")
 
 #
