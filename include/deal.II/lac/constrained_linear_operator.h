@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2015 - 2024 by the deal.II authors
+// Copyright (C) 2015 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -42,6 +42,17 @@ DEAL_II_NAMESPACE_OPEN
  * AffineConstraints::distribute() on <code>u</code> - with one important
  * difference: inhomogeneities are not applied, but always treated as 0
  * instead.
+ *
+ * The returned homogeneous constraint operator, denoted by $C$, acts on the
+ * full DoF vector. For closed constraints, with independent entries ordered
+ * first, it has the block form
+ * @f[
+ *   C = \begin{pmatrix} I & 0 \\ W & 0 \end{pmatrix}.
+ * @f]
+ * Here $W$ contains the weights defining the dependent entries. The
+ * operator leaves independent entries unchanged and replaces dependent entries
+ * by their homogeneous constrained values, ignoring the corresponding input
+ * entries.
  *
  * The LinearOperator object created by this function is primarily used
  * internally in constrained_linear_operator() to build up a modified system
@@ -224,8 +235,12 @@ project_to_constrained_linear_operator(
  * @f[
  *   (C^T A C + Id_c) x = C^T (b - A\,k)
  * @f]
- * with a given (unconstrained) system matrix $A$, right hand side $b$, and
- * linear constraints $C$ with inhomogeneities $k$.
+ * with a given (unconstrained) system matrix $A$ and right hand side $b$.
+ * Here $C$ is the full-size homogeneous extension operator defined above, and
+ * $k$ is zero on independent entries and contains the resolved inhomogeneities
+ * on dependent entries. The finite element solution is recovered as
+ * $u=Cx+k$, equivalently by applying AffineConstraints::distribute() to
+ * $x$.
  *
  * A detailed explanation of this approach is given in the
  * @ref constraints
@@ -264,14 +279,18 @@ constrained_linear_operator(
  *   Ct = transpose_operator(C);
  * @endcode
  *
- * This LinearOperator object is used together with
- * constrained_right_hand_side() to build up the following modified system of
+ * This PackagedOperation object is used together with
+ * constrained_linear_operator() to build up the following modified system of
  * linear equations:
  * @f[
  *   (C^T A C + Id_c) x = C^T (b - A\,k)
  * @f]
- * with a given (unconstrained) system matrix $A$, right hand side $b$, and
- * linear constraints $C$ with inhomogeneities $k$.
+ * with a given (unconstrained) system matrix $A$ and right hand side $b$.
+ * Here $C$ is the full-size homogeneous extension operator defined above, and
+ * $k$ is zero on independent entries and contains the resolved inhomogeneities
+ * on dependent entries. The finite element solution is recovered as
+ * $u=Cx+k$, equivalently by applying AffineConstraints::distribute() to
+ * $x$.
  *
  * A detailed explanation of this approach is given in the
  * @ref constraints
