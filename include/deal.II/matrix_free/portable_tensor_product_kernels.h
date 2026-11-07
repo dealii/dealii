@@ -72,7 +72,6 @@ namespace Portable
 
 
 
-#if DEAL_II_KOKKOS_VERSION_GTE(4, 0, 0)
     /**
      * Helper function for apply() in 1D
      */
@@ -282,7 +281,6 @@ namespace Portable
 
       team_member.team_barrier();
     }
-#endif
 
 
 
