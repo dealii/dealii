@@ -1,0 +1,13 @@
+
+DEAL::FE_Q<2>(1): failed round trips: 0 of 84 points
+DEAL::FE_Q<2>(2): failed round trips: 0 of 84 points
+DEAL::FE_Q<2>(3): failed round trips: 0 of 84 points
+DEAL::FE_SimplexP<2>(1): failed round trips: 0 of 128 points
+DEAL::FE_SimplexP<2>(2): failed round trips: 0 of 128 points
+DEAL::FE_SimplexP<2>(3): failed round trips: 0 of 128 points
+DEAL::FE_Q<3>(1): failed round trips: 0 of 648 points
+DEAL::FE_Q<3>(2): failed round trips: 0 of 648 points
+DEAL::FE_Q<3>(3): failed round trips: 0 of 648 points
+DEAL::FE_SimplexP<3>(1): failed round trips: 0 of 1680 points
+DEAL::FE_SimplexP<3>(2): failed round trips: 0 of 1680 points
+DEAL::FE_SimplexP<3>(3): failed round trips: 0 of 1680 points

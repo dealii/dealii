@@ -1,0 +1,3 @@
+
+DEAL::FE_WedgeP<3>(1): failed round trips: 0 of 992 points
+DEAL::FE_WedgeP<3>(2): failed round trips: 0 of 992 points
