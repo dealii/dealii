@@ -1148,7 +1148,7 @@ namespace SUNDIALS
                 const auto &d_block = block(*den, b);
                 update(n_block, d_block, n_block.locally_owned_elements());
               }
-            return Utilities::MPI::min(
+            return ::dealii::Utilities::MPI::min(
               local_min, get_mpi_communicator<VectorType>(numerator));
           }
       }
