@@ -43,6 +43,9 @@ module;
 #  include <petscsf.h>
 #  include <petscsnes.h>
 #  include <petscsys.h>
+#  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
+#    include <petsctao.h>
+#  endif
 #  include <petscts.h>
 #  include <petscvec.h>
 #endif
@@ -96,6 +99,7 @@ export
   using ::MatConvert;
   using ::MatCopy;
   using ::MatCreate;
+  using ::MatCreateAIJ;
   using ::MatCreateDense;
   using ::MatCreateIS;
   using ::MatCreateNest;
@@ -300,6 +304,37 @@ export
   using ::SNESSetType;
   using ::SNESSetUseMatrixFree;
   using ::SNESSolve;
+#  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
+  using ::Tao;
+  using ::TaoALMMGetSubsolver;
+  using ::TaoCreate;
+  using ::TaoDestroy;
+  using ::TaoGetIterationNumber;
+  using ::TaoSetApplicationContext;
+  using ::TaoSetConstraintTolerances;
+  using ::TaoSetEqualityConstraintsRoutine;
+  using ::TaoSetFromOptions;
+#    if DEAL_II_PETSC_VERSION_GTE(3, 17, 0)
+  using ::TaoSetGradient;
+  using ::TaoSetHessian;
+  using ::TaoSetObjective;
+  using ::TaoSetSolution;
+#    else
+  using ::TaoSetGradientRoutine;
+  using ::TaoSetHessianRoutine;
+  using ::TaoSetInitialVector;
+  using ::TaoSetObjectiveRoutine;
+#    endif
+  using ::TaoSetInequalityConstraintsRoutine;
+  using ::TaoSetJacobianEqualityRoutine;
+  using ::TaoSetJacobianInequalityRoutine;
+  using ::TaoSetMaximumIterations;
+  using ::TaoSetOptionsPrefix;
+  using ::TaoSetTolerances;
+  using ::TaoSetType;
+  using ::TaoSetVariableBounds;
+  using ::TaoSolve;
+#  endif
   using ::TS;
   using ::TSAdapt;
   using ::TSAdaptSetOptionsPrefix;
@@ -371,6 +406,7 @@ export
   using ::VecGhostUpdateBegin;
   using ::VecGhostUpdateEnd;
   using ::VecMAXPY;
+  using ::VecMin;
   using ::VecNestGetSize;
   using ::VecNestGetSubVec;
   using ::VecNorm;
@@ -388,6 +424,7 @@ export
   using ::VecShift;
   using ::VecSum;
   using ::VecView;
+  using ::VecWAXPY;
 
 #  if DEAL_II_PETSC_VERSION_GTE(3, 22, 0)
   using ::PetscLayoutFindOwner;
@@ -463,6 +500,29 @@ export
     {                                                                  \
       export const auto &sym = dealii::PETSc_Macros::exportable_##sym; \
     }
+
+namespace dealii
+{
+  namespace PETSc_Macros
+  {
+    inline PetscReal
+    exportable_PetscRealPart(const PetscScalar value)
+    {
+      return PetscRealPart(value);
+    }
+  } // namespace PETSc_Macros
+} // namespace dealii
+
+#  undef PetscRealPart
+
+namespace dealii
+{
+  export inline PetscReal
+  PetscRealPart(const PetscScalar value)
+  {
+    return PETSc_Macros::exportable_PetscRealPart(value);
+  }
+} // namespace dealii
 
 
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(ADD_VALUES)
@@ -697,6 +757,10 @@ CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_ERR_LIB)
 #  undef PETSC_ERR_LIB
 EXPORT_PREPROCESSOR_SYMBOL(PETSC_ERR_LIB)
 
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_ERR_USER)
+#  undef PETSC_ERR_USER
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_ERR_USER)
+
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_ERR_RETURN)
 #  undef PETSC_ERR_RETURN
 EXPORT_PREPROCESSOR_SYMBOL(PETSC_ERR_RETURN)
@@ -704,6 +768,14 @@ EXPORT_PREPROCESSOR_SYMBOL(PETSC_ERR_RETURN)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_MACHINE_EPSILON)
 #  undef PETSC_MACHINE_EPSILON
 EXPORT_PREPROCESSOR_SYMBOL(PETSC_MACHINE_EPSILON)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_NINFINITY)
+#  undef PETSC_NINFINITY
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_NINFINITY)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_INFINITY)
+#  undef PETSC_INFINITY
+EXPORT_PREPROCESSOR_SYMBOL(PETSC_INFINITY)
 
 #  if DEAL_II_PETSC_VERSION_GTE(3, 19, 0)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PETSC_SUCCESS)
@@ -748,6 +820,20 @@ EXPORT_PREPROCESSOR_SYMBOL(PCSHELL)
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(PCSOR)
 #  undef PCSOR
 EXPORT_PREPROCESSOR_SYMBOL(PCSOR)
+
+#  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(TAOALMM)
+#    undef TAOALMM
+EXPORT_PREPROCESSOR_SYMBOL(TAOALMM)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(TAOBNCG)
+#    undef TAOBNCG
+EXPORT_PREPROCESSOR_SYMBOL(TAOBNCG)
+
+CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(TAOBQNLS)
+#    undef TAOBQNLS
+EXPORT_PREPROCESSOR_SYMBOL(TAOBQNLS)
+#  endif
 
 CREATE_EXPORTABLE_PREPROCESSOR_SYMBOL(SAME_NONZERO_PATTERN)
 #  undef SAME_NONZERO_PATTERN

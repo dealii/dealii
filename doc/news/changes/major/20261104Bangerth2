@@ -1,0 +1,6 @@
+New: The new PETScWrappers::LinearOptimizer class uses the
+PETScWrappers::NonlinearOptimizer class to solve linear programs,
+i.e., optimization problems in which the objective function, equality,
+constraints, and bounds are all linear.
+<br>
+(Wolfgang Bangerth, 2026/11/04)
