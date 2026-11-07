@@ -433,5 +433,5 @@ temperature, and heat alternatingly in two parts of the domain. While heating
 is in effect, the temperature rises in these places, after which it diffuses
 and diminishes again. The point of these initial conditions is that they
 provide us with a solution that has singularities both in time (when sources
-switch on and off) as well as time (at the reentrant corner as well as at the
+switch on and off) as well as space (at the reentrant corner as well as at the
 edges and corners of the regions where the source acts).
