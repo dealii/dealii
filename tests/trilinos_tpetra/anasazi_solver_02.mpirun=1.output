@@ -1,0 +1,15 @@
+
+DEAL::Size 46 Unknowns 2025
+DEAL::
+DEAL::AnasaziSolverBlockKrylovSchur
+DEAL::Eigenvalues1: 11.98135
+DEAL::Eigenvalues2: 11.95342
+DEAL::Eigenvalues3: 11.92549
+DEAL::Eigenvalues4: 11.90701
+DEAL::OK
+DEAL::AnasaziSolverGeneralizedDavidson
+DEAL::Eigenvalues1: 44.47167
+DEAL::Eigenvalues2: 44.35809
+DEAL::Eigenvalues3: 44.18491
+DEAL::Eigenvalues4: 43.94323
+DEAL::OK
