@@ -403,9 +403,9 @@ namespace TrilinosWrappers
             TrilinosScalar *value_ptr, *rhs_value_ptr;
             int            *index_ptr, *rhs_index_ptr;
             int             ierr = rhs.matrix->ExtractMyRowView(row_local,
-                                                    rhs_n_entries,
-                                                    rhs_value_ptr,
-                                                    rhs_index_ptr);
+                                                                rhs_n_entries,
+                                                                rhs_value_ptr,
+                                                                rhs_index_ptr);
             Assert(ierr == 0, ExcTrilinosError(ierr));
 
             ierr = matrix->ExtractMyRowView(row_local,
@@ -502,7 +502,7 @@ namespace TrilinosWrappers
                                     last_row = TrilinosWrappers::max_my_gid(
                                                  row_space_map) +
                                                1;
-      std::vector<int> n_entries_per_row(last_row - first_row);
+      std::vector<int>              n_entries_per_row(last_row - first_row);
 
       for (SparseMatrix::size_type row = first_row; row < last_row; ++row)
         n_entries_per_row[row - first_row] = sparsity_pattern.row_length(row);
@@ -1168,10 +1168,10 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the matrix.
-    int trilinos_i =
-          matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-        trilinos_j =
-          matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+    int            trilinos_i =
+                     matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+                   trilinos_j =
+                     matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
     TrilinosScalar value = 0.;
 
     // If the data is not on the
@@ -1246,10 +1246,10 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the matrix.
-    int trilinos_i =
-          matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-        trilinos_j =
-          matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+    int            trilinos_i =
+                     matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+                   trilinos_j =
+                     matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
     TrilinosScalar value = 0.;
 
     // If the data is not on the
@@ -1747,8 +1747,8 @@ namespace TrilinosWrappers
                matrix->RowMap().MyGID(
                  static_cast<TrilinosWrappers::types::int_type>(row)) ==
                  false) ?
-                                        &nonlocal_matrix->Graph() :
-                                        &matrix->Graph();
+                &nonlocal_matrix->Graph() :
+                &matrix->Graph();
 
             indices.resize(graph->NumGlobalIndices(row));
             int n_indices = 0;
@@ -1824,9 +1824,9 @@ namespace TrilinosWrappers
         TrilinosScalar *value_ptr, *rhs_value_ptr;
         int            *index_ptr, *rhs_index_ptr;
         int             ierr = rhs.matrix->ExtractMyRowView(row_local,
-                                                rhs_n_entries,
-                                                rhs_value_ptr,
-                                                rhs_index_ptr);
+                                                            rhs_n_entries,
+                                                            rhs_value_ptr,
+                                                            rhs_index_ptr);
         Assert(ierr == 0, ExcTrilinosError(ierr));
 
         ierr =
@@ -1982,7 +1982,7 @@ namespace TrilinosWrappers
                           "ghost elements?"));
       }
     } // namespace SparseMatrixImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
   template <typename VectorType>
@@ -3001,7 +3001,7 @@ namespace TrilinosWrappers
       }
 
     } // namespace LinearOperatorImplementation
-  }   /* namespace internal */
+  } /* namespace internal */
 } /* namespace TrilinosWrappers */
 
 

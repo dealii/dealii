@@ -522,9 +522,9 @@ namespace internal
       // sure we get all
       // bits
       if (sizeof(material_id) > sizeof(boundary_id))
-        ar &material_id;
+        ar & material_id;
       else
-        ar &boundary_id;
+        ar & boundary_id;
     }
 
 
@@ -629,7 +629,7 @@ namespace internal
     TriaObjects::UserData::serialize(Archive &ar, const unsigned int)
     {
       // serialize this as an integer
-      ar &i;
+      ar & i;
     }
 
 
@@ -638,17 +638,17 @@ namespace internal
     void
     TriaObjects::serialize(Archive &ar, const unsigned int)
     {
-      ar                                   &structdim;
-      ar                                   &children_per_object;
-      ar                                   &faces_per_object;
-      ar &bounding_objects                 &children;
-      ar                                   &refinement_cases;
-      ar                                   &used;
-      ar                                   &user_flags;
-      ar                                   &boundary_or_material_id;
-      ar                                   &manifold_id;
-      ar &next_free_single &next_free_pair &reverse_order_next_free_single;
-      ar &user_data                        &user_data_type;
+      ar & structdim;
+      ar & children_per_object;
+      ar & faces_per_object;
+      ar & bounding_objects & children;
+      ar & refinement_cases;
+      ar & used;
+      ar & user_flags;
+      ar & boundary_or_material_id;
+      ar & manifold_id;
+      ar & next_free_single & next_free_pair & reverse_order_next_free_single;
+      ar & user_data & user_data_type;
     }
 
 

@@ -398,7 +398,7 @@ ChunkSparsityPattern::row_length(const size_type i) const
                                         sparsity_pattern.begin(i / chunk_size),
                                       end =
                                         sparsity_pattern.end(i / chunk_size);
-      unsigned int n = 0;
+      unsigned int                    n = 0;
       for (; p != end; ++p)
         if (p->column() != sparsity_pattern.n_cols() - 1)
           n += chunk_size;

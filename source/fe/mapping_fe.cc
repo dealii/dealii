@@ -836,7 +836,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace MappingFEImplementation
+  } // namespace MappingFEImplementation
 } // namespace internal
 
 
@@ -1578,7 +1578,7 @@ namespace internal
                                 output_data);
       }
     } // namespace
-  }   // namespace MappingFEImplementation
+  } // namespace MappingFEImplementation
 } // namespace internal
 
 
@@ -1977,7 +1977,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace MappingFEImplementation
+  } // namespace MappingFEImplementation
 } // namespace internal
 
 

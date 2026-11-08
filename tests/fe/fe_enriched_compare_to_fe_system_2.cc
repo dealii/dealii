@@ -156,9 +156,9 @@ check_consistency(const Point<dim>     &p,
   const double         v_s = v_s0 + v_s1 * v_f1 + v_s2 * v_f2 + v_s3 * v_f3;
   const Tensor<1, dim> g_s = g_s0 + g_s1 * v_f1 + v_s1 * g_f1 + g_s2 * v_f2 +
                              v_s2 * g_f2 + g_s3 * v_f3 + v_s3 * g_f3;
-  Tensor<2, dim> op1 = outer_product(g_s1, g_f1),
-                 op2 = outer_product(g_s2, g_f2),
-                 op3 = outer_product(g_s3, g_f3);
+  Tensor<2, dim>       op1 = outer_product(g_s1, g_f1),
+                       op2 = outer_product(g_s2, g_f2),
+                       op3 = outer_product(g_s3, g_f3);
 
   const SymmetricTensor<2, dim> sp1 =
     symmetrize(op1) * 2.0; // symmetrize does [s+s^T]/2

@@ -93,7 +93,7 @@ test()
   Kokkos::View<Number *, MemorySpace::Default::kokkos_space> owned(
     "owned", rank == 0 ? 8 : 0);
   ArrayView<Number, MemorySpace::Default>             owned_view(owned.data(),
-                                                     owned.size());
+                                                                 owned.size());
   MemorySpace::Default::kokkos_space::execution_space exec;
   Kokkos::parallel_for(
     Kokkos::RangePolicy<decltype(exec)>(exec, 0, owned.size()),

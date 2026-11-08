@@ -52,8 +52,7 @@ export module dealii.external.symengine;
 
 #ifdef DEAL_II_WITH_SYMENGINE
 
-export
-{
+export {
   namespace SymEngine
   {
     using ::SymEngine::abs;

@@ -39,8 +39,8 @@ public:
   {
     auto point = polar_manifold.pull_back(space_point);
     Assert(point[0] >= 0., ExcInternalError());
-    point[0] = std::pow(point[0] + epsilon, 1. / grading) -
-               std::pow(epsilon, 1. / grading) + 1.e-14;
+    point[0]               = std::pow(point[0] + epsilon, 1. / grading) -
+                             std::pow(epsilon, 1. / grading) + 1.e-14;
     const auto chart_point = polar_manifold.push_forward(point);
     return chart_point;
   }
@@ -50,7 +50,7 @@ public:
   {
     auto point = polar_manifold.pull_back(chart_point);
     point[0]   = std::pow(point[0] + std::pow(epsilon, 1. / grading), grading) -
-               epsilon + 1.e-14;
+                 epsilon + 1.e-14;
     Assert(point[0] >= 0., ExcInternalError());
     return polar_manifold.push_forward(point);
   }

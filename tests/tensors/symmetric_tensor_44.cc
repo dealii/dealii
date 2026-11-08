@@ -42,11 +42,9 @@ fill_tensor(Tensor<rank, dim, NumberType> &t)
 }
 
 template <int dim,
-          template <int, int, typename>
-          class TensorType1,
+          template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 void
 print(const TensorType1<2, dim, NumberType1> &t2,
@@ -57,11 +55,9 @@ print(const TensorType1<2, dim, NumberType1> &t2,
 }
 
 template <int dim,
-          template <int, int, typename>
-          class TensorType1,
+          template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 void
 print(const TensorType1<2, dim, NumberType1> &t2_1,
@@ -77,8 +73,7 @@ print(const TensorType1<2, dim, NumberType1> &t2_1,
 
 
 template <template <int, int, typename> class TensorType1,
-          template <int, int, typename>
-          class TensorType2>
+          template <int, int, typename> class TensorType2>
 struct AreSame : std::false_type
 {};
 
@@ -89,8 +84,7 @@ struct AreSame<TensorType1, TensorType1> : std::true_type
 
 template <template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 void
 test_one()
@@ -125,8 +119,7 @@ test_one()
 
 template <template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 std::enable_if_t<AreSame<TensorType1, TensorType2>::value>
 test_two()
@@ -179,8 +172,7 @@ test_two()
 
 template <template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 std::enable_if_t<!AreSame<TensorType1, TensorType2>::value>
 test_two()
@@ -188,8 +180,7 @@ test_two()
 
 template <template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 std::enable_if_t<(AreSame<TensorType1, SymmetricTensor>::value &&
                   AreSame<TensorType2, SymmetricTensor>::value)>
@@ -213,8 +204,7 @@ test_three()
 
 template <template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 std::enable_if_t<!(AreSame<TensorType1, SymmetricTensor>::value &&
                    AreSame<TensorType2, SymmetricTensor>::value)>
@@ -224,8 +214,7 @@ test_three()
 
 template <template <int, int, typename> class TensorType1,
           typename NumberType1,
-          template <int, int, typename>
-          class TensorType2,
+          template <int, int, typename> class TensorType2,
           typename NumberType2>
 void
 test_all()

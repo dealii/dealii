@@ -414,9 +414,9 @@ MGTransferComponentBase::build(const DoFHandler<dim, spacedim> &mg_dof)
                         begin = prolongation_matrices[level]
                                   ->block(iblock, jblock)
                                   .begin(i),
-                        end = prolongation_matrices[level]
-                                ->block(iblock, jblock)
-                                .end(i);
+                        end   = prolongation_matrices[level]
+                                  ->block(iblock, jblock)
+                                  .end(i);
                       for (; begin != end; ++begin)
                         {
                           const types::global_dof_index column_number =

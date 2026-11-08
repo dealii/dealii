@@ -77,9 +77,9 @@ namespace internal
                             const double                     target_error,
                             const MPI_Comm                   mpi_communicator);
         } // namespace RefineAndCoarsenFixedFraction
-      }   // namespace GridRefinement
-    }     // namespace distributed
-  }       // namespace parallel
+      } // namespace GridRefinement
+    } // namespace distributed
+  } // namespace parallel
 } // namespace internal
 
 
@@ -213,7 +213,7 @@ namespace parallel
         const double                          bottom_fraction_of_error,
         const VectorTools::NormType           norm_type = VectorTools::L1_norm);
     } // namespace GridRefinement
-  }   // namespace distributed
+  } // namespace distributed
 } // namespace parallel
 
 

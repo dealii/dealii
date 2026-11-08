@@ -159,9 +159,9 @@ main(int argc, char **argv)
   psblas_rhs_vector.compress(VectorOperation::add);
 
   SolverControl        solver_control(1000,
-                               1e-6 * psblas_rhs_vector.l2_norm(),
-                               false,
-                               false);
+                                      1e-6 * psblas_rhs_vector.l2_norm(),
+                                      false,
+                                      false);
   SolverCG<VectorType> solver(solver_control);
 
   //  Use AMG preconditioner from PSBLAS

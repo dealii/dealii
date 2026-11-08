@@ -71,7 +71,7 @@ struct P
   void
   serialize(Archive &ar, const unsigned int)
   {
-    ar &c;
+    ar & c;
   }
 
   bool

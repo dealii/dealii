@@ -472,25 +472,25 @@ namespace internal
     void
     TriaLevel<dim, spacedim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &refine_flags &coarsen_flags;
+      ar & refine_flags & coarsen_flags;
 
-      ar &children_per_object;
-      ar &faces_per_object;
-      ar &vertices_per_object;
+      ar & children_per_object;
+      ar & faces_per_object;
+      ar & vertices_per_object;
 
       // do not serialize `active_cell_indices` and `vertex_indices_cache`
       // here. instead of storing them to the stream and re-reading them again
       // later, we just rebuild them in Triangulation::load()
 
-      ar &neighbor_levels;
-      ar &neighbor_indices;
-      ar &subdomain_ids;
-      ar &level_subdomain_ids;
-      ar &parents;
-      ar &direction_flags;
-      ar &cells;
-      ar &face_orientations;
-      ar &reference_cell;
+      ar & neighbor_levels;
+      ar & neighbor_indices;
+      ar & subdomain_ids;
+      ar & level_subdomain_ids;
+      ar & parents;
+      ar & direction_flags;
+      ar & cells;
+      ar & face_orientations;
+      ar & reference_cell;
 
       // we do need to resize them so they can be populated in the other
       // functions though.

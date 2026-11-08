@@ -44,8 +44,8 @@ namespace GridTools
      * Update vertex_to_cell_centers_directions, as returned by
      * GridTools::vertex_to_cell_centers_directions()
      */
-    update_vertex_to_cell_centers_directions =
-      update_vertex_to_cell_map | 0x002,
+    update_vertex_to_cell_centers_directions = update_vertex_to_cell_map |
+      0x002,
 
     /**
      * Update a mapping of used vertices.

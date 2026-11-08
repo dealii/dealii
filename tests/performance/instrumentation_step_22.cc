@@ -497,7 +497,7 @@ StokesProblem<dim>::solve()
       system_matrix, A_inverse);
 
     SolverControl            solver_control(solution.block(1).size(),
-                                 1e-6 * schur_rhs.l2_norm());
+                                            1e-6 * schur_rhs.l2_norm());
     SolverCG<Vector<double>> cg(solver_control);
 
     SparseILU<double> preconditioner;

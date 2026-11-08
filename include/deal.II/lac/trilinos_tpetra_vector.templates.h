@@ -46,7 +46,8 @@ namespace LinearAlgebra
     namespace internal
     {
       template <typename Number, typename MemorySpace>
-      VectorReference<Number, MemorySpace>::operator Number() const
+      VectorReference<Number, MemorySpace>::
+      operator Number() const
       {
         // Get the local index
         const TrilinosWrappers::types::int_type local_index =

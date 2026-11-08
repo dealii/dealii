@@ -225,10 +225,10 @@ ScaLAPACKMatrix<NumberType>::reinit(
     {
       // Get local sizes:
       n_local_rows    = numroc_(&n_rows,
-                             &row_block_size,
-                             &(grid->this_process_row),
-                             &first_process_row,
-                             &(grid->n_process_rows));
+                                &row_block_size,
+                                &(grid->this_process_row),
+                                &first_process_row,
+                                &(grid->n_process_rows));
       n_local_columns = numroc_(&n_columns,
                                 &column_block_size,
                                 &(grid->this_process_column),
@@ -379,9 +379,9 @@ ScaLAPACKMatrix<NumberType>::copy_from(const LAPACKFullMatrix<NumberType> &B,
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_from;
   const int ierr    = MPI_Comm_create_group(this->grid->mpi_communicator,
-                                         group_B,
-                                         mpi_tag,
-                                         &communicator_B);
+                                            group_B,
+                                            mpi_tag,
+                                            &communicator_B);
   AssertThrowMPI(ierr);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
@@ -552,9 +552,9 @@ ScaLAPACKMatrix<NumberType>::copy_to(LAPACKFullMatrix<NumberType> &B,
 
   const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to;
   const int ierr    = MPI_Comm_create_group(this->grid->mpi_communicator,
-                                         group_B,
-                                         mpi_tag,
-                                         &communicator_B);
+                                            group_B,
+                                            mpi_tag,
+                                            &communicator_B);
   AssertThrowMPI(ierr);
   int n_proc_rows_B = 1, n_proc_cols_B = 1;
   int this_process_row_B = -1, this_process_column_B = -1;
@@ -887,9 +887,9 @@ ScaLAPACKMatrix<NumberType>::copy_to(ScaLAPACKMatrix<NumberType> &dest) const
 
       const int mpi_tag = Utilities::MPI::internal::Tags::scalapack_copy_to2;
       ierr              = MPI_Comm_create_group(MPI_COMM_WORLD,
-                                   group_union,
-                                   mpi_tag,
-                                   &mpi_communicator_union);
+                                                group_union,
+                                                mpi_tag,
+                                                &mpi_communicator_union);
       AssertThrowMPI(ierr);
 
       /*
@@ -1270,10 +1270,10 @@ ScaLAPACKMatrix<NumberType>::compute_lu_factorization()
                                  &first_process_row,
                                  &(grid->n_process_rows));
       const int mp    = numroc_(&n_rows,
-                             &row_block_size,
-                             &(grid->this_process_row),
-                             &iarow,
-                             &(grid->n_process_rows));
+                                &row_block_size,
+                                &(grid->this_process_row),
+                                &iarow,
+                                &(grid->n_process_rows));
       ipiv.resize(mp + row_block_size);
 
       pgetrf(&n_rows,
@@ -2428,15 +2428,15 @@ ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
                                  &first_process_column,
                                  &(grid->n_process_columns));
       const int mp0   = numroc_(&n_rows,
-                              &row_block_size,
-                              &(grid->this_process_row),
-                              &iarow,
-                              &(grid->n_process_rows));
+                                &row_block_size,
+                                &(grid->this_process_row),
+                                &iarow,
+                                &(grid->n_process_rows));
       const int nq0   = numroc_(&n_columns,
-                              &column_block_size,
-                              &(grid->this_process_column),
-                              &iacol,
-                              &(grid->n_process_columns));
+                                &column_block_size,
+                                &(grid->this_process_column),
+                                &iacol,
+                                &(grid->n_process_columns));
 
       // type='M': compute largest absolute value
       // type='F' || type='E': compute Frobenius norm
@@ -2450,13 +2450,13 @@ ScaLAPACKMatrix<NumberType>::norm_general(const char type) const
       work.resize(lwork);
       const NumberType *A_loc = this->values.begin();
       res                     = plange(&type,
-                   &n_rows,
-                   &n_columns,
-                   A_loc,
-                   &submatrix_row,
-                   &submatrix_column,
-                   descriptor,
-                   work.data());
+                                       &n_rows,
+                                       &n_columns,
+                                       A_loc,
+                                       &submatrix_row,
+                                       &submatrix_column,
+                                       descriptor,
+                                       work.data());
     }
   grid->send_to_inactive(&res);
   return res;
@@ -2495,15 +2495,15 @@ ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
                                  &first_process_column,
                                  &(grid->n_process_columns));
       const int Np0   = numroc_(&n_columns /*+IROFFA*/,
-                              &row_block_size,
-                              &(grid->this_process_row),
-                              &IAROW,
-                              &(grid->n_process_rows));
+                                &row_block_size,
+                                &(grid->this_process_row),
+                                &IAROW,
+                                &(grid->n_process_rows));
       const int Nq0   = numroc_(&n_columns /*+ICOFFA*/,
-                              &column_block_size,
-                              &(grid->this_process_column),
-                              &IACOL,
-                              &(grid->n_process_columns));
+                                &column_block_size,
+                                &(grid->this_process_column),
+                                &IACOL,
+                                &(grid->n_process_columns));
 
       const int v1  = iceil_(&Np0, &row_block_size);
       const int ldw = (n_local_rows == n_local_columns) ?
@@ -2515,13 +2515,13 @@ ScaLAPACKMatrix<NumberType>::norm_symmetric(const char type) const
       work.resize(lwork);
       const NumberType *A_loc = this->values.begin();
       res                     = plansy(&type,
-                   &uplo,
-                   &n_columns,
-                   A_loc,
-                   &submatrix_row,
-                   &submatrix_column,
-                   descriptor,
-                   work.data());
+                                       &uplo,
+                                       &n_columns,
+                                       A_loc,
+                                       &submatrix_row,
+                                       &submatrix_column,
+                                       descriptor,
+                                       work.data());
     }
   grid->send_to_inactive(&res);
   return res;

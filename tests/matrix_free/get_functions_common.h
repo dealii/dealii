@@ -62,7 +62,7 @@ public:
     : data(data_in)
     , fe_val(data.get_dof_handler().get_fe(),
              Quadrature<dim>(data.get_quadrature(0)),
-             update_values | update_gradients | update_hessians){};
+             update_values | update_gradients | update_hessians) {};
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in,
                  const Mapping<dim>            &mapping)
@@ -70,7 +70,7 @@ public:
     , fe_val(mapping,
              data.get_dof_handler().get_fe(),
              Quadrature<dim>(data.get_quadrature(0)),
-             update_values | update_gradients | update_hessians){};
+             update_values | update_gradients | update_hessians) {};
 
   virtual ~MatrixFreeTest()
   {}
@@ -184,9 +184,9 @@ template <int dim, int fe_degree, typename Number>
 class MatrixFreeTest<dim, fe_degree, 0, Number>
 {
 public:
-  MatrixFreeTest(const MatrixFree<dim, Number> &){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &) {};
 
-  MatrixFreeTest(const MatrixFree<dim, Number> &, const Mapping<dim> &){};
+  MatrixFreeTest(const MatrixFree<dim, Number> &, const Mapping<dim> &) {};
 
   void
   cell_integration(Vector<Number> &,

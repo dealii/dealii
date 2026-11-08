@@ -473,8 +473,8 @@ namespace Utilities
         {
           int       communicators_same = 0;
           const int ierr               = MPI_Comm_compare(part.communicator,
-                                            communicator,
-                                            &communicators_same);
+                                                          communicator,
+                                                          &communicators_same);
           AssertThrowMPI(ierr);
           if (!(communicators_same == MPI_IDENT ||
                 communicators_same == MPI_CONGRUENT))

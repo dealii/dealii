@@ -148,9 +148,9 @@ namespace Step55
                                                  const VectorType &src) const
     {
       SolverControl             solver_control(src.size(),
-                                   1e-8 * src.l2_norm(),
-                                   false,
-                                   false);
+                                               1e-8 * src.l2_norm(),
+                                               false,
+                                               false);
       SolverCG<LA::MPI::Vector> cg(solver_control);
       dst = 0;
 
@@ -729,7 +729,7 @@ namespace Step55
                                       QGauss<dim>(velocity_degree + 2),
 #else
                                       QGaussSimplex<dim>(velocity_degree +
-                                                         1),    // TODO: +2
+                                                         1), // TODO: +2
 #endif
                                       locally_relevant_solution,
                                       dim);

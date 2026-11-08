@@ -81,8 +81,8 @@ namespace internal
                                                                 unpack);
         }
       } // namespace TriangulationImplementation
-    }   // namespace distributed
-  }     // namespace parallel
+    } // namespace distributed
+  } // namespace parallel
 } // namespace internal
 
 

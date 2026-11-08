@@ -384,9 +384,9 @@ namespace Step61
     const QGauss<dim - 1> face_quadrature_formula(fe_dgrt.degree + 1);
 
     FEValues<dim>     fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_quadrature_points |
-                              update_JxW_values);
+                                quadrature_formula,
+                                update_values | update_quadrature_points |
+                                  update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_normal_vectors |
@@ -394,10 +394,10 @@ namespace Step61
                                        update_JxW_values);
 
     FEValues<dim>     fe_values_dgrt(fe_dgrt,
-                                 quadrature_formula,
-                                 update_values | update_gradients |
-                                   update_quadrature_points |
-                                   update_JxW_values);
+                                     quadrature_formula,
+                                     update_values | update_gradients |
+                                       update_quadrature_points |
+                                       update_JxW_values);
     FEFaceValues<dim> fe_face_values_dgrt(fe_dgrt,
                                           face_quadrature_formula,
                                           update_values |

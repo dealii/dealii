@@ -72,10 +72,10 @@ run(const std::string &label)
     }
   MappingFE<dim - 1, dim> mapping(*fe);
   FEValues<dim - 1, dim>  fev(mapping,
-                             *fe,
-                             *quad,
-                             update_quadrature_points | update_normal_vectors |
-                               update_JxW_values);
+                              *fe,
+                              *quad,
+                              update_quadrature_points | update_normal_vectors |
+                                update_JxW_values);
 
   double integral = 0.0;
   for (const auto &cell : surf.active_cell_iterators())

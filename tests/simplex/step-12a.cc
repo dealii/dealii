@@ -124,7 +124,7 @@ namespace Step12
                 const FiniteElement<dim>  &fe,
                 const Quadrature<dim>     &quad,
                 const Quadrature<dim - 1> &quad_face,
-                const UpdateFlags          update_flags = update_values |
+                const UpdateFlags update_flags = update_values |
                                                  update_gradients |
                                                  update_quadrature_points |
                                                  update_JxW_values,
@@ -215,7 +215,7 @@ namespace Step12
 #ifdef HEX
     FE_DGQ<dim> fe;
 #else
-    FE_SimplexDGP<dim>   fe;
+    FE_SimplexDGP<dim> fe;
 #endif
     DoFHandler<dim> dof_handler;
 

@@ -310,9 +310,9 @@ namespace internal
               {
                 MPI_Status status;
                 int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                                     mpi_tag,
-                                     tria->get_mpi_communicator(),
-                                     &status);
+                                            mpi_tag,
+                                            tria->get_mpi_communicator(),
+                                            &status);
                 AssertThrowMPI(ierr);
                 int len;
                 ierr = MPI_Get_count(&status, MPI_BYTE, &len);
@@ -338,12 +338,12 @@ namespace internal
 
                 void *ptr = receive_buffer.data();
                 ierr      = MPI_Recv(ptr,
-                                len,
-                                MPI_BYTE,
-                                status.MPI_SOURCE,
-                                status.MPI_TAG,
-                                tria->get_mpi_communicator(),
-                                &status);
+                                     len,
+                                     MPI_BYTE,
+                                     status.MPI_SOURCE,
+                                     status.MPI_TAG,
+                                     tria->get_mpi_communicator(),
+                                     &status);
                 AssertThrowMPI(ierr);
 
                 for (const auto &dof_pair : receive_buffer)

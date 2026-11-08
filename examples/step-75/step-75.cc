@@ -160,8 +160,8 @@ namespace Step75
     struct
     {
       MGTransferGlobalCoarseningTools::PolynomialCoarseningSequenceType
-        p_sequence = MGTransferGlobalCoarseningTools::
-          PolynomialCoarseningSequenceType::decrease_by_one;
+           p_sequence = MGTransferGlobalCoarseningTools::
+             PolynomialCoarseningSequenceType::decrease_by_one;
       bool perform_h_transfer = true;
     } transfer;
   };
@@ -566,7 +566,7 @@ namespace Step75
     const unsigned int max_level = mg_matrices.max_level();
 
     using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
-    using SmootherType               = PreconditionChebyshev<LevelMatrixType,
+    using SmootherType = PreconditionChebyshev<LevelMatrixType,
                                                VectorType,
                                                SmootherPreconditionerType>;
     using PreconditionerType = PreconditionMG<dim, VectorType, MGTransferType>;

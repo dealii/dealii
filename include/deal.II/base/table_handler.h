@@ -846,31 +846,31 @@ namespace internal
       {
         const int p = std::get<int>(value);
         char      c = 'i';
-        ar &c    &p;
+        ar & c & p;
       }
     else if (std::holds_alternative<unsigned int>(value))
       {
         const unsigned int p = std::get<unsigned int>(value);
         char               c = 'u';
-        ar &c             &p;
+        ar & c & p;
       }
     else if (std::holds_alternative<double>(value))
       {
         const double p = std::get<double>(value);
         char         c = 'd';
-        ar &c       &p;
+        ar & c & p;
       }
     else if (std::holds_alternative<std::string>(value))
       {
         const std::string p = std::get<std::string>(value);
         char              c = 's';
-        ar &c            &p;
+        ar & c & p;
       }
     else if (std::holds_alternative<std::uint64_t>(value))
       {
         const std::uint64_t p = std::get<std::uint64_t>(value);
         char                c = 'l';
-        ar &c              &p;
+        ar & c & p;
       }
     else
       DEAL_II_ASSERT_UNREACHABLE();
@@ -887,14 +887,14 @@ namespace internal
     // as a one-character id, and then read
     // the data
     char c;
-    ar  &c;
+    ar & c;
 
     switch (c)
       {
         case 'i':
           {
             int val;
-            ar &val;
+            ar & val;
             value = val;
             break;
           }
@@ -902,7 +902,7 @@ namespace internal
         case 'u':
           {
             unsigned int val;
-            ar          &val;
+            ar & val;
             value = val;
             break;
           }
@@ -910,7 +910,7 @@ namespace internal
         case 'd':
           {
             double val;
-            ar    &val;
+            ar & val;
             value = val;
             break;
           }
@@ -918,7 +918,7 @@ namespace internal
         case 's':
           {
             std::string val;
-            ar         &val;
+            ar & val;
             value = val;
             break;
           }
@@ -926,7 +926,7 @@ namespace internal
         case 'l':
           {
             std::uint64_t val;
-            ar           &val;
+            ar & val;
             value = val;
             break;
           }
@@ -984,7 +984,8 @@ template <class Archive>
 void
 TableHandler::Column::save(Archive &ar, const unsigned int /*version*/) const
 {
-  ar &entries &tex_caption &tex_format &precision &scientific &flag &max_length;
+  ar & entries & tex_caption & tex_format & precision & scientific & flag &
+    max_length;
 }
 
 
@@ -993,7 +994,8 @@ template <class Archive>
 void
 TableHandler::Column::load(Archive &ar, const unsigned int /*version*/)
 {
-  ar &entries &tex_caption &tex_format &precision &scientific &flag &max_length;
+  ar & entries & tex_caption & tex_format & precision & scientific & flag &
+    max_length;
   invalidate_cache();
 }
 
@@ -1002,8 +1004,8 @@ template <class Archive>
 void
 TableHandler::serialize(Archive &ar, const unsigned int)
 {
-  ar &column_order &columns &supercolumns &tex_supercaptions &tex_table_caption
-    &tex_table_label &auto_fill_mode;
+  ar & column_order & columns & supercolumns & tex_supercaptions &
+    tex_table_caption & tex_table_label & auto_fill_mode;
 }
 
 

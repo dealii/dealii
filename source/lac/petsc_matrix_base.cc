@@ -696,7 +696,8 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::operator Mat() const
+  MatrixBase::
+  operator Mat() const
   {
     return matrix;
   }

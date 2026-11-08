@@ -110,7 +110,7 @@ struct ScratchData
               const hp::FECollection<dim>      &fe,
               const hp::QCollection<dim>       &quadrature,
               const hp::QCollection<dim - 1>   &quadrature_face,
-              const UpdateFlags                 update_flags = update_values |
+              const UpdateFlags update_flags = update_values |
                                                update_gradients |
                                                update_quadrature_points |
                                                update_JxW_values,

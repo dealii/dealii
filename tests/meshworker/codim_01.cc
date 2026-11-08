@@ -38,7 +38,7 @@ template <int dim, int spacedim>
 class TestIntegrator : public MeshWorker::LocalIntegrator<dim, spacedim>
 {
 public:
-  TestIntegrator(){};
+  TestIntegrator() {};
 
   void
   cell(MeshWorker::DoFInfo<dim, spacedim>                  &dinfo,

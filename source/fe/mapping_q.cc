@@ -1639,9 +1639,9 @@ MappingQ<3, 3>::add_quad_support_points(
 
       if constexpr (running_in_debug_mode())
         {
-          const bool face_orientation = cell->face_orientation(face_no),
-                     face_flip        = cell->face_flip(face_no),
-                     face_rotation    = cell->face_rotation(face_no);
+          const bool         face_orientation = cell->face_orientation(face_no),
+                             face_flip        = cell->face_flip(face_no),
+                             face_rotation    = cell->face_rotation(face_no);
           const unsigned int vertices_per_face =
                                GeometryInfo<3>::vertices_per_face,
                              lines_per_face = GeometryInfo<3>::lines_per_face;

@@ -803,7 +803,7 @@ namespace VectorTools
         get_position_vector(map_q, dhq, eulerq);
 
         FullMatrix<double>             transfer(fe.n_dofs_per_cell(),
-                                    feq.n_dofs_per_cell());
+                                                feq.n_dofs_per_cell());
         FullMatrix<double>             local_transfer(feq.n_dofs_per_cell());
         const std::vector<Point<dim>> &points = feq.get_unit_support_points();
 

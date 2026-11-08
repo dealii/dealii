@@ -27,8 +27,8 @@ struct TestObject
   void
   serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &int_vector;
-    ar &string;
+    ar & int_vector;
+    ar & string;
   }
 
   friend std::ostream &

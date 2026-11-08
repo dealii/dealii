@@ -274,10 +274,10 @@ namespace Step20
     MappingFE<dim>         mapping(FE_SimplexDGP<dim>(1));
 
     FEValues<dim>     fe_values(mapping,
-                            fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                                fe,
+                                quadrature_formula,
+                                update_values | update_gradients |
+                                  update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(mapping,
                                      fe,
                                      face_quadrature_formula,

@@ -175,7 +175,7 @@ namespace internal
     void
     DoFFaces<2>::serialize(Archive &ar, const unsigned int)
     {
-      ar &lines;
+      ar & lines;
     }
 
 
@@ -183,7 +183,7 @@ namespace internal
     void
     DoFFaces<3>::serialize(Archive &ar, const unsigned int)
     {
-      ar &lines &quads;
+      ar & lines & quads;
     }
 
   } // namespace DoFHandlerImplementation

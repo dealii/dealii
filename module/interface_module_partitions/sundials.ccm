@@ -61,8 +61,7 @@ export module dealii.external.sundials;
 
 #ifdef DEAL_II_WITH_SUNDIALS
 
-export
-{
+export {
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
 #    undef sunbooleantype
   using sunbooleantype = int;

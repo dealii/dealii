@@ -140,9 +140,9 @@ namespace PSCToolkitWrappers
         // Insert the indexes into the descriptor
         psblas_context = InitFinalize::get_psblas_context();
         ierr           = psb_c_cdall_vl(number_of_local_indexes,
-                              vl.data(),
-                              *psblas_context,
-                              psblas_descriptor.get());
+                                        vl.data(),
+                                        *psblas_context,
+                                        psblas_descriptor.get());
 
         // Free the vl array
         Assert(ierr == 0, ExcInitializePSBLASDescriptor(ierr));
@@ -240,10 +240,10 @@ namespace PSCToolkitWrappers
         // Insert the indexes into the descriptor
         psblas_context = InitFinalize::get_psblas_context();
         ierr           = psb_c_cdall_vl_lidx(number_of_local_indexes,
-                                   vl.data(),
-                                   lidx.data(),
-                                   *psblas_context,
-                                   psblas_descriptor.get());
+                                             vl.data(),
+                                             lidx.data(),
+                                             *psblas_context,
+                                             psblas_descriptor.get());
 
         Assert(ierr == 0, ExcInitializePSBLASDescriptor(ierr));
 

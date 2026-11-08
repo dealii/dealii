@@ -38,8 +38,7 @@ export module dealii.external.slepc;
 
 #ifdef DEAL_II_WITH_SLEPC
 
-export
-{
+export {
   using ::EPS;
   using ::EPSArnoldiSetDelayed;
   using ::EPSComputeError;

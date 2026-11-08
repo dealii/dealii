@@ -718,13 +718,13 @@ namespace Step83
   void CathodeRaySimulator<dim>::serialize(Archive &ar,
                                            const unsigned int /* version */)
   {
-    ar &solution;
-    ar &particle_handler;
-    ar &next_unused_particle_id;
-    ar &n_recently_lost_particles;
-    ar &n_total_lost_particles;
-    ar &n_particles_lost_through_anode;
-    ar &time;
+    ar & solution;
+    ar & particle_handler;
+    ar & next_unused_particle_id;
+    ar & n_recently_lost_particles;
+    ar & n_total_lost_particles;
+    ar & n_particles_lost_through_anode;
+    ar & time;
   }
 
 

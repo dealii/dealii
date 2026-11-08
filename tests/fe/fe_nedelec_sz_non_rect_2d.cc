@@ -206,10 +206,10 @@ namespace polytest
   {
     const QGauss<dim> test_quad(quad_order);
     FEValues<dim>     fe_values_test(fe,
-                                 test_quad,
-                                 update_values | update_gradients |
-                                   update_quadrature_points |
-                                   update_JxW_values);
+                                     test_quad,
+                                     update_values | update_gradients |
+                                       update_quadrature_points |
+                                       update_JxW_values);
 
     const QGauss<dim>  quadrature_formula(quad_order);
     const unsigned int n_q_points = quadrature_formula.size();

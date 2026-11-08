@@ -311,7 +311,7 @@ namespace dealii
                   (j + 0) * (repetitions[0] + 1) + i + 1, //
                   (j + 1) * (repetitions[0] + 1) + i + 0, //
                   (j + 1) * (repetitions[0] + 1) + i + 1  //
-                }};                                       //
+                }}; //
 
                 if (j < repetitions[1] / 2 && i < repetitions[0] / 2)
                   {

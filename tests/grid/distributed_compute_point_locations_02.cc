@@ -196,8 +196,8 @@ test_compute_pt_loc(unsigned int ref_cube, unsigned int ref_sphere)
                 {
                   const auto &pt    = output_points[c][pt_idx];
                   auto        pt_it = std::find(computed_points[c_cell].begin(),
-                                         computed_points[c_cell].end(),
-                                         pt);
+                                                computed_points[c_cell].end(),
+                                                pt);
                   if (pt_it == computed_points[c_cell].end())
                     {
                       deallog << "ERROR: point " << pt << " not found"

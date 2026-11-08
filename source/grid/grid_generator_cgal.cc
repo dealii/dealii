@@ -170,7 +170,7 @@ namespace GridGenerator
     using Mesh_domain =
       CGAL::Polyhedral_mesh_domain_with_features_3<K,
                                                    CGAL::Surface_mesh<Point_3>>;
-    using Tr            = CGAL::Mesh_triangulation_3<Mesh_domain,
+    using Tr = CGAL::Mesh_triangulation_3<Mesh_domain,
                                           CGAL::Default,
                                           CGALWrappers::ConcurrencyTag>::type;
     using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;

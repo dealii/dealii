@@ -113,7 +113,7 @@ public:
               EvaluationFlags::gradients));
   };
 
-  virtual ~MatrixFreeTest(){};
+  virtual ~MatrixFreeTest() {};
 
   void
   operator()(const MatrixFree<dim, Number>               &data,
@@ -206,10 +206,10 @@ do_test(const DoFHandler<dim>           &dof,
 
   const MappingQ<dim> mapping(fe_degree + 2);
   FEValues<dim>       fe_val(mapping,
-                       dof.get_fe(),
-                       Quadrature<dim>(mf_data.get_quadrature(0)),
-                       update_values | update_gradients | update_piola |
-                         update_JxW_values);
+                             dof.get_fe(),
+                             Quadrature<dim>(mf_data.get_quadrature(0)),
+                             update_values | update_gradients | update_piola |
+                               update_JxW_values);
 
   const unsigned int dofs_per_cell = fe_val.get_fe().dofs_per_cell;
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);

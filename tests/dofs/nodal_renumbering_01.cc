@@ -151,7 +151,7 @@ main(int argc, char **argv)
     GridGenerator::cube_and_pyramid(tria);
 
     hp::FECollection<2>      fe(FESystem<2>(FE_Q<2>(1), 2),
-                           FESystem<2>(FE_SimplexP<2>(1), 2));
+                                FESystem<2>(FE_SimplexP<2>(1), 2));
     hp::MappingCollection<2> mappings(MappingQ<2>(1),
                                       MappingFE<2>(FE_SimplexP<2>(1)));
     DoFHandler<2>            dof_handler(tria);
@@ -201,8 +201,8 @@ main(int argc, char **argv)
     tria.execute_coarsening_and_refinement();
 
     hp::FECollection<2>      fe(FESystem<2>(FE_Q<2>(2), 2),
-                           FESystem<2>(FE_Q<2>(4), 2),
-                           FESystem<2>(FE_Nothing<2>(), 2));
+                                FESystem<2>(FE_Q<2>(4), 2),
+                                FESystem<2>(FE_Nothing<2>(), 2));
     hp::MappingCollection<2> mappings(MappingQ<2>(1),
                                       MappingQ<2>(1),
                                       MappingQ<2>(1));

@@ -64,7 +64,7 @@ namespace internal
       class PolicyBase;
       struct Implementation;
     } // namespace Policy
-  }   // namespace DoFHandlerImplementation
+  } // namespace DoFHandlerImplementation
 
   namespace DoFAccessorImplementation
   {
@@ -1775,7 +1775,7 @@ namespace internal
         "No FiniteElement has been found in your FECollection that is "
         "dominated by all children of a cell you are trying to coarsen!");
     } // namespace DoFHandlerImplementation
-  }   // namespace hp
+  } // namespace hp
 } // namespace internal
 
 #ifndef DOXYGEN
@@ -1984,12 +1984,12 @@ void DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
       ar &this->hp_cell_active_fe_indices;
       ar &this->hp_cell_future_fe_indices;
 
-      ar &hp_object_fe_ptr;
-      ar &hp_object_fe_indices;
+      ar & hp_object_fe_ptr;
+      ar & hp_object_fe_indices;
 
-      ar &number_cache;
+      ar & number_cache;
 
-      ar &mg_number_cache;
+      ar & mg_number_cache;
 
       // write out the number of triangulation cells and later check during
       // loading that this number is indeed correct; same with something that
@@ -1998,12 +1998,12 @@ void DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
       std::string        policy_name =
         dealii::internal::policy_to_string(*this->policy);
 
-      ar &n_cells &policy_name;
+      ar & n_cells & policy_name;
     }
   else
     {
       // Ignore BlockInfo: it will be recomputed on first access
-      ar &number_cache;
+      ar & number_cache;
 
       ar &this->object_dof_indices;
       ar &this->object_dof_ptr;
@@ -2015,7 +2015,7 @@ void DoFHandler<dim, spacedim>::save(Archive &ar, const unsigned int) const
       std::string  fe_name     = this->get_fe(0).get_name();
       std::string  policy_name = internal::policy_to_string(*this->policy);
 
-      ar &n_cells &fe_name &policy_name;
+      ar & n_cells & fe_name & policy_name;
     }
 }
 
@@ -2034,19 +2034,19 @@ void DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
       ar &this->hp_cell_active_fe_indices;
       ar &this->hp_cell_future_fe_indices;
 
-      ar &hp_object_fe_ptr;
-      ar &hp_object_fe_indices;
+      ar & hp_object_fe_ptr;
+      ar & hp_object_fe_indices;
 
-      ar &number_cache;
+      ar & number_cache;
 
-      ar &mg_number_cache;
+      ar & mg_number_cache;
 
       // these are the checks that correspond to the last block in the save()
       // function
       unsigned int n_cells;
       std::string  policy_name;
 
-      ar &n_cells &policy_name;
+      ar & n_cells & policy_name;
 
       AssertThrow(
         n_cells == this->tria->n_cells(),
@@ -2064,7 +2064,7 @@ void DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
   else
     {
       // Ignore BlockInfo: it will be recomputed on first access
-      ar &number_cache;
+      ar & number_cache;
 
       object_dof_indices.clear();
 
@@ -2079,7 +2079,7 @@ void DoFHandler<dim, spacedim>::load(Archive &ar, const unsigned int)
       std::string  fe_name;
       std::string  policy_name;
 
-      ar &n_cells &fe_name &policy_name;
+      ar & n_cells & fe_name & policy_name;
 
       AssertThrow(
         n_cells == this->tria->n_cells(),

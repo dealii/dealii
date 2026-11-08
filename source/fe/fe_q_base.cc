@@ -74,7 +74,7 @@ namespace internal
             }
       }
     } // namespace
-  }   // namespace FE_Q_Base
+  } // namespace FE_Q_Base
 } // namespace internal
 
 

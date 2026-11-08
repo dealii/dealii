@@ -1127,9 +1127,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                   double *values;
                   int    *local_cols;
                   int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
-                                                              num_entries,
-                                                              values,
-                                                              local_cols);
+                                                                  num_entries,
+                                                                  values,
+                                                                  local_cols);
                   (void)ierr;
                   Assert(
                     ierr == 0,
@@ -1262,9 +1262,9 @@ SparseDirectMUMPS::initialize_matrix(const Matrix &matrix)
                   double *values;
                   int    *local_cols;
                   int     ierr = trilinos_matrix.ExtractMyRowView(local_row,
-                                                              num_entries,
-                                                              values,
-                                                              local_cols);
+                                                                  num_entries,
+                                                                  values,
+                                                                  local_cols);
                   (void)ierr;
                   Assert(
                     ierr == 0,

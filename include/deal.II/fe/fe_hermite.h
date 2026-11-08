@@ -259,9 +259,9 @@ protected:
   {
     std::unique_ptr<typename FiniteElement<dim, spacedim>::InternalDataBase>
           data_ptr = FE_Poly<dim, spacedim>::get_data(update_flags,
-                                                  mapping,
-                                                  quadrature,
-                                                  output_data);
+                                                      mapping,
+                                                      quadrature,
+                                                      output_data);
     auto &data =
       dynamic_cast<typename FE_Poly<dim, spacedim>::InternalData &>(*data_ptr);
 

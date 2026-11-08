@@ -50,7 +50,7 @@ namespace internal
         return std::vector<Point<1>>();
       }
     } // namespace
-  }   // namespace FE_Q
+  } // namespace FE_Q
 } // namespace internal
 
 

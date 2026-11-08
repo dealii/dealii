@@ -22,8 +22,8 @@
 void
 test()
 {
-  unsigned int index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1,
-               index6 = 7, index7 = 6;
+  unsigned int    index1 = 3, index2 = 4, index3 = 2, index4 = 5, index5 = 1,
+                  index6 = 7, index7 = 6;
   TableIndices<7> indices1(
     index1, index2, index3, index4, index5, index6, index7);
   unsigned int sum_of_indices =

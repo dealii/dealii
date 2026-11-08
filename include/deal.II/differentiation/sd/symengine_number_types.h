@@ -837,13 +837,15 @@ namespace Differentiation
        * @endcode
        */
       template <typename ResultType>
-      explicit operator ResultType() const;
+      explicit
+      operator ResultType() const;
 
       /**
        * Conversion operator that returns the value or expression that this
        * class instance represents.
        */
-      explicit operator const SymEngine::Expression &() const;
+      explicit
+      operator const SymEngine::Expression &() const;
 
       /**
        * Conversion operator that returns a SymEngine reference counted pointer
@@ -1252,7 +1254,7 @@ namespace Differentiation
       std::stringstream sstream;
       sstream << *this;
       const std::string expr = sstream.str();
-      ar               &expr;
+      ar & expr;
     }
 
 
@@ -1261,7 +1263,7 @@ namespace Differentiation
     Expression::load(Archive &ar, const unsigned int /*version*/)
     {
       std::string expr;
-      ar         &expr;
+      ar & expr;
       parse(expr);
     }
 
@@ -1345,7 +1347,8 @@ namespace Differentiation
 
 
     template <typename ResultType>
-    Expression::operator ResultType() const
+    Expression::
+    operator ResultType() const
     {
       return static_cast<ResultType>(get_expression());
     }

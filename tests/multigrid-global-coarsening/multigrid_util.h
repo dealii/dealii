@@ -325,9 +325,9 @@ mg_solve(SolverControl                        &solver_control,
 
   using Number                     = typename VectorType::value_type;
   using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
-  using SmootherType               = PreconditionChebyshev<LevelMatrixType,
-                                             VectorType,
-                                             SmootherPreconditionerType>;
+  using SmootherType       = PreconditionChebyshev<LevelMatrixType,
+                                                   VectorType,
+                                                   SmootherPreconditionerType>;
   using PreconditionerType = PreconditionMG<dim, VectorType, MGTransferType>;
 
   // Initialize level operators.
@@ -354,10 +354,10 @@ mg_solve(SolverControl                        &solver_control,
 
   // Initialize coarse-grid solver.
   ReductionControl     coarse_grid_solver_control(mg_data.coarse_solver.maxiter,
-                                              mg_data.coarse_solver.abstol,
-                                              mg_data.coarse_solver.reltol,
-                                              false,
-                                              false);
+                                                  mg_data.coarse_solver.abstol,
+                                                  mg_data.coarse_solver.reltol,
+                                                  false,
+                                                  false);
   SolverCG<VectorType> coarse_grid_solver(coarse_grid_solver_control);
 
   PreconditionIdentity precondition_identity;

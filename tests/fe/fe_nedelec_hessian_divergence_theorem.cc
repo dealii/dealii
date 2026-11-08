@@ -69,12 +69,12 @@ test(const Triangulation<dim> &tr,
 
   const QGauss<dim> quadrature(4);
   FEValues<dim>     fe_values(fe,
-                          quadrature,
-                          update_hessians | update_quadrature_points |
-                            update_JxW_values);
+                              quadrature,
+                              update_hessians | update_quadrature_points |
+                                update_JxW_values);
 
   const QGauss<dim - 1> face_quadrature(4);
-  FEFaceValues<dim>     fe_face_values(fe,
+  FEFaceValues<dim> fe_face_values(fe,
                                    face_quadrature,
                                    update_gradients | update_quadrature_points |
                                      update_normal_vectors | update_JxW_values);

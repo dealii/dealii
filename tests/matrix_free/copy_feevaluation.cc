@@ -56,7 +56,7 @@ public:
   using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_apply(const MatrixFree<dim, Number>               &data,
@@ -71,7 +71,7 @@ public:
     velocity.push_back(
       FEEvaluation<dim, degree_p + 1, degree_p + 2, dim, Number>(data, 0));
     AlignedVector<FEEvaluation<dim, degree_p, degree_p + 2, 1, Number>>
-                                                         pressure(1,
+      pressure(1,
                FEEvaluation<dim, degree_p, degree_p + 2, 1, Number>(data, 1));
     FEEvaluation<dim, degree_p, degree_p + 2, 1, Number> pressure2(data, 1);
     pressure2 = pressure[0];

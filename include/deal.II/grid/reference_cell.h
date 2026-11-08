@@ -852,8 +852,8 @@ public:
    */
   template <typename T, std::size_t N>
   DEAL_II_DEPRECATED types::geometric_orientation
-                     compute_orientation(const std::array<T, N> &vertices_0,
-                                         const std::array<T, N> &vertices_1) const;
+  compute_orientation(const std::array<T, N> &vertices_0,
+                      const std::array<T, N> &vertices_1) const;
 
   /**
    * Determine the relative orientation of the current entity described by its
@@ -1077,7 +1077,8 @@ public:
   /**
    * Conversion operator to an integer.
    */
-  constexpr operator std::uint8_t() const;
+  constexpr
+  operator std::uint8_t() const;
 
   /**
    * Operator for equality comparison.
@@ -1266,7 +1267,8 @@ inline constexpr ReferenceCell<dim>::ReferenceCell(const std::uint8_t kind)
 
 
 template <int dim>
-inline constexpr ReferenceCell<dim>::operator std::uint8_t() const
+inline constexpr ReferenceCell<dim>::
+operator std::uint8_t() const
 {
   return kind;
 }
@@ -1482,7 +1484,7 @@ template <class Archive>
 inline void
 ReferenceCell<dim>::serialize(Archive &archive, const unsigned int /*version*/)
 {
-  archive &kind;
+  archive & kind;
 }
 
 
@@ -4360,8 +4362,8 @@ ReferenceCell<dim>::face_to_cell_line_orientation(
           case ReferenceCells::Tetrahedron:
             {
               static constexpr dealii::ndarray<unsigned int, 4, 3>
-                combined_lines{
-                  {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
+                         combined_lines{
+                           {{{0, 0, 0}}, {{X, 0, 1}}, {{X, 0, X}}, {{X, X, X}}}};
               const auto combined_line = combined_lines[face_no][face_line_no];
 
               Assert(

@@ -130,9 +130,9 @@ test()
   Vector<double> local_rhs(fe.dofs_per_cell);
   QGauss<dim>    quadrature(3);
   FEValues<dim>  fe_values(fe,
-                          quadrature,
-                          update_values | update_JxW_values |
-                            update_quadrature_points);
+                           quadrature,
+                           update_values | update_JxW_values |
+                             update_quadrature_points);
   for (typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
        ++cell)

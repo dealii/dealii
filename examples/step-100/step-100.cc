@@ -645,13 +645,13 @@ namespace Step100
     const unsigned int    n_face_q_points = face_quadrature_formula.size();
 
     FEValues<dim>     fe_values_trial_interior(fe_trial_interior,
-                                           quadrature_formula,
-                                           update_values |
-                                             update_quadrature_points |
-                                             update_JxW_values);
+                                               quadrature_formula,
+                                               update_values |
+                                                 update_quadrature_points |
+                                                 update_JxW_values);
     FEValues<dim>     fe_values_test(fe_test,
-                                 quadrature_formula,
-                                 update_values | update_gradients);
+                                     quadrature_formula,
+                                     update_values | update_gradients);
     FEFaceValues<dim> fe_values_trial_skeleton(fe_trial_skeleton,
                                                face_quadrature_formula,
                                                update_values |
@@ -1566,17 +1566,17 @@ namespace Step100
   {
     QGauss<dim>           quadrature_formula(fe_test.degree + 1);
     FEValues<dim>         fe_values_trial_interior(fe_trial_interior,
-                                           quadrature_formula,
-                                           update_values |
-                                             update_quadrature_points |
-                                             update_JxW_values);
+                                                   quadrature_formula,
+                                                   update_values |
+                                                     update_quadrature_points |
+                                                     update_JxW_values);
     const QGauss<dim - 1> face_quadrature_formula(fe_test.degree + 1);
     FEFaceValues<dim>     fe_values_trial_skeleton(fe_trial_skeleton,
-                                               face_quadrature_formula,
-                                               update_values |
-                                                 update_quadrature_points |
-                                                 update_normal_vectors |
-                                                 update_JxW_values);
+                                                   face_quadrature_formula,
+                                                   update_values |
+                                                     update_quadrature_points |
+                                                     update_normal_vectors |
+                                                     update_JxW_values);
 
     const unsigned int n_q_points      = quadrature_formula.size();
     const unsigned int n_face_q_points = face_quadrature_formula.size();

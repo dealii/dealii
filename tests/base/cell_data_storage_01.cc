@@ -57,8 +57,8 @@ public:
 class MyQData
 {
 public:
-  MyQData(){};
-  virtual ~MyQData(){};
+  MyQData() {};
+  virtual ~MyQData() {};
 
   double value;
 };

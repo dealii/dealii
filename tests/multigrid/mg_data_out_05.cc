@@ -103,7 +103,7 @@ do_test()
   }
 
   {
-    MGLevelObject<VectorType>         dof_vector(0,
+    MGLevelObject<VectorType> dof_vector(0,
                                          triangulation.n_global_levels() - 1);
     MGTransferMatrixFree<dim, double> transfer;
 

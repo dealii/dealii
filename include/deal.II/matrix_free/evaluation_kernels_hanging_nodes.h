@@ -199,9 +199,9 @@ namespace internal
               for (unsigned int h = 0; h < points / 2; ++h)
                 {
                   const unsigned int hmirror = points - 1 - h;
-                  const Number       w0 = weights[(transpose ? 1 : points) * k +
+                  const Number w0 = weights[(transpose ? 1 : points) * k +
                                             (transpose ? points : 1) * hmirror];
-                  const Number       w1 = weights[(transpose ? 1 : points) * k +
+                  const Number w1 = weights[(transpose ? 1 : points) * k +
                                             (transpose ? points : 1) * h];
                   sum0 += temp[h] * w0;
                   sum0 += temp[hmirror] * w1;
@@ -1263,7 +1263,7 @@ namespace internal
 
   private:
     const dealii::ndarray<unsigned int, 3, 2, 2> line_array = {
-      {{{{{points * points * points - points, points *points - points}},
+      {{{{{points * points * points - points, points * points - points}},
          {{points * points * points - points * points, 0}}}},
        {{{{points * points * points - points * points + points - 1,
            points - 1}},
@@ -1278,67 +1278,67 @@ namespace internal
 
     const dealii::ndarray<unsigned int, 3, 2, 2, 4> lines_plane_array = {
       {{{{{{{points * points - points,
-             points *points *points - points,
+             points * points * points - points,
              points - 1,
-             points *points *points - points *points + points - 1}},
+             points * points * points - points * points + points - 1}},
            {{0,
-             points *points *points - points *points,
+             points * points * points - points * points,
              points - 1,
-             points *points *points - points *points + points - 1}}}},
+             points * points * points - points * points + points - 1}}}},
          {{{{points * points - points,
-             points *points *points - points,
+             points * points * points - points,
              0,
-             points *points *points - points *points}},
+             points * points * points - points * points}},
            {{0,
-             points *points *points - points *points,
+             points * points * points - points * points,
              0,
-             points *points *points - points *points}}}}}},
+             points * points * points - points * points}}}}}},
        {{{{{{points * points * points - points * points,
-             points *points *points - points,
+             points * points * points - points,
              points - 1,
-             points *points - 1}},
-           {{0, points *points - points, points - 1, points *points - 1}}}},
+             points * points - 1}},
+           {{0, points * points - points, points - 1, points * points - 1}}}},
          {{{{points * points * points - points * points,
-             points *points *points - points,
+             points * points * points - points,
              0,
-             points *points - points}},
-           {{0, points *points - points, 0, points *points - points}}}}}},
+             points * points - points}},
+           {{0, points * points - points, 0, points * points - points}}}}}},
        {{{{{{points * points * points - points * points,
-             points *points *points - points *points + points - 1,
-             points                          *points - points,
-             points                          *points - 1}},
-           {{0, points - 1, points *points - points, points *points - 1}}}},
+             points * points * points - points * points + points - 1,
+             points * points - points,
+             points * points - 1}},
+           {{0, points - 1, points * points - points, points * points - 1}}}},
          {{{{points * points * points - points * points,
-             points *points *points - points *points + points - 1,
+             points * points * points - points * points + points - 1,
              0,
              points - 1}},
            {{0, points - 1, 0, points - 1}}}}}}}};
 
     const dealii::ndarray<unsigned int, 3, 2, 2, 3> lines_array = {
       {{{{{{{points * points - points,
-             points *points *points - points *points,
-             points *points                  *points - points}},
-           {{0, points *points - points, points *points *points - points}}}},
+             points * points * points - points * points,
+             points * points * points - points}},
+           {{0, points * points - points, points * points * points - points}}}},
          {{{{0,
-             points *points *points - points *points,
-             points *points                  *points - points}},
+             points * points * points - points * points,
+             points * points * points - points}},
            {{0,
-             points         *points - points,
-             points *points *points - points *points}}}}}},
+             points * points - points,
+             points * points * points - points * points}}}}}},
        {{{{{{points - 1,
-             points *points *points - points *points,
-             points *points *points - points *points + points - 1}},
+             points * points * points - points * points,
+             points * points * points - points * points + points - 1}},
            {{0,
              points - 1,
-             points *points *points - points *points + points - 1}}}},
+             points * points * points - points * points + points - 1}}}},
          {{{{0,
-             points *points *points - points *points,
-             points *points *points - points *points + points - 1}},
-           {{0, points - 1, points *points *points - points *points}}}}}},
-       {{{{{{points - 1, points *points - points, points *points - 1}},
-           {{0, points - 1, points *points - 1}}}},
-         {{{{0, points *points - points, points *points - 1}},
-           {{0, points - 1, points *points - points}}}}}}}};
+             points * points * points - points * points,
+             points * points * points - points * points + points - 1}},
+           {{0, points - 1, points * points * points - points * points}}}}}},
+       {{{{{{points - 1, points * points - points, points * points - 1}},
+           {{0, points - 1, points * points - 1}}}},
+         {{{{0, points * points - points, points * points - 1}},
+           {{0, points - 1, points * points - points}}}}}}}};
   };
 
   /**

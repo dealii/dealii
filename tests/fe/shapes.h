@@ -61,10 +61,10 @@ plot_shape_functions(Mapping<dim>       &mapping,
   QTrapezoid<1>  q_trapez;
   QIterated<dim> q(q_trapez, div);
   FEValues<dim>  fe(mapping,
-                   finel,
-                   q,
-                   UpdateFlags(update_values | update_gradients |
-                               update_hessians));
+                    finel,
+                    q,
+                    UpdateFlags(update_values | update_gradients |
+                                update_hessians));
 
   sprintf(fname, "Cell%dd-%s", dim, name);
   //  cerr << "\n" << fname << "\n";
@@ -148,9 +148,9 @@ plot_face_shape_functions(Mapping<dim>       &mapping,
   QTrapezoid<1>        q_trapez;
   QIterated<dim - 1>   q(q_trapez, div);
   FEFaceValues<dim>    fe(mapping,
-                       finel,
-                       q,
-                       UpdateFlags(uflags | update_quadrature_points));
+                          finel,
+                          q,
+                          UpdateFlags(uflags | update_quadrature_points));
   FESubfaceValues<dim> sub(mapping,
                            finel,
                            q,
@@ -158,9 +158,9 @@ plot_face_shape_functions(Mapping<dim>       &mapping,
 
   // Test the iterator-based initialization routines too:
   FEFaceValues<dim>    fe2(mapping,
-                        finel,
-                        q,
-                        UpdateFlags(uflags | update_quadrature_points));
+                           finel,
+                           q,
+                           UpdateFlags(uflags | update_quadrature_points));
   FESubfaceValues<dim> sub2(mapping,
                             finel,
                             q,

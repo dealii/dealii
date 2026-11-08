@@ -300,13 +300,13 @@ namespace Polynomials
   {
     // forward to serialization function in the base class.
     ar &static_cast<EnableObserverPointer &>(*this);
-    ar &polynomial;
-    ar &n_intervals;
-    ar &interval;
-    ar &spans_two_intervals;
-    ar &points;
-    ar &one_over_lengths;
-    ar &index;
+    ar & polynomial;
+    ar & n_intervals;
+    ar & interval;
+    ar & spans_two_intervals;
+    ar & points;
+    ar & one_over_lengths;
+    ar & index;
   }
 } // namespace Polynomials
 

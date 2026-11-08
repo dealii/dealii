@@ -752,10 +752,10 @@ namespace Step9
   template <int dim>
   void AdvectionProblem<dim>::solve()
   {
-    SolverControl               solver_control(std::max<std::size_t>(1000,
+    SolverControl solver_control(std::max<std::size_t>(1000,
                                                        system_rhs.size() / 10),
                                  1e-10 * system_rhs.l2_norm());
-    SolverGMRES<Vector<double>> solver(solver_control);
+    SolverGMRES<Vector<double>>              solver(solver_control);
     PreconditionJacobi<SparseMatrix<double>> preconditioner;
     preconditioner.initialize(system_matrix, 1.0);
     solver.solve(system_matrix, solution, system_rhs, preconditioner);

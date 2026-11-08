@@ -330,7 +330,8 @@ namespace PETScWrappers
       return PetscObjectComm(reinterpret_cast<PetscObject>(petsc_nest_matrix));
     }
 
-    BlockSparseMatrix::operator const Mat &() const
+    BlockSparseMatrix::
+    operator const Mat &() const
     {
       return petsc_nest_matrix;
     }

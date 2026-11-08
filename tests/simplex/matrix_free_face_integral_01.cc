@@ -151,7 +151,7 @@ test(const unsigned int v, const unsigned int degree)
   {
     const UpdateFlags flag = update_JxW_values | update_values |
                              update_gradients | update_quadrature_points;
-    FEValues<dim> fe_values(mapping, *fe, *quad, flag);
+    FEValues<dim>     fe_values(mapping, *fe, *quad, flag);
 
     FEFaceValues<dim> fe_face_values(mapping, *fe, face_quad, flag);
 

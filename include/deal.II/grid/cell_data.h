@@ -264,10 +264,10 @@ template <class Archive>
 void
 CellData<structdim>::serialize(Archive &ar, const unsigned int /*version*/)
 {
-  ar &vertices;
-  ar &material_id;
-  ar &boundary_id;
-  ar &manifold_id;
+  ar & vertices;
+  ar & material_id;
+  ar & boundary_id;
+  ar & manifold_id;
 }
 
 DEAL_II_NAMESPACE_CLOSE

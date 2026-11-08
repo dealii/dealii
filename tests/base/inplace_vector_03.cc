@@ -65,13 +65,13 @@ test_serialization()
     vec.assign(as.begin(), as.end());
     std::ostringstream              out;
     boost::archive::binary_oarchive oarchive(out);
-    oarchive                       &vec;
-    const auto                      serialization = out.str();
+    oarchive & vec;
+    const auto serialization = out.str();
     deallog << "size = " << serialization.size() << std::endl;
 
     std::istringstream              in(serialization);
     boost::archive::binary_iarchive iarchive(in);
-    iarchive                       &vec2;
+    iarchive & vec2;
 
     AssertThrow(vec == vec2, ExcInternalError());
     print(vec2);

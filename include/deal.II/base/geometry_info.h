@@ -821,7 +821,8 @@ public:
    * base class to actual numerical values (the array indices).
    */
   DEAL_II_HOST_DEVICE
-  constexpr operator std::uint8_t() const;
+  constexpr
+  operator std::uint8_t() const;
 
   /**
    * Return the union of the refinement flags represented by the current
@@ -2701,7 +2702,8 @@ inline GeometryPrimitive::GeometryPrimitive(const unsigned int object_dimension)
 {}
 
 
-inline GeometryPrimitive::operator unsigned int() const
+inline GeometryPrimitive::
+operator unsigned int() const
 {
   return static_cast<unsigned int>(object);
 }
@@ -2718,7 +2720,8 @@ namespace internal
 
 
   template <int dim>
-  inline SubfaceCase<dim>::operator std::uint8_t() const
+  inline SubfaceCase<dim>::
+  operator std::uint8_t() const
   {
     return value;
   }
@@ -2855,8 +2858,8 @@ inline constexpr RefinementCase<dim>::RefinementCase(
 
 
 template <int dim>
-inline constexpr DEAL_II_HOST_DEVICE
-  RefinementCase<dim>::operator std::uint8_t() const
+inline constexpr DEAL_II_HOST_DEVICE RefinementCase<dim>::
+operator std::uint8_t() const
 {
   return value;
 }
@@ -2908,7 +2911,7 @@ RefinementCase<dim>::serialize(Archive &ar, const unsigned int)
   // serialization can't deal with bitfields, so copy from/to a full sized
   // std::uint8_t
   std::uint8_t uchar_value = value;
-  ar          &uchar_value;
+  ar & uchar_value;
   value = uchar_value;
 }
 
@@ -3792,7 +3795,7 @@ GeometryInfo<3>::face_refinement_case(
                {RefinementCase<dim - 1>::cut_xy, // cut_xyz
                 RefinementCase<dim - 1>::cut_xy,
                 RefinementCase<dim - 1>::cut_xy},
-             };
+  };
 
   const RefinementCase<dim - 1> ref_case =
     ref_cases[cell_refinement_case][face_no / 2];

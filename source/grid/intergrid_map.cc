@@ -154,7 +154,7 @@ void InterGridMap<MeshType>::set_entries_to_cell(const cell_iterator &src_cell,
 template <typename MeshType>
 DEAL_II_CXX20_REQUIRES(concepts::is_triangulation_or_dof_handler<MeshType>)
 typename InterGridMap<MeshType>::cell_iterator
-  InterGridMap<MeshType>::operator[](const cell_iterator &source_cell) const
+  InterGridMap<MeshType>::operator[](const cell_iterator & source_cell) const
 {
   Assert(source_cell.state() == IteratorState::valid,
          ExcInvalidKey(source_cell));

@@ -47,8 +47,8 @@ test(std::string filename)
   QTrapezoid<dim>         quad;
   MappingQ<dim, spacedim> mapping(1);
   typename Triangulation<dim, spacedim>::active_cell_iterator
-    cell = tria.begin_active(),
-    endc = tria.end();
+                  cell = tria.begin_active(),
+                  endc = tria.end();
   Point<spacedim> real;
   Point<dim>      unit;
   double          eps = 1e-10;

@@ -699,8 +699,8 @@ namespace Differentiation
       {
         // The reduced expressions depend on the intermediate expressions,
         // so we serialize the latter before the former.
-        ar &intermediate_symbols_exprs;
-        ar &reduced_exprs;
+        ar & intermediate_symbols_exprs;
+        ar & reduced_exprs;
       }
 
 
@@ -717,8 +717,8 @@ namespace Differentiation
 
         // The reduced expressions depend on the intermediate expressions,
         // so we deserialize the latter before the former.
-        ar &intermediate_symbols_exprs;
-        ar &reduced_exprs;
+        ar & intermediate_symbols_exprs;
+        ar & reduced_exprs;
       }
 
 
@@ -926,9 +926,9 @@ namespace Differentiation
         // symbols, so we serialize them first. The dependent variables
         // might depend on the outcome of CSE, so we have to serialize
         // them last.
-        ar &independent_symbols;
+        ar & independent_symbols;
         cse.save(ar, version);
-        ar &dependent_functions;
+        ar & dependent_functions;
       }
 
 
@@ -948,9 +948,9 @@ namespace Differentiation
         // symbols, so we deserialize them first. The dependent variables
         // might depend on the outcome of CSE, so we have to deserialize
         // them last.
-        ar &independent_symbols;
+        ar & independent_symbols;
         cse.load(ar, version);
-        ar &dependent_functions;
+        ar & dependent_functions;
       }
 
 
@@ -996,7 +996,7 @@ namespace Differentiation
 #  endif // DOXYGEN
 
     } // namespace internal
-  }   // namespace SD
+  } // namespace SD
 } // namespace Differentiation
 
 #endif // DEAL_II_WITH_SYMENGINE

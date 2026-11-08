@@ -156,10 +156,10 @@ test(const Triangulation<dim, spacedim> &tria,
   VectorType                     system_rhs;
 #else
   using VectorType = Vector<double>;
-  SparsityPattern        sparsity_pattern;
-  SparseMatrix<double>   system_matrix;
-  VectorType             solution(dof_handler.n_dofs());
-  VectorType             system_rhs(dof_handler.n_dofs());
+  SparsityPattern      sparsity_pattern;
+  SparseMatrix<double> system_matrix;
+  VectorType           solution(dof_handler.n_dofs());
+  VectorType           system_rhs(dof_handler.n_dofs());
 #endif
 
 
@@ -188,8 +188,8 @@ test(const Triangulation<dim, spacedim> &tria,
   system_matrix.reinit(sparsity_pattern);
 #endif
 
-  const UpdateFlags flag = update_JxW_values | update_values |
-                           update_gradients | update_quadrature_points;
+  const UpdateFlags       flag = update_JxW_values | update_values |
+                                 update_gradients | update_quadrature_points;
   FEValues<dim, spacedim> fe_values(mapping, fe, quad, flag);
 
   std::shared_ptr<FEFaceValues<dim, spacedim>> fe_face_values;

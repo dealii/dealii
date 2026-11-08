@@ -891,7 +891,7 @@ test(unsigned int n_refinements)
   using LevelMatrixType =
     PortableMFVelocityOperator<dim, degree_u, degree_p, LevelNumber>;
   using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
-  using SmootherType               = PreconditionChebyshev<LevelMatrixType,
+  using SmootherType = PreconditionChebyshev<LevelMatrixType,
                                              VectorType,
                                              SmootherPreconditionerType>;
   using MGTransferType =

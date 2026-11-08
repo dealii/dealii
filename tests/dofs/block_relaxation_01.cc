@@ -54,9 +54,9 @@ make_stokes_matrix(const DoFHandler<dim> &dof_handler,
   AffineConstraints<double> constraints;
   constraints.close();
   FEValues<dim>      fe_values(fe,
-                          quadrature_formula,
-                          update_values | update_quadrature_points |
-                            update_JxW_values | update_gradients);
+                               quadrature_formula,
+                               update_values | update_quadrature_points |
+                                 update_JxW_values | update_gradients);
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
   FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);

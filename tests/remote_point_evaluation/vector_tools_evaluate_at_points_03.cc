@@ -167,9 +167,9 @@ test()
   const MappingQ1<dim> mapping_2;
   const QGauss<dim>    quadrature_2(degree + 1);
   FEValues<dim>        fe_values_2(mapping_2,
-                            fe_2,
-                            quadrature_2,
-                            update_quadrature_points);
+                                   fe_2,
+                                   quadrature_2,
+                                   update_quadrature_points);
 
   std::vector<Point<dim>> evaluation_points;
   for (const auto &cell : dof_handler_2.active_cell_iterators())

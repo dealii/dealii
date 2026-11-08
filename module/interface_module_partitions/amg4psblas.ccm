@@ -37,8 +37,7 @@ export module dealii.external.amg4psblas;
 
 #ifdef DEAL_II_WITH_AMG4PSBLAS
 
-export
-{
+export {
   using ::amg_c_dprec;
   using ::amg_c_dprecbld;
   using ::amg_c_dprecfree;

@@ -30,7 +30,7 @@ public:
   PolynomialWedge(const unsigned int degree_in)
     : degree(degree_in)
     , poly_tri(BarycentricPolynomials<2>::get_fe_p_basis(degree_in))
-    , poly_line(BarycentricPolynomials<1>::get_fe_p_basis(degree_in)){};
+    , poly_line(BarycentricPolynomials<1>::get_fe_p_basis(degree_in)) {};
 
 
   double

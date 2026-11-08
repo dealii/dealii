@@ -169,10 +169,10 @@ namespace internal
             typename number>
   void
   process_by_interpolation(
-    const DoFCellAccessor<dim, spacedim, lda>       &cell,
-    const Vector<number>                            &local_values,
-    OutputVector                                    &values,
-    const types::fe_index                            fe_index_,
+    const DoFCellAccessor<dim, spacedim, lda>               &cell,
+    const Vector<number>                                    &local_values,
+    OutputVector                                            &values,
+    const types::fe_index                                    fe_index_,
     const std::function<void(const DoFCellAccessor<dim, spacedim, lda> &cell,
                              const Vector<number> &local_values,
                              OutputVector         &values)> &processor)

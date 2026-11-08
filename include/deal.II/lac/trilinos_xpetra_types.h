@@ -183,7 +183,7 @@ namespace LinearAlgebra
 #  endif // DEAL_II_TRILINOS_WITH_SHYLU_DDFROSCH
 
     } // namespace XpetraTypes
-  }   // namespace TpetraWrappers
+  } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 #endif // DEAL_II_TRILINOS_WITH_XPETRA

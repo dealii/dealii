@@ -2511,8 +2511,7 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename NumberType,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       inline NumberType
       get_tensor_entry(const TensorType<rank, dim, NumberType> &t,
                        const unsigned int                       unrolled_index)
@@ -2530,8 +2529,7 @@ namespace Differentiation
        */
       template <int dim,
                 typename NumberType,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       inline NumberType
       get_tensor_entry(const TensorType<0, dim, NumberType> &t,
                        const unsigned int                    unrolled_index)
@@ -2564,8 +2562,7 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename NumberType,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       inline NumberType &
       get_tensor_entry(TensorType<rank, dim, NumberType> &t,
                        const unsigned int                 unrolled_index)
@@ -2583,8 +2580,7 @@ namespace Differentiation
        */
       template <int dim,
                 typename NumberType,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       NumberType &
       get_tensor_entry(TensorType<0, dim, NumberType> &t,
                        const unsigned int              index)
@@ -3959,7 +3955,7 @@ namespace Differentiation
                                 const ExtractorType_Row       &extractor_row,
                                 const ExtractorType_Col       &extractor_col)
     {
-      using InternalHessian      = internal::ScalarFieldHessian<dim,
+      using InternalHessian = internal::ScalarFieldHessian<dim,
                                                            scalar_type,
                                                            ExtractorType_Row,
                                                            ExtractorType_Col>;
@@ -4081,7 +4077,7 @@ namespace Differentiation
                                  const ExtractorType_Row       &extractor_row,
                                  const ExtractorType_Col       &extractor_col)
     {
-      using InternalJacobian     = internal::VectorFieldJacobian<dim,
+      using InternalJacobian = internal::VectorFieldJacobian<dim,
                                                              scalar_type,
                                                              ExtractorType_Row,
                                                              ExtractorType_Col>;

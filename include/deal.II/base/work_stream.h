@@ -11,40 +11,40 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_work_stream_h
-#  define dealii_work_stream_h
+#define dealii_work_stream_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/array_view.h>
-#  include <deal.II/base/graph_coloring.h>
-#  include <deal.II/base/iterator_range.h>
-#  include <deal.II/base/multithread_info.h>
-#  include <deal.II/base/parallel.h>
-#  include <deal.II/base/std_cxx20/type_traits.h>
-#  include <deal.II/base/template_constraints.h>
-#  include <deal.II/base/thread_local_storage.h>
-#  include <deal.II/base/thread_management.h>
+#include <deal.II/base/array_view.h>
+#include <deal.II/base/graph_coloring.h>
+#include <deal.II/base/iterator_range.h>
+#include <deal.II/base/multithread_info.h>
+#include <deal.II/base/parallel.h>
+#include <deal.II/base/std_cxx20/type_traits.h>
+#include <deal.II/base/template_constraints.h>
+#include <deal.II/base/thread_local_storage.h>
+#include <deal.II/base/thread_management.h>
 
-#  ifdef DEAL_II_WITH_TBB
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
-#      include <tbb/parallel_pipeline.h>
-#    else
-#      include <tbb/pipeline.h>
-#    endif
-#    include <tbb/blocked_range.h>
+#ifdef DEAL_II_WITH_TBB
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
+#    include <tbb/parallel_pipeline.h>
+#  else
+#    include <tbb/pipeline.h>
 #  endif
+#  include <tbb/blocked_range.h>
+#endif
 
-#  ifdef DEAL_II_WITH_TASKFLOW
-#    include <taskflow/taskflow.hpp>
-#  endif
+#ifdef DEAL_II_WITH_TASKFLOW
+#  include <taskflow/taskflow.hpp>
+#endif
 
-#  include <functional>
-#  include <iterator>
-#  include <list>
-#  include <memory>
-#  include <utility>
-#  include <vector>
+#include <functional>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <utility>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -243,7 +243,7 @@ namespace WorkStream
       ScratchDataObject(ScratchDataObject &&o) noexcept = default;
     };
 
-#  ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TBB
     /**
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the second
@@ -536,11 +536,11 @@ namespace WorkStream
         // to work on (the stream of "items"). This stage will run sequentially.
         IteratorRangeToItemStream<Iterator, ScratchData, CopyData>
              iterator_range_to_item_stream(begin,
-                                        end,
-                                        queue_length,
-                                        chunk_size,
-                                        sample_scratch_data,
-                                        sample_copy_data);
+                                           end,
+                                           queue_length,
+                                           chunk_size,
+                                           sample_scratch_data,
+                                           sample_copy_data);
         auto item_generator = [&](tbb::flow_control &fc) -> ItemType * {
           if (const auto item = iterator_range_to_item_stream.get_item())
             return item;
@@ -677,27 +677,27 @@ namespace WorkStream
 
         // Now we just have to set up the pipeline and run it:
         auto tbb_item_stream_filter = tbb::make_filter<void, ItemType *>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
           tbb::filter_mode::serial_in_order,
-#    else
+#  else
           tbb::filter::serial,
-#    endif
+#  endif
           item_generator);
 
         auto tbb_worker_filter = tbb::make_filter<ItemType *, ItemType *>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
           tbb::filter_mode::parallel,
-#    else
+#  else
           tbb::filter::parallel,
-#    endif
+#  endif
           item_worker);
 
         auto tbb_copier_filter = tbb::make_filter<ItemType *, void>(
-#    ifdef DEAL_II_TBB_WITH_ONEAPI
+#  ifdef DEAL_II_TBB_WITH_ONEAPI
           tbb::filter_mode::serial_in_order,
-#    else
+#  else
           tbb::filter::serial,
-#    endif
+#  endif
           item_copier);
 
         tbb::parallel_pipeline(queue_length,
@@ -705,12 +705,12 @@ namespace WorkStream
                                  tbb_copier_filter);
       }
 
-    }    // namespace tbb_no_coloring
-#  endif // DEAL_II_WITH_TBB
+    } // namespace tbb_no_coloring
+#endif // DEAL_II_WITH_TBB
 
 
 
-#  ifdef DEAL_II_WITH_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
     /**
      * Mostly a copy of the 2nd implementation of the Workstream paper taking
      * advantage of thread local lists for re-use. Uses taskflow for task
@@ -740,7 +740,7 @@ namespace WorkStream
           const CopyData                             &sample_copy_data,
           const unsigned int /*queue_length*/ = 2 *
                                                 MultithreadInfo::n_threads(),
-          const unsigned int chunk_size = 8)
+          const unsigned int chunk_size       = 8)
 
       {
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
@@ -899,7 +899,7 @@ namespace WorkStream
           executor.run(taskflow).wait();
       }
     } // namespace taskflow_no_coloring
-#  endif
+#endif
 
     /**
      * A reference implementation without using multithreading to be used if we
@@ -996,7 +996,7 @@ namespace WorkStream
 
 
 
-#  ifdef DEAL_II_WITH_TBB
+#ifdef DEAL_II_WITH_TBB
     /**
      * A namespace for the implementation of details of the WorkStream pattern
      * and function. This namespace holds classes that deal with the third
@@ -1197,12 +1197,12 @@ namespace WorkStream
             }
       }
 
-    }    // namespace tbb_colored
-#  endif // DEAL_II_WITH_TBB
+    } // namespace tbb_colored
+#endif // DEAL_II_WITH_TBB
 
 
 
-#  ifdef DEAL_II_WITH_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
     /**
      * Mostly a copy of the 3rd implementation of the Workstream paper taking
      * advantage of thread local lists for re-use. Uses taskflow for task
@@ -1418,8 +1418,8 @@ namespace WorkStream
           executor.run(taskflow).wait();
       }
 
-    }    // namespace taskflow_colored
-#  endif // DEAL_II_WITH_TASKFLOW
+    } // namespace taskflow_colored
+#endif // DEAL_II_WITH_TASKFLOW
 
 
   } // namespace internal
@@ -1566,11 +1566,11 @@ namespace WorkStream
 
     if (MultithreadInfo::n_threads() > 1)
       {
-#  if defined(DEAL_II_WITH_TBB) || defined(DEAL_II_WITH_TASKFLOW)
+#if defined(DEAL_II_WITH_TBB) || defined(DEAL_II_WITH_TASKFLOW)
         if (static_cast<const std::function<void(const CopyData &)> &>(copier))
           {
             // If we have a copier, run the algorithm:
-#    if defined(DEAL_II_WITH_TASKFLOW)
+#  if defined(DEAL_II_WITH_TASKFLOW)
             internal::taskflow_no_coloring::run(begin,
                                                 end,
                                                 worker,
@@ -1579,7 +1579,7 @@ namespace WorkStream
                                                 sample_copy_data,
                                                 queue_length,
                                                 chunk_size);
-#    elif defined(DEAL_II_WITH_TBB)
+#  elif defined(DEAL_II_WITH_TBB)
             internal::tbb_no_coloring::run(begin,
                                            end,
                                            worker,
@@ -1588,7 +1588,7 @@ namespace WorkStream
                                            sample_copy_data,
                                            queue_length,
                                            chunk_size);
-#    endif
+#  endif
           }
         else
           {
@@ -1621,7 +1621,7 @@ namespace WorkStream
 
         // exit this function to not run the sequential version below:
         return;
-#  endif
+#endif
       }
 
     // no TBB or Taskflow installed or we are requested to run sequentially:
@@ -1724,7 +1724,7 @@ namespace WorkStream
 
     if (MultithreadInfo::n_threads() > 1)
       {
-#  ifdef DEAL_II_WITH_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
         internal::taskflow_colored::run(colored_iterators,
                                         worker,
                                         copier,
@@ -1734,7 +1734,7 @@ namespace WorkStream
 
         // exit this function to not run the sequential version below:
         return;
-#  elif defined(DEAL_II_WITH_TBB)
+#elif defined(DEAL_II_WITH_TBB)
         internal::tbb_colored::run(colored_iterators,
                                    worker,
                                    copier,
@@ -1744,7 +1744,7 @@ namespace WorkStream
 
         // exit this function to not run the sequential version below:
         return;
-#  endif
+#endif
       }
 
     // run all colors sequentially:

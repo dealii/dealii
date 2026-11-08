@@ -144,7 +144,7 @@ TestPointValueHistory<dim>::run()
                 -0.1; // dim+1th component is not handled well by the code above
           }
 
-      }                      // loop over all cells
+      } // loop over all cells
     poles.add(1.0);          // slow down the pole settling time
     post_processed.add(3.0); // set to starting value.
   }

@@ -240,9 +240,9 @@ test(std::string solver_name, std::string preconditioner_name)
       }
 
     dealii::SolverControl   linear_solver_control(dof_handler.n_dofs(),
-                                                1e-15,
-                                                /*log_history*/ false,
-                                                /*log_results*/ false);
+                                                  1e-15,
+                                                  /*log_history*/ false,
+                                                  /*log_results*/ false);
     PETScWrappers::SolverCG linear_solver(linear_solver_control);
     linear_solver.initialize(*preconditioner);
 

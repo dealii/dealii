@@ -2199,7 +2199,8 @@ namespace SparseMatrixIterators
 
 
   template <typename number>
-  inline Accessor<number, false>::Reference::operator number() const
+  inline Accessor<number, false>::Reference::
+  operator number() const
   {
     AssertIndexRange(accessor->linear_index,
                      accessor->matrix->n_nonzero_elements());

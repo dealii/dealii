@@ -135,8 +135,7 @@ namespace VectorTools
    *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -176,8 +175,7 @@ namespace VectorTools
    *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -211,8 +209,7 @@ namespace VectorTools
    *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -252,8 +249,7 @@ namespace VectorTools
    *    concepts::is_triangulation_or_dof_handler<MeshType<dim, spacedim>>)}
    */
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -282,8 +278,7 @@ namespace VectorTools
 
 #ifndef DOXYGEN
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -315,8 +310,7 @@ namespace VectorTools
 
 
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -743,8 +737,7 @@ namespace VectorTools
   } // namespace internal
 
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>
@@ -788,8 +781,7 @@ namespace VectorTools
 
 
   template <int n_components,
-            template <int, int>
-            class MeshType,
+            template <int, int> class MeshType,
             int dim,
             int spacedim,
             typename VectorType>

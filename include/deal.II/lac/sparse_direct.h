@@ -63,8 +63,8 @@ namespace types
   using mumps_index = MUMPS_INT;
   using mumps_nnz   = MUMPS_INT8;
 #else
-  using mumps_index       = int;
-  using mumps_nnz         = std::size_t;
+  using mumps_index = int;
+  using mumps_nnz   = std::size_t;
 #endif
 
 

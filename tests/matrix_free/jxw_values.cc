@@ -47,8 +47,8 @@ test()
     {
       typename Triangulation<dim>::active_cell_iterator cell =
                                                           tria.begin_active(),
-                                                        endc = tria.end();
-      unsigned int counter                                   = 0;
+                                                        endc    = tria.end();
+      unsigned int                                      counter = 0;
       for (; cell != endc; ++cell, ++counter)
         if (counter % (7 - i) == 0)
           cell->set_refine_flag();

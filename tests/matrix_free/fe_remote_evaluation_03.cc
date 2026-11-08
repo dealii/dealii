@@ -66,7 +66,7 @@ test_point_to_point(const MatrixFree<dim, Number> &matrix_free)
     std::vector<bool> mask(tria.n_vertices(), true);
 
     for (const auto &cell : tria.active_cell_iterators())
-      for (auto const &f : cell->face_indices())
+      for (const auto &f : cell->face_indices())
         if (cell->face(f)->at_boundary() && cell->face(f)->boundary_id() == 1)
           for (const auto v : cell->vertex_indices())
             mask[cell->vertex_index(v)] = false;
@@ -144,7 +144,7 @@ test_nitsche_type_mortaring(const MatrixFree<dim, Number> &matrix_free)
     std::vector<bool> mask(tria.n_vertices(), true);
 
     for (const auto &cell : tria.active_cell_iterators())
-      for (auto const &f : cell->face_indices())
+      for (const auto &f : cell->face_indices())
         if (cell->face(f)->at_boundary() && cell->face(f)->boundary_id() == 1)
           for (const auto v : cell->vertex_indices())
             mask[cell->vertex_index(v)] = false;

@@ -32,7 +32,7 @@ main(int argc, char **argv)
   try
     {
       const unsigned int dim = 3;
-      Solid<dim>         solid(SOURCE_DIR
+      Solid<dim> solid(SOURCE_DIR
                        "/prm/parameters-step-44-with_linesearch_ptrb.prm");
       solid.run();
     }

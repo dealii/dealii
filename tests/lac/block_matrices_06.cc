@@ -294,7 +294,7 @@ LaplaceProblem<VectorType, Matrix, Sparsity>::assemble_system()
   const unsigned int n_q_points    = quadrature_formula.size();
 
   FullMatrix<typename Matrix::value_type>   cell_matrix(dofs_per_cell,
-                                                      dofs_per_cell);
+                                                        dofs_per_cell);
   ::Vector<typename VectorType::value_type> cell_rhs(dofs_per_cell);
 
   std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);

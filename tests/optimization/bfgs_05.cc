@@ -122,9 +122,9 @@ test()
   unsigned int       iteration              = 0;
   unsigned int       line_search_iterations = 0;
   const auto         line_min               = [&](number           &f,
-                            VectorType       &x,
-                            VectorType       &g,
-                            const VectorType &p) {
+                                                  VectorType       &x,
+                                                  VectorType       &g,
+                                                  const VectorType &p) {
     if (iteration <= print_n_iterations)
       out << "------------------------------------------------" << std::endl
           << "Line search " << iteration << std::endl

@@ -115,8 +115,8 @@ test(const unsigned int mapping_degree,
 
   Quadrature<dim>    quadrature(fe.base_element(0).get_unit_support_points());
   FEValues<dim>      fe_values(fe,
-                          quadrature,
-                          update_quadrature_points | update_values);
+                               quadrature,
+                               update_quadrature_points | update_values);
   MappingQCache<dim> mapping(mapping_degree);
   mapping.initialize(
     tria,

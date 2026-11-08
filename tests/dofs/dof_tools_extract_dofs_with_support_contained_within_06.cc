@@ -245,7 +245,7 @@ test()
       const std::string filename_gnuplot = "grid_n_ranks_" +
                                            std::to_string(n_ranks) + "_rank_" +
                                            std::to_string(rank);
-      std::ofstream f(filename_gnuplot + ".gp");
+      std::ofstream     f(filename_gnuplot + ".gp");
 
       f << "set terminal png size 400,410 enhanced font \"Helvetica,8\""
         << std::endl

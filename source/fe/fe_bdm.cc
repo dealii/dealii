@@ -345,7 +345,7 @@ namespace internal
                              const unsigned int)
       {}
     } // namespace
-  }   // namespace FE_BDM
+  } // namespace FE_BDM
 } // namespace internal
 
 

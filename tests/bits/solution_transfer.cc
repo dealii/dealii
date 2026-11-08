@@ -45,7 +45,7 @@ class MyFunction : public Function<dim>
 {
 public:
   MyFunction()
-    : Function<dim>(){};
+    : Function<dim>() {};
 
   virtual double
   value(const Point<dim> &p, const unsigned int) const

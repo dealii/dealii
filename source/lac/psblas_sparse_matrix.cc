@@ -310,7 +310,7 @@ namespace PSCToolkitWrappers
   SparseMatrix::local_range() const
   {
     std::vector<psb_l_t> local_indices(local_size());
-    int                  err = psb_c_cd_get_global_indices(local_indices.data(),
+    int err = psb_c_cd_get_global_indices(local_indices.data(),
                                           local_size(),
                                           true /*only owned indices*/,
                                           psblas_descriptor.get());
@@ -488,11 +488,11 @@ namespace PSCToolkitWrappers
     psb_l_t irw  = i;
     psb_l_t icl  = j;
     int     info = psb_c_dspins(1 /*nz*/,
-                            &irw,
-                            &icl,
-                            &value,
-                            psblas_sparse_matrix,
-                            psblas_descriptor.get());
+                                &irw,
+                                &icl,
+                                &value,
+                                psblas_sparse_matrix,
+                                psblas_descriptor.get());
     Assert(info == 0, ExcInsertionInPSBLASMatrix(info));
   }
 
@@ -639,13 +639,13 @@ namespace PSCToolkitWrappers
 
     char transpose = 'T';
     int  err       = psb_c_dspmm_opt(value_type(1.0), // alpha
-                              psblas_sparse_matrix,
-                              src.psblas_vector,
-                              value_type(0.0), // beta
-                              dst.psblas_vector,
-                              psblas_descriptor.get(),
-                              &transpose,
-                              true);
+                                     psblas_sparse_matrix,
+                                     src.psblas_vector,
+                                     value_type(0.0), // beta
+                                     dst.psblas_vector,
+                                     psblas_descriptor.get(),
+                                     &transpose,
+                                     true);
     Assert(err == 0, ExcMatVecPSBLAS(err));
   }
 
@@ -664,13 +664,13 @@ namespace PSCToolkitWrappers
 
     char transpose = 'T';
     int  err       = psb_c_dspmm_opt(value_type(1.0), // alpha
-                              psblas_sparse_matrix,
-                              src.psblas_vector,
-                              value_type(1.0), // beta
-                              dst.psblas_vector,
-                              psblas_descriptor.get(),
-                              &transpose,
-                              true);
+                                     psblas_sparse_matrix,
+                                     src.psblas_vector,
+                                     value_type(1.0), // beta
+                                     dst.psblas_vector,
+                                     psblas_descriptor.get(),
+                                     &transpose,
+                                     true);
     Assert(err == 0, ExcMatVecPSBLAS(err));
   }
 

@@ -64,9 +64,9 @@ test(const Triangulation<dim> &tr)
 
   const Quadrature<dim> quadrature(points);
   FEValues<dim>         fe_values(mapping,
-                          fe,
-                          quadrature,
-                          update_gradients | update_jacobians);
+                                  fe,
+                                  quadrature,
+                                  update_gradients | update_jacobians);
 
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();

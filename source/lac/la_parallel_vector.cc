@@ -30,10 +30,10 @@ namespace LinearAlgebra
   {
 #ifndef DOXYGEN
 
-#  define TEMPL_COPY_CONSTRUCTOR(S1, S2, MemorySpaceType)         \
-    template Vector<S1, ::dealii::MemorySpace::MemorySpaceType> & \
-    Vector<S1, ::dealii::MemorySpace::MemorySpaceType>::operator= \
-      <S2>(const Vector<S2, ::dealii::MemorySpace::MemorySpaceType> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2, MemorySpaceType)            \
+    template Vector<S1, ::dealii::MemorySpace::MemorySpaceType>      \
+      &Vector<S1, ::dealii::MemorySpace::MemorySpaceType>::operator= \
+        <S2>(const Vector<S2, ::dealii::MemorySpace::MemorySpaceType> &)
 
     TEMPL_COPY_CONSTRUCTOR(double, float, Host);
     TEMPL_COPY_CONSTRUCTOR(float, double, Host);

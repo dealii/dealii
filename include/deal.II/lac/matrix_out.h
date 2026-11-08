@@ -11,34 +11,34 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_matrix_out_h
-#  define dealii_matrix_out_h
+#define dealii_matrix_out_h
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/data_out_base.h>
-#  include <deal.II/base/exception_macros.h>
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/point.h>
-#  include <deal.II/base/table.h>
-#  include <deal.II/base/tensor.h>
-#  include <deal.II/base/types.h>
+#include <deal.II/base/data_out_base.h>
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/point.h>
+#include <deal.II/base/table.h>
+#include <deal.II/base/tensor.h>
+#include <deal.II/base/types.h>
 
-#  include <deal.II/grid/reference_cell.h>
+#include <deal.II/grid/reference_cell.h>
 
-#  include <deal.II/lac/block_sparse_matrix.h>
-#  include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/block_sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 
-#  include <algorithm>
-#  include <array>
-#  include <cmath>
-#  include <new>
-#  include <string>
-#  include <vector>
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <new>
+#include <string>
+#include <vector>
 
-#  ifdef DEAL_II_WITH_TRILINOS
-#    include <deal.II/lac/trilinos_block_sparse_matrix.h>
-#    include <deal.II/lac/trilinos_sparse_matrix.h>
-#  endif
+#ifdef DEAL_II_WITH_TRILINOS
+#  include <deal.II/lac/trilinos_block_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_sparse_matrix.h>
+#endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -280,7 +280,7 @@ namespace internal
     }
 
 
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
     /**
      * Return the element with given indices of a Trilinos sparse matrix.
      */
@@ -305,14 +305,14 @@ namespace internal
     {
       return matrix.el(i, j);
     }
-#  endif
+#endif
 
 
-#  ifdef DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
     // no need to do anything: PETSc matrix objects do not distinguish
     // between operator() and el(i,j), so we can safely access elements
     // through the generic function below
-#  endif
+#endif
 
 
     /**

@@ -63,17 +63,17 @@ main()
   ida.reinit_vector        = [](VectorType &v) { v.reinit(1); };
   unsigned int setup_count = 0;
   ida.residual             = [&](const double,
-                     const VectorType &,
-                     const VectorType &ydot,
-                     VectorType       &r) {
+                                 const VectorType &,
+                                 const VectorType &ydot,
+                                 VectorType       &r) {
     Assert(setup_count > 0, ExcInternalError());
     r = ydot;
   };
   double jacobian_scale = 1.0;
   ida.setup_jacobian    = [&](const double,
-                           const VectorType &,
-                           const VectorType &,
-                           const double alpha) { jacobian_scale = alpha; };
+                              const VectorType &,
+                              const VectorType &,
+                              const double alpha) { jacobian_scale = alpha; };
   ida.solve_with_jacobian =
     [&](const VectorType &rhs, VectorType &dst, const double) {
       dst = rhs;
@@ -124,9 +124,9 @@ main()
   double                    constrained_jacobian_scale = 1.0;
   constrained_ida.reinit_vector = [](VectorType &v) { v.reinit(1); };
   constrained_ida.residual      = [](const double,
-                                const VectorType &,
-                                const VectorType &ydot,
-                                VectorType       &r) {
+                                     const VectorType &,
+                                     const VectorType &ydot,
+                                     VectorType       &r) {
     r = ydot;
     r[0] += 1.0;
   };

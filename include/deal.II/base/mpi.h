@@ -1659,7 +1659,7 @@ namespace Utilities
         }
 #endif
       } // namespace MPIDataTypes
-    }   // namespace internal
+    } // namespace internal
 
 
 

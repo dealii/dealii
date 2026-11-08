@@ -262,7 +262,7 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
       test_boundary(fef1);
     }
 
-  FEFaceValues<dim>                          fef2(fe,
+  FEFaceValues<dim> fef2(fe,
                          face_quadrature,
                          update_values | update_gradients |
                            update_normal_vectors | update_JxW_values);

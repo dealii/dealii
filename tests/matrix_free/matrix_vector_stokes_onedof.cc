@@ -59,7 +59,7 @@ public:
   using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_apply(const MatrixFree<dim, Number>               &data,
@@ -73,9 +73,9 @@ public:
                                                                         0,
                                                                         0);
     FEEvaluation<dim, degree_p, degree_p + 2, 1, Number>       pressure(data,
-                                                                  0,
-                                                                  0,
-                                                                  dim);
+                                                                        0,
+                                                                        0,
+                                                                        dim);
 
     for (unsigned int cell = cell_range.first; cell < cell_range.second; ++cell)
       {

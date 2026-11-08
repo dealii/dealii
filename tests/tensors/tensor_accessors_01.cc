@@ -145,7 +145,7 @@ main()
         foo = TensorAccessors::reordered_index_view<2, 5>(t);
     deallog << foo[0][1][0][1][2] << std::endl;
 
-    const double(&t_ref)[3][3][3][3][3] = t;
+    const double (&t_ref)[3][3][3][3][3] = t;
     dealii::TensorAccessors::internal::
       ReorderedIndexView<2, 5, const double[3][3][3][3][3]> // auto ...
         foo2 = TensorAccessors::reordered_index_view<2, 5>(t_ref);

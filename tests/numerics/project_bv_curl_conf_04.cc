@@ -68,7 +68,7 @@ test_boundary_values(DoFHandler<dim>    &dof_handler,
 {
   // Initialize
   QGaussLobatto<dim - 1> quadrature(3);
-  FEFaceValues<dim>      fe_values(mapping,
+  FEFaceValues<dim> fe_values(mapping,
                               fe,
                               quadrature,
                               update_values | update_normal_vectors |

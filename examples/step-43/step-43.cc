@@ -839,13 +839,13 @@ namespace Step43
 
     const QGauss<dim> quadrature_formula(darcy_degree + 2);
     FEValues<dim>     darcy_fe_values(darcy_fe,
-                                  quadrature_formula,
-                                  update_JxW_values | update_values |
-                                    update_gradients |
-                                    update_quadrature_points);
+                                      quadrature_formula,
+                                      update_JxW_values | update_values |
+                                        update_gradients |
+                                        update_quadrature_points);
     FEValues<dim>     saturation_fe_values(saturation_fe,
-                                       quadrature_formula,
-                                       update_values);
+                                           quadrature_formula,
+                                           update_values);
 
     const unsigned int dofs_per_cell = darcy_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -939,7 +939,7 @@ namespace Step43
 #ifdef DEAL_II_TRILINOS_WITH_EPETRA
     top_left_preconditioner = std::make_shared<PreconditionType>();
 #else
-    top_left_preconditioner     = std::make_shared<PreconditionType>("FAST_IC");
+    top_left_preconditioner = std::make_shared<PreconditionType>("FAST_IC");
 #endif
     top_left_preconditioner->initialize(
       darcy_preconditioner_matrix.block(0, 0));
@@ -1640,8 +1640,8 @@ namespace Step43
     {
       const QMidpoint<dim>        quadrature_formula;
       FEValues<dim>               fe_values(saturation_fe,
-                              quadrature_formula,
-                              update_gradients);
+                                            quadrature_formula,
+                                            update_gradients);
       std::vector<Tensor<1, dim>> grad_saturation(1);
 
       TrilinosWrappers::MPI::Vector extrapolated_saturation_solution(

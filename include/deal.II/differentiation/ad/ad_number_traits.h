@@ -879,7 +879,8 @@ namespace Differentiation
       /**
        * Extract the value of an auto-differentiable number
        */
-      static scalar_type get_scalar_value(const ad_type &x)
+      static scalar_type
+      get_scalar_value(const ad_type &x)
       {
         // Some tricky conversion cases to consider here:
         // - Nested AD numbers
@@ -895,8 +896,8 @@ namespace Differentiation
       /**
        * Extract the derivative value of an auto-differentiable number
        */
-      static derivative_type get_directional_derivative(
-        const ad_type &x, const unsigned int direction)
+      static derivative_type
+      get_directional_derivative(const ad_type &x, const unsigned int direction)
       {
         return internal::ExtractData<ad_type>::directional_derivative(
           x, direction);
@@ -907,7 +908,8 @@ namespace Differentiation
        * Extract the number of directional derivatives value tracked by
        * an auto-differentiable number
        */
-      static unsigned int n_directional_derivatives(const ad_type &x)
+      static unsigned int
+      n_directional_derivatives(const ad_type &x)
       {
         return internal::ExtractData<ad_type>::n_directional_derivatives(x);
       }

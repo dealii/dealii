@@ -53,8 +53,8 @@ check()
   Triangulation<dim> triangulation;
   GridGenerator::cylinder(triangulation);
 
-  GridTools::transform((Point<dim>(*)(const Point<dim> &)) &
-                         rotate_by_xy_angle<dim>,
+  GridTools::transform((Point<dim> (*)(
+                         const Point<dim> &))&rotate_by_xy_angle<dim>,
                        triangulation);
 
   const Tensor<1, dim> direction{{std::cos(xy_angle), std::sin(xy_angle), 0}};

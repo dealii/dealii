@@ -102,7 +102,7 @@ namespace internal
         data.max_index = numbers::invalid_unsigned_int;
       }
     } // namespace
-  }   // namespace TimerImplementation
+  } // namespace TimerImplementation
 } // namespace internal
 
 

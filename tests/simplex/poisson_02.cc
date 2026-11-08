@@ -67,7 +67,7 @@ struct ScratchData
               const FiniteElement<dim>  &fe,
               const Quadrature<dim>     &quad,
               const Quadrature<dim - 1> &quad_face,
-              const UpdateFlags          update_flags = update_values |
+              const UpdateFlags update_flags = update_values |
                                                update_gradients |
                                                update_quadrature_points |
                                                update_JxW_values,

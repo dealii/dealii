@@ -331,8 +331,8 @@ namespace dealii
                       ((constraint_mask[v] & face1_type) !=
                        dealii::internal::MatrixFreeFunctions::ConstraintKinds::
                          unconstrained) ?
-                                         (face1_idx == 0) :
-                                         (face1_idx == fe_degree);
+                        (face1_idx == 0) :
+                        (face1_idx == fe_degree);
                     const bool on_face2 =
                       ((constraint_mask[v] & face2_type) !=
                        dealii::internal::MatrixFreeFunctions::ConstraintKinds::

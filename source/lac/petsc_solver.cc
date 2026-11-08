@@ -75,7 +75,8 @@ namespace PETScWrappers
 
 
 
-  SolverBase::operator KSP() const
+  SolverBase::
+  operator KSP() const
   {
     return ksp;
   }
@@ -640,7 +641,7 @@ namespace PETScWrappers
     else
       AssertPETSc(PCSetType(pc, PCLU));
 
-      // Select MUMPS for the LU or Cholesky factorization.
+    // Select MUMPS for the LU or Cholesky factorization.
 #    if DEAL_II_PETSC_VERSION_LT(3, 9, 0)
     AssertPETSc(PCFactorSetMatSolverPackage(pc, MATSOLVERMUMPS));
 #    else

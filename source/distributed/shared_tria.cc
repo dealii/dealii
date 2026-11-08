@@ -654,7 +654,7 @@ namespace internal
           }
       }
     } // namespace shared
-  }   // namespace parallel
+  } // namespace parallel
 } // namespace internal
 
 

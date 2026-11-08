@@ -485,7 +485,7 @@ namespace MatrixCreator
 
 
     } // namespace AssemblerBoundary
-  }   // namespace internal
+  } // namespace internal
 } // namespace MatrixCreator
 
 
@@ -498,8 +498,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
     MatrixType                      &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -564,8 +564,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
     MatrixType                      &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
@@ -587,8 +587,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -652,8 +652,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(get_default_linear_mapping(dof.get_triangulation()),
@@ -675,8 +675,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim>            &dof,
     const hp::QCollection<dim>                 &q,
     MatrixType                                 &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -736,8 +736,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim>      &q,
     MatrixType                      &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
@@ -759,8 +759,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -821,8 +821,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim, spacedim>::mapping_collection,
@@ -1291,7 +1291,7 @@ namespace MatrixCreator
     create_hp_boundary_mass_matrix_1(
       const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
       const MatrixCreator::internal::AssemblerBoundary::Scratch &,
-      MatrixCreator::internal::AssemblerBoundary ::
+      MatrixCreator::internal::AssemblerBoundary::
         CopyData<dim, spacedim, number>          &copy_data,
       const hp::MappingCollection<dim, spacedim> &mapping,
       const hp::FECollection<dim, spacedim>      &fe_collection,
@@ -1547,7 +1547,7 @@ namespace MatrixCreator
     template <int dim, int spacedim, typename number>
     void
     copy_hp_boundary_mass_matrix_1(
-      const MatrixCreator::internal::AssemblerBoundary ::
+      const MatrixCreator::internal::AssemblerBoundary::
         CopyData<dim, spacedim, number> &copy_data,
       const std::map<types::boundary_id, const Function<spacedim, number> *>
                                                  &boundary_functions,
@@ -1728,11 +1728,11 @@ namespace MatrixCreator
       copy_data;
 
     // Same trick with std::function
-    std::function<void(const MatrixCreator::internal::AssemblerBoundary ::
+    std::function<void(const MatrixCreator::internal::AssemblerBoundary::
                          CopyData<dim, spacedim, number> &copy_data)>
       copier =
         [&boundary_functions, &dof_to_boundary_mapping, &matrix, &rhs_vector](
-          const MatrixCreator::internal::AssemblerBoundary ::
+          const MatrixCreator::internal::AssemblerBoundary::
             CopyData<dim, spacedim, number> &copy_data) {
           internal::copy_hp_boundary_mass_matrix_1(copy_data,
                                                    boundary_functions,
@@ -1752,7 +1752,7 @@ namespace MatrixCreator
        &component_mapping](
         const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
         const MatrixCreator::internal::AssemblerBoundary::Scratch &scratch_data,
-        MatrixCreator::internal::AssemblerBoundary ::
+        MatrixCreator::internal::AssemblerBoundary::
           CopyData<dim, spacedim, number> &copy_data) {
         internal::create_hp_boundary_mass_matrix_1(cell,
                                                    scratch_data,
@@ -1804,8 +1804,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
     MatrixType                      &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -1869,8 +1869,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim> &dof,
     const Quadrature<dim>           &q,
     MatrixType                      &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
@@ -1892,8 +1892,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -1958,8 +1958,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(get_default_linear_mapping(dof.get_triangulation()),
@@ -1981,8 +1981,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim>            &dof,
     const hp::QCollection<dim>                 &q,
     MatrixType                                 &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -2043,8 +2043,8 @@ namespace MatrixCreator
     const DoFHandler<dim, spacedim> &dof,
     const hp::QCollection<dim>      &q,
     MatrixType                      &matrix,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(
@@ -2067,8 +2067,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     Assert(matrix.m() == dof.n_dofs(),
@@ -2131,8 +2131,8 @@ namespace MatrixCreator
     MatrixType                                                &matrix,
     const Function<spacedim, typename MatrixType::value_type> &rhs,
     Vector<typename MatrixType::value_type>                   &rhs_vector,
-    const Function<spacedim, typename MatrixType::value_type>
-      *const                                                  coefficient,
+    const Function<spacedim, typename MatrixType::value_type> *const
+                                                              coefficient,
     const AffineConstraints<typename MatrixType::value_type> &constraints)
   {
     create_laplace_matrix(

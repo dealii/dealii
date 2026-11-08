@@ -120,8 +120,6 @@ namespace internal
        * Shape functions without a tensor product properties.
        */
       tensor_none = 9
-
-
     };
 
 

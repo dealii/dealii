@@ -408,17 +408,17 @@ namespace Step30
 
     FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
     FEFaceValues<dim>    fe_v_face(mapping,
-                                fe,
-                                face_quadrature,
-                                face_update_flags);
+                                   fe,
+                                   face_quadrature,
+                                   face_update_flags);
     FESubfaceValues<dim> fe_v_subface(mapping,
                                       fe,
                                       face_quadrature,
                                       face_update_flags);
     FEFaceValues<dim>    fe_v_face_neighbor(mapping,
-                                         fe,
-                                         face_quadrature,
-                                         neighbor_face_update_flags);
+                                            fe,
+                                            face_quadrature,
+                                            neighbor_face_update_flags);
 
 
     FullMatrix<double> ui_vi_matrix(dofs_per_cell, dofs_per_cell);
@@ -693,17 +693,17 @@ namespace Step30
       UpdateFlags(update_values | update_JxW_values);
 
     FEFaceValues<dim>    fe_v_face(mapping,
-                                fe,
-                                face_quadrature,
-                                face_update_flags);
+                                   fe,
+                                   face_quadrature,
+                                   face_update_flags);
     FESubfaceValues<dim> fe_v_subface(mapping,
                                       fe,
                                       face_quadrature,
                                       face_update_flags);
     FEFaceValues<dim>    fe_v_face_neighbor(mapping,
-                                         fe,
-                                         face_quadrature,
-                                         update_values);
+                                            fe,
+                                            face_quadrature,
+                                            update_values);
 
     // Now we need to loop over all active cells.
     for (const auto &cell : dof_handler.active_cell_iterators())

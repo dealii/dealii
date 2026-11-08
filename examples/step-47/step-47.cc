@@ -716,7 +716,7 @@ namespace Step47
     // MeshWorker::mesh_loop() does all of this in parallel, using
     // as many processor cores as your machine happens to have.
     const unsigned int n_gauss_points = dof_handler.get_fe().degree + 1;
-    ScratchData<dim>   scratch_data(mapping,
+    ScratchData<dim> scratch_data(mapping,
                                   fe,
                                   n_gauss_points,
                                   update_values | update_gradients |
@@ -725,7 +725,7 @@ namespace Step47
                                   update_values | update_gradients |
                                     update_hessians | update_quadrature_points |
                                     update_JxW_values | update_normal_vectors);
-    CopyData           copy_data(dof_handler.get_fe().n_dofs_per_cell());
+    CopyData         copy_data(dof_handler.get_fe().n_dofs_per_cell());
     MeshWorker::mesh_loop(dof_handler.begin_active(),
                           dof_handler.end(),
                           cell_worker,

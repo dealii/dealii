@@ -853,8 +853,7 @@ namespace Differentiation
 
       template <int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<0, dim, ValueType>
       scalar_diff_tensor(const ValueType                     &func,
                          const TensorType<0, dim, ValueType> &op)
@@ -866,8 +865,7 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, ValueType>
       scalar_diff_tensor(const ValueType                        &func,
                          const TensorType<rank, dim, ValueType> &op)
@@ -890,8 +888,7 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, ValueType>
       tensor_diff_tensor(const TensorType<0, dim, ValueType>    &func,
                          const TensorType<rank, dim, ValueType> &op)
@@ -913,8 +910,7 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, ValueType>
       tensor_diff_scalar(const TensorType<rank, dim, ValueType> &funcs,
                          const ValueType                        &op)
@@ -934,8 +930,7 @@ namespace Differentiation
       template <int rank,
                 int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, ValueType>
       tensor_diff_tensor(const TensorType<rank, dim, ValueType> &funcs,
                          const TensorType<0, dim, ValueType>    &op)
@@ -956,8 +951,7 @@ namespace Differentiation
                 int rank_2,
                 int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank_1 + rank_2, dim, ValueType>
       tensor_diff_tensor(const TensorType<rank_1, dim, ValueType> &funcs,
                          const TensorType<rank_2, dim, ValueType> &op)
@@ -993,10 +987,8 @@ namespace Differentiation
                 int rank_2,
                 int dim,
                 typename ValueType = Expression,
-                template <int, int, typename>
-                class TensorType_1,
-                template <int, int, typename>
-                class TensorType_2>
+                template <int, int, typename> class TensorType_1,
+                template <int, int, typename> class TensorType_2>
       Tensor<rank_1 + rank_2, dim, ValueType>
       tensor_diff_tensor(const TensorType_1<rank_1, dim, ValueType> &funcs,
                          const TensorType_2<rank_2, dim, ValueType> &op)
@@ -1175,8 +1167,7 @@ namespace Differentiation
                 typename ValueType,
                 int rank,
                 int dim,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       void
       set_tensor_value_in_symbol_map(
         types::substitution_map                   &substitution_map,
@@ -1313,8 +1304,7 @@ namespace Differentiation
                 int dim,
                 typename ExpressionType,
                 typename ValueType,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       std::vector<std::pair<ExpressionType, ValueType>>
       make_tensor_entries_for_substitution_map(
         const TensorType<rank, dim, ExpressionType> &symbol_tensor,
@@ -1412,8 +1402,7 @@ namespace Differentiation
     {
       template <int rank,
                 int dim,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, Expression>
       substitute_tensor(
         const TensorType<rank, dim, Expression> &expression_tensor,
@@ -1467,8 +1456,7 @@ namespace Differentiation
       template <typename ValueType,
                 int rank,
                 int dim,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, ValueType>
       substitute_and_evaluate_tensor(
         const TensorType<rank, dim, Expression> &expression_tensor,

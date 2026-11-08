@@ -514,7 +514,7 @@ namespace internal
         return support_points;
       }
     } // namespace
-  }   // namespace QIteratedImplementation
+  } // namespace QIteratedImplementation
 } // namespace internal
 
 

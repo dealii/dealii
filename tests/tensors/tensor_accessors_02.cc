@@ -77,7 +77,7 @@ main()
 
     // read-only:
 
-    const double(&foo2)[3][3][3][3][3] = foo;
+    const double (&foo2)[3][3][3][3][3] = foo;
     deallog << TensorAccessors::extract<5>(foo2, indices) << std::endl;
 
     // via std::array

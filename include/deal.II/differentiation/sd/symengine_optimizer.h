@@ -644,7 +644,7 @@ namespace Differentiation
              OptimizerType &optimizer)
         {
           const std::string llvm_compiled_function = optimizer.dumps();
-          archive          &llvm_compiled_function;
+          archive & llvm_compiled_function;
         }
 
 
@@ -663,7 +663,7 @@ namespace Differentiation
              const enum OptimizationFlags & /*optimization_flags*/)
         {
           std::string llvm_compiled_function;
-          archive    &llvm_compiled_function;
+          archive & llvm_compiled_function;
           optimizer.loads(llvm_compiled_function);
         }
 
@@ -1123,8 +1123,7 @@ namespace Differentiation
       template <typename NumberType,
                 int rank,
                 int dim,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       TensorType<rank, dim, NumberType>
       tensor_evaluate_optimized(
         const TensorType<rank, dim, Expression> &symbol_tensor,
@@ -1285,8 +1284,7 @@ namespace Differentiation
        */
       template <int rank,
                 int dim,
-                template <int, int, typename>
-                class TensorType>
+                template <int, int, typename> class TensorType>
       types::symbol_vector
       unroll_to_expression_vector(
         const TensorType<rank, dim, Expression> &symbol_tensor)
@@ -2271,26 +2269,26 @@ namespace Differentiation
       {
         const auto m =
           static_cast<std::underlying_type_t<OptimizerType>>(method);
-        ar &m;
+        ar & m;
       }
       {
         const auto f =
           static_cast<std::underlying_type_t<OptimizationFlags>>(flags);
-        ar &f;
+        ar & f;
       }
 
       // Important: Independent variables must always be
       // serialized before the dependent variables.
-      ar &independent_variables_symbols;
-      ar &dependent_variables_functions;
+      ar & independent_variables_symbols;
+      ar & dependent_variables_functions;
 
-      ar &dependent_variables_output;
-      ar &map_dep_expr_vec_entry;
-      ar &ready_for_value_extraction;
+      ar & dependent_variables_output;
+      ar & map_dep_expr_vec_entry;
+      ar & ready_for_value_extraction;
 
       // Mark that we've saved this class at some point.
       has_been_serialized = true;
-      ar &has_been_serialized;
+      ar & has_been_serialized;
 
       // When we serialize the optimizer itself, we have to (unfortunately)
       // provide it with sufficient information to rebuild itself from scratch.
@@ -2352,25 +2350,25 @@ namespace Differentiation
       // Deserialize enum classes...
       {
         std::underlying_type_t<OptimizerType> m;
-        ar                                   &m;
+        ar & m;
         method = static_cast<OptimizerType>(m);
       }
       {
         std::underlying_type_t<OptimizationFlags> f;
-        ar                                       &f;
+        ar & f;
         flags = static_cast<OptimizationFlags>(f);
       }
 
       // Important: Independent variables must always be
       // deserialized before the dependent variables.
-      ar &independent_variables_symbols;
-      ar &dependent_variables_functions;
+      ar & independent_variables_symbols;
+      ar & dependent_variables_functions;
 
-      ar &dependent_variables_output;
-      ar &map_dep_expr_vec_entry;
-      ar &ready_for_value_extraction;
+      ar & dependent_variables_output;
+      ar & map_dep_expr_vec_entry;
+      ar & ready_for_value_extraction;
 
-      ar &has_been_serialized;
+      ar & has_been_serialized;
 
       // If we're reading in data, then create the optimizer
       // and then deserialize it.

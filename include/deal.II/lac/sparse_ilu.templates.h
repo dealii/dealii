@@ -199,7 +199,7 @@ SparseILU<number>::vmult(Vector<somenumber>       &dst,
 
       somenumber    dst_row = dst(row);
       const number *luval   = this->SparseMatrix<number>::val.get() +
-                            (first_after_diagonal - column_numbers);
+                              (first_after_diagonal - column_numbers);
       for (const size_type *col = first_after_diagonal; col != rowend;
            ++col, ++luval)
         dst_row -= *luval * dst(*col);
@@ -257,7 +257,7 @@ SparseILU<number>::Tvmult(Vector<somenumber>       &dst,
 
       const somenumber dst_row = dst(row);
       const number    *luval   = this->SparseMatrix<number>::val.get() +
-                            (first_after_diagonal - column_numbers);
+                                 (first_after_diagonal - column_numbers);
       for (const size_type *col = first_after_diagonal; col != rowend;
            ++col, ++luval)
         tmp(*col) += *luval * dst_row;

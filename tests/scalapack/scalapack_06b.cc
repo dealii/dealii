@@ -82,13 +82,13 @@ test(const unsigned int size,
       for (unsigned int j = 0; j < size; ++j)
         lapack_A[i * size + j] = full_A(i, j);
 
-    int info; // Variable containing information about the successful exit of
-              // the lapack routine
-    char jobz = 'V'; //'V': all eigenpairs of A are computed
-    char uplo = 'U'; // storage format of the matrix A; not so important as
-                     // matrix is symmetric
-    int                     LDA = size; // leading dimension of the matrix A
-    int                     lwork;      // length of vector/array work
+    int  info; // Variable containing information about the successful exit of
+               // the lapack routine
+    char jobz = 'V';  //'V': all eigenpairs of A are computed
+    char uplo = 'U';  // storage format of the matrix A; not so important as
+                      // matrix is symmetric
+    int  LDA  = size; // leading dimension of the matrix A
+    int  lwork;       // length of vector/array work
     std::vector<NumberType> work(1);
 
     // by setting lwork to -1 a workspace query for work is done

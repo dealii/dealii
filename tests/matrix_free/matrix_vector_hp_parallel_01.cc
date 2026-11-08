@@ -52,7 +52,7 @@ class MatrixFreeTestHP
 {
 public:
   MatrixFreeTestHP(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_apply(const MatrixFree<dim, Number>                    &data,
@@ -160,11 +160,11 @@ test()
   // assemble sparse matrix with (\nabla v,
   // \nabla u) + (v, 10 * u)
   {
-    hp::FEValues<dim>                    hp_fe_values(fe_collection,
-                                   quadrature_collection,
-                                   update_values | update_gradients |
-                                     update_JxW_values);
-    FullMatrix<double>                   cell_matrix;
+    hp::FEValues<dim>  hp_fe_values(fe_collection,
+                                    quadrature_collection,
+                                    update_values | update_gradients |
+                                      update_JxW_values);
+    FullMatrix<double> cell_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
 
     for (const auto &cell : dof.active_cell_iterators())

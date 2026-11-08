@@ -175,7 +175,7 @@ template <class Archive>
 inline void
 TableIndices<N>::serialize(Archive &ar, const unsigned int)
 {
-  ar &indices;
+  ar & indices;
 }
 
 

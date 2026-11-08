@@ -95,7 +95,7 @@ main()
   const hp::FECollection<2> fe(FE_SimplexP<2>(3),
                                FE_Q<2>(QIterated<1>(QTrapezoid<1>(), 3)));
   const hp::QCollection<2>  quadrature_formula(QGaussSimplex<2>(4),
-                                              QGauss<2>(4));
+                                               QGauss<2>(4));
 
   Triangulation<2> tria;
   GridTools::invert_cells_with_negative_measure(vertices, cells);

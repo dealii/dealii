@@ -2079,9 +2079,9 @@ namespace GridTools
                           }
                       }
                   } // for lines l
-              }     // if dim == 3
-          }         // if cell->is_locally_owned()
-      }             // for cells
+              } // if dim == 3
+          } // if cell->is_locally_owned()
+      } // for cells
 
 
     if (dim == 3)

@@ -393,9 +393,9 @@ KellyErrorEstimator<1, spacedim>::estimate(
 
 
   hp::FEValues<1, spacedim>     fe_values(mapping,
-                                      fe,
-                                      q_collection,
-                                      update_gradients);
+                                          fe,
+                                          q_collection,
+                                          update_gradients);
   hp::FEFaceValues<1, spacedim> fe_face_values(
     /*mapping,*/ fe, q_face_collection, update_normal_vectors);
 

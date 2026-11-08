@@ -429,7 +429,7 @@ FE_RaviartThomas<dim>::initialize_quad_dof_index_permutation_and_sign_change()
                      ->adjust_quad_dof_sign_for_face_orientation_table[face_no](
                        local_face_dof, case_no);
             } // case_no
-    }         // local_face_dof
+    } // local_face_dof
 }
 
 

@@ -136,8 +136,8 @@ build_matrix_vector(TrilinosWrappers::BlockSparseMatrix &matrix,
 
   // Assemble system: Mass matrix and constraint RHS vector
   FEValues<dim>      fe_values(fe,
-                          quadrature_formula,
-                          update_values | update_JxW_values);
+                               quadrature_formula,
+                               update_values | update_JxW_values);
   const unsigned int n_q_points = quadrature_formula.size();
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double>     cell_rhs(dofs_per_cell);

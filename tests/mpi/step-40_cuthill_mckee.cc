@@ -141,11 +141,11 @@ namespace Step40
 
       const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
       FEFaceValues<dim>     fe_face_values(fe,
-                                       face_quadrature_formula,
-                                       update_values |
-                                         update_quadrature_points |
-                                         update_normal_vectors |
-                                         update_JxW_values);
+                                           face_quadrature_formula,
+                                           update_values |
+                                             update_quadrature_points |
+                                             update_normal_vectors |
+                                             update_JxW_values);
 
       Tensor<1, dim>                       u;
       Point<dim>                           down{0, -1};

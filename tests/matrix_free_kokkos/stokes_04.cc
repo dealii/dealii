@@ -880,7 +880,7 @@ solve_cycle(parallel::distributed::Triangulation<dim> &tria,
     LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>;
   using LevelMatrixType = PortableMFVelocityOperator<dim, degree_u, degree_p>;
   using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
-  using SmootherType               = PreconditionChebyshev<LevelMatrixType,
+  using SmootherType = PreconditionChebyshev<LevelMatrixType,
                                              VectorType,
                                              SmootherPreconditionerType>;
   using MGTransferType =

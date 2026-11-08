@@ -251,11 +251,11 @@ InitFinalize::InitFinalize([[maybe_unused]] int    &argc,
           int my_hostname_size  = hostname.size() + 1;
           int max_hostname_size = -1;
           ierr                  = MPI_Allreduce(&my_hostname_size,
-                               &max_hostname_size,
-                               1,
-                               MPI_INT,
-                               MPI_MAX,
-                               MPI_COMM_WORLD);
+                                                &max_hostname_size,
+                                                1,
+                                                MPI_INT,
+                                                MPI_MAX,
+                                                MPI_COMM_WORLD);
           AssertThrowMPI(ierr);
           std::vector<char> hostname_array(max_hostname_size);
           std::copy(hostname.c_str(),
@@ -484,9 +484,9 @@ InitFinalize::finalize()
       if (static_cast<bool>(libraries & InitializeLibrary::Kokkos))
         Kokkos::finalize();
 
-        // only MPI_Finalize if we are running with MPI. We also need to do this
-        // when running PETSc, because we initialize MPI ourselves before
-        // calling PetscInitialize
+      // only MPI_Finalize if we are running with MPI. We also need to do this
+      // when running PETSc, because we initialize MPI ourselves before
+      // calling PetscInitialize
 #ifdef DEAL_II_WITH_MPI
       int       MPI_has_been_started = 0;
       const int ierr                 = MPI_Initialized(&MPI_has_been_started);

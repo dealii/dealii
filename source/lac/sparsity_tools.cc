@@ -999,8 +999,8 @@ namespace SparsityTools
             for (DynamicSparsityPattern::size_type c = 0; c < rlen; ++c)
               send_data[data.first].push_back(
                 dsp.column_number(row, c)); // columns
-          }                                 // loop over rows
-      }                                     // loop over received data
+          } // loop over rows
+      } // loop over received data
 
     // 5. communicate rows
     const auto received_data =

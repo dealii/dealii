@@ -2171,8 +2171,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
 
 
       template <typename Number, typename MemorySpace>
-      inline Accessor<Number, MemorySpace, false>::Reference::operator Number()
-        const
+      inline Accessor<Number, MemorySpace, false>::Reference::
+      operator Number() const
       {
         return (*accessor.value_cache)[accessor.a_index];
       }
@@ -2388,7 +2388,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
       }
 
     } // namespace SparseMatrixIterators
-  }   // namespace TpetraWrappers
+  } // namespace TpetraWrappers
 
 } // namespace LinearAlgebra
 

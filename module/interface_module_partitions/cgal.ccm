@@ -101,8 +101,7 @@ export module dealii.external.cgal;
 
 #ifdef DEAL_II_WITH_CGAL
 
-export
-{
+export {
   namespace CGAL
   {
     using ::CGAL::Complex_2_in_triangulation_3;
@@ -173,7 +172,7 @@ export
       using ::CGAL::Polygon_mesh_processing::corefine_and_compute_union;
       using ::CGAL::Polygon_mesh_processing::volume;
     } // namespace Polygon_mesh_processing
-  }   // namespace CGAL
+  } // namespace CGAL
 
 
   // In CGAL 5.6.1, the following are variables of types such as 'const
@@ -196,7 +195,7 @@ export
       using ::CGAL::parameters::no_exude;
       using ::CGAL::parameters::no_perturb;
     } // namespace parameters
-  }   // namespace CGAL
+  } // namespace CGAL
 #  endif
 }
 

@@ -44,8 +44,7 @@ export module dealii.external.adolc;
 
 #ifdef DEAL_II_WITH_ADOLC
 
-export
-{
+export {
   using ::adouble;
   using ::adub;
   using ::badouble;

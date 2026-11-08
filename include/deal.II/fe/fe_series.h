@@ -606,22 +606,22 @@ FESeries::Fourier<dim, spacedim>::save_transformation_matrices(
   // Store information about those resources which have been used to generate
   // the transformation matrices.
   // mode vector
-  ar &n_coefficients_per_direction;
+  ar & n_coefficients_per_direction;
 
   // finite element collection
   unsigned int size = fe_collection->size();
-  ar          &size;
+  ar & size;
   for (unsigned int i = 0; i < size; ++i)
     ar &(*fe_collection)[i].get_name();
 
   // quadrature collection
   size = q_collection.size();
-  ar &size;
+  ar & size;
   for (unsigned int i = 0; i < size; ++i)
     ar &q_collection[i];
 
   // Store the actual transform matrices.
-  ar &fourier_transform_matrices;
+  ar & fourier_transform_matrices;
 }
 
 
@@ -637,7 +637,7 @@ FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
   // the transformation matrices to load.
   // mode vector
   std::vector<unsigned int> compare_coefficients;
-  ar                       &compare_coefficients;
+  ar & compare_coefficients;
   Assert(compare_coefficients == n_coefficients_per_direction,
          ExcMessage("A different number of coefficients vector has been used "
                     "to generate the transformation matrices you are about "
@@ -645,31 +645,31 @@ FESeries::Fourier<dim, spacedim>::load_transformation_matrices(
 
   // finite element collection
   unsigned int size;
-  ar          &size;
+  ar & size;
   AssertDimension(size, fe_collection->size());
   std::string name;
   for (unsigned int i = 0; i < size; ++i)
     {
-      ar &name;
+      ar & name;
       Assert(name.compare((*fe_collection)[i].get_name()) == 0,
              ExcMessage("A different FECollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
 
   // quadrature collection
-  ar &size;
+  ar & size;
   AssertDimension(size, q_collection.size());
   Quadrature<dim> quadrature;
   for (unsigned int i = 0; i < size; ++i)
     {
-      ar &quadrature;
+      ar & quadrature;
       Assert(quadrature == q_collection[i],
              ExcMessage("A different QCollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
 
   // Restore the transform matrices since all prerequisites are fulfilled.
-  ar &fourier_transform_matrices;
+  ar & fourier_transform_matrices;
 }
 
 
@@ -684,22 +684,22 @@ FESeries::Legendre<dim, spacedim>::save_transformation_matrices(
   // Store information about those resources which have been used to generate
   // the transformation matrices.
   // mode vector
-  ar &n_coefficients_per_direction;
+  ar & n_coefficients_per_direction;
 
   // finite element collection
   unsigned int size = fe_collection->size();
-  ar          &size;
+  ar & size;
   for (unsigned int i = 0; i < size; ++i)
     ar &(*fe_collection)[i].get_name();
 
   // quadrature collection
   size = q_collection.size();
-  ar &size;
+  ar & size;
   for (unsigned int i = 0; i < size; ++i)
     ar &q_collection[i];
 
   // Store the actual transform matrices.
-  ar &legendre_transform_matrices;
+  ar & legendre_transform_matrices;
 }
 
 
@@ -715,7 +715,7 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
   // the transformation matrices to load.
   // mode vector
   std::vector<unsigned int> compare_coefficients;
-  ar                       &compare_coefficients;
+  ar & compare_coefficients;
   Assert(compare_coefficients == n_coefficients_per_direction,
          ExcMessage("A different number of coefficients vector has been used "
                     "to generate the transformation matrices you are about "
@@ -723,31 +723,31 @@ FESeries::Legendre<dim, spacedim>::load_transformation_matrices(
 
   // finite element collection
   unsigned int size;
-  ar          &size;
+  ar & size;
   AssertDimension(size, fe_collection->size());
   std::string name;
   for (unsigned int i = 0; i < size; ++i)
     {
-      ar &name;
+      ar & name;
       Assert(name.compare((*fe_collection)[i].get_name()) == 0,
              ExcMessage("A different FECollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
 
   // quadrature collection
-  ar &size;
+  ar & size;
   AssertDimension(size, q_collection.size());
   Quadrature<dim> quadrature;
   for (unsigned int i = 0; i < size; ++i)
     {
-      ar &quadrature;
+      ar & quadrature;
       Assert(quadrature == q_collection[i],
              ExcMessage("A different QCollection has been used to generate "
                         "the transformation matrices you are about to load!"));
     }
 
   // Restore the transform matrices since all prerequisites are fulfilled.
-  ar &legendre_transform_matrices;
+  ar & legendre_transform_matrices;
 }
 
 

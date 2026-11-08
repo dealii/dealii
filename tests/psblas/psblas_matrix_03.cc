@@ -80,7 +80,7 @@ test()
   PSCToolkitWrappers::SparsityPattern sparsity_pattern(locally_owned_dofs,
                                                        mpi_communicator);
   PSCToolkitWrappers::SparseMatrix    psblas_matrix(sparsity_pattern,
-                                                 mpi_communicator);
+                                                    mpi_communicator);
 
   // Assemble system
   QGauss<dim>   quadrature_formula(fe.degree + 1);

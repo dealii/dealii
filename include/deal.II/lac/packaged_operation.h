@@ -502,7 +502,7 @@ namespace internal
 
       using type = decltype(test<T>(nullptr, nullptr, nullptr));
     }; // namespace
-  }    // namespace PackagedOperationImplementation
+  } // namespace PackagedOperationImplementation
 } // namespace internal
 
 

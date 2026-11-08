@@ -73,7 +73,7 @@ do_test(const Triangulation<dim, spacedim> &tria)
             weights[0] = 0.55;
             weights[1] = 0.45;
             p    = cell->get_manifold().get_new_point(make_array_view(points),
-                                                   make_array_view(weights));
+                                                      make_array_view(weights));
             pref = cell->face(face)->get_manifold().get_new_point(
               make_array_view(points), make_array_view(weights));
             deallog << "Distance between cell manifold and face manifold: "

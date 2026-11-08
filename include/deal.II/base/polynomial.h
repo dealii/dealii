@@ -1141,10 +1141,10 @@ namespace Polynomials
   {
     // forward to serialization function in the base class.
     ar &static_cast<EnableObserverPointer &>(*this);
-    ar &coefficients;
-    ar &in_lagrange_product_form;
-    ar &lagrange_support_points;
-    ar &lagrange_weight;
+    ar & coefficients;
+    ar & in_lagrange_product_form;
+    ar & lagrange_support_points;
+    ar & lagrange_weight;
   }
 
 

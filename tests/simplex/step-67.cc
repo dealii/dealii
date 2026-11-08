@@ -1081,7 +1081,7 @@ namespace Euler_DG
 #ifdef HEX
     FEEvaluation<dim, degree, n_points_1d, dim + 2, Number> phi(data);
 #else
-    FEEvaluation<dim, -1, n_points_1d, dim + 2, Number>     phi(data);
+    FEEvaluation<dim, -1, n_points_1d, dim + 2, Number> phi(data);
 #endif
 
     Tensor<1, dim, VectorizedArray<Number>> constant_body_force;
@@ -1792,7 +1792,7 @@ namespace Euler_DG
 #ifdef HEX
     FEEvaluation<dim, degree, degree + 1, dim + 2, Number> phi(data, 0, 1);
 #else
-    FEEvaluation<dim, -1, degree + 1, dim + 2, Number>  phi(data, 0, 1);
+    FEEvaluation<dim, -1, degree + 1, dim + 2, Number> phi(data, 0, 1);
 #endif
 
     for (unsigned int cell = 0; cell < data.n_cell_batches(); ++cell)
@@ -1902,13 +1902,13 @@ namespace Euler_DG
     parallel::fullydistributed::Triangulation<dim> triangulation;
 #  endif
 #else
-    Triangulation<dim>                                  triangulation;
+    Triangulation<dim> triangulation;
 #endif
 
 #ifdef HEX
     MappingQ<dim> mapping;
 #else
-    MappingFE<dim>                                      mapping;
+    MappingFE<dim> mapping;
 #endif
 
     FESystem<dim>   fe;

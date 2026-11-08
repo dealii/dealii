@@ -268,7 +268,7 @@ namespace ExactSolutions
     const double OMEGA   = ((mur - 1.0) / (mur + 2.0)) * (a3 / b3);
     const double gamma_1 = (-3.0 * b3 * H0 * OMEGA) /
                            ((2.0 * mur + 1.0) - 2.0 * (mur - 1.0) * OMEGA);
-    const double beta_1 = ((2.0 * mur + 1.0) * gamma_1) / ((mur - 1.0) * a3);
+    const double beta_1  = ((2.0 * mur + 1.0) * gamma_1) / ((mur - 1.0) * a3);
     const double alpha_1 =
       (-b3 * H0 + 2.0 * mur * gamma_1 - mur * b3 * beta_1) / 2.0;
     const double delta_1 = (mur * a3 * beta_1 - 2.0 * mur * gamma_1) / a3;
@@ -1257,13 +1257,13 @@ namespace SolverA
                               /* (n x phi_i(x_q)).(n x phi_j(x_q)) */
                               * scratch_data.fe_face_values.JxW(
                                   q_index_face); // dx
-                          }                      // for j
-                      }                          // for i
-                  }                              // for q_index_face
+                          } // for j
+                      } // for i
+                  } // for q_index_face
               } // if (cell->face(f)->at_boundary())
-          }     // for f
-      }         /* if (scratch_data.boundary_condition_type ==
-                   BoundaryConditionType::Robin) */
+          } // for f
+      } /* if (scratch_data.boundary_condition_type ==
+           BoundaryConditionType::Robin) */
 
     cell->get_dof_indices(copy_data.local_dof_indices);
   }

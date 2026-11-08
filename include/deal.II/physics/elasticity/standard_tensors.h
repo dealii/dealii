@@ -343,7 +343,7 @@ namespace Physics
 template <int dim>
 template <typename Number>
 DEAL_II_HOST DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
-             Physics::Elasticity::StandardTensors<dim>::Dev_P(
+Physics::Elasticity::StandardTensors<dim>::Dev_P(
   const Tensor<2, dim, Number> &F)
 {
   // Make things work with AD types
@@ -370,7 +370,7 @@ DEAL_II_HOST DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
 template <int dim>
 template <typename Number>
 DEAL_II_HOST DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
-             Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
+Physics::Elasticity::StandardTensors<dim>::Dev_P_T(
   const Tensor<2, dim, Number> &F)
 {
   // Make things work with AD types
@@ -410,7 +410,7 @@ Physics::Elasticity::StandardTensors<dim>::ddet_F_dC(
 template <int dim>
 template <typename Number>
 DEAL_II_HOST DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
-             Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(
+Physics::Elasticity::StandardTensors<dim>::dC_inv_dC(
   const Tensor<2, dim, Number> &F)
 {
   const SymmetricTensor<2, dim, Number> C_inv =

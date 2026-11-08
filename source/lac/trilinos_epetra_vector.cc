@@ -47,7 +47,8 @@ namespace LinearAlgebra
 #  ifndef DOXYGEN
     namespace internal
     {
-      VectorReference::operator value_type() const
+      VectorReference::
+      operator value_type() const
       {
         AssertIndexRange(index, vector.size());
 
@@ -306,8 +307,8 @@ namespace LinearAlgebra
 
           Epetra_Import data_exchange(vector->Map(), V.trilinos_vector().Map());
           const int     ierr = vector->Import(V.trilinos_vector(),
-                                          data_exchange,
-                                          Epetra_AddLocalAlso);
+                                              data_exchange,
+                                              Epetra_AddLocalAlso);
           Assert(ierr == 0, ExcTrilinosError(ierr));
         }
 

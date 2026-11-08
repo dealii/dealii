@@ -77,10 +77,10 @@ namespace Particles
         // fails however for higher-order mappings.
         FE_Nothing<dim, spacedim> alibi_finite_element;
         FEValues<dim, spacedim>   fe_values(mapping,
-                                          alibi_finite_element,
-                                          quadrature_formula,
-                                          update_quadrature_points |
-                                            update_JxW_values);
+                                            alibi_finite_element,
+                                            quadrature_formula,
+                                            update_quadrature_points |
+                                              update_JxW_values);
 
         // compute the integral weight
         for (const auto &cell : triangulation.active_cell_iterators())

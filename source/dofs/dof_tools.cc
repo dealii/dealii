@@ -1130,7 +1130,7 @@ namespace DoFTools
         return selected_dofs;
       }
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -2264,7 +2264,7 @@ namespace DoFTools
         return true;
       }
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -2695,7 +2695,7 @@ namespace DoFTools
         return support_points;
       }
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
 
   template <int dim, int spacedim>

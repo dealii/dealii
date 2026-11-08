@@ -789,7 +789,7 @@ namespace step62
   {
     TimerOutput::Scope t(computing_timer, "assembly");
 
-    FEValues<dim>      fe_values(fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
@@ -889,9 +889,9 @@ namespace step62
                             alpha[m][n][k][l] = xi *
                                                 stiffness_tensor[m][n][k][l] /
                                                 (2.0 * s[n] * s[k]);
-                            beta[m][n][k][l] = xi *
-                                               stiffness_tensor[m][n][k][l] /
-                                               (2.0 * s[n] * s[l]);
+                            beta[m][n][k][l]  = xi *
+                                                stiffness_tensor[m][n][k][l] /
+                                                (2.0 * s[n] * s[l]);
                           }
 
                   for (unsigned int i = 0; i < dofs_per_cell; ++i)

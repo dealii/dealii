@@ -213,10 +213,10 @@ namespace Portable
        * Constructor.
        */
       AdditionalData(
-        const UpdateFlags mapping_update_flags = update_gradients |
-                                                 update_JxW_values |
-                                                 update_quadrature_points,
-        const bool         use_coloring                      = false,
+        const UpdateFlags  mapping_update_flags = update_gradients |
+                                                  update_JxW_values |
+                                                  update_quadrature_points,
+        const bool         use_coloring         = false,
         const bool         overlap_communication_computation = false,
         const unsigned int mg_level  = numbers::invalid_unsigned_int,
         const unsigned int team_size = numbers::invalid_unsigned_int)
@@ -1109,12 +1109,12 @@ namespace Portable
            const typename MatrixFree<dim, Number>::PrecomputedData &gpu_data)
     {
       values      = SharedViewValues(team_handle.team_shmem(),
-                                n_q_points,
-                                gpu_data.n_components);
+                                     n_q_points,
+                                     gpu_data.n_components);
       gradients   = SharedViewGradients(team_handle.team_shmem(),
-                                      n_q_points,
-                                      dim,
-                                      gpu_data.n_components);
+                                        n_q_points,
+                                        dim,
+                                        gpu_data.n_components);
       scratch_pad = SharedViewScratchPad(team_handle.team_shmem(),
                                          gpu_data.scratch_pad_size);
     }

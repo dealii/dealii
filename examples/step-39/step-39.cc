@@ -742,8 +742,8 @@ namespace Step39
                   const std::vector<double> &boundary_values,
                   Vector<double>            &local_vector)
     {
-      const unsigned int degree  = fe.get_fe().tensor_degree();
-      const double       penalty = 2. * degree * (degree + 1) *
+      const unsigned int degree = fe.get_fe().tensor_degree();
+      const double penalty = 2. * degree * (degree + 1) *
                              cell->face(face_no)->measure() / cell->measure();
 
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
@@ -789,8 +789,8 @@ namespace Step39
                     const std::vector<double> &uh,
                     const std::vector<double> &boundary_values)
     {
-      const unsigned int degree  = fe.get_fe().tensor_degree();
-      const double       penalty = 2. * degree * (degree + 1) *
+      const unsigned int degree = fe.get_fe().tensor_degree();
+      const double penalty = 2. * degree * (degree + 1) *
                              cell->face(face_no)->measure() / cell->measure();
 
       double value = 0.;
@@ -819,13 +819,13 @@ namespace Step39
     {
       const unsigned int degree   = fe.get_fe().tensor_degree();
       const double       penalty1 = degree * (degree + 1) *
-                              cell_1->face(face_no_1)->measure() /
-                              cell_1->measure();
-      const double penalty2 = degree * (degree + 1) *
-                              cell_2->face(face_no_2)->measure() /
-                              cell_2->measure();
-      const double penalty = penalty1 + penalty2;
-      const double h       = cell_1->face(face_no_1)->measure();
+                                    cell_1->face(face_no_1)->measure() /
+                                    cell_1->measure();
+      const double       penalty2 = degree * (degree + 1) *
+                                    cell_2->face(face_no_2)->measure() /
+                                    cell_2->measure();
+      const double       penalty  = penalty1 + penalty2;
+      const double       h        = cell_1->face(face_no_1)->measure();
 
       double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)
@@ -897,8 +897,8 @@ namespace Step39
                     const std::vector<double> &uh,
                     const std::vector<double> &exact_values)
     {
-      const unsigned int degree  = fe.get_fe().tensor_degree();
-      const double       penalty = 2. * degree * (degree + 1) *
+      const unsigned int degree = fe.get_fe().tensor_degree();
+      const double penalty = 2. * degree * (degree + 1) *
                              cell->face(face_no)->measure() / cell->measure();
 
       double value = 0.;
@@ -923,12 +923,12 @@ namespace Step39
     {
       const unsigned int degree   = fe.get_fe().tensor_degree();
       const double       penalty1 = degree * (degree + 1) *
-                              cell_1->face(face_no_1)->measure() /
-                              cell_1->measure();
-      const double penalty2 = degree * (degree + 1) *
-                              cell_2->face(face_no_2)->measure() /
-                              cell_2->measure();
-      const double penalty = penalty1 + penalty2;
+                                    cell_1->face(face_no_1)->measure() /
+                                    cell_1->measure();
+      const double       penalty2 = degree * (degree + 1) *
+                                    cell_2->face(face_no_2)->measure() /
+                                    cell_2->measure();
+      const double       penalty  = penalty1 + penalty2;
 
       double value = 0.;
       for (unsigned k = 0; k < fe.n_quadrature_points; ++k)

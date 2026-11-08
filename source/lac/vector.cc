@@ -27,15 +27,14 @@ template class Vector<std::complex<double>>;
 
 // instantiate for integers:
 template class Vector<int>;
-template Vector<double> &
-Vector<double>::operator=<int>(const dealii::Vector<int> &);
-template bool
-Vector<int>::operator==<int>(const dealii::Vector<int> &) const;
+template Vector<double>             &
+  Vector<double>::operator= <int>(const dealii::Vector<int> &);
+template bool Vector<int>::operator== <int>(const dealii::Vector<int> &) const;
 
 // instantiate for long double manually because we use it in a few places:
 template class Vector<long double>;
-template long double
-Vector<long double>::operator*<long double>(const Vector<long double> &) const;
+template long double Vector<long double>::operator*
+  <long double>(const Vector<long double> &) const;
 
 // do a few functions that currently don't fit the scheme because they have
 // two template arguments that need to be different (the case of same
@@ -44,7 +43,7 @@ Vector<long double>::operator*<long double>(const Vector<long double> &) const;
 
 #  define TEMPL_COPY_CONSTRUCTOR(S1, S2)             \
     template Vector<S1>::Vector(const Vector<S2> &); \
-    template Vector<S1> &Vector<S1>::operator=<S2>(const Vector<S2> &)
+    template Vector<S1> &Vector<S1>::operator= <S2>(const Vector<S2> &)
 
 TEMPL_COPY_CONSTRUCTOR(double, float);
 TEMPL_COPY_CONSTRUCTOR(float, double);
@@ -91,11 +90,9 @@ template Vector<float>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
 template Vector<float>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
-template Vector<float> &
-Vector<float>::operator=<float>(
+template Vector<float> &Vector<float>::operator= <float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Host> &);
-template Vector<float> &
-Vector<float>::operator=<float>(
+template Vector<float> &Vector<float>::operator= <float>(
   const LinearAlgebra::TpetraWrappers::Vector<float, MemorySpace::Default> &);
 #    endif
 
@@ -104,17 +101,14 @@ template Vector<double>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
 template Vector<double>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &);
-template Vector<double> &
-Vector<double>::operator=<double>(
+template Vector<double> &Vector<double>::operator= <double>(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Host> &);
-template Vector<double> &
-Vector<double>::operator=<double>(
+template Vector<double> &Vector<double>::operator= <double>(
   const LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> &);
 template dealii::Vector<float> &
-dealii::Vector<float>::operator=<double, dealii::MemorySpace::Host>(
-  const dealii::LinearAlgebra::TpetraWrappers::Vector<double,
-                                                      dealii::MemorySpace::Host>
-    &);
+  dealii::Vector<float>::operator= <double, dealii::MemorySpace::Host>(
+    const dealii::LinearAlgebra::TpetraWrappers::
+      Vector<double, dealii::MemorySpace::Host> &);
 #    endif
 
 #    ifdef DEAL_II_WITH_COMPLEX_VALUES
@@ -126,13 +120,13 @@ template Vector<std::complex<float>>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
                                               MemorySpace::Default> &);
 template Vector<std::complex<float>> &
-Vector<std::complex<float>>::operator=<std::complex<float>>(
-  const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
-                                              MemorySpace::Host> &);
+  Vector<std::complex<float>>::operator= <std::complex<float>>(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
+                                                MemorySpace::Host> &);
 template Vector<std::complex<float>> &
-Vector<std::complex<float>>::operator=<std::complex<float>>(
-  const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
-                                              MemorySpace::Default> &);
+  Vector<std::complex<float>>::operator= <std::complex<float>>(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<float>,
+                                                MemorySpace::Default> &);
 #      endif
 
 #      ifdef DEAL_II_TRILINOS_WITH_TPETRA_INST_COMPLEX_DOUBLE
@@ -143,13 +137,13 @@ template Vector<std::complex<double>>::Vector(
   const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
                                               MemorySpace::Default> &);
 template Vector<std::complex<double>> &
-Vector<std::complex<double>>::operator=<std::complex<double>>(
-  const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
-                                              MemorySpace::Host> &);
+  Vector<std::complex<double>>::operator= <std::complex<double>>(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
+                                                MemorySpace::Host> &);
 template Vector<std::complex<double>> &
-Vector<std::complex<double>>::operator=<std::complex<double>>(
-  const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
-                                              MemorySpace::Default> &);
+  Vector<std::complex<double>>::operator= <std::complex<double>>(
+    const LinearAlgebra::TpetraWrappers::Vector<std::complex<double>,
+                                                MemorySpace::Default> &);
 #      endif
 #    endif
 #  endif

@@ -467,8 +467,8 @@ namespace Particles
         else
           {
             const typename particle_container::iterator
-              particles_in_current_cell =
-                cells_to_particle_cache[active_cell_index];
+                                                  particles_in_current_cell =
+                                                    cells_to_particle_cache[active_cell_index];
             typename particle_container::iterator particles_in_next_cell =
               particles_in_current_cell;
             ++particles_in_next_cell;
@@ -1514,10 +1514,10 @@ namespace Particles
               const unsigned int closest_vertex_index_in_domain =
                 closest_vertex_in_domain[0].second;
 #else
-              const unsigned int closest_vertex_index_in_domain =
-                GridTools::find_closest_vertex(*mapping,
-                                               *triangulation,
-                                               (*out_particle)->get_location());
+            const unsigned int closest_vertex_index_in_domain =
+              GridTools::find_closest_vertex(*mapping,
+                                             *triangulation,
+                                             (*out_particle)->get_location());
 #endif
 
               // Search all of the cells adjacent to the closest vertex of the

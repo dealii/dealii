@@ -81,9 +81,9 @@ test()
   // random values, insert both into sparse and
   // full matrix. Make some random entries equal
   // to zero
-  typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
-                                                 endc = dof.end();
-  unsigned int counter                                = 0;
+  typename DoFHandler<dim>::active_cell_iterator cell    = dof.begin_active(),
+                                                 endc    = dof.end();
+  unsigned int                                   counter = 0;
   for (; cell != endc; ++cell)
     {
       for (unsigned int i = 0; i < fe.dofs_per_cell; ++i)

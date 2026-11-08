@@ -522,17 +522,17 @@ DGMethod<dim>::assemble_system2()
 
   hp::FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
   hp::FEFaceValues<dim>    fe_v_face(mapping,
-                                  fe,
-                                  face_quadrature,
-                                  face_update_flags);
+                                     fe,
+                                     face_quadrature,
+                                     face_update_flags);
   hp::FESubfaceValues<dim> fe_v_subface(mapping,
                                         fe,
                                         face_quadrature_dummy,
                                         face_update_flags);
   hp::FEFaceValues<dim>    fe_v_face_neighbor(mapping,
-                                           fe,
-                                           face_quadrature,
-                                           neighbor_face_update_flags);
+                                              fe,
+                                              face_quadrature,
+                                              neighbor_face_update_flags);
 
 
   FullMatrix<double> ui_vi_matrix(dofs_per_cell, dofs_per_cell);

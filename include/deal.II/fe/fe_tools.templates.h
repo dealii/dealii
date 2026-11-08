@@ -1342,7 +1342,7 @@ namespace FETools
         interpolation_matrix = tmp;
       }
     } // namespace FEToolsGetInterpolationMatrixHelper
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -1787,7 +1787,7 @@ namespace FETools
               for (unsigned int j = 0; j < dim; ++j)
                 q_points_coarse[i][j] = q_points_fine[i][j];
             const Quadrature<dim>   q_coarse(q_points_coarse,
-                                           fine.get_JxW_values());
+                                             fine.get_JxW_values());
             FEValues<dim, spacedim> coarse(mapping,
                                            fe,
                                            q_coarse,
@@ -2492,7 +2492,7 @@ namespace FETools
           name, FEToolsAddFENameHelper::get_fe_name_map()[dim][spacedim]);
       }
     } // namespace FEToolsGetFEHelper
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -2966,7 +2966,7 @@ namespace FETools
       }
 
     } // namespace FEToolsConvertHelper
-  }   // namespace internal
+  } // namespace internal
 
 
 

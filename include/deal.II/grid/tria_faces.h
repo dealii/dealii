@@ -258,8 +258,8 @@ namespace internal
     void
     TriaFaces<dim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &lines_per_quad &quads &lines &quads_line_orientations
-        &quad_is_quadrilateral;
+      ar & lines_per_quad & quads & lines & quads_line_orientations &
+        quad_is_quadrilateral;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

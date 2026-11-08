@@ -77,7 +77,7 @@ test(const Triangulation<dim> &tr)
   dof.distribute_dofs(fe);
 
   const QGauss<dim> quadrature(2);
-  FEValues<dim>     fe_values(mapping,
+  FEValues<dim> fe_values(mapping,
                           fe,
                           quadrature,
                           update_values | update_gradients | update_JxW_values);

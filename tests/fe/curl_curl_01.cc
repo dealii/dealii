@@ -325,11 +325,11 @@ template <int dim>
 void
 MaxwellProblem<dim>::assemble_system()
 {
-  const QGauss<dim>          quadrature_formula(quad_order);
-  FEValues<dim>              fe_values(fe,
-                          quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+  const QGauss<dim> quadrature_formula(quad_order);
+  FEValues<dim>     fe_values(fe,
+                              quadrature_formula,
+                              update_values | update_gradients |
+                                update_quadrature_points | update_JxW_values);
   FEValuesViews::Vector<dim> fe_views(fe_values, 0);
   const unsigned int         dofs_per_cell = fe.dofs_per_cell;
   const unsigned int         n_q_points    = quadrature_formula.size();

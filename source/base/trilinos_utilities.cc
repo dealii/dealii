@@ -195,7 +195,7 @@ namespace Utilities
 #  endif
       return out;
     }
-  }    // namespace Trilinos
+  } // namespace Trilinos
 #endif // DEAL_II_TRILINOS_WITH_TPETRA
 
 } // namespace Utilities

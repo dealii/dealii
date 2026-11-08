@@ -544,8 +544,8 @@ FullMatrix<number>::mmult(FullMatrix<number2>       &dst,
     // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same_v<number, double> ||
-       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
+  if ((std::is_same_v<number, double> || std::is_same_v<number, float>) &&
+      std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.n() > 300 && src.n() <= max_blas_int &&
         this->m() <= max_blas_int && this->n() <= max_blas_int)
       {
@@ -626,8 +626,8 @@ FullMatrix<number>::Tmmult(FullMatrix<number2>       &dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same_v<number, double> ||
-       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
+  if ((std::is_same_v<number, double> || std::is_same_v<number, float>) &&
+      std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.n() > 300 && src.n() <= max_blas_int &&
         this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
@@ -729,8 +729,8 @@ FullMatrix<number>::mTmult(FullMatrix<number2>       &dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same_v<number, double> ||
-       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
+  if ((std::is_same_v<number, double> || std::is_same_v<number, float>) &&
+      std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.m() > 300 && src.m() <= max_blas_int &&
         this->n() <= max_blas_int && this->m() <= max_blas_int)
       {
@@ -830,8 +830,8 @@ FullMatrix<number>::TmTmult(FullMatrix<number2>       &dst,
   // matrices):
 #ifdef DEAL_II_WITH_LAPACK
   const size_type max_blas_int = std::numeric_limits<types::blas_int>::max();
-  if ((std::is_same_v<number, double> ||
-       std::is_same_v<number, float>)&&std::is_same_v<number, number2>)
+  if ((std::is_same_v<number, double> || std::is_same_v<number, float>) &&
+      std::is_same_v<number, number2>)
     if (this->n() * this->m() * src.m() > 300 && src.m() <= max_blas_int &&
         this->n() <= max_blas_int && this->m() <= max_blas_int)
       {

@@ -628,8 +628,8 @@ namespace Functions
                                 std::cos(numbers::PI_2 * p[1]);
             const double sisi = pi2 * std::sin(numbers::PI_2 * p[0]) *
                                 std::sin(numbers::PI_2 * p[1]);
-            result[0][0] = coco;
-            result[1][1] = coco;
+            result[0][0]      = coco;
+            result[1][1]      = coco;
             // for SymmetricTensor we assign [ij] and [ji] simultaneously:
             result[0][1] = sisi;
           }
@@ -897,15 +897,15 @@ namespace Functions
           result[0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
           break;
         case 2:
-          result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
-                      std::cos(numbers::PI_2 * p[d1]);
+          result[d]  = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                       std::cos(numbers::PI_2 * p[d1]);
           result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
                        std::sin(numbers::PI_2 * p[d1]);
           break;
         case 3:
-          result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
-                      std::cos(numbers::PI_2 * p[d1]) *
-                      std::cos(numbers::PI_2 * p[d2]);
+          result[d]  = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                       std::cos(numbers::PI_2 * p[d1]) *
+                       std::cos(numbers::PI_2 * p[d2]);
           result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
                        std::sin(numbers::PI_2 * p[d1]) *
                        std::cos(numbers::PI_2 * p[d2]);
@@ -944,15 +944,15 @@ namespace Functions
               result[0] = -pi2 * std::cos(numbers::PI_2 * p[0]);
               break;
             case 2:
-              result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
-                          std::cos(numbers::PI_2 * p[d1]);
+              result[d]  = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                           std::cos(numbers::PI_2 * p[d1]);
               result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
                            std::sin(numbers::PI_2 * p[d1]);
               break;
             case 3:
-              result[d] = -pi2 * std::cos(numbers::PI_2 * p[d]) *
-                          std::cos(numbers::PI_2 * p[d1]) *
-                          std::cos(numbers::PI_2 * p[d2]);
+              result[d]  = -pi2 * std::cos(numbers::PI_2 * p[d]) *
+                           std::cos(numbers::PI_2 * p[d1]) *
+                           std::cos(numbers::PI_2 * p[d2]);
               result[d1] = pi2 * std::sin(numbers::PI_2 * p[d]) *
                            std::sin(numbers::PI_2 * p[d1]) *
                            std::cos(numbers::PI_2 * p[d2]);
@@ -986,10 +986,10 @@ namespace Functions
               break;
             case 2:
               {
-                const double coco = -pi2 * std::cos(numbers::PI_2 * p[0]) *
-                                    std::cos(numbers::PI_2 * p[1]);
-                const double sisi = pi2 * std::sin(numbers::PI_2 * p[0]) *
-                                    std::sin(numbers::PI_2 * p[1]);
+                const double coco  = -pi2 * std::cos(numbers::PI_2 * p[0]) *
+                                     std::cos(numbers::PI_2 * p[1]);
+                const double sisi  = pi2 * std::sin(numbers::PI_2 * p[0]) *
+                                     std::sin(numbers::PI_2 * p[1]);
                 gradients[i][0][0] = coco;
                 gradients[i][1][1] = coco;
                 gradients[i][0][1] = sisi;
@@ -2437,9 +2437,9 @@ namespace Functions
     {
       Tensor<1, 2> grad;
       double       u00 = data_values[ix[0]][ix[1]],
-             u01       = data_values[ix[0] + 1][ix[1]],
-             u10       = data_values[ix[0]][ix[1] + 1],
-             u11       = data_values[ix[0] + 1][ix[1] + 1];
+                   u01 = data_values[ix[0] + 1][ix[1]],
+                   u10 = data_values[ix[0]][ix[1] + 1],
+                   u11 = data_values[ix[0] + 1][ix[1] + 1];
 
       grad[0] =
         ((1 - p_unit[1]) * (u01 - u00) + p_unit[1] * (u11 - u10)) / dx[0];
@@ -2457,13 +2457,13 @@ namespace Functions
     {
       Tensor<1, 3> grad;
       double       u000 = data_values[ix[0]][ix[1]][ix[2]],
-             u001       = data_values[ix[0] + 1][ix[1]][ix[2]],
-             u010       = data_values[ix[0]][ix[1] + 1][ix[2]],
-             u100       = data_values[ix[0]][ix[1]][ix[2] + 1],
-             u011       = data_values[ix[0] + 1][ix[1] + 1][ix[2]],
-             u101       = data_values[ix[0] + 1][ix[1]][ix[2] + 1],
-             u110       = data_values[ix[0]][ix[1] + 1][ix[2] + 1],
-             u111       = data_values[ix[0] + 1][ix[1] + 1][ix[2] + 1];
+                   u001 = data_values[ix[0] + 1][ix[1]][ix[2]],
+                   u010 = data_values[ix[0]][ix[1] + 1][ix[2]],
+                   u100 = data_values[ix[0]][ix[1]][ix[2] + 1],
+                   u011 = data_values[ix[0] + 1][ix[1] + 1][ix[2]],
+                   u101 = data_values[ix[0] + 1][ix[1]][ix[2] + 1],
+                   u110 = data_values[ix[0]][ix[1] + 1][ix[2] + 1],
+                   u111 = data_values[ix[0] + 1][ix[1] + 1][ix[2] + 1];
 
       grad[0] =
         ((1 - p_unit[2]) *
@@ -2801,10 +2801,10 @@ namespace Functions
       {
         delta_x[d] = this->delta_x[d];
         p_unit[d]  = std::clamp((p[d] - this->interval_endpoints[d].first -
-                                ix[d] * delta_x[d]) /
-                                 delta_x[d],
-                               0.,
-                               1.);
+                                 ix[d] * delta_x[d]) /
+                                  delta_x[d],
+                                0.,
+                                1.);
       }
 
     return gradient_interpolate(this->data_values, ix, p_unit, delta_x);

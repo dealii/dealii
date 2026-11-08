@@ -53,7 +53,7 @@ namespace internal
         // Initialize quadrature formula on fine cells
         std::unique_ptr<Quadrature<dim>> q_fine;
         Quadrature<1>                    q_dummy(std::vector<Point<1>>(1),
-                              std::vector<double>(1, 1.));
+                                                 std::vector<double>(1, 1.));
         switch (dim)
           {
             case 1:
@@ -177,7 +177,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace FE_Q_Bubbles
+  } // namespace FE_Q_Bubbles
 } // namespace internal
 
 

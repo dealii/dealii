@@ -4744,9 +4744,9 @@ namespace internal
     void
     NumberCache<1>::serialize(Archive &ar, const unsigned int)
     {
-      ar                 &n_levels;
-      ar &n_lines        &n_lines_level;
-      ar &n_active_lines &n_active_lines_level;
+      ar & n_levels;
+      ar & n_lines & n_lines_level;
+      ar & n_active_lines & n_active_lines_level;
     }
 
 
@@ -4756,8 +4756,8 @@ namespace internal
     {
       this->NumberCache<1>::serialize(ar, version);
 
-      ar &n_quads        &n_quads_level;
-      ar &n_active_quads &n_active_quads_level;
+      ar & n_quads & n_quads_level;
+      ar & n_active_quads & n_active_quads_level;
     }
 
 
@@ -4767,8 +4767,8 @@ namespace internal
     {
       this->NumberCache<2>::serialize(ar, version);
 
-      ar &n_hexes        &n_hexes_level;
-      ar &n_active_hexes &n_active_hexes_level;
+      ar & n_hexes & n_hexes_level;
+      ar & n_active_hexes & n_active_hexes_level;
     }
   } // namespace TriangulationImplementation
 } // namespace internal
@@ -4825,36 +4825,36 @@ void Triangulation<dim, spacedim>::save(Archive &ar, const unsigned int) const
 {
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
-  ar &smooth_grid;
+  ar & smooth_grid;
 
-  ar &reference_cells;
+  ar & reference_cells;
 
   unsigned int n_levels = levels.size();
-  ar          &n_levels;
+  ar & n_levels;
   Assert(n_levels <= numbers::max_n_levels, ExcInternalError());
   for (const auto &level : levels)
-    ar &level;
+    ar & level;
 
   // boost dereferences a nullptr when serializing a nullptr
   // at least up to 1.65.1. This causes problems with clang-5.
   // Therefore, work around it.
   bool faces_is_nullptr = (faces.get() == nullptr);
-  ar  &faces_is_nullptr;
+  ar & faces_is_nullptr;
   if (!faces_is_nullptr)
-    ar &faces;
+    ar & faces;
 
-  ar &vertices;
-  ar &vertices_used;
+  ar & vertices;
+  ar & vertices_used;
 
-  ar &anisotropic_refinement;
-  ar &number_cache;
+  ar & anisotropic_refinement;
+  ar & number_cache;
 
-  ar &check_for_distorted_cells;
+  ar & check_for_distorted_cells;
 
   if (dim == 1)
     {
-      ar &vertex_to_boundary_id_map_1d;
-      ar &vertex_to_manifold_id_map_1d;
+      ar & vertex_to_boundary_id_map_1d;
+      ar & vertex_to_manifold_id_map_1d;
     }
 }
 
@@ -4870,36 +4870,36 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
 
   // as discussed in the documentation, do not store the signals as
   // well as boundary and manifold description but everything else
-  ar &smooth_grid;
+  ar & smooth_grid;
 
-  ar &reference_cells;
+  ar & reference_cells;
   strides =
     internal::TriangulationImplementation::Strides<dim>(reference_cells);
 
   unsigned int n_levels;
-  ar          &n_levels;
+  ar & n_levels;
   Assert(n_levels <= numbers::max_n_levels, ExcInternalError());
   levels.resize(n_levels);
   for (auto &level_ : levels)
     {
       std::unique_ptr<
         internal::TriangulationImplementation::TriaLevel<dim, spacedim>>
-          level;
-      ar &level;
+        level;
+      ar & level;
       level_ = std::move(level);
     }
 
   // Workaround for nullptr, see in save().
   bool faces_is_nullptr = true;
-  ar  &faces_is_nullptr;
+  ar & faces_is_nullptr;
   if (!faces_is_nullptr)
-    ar &faces;
+    ar & faces;
 
-  ar &vertices;
-  ar &vertices_used;
+  ar & vertices;
+  ar & vertices_used;
 
-  ar &anisotropic_refinement;
-  ar &number_cache;
+  ar & anisotropic_refinement;
+  ar & number_cache;
 
   // the levels do not serialize the active_cell_indices or cached cell vertices
   // because they are easy enough to rebuild upon re-loading data. do this here.
@@ -4910,7 +4910,7 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
   reset_policy();
 
   bool my_check_for_distorted_cells;
-  ar  &my_check_for_distorted_cells;
+  ar & my_check_for_distorted_cells;
 
   Assert(my_check_for_distorted_cells == check_for_distorted_cells,
          ExcMessage("The triangulation loaded into here must have the "
@@ -4919,8 +4919,8 @@ void Triangulation<dim, spacedim>::load(Archive &ar, const unsigned int)
 
   if (dim == 1)
     {
-      ar &vertex_to_boundary_id_map_1d;
-      ar &vertex_to_manifold_id_map_1d;
+      ar & vertex_to_boundary_id_map_1d;
+      ar & vertex_to_manifold_id_map_1d;
     }
 
   // trigger the create signal to indicate

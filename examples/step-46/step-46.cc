@@ -467,11 +467,11 @@ namespace Step46
     const QGauss<dim - 1> common_face_quadrature(
       std::max(stokes_degree + 2, elasticity_degree + 2));
 
-    FEFaceValues<dim>    stokes_fe_face_values(stokes_fe,
+    FEFaceValues<dim> stokes_fe_face_values(stokes_fe,
                                             common_face_quadrature,
                                             update_JxW_values |
                                               update_gradients | update_values);
-    FEFaceValues<dim>    elasticity_fe_face_values(elasticity_fe,
+    FEFaceValues<dim> elasticity_fe_face_values(elasticity_fe,
                                                 common_face_quadrature,
                                                 update_normal_vectors |
                                                   update_values);

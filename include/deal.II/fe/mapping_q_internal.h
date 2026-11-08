@@ -320,7 +320,7 @@ namespace internal
           for (unsigned int k = 0; k < M; ++k)
             {
               const Point<3>    &p = gl.point((i + 1) * (M + 2) * (M + 2) +
-                                           (j + 1) * (M + 2) + (k + 1));
+                                              (j + 1) * (M + 2) + (k + 1));
               const unsigned int index_table = i * M * M + j * M + k;
 
               // vertices

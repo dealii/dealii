@@ -51,10 +51,10 @@ check(const Mapping<3>       &mapping,
   const FE_Q<3>       fe(1);
   const QGauss<2>     quadrature(8);
   FESubfaceValues<3>  subface(mapping,
-                             fe,
-                             quadrature,
-                             update_JxW_values | update_quadrature_points |
-                               update_normal_vectors);
+                              fe,
+                              quadrature,
+                              update_JxW_values | update_quadrature_points |
+                                update_normal_vectors);
   std::vector<double> areas(n_subfaces, 0.);
   for (unsigned int s = 0; s < n_subfaces; ++s)
     {

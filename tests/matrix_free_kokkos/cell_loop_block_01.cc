@@ -35,7 +35,7 @@ public:
   static const unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
   MatrixFreeTest(const Portable::MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   DEAL_II_HOST_DEVICE void
   operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
@@ -81,7 +81,7 @@ public:
   static const unsigned int n_q_points = Utilities::pow(n_q_points_1d, dim);
 
   MatrixFreeTestBlock(const Portable::MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   DEAL_II_HOST_DEVICE void
   operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,

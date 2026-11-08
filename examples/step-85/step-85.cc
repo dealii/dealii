@@ -344,8 +344,8 @@ namespace Step85
     const QGauss<1> quadrature_1D(fe_degree + 1);
 
     NonMatching::RegionUpdateFlags region_update_flags;
-    region_update_flags.inside = update_values | update_gradients |
-                                 update_JxW_values | update_quadrature_points;
+    region_update_flags.inside  = update_values | update_gradients |
+                                  update_JxW_values | update_quadrature_points;
     region_update_flags.surface = update_values | update_gradients |
                                   update_JxW_values | update_quadrature_points |
                                   update_normal_vectors;

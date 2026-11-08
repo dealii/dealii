@@ -980,8 +980,8 @@ namespace Legacy
             const std::vector<types::global_dof_index> *const indexptr =
               pointerstruct->second.indices_ptr;
 
-            const std::vector<Vector<typename VectorType::value_type>>
-              *const valuesptr = pointerstruct->second.dof_values_ptr;
+            const std::vector<Vector<typename VectorType::value_type>> *const
+              valuesptr = pointerstruct->second.dof_values_ptr;
 
             // cell stayed as it was or was refined
             if (indexptr != nullptr)

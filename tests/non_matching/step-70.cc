@@ -1563,8 +1563,8 @@ namespace Step70
     const auto amgS = linear_operator(S, prec_S);
 
     ReductionControl          inner_solver_control(100,
-                                          1e-8 * system_rhs.l2_norm(),
-                                          1.e-2);
+                                                   1e-8 * system_rhs.l2_norm(),
+                                                   1.e-2);
     SolverCG<LA::MPI::Vector> cg(inner_solver_control);
 
     const auto invS = inverse_operator(S, cg, amgS);

@@ -580,9 +580,9 @@ namespace Step21
     const QGauss<dim - 1> face_quadrature_formula(degree + 2);
 
     FEValues<dim>     fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
+                                quadrature_formula,
+                                update_values | update_gradients |
+                                  update_quadrature_points | update_JxW_values);
     FEFaceValues<dim> fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_normal_vectors |
@@ -728,16 +728,16 @@ namespace Step21
   {
     const QGauss<dim>     quadrature_formula(degree + 2);
     const QGauss<dim - 1> face_quadrature_formula(degree + 2);
-    FEValues<dim>         fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim>     fe_face_values(fe,
+    FEValues<dim>     fe_values(fe,
+                                quadrature_formula,
+                                update_values | update_gradients |
+                                  update_quadrature_points | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(fe,
                                      face_quadrature_formula,
                                      update_values | update_normal_vectors |
                                        update_quadrature_points |
                                        update_JxW_values);
-    FEFaceValues<dim>     fe_face_values_neighbor(fe,
+    FEFaceValues<dim> fe_face_values_neighbor(fe,
                                               face_quadrature_formula,
                                               update_values);
 
@@ -899,7 +899,7 @@ namespace Step21
 
 
       SolverControl            solver_control(solution.block(1).size(),
-                                   1e-12 * schur_rhs.l2_norm());
+                                              1e-12 * schur_rhs.l2_norm());
       SolverCG<Vector<double>> cg(solver_control);
 
       cg.solve(schur_complement, solution.block(1), schur_rhs, preconditioner);
@@ -943,7 +943,7 @@ namespace Step21
     // onto the physically reasonable range:
     assemble_rhs_S();
     {
-      SolverControl            solver_control(system_matrix.block(2, 2).m(),
+      SolverControl solver_control(system_matrix.block(2, 2).m(),
                                    1e-8 * system_rhs.block(2).l2_norm());
       SolverCG<Vector<double>> cg(solver_control);
       cg.solve(system_matrix.block(2, 2),

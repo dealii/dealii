@@ -200,8 +200,8 @@ namespace Step14
 
       // ...then have some objects of which the meaning will become clear
       // below...
-      const QTrapezoid<dim>       vertex_quadrature;
-      FEValues<dim>               fe_values(dof_handler.get_fe(),
+      const QTrapezoid<dim> vertex_quadrature;
+      FEValues<dim> fe_values(dof_handler.get_fe(),
                               vertex_quadrature,
                               update_gradients | update_quadrature_points);
       std::vector<Tensor<1, dim>> solution_gradients(vertex_quadrature.size());
@@ -1529,9 +1529,9 @@ namespace Step14
       // functions...
       const QGauss<dim>  quadrature(dof_handler.get_fe().degree + 1);
       FEValues<dim>      fe_values(dof_handler.get_fe(),
-                              quadrature,
-                              update_gradients | update_quadrature_points |
-                                update_JxW_values);
+                                   quadrature,
+                                   update_gradients | update_quadrature_points |
+                                     update_JxW_values);
       const unsigned int n_q_points    = fe_values.n_quadrature_points;
       const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 

@@ -41,7 +41,7 @@ struct X
   void
   serialize(Archive &ar, const unsigned int)
   {
-    ar &i &k &d;
+    ar & i & k & d;
   }
 };
 

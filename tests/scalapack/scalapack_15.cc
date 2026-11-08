@@ -81,13 +81,13 @@ test(const unsigned int size,
       for (unsigned int j = 0; j < size; ++j)
         lapack_A[i * size + j] = full_A(i, j);
 
-    int info; // Variable containing information about the successful exit of
-              // the lapack routine
-    char jobz = 'V'; //'V': all eigenpairs of A are computed
-    char uplo = 'U'; // storage format of the matrix A; not so important as
-                     // matrix is symmetric
-    char       range = 'I'; // the il-th through iu-th eigenvalues will be found
-    int        LDA   = size; // leading dimension of the matrix A
+    int  info; // Variable containing information about the successful exit of
+               // the lapack routine
+    char jobz     = 'V';  //'V': all eigenpairs of A are computed
+    char uplo     = 'U';  // storage format of the matrix A; not so important as
+                          // matrix is symmetric
+    char range    = 'I';  // the il-th through iu-th eigenvalues will be found
+    int  LDA      = size; // leading dimension of the matrix A
     NumberType vl = 0, vu = 0;
     int        il = 1, iu = size;
     char       sign   = 'S';
