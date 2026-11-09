@@ -184,14 +184,14 @@ check_commit_authors()
       fi
 
       case "${email}" in
-        *.*) ;;
-        *) echo "    invalid email '${email}'" ;;
+        (*.*) ;;
+        (*) echo "    invalid email '${email}'" ;;
       esac
 
       case "${email}" in
-        *.local)
+        (*.local)
           echo "    invalid email '${email}'" ;;
-        *users.noreply.github.com)
+        (*users.noreply.github.com)
           echo "    invalid email '${email}' (anonymized github address)" ;;
       esac
     done
