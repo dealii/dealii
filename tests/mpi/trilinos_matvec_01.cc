@@ -117,6 +117,21 @@ test()
       const unsigned int global_index = row_partitioning.nth_index_in_set(i);
       AssertThrow(dy(global_index) == y(global_index), ExcInternalError());
     }
+
+  // Also exercise vmult_add with distributed vectors, which requires its own
+  // template instantiation. Initialize both destinations with identical
+  // nonzero values to compare how the two vector types preserve the existing
+  // destination values when adding the matrix-vector product.
+  y  = 3.;
+  dy = 3.;
+  A.vmult_add(y, x);
+  A.vmult_add(dy, dx);
+  for (unsigned int i = 0; i < row_partitioning.n_elements(); ++i)
+    {
+      const unsigned int global_index = row_partitioning.nth_index_in_set(i);
+      AssertThrow(dy(global_index) == y(global_index), ExcInternalError());
+    }
+
   if (my_id == 0)
     deallog << "OK" << std::endl;
 }
