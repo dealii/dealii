@@ -444,6 +444,30 @@ FE_SimplexPoly<dim, spacedim>::get_prolongation_matrix(
 
 
 template <int dim, int spacedim>
+bool
+FE_SimplexPoly<dim, spacedim>::has_support_on_face(
+  const unsigned int shape_index,
+  const unsigned int face_index) const
+{
+  AssertIndexRange(shape_index, this->n_dofs_per_cell());
+  AssertIndexRange(face_index, this->reference_cell().n_faces());
+
+  //
+  // A support point lies on the face if its offset from the face vertex is
+  // orthogonal to the face normal.
+  //
+
+  const ReferenceCell<dim> reference_cell = this->reference_cell();
+  const auto               offset = this->unit_support_points[shape_index] -
+                      reference_cell.face_vertex_location(face_index, 0);
+  const auto normal = reference_cell.face_normal_vector(face_index);
+
+  return std::abs(offset * normal) < 1e-10;
+}
+
+
+
+template <int dim, int spacedim>
 unsigned int
 FE_SimplexPoly<dim, spacedim>::face_to_cell_index(
   const unsigned int                 face_dof_index,
