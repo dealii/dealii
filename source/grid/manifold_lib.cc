@@ -1151,10 +1151,14 @@ CylindricalManifold<dim, spacedim>::push_forward_gradient(
   derivatives[s1][s0] = intermediate[s1];
   derivatives[s2][s0] = intermediate[s2];
 
-  // derivatives w.r.t the angle
-  derivatives[s0][s1] = -normal_direction[s0] * sine + dxn[s0] * cosine;
-  derivatives[s1][s1] = -normal_direction[s1] * sine + dxn[s1] * cosine;
-  derivatives[s2][s1] = -normal_direction[s2] * sine + dxn[s2] * cosine;
+  // derivatives w.r.t the angle: push_forward() scales the rotated direction
+  // by the radius chart_point[0], so does its derivative
+  const double sine_r   = sine * chart_point[0];
+  const double cosine_r = cosine * chart_point[0];
+  
+  derivatives[s0][s1] = -normal_direction[s0] * sine_r + dxn[s0] * cosine_r;
+  derivatives[s1][s1] = -normal_direction[s1] * sine_r + dxn[s1] * cosine_r;
+  derivatives[s2][s1] = -normal_direction[s2] * sine_r + dxn[s2] * cosine_r;
 
   // derivatives w.r.t the direction of the axis
   derivatives[s0][s2] = direction[s0];

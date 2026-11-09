@@ -1,0 +1,4 @@
+Fixed: Cylilndrical Manifold::push_forward_gradient() was missing a
+radius factor in the derivative w.r.t. the angle.
+<br>
+(Andreas Müsing, 2026/11/09)
