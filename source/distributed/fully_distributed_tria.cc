@@ -21,8 +21,11 @@
 
 #include <deal.II/grid/grid_tools.h>
 
+#include <algorithm>
 #include <fstream>
+#include <limits>
 #include <memory>
+#include <string>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -88,7 +91,8 @@ namespace parallel
       this->set_mesh_smoothing(construction_data.smoothing);
 
       // clear internal data structures
-      this->coarse_cell_id_to_coarse_cell_index_vector.clear();
+      this->coarse_cell_ids.clear();
+      this->coarse_cell_indices.clear();
       this->coarse_cell_index_to_coarse_cell_id_vector.clear();
 
       // check if no locally relevant coarse-grid cells have been provided
@@ -107,10 +111,9 @@ namespace parallel
 
           // 3) set up dummy mapping between locally relevant coarse-grid cells
           //    and global cells
-          this->coarse_cell_id_to_coarse_cell_index_vector.emplace_back(
-            numbers::invalid_coarse_cell_id, 0);
           this->coarse_cell_index_to_coarse_cell_id_vector.emplace_back(
             numbers::invalid_coarse_cell_id);
+          this->setup_coarse_cell_id_to_coarse_cell_index();
         }
       else
         {
@@ -119,20 +122,7 @@ namespace parallel
             construction_data.coarse_cell_index_to_coarse_cell_id;
 
           // 2) set up `coarse-cell id to coarse-cell index`-mapping
-          this->coarse_cell_id_to_coarse_cell_index_vector.resize(
-            construction_data.coarse_cell_index_to_coarse_cell_id.size());
-          for (unsigned int i = 0;
-               i < construction_data.coarse_cell_index_to_coarse_cell_id.size();
-               ++i)
-            this->coarse_cell_id_to_coarse_cell_index_vector[i] =
-              std::make_pair(
-                construction_data.coarse_cell_index_to_coarse_cell_id[i], i);
-
-          std::sort(this->coarse_cell_id_to_coarse_cell_index_vector.begin(),
-                    this->coarse_cell_id_to_coarse_cell_index_vector.end(),
-                    [](const auto &a, const auto &b) {
-                      return a.first < b.first;
-                    });
+          this->setup_coarse_cell_id_to_coarse_cell_index();
 
           // create locally-relevant
           currently_processing_prepare_coarsening_and_refinement_for_internal_usage =
@@ -354,7 +344,8 @@ namespace parallel
 
       // clear old content
       this->clear();
-      this->coarse_cell_id_to_coarse_cell_index_vector.clear();
+      this->coarse_cell_ids.clear();
+      this->coarse_cell_indices.clear();
       this->coarse_cell_index_to_coarse_cell_id_vector.clear();
 
       // use construction_data to set up new triangulation
@@ -396,8 +387,8 @@ namespace parallel
       const std::size_t mem =
         this->dealii::parallel::TriangulationBase<dim, spacedim>::
           memory_consumption() +
-        MemoryConsumption::memory_consumption(
-          coarse_cell_id_to_coarse_cell_index_vector) +
+        coarse_cell_ids.memory_consumption() +
+        MemoryConsumption::memory_consumption(coarse_cell_indices) +
         MemoryConsumption::memory_consumption(
           coarse_cell_index_to_coarse_cell_id_vector);
       return mem;
@@ -423,17 +414,65 @@ namespace parallel
       coarse_cell_id_to_coarse_cell_index(
         const types::coarse_cell_id coarse_cell_id) const
     {
-      const auto coarse_cell_index = std::lower_bound(
-        coarse_cell_id_to_coarse_cell_index_vector.begin(),
-        coarse_cell_id_to_coarse_cell_index_vector.end(),
-        coarse_cell_id,
-        [](const std::pair<types::coarse_cell_id, unsigned int> &pair,
-           const types::coarse_cell_id &val) { return pair.first < val; });
-      if (coarse_cell_index !=
-          coarse_cell_id_to_coarse_cell_index_vector.cend())
-        return coarse_cell_index->second;
+      // This function is called before the Triangulation is set up, so we don't
+      // know the number of global coarse cells here: hence we cannot assert
+      // that coarse_cell_id is valid
+      if (coarse_cell_id >= coarse_cell_ids.size())
+        return numbers::invalid_unsigned_int;
+
+      const auto index = coarse_cell_ids.index_within_set(
+        static_cast<IndexSet::size_type>(coarse_cell_id));
+      if (index == numbers::invalid_dof_index)
+        return numbers::invalid_unsigned_int; // cell could not be found
       else
-        return numbers::invalid_unsigned_int; // cell could no be found
+        {
+          AssertIndexRange(index, coarse_cell_indices.size());
+          return coarse_cell_indices[index];
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim,
+                       spacedim>::setup_coarse_cell_id_to_coarse_cell_index()
+    {
+      coarse_cell_ids.clear();
+      coarse_cell_indices.clear();
+
+      std::vector<std::pair<types::coarse_cell_id, unsigned int>> id_index;
+      id_index.reserve(coarse_cell_index_to_coarse_cell_id_vector.size());
+      for (unsigned int i = 0;
+           i < coarse_cell_index_to_coarse_cell_id_vector.size();
+           ++i)
+        if (coarse_cell_index_to_coarse_cell_id_vector[i] !=
+            numbers::invalid_coarse_cell_id)
+          id_index.emplace_back(coarse_cell_index_to_coarse_cell_id_vector[i],
+                                i);
+
+      // In the case of a dummy cell (see create_triangulation()), there is no
+      // valid coarse-cell id to look up: leave the index set empty.
+      if (id_index.size() == 0)
+        return;
+
+      std::sort(id_index.begin(), id_index.end());
+
+      const types::coarse_cell_id      max_id = id_index.back().first;
+      std::vector<IndexSet::size_type> ids;
+      ids.reserve(id_index.size());
+      coarse_cell_indices.reserve(id_index.size());
+      for (const auto &[id, index] : id_index)
+        {
+          Assert(ids.empty() || ids.back() != id,
+                 ExcMessage("Coarse-cell ids must be unique."));
+          ids.push_back(static_cast<IndexSet::size_type>(id));
+          coarse_cell_indices.push_back(index);
+        }
+
+      coarse_cell_ids.set_size(static_cast<IndexSet::size_type>(max_id) + 1);
+      coarse_cell_ids.add_indices(ids.begin(), ids.end());
+      coarse_cell_ids.compress();
     }
 
 
