@@ -19,6 +19,8 @@
 # Compiling clang-format and all necessary parts of LLVM/CLANG might
 # require a significant amount of resources. Alternatively, you can use
 # download_clang_format to install a statically-linked binary.
+# On macOS, this script builds a universal binary for Apple silicon and Intel,
+# targeting macOS 11.0 or later.
 #
 
 set -e
@@ -88,7 +90,8 @@ CMAKE_OPTIONS="${CMAKE_OPTIONS} -DLLVM_ENABLE_LIBXML2=OFF"
 
 case "${OSTYPE}" in
   darwin*)
-    cmake ${CMAKE_OPTIONS} ..
+    cmake ${CMAKE_OPTIONS} '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' \
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 ..
     ;;
   *)
     cmake ${CMAKE_OPTIONS} -DLLVM_BUILD_STATIC=true ..

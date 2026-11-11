@@ -16,9 +16,10 @@
 # destination directory is
 #   [contrib/utilities]/programs/clang-<VERSION>/bin.
 #
-# This script only works on Linux (amd64). For other architectures and
-# operating systems it is necessary to compile the clang-format binary by
-# hand. This can be done with the compile_clang_format script.
+# This script only works on Linux (amd64) and macOS (Apple silicon and Intel,
+# macOS 11.0 or later). For other architectures and operating systems it is
+# necessary to compile the clang-format binary by hand. This can be done with
+# the compile_clang_format script.
 #
 
 VERSION=23
@@ -35,9 +36,10 @@ case "${OSTYPE}" in
     CHECKSUM="ad08d6d0e4a28f28459da4dc26bbdc4b99610597929a800b955caa29b0d65f4a  $FILENAME"
     ;;
   darwin*)
-    echo "No precompiled clang-format-${VERSION} binary is available for macOS."
-    echo "Please use the compile_clang_format script instead."
-    exit 1
+    # Universal binary for both x86_64 and arm64:
+    FILENAME="clang-format-${VERSION}-darwin-universal.tar.gz"
+    CHECKSUM_CMD="shasum"
+    CHECKSUM="8ca4fe91530ac6b7e2917ab1f9086dc9cab33493e791f9448748e833843a8a61  $FILENAME"
     ;;
   *)
     echo "unknown: ${OSTYPE}"
