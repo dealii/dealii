@@ -424,12 +424,40 @@ namespace PETScWrappers
     if (pending_exception != nullptr)
       std::rethrow_exception(std::exchange(pending_exception, nullptr));
 
-    // Obtain the number of iterations taken by the solver and return it to the
-    // caller:
-    PetscInt iterations;
+    // Ensure that we converged. If not, throw an exception with the number of
+    // iterations and the final residual norm (i.e., the norm of the objective
+    // gradient).
+    TaoConvergedReason reason;
     internal::assert_nonlinear_optimizer_petsc(
-      TaoGetIterationNumber(tao, &iterations));
-    return iterations;
+      TaoGetConvergedReason(tao, &reason));
+    if (reason > 0)
+      {
+        // Successful convergence. Return the number of iterations to the
+        // caller.
+        PetscInt iterations;
+        internal::assert_nonlinear_optimizer_petsc(
+          TaoGetIterationNumber(tao, &iterations));
+
+        return iterations;
+      }
+    else
+      {
+        // Unsuccessful convergence. Throw an exception.
+        PetscInt  iterations;
+        PetscReal objective_value;
+        PetscReal gradient_norm;
+        PetscReal constraint_norm;
+        PetscReal step_norm;
+        internal::assert_nonlinear_optimizer_petsc(
+          TaoGetSolutionStatus(tao,
+                               &iterations,
+                               &objective_value,
+                               &gradient_norm,
+                               &constraint_norm,
+                               &step_norm,
+                               &reason));
+        throw SolverControl::NoConvergence(iterations, gradient_norm);
+      }
   }
 
 

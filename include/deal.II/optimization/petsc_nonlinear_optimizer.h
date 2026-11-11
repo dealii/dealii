@@ -22,6 +22,7 @@
 
 #    include <deal.II/lac/petsc_matrix_base.h>
 #    include <deal.II/lac/petsc_vector_base.h>
+#    include <deal.II/lac/solver_control.h>
 
 #    include <petsctao.h>
 
@@ -404,6 +405,12 @@ namespace PETScWrappers
      * @param bounds Optional lower and upper variable bounds.
      *
      * @return The number of optimization iterations performed.
+     *
+     * @throws SolverControl::NoConvergence if TAO terminates without
+     * convergence within the allowed number of iterations. The exception
+     * object contains the number of iterations performed and the final
+     * residual norm (i.e., the norm of the gradient of the objective
+     * function).
      */
     unsigned int
     solve(
