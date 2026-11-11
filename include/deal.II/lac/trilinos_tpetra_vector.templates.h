@@ -1647,6 +1647,9 @@ namespace LinearAlgebra
     const TpetraTypes::VectorType<Number, MemorySpace> &
     Vector<Number, MemorySpace>::trilinos_vector() const
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
       return *vector;
     }
 
@@ -1656,6 +1659,9 @@ namespace LinearAlgebra
     TpetraTypes::VectorType<Number, MemorySpace> &
     Vector<Number, MemorySpace>::trilinos_vector()
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
       return *vector;
     }
 
@@ -1674,6 +1680,9 @@ namespace LinearAlgebra
     Teuchos::RCP<TpetraTypes::VectorType<Number, MemorySpace>>
     Vector<Number, MemorySpace>::trilinos_rcp()
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
       return vector;
     }
 
@@ -1683,6 +1692,9 @@ namespace LinearAlgebra
     Teuchos::RCP<const TpetraTypes::VectorType<Number, MemorySpace>>
     Vector<Number, MemorySpace>::trilinos_rcp() const
     {
+      // Reset our cached vector view so that trilinos operations on device do
+      // not detect an existing host view.
+      vector_1d_view.reset();
       return vector.getConst();
     }
 
