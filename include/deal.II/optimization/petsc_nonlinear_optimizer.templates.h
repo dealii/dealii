@@ -109,6 +109,25 @@ namespace PETScWrappers
     const AdditionalData &data,
     const MPI_Comm        mpi_comm)
     : tao(nullptr)
+    , additional_data(data)
+    , mpi_comm(mpi_comm)
+    , constraints_are_initialized(false)
+    , previous_has_equality_constraints(false)
+    , previous_has_inequality_constraints(false)
+  {
+    initialize_tao();
+  }
+
+
+
+  template <typename VectorType, typename MatrixType>
+  DEAL_II_CXX20_REQUIRES(
+    (concepts::is_dealii_petsc_vector_type<VectorType> ||
+     std::constructible_from<
+       VectorType,
+       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+               std::constructible_from<MatrixType, Mat>))
+  void NonlinearOptimizer<VectorType, MatrixType>::initialize_tao()
   {
     internal::assert_nonlinear_optimizer_petsc(TaoCreate(mpi_comm, &tao));
     internal::assert_nonlinear_optimizer_petsc(
@@ -117,7 +136,7 @@ namespace PETScWrappers
     Tao almm_subsolver;
     internal::assert_nonlinear_optimizer_petsc(
       TaoALMMGetSubsolver(tao, &almm_subsolver));
-    switch (data.almm_subsolver)
+    switch (additional_data.almm_subsolver)
       {
         case AdditionalData::ALMMSubsolver::bqnls:
           internal::assert_nonlinear_optimizer_petsc(
@@ -130,20 +149,22 @@ namespace PETScWrappers
           break;
       }
 
-    if (!data.options_prefix.empty())
+    if (!additional_data.options_prefix.empty())
       internal::assert_nonlinear_optimizer_petsc(
-        TaoSetOptionsPrefix(tao, data.options_prefix.c_str()));
+        TaoSetOptionsPrefix(tao, additional_data.options_prefix.c_str()));
 
     const PetscReal gradient_tolerance =
-      data.gradient_tolerance > 0. ? data.gradient_tolerance : PETSC_DEFAULT;
+      additional_data.gradient_tolerance > 0. ?
+        additional_data.gradient_tolerance :
+        PETSC_DEFAULT;
     internal::assert_nonlinear_optimizer_petsc(
       TaoSetTolerances(tao, gradient_tolerance, PETSC_DEFAULT, PETSC_DEFAULT));
-    if (data.constraint_tolerance > 0.)
+    if (additional_data.constraint_tolerance > 0.)
       internal::assert_nonlinear_optimizer_petsc(TaoSetConstraintTolerances(
-        tao, data.constraint_tolerance, PETSC_DEFAULT));
-    if (data.maximum_iterations >= 0)
+        tao, additional_data.constraint_tolerance, PETSC_DEFAULT));
+    if (additional_data.maximum_iterations >= 0)
       internal::assert_nonlinear_optimizer_petsc(
-        TaoSetMaximumIterations(tao, data.maximum_iterations));
+        TaoSetMaximumIterations(tao, additional_data.maximum_iterations));
   }
 
 
@@ -179,6 +200,17 @@ namespace PETScWrappers
     AssertThrow(objective, ExcMessage("An objective callback is required."));
     AssertThrow(gradient, ExcMessage("A gradient callback is required."));
     AssertThrow(hessian, ExcMessage("A Hessian callback is required."));
+
+    if (constraints_are_initialized &&
+        (previous_has_equality_constraints != equality.has_value() ||
+         previous_has_inequality_constraints != inequality.has_value()))
+      {
+        internal::assert_nonlinear_optimizer_petsc(TaoDestroy(&tao));
+        initialize_tao();
+      }
+    constraints_are_initialized         = true;
+    previous_has_equality_constraints   = equality.has_value();
+    previous_has_inequality_constraints = inequality.has_value();
 
     // Error checking: If bounds are supplied, check that the initial
     // guess satisfies them:

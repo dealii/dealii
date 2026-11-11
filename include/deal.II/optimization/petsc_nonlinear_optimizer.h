@@ -531,6 +531,12 @@ namespace PETScWrappers
 
   private:
     /**
+     * Create and configure the PETSc TAO object.
+     */
+    void
+    initialize_tao();
+
+    /**
      * Forward PETSc's objective request to the user callback.
      *
      * @param tao PETSc TAO object.
@@ -626,6 +632,27 @@ namespace PETScWrappers
      * PETSc TAO object owned by this optimizer.
      */
     Tao tao;
+
+    /**
+     * Parameters used to configure TAO.
+     */
+    const AdditionalData additional_data;
+
+    /**
+     * Communicator used to create TAO.
+     */
+    const MPI_Comm mpi_comm;
+
+    /**
+     * Whether a previous solve has configured TAO's constraints.
+     */
+    bool constraints_are_initialized;
+
+    /**
+     * Constraint sets supplied to the previous solve.
+     */
+    bool previous_has_equality_constraints;
+    bool previous_has_inequality_constraints;
 
     /**
      * Exception captured in a user callback and rethrown after TAO returns.
