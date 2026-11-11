@@ -193,8 +193,8 @@ private:
 
         for (unsigned int q = 0; q < phi_m.n_q_points; ++q)
           {
-            value_type u_minus = phi_m.get_value(q),
-                       u_plus  = phi_p.get_value(q);
+            value_type                u_minus = phi_m.get_value(q),
+                                      u_plus  = phi_p.get_value(q);
             const VectorizedArrayType normal_times_advection =
               advection * phi_m.normal_vector(q);
             const value_type flux_times_normal =

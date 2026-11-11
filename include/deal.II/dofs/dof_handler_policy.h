@@ -248,7 +248,7 @@ namespace internal
         ObserverPointer<DoFHandler<dim, spacedim>> dof_handler;
       };
     } // namespace Policy
-  }   // namespace DoFHandlerImplementation
+  } // namespace DoFHandlerImplementation
 } // namespace internal
 
 

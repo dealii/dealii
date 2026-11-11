@@ -279,8 +279,8 @@ namespace internal
 
           const double local_min = min_element(criteria),
                        local_max = max_element(criteria);
-          double comp[2]         = {local_min, -local_max};
-          double result[2]       = {0, 0};
+          double       comp[2]   = {local_min, -local_max};
+          double       result[2] = {0, 0};
 
           // compute the minimum on processor zero
           const int ierr = MPI_Reduce(
@@ -482,9 +482,9 @@ namespace internal
             return -1;
           }
         } // namespace RefineAndCoarsenFixedFraction
-      }   // namespace GridRefinement
-    }     // namespace distributed
-  }       // namespace parallel
+      } // namespace GridRefinement
+    } // namespace distributed
+  } // namespace parallel
 } // namespace internal
 
 
@@ -629,7 +629,7 @@ namespace parallel
           }
       }
     } // namespace GridRefinement
-  }   // namespace distributed
+  } // namespace distributed
 } // namespace parallel
 
 

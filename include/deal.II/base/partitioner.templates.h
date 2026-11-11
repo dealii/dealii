@@ -108,8 +108,8 @@ namespace Utilities
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
-            import_indices_plain_dev.size() != n_import_indices()))
+      if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>) &&
+          (import_indices_plain_dev.size() != n_import_indices()))
         initialize_import_indices_plain_dev();
 #    endif
 
@@ -148,10 +148,10 @@ namespace Utilities
             {
               // copy the data to be sent to the import_data field
               std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-                my_imports = import_indices_data.begin() +
-                             import_indices_chunks_by_rank_data[i],
-                end_my_imports = import_indices_data.begin() +
-                                 import_indices_chunks_by_rank_data[i + 1];
+                my_imports       = import_indices_data.begin() +
+                                   import_indices_chunks_by_rank_data[i],
+                end_my_imports   = import_indices_data.begin() +
+                                   import_indices_chunks_by_rank_data[i + 1];
               unsigned int index = 0;
               for (; my_imports != end_my_imports; ++my_imports)
                 {
@@ -381,8 +381,8 @@ namespace Utilities
               ghost_array.size() == n_ghost_indices_in_larger_set)
             {
               std::vector<std::pair<unsigned int, unsigned int>>::const_iterator
-                my_ghosts = ghost_indices_subset_data.begin() +
-                            ghost_indices_subset_chunks_by_rank_data[i],
+                my_ghosts     = ghost_indices_subset_data.begin() +
+                                ghost_indices_subset_chunks_by_rank_data[i],
                 end_my_ghosts = ghost_indices_subset_data.begin() +
                                 ghost_indices_subset_chunks_by_rank_data[i + 1];
               unsigned int offset = 0;
@@ -581,8 +581,8 @@ namespace Utilities
       // performance reasons as this can significantly decrease the number of
       // kernel launched. The indices are expanded the first time the function
       // is called.
-      if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>)&&(
-            import_indices_plain_dev.size() != n_import_indices()))
+      if ((std::is_same_v<MemorySpaceType, MemorySpace::Default>) &&
+          (import_indices_plain_dev.size() != n_import_indices()))
         initialize_import_indices_plain_dev();
 #    endif
 

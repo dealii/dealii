@@ -630,8 +630,8 @@ ParsedConvergenceTable::error_from_exact(const Mapping<dim, spacedim> &mapping,
               errors[norm] = VectorTools::compute_global_error(
                 dh.get_triangulation(), difference_per_cell, norm, exponent);
 
-              std::string name = unique_component_names[i] + "_" +
-                                 Patterns::Tools::to_string(norm);
+              std::string name       = unique_component_names[i] + "_" +
+                                       Patterns::Tools::to_string(norm);
               std::string latex_name = "$\\| " + unique_component_names[i] +
                                        " - " + unique_component_names[i] +
                                        "_h \\|_{" +

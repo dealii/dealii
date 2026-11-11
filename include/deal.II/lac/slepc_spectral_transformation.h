@@ -12,35 +12,35 @@
 
 
 #ifndef dealii_slepc_spectral_transformation_h
-#  define dealii_slepc_spectral_transformation_h
+#define dealii_slepc_spectral_transformation_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifdef DEAL_II_WITH_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/petsc_solver.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/petsc_solver.h>
 
-#    include <petscksp.h>
+#  include <petscksp.h>
 
-#    include <slepceps.h>
+#  include <slepceps.h>
 
-#    include <memory>
+#  include <memory>
 
-#  endif // DEAL_II_WITH_SLEPC
+#endif // DEAL_II_WITH_SLEPC
 
 DEAL_II_NAMESPACE_OPEN
 
-#  ifdef DEAL_II_WITH_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
 // Forward declaration
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 namespace PETScWrappers
 {
   // forward declarations
   class SolverBase;
 } // namespace PETScWrappers
-#    endif
+#  endif
 
 namespace SLEPcWrappers
 {
@@ -246,7 +246,7 @@ namespace SLEPcWrappers
 
 } // namespace SLEPcWrappers
 
-#  endif // DEAL_II_WITH_SLEPC
+#endif // DEAL_II_WITH_SLEPC
 
 DEAL_II_NAMESPACE_CLOSE
 

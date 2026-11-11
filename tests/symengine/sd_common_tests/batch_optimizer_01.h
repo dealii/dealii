@@ -497,8 +497,7 @@ struct FunctionMin
 template <typename number_t,
           enum SD::OptimizerType     opt_method,
           enum SD::OptimizationFlags opt_flags,
-          template <typename>
-          class FunctionStruct>
+          template <typename> class FunctionStruct>
 void
 test_functions()
 {

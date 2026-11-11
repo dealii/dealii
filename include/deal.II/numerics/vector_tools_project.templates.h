@@ -104,10 +104,8 @@ namespace VectorTools
      */
     template <int dim,
               int spacedim,
-              template <int, int>
-              class M_or_MC,
-              template <int>
-              class Q_or_QC,
+              template <int, int> class M_or_MC,
+              template <int> class Q_or_QC,
               typename Number>
     void
     project_compute_b_v(
@@ -474,10 +472,8 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename VectorType,
-              template <int, int>
-              class M_or_MC,
-              template <int>
-              class Q_or_QC>
+              template <int, int> class M_or_MC,
+              template <int> class Q_or_QC>
     DEAL_II_CXX20_REQUIRES(concepts::is_writable_dealii_vector_type<VectorType>)
     void do_project(
       const M_or_MC<dim, spacedim>                              &mapping,

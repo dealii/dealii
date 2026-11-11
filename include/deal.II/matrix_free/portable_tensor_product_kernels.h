@@ -1294,7 +1294,7 @@ namespace Portable
 
 
     } // namespace batched
-  }   // namespace internal
+  } // namespace internal
 } // namespace Portable
 
 DEAL_II_NAMESPACE_CLOSE

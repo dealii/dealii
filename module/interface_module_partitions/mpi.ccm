@@ -38,8 +38,7 @@ export module dealii.external.mpi;
 // If we are using MPI, export some symbols. If we aren't, the
 // include/deal.II/base/mpi_stub.h file (or its transformed version)
 // exports some stubs.
-export
-{
+export {
   using ::MPI_Abort;
   using ::MPI_Aint;
   using ::MPI_Allgather;
@@ -397,16 +396,14 @@ namespace dealii
   }
 } // namespace dealii
 #    undef MPI_Fint
-export
-{
+export {
   using MPI_Fint = dealii::MPI_Macros::MPI_Fint_alias;
 }
 
 #  else
 
 // The implementation does not use the preprocessor to #define MPI_Fint
-export
-{
+export {
   using ::MPI_Fint;
 }
 #  endif

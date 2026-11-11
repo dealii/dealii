@@ -113,8 +113,7 @@ module;
 
 
 export module dealii.external.boost;
-export
-{
+export {
   namespace boost
   {
     namespace algorithm
@@ -139,7 +138,7 @@ export
         using boost::archive::iterators::binary_from_base64;
         using boost::archive::iterators::transform_width;
       } // namespace iterators
-    }   // namespace archive
+    } // namespace archive
 
     namespace container
     {
@@ -200,8 +199,8 @@ export
               using boost::geometry::index::detail::rtree::utilities::view;
             }
           } // namespace rtree
-        }   // namespace detail
-      }     // namespace index
+        } // namespace detail
+      } // namespace index
 
       namespace model
       {

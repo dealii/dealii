@@ -3415,9 +3415,9 @@ namespace GridTools
         {
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                               mpi_tag,
-                               tria->get_mpi_communicator(),
-                               &status);
+                                      mpi_tag,
+                                      tria->get_mpi_communicator(),
+                                      &status);
           AssertThrowMPI(ierr);
 
           int len;
@@ -3501,9 +3501,9 @@ namespace GridTools
         {
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                               mpi_tag_reply,
-                               tria->get_mpi_communicator(),
-                               &status);
+                                      mpi_tag_reply,
+                                      tria->get_mpi_communicator(),
+                                      &status);
           AssertThrowMPI(ierr);
 
           int len;

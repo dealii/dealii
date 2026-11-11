@@ -178,9 +178,9 @@ SeventhProblem<dim>::assemble_system()
 {
   const QGauss<dim>  quadrature_formula(3);
   FEValues<dim>      fe_values(fe,
-                          quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                               quadrature_formula,
+                               update_values | update_gradients |
+                                 update_quadrature_points | update_JxW_values);
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
   const unsigned int n_q_points    = quadrature_formula.size();
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
@@ -226,7 +226,7 @@ void
 SeventhProblem<dim>::solve()
 {
   LA::MPI::Vector            completely_distributed_solution(locally_owned_dofs,
-                                                  mpi_communicator);
+                                                             mpi_communicator);
   SolverControl              solver_control(dof_handler.n_dofs(), 1e-12);
   TrilinosWrappers::SolverCG solver(solver_control);
   TrilinosWrappers::PreconditionAMG                 preconditioner;

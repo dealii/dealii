@@ -45,7 +45,7 @@ class MatrixFreeTest
 {
 public:
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_mass_operator(

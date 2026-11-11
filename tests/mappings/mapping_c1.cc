@@ -71,7 +71,7 @@ main()
   // the vertices
   const QTrapezoid<1> quadrature;
   const MappingC1<2>  c1_mapping;
-  FEFaceValues<2>     c1_values(c1_mapping,
+  FEFaceValues<2> c1_values(c1_mapping,
                             fe,
                             quadrature,
                             update_quadrature_points | update_normal_vectors);
@@ -81,9 +81,9 @@ main()
   // cubic mapping
   const MappingQ<2> q3_mapping(3);
   FEFaceValues<2>   q3_values(q3_mapping,
-                            fe,
-                            quadrature,
-                            update_quadrature_points | update_normal_vectors);
+                              fe,
+                              quadrature,
+                              update_quadrature_points | update_normal_vectors);
 
   for (DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();

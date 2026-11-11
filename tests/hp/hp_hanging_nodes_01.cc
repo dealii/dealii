@@ -94,8 +94,8 @@ test_constraints(hp::FECollection<dim, spacedim> &fe_coll)
   // the different cells.
   DoFHandler<dim, spacedim> dof_handler(tria);
   typename DoFHandler<dim, spacedim>::active_cell_iterator
-    cell                = dof_handler.begin_active(),
-    endc                = dof_handler.end();
+               cell     = dof_handler.begin_active(),
+               endc     = dof_handler.end();
   unsigned int fe_index = 0;
   for (; cell != endc; ++cell)
     {

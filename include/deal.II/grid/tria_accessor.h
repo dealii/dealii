@@ -298,7 +298,7 @@ protected:
   TriaAccessorBase(const Triangulation<dim, spacedim> *parent = nullptr,
                    const int                           level  = -1,
                    const int                           index  = -1,
-                   const AccessorData                       * = nullptr);
+                   const AccessorData *                       = nullptr);
 
   /**
    * Copy constructor. Creates an object with exactly the same data.
@@ -1908,7 +1908,7 @@ public:
   TriaAccessor(const Triangulation<dim, spacedim> *tria  = nullptr,
                const int                           level = 0,
                const int                           index = 0,
-               const AccessorData                      * = nullptr);
+               const AccessorData *                      = nullptr);
 
   /**
    * Constructor. Should never be called and thus produces an error.
@@ -2347,7 +2347,7 @@ public:
   TriaAccessor(const Triangulation<1, spacedim> *tria = nullptr,
                const int                              = 0,
                const int                              = 0,
-               const AccessorData                   * = nullptr);
+               const AccessorData *                   = nullptr);
 
   /**
    * Constructor. Should never be called and thus produces an error.

@@ -44,9 +44,9 @@ test_bounding_boxes(const Mapping<dim, spacedim> &mapping,
   const auto boxes = cache.get_cell_bounding_boxes_rtree();
 
   {
-    std::string fname = "boxes_" + std::to_string(dim) + "_" +
-                        std::to_string(spacedim) + "_" +
-                        std::to_string(degree) + ".vtk";
+    std::string             fname = "boxes_" + std::to_string(dim) + "_" +
+                                    std::to_string(spacedim) + "_" +
+                                    std::to_string(degree) + ".vtk";
     std::ofstream           ofile(fname);
     BoundingBoxDataOut<dim> data_out;
     DataOutBase::VtkFlags   flags;

@@ -44,7 +44,7 @@ test()
   const FEValuesExtractors::Vector             vector(0 + 1);
   const FEValuesExtractors::SymmetricTensor<2> symm_tensor(0 + 1 + dim);
   const FEValuesExtractors::Tensor<2>          tensor(0 + 1 + dim +
-                                             (dim * (dim + 1) / 2));
+                                                      (dim * (dim + 1) / 2));
 
   for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
     deallog << "phi_" << i << " is part of the scalar part: " << std::boolalpha

@@ -956,8 +956,8 @@ namespace internal
                          eval_val(transformation_matrix,
                                   {},
                                   {},
-                 basis_size_1_variable,
-                 basis_size_2_variable);
+                                  basis_size_1_variable,
+                                  basis_size_2_variable);
       const unsigned int np_1 =
         basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
       const unsigned int np_2 =
@@ -1078,10 +1078,10 @@ namespace internal
                              Number,
                              Number2>
                          eval_val(transformation_matrix,
-                 transformation_matrix,
-                 transformation_matrix,
-                 basis_size_1_variable,
-                 basis_size_2_variable);
+                                  transformation_matrix,
+                                  transformation_matrix,
+                                  basis_size_1_variable,
+                                  basis_size_2_variable);
       const unsigned int np_1 =
         basis_size_1 > 0 ? basis_size_1 : basis_size_1_variable;
       const unsigned int np_2 =
@@ -1484,10 +1484,10 @@ namespace internal
                            Number,
                            Number2>
                       eval({},
-           data.shape_gradients_collocation.data(),
-           data.shape_hessians_collocation.data(),
-           data.n_q_points_1d,
-           data.n_q_points_1d);
+                           data.shape_gradients_collocation.data(),
+                           data.shape_hessians_collocation.data(),
+                           data.n_q_points_1d,
+                           data.n_q_points_1d);
     Number           *values   = fe_eval.begin_values();
     const Number     *hessians = fe_eval.begin_hessians();
     Number           *scratch  = fe_eval.get_scratch_data().begin();

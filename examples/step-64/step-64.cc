@@ -534,8 +534,8 @@ namespace Step64
   {
     LinearAlgebra::distributed::Vector<double, MemorySpace::Host>
                       system_rhs_host(locally_owned_dofs,
-                      locally_relevant_dofs,
-                      mpi_communicator);
+                                      locally_relevant_dofs,
+                                      mpi_communicator);
     const QGauss<dim> quadrature_formula(fe_degree + 1);
 
     FEValues<dim> fe_values(fe,

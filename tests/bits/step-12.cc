@@ -430,9 +430,9 @@ DGMethod<dim>::assemble_system1()
                                     face_quadrature,
                                     face_update_flags);
   FEFaceValues<dim>    fe_v_face_neighbor(mapping,
-                                       fe,
-                                       face_quadrature,
-                                       neighbor_face_update_flags);
+                                          fe,
+                                          face_quadrature,
+                                          neighbor_face_update_flags);
   FESubfaceValues<dim> fe_v_subface_neighbor(mapping,
                                              fe,
                                              face_quadrature,
@@ -535,8 +535,8 @@ DGMethod<dim>::assemble_system1()
                              ExcInternalError());
 
                       const std::pair<unsigned int, unsigned int>
-                        faceno_subfaceno =
-                          cell->neighbor_of_coarser_neighbor(face_no);
+                                         faceno_subfaceno =
+                                           cell->neighbor_of_coarser_neighbor(face_no);
                       const unsigned int neighbor_face_no =
                                            faceno_subfaceno.first,
                                          neighbor_subface_no =
@@ -603,9 +603,9 @@ DGMethod<dim>::assemble_system2()
                                     face_quadrature,
                                     face_update_flags);
   FEFaceValues<dim>    fe_v_face_neighbor(mapping,
-                                       fe,
-                                       face_quadrature,
-                                       neighbor_face_update_flags);
+                                          fe,
+                                          face_quadrature,
+                                          neighbor_face_update_flags);
 
 
   FullMatrix<double> ui_vi_matrix(dofs_per_cell, dofs_per_cell);

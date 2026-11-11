@@ -1245,10 +1245,10 @@ namespace internal
       const size_type start_irregular = regular_chunks * n_lanes * 32;
       if (start_irregular < vec_size)
         {
-          VectorizedArray<Number> r0  = VectorizedArray<Number>(),
-                                  r1  = VectorizedArray<Number>();
-          const size_type remainder   = vec_size - start_irregular;
-          const size_type loop_length = remainder / (2 * n_lanes);
+          VectorizedArray<Number> r0          = VectorizedArray<Number>(),
+                                  r1          = VectorizedArray<Number>();
+          const size_type         remainder   = vec_size - start_irregular;
+          const size_type         loop_length = remainder / (2 * n_lanes);
           for (size_type j = 0; j < loop_length; ++j, index += 2 * n_lanes)
             {
               r0 += op.do_vectorized(index);

@@ -277,7 +277,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
                               SUNATimesFn ATimes
 #  else
-                              ATimesFn        ATimes
+                              ATimesFn ATimes
 #  endif
     )
     {
@@ -412,7 +412,8 @@ namespace SUNDIALS
 
 
     template <typename VectorType>
-    LinearSolverWrapper<VectorType>::operator SUNLinearSolver() const
+    LinearSolverWrapper<VectorType>::
+    operator SUNLinearSolver() const
     {
       return sun_linear_solver;
     }

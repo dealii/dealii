@@ -301,7 +301,7 @@ namespace LinearAlgebra
     }
 
 #  endif // DEAL_II_TRILINOS_WITH_IFPACK2
-  }      // namespace TpetraWrappers
+  } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 #endif // DEAL_II_TRILINOS_WITH_TPETRA_MUELU

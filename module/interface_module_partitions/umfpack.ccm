@@ -37,8 +37,7 @@ export module dealii.external.umfpack;
 
 #ifdef DEAL_II_WITH_UMFPACK
 
-export
-{
+export {
   using ::umfpack_dl_defaults;
   using ::umfpack_dl_free_numeric;
   using ::umfpack_dl_free_symbolic;

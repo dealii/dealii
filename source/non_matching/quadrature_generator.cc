@@ -1779,7 +1779,7 @@ namespace NonMatching
         return mask;
       }
     } // namespace DiscreteQuadratureGeneratorImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
 

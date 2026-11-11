@@ -150,10 +150,10 @@ namespace hp
      */
     FECollection(FECollection<dim, spacedim> &&) noexcept(
       std::is_nothrow_move_constructible_v<
-        std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>>
-        &&std::is_nothrow_move_constructible_v<std::function<
-          unsigned int(const typename hp::FECollection<dim, spacedim> &,
-                       const unsigned int)>>) = default;
+        std::vector<std::shared_ptr<const FiniteElement<dim, spacedim>>>> &&
+      std::is_nothrow_move_constructible_v<std::function<
+        unsigned int(const typename hp::FECollection<dim, spacedim> &,
+                     const unsigned int)>>) = default;
 
     /**
      * Move assignment operator.

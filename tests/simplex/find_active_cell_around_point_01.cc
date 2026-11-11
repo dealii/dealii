@@ -59,7 +59,7 @@ test(unsigned int n_ref, unsigned int n_points)
   auto &mapping = tria.get_reference_cells()
                     .front()
                     .template get_default_linear_mapping<spacedim>();
-  auto cell = tria.begin_active();
+  auto  cell    = tria.begin_active();
   for (auto &p : points)
     {
       auto c_and_p = GridTools::find_active_cell_around_point(

@@ -35,7 +35,7 @@ class MatrixFreeTestHP
 {
 public:
   MatrixFreeTestHP(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_apply(const MatrixFree<dim, Number>               &data,

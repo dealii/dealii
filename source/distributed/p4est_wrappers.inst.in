@@ -49,5 +49,5 @@ for (deal_II_dimension : DIMENSIONS)
 #  endif
       \}
     \}
-#endif  // DEAL_II_WITH_P4EST
+#endif // DEAL_II_WITH_P4EST
   }

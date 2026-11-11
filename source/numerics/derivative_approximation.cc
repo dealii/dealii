@@ -722,7 +722,7 @@ namespace DerivativeApproximation
         CopyData() = default;
       };
     } // namespace Assembler
-  }   // namespace internal
+  } // namespace internal
 } // namespace DerivativeApproximation
 
 // --------------- now for the functions that do the actual work --------------

@@ -59,7 +59,7 @@ public:
   void
   serialize(Archive &ar, const unsigned int)
   {
-    ar &object_number;
+    ar & object_number;
   }
 
 

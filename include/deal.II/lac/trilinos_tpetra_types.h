@@ -175,7 +175,7 @@ namespace LinearAlgebra
 #  endif
 
     } // namespace TpetraTypes
-  }   // namespace TpetraWrappers
+  } // namespace TpetraWrappers
 } // namespace LinearAlgebra
 
 #endif

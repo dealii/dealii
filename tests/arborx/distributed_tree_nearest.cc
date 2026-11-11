@@ -62,7 +62,7 @@ test_bounding_box_2d()
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
   ArborXWrappers::DistributedTree             distributed_tree(MPI_COMM_WORLD,
-                                                   bounding_boxes);
+                                                               bounding_boxes);
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);
   auto indices_ranks_offsets = distributed_tree.query(bb_nearest);
@@ -217,7 +217,7 @@ test_bounding_box_3d()
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
   ArborXWrappers::DistributedTree             distributed_tree(MPI_COMM_WORLD,
-                                                   bounding_boxes);
+                                                               bounding_boxes);
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);
   auto indices_ranks_offsets = distributed_tree.query(bb_nearest);

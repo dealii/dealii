@@ -217,9 +217,9 @@ namespace Step22
     const TrilinosWrappers::MPI::Vector &src) const
   {
     SolverControl              solver_control(src.size(),
-                                 1e-6 * src.l2_norm(),
-                                 false,
-                                 false);
+                                              1e-6 * src.l2_norm(),
+                                              false,
+                                              false);
     TrilinosWrappers::SolverCG cg(solver_control,
                                   TrilinosWrappers::SolverCG::AdditionalData());
 

@@ -1742,7 +1742,8 @@ namespace ChunkSparseMatrixIterators
 
 
   template <typename number>
-  inline Accessor<number, false>::Reference::operator number() const
+  inline Accessor<number, false>::Reference::
+  operator number() const
   {
     const unsigned int chunk_size =
       accessor->matrix->get_sparsity_pattern().get_chunk_size();

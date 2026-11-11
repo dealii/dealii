@@ -160,9 +160,9 @@ test2cells(const unsigned int p1 = 2, const unsigned int p2 = 1)
     data_out.add_data_vector(shape_functions[i], names[i]);
 
   data_out.build_patches(0);
-  std::string filename = "shape_functions_" +
-                         dealii::Utilities::int_to_string(counter, 1) + "_" +
-                         dealii::Utilities::int_to_string(dim) + "D.vtu";
+  std::string   filename = "shape_functions_" +
+                           dealii::Utilities::int_to_string(counter, 1) + "_" +
+                           dealii::Utilities::int_to_string(dim) + "D.vtu";
   std::ofstream output(filename);
   data_out.write_vtu(output);
 #endif

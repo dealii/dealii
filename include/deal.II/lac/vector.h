@@ -1458,7 +1458,7 @@ Vector<Number>::save(Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
   ar &static_cast<const EnableObserverPointer &>(*this);
-  ar &values;
+  ar & values;
 }
 
 
@@ -1470,7 +1470,7 @@ Vector<Number>::load(Archive &ar, const unsigned int)
 {
   // the load stuff again from the archive
   ar &static_cast<EnableObserverPointer &>(*this);
-  ar &values;
+  ar & values;
   maybe_reset_thread_partitioner();
 }
 

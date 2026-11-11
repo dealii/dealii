@@ -634,14 +634,16 @@ MatrixBlock<MatrixType>::reinit(const BlockSparsityPattern &sparsity)
 
 
 template <typename MatrixType>
-inline MatrixBlock<MatrixType>::operator MatrixType &()
+inline MatrixBlock<MatrixType>::
+operator MatrixType &()
 {
   return matrix;
 }
 
 
 template <typename MatrixType>
-inline MatrixBlock<MatrixType>::operator const MatrixType &() const
+inline MatrixBlock<MatrixType>::
+operator const MatrixType &() const
 {
   return matrix;
 }

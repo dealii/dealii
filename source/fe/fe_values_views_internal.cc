@@ -225,7 +225,7 @@ namespace FEValuesViews
             {
               const unsigned int comp = shape_function_data[shape_function]
                                           .single_nonzero_component_index;
-              const double *shape_value_ptr = &shape_values(snc, 0);
+              const double      *shape_value_ptr = &shape_values(snc, 0);
               for (unsigned int q_point = 0; q_point < n_quadrature_points;
                    ++q_point, ++shape_value_ptr)
                 values[q_point][comp] += value * (*shape_value_ptr);

@@ -66,13 +66,13 @@ test(const Triangulation<dim> &tr,
 
   const QGauss<dim> quadrature(4);
   FEValues<dim>     fe_values(mapping,
-                          fe,
-                          quadrature,
-                          update_gradients | update_quadrature_points |
-                            update_JxW_values);
+                              fe,
+                              quadrature,
+                              update_gradients | update_quadrature_points |
+                                update_JxW_values);
 
   const QGauss<dim - 1> face_quadrature(4);
-  FEFaceValues<dim>     fe_face_values(mapping,
+  FEFaceValues<dim> fe_face_values(mapping,
                                    fe,
                                    face_quadrature,
                                    update_values | update_quadrature_points |

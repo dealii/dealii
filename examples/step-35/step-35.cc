@@ -1380,9 +1380,9 @@ namespace Step35
       prec_vel_mass.initialize(vel_Mass);
 
     FEValues<dim>      fe_val_vel(fe_velocity,
-                             quadrature_velocity,
-                             update_gradients | update_JxW_values |
-                               update_values);
+                                  quadrature_velocity,
+                                  update_gradients | update_JxW_values |
+                                    update_values);
     const unsigned int dpc = fe_velocity.n_dofs_per_cell(),
                        nqp = quadrature_velocity.size();
     std::vector<types::global_dof_index> ldi(dpc);

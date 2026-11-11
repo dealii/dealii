@@ -376,7 +376,7 @@ namespace Step36
     FullMatrix<double>                   cell_mass_matrix;
     std::vector<types::global_dof_index> local_dof_indices;
     std::vector<double>                  potential_values;
-    hp::FEValues<dim>                    fe_values_hp(fe_collection,
+    hp::FEValues<dim> fe_values_hp(fe_collection,
                                    q_collection,
                                    update_values | update_gradients |
                                      update_quadrature_points |

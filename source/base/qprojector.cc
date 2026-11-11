@@ -99,7 +99,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace QProjector
+  } // namespace QProjector
 } // namespace internal
 
 

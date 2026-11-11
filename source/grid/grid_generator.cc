@@ -518,7 +518,7 @@ namespace GridGenerator
 
           // Calculate radius so that point (x=1|y=0) is enclosed - requirement
           //  for Joukowski transform
-          const double radius      = std::sqrt(center[1] * center[1] +
+          const double radius = std::sqrt(center[1] * center[1] +
                                           (1 - center[0]) * (1 - center[0]));
           const double radius_test = std::sqrt(
             center[1] * center[1] + (1 + center[0]) * (1 + center[0]));
@@ -3939,8 +3939,8 @@ namespace GridGenerator
         &tria_2.get_manifold(cylindrical_manifold_id));
     Assert(m_ptr != nullptr, ExcInternalError());
     const Point<3>     axial_point(m_ptr->get_center()[0],
-                               m_ptr->get_center()[1],
-                               0.0);
+                                   m_ptr->get_center()[1],
+                                   0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
     tria.set_manifold(cylindrical_manifold_id, FlatManifold<3>());
@@ -4190,8 +4190,8 @@ namespace GridGenerator
         &tria_2.get_manifold(cylindrical_manifold_id));
     Assert(m_ptr != nullptr, ExcInternalError());
     const Point<3>     axial_point(m_ptr->get_center()[0],
-                               m_ptr->get_center()[1],
-                               0.0);
+                                   m_ptr->get_center()[1],
+                                   0.0);
     const Tensor<1, 3> direction{{0.0, 0.0, 1.0}};
 
     const CylindricalManifold<3> cylindrical_manifold(direction, axial_point);
@@ -6555,7 +6555,7 @@ namespace GridGenerator
       }
 
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -8487,15 +8487,15 @@ namespace GridGenerator
     // defined by 3 vertices.
     static const std::
       array<std::pair<unsigned int, std::array<unsigned int, 3>>, 24>
-        vertex_ids_for_boundary_faces_3d_24 = {
-          {{0, {{0, 4, 8}}},  {0, {{4, 8, 6}}},  {0, {{8, 6, 2}}},
-           {0, {{0, 2, 8}}},  {1, {{1, 3, 9}}},  {1, {{3, 9, 7}}},
-           {1, {{9, 7, 5}}},  {1, {{1, 9, 5}}},  {2, {{0, 1, 10}}},
-           {2, {{1, 10, 5}}}, {2, {{10, 5, 4}}}, {2, {{0, 10, 4}}},
-           {3, {{2, 3, 11}}}, {3, {{3, 11, 7}}}, {3, {{11, 7, 6}}},
-           {3, {{2, 11, 6}}}, {4, {{0, 1, 12}}}, {4, {{1, 12, 3}}},
-           {4, {{12, 3, 2}}}, {4, {{0, 12, 2}}}, {5, {{4, 5, 13}}},
-           {5, {{5, 13, 7}}}, {5, {{13, 7, 6}}}, {5, {{4, 13, 6}}}}};
+                                vertex_ids_for_boundary_faces_3d_24 = {
+                                  {{0, {{0, 4, 8}}},  {0, {{4, 8, 6}}},  {0, {{8, 6, 2}}},
+                                   {0, {{0, 2, 8}}},  {1, {{1, 3, 9}}},  {1, {{3, 9, 7}}},
+                                   {1, {{9, 7, 5}}},  {1, {{1, 9, 5}}},  {2, {{0, 1, 10}}},
+                                   {2, {{1, 10, 5}}}, {2, {{10, 5, 4}}}, {2, {{0, 10, 4}}},
+                                   {3, {{2, 3, 11}}}, {3, {{3, 11, 7}}}, {3, {{11, 7, 6}}},
+                                   {3, {{2, 11, 6}}}, {4, {{0, 1, 12}}}, {4, {{1, 12, 3}}},
+                                   {4, {{12, 3, 2}}}, {4, {{0, 12, 2}}}, {5, {{4, 5, 13}}},
+                                   {5, {{5, 13, 7}}}, {5, {{13, 7, 6}}}, {5, {{4, 13, 6}}}}};
     [[maybe_unused]] const auto vertex_ids_for_boundary_faces_3d =
       n_divisions == 6 ? make_array_view(vertex_ids_for_boundary_faces_3d_6) :
                          make_array_view(vertex_ids_for_boundary_faces_3d_24);
@@ -8603,13 +8603,13 @@ namespace GridGenerator
     // require a lookup table.
     static const std::
       array<std::pair<unsigned int, std::array<unsigned int, 2>>, 24>
-        vertex_ids_for_new_boundary_edges_3d_24 = {
-          {{0, {{4, 8}}},  {0, {{6, 8}}},  {0, {{0, 8}}},  {0, {{2, 8}}},
-           {1, {{5, 9}}},  {1, {{7, 9}}},  {1, {{1, 9}}},  {1, {{3, 9}}},
-           {2, {{4, 10}}}, {2, {{5, 10}}}, {2, {{0, 10}}}, {2, {{1, 10}}},
-           {3, {{6, 11}}}, {3, {{7, 11}}}, {3, {{2, 11}}}, {3, {{3, 11}}},
-           {4, {{2, 12}}}, {4, {{3, 12}}}, {4, {{0, 12}}}, {4, {{1, 12}}},
-           {5, {{6, 13}}}, {5, {{7, 13}}}, {5, {{4, 13}}}, {5, {{5, 13}}}}};
+                                vertex_ids_for_new_boundary_edges_3d_24 = {
+                                  {{0, {{4, 8}}},  {0, {{6, 8}}},  {0, {{0, 8}}},  {0, {{2, 8}}},
+                                   {1, {{5, 9}}},  {1, {{7, 9}}},  {1, {{1, 9}}},  {1, {{3, 9}}},
+                                   {2, {{4, 10}}}, {2, {{5, 10}}}, {2, {{0, 10}}}, {2, {{1, 10}}},
+                                   {3, {{6, 11}}}, {3, {{7, 11}}}, {3, {{2, 11}}}, {3, {{3, 11}}},
+                                   {4, {{2, 12}}}, {4, {{3, 12}}}, {4, {{0, 12}}}, {4, {{1, 12}}},
+                                   {5, {{6, 13}}}, {5, {{7, 13}}}, {5, {{4, 13}}}, {5, {{5, 13}}}}};
     [[maybe_unused]] const auto vertex_ids_for_new_boundary_edges_3d =
       n_divisions == 6 ?
         make_array_view(vertex_ids_for_new_boundary_edges_3d_6) :
@@ -9089,8 +9089,8 @@ namespace GridGenerator
                 if constexpr (dim == 2)
                   {
                     CellData<dim - 1> child_face_1, child_face_2;
-                    child_face_1.vertices    = {face->vertex_index(0),
-                                                face_to_midpoint_vertex_map[face]};
+                    child_face_1.vertices = {face->vertex_index(0),
+                                             face_to_midpoint_vertex_map[face]};
                     child_face_1.boundary_id = face->boundary_id();
                     child_face_2.vertices = {face_to_midpoint_vertex_map[face],
                                              face->vertex_index(1)};
@@ -9678,8 +9678,8 @@ namespace GridGenerator
             for (const auto &refined_cell_n : cells_refined)
               {
                 const typename MeshType<dim - 1, spacedim>::cell_iterator
-                  refined_cell =
-                    temporary_map_boundary_cell_face[refined_cell_n].first;
+                                                                 refined_cell =
+                                                                   temporary_map_boundary_cell_face[refined_cell_n].first;
                 const typename MeshType<dim,
                                         spacedim>::face_iterator refined_face =
                   temporary_map_boundary_cell_face[refined_cell_n].second.first;
@@ -9766,7 +9766,7 @@ namespace GridGenerator
                 (j + 0) * (repetitions[0] + 1) + i + 1, //
                 (j + 1) * (repetitions[0] + 1) + i + 0, //
                 (j + 1) * (repetitions[0] + 1) + i + 1  //
-              }};                                       //
+              }}; //
 
               // TRI cell 0
               {

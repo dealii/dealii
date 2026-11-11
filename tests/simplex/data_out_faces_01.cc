@@ -77,7 +77,7 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
 #if true
   static unsigned int counter = 0;
   std::ofstream       output("test." + std::to_string(dim) +
-                       std::to_string(counter++) + ".vtk");
+                             std::to_string(counter++) + ".vtk");
   data_out.write_vtk(output);
 #endif
 

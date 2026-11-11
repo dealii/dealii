@@ -976,7 +976,7 @@ namespace Step104
     using LevelMatrixType =
       PortableMFVelocityOperator<dim, degree_u, degree_p, Number>;
     using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
-    using SmootherType               = PreconditionChebyshev<LevelMatrixType,
+    using SmootherType = PreconditionChebyshev<LevelMatrixType,
                                                VectorType,
                                                SmootherPreconditionerType>;
     using MGTransferType =

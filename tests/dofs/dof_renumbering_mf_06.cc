@@ -57,8 +57,8 @@ test(const unsigned int degree)
     const unsigned int group_size = 8;
 
     typename dealii::TriangulationDescription::Settings
-      triangulation_description_setting =
-        dealii::TriangulationDescription::default_setting;
+               triangulation_description_setting =
+                 dealii::TriangulationDescription::default_setting;
     const auto description = dealii::TriangulationDescription::Utilities::
       create_description_from_triangulation_in_groups<dim, dim>(
         serial_grid_generator,

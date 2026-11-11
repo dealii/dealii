@@ -59,8 +59,8 @@ public:
 
 struct MyDataBase : public TransferableQuadraturePointData
 {
-  MyDataBase(){};
-  virtual ~MyDataBase(){};
+  MyDataBase() {};
+  virtual ~MyDataBase() {};
 };
 
 
@@ -76,8 +76,8 @@ struct MyData : public MyDataBase
   }
 
 
-  MyData(){};
-  virtual ~MyData(){};
+  MyData() {};
+  virtual ~MyData() {};
 
   virtual void
   pack_values(std::vector<double> &scalars) const

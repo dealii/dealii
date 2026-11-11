@@ -453,7 +453,7 @@ namespace internal
           }
       }
     }; // class Rescaler
-  }    // namespace
+  } // namespace
 } // namespace internal
 
 

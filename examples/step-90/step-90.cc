@@ -995,8 +995,8 @@ namespace Step90
     double             error_H1_sqr   = 0.0;
     double             error_stab_sqr = 0.0;
     const auto         cell_worker    = [&](const auto &cell,
-                                 auto       &scratch_data,
-                                 auto       &copy_data) {
+                                            auto       &scratch_data,
+                                            auto       &copy_data) {
       if (mesh_classifier.location_to_level_set(cell) ==
             NonMatching::LocationToLevelSet::intersected &&
           cell->is_locally_owned())

@@ -50,7 +50,7 @@ class MatrixFreeTest
 {
 public:
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   // make function virtual to allow derived
   // classes to define a different function

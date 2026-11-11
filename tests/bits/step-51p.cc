@@ -794,7 +794,7 @@ namespace Step51
   HDG<dim>::solve()
   {
     SolverControl      solver_control(system_matrix.m() * 10,
-                                 1e-12 * system_rhs.l2_norm());
+                                      1e-12 * system_rhs.l2_norm());
     std::ostringstream stream;
     deallog.attach(stream);
     SolverBicgstab<> solver(solver_control);

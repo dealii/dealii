@@ -698,9 +698,9 @@ namespace Step19
 
           const Quadrature<dim> quadrature_formula(particle_positions);
           FEValues<dim>         particle_position_fe_values(mapping,
-                                                    fe,
-                                                    quadrature_formula,
-                                                    update_gradients);
+                                                            fe,
+                                                            quadrature_formula,
+                                                            update_gradients);
 
           particle_position_fe_values.reinit(cell);
 

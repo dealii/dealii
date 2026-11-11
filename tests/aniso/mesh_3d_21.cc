@@ -39,10 +39,10 @@
 
 // declare these global in order to reduce time needed upon construction of
 // these objects which is considerable
-FE_DGQ<3>          fe(1);
-QGauss<2>          quadrature(3);
-MappingQ<3>        mapping(2);
-FEFaceValues<3>    fe_face_values1(mapping,
+FE_DGQ<3>       fe(1);
+QGauss<2>       quadrature(3);
+MappingQ<3>     mapping(2);
+FEFaceValues<3> fe_face_values1(mapping,
                                 fe,
                                 quadrature,
                                 update_quadrature_points | update_JxW_values |

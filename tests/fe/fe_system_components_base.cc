@@ -85,7 +85,7 @@ test(const bool renumber = false)
 
       const std::string filename = "grid" + Utilities::int_to_string(dim) +
                                    Utilities::int_to_string(renumber) + ".gp";
-      std::ofstream f(filename);
+      std::ofstream     f(filename);
 
       f << "set terminal png size 420,440 enhanced font \"Helvetica,16\""
         << std::endl

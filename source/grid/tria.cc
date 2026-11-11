@@ -873,11 +873,11 @@ namespace internal
             const std::uint64_t size_on_proc = src_data_variable.size();
             std::uint64_t       prefix_sum   = 0;
             ierr                             = MPI_Exscan(&size_on_proc,
-                              &prefix_sum,
-                              1,
-                              MPI_UINT64_T,
-                              MPI_SUM,
-                              mpi_communicator);
+                                                          &prefix_sum,
+                                                          1,
+                                                          MPI_UINT64_T,
+                                                          MPI_SUM,
+                                                          mpi_communicator);
             AssertThrowMPI(ierr);
 
             const MPI_Offset my_global_file_position =
@@ -1088,11 +1088,11 @@ namespace internal
 
             std::uint64_t prefix_sum = 0;
             ierr                     = MPI_Exscan(&size_on_proc,
-                              &prefix_sum,
-                              1,
-                              MPI_UINT64_T,
-                              MPI_SUM,
-                              mpi_communicator);
+                                                  &prefix_sum,
+                                                  1,
+                                                  MPI_UINT64_T,
+                                                  MPI_SUM,
+                                                  mpi_communicator);
             AssertThrowMPI(ierr);
 
             const MPI_Offset my_global_file_position =
@@ -1437,7 +1437,7 @@ namespace
                 return false;
               }
           } // if face will be refined
-      }     // if neighbor is flagged for refinement
+      } // if neighbor is flagged for refinement
 
     // no cases left, so the neighbor will not
     // refine the face
@@ -3668,8 +3668,8 @@ namespace internal
                                          offset] = cell;
                         }
                     } // if cell active and face refined
-                }     // else -> dim==3
-            }         // for all faces of all cells
+                } // else -> dim==3
+            } // for all faces of all cells
 
         // now loop again over all cells and set the corresponding neighbor
         // cell. Note, that we have to use the opposite of the
@@ -6668,8 +6668,8 @@ namespace internal
 
         { // LINES
           typename Triangulation<dim, spacedim>::active_line_iterator
-            line = triangulation.begin_active_line(),
-            endl = triangulation.end_line();
+                            line = triangulation.begin_active_line(),
+                            endl = triangulation.end_line();
           raw_line_iterator next_unused_line = triangulation.begin_raw_line();
 
           for (; line != endl; ++line)
@@ -8784,10 +8784,10 @@ namespace internal
                             // for faces n+1 (switch_1) and n+2
                             // (switch_2).
                             const typename Triangulation<dim, spacedim>::
-                              quad_iterator switch_1 = quad->child(1),
-                                            switch_2 = quad->child(2);
-                            const int switch_1_index = switch_1->index();
-                            const int switch_2_index = switch_2->index();
+                              quad_iterator switch_1       = quad->child(1),
+                                            switch_2       = quad->child(2);
+                            const int       switch_1_index = switch_1->index();
+                            const int       switch_2_index = switch_2->index();
                             for (unsigned int l = 0;
                                  l < triangulation.levels.size();
                                  ++l)
@@ -8832,8 +8832,8 @@ namespace internal
                             const bool switch_1_user_flag =
                               switch_1->user_flag_set();
                             const RefinementCase<dim - 1>
-                              switch_1_refinement_case =
-                                switch_1->refinement_case();
+                                      switch_1_refinement_case =
+                                        switch_1->refinement_case();
                             const int switch_1_first_child_pair =
                               (switch_1_refinement_case ?
                                  switch_1->child_index(0) :
@@ -9288,8 +9288,8 @@ namespace internal
                     // refinement
                     quad->clear_user_flag();
                   } // if (isotropic refinement)
-              }     // for all quads
-          }         // looped two times over all quads, all quads refined now
+              } // for all quads
+          } // looped two times over all quads, all quads refined now
 
         //---------------------------------
         // Now, finally, set up the new
@@ -9625,7 +9625,7 @@ namespace internal
                                  RefinementCase<2>::cut_x) ?
                                   1 :
                                   3) // 3
-                            };
+                          };
 
                           int line_indices[4];
                           for (unsigned int i = 0; i < 4; ++i)
@@ -9853,7 +9853,7 @@ namespace internal
                                  RefinementCase<2>::cut_x) ?
                                   1 :
                                   3) // 3
-                            };
+                          };
 
                           int line_indices[4];
                           for (unsigned int i = 0; i < 4; ++i)
@@ -10083,7 +10083,7 @@ namespace internal
                                  RefinementCase<2>::cut_x) ?
                                   1 :
                                   3) // 3
-                            };
+                          };
 
                           int line_indices[4];
                           for (unsigned int i = 0; i < 4; ++i)
@@ -12429,8 +12429,8 @@ namespace internal
                         if (dist > allowed)
                           cell->flag_for_face_refinement(face_no);
                       } // if flagged for anistropic refinement
-                  }     // if (cell->face(face)->at_boundary())
-            }           // for all cells
+                  } // if (cell->face(face)->at_boundary())
+            } // for all cells
       }
 
 
@@ -13731,9 +13731,9 @@ void Triangulation<dim, spacedim>::compute_line_to_adjacent_cells_map()
           this->n_active_cells(),
           (is_mixed_mesh() ?
              GeometryInfo<dim>::lines_per_cell : // err on the safe side: choose
-                                                 // the largest number of lines
-                                                 // per cell
-                                                 get_reference_cells()[0]
+                                                   // the largest number of lines
+                                                   // per cell
+             get_reference_cells()[0]
                .n_lines()) // choose the right number of  lines per cell for the
                            // mesh type used
         );
@@ -18310,12 +18310,12 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                     //   /               /
 
                                     std::pair<unsigned int, unsigned int>
-                                      nb_indices =
-                                        has_periodic_neighbor ?
-                                          cell
-                                            ->periodic_neighbor_of_coarser_periodic_neighbor(
-                                              i) :
-                                          cell->neighbor_of_coarser_neighbor(i);
+                                                 nb_indices =
+                                                   has_periodic_neighbor ?
+                                                     cell
+                                                       ->periodic_neighbor_of_coarser_periodic_neighbor(
+                                                         i) :
+                                                     cell->neighbor_of_coarser_neighbor(i);
                                     unsigned int refined_along_x       = 0,
                                                  refined_along_y       = 0,
                                                  to_be_refined_along_x = 0,
@@ -18456,7 +18456,7 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
                                         i,
                                         RefinementCase<dim - 1>::cut_axis(1));
                                   }
-                              }  // if neighbor is coarser
+                              } // if neighbor is coarser
                             else // -> now the neighbor is not coarser
                               {
                                 cell->neighbor_or_periodic_neighbor(i)

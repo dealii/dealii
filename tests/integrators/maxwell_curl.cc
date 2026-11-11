@@ -49,9 +49,9 @@ TestMaxwellCurl(Triangulation<dim> &tr)
   int element_order    = 1;
   int quadrature_order = 3;
 
-  DoFHandler<dim>   dof_handler(tr);
-  FESystem<dim>     fe(FE_Q<dim>(element_order), dim);
-  FEValues<dim>     fe_values(fe,
+  DoFHandler<dim> dof_handler(tr);
+  FESystem<dim>   fe(FE_Q<dim>(element_order), dim);
+  FEValues<dim> fe_values(fe,
                           QGauss<dim>(quadrature_order),
                           update_values | update_JxW_values | update_gradients |
                             update_quadrature_points);

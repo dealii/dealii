@@ -57,7 +57,7 @@ public:
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
     : read_vector(false)
-    , data(data_in){};
+    , data(data_in) {};
 
   void
   operator()(const MatrixFree<dim, Number> &data,

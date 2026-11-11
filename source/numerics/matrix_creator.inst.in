@@ -28,8 +28,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const Quadrature<deal_II_dimension>                          &q,
       deal_II_sparse_matrix_type                                   &matrix,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void MatrixCreator::create_mass_matrix<deal_II_dimension,
@@ -39,8 +39,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const Quadrature<deal_II_dimension>                          &q,
       deal_II_sparse_matrix_type                                   &matrix,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
 
@@ -54,8 +54,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const hp::QCollection<deal_II_dimension>                     &q,
       deal_II_sparse_matrix_type                                   &matrix,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
 
@@ -66,8 +66,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const hp::QCollection<deal_II_dimension>                     &q,
       deal_II_sparse_matrix_type                                   &matrix,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
 #endif
@@ -212,8 +212,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const Quadrature<deal_II_dimension> &q,
       deal_II_sparse_matrix_type          &matrix,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -225,8 +225,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const Quadrature<deal_II_dimension> &q,
       deal_II_sparse_matrix_type          &matrix,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -241,8 +241,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
                      typename deal_II_sparse_matrix_type::value_type> &rhs,
       Vector<typename deal_II_sparse_matrix_type::value_type> &rhs_vector,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -256,8 +256,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
                      typename deal_II_sparse_matrix_type::value_type> &rhs,
       Vector<typename deal_II_sparse_matrix_type::value_type> &rhs_vector,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
 
@@ -270,8 +270,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const hp::QCollection<deal_II_dimension> &q,
       deal_II_sparse_matrix_type               &matrix,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -283,8 +283,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const hp::QCollection<deal_II_dimension>       &q,
       deal_II_sparse_matrix_type                     &matrix,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -299,8 +299,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
                      typename deal_II_sparse_matrix_type::value_type> &rhs,
       Vector<typename deal_II_sparse_matrix_type::value_type> &rhs_vector,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -314,8 +314,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
                      typename deal_II_sparse_matrix_type::value_type> &rhs,
       Vector<typename deal_II_sparse_matrix_type::value_type> &rhs_vector,
       const Function<deal_II_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
 
@@ -337,8 +337,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const Quadrature<deal_II_dimension>                          &q,
       deal_II_sparse_matrix_type                                   &matrix,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -349,8 +349,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
       const Quadrature<deal_II_dimension>                          &q,
       deal_II_sparse_matrix_type                                   &matrix,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -365,8 +365,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
                      typename deal_II_sparse_matrix_type::value_type> &rhs,
       Vector<typename deal_II_sparse_matrix_type::value_type> &rhs_vector,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
     template void
@@ -380,8 +380,8 @@ for (deal_II_sparse_matrix_type : SPARSE_MATRICES;
                      typename deal_II_sparse_matrix_type::value_type> &rhs,
       Vector<typename deal_II_sparse_matrix_type::value_type> &rhs_vector,
       const Function<deal_II_space_dimension,
-                     typename deal_II_sparse_matrix_type::value_type>
-        *const coefficient,
+                     typename deal_II_sparse_matrix_type::value_type> *const
+        coefficient,
       const AffineConstraints<typename deal_II_sparse_matrix_type::value_type>
         &constraints);
 #endif

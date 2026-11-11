@@ -856,12 +856,12 @@ namespace internal
                            ++v)
                         {
                           typename dealii::Triangulation<dim>::cell_iterator
-                            cell_it(
-                              &tria,
-                              cells[cell * VectorizedArrayType::size() + v]
-                                .first,
-                              cells[cell * VectorizedArrayType::size() + v]
-                                .second);
+                                           cell_it(
+                                             &tria,
+                                             cells[cell * VectorizedArrayType::size() + v]
+                                               .first,
+                                             cells[cell * VectorizedArrayType::size() + v]
+                                               .second);
                           const Point<dim> p =
                             mapping[hp_mapping_index]
                               .transform_unit_to_real_cell(cell_it,

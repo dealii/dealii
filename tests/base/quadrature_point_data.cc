@@ -59,8 +59,8 @@ public:
 class MyQData : public TransferableQuadraturePointData
 {
 public:
-  MyQData(){};
-  virtual ~MyQData(){};
+  MyQData() {};
+  virtual ~MyQData() {};
 
   unsigned int
   number_of_values() const

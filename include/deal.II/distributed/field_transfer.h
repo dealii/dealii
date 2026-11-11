@@ -96,7 +96,7 @@ namespace parallel
           cell_data_transfer;
       };
     } // namespace experimental
-  }   // namespace distributed
+  } // namespace distributed
 } // namespace parallel
 
 DEAL_II_NAMESPACE_CLOSE

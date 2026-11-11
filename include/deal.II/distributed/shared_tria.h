@@ -629,7 +629,7 @@ namespace internal
         std::vector<unsigned int> saved_subdomain_ids;
       };
     } // namespace shared
-  }   // namespace parallel
+  } // namespace parallel
 } // namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

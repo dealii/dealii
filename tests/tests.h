@@ -579,7 +579,7 @@ std::ofstream deallogfile;
 void
 initlog(const bool                    console = false,
         const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                              std::ios::left)
+                                                std::ios::left)
 {
   deallogname = "output";
   deallogfile.open(deallogname);
@@ -602,7 +602,7 @@ initlog(const bool                    console = false,
 inline void
 mpi_initlog(const bool                    console = false,
             const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                                  std::ios::left)
+                                                    std::ios::left)
 {
 #ifdef DEAL_II_WITH_MPI
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
@@ -632,7 +632,7 @@ struct MPILogInitAll
 {
   MPILogInitAll(const bool                    console = false,
                 const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                                      std::ios::left)
+                                                        std::ios::left)
   {
 #ifdef DEAL_II_WITH_MPI
     const unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);

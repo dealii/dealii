@@ -83,7 +83,7 @@ public:
   using value_type = number;
   using VectorType = LinearAlgebra::distributed::Vector<number>;
 
-  LaplaceOperator(){};
+  LaplaceOperator() {};
 
   void
   initialize(const Mapping<dim>              &mapping,

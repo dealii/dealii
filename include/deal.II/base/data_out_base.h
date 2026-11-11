@@ -3632,9 +3632,9 @@ public:
   void
   serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &valid &h5_sol_filename &h5_mesh_filename &entry_time &num_nodes
-      &num_cells &dimension &space_dimension &cell_type_name
-        &n_vertices_per_cell &attribute_dims;
+    ar & valid & h5_sol_filename & h5_mesh_filename & entry_time & num_nodes &
+      num_cells & dimension & space_dimension & cell_type_name &
+      n_vertices_per_cell & attribute_dims;
   }
 
   /**

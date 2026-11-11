@@ -256,7 +256,7 @@ namespace internal
     void
     TriaObjectsOrientations::serialize(Archive &ar, const unsigned int)
     {
-      ar &n_stored_objects &faces_per_object &face_orientations;
+      ar & n_stored_objects & faces_per_object & face_orientations;
     }
   } // namespace TriangulationImplementation
 } // namespace internal

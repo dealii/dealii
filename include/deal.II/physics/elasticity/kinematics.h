@@ -261,7 +261,7 @@ namespace Physics
 
       /** @} */
     } // namespace Kinematics
-  }   // namespace Elasticity
+  } // namespace Elasticity
 } // namespace Physics
 
 

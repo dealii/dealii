@@ -51,7 +51,7 @@ class MatrixFreeTest
 {
 public:
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   vmult(VectorType &dst, const VectorType &src) const

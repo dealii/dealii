@@ -106,12 +106,12 @@ check()
 
   const double current_time = 0.0;
   XDMFEntry    entry(output_basename + ".h5",
-                  output_basename + ".h5",
-                  current_time,
-                  data_filter.n_nodes(),
-                  data_filter.n_cells(),
-                  dim,
-                  spacedim);
+                     output_basename + ".h5",
+                     current_time,
+                     data_filter.n_nodes(),
+                     data_filter.n_cells(),
+                     dim,
+                     spacedim);
   unsigned int n_data_sets = data_filter.n_data_sets();
 
   // The vector names generated here must match those generated in the HDF5 file

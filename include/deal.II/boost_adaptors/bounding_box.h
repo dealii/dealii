@@ -134,7 +134,7 @@ DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
         }
       };
     } // namespace traits
-  }   // namespace geometry
+  } // namespace geometry
 } // namespace boost
 
 DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes

@@ -197,12 +197,10 @@ namespace SUNDIALS
     {
       Assert(pending_exception_ptr != nullptr,
              ExcMessage("This stepper is not attached to an ARKode object."));
-      return internal::InvocationContext
-      {
-        *pending_exception_ptr
+      return internal::InvocationContext{*pending_exception_ptr
 #  if DEAL_II_SUNDIALS_VERSION_GTE(6, 0, 0)
-          ,
-          sundials_context
+                                         ,
+                                         sundials_context
 #  endif
       };
     }

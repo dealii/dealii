@@ -271,7 +271,7 @@ namespace internal
             }
       }
     } // namespace
-  }   // namespace FE_PolyTensor
+  } // namespace FE_PolyTensor
 } // namespace internal
 
 #ifndef DOXYGEN

@@ -226,12 +226,12 @@ namespace PETScWrappers
 
             const auto           petsc_i = static_cast<PetscInt>(i);
             const PetscErrorCode ierr    = MatSetValues(matrix,
-                                                     1,
-                                                     &petsc_i,
-                                                     row_lengths[i],
-                                                     row_entries.data(),
-                                                     row_values.data(),
-                                                     INSERT_VALUES);
+                                                        1,
+                                                        &petsc_i,
+                                                        row_lengths[i],
+                                                        row_entries.data(),
+                                                        row_values.data(),
+                                                        INSERT_VALUES);
             AssertThrow(ierr == 0, ExcPETScError(ierr));
           }
         compress(VectorOperation::insert);

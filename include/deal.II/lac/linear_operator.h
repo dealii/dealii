@@ -1515,8 +1515,7 @@ linear_operator(const OperatorExemplar &operator_exemplar, const Matrix &matrix)
     has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
     MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
     MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>()
-    .
-    operator()(return_op, matrix);
+    .operator()(return_op, matrix);
 
   return return_op;
 }
@@ -1552,8 +1551,7 @@ linear_operator(const LinearOperator<Range, Domain, Payload> &operator_exemplar,
     has_vmult_add_and_Tvmult_add<Range, Domain, Matrix>::type::value,
     MatrixInterfaceWithVmultAdd<Range, Domain, Payload>,
     MatrixInterfaceWithoutVmultAdd<Range, Domain, Payload>>()
-    .
-    operator()(return_op, matrix);
+    .operator()(return_op, matrix);
 
   return return_op;
 }

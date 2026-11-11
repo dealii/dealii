@@ -470,7 +470,7 @@ test()
     background_tria.refine_global(background_n_global_refinements);
 
   FESystem<spacedim>   background_fe(FE_Q<spacedim>{background_fe_degree},
-                                   spacedim);
+                                     spacedim);
   DoFHandler<spacedim> background_dof_handler(background_tria);
   background_dof_handler.distribute_dofs(background_fe);
 

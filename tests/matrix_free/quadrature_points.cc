@@ -74,9 +74,9 @@ test()
   const unsigned int           n_cells = mf_data.n_cell_batches();
   FEEvaluation<dim, fe_degree> fe_eval(mf_data);
   FEValues<dim>                fe_values(mapping,
-                          fe,
-                          mf_data.get_quadrature(),
-                          update_quadrature_points);
+                                         fe,
+                                         mf_data.get_quadrature(),
+                                         update_quadrature_points);
 
   using vector_t = VectorizedArray<double>;
   for (unsigned int cell = 0; cell < n_cells; ++cell)

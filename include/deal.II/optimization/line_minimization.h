@@ -402,12 +402,12 @@ namespace LineMinimization
     if (denom == 0.)
       return {};
 
-    const NumberType A = (r1 * Utilities::fixed_power<2>(x3_shift) -
-                          r2 * Utilities::fixed_power<2>(x2_shift)) /
-                         denom;
-    const NumberType B = (r2 * Utilities::fixed_power<3>(x2_shift) -
-                          r1 * Utilities::fixed_power<3>(x3_shift)) /
-                         denom;
+    const NumberType  A = (r1 * Utilities::fixed_power<2>(x3_shift) -
+                           r2 * Utilities::fixed_power<2>(x2_shift)) /
+                          denom;
+    const NumberType  B = (r2 * Utilities::fixed_power<3>(x2_shift) -
+                           r1 * Utilities::fixed_power<3>(x3_shift)) /
+                          denom;
     const NumberType &C = g1;
 
     // now get the minimizer:

@@ -132,7 +132,8 @@ namespace Utilities
           /// NoncontiguousPartitioner::update_values
           noncontiguous_partitioner_update_ghost_values_start,
           noncontiguous_partitioner_update_ghost_values_end =
-            noncontiguous_partitioner_update_ghost_values_start + 10,
+              noncontiguous_partitioner_update_ghost_values_start +
+            10,
 
           // Utilities::MPI::compute_union
           compute_union,
@@ -151,8 +152,8 @@ namespace Utilities
           data_out_write_vtu_in_parallel,
         };
       } // namespace Tags
-    }   // namespace internal
-  }     // namespace MPI
+    } // namespace internal
+  } // namespace MPI
 } // namespace Utilities
 
 

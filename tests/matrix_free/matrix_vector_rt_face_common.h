@@ -113,7 +113,7 @@ public:
               EvaluationFlags::gradients));
   };
 
-  virtual ~MatrixFreeTest(){};
+  virtual ~MatrixFreeTest() {};
 
   void
   dummy(const MatrixFree<dim, Number> &,

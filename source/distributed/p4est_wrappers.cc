@@ -641,7 +641,7 @@ namespace internal
       // determine the current level of quadrant
       const int level_parent = (q << types<1>::max_n_child_indices_bits) >>
                                types<1>::max_n_child_indices_bits;
-      const int level_child = level_parent + 1;
+      const int level_child  = level_parent + 1;
 
       // left child: only n_child_indices has to be incremented
       p4est_children[0] = (q + 1);

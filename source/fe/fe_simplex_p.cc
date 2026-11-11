@@ -458,7 +458,7 @@ FE_SimplexPoly<dim, spacedim>::has_support_on_face(
   //
 
   const ReferenceCell<dim> reference_cell = this->reference_cell();
-  const auto               offset = this->unit_support_points[shape_index] -
+  const auto offset = this->unit_support_points[shape_index] -
                       reference_cell.face_vertex_location(face_index, 0);
   const auto normal = reference_cell.face_normal_vector(face_index);
 

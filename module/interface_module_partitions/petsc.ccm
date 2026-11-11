@@ -52,8 +52,7 @@ export module dealii.external.petsc;
 
 #ifdef DEAL_II_WITH_PETSC
 
-export
-{
+export {
   using ::DM;
   using ::DMDestroy;
   using ::DMSetMatType;

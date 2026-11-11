@@ -336,10 +336,10 @@ create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
   // cube+part of ball
   if (2)
     {
-      Point<3> m(2, 2, 2);
-      Point<3> v(3, 3, 3);
-      double   r = std::sqrt((m - v).norm_square()), h = r - 1.5,
-             pi              = std::acos(-1.);
+      Point<3>     m(2, 2, 2);
+      Point<3>     v(3, 3, 3);
+      double       r = std::sqrt((m - v).norm_square()), h = r - 1.5,
+                   pi        = std::acos(-1.);
       Manifold<3> *boundary1 = new SphericalManifold<3>(m);
       boundary_ptr.push_back(boundary1);
 

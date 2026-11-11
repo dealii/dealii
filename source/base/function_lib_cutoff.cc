@@ -333,9 +333,9 @@ namespace Functions
       for (unsigned int i = 0; i < values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
-          values[i]      = ((d < this->radius) ?
-                              (this->radius - d) / this->radius * this->rescaling :
-                              0.);
+          values[i] = ((d < this->radius) ?
+                         (this->radius - d) / this->radius * this->rescaling :
+                         0.);
         }
     else
       std::fill(values.begin(), values.end(), 0.);

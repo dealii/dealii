@@ -64,9 +64,9 @@ run(const ExtractorType &extractor)
   hp::FECollection<dim, spacedim> fe(FE_DGQ<dim, spacedim>(3),
                                      FE_DGQ<dim, spacedim>(4));
   hp::QCollection<dim>            qf_cell(QGauss<dim>(fe.max_degree()),
-                               QGauss<dim>(fe.max_degree() + 1));
+                                          QGauss<dim>(fe.max_degree() + 1));
   hp::QCollection<dim - 1>        qf_face(QGauss<dim - 1>(fe.max_degree()),
-                                   QGauss<dim - 1>(fe.max_degree() + 1));
+                                          QGauss<dim - 1>(fe.max_degree() + 1));
 
   Triangulation<dim, spacedim> triangulation;
   GridGenerator::hyper_cube(triangulation, -1, 1);

@@ -168,7 +168,7 @@ main(int argc, char **argv)
 
     {
       SLEPcWrappers::SolverGeneralizedDavidson::AdditionalData data(true);
-      SLEPcWrappers::SolverGeneralizedDavidson                 solver(control,
+      SLEPcWrappers::SolverGeneralizedDavidson solver(control,
                                                       PETSC_COMM_SELF,
                                                       data);
       check_solve(solver, 5, control, A, u, v);

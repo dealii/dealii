@@ -617,7 +617,7 @@ namespace TrilinosWrappers
       };
 
     } // namespace BlockLinearOperatorImplementation
-  }   /* namespace internal */
+  } /* namespace internal */
 
 
 } /* namespace TrilinosWrappers */

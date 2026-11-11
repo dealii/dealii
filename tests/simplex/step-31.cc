@@ -244,19 +244,19 @@ namespace Step31
     void
     refine_mesh(const unsigned int max_grid_level);
     double
-    compute_viscosity(
-      const std::vector<double>         &old_temperature,
-      const std::vector<double>         &old_old_temperature,
-      const std::vector<Tensor<1, dim>> &old_temperature_grads,
-      const std::vector<Tensor<1, dim>> &old_old_temperature_grads,
-      const std::vector<double>         &old_temperature_laplacians,
-      const std::vector<double>         &old_old_temperature_laplacians,
-      const std::vector<Tensor<1, dim>> &old_velocity_values,
-      const std::vector<Tensor<1, dim>> &old_old_velocity_values,
-      const std::vector<double>         &gamma_values,
-      const double                       global_u_infty,
-      const double                       global_T_variation,
-      const double                       cell_diameter) const;
+                                        compute_viscosity(
+                                          const std::vector<double>         &old_temperature,
+                                          const std::vector<double>         &old_old_temperature,
+                                          const std::vector<Tensor<1, dim>> &old_temperature_grads,
+                                          const std::vector<Tensor<1, dim>> &old_old_temperature_grads,
+                                          const std::vector<double>         &old_temperature_laplacians,
+                                          const std::vector<double>         &old_old_temperature_laplacians,
+                                          const std::vector<Tensor<1, dim>> &old_velocity_values,
+                                          const std::vector<Tensor<1, dim>> &old_old_velocity_values,
+                                          const std::vector<double>         &gamma_values,
+                                          const double                       global_u_infty,
+                                          const double                       global_T_variation,
+                                          const double                       cell_diameter) const;
     Triangulation<dim>                  triangulation;
     double                              global_Omega_diameter;
     MappingFE<dim>                      mapping;
@@ -324,9 +324,9 @@ namespace Step31
     const auto                      &quadrature_formula = quadrature_stokes;
     const unsigned int               n_q_points = quadrature_formula.size();
     FEValues<dim>                    fe_values(mapping,
-                            stokes_fe,
-                            quadrature_formula,
-                            update_values);
+                                               stokes_fe,
+                                               quadrature_formula,
+                                               update_values);
     std::vector<Tensor<1, dim>>      velocity_values(n_q_points);
     double                           max_velocity = 0;
     const FEValuesExtractors::Vector velocities(0);
@@ -347,9 +347,9 @@ namespace Step31
     const auto         &quadrature_formula = quadrature_temperature;
     const unsigned int  n_q_points         = quadrature_formula.size();
     FEValues<dim>       fe_values(mapping,
-                            temperature_fe,
-                            quadrature_formula,
-                            update_values);
+                                  temperature_fe,
+                                  quadrature_formula,
+                                  update_values);
     std::vector<double> old_temperature_values(n_q_points);
     std::vector<double> old_old_temperature_values(n_q_points);
     if (timestep_number != 0)
@@ -553,10 +553,10 @@ namespace Step31
     stokes_preconditioner_matrix          = 0;
     const auto        &quadrature_formula = quadrature_stokes;
     FEValues<dim>      stokes_fe_values(mapping,
-                                   stokes_fe,
-                                   quadrature_formula,
-                                   update_JxW_values | update_values |
-                                     update_gradients);
+                                        stokes_fe,
+                                        quadrature_formula,
+                                        update_JxW_values | update_values |
+                                          update_gradients);
     const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
@@ -644,9 +644,9 @@ namespace Step31
       update_values | update_quadrature_points | update_JxW_values |
         (rebuild_stokes_matrix == true ? update_gradients : UpdateFlags(0)));
     FEValues<dim>      temperature_fe_values(mapping,
-                                        temperature_fe,
-                                        quadrature_formula,
-                                        update_values);
+                                             temperature_fe,
+                                             quadrature_formula,
+                                             update_values);
     const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
     FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
@@ -724,10 +724,10 @@ namespace Step31
     temperature_stiffness_matrix          = 0;
     const auto        &quadrature_formula = quadrature_temperature;
     FEValues<dim>      temperature_fe_values(mapping,
-                                        temperature_fe,
-                                        quadrature_formula,
-                                        update_values | update_gradients |
-                                          update_JxW_values);
+                                             temperature_fe,
+                                             quadrature_formula,
+                                             update_values | update_gradients |
+                                               update_JxW_values);
     const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
     FullMatrix<double> local_mass_matrix(dofs_per_cell, dofs_per_cell);
@@ -788,15 +788,15 @@ namespace Step31
     temperature_rhs                       = 0;
     const auto        &quadrature_formula = quadrature_temperature;
     FEValues<dim>      temperature_fe_values(mapping,
-                                        temperature_fe,
-                                        quadrature_formula,
-                                        update_values | update_gradients |
-                                          update_hessians |
-                                          update_quadrature_points |
-                                          update_JxW_values);
+                                             temperature_fe,
+                                             quadrature_formula,
+                                             update_values | update_gradients |
+                                               update_hessians |
+                                               update_quadrature_points |
+                                               update_JxW_values);
     FEValues<dim>      stokes_fe_values(stokes_fe,
-                                   quadrature_formula,
-                                   update_values);
+                                        quadrature_formula,
+                                        update_values);
     const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
     Vector<double>     local_rhs(dofs_per_cell);

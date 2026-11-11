@@ -320,12 +320,12 @@ test(const unsigned int refinement)
 
   LinearAlgebra::distributed::Vector<double, MemorySpace::Host> rhs_host;
   data->initialize_dof_vector(rhs_host, 0);
-  FEValues<dim>                        fe_values(mapping,
-                          fe,
-                          QGauss<dim>(degree + 1),
-                          update_values | update_quadrature_points |
-                            update_JxW_values);
-  Vector<double>                       cell_rhs(fe.n_dofs_per_cell());
+  FEValues<dim>  fe_values(mapping,
+                           fe,
+                           QGauss<dim>(degree + 1),
+                           update_values | update_quadrature_points |
+                             update_JxW_values);
+  Vector<double> cell_rhs(fe.n_dofs_per_cell());
   std::vector<types::global_dof_index> indices(fe.n_dofs_per_cell());
   RightHandSide<dim>                   forcing;
   for (const auto &cell : dof_handler.active_cell_iterators())
@@ -412,12 +412,12 @@ test(const unsigned int refinement)
   MGCoarseGridApplySmoother<VectorType> coarse_solver;
   coarse_solver.initialize(smoother);
   Multigrid<VectorType>                     mg(mg_matrix,
-                           coarse_solver,
-                           transfer,
-                           smoother,
-                           smoother,
-                           min_level,
-                           max_level);
+                                               coarse_solver,
+                                               transfer,
+                                               smoother,
+                                               smoother,
+                                               min_level,
+                                               max_level);
   PreconditionMG<dim, VectorType, Transfer> preconditioner(dof_handler,
                                                            mg,
                                                            transfer);

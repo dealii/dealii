@@ -125,7 +125,8 @@ check_fe(FiniteElement<dim> &fe)
   dofh.distribute_dofs(fe);
   dofh.distribute_mg_dofs();
   using vector_t = PETScWrappers::MPI::Vector;
-  {}
+  {
+  }
   MGTransferPrebuilt<vector_t> transfer;
   transfer.build(dofh);
   transfer.print_indices(deallog.get_file_stream());

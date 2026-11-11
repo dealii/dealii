@@ -119,10 +119,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   const QGauss<dim> quadrature(fe.degree + 2);
   FEValues<dim>     fe_values(mapping,
-                          fe,
-                          quadrature,
-                          update_values | update_gradients |
-                            update_3rd_derivatives);
+                              fe,
+                              quadrature,
+                              update_values | update_gradients |
+                                update_3rd_derivatives);
 
   AffineConstraints<double> constraints;
   DoFTools::make_hanging_node_constraints(dof_handler, constraints);

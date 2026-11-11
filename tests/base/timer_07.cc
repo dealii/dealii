@@ -49,9 +49,9 @@ main(int argc, char **argv)
     {
       std::cerr << "TimerOutput::Scope\n";
       TimerOutput        timer_out(MPI_COMM_WORLD,
-                            std::cerr,
-                            TimerOutput::summary,
-                            TimerOutput::cpu_times);
+                                   std::cerr,
+                                   TimerOutput::summary,
+                                   TimerOutput::cpu_times);
       TimerOutput::Scope timer_scope(timer_out, "Section1");
 
       throw Timer07Exception();
@@ -67,9 +67,9 @@ main(int argc, char **argv)
     {
       std::cerr << "TimerOutput::Scope with MPI_COMM_SELF\n";
       TimerOutput        timer_out(MPI_COMM_SELF,
-                            std::cerr,
-                            TimerOutput::summary,
-                            TimerOutput::cpu_times);
+                                   std::cerr,
+                                   TimerOutput::summary,
+                                   TimerOutput::cpu_times);
       TimerOutput::Scope timer_scope(timer_out, "Section1");
 
       throw Timer07Exception();
@@ -87,9 +87,9 @@ main(int argc, char **argv)
       std::cerr
         << "TimerOutput::Scope with other single process communicator\n";
       TimerOutput        timer_out(single_rank_comm,
-                            std::cerr,
-                            TimerOutput::summary,
-                            TimerOutput::cpu_times);
+                                   std::cerr,
+                                   TimerOutput::summary,
+                                   TimerOutput::cpu_times);
       TimerOutput::Scope timer_scope(timer_out, "Section1");
 
       throw Timer07Exception();

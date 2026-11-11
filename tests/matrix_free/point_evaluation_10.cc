@@ -64,9 +64,9 @@ test(const unsigned int degree)
 
   FE_DGQArbitraryNodes<dim> fe(QGauss<1>(degree + 1));
   FEValues<dim>             fe_values(mapping,
-                          fe,
-                          Quadrature<dim>(unit_points),
-                          update_values | update_gradients);
+                                      fe,
+                                      Quadrature<dim>(unit_points),
+                                      update_values | update_gradients);
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);

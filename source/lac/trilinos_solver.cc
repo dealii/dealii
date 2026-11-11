@@ -415,7 +415,7 @@ namespace TrilinosWrappers
       }
 
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
 
   template <typename Preconditioner>
@@ -527,8 +527,8 @@ namespace TrilinosWrappers
     // certain choices of solver or if a custom status test is set, then the
     // result returned by TrueResidual() is equal to -1. In this case we must
     // compute it ourself.
-    if (const internal::TrilinosReductionControl
-          *const reduction_control_status =
+    if (const internal::TrilinosReductionControl *const
+          reduction_control_status =
             dynamic_cast<const internal::TrilinosReductionControl *>(
               status_test.get()))
       {

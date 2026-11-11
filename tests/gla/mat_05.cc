@@ -76,7 +76,8 @@ test()
   {
     // disabled:
     // typename LA::MPI::SparseMatrix mat2(mat);
-  } {
+  }
+  {
     // disabled:
     // typename LA::MPI::SparseMatrix mat2;
     // mat2 = mat;

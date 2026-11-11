@@ -205,7 +205,7 @@ namespace numbers
         }
       };
     } // namespace SignalingNaN
-  }   // namespace internal
+  } // namespace internal
 
 
 

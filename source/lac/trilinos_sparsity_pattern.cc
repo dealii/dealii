@@ -448,8 +448,8 @@ namespace TrilinosWrappers
              ExcMessage(
                "This function only works if the row map is contiguous."));
 
-      const size_type first_row = TrilinosWrappers::min_my_gid(row_map),
-                      last_row  = TrilinosWrappers::max_my_gid(row_map) + 1;
+      const size_type  first_row = TrilinosWrappers::min_my_gid(row_map),
+                       last_row  = TrilinosWrappers::max_my_gid(row_map) + 1;
       std::vector<int> n_entries_per_row(last_row - first_row);
 
       // Trilinos wants the row length as an int this is hopefully never going

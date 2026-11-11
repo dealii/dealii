@@ -161,7 +161,7 @@ namespace Step8
   ElasticProblem<dim>::assemble_system()
   {
     QGaussSimplex<dim> quadrature_formula(fe.degree + 1);
-    FEValues<dim>      fe_values(mapping,
+    FEValues<dim> fe_values(mapping,
                             fe,
                             quadrature_formula,
                             update_values | update_gradients |

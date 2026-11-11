@@ -59,7 +59,7 @@ public:
   using Number       = double;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_apply(const MatrixFree<dim, Number>               &data,

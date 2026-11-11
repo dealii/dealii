@@ -408,7 +408,7 @@ namespace MatrixTools
           }
       }
     } // namespace TrilinosWrappers
-  }   // namespace internal
+  } // namespace internal
 
 
 

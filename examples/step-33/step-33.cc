@@ -448,9 +448,9 @@ namespace Step33
       const QMidpoint<dim> quadrature_formula;
       const UpdateFlags    update_flags = update_gradients;
       FEValues<dim>        fe_v(mapping,
-                         dof_handler.get_fe(),
-                         quadrature_formula,
-                         update_flags);
+                                dof_handler.get_fe(),
+                                quadrature_formula,
+                                update_flags);
 
       std::vector<std::vector<Tensor<1, dim>>> dU(
         1, std::vector<Tensor<1, dim>>(n_components));
@@ -1449,17 +1449,17 @@ namespace Step33
 
     FEValues<dim>        fe_v(mapping, fe, quadrature, update_flags);
     FEFaceValues<dim>    fe_v_face(mapping,
-                                fe,
-                                face_quadrature,
-                                face_update_flags);
+                                   fe,
+                                   face_quadrature,
+                                   face_update_flags);
     FESubfaceValues<dim> fe_v_subface(mapping,
                                       fe,
                                       face_quadrature,
                                       face_update_flags);
     FEFaceValues<dim>    fe_v_face_neighbor(mapping,
-                                         fe,
-                                         face_quadrature,
-                                         neighbor_face_update_flags);
+                                            fe,
+                                            face_quadrature,
+                                            neighbor_face_update_flags);
     FESubfaceValues<dim> fe_v_subface_neighbor(mapping,
                                                fe,
                                                face_quadrature,

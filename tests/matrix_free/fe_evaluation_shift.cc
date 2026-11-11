@@ -68,9 +68,9 @@ namespace dealii
                   first_selected_component,
                   active_fe_index,
                   active_quad_index)
-      , shape_info_base(this->data){
+      , shape_info_base(this->data) {
 
-        };
+      };
 
     const internal::MatrixFreeFunctions::ShapeInfo<Number> *shape_info_base;
 

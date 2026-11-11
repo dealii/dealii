@@ -254,9 +254,9 @@ template <class Archive>
 void
 CellId::serialize(Archive &ar, const unsigned int /*version*/)
 {
-  ar &coarse_cell_id;
-  ar &n_child_indices;
-  ar &child_indices;
+  ar & coarse_cell_id;
+  ar & n_child_indices;
+  ar & child_indices;
 }
 
 /**

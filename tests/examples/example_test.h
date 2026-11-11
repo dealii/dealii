@@ -77,7 +77,7 @@ std::ofstream deallogfile;
 void
 initlog(const bool                    console = false,
         const std::ios_base::fmtflags flags   = std::ios::showpoint |
-                                              std::ios::left)
+                                                std::ios::left)
 {
   deallogname = "output";
   deallogfile.open(deallogname);

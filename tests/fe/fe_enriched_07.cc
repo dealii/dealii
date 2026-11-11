@@ -179,10 +179,10 @@ test6(const bool         do_href,
 
   data_out.build_patches(patches);
 
-  std::string filename = "hp-shape_functions_ref=" + std::to_string(do_href) +
-                         "_p_feq=" + std::to_string(p_feq) +
-                         "_p_feenr=" + std::to_string(p_feen) + "_" +
-                         dealii::Utilities::int_to_string(dim) + "D.vtu";
+  std::string   filename = "hp-shape_functions_ref=" + std::to_string(do_href) +
+                           "_p_feq=" + std::to_string(p_feq) +
+                           "_p_feenr=" + std::to_string(p_feen) + "_" +
+                           dealii::Utilities::int_to_string(dim) + "D.vtu";
   std::ofstream output(filename);
   data_out.write_vtu(output);
 #endif

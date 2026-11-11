@@ -138,10 +138,10 @@ create_mass_matrix(const Mapping<dim>        &mapping,
 
   FEValues<dim> fe_values(mapping, dof.get_fe(), q, update_flags);
 
-  const unsigned int dofs_per_cell       = fe_values.dofs_per_cell,
-                     n_q_points          = fe_values.n_quadrature_points;
-  const FiniteElement<dim> &fe           = fe_values.get_fe();
-  const unsigned int        n_components = fe.n_components();
+  const unsigned int        dofs_per_cell = fe_values.dofs_per_cell,
+                            n_q_points    = fe_values.n_quadrature_points;
+  const FiniteElement<dim> &fe            = fe_values.get_fe();
+  const unsigned int        n_components  = fe.n_components();
 
   Assert(coefficient == nullptr || coefficient->n_components == 1 ||
            coefficient->n_components == n_components,
@@ -424,7 +424,7 @@ project(const Mapping<dim>              &mapping,
         const Function<dim>             &function,
         Vector<double>                  &vec,
         const bool                       enforce_zero_boundary = false,
-        const Quadrature<dim - 1>          & = QGauss<dim - 1>(2),
+        const Quadrature<dim - 1> &          = QGauss<dim - 1>(2),
         const bool project_to_boundary_first = false)
 {
   Assert(dof.get_fe().n_components() == function.n_components,

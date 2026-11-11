@@ -1564,7 +1564,7 @@ namespace Physics
       }
 
     } // namespace Kelvin
-  }   // namespace Notation
+  } // namespace Notation
 } // namespace Physics
 
 

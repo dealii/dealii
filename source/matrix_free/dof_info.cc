@@ -150,7 +150,7 @@ namespace internal
 
       // sort ghost dofs and compress out duplicates
       const unsigned int n_owned  = (vector_partitioner->local_range().second -
-                                    vector_partitioner->local_range().first);
+                                     vector_partitioner->local_range().first);
       const std::size_t  n_ghosts = ghost_dofs.size();
       if constexpr (running_in_debug_mode())
         {
@@ -1309,8 +1309,8 @@ namespace internal
             row_entries.clear();
 
             const unsigned int
-              *it = dof_info.dof_indices.data() +
-                    dof_info.row_starts[block * n_components].first,
+              *it       = dof_info.dof_indices.data() +
+                          dof_info.row_starts[block * n_components].first,
               *end_cell = dof_info.dof_indices.data() +
                           dof_info.row_starts[(block + 1) * n_components].first;
             for (; it != end_cell; ++it)

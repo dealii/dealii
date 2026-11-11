@@ -37,8 +37,7 @@ export module dealii.external.muparser;
 
 #ifdef DEAL_II_WITH_MUPARSER
 
-export
-{
+export {
   namespace mu
   {
 // bundled/muparser_v2_3_3/include/muParser.h declares its symbols in the dealii

@@ -193,7 +193,7 @@ LaplaceProblem<dim>::solve()
   PSCToolkitWrappers::Vector completely_distributed_solution(locally_owned_dofs,
                                                              mpi_communicator);
 
-  SolverControl                        solver_control(dof_handler.n_dofs(),
+  SolverControl solver_control(dof_handler.n_dofs(),
                                1e-8 * system_rhs.l2_norm(),
                                false,
                                false);

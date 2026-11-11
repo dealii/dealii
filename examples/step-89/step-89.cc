@@ -194,8 +194,8 @@ namespace Step89
       data_out.set_flags(flags);
 
       std::vector<DataComponentInterpretation::DataComponentInterpretation>
-        interpretation(
-          dim + 1, DataComponentInterpretation::component_is_part_of_vector);
+                               interpretation(
+                                 dim + 1, DataComponentInterpretation::component_is_part_of_vector);
       std::vector<std::string> names(dim + 1, "U");
 
       interpretation[0] = DataComponentInterpretation::component_is_scalar;
@@ -1401,7 +1401,7 @@ namespace Step89
           std::vector<bool> mask(tria.n_vertices(), true);
 
           for (const auto &cell : tria.active_cell_iterators())
-            for (auto const &f : cell->face_indices())
+            for (const auto &f : cell->face_indices())
               if (cell->face(f)->at_boundary() &&
                   cell->face(f)->boundary_id() == nm_face)
                 for (const auto v : cell->vertex_indices())
@@ -1567,7 +1567,7 @@ namespace Step89
           std::vector<bool> mask(tria.n_vertices(), true);
 
           for (const auto &cell : tria.active_cell_iterators())
-            for (auto const &f : cell->face_indices())
+            for (const auto &f : cell->face_indices())
               if (cell->face(f)->at_boundary() &&
                   cell->face(f)->boundary_id() == nm_face)
                 for (const auto v : cell->vertex_indices())

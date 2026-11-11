@@ -55,7 +55,7 @@ namespace internal
         return 1.e-15 * std::exp(std::pow(p, 1.075));
       }
     } // namespace
-  }   // namespace FE_Nedelec
+  } // namespace FE_Nedelec
 } // namespace internal
 
 

@@ -194,9 +194,9 @@ namespace FEConforimityTest
                             numbers::default_geometric_orientation)
                         << "}" << std::endl;
               } // line_index
-          }     // cell
-      }         // plot_mesh_properties
-  }             // make_grid<3>()
+          } // cell
+      } // plot_mesh_properties
+  } // make_grid<3>()
 
 
   template <>
@@ -247,9 +247,9 @@ namespace FEConforimityTest
                             numbers::default_geometric_orientation)
                         << "}" << std::endl;
               } // line_index
-          }     // cell
-      }         // plot_mesh_properties
-  }             // make_grid<2>()
+          } // cell
+      } // plot_mesh_properties
+  } // make_grid<2>()
 
 
   template <int dim>
@@ -501,8 +501,8 @@ namespace FEConforimityTest
               }
             deallog << std::endl;
           } // face_index
-      }     // cell
-  }         // run_test()
+      } // cell
+  } // run_test()
 
 
 

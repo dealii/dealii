@@ -49,9 +49,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   const QGauss<dim> quadrature(2);
   FEValues<dim>     fe_values(fe,
-                          quadrature,
-                          update_values | update_gradients |
-                            update_quadrature_points);
+                              quadrature,
+                              update_values | update_gradients |
+                                update_quadrature_points);
   fe_values.reinit(dof.begin_active());
 
   // let the FEValues object compute the

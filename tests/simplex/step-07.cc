@@ -276,7 +276,7 @@ namespace Step7
 #ifdef USE_SIMPLEX
     MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 #else
-    MappingFE<dim>  mapping(FE_Q<dim>(1));
+    MappingFE<dim> mapping(FE_Q<dim>(1));
 #endif
 
     FEValues<dim> fe_values(mapping,
@@ -436,7 +436,7 @@ namespace Step7
 #ifdef USE_SIMPLEX
     MappingFE<dim> mapping(FE_SimplexP<dim>(1));
 #else
-    MappingFE<dim>  mapping(FE_Q<dim>(1));
+    MappingFE<dim> mapping(FE_Q<dim>(1));
 #endif
 
     VectorTools::integrate_difference(mapping,

@@ -414,7 +414,7 @@ namespace BlackScholesSolver
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
     const QGauss<dim>  quadrature_formula(fe.degree + 1);
-    FEValues<dim>      fe_values(fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);

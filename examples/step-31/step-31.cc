@@ -1039,9 +1039,9 @@ namespace Step31
 
     const QGauss<dim> quadrature_formula(stokes_degree + 2);
     FEValues<dim>     stokes_fe_values(stokes_fe,
-                                   quadrature_formula,
-                                   update_JxW_values | update_values |
-                                     update_gradients);
+                                       quadrature_formula,
+                                       update_JxW_values | update_values |
+                                         update_gradients);
 
     const unsigned int dofs_per_cell = stokes_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -1413,9 +1413,9 @@ namespace Step31
 
     const QGauss<dim> quadrature_formula(temperature_degree + 2);
     FEValues<dim>     temperature_fe_values(temperature_fe,
-                                        quadrature_formula,
-                                        update_values | update_gradients |
-                                          update_JxW_values);
+                                            quadrature_formula,
+                                            update_values | update_gradients |
+                                              update_JxW_values);
 
     const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -1518,14 +1518,14 @@ namespace Step31
 
     const QGauss<dim> quadrature_formula(temperature_degree + 2);
     FEValues<dim>     temperature_fe_values(temperature_fe,
-                                        quadrature_formula,
-                                        update_values | update_gradients |
-                                          update_hessians |
-                                          update_quadrature_points |
-                                          update_JxW_values);
+                                            quadrature_formula,
+                                            update_values | update_gradients |
+                                              update_hessians |
+                                              update_quadrature_points |
+                                              update_JxW_values);
     FEValues<dim>     stokes_fe_values(stokes_fe,
-                                   quadrature_formula,
-                                   update_values);
+                                       quadrature_formula,
+                                       update_values);
 
     const unsigned int dofs_per_cell = temperature_fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();

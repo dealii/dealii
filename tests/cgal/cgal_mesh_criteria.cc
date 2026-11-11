@@ -32,7 +32,7 @@ using Mesh_domain =
 using Tr = typename CGAL::
   Mesh_triangulation_3<Mesh_domain, CGAL::Default, ConcurrencyTag>::type;
 using Mesh_criteria = CGAL::Mesh_criteria_3<Tr>;
-using C3t3          = CGAL::Mesh_complex_3_in_triangulation_3<Tr,
+using C3t3 = CGAL::Mesh_complex_3_in_triangulation_3<Tr,
                                                      Mesh_domain::Corner_index,
                                                      Mesh_domain::Curve_index>;
 

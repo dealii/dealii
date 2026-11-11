@@ -2343,7 +2343,7 @@ ParameterHandler::save(Archive &ar, const unsigned int) const
   for (const auto &pattern : patterns)
     descriptions.push_back(pattern->description());
 
-  ar &descriptions;
+  ar & descriptions;
 }
 
 
@@ -2358,7 +2358,7 @@ ParameterHandler::load(Archive &ar, const unsigned int)
   ar &*entries.get();
 
   std::vector<std::string> descriptions;
-  ar                      &descriptions;
+  ar & descriptions;
 
   patterns.clear();
   for (const auto &description : descriptions)

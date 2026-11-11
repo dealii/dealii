@@ -515,7 +515,7 @@ namespace PETScWrappers
 
 
 #  endif // DOXYGEN
-  }      // namespace MPI
+  } // namespace MPI
 } // namespace PETScWrappers
 
 namespace internal

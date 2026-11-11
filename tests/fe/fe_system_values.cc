@@ -43,9 +43,9 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   const QGauss<dim> quadrature(2);
   MappingQ<dim>     mapping(2);
   FEValues<dim>     fe_values(mapping,
-                          fe,
-                          quadrature,
-                          update_values | update_quadrature_points);
+                              fe,
+                              quadrature,
+                              update_values | update_quadrature_points);
 
   for (const auto &cell : dof_handler.active_cell_iterators())
     {

@@ -99,9 +99,9 @@ main(int argc, char *argv[])
 
   const QGauss<2> quadrature_formula(2);
   FEValues<2>     fe_values(fe,
-                        quadrature_formula,
-                        update_values | update_gradients |
-                          update_quadrature_points | update_JxW_values);
+                            quadrature_formula,
+                            update_values | update_gradients |
+                              update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
   const unsigned int n_q_points    = quadrature_formula.size();

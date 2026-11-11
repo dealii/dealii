@@ -1130,8 +1130,8 @@ namespace Step50
 #ifdef USE_PETSC_LA
             Amg_data.symmetric_operator = true;
 #else
-            Amg_data.elliptic              = true;
-            Amg_data.smoother_type         = "Jacobi";
+            Amg_data.elliptic      = true;
+            Amg_data.smoother_type = "Jacobi";
 #  ifdef DEAL_II_TRILINOS_WITH_EPETRA
             Amg_data.higher_order_elements = true;
 #  endif
@@ -1343,14 +1343,14 @@ namespace Step50
     };
 
     const unsigned int n_gauss_points = degree + 1;
-    ScratchData<dim>   scratch_data(mapping,
+    ScratchData<dim> scratch_data(mapping,
                                   fe,
                                   n_gauss_points,
                                   update_hessians | update_quadrature_points |
                                     update_JxW_values,
                                   update_values | update_gradients |
                                     update_JxW_values | update_normal_vectors);
-    CopyData           copy_data;
+    CopyData         copy_data;
 
     // We need to assemble each interior face once but we need to make sure that
     // both processes assemble the face term between a locally owned and a ghost

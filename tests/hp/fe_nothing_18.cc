@@ -322,8 +322,8 @@ ElasticProblem<dim>::setup_system()
   typename DoFHandler<dim>::active_cell_iterator cell =
                                                    dof_handler.begin_active(),
                                                  endc = dof_handler.end();
-  unsigned int n_lagrange_cells                       = 0;
-  unsigned int n_elasticity_cells                     = 0;
+  unsigned int                                   n_lagrange_cells   = 0;
+  unsigned int                                   n_elasticity_cells = 0;
   for (; cell != endc; ++cell) // loop over all cells
     {
       if (cell->material_id() == id_of_lagrange_mult)

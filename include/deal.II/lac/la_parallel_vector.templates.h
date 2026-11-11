@@ -864,9 +864,9 @@ namespace LinearAlgebra
       const Vector<Number, MemorySpaceType> &c)
     {
 #ifdef _MSC_VER
-      return this->operator=<Number>(c);
+      return this->operator= <Number>(c);
 #else
-      return this->template operator=<Number>(c);
+      return this->template operator= <Number>(c);
 #endif
     }
 
@@ -2194,9 +2194,9 @@ namespace LinearAlgebra
       else
         out.setf(std::ios::fixed, std::ios::floatfield);
 
-        // to make the vector write out all the information in order, use as
-        // many barriers as there are processors and start writing when it's our
-        // turn
+      // to make the vector write out all the information in order, use as
+      // many barriers as there are processors and start writing when it's our
+      // turn
 #ifdef DEAL_II_WITH_MPI
       if (partitioner->n_mpi_processes() > 1)
         for (unsigned int i = 0; i < partitioner->this_mpi_process(); ++i)

@@ -64,7 +64,7 @@ namespace numbers
                    result) == 0.0);
       }
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
   bool
   values_are_equal(const adouble &value_1, const adouble &value_2)

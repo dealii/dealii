@@ -1955,7 +1955,7 @@ public:
     void
     serialize(Archive &ar, const unsigned int)
     {
-      ar &index &entries &inhomogeneity;
+      ar & index & entries & inhomogeneity;
     }
 
     /**

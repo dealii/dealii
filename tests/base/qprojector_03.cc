@@ -29,7 +29,7 @@ test(const ReferenceCell<dim> reference_cell)
   deallog.push(reference_cell.to_string());
 
   std::vector<Point<dim - 1>> points(dim == 1 ? 1 : 2);
-  std::vector<double>         weights(dim == 1 ? 1 : 2,
+  std::vector<double> weights(dim == 1 ? 1 : 2,
                               reference_cell.face_reference_cell(0).volume() /
                                 (dim == 1 ? 1.0 : 2.0));
   if constexpr (dim > 1)

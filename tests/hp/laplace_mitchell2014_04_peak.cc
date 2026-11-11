@@ -55,7 +55,7 @@ public:
   ExactSolution(const double alpha, const Point<dim> center)
     : Function<dim>(1)
     , alpha(alpha)
-    , center(center){};
+    , center(center) {};
 
   virtual double
   value(const Point<dim> &point, const unsigned int component = 0) const;

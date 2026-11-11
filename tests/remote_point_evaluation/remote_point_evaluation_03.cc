@@ -378,7 +378,7 @@ test(const MPI_Comm comm)
     background_tria.refine_global(background_n_global_refinements);
 
   FESystem<spacedim>   background_fe_dim(FE_Q<spacedim>{background_fe_degree},
-                                       spacedim);
+                                         spacedim);
   DoFHandler<spacedim> background_dof_handler_dim(background_tria);
   background_dof_handler_dim.distribute_dofs(background_fe_dim);
 

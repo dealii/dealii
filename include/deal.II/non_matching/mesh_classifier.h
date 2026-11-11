@@ -34,7 +34,7 @@ namespace NonMatching
       template <int dim>
       class LevelSetDescription;
     } // namespace MeshClassifierImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
   /**
@@ -332,7 +332,7 @@ namespace NonMatching
       };
 
     } // namespace MeshClassifierImplementation
-  }   // namespace internal
+  } // namespace internal
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE
 

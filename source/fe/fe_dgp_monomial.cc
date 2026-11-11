@@ -120,7 +120,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace FE_DGPMonomial
+  } // namespace FE_DGPMonomial
 } // namespace internal
 
 

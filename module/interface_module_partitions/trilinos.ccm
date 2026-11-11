@@ -146,8 +146,7 @@ export module dealii.external.trilinos;
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-export
-{
+export {
   using ::Amesos;
   using ::Amesos_BaseSolver;
   using ::AztecOO;
@@ -296,7 +295,7 @@ export
       using ::ROL::Elementwise::ReductionOp;
       using ::ROL::Elementwise::UnaryFunction;
     } // namespace Elementwise
-  }   // namespace ROL
+  } // namespace ROL
 #  endif
 
 #  ifdef DEAL_II_TRILINOS_WITH_SACADO
@@ -334,7 +333,7 @@ export
         using ::Sacado::Fad::Exp::fabs;
         using ::Sacado::Fad::Exp::sqrt;
       } // namespace Exp
-    }   // namespace Fad
+    } // namespace Fad
 
     namespace Rad
     {
@@ -356,7 +355,7 @@ export
       using ::Sacado::Rad::fabs;
       using ::Sacado::Rad::sqrt;
     } // namespace Rad
-  }   // namespace Sacado
+  } // namespace Sacado
 
   // Sacado also places some symbols into namespace std, namely
   // overloads of math functions. We need to export those as well.
@@ -416,8 +415,8 @@ export
 // is perhaps a simpler work-around:
 #    undef ex_open
 
-  extern "C" inline int ex_open(
-    const char *path, int mode, int *comp_ws, int *io_ws, float *version)
+  extern "C" inline int
+  ex_open(const char *path, int mode, int *comp_ws, int *io_ws, float *version)
   {
     return ex_open_int(path, mode, comp_ws, io_ws, version, EX_API_VERS_NODOT);
   }

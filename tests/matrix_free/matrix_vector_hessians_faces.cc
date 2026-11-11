@@ -91,25 +91,25 @@ test_hessians(const unsigned int                             degree,
   matrix_free.initialize_dof_vector(dst2);
 
   // Setup FEFaceValues
-  QGauss<dim - 1>             quad(degree + 1);
-  FEFaceValues<dim>           fe_face_values_m(mapping,
+  QGauss<dim - 1>   quad(degree + 1);
+  FEFaceValues<dim> fe_face_values_m(mapping,
                                      fe,
                                      quad,
                                      update_values | update_gradients |
                                        update_hessians | update_JxW_values);
-  FEFaceValues<dim>           fe_regface_values_p(mapping,
+  FEFaceValues<dim> fe_regface_values_p(mapping,
                                         fe,
                                         quad,
                                         update_values | update_gradients |
                                           update_hessians | update_JxW_values);
-  FESubfaceValues<dim>        fe_subface_values_p(mapping,
+  FESubfaceValues<dim> fe_subface_values_p(mapping,
                                            fe,
                                            quad,
                                            update_values | update_gradients |
                                              update_hessians |
                                              update_JxW_values);
-  Vector<double>              solution_values_m(fe.dofs_per_cell);
-  Vector<double>              solution_values_p(fe.dofs_per_cell);
+  Vector<double>       solution_values_m(fe.dofs_per_cell);
+  Vector<double>       solution_values_p(fe.dofs_per_cell);
   std::vector<Tensor<2, dim>> solution_hessians(quad.size());
   std::vector<Tensor<1, dim>> solution_gradients(quad.size());
   std::vector<double>         solution_values(quad.size());

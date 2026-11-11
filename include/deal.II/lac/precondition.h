@@ -3382,7 +3382,7 @@ namespace internal
         {
           VectorizedArray<Number> sum         = 0;
           const auto              post_update = [&](const unsigned int begin,
-                                       const unsigned int end) {
+                                                    const unsigned int end) {
             if (iteration_index == 1)
               {
                 DEAL_II_OPENMP_SIMD_PRAGMA
@@ -3517,7 +3517,7 @@ namespace internal
             KOKKOS_LAMBDA(size_type i) {
               const Number residual = rhs_data[i] - tmp_data[i];
               sol_old_data[i]       = factor2 * prec_data[i] * residual +
-                                factor1_plus_1 * sol_data[i];
+                                      factor1_plus_1 * sol_data[i];
             });
           if (compute_residual_norm)
             residual_norm =
@@ -3533,8 +3533,8 @@ namespace internal
             KOKKOS_LAMBDA(size_type i) {
               const Number residual = rhs_data[i] - tmp_data[i];
               sol_old_data[i]       = factor2 * prec_data[i] * residual -
-                                factor1 * sol_old_data[i] +
-                                factor1_plus_1 * sol_data[i];
+                                      factor1 * sol_old_data[i] +
+                                      factor1_plus_1 * sol_data[i];
             });
           if (compute_residual_norm)
             residual_norm =
@@ -3934,7 +3934,7 @@ namespace internal
 
           VectorizedArray<Number> sum = 0;
           const auto post_operation   = [&](const unsigned int start_range,
-                                          const unsigned int end_range) {
+                                            const unsigned int end_range) {
             const auto rhs_ptr = rhs.begin();
             const auto tmp_ptr = temp_vector1.begin();
 
@@ -4256,8 +4256,8 @@ PreconditionChebyshev<MatrixType, VectorType, PreconditionerType>::
 
       const double actual_range = info.max_eigenvalue_estimate / alpha;
       const double sigma        = (1. - std::sqrt(1. / actual_range)) /
-                           (1. + std::sqrt(1. / actual_range));
-      const double eps = data.smoothing_range;
+                                  (1. + std::sqrt(1. / actual_range));
+      const double eps          = data.smoothing_range;
       const_cast<
         PreconditionChebyshev<MatrixType, VectorType, PreconditionerType> *>(
         this)

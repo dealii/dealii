@@ -490,7 +490,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace MappingManifoldImplementation
+  } // namespace MappingManifoldImplementation
 } // namespace internal
 
 
@@ -1154,7 +1154,7 @@ namespace internal
           }
       }
     } // namespace
-  }   // namespace MappingManifoldImplementation
+  } // namespace MappingManifoldImplementation
 } // namespace internal
 
 

@@ -316,7 +316,7 @@ namespace parallel
         });
       }
     } // namespace experimental
-  }   // namespace distributed
+  } // namespace distributed
 } // namespace parallel
 
 // explicit instantiations

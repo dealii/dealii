@@ -30,9 +30,9 @@ test()
 {
   std::stringstream ss;
   TimerOutput       t(MPI_COMM_WORLD,
-                ss,
-                TimerOutput::never,
-                TimerOutput::wall_times);
+                      ss,
+                      TimerOutput::never,
+                      TimerOutput::wall_times);
   {
     TimerOutput::Scope timer_section(t, "Test section");
 

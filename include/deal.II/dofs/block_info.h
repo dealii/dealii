@@ -310,11 +310,11 @@ template <class Archive>
 void
 BlockInfo::serialize(Archive &ar, const unsigned int /*version*/)
 {
-  ar &bi_global;
-  ar &levels;
-  ar &bi_local;
-  ar &base_elements;
-  ar &local_renumbering;
+  ar & bi_global;
+  ar & levels;
+  ar & bi_local;
+  ar & base_elements;
+  ar & local_renumbering;
 }
 
 

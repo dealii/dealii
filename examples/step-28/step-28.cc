@@ -1014,7 +1014,7 @@ namespace Step28
                                        system_rhs);
 
     SolverControl            solver_control(system_matrix.m(),
-                                 1e-12 * system_rhs.l2_norm());
+                                            1e-12 * system_rhs.l2_norm());
     SolverCG<Vector<double>> cg(solver_control);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;

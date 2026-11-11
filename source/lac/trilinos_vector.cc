@@ -46,7 +46,8 @@ namespace TrilinosWrappers
 #  ifndef DOXYGEN
   namespace internal
   {
-    VectorReference::operator TrilinosScalar() const
+    VectorReference::
+    operator TrilinosScalar() const
     {
       AssertIndexRange(index, vector.size());
 

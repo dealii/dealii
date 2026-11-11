@@ -108,9 +108,8 @@ test(const FiniteElement<dim, spacedim> &fe, const unsigned int n_components)
   std::ifstream xdmf(output_basename + ".xdmf");
   AssertThrow(h5.good(), ExcIO());
 
-  deallog << "Files " << output_basename + ".h5"
-          << " and " << output_basename + ".xdmf"
-          << " created successfully!" << std::endl;
+  deallog << "Files " << output_basename + ".h5" << " and "
+          << output_basename + ".xdmf" << " created successfully!" << std::endl;
 }
 
 int

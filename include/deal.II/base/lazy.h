@@ -323,7 +323,7 @@ inline Lazy<T>::Lazy(Lazy &&other) noexcept
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
-inline Lazy<T> &Lazy<T>::operator=(const Lazy &other)
+inline Lazy<T> &Lazy<T>::operator=(const Lazy & other)
 {
   // If the other object has a value stored, then get it and set our
   // own object to a copy of it:
@@ -346,7 +346,7 @@ inline Lazy<T> &Lazy<T>::operator=(const Lazy &other)
 template <typename T>
 DEAL_II_CXX20_REQUIRES((std::is_move_constructible_v<T> &&
                         std::is_move_assignable_v<T>))
-inline Lazy<T> &Lazy<T>::operator=(Lazy &&other) noexcept
+inline Lazy<T> &Lazy<T>::operator=(Lazy && other) noexcept
 {
   task_result = std::move(other.task_result);
   object_is_initialized.store(other.object_is_initialized.load());

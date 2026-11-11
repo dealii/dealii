@@ -96,9 +96,9 @@ test(const unsigned int degree)
                                         update_values | update_gradients,
                                         0);
   FEPointEvaluation<1, dim>   evaluator_scalar(mapping,
-                                             fe,
-                                             update_values | update_gradients,
-                                             dim);
+                                               fe,
+                                               update_values | update_gradients,
+                                               dim);
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 

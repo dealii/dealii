@@ -37,7 +37,7 @@ main()
   struct MyFE : FE_Nedelec<3>
   {
     MyFE()
-      : FE_Nedelec<3>(0){};
+      : FE_Nedelec<3>(0) {};
     virtual bool
     hp_constraints_are_implemented() const
     {

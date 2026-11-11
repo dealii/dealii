@@ -44,9 +44,7 @@ namespace SUNDIALS
      */
     template <typename T>
     concept SundialsTraits = requires(typename T::Handle h) {
-      {
-        T::free(h)
-      } -> std::same_as<void>;
+      { T::free(h) } -> std::same_as<void>;
     };
 #  endif
 

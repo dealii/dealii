@@ -49,7 +49,7 @@ class MyFunction : public Function<dim>
 {
 public:
   MyFunction()
-    : Function<dim>(){};
+    : Function<dim>() {};
 
   virtual double
   value(const Point<dim> &p, const unsigned int) const
@@ -181,12 +181,12 @@ transfer(std::ostream &out)
   // on points of QGauss of order 2.
   MyFunction<dim> func;
   {
-    double                                         error = 0;
-    const hp::QCollection<dim>                     quad(QGauss<dim>(2));
-    hp::FEValues<dim>                              hp_fe_val(fe_q,
-                                quad,
-                                update_values | update_quadrature_points);
-    std::vector<double>                            vals(quad[0].size());
+    double                     error = 0;
+    const hp::QCollection<dim> quad(QGauss<dim>(2));
+    hp::FEValues<dim>   hp_fe_val(fe_q,
+                                  quad,
+                                  update_values | update_quadrature_points);
+    std::vector<double> vals(quad[0].size());
     typename DoFHandler<dim>::active_cell_iterator cell = q_dof_handler
                                                             .begin_active(),
                                                    endc = q_dof_handler.end();
@@ -205,12 +205,12 @@ transfer(std::ostream &out)
     deallog << "Error in interpolating hp-FE_Q: " << error << std::endl;
   }
   {
-    double                                         error = 0;
-    const hp::QCollection<dim>                     quad(QGauss<dim>(2));
-    hp::FEValues<dim>                              hp_fe_val(fe_dgq,
-                                quad,
-                                update_values | update_quadrature_points);
-    std::vector<double>                            vals(quad[0].size());
+    double                     error = 0;
+    const hp::QCollection<dim> quad(QGauss<dim>(2));
+    hp::FEValues<dim>   hp_fe_val(fe_dgq,
+                                  quad,
+                                  update_values | update_quadrature_points);
+    std::vector<double> vals(quad[0].size());
     typename DoFHandler<dim>::active_cell_iterator celldg = dgq_dof_handler
                                                               .begin_active(),
                                                    endc = dgq_dof_handler.end();

@@ -303,7 +303,7 @@ namespace Step15
   void MinimalSurfaceProblem<dim>::solve()
   {
     SolverControl            solver_control(system_rhs.size(),
-                                 system_rhs.l2_norm() * 1e-6);
+                                            system_rhs.l2_norm() * 1e-6);
     SolverCG<Vector<double>> solver(solver_control);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;
@@ -417,9 +417,9 @@ namespace Step15
 
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
-                            quadrature_formula,
-                            update_gradients | update_quadrature_points |
-                              update_JxW_values);
+                                quadrature_formula,
+                                update_gradients | update_quadrature_points |
+                                  update_JxW_values);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();

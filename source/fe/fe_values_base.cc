@@ -1377,8 +1377,8 @@ FEValuesBase<dim, spacedim>::maybe_invalidate_previous_present_cell(
   if (present_cell.is_initialized())
     {
       const auto stored_cell =
-        present_cell.
-        operator typename Triangulation<dim, spacedim>::cell_iterator();
+        present_cell
+          .operator typename Triangulation<dim, spacedim>::cell_iterator();
 
       // There's no good way to check that the corresponding Triangulation
       // objects are still alive. approximate that by checking that the

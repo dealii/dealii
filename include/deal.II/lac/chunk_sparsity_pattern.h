@@ -968,9 +968,9 @@ namespace ChunkSparsityPatternIterators
             reduced_accessor.container->n_nonzero_elements())
           return true;
 
-        const auto global_row = sparsity_pattern->get_chunk_size() *
-                                  reduced_accessor.row() +
-                                chunk_row,
+        const auto global_row       = sparsity_pattern->get_chunk_size() *
+                                        reduced_accessor.row() +
+                                      chunk_row,
                    other_global_row = sparsity_pattern->get_chunk_size() *
                                         other.reduced_accessor.row() +
                                       other.chunk_row;

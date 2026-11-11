@@ -4520,7 +4520,7 @@ namespace DoFTools
 
 
     } // namespace
-  }   // namespace internal
+  } // namespace internal
 
 
 

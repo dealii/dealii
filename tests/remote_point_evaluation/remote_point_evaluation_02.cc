@@ -226,8 +226,8 @@ compute_force_vector_sharp_interface(
     AffineConstraints<double> constraints; // TODO: use the right ones
 
     FEPointEvaluation<1, spacedim>        phi_curvature(mapping,
-                                                 dof_handler.get_fe(),
-                                                 update_values);
+                                                        dof_handler.get_fe(),
+                                                        update_values);
     FEPointEvaluation<spacedim, spacedim> phi_normal(mapping,
                                                      dof_handler_dim.get_fe(),
                                                      update_values);
@@ -379,7 +379,7 @@ test()
     background_tria.refine_global(background_n_global_refinements);
 
   FESystem<spacedim>   background_fe_dim(FE_Q<spacedim>{background_fe_degree},
-                                       spacedim);
+                                         spacedim);
   DoFHandler<spacedim> background_dof_handler_dim(background_tria);
   background_dof_handler_dim.distribute_dofs(background_fe_dim);
 

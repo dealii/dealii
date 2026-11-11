@@ -66,7 +66,7 @@ run(const ExtractorType &extractor)
     FESystem<dim, spacedim>(FE_DGQ<dim, spacedim>(3), dim),
     FESystem<dim, spacedim>(FE_DGQ<dim, spacedim>(4), dim));
   hp::QCollection<dim>     qf_cell(QGauss<dim>(fe.max_degree()),
-                               QGauss<dim>(fe.max_degree() + 1));
+                                   QGauss<dim>(fe.max_degree() + 1));
   hp::QCollection<dim - 1> qf_face(QGauss<dim - 1>(fe.max_degree()),
                                    QGauss<dim - 1>(fe.max_degree() + 1));
 

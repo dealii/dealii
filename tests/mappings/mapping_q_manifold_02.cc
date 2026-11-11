@@ -88,7 +88,7 @@ public:
     , y_FoR(h)
   {}
 
-  virtual ~PushForward(){};
+  virtual ~PushForward() {};
 
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const;
@@ -145,7 +145,7 @@ public:
     , y_FoR(h)
   {}
 
-  virtual ~PullBack(){};
+  virtual ~PullBack() {};
 
   virtual double
   value(const Point<dim> &p, const unsigned int component = 0) const;

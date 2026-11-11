@@ -412,9 +412,9 @@ namespace VectorTools
 
     const FEValuesExtractors::Vector vec(0);
     FEValues<dim, spacedim>          fe_values(mapping,
-                                      dof_handler.get_fe(),
-                                      quadrature,
-                                      UpdateFlags(update_values));
+                                               dof_handler.get_fe(),
+                                               quadrature,
+                                               UpdateFlags(update_values));
     fe_values.reinit(cell_point.first);
 
     const unsigned int dofs_per_cell = dof_handler.get_fe().n_dofs_per_cell();

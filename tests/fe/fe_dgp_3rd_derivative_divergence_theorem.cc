@@ -63,14 +63,14 @@ test(const Triangulation<dim> &tr,
   deallog << "FE=" << fe.get_name() << std::endl;
 
   const QGauss<dim> quadrature(6);
-  FEValues<dim>     fe_values(mapping,
+  FEValues<dim> fe_values(mapping,
                           fe,
                           quadrature,
                           update_3rd_derivatives | update_quadrature_points |
                             update_JxW_values);
 
   const QGauss<dim - 1> face_quadrature(6);
-  FEFaceValues<dim>     fe_face_values(mapping,
+  FEFaceValues<dim> fe_face_values(mapping,
                                    fe,
                                    face_quadrature,
                                    update_hessians | update_quadrature_points |

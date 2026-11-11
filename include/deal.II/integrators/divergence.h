@@ -389,8 +389,8 @@ namespace LocalIntegrators
                                      fe1.normal_vector(k)[d];
                   const double un2 = -fe2.shape_value_component(j, k, d) *
                                      fe1.normal_vector(k)[d];
-                  const double v1 = fetest1.shape_value(i, k);
-                  const double v2 = fetest2.shape_value(i, k);
+                  const double v1  = fetest1.shape_value(i, k);
+                  const double v2  = fetest2.shape_value(i, k);
 
                   M11(i, j) += .5 * dx * un1 * v1;
                   M12(i, j) += .5 * dx * un2 * v1;

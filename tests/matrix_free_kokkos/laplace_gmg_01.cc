@@ -297,9 +297,9 @@ run(const unsigned int n_refinements)
       using LevelMatrixType =
         LaplaceOperator<dim, degree, n_components, Number>;
       using SmootherPreconditionerType = DiagonalMatrix<VectorType>;
-      using SmootherType               = PreconditionChebyshev<LevelMatrixType,
-                                                 VectorType,
-                                                 SmootherPreconditionerType>;
+      using SmootherType   = PreconditionChebyshev<LevelMatrixType,
+                                                   VectorType,
+                                                   SmootherPreconditionerType>;
       using MGTransferType = MGTransferMatrixFree<dim, Number, MemorySpace>;
 
       const auto coarse_grid_triangulations =

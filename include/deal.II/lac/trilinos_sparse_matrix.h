@@ -11,54 +11,54 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_trilinos_sparse_matrix_h
-#  define dealii_trilinos_sparse_matrix_h
+#define dealii_trilinos_sparse_matrix_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  ifndef DEAL_II_TRILINOS_WITH_EPETRA
-#    include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
-#    include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
+#ifndef DEAL_II_TRILINOS_WITH_EPETRA
+#  include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#  include <deal.II/lac/trilinos_tpetra_to_trilinos_wrappers.h>
 
-#  endif
+#endif
 
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
-#    include <deal.II/base/enable_observer_pointer.h>
-#    include <deal.II/base/index_set.h>
-#    include <deal.II/base/mpi_stub.h>
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#  include <deal.II/base/enable_observer_pointer.h>
+#  include <deal.II/base/index_set.h>
+#  include <deal.II/base/mpi_stub.h>
 
-#    include <deal.II/lac/exceptions.h>
-#    include <deal.II/lac/full_matrix.h>
-#    include <deal.II/lac/trilinos_epetra_vector.h>
-#    include <deal.II/lac/trilinos_index_access.h>
-#    include <deal.II/lac/trilinos_vector.h>
-#    include <deal.II/lac/vector_memory.h>
-#    include <deal.II/lac/vector_operation.h>
+#  include <deal.II/lac/exceptions.h>
+#  include <deal.II/lac/full_matrix.h>
+#  include <deal.II/lac/trilinos_epetra_vector.h>
+#  include <deal.II/lac/trilinos_index_access.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/vector_memory.h>
+#  include <deal.II/lac/vector_operation.h>
 
 DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
-#    include <Epetra_Comm.h>
-#    include <Epetra_CrsGraph.h>
-#    include <Epetra_Export.h>
-#    include <Epetra_FECrsMatrix.h>
-#    include <Epetra_Map.h>
-#    include <Epetra_MpiComm.h>
-#    include <Epetra_MultiVector.h>
-#    include <Epetra_Operator.h>
+#  include <Epetra_Comm.h>
+#  include <Epetra_CrsGraph.h>
+#  include <Epetra_Export.h>
+#  include <Epetra_FECrsMatrix.h>
+#  include <Epetra_Map.h>
+#  include <Epetra_MpiComm.h>
+#  include <Epetra_MultiVector.h>
+#  include <Epetra_Operator.h>
 DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
-#    include <cmath>
-#    include <iterator>
-#    include <memory>
-#    include <type_traits>
-#    include <vector>
+#  include <cmath>
+#  include <iterator>
+#  include <memory>
+#  include <type_traits>
+#  include <vector>
 
-#  endif
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
-#  ifdef DEAL_II_TRILINOS_WITH_EPETRA
+#ifdef DEAL_II_TRILINOS_WITH_EPETRA
 // forward declarations
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 template <typename MatrixType>
 class BlockMatrixBase;
 
@@ -78,7 +78,7 @@ namespace TrilinosWrappers
     class Iterator;
   }
 } // namespace TrilinosWrappers
-#    endif
+#  endif
 
 namespace TrilinosWrappers
 {
@@ -2485,13 +2485,13 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                 const TrilinosPayload &second_op);
 
     } // namespace LinearOperatorImplementation
-  }   /* namespace internal */
+  } /* namespace internal */
 
 
 
   // ----------------------- inline and template functions --------------------
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
 
   namespace SparseMatrixIterators
   {
@@ -2556,7 +2556,8 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
     {}
 
 
-    inline Accessor<false>::Reference::operator TrilinosScalar() const
+    inline Accessor<false>::Reference::
+    operator TrilinosScalar() const
     {
       return (*accessor.value_cache)[accessor.a_index];
     }
@@ -2838,13 +2839,13 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   inline bool SparseMatrix::in_local_range(const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#    ifndef DEAL_II_WITH_64BIT_INDICES
     begin = matrix->RowMap().MinMyGID();
     end   = matrix->RowMap().MaxMyGID() + 1;
-#      else
+#    else
     begin = matrix->RowMap().MinMyGID64();
     end   = matrix->RowMap().MaxMyGID64() + 1;
-#      endif
+#    endif
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
@@ -2952,11 +2953,11 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   // a call to some Trilinos function.
   inline SparseMatrix::size_type SparseMatrix::m() const
   {
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#    ifndef DEAL_II_WITH_64BIT_INDICES
     return matrix->NumGlobalRows();
-#      else
+#    else
     return matrix->NumGlobalRows64();
-#      endif
+#    endif
   }
 
 
@@ -2983,13 +2984,13 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
   SparseMatrix::local_range() const
   {
     size_type begin, end;
-#      ifndef DEAL_II_WITH_64BIT_INDICES
+#    ifndef DEAL_II_WITH_64BIT_INDICES
     begin = matrix->RowMap().MinMyGID();
     end   = matrix->RowMap().MaxMyGID() + 1;
-#      else
+#    else
     begin = matrix->RowMap().MinMyGID64();
     end   = matrix->RowMap().MaxMyGID64() + 1;
-#      endif
+#    endif
 
     return std::make_pair(begin, end);
   }
@@ -3281,7 +3282,7 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
         return return_op;
       }
     } // namespace LinearOperatorImplementation
-  }   // namespace internal
+  } // namespace internal
 
   template <>
   void SparseMatrix::set<TrilinosScalar>(const size_type       row,
@@ -3289,11 +3290,11 @@ DEAL_II_NAMESPACE_OPEN // Do not convert for module purposes
                                          const size_type      *col_indices,
                                          const TrilinosScalar *values,
                                          const bool elide_zero_values);
-#    endif // DOXYGEN
+#  endif // DOXYGEN
 
 } /* namespace TrilinosWrappers */
 
-#  endif
+#endif
 
 DEAL_II_NAMESPACE_CLOSE
 
