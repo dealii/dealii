@@ -451,10 +451,11 @@ namespace PETScWrappers
 
     // Solve the optimization problem. If the user callback throws an exception,
     // it will be captured and rethrown here.
-    internal::assert_nonlinear_optimizer_petsc(TaoSolve(tao));
+    const PetscErrorCode error_code = TaoSolve(tao);
 
     if (pending_exception != nullptr)
       std::rethrow_exception(std::exchange(pending_exception, nullptr));
+    internal::assert_nonlinear_optimizer_petsc(error_code);
 
     // Ensure that we converged. If not, throw an exception with the number of
     // iterations and the final residual norm (i.e., the norm of the objective
