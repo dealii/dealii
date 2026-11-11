@@ -307,9 +307,12 @@ export
 #  if DEAL_II_PETSC_VERSION_GTE(3, 13, 0)
   using ::Tao;
   using ::TaoALMMGetSubsolver;
+  using ::TaoConvergedReason;
   using ::TaoCreate;
   using ::TaoDestroy;
+  using ::TaoGetConvergedReason;
   using ::TaoGetIterationNumber;
+  using ::TaoGetSolutionStatus;
   using ::TaoSetApplicationContext;
   using ::TaoSetConstraintTolerances;
   using ::TaoSetEqualityConstraintsRoutine;
