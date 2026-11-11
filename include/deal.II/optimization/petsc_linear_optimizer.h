@@ -218,6 +218,19 @@ namespace PETScWrappers
                     const MPI_Comm        mpi_comm = PETSC_COMM_WORLD);
 
     /**
+     * Copy constructor. Deleted to ensure that this object, which owns a PETSc
+     * TAO object, cannot be copied.
+     */
+    LinearOptimizer(const LinearOptimizer &) = delete;
+
+    /**
+     * Copy assignment operator. Deleted to ensure that this object, which owns
+     * a PETSc TAO object, cannot be copied.
+     */
+    LinearOptimizer &
+    operator=(const LinearOptimizer &) = delete;
+
+    /**
      * Solve a linear program. @p solution supplies the initial guess and is
      * overwritten with the solution. The constraints and bounds objects
      * are optional (see the class documentation for examples) but for

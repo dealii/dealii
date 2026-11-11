@@ -384,6 +384,19 @@ namespace PETScWrappers
                        const MPI_Comm        mpi_comm = PETSC_COMM_WORLD);
 
     /**
+     * Copy constructor. Deleted to ensure that this object, which owns a PETSc
+     * TAO object, cannot be copied.
+     */
+    NonlinearOptimizer(const NonlinearOptimizer &) = delete;
+
+    /**
+     * Copy assignment operator. Deleted to ensure that this object, which owns
+     * a PETSc TAO object, cannot be copied.
+     */
+    NonlinearOptimizer &
+    operator=(const NonlinearOptimizer &) = delete;
+
+    /**
      * Destructor.
      */
     ~NonlinearOptimizer();
