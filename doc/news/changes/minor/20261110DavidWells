@@ -1,0 +1,6 @@
+Fixed: AlignedVector::insert() now reuses the existing capacity and grows the
+allocation geometrically when it needs more memory. Previously, every call
+reallocated the whole array to exactly the new size, so inserting elements one
+at a time had quadratic complexity.
+<br>
+(David Wells, 2026/11/10)

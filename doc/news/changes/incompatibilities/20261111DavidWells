@@ -1,0 +1,7 @@
+Changed: Like for std::vector, the range passed to AlignedVector::insert() may
+no longer refer to elements of the vector itself. In debug mode, this is
+checked for ranges of the vector's value type by testing the addresses of the
+first and the last element of the range. Copy such a range into a separate
+container before inserting it.
+<br>
+(David Wells, 2026/11/11)

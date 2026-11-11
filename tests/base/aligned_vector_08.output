@@ -1,0 +1,10 @@
+
+DEAL::unsigned int
+DEAL::insert at end: size 10000, few reallocations: 1
+DEAL::insert at front and middle: size 1998
+DEAL::insert from other containers: size 700
+DEAL::Tracked
+DEAL::insert at end: size 10000, few reallocations: 1
+DEAL::insert at front and middle: size 1998
+DEAL::insert from other containers: size 700
+DEAL::live objects: 0
