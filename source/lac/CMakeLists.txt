@@ -167,6 +167,7 @@ if(DEAL_II_TRILINOS_WITH_TPETRA)
 
   set(_inst
     ${_inst}
+    trilinos_tpetra_block_sparse_matrix.inst.in
     trilinos_tpetra_sparse_matrix.inst.in
   )
 

@@ -1,0 +1,99 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+
+for (S : TRILINOS_SCALARS; MEMORY_SPACE : MEMORY_SPACES)
+  {
+    namespace LinearAlgebra
+    \{
+      namespace TpetraWrappers
+      \{
+        template class BlockSparseMatrix<S, MEMORY_SPACE>;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::reinit(
+          const dealii::BlockDynamicSparsityPattern &);
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::reinit(
+          const std::vector<IndexSet> &,
+          const dealii::BlockDynamicSparsityPattern &,
+          const MPI_Comm,
+          const bool);
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::vmult(
+          Vector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::Tvmult(
+          Vector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::vmult(
+          BlockVector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::Tvmult(
+          BlockVector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::vmult(
+          Vector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::Tvmult(
+          Vector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::vmult(
+          BlockVector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &) const;
+
+        template void
+        BlockSparseMatrix<S, MEMORY_SPACE>::Tvmult(
+          BlockVector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &) const;
+
+        template S
+        BlockSparseMatrix<S, MEMORY_SPACE>::residual(
+          Vector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &) const;
+
+        template S
+        BlockSparseMatrix<S, MEMORY_SPACE>::residual(
+          BlockVector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &) const;
+
+        template S
+        BlockSparseMatrix<S, MEMORY_SPACE>::residual(
+          Vector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &) const;
+
+        template S
+        BlockSparseMatrix<S, MEMORY_SPACE>::residual(
+          BlockVector<S, MEMORY_SPACE> &,
+          const Vector<S, MEMORY_SPACE> &,
+          const BlockVector<S, MEMORY_SPACE> &) const;
+      \}
+    \}
+  }

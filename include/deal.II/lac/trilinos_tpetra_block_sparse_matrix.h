@@ -182,7 +182,7 @@ namespace LinearAlgebra
       void
       reinit(
         const std::vector<IndexSet>               &parallel_partitioning,
-        const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+        const ::dealii::BlockSparseMatrix<Number> &dealii_block_sparse_matrix,
         const MPI_Comm communicator   = MPI_COMM_WORLD,
         const double   drop_tolerance = 1e-13);
 
@@ -194,7 +194,7 @@ namespace LinearAlgebra
        * the elements will be locally stored.
        */
       void
-      reinit(const ::dealii::BlockSparseMatrix<double> &deal_ii_sparse_matrix,
+      reinit(const ::dealii::BlockSparseMatrix<Number> &deal_ii_sparse_matrix,
              const double                               drop_tolerance = 1e-13);
 
       /**

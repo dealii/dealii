@@ -24,46 +24,9 @@ DEAL_II_NAMESPACE_OPEN
 #ifdef DEAL_II_TRILINOS_WITH_TPETRA
 
 #  ifndef DOXYGEN
-// explicit instantiations
-namespace LinearAlgebra
-{
-  namespace TpetraWrappers
-  {
-    template class BlockSparseMatrix<double, MemorySpace::Host>;
 
-    template void
-    BlockSparseMatrix<double, MemorySpace::Host>::reinit(
-      const ::dealii::BlockDynamicSparsityPattern &);
+#    include "lac/trilinos_tpetra_block_sparse_matrix.inst"
 
-    template void
-    BlockSparseMatrix<double, MemorySpace::Host>::reinit<
-      ::dealii::BlockDynamicSparsityPattern>(
-      const std::vector<dealii::IndexSet> &,
-      const ::dealii::BlockDynamicSparsityPattern &,
-      MPI_Comm,
-      bool);
-
-    template void
-    BlockSparseMatrix<double, MemorySpace::Host>::vmult(
-      TpetraWrappers::Vector<double, MemorySpace::Host> &,
-      const TpetraWrappers::Vector<double, MemorySpace::Host> &) const;
-
-    template void
-    BlockSparseMatrix<double, MemorySpace::Host>::Tvmult(
-      TpetraWrappers::Vector<double, MemorySpace::Host> &,
-      const TpetraWrappers::Vector<double, MemorySpace::Host> &) const;
-
-    template void
-    BlockSparseMatrix<double, MemorySpace::Host>::vmult(
-      TpetraWrappers::BlockVector<double, MemorySpace::Host> &,
-      const TpetraWrappers::BlockVector<double, MemorySpace::Host> &) const;
-
-    template void
-    BlockSparseMatrix<double, MemorySpace::Host>::Tvmult(
-      TpetraWrappers::BlockVector<double, MemorySpace::Host> &,
-      const TpetraWrappers::BlockVector<double, MemorySpace::Host> &) const;
-  } // namespace TpetraWrappers
-} // namespace LinearAlgebra
 #  endif // DOXYGEN
 
 

@@ -170,7 +170,7 @@ namespace LinearAlgebra
     void
     BlockSparseMatrix<Number, MemorySpace>::reinit(
       const std::vector<IndexSet>               &parallel_partitioning,
-      const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+      const ::dealii::BlockSparseMatrix<Number> &dealii_block_sparse_matrix,
       const MPI_Comm                             communicator,
       const double                               drop_tolerance)
     {
@@ -207,7 +207,7 @@ namespace LinearAlgebra
     template <typename Number, typename MemorySpace>
     void
     BlockSparseMatrix<Number, MemorySpace>::reinit(
-      const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
+      const ::dealii::BlockSparseMatrix<Number> &dealii_block_sparse_matrix,
       const double                               drop_tolerance)
     {
       Assert(dealii_block_sparse_matrix.n_block_rows() ==
