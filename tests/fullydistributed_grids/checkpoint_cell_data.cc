@@ -10,6 +10,8 @@
 //
 // -----------------------------------------------------------------------------
 
+
+
 // Check fixed- and variable-size cell data on unequal partitions, including
 // empty ranks. Serialization offsets count cells, not bytes.
 
@@ -23,11 +25,14 @@
 
 #include "../tests.h"
 
+
 std::vector<char>
 payload(const unsigned int material, const bool variable_size)
 {
   return std::vector<char>(variable_size ? material + 1 : 3, material + 7);
 }
+
+
 
 int
 main(int argc, char **argv)
