@@ -713,32 +713,6 @@ AffineConstraints<number>::add_entries(
 
 template <typename number>
 void
-AffineConstraints<number>::add_selected_constraints(
-  const AffineConstraints &constraints,
-  const IndexSet          &filter)
-{
-  if (constraints.n_constraints() == 0)
-    return;
-
-  Assert(filter.size() > constraints.lines.back().index,
-         ExcMessage(
-           "The filter must be larger than the given constraints object."));
-  for (const ConstraintLine &line : constraints.lines)
-    if (filter.is_element(line.index))
-      {
-        const size_type row = filter.index_within_set(line.index);
-        add_line(row);
-        set_inhomogeneity(row, line.inhomogeneity);
-        for (const std::pair<size_type, number> &entry : line.entries)
-          if (filter.is_element(entry.first))
-            add_entry(row, filter.index_within_set(entry.first), entry.second);
-      }
-}
-
-
-
-template <typename number>
-void
 AffineConstraints<number>::close()
 {
   if (sorted == true)
@@ -1284,15 +1258,6 @@ void
 AffineConstraints<number>::reinit()
 {
   reinit(IndexSet(), IndexSet());
-}
-
-
-
-template <typename number>
-void
-AffineConstraints<number>::reinit(const IndexSet &locally_stored_constraints)
-{
-  reinit(locally_stored_constraints, locally_stored_constraints);
 }
 
 

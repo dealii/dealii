@@ -135,7 +135,7 @@ run_test(const unsigned int fe_degree)
               in(i)              = entry;
             }
 
-          // assemble sparse matrix with MeshWorker for degrees less than 3
+          // assemble sparse matrix with mesh_loop for degrees less than 3
           // (the latter would be extraordinarily expensive already on 9 cells
           // as done here)
           if (fe_degree < 3)
@@ -148,28 +148,8 @@ run_test(const unsigned int fe_degree)
                 sparsity.copy_from(d_sparsity);
               }
               matrix.reinit(sparsity);
-              MeshWorker::IntegrationInfoBox<3> info_box;
-              UpdateFlags                       update_flags =
-                update_values | update_gradients | update_jacobians;
-              info_box.add_update_flags_all(update_flags);
-              info_box.initialize_gauss_quadrature(dof.get_fe().degree + 1,
-                                                   dof.get_fe().degree + 1,
-                                                   dof.get_fe().degree + 1);
-              info_box.initialize(dof.get_fe(), mapping);
-
-              MeshWorker::DoFInfo<3> dof_info(dof);
-
-              MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>>
-                assembler;
-              assembler.initialize(matrix);
-
-              MatrixIntegrator<3> integrator;
-              MeshWorker::integration_loop<3, 3>(dof.begin_active(),
-                                                 dof.end(),
-                                                 dof_info,
-                                                 info_box,
-                                                 integrator,
-                                                 assembler);
+              assemble_reference_matrix<3, double, VectorizedArray<double>>(
+                dof, mapping, dof.get_fe().degree + 1, matrix);
 
               matrix.vmult(out, in);
             }

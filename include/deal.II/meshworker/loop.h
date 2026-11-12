@@ -24,7 +24,6 @@
 
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/local_integrator.h>
 
 #include <functional>
 
@@ -604,76 +603,6 @@ namespace MeshWorker
       },
       info,
       dof_info);
-  }
-
-
-  /**
-   * Simplified interface for loop() if specialized for integration, using the
-   * virtual functions in LocalIntegrator.
-   *
-   * @deprecated This function is deprecated, along with the LocalIntegrator
-   *   class. Use the MeshWorker::loop() function directly, with three function
-   *   objects that perform the cell, boundary, and interior face integration.
-   *
-   * @ingroup MeshWorker
-   */
-  template <int dim,
-            int spacedim,
-            typename IteratorType,
-            typename AssemblerType>
-  DEAL_II_DEPRECATED void
-  integration_loop(IteratorType                             begin,
-                   std_cxx20::type_identity_t<IteratorType> end,
-                   DoFInfo<dim, spacedim>                  &dof_info,
-                   IntegrationInfoBox<dim, spacedim>       &box,
-                   const LocalIntegrator<dim, spacedim>    &integrator,
-                   AssemblerType                           &assembler,
-                   const LoopControl &lctrl = LoopControl())
-  {
-    std::function<void(DoFInfo<dim, spacedim> &,
-                       IntegrationInfo<dim, spacedim> &)>
-      cell_worker;
-    std::function<void(DoFInfo<dim, spacedim> &,
-                       IntegrationInfo<dim, spacedim> &)>
-      boundary_worker;
-    std::function<void(DoFInfo<dim, spacedim> &,
-                       DoFInfo<dim, spacedim> &,
-                       IntegrationInfo<dim, spacedim> &,
-                       IntegrationInfo<dim, spacedim> &)>
-      face_worker;
-    if (integrator.use_cell)
-      cell_worker =
-        [&integrator](DoFInfo<dim, spacedim>         &dof_info,
-                      IntegrationInfo<dim, spacedim> &integration_info) {
-          integrator.cell(dof_info, integration_info);
-        };
-    if (integrator.use_boundary)
-      boundary_worker =
-        [&integrator](DoFInfo<dim, spacedim>         &dof_info,
-                      IntegrationInfo<dim, spacedim> &integration_info) {
-          integrator.boundary(dof_info, integration_info);
-        };
-    if (integrator.use_face)
-      face_worker =
-        [&integrator](DoFInfo<dim, spacedim>         &dof_info_1,
-                      DoFInfo<dim, spacedim>         &dof_info_2,
-                      IntegrationInfo<dim, spacedim> &integration_info_1,
-                      IntegrationInfo<dim, spacedim> &integration_info_2) {
-          integrator.face(dof_info_1,
-                          dof_info_2,
-                          integration_info_1,
-                          integration_info_2);
-        };
-
-    loop<dim, spacedim>(begin,
-                        end,
-                        dof_info,
-                        box,
-                        cell_worker,
-                        boundary_worker,
-                        face_worker,
-                        assembler,
-                        lctrl);
   }
 
 } // namespace MeshWorker

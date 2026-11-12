@@ -141,15 +141,6 @@ public:
   const Point<spacedim> &
   get_center() const;
 
-  /**
-   * The center of the spherical coordinate system.
-   *
-   * @deprecated Use get_center() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Access the center with get_center() instead.")
-  const Point<spacedim> center;
-
 private:
   /**
    * The center of the spherical coordinate system.
@@ -346,15 +337,6 @@ public:
    */
   const Point<spacedim> &
   get_center() const;
-
-  /**
-   * The center of the spherical coordinate system.
-   *
-   * @deprecated Use get_center() instead.
-   */
-  DEAL_II_DEPRECATED_WITH_COMMENT(
-    "Access the center with get_center() instead.")
-  const Point<spacedim> center;
 
 private:
   /**

@@ -121,15 +121,12 @@ namespace internal
 // PolarManifold
 // ============================================================
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 template <int dim, int spacedim>
 PolarManifold<dim, spacedim>::PolarManifold(const Point<spacedim> center)
   : ChartManifold<dim, spacedim, spacedim>(
       PolarManifold<dim, spacedim>::get_periodicity())
-  , center(center)
   , p_center(center)
 {}
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 
@@ -355,15 +352,12 @@ PolarManifold<dim, spacedim>::normal_vector(
 // SphericalManifold
 // ============================================================
 
-DEAL_II_DISABLE_EXTRA_DIAGNOSTICS
 template <int dim, int spacedim>
 SphericalManifold<dim, spacedim>::SphericalManifold(
   const Point<spacedim> center)
-  : center(center)
-  , p_center(center)
+  : p_center(center)
   , polar_manifold(center)
 {}
-DEAL_II_ENABLE_EXTRA_DIAGNOSTICS
 
 
 

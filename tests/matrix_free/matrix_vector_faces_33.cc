@@ -61,7 +61,7 @@ test()
 
   constexpr unsigned int n_q_points_1d = fe_degree + 1;
 
-  // assemble sparse matrix with MeshWorker
+  // assemble sparse matrix with mesh_loop
   SparsityPattern      sparsity;
   SparseMatrix<double> matrix;
   {
@@ -70,23 +70,10 @@ test()
     sparsity.copy_from(d_sparsity);
   }
   matrix.reinit(sparsity);
-  MeshWorker::IntegrationInfoBox<dim> info_box;
-  UpdateFlags                         update_flags =
-    update_values | update_gradients | update_jacobians;
-  info_box.add_update_flags_all(update_flags);
-  info_box.initialize_gauss_quadrature(n_q_points_1d,
-                                       n_q_points_1d,
-                                       n_q_points_1d);
-  info_box.initialize(dof.get_fe(), mapping);
-
-  MeshWorker::DoFInfo<dim> dof_info(dof);
-
-  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assembler;
-  assembler.initialize(matrix);
-
-  MatrixIntegrator<dim> integrator;
-  MeshWorker::integration_loop<dim, dim>(
-    dof.begin_active(), dof.end(), dof_info, info_box, integrator, assembler);
+  assemble_reference_matrix<dim, double, VectorizedArray<double>>(dof,
+                                                                  mapping,
+                                                                  n_q_points_1d,
+                                                                  matrix);
 
   matrix.vmult(out, in);
 

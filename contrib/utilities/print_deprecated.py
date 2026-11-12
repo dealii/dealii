@@ -125,6 +125,7 @@ def main():
 
     deprecated_declarations = list()
     for line in result:
+        print(line)
         try:
             deprecated_declarations.append(DeprecatedDeclaration(line))
         except subprocess.CalledProcessError:  # ignore errors coming from git

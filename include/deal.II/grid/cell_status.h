@@ -43,27 +43,7 @@ enum class CellStatus : unsigned int
   /**
    * Invalid status. Will not occur for the user.
    */
-  cell_invalid,
-
-  /**
-   * @deprecated Use CellStatus::cell_will_persist instead
-   */
-  CELL_PERSIST DEAL_II_DEPRECATED = cell_will_persist,
-
-  /**
-   * @deprecated Use CellStatus::cell_will_be_refined instead
-   */
-  CELL_REFINE DEAL_II_DEPRECATED = cell_will_be_refined,
-
-  /**
-   * @deprecated Use CellStatus::cell_will_be_coarsened instead
-   */
-  CELL_COARSEN DEAL_II_DEPRECATED = children_will_be_coarsened,
-
-  /**
-   * @deprecated Use CellStatus::cell_invalid instead
-   */
-  CELL_INVALID DEAL_II_DEPRECATED = cell_invalid,
+  cell_invalid
 };
 
 DEAL_II_NAMESPACE_CLOSE

@@ -16,11 +16,13 @@
 // multithreading in case it was enabled
 
 #include <deal.II/base/logstream.h>
+#include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/utilities.h>
 
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_tools.h>
 
+#include <deal.II/fe/fe_interface_values.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
@@ -36,19 +38,13 @@
 #include <deal.II/matrix_free/fe_evaluation.h>
 #include <deal.II/matrix_free/matrix_free.h>
 
+#include <deal.II/meshworker/mesh_loop.h>
+
 #include <deal.II/numerics/vector_tools.h>
 
-#include "../tests.h"
-
-// To generate a reference solution
-#include <deal.II/integrators/laplace.h>
-
-#include <deal.II/meshworker/assembler.h>
-#include <deal.II/meshworker/dof_info.h>
-#include <deal.II/meshworker/integration_info.h>
-#include <deal.II/meshworker/loop.h>
-
 #include <iostream>
+
+#include "../tests.h"
 
 
 // forward declare this function. will be implemented in .cc files
@@ -688,91 +684,217 @@ private:
 
 
 
-// Reference solution created with MeshWorker
+// Reference solution: assemble the symmetric interior penalty / Nitsche
+// matrix with mesh_loop and FEInterfaceValues. It is compared against the
+// matrix-free operator below.
 template <int dim>
-class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
+struct MatrixAssemblyScratchData
 {
-public:
-  void
-  cell(MeshWorker::DoFInfo<dim>                  &dinfo,
-       typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void
-  boundary(MeshWorker::DoFInfo<dim>                  &dinfo,
-           typename MeshWorker::IntegrationInfo<dim> &info) const;
-  void
-  face(MeshWorker::DoFInfo<dim>                  &dinfo1,
-       MeshWorker::DoFInfo<dim>                  &dinfo2,
-       typename MeshWorker::IntegrationInfo<dim> &info1,
-       typename MeshWorker::IntegrationInfo<dim> &info2) const;
+  MatrixAssemblyScratchData(const Mapping<dim>        &mapping,
+                            const FiniteElement<dim>  &fe,
+                            const Quadrature<dim>     &quadrature,
+                            const Quadrature<dim - 1> &face_quadrature)
+    : mapping(&mapping)
+    , fe(&fe)
+    , quadrature(quadrature)
+    , face_quadrature(face_quadrature)
+    , fe_values(mapping, fe, quadrature, update_gradients | update_JxW_values)
+    , fe_face_values(mapping,
+                     fe,
+                     face_quadrature,
+                     update_values | update_gradients | update_JxW_values |
+                       update_normal_vectors | update_inverse_jacobians)
+    , fe_interface_values(mapping,
+                          fe,
+                          face_quadrature,
+                          update_values | update_gradients | update_JxW_values |
+                            update_normal_vectors | update_inverse_jacobians)
+  {}
+
+  MatrixAssemblyScratchData(const MatrixAssemblyScratchData &other)
+    : MatrixAssemblyScratchData(*other.mapping,
+                                *other.fe,
+                                other.quadrature,
+                                other.face_quadrature)
+  {}
+
+  const Mapping<dim>       *mapping;
+  const FiniteElement<dim> *fe;
+  Quadrature<dim>           quadrature;
+  Quadrature<dim - 1>       face_quadrature;
+  FEValues<dim>             fe_values;
+  FEFaceValues<dim>         fe_face_values;
+  FEInterfaceValues<dim>    fe_interface_values;
 };
 
 
 
-template <int dim>
-void
-MatrixIntegrator<dim>::cell(
-  MeshWorker::DoFInfo<dim>                  &dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
+struct MatrixAssemblyCopyData
 {
-  LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0, false).matrix,
-                                         info.fe_values());
+  struct FaceData
+  {
+    FullMatrix<double>                   matrix;
+    std::vector<types::global_dof_index> dof_indices;
+  };
+
+  FullMatrix<double>                   cell_matrix;
+  std::vector<types::global_dof_index> cell_dof_indices;
+  std::vector<FaceData>                face_data;
+};
+
+
+
+// Penalty parameter of the interior penalty method: the normal part of the
+// inverse Jacobian for the face, averaged over the two cells.
+template <int dim>
+double
+normal_volume_fraction(const FEFaceValuesBase<dim> &fe_face_values,
+                       const unsigned int           face_no,
+                       const Tensor<1, dim>        &normal)
+{
+  return std::abs(fe_face_values.inverse_jacobian(
+                    0)[GeometryInfo<dim>::unit_normal_direction[face_no]] *
+                  normal);
 }
 
 
 
-template <int dim>
+template <int dim, typename number, typename VectorizedArrayType>
 void
-MatrixIntegrator<dim>::face(
-  MeshWorker::DoFInfo<dim>                  &dinfo1,
-  MeshWorker::DoFInfo<dim>                  &dinfo2,
-  typename MeshWorker::IntegrationInfo<dim> &info1,
-  typename MeshWorker::IntegrationInfo<dim> &info2) const
+assemble_reference_matrix(const DoFHandler<dim> &dof,
+                          const Mapping<dim>    &mapping,
+                          const unsigned int     n_q_points_1d,
+                          SparseMatrix<double>  &matrix)
 {
-  const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
-  // Manually compute penalty parameter instead of using the function
-  // compute_penalty because we do it slightly differently on non-Cartesian
-  // meshes.
-  Tensor<2, dim> inverse_jacobian =
-    transpose(info1.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction1 =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo1.face_number]] *
-              info1.fe_values(0).normal_vector(0)));
-  inverse_jacobian = transpose(info2.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction2 =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo2.face_number]] *
-              info1.fe_values(0).normal_vector(0)));
-  double penalty = 0.5 * (normal_volume_fraction1 + normal_volume_fraction2) *
-                   std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace::ip_matrix(dinfo1.matrix(0, false).matrix,
-                                       dinfo1.matrix(0, true).matrix,
-                                       dinfo2.matrix(0, true).matrix,
-                                       dinfo2.matrix(0, false).matrix,
-                                       info1.fe_values(0),
-                                       info2.fe_values(0),
-                                       penalty);
-}
+  const FiniteElement<dim> &fe  = dof.get_fe();
+  const unsigned int        deg = fe.tensor_degree();
+  const unsigned int        n_q = n_q_points_1d > 0 ? n_q_points_1d : deg + 1;
+  const unsigned int        n_comp = fe.n_components();
 
+  using Iterator = typename DoFHandler<dim>::active_cell_iterator;
 
+  const auto cell_worker = [&](const Iterator                 &cell,
+                               MatrixAssemblyScratchData<dim> &scratch,
+                               MatrixAssemblyCopyData         &copy) {
+    scratch.fe_values.reinit(cell);
+    const unsigned int n_dofs = fe.n_dofs_per_cell();
+    copy.cell_matrix.reinit(n_dofs, n_dofs);
+    for (unsigned int q = 0; q < scratch.fe_values.n_quadrature_points; ++q)
+      for (unsigned int i = 0; i < n_dofs; ++i)
+        for (unsigned int j = 0; j < n_dofs; ++j)
+          for (unsigned int c = 0; c < n_comp; ++c)
+            copy.cell_matrix(i, j) +=
+              scratch.fe_values.shape_grad_component(i, q, c) *
+              scratch.fe_values.shape_grad_component(j, q, c) *
+              scratch.fe_values.JxW(q);
+    copy.cell_dof_indices.resize(n_dofs);
+    cell->get_active_or_mg_dof_indices(copy.cell_dof_indices);
+  };
 
-template <int dim>
-void
-MatrixIntegrator<dim>::boundary(
-  MeshWorker::DoFInfo<dim>                  &dinfo,
-  typename MeshWorker::IntegrationInfo<dim> &info) const
-{
-  const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
-  Tensor<2, dim>     inverse_jacobian =
-    transpose(info.fe_values(0).jacobian(0).covariant_form());
-  const double normal_volume_fraction =
-    std::abs((inverse_jacobian
-                [GeometryInfo<dim>::unit_normal_direction[dinfo.face_number]] *
-              info.fe_values(0).normal_vector(0)));
-  double penalty = normal_volume_fraction * std::max(1U, deg) * (deg + 1.0);
-  LocalIntegrators::Laplace::nitsche_matrix(dinfo.matrix(0, false).matrix,
-                                            info.fe_values(0),
-                                            penalty);
+  // Nitsche boundary terms: 2 gamma u v - d_n u v - u d_n v
+  const auto boundary_worker = [&](const Iterator                 &cell,
+                                   const unsigned int              face_no,
+                                   MatrixAssemblyScratchData<dim> &scratch,
+                                   MatrixAssemblyCopyData         &copy) {
+    scratch.fe_face_values.reinit(cell, face_no);
+    const auto        &fev    = scratch.fe_face_values;
+    const unsigned int n_dofs = fe.n_dofs_per_cell();
+    const double       penalty =
+      normal_volume_fraction<dim>(fev, face_no, fev.normal_vector(0)) *
+      std::max(1U, deg) * (deg + 1.0);
+
+    auto &face_data = copy.face_data.emplace_back();
+    face_data.matrix.reinit(n_dofs, n_dofs);
+    face_data.dof_indices.resize(n_dofs);
+    cell->get_active_or_mg_dof_indices(face_data.dof_indices);
+    for (unsigned int q = 0; q < fev.n_quadrature_points; ++q)
+      for (unsigned int i = 0; i < n_dofs; ++i)
+        for (unsigned int j = 0; j < n_dofs; ++j)
+          for (unsigned int c = 0; c < n_comp; ++c)
+            face_data.matrix(i, j) +=
+              (2. * penalty * fev.shape_value_component(i, q, c) *
+                 fev.shape_value_component(j, q, c) -
+               (fev.normal_vector(q) * fev.shape_grad_component(i, q, c)) *
+                 fev.shape_value_component(j, q, c) -
+               (fev.normal_vector(q) * fev.shape_grad_component(j, q, c)) *
+                 fev.shape_value_component(i, q, c)) *
+              fev.JxW(q);
+  };
+
+  // Interior penalty: gamma [u][v] - {d_n u}[v] - [u]{d_n v}
+  const auto face_worker = [&](const Iterator                 &cell,
+                               const unsigned int              f,
+                               const unsigned int              sf,
+                               const Iterator                 &ncell,
+                               const unsigned int              nf,
+                               const unsigned int              nsf,
+                               MatrixAssemblyScratchData<dim> &scratch,
+                               MatrixAssemblyCopyData         &copy) {
+    auto &fiv = scratch.fe_interface_values;
+    fiv.reinit(cell, f, sf, ncell, nf, nsf);
+
+    const double penalty =
+      0.5 *
+      (normal_volume_fraction<dim>(fiv.get_fe_face_values(0),
+                                   f,
+                                   fiv.normal_vector(0)) +
+       normal_volume_fraction<dim>(fiv.get_fe_face_values(1),
+                                   nf,
+                                   fiv.normal_vector(0))) *
+      std::max(1U, deg) * (deg + 1.0);
+
+    const unsigned int n_interface_dofs = fiv.n_current_interface_dofs();
+    auto              &face_data        = copy.face_data.emplace_back();
+    face_data.matrix.reinit(n_interface_dofs, n_interface_dofs);
+    face_data.dof_indices = fiv.get_interface_dof_indices();
+
+    const std::vector<Tensor<1, dim>> &normals = fiv.get_normal_vectors();
+    for (unsigned int q = 0; q < fiv.n_quadrature_points; ++q)
+      for (unsigned int i = 0; i < n_interface_dofs; ++i)
+        for (unsigned int j = 0; j < n_interface_dofs; ++j)
+          for (unsigned int c = 0; c < n_comp; ++c)
+            face_data.matrix(i, j) +=
+              (penalty * fiv.jump_in_shape_values(i, q, c) *
+                 fiv.jump_in_shape_values(j, q, c) -
+               (fiv.average_of_shape_gradients(j, q, c) * normals[q]) *
+                 fiv.jump_in_shape_values(i, q, c) -
+               (fiv.average_of_shape_gradients(i, q, c) * normals[q]) *
+                 fiv.jump_in_shape_values(j, q, c)) *
+              fiv.JxW(q);
+  };
+
+  const auto copier = [&](const MatrixAssemblyCopyData &copy) {
+    for (unsigned int i = 0; i < copy.cell_dof_indices.size(); ++i)
+      for (unsigned int j = 0; j < copy.cell_dof_indices.size(); ++j)
+        matrix.add(copy.cell_dof_indices[i],
+                   copy.cell_dof_indices[j],
+                   copy.cell_matrix(i, j));
+
+    for (const auto &face : copy.face_data)
+      for (unsigned int i = 0; i < face.dof_indices.size(); ++i)
+        for (unsigned int j = 0; j < face.dof_indices.size(); ++j)
+          matrix.add(face.dof_indices[i],
+                     face.dof_indices[j],
+                     face.matrix(i, j));
+  };
+
+  MatrixAssemblyScratchData<dim> scratch(mapping,
+                                         fe,
+                                         QGauss<dim>(n_q),
+                                         QGauss<dim - 1>(n_q));
+  MatrixAssemblyCopyData         copy;
+
+  MeshWorker::mesh_loop(dof.begin_active(),
+                        dof.end(),
+                        cell_worker,
+                        copier,
+                        scratch,
+                        copy,
+                        MeshWorker::assemble_own_cells |
+                          MeshWorker::assemble_boundary_faces |
+                          MeshWorker::assemble_own_interior_faces_once,
+                        boundary_worker,
+                        face_worker);
 }
 
 
@@ -790,12 +912,7 @@ do_test(const DoFHandler<dim>           &dof,
   if (std::is_same_v<number, float> == true)
     deallog.push("float");
 
-  deallog << "Testing " << dof.get_fe().get_name();
-  deallog << std::endl;
-  // std::cout << "Number of cells: " <<
-  // dof.get_triangulation().n_active_cells() << std::endl; std::cout << "Number
-  // of degrees of freedom: " << dof.n_dofs() << std::endl; std::cout << "Number
-  // of constraints: " << constraints.n_constraints() << std::endl;
+  deallog << "Testing " << dof.get_fe().get_name() << std::endl;
 
   MappingQ<dim> mapping(dof.get_fe().degree + 1);
 
@@ -812,7 +929,7 @@ do_test(const DoFHandler<dim>           &dof,
       in(i)              = entry;
     }
 
-  // assemble sparse matrix with MeshWorker
+  // assemble the reference sparse matrix with mesh_loop
   SparsityPattern      sparsity;
   SparseMatrix<double> matrix;
   {
@@ -821,24 +938,12 @@ do_test(const DoFHandler<dim>           &dof,
     sparsity.copy_from(d_sparsity);
   }
   matrix.reinit(sparsity);
-  MeshWorker::IntegrationInfoBox<dim> info_box;
-  UpdateFlags                         update_flags =
-    update_values | update_gradients | update_jacobians;
-  info_box.add_update_flags_all(update_flags);
-  info_box.initialize_gauss_quadrature(n_q_points_1d,
-                                       n_q_points_1d,
-                                       n_q_points_1d);
-  info_box.initialize(dof.get_fe(), mapping);
+  assemble_reference_matrix<dim, number, VectorizedArrayType>(dof,
+                                                              mapping,
+                                                              n_q_points_1d,
+                                                              matrix);
 
-  MeshWorker::DoFInfo<dim> dof_info(dof);
-
-  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double>> assembler;
-  assembler.initialize(matrix);
-
-  MatrixIntegrator<dim> integrator;
-  MeshWorker::integration_loop<dim, dim>(
-    dof.begin_active(), dof.end(), dof_info, info_box, integrator, assembler);
-
+  // compute matrix-vector product
   matrix.vmult(out, in);
 
   // zero constrained dofs
@@ -846,6 +951,8 @@ do_test(const DoFHandler<dim>           &dof,
     if (constraints.is_constrained(i))
       out(i) = 0;
 
+  // Later on we will still construct a separate MatrixFree instance for
+  // performance testing; name it mf_data to match the rest of the test.
   MatrixFree<dim, number, VectorizedArrayType> mf_data;
   const QGauss<1> quad(n_q_points_1d > 0 ? n_q_points_1d :
                                            dof.get_fe().degree + 1);
@@ -854,9 +961,11 @@ do_test(const DoFHandler<dim>           &dof,
     MatrixFree<dim, number, VectorizedArrayType>::AdditionalData::none;
   data.tasks_block_size = 3;
   data.mapping_update_flags_inner_faces =
-    (update_gradients | update_JxW_values);
+    (update_gradients | update_JxW_values | update_normal_vectors |
+     update_contravariant_transformation);
   data.mapping_update_flags_boundary_faces =
-    (update_gradients | update_JxW_values);
+    (update_gradients | update_JxW_values | update_normal_vectors |
+     update_contravariant_transformation);
 
   mf_data.reinit(mapping, dof, constraints, quad, data);
 
