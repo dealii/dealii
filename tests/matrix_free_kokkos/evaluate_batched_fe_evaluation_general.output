@@ -1,0 +1,127 @@
+
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=1 n_q_points_1d=2 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=2 n_q_points_1d=3 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=1 degree=3 n_q_points_1d=5 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=1 n_q_points_1d=2 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=2 n_q_points_1d=3 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=2 degree=3 n_q_points_1d=5 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=1 n_q_points_1d=2 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=2 n_q_points_1d=3 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values evaluate: values 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=1 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values evaluate: values 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 gradients evaluate: gradients 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 gradients integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=1 values|gradients integrate: error 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=2 values|gradients evaluate: values 0.00000 gradients 0.00000
+DEAL::dim=3 degree=3 n_q_points_1d=5 n_cells=3 n_components=2 values|gradients integrate: error 0.00000
