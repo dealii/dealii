@@ -766,9 +766,37 @@ namespace SUNDIALS
         prm.leave_subsection();
 
         prm.enter_subsection("Initial condition correction parameters");
-        prm.add_parameter(
+        const auto correction_type_to_string =
+          [](const InitialConditionCorrection type) {
+            switch (type)
+              {
+                case none:
+                  return std::string("none");
+                case use_y_diff:
+                  return std::string("use_y_diff");
+                case use_y_dot:
+                  return std::string("use_y_dot");
+              }
+
+            DEAL_II_ASSERT_UNREACHABLE();
+            return std::string();
+          };
+        const auto set_correction_type = [](const std::string          &value,
+                                            InitialConditionCorrection &type) {
+          if (value == "none")
+            type = none;
+          else if (value == "use_y_diff")
+            type = use_y_diff;
+          else if (value == "use_y_dot")
+            type = use_y_dot;
+          else
+            AssertThrow(false, ExcInternalError());
+        };
+
+        prm.declare_entry(
           "Correction type at initial time",
-          ic_type,
+          correction_type_to_string(ic_type),
+          Patterns::Selection("none|use_y_diff|use_y_dot"),
           "This is one of the following three options for the "
           "initial condition calculation. \n"
           " none: do not try to make initial conditions consistent. \n"
@@ -777,9 +805,14 @@ namespace SUNDIALS
           "    This option requires that the user specifies differential and \n"
           "    algebraic components in the function differential_components().\n"
           " use_y_dot: compute all components of y, given y_dot.");
-        prm.add_parameter(
+        prm.add_action("Correction type at initial time",
+                       [this, set_correction_type](const std::string &value) {
+                         set_correction_type(value, ic_type);
+                       });
+        prm.declare_entry(
           "Correction type after restart",
-          reset_type,
+          correction_type_to_string(reset_type),
+          Patterns::Selection("none|use_y_diff|use_y_dot"),
           "This is one of the following three options for the "
           "initial condition calculation. \n"
           " none: do not try to make initial conditions consistent. \n"
@@ -788,6 +821,10 @@ namespace SUNDIALS
           "    This option requires that the user specifies differential and \n"
           "    algebraic components in the function differential_components().\n"
           " use_y_dot: compute all components of y, given y_dot.");
+        prm.add_action("Correction type after restart",
+                       [this, set_correction_type](const std::string &value) {
+                         set_correction_type(value, reset_type);
+                       });
         prm.add_parameter("Maximum number of nonlinear iterations",
                           maximum_non_linear_iterations_ic);
         prm.add_parameter(
