@@ -118,7 +118,7 @@ test_points_2d()
 #if ARBORX_VERSION_MAJOR < 2
   ArborXWrappers::BVH bvh(points);
 #else
-  ArborXWrappers::BVH<Point<2>>       bvh(points);
+  ArborXWrappers::BVH<Point<2>> bvh(points);
 #endif
   ArborXWrappers::PointNearestPredicate pt_nearest(query_points, 1);
   auto                                  indices_offset = bvh.query(pt_nearest);

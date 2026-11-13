@@ -554,7 +554,8 @@ ObserverPointer<T, P>::operator=(ObserverPointer<T, P> &&other) noexcept
 
 
 template <typename T, typename P>
-inline ObserverPointer<T, P>::operator T *() const
+inline ObserverPointer<T, P>::
+operator T *() const
 {
   return pointer;
 }

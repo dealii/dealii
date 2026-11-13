@@ -90,7 +90,7 @@ test()
       const unsigned int                   dofs_per_cell = fe.dofs_per_cell;
       std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
       DoFHandler<2>::active_cell_iterator  cell = dof_handler.begin_active(),
-                                          endc  = dof_handler.end();
+                                           endc = dof_handler.end();
       for (; cell != endc; ++cell)
         if (cell->subdomain_id() == tr.locally_owned_subdomain())
           {

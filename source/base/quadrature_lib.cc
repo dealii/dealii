@@ -1183,8 +1183,8 @@ QTelles<1>::QTelles(const Quadrature<1> &base_quad, const Point<1> &singularity)
     {
       double gamma = quadrature_points[q][0] * 2 - 1;
       double eta   = (Utilities::fixed_power<3>(gamma - gamma_bar) +
-                    gamma_bar * (gamma_bar * gamma_bar + 3)) /
-                   (1 + 3 * gamma_bar * gamma_bar);
+                      gamma_bar * (gamma_bar * gamma_bar + 3)) /
+                     (1 + 3 * gamma_bar * gamma_bar);
 
       double J = 3 * ((gamma - gamma_bar) * (gamma - gamma_bar)) /
                  (1 + 3 * gamma_bar * gamma_bar);
@@ -2418,7 +2418,7 @@ QIteratedSimplex<dim>::QIteratedSimplex(const Quadrature<dim> &base_quad,
             reference_cell.template get_default_linear_mapping<dim>();
           FE_Nothing<dim> fe(reference_cell);
 
-          FEValues<dim>           fe_values(mapping,
+          FEValues<dim> fe_values(mapping,
                                   fe,
                                   base_quad,
                                   update_quadrature_points | update_JxW_values);

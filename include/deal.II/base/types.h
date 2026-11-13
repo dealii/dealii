@@ -89,7 +89,7 @@ namespace types
 #ifdef DEAL_II_WITH_64BIT_INDICES
   using global_dof_index = std::uint64_t;
 #else
-  using global_dof_index        = unsigned int;
+  using global_dof_index = unsigned int;
 #endif
 
   /**
@@ -133,7 +133,7 @@ namespace types
 #ifdef DEAL_II_WITH_64BIT_INDICES
   using global_cell_index = std::uint64_t;
 #else
-  using global_cell_index       = unsigned int;
+  using global_cell_index = unsigned int;
 #endif
 
   /**

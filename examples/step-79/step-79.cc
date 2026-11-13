@@ -754,12 +754,12 @@ namespace SAND
     const MappingQ<dim>   mapping(1);
     const QGauss<dim>     quadrature_formula(fe.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
-    FEValues<dim>         fe_values(mapping,
-                            fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim>     fe_face_values(mapping,
+    FEValues<dim>     fe_values(mapping,
+                                fe,
+                                quadrature_formula,
+                                update_values | update_gradients |
+                                  update_quadrature_points | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(mapping,
                                      fe,
                                      face_quadrature_formula,
                                      update_values | update_quadrature_points |
@@ -887,9 +887,9 @@ namespace SAND
                   fe_values[displacements<dim>].divergence(i, q_point);
 
                 const SymmetricTensor<2, dim>
-                  displacement_multiplier_phi_i_symmgrad =
-                    fe_values[displacement_multipliers<dim>].symmetric_gradient(
-                      i, q_point);
+                             displacement_multiplier_phi_i_symmgrad =
+                               fe_values[displacement_multipliers<dim>].symmetric_gradient(
+                                 i, q_point);
                 const double displacement_multiplier_phi_i_div =
                   fe_values[displacement_multipliers<dim>].divergence(i,
                                                                       q_point);
@@ -929,9 +929,9 @@ namespace SAND
                       fe_values[displacements<dim>].divergence(j, q_point);
 
                     const SymmetricTensor<2, dim>
-                      displacement_multiplier_phi_j_symmgrad =
-                        fe_values[displacement_multipliers<dim>]
-                          .symmetric_gradient(j, q_point);
+                                 displacement_multiplier_phi_j_symmgrad =
+                                   fe_values[displacement_multipliers<dim>]
+                                     .symmetric_gradient(j, q_point);
                     const double displacement_multiplier_phi_j_div =
                       fe_values[displacement_multipliers<dim>].divergence(
                         j, q_point);
@@ -1302,12 +1302,12 @@ namespace SAND
     const MappingQ<dim>   mapping(1);
     const QGauss<dim>     quadrature_formula(fe.degree + 1);
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
-    FEValues<dim>         fe_values(mapping,
-                            fe,
-                            quadrature_formula,
-                            update_values | update_gradients |
-                              update_quadrature_points | update_JxW_values);
-    FEFaceValues<dim>     fe_face_values(mapping,
+    FEValues<dim>     fe_values(mapping,
+                                fe,
+                                quadrature_formula,
+                                update_values | update_gradients |
+                                  update_quadrature_points | update_JxW_values);
+    FEFaceValues<dim> fe_face_values(mapping,
                                      fe,
                                      face_quadrature_formula,
                                      update_values | update_quadrature_points |
@@ -1421,9 +1421,9 @@ namespace SAND
                   fe_values[displacements<dim>].divergence(i, q_point);
 
                 const SymmetricTensor<2, dim>
-                  displacement_multiplier_phi_i_symmgrad =
-                    fe_values[displacement_multipliers<dim>].symmetric_gradient(
-                      i, q_point);
+                             displacement_multiplier_phi_i_symmgrad =
+                               fe_values[displacement_multipliers<dim>].symmetric_gradient(
+                                 i, q_point);
                 const double displacement_multiplier_phi_i_div =
                   fe_values[displacement_multipliers<dim>].divergence(i,
                                                                       q_point);
@@ -1628,12 +1628,12 @@ namespace SAND
       const MappingQ<dim>   mapping(1);
       const QGauss<dim>     quadrature_formula(fe.degree + 1);
       const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
-      FEValues<dim>         fe_values(mapping,
+      FEValues<dim> fe_values(mapping,
                               fe,
                               quadrature_formula,
                               update_values | update_gradients |
                                 update_quadrature_points | update_JxW_values);
-      FEFaceValues<dim>     fe_face_values(mapping,
+      FEFaceValues<dim> fe_face_values(mapping,
                                        fe,
                                        face_quadrature_formula,
                                        update_values |

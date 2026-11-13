@@ -94,8 +94,8 @@ test(const unsigned int degree)
 
   VectorTools::interpolate(mapping, dof_handler, MyFunction<dim>(), vector);
 
-  std::vector<double>                      solution_values(fe.dofs_per_cell);
-  std::vector<Vector<double>>              function_values(unit_points.size(),
+  std::vector<double>         solution_values(fe.dofs_per_cell);
+  std::vector<Vector<double>> function_values(unit_points.size(),
                                               Vector<double>(dim + 1));
   std::vector<std::vector<Tensor<1, dim>>> function_gradients(
     unit_points.size(), std::vector<Tensor<1, dim>>(dim + 1));

@@ -1812,7 +1812,7 @@ namespace Utilities
         }
 
       } // namespace ComputeIndexOwner
-    }   // namespace
+    } // namespace
 
 
 
@@ -1945,7 +1945,7 @@ namespace Utilities
 #endif
         }
       } // namespace CollectiveMutexImplementation
-    }   // namespace internal
+    } // namespace internal
 
 
 

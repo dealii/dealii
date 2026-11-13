@@ -3317,12 +3317,12 @@ namespace internal
               // set rcounts based on new_numbers:
               int cur_count = new_numbers_copy.size();
               int ierr      = MPI_Allgather(&cur_count,
-                                       1,
-                                       MPI_INT,
-                                       rcounts.data(),
-                                       1,
-                                       MPI_INT,
-                                       tr->get_mpi_communicator());
+                                            1,
+                                            MPI_INT,
+                                            rcounts.data(),
+                                            1,
+                                            MPI_INT,
+                                            tr->get_mpi_communicator());
               AssertThrowMPI(ierr);
 
               // compute the displacements (relative to recvbuf)
@@ -4265,7 +4265,7 @@ namespace internal
 #endif
       }
     } // namespace Policy
-  }   // namespace DoFHandlerImplementation
+  } // namespace DoFHandlerImplementation
 } // namespace internal
 
 

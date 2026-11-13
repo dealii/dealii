@@ -39,8 +39,8 @@ test()
     {
       const auto c = random_point<dim>();
       const auto d = random_value();
-      box          = std::make_pair(BoundingBox<dim>({Point<dim>(c - d * ones),
-                                                      Point<dim>(c + d * ones)}),
+      box = std::make_pair(BoundingBox<dim>({Point<dim>(c - d * ones),
+                                             Point<dim>(c + d * ones)}),
                            i++);
     }
 

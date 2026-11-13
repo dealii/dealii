@@ -253,7 +253,7 @@ test_intersection_diagonally_through_vertices()
 // coefficients are positive but the cell is still intersected.
 template <int dim>
 void
-setup_intersected_Q2_positive_coefficients(Vector<double> &level_set){
+setup_intersected_Q2_positive_coefficients(Vector<double> &level_set) {
   // This test case only makes sense in 2D and 3D, specialize for these below
   // and do nothing by default.
 };

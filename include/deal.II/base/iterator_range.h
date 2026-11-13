@@ -359,7 +359,8 @@ IteratorOverIterators<Iterator>::operator!=(
 
 
 template <typename Iterator>
-inline IteratorOverIterators<Iterator>::operator const BaseIterator &() const
+inline IteratorOverIterators<Iterator>::
+operator const BaseIterator &() const
 {
   return element_of_iterator_collection;
 }

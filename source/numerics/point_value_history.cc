@@ -216,7 +216,7 @@ PointValueHistory<dim>::add_point(const Point<dim> &location)
   // consistent in case they are actually
   // chosen
   typename DoFHandler<dim>::active_cell_iterator current_cell = cell;
-  std::vector<unsigned int>                      current_fe_index(n_components,
+  std::vector<unsigned int> current_fe_index(n_components,
                                              0); // need one index per component
   fe_values.reinit(cell);
   std::vector<Point<dim>> current_points(n_components, Point<dim>());
@@ -1261,8 +1261,8 @@ PointValueHistory<dim>::get_postprocessor_locations(
   locations = std::vector<Point<dim>>();
 
   FEValues<dim>           fe_values(dof_handler->get_fe(),
-                          quadrature,
-                          update_quadrature_points);
+                                    quadrature,
+                                    update_quadrature_points);
   unsigned int            n_quadrature_points = quadrature.size();
   std::vector<Point<dim>> evaluation_points;
 

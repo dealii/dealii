@@ -67,10 +67,10 @@ plot_function_derivatives(Mapping<dim>       &mapping,
 
   QTrapezoid<dim> q;
   FEValues<dim>   fe(mapping,
-                   finel,
-                   q,
-                   UpdateFlags(update_values | update_gradients |
-                               update_hessians | update_3rd_derivatives));
+                     finel,
+                     q,
+                     UpdateFlags(update_values | update_gradients |
+                                 update_hessians | update_3rd_derivatives));
 
   sprintf(fname, "Cell-%dd-%s", dim, name);
   deallog.push(fname);

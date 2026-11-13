@@ -882,7 +882,8 @@ public:
    * elements, but using the different storage scheme of full tensors.
    */
   DEAL_II_HOST_DEVICE
-  constexpr operator Tensor<rank_, dim, Number>() const;
+  constexpr
+  operator Tensor<rank_, dim, Number>() const;
 
   /**
    * Test for equality of two tensors.
@@ -1732,8 +1733,8 @@ namespace internal
 
 template <int rank_, int dim, typename Number>
 DEAL_II_HOST_DEVICE constexpr DEAL_II_ALWAYS_INLINE
-  SymmetricTensor<rank_, dim, Number>::operator Tensor<rank_, dim, Number>()
-    const
+  SymmetricTensor<rank_, dim, Number>::
+  operator Tensor<rank_, dim, Number>() const
 {
   return internal::SymmetricTensorImplementation::convert_to_tensor(*this);
 }
@@ -2164,8 +2165,8 @@ namespace internal
 
 
   template <int dim, typename Number>
-  DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const
-    Number &
+  DEAL_II_HOST_DEVICE
+    DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const Number &
     symmetric_tensor_access(
       const TableIndices<2> &indices,
       const typename SymmetricTensorAccessors::StorageType<2, dim, Number>::
@@ -2226,8 +2227,8 @@ namespace internal
 
 
   template <int dim, typename Number>
-  DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const
-    Number &
+  DEAL_II_HOST_DEVICE
+    DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE const Number &
     symmetric_tensor_access(
       const TableIndices<4> &indices,
       const typename SymmetricTensorAccessors::StorageType<4, dim, Number>::
@@ -2628,7 +2629,7 @@ template <class Archive>
 inline void
 SymmetricTensor<rank_, dim, Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar &data;
+  ar & data;
 }
 
 
@@ -3220,7 +3221,7 @@ DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline DEAL_II_ALWAYS_INLINE
 
 template <int dim, typename Number>
 DEAL_II_HOST_DEVICE DEAL_II_CONSTEXPR inline SymmetricTensor<4, dim, Number>
-                    deviator_tensor()
+deviator_tensor()
 {
   SymmetricTensor<4, dim, Number> tmp;
 

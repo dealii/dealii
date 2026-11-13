@@ -695,7 +695,7 @@ namespace Step32
                         temperature_fe.n_dofs_per_cell())
       {}
     } // namespace CopyData
-  }   // namespace Assembly
+  } // namespace Assembly
 
 
 
@@ -1253,9 +1253,9 @@ namespace Step32
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim>               fe_values(mapping,
-                            stokes_fe,
-                            quadrature_formula,
-                            update_values);
+                                          stokes_fe,
+                                          quadrature_formula,
+                                          update_values);
     std::vector<Tensor<1, dim>> velocity_values(n_q_points);
 
     const FEValuesExtractors::Vector velocities(0);
@@ -1295,9 +1295,9 @@ namespace Step32
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim>               fe_values(mapping,
-                            stokes_fe,
-                            quadrature_formula,
-                            update_values);
+                                          stokes_fe,
+                                          quadrature_formula,
+                                          update_values);
     std::vector<Tensor<1, dim>> velocity_values(n_q_points);
 
     const FEValuesExtractors::Vector velocities(0);
@@ -1355,8 +1355,8 @@ namespace Step32
     const unsigned int n_q_points = quadrature_formula.size();
 
     FEValues<dim>       fe_values(temperature_fe,
-                            quadrature_formula,
-                            update_values | update_JxW_values);
+                                  quadrature_formula,
+                                  update_values | update_JxW_values);
     std::vector<double> old_temperature_values(n_q_points);
     std::vector<double> old_old_temperature_values(n_q_points);
 
@@ -1413,7 +1413,7 @@ namespace Step32
     // combined with forming the maximum over the maximal entropies.
     const double local_sums[2]   = {entropy_integrated, area},
                  local_maxima[2] = {-min_entropy, max_entropy};
-    double global_sums[2], global_maxima[2];
+    double       global_sums[2], global_maxima[2];
 
     Utilities::MPI::sum(local_sums, MPI_COMM_WORLD, global_sums);
     Utilities::MPI::max(local_maxima, MPI_COMM_WORLD, global_maxima);
@@ -1422,7 +1422,7 @@ namespace Step32
     // entropy and find the $L^\infty$ norm by taking the larger of the
     // deviation of the maximum or minimum from the average:
     const double average_entropy = global_sums[0] / global_sums[1];
-    const double entropy_diff    = std::max(global_maxima[1] - average_entropy,
+    const double entropy_diff = std::max(global_maxima[1] - average_entropy,
                                          average_entropy - (-global_maxima[0]));
     return entropy_diff;
   }
@@ -1450,9 +1450,9 @@ namespace Step32
     const unsigned int   n_q_points = quadrature_formula.size();
 
     FEValues<dim>       fe_values(mapping,
-                            temperature_fe,
-                            quadrature_formula,
-                            update_values);
+                                  temperature_fe,
+                                  quadrature_formula,
+                                  update_values);
     std::vector<double> old_temperature_values(n_q_points);
     std::vector<double> old_old_temperature_values(n_q_points);
 
@@ -2800,7 +2800,7 @@ namespace Step32
         start = (distributed_stokes_solution.block(0).size() +
                  distributed_stokes_solution.block(1).local_range().first),
         end   = (distributed_stokes_solution.block(0).size() +
-               distributed_stokes_solution.block(1).local_range().second);
+                 distributed_stokes_solution.block(1).local_range().second);
       for (unsigned int i = start; i < end; ++i)
         if (stokes_constraints.is_constrained(i))
           distributed_stokes_solution(i) = 0;
@@ -2902,7 +2902,7 @@ namespace Step32
       old_time_step = time_step;
 
       const double scaling = (dim == 3 ? 0.25 : 1.0);
-      time_step            = (scaling / (2.1 * dim * std::sqrt(1. * dim)) /
+      time_step = (scaling / (2.1 * dim * std::sqrt(1. * dim)) /
                    (parameters.temperature_degree * get_cfl_number()));
 
       const double maximal_velocity = get_maximal_velocity();

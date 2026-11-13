@@ -198,7 +198,7 @@ namespace internal
     void
     DoFObjects<dim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &dofs;
+      ar & dofs;
     }
 
   } // namespace DoFHandlerImplementation

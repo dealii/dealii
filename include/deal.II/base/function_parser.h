@@ -244,7 +244,7 @@ public:
                  const std::string &constants      = "",
                  const std::string &variable_names = default_variable_names() +
                                                      ",t",
-                 const double h = 1e-8);
+                 const double       h              = 1e-8);
 
   /**
    * Copy constructor. Objects of this type can not be copied, and

@@ -61,7 +61,7 @@ namespace Step12
     ScratchData(const Mapping<dim>       &mapping,
                 const FiniteElement<dim> &fe,
                 const unsigned int        quadrature_degree,
-                const UpdateFlags         update_flags = update_values |
+                const UpdateFlags update_flags = update_values |
                                                  update_gradients |
                                                  update_quadrature_points |
                                                  update_JxW_values,

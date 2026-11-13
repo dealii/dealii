@@ -899,9 +899,9 @@ namespace Utilities
           // receive remote data
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                               internal::Tags::remote_point_evaluation,
-                               tria->get_mpi_communicator(),
-                               &status);
+                                      internal::Tags::remote_point_evaluation,
+                                      tria->get_mpi_communicator(),
+                                      &status);
           AssertThrowMPI(ierr);
 
           const auto ptr =
@@ -1119,9 +1119,9 @@ namespace Utilities
           // receive remote data
           MPI_Status status;
           int        ierr = MPI_Probe(MPI_ANY_SOURCE,
-                               internal::Tags::remote_point_evaluation,
-                               tria->get_mpi_communicator(),
-                               &status);
+                                      internal::Tags::remote_point_evaluation,
+                                      tria->get_mpi_communicator(),
+                                      &status);
           AssertThrowMPI(ierr);
 
           // write data into buffer vector

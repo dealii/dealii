@@ -54,12 +54,12 @@ namespace Utilities
                   unsigned int       size_max = 0;
                   int                ierr2    = 0;
                   ierr2                       = MPI_Reduce(&size,
-                                     &size_min,
-                                     1,
-                                     MPI_UNSIGNED,
-                                     MPI_MIN,
-                                     0,
-                                     mpi_communicator);
+                                                           &size_min,
+                                                           1,
+                                                           MPI_UNSIGNED,
+                                                           MPI_MIN,
+                                                           0,
+                                                           mpi_communicator);
                   AssertThrowMPI(ierr2);
                   ierr2 = MPI_Reduce(&size,
                                      &size_max,

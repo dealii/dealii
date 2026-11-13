@@ -201,7 +201,8 @@ public:
    *
    * @note This function can also be used in @ref GlossDevice "device" code.
    */
-  constexpr DEAL_II_HOST_DEVICE operator const Number &() const;
+  constexpr DEAL_II_HOST_DEVICE
+  operator const Number &() const;
 
   /**
    * Assignment from tensors with different underlying scalar type. This
@@ -979,8 +980,8 @@ Tensor<0, dim, Number>::Tensor(Tensor<0, dim, Number> &&other) noexcept
 
 
 template <int dim, typename Number>
-constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE
-Tensor<0, dim, Number>::operator Number &()
+constexpr DEAL_II_HOST_DEVICE_ALWAYS_INLINE Tensor<0, dim, Number>::
+operator Number &()
 {
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
@@ -990,7 +991,8 @@ Tensor<0, dim, Number>::operator Number &()
 
 template <int dim, typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE
-  DEAL_II_HOST_DEVICE Tensor<0, dim, Number>::operator const Number &() const
+  DEAL_II_HOST_DEVICE Tensor<0, dim, Number>::
+                      operator const Number &() const
 {
   Assert(dim != 0,
          ExcMessage("Cannot access an object of type Tensor<0,0,Number>"));
@@ -1203,7 +1205,7 @@ template <class Archive>
 inline void
 Tensor<0, dim, Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar &value;
+  ar & value;
 }
 
 
@@ -1591,7 +1593,7 @@ Tensor<rank_, dim, Number>::operator=(const Tensor<rank_, dim, Number> &other)
 
 
 template <int rank_, int dim, typename Number>
-constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number>                                 &
+constexpr DEAL_II_ALWAYS_INLINE Tensor<rank_, dim, Number> &
 Tensor<rank_, dim, Number>::operator=(
   Tensor<rank_, dim, Number> &&other) noexcept
 {
@@ -1652,7 +1654,7 @@ template <typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number>                     &
   Tensor<rank_, dim, Number>::operator+=(
-    const Tensor<rank_, dim, OtherNumber> &p)
+                        const Tensor<rank_, dim, OtherNumber> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i] += p.values[i];
@@ -1665,7 +1667,7 @@ template <typename OtherNumber>
 constexpr inline DEAL_II_ALWAYS_INLINE
   DEAL_II_HOST_DEVICE Tensor<rank_, dim, Number>                     &
   Tensor<rank_, dim, Number>::operator-=(
-    const Tensor<rank_, dim, OtherNumber> &p)
+                        const Tensor<rank_, dim, OtherNumber> &p)
 {
   for (unsigned int i = 0; i < dim; ++i)
     values[i] -= p.values[i];
@@ -2495,10 +2497,8 @@ constexpr inline
     (index_3 < index_1 ? index_3 : index_3 - 1),
     rank_1,
     ReorderedIndexView<index_1, rank_1, const Tensor<rank_1, dim, Number>>>
-    reord_3 =
-      TensorAccessors::reordered_index_view < index_3 < index_1 ? index_3 :
-                                                                  index_3 - 1,
-    rank_1 > (reord_1);
+    reord_3 = TensorAccessors::reordered_index_view <
+              index_3<index_1 ? index_3 : index_3 - 1, rank_1>(reord_1);
 
   // Now, reorder index_4 to the end of src2. We have to make sure to
   // preserve the original ordering: index_2 has been removed. If
@@ -2507,10 +2507,8 @@ constexpr inline
     (index_4 < index_2 ? index_4 : index_4 - 1),
     rank_2,
     ReorderedIndexView<index_2, rank_2, const Tensor<rank_2, dim, OtherNumber>>>
-    reord_4 =
-      TensorAccessors::reordered_index_view < index_4 < index_2 ? index_4 :
-                                                                  index_4 - 1,
-    rank_2 > (reord_2);
+    reord_4 = TensorAccessors::reordered_index_view <
+              index_4<index_2 ? index_4 : index_4 - 1, rank_2>(reord_2);
 
   typename Tensor<rank_1 + rank_2 - 4,
                   dim,
@@ -2563,10 +2561,8 @@ constexpr inline DEAL_II_ALWAYS_INLINE
  * @relatesalso Tensor
  */
 template <template <int, int, typename> class TensorT1,
-          template <int, int, typename>
-          class TensorT2,
-          template <int, int, typename>
-          class TensorT3,
+          template <int, int, typename> class TensorT2,
+          template <int, int, typename> class TensorT3,
           int rank_1,
           int rank_2,
           int dim,
@@ -2804,7 +2800,7 @@ invert(const Tensor<2, dim, Number> &)
 
 template <typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 1, Number>
-                                       invert(const Tensor<2, 1, Number> &t)
+invert(const Tensor<2, 1, Number> &t)
 {
   Tensor<2, 1, Number> return_tensor;
 
@@ -2816,7 +2812,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 1, Number>
 
 template <typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
-                                       invert(const Tensor<2, 2, Number> &t)
+invert(const Tensor<2, 2, Number> &t)
 {
   Tensor<2, 2, Number> return_tensor;
 
@@ -2833,7 +2829,7 @@ constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 2, Number>
 
 template <typename Number>
 constexpr inline DEAL_II_ALWAYS_INLINE Tensor<2, 3, Number>
-                                       invert(const Tensor<2, 3, Number> &t)
+invert(const Tensor<2, 3, Number> &t)
 {
   Tensor<2, 3, Number> return_tensor;
 

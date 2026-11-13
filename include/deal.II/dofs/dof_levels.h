@@ -132,8 +132,8 @@ namespace internal
     inline void
     DoFLevel<dim>::serialize(Archive &ar, const unsigned int)
     {
-      ar &cell_dof_indices_cache;
-      ar &dof_object;
+      ar & cell_dof_indices_cache;
+      ar & dof_object;
     }
   } // namespace DoFHandlerImplementation
 } // namespace internal

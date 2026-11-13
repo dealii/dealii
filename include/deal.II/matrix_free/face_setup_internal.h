@@ -227,10 +227,10 @@ namespace internal
                          ++c)
                       {
                         typename dealii::Triangulation<dim>::cell_iterator
-                          neighbor_c =
-                            dcell->at_boundary(f) ?
-                              dcell->periodic_neighbor_child_on_subface(f, c) :
-                              dcell->neighbor_child_on_subface(f, c);
+                                                  neighbor_c =
+                                                    dcell->at_boundary(f) ?
+                                                      dcell->periodic_neighbor_child_on_subface(f, c) :
+                                                      dcell->neighbor_child_on_subface(f, c);
                         const types::subdomain_id neigh_domain =
                           neighbor_c->subdomain_id();
                         if (my_domain < neigh_domain)
@@ -318,32 +318,32 @@ namespace internal
               AssertDimension(mysize, othersize);
               mysize = inner_face.second.n_hanging_faces_smaller_subdomain;
               ierr   = MPI_Sendrecv(&mysize,
-                                  1,
-                                  MPI_UNSIGNED,
-                                  inner_face.first,
-                                  700 + my_domain,
-                                  &othersize,
-                                  1,
-                                  MPI_UNSIGNED,
-                                  inner_face.first,
-                                  700 + inner_face.first,
-                                  comm,
-                                  &status);
+                                    1,
+                                    MPI_UNSIGNED,
+                                    inner_face.first,
+                                    700 + my_domain,
+                                    &othersize,
+                                    1,
+                                    MPI_UNSIGNED,
+                                    inner_face.first,
+                                    700 + inner_face.first,
+                                    comm,
+                                    &status);
               AssertThrowMPI(ierr);
               AssertDimension(mysize, othersize);
               mysize = inner_face.second.n_hanging_faces_larger_subdomain;
               ierr   = MPI_Sendrecv(&mysize,
-                                  1,
-                                  MPI_UNSIGNED,
-                                  inner_face.first,
-                                  800 + my_domain,
-                                  &othersize,
-                                  1,
-                                  MPI_UNSIGNED,
-                                  inner_face.first,
-                                  800 + inner_face.first,
-                                  comm,
-                                  &status);
+                                    1,
+                                    MPI_UNSIGNED,
+                                    inner_face.first,
+                                    800 + my_domain,
+                                    &othersize,
+                                    1,
+                                    MPI_UNSIGNED,
+                                    inner_face.first,
+                                    800 + inner_face.first,
+                                    comm,
+                                    &status);
               AssertThrowMPI(ierr);
               AssertDimension(mysize, othersize);
 #  endif
@@ -467,7 +467,7 @@ namespace internal
                 split_index = n_total_faces_at_proc_boundary -
                               n_faces_higher_proc - n_faces_lower_proc;
 
-                // make sure the splitting is consistent between both sides
+              // make sure the splitting is consistent between both sides
 #  if defined(DEAL_II_WITH_MPI) && defined(DEBUG)
               ierr = MPI_Sendrecv(&split_index,
                                   1,
@@ -1230,7 +1230,8 @@ namespace internal
                 }
               faces_type.emplace_back(1, face);
             face_found:
-              {}
+              {
+              }
             }
 
           // insert new faces in sorted list to get good data locality

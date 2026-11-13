@@ -1136,7 +1136,7 @@ namespace GridTools
         return std::make_tuple(bbox, has_predicate);
       }
     } // namespace BoundingBoxPredicate
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -2213,7 +2213,7 @@ namespace GridTools
         DEAL_II_NOT_IMPLEMENTED();
       }
     } // anonymous namespace
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -2766,7 +2766,7 @@ namespace GridTools
           }
       }
     } /* namespace FixUpDistortedChildCells */
-  }   /* namespace internal */
+  } /* namespace internal */
 
 
   template <int dim, int spacedim>

@@ -850,11 +850,11 @@ namespace LinearAlgebra
       if (copy_values == false)
         return;
 
-        // fill the values: go through all rows of the
-        // matrix, and then all columns. since the sparsity patterns of the
-        // input matrix and the specified sparsity pattern might be different,
-        // need to go through the row for both these sparsity structures
-        // simultaneously in order to really set the correct values.
+      // fill the values: go through all rows of the
+      // matrix, and then all columns. since the sparsity patterns of the
+      // input matrix and the specified sparsity pattern might be different,
+      // need to go through the row for both these sparsity structures
+      // simultaneously in order to really set the correct values.
 #  if DEAL_II_TRILINOS_VERSION_GTE(14, 0, 0)
       size_type maximum_row_length = matrix->getLocalMaxNumRowEntries();
 #  else

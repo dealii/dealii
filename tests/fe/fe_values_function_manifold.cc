@@ -350,13 +350,13 @@ double
 JxWError<dim>::solve()
 {
   {
-    SolverControl      solver_control(std::max(types::global_dof_index(100),
+    SolverControl solver_control(std::max(types::global_dof_index(100),
                                           static_cast<types::global_dof_index>(
                                             system_rhs.size())),
                                  1e-14 * system_rhs.l2_norm(),
                                  false,
                                  false);
-    SolverCG<>         solver(solver_control);
+    SolverCG<>    solver(solver_control);
     PreconditionSSOR<> preconditioner;
     preconditioner.initialize(system_matrix, 1.2);
 

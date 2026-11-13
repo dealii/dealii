@@ -1503,8 +1503,8 @@ ReferenceCell<dim>::closest_point(const Point<dim> &p) const
           const std::array<unsigned int, 5> all_pyramid_faces{{0, 1, 2, 3, 4}};
           const auto                       &faces =
             *this == ReferenceCells::Pyramid ?
-                                    ArrayView<const unsigned int>(all_pyramid_faces) :
-                                    faces_for_given_vertex(closest_vertex_no);
+              ArrayView<const unsigned int>(all_pyramid_faces) :
+              faces_for_given_vertex(closest_vertex_no);
           for (const unsigned int face_no : faces)
             {
               auto face_cell = face_reference_cell(face_no);

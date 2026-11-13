@@ -4116,7 +4116,7 @@ inline DEAL_II_ALWAYS_INLINE
               const Tensor<2, dim, VectorizedArrayType> jac = this->jacobian[1];
               const VectorizedArrayType                 inv_det =
                 (dim == 2) ? this->jacobian[0][0][0] * this->jacobian[0][1][1] :
-                                             this->jacobian[0][0][0] * this->jacobian[0][1][1] *
+                             this->jacobian[0][0][0] * this->jacobian[0][1][1] *
                                this->jacobian[0][2][2];
 
               // J * u * det(J^-1)
@@ -7746,8 +7746,8 @@ FEFaceEvaluation<dim,
     return;
   Assert(this->matrix_free != nullptr, ExcNotInitialized());
 
-  this->cell_type = this->matrix_free->get_mapping_info()
-                      .faces_by_cells_type[cell_index][face_number];
+  this->cell_type     = this->matrix_free->get_mapping_info()
+                          .faces_by_cells_type[cell_index][face_number];
   this->cell          = cell_index;
   this->subface_index = GeometryInfo<dim>::max_children_per_cell;
   this->dof_access_index =
@@ -7855,15 +7855,15 @@ FEFaceEvaluation<dim,
                    this->matrix_free->get_mapping_info()
                      .face_data_by_cells[this->quadrature_index]
                      .JxW_values.size());
-  this->J_value = &this->matrix_free->get_mapping_info()
-                     .face_data_by_cells[this->quadrature_index]
-                     .JxW_values[offsets];
+  this->J_value        = &this->matrix_free->get_mapping_info()
+                            .face_data_by_cells[this->quadrature_index]
+                            .JxW_values[offsets];
   this->normal_vectors = &this->matrix_free->get_mapping_info()
                             .face_data_by_cells[this->quadrature_index]
                             .normal_vectors[offsets];
-  this->jacobian = &this->matrix_free->get_mapping_info()
-                      .face_data_by_cells[this->quadrature_index]
-                      .jacobians[!this->is_interior_face()][offsets];
+  this->jacobian       = &this->matrix_free->get_mapping_info()
+                            .face_data_by_cells[this->quadrature_index]
+                            .jacobians[!this->is_interior_face()][offsets];
   this->normal_x_jacobian =
     &this->matrix_free->get_mapping_info()
        .face_data_by_cells[this->quadrature_index]

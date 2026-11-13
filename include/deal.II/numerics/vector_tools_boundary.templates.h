@@ -53,8 +53,7 @@ namespace VectorTools
     template <int dim,
               int spacedim,
               typename number,
-              template <int, int>
-              class M_or_MC>
+              template <int, int> class M_or_MC>
     inline void
     do_interpolate_boundary_values(
       const M_or_MC<dim, spacedim>    &mapping,
@@ -388,7 +387,7 @@ namespace VectorTools
                 }
         }
     } // end of interpolate_boundary_values
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -688,10 +687,8 @@ namespace VectorTools
 
     template <int dim,
               int spacedim,
-              template <int, int>
-              class M_or_MC,
-              template <int>
-              class Q_or_QC,
+              template <int, int> class M_or_MC,
+              template <int> class Q_or_QC,
               typename number>
     void
     do_project_boundary_values(
@@ -1528,8 +1525,8 @@ namespace VectorTools
               const unsigned int lines_per_face =
                 GeometryInfo<dim>::lines_per_face;
               std::vector<std::vector<unsigned int>>
-                associated_edge_dof_to_face_dof(
-                  lines_per_face, std::vector<unsigned int>(degree + 1));
+                                        associated_edge_dof_to_face_dof(
+                                          lines_per_face, std::vector<unsigned int>(degree + 1));
               std::vector<unsigned int> associated_edge_dofs(lines_per_face);
 
               for (unsigned int line = 0; line < lines_per_face; ++line)
@@ -2200,9 +2197,9 @@ namespace VectorTools
                                               update_quadrature_points |
                                               update_values);
     hp::FEValues<dim>     fe_values(mapping_collection,
-                                fe_collection,
-                                quadrature_collection,
-                                update_jacobians);
+                                    fe_collection,
+                                    quadrature_collection,
+                                    update_jacobians);
 
     std::vector<Vector<number2>>         function_values;
     Vector<number2>                      dof_values;

@@ -108,7 +108,7 @@ test_2d()
 #if ARBORX_VERSION_MAJOR < 2
   ArborXWrappers::BVH bvh(points);
 #else
-  std::vector<BoundingBox<2, float>>         bounding_boxes;
+  std::vector<BoundingBox<2, float>> bounding_boxes;
   for (const auto &p : points)
     {
       bounding_boxes.emplace_back(std::pair(p, p));
@@ -176,7 +176,7 @@ test_3d()
 #if ARBORX_VERSION_MAJOR < 2
   ArborXWrappers::BVH bvh(points);
 #else
-  std::vector<BoundingBox<3, float>>         bounding_boxes;
+  std::vector<BoundingBox<3, float>> bounding_boxes;
   for (const auto &p : points)
     {
       bounding_boxes.emplace_back(std::pair(p, p));

@@ -881,7 +881,7 @@ namespace ColorEnriched
         &fe_enriched, // FE multiplied by enrichment function
       const FE_Nothing<dim, spacedim> &fe_nothing,
       hp::FECollection<dim, spacedim> &fe_collection);
-  }    // namespace internal
+  } // namespace internal
 #endif // DOXYGEN
 
 

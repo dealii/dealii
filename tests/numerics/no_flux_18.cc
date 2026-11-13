@@ -1193,7 +1193,7 @@ namespace StokesClass
     typename MatrixFree<dim, double>::AdditionalData data;
     data.tasks_parallel_scheme = MatrixFree<dim, double>::AdditionalData::none;
     data.mapping_update_flags  = (update_values | update_gradients |
-                                 update_JxW_values | update_quadrature_points);
+                                  update_JxW_values | update_quadrature_points);
 
     // Create constraints with no Dirchlet info
     AffineConstraints<double> constraints_u_no_dirchlet;

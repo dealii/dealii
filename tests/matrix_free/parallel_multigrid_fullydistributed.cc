@@ -60,7 +60,7 @@ class LaplaceOperator : public EnableObserverPointer
 public:
   using value_type = number;
 
-  LaplaceOperator(){};
+  LaplaceOperator() {};
 
   void
   initialize(const Mapping<dim>                 &mapping,

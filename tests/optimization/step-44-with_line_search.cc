@@ -32,7 +32,7 @@ main(int argc, char **argv)
     {
       const unsigned int dim = 3;
       Solid<dim>         solid(SOURCE_DIR
-                       "/prm/parameters-step-44-with_linesearch.prm");
+                               "/prm/parameters-step-44-with_linesearch.prm");
       solid.run();
     }
   catch (const std::exception &exc)

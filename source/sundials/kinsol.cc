@@ -463,7 +463,7 @@ namespace SUNDIALS
 #  if DEAL_II_SUNDIALS_VERSION_LT(6, 0, 0)
         J = SUNMatNewEmpty();
 #  else
-        J  = SUNMatNewEmpty(kinsol_ctx);
+        J = SUNMatNewEmpty(kinsol_ctx);
 #  endif
         J->content = this;
 

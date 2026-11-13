@@ -151,9 +151,9 @@ LaplaceProblem::assemble_system()
 {
   hp::QCollection<2> quadrature_formula(QGauss<2>(6));
   hp::FEValues<2>    x_fe_values(fe,
-                              quadrature_formula,
-                              update_values | update_gradients |
-                                update_JxW_values);
+                                 quadrature_formula,
+                                 update_values | update_gradients |
+                                   update_JxW_values);
 
   const unsigned int max_dofs_per_cell = fe.max_dofs_per_cell();
   const unsigned int n_q_points        = quadrature_formula[0].size();

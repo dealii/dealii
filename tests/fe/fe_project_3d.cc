@@ -285,11 +285,11 @@ test(const FiniteElement<dim> &fe,
       boundary_tangentials *= 0.;
 
       FEValues<dim>     fe_values(mapping,
-                              fe,
-                              quadrature,
-                              update_JxW_values | update_quadrature_points |
-                                update_values | update_gradients |
-                                update_hessians);
+                                  fe,
+                                  quadrature,
+                                  update_JxW_values | update_quadrature_points |
+                                    update_values | update_gradients |
+                                    update_hessians);
       FEFaceValues<dim> fe_face_values(mapping,
                                        fe,
                                        face_quadrature,

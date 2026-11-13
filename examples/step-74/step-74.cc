@@ -563,7 +563,7 @@ namespace Step74
     const std::string filename = "sol_Q" + Utilities::int_to_string(degree, 1) +
                                  "-" + Utilities::int_to_string(cycle, 2) +
                                  ".vtu";
-    std::ofstream output(filename);
+    std::ofstream     output(filename);
 
     DataOut<dim> data_out;
     data_out.attach_dof_handler(dof_handler);

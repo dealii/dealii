@@ -907,7 +907,7 @@ namespace TrilinosWrappers
         NOX::StatusTest::StatusType status;
       };
     } // namespace NOXWrappers
-  }   // namespace internal
+  } // namespace internal
 
 
 

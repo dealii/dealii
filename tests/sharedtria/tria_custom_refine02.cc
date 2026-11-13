@@ -36,8 +36,8 @@ mypartition(parallel::shared::Triangulation<dim> &tria)
   {
     typename Triangulation<dim>::active_cell_iterator cell =
                                                         tria.begin_active(),
-                                                      endc = tria.end();
-    unsigned int index                                     = 0;
+                                                      endc  = tria.end();
+    unsigned int                                      index = 0;
     for (; cell != endc; ++cell, ++index)
       cell->set_subdomain_id(assignment[index % 16]);
   }

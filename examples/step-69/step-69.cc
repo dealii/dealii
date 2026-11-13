@@ -1093,8 +1093,8 @@ namespace Step69
                         copy.cell_cij_matrix[d](i, j) += value * grad_JxW[d];
 
                     } /* i */
-                }     /* j */
-            }         /* q */
+                } /* j */
+            } /* q */
 
           // Now we have to compute the boundary normals. Note that the
           // following loop does not do much unless the element has faces on

@@ -47,7 +47,7 @@ namespace internal
         return out;
       }
     } // namespace
-  }   // namespace FE_Q_Hierarchical
+  } // namespace FE_Q_Hierarchical
 } // namespace internal
 
 

@@ -1710,7 +1710,7 @@ namespace internal
           parent);
       }
     } // namespace DoFHandlerImplementation
-  }   // namespace hp
+  } // namespace hp
 } // namespace internal
 
 #ifndef DOXYGEN

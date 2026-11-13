@@ -41,7 +41,7 @@ namespace internal
           return std::vector<Point<1>>(1, Point<1>(0.5));
       }
     } // namespace
-  }   // namespace FE_FaceQImplementation
+  } // namespace FE_FaceQImplementation
 } // namespace internal
 
 template <int dim, int spacedim>

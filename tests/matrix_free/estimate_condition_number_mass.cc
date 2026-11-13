@@ -75,7 +75,7 @@ public:
   using vector_t = VectorizedArray<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   vmult(Vector<Number> &dst, const Vector<Number> &src) const

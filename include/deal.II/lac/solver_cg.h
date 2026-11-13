@@ -824,11 +824,11 @@ namespace internal
       PreconditionerType,
       std::enable_if_t<has_vmult_functions<MatrixType, VectorType> &&
                          (has_apply_to_subrange<PreconditionerType> ||
-                          has_apply<PreconditionerType>)&&std::
-                           is_same_v<VectorType,
-                                     LinearAlgebra::distributed::Vector<
-                                       typename VectorType::value_type,
-                                       MemorySpace::Host>>,
+                          has_apply<PreconditionerType>) &&
+                         std::is_same_v<VectorType,
+                                        LinearAlgebra::distributed::Vector<
+                                          typename VectorType::value_type,
+                                          MemorySpace::Host>>,
                        int>>
       : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
     {
@@ -865,7 +865,7 @@ namespace internal
           {
             previous_beta = this->beta;
             this->beta    = next_r_dot_preconditioner_dot_r /
-                         this->r_dot_preconditioner_dot_r;
+                            this->r_dot_preconditioner_dot_r;
           }
 
         std::array<VectorizedArray<Number>, 7> vectorized_sums = {};

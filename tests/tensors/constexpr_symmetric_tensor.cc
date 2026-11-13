@@ -62,7 +62,7 @@ test_symmetric_tensor()
 }
 
 DEAL_II_CONSTEXPR SymmetricTensor<2, 2>
-                  get_tensor_2()
+get_tensor_2()
 {
   SymmetricTensor<2, 2> A;
   A[0][0] = 1.;
@@ -73,7 +73,7 @@ DEAL_II_CONSTEXPR SymmetricTensor<2, 2>
 
 
 DEAL_II_CONSTEXPR SymmetricTensor<4, 2>
-                  get_tensor_4()
+get_tensor_4()
 {
   SymmetricTensor<4, 2> B;
   B[0][0][0][0] = 1.;

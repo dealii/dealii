@@ -40,8 +40,7 @@ export module dealii.external.metis;
 
 #ifdef DEAL_II_WITH_METIS
 
-export
-{
+export {
   using ::idx_t;
   using ::METIS_OPTION_SEED;
   using ::METIS_PartGraphKway;

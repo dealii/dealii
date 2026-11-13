@@ -11,21 +11,21 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_thread_local_storage_h
-#  define dealii_thread_local_storage_h
+#define dealii_thread_local_storage_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
+#include <deal.II/base/exceptions.h>
 
-#  include <list>
-#  include <map>
-#  include <memory>
-#  include <mutex>
-#  include <optional>
-#  include <shared_mutex>
-#  include <thread>
-#  include <vector>
+#include <list>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <optional>
+#include <shared_mutex>
+#include <thread>
+#include <vector>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -34,13 +34,13 @@ DEAL_II_NAMESPACE_OPEN
  * @{
  */
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 class LogStream;
-#  endif
+#endif
 
 namespace Threads
 {
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
   namespace internal
   {
     /*
@@ -69,7 +69,7 @@ namespace Threads
       using type = T;
     };
   } // namespace internal
-#  endif
+#endif
 
   /**
    * @brief A class that provides a separate storage location on each thread
@@ -278,7 +278,7 @@ namespace Threads
  * @}
  */
 
-#  ifndef DOXYGEN
+#ifndef DOXYGEN
 namespace Threads
 {
   // ----------------- inline and template functions --------------------------
@@ -375,7 +375,7 @@ namespace Threads
   }
 
 
-#    ifndef DOXYGEN
+#  ifndef DOXYGEN
   namespace internal
   {
     /*
@@ -411,7 +411,7 @@ namespace Threads
       return data[id];
     }
   } // namespace internal
-#    endif
+#  endif
 
 
   template <typename T>
@@ -481,7 +481,8 @@ namespace Threads
 
 
   template <typename T>
-  inline ThreadLocalStorage<T>::operator T &()
+  inline ThreadLocalStorage<T>::
+  operator T &()
   {
     return get();
   }
@@ -514,7 +515,7 @@ namespace Threads
   }
 } // namespace Threads
 
-#  endif // DOXYGEN
+#endif // DOXYGEN
 
 //---------------------------------------------------------------------------
 DEAL_II_NAMESPACE_CLOSE

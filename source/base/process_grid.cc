@@ -166,9 +166,9 @@ namespace Utilities
       MPI_Group inactive_with_root_group;
       const int n = inactive_with_root_ranks.size();
       ierr        = MPI_Group_incl(all_group,
-                            n,
-                            inactive_with_root_ranks.data(),
-                            &inactive_with_root_group);
+                                   n,
+                                   inactive_with_root_ranks.data(),
+                                   &inactive_with_root_group);
       AssertThrowMPI(ierr);
 
       // Create the communicator based on inactive_with_root_group.

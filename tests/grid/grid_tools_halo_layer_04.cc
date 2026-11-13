@@ -54,8 +54,8 @@ write_vtk(const DoFHandler<dim> &dof_handler, const std::string filename)
     }
 
   const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-    data_component_interpretation(
-      1, DataComponentInterpretation::component_is_scalar);
+                                 data_component_interpretation(
+                                   1, DataComponentInterpretation::component_is_scalar);
   const std::vector<std::string> data_names(1, "active_fe_index");
 
   DataOut<dim> data_out;

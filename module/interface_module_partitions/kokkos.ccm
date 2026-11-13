@@ -43,8 +43,7 @@ module;
 #endif
 
 export module dealii.external.kokkos;
-export
-{
+export {
   namespace Kokkos
   {
     using ::Kokkos::abort;

@@ -48,7 +48,7 @@ test_1d()
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
-  ArborXWrappers::DistributedTree               distributed_tree(MPI_COMM_WORLD,
+  ArborXWrappers::DistributedTree distributed_tree(MPI_COMM_WORLD,
                                                    bounding_boxes);
   ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
     query_bounding_boxes);
@@ -125,7 +125,7 @@ test_2d()
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
-  ArborXWrappers::DistributedTree               distributed_tree(MPI_COMM_WORLD,
+  ArborXWrappers::DistributedTree distributed_tree(MPI_COMM_WORLD,
                                                    bounding_boxes);
   ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
     query_bounding_boxes);
@@ -209,7 +209,7 @@ test_3d()
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
   query_bounding_boxes.emplace_back(std::make_pair(point_c, point_d));
 
-  ArborXWrappers::DistributedTree               distributed_tree(MPI_COMM_WORLD,
+  ArborXWrappers::DistributedTree distributed_tree(MPI_COMM_WORLD,
                                                    bounding_boxes);
   ArborXWrappers::BoundingBoxIntersectPredicate bb_intersect(
     query_bounding_boxes);

@@ -94,7 +94,7 @@ test(unsigned int fe_degree)
 
   MappingQ<dim> mapping(1);
   UpdateFlags   update_flags = update_values | update_gradients |
-                             update_quadrature_points | update_JxW_values;
+                               update_quadrature_points | update_JxW_values;
 
   FEInterfaceValues<dim> fiv(mapping,
                              fe,

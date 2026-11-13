@@ -98,7 +98,7 @@ private:
 #ifdef USE_SIMPLEX
   FE_SimplexP<dim> fe;
 #else
-  FE_Q<dim>         fe;
+  FE_Q<dim> fe;
 #endif
 
   Triangulation<dim> triangulation;
@@ -175,10 +175,10 @@ Step6<dim>::assemble_system()
 
   MappingFE<dim> mapping(fe);
   FEValues<dim>  fe_values(mapping,
-                          fe,
-                          quadrature_formula,
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+                           fe,
+                           quadrature_formula,
+                           update_values | update_gradients |
+                             update_quadrature_points | update_JxW_values);
 
   const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
 

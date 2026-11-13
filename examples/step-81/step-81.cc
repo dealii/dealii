@@ -227,7 +227,7 @@ namespace Step81
                    std::cos(distance * numbers::PI / 2.) /
                    (numbers::PI / 2. - 2. / numbers::PI) / dipole_radius /
                    dipole_radius;
-    J_a = dipole_strength * dipole_orientation * scale;
+    J_a          = dipole_strength * dipole_orientation * scale;
     return J_a;
   }
 
@@ -600,10 +600,10 @@ namespace Step81
     const QGauss<dim - 1> face_quadrature_formula(quadrature_order);
 
     FEValues<dim, dim>     fe_values(*fe,
-                                 quadrature_formula,
-                                 update_values | update_gradients |
-                                   update_quadrature_points |
-                                   update_JxW_values);
+                                     quadrature_formula,
+                                     update_values | update_gradients |
+                                       update_quadrature_points |
+                                       update_JxW_values);
     FEFaceValues<dim, dim> fe_face_values(*fe,
                                           face_quadrature_formula,
                                           update_values | update_gradients |
@@ -772,8 +772,8 @@ namespace Step81
                                   -imag * ((sqrt_prod * phi_j_T) * phi_i_T);
                                 cell_matrix(i, j) += temp.real();
                               } /* j */
-                          }     /* i */
-                      }         /* q_point */
+                          } /* i */
+                      } /* q_point */
                   }
               }
             else
@@ -824,8 +824,8 @@ namespace Step81
                                               fe_face_values.JxW(q_point);
                             cell_matrix(i, j) += temp.real();
                           } /* j */
-                      }     /* i */
-                  }         /* q_point */
+                      } /* i */
+                  } /* q_point */
               }
           }
 

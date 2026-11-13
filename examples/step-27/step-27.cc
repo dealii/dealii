@@ -302,7 +302,7 @@ namespace Step27
   void LaplaceProblem<dim>::solve()
   {
     SolverControl            solver_control(system_rhs.size(),
-                                 1e-12 * system_rhs.l2_norm());
+                                            1e-12 * system_rhs.l2_norm());
     SolverCG<Vector<double>> cg(solver_control);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;

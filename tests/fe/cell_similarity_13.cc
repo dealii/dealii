@@ -60,9 +60,9 @@ test()
 
   const Quadrature<dim> quadrature(points);
   FEValues<dim>         fe_values(mapping,
-                          fe,
-                          quadrature,
-                          update_gradients | update_jacobians);
+                                  fe,
+                                  quadrature,
+                                  update_gradients | update_jacobians);
 
   for (const auto &cell : dof.active_cell_iterators())
     {

@@ -16,34 +16,30 @@
 # destination directory is
 #   [contrib/utilities]/programs/clang-<VERSION>/bin.
 #
-# This script only works on Linux (amd64) and macOS. For other
-# architectures it is necessary to compile the clang-format binary by hand.
-# This can be done with the compile_clang_format script.
+# This script only works on Linux (amd64) and macOS (Apple silicon and Intel,
+# macOS 11.0 or later). For other architectures and operating systems it is
+# necessary to compile the clang-format binary by hand. This can be done with
+# the compile_clang_format script.
 #
 
-VERSION=16
+VERSION=23
 PRG="$(cd "$(dirname "$0")" && pwd)/programs"
 CLANG_PATH="${PRG}/clang-${VERSION}"
 
-URL="https://github.com/dealii/dealii/releases/download/v9.5.1"
+URL="https://github.com/dealii/dealii/releases/download/v9.8.0"
 
 # Find out which kind of OS we are running and set the appropriate settings
 case "${OSTYPE}" in
   linux*)
     FILENAME="clang-format-${VERSION}-linux.tar.gz"
     CHECKSUM_CMD="sha256sum"
-    CHECKSUM="e6d92ab1b385f5e4392466a3cf651a9e403a5c212f4c1c3737ee173bc6d79d93  $FILENAME"
+    CHECKSUM="ad08d6d0e4a28f28459da4dc26bbdc4b99610597929a800b955caa29b0d65f4a  $FILENAME"
     ;;
   darwin*)
+    # Universal binary for both x86_64 and arm64:
+    FILENAME="clang-format-${VERSION}-darwin-universal.tar.gz"
     CHECKSUM_CMD="shasum"
-    ARCH=$(uname -m)
-    if [[ "$ARCH" == "arm64" ]]; then
-        FILENAME="clang-format-${VERSION}-darwin-arm.tar.gz"
-        CHECKSUM="8b1733414dec5a91e15060f482bebeb0723ac8e8f3115241c1ea595302758b46  $FILENAME"
-    else
-        FILENAME="clang-format-${VERSION}-darwin-intel.tar.gz"
-        CHECKSUM="edff4341fb3b9e25c670902227538be6348d3b91ff88aa676ff8e7bb589b2ae5  $FILENAME"
-    fi
+    CHECKSUM="8ca4fe91530ac6b7e2917ab1f9086dc9cab33493e791f9448748e833843a8a61  $FILENAME"
     ;;
   *)
     echo "unknown: ${OSTYPE}"

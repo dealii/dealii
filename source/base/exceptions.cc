@@ -284,7 +284,7 @@ ExceptionBase::print_stack_trace(std::ostream &out) const
       std::string        stacktrace_entry(stacktrace[frame]);
       const unsigned int pos_start = stacktrace_entry.find('('),
                          pos_end   = stacktrace_entry.find('+');
-      std::string functionname =
+      std::string        functionname =
         stacktrace_entry.substr(pos_start + 1, pos_end - pos_start - 1);
 
       std::string demangled_stacktrace_entry =

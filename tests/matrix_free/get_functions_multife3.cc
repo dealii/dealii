@@ -66,7 +66,7 @@ public:
               update_values | update_gradients | update_hessians)
     , hp_fe_val1(fe_collection,
                  hp::QCollection<dim>(data.get_quadrature(1)),
-                 update_values | update_gradients | update_hessians){};
+                 update_values | update_gradients | update_hessians) {};
 
   void
   operator()(const MatrixFree<dim, Number> &data,

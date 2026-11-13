@@ -236,7 +236,7 @@ public:
       const TasksParallelScheme tasks_parallel_scheme = partition_partition,
       const unsigned int        tasks_block_size      = 0,
       const UpdateFlags         mapping_update_flags  = update_gradients |
-                                               update_JxW_values,
+                                                        update_JxW_values,
       const UpdateFlags  mapping_update_flags_boundary_faces = update_default,
       const UpdateFlags  mapping_update_flags_inner_faces    = update_default,
       const UpdateFlags  mapping_update_flags_faces_by_cells = update_default,

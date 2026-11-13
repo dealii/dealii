@@ -180,7 +180,7 @@ namespace Step25
               const double lambda = 1.;
               const double a0     = 1.;
               const double s      = 1.;
-              const double arg    = p[0] * std::cos(theta) +
+              const double arg = p[0] * std::cos(theta) +
                                  std::sin(theta) * (p[1] * std::cosh(lambda) +
                                                     t * std::sinh(lambda));
               return 4. * std::atan(a0 * std::exp(s * arg));
@@ -193,7 +193,7 @@ namespace Step25
               const double tau   = 1.;
               const double c0    = 1.;
               const double s     = 1.;
-              const double arg   = p[0] * std::cos(theta) +
+              const double arg = p[0] * std::cos(theta) +
                                  p[1] * std::sin(theta) * std::cos(phi) +
                                  std::sin(theta) * std::sin(phi) *
                                    (p[2] * std::cosh(tau) + t * std::sinh(tau));
@@ -396,9 +396,9 @@ namespace Step25
     nl_term = 0;
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_JxW_values |
-                              update_quadrature_points);
+                                quadrature_formula,
+                                update_values | update_JxW_values |
+                                  update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();
@@ -456,9 +456,9 @@ namespace Step25
   {
     const QGauss<dim> quadrature_formula(fe.degree + 1);
     FEValues<dim>     fe_values(fe,
-                            quadrature_formula,
-                            update_values | update_JxW_values |
-                              update_quadrature_points);
+                                quadrature_formula,
+                                update_values | update_JxW_values |
+                                  update_quadrature_points);
 
     const unsigned int dofs_per_cell = fe.n_dofs_per_cell();
     const unsigned int n_q_points    = quadrature_formula.size();

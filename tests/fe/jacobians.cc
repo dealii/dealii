@@ -101,7 +101,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   }
   {
     deallog << dim << "D Jacobian pushed forward gradients:" << std::endl;
-    FEValues<dim>                                     fe_val(mapping,
+    FEValues<dim> fe_val(mapping,
                          dummy,
                          quad,
                          update_jacobian_pushed_forward_grads);
@@ -141,7 +141,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   }
   {
     deallog << dim << "D Jacobian pushed forward hessians:" << std::endl;
-    FEValues<dim>                                     fe_val(mapping,
+    FEValues<dim> fe_val(mapping,
                          dummy,
                          quad,
                          update_jacobian_pushed_forward_2nd_derivatives);
@@ -187,7 +187,7 @@ do_test(const Triangulation<dim> &tria, const Mapping<dim> &mapping)
   {
     deallog << dim
             << "D Jacobian pushed forward hessian gradients:" << std::endl;
-    FEValues<dim>                                     fe_val(mapping,
+    FEValues<dim> fe_val(mapping,
                          dummy,
                          quad,
                          update_jacobian_pushed_forward_3rd_derivatives);

@@ -270,13 +270,15 @@ namespace Differentiation
     /* ------------- Conversion operators ------------------------- */
 
 
-    Expression::operator const SymEngine::Expression &() const
+    Expression::
+    operator const SymEngine::Expression &() const
     {
       return get_expression();
     }
 
 
-    Expression::operator const SymEngine::RCP<const SymEngine::Basic> &() const
+    Expression::
+    operator const SymEngine::RCP<const SymEngine::Basic> &() const
     {
       return get_expression().get_basic();
     }

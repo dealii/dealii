@@ -7559,7 +7559,7 @@ namespace DataOutBase
     // useless, but without it clang-tidy will complain about a wrong
     // MPI type.
     std::vector<std::uint64_t> chunk_sizes(n_ranks);
-    int                        ierr = MPI_Gather(&my_size,
+    int ierr = MPI_Gather(&my_size,
                           1,
                           Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
                           static_cast<std::uint64_t *>(chunk_sizes.data()),
@@ -7607,7 +7607,7 @@ namespace DataOutBase
     // Write the main part on each rank:
     {
       std::uint64_t prefix_sum = 0;
-      ierr                     = MPI_Exscan(&my_size,
+      ierr = MPI_Exscan(&my_size,
                         &prefix_sum,
                         1,
                         Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
@@ -7891,7 +7891,7 @@ DataOutInterface<dim, spacedim>::write_vtu_in_parallel(
   // Use prefix sum to find specific offset to write at.
   const std::uint64_t size_on_proc = chunk.size();
   std::uint64_t       offset       = 0;
-  int                 ierr         = MPI_Exscan(&size_on_proc,
+  int ierr = MPI_Exscan(&size_on_proc,
                         &offset,
                         1,
                         Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
@@ -8157,13 +8157,13 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
         }
 
       XDMFEntry          entry(h5_mesh_filename,
-                      h5_solution_filename,
-                      cur_time,
-                      global_node_cell_count[0],
-                      global_node_cell_count[1],
-                      dim,
-                      spacedim,
-                      patches[0].reference_cell);
+                               h5_solution_filename,
+                               cur_time,
+                               global_node_cell_count[0],
+                               global_node_cell_count[1],
+                               dim,
+                               spacedim,
+                               patches[0].reference_cell);
       const unsigned int n_data_sets = data_filter.n_data_sets();
 
       // The vector names generated here must match those generated in
@@ -9327,7 +9327,7 @@ namespace
           {
             // data set doesn't exist yet, create new
             const int var_dims[2] = {dim_time, dim_node};
-            ncerr                 = nc_def_var(ncid,
+            ncerr = nc_def_var(ncid,
                                key.c_str(),
                                NC_DOUBLE,
                                has_time ? 2 : 1, // skip time if not available

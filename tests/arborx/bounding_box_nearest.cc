@@ -118,12 +118,12 @@ test_point_2d()
 
   std::vector<BoundingBox<3>> query_bounding_boxes;
 #else
-  Point<2>                            point_a(0.5, 0.5);
-  Point<2>                            point_b(1.5, 1.5);
-  Point<2>                            point_c(2.2, 2.2);
-  Point<2>                            point_d(2.6, 2.6);
+  Point<2> point_a(0.5, 0.5);
+  Point<2> point_b(1.5, 1.5);
+  Point<2> point_c(2.2, 2.2);
+  Point<2> point_d(2.6, 2.6);
 
-  std::vector<BoundingBox<2>>         query_bounding_boxes;
+  std::vector<BoundingBox<2>> query_bounding_boxes;
 #endif
 
   query_bounding_boxes.emplace_back(std::make_pair(point_a, point_b));
@@ -132,7 +132,7 @@ test_point_2d()
 #if ARBORX_VERSION_MAJOR < 2
   ArborXWrappers::BVH bvh(points);
 #else
-  ArborXWrappers::BVH<Point<2>>       bvh(points);
+  ArborXWrappers::BVH<Point<2>> bvh(points);
 #endif
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);
@@ -278,7 +278,7 @@ test_point_3d()
 #if ARBORX_VERSION_MAJOR < 2
   ArborXWrappers::BVH bvh(points);
 #else
-  ArborXWrappers::BVH<Point<3>>       bvh(points);
+  ArborXWrappers::BVH<Point<3>> bvh(points);
 #endif
   ArborXWrappers::BoundingBoxNearestPredicate bb_nearest(query_bounding_boxes,
                                                          1);

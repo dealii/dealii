@@ -694,7 +694,7 @@ namespace StokesTests
     };
 
     const unsigned int n_gauss_points = pressure_degree + 2;
-    const UpdateFlags  cell_flags     = update_values | update_gradients |
+    const UpdateFlags cell_flags = update_values | update_gradients |
                                    update_quadrature_points | update_JxW_values;
     const UpdateFlags face_flags = update_values | update_gradients |
                                    update_quadrature_points |

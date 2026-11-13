@@ -115,15 +115,15 @@ namespace RotatedPeriodicityTest
     values.update_ghost_values();
     const Vector         &read_values = values;
     const QGauss<dim - 1> quadrature(fe.degree + 1);
-    FEFaceValues<dim>     first_values(fe,
+    FEFaceValues<dim> first_values(fe,
                                    quadrature,
                                    update_values | update_quadrature_points);
-    FEFaceValues<dim>     second_values(fe,
+    FEFaceValues<dim> second_values(fe,
                                     quadrature,
                                     update_values | update_quadrature_points);
-    const double          cosine = std::cos(angle * numbers::PI / 180.);
-    const double          sine   = std::sin(angle * numbers::PI / 180.);
-    double                error  = 0.;
+    const double      cosine = std::cos(angle * numbers::PI / 180.);
+    const double      sine   = std::sin(angle * numbers::PI / 180.);
+    double            error  = 0.;
     for (const auto &[first, second] : tria.get_periodic_face_map())
       {
         if (first.first->is_artificial_on_level() ||

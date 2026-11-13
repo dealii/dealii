@@ -1003,7 +1003,7 @@ namespace Step34
 
     const std::string filename = std::to_string(dim) + "d_boundary_solution_" +
                                  std::to_string(cycle) + ".vtk";
-    std::ofstream file(filename);
+    std::ofstream     file(filename);
 
     dataout.write_vtk(file);
 

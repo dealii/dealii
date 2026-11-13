@@ -32,20 +32,20 @@
 using VectorType = Vector<double>;
 
 // Helper: try assigning to a proxy and report the result.
-#define CHECK_PROXY(name, assignment)                                  \
-  do                                                                   \
-    {                                                                  \
-      try                                                              \
-        {                                                              \
-          assignment;                                                  \
+#define CHECK_PROXY(name, assignment)                                \
+  do                                                                 \
+    {                                                                \
+      try                                                            \
+        {                                                            \
+          assignment;                                                \
           deallog << #name ": ERROR – expected exception not thrown" \
-                  << std::endl;                                        \
-        }                                                              \
-      catch (const ExceptionBase &)                                    \
-        {                                                              \
-          deallog << #name ": OK" << std::endl;                        \
-        }                                                              \
-    }                                                                  \
+                  << std::endl;                                      \
+        }                                                            \
+      catch (const ExceptionBase &)                                  \
+        {                                                            \
+          deallog << #name ": OK" << std::endl;                      \
+        }                                                            \
+    }                                                                \
   while (false)
 
 int
@@ -71,8 +71,7 @@ main()
     ode.mass_times_vector = [](const double, const VectorType &, VectorType &) {
     });
 
-  CHECK_PROXY(
-    mass_times_setup, ode.mass_times_setup = [](const double) {});
+  CHECK_PROXY(mass_times_setup, ode.mass_times_setup = [](const double) {});
 
   CHECK_PROXY(
     jacobian_times_vector,

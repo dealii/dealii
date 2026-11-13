@@ -200,10 +200,10 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fv, FiniteElement<dim> &fs)
       test_boundary(fev1, fes1);
     }
 
-  FEFaceValues<dim>                          fev2(fv,
+  FEFaceValues<dim> fev2(fv,
                          face_quadrature,
                          update_values | update_gradients | update_JxW_values);
-  FEFaceValues<dim>                          fes2(fs,
+  FEFaceValues<dim> fes2(fs,
                          face_quadrature,
                          update_values | update_gradients | update_JxW_values);
   typename Triangulation<dim>::cell_iterator cell2 = cell1->neighbor(1);

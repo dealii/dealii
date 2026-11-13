@@ -386,8 +386,8 @@ namespace Step55
     // into two IndexSets based on how we want to create the block matrices
     // and vectors.
     const IndexSet &locally_owned_dofs = dof_handler.locally_owned_dofs();
-    owned_partitioning                 = {locally_owned_dofs.get_view(0, n_u),
-                                          locally_owned_dofs.get_view(n_u, n_u + n_p)};
+    owned_partitioning = {locally_owned_dofs.get_view(0, n_u),
+                          locally_owned_dofs.get_view(n_u, n_u + n_p)};
 
     const IndexSet locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(dof_handler);

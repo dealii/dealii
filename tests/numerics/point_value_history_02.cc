@@ -243,7 +243,7 @@ TestPointValueHistory<dim>::run()
             solution(local_dof_indices[dof]) = 1; // start all solutions at 1
           }
 
-      }                      // loop over all cells
+      } // loop over all cells
     poles.add(1.0);          // slow down the pole settling time
     post_processed.add(3.0); // set to starting value.
                              //         output_results(10, poles);

@@ -87,7 +87,7 @@ do_test(const DoFHandler<dim>           &dof,
   additional_data.mapping_update_flags = update_values | update_gradients |
                                          update_JxW_values |
                                          update_quadrature_points;
-  additional_data.use_coloring = coloring;
+  additional_data.use_coloring         = coloring;
   const QGauss<1> quad(n_q_points_1d);
   mf_data.reinit(mapping, dof, constraints, quad, additional_data);
 

@@ -455,7 +455,7 @@ namespace SUNDIALS
       get_mpi_communicator_as_void_ptr(N_Vector v);
 #  endif
     } // namespace NVectorOperations
-  }   // namespace internal
+  } // namespace internal
 } // namespace SUNDIALS
 
 
@@ -639,7 +639,8 @@ namespace SUNDIALS
 
 
     template <typename VectorType>
-    NVectorView<VectorType>::operator N_Vector() const
+    NVectorView<VectorType>::
+    operator N_Vector() const
     {
       Assert(vector_ptr != nullptr, ExcNotInitialized());
       return vector_ptr.get();

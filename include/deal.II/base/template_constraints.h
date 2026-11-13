@@ -51,8 +51,7 @@ namespace internal
      */
     template <class Default,
               class AlwaysVoid,
-              template <class...>
-              class Op,
+              template <class...> class Op,
               class... Args>
     struct detector
     {
@@ -690,12 +689,8 @@ namespace concepts
    */
   template <typename C>
   concept is_contiguous_container = requires(C &c) {
-    {
-      std::data(c)
-    };
-    {
-      std::size(c)
-    };
+    { std::data(c) };
+    { std::size(c) };
   };
 
 
@@ -1077,48 +1072,30 @@ namespace concepts
     U.sadd(s, a, V);
 
     // Norms and similar stuff:
-    {
-      U.mean_value()
-    } -> std::convertible_to<typename VectorType::value_type>;
+    { U.mean_value() } -> std::convertible_to<typename VectorType::value_type>;
 
-    {
-      U.l1_norm()
-    } -> std::convertible_to<typename VectorType::real_type>;
+    { U.l1_norm() } -> std::convertible_to<typename VectorType::real_type>;
 
-    {
-      U.l2_norm()
-    } -> std::convertible_to<typename VectorType::real_type>;
+    { U.l2_norm() } -> std::convertible_to<typename VectorType::real_type>;
 
-    {
-      U.linfty_norm()
-    } -> std::convertible_to<typename VectorType::real_type>;
+    { U.linfty_norm() } -> std::convertible_to<typename VectorType::real_type>;
 
     // Dot products:
-    {
-      U *V
-    } -> std::convertible_to<typename VectorType::value_type>;
+    { U * V } -> std::convertible_to<typename VectorType::value_type>;
 
     {
       U.add_and_dot(a, V, W)
     } -> std::convertible_to<typename VectorType::value_type>;
 
     // Some queries:
-    {
-      U.size()
-    } -> std::convertible_to<typename VectorType::size_type>;
+    { U.size() } -> std::convertible_to<typename VectorType::size_type>;
 
-    {
-      U.all_zero()
-    } -> std::same_as<bool>;
+    { U.all_zero() } -> std::same_as<bool>;
 
-    {
-      U.get_mpi_communicator()
-    } -> std::same_as<MPI_Comm>;
+    { U.get_mpi_communicator() } -> std::same_as<MPI_Comm>;
 
     // Synchronization:
-    {
-      U.compress(operation)
-    } -> std::same_as<void>;
+    { U.compress(operation) } -> std::same_as<void>;
   };
 
 

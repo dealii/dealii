@@ -747,8 +747,8 @@ namespace Portable
                             const Number      *data_val =
                               constraint_info_coarse.constraint_pool_data
                                   .empty() ?
-                                     nullptr :
-                                     constraint_info_coarse.constraint_pool_data
+                                nullptr :
+                                constraint_info_coarse.constraint_pool_data
                                     .data() +
                                   constraint_info_coarse
                                     .constraint_pool_row_index[pool_row];
@@ -974,7 +974,7 @@ namespace Portable
               scheme.hanging_node_masks.extent(0) > 0;
 
             CellTransferFactory      cell_transfer(scheme.degree_fine,
-                                              scheme.degree_coarse);
+                                                   scheme.degree_coarse);
             HangingNodeDegreeFactory hanging_node_factory(scheme.degree_coarse);
 
             unsigned int scratch_pad_size         = 0;
@@ -1239,7 +1239,7 @@ namespace Portable
               scheme.hanging_node_masks.extent(0) > 0;
 
             CellTransferFactory      cell_transfer(scheme.degree_fine,
-                                              scheme.degree_coarse);
+                                                   scheme.degree_coarse);
             HangingNodeDegreeFactory hanging_node_factory(scheme.degree_coarse);
 
             unsigned int scratch_pad_size         = 0;

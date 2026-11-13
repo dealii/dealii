@@ -1145,7 +1145,7 @@ namespace Utilities
 
 
     } // namespace ConsensusAlgorithms
-  }   // end of namespace MPI
+  } // end of namespace MPI
 } // end of namespace Utilities
 
 
@@ -1984,7 +1984,7 @@ namespace Utilities
 
 
     } // namespace ConsensusAlgorithms
-  }   // end of namespace MPI
+  } // end of namespace MPI
 } // end of namespace Utilities
 
 #endif // DOXYGEN

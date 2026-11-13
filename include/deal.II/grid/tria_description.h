@@ -498,16 +498,16 @@ namespace TriangulationDescription
   void
   CellData<dim>::serialize(Archive &ar, const unsigned int /*version*/)
   {
-    ar &id;
-    ar &subdomain_id;
-    ar &level_subdomain_id;
-    ar &material_id;
-    ar &manifold_id;
+    ar & id;
+    ar & subdomain_id;
+    ar & level_subdomain_id;
+    ar & material_id;
+    ar & manifold_id;
     if (dim >= 2)
-      ar &manifold_line_ids;
+      ar & manifold_line_ids;
     if (dim >= 3)
-      ar &manifold_quad_ids;
-    ar &boundary_ids;
+      ar & manifold_quad_ids;
+    ar & boundary_ids;
   }
 
 
@@ -527,12 +527,12 @@ namespace TriangulationDescription
   Description<dim, spacedim>::serialize(Archive &ar,
                                         const unsigned int /*version*/)
   {
-    ar &coarse_cells;
-    ar &coarse_cell_vertices;
-    ar &coarse_cell_index_to_coarse_cell_id;
-    ar &cell_infos;
-    ar &settings;
-    ar &smoothing;
+    ar & coarse_cells;
+    ar & coarse_cell_vertices;
+    ar & coarse_cell_index_to_coarse_cell_id;
+    ar & cell_infos;
+    ar & settings;
+    ar & smoothing;
   }
 
 

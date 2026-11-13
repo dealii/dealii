@@ -260,8 +260,8 @@ namespace std_cxx26
      */
     inplace_vector &
     operator=(inplace_vector &&other) noexcept(
-      std::is_nothrow_move_assignable_v<T>
-        &&std::is_nothrow_move_constructible_v<T>)
+      std::is_nothrow_move_assignable_v<T> &&
+      std::is_nothrow_move_constructible_v<T>)
     {
       if (std::addressof(other) != this)
         internal_assign<iterator, false, true>(other.begin(), other.end());
@@ -872,7 +872,7 @@ namespace std_cxx26
      */
     void
     swap(inplace_vector &other) noexcept(
-      std::is_nothrow_swappable_v<T> &&std::is_nothrow_move_constructible_v<T>)
+      std::is_nothrow_swappable_v<T> && std::is_nothrow_move_constructible_v<T>)
     {
       if (std::addressof(other) == this)
         return;
@@ -900,8 +900,9 @@ namespace std_cxx26
      * Friend swap function.
      */
     friend void
-    swap(inplace_vector &x, inplace_vector &y) noexcept(
-      std::is_nothrow_swappable_v<T> &&std::is_nothrow_move_constructible_v<T>)
+    swap(inplace_vector &x,
+         inplace_vector &y) noexcept(std::is_nothrow_swappable_v<T> &&
+                                     std::is_nothrow_move_constructible_v<T>)
     {
       x.swap(y);
     }

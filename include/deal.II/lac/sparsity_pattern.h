@@ -1487,7 +1487,7 @@ SparsityPattern::save(Archive &ar, const unsigned int) const
   // forward to serialization function in the base class.
   ar &boost::serialization::base_object<const EnableObserverPointer>(*this);
 
-  ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
+  ar & max_dim & rows & cols & max_vec_len & max_row_length & compressed;
 
   if (max_dim != 0)
     ar &boost::serialization::make_array(rowstart.get(), max_dim + 1);
@@ -1498,7 +1498,7 @@ SparsityPattern::save(Archive &ar, const unsigned int) const
     ar &boost::serialization::make_array(colnums.get(), max_vec_len);
   else
     Assert(colnums.get() == nullptr, ExcInternalError());
-  ar &store_diagonal_first_in_row;
+  ar & store_diagonal_first_in_row;
 }
 
 
@@ -1510,7 +1510,7 @@ SparsityPattern::load(Archive &ar, const unsigned int)
   // forward to serialization function in the base class.
   ar &boost::serialization::base_object<EnableObserverPointer>(*this);
 
-  ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed;
+  ar & max_dim & rows & cols & max_vec_len & max_row_length & compressed;
 
   if (max_dim != 0)
     {
@@ -1527,7 +1527,7 @@ SparsityPattern::load(Archive &ar, const unsigned int)
     }
   else
     colnums.reset();
-  ar &store_diagonal_first_in_row;
+  ar & store_diagonal_first_in_row;
 }
 
 

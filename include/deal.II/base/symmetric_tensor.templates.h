@@ -113,7 +113,7 @@ eigenvalues(const SymmetricTensor<2, 3, Number> &T)
       const Number tmp1 = (T[0][0] - q) * (T[0][0] - q) +
                           (T[1][1] - q) * (T[1][1] - q) +
                           (T[2][2] - q) * (T[2][2] - q) + 2.0 * upp_tri_sq;
-      const Number                        p = sqrt(tmp1 / 6.0);
+      const Number p    = sqrt(tmp1 / 6.0);
       const SymmetricTensor<2, 3, Number> B =
         Number(1.0 / p) * (T - q * unit_symmetric_tensor<3, Number>());
       const Number tmp_2 = determinant(B) / 2.0;

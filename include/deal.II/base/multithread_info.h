@@ -11,24 +11,24 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_multithread_info_h
-#  define dealii_multithread_info_h
+#define dealii_multithread_info_h
 //---------------------------------------------------------------------------
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/types.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/types.h>
 
-#  include <memory>
+#include <memory>
 
-#  ifdef DEAL_II_WITH_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
 // forward declaration from <taskflow/taskflow.hpp>
 namespace tf
 {
   class Executor;
 }
-#  endif
+#endif
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -121,7 +121,7 @@ public:
   initialize_multithreading();
 
 
-#  ifdef DEAL_II_WITH_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
   /**
    * Return a reference to the global Executor from taskflow.
    *
@@ -131,7 +131,7 @@ public:
    */
   static tf::Executor &
   get_taskflow_executor();
-#  endif
+#endif
 
 private:
   /**
@@ -139,13 +139,13 @@ private:
    */
   static unsigned int n_max_threads;
 
-#  ifdef DEAL_II_WITH_TASKFLOW
+#ifdef DEAL_II_WITH_TASKFLOW
   /**
    * Store a taskflow Executor that is constructed with N workers (from
    * set_thread_limit).
    */
   static std::unique_ptr<tf::Executor> executor;
-#  endif
+#endif
 };
 
 

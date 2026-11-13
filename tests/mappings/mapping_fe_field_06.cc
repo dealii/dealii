@@ -65,7 +65,7 @@ test()
   std::vector<LinearAlgebra::distributed::Vector<double>> level_vectors(
     tria.n_global_levels());
   MappingQ<dim, spacedim> mapping_ref(fe.degree);
-  FEValues<dim>           fe_values_setup(mapping_ref,
+  FEValues<dim> fe_values_setup(mapping_ref,
                                 dh.get_fe(),
                                 Quadrature<dim>(
                                   dh.get_fe().get_unit_support_points()),

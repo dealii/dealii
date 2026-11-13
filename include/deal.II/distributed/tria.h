@@ -88,7 +88,7 @@ namespace internal
           dealii::parallel::distributed::Triangulation<dim, spacedim> &);
       }
     } // namespace distributed
-  }   // namespace parallel
+  } // namespace parallel
 } // namespace internal
 #endif
 

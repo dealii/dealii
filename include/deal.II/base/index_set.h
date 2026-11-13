@@ -2086,7 +2086,7 @@ template <class Archive>
 inline void
 IndexSet::Range::serialize(Archive &ar, const unsigned int)
 {
-  ar &begin &end &nth_index_in_set;
+  ar & begin & end & nth_index_in_set;
 }
 
 
@@ -2095,7 +2095,7 @@ template <class Archive>
 inline void
 IndexSet::serialize(Archive &ar, const unsigned int)
 {
-  ar &ranges &is_compressed &index_space_size &largest_range;
+  ar & ranges & is_compressed & index_space_size & largest_range;
 }
 
 DEAL_II_NAMESPACE_CLOSE

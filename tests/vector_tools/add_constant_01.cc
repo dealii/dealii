@@ -75,13 +75,13 @@ test()
   tria.refine_global(2);
 
   FESystem<dim>   fe(FE_RaviartThomas<dim>(1),
-                   1,
-                   FE_Q<dim>(2),
-                   1,
-                   FE_DGQ<dim>(2),
-                   1,
-                   FE_DGP<dim>(1),
-                   1);
+                     1,
+                     FE_Q<dim>(2),
+                     1,
+                     FE_DGQ<dim>(2),
+                     1,
+                     FE_DGP<dim>(1),
+                     1);
   DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(fe);
 
@@ -116,13 +116,13 @@ test_simplex()
   GridGenerator::subdivided_hyper_cube_with_simplices(tria, 4);
 
   FESystem<dim>   fe(FE_SimplexP<dim>(1),
-                   dim,
-                   FE_SimplexP<dim>(2),
-                   1,
-                   FE_SimplexP<dim>(1),
-                   1,
-                   FE_SimplexDGP<dim>(1),
-                   1);
+                     dim,
+                     FE_SimplexP<dim>(2),
+                     1,
+                     FE_SimplexP<dim>(1),
+                     1,
+                     FE_SimplexDGP<dim>(1),
+                     1);
   DoFHandler<dim> dofhandler(tria);
   dofhandler.distribute_dofs(fe);
 

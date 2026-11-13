@@ -1697,10 +1697,10 @@ AlignedVector<T>::replicate_across_communicator(const MPI_Comm     communicator,
   {
     MPI_Comm shmem_group_communicator_temp;
     int      ierr = MPI_Comm_split_type(communicator,
-                                   MPI_COMM_TYPE_SHARED,
-                                   /* key */ 0,
-                                   MPI_INFO_NULL,
-                                   &shmem_group_communicator_temp);
+                                        MPI_COMM_TYPE_SHARED,
+                                        /* key */ 0,
+                                        MPI_INFO_NULL,
+                                        &shmem_group_communicator_temp);
     AssertThrowMPI(ierr);
 
     const int key =
@@ -2160,7 +2160,7 @@ inline void
 AlignedVector<T>::save(Archive &ar, const unsigned int) const
 {
   size_type vec_size = size();
-  ar       &vec_size;
+  ar & vec_size;
   if (vec_size > 0)
     {
       if constexpr (std::is_trivially_copyable_v<T>)
@@ -2179,7 +2179,7 @@ inline void
 AlignedVector<T>::load(Archive &ar, const unsigned int)
 {
   size_type vec_size = 0;
-  ar       &vec_size;
+  ar & vec_size;
 
   resize(vec_size);
 

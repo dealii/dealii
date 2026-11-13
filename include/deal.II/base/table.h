@@ -2199,7 +2199,7 @@ TableBase<N, T>::serialize(Archive &ar, const unsigned int)
 {
   ar &static_cast<EnableObserverPointer &>(*this);
 
-  ar &values &table_size;
+  ar & values & table_size;
 }
 
 
@@ -3049,7 +3049,8 @@ namespace MatrixTableIterators
 
 
   template <typename TableType, Storage storage_order>
-  inline Accessor<TableType, false, storage_order>::operator value_type &()
+  inline Accessor<TableType, false, storage_order>::
+  operator value_type &()
   {
     this->assert_valid_linear_index();
     return this->container->values[this->linear_index];

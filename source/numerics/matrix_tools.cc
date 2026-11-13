@@ -280,8 +280,8 @@ namespace MatrixTools
 
 
     typename std::map<types::global_dof_index, number>::const_iterator
-      dof  = boundary_values.begin(),
-      endd = boundary_values.end();
+                                dof  = boundary_values.begin(),
+                                endd = boundary_values.end();
     const BlockSparsityPattern &sparsity_pattern =
       matrix.get_sparsity_pattern();
 

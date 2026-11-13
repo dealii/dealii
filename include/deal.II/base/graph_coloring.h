@@ -11,26 +11,26 @@
 // -----------------------------------------------------------------------------
 
 #ifndef dealii_graph_coloring_h
-#  define dealii_graph_coloring_h
+#define dealii_graph_coloring_h
 
 
-#  include <deal.II/base/config.h>
+#include <deal.II/base/config.h>
 
-#  include <deal.II/base/exception_macros.h>
-#  include <deal.II/base/exceptions.h>
-#  include <deal.II/base/std_cxx20/type_traits.h>
-#  include <deal.II/base/thread_management.h>
-#  include <deal.II/base/types.h>
+#include <deal.II/base/exception_macros.h>
+#include <deal.II/base/exceptions.h>
+#include <deal.II/base/std_cxx20/type_traits.h>
+#include <deal.II/base/thread_management.h>
+#include <deal.II/base/types.h>
 
-#  include <Kokkos_Macros.hpp>
+#include <Kokkos_Macros.hpp>
 
-#  include <algorithm>
-#  include <functional>
-#  include <set>
-#  include <string>
-#  include <unordered_map>
-#  include <unordered_set>
-#  include <vector>
+#include <algorithm>
+#include <functional>
+#include <set>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 
 DEAL_II_NAMESPACE_OPEN

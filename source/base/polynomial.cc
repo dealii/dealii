@@ -580,7 +580,7 @@ namespace Polynomials
         return points;
       }
     } // namespace LagrangeEquidistantImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
 
@@ -823,8 +823,8 @@ namespace Polynomials
                                       (2.0 * legendre_coefficients_tmp1[i - 2] -
                                        legendre_coefficients_tmp1[i - 1]) /
                                       i;
-                coefficients[i] = 2.0 * std::sqrt(4 * i * i - 1.) *
-                                  legendre_coefficients_tmp1[i - 1] / i;
+                coefficients[i]     = 2.0 * std::sqrt(4 * i * i - 1.) *
+                                      legendre_coefficients_tmp1[i - 1] / i;
               }
 
             for (int i = p; i > 0; --i)

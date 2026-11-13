@@ -89,7 +89,7 @@ def parse_arguments():
         "in a list of directories "
         "that satisfy a given regex."
         "This program requires "
-        "clang-format version 16.0."
+        "clang-format version 23.1."
     )
 
     parser.add_argument(
@@ -307,11 +307,11 @@ if __name__ == "__main__":
 
     #
     # If clang-format-binary is not found, search again in
-    # contrib/utlitlies/programs/clang-16/bin
+    # contrib/utlitlies/programs/clang-23/bin
     #
     if not PARSED_ARGUMENTS.clang_format_binary:
         os.environ["PATH"] += (
-            ":" + os.getcwd() + "/contrib/utilities/programs/clang-16/bin"
+            ":" + os.getcwd() + "/contrib/utilities/programs/clang-23/bin"
         )
         PARSED_ARGUMENTS.clang_format_binary = shutil.which("clang-format")
 

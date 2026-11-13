@@ -37,8 +37,7 @@ export module dealii.external.hdf5;
 
 #ifdef DEAL_II_WITH_HDF5
 
-export
-{
+export {
   using ::H5Aclose;
   using ::H5Acreate2;
   using ::H5Aopen;
@@ -223,8 +222,7 @@ EXPORT_PREPROCESSOR_SYMBOL(H5D_MPIO_SET_INDEPENDENT)
 // We deal with this by exporting a symbol H5DCreate that simply
 // aliases H5DCreate2:
 #  undef H5Dcreate
-export
-{
+export {
   auto H5Dcreate = &::H5Dcreate2;
 }
 

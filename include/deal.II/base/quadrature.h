@@ -546,7 +546,7 @@ Quadrature<dim>::serialize(Archive &ar, const unsigned int)
   // function in the base class.
   ar &static_cast<EnableObserverPointer &>(*this);
 
-  ar &quadrature_points &weights;
+  ar & quadrature_points & weights;
 }
 
 

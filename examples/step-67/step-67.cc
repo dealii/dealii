@@ -435,8 +435,7 @@ namespace Euler_DG
   // second argument (number type) can be automatically deduced.
   template <int dim, typename Number>
   inline DEAL_II_ALWAYS_INLINE //
-    Number
-    euler_pressure(const Tensor<1, dim + 2, Number> &conserved_variables)
+    Number euler_pressure(const Tensor<1, dim + 2, Number> &conserved_variables)
   {
     const Tensor<1, dim, Number> velocity =
       euler_velocity<dim>(conserved_variables);

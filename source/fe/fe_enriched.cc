@@ -128,7 +128,7 @@ namespace internal
         return false;
       }
     } // namespace
-  }   // namespace FE_Enriched
+  } // namespace FE_Enriched
 } // namespace internal
 
 

@@ -634,7 +634,7 @@ namespace Step82
                   }
 
               } // boundary check
-          }     // for face
+          } // for face
 
         // We now compute and add the interactions of the degrees of freedom of
         // a neighboring cells with those of another neighboring cell (this is
@@ -709,9 +709,9 @@ namespace Step82
                                 stiffness_matrix_n2n1(i, j);
                             }
                       } // boundary check face_2
-                  }     // for face_2
-              }         // boundary check face_1
-          }             // for face_1
+                  } // for face_2
+              } // boundary check face_1
+          } // for face_1
 
 
         // Finally, we compute and add the two penalty terms.
@@ -846,7 +846,7 @@ namespace Step82
               }
 
           } // for face
-      }     // for cell
+      } // for cell
   }
 
 
@@ -1450,8 +1450,8 @@ namespace Step82
                   }
 
               } // for dof i
-          }     // boundary check
-      }         // for face
+          } // boundary check
+      } // for face
   }
 
 

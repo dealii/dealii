@@ -132,15 +132,12 @@ main(int argc, char **argv)
   run("sum_inverse_transpose", [&]() { check(sum, true, {4, 6}, {3, 3, 0}); });
   sum.SetUseTranspose(false);
   run("product", [&]() { check(product, false, {1, 2, 3, 4}, {10, 42, 0}); });
-  run("product_inverse", [&]() {
-    check(product, true, {10, 42, 5}, {1, 2, 0, 0});
-  });
+  run("product_inverse",
+      [&]() { check(product, true, {10, 42, 5}, {1, 2, 0, 0}); });
   product.SetUseTranspose(true);
-  run("product_transpose", [&]() {
-    check(product, false, {1, 2, 3}, {10, 42, 0, 0});
-  });
-  run("product_inverse_transpose", [&]() {
-    check(product, true, {10, 42, 8, 9}, {1, 2, 0});
-  });
+  run("product_transpose",
+      [&]() { check(product, false, {1, 2, 3}, {10, 42, 0, 0}); });
+  run("product_inverse_transpose",
+      [&]() { check(product, true, {10, 42, 8, 9}, {1, 2, 0}); });
   AssertThrow(executed, ExcMessage("Unknown test case"));
 }

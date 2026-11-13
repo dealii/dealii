@@ -54,7 +54,7 @@ namespace ResFlow
     virtual void
     vector_value(const Point<dim> &p, Vector<double> &value) const override;
 
-    virtual ~FluxBoundaryValues(){};
+    virtual ~FluxBoundaryValues() {};
   };
 
   template <int dim>

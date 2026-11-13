@@ -319,7 +319,8 @@ QProjector<dim>::DataSetDescriptor::cell()
 
 
 template <int dim>
-inline QProjector<dim>::DataSetDescriptor::operator unsigned int() const
+inline QProjector<dim>::DataSetDescriptor::
+operator unsigned int() const
 {
   return dataset_offset;
 }

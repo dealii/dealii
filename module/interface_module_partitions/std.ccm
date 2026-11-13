@@ -93,8 +93,7 @@ module;
 
 export module dealii.external.std;
 
-export
-{
+export {
   namespace std
   {
     // Some types
@@ -443,7 +442,7 @@ export
         using std::literals::string_view_literals::operator""sv;
 
       } // namespace string_view_literals
-    }   // namespace literals
+    } // namespace literals
 
     // Algorithms
     using std::accumulate;

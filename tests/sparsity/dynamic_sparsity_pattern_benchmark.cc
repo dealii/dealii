@@ -309,7 +309,7 @@ main()
 
     const types::global_dof_index n_u = dofs_per_block[0],
                                   n_p = dofs_per_block[1];
-    std::vector<IndexSet> partitioning(2);
+    std::vector<IndexSet>         partitioning(2);
     partitioning[0] = complete_index_set(n_u);
     partitioning[1] = complete_index_set(n_p);
 

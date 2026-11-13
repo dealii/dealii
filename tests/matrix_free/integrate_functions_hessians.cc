@@ -52,7 +52,7 @@ public:
     , fe_val(data.get_dof_handler().get_fe(),
              Quadrature<dim>(data.get_quadrature(0)),
              update_values | update_gradients | update_hessians |
-               update_JxW_values){};
+               update_JxW_values) {};
 
   void
   operator()(const MatrixFree<dim, Number>               &data,

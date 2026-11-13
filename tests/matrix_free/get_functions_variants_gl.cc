@@ -45,7 +45,7 @@ public:
   using VectorType = Vector<Number>;
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   operator()(const MatrixFree<dim, Number>               &data,

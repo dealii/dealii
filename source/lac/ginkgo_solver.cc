@@ -55,7 +55,7 @@ namespace GinkgoWrappers
             " exec_type needs to be one of the three strings: \"reference\", \"cuda\" or \"omp\" "));
       }
     using ResidualCriterionFactory = gko::stop::ResidualNormReduction<>;
-    residual_criterion             = ResidualCriterionFactory::build()
+    residual_criterion = ResidualCriterionFactory::build()
                            .with_reduction_factor(solver_control.tolerance())
                            .on(executor);
 
@@ -226,8 +226,8 @@ namespace GinkgoWrappers
     using mtx = gko::matrix::Csr<ValueType, IndexType>;
     std::shared_ptr<mtx> system_matrix_compute;
     system_matrix_compute   = mtx::create(executor->get_master(),
-                                        gko::dim<2>(N),
-                                        matrix.n_nonzero_elements());
+                                          gko::dim<2>(N),
+                                          matrix.n_nonzero_elements());
     ValueType *mat_values   = system_matrix_compute->get_values();
     IndexType *mat_row_ptrs = system_matrix_compute->get_row_ptrs();
     IndexType *mat_col_idxs = system_matrix_compute->get_col_idxs();

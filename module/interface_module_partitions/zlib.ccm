@@ -37,8 +37,7 @@ export module dealii.external.zlib;
 
 #ifdef DEAL_II_WITH_ZLIB
 
-export
-{
+export {
   using ::Bytef;
   using ::compress2;
   using ::compressBound;

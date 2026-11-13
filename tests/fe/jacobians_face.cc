@@ -162,9 +162,9 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping,
-                             dummy,
-                             quad,
-                             update_jacobian_pushed_forward_grads);
+                                dummy,
+                                quad,
+                                update_jacobian_pushed_forward_grads);
     FESubfaceValues<dim> fe_sub_val(mapping,
                                     dummy,
                                     quad,
@@ -208,9 +208,9 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping,
-                             dummy,
-                             quad,
-                             update_jacobian_2nd_derivatives);
+                                dummy,
+                                quad,
+                                update_jacobian_2nd_derivatives);
     FESubfaceValues<dim> fe_sub_val(mapping,
                                     dummy,
                                     quad,
@@ -256,9 +256,9 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping,
-                             dummy,
-                             quad,
-                             update_jacobian_pushed_forward_2nd_derivatives);
+                                dummy,
+                                quad,
+                                update_jacobian_pushed_forward_2nd_derivatives);
     FESubfaceValues<dim> fe_sub_val(
       mapping, dummy, quad, update_jacobian_pushed_forward_2nd_derivatives);
 
@@ -304,9 +304,9 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping,
-                             dummy,
-                             quad,
-                             update_jacobian_3rd_derivatives);
+                                dummy,
+                                quad,
+                                update_jacobian_3rd_derivatives);
     FESubfaceValues<dim> fe_sub_val(mapping,
                                     dummy,
                                     quad,
@@ -354,9 +354,9 @@ test()
 
   {
     FEFaceValues<dim>    fe_val(mapping,
-                             dummy,
-                             quad,
-                             update_jacobian_pushed_forward_3rd_derivatives);
+                                dummy,
+                                quad,
+                                update_jacobian_pushed_forward_3rd_derivatives);
     FESubfaceValues<dim> fe_sub_val(
       mapping, dummy, quad, update_jacobian_pushed_forward_3rd_derivatives);
 

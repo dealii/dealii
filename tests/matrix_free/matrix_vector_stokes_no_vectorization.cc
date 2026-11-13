@@ -54,7 +54,7 @@ public:
   using VectorizedArrayType = VectorizedArray<Number, 1>;
 
   MatrixFreeTest(const MatrixFree<dim, Number, VectorizedArrayType> &data_in)
-    : data(data_in){};
+    : data(data_in) {};
 
   void
   local_apply(const MatrixFree<dim, Number, VectorizedArrayType> &data,

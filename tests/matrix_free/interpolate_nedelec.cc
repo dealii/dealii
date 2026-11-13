@@ -153,13 +153,13 @@ class MatrixFreeTest
 public:
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in, bool Constant = false)
     : data(data_in)
-    , constFunction(Constant){};
+    , constFunction(Constant) {};
 
   MatrixFreeTest(const MatrixFree<dim, Number> &data_in,
                  const Mapping<dim>            &mapping,
                  bool                           Constant = false)
     : data(data_in)
-    , constFunction(Constant){};
+    , constFunction(Constant) {};
 
   virtual ~MatrixFreeTest()
   {}

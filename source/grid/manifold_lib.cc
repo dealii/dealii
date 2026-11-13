@@ -746,7 +746,7 @@ namespace internal
         return candidate;
       }
     } // namespace
-  }   // namespace SphericalManifold
+  } // namespace SphericalManifold
 } // namespace internal
 
 

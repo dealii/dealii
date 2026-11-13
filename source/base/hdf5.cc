@@ -57,7 +57,7 @@ namespace HDF5
 #endif
       }
     } // namespace HDF5ObjectImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
 

@@ -133,9 +133,9 @@ namespace GridTools
     // element
     FE_Nothing<dim, spacedim> dummy_fe(reference_cell);
     FEValues<dim, spacedim>   fe_values(mapping,
-                                      dummy_fe,
-                                      quadrature_formula,
-                                      update_JxW_values);
+                                        dummy_fe,
+                                        quadrature_formula,
+                                        update_JxW_values);
 
     double local_volume = 0;
 

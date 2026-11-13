@@ -513,7 +513,7 @@ namespace internal
       };
 
     } // namespace VectorDataExchange
-  }   // end of namespace MatrixFreeFunctions
+  } // end of namespace MatrixFreeFunctions
 } // end of namespace internal
 
 DEAL_II_NAMESPACE_CLOSE

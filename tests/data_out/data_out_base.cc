@@ -72,7 +72,7 @@ struct PatchInfo
   static double vertices[GeometryInfo<dim>::vertices_per_cell][3];
   static double offsets[GeometryInfo<dim>::vertices_per_cell][3];
   static int    neighbors[GeometryInfo<dim>::vertices_per_cell]
-                      [GeometryInfo<dim>::faces_per_cell];
+                         [GeometryInfo<dim>::faces_per_cell];
 };
 
 

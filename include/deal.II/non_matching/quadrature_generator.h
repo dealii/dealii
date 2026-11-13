@@ -48,7 +48,7 @@ namespace NonMatching
       template <int dim>
       class CellWiseFunction;
     } // namespace DiscreteQuadratureGeneratorImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
   /**
@@ -1482,7 +1482,7 @@ namespace NonMatching
       };
 
     } // namespace DiscreteQuadratureGeneratorImplementation
-  }   // namespace internal
+  } // namespace internal
 
 } // namespace NonMatching
 DEAL_II_NAMESPACE_CLOSE

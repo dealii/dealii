@@ -73,8 +73,8 @@ main(int argc, char **argv)
     GinkgoWrappers::SolverGMRES<>    gmres_solver(control, executor);
     GinkgoWrappers::SolverIR<>       ir_solver_cg(control, executor, inner_cg);
     GinkgoWrappers::SolverCG<>       cg_solver_with_jacobi_precond(control,
-                                                             executor,
-                                                             jacobi);
+                                                                   executor,
+                                                                   jacobi);
 
     check_solver_within_range(cg_solver.solve(A, u, f),
                               control.last_step(),

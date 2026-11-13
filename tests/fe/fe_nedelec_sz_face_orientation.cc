@@ -190,7 +190,7 @@ evaluate(const FiniteElement<3> &fe, const DoFHandler<3> &dof_handler)
 {
   const FEValuesExtractors::Vector component(0);
   const Quadrature<3>              quadrature(Point<3>(0.5, 0.5, 0.5));
-  FEValues<3>                      fe_values(fe,
+  FEValues<3> fe_values(fe,
                         quadrature,
                         update_quadrature_points | update_values |
                           update_gradients);

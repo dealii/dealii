@@ -253,7 +253,7 @@ test_extractor(const FEType &fe, const ExtractorType &extractor)
       solution(i) = i + 1;
     }
 
-  FEValues<dim>                        fe_values(fe,
+  FEValues<dim> fe_values(fe,
                           quadrature_formula,
                           update_values | update_gradients | update_hessians |
                             update_3rd_derivatives);
@@ -310,7 +310,7 @@ test()
 
   deallog.push("SymmetricTensor");
   {
-    FESystem<dim>                                fe(FE_Q<dim>(degree),
+    FESystem<dim> fe(FE_Q<dim>(degree),
                      SymmetricTensor<2, dim>::n_independent_components);
     const FEValuesExtractors::SymmetricTensor<2> extractor(0);
     test_extractor<NumberType, dim>(fe, extractor);
@@ -319,7 +319,7 @@ test()
 
   deallog.push("Tensor");
   {
-    FESystem<dim>                       fe(FE_Q<dim>(degree),
+    FESystem<dim> fe(FE_Q<dim>(degree),
                      Tensor<2, dim>::n_independent_components);
     const FEValuesExtractors::Tensor<2> extractor(0);
     test_extractor<NumberType, dim>(fe, extractor);

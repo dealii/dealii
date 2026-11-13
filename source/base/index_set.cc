@@ -253,7 +253,7 @@ IndexSet::operator&(const IndexSet &is) const
 
   std::vector<Range>::const_iterator r1 = ranges.begin(),
                                      r2 = is.ranges.begin();
-  IndexSet result(size());
+  IndexSet                           result(size());
 
   while ((r1 != ranges.end()) && (r2 != is.ranges.end()))
     {

@@ -227,7 +227,7 @@ namespace Differentiation
           }
         };
       } // namespace
-    }   // namespace internal
+    } // namespace internal
 
 
     template <int dim>

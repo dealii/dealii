@@ -1887,7 +1887,7 @@ namespace Step42
           solution,
           estimated_error_per_cell);
 
-        parallel::distributed::GridRefinement ::refine_and_coarsen_fixed_number(
+        parallel::distributed::GridRefinement::refine_and_coarsen_fixed_number(
           triangulation, estimated_error_per_cell, 0.3, 0.03);
       }
 
@@ -2060,8 +2060,8 @@ namespace Step42
 
     const QGauss<dim - 1> face_quadrature_formula(fe.degree + 1);
     FEFaceValues<dim>     fe_values_face(fe,
-                                     face_quadrature_formula,
-                                     update_values | update_JxW_values);
+                                         face_quadrature_formula,
+                                         update_values | update_JxW_values);
 
     const unsigned int n_face_q_points = face_quadrature_formula.size();
 

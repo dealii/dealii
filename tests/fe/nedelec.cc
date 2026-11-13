@@ -126,9 +126,9 @@ plot_shape_functions(const unsigned int degree)
       const unsigned int div = 2;
       QIterated<dim>     q(q_trapez, div);
       FEValues<dim>      fe(element,
-                       q,
-                       update_values | update_gradients |
-                         update_quadrature_points);
+                            q,
+                            update_values | update_gradients |
+                              update_quadrature_points);
       fe.reinit(c);
 
       for (unsigned int q_point = 0; q_point < q.size(); ++q_point)

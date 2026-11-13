@@ -62,9 +62,9 @@ test(const Triangulation<dim> &tr,
 
   const QGauss<dim> quadrature(4);
   FEValues<dim>     fe_values(fe,
-                          quadrature,
-                          update_gradients | update_quadrature_points |
-                            update_JxW_values);
+                              quadrature,
+                              update_gradients | update_quadrature_points |
+                                update_JxW_values);
 
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
        cell != dof.end();

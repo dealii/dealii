@@ -1353,7 +1353,7 @@ namespace PETScWrappers
 
     boost::serialization::array_wrapper<const PetscScalar> wrapper(
       array, locally_owned_size());
-    ar &wrapper;
+    ar & wrapper;
 
     ierr = VecRestoreArrayRead(*this, &array);
     AssertThrow(ierr == 0, ExcPETScError(ierr));
@@ -1370,12 +1370,12 @@ namespace PETScWrappers
     size_type                       size = 0;
     std::pair<size_type, size_type> local_range;
 
-    ar &size;
+    ar & size;
     Assert(size == this->size(),
            ExcMessage("The serialized value of size (" + std::to_string(size) +
                       ") does not match the current size (" +
                       std::to_string(this->size()) + ")"));
-    ar &local_range;
+    ar & local_range;
     Assert(local_range == this->local_range(),
            ExcMessage("The serialized value of local_range (" +
                       std::to_string(local_range.first) + ", " +
@@ -1390,7 +1390,7 @@ namespace PETScWrappers
 
     boost::serialization::array_wrapper<PetscScalar> wrapper(
       array, locally_owned_size());
-    ar &wrapper;
+    ar & wrapper;
 
     ierr = VecRestoreArray(petsc_vector(), &array);
     AssertThrow(ierr == 0, ExcPETScError(ierr));

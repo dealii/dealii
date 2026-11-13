@@ -76,7 +76,7 @@ test_hp_line_dof_identities(const FiniteElement<dim> &fe,
             fe_is_equidistant = false;
 
           const double     scale_other = (fe_other.unit_support_point(1) -
-                                      fe_other.unit_support_point(0))[0];
+                                          fe_other.unit_support_point(0))[0];
           const Point<dim> first_line_point_other =
             fe_other.unit_support_point(fe_other.get_first_line_index());
           const double distance_other =

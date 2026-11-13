@@ -43,9 +43,9 @@ test(const unsigned int fe_degree0, const unsigned int fe_degree1 = 0)
 
 
 
-  UpdateFlags update_flags = update_values | update_gradients |
-                             update_quadrature_points | update_JxW_values;
-  DoFHandler<dim>          dofh(tria);
+  UpdateFlags     update_flags = update_values | update_gradients |
+                                 update_quadrature_points | update_JxW_values;
+  DoFHandler<dim> dofh(tria);
   hp::FECollection<dim>    fe_collection;
   hp::QCollection<dim - 1> q_collection;
   fe_collection.push_back(FE_DGQ<dim>(fe_degree0));

@@ -490,10 +490,10 @@ namespace Particles
   {
     unsigned int n_properties = 0;
 
-    Point<spacedim>                       location;
-    Point<dim>                            reference_location;
-    types::particle_index                 id;
-    ar &location &reference_location &id &n_properties;
+    Point<spacedim>       location;
+    Point<dim>            reference_location;
+    types::particle_index id;
+    ar & location & reference_location & id & n_properties;
 
     set_location(location);
     set_reference_location(reference_location);
@@ -531,7 +531,7 @@ namespace Particles
     Point<dim>            reference_location = get_reference_location();
     types::particle_index id                 = get_id();
 
-    ar &location &reference_location &id &n_properties;
+    ar & location & reference_location & id & n_properties;
 
     if (n_properties > 0)
       ar &boost::serialization::make_array(get_properties().data(),
@@ -712,7 +712,7 @@ DEAL_II_NAMESPACE_CLOSE // Do not convert for module purposes
       };
 
     } // namespace index
-  }   // namespace geometry
+  } // namespace geometry
 } // namespace boost
 
 

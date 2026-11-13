@@ -107,8 +107,7 @@ export module dealii.external.opencascade;
 
 #ifdef DEAL_II_WITH_OPENCASCADE
 
-export
-{
+export {
   using ::Adaptor3d_Curve;
   using ::BRep_Tool;
   using ::BRepAdaptor_CompCurve;

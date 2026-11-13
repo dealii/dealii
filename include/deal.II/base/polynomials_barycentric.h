@@ -277,7 +277,7 @@ public:
   // We need to define the destructor to work around a compiler bug with hipcc
   // 6.4. Using default also triggers the error.
   // NOLINTNEXTLINE(modernize-use-equals-default)
-  virtual ~BarycentricPolynomials(){};
+  virtual ~BarycentricPolynomials() {};
 
   /**
    * Access operator.

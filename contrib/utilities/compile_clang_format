@@ -19,6 +19,8 @@
 # Compiling clang-format and all necessary parts of LLVM/CLANG might
 # require a significant amount of resources. Alternatively, you can use
 # download_clang_format to install a statically-linked binary.
+# On macOS, this script builds a universal binary for Apple silicon and Intel,
+# targeting macOS 11.0 or later.
 #
 
 set -e
@@ -26,9 +28,9 @@ set -u
 
 PRG="$(cd "$(dirname "$0")" && pwd)/programs"
 
-VERSION="16"
-RELEASE_DATE="2023-06-10"
-LLVM_COMMIT="7cbf1a2591520c2491aa35339f227775f4d3adf6"
+VERSION="23"
+RELEASE_DATE="2026-11-01"
+LLVM_COMMIT="392dfff97d29b59d77e5cac6d4b6ef2585fe7117"
 
 CLANG_PATH="${PRG}/clang-${VERSION}"
 RELEASE_BRANCH="release/${VERSION}.x"
@@ -76,24 +78,29 @@ else
 fi
 git reset --hard "${LLVM_COMMIT}"
 
-# move clang directory into right place for the build system
-mv clang llvm/tools
-
 mkdir llvm/build
 cd llvm/build
 
+# clang-format does not need any of the optional compression and XML
+# libraries. Disable them so that a static link does not depend on static
+# versions of these libraries being installed.
+CMAKE_OPTIONS="-DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_ENABLE_PROJECTS=clang"
+CMAKE_OPTIONS="${CMAKE_OPTIONS} -DLLVM_ENABLE_ZLIB=OFF -DLLVM_ENABLE_ZSTD=OFF"
+CMAKE_OPTIONS="${CMAKE_OPTIONS} -DLLVM_ENABLE_LIBXML2=OFF"
+
 case "${OSTYPE}" in
   darwin*)
-    cmake -DCMAKE_BUILD_TYPE=MinSizeRel ..
+    cmake ${CMAKE_OPTIONS} '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' \
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 ..
     ;;
   *)
-    cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DLLVM_BUILD_STATIC=true ..
+    cmake ${CMAKE_OPTIONS} -DLLVM_BUILD_STATIC=true ..
     ;;
 esac
 
 make -j4 clang-format
 cp bin/clang-format "${CLANG_PATH}"/bin
-cp ../{CODE_OWNERS,CREDITS,LICENSE}.TXT "${CLANG_PATH}"
+cp ../{CREDITS.TXT,LICENSE.TXT,Maintainers.md} "${CLANG_PATH}"
 rm -rf "${tmpdir}"
 
 echo "All done. clang-format successfully installed into"

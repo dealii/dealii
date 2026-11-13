@@ -763,7 +763,7 @@ namespace Step72
   void MinimalSurfaceProblem<dim>::solve()
   {
     SolverControl            solver_control(system_rhs.size(),
-                                 system_rhs.l2_norm() * 1e-6);
+                                            system_rhs.l2_norm() * 1e-6);
     SolverCG<Vector<double>> solver(solver_control);
 
     PreconditionSSOR<SparseMatrix<double>> preconditioner;

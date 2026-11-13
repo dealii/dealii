@@ -39,8 +39,7 @@ export module dealii.external.psblas;
 
 #ifdef DEAL_II_WITH_PSBLAS
 
-export
-{
+export {
   using ::psb_c_ctxt;
   using ::psb_c_descriptor;
   using ::psb_c_dspmat;

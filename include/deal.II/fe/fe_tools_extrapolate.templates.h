@@ -474,7 +474,7 @@ namespace FETools
       const unsigned int)
     {
       // Serialize those data types for which there are overloads:
-      ar &dof_values &tree_index;
+      ar & dof_values & tree_index;
 
       // Then also serialize the 'quadrant' variable for which there
       // isn't an overload. Do so by simply copying the individual
@@ -1451,8 +1451,8 @@ namespace FETools
             typename dealii::internal::p4est::types<dim>::quadrant
               p4est_coarse_cell;
             const typename dealii::internal::p4est::types<dim>::locidx
-              tree_index =
-                tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
+                                                                tree_index =
+                                                                  tr->coarse_cell_to_p4est_tree_permutation[cell->index()];
             typename dealii::internal::p4est::types<dim>::tree *tree =
               tr->init_tree(cell->index());
 

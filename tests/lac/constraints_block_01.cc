@@ -93,7 +93,7 @@ main()
         cell->set_material_id(0); // solid
       else
         cell->set_material_id(1); // fluid
-    }                             // cell
+    } // cell
 
   // create the FE spaces for the solid and the fluid/mesh
   // each are padded with FE_Nothing to be equal length
@@ -196,8 +196,8 @@ main()
                 face_coupling[c][d] = DoFTools::always;
                 face_coupling[d][c] = DoFTools::always;
               } // face_coupling
-          }     // d
-      }         // c
+          } // d
+      } // c
     DoFTools::make_flux_sparsity_pattern(dh, csp, cell_coupling, face_coupling);
     block_sparsity_pattern.copy_from(csp);
   }
@@ -305,10 +305,10 @@ main()
                               fl_msh_face_dof_indices[mesh_disp_dof[i]]));
                         }
                     } // at interface check
-                }     // not at boundary check
-            }         // face
-        }             // is this in the fluid material region?
-    }                 // cell
+                } // not at boundary check
+            } // face
+        } // is this in the fluid material region?
+    } // cell
 
   constraints.close();
 

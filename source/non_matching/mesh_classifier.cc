@@ -395,7 +395,7 @@ namespace NonMatching
         return 0;
       }
     } // namespace MeshClassifierImplementation
-  }   // namespace internal
+  } // namespace internal
 
 
 

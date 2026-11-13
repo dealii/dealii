@@ -1394,7 +1394,7 @@ namespace internal
 
 
     } // namespace VectorDataExchange
-  }   // namespace MatrixFreeFunctions
+  } // namespace MatrixFreeFunctions
 } // namespace internal
 
 

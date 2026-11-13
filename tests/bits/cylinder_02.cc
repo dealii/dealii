@@ -62,7 +62,7 @@ check()
   Triangulation<dim> triangulation;
   GridGenerator::cylinder(triangulation);
 
-  GridTools::transform((Point<dim>(*)(const Point<dim> &)) & rotate_to_y<dim>,
+  GridTools::transform((Point<dim> (*)(const Point<dim> &))&rotate_to_y<dim>,
                        triangulation);
 
   set_manifold(triangulation);

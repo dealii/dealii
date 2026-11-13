@@ -310,7 +310,7 @@ namespace Advection
                                      fe_v.JxW(q_point);
               }
           } // i
-      }     // q_point
+      } // q_point
 
   } // integrate_cell_term
 
@@ -344,7 +344,7 @@ namespace Advection
                            fe_v[upos].value(i, q_point) * fe_v.JxW(q_point);
 
           } // i
-      }     // q_point
+      } // q_point
 
   } // integrate_boundary_term
 
@@ -388,7 +388,7 @@ namespace Advection
                                 fe_v_1.JxW(q_point);
 
           } // i
-      }     // q_point
+      } // q_point
 
   } // integrate_face_term
 

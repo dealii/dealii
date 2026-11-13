@@ -1315,8 +1315,8 @@ namespace Particles
     // the domain is distributed differently after resuming from a checkpoint.
     //
     // See step-83 for how to serialize ParticleHandler objects.
-    ar &global_number_of_particles &global_max_particles_per_cell
-      &next_free_particle_index;
+    ar & global_number_of_particles & global_max_particles_per_cell &
+      next_free_particle_index;
   }
 
 

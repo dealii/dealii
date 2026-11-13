@@ -180,16 +180,16 @@ namespace Evaluation
   {
     double point_derivative = 0;
 
-    QTrapezoid<dim>             vertex_quadrature;
-    FEValues<dim>               fe_values(dof_handler.get_fe(),
-                            vertex_quadrature,
-                            update_gradients | update_quadrature_points);
+    QTrapezoid<dim> vertex_quadrature;
+    FEValues<dim>   fe_values(dof_handler.get_fe(),
+                              vertex_quadrature,
+                              update_gradients | update_quadrature_points);
     std::vector<Tensor<1, dim>> solution_gradients(vertex_quadrature.size());
 
     typename DoFHandler<dim>::active_cell_iterator cell =
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
-    unsigned int evaluation_point_hits                  = 0;
+    unsigned int                                   evaluation_point_hits = 0;
     for (; cell != endc; ++cell)
       for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
@@ -1189,9 +1189,9 @@ namespace DualFunctional
 
     QGauss<dim>        quadrature(4);
     FEValues<dim>      fe_values(dof_handler.get_fe(),
-                            quadrature,
-                            update_gradients | update_quadrature_points |
-                              update_JxW_values);
+                                 quadrature,
+                                 update_gradients | update_quadrature_points |
+                                   update_JxW_values);
     const unsigned int n_q_points    = fe_values.n_quadrature_points;
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 

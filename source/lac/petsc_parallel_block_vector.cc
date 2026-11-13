@@ -115,7 +115,8 @@ namespace PETScWrappers
       return petsc_nest_vector;
     }
 
-    BlockVector::operator const Vec &() const
+    BlockVector::
+    operator const Vec &() const
     {
       return petsc_nest_vector;
     }

@@ -1350,7 +1350,7 @@ namespace LinearAlgebra
     }
 
 #  endif // DOXYGEN
-  }      // namespace TpetraWrappers
+  } // namespace TpetraWrappers
 
 } // namespace LinearAlgebra
 

@@ -462,7 +462,7 @@ namespace Utilities
       }
 
     } // namespace LargeCount
-  }   // namespace MPI
+  } // namespace MPI
 } // namespace Utilities
 
 #endif

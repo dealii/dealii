@@ -239,7 +239,7 @@ namespace Step18
 #ifdef HEX
     MappingQ<dim, dim> mapping;
 #else
-    MappingFE<dim, dim>  mapping;
+    MappingFE<dim, dim> mapping;
 #endif
 
     std::vector<PointHistory<dim>> quadrature_point_history;
@@ -629,7 +629,7 @@ namespace Step18
                                                               system_rhs);
         }
 
-        // Now compress the vector and the system matrix:
+      // Now compress the vector and the system matrix:
 #ifdef DEAL_II_WITH_PETSC
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);

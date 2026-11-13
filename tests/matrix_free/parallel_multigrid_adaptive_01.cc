@@ -55,7 +55,7 @@ template <int dim,
 class LaplaceOperator : public EnableObserverPointer
 {
 public:
-  LaplaceOperator(){};
+  LaplaceOperator() {};
 
 
   void

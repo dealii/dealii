@@ -149,7 +149,7 @@ compute_pi_by_perimeter()
       typename DoFHandler<dim>::active_cell_iterator cell = dof_handler
                                                               .begin_active(),
                                                      endc = dof_handler.end();
-      long double perimeter                               = 0;
+      long double                                    perimeter = 0;
       for (; cell != endc; ++cell)
         for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
           if (cell->face(face_no)->at_boundary())

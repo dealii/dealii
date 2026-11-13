@@ -31,10 +31,10 @@ namespace LinearAlgebra
   namespace distributed
   {
 #ifndef DOXYGEN
-#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)                    \
-    template BlockVector<S1, ::dealii::MemorySpace::Host> & \
-    BlockVector<S1, ::dealii::MemorySpace::Host>::operator= \
-      <S2>(const BlockVector<S2, ::dealii::MemorySpace::Host> &)
+#  define TEMPL_COPY_CONSTRUCTOR(S1, S2)                       \
+    template BlockVector<S1, ::dealii::MemorySpace::Host>      \
+      &BlockVector<S1, ::dealii::MemorySpace::Host>::operator= \
+        <S2>(const BlockVector<S2, ::dealii::MemorySpace::Host> &)
 
     TEMPL_COPY_CONSTRUCTOR(double, float);
     TEMPL_COPY_CONSTRUCTOR(float, double);

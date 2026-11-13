@@ -392,7 +392,7 @@ namespace Step18
   {
     system_rhs    = 0;
     system_matrix = 0;
-    FEValues<dim>      fe_values(fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients |
                               update_quadrature_points | update_JxW_values);
@@ -403,7 +403,7 @@ namespace Step18
     std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
     BodyForce<dim>                       body_force;
     std::vector<Vector<double>>          body_force_values(n_q_points,
-                                                  Vector<double>(dim));
+                                                           Vector<double>(dim));
     typename DoFHandler<dim>::active_cell_iterator cell =
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
@@ -491,11 +491,11 @@ namespace Step18
     PETScWrappers::MPI::Vector distributed_incremental_displacement(
       locally_owned_dofs, mpi_communicator);
     distributed_incremental_displacement = incremental_displacement;
-    SolverControl                          solver_control(dof_handler.n_dofs(),
-                                 1e-16 * system_rhs.l2_norm(),
-                                 false,
-                                 false);
-    PETScWrappers::SolverCG                cg(solver_control);
+    SolverControl           solver_control(dof_handler.n_dofs(),
+                                           1e-16 * system_rhs.l2_norm(),
+                                           false,
+                                           false);
+    PETScWrappers::SolverCG cg(solver_control);
     PETScWrappers::PreconditionBlockJacobi preconditioner(system_matrix);
     cg.solve(system_matrix,
              distributed_incremental_displacement,
@@ -747,7 +747,7 @@ namespace Step18
   void
   TopLevel<dim>::update_quadrature_point_history()
   {
-    FEValues<dim>                            fe_values(fe,
+    FEValues<dim> fe_values(fe,
                             quadrature_formula,
                             update_values | update_gradients);
     std::vector<std::vector<Tensor<1, dim>>> displacement_increment_grads(

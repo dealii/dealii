@@ -530,7 +530,9 @@ check_invalid_input()
     {
       DoFRenumbering::component_wise(dof_handler,
                                      {
-                                       stress, pressure, stress_sym,
+                                       stress,
+                                       pressure,
+                                       stress_sym,
                                        // velocity
                                      });
     }

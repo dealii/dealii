@@ -548,13 +548,13 @@ template <class Archive>
 inline void
 DiscreteTime::serialize(Archive &ar, const unsigned int)
 {
-  ar &start_time;
-  ar &end_time;
-  ar &current_time;
-  ar &next_time;
-  ar &previous_time;
-  ar &start_step_size;
-  ar &step_number;
+  ar & start_time;
+  ar & end_time;
+  ar & current_time;
+  ar & next_time;
+  ar & previous_time;
+  ar & start_step_size;
+  ar & step_number;
 }
 
 DEAL_II_NAMESPACE_CLOSE
