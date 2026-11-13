@@ -20,18 +20,11 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_description.h>
 
-#include <fstream>
+#include <algorithm>
+#include <filesystem>
 #include <vector>
 
 #include "../tests.h"
-
-
-std::vector<char>
-payload(const unsigned int material, const bool variable_size)
-{
-  return std::vector<char>(variable_size ? material + 1 : 3, material + 7);
-}
-
 
 
 int
@@ -62,7 +55,8 @@ main(int argc, char **argv)
   for (const bool variable_size : {false, true})
     mesh.register_data_attach(
       [variable_size](const auto &cell, const CellStatus) {
-        return payload(cell->material_id(), variable_size);
+        return std::vector<char>(variable_size ? cell->material_id() + 1 : 3,
+                                 cell->material_id() + 7);
       },
       variable_size);
   mesh.save("checkpoint");
@@ -70,12 +64,9 @@ main(int argc, char **argv)
   // Using the same wrong offset for saving and loading can hide the bug.
   // The file must contain five cell sizes followed by 2+3+4+5+6 payload bytes.
   if (rank == 0)
-    {
-      std::ifstream file("checkpoint_variable.data",
-                         std::ios::binary | std::ios::ate);
-      AssertThrow(file.tellg() == 5 * sizeof(unsigned int) + 20,
-                  ExcMessage("Checkpoint contains gaps between cell data."));
-    }
+    AssertThrow(std::filesystem::file_size("checkpoint_variable.data") ==
+                  5 * sizeof(unsigned int) + 20,
+                ExcMessage("Checkpoint contains gaps between cell data."));
 
   parallel::fullydistributed::Triangulation<1> restored(communicator);
   restored.load("checkpoint");
@@ -87,9 +78,15 @@ main(int argc, char **argv)
       unsigned int unpacked = 0;
       restored.notify_ready_to_unpack(
         handle, [&](const auto &cell, const CellStatus, const auto &data) {
-          AssertThrow(std::vector<char>(data.begin(), data.end()) ==
-                        payload(cell->material_id(), variable_size),
-                      ExcMessage("Checkpoint changed cell data."));
+          AssertThrow(data.size() ==
+                        (variable_size ? cell->material_id() + 1 : 3),
+                      ExcMessage("Checkpoint changed cell data size."));
+          AssertThrow(std::all_of(data.begin(),
+                                  data.end(),
+                                  [&](const char value) {
+                                    return value == cell->material_id() + 7;
+                                  }),
+                      ExcMessage("Checkpoint changed cell data values."));
           ++unpacked;
         });
       AssertThrow(unpacked == restored.n_locally_owned_active_cells(),
