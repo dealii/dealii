@@ -26,14 +26,16 @@
 
 template <int chartdim, int spacedim, typename ManifoldType>
 void
-check(const std::string        &name,
-      const ManifoldType       &manifold,
-      const Point<chartdim>    &chart_point)
+check(const std::string     &name,
+      const ManifoldType    &manifold,
+      const Point<chartdim> &chart_point)
 {
   const auto   grad    = manifold.push_forward_gradient(chart_point);
   const double h       = 1e-6;
-  double       max_err = 0., max_val = 0.;
+  double       max_err = 0.;
+  double       max_val = 0.;
   bool         finite  = true;
+
   for (unsigned int d = 0; d < chartdim; ++d)
     {
       Point<chartdim> cp = chart_point, cm = chart_point;
