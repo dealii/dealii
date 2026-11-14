@@ -1,0 +1,5 @@
+New: The Function::SignedDistance namespace
+has been extended by a class ArbitraryLevelSet
+which allows to create level sets based on binary images.
+<br>
+(Jonas Plank, 2026/08/06)
