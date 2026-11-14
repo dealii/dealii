@@ -735,3 +735,11 @@ static_assert(
   "deal.II.");
 
 #endif
+
+/*
+ * Ensure /Zc:__cplusplus flag is used when building with MSVC. If the flag is
+ * not used, the value of the __cplusplus macro defaults to a value of 199711L.
+ */
+#if defined(_MSC_VER) && (__cplusplus == 199711L)
+#error "Deal.II requires the /Zc:__cplusplus flag when building with MSVC."
+#endif
