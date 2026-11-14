@@ -409,8 +409,8 @@ this file that is distributed with the library uses
   u_0(\mathbf x) &= 0, \\
   g(\mathbf x,t) &=
   \begin{cases}
-    \cos(4\pi t) & \text{if $x=-1$}, \\
-    -\cos(4\pi t) & \text{if $x=1$}, \\
+    \cos(4\pi t) & \text{if } x=-1, \\
+    -\cos(4\pi t) & \text{if } x=1, \\
     0 & \text{otherwise}
   \end{cases}
 @f}
