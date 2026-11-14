@@ -45,7 +45,7 @@ pipeline
       {
         docker
         {
-          image 'tjhei/candi:v9.4.1-r1-ubuntu20.04'
+          image 'tjhei/candi:v9.8.0-r3-ubuntu-24.04'
         }
       }
 
