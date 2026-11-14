@@ -95,6 +95,66 @@ test3()
 }
 
 
+
+void
+test_simplex_cells()
+{
+  // Triangle: use the reference cell vertices.
+  // The mapping is exactly affine for simplices, so A should be the
+  // identity and b should be zero.
+  {
+    deallog << "Triangle:" << std::endl;
+    std::vector<Point<2>> v = {{0, 0}, {1, 0}, {0, 1}};
+    const auto [A, b] =
+      GridTools::affine_cell_approximation<2, 2>(make_array_view(v));
+    deallog << "A = " << A[0][0] << " " << A[0][1] << " " << A[1][0] << " "
+            << A[1][1] << std::endl;
+    deallog << "b = " << b << std::endl;
+  }
+
+  // Tetrahedron: use the reference cell vertices.
+  // Also exactly affine.
+  {
+    deallog << "Tetrahedron:" << std::endl;
+    std::vector<Point<3>> v = {{0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    const auto [A, b] =
+      GridTools::affine_cell_approximation<3, 3>(make_array_view(v));
+    deallog << "A = " << A[0][0] << " " << A[0][1] << " " << A[0][2] << " "
+            << A[1][0] << " " << A[1][1] << " " << A[1][2] << " " << A[2][0]
+            << " " << A[2][1] << " " << A[2][2] << std::endl;
+    deallog << "b = " << b << std::endl;
+  }
+
+  // Wedge: use the reference cell vertices.
+  // Mapping is NOT exactly affine; we get a least-squares approximation.
+  {
+    deallog << "Wedge:" << std::endl;
+    std::vector<Point<3>> v = {
+      {0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, 0, 1}, {1, 0, 1}, {0, 1, 1}};
+    const auto [A, b] =
+      GridTools::affine_cell_approximation<3, 3>(make_array_view(v));
+    deallog << "A = " << A[0][0] << " " << A[0][1] << " " << A[0][2] << " "
+            << A[1][0] << " " << A[1][1] << " " << A[1][2] << " " << A[2][0]
+            << " " << A[2][1] << " " << A[2][2] << std::endl;
+    deallog << "b = " << b << std::endl;
+  }
+
+  // Pyramid: use the reference cell vertices.
+  // Mapping is NOT exactly affine; we get a least-squares approximation.
+  {
+    deallog << "Pyramid:" << std::endl;
+    std::vector<Point<3>> v = {
+      {-1, -1, 0}, {1, -1, 0}, {-1, 1, 0}, {1, 1, 0}, {0, 0, 1}};
+    const auto [A, b] =
+      GridTools::affine_cell_approximation<3, 3>(make_array_view(v));
+    deallog << "A = " << A[0][0] << " " << A[0][1] << " " << A[0][2] << " "
+            << A[1][0] << " " << A[1][1] << " " << A[1][2] << " " << A[2][0]
+            << " " << A[2][1] << " " << A[2][2] << std::endl;
+    deallog << "b = " << b << std::endl;
+  }
+}
+
+
 int
 main()
 {
@@ -106,6 +166,8 @@ main()
 
   test2<2>();
   test2<3>();
+
+  test_simplex_cells();
 
   test3<1, 2>();
   test3<2, 3>();
