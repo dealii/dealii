@@ -1,0 +1,14 @@
+Fixed: MappingFE::transform_real_to_unit_cell() now starts the Newton
+iteration from the inverse of the affine map through the vertices for
+simplices and from the barycenter of the reference cell otherwise, instead of
+the origin of the reference cell, and halves the Newton step until the
+residual decreases. If the iteration does not converge from the affine map or
+converges to a point outside of the reference cell, it is restarted from the
+barycenter. For a point outside of the cell, the result closest to the
+reference cell is returned. This improves robustness for curved cells of all
+types.
+The iteration no longer needs the second derivatives of the shape functions,
+which are not implemented for wedges and pyramids, such that the function now
+also works for these cells.
+<br>
+(Richard Schussnig, 2026/11/04)
