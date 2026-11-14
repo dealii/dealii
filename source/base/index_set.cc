@@ -1171,11 +1171,8 @@ IndexSet::is_ascending_and_one_to_one(const MPI_Comm communicator) const
     }
 
   // now broadcast the result
-  int is_ascending = is_globally_ascending ? 1 : 0;
-  int ierr         = MPI_Bcast(&is_ascending, 1, MPI_INT, 0, communicator);
-  AssertThrowMPI(ierr);
+  return Utilities::MPI::broadcast(communicator, is_globally_ascending, 0);
 
-  return (is_ascending == 1);
 #else
   return true;
 #endif // DEAL_II_WITH_MPI

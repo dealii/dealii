@@ -4618,65 +4618,29 @@ namespace GridTools
             local_bboxes[i].get_boundary_points().second[d];
         }
 
-    // Step 2: exchanging the size of local data
-    unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_communicator);
+    const std::vector<std::vector<double>> all_data_arrays =
+      Utilities::MPI::all_gather(mpi_communicator, loc_data_array);
 
-    // Vector to store the size of loc_data_array for every process
-    std::vector<int> size_all_data(n_procs);
-
-    // Exchanging the number of bboxes
-    int ierr = MPI_Allgather(&n_local_data,
-                             1,
-                             MPI_INT,
-                             size_all_data.data(),
-                             1,
-                             MPI_INT,
-                             mpi_communicator);
-    AssertThrowMPI(ierr);
-
-    // Now computing the displacement, relative to recvbuf,
-    // at which to store the incoming data
-    std::vector<int> rdispls(n_procs);
-    rdispls[0] = 0;
-    for (unsigned int i = 1; i < n_procs; ++i)
-      rdispls[i] = rdispls[i - 1] + size_all_data[i - 1];
-
-    // Step 3: exchange the data and bounding boxes:
-    // Allocating a vector to contain all the received data
-    std::vector<double> data_array(rdispls.back() + size_all_data.back());
-
-    ierr = MPI_Allgatherv(loc_data_array.data(),
-                          n_local_data,
-                          MPI_DOUBLE,
-                          data_array.data(),
-                          size_all_data.data(),
-                          rdispls.data(),
-                          MPI_DOUBLE,
-                          mpi_communicator);
-    AssertThrowMPI(ierr);
-
-    // Step 4: create the array of bboxes for output
-    std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes(n_procs);
-    unsigned int                                    begin_idx = 0;
-    for (unsigned int i = 0; i < n_procs; ++i)
+    // Step 2: create the array of bboxes for output
+    std::vector<std::vector<BoundingBox<spacedim>>> global_bboxes(
+      all_data_arrays.size());
+    for (unsigned int i = 0; i < all_data_arrays.size(); ++i)
       {
         // Number of local bounding boxes
-        unsigned int n_bbox_i = size_all_data[i] / (spacedim * 2);
+        const unsigned int n_bbox_i =
+          all_data_arrays[i].size() / (spacedim * 2);
         global_bboxes[i].resize(n_bbox_i);
         for (unsigned int bbox = 0; bbox < n_bbox_i; ++bbox)
           {
             Point<spacedim> p1, p2; // boundary points for bbox
             for (unsigned int d = 0; d < spacedim; ++d)
               {
-                p1[d] = data_array[begin_idx + 2 * bbox * spacedim + d];
-                p2[d] =
-                  data_array[begin_idx + 2 * bbox * spacedim + spacedim + d];
+                p1[d] = all_data_arrays[i][2 * bbox * spacedim + d];
+                p2[d] = all_data_arrays[i][2 * bbox * spacedim + spacedim + d];
               }
             BoundingBox<spacedim> loc_bbox(std::make_pair(p1, p2));
             global_bboxes[i][bbox] = loc_bbox;
           }
-        // Shifting the first index to the start of the next vector
-        begin_idx += size_all_data[i];
       }
     return global_bboxes;
 #endif // DEAL_II_WITH_MPI
