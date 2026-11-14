@@ -10,6 +10,7 @@
 //
 // -----------------------------------------------------------------------------
 
+#include <deal.II/grid/reference_cell.h>
 #include <deal.II/grid/refinement_choice.h>
 
 #include <algorithm>
@@ -116,4 +117,37 @@ main()
             << ") = " << RefinementChoice<3>::cut_axis(i).to_string()
             << std::endl;
   static_assert(RefinementChoice<3>::cut_axis(2) == RefinementChoices::CutZ<3>);
+
+  // Test ReferenceCell::is_compatible_with():
+
+  // 1d
+  for (const auto &reference_cell : {ReferenceCells::Line})
+    for (const auto &choice : get_hypercube_choices<1>())
+      deallog << reference_cell.to_string() << " " << choice.to_string()
+              << " compatible = " << reference_cell.is_compatible_with(choice)
+              << std::endl;
+
+  // 2d
+  for (const auto &reference_cell :
+       {ReferenceCells::Triangle, ReferenceCells::Quadrilateral})
+    for (const auto &choice : get_hypercube_choices<2>())
+      deallog << reference_cell.to_string() << " " << choice.to_string()
+              << " compatible = " << reference_cell.is_compatible_with(choice)
+              << std::endl;
+
+  // 3d
+  for (const auto &reference_cell : {ReferenceCells::Tetrahedron,
+                                     ReferenceCells::Pyramid,
+                                     ReferenceCells::Wedge,
+                                     ReferenceCells::Hexahedron})
+    {
+      auto choices = get_hypercube_choices<3>();
+      for (const auto &choice : get_tetrahedron_choices())
+        if (choice != RefinementChoices::None<3>)
+          choices.push_back(choice);
+      for (const auto &choice : choices)
+        deallog << reference_cell.to_string() << " " << choice.to_string()
+                << " compatible = " << reference_cell.is_compatible_with(choice)
+                << std::endl;
+    }
 }
