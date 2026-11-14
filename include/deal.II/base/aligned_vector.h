@@ -34,6 +34,8 @@
 #include <boost/serialization/split_member.hpp>
 
 #include <cstring>
+#include <functional>
+#include <iterator>
 #include <memory>
 #include <type_traits>
 
@@ -256,6 +258,16 @@ public:
    *
    * @note Unlike std::vector, this function uses random-access iterators so
    * that the copy may be parallelized.
+   *
+   * @note Like std::vector, this function only reallocates memory when the
+   * current capacity() is insufficient, in which case the capacity is grown
+   * geometrically (see reserve()). Hence, inserting $k$ elements at the end
+   * of the vector one at a time has amortized complexity ${\cal O}(k)$.
+   *
+   * @note Like for std::vector, the range [@p begin, @p end) must not refer to
+   * elements of this vector. In debug mode, this is checked for ranges of
+   * <tt>T</tt> by testing whether the first or the last element of the range
+   * is an element of this vector.
    *
    * @dealiiOperationIsMultithreaded
    */
@@ -1585,8 +1597,15 @@ AlignedVector<T>::insert(const_iterator       position,
 {
   Assert(replicated_across_communicator == false,
          ExcAlignedVectorChangeAfterReplication());
-  Assert(this->begin() <= position && position <= this->end(),
-         ExcMessage("The position iterator is not valid."));
+  // Compare with std::less_equal (and, later on, with std::less): unlike
+  // operator<=, it is well-defined also for pointers into unrelated arrays,
+  // i.e., for invalid positions.
+  {
+    const std::less_equal<const T *> less_equal;
+    Assert(less_equal(this->begin(), position) &&
+             less_equal(position, this->end()),
+           ExcMessage("The position iterator is not valid."));
+  }
   const auto offset = position - this->begin();
 
   const size_type old_size   = size();
@@ -1594,29 +1613,65 @@ AlignedVector<T>::insert(const_iterator       position,
   const size_type new_size   = old_size + range_size;
   if (range_size != 0)
     {
-      // This is similar to allocate_and_move(), except that we need to move
-      // whatever was before position and whatever is after it into two
-      // different places
-      T *new_data_ptr = nullptr;
-      Utilities::System::posix_memalign(
-        reinterpret_cast<void **>(&new_data_ptr), 64, new_size * sizeof(T));
+      // Like for std::vector, the range may not refer to elements of this
+      // vector: reallocating or shifting elements below would invalidate it.
+      // In debug mode, check this in O(1) for ranges of T (other types cannot
+      // refer to our elements) via the addresses of the first and the last
+      // element in the range. This catches every overlapping contiguous range
+      // and every range that lies entirely inside the vector, whatever the
+      // iterator type.
+      using iterator_reference =
+        typename std::iterator_traits<RandomAccessIterator>::reference;
+      constexpr bool same_iterator_reference_type =
+        std::is_same_v<iterator_reference, reference> ||
+        std::is_same_v<iterator_reference, const T &>;
+      if constexpr (running_in_debug_mode() && same_iterator_reference_type)
+        if (old_size != 0)
+          {
+            const std::less<const T *> less;
+            const auto                 is_own_element = [&](const T &element) {
+              const T *const address = std::addressof(element);
+              return !less(address, elements.get()) &&
+                     less(address, used_elements_end);
+            };
+            Assert(!is_own_element(*begin) && !is_own_element(*(end - 1)),
+                   ExcMessage("The range [begin, end) passed to "
+                              "AlignedVector::insert() must not refer to "
+                              "elements of the vector itself."));
+          }
 
-      // Correctly handle the case where the range is inside the present array
-      // by creating a temporary.
-      AlignedVector<T> temporary(begin, end);
-      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
-        elements.get(), elements.get() + offset, new_data_ptr);
-      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
-        temporary.begin(), temporary.end(), new_data_ptr + offset);
-      dealii::internal::AlignedVectorMoveConstruct<T *, T>(
-        elements.get() + offset,
-        elements.get() + old_size,
-        new_data_ptr + offset + range_size);
+      // Only reallocate if the current capacity is not sufficient. reserve()
+      // grows the allocation geometrically, so repeated insertions have
+      // amortized cost proportional to the number of elements moved and do
+      // not reallocate (and copy the whole array) every time.
+      if (new_size > capacity())
+        reserve(new_size);
 
-      Deleter deleter(this);
-      elements          = decltype(elements)(new_data_ptr, std::move(deleter));
-      used_elements_end = elements.get() + new_size;
-      allocated_elements_end = elements.get() + new_size;
+      T *const data = elements.get();
+
+      // Shift the elements after position back by range_size. Mark only the
+      // elements before position as alive while doing so: should a move
+      // constructor throw, the other elements are leaked rather than
+      // destroyed twice.
+      used_elements_end = data + offset;
+      if constexpr (std::is_trivially_copyable_v<T>)
+        std::memmove(data + offset + range_size,
+                     data + offset,
+                     (old_size - offset) * sizeof(T));
+      else
+        // Go from back to front: the destination of each element is either
+        // past the old end of the array, or the slot of an element that was
+        // already moved and destroyed.
+        for (size_type i = old_size; i > static_cast<size_type>(offset); --i)
+          {
+            new (data + i - 1 + range_size) T(std::move(data[i - 1]));
+            data[i - 1].~T();
+          }
+
+      // Fill the gap.
+      dealii::internal::AlignedVectorCopyConstruct<RandomAccessIterator, T>(
+        begin, end, data + offset);
+      used_elements_end = data + new_size;
     }
   return this->begin() + offset;
 }
