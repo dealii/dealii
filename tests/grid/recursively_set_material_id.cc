@@ -27,6 +27,8 @@ template <int dim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   for (unsigned int t = 0; t < 2; ++t)
     {
       deallog << "dim=" << dim << ", test=" << t << std::endl;
@@ -79,7 +81,7 @@ test()
 
       if (t == 0)
         {
-          AssertThrow(n == GeometryInfo<dim>::max_children_per_cell,
+          AssertThrow(n == reference_cell.n_isotropic_children(),
                       ExcInternalError());
         }
       else

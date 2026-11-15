@@ -98,8 +98,7 @@ check_element(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
         // this, _all_ children have
         // to be active, not only
         // some of them
-        for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell;
-             ++c)
+        for (unsigned int c = 0; c < cell->n_children(); ++c)
           AssertThrow(cell->child(c)->is_active(), ExcInternalError());
 
         // then restrict and prolongate

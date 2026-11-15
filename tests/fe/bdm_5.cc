@@ -32,7 +32,8 @@ test(const unsigned int degree)
 
   FE_BDM<dim> fe_rt(degree);
 
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < fe_rt.reference_cell().n_isotropic_children();
+       ++c)
     {
       const FullMatrix<double> &m = fe_rt.get_restriction_matrix(c);
 

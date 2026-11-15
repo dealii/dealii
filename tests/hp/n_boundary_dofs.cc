@@ -41,12 +41,14 @@ template <int dim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   Triangulation<dim> triangulation;
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(1);
 
   hp::FECollection<dim> fe;
-  for (unsigned int i = 1; i <= GeometryInfo<dim>::max_children_per_cell; ++i)
+  for (unsigned int i = 1; i <= reference_cell.n_isotropic_children(); ++i)
     fe.push_back(FE_Q<dim>(i));
 
   DoFHandler<dim> dof_handler(triangulation);

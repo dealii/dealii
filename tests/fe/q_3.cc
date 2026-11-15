@@ -35,7 +35,8 @@ test(const FE_Q<dim> &fe_q)
 {
   deallog << fe_q.get_name() << std::endl;
 
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < fe_q.reference_cell().n_isotropic_children();
+       ++c)
     {
       const FullMatrix<double> &m = fe_q.get_restriction_matrix(c);
 

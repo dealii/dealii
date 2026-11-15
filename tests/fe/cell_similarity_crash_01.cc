@@ -53,7 +53,7 @@ test()
 
   // then make this first cell invalid by
   // coarsening it away
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < tr.begin(1)->n_children(); ++c)
     tr.begin(1)->child(c)->set_coarsen_flag();
   tr.execute_coarsening_and_refinement();
   dof.distribute_dofs(fe);

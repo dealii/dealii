@@ -39,6 +39,8 @@ template <int dim>
 void
 check()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   FE_DGQ<dim> fe(1);
   deallog << fe.get_name() << std::endl;
 
@@ -47,7 +49,7 @@ check()
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell;
+  for (unsigned int i = 0; i < reference_cell.n_isotropic_children();
        ++i, ++cell)
     cell->set_coarsen_flag();
   tria.execute_coarsening_and_refinement();

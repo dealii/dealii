@@ -34,6 +34,8 @@ template <int dim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   Triangulation<dim> tria;
   GridGenerator::hyper_cube(tria);
   tria.refine_global(2);
@@ -42,7 +44,7 @@ test()
   grid_out.write_dx(tria, deallog.get_file_stream());
 
   typename Triangulation<dim>::active_cell_iterator cell = tria.begin_active();
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
+  for (unsigned int i = 0; i < reference_cell.n_isotropic_children(); ++i)
     {
       cell->set_coarsen_flag();
       ++cell;

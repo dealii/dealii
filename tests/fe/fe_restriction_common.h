@@ -68,7 +68,7 @@ check_restriction(FiniteElement<dim> &fe, const char *name)
   deallog << name << '<' << dim << '>' << " constraint " << std::endl;
   print_formatted(fe.constraints(), 7, 10);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
+  for (unsigned int i = 0; i < fe.reference_cell().n_isotropic_children(); ++i)
     {
       deallog << name << '<' << dim << '>' << " restriction " << i << std::endl;
       if (fe.isotropic_restriction_is_implemented())

@@ -71,9 +71,9 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < triangulation.begin(1)->n_children(); ++c)
     triangulation.begin(1)->child(c)->set_refine_flag();
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < (--triangulation.begin(2))->n_children(); ++c)
     (--triangulation.begin(2))->child(c)->set_coarsen_flag();
 
   triangulation.prepare_coarsening_and_refinement();

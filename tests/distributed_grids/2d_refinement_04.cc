@@ -41,7 +41,9 @@ template <int dim>
 void
 test(std::ostream & /*out*/)
 {
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
+  for (unsigned int i = 0; i < reference_cell.n_isotropic_children(); ++i)
     {
       parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
