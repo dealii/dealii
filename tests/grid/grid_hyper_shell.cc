@@ -55,7 +55,7 @@ check(double r1, double r2, unsigned int n)
          ++c)
       for (const unsigned int f : c->face_indices())
         if (c->face(f)->at_boundary())
-          for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_face; ++e)
+          for (const unsigned int e : c->face(f)->line_indices())
             c->face(f)->line(e)->set_manifold_id(0);
 
   static const SphericalManifold<dim> boundary(center);
