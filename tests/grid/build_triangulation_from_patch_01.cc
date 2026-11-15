@@ -69,7 +69,7 @@ test()
           deallog << "   " << tria_cell << " user flag check:  "
                   << (tria_cell->user_flag_set() ? " (+) " : " (-) ")
                   << std::endl;
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          for (const unsigned int v : tria_cell->vertex_indices())
             {
               deallog << "  vertices for cell  " << tria_cell << " : "
                       << tria_cell->vertex(v) << std::endl;

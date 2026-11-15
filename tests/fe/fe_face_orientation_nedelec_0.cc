@@ -41,6 +41,8 @@ create_reference_triangulation(Triangulation<3> &triangulation)
 void
 create_triangulation(Triangulation<3> &triangulation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   static const Point<3> vertices_parallelograms[] = {
     Point<3>(-1., -1., -1.), // 0
     Point<3>(0., -1., -1.),  Point<3>(1., -1., -1.),
@@ -92,7 +94,7 @@ create_triangulation(Triangulation<3> &triangulation)
   std::vector<CellData<3>> cells(n_cells, CellData<3>());
   for (unsigned i = 0; i < n_cells; ++i)
     {
-      for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

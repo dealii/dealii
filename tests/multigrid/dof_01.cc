@@ -53,7 +53,7 @@ dofs(const DoFHandler<dim> &dof)
       cell->get_mg_dof_indices(indices);
 
       deallog << "Level " << cell->level();
-      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int i : cell->vertex_indices())
         deallog << " v" << cell->vertex(i);
       deallog << " dofs ";
       for (unsigned int i = 0; i < indices.size(); ++i)

@@ -133,7 +133,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     bool evaluation_point_found                         = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex : cell->vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
           {
             point_value = solution(

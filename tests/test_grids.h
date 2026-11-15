@@ -167,13 +167,15 @@ namespace TestGrids
   inline void
   reorder_old_to_new_style(std::vector<CellData<3>> &cells)
   {
+    constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
     // undo the ordering above
     unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
     for (auto &cell : cells)
       {
-        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+        for (const unsigned int i : reference_cell.vertex_indices())
           tmp[i] = cell.vertices[i];
-        for (const unsigned int i : GeometryInfo<3>::vertex_indices())
+        for (const unsigned int i : reference_cell.vertex_indices())
           cell.vertices[local_vertex_numbering[i]] = tmp[i];
       }
   }

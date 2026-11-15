@@ -30,6 +30,8 @@
 void
 create_coarse_grid(Triangulation<2> &coarse_grid)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<2>();
+
   static const Point<2> vertices_1[] = {
     Point<2>(0., 0.),       // 0
     Point<2>(1., 0.),       // 1
@@ -51,7 +53,7 @@ create_coarse_grid(Triangulation<2> &coarse_grid)
   std::vector<CellData<2>> cells(n_cells, CellData<2>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -69,7 +71,7 @@ check(Triangulation<2> &tria)
     GridTools::find_active_cell_around_point(tria, p);
 
   deallog << cell << std::endl;
-  for (const unsigned int v : GeometryInfo<2>::vertex_indices())
+  for (const unsigned int v : cell->vertex_indices())
     deallog << '<' << cell->vertex(v) << "> ";
   deallog << std::endl;
 

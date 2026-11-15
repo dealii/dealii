@@ -523,7 +523,7 @@ LaplaceProblem<dim>::refine_grid(const std::string &reftype)
              triangulation.begin_active();
            cell != triangulation.end();
            ++cell)
-        for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int vertex : cell->vertex_indices())
           {
             {
               const Point<dim> p = cell->vertex(vertex);

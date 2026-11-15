@@ -75,6 +75,8 @@ void
 generate_grid(parallel::distributed::Triangulation<2> &triangulation,
               int                                      orientation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<2>();
+
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
     Point<2>(+1., -3.),
@@ -98,7 +100,7 @@ generate_grid(parallel::distributed::Triangulation<2> &triangulation,
     {7, 6, 5, 4},
   };
 
-  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];
@@ -116,6 +118,8 @@ void
 generate_grid(parallel::distributed::Triangulation<3> &triangulation,
               int                                      orientation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                                         Point<3>(+1., -1., -3.),
                                         Point<3>(-1., +1., -3.),
@@ -152,7 +156,7 @@ generate_grid(parallel::distributed::Triangulation<3> &triangulation,
     {15, 13, 14, 12, 11, 9, 10, 8},
   };
 
-  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];

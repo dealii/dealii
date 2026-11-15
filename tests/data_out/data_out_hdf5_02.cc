@@ -39,7 +39,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
 
       patch.n_subdivisions = nsub;
       patch.reference_cell = ReferenceCells::get_hypercube<dim>();
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : patch.reference_cell.vertex_indices())
         for (unsigned int d = 0; d < spacedim; ++d)
           patch.vertices[v](d) =
             p + cell_coordinates[d][v] + ((d >= dim) ? v : 0);

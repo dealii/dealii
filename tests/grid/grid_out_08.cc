@@ -31,7 +31,9 @@ test()
 {
   Triangulation<1, 3> tria;
 
-  const unsigned int    dim          = 1;
+  const unsigned int dim            = 1;
+  constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
+
   static const Point<3> vertices_1[] = {
     Point<3>(0, 0, 0), Point<3>(1, 0, 0), Point<3>(1, 0, 0), Point<3>(1, 1, 0),
     Point<3>(1, 1, 0), Point<3>(0, 1, 0), Point<3>(0, 1, 0), Point<3>(0, 0, 0),
@@ -60,7 +62,7 @@ test()
 
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

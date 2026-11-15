@@ -41,7 +41,8 @@
 void
 test()
 {
-  const unsigned int dim = 3;
+  const unsigned int dim            = 3;
+  constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
 
   static const Point<3> vertices_1[] = {
     // points on the lower surface
@@ -192,7 +193,7 @@ test()
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

@@ -54,6 +54,8 @@ public:
 void
 generate_grid(Triangulation<3> &triangulation, int orientation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   Point<3>              vertices_1[] = {Point<3>(-0., -0., -0.),
                                         Point<3>(+1., -0., -0.),
                                         Point<3>(-0., +1., -0.),
@@ -85,7 +87,7 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
     {10, 11, 8, 9, 6, 7, 4, 5},
     {11, 9, 10, 8, 7, 5, 6, 4}};
 
-  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];

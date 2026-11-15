@@ -132,7 +132,7 @@ test()
       std::cout << "step " << step << std::endl;
       for (auto &cell : tria.active_cell_iterators())
         {
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          for (const unsigned int v : cell->vertex_indices())
             {
               if (p.distance(cell->vertex(v)) < 0.03 / (1 << step))
                 {

@@ -59,7 +59,7 @@ test()
   for (const auto &cell :
        tria.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
     {
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         {
           const std::map<unsigned int,
                          std::set<dealii::types::subdomain_id>>::const_iterator

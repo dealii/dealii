@@ -191,6 +191,8 @@ void
 create_tria(Triangulation<3> &triangulation,
             const Point<3>   *vertices_parallelograms)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
@@ -213,7 +215,7 @@ create_tria(Triangulation<3> &triangulation,
   std::vector<CellData<3>> cells(n_cells, CellData<3>());
   for (unsigned i = 0; i < cells.size(); ++i)
     {
-      for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }

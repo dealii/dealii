@@ -46,7 +46,7 @@ test()
   std::map<unsigned int, Point<dim>> non_artificial_vertices_old;
   for (cell = triangulation.begin_active(); cell != endc; ++cell)
     if (!cell->is_artificial())
-      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex_no : cell->vertex_indices())
         non_artificial_vertices_old[cell->vertex_index(vertex_no)] =
           cell->vertex(vertex_no);
 
@@ -55,7 +55,7 @@ test()
     GridTools::get_locally_owned_vertices(triangulation);
   for (cell = triangulation.begin_active(); cell != endc; ++cell)
     if (cell->is_locally_owned())
-      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex_no : cell->vertex_indices())
         {
           const unsigned global_vertex_no = cell->vertex_index(vertex_no);
           if (!vertex_moved[global_vertex_no] &&
@@ -71,7 +71,7 @@ test()
   std::map<unsigned int, Point<dim>> non_artificial_vertices_new;
   for (cell = triangulation.begin_active(); cell != endc; ++cell)
     if (!cell->is_artificial())
-      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex_no : cell->vertex_indices())
         {
           Point<dim> point = cell->vertex(vertex_no);
           point[0] -= 1.e-1;

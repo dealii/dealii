@@ -70,7 +70,7 @@ refine_mesh(Triangulation<dim> &triangulation)
        cell != triangulation.end();
        ++cell)
     {
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex : cell->vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =

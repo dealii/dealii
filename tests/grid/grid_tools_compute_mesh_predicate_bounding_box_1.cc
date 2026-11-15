@@ -90,7 +90,7 @@ test_hypercube(unsigned int ref, unsigned int max_bbox)
   // Looking if every point is at least inside a bounding box
   for (; cell < endc; ++cell)
     if (cell->is_locally_owned())
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         {
           bool inside_a_box = false;
           for (unsigned int i = 0; i < local_bbox.size(); ++i)
