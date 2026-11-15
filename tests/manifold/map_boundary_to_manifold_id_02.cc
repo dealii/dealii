@@ -68,9 +68,7 @@ test()
   deallog << "Set edge manifold IDs" << std::endl;
   for (auto cell = tria.begin_active(); cell != tria.end(); ++cell)
     {
-      for (signed int e = 0;
-           e < static_cast<signed int>(GeometryInfo<dim>::lines_per_cell);
-           ++e)
+      for (signed int e = 0; e < static_cast<signed int>(cell->n_lines()); ++e)
         cell->line(e)->set_manifold_id(e);
       for (const unsigned int f : cell->face_indices())
         {

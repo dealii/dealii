@@ -62,7 +62,7 @@ test()
         {
           deallog << "face: " << face->center()
                   << " boundary id: " << face->boundary_id() << std::endl;
-          for (unsigned int l = 0; l < GeometryInfo<2>::lines_per_cell; ++l)
+          for (const unsigned int l : face->line_indices())
             deallog << "line: " << face->line(l)->center()
                     << " boundary id: " << face->line(l)->boundary_id()
                     << std::endl;

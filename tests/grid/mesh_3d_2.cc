@@ -45,7 +45,7 @@ main()
        ++cell)
     {
       deallog << "Cell = " << cell << std::endl;
-      for (unsigned int i = 0; i < GeometryInfo<3>::lines_per_cell; ++i)
+      for (const unsigned int i : cell->line_indices())
         deallog << "    Line = " << cell->line(i) << " : "
                 << cell->line(i)->vertex_index(0) << " -> "
                 << cell->line(i)->vertex_index(1) << std::endl;

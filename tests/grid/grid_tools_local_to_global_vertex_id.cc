@@ -58,7 +58,7 @@ test()
     {
       if (cell->is_locally_owned())
         {
-          for (unsigned int i = 0; i < GeometryInfo<2>::lines_per_cell; ++i)
+          for (const unsigned int i : cell->line_indices())
             {
               vertex_global_index.push_back(
                 local_to_global_id[cell->line(i)->vertex_index(0)]);

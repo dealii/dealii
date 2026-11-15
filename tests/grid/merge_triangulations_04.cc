@@ -68,8 +68,7 @@ main()
   auto minimal_line_length = [](const Triangulation<2> &tria) -> double {
     double min_line_length = std::numeric_limits<double>::max();
     for (const auto &cell : tria.active_cell_iterators())
-      for (unsigned int line_n = 0; line_n < GeometryInfo<2>::lines_per_cell;
-           ++line_n)
+      for (const unsigned int line_n : cell->line_indices())
         min_line_length = std::min(min_line_length,
                                    (cell->line(line_n)->vertex(0) -
                                     cell->line(line_n)->vertex(1))

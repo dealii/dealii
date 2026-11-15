@@ -56,7 +56,7 @@ test()
         deallog << "    face=" << f
                 << (c->face_orientation(f) ? " -> true" : " -> false")
                 << (c->face_flip(f) ? "/true" : "/false") << std::endl;
-      for (unsigned int e = 0; e < GeometryInfo<3>::lines_per_cell; ++e)
+      for (const unsigned int e : c->line_indices())
         deallog << "    edge=" << e
                 << (c->line_orientation(e) ==
                         numbers::default_geometric_orientation ?

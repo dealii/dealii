@@ -64,7 +64,7 @@ check(Triangulation<dim, spacedim> &tria)
           Assert(p1.distance(p2) == 0, ExcInternalError());
         }
       if (dim == 3)
-        for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell; ++i)
+        for (const unsigned int i : cell1->line_indices())
           {
             auto obj1 = cell1->line(i);
             auto obj2 = cell2->line(i);

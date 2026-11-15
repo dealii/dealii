@@ -99,7 +99,7 @@ check_edges(const DoFHandler<dim> &dof_handler)
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
+    for (const unsigned int e : cell->line_indices())
       {
         deallog << "edge=" << cell->line(e) << std::endl;
         deallog << "n=" << cell->line(e)->n_active_fe_indices() << std::endl;

@@ -96,7 +96,7 @@ test()
       for (unsigned int i = 0; i < dim; ++i)
         trial_point[i] = 1.5;
 
-      for (unsigned int e = 0; e < GeometryInfo<dim>::lines_per_cell; ++e)
+      for (const unsigned int e : cell->line_indices())
         {
           deallog << "    Line " << e << ", projected point=";
           if (dim > 1)

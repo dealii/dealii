@@ -64,8 +64,7 @@ test()
       for (const unsigned int face_n : cell->face_indices())
         face_centers[cell->face(face_n)->manifold_id()].push_back(
           cell->face(face_n)->center());
-      for (unsigned int line_n = 0; line_n < GeometryInfo<3>::lines_per_cell;
-           ++line_n)
+      for (const unsigned int line_n : cell->line_indices())
         line_centers[cell->line(line_n)->manifold_id()].push_back(
           cell->line(line_n)->center());
     }

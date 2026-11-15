@@ -47,9 +47,7 @@ plot_all_info(const Triangulation<dim> &tria)
       // in 2D faces that are not consistently oriented should of course be also
       // lines with the same property
       deallog << "   line orientation: {  ";
-      for (unsigned int line_index = 0;
-           line_index < GeometryInfo<dim>::lines_per_cell;
-           ++line_index)
+      for (const unsigned int line_index : cell->line_indices())
         {
           deallog << (cell->line_orientation(line_index) ==
                       numbers::default_geometric_orientation)

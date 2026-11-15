@@ -102,7 +102,7 @@ main()
   for (DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
+    for (const unsigned int l : cell->line_indices())
       if (cell->line(l)->n_active_fe_indices() == 4)
         {
           deallog << "Shared line: " << cell->line(l) << std::endl;

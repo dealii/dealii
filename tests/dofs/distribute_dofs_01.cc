@@ -38,7 +38,7 @@ test()
   dh_nedelec.distribute_dofs(fe_nedelec);
 
   for (const auto &cell : dh_nedelec.active_cell_iterators())
-    for (unsigned int i = 0; i < dealii::GeometryInfo<3>::lines_per_cell; ++i)
+    for (const unsigned int i : cell->line_indices())
       cell->line(i)->dof_index(0);
 
   deallog << "ok" << std::endl;

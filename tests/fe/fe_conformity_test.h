@@ -183,9 +183,7 @@ namespace FEConforimityTest
               } // face_index
 
             deallog << "   {line_index -> line_orientation}: " << std::endl;
-            for (unsigned int line_index = 0;
-                 line_index < GeometryInfo<3>::lines_per_cell;
-                 ++line_index)
+            for (const unsigned int line_index : cell->line_indices())
               {
                 deallog << "      {" << line_index << " -> "
                         << (cell->line_orientation(line_index) ==
@@ -234,9 +232,7 @@ namespace FEConforimityTest
               } // face_index
 
             deallog << "   {line_index -> line_orientation}: " << std::endl;
-            for (unsigned int line_index = 0;
-                 line_index < GeometryInfo<2>::lines_per_cell;
-                 ++line_index)
+            for (const unsigned int line_index : cell->line_indices())
               {
                 deallog << "      {" << line_index << " -> "
                         << (cell->line_orientation(line_index) ==

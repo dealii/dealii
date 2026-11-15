@@ -31,8 +31,7 @@ do_test(const Triangulation<dim, spacedim> &tria)
        ++cell)
     {
       deallog << "Lines on cell with center: " << cell->center() << std::endl;
-      for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
-           ++line)
+      for (const unsigned int line : cell->line_indices())
         deallog << cell->line(line)->center(/*respect_manifold=*/true)
                 << std::endl;
       deallog << "Faces on cell with center: " << cell->center() << std::endl;

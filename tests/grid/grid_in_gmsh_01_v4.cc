@@ -69,7 +69,7 @@ gmsh_grid(const char *name_v2, const char *name_v4)
                         cell_v4->face(i)->boundary_id(),
                       ExcInternalError());
         }
-      for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell; ++i)
+      for (const unsigned int i : cell_v2->line_indices())
         {
           AssertThrow(cell_v2->line(i)->boundary_id() ==
                         cell_v4->line(i)->boundary_id(),

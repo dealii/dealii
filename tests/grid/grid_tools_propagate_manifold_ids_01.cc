@@ -45,7 +45,7 @@ test()
     {
       deallog << "Cell: " << (int)cell->manifold_id() << std::endl;
       if (dim > 1)
-        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+        for (const unsigned int l : cell->line_indices())
           deallog << "Line " << l << ", " << (int)cell->line(l)->manifold_id()
                   << std::endl;
       if (dim > 2)
