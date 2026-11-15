@@ -77,7 +77,7 @@ test()
   std::set<types::global_dof_index> starting_indices;
   for (const auto &cell :
        dofh.active_cell_iterators() | IteratorFilters::LocallyOwnedCell())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (!cell->at_boundary(f) && cell->neighbor(f)->is_ghost())
         {
           // we've identified a subdomain interface. use these DoFs

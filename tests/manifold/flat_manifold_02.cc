@@ -40,7 +40,7 @@ test(unsigned int ref = 1)
     {
       // check that FlatManifold returns the middle of the cell.
       deallog << "Cell: " << cell << std::endl;
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           const typename Triangulation<dim, spacedim>::face_iterator &face =
             cell->face(f);

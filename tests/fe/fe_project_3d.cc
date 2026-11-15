@@ -330,7 +330,7 @@ test(const FiniteElement<dim> &fe,
                 }
             }
 
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face : cell->face_indices())
             {
               fe_face_values.reinit(cell, face);
               const std::vector<double> &face_JxW_values =

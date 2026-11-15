@@ -68,7 +68,7 @@ main()
          ++cell)
       {
         bool done = false;
-        for (const unsigned int f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : cell->face_indices())
           if (cell->at_boundary(f))
             {
               cell->face(f)->set_boundary_id(1);

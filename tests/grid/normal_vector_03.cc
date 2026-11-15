@@ -73,7 +73,7 @@ main()
       create_triangulation(case_no, tria);
       const Triangulation<3>::active_cell_iterator cell = tria.begin_active();
       Triangulation<3>::face_iterator              face;
-      for (const unsigned int face_no : GeometryInfo<3>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);

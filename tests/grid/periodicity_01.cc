@@ -64,7 +64,7 @@ test()
   unsigned int neighbor_count = 0;
 
   for (const auto &cell : tria.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->has_periodic_neighbor(f))
         ++neighbor_count;
 

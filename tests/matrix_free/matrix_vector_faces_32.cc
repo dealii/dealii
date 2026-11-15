@@ -44,7 +44,7 @@ do_test(const unsigned int fe_degree)
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_boundary_ids(f);
   std::vector<

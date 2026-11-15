@@ -227,7 +227,8 @@ test()
 
     // We don't necessarily visit all faces, so we have to filter
     // some of them out here.
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f :
+         ReferenceCells::get_hypercube<dim>().face_indices())
       if (c.local_dof_indices[f + 1].size() > 0)
         constraints.distribute_local_to_global(c.matrices[f + 1],
                                                c.local_dof_indices[0],

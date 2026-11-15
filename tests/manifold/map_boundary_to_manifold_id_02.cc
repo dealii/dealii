@@ -32,7 +32,7 @@ print_info(const Triangulation<dim, spacedim> &tria)
     {
       deallog << "C: " << cell << ", manifold id: " << (int)cell->manifold_id()
               << std::endl;
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           deallog << "f: " << cell->face(f)
                   << ", boundary id: " << (int)cell->face(f)->boundary_id()
@@ -72,7 +72,7 @@ test()
            e < static_cast<signed int>(GeometryInfo<dim>::lines_per_cell);
            ++e)
         cell->line(e)->set_manifold_id(e);
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           cell->face(f)->set_boundary_id(f);
           for (signed int e = 0;

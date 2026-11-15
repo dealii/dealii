@@ -61,7 +61,7 @@ plot_faces(Mapping<dim>                            &mapping,
                                           update_gradients | update_hessians |
                                           update_normal_vectors));
 
-  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face_nr : cell->face_indices())
     {
       deallog << "Face=" << face_nr << std::endl;
       fe_values.reinit(cell, face_nr);

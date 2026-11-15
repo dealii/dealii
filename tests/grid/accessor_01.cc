@@ -40,7 +40,7 @@ test()
 
   for (auto &cell : tria.active_cell_iterators())
     {
-      for (const unsigned int i : GeometryInfo<dim>::face_indices())
+      for (const unsigned int i : cell->face_indices())
         {
           if (mymap.find(cell->face(i)) == mymap.end())
             {

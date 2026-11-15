@@ -41,7 +41,7 @@ main()
        cell != tria.end();
        ++cell)
     {
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           bool face_at_sphere_boundary = true;
           for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;

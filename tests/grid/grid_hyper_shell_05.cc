@@ -48,7 +48,7 @@ check(const unsigned int n)
          tria.begin_active();
        cell != tria.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       AssertThrow(cell->face(f)->at_boundary() == cell->at_boundary(f),
                   ExcInternalError());
 
@@ -58,7 +58,7 @@ check(const unsigned int n)
          tria.begin_active();
        cell != tria.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         deallog << cell->face(f) << ' ' << (int)cell->face(f)->boundary_id()
                 << ' ' << cell->face(f)->center().norm() << std::endl;

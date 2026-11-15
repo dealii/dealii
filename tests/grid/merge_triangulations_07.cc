@@ -44,7 +44,7 @@ main()
 
   unsigned int boundary_face_count = 0;
   for (const auto &cell : tria_2.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<spacedim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->face(f)->at_boundary())
         ++boundary_face_count;
 

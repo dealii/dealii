@@ -165,7 +165,7 @@ test_boundary_values(const FiniteElement<dim> &fe)
       std::vector<double>         cell_pres_values(face_quadrature.size());
       for (const auto &cell : dof_handler.active_cell_iterators())
         {
-          for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face_n : cell->face_indices())
             {
               auto face = cell->face(face_n);
               if (face->at_boundary())

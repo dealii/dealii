@@ -170,7 +170,7 @@ plot_face_shape_functions(Mapping<dim>       &mapping,
   sprintf(fname, "Face%dd-%s", dim, name);
   deallog.push(fname);
 
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : c->face_indices())
     {
       if (!c->face(f)->has_children())
         {

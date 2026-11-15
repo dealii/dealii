@@ -96,7 +96,7 @@ generate_grid(Triangulation<2> &triangulation, int orientation)
   Triangulation<2>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<2>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
@@ -153,7 +153,7 @@ generate_grid(Triangulation<2, 3> &triangulation, int orientation)
   Triangulation<2, 3>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<2>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
@@ -224,7 +224,7 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
   Triangulation<3>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<3>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[2] > 2.9)
         face_1 = cell_1->face(j);
@@ -276,7 +276,7 @@ print_matching(DoFHandler<dim, spacedim> &dof_handler,
        cell != dof_handler.end(0);
        ++cell)
     {
-      for (const unsigned int j : GeometryInfo<dim>::face_indices())
+      for (const unsigned int j : cell->face_indices())
         {
           if (cell->face(j)->center()[dim == 2 ? 1 : 2] > 2.9)
             face_1 = cell->face(j);

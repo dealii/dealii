@@ -71,7 +71,7 @@ check(const Triangulation<dim> &tria, const unsigned int order)
 
       // integrate over faces and make sure that the result of the integration
       // is close to the one with the cell integral
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f))
           {
             fe_face_values.reinit(cell, f);

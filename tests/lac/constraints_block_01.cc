@@ -237,7 +237,7 @@ main()
       if (int(cell->material_id()) == 1)
         {
           // Only loop over cells in the fluid region
-          for (const unsigned int f : GeometryInfo<dim>::face_indices())
+          for (const unsigned int f : cell->face_indices())
             {
               if (!cell->at_boundary(f))
                 {

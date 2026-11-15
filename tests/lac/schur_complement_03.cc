@@ -371,7 +371,7 @@ namespace Step22
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->face(f)->center()[dim - 1] == 0)
           cell->face(f)->set_all_boundary_ids(1);
     triangulation.refine_global(4 - dim);

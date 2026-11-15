@@ -31,7 +31,7 @@ test()
     if (cell->at_boundary())
       {
         cell->set_manifold_id(1);
-        for (const unsigned int face_n : GeometryInfo<2>::face_indices())
+        for (const unsigned int face_n : cell->face_indices())
           if (!cell->face(face_n)->at_boundary())
             cell->face(face_n)->set_manifold_id(1);
       }
@@ -61,7 +61,7 @@ test()
   for (const auto &cell : triangulation_3.active_cell_iterators())
     {
       cell_centers[cell->manifold_id()].push_back(cell->center());
-      for (const unsigned int face_n : GeometryInfo<3>::face_indices())
+      for (const unsigned int face_n : cell->face_indices())
         face_centers[cell->face(face_n)->manifold_id()].push_back(
           cell->face(face_n)->center());
       for (unsigned int line_n = 0; line_n < GeometryInfo<3>::lines_per_cell;

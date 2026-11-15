@@ -79,7 +79,7 @@ test()
          tr.begin_active();
        cell != tr.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(numbers::flat_manifold_id);
   //  static const SphericalManifold<dim> boundary_shell;

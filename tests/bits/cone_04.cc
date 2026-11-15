@@ -37,7 +37,7 @@ check()
   triangulation.refine_global(2);
 
   for (const auto &cell : triangulation.active_cell_iterators())
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       {
         const auto face = cell->face(face_no);
         if (face->boundary_id() == 0)

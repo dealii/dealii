@@ -327,7 +327,8 @@ private:
             phi.integrate(EvaluationFlags::gradients);
             local_diagonal_vector[i] = phi.begin_dof_values()[i];
           }
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face :
+             data.get_cell_iterator(cell, 0)->face_indices())
           {
             phif.reinit(cell, face);
             VectorizedArray<number> sigmaF =

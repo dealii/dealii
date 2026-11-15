@@ -72,7 +72,7 @@ check(Triangulation<dim, spacedim> &tria)
             AssertDimension(obj1->boundary_id(), obj2->boundary_id());
           }
       if (dim > 1)
-        for (const unsigned int i : GeometryInfo<dim>::face_indices())
+        for (const unsigned int i : cell1->face_indices())
           {
             auto obj1 = cell1->face(i);
             auto obj2 = cell2->face(i);

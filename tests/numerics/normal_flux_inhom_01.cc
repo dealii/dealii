@@ -46,10 +46,10 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   Functions::ConstantFunction<dim> constant_function(1., dim);
   std::map<types::boundary_id, const Function<dim> *> function_map;
-  for (const unsigned int j : GeometryInfo<dim>::face_indices())
+  for (const unsigned int j : tr.begin_active()->face_indices())
     function_map[j] = &constant_function;
 
-  for (const unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i : tr.begin_active()->face_indices())
     {
       deallog << "FE=" << fe.get_name() << ", case=" << i << std::endl;
 
@@ -74,7 +74,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
                                                  endc = dof.end();
   for (; cell != endc; ++cell)
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       if (cell->face(face_no)->at_boundary())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
@@ -100,7 +100,7 @@ test_hyper_cube()
   Triangulation<dim> tr;
   GridGenerator::hyper_cube(tr);
 
-  for (const unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i : tr.begin_active()->face_indices())
     tr.begin_active()->face(i)->set_boundary_id(i);
 
   tr.refine_global(2);

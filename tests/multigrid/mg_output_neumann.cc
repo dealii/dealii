@@ -126,7 +126,7 @@ initialize(const DoFHandler<dim> &dof, MGLevelObject<Vector<double>> &u)
            ++cell)
         {
           cell->get_mg_dof_indices(dof_indices);
-          for (const unsigned int f : GeometryInfo<dim>::face_indices())
+          for (const unsigned int f : cell->face_indices())
             {
               cell->face(f)->get_mg_dof_indices(cell->level(), face_indices);
               if (cell->face(f)->at_boundary())

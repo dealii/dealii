@@ -161,7 +161,7 @@ curved_grid(std::ostream &out)
         }
 
       if (cell->at_boundary())
-        for (const unsigned int face_no : GeometryInfo<2>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             face = cell->face(face_no);
             // insert a modified value for

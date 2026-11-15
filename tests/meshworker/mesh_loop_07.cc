@@ -137,7 +137,7 @@ run()
 
     double reference_area = 0.0;
     for (auto &cell : dof_handler.active_cell_iterators())
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->face(face)->at_boundary())
           {
             reference_area += cell->face(face)->measure();

@@ -57,7 +57,7 @@ test(unsigned int fe_degree)
 
   auto cell = dofh.begin();
 
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : cell->face_indices())
     if (!cell->at_boundary(f))
       {
         fiv.reinit(cell,

@@ -36,11 +36,11 @@ do_test(const Triangulation<dim, spacedim> &tria)
         deallog << cell->line(line)->center(/*respect_manifold=*/true)
                 << std::endl;
       deallog << "Faces on cell with center: " << cell->center() << std::endl;
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         deallog << cell->face(face)->center(/*respect_manifold=*/true)
                 << std::endl;
       deallog << "Center with manifold: " << cell->center(true) << std::endl;
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->at_boundary(face))
           {
             std::vector<Point<spacedim>> points;
@@ -135,7 +135,7 @@ test_cylinder(unsigned int ref = 1)
        cell != tria.end();
        ++cell)
     {
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->at_boundary(face))
           {
             bool cell_at_surfaces = true;

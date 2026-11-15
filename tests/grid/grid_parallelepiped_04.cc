@@ -88,7 +88,7 @@ check_parallelepiped(bool colorize, bool log, const unsigned int (&subd)[dim])
                                                         triangulation.end();
     for (; cell != endc; ++cell)
       {
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           {
             if (cell->face(face)->at_boundary())
               {

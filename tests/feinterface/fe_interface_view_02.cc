@@ -55,7 +55,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
   auto                   cell = dof.begin_active();
 
 
-  for (const auto f : GeometryInfo<dim>::face_indices())
+  for (const auto f : cell->face_indices())
     if (!cell->face(f)->at_boundary())
       {
         fe_iv.reinit(cell,

@@ -44,7 +44,7 @@ test(std::ostream &out)
     {
       deallog << "2d cell " << c
               << " has the following face orientations:" << std::endl;
-      for (const unsigned int l : GeometryInfo<2>::face_indices())
+      for (const unsigned int l : c->face_indices())
         deallog << "    " << (c->face_orientation(l) ? "true" : "false")
                 << std::endl;
     }
@@ -60,7 +60,7 @@ test(std::ostream &out)
         << "3d cell " << c
         << " has the following face orientation/flips and edge orientations:"
         << std::endl;
-      for (const unsigned int f : GeometryInfo<3>::face_indices())
+      for (const unsigned int f : c->face_indices())
         deallog << "    face=" << f
                 << (c->face_orientation(f) ? " -> true" : " -> false")
                 << (c->face_flip(f) ? "/true" : "/false") << std::endl;

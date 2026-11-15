@@ -204,7 +204,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if ((cell->face(f)->center()[2] != -4) &&
           (cell->face(f)->center()[2] != 7) && (cell->face(f)->at_boundary()))
         cell->face(f)->set_boundary_id(1);
@@ -215,7 +215,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       AssertThrow(cell->at_boundary(face_no) ==
                     cell->face(face_no)->at_boundary(),
                   ExcInternalError());

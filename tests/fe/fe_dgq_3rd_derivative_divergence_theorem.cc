@@ -94,7 +94,7 @@ test(const Triangulation<dim> &tr,
       // Precompute boundary integrals to avoid frequent
       // fe_face_values.reinit() calls
       boundary_integrals.fill(Tensor<3, dim>());
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           fe_face_values.reinit(cell, face);
           for (unsigned int c = 0; c < fe.n_components(); ++c)

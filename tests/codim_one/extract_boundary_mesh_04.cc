@@ -105,7 +105,7 @@ main()
            volume_mesh.begin_active();
          cell != volume_mesh.end();
          ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f) && (cell->center()[dim - 1] > 0))
           cell->face(f)->set_all_boundary_ids(1);
 

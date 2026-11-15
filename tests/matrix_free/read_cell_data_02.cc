@@ -118,7 +118,8 @@ private:
                    ExcInternalError());
             // deallog << "c " << cell_data[lane] << std::endl;
 
-            for (const unsigned int face : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face :
+                 data.get_cell_iterator(cell, lane)->face_indices())
               {
                 fe_eval_m.reinit(cell, face);
                 fe_eval_p.reinit(cell, face);

@@ -52,7 +52,7 @@ dofs(const DoFHandler<dim> &dof)
       indices.resize(cell->get_fe().dofs_per_face);
 
       deallog << "Level " << cell->level() << std::endl;
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(f);
           face->get_mg_dof_indices(cell->level(), indices);

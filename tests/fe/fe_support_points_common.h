@@ -67,7 +67,7 @@ check_support(const FiniteElement<dim> &finel, const char *name)
 
   Quadrature<dim - 1> q(face_points, dummy_weights);
 
-  for (const unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i : finel.reference_cell().face_indices())
     {
       const auto qp = QProjector<dim>::project_to_face(
         ReferenceCells::get_hypercube<dim>(),

@@ -224,7 +224,7 @@ test_dg_ecl(const unsigned int degree, const bool curved_mesh)
 
         quad_vec_cells.push_back(quad_cell);
 
-        for (const auto f : GeometryInfo<dim>::face_indices())
+        for (const auto f : vector_accessors.back()->face_indices())
           {
             (void)f;
             quad_vec_faces[cell_batch * n_lanes + v].push_back(quad_face);

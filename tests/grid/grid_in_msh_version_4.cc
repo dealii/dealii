@@ -112,7 +112,7 @@ gmsh_grid(const char *name_v2, const char *name_v4)
       AssertThrow(vertices_v2 == vertices_v4, ExcInternalError());
       std::map<Point<dim>, types::boundary_id, PointComparator<dim>> faces_v2;
       std::map<Point<dim>, types::boundary_id, PointComparator<dim>> faces_v4;
-      for (const unsigned int i : GeometryInfo<dim>::face_indices())
+      for (const unsigned int i : cell_v2->face_indices())
         {
           faces_v2[cell_v2->face(i)->center()] =
             cell_v2->face(i)->boundary_id();

@@ -121,7 +121,7 @@ test_cylinder(unsigned int ref = 1)
        cell != tria.end();
        ++cell)
     {
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->at_boundary(face))
           {
             bool cell_at_surfaces = true;

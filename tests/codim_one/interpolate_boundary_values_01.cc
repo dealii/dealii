@@ -61,7 +61,7 @@ test(std::string filename)
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
           for (unsigned int i = 0; i < fe.dofs_per_vertex; ++i)

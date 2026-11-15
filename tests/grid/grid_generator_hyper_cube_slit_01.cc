@@ -35,7 +35,7 @@ test()
     {
       deallog << "cell:" << std::endl;
 
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           if (cell->face(face)->at_boundary() &&
               cell->face(face)->boundary_id() != 0)

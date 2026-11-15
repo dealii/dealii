@@ -40,7 +40,7 @@ main()
 
   Triangulation<2>::active_cell_iterator cell = tria.begin_active();
   for (; cell != tria.end(); ++cell)
-    for (const unsigned int face_no : GeometryInfo<2>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       if (cell->at_boundary(face_no))
         {
           Triangulation<2>::face_iterator face = cell->face(face_no);

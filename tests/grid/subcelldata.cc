@@ -36,6 +36,7 @@ void
 test()
 {
   Assert(dim == 2 || dim == 3, ExcNotImplemented());
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
 
   std::vector<Point<dim>> vertices(GeometryInfo<dim>::vertices_per_cell);
   vertices[0][0] = 0;
@@ -72,7 +73,7 @@ test()
   if (dim == 2)
     {
       subcelldata.boundary_lines.resize(GeometryInfo<dim>::faces_per_cell);
-      for (const unsigned int i : GeometryInfo<dim>::face_indices())
+      for (const unsigned int i : reference_cell.face_indices())
         {
           subcelldata.boundary_lines[i].vertices[0] = i;
           subcelldata.boundary_lines[i].vertices[1] = (i + 1) % 4;
@@ -82,7 +83,7 @@ test()
   else if (dim == 3)
     {
       subcelldata.boundary_quads.resize(GeometryInfo<dim>::faces_per_cell);
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : reference_cell.face_indices())
         {
           for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
                ++i)

@@ -90,7 +90,7 @@ mesh_info(const Triangulation<dim> &tria, const std::string &filename)
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;

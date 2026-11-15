@@ -126,7 +126,7 @@ test()
   Triangulation<dim>           tria;
   GridGenerator::hyper_ball(tria);
   for (const auto &cell : tria.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         cell->face(f)->set_all_manifold_ids(0);
   tria.set_manifold(0, manifold);

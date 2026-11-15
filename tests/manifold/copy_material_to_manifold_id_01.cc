@@ -36,7 +36,7 @@ print_info(Triangulation<dim, spacedim> &tria)
       deallog << "cell: " << cell << ", material_id: " << cell->material_id()
               << ", manifold_id: " << cell->manifold_id() << std::endl;
 
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         deallog << "face: " << cell->face(f)
                 << ", boundary_id: " << cell->face(f)->boundary_id()
                 << ", manifold_id: " << cell->face(f)->manifold_id()

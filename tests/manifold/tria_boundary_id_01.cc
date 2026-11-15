@@ -36,7 +36,7 @@ print_triangulation_data(Stream                   &stream,
   std::map<int, int> manifold_id_count;
   for (const auto &cell : triangulation.active_cell_iterators())
     {
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           if (cell->face(face)->at_boundary())
             {
@@ -95,7 +95,7 @@ main()
   const types::manifold_id curved_manifold_id = 1;
   for (const auto &cell : tria.active_cell_iterators())
     {
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           if (cell->face(face)->at_boundary())
             {

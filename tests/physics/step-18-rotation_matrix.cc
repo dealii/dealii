@@ -321,7 +321,7 @@ namespace Step18
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->face(f)->at_boundary())
           {
             const Point<dim> face_center = cell->face(f)->center();

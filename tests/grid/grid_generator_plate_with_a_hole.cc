@@ -39,7 +39,7 @@ test()
   std::vector<Tuple> boundary_faces;
 
   for (const auto &cell : triangulation.active_cell_iterators())
-    for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_n : cell->face_indices())
       if (cell->face(face_n)->at_boundary())
         boundary_faces.push_back(
           std::make_tuple(cell->face(face_n)->center(),

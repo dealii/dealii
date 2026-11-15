@@ -44,7 +44,7 @@ set_periodicity(parallel::distributed::Triangulation<dim> &triangulation,
   typename Triangulation<dim>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<dim>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[dim - 1] > 2.9)
         face_1 = cell_1->face(j);

@@ -101,7 +101,7 @@ main()
 
   for (; cell != endc; ++cell)
     if (cell->at_boundary() == true)
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->face(face)->at_boundary() == true)
           for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
                ++v)

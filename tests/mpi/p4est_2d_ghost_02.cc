@@ -75,7 +75,7 @@ test()
                   continue;
                 }
 
-              for (const unsigned int n : GeometryInfo<dim>::face_indices())
+              for (const unsigned int n : cell->face_indices())
                 {
                   if (cell->at_boundary(n))
                     continue;

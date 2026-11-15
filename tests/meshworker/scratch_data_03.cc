@@ -198,7 +198,8 @@ test()
     constraints.distribute_local_to_global(
       c.matrices[0], c.vectors[0], c.local_dof_indices[0], matrix, rhs);
 
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f :
+         ReferenceCells::get_hypercube<dim>().face_indices())
       constraints.distribute_local_to_global(c.matrices[1 + f],
                                              c.local_dof_indices[0],
                                              c.local_dof_indices[1 + f],

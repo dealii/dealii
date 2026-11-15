@@ -74,7 +74,7 @@ main()
 
   Triangulation<dim>::face_iterator face;
   for (cell = tria.begin_active(); cell != endc; ++cell)
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       {
         face = cell->face(face_no);
         if (face->at_boundary())

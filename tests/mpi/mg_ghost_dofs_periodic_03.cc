@@ -49,7 +49,7 @@ test()
       for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
            cell != tria.end();
            ++cell)
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           if (cell->at_boundary(face))
             cell->face(face)->set_all_boundary_ids(face);
 

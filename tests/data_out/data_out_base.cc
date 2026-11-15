@@ -165,7 +165,7 @@ create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
           p.vertices[i][j] =
             PatchInfo<dim>::vertices[i][j] + PatchInfo<dim>::offsets[c][j];
 
-      for (const unsigned int i : GeometryInfo<dim>::face_indices())
+      for (const unsigned int i : p.reference_cell.face_indices())
         p.neighbors[i] = (unsigned int)PatchInfo<dim>::neighbors[c][i];
 
       unsigned int ndata = 1;

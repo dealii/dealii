@@ -65,7 +65,7 @@ check_faces(const DoFHandler<dim> &dof_handler)
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       {
         deallog << "face=" << cell->face(f) << std::endl;
         deallog << "n=" << cell->face(f)->n_active_fe_indices() << std::endl;

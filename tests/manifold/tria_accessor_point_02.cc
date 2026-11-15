@@ -51,7 +51,7 @@ test(unsigned int ref = 1)
        cell != tria.end();
        ++cell)
     {
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->face(f)->at_boundary())
           deallog << "Center: " << cell->face(f)->center(true, true)
                   << ", Norm: " << cell->face(f)->center(true, true).norm()
