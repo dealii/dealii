@@ -51,7 +51,10 @@ test()
 
   // verify whether unrefined cell and neighboring children have matching
   // vertices on their corresponding subface
-  for (unsigned int sf = 0; sf < GeometryInfo<dim>::max_children_per_face; ++sf)
+  for (unsigned int sf = 0; sf < unrefined_cell->face(unrefined_f)
+                                   ->reference_cell()
+                                   .n_isotropic_children();
+       ++sf)
     {
       // unrefined vertex on subface
       const Point<dim> &vertex_unrefined =

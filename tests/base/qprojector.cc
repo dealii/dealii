@@ -74,7 +74,9 @@ check_face(Quadrature<1> &q1)
 
   for (const unsigned int f :
        ReferenceCells::get_hypercube<dim>().face_indices())
-    for (unsigned int s = 0; s < GeometryInfo<dim>::max_children_per_face; ++s)
+    for (unsigned int s = 0;
+         s < ReferenceCells::get_hypercube<dim - 1>().n_isotropic_children();
+         ++s)
       {
         deallog << "Face " << f << " subface " << s << std::endl;
 

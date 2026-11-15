@@ -46,7 +46,8 @@ check_this(const FiniteElement<dim> &fe1, const FiniteElement<dim> &fe2)
 {
   // check all combinations of fe1 and fe2
   for (unsigned int subface = 0;
-       subface < GeometryInfo<dim>::max_children_per_face;
+       subface <
+       fe1.reference_cell().face_reference_cell(0).n_isotropic_children();
        ++subface)
     {
       FullMatrix<double> face_constraints;

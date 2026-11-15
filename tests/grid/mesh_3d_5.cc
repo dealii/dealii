@@ -36,8 +36,7 @@ check_this(Triangulation<3> &tria)
        ++cell)
     for (const unsigned int f : cell->face_indices())
       if (cell->has_children())
-        for (unsigned int c = 0; c < GeometryInfo<3>::max_children_per_face;
-             ++c)
+        for (unsigned int c = 0; c < cell->face(f)->n_children(); ++c)
           {
             Assert(cell->face_orientation(f) ==
                      cell

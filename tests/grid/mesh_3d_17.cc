@@ -98,8 +98,7 @@ check(Triangulation<3> &tria)
 
 
             deallog << "  checking subfaces:" << std::endl;
-            for (unsigned int subface_no = 0;
-                 subface_no < GeometryInfo<dim>::max_children_per_face;
+            for (unsigned int subface_no = 0; subface_no < face->n_children();
                  ++subface_no)
               {
                 deallog << "    subface_no=" << subface_no << std::endl;
