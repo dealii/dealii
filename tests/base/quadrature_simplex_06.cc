@@ -47,7 +47,7 @@ main()
     {
       for (unsigned int index = 0; index < 4; ++index)
         {
-          auto split_point = GeometryInfo<2>::unit_cell_vertex(index);
+          auto split_point = ReferenceCells::get_hypercube<2>().vertex(index);
 
           QSplit<2> quad(QTrianglePolar(m + 1), split_point);
 

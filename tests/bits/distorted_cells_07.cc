@@ -42,7 +42,7 @@ check(const unsigned int testcase)
 
   std::vector<Point<dim>> vertices;
   for (const unsigned int v : reference_cell.vertex_indices())
-    vertices.push_back(GeometryInfo<dim>::unit_cell_vertex(v));
+    vertices.push_back(reference_cell.vertex(v));
 
   switch (testcase)
     {

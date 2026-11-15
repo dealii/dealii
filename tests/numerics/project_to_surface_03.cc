@@ -80,8 +80,8 @@ test()
       // original unit cell as well
       // as the center point
       const Point<dim> trial_point =
-        (point < 8 ? GeometryInfo<dim>::unit_cell_vertex(point) :
-                     Point<dim>(.5, .5, .5));
+        (point < cell->n_vertices() ? cell->reference_cell().vertex(point) :
+                                      Point<dim>(.5, .5, .5));
 
       deallog << "Trial point = " << trial_point << std::endl;
 

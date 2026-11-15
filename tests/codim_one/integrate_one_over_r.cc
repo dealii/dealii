@@ -80,7 +80,7 @@ main()
                         (pow(x, (double)i) * pow(y, (double)j) *
                          quad_de.weight(q) /
                          (quad_de.point(q) -
-                          GeometryInfo<2>::unit_cell_vertex(index))
+                          ReferenceCells::get_hypercube<2>().vertex(index))
                            .norm());
                     }
 
