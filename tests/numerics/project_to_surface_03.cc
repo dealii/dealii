@@ -85,7 +85,7 @@ test()
 
       deallog << "Trial point = " << trial_point << std::endl;
 
-      for (unsigned int e = 0; e < GeometryInfo<dim>::quads_per_cell; ++e)
+      for (const unsigned int e : cell->face_indices())
         {
           const typename Triangulation<dim>::quad_iterator quad =
             get_quad_iterator<dim>(cell, e);

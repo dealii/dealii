@@ -49,7 +49,7 @@ test()
           deallog << "Line " << l << ", " << (int)cell->line(l)->manifold_id()
                   << std::endl;
       if (dim > 2)
-        for (unsigned int l = 0; l < GeometryInfo<dim>::quads_per_cell; ++l)
+        for (const unsigned int l : cell->face_indices())
           deallog << "Quad " << l << ", " << (int)cell->quad(l)->manifold_id()
                   << std::endl;
     }
