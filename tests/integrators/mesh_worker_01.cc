@@ -127,7 +127,7 @@ test_simple(DoFHandler<dim> &mgdofs)
   const FiniteElement<dim> &fe   = dofs.get_fe();
   pattern.reinit(dofs.n_dofs(),
                  dofs.n_dofs(),
-                 (GeometryInfo<dim>::faces_per_cell *
+                 (fe.reference_cell().n_faces() *
                     GeometryInfo<dim>::max_children_per_face +
                   1) *
                    fe.dofs_per_cell);

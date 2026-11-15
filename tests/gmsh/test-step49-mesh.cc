@@ -77,7 +77,7 @@ main(int argc, char **argv)
   std::map<types::boundary_id, unsigned int> boundary_id_counts;
   for (const auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (const unsigned int f : cell->face_indices())
         if (cell->face(f)->at_boundary())
           ++boundary_id_counts[cell->face(f)->boundary_id()];
 

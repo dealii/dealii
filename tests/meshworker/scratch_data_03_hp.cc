@@ -55,6 +55,8 @@ template <int dim, int spacedim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   Triangulation<dim, spacedim>    tria;
   hp::FECollection<dim, spacedim> fe(FE_DGQ<dim, spacedim>(1),
                                      FE_DGQ<dim, spacedim>(2));
@@ -116,9 +118,8 @@ test()
   double gamma = 100;
 
   using ScratchData = MeshWorker::ScratchData<dim, spacedim>;
-  using CopyData = MeshWorker::CopyData<1 + GeometryInfo<dim>::faces_per_cell,
-                                        1,
-                                        1 + GeometryInfo<dim>::faces_per_cell>;
+  using CopyData    = MeshWorker::
+    CopyData<1 + reference_cell.n_faces(), 1, 1 + reference_cell.n_faces()>;
 
   ScratchData scratch(fe, cell_quad, cell_flags, face_quad, face_flags);
   CopyData    copy(0);

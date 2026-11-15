@@ -38,9 +38,7 @@ plot_all_info(const Triangulation<dim> &tria)
 
       deallog << "CellId = " << current_cell_id << std::endl
               << "   {line_index -> face_orientation}: " << std::endl;
-      for (unsigned int face_index = 0;
-           face_index < GeometryInfo<dim>::faces_per_cell;
-           ++face_index)
+      for (const unsigned int face_index : cell->face_indices())
         {
           deallog << "      {" << face_index << " -> "
                   << cell->face_orientation(face_index) << "} " << std::endl;

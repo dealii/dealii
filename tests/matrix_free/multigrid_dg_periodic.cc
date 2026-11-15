@@ -590,8 +590,7 @@ test(const unsigned int fe_degree)
           dim>::construct_multigrid_hierarchy);
       GridGenerator::hyper_cube(tria);
       // set boundary ids on boundaries to the number of the face
-      for (unsigned int face = 2; face < GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (unsigned int face = 2; face < tria.begin()->n_faces(); ++face)
         tria.begin()->face(face)->set_all_boundary_ids(face);
 
       std::vector<

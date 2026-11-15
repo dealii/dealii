@@ -76,8 +76,7 @@ test(const unsigned int n_refinements)
         for (unsigned int cell = cell_range.first; cell < cell_range.second;
              ++cell)
           {
-            for (unsigned int face = 0;
-                 face < GeometryInfo<dim>::faces_per_cell;
+            for (unsigned int face = 0; face < fe.reference_cell().n_faces();
                  ++face)
               {
                 bool temp = true;

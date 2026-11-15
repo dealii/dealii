@@ -80,7 +80,7 @@ check_poly_q(const PolynomialsBernardiRaugel<dim> &poly)
       thirds.clear();
       fourths.clear();
       values.resize(dim * reference_cell.n_vertices() +
-                    GeometryInfo<dim>::faces_per_cell);
+                    reference_cell.n_faces());
 
       deallog << "BR1<" << dim << "> point " << i << " (" << points[i][0];
       for (unsigned int d = 1; d < dim; ++d)
@@ -139,7 +139,7 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
       thirds.clear();
       fourths.clear();
       values.resize(dim * reference_cell.n_vertices() +
-                    GeometryInfo<dim>::faces_per_cell);
+                    reference_cell.n_faces());
 
       deallog << "BR1<" << dim << "> point "
               << (i + reference_cell.n_vertices()) << " (" << points[i][0];
@@ -151,8 +151,7 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
 
       // loop through the bubble shape functions
       for (unsigned int j = dim * reference_cell.n_vertices();
-           j < dim * reference_cell.n_vertices() +
-                 GeometryInfo<dim>::faces_per_cell;
+           j < dim * reference_cell.n_vertices() + reference_cell.n_faces();
            ++j)
         {
           deallog << "BR1<" << dim << "> shape fxn " << j << ": ";

@@ -72,7 +72,7 @@ test()
   SubCellData subcelldata;
   if (dim == 2)
     {
-      subcelldata.boundary_lines.resize(GeometryInfo<dim>::faces_per_cell);
+      subcelldata.boundary_lines.resize(reference_cell.n_faces());
       for (const unsigned int i : reference_cell.face_indices())
         {
           subcelldata.boundary_lines[i].vertices[0] = i;
@@ -82,7 +82,7 @@ test()
     }
   else if (dim == 3)
     {
-      subcelldata.boundary_quads.resize(GeometryInfo<dim>::faces_per_cell);
+      subcelldata.boundary_quads.resize(reference_cell.n_faces());
       for (const unsigned int f : reference_cell.face_indices())
         {
           for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;

@@ -103,8 +103,8 @@ test(const unsigned int n_refinements = 1)
 
           phi.gather_evaluate(src, EvaluationFlags::values);
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               face++)
+          for (const unsigned int face :
+               matrix_free.get_cell_iterator(cell, 0)->face_indices())
             {
               phi_m.reinit(cell, face);
               phi_m.gather_evaluate(src, EvaluationFlags::values);

@@ -296,9 +296,10 @@ main()
   }
   {
     deallog << " hyper_cube:" << std::endl;
-    const unsigned int           dim = 2;
+    const unsigned int dim            = 2;
+    constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
     std::set<types::boundary_id> no_flux_boundary;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (const unsigned int i : reference_cell.face_indices())
       {
         no_flux_boundary.insert(i);
         Triangulation<dim> triangulation(
@@ -308,9 +309,10 @@ main()
       }
   }
   {
-    const unsigned int           dim = 3;
+    const unsigned int dim            = 3;
+    constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
     std::set<types::boundary_id> no_flux_boundary;
-    for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+    for (const unsigned int i : reference_cell.face_indices())
       {
         no_flux_boundary.insert(i);
         Triangulation<dim> triangulation(

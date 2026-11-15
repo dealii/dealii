@@ -80,7 +80,7 @@ main()
   std::set<Point<spacedim>, decltype(is_less_tol)> domain_vertices(is_less_tol);
 
   for (const auto &domain_cell : tria_domain.active_cell_iterators())
-    for (unsigned int f = 0; f < GeometryInfo<spacedim>::faces_per_cell; ++f)
+    for (const unsigned int f : domain_cell->face_indices())
       if (domain_cell->face(f)->at_boundary())
         for (unsigned int v = 0; v < GeometryInfo<spacedim>::vertices_per_face;
              ++v)

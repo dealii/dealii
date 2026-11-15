@@ -80,7 +80,8 @@ check()
 
   // set bottom middle edge to use MyManifold
   for (const unsigned int f : coarse_grid.begin_active()->face_indices())
-    for (unsigned int e = 0; e < GeometryInfo<dim - 1>::faces_per_cell; ++e)
+    for (const unsigned int e :
+         coarse_grid.begin_active()->face(f)->line_indices())
       if (coarse_grid.begin_active()->face(f)->line(e)->center()[0] == 0)
         if (coarse_grid.begin_active()->face(f)->line(e)->center()[1] == 0.5)
           if (coarse_grid.begin_active()->face(f)->line(e)->center()[2] == 0)

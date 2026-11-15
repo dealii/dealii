@@ -434,8 +434,8 @@ namespace Step51
       , u_phi_grad(fe_local.dofs_per_cell)
       , tr_phi(fe.dofs_per_cell)
       , trace_values(face_quadrature_formula.size())
-      , fe_local_support_on_face(GeometryInfo<dim>::faces_per_cell)
-      , fe_support_on_face(GeometryInfo<dim>::faces_per_cell)
+      , fe_local_support_on_face(fe_local.reference_cell().n_faces())
+      , fe_support_on_face(fe.reference_cell().n_faces())
     {
       for (const unsigned int face : fe_local.reference_cell().face_indices())
         for (unsigned int i = 0; i < fe_local.dofs_per_cell; ++i)

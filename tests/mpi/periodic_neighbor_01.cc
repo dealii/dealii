@@ -240,9 +240,7 @@ periodicity_tests<dim>::check_periodicity()
           active_cell_iterator cell_it = the_grid.begin_active();
           for (; cell_it != the_grid.end(); ++cell_it)
             {
-              for (unsigned i_face = 0;
-                   i_face < GeometryInfo<dim>::faces_per_cell;
-                   ++i_face)
+              for (const unsigned int i_face : cell_it->face_indices())
                 {
                   if (cell_it->has_periodic_neighbor(i_face))
                     {

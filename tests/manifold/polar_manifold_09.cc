@@ -51,7 +51,7 @@ main()
        cell != tria.end();
        ++cell)
     {
-      for (unsigned int f = 0; f < GeometryInfo<2>::faces_per_cell; ++f)
+      for (const unsigned int f : cell->face_indices())
         {
           const Point<2>     position = cell->face(f)->center();
           const Tensor<1, 2> polar_normal =

@@ -773,8 +773,8 @@ namespace NavierStokes_DG
             }
         }
 
-        for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-             ++face)
+        for (const unsigned int face :
+             data.get_cell_iterator(cell, 0)->face_indices())
           {
             const auto boundary_ids =
               data.get_faces_by_cells_boundary_id(cell, face);

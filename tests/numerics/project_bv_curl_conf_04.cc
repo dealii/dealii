@@ -89,9 +89,7 @@ test_boundary_values(DoFHandler<dim>    &dof_handler,
       // For testing we take only one cell! Otherwise, local to global is
       // missing
       assert(num_cells == 0);
-      for (unsigned int face = 0;
-           face < dealii::GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : cell->face_indices())
         {
           if (cell->face(face)->at_boundary())
             {

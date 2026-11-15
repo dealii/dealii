@@ -55,7 +55,7 @@ test_boundary(const FiniteElement<dim> &fe, bool diff = false)
 
   typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active();
   cell->get_dof_indices(indices);
-  for (unsigned i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+  for (const unsigned int i : cell->face_indices())
     {
       fev.reinit(cell, i);
       nitsche_tangential_matrix(M, fev, 10.);

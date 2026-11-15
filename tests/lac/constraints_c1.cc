@@ -84,8 +84,7 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
 
       // Do lower left and upper
       // right vertex
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           face += 2)
+      for (unsigned int face = 0; face < cell->n_faces(); face += 2)
         {
           if (cell->at_boundary(face))
             continue;

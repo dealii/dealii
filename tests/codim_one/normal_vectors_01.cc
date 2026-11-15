@@ -59,7 +59,7 @@ test()
     {
       deallog << "Face centered at " << cell->center() << std::endl;
 
-      for (unsigned int f = 0; f < GeometryInfo<dim - 1>::faces_per_cell; ++f)
+      for (const unsigned int f : cell->face_indices())
         {
           deallog << "  Edge centered at " << cell->face(f)->center()
                   << std::endl;

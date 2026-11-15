@@ -145,7 +145,8 @@ test_dg_ecl(const unsigned int degree, const bool curved_mesh)
 
             fe_eval.integrate(EvaluationFlags::gradients);
 
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (const unsigned int f :
+                 matrix_free.get_cell_iterator(cell, 0)->face_indices())
               {
                 // ask for boundary ids of face
                 const auto boundary_ids =
@@ -282,7 +283,8 @@ test_dg_ecl(const unsigned int degree, const bool curved_mesh)
                                    EvaluationFlags::gradients);
               }
 
-            for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+            for (const unsigned int f :
+                 matrix_free.get_cell_iterator(cell, 0)->face_indices())
               {
                 fe_eval_m.reinit(cell, f);
 

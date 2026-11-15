@@ -485,7 +485,7 @@ DGMethod<dim>::setup_system()
 
   sparsity_pattern.reinit(dof_handler.n_dofs(),
                           dof_handler.n_dofs(),
-                          (GeometryInfo<dim>::faces_per_cell *
+                          (fe[0].reference_cell().n_faces() *
                              GeometryInfo<dim>::max_children_per_face +
                            1) *
                             fe[0].dofs_per_cell);

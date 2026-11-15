@@ -106,8 +106,7 @@ integrate_error(const DoFHandler<dim> &dof,
        cell != dof.end();
        ++cell)
     {
-      for (unsigned int face = 0; face != GeometryInfo<dim>::faces_per_cell;
-           ++face)
+      for (const unsigned int face : cell->face_indices())
         {
           if (!cell->at_boundary(face))
             continue;
