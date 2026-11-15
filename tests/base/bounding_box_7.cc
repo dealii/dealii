@@ -39,7 +39,8 @@ test()
     {
       const auto box = random_box<dim>();
       // Check that all vertices get transformed correctly
-      for (auto v : iota(0, GeometryInfo<dim>::vertices_per_cell))
+      for (const unsigned int v :
+           ReferenceCells::get_hypercube<dim>().vertex_indices())
         {
           const auto vertex      = unit_box.vertex(v);
           const auto real_vertex = box.unit_to_real(vertex);

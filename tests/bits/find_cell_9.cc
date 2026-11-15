@@ -47,7 +47,7 @@ create_coarse_grid(Triangulation<2> &coarse_grid)
 
   const std::vector<Point<2>> vertices(&vertices_1[0], &vertices_1[n_vertices]);
 
-  static const int cell_vertices[][GeometryInfo<2>::vertices_per_cell] = {
+  static const int cell_vertices[][reference_cell.n_vertices()] = {
     {0, 1, 3, 2},
     {4, 6, 5, 7},
   };

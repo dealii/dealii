@@ -55,8 +55,7 @@ test()
        ++cell)
     {
       deallog << "Cell: " << cell << std::endl;
-      for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;
-           ++v)
+      for (const unsigned int v : cell->vertex_indices())
         {
           unsigned int index = cell->vertex_dof_index(v, 0);
           deallog << "vertex: " << v << ", global: " << cell->vertex_index(v)

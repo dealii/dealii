@@ -64,6 +64,8 @@ template <int dim>
 void
 test_hyper_cube()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   Triangulation<dim> tr;
 
   // create a hypercube, then shear
@@ -71,8 +73,8 @@ test_hyper_cube()
   // result non-square
   GridGenerator::hyper_cube(tr);
   Point<dim> shift;
-  for (unsigned int i = GeometryInfo<dim>::vertices_per_cell / 2;
-       i < GeometryInfo<dim>::vertices_per_cell;
+  for (unsigned int i = reference_cell.n_vertices() / 2;
+       i < reference_cell.n_vertices();
        ++i)
     tr.begin_active()->vertex(i)[0] += 0.5;
 

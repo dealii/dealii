@@ -44,19 +44,18 @@ test()
   const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
   const std::vector<Point<3>> vertices(&vertices_1[0], &vertices_1[n_vertices]);
 
-  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
-    {0, 1},
-    {2, 3},
-    {4, 5},
-    {6, 7},
-    {8, 9},
-    {10, 11},
-    {12, 13},
-    {14, 15},
-    {16, 17},
-    {18, 19},
-    {20, 21},
-    {22, 23}};
+  static const int   cell_vertices[][reference_cell.n_vertices()] = {{0, 1},
+                                                                     {2, 3},
+                                                                     {4, 5},
+                                                                     {6, 7},
+                                                                     {8, 9},
+                                                                     {10, 11},
+                                                                     {12, 13},
+                                                                     {14, 15},
+                                                                     {16, 17},
+                                                                     {18, 19},
+                                                                     {20, 21},
+                                                                     {22, 23}};
   const unsigned int n_cells = sizeof(cell_vertices) / sizeof(cell_vertices[0]);
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
 

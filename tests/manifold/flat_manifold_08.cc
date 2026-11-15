@@ -32,7 +32,7 @@ test(unsigned int ref = 1)
 {
   constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
 
-  std::vector<Point<spacedim>> vertices(GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<spacedim>> vertices(reference_cell.n_vertices());
   std::vector<CellData<dim>>   cells(1);
   for (const unsigned int i : reference_cell.vertex_indices())
     cells[0].vertices[i] = i;

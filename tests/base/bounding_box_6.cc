@@ -156,7 +156,8 @@ test_vertex()
 
   const BoundingBox<dim> box(lower_upper_corners);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i :
+       ReferenceCells::get_hypercube<dim>().vertex_indices())
     {
       deallog << "vertex " << i << " = " << box.vertex(i) << std::endl;
     }

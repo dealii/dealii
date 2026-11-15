@@ -74,8 +74,7 @@ main()
     is_less_tol);
 
   for (const auto &boundary_cell : tria_boundary.active_cell_iterators())
-    for (unsigned int v = 0; v < GeometryInfo<spacedim - 1>::vertices_per_cell;
-         ++v)
+    for (const unsigned int v : boundary_cell->vertex_indices())
       boundary_vertices.insert(boundary_cell->vertex(v));
 
   std::set<Point<spacedim>, decltype(is_less_tol)> domain_vertices(is_less_tol);

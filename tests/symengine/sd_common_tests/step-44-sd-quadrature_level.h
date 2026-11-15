@@ -777,8 +777,7 @@ namespace Step44
             cell = dof_handler_ref.begin_active(),
             endc = dof_handler_ref.end();
           for (; cell != endc; ++cell)
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_cell;
-                 ++v)
+            for (const unsigned int v : cell->vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6 * parameters.scale)
                 {
                   Tensor<1, dim> soln;

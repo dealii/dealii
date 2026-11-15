@@ -170,7 +170,7 @@ namespace TestGrids
     constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
 
     // undo the ordering above
-    unsigned int tmp[GeometryInfo<3>::vertices_per_cell];
+    unsigned int tmp[reference_cell.n_vertices()];
     for (auto &cell : cells)
       {
         for (const unsigned int i : reference_cell.vertex_indices())

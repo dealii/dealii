@@ -56,9 +56,8 @@ calculate_volume_and_surface_area()
     {
       // Create a box corresponding to the cell.
       std::pair<Point<dim>, Point<dim>> lower_upper_corner;
-      lower_upper_corner.first = cell->vertex(0);
-      lower_upper_corner.second =
-        cell->vertex(GeometryInfo<dim>::vertices_per_cell - 1);
+      lower_upper_corner.first  = cell->vertex(0);
+      lower_upper_corner.second = cell->vertex(cell->n_vertices() - 1);
       const BoundingBox<dim> box(lower_upper_corner);
 
       // Generate immersed quadrature rules.

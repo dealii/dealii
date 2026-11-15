@@ -302,7 +302,7 @@ test(const Triangulation<dim, spacedim> &tria,
   bool hex_mesh = true;
 
   for (const auto &cell : tria.active_cell_iterators())
-    hex_mesh &= (cell->n_vertices() == GeometryInfo<dim>::vertices_per_cell);
+    hex_mesh &= cell->reference_cell().is_hyper_cube();
 
   deallog << std::endl;
 

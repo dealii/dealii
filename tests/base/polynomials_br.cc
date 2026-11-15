@@ -30,6 +30,8 @@ template <int dim>
 void
 check_poly_q(const PolynomialsBernardiRaugel<dim> &poly)
 {
+  const auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   std::vector<Point<dim>>     points;
   std::vector<Tensor<1, dim>> values;
   std::vector<Tensor<2, dim>> grads;
@@ -77,7 +79,7 @@ check_poly_q(const PolynomialsBernardiRaugel<dim> &poly)
       grads2.clear();
       thirds.clear();
       fourths.clear();
-      values.resize(dim * GeometryInfo<dim>::vertices_per_cell +
+      values.resize(dim * reference_cell.n_vertices() +
                     GeometryInfo<dim>::faces_per_cell);
 
       deallog << "BR1<" << dim << "> point " << i << " (" << points[i][0];
@@ -88,8 +90,7 @@ check_poly_q(const PolynomialsBernardiRaugel<dim> &poly)
       poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 
       // loop through the Q_1^d shape functions
-      for (unsigned int j = 0; j < dim * GeometryInfo<dim>::vertices_per_cell;
-           ++j)
+      for (unsigned int j = 0; j < dim * reference_cell.n_vertices(); ++j)
         {
           deallog << "BR1<" << dim << "> shape fxn " << j << ": ";
           for (unsigned int d = 0; d < dim; ++d)
@@ -105,6 +106,8 @@ template <int dim>
 void
 check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
 {
+  const auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   std::vector<Point<dim>>     points;
   std::vector<Tensor<1, dim>> values;
   std::vector<Tensor<2, dim>> grads;
@@ -135,12 +138,11 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
       grads2.clear();
       thirds.clear();
       fourths.clear();
-      values.resize(dim * GeometryInfo<dim>::vertices_per_cell +
+      values.resize(dim * reference_cell.n_vertices() +
                     GeometryInfo<dim>::faces_per_cell);
 
       deallog << "BR1<" << dim << "> point "
-              << (i + GeometryInfo<dim>::vertices_per_cell) << " ("
-              << points[i][0];
+              << (i + reference_cell.n_vertices()) << " (" << points[i][0];
       for (unsigned int d = 1; d < dim; ++d)
         deallog << ", " << points[i][d];
       deallog << ')' << std::endl;
@@ -148,8 +150,8 @@ check_poly_bubble(const PolynomialsBernardiRaugel<dim> &poly)
       poly.evaluate(points[i], values, grads, grads2, thirds, fourths);
 
       // loop through the bubble shape functions
-      for (unsigned int j = dim * GeometryInfo<dim>::vertices_per_cell;
-           j < dim * GeometryInfo<dim>::vertices_per_cell +
+      for (unsigned int j = dim * reference_cell.n_vertices();
+           j < dim * reference_cell.n_vertices() +
                  GeometryInfo<dim>::faces_per_cell;
            ++j)
         {

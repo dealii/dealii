@@ -29,14 +29,14 @@ test(bool second_case = false)
 {
   constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
 
-  std::vector<Point<dim>> vertices(GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<dim>> vertices(reference_cell.n_vertices());
   vertices[1][1] = 1;
   vertices[2][0] = 1;
   vertices[2][1] = 1;
   vertices[3][0] = 1;
   if (dim == 3)
     {
-      for (unsigned int i = 4; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (unsigned int i = 4; i < reference_cell.n_vertices(); ++i)
         vertices[i][2] = -1;
       vertices[5][1] = 1;
       vertices[6][0] = 1;
@@ -51,7 +51,7 @@ test(bool second_case = false)
     {
       std::swap(cells[0].vertices[1], cells[0].vertices[3]);
       std::swap(cells[0].vertices[5], cells[0].vertices[7]);
-      for (unsigned int i = 4; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+      for (unsigned int i = 4; i < reference_cell.n_vertices(); ++i)
         vertices[i][2] = 1;
     }
 

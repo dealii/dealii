@@ -203,7 +203,6 @@ void
 MappingTest<dim>::explicitly_move_mesh()
 {
   std::vector<bool> moved(triangulation.n_vertices(), false);
-  unsigned int      vpc = GeometryInfo<dim>::vertices_per_cell;
 
   typename DoFHandler<dim>::active_cell_iterator cell =
                                                    dof_handler.begin_active(),
@@ -211,7 +210,7 @@ MappingTest<dim>::explicitly_move_mesh()
 
   for (; cell != endc; ++cell)
     {
-      for (unsigned int v = 0; v < vpc; ++v)
+      for (const unsigned int v : cell->vertex_indices())
         {
           if (moved[cell->vertex_index(v)] == false)
             {

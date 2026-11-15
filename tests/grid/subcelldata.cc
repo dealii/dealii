@@ -38,7 +38,7 @@ test()
   Assert(dim == 2 || dim == 3, ExcNotImplemented());
   constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
 
-  std::vector<Point<dim>> vertices(GeometryInfo<dim>::vertices_per_cell);
+  std::vector<Point<dim>> vertices(reference_cell.n_vertices());
   vertices[0][0] = 0;
   vertices[0][1] = 0;
   vertices[1][0] = 2;

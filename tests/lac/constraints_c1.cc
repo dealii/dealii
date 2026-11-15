@@ -42,7 +42,7 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
   // Set up derivative constraints to
   // make element C1
   std::vector<std::vector<std::vector<double>>> vertex_constraints(
-    GeometryInfo<dim>::vertices_per_cell,
+    fe.reference_cell().n_vertices(),
     std::vector<std::vector<double>>(
       dim + 1, std::vector<double>(fe.dofs_per_cell, 0.)));
 

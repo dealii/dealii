@@ -69,9 +69,11 @@ write_patches(const std::vector<DataOutBase::Patch<dim, spacedim>> &patches,
 template <int dim>
 struct PatchInfo
 {
-  static double vertices[GeometryInfo<dim>::vertices_per_cell][3];
-  static double offsets[GeometryInfo<dim>::vertices_per_cell][3];
-  static int    neighbors[GeometryInfo<dim>::vertices_per_cell]
+  static constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
+  static double vertices[reference_cell.n_vertices()][3];
+  static double offsets[reference_cell.n_vertices()][3];
+  static int    neighbors[reference_cell.n_vertices()]
                          [GeometryInfo<dim>::faces_per_cell];
 };
 
@@ -148,7 +150,7 @@ template <int dim, int spacedim>
 void
 create_patches(std::vector<DataOutBase::Patch<dim, spacedim>> &patches)
 {
-  const unsigned int ncells = GeometryInfo<dim>::vertices_per_cell;
+  const unsigned int ncells = ReferenceCells::get_hypercube<dim>().n_vertices();
   const unsigned int nsub   = 3;
 
   patches.resize(ncells);

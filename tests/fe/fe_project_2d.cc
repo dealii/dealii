@@ -147,7 +147,7 @@ create_tria(Triangulation<2> &triangulation,
   const std::vector<Point<2>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
-  static const int cell_vertices[][GeometryInfo<2>::vertices_per_cell] = {
+  static const int cell_vertices[][reference_cell.n_vertices()] = {
     {0, 1, 3, 4}, {1, 2, 4, 5}, {3, 4, 6, 7}, {4, 5, 7, 8}};
 
   std::vector<CellData<2>> cells(n_cells, CellData<2>());

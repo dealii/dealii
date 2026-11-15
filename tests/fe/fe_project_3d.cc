@@ -198,7 +198,7 @@ create_tria(Triangulation<3> &triangulation,
 
   // create grid with all possible combinations of face_flip, face_orientation
   // and face_rotation flags
-  static const int cell_vertices[][GeometryInfo<3>::vertices_per_cell] = {
+  static const int cell_vertices[][reference_cell.n_vertices()] = {
     {0, 1, 9, 10, 3, 4, 12, 13},  // cell 1 standard
     {1, 2, 10, 11, 4, 5, 13, 14}, // cell 2 standard
     //{10, 11, 13, 14, 1, 2, 4, 5},       // cell 2 rotated by 270 deg

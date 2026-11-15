@@ -174,7 +174,7 @@ test()
   const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
   const std::vector<Point<dim>> vertices(&vertices_1[0],
                                          &vertices_1[n_vertices]);
-  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
+  static const int              cell_vertices[][reference_cell.n_vertices()] = {
     // the three cells in the stem
     {0, 2, 4, 3, 7, 9, 11, 10},
     {6, 0, 5, 4, 13, 7, 12, 11},

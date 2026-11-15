@@ -406,7 +406,7 @@ namespace Step27
       {-1.0, +0.5}, {-0.5, +0.5}, {+0.0, +0.5}, {+0.5, +0.5}, {+1.0, +0.5}, //
       {-1.0, +1.0}, {-0.5, +1.0}, {+0.0, +1.0}, {+0.5, +1.0}, {+1.0, +1.0}};
 
-    const std::vector<std::array<int, GeometryInfo<dim>::vertices_per_cell>>
+    const std::vector<std::array<int, reference_cell.n_vertices()>>
       cell_vertices = {{{0, 1, 5, 6}},
                        {{1, 2, 6, 7}},
                        {{2, 3, 7, 8}},

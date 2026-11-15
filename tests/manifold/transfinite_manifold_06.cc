@@ -44,8 +44,7 @@ main()
       for (const unsigned int f : cell->face_indices())
         {
           bool face_at_sphere_boundary = true;
-          for (unsigned int v = 0; v < GeometryInfo<dim - 1>::vertices_per_cell;
-               ++v)
+          for (const unsigned int v : cell->face(f)->vertex_indices())
             if (std::abs(cell->face(f)->vertex(v).norm() - 0.4) > 1e-12)
               face_at_sphere_boundary = false;
           if (face_at_sphere_boundary)

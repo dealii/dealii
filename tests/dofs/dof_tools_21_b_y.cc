@@ -69,10 +69,10 @@ generate_grid(Triangulation<2> &triangulation)
   std::vector<CellData<2>> cells(2, CellData<2>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3};
 
   /* cell 1 */
-  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {7, 6, 5, 4};
+  int cell_vertices_1[reference_cell.n_vertices()] = {7, 6, 5, 4};
 
   for (const unsigned int j : reference_cell.vertex_indices())
     {
@@ -123,10 +123,10 @@ generate_grid(Triangulation<2, 3> &triangulation)
   std::vector<CellData<2>> cells(2, CellData<2>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3};
 
   /* cell 1 */
-  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {7, 6, 5, 4};
+  int cell_vertices_1[reference_cell.n_vertices()] = {7, 6, 5, 4};
 
   for (const unsigned int j : reference_cell.vertex_indices())
     {

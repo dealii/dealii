@@ -595,7 +595,7 @@ LaplaceProblem<2>::create_coarse_grid()
   const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
   const std::vector<Point<dim>> vertices(&vertices_1[0],
                                          &vertices_1[n_vertices]);
-  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
+  static const int              cell_vertices[][reference_cell.n_vertices()] = {
     {0, 1, 5, 6},
     {1, 2, 6, 7},
     {2, 3, 7, 8},
