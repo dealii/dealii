@@ -85,8 +85,8 @@ test()
       subcelldata.boundary_quads.resize(reference_cell.n_faces());
       for (const unsigned int f : reference_cell.face_indices())
         {
-          for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face;
-               ++i)
+          for (const unsigned int i :
+               reference_cell.face_reference_cell(f).vertex_indices())
             subcelldata.boundary_quads[f].vertices[i] = subcells[f][i];
           subcelldata.boundary_quads[f].material_id = 10 * f + 1;
         }

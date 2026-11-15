@@ -68,8 +68,7 @@ test()
         for (const unsigned int f : cell->face_indices())
           if (cell->at_boundary(f) &&
               (cell->face(f)->boundary_id() == boundary_id))
-            for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-                 ++v)
+            for (const unsigned int v : cell->face(f)->vertex_indices())
               for (unsigned int i = 0; i < fe.dofs_per_vertex; ++i)
                 {
                   AssertThrow(bv.find(cell->face(f)->vertex_dof_index(v, i)) !=

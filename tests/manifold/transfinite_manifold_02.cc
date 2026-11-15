@@ -168,8 +168,7 @@ test_cylinder(unsigned int ref = 1)
         if (cell->at_boundary(face))
           {
             bool cell_at_surfaces = true;
-            for (unsigned int i = 1; i < GeometryInfo<dim>::vertices_per_face;
-                 ++i)
+            for (unsigned int i = 1; i < cell->face(face)->n_vertices(); ++i)
               if (std::abs(cell->face(face)->vertex(i)[0] -
                            cell->face(face)->vertex(0)[0]) > 1e-10)
                 cell_at_surfaces = false;

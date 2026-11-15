@@ -63,8 +63,7 @@ check<2>()
           deallog << face->boundary_id() << std::endl;
           typename Manifold<dim>::FaceVertexNormals normals;
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-               ++v)
+          for (const unsigned int v : face->vertex_indices())
             deallog << face->vertex(v) << ": " << normals[v] << std::endl;
         }
     }
@@ -93,8 +92,7 @@ check<3>()
           deallog << face->boundary_id() << std::endl;
           typename Manifold<dim>::FaceVertexNormals normals;
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-               ++v)
+          for (const unsigned int v : face->vertex_indices())
             deallog << face->vertex(v) << ": " << normals[v] << std::endl;
         }
     }

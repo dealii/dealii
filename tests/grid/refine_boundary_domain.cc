@@ -82,8 +82,7 @@ main()
   for (const auto &domain_cell : tria_domain.active_cell_iterators())
     for (const unsigned int f : domain_cell->face_indices())
       if (domain_cell->face(f)->at_boundary())
-        for (unsigned int v = 0; v < GeometryInfo<spacedim>::vertices_per_face;
-             ++v)
+        for (const unsigned int v : domain_cell->face(f)->vertex_indices())
           {
             domain_vertices.insert(domain_cell->face(f)->vertex(v));
           }

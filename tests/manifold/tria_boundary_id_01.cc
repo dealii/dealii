@@ -99,9 +99,8 @@ main()
         {
           if (cell->face(face)->at_boundary())
             {
-              for (unsigned int vertex = 0;
-                   vertex < GeometryInfo<dim>::vertices_per_face;
-                   ++vertex)
+              for (const unsigned int vertex :
+                   cell->face(face)->vertex_indices())
                 {
                   const Point<dim> pt_vertex = cell->face(face)->vertex(vertex);
 

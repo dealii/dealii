@@ -78,9 +78,7 @@ main()
       {
         face = cell->face(face_no);
         if (face->at_boundary())
-          for (unsigned int vertex_no = 0;
-               vertex_no < GeometryInfo<dim>::vertices_per_face;
-               ++vertex_no)
+          for (const unsigned int vertex_no : face->vertex_indices())
             {
               const Point<dim> &old_vertex = face->vertex(vertex_no);
 

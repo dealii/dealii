@@ -45,7 +45,7 @@ main()
         {
           Triangulation<3>::face_iterator face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_face; ++v)
+          for (const unsigned int v : face->vertex_indices())
             {
               AssertThrow((boundary.normal_vector(face, face->vertex(v)) -
                            normals[v] / normals[v].norm())

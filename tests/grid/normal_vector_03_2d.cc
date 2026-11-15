@@ -83,8 +83,7 @@ main()
               Point<2>     p;
               Tensor<1, 2> normal;
 
-              for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_face;
-                   ++v)
+              for (const unsigned int v : face->vertex_indices())
                 {
                   p += face->vertex(v) *
                        linear_interpolator.shape_value(v, Point<1>(xi));

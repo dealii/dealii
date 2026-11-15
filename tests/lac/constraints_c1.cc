@@ -89,7 +89,7 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
           if (cell->at_boundary(face))
             continue;
           for (unsigned int fvertex = 0;
-               fvertex < GeometryInfo<dim>::vertices_per_face;
+               fvertex < cell->face(face)->n_vertices();
                ++fvertex)
             {
               const unsigned int other_face =

@@ -162,12 +162,12 @@ print_match(const FaceIterator                &face_1,
   static const int dim = FaceIterator::AccessorType::dimension;
 
   deallog << "face 1";
-  for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
+  for (const unsigned int j : face_1->vertex_indices())
     deallog << " :: " << face_1->vertex(j);
   deallog << std::endl;
 
   deallog << "face 2";
-  for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
+  for (const unsigned int j : face_2->vertex_indices())
     deallog << " :: " << face_2->vertex(j);
   deallog << std::endl;
 

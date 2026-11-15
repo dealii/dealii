@@ -46,7 +46,7 @@ main()
           deallog << " Face" << face_no << std::endl;
           Triangulation<3>::face_iterator face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_face; ++v)
+          for (const unsigned int v : face->vertex_indices())
             {
               deallog << "  vertex=" << face->vertex(v)
                       << ",  normal=" << normals[v] << std::endl;

@@ -74,8 +74,7 @@ main()
     if (cell->at_boundary() == true)
       for (const unsigned int face : cell->face_indices())
         if (cell->face(face)->at_boundary() == true)
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-               ++v)
+          for (const unsigned int v : cell->face(face)->vertex_indices())
             {
               unsigned int vertex_number = cell->face(face)->vertex_index(v);
               new_points[vertex_number]  = cell->face(face)->vertex(v);

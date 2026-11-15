@@ -41,8 +41,7 @@ check()
       {
         const auto face = cell->face(face_no);
         if (face->boundary_id() == 0)
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-               ++v)
+          for (const unsigned int v : face->vertex_indices())
             {
               const Point<dim>     vertex = face->vertex(v);
               const Tensor<1, dim> tangent_1({-vertex[2], 0., vertex[0]});
