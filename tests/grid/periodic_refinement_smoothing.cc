@@ -37,9 +37,8 @@ template <int dim>
 void
 test()
 {
-  using Smoothing = typename Triangulation<dim>::MeshSmoothing;
   Triangulation<dim> triangulation(
-    Smoothing(Triangulation<dim>::match_refinement_across_periodic_boundaries));
+    Triangulation<dim>::match_refinement_across_periodic_boundaries);
 
   GridGenerator::hyper_cube(triangulation, 0., 1., true);
 
