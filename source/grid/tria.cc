@@ -13568,34 +13568,9 @@ void Triangulation<dim, spacedim>::create_triangulation(
                        construction_data.coarse_cells,
                        SubCellData());
 
-  // create a copy of cell_infos such that we can sort them
-  auto cell_infos = construction_data.cell_infos;
-
-  // sort cell_infos on each level separately
-  for (auto &cell_info : cell_infos)
-    std::sort(
-      cell_info.begin(),
-      cell_info.end(),
-      [&](const TriangulationDescription::CellData<dim> &a,
-          const TriangulationDescription::CellData<dim> &b) {
-        const CellId a_id(a.id);
-        const CellId b_id(b.id);
-
-        const auto a_coarse_cell_index =
-          this->coarse_cell_id_to_coarse_cell_index(a_id.get_coarse_cell_id());
-        const auto b_coarse_cell_index =
-          this->coarse_cell_id_to_coarse_cell_index(b_id.get_coarse_cell_id());
-
-        // according to their coarse-cell index and if that is
-        // same according to their cell id (the result is that
-        // cells on each level are sorted according to their
-        // index on that level - what we need in the following
-        // operations)
-        if (a_coarse_cell_index != b_coarse_cell_index)
-          return a_coarse_cell_index < b_coarse_cell_index;
-        else
-          return a_id < b_id;
-      });
+  // sort cell_infos on each level separately by coarse-cell index and
+  // CellId
+  const auto cell_infos = get_sorted_cell_infos(construction_data.cell_infos);
 
   // 2) create all levels via a sequence of refinements. note that
   //    we must make sure that we actually have cells on this level,
@@ -18596,6 +18571,65 @@ bool Triangulation<dim, spacedim>::prepare_coarsening_and_refinement()
   // after the last loop, i.e., the present state
   return ((coarsen_flags_before != coarsen_flags_before_loop) ||
           (refine_flags_before != refine_flags_before_loop));
+}
+
+
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+std::vector<std::vector<
+  TriangulationDescription::CellData<dim>>> Triangulation<dim, spacedim>::
+  get_sorted_cell_infos(
+    const std::vector<std::vector<TriangulationDescription::CellData<dim>>>
+      &cell_infos) const
+{
+  std::vector<std::vector<TriangulationDescription::CellData<dim>>>
+    sorted_cell_infos(cell_infos.size());
+
+  // compute sort keys once per cell rather than for each comparison
+  std::vector<std::pair<CellId::binary_type, unsigned int>> keys;
+  for (unsigned int level = 0; level < cell_infos.size(); ++level)
+    {
+      const std::vector<TriangulationDescription::CellData<dim>> &level_infos =
+        cell_infos[level];
+      keys.resize(level_infos.size());
+
+      // consecutive cells typically share the same coarse cell, so
+      // cache the result of the last lookup
+      types::coarse_cell_id last_coarse_cell_id =
+        numbers::invalid_coarse_cell_id;
+      unsigned int last_coarse_cell_index = numbers::invalid_unsigned_int;
+      bool         is_sorted              = true;
+      for (unsigned int i = 0; i < level_infos.size(); ++i)
+        {
+          const CellId::binary_type &id = level_infos[i].id;
+          if (id[0] != last_coarse_cell_id || i == 0)
+            {
+              last_coarse_cell_id    = id[0];
+              last_coarse_cell_index = coarse_cell_id_to_coarse_cell_index(
+                static_cast<types::coarse_cell_id>(id[0]));
+            }
+          keys[i].first    = id;
+          keys[i].first[0] = last_coarse_cell_index;
+          keys[i].second   = i;
+          if (i > 0 && keys[i].first < keys[i - 1].first)
+            is_sorted = false;
+        }
+
+      if (is_sorted)
+        sorted_cell_infos[level] = level_infos;
+      else
+        {
+          std::sort(keys.begin(), keys.end(), [](const auto &a, const auto &b) {
+            return a.first < b.first;
+          });
+          sorted_cell_infos[level].reserve(level_infos.size());
+          for (const auto &key : keys)
+            sorted_cell_infos[level].push_back(level_infos[key.second]);
+        }
+    }
+
+  return sorted_cell_infos;
 }
 
 
