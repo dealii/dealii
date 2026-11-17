@@ -19,6 +19,7 @@
 
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/mapping_q.h>
 
 #include <boost/container/small_vector.hpp>
@@ -45,29 +46,20 @@ class Vector;
  *
  * <h3>Usage</h3>
  *
- * The constructor of this class takes two arguments: a reference to the
- * vector that defines the mapping from the reference configuration to the
- * current configuration and a reference to the DoFHandler. The vector should
- * then represent a (flattened out version of a) vector valued field defined
- * at nodes defined by the DoFHandler, where the number of components of
- * the vector field equals the number of space dimensions. Thus, the
- * DoFHandler shall operate on a finite element that has as many components as
- * space dimensions. As an additional requirement, we impose that it have as
- * many degree of freedom per vertex as there are space dimensions; since this
- * object only evaluates the finite element field at the vertices, the values
- * of all other degrees of freedom (not associated to vertices) are ignored.
- * These requirements are met if the finite element which the given DoFHandler
- * operates on is constructed as a system element (FESystem) from @p dim
- * continuous FE_Q() objects.
+ * The two-argument constructor takes a reference to a displacement vector
+ * and its DoFHandler. The finite element must have at least @p spacedim
+ * components. The first @p spacedim components define the displacement;
+ * a ComponentMask can select different components from a coupled solution.
  *
- * In many cases, the shift vector will also be the solution vector of the
- * problem under investigation. If this is not the case (i.e. the number of
- * components of the solution variable is not equal to the space dimension,
- * e.g. for scalar problems in <tt>dim>1</tt> where the Eulerian coordinates
- * only give a background field) or for coupled problems where more variables
- * are computed than just the flow field), then a different DoFHandler has to
- * be set up on the given triangulation, and the shift vector has then to be
- * associated to it.
+ * Each selected component must have exactly one primitive degree of freedom
+ * at each vertex. Selected shape functions associated with other degrees of
+ * freedom must vanish at vertices, since this mapping only reads vertex
+ * coefficients. The other components can use different finite elements.
+ * These requirements are met by @p spacedim continuous FE_Q components.
+ *
+ * The DoFHandler must have a finite element assigned before construction,
+ * through DoFHandler::distribute_dofs(). The finite element must remain
+ * unchanged for the lifetime of the mapping.
  *
  * An example is shown below:
  * @code
@@ -98,18 +90,33 @@ public:
    * Constructor.
    *
    * @param[in] euler_dof_handler A DoFHandler object that defines a finite
-   * element space. This space needs to have exactly dim components
-   * and these will be considered displacements
-   * relative to the original positions of the cells of the triangulation.
-   * This DoFHandler must be based on a <code>FESystem(FE_Q(1),dim)</code>
-   * finite element.
+   * element space with at least @p spacedim components. The first @p spacedim
+   * components are interpreted as displacements relative to the original
+   * cell positions. Each selected component must satisfy the vertex
+   * requirements described in the class documentation. The finite element
+   * must already be assigned to the DoFHandler and remain unchanged for the
+   * lifetime of the mapping.
    * @param[in] euler_vector A finite element function in the space defined by
-   * the first argument. The dim components of this function will be
-   * interpreted as the displacement we use in defining the mapping, relative
-   * to the location of cells of the underlying triangulation.
+   * the first argument. The first @p spacedim components define the displacement.
    */
   MappingQ1Eulerian(const DoFHandler<dim, spacedim> &euler_dof_handler,
                     const VectorType                &euler_vector);
+
+  /**
+   * Construct a mapping using the @p spacedim components selected by
+   * @p component_mask, in increasing component order. Each selected component
+   * must have exactly one primitive degree of freedom at each vertex. Other
+   * components are ignored. Selected shape functions associated with DoFs
+   * away from vertices must vanish at vertices.
+   * An empty mask selects the first @p spacedim components, including in a
+   * field with more components. The DoFHandler must have a finite element
+   * assigned before construction, and that finite element must remain
+   * unchanged for the lifetime of the mapping.
+   */
+  MappingQ1Eulerian(const DoFHandler<dim, spacedim> &euler_dof_handler,
+                    const VectorType                &euler_vector,
+                    const ComponentMask             &component_mask);
+
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -192,6 +199,19 @@ protected:
   ObserverPointer<const DoFHandler<dim, spacedim>,
                   MappingQ1Eulerian<dim, VectorType, spacedim>>
     shiftmap_dof_handler;
+
+  /**
+   * Mask of the selected displacement components, with one entry per finite
+   * element component and exactly @p spacedim entries selected.
+   */
+  const ComponentMask component_mask;
+
+private:
+  /**
+   * Return the vertex DoF indices of the selected displacement components.
+   */
+  std::array<unsigned int, spacedim>
+  get_vertex_dof_indices() const;
 };
 
 /** @} */

@@ -22,6 +22,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 
+#include <deal.II/fe/component_mask.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q.h>
 
@@ -46,6 +47,9 @@ class Vector;
  * $Q_p$ mappings.  It is useful when one wants to calculate shape function
  * information on a domain that is deforming as the computation proceeds.
  *
+ * A ComponentMask can select different displacement components from the
+ * finite element field, in increasing component order.
+ *
  * <h3>Usage</h3>
  *
  * The constructor of this class takes three arguments: the polynomial degree
@@ -57,10 +61,9 @@ class Vector;
  * be equal to (or possibly greater than) the number of space dimensions. If
  * there are more components than space dimensions (for example, if one is
  * working with a coupled problem where there are additional solution
- * variables), the first <tt>dim</tt> components are assumed to represent the
- * displacement field, and the remaining components are ignored.  If this
- * assumption does not hold one may need to set up a separate DoFHandler on
- * the triangulation and associate the desired shift vector to it.
+ * variables), by default the first <tt>spacedim</tt> components are assumed to
+ * represent the displacement field, and the remaining components are ignored.
+ * A ComponentMask can select different displacement components.
  *
  * Typically, the DoFHandler operates on a finite element that is constructed
  * as a system element (FESystem) from continuous FE_Q objects. An example
@@ -78,8 +81,9 @@ class Vector;
  * the first <tt>dim</tt> components will be used, however, to define the Q2
  * mapping.  The remaining components are ignored.
  *
- * Note that it is essential to call the distribute_dofs(...) function before
- * constructing a mapping object.
+ * The DoFHandler must have a finite element assigned before construction,
+ * through DoFHandler::distribute_dofs(). The finite element must remain
+ * unchanged for the lifetime of the mapping.
  *
  * Also note that since the vector of shift values and the dof handler are
  * only associated to this object at construction time, you have to make sure
@@ -99,11 +103,13 @@ public:
    *
    * @param[in] degree The polynomial degree of the desired $Q_p$ mapping.
    * @param[in] euler_dof_handler A DoFHandler object that defines a finite
-   * element space. This space needs to have at least dim components and the
-   * first dim components of the space will be considered displacements
+   * element space. This space needs to have at least spacedim components and
+   * the first spacedim components of the space will be considered displacements
    * relative to the original positions of the cells of the triangulation.
+   * The finite element must already be assigned to the DoFHandler and remain
+   * unchanged for the lifetime of the mapping.
    * @param[in] euler_vector A finite element function in the space defined by
-   * the second argument. The first dim components of this function will be
+   * the second argument. The first spacedim components of this function will be
    * interpreted as the displacement we use in defining the mapping, relative
    * to the location of cells of the underlying triangulation.
    * @param[in] level The multi-grid level at which the mapping will
@@ -114,6 +120,22 @@ public:
                    const DoFHandler<dim, spacedim> &euler_dof_handler,
                    const VectorType                &euler_vector,
                    const unsigned int level = numbers::invalid_unsigned_int);
+
+  /**
+   * Construct a mapping using the @p spacedim components selected by
+   * @p component_mask, in increasing component order. An empty mask selects
+   * the first @p spacedim components, including in a field with more components.
+   * The remaining arguments have the same meaning as in the other constructor.
+   * The DoFHandler must have a finite element assigned before construction,
+   * and that finite element must remain unchanged for the lifetime of the
+   * mapping.
+   */
+  MappingQEulerian(const unsigned int               degree,
+                   const DoFHandler<dim, spacedim> &euler_dof_handler,
+                   const VectorType                &euler_vector,
+                   const ComponentMask             &component_mask,
+                   const unsigned int level = numbers::invalid_unsigned_int);
+
 
   /**
    * Return the mapped vertices of the cell. For the current class, this
@@ -188,6 +210,12 @@ protected:
   ObserverPointer<const DoFHandler<dim, spacedim>,
                   MappingQEulerian<dim, VectorType, spacedim>>
     euler_dof_handler;
+
+  /**
+   * Mask of the selected displacement components, with one entry per finite
+   * element component and exactly @p spacedim entries selected.
+   */
+  const ComponentMask component_mask;
 
 private:
   /**
