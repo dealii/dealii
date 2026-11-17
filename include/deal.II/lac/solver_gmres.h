@@ -66,11 +66,35 @@ namespace internal
   namespace SolverGMRESImplementation
   {
     /**
-     * Class to hold temporary vectors.  This class automatically allocates a
-     * new vector, once it is needed.
-     *
-     * A future version should also be able to shift through vectors
-     * automatically, avoiding restart.
+     * Forward declaration of device-side data (pointer arrays, coefficients,
+     * partial sums) of the orthogonalization kernels for
+     * LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>.
+     */
+    template <typename Number>
+    struct DeviceData;
+
+    /**
+     * Data used by the optimized orthogonalization kernels for deal.II's own
+     * vector types.
+     */
+    template <typename Number>
+    struct OrthogonalizationData
+    {
+      /**
+       * Pointers to the local data of the vectors to work on.
+       */
+      std::vector<const Number *> vector_ptrs;
+
+      /**
+       * Persistent device data for vectors in MemorySpace::Default, created
+       * on first use to avoid repeated allocations on the device.
+       */
+      std::shared_ptr<DeviceData<Number>> device_data;
+    };
+
+    /**
+     * Class to hold temporary vectors of SolverGMRES. This class
+     * automatically allocates a new vector, once it is needed.
      */
     template <typename VectorType>
     class TmpVectors
@@ -197,9 +221,11 @@ namespace internal
       get_hessenberg_matrix() const;
 
       /**
-       * Temporary vector to implement work for deal.II vector types
+       * Temporary data used to pass vector pointers and related fields to the
+       * specialized orthogonalization implementation for deal.II vector
+       * types.
        */
-      std::vector<const Number *> vector_ptrs;
+      OrthogonalizationData<Number> temp_data;
 
     private:
       /**
@@ -1090,24 +1116,39 @@ namespace internal
 
 
 
-    template <typename VectorType,
-              std::enable_if_t<!IsBlockVector<VectorType>::value, VectorType>
-                * = nullptr>
-    unsigned int
-    n_blocks(const VectorType &)
-    {
-      return 1;
-    }
+    template <typename VectorType>
+    struct is_dealii_device_vector : std::false_type
+    {};
+
+    template <typename Number>
+    struct is_dealii_device_vector<
+      LinearAlgebra::distributed::Vector<Number, MemorySpace::Default>>
+      : std::true_type
+    {};
+
+    template <typename Number>
+    struct is_dealii_device_vector<
+      LinearAlgebra::distributed::BlockVector<Number, MemorySpace::Default>>
+      : std::true_type
+    {};
 
 
 
-    template <typename VectorType,
-              std::enable_if_t<IsBlockVector<VectorType>::value, VectorType> * =
-                nullptr>
+    template <typename VectorType>
+    constexpr bool use_generic_implementation =
+      !is_dealii_compatible_vector<VectorType>::value &&
+      !is_dealii_device_vector<VectorType>::value;
+
+
+
+    template <typename VectorType>
     unsigned int
     n_blocks(const VectorType &vector)
     {
-      return vector.n_blocks();
+      if constexpr (IsBlockVector<VectorType>::value)
+        return vector.n_blocks();
+      else
+        return 1;
     }
 
 
@@ -1160,14 +1201,14 @@ namespace internal
 
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<!is_dealii_compatible_vector<VectorType>::value,
+              std::enable_if_t<use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     void
     Tvmult_add(const unsigned int            n,
                const VectorType             &vv,
                const TmpVectors<VectorType> &orthogonal_vectors,
                Vector<double>               &h,
-               std::vector<const typename VectorType::value_type *> &)
+               OrthogonalizationData<typename VectorType::value_type> &)
     {
       for (unsigned int i = 0; i < n; ++i)
         {
@@ -1181,41 +1222,47 @@ namespace internal
 
 
 
-    // worker method for deal.II's vector types implemented in .cc file
-    template <bool delayed_reorthogonalization, typename Number>
+    // worker method for deal.II's vector types implemented in the .cc file
+    template <bool delayed_reorthogonalization,
+              typename MemorySpace,
+              typename Number>
     void
-    do_Tvmult_add(const unsigned int                 n_vectors,
-                  const std::size_t                  locally_owned_size,
-                  const Number                      *current_vector,
-                  const std::vector<const Number *> &orthogonal_vectors,
-                  Vector<double>                    &b);
+    do_Tvmult_add(const unsigned int             n_vectors,
+                  const std::size_t              locally_owned_size,
+                  const Number                  *current_vector,
+                  OrthogonalizationData<Number> &temp_data,
+                  Vector<double>                &b);
 
 
 
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<is_dealii_compatible_vector<VectorType>::value,
+              std::enable_if_t<!use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     void
     Tvmult_add(
-      const unsigned int                                    n,
-      const VectorType                                     &vv,
-      const TmpVectors<VectorType>                         &orthogonal_vectors,
-      Vector<double>                                       &h,
-      std::vector<const typename VectorType::value_type *> &vector_ptrs)
+      const unsigned int            n,
+      const VectorType             &vv,
+      const TmpVectors<VectorType> &orthogonal_vectors,
+      Vector<double>               &h,
+      OrthogonalizationData<typename VectorType::value_type> &temp_data)
     {
+      using MemorySpace =
+        std::conditional_t<is_dealii_device_vector<VectorType>::value,
+                           MemorySpace::Default,
+                           MemorySpace::Host>;
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          vector_ptrs.resize(n);
+          temp_data.vector_ptrs.resize(n);
           for (unsigned int i = 0; i < n; ++i)
-            vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
+            temp_data.vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
 
-          do_Tvmult_add<delayed_reorthogonalization>(n,
-                                                     block(vv, b).end() -
-                                                       block(vv, b).begin(),
-                                                     block(vv, b).begin(),
-                                                     vector_ptrs,
-                                                     h);
+          do_Tvmult_add<delayed_reorthogonalization, MemorySpace>(
+            n,
+            block(vv, b).end() - block(vv, b).begin(),
+            block(vv, b).begin(),
+            temp_data,
+            h);
         }
 
       Utilities::MPI::sum(h, block(vv, 0).get_mpi_communicator(), h);
@@ -1225,14 +1272,14 @@ namespace internal
 
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<!is_dealii_compatible_vector<VectorType>::value,
+              std::enable_if_t<use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     double
     subtract_and_norm(const unsigned int            n,
                       const TmpVectors<VectorType> &orthogonal_vectors,
                       const Vector<double>         &h,
                       VectorType                   &vv,
-                      std::vector<const typename VectorType::value_type *> &)
+                      OrthogonalizationData<typename VectorType::value_type> &)
     {
       Assert(n > 0, ExcInternalError());
 
@@ -1271,43 +1318,51 @@ namespace internal
 
 
 
-    // worker method for deal.II's vector types implemented in .cc file
-    template <bool delayed_reorthogonalization, typename Number>
+    // worker method for deal.II's host vector types implemented in the .cc
+    // file
+    template <bool delayed_reorthogonalization,
+              typename MemorySpace,
+              typename Number>
     double
-    do_subtract_and_norm(const unsigned int                 n_vectors,
-                         const std::size_t                  locally_owned_size,
-                         const std::vector<const Number *> &orthogonal_vectors,
-                         const Vector<double>              &h,
-                         Number                            *current_vector);
+    do_subtract_and_norm(const unsigned int             n_vectors,
+                         const std::size_t              locally_owned_size,
+                         OrthogonalizationData<Number> &temp_data,
+                         const Vector<double>          &h,
+                         Number                        *current_vector);
 
 
 
     template <bool delayed_reorthogonalization,
               typename VectorType,
-              std::enable_if_t<is_dealii_compatible_vector<VectorType>::value,
+              std::enable_if_t<!use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     double
     subtract_and_norm(
-      const unsigned int                                    n,
-      const TmpVectors<VectorType>                         &orthogonal_vectors,
-      const Vector<double>                                 &h,
-      VectorType                                           &vv,
-      std::vector<const typename VectorType::value_type *> &vector_ptrs)
+      const unsigned int            n,
+      const TmpVectors<VectorType> &orthogonal_vectors,
+      const Vector<double>         &h,
+      VectorType                   &vv,
+      OrthogonalizationData<typename VectorType::value_type> &temp_data)
     {
+      using MemorySpace =
+        std::conditional_t<is_dealii_device_vector<VectorType>::value,
+                           MemorySpace::Default,
+                           MemorySpace::Host>;
       double norm_vv_temp = 0.0;
 
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          vector_ptrs.resize(n);
+          temp_data.vector_ptrs.resize(n);
           for (unsigned int i = 0; i < n; ++i)
-            vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
+            temp_data.vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
 
-          norm_vv_temp += do_subtract_and_norm<delayed_reorthogonalization>(
-            n,
-            block(vv, b).end() - block(vv, b).begin(),
-            vector_ptrs,
-            h,
-            block(vv, b).begin());
+          norm_vv_temp +=
+            do_subtract_and_norm<delayed_reorthogonalization, MemorySpace>(
+              n,
+              block(vv, b).end() - block(vv, b).begin(),
+              temp_data,
+              h,
+              block(vv, b).begin());
         }
 
       return std::sqrt(
@@ -1317,7 +1372,7 @@ namespace internal
 
 
     template <typename VectorType,
-              std::enable_if_t<!is_dealii_compatible_vector<VectorType>::value,
+              std::enable_if_t<use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     void
     add(VectorType                   &p,
@@ -1325,7 +1380,7 @@ namespace internal
         const Vector<double>         &h,
         const TmpVectors<VectorType> &tmp_vectors,
         const bool                    zero_out,
-        std::vector<const typename VectorType::value_type *> &)
+        OrthogonalizationData<typename VectorType::value_type> &)
     {
       if (zero_out)
         p.equ(h(0), tmp_vectors[0]);
@@ -1338,40 +1393,45 @@ namespace internal
 
 
 
-    // worker method for deal.II's vector types implemented in .cc file
-    template <typename Number>
+    // worker method for deal.II's host vector types implemented in the .cc
+    // file
+    template <typename MemorySpace, typename Number>
     void
-    do_add(const unsigned int                 n_vectors,
-           const std::size_t                  locally_owned_size,
-           const std::vector<const Number *> &tmp_vectors,
-           const Vector<double>              &h,
-           const bool                         zero_out,
-           Number                            *output);
+    do_add(const unsigned int             n_vectors,
+           const std::size_t              locally_owned_size,
+           OrthogonalizationData<Number> &temp_data,
+           const Vector<double>          &h,
+           const bool                     zero_out,
+           Number                        *output);
 
 
 
     template <typename VectorType,
-              std::enable_if_t<is_dealii_compatible_vector<VectorType>::value,
+              std::enable_if_t<!use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     void
-    add(VectorType                                           &p,
-        const unsigned int                                    n,
-        const Vector<double>                                 &h,
-        const TmpVectors<VectorType>                         &tmp_vectors,
-        const bool                                            zero_out,
-        std::vector<const typename VectorType::value_type *> &vector_ptrs)
+    add(VectorType                                             &p,
+        const unsigned int                                      n,
+        const Vector<double>                                   &h,
+        const TmpVectors<VectorType>                           &tmp_vectors,
+        const bool                                              zero_out,
+        OrthogonalizationData<typename VectorType::value_type> &temp_data)
     {
+      using MemorySpace =
+        std::conditional_t<is_dealii_device_vector<VectorType>::value,
+                           MemorySpace::Default,
+                           MemorySpace::Host>;
       for (unsigned int b = 0; b < n_blocks(p); ++b)
         {
-          vector_ptrs.resize(n);
+          temp_data.vector_ptrs.resize(n);
           for (unsigned int i = 0; i < n; ++i)
-            vector_ptrs[i] = block(tmp_vectors[i], b).begin();
-          do_add(n,
-                 block(p, b).end() - block(p, b).begin(),
-                 vector_ptrs,
-                 h,
-                 zero_out,
-                 block(p, b).begin());
+            temp_data.vector_ptrs[i] = block(tmp_vectors[i], b).begin();
+          do_add<MemorySpace>(n,
+                              block(p, b).end() - block(p, b).begin(),
+                              temp_data,
+                              h,
+                              zero_out,
+                              block(p, b).begin());
         }
     }
 
@@ -1443,7 +1503,7 @@ namespace internal
           h.reinit(n + n + 1);
 
           // global reduction
-          Tvmult_add<true>(n, vv, orthogonal_vectors, h, vector_ptrs);
+          Tvmult_add<true>(n, vv, orthogonal_vectors, h, temp_data);
 
           // delayed correction terms
           double tmp = 0;
@@ -1494,7 +1554,7 @@ namespace internal
           // values and correct the actual norm in the Hessenberg matrix in
           // high precision in the next iteration.
           h(n + n) = hessenberg_matrix(n, n - 1);
-          subtract_and_norm<true>(n, orthogonal_vectors, h, vv, vector_ptrs);
+          subtract_and_norm<true>(n, orthogonal_vectors, h, vv, temp_data);
 
           // transform new column of upper Hessenberg matrix into upper
           // triangular form by computing the respective factor
@@ -1539,9 +1599,9 @@ namespace internal
                        LinearAlgebra::OrthogonalizationStrategy::
                          classical_gram_schmidt)
                 {
-                  Tvmult_add<false>(n, vv, orthogonal_vectors, h, vector_ptrs);
+                  Tvmult_add<false>(n, vv, orthogonal_vectors, h, temp_data);
                   norm_vv = subtract_and_norm<false>(
-                    n, orthogonal_vectors, h, vv, vector_ptrs);
+                    n, orthogonal_vectors, h, vv, temp_data);
                 }
               else
                 {
@@ -2092,7 +2152,7 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
           projected_solution,
           basis_vectors,
           false,
-          arnoldi_process.vector_ptrs);
+          arnoldi_process.temp_data);
       else
         {
           dealii::internal::SolverGMRESImplementation::add(
@@ -2101,7 +2161,7 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
             projected_solution,
             basis_vectors,
             true,
-            arnoldi_process.vector_ptrs);
+            arnoldi_process.temp_data);
           preconditioner.vmult(v, p);
           x.add(1., v);
         }
@@ -2428,7 +2488,7 @@ void SolverMPGMRES<VectorType>::solve_internal(
         projected_solution,
         z,
         false,
-        arnoldi_process.vector_ptrs);
+        arnoldi_process.temp_data);
     }
   while (iteration_state == SolverControl::iterate);
 
