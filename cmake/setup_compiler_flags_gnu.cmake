@@ -225,7 +225,13 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
   #
   # https://github.com/dealii/dealii/issues/15496
   #
-  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-ffp-exception-behavior=strict")
+  # With clang CUDA, only the host compilation supports it: the device
+  # compilation ignores it with a warning for every file.
+  #
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-Xarch_host -ffp-exception-behavior=strict")
+  if(NOT DEAL_II_HAVE_FLAG_Xarch_host__ffp_exception_behavior_strict)
+    enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "-ffp-exception-behavior=strict")
+  endif()
 
   #
   # In recent versions, gcc often eliminates too much debug information
