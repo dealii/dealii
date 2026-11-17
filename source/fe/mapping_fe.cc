@@ -925,74 +925,140 @@ MappingFE<dim, spacedim>::transform_real_to_unit_cell(
 {
   const auto support_points = this->compute_mapping_support_points(cell);
 
-  const double       eps        = 1.e-12 * cell->diameter();
-  const unsigned int loop_limit = 10;
+  const double       eps                   = 1.e-12 * cell->diameter();
+  const double       step_reduction_factor = 0.5;
+  const unsigned int n_step_reductions     = 10;
+  const unsigned int loop_limit            = 10;
 
-  Point<dim> p_unit;
+  // Start the iteration from the inverse of the affine map through the
+  // vertices for simplices, which is exact for cells with straight edges, and
+  // from the barycenter of the reference cell otherwise. The barycenter is
+  // also the fallback if the iteration does not converge from the former or
+  // converges to a point outside of the reference cell, e.g., for strongly
+  // curved cells, where the affine map is a poor approximation or even
+  // inverted.
+  const ReferenceCell<dim> reference_cell = this->fe->reference_cell();
 
-  unsigned int loop = 0;
-
-  // This loop solves the following problem:
-  // grad_F^T residual + (grad_F^T grad_F + grad_F^T hess_F^T dp) dp = 0
-  // where the term
-  // (grad_F^T hess_F dp) is approximated by (-hess_F * residual)
-  // This is basically a second order approximation of Newton method, where the
-  // Jacobian is corrected with a higher order term coming from the hessian.
-  do
+  std::array<Point<dim>, 2> initial_guesses;
+  unsigned int              n_initial_guesses = 0;
+  if (reference_cell.is_simplex() && this->fe->n_dofs_per_vertex() > 0)
     {
-      Point<spacedim> mapped_point;
-
-      // Transpose of the gradient map
-      DerivativeForm<1, spacedim, dim> grad_FT;
-      DerivativeForm<2, spacedim, dim> hess_FT;
-
-      for (unsigned int i = 0; i < this->fe->n_dofs_per_cell(); ++i)
+      // The first support points are the vertices, the vertices of the
+      // reference cell are the origin and the unit vectors. Least squares for
+      // spacedim > dim.
+      Tensor<2, dim> metric;
+      Tensor<1, dim> rhs;
+      for (unsigned int i = 0; i < dim; ++i)
         {
-          mapped_point += support_points[i] * this->fe->shape_value(i, p_unit);
-          const auto grad_F_i    = this->fe->shape_grad(i, p_unit);
-          const auto hessian_F_i = this->fe->shape_grad_grad(i, p_unit);
+          const Tensor<1, spacedim> a_i =
+            support_points[i + 1] - support_points[0];
+          rhs[i] = a_i * (p - support_points[0]);
           for (unsigned int j = 0; j < dim; ++j)
+            metric[i][j] = a_i * (support_points[j + 1] - support_points[0]);
+        }
+      if (determinant(metric) > 0.)
+        initial_guesses[n_initial_guesses++] = Point<dim>(invert(metric) * rhs);
+    }
+  initial_guesses[n_initial_guesses++] = reference_cell.barycenter();
+
+  // Evaluate the residual p - F(p_unit) and the transpose of the gradient of
+  // the map F.
+  const auto evaluate = [&](const Point<dim>                 &p_unit_trial,
+                            Tensor<1, spacedim>              &residual,
+                            DerivativeForm<1, spacedim, dim> &grad_FT) {
+    Point<spacedim> mapped_point;
+    grad_FT = DerivativeForm<1, spacedim, dim>();
+    for (unsigned int i = 0; i < this->fe->n_dofs_per_cell(); ++i)
+      {
+        mapped_point +=
+          support_points[i] * this->fe->shape_value(i, p_unit_trial);
+        const auto grad_F_i = this->fe->shape_grad(i, p_unit_trial);
+        for (unsigned int j = 0; j < dim; ++j)
+          grad_FT[j] += grad_F_i[j] * support_points[i];
+      }
+    residual = p - mapped_point;
+  };
+
+  // The map is in general not injective outside of the reference cell, i.e.,
+  // the iteration may converge to a preimage outside of the reference cell for
+  // a point inside the cell. Hence, the iteration is restarted from the
+  // barycenter for a result outside of the reference cell. If all results are
+  // outside, the point is assumed to be outside the cell and the result
+  // closest to the reference cell is returned.
+  const double tolerance_inside = 1.e-10;
+  bool         found_outside    = false;
+  Point<dim>   p_unit_outside;
+  double       distance_outside = 0.;
+
+  for (unsigned int g = 0; g < n_initial_guesses; ++g)
+    {
+      Point<dim>                       p_unit = initial_guesses[g];
+      Tensor<1, spacedim>              residual;
+      DerivativeForm<1, spacedim, dim> grad_FT;
+      evaluate(p_unit, residual, grad_FT);
+
+      // This loop solves grad_F^T residual = 0 with the Gauss-Newton method,
+      // i.e., the Newton method for dim == spacedim, reducing the step by the
+      // step reduction factor until the residual decreases. The projection of
+      // the residual on the reference coordinate system filters the
+      // components orthogonal to the manifold for spacedim > dim.
+      bool converged = apply_transformation(grad_FT, residual).norm() <= eps;
+      for (unsigned int loop = 0; loop < loop_limit && !converged; ++loop)
+        {
+          const auto grad_FT_residual = apply_transformation(grad_FT, residual);
+
+          Tensor<2, dim> metric_tensor;
+          for (unsigned int j = 0; j < dim; ++j)
+            for (unsigned int l = 0; l < dim; ++l)
+              metric_tensor[j][l] = grad_FT[j] * grad_FT[l];
+          const Tensor<1, dim> step = invert(metric_tensor) * grad_FT_residual;
+
+          bool   step_accepted = false;
+          double step_length   = 1.0;
+          for (unsigned int i = 0; i < n_step_reductions && !step_accepted; ++i)
             {
-              grad_FT[j] += grad_F_i[j] * support_points[i];
-              for (unsigned int l = 0; l < dim; ++l)
-                hess_FT[j][l] += hessian_F_i[j][l] * support_points[i];
+              const Point<dim> p_unit_trial = p_unit + step_length * step;
+
+              Tensor<1, spacedim>              residual_trial;
+              DerivativeForm<1, spacedim, dim> grad_FT_trial;
+              evaluate(p_unit_trial, residual_trial, grad_FT_trial);
+
+              if (residual_trial.norm() < residual.norm())
+                {
+                  p_unit        = p_unit_trial;
+                  residual      = residual_trial;
+                  grad_FT       = grad_FT_trial;
+                  step_accepted = true;
+                }
+              else
+                step_length *= step_reduction_factor;
             }
+
+          converged = apply_transformation(grad_FT, residual).norm() <= eps;
+          if (!step_accepted)
+            break;
         }
 
-      // Residual
-      const auto residual = p - mapped_point;
-      // Project the residual on the reference coordinate system
-      // to compute the error, and to filter components orthogonal to the
-      // manifold, and compute a 2nd order correction of the metric tensor
-      const auto grad_FT_residual = apply_transformation(grad_FT, residual);
+      if (converged)
+        {
+          if (reference_cell.contains_point(p_unit, tolerance_inside))
+            return p_unit;
 
-      // Do not invert nor compute the metric if not necessary.
-      if (grad_FT_residual.norm() <= eps)
-        break;
-
-      // Now compute the (corrected) metric tensor
-      Tensor<2, dim> corrected_metric_tensor;
-      for (unsigned int j = 0; j < dim; ++j)
-        for (unsigned int l = 0; l < dim; ++l)
-          corrected_metric_tensor[j][l] =
-            -grad_FT[j] * grad_FT[l] + hess_FT[j][l] * residual;
-
-      // And compute the update
-      const auto g_inverse = invert(corrected_metric_tensor);
-      p_unit -= Point<dim>(g_inverse * grad_FT_residual);
-
-      ++loop;
+          const double distance =
+            reference_cell.closest_point(p_unit).distance(p_unit);
+          if (!found_outside || distance < distance_outside)
+            {
+              found_outside    = true;
+              p_unit_outside   = p_unit;
+              distance_outside = distance;
+            }
+        }
     }
-  while (loop < loop_limit);
 
-  // Here we check that in the last execution of while the first
-  // condition was already wrong, meaning the residual was below
-  // eps. Only if the first condition failed, loop will have been
-  // increased and tested, and thus have reached the limit.
-  AssertThrow(loop < loop_limit,
+  AssertThrow(found_outside,
               (typename Mapping<dim, spacedim>::ExcTransformationFailed()));
 
-  return p_unit;
+  return p_unit_outside;
 }
 
 

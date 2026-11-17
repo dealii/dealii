@@ -1,0 +1,7 @@
+
+DEAL::2D ball, mapping degree 2: failed round trips: 0 of 48 face quadrature points on the boundary, 0 of 112 cell quadrature points
+DEAL::2D ball, mapping degree 3: failed round trips: 0 of 48 face quadrature points on the boundary, 0 of 112 cell quadrature points
+DEAL::3D ball, mapping degree 2: failed round trips: 0 of 672 face quadrature points on the boundary, 0 of 1344 cell quadrature points
+DEAL::3D ball, mapping degree 3: failed round trips: 0 of 672 face quadrature points on the boundary, 0 of 1344 cell quadrature points
+DEAL::3D cylinder, mapping degree 2: failed round trips: 0 of 2016 face quadrature points on the boundary, 0 of 3808 cell quadrature points
+DEAL::3D cylinder, mapping degree 3: failed round trips: 0 of 2016 face quadrature points on the boundary, 0 of 3808 cell quadrature points

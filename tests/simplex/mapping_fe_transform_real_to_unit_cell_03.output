@@ -1,0 +1,4 @@
+
+DEAL::FE_PyramidP<3>(1): failed round trips: 0 of 3072 points
+DEAL::FE_PyramidP<3>(2): failed round trips: 0 of 3072 points
+DEAL::FE_PyramidP<3>(3): failed round trips: 0 of 3072 points
