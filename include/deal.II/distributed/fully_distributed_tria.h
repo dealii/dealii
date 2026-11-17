@@ -16,6 +16,7 @@
 
 #include <deal.II/base/config.h>
 
+#include <deal.II/base/index_set.h>
 #include <deal.II/base/mpi_stub.h>
 
 #include <deal.II/distributed/repartitioning_policy_tools.h>
@@ -310,10 +311,29 @@ namespace parallel
         partitioner_distributed;
 
       /**
-       * Sorted list of pairs of coarse-cell ids and their indices.
+       * Set up the data structures used by
+       * coarse_cell_id_to_coarse_cell_index() from
+       * coarse_cell_index_to_coarse_cell_id_vector.
        */
-      std::vector<std::pair<types::coarse_cell_id, unsigned int>>
-        coarse_cell_id_to_coarse_cell_index_vector;
+      void
+      setup_coarse_cell_id_to_coarse_cell_index();
+
+      /**
+       * The coarse-cell ids of all cells on level 0.
+       *
+       * @note Since this IndexSet must be set up before the Triangulation is
+       * completely set up, its size is determined by the largest coarse id on
+       * the current rank, not the number of total coarse ids (which is not
+       * available at that point).
+       */
+      IndexSet coarse_cell_ids;
+
+      /**
+       * Coarse-cell index of each element of coarse_cell_ids, i.e., the
+       * coarse-cell with id `id` has the index
+       * `coarse_cell_indices[coarse_cell_ids.index_within_set(id)]`.
+       */
+      std::vector<unsigned int> coarse_cell_indices;
 
       /**
        * List of the coarse-cell id for each coarse cell (stored at
