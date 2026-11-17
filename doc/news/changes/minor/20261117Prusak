@@ -1,0 +1,10 @@
+New: Portable::internal::batched::resolve_hanging_nodes() resolves the
+hanging-node constraints of a batch of cells, whose values are stored cell
+after cell, within a single team. Like the cell-wise
+Portable::internal::resolve_hanging_nodes(), it uses one thread per
+constrained line of degrees of freedom, now over all cells of the batch, and
+a single team barrier per direction. The constraint masks of the cells of
+the batch are passed as a Kokkos::View, which the caller sets up, e.g., as a
+subview of the masks of all cells.
+<br>
+(Ivan Prusak, 2026/11/17)
