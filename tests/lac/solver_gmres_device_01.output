@@ -1,0 +1,37 @@
+
+DEAL:double host:CGS::GMRES left converged in 85 steps, error ok
+DEAL:double host:CGS::GMRES right converged in 85 steps, error ok
+DEAL:double host:CGS::FGMRES converged in 85 steps, error ok
+DEAL:double host:DCGS::GMRES left converged in 85 steps, error ok
+DEAL:double host:DCGS::GMRES right converged in 85 steps, error ok
+DEAL:double host:DCGS::FGMRES converged in 85 steps, error ok
+DEAL:double host:MGS::GMRES left converged in 85 steps, error ok
+DEAL:double host:MGS::GMRES right converged in 85 steps, error ok
+DEAL:double host:MGS::FGMRES converged in 85 steps, error ok
+DEAL:double default:CGS::GMRES left converged in 85 steps, error ok
+DEAL:double default:CGS::GMRES right converged in 85 steps, error ok
+DEAL:double default:CGS::FGMRES converged in 85 steps, error ok
+DEAL:double default:DCGS::GMRES left converged in 85 steps, error ok
+DEAL:double default:DCGS::GMRES right converged in 85 steps, error ok
+DEAL:double default:DCGS::FGMRES converged in 85 steps, error ok
+DEAL:double default:MGS::GMRES left converged in 85 steps, error ok
+DEAL:double default:MGS::GMRES right converged in 85 steps, error ok
+DEAL:double default:MGS::FGMRES converged in 85 steps, error ok
+DEAL:float host:CGS::GMRES left converged in 41 steps, error ok
+DEAL:float host:CGS::GMRES right converged in 41 steps, error ok
+DEAL:float host:CGS::FGMRES converged in 41 steps, error ok
+DEAL:float host:DCGS::GMRES left converged in 41 steps, error ok
+DEAL:float host:DCGS::GMRES right converged in 41 steps, error ok
+DEAL:float host:DCGS::FGMRES converged in 41 steps, error ok
+DEAL:float host:MGS::GMRES left converged in 41 steps, error ok
+DEAL:float host:MGS::GMRES right converged in 41 steps, error ok
+DEAL:float host:MGS::FGMRES converged in 41 steps, error ok
+DEAL:float default:CGS::GMRES left converged in 41 steps, error ok
+DEAL:float default:CGS::GMRES right converged in 41 steps, error ok
+DEAL:float default:CGS::FGMRES converged in 41 steps, error ok
+DEAL:float default:DCGS::GMRES left converged in 41 steps, error ok
+DEAL:float default:DCGS::GMRES right converged in 41 steps, error ok
+DEAL:float default:DCGS::FGMRES converged in 41 steps, error ok
+DEAL:float default:MGS::GMRES left converged in 41 steps, error ok
+DEAL:float default:MGS::GMRES right converged in 41 steps, error ok
+DEAL:float default:MGS::FGMRES converged in 41 steps, error ok
