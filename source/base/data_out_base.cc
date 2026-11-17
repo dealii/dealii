@@ -7554,23 +7554,12 @@ namespace DataOutBase
       n_ranks,
       n_patches};
 
-    // Rank 0 also collects and writes the size of the data from each
-    // rank in bytes. The static_cast for the destination buffer looks
-    // useless, but without it clang-tidy will complain about a wrong
-    // MPI type.
-    std::vector<std::uint64_t> chunk_sizes(n_ranks);
-    int ierr = MPI_Gather(&my_size,
-                          1,
-                          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
-                          static_cast<std::uint64_t *>(chunk_sizes.data()),
-                          1,
-                          Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
-                          0,
-                          comm);
-    AssertThrowMPI(ierr);
+    // Rank 0 also collects the size of the data from each rank in bytes.
+    const std::vector<std::uint64_t> chunk_sizes =
+      Utilities::MPI::gather(comm, my_size, 0);
 
     MPI_Info info;
-    ierr = MPI_Info_create(&info);
+    int      ierr = MPI_Info_create(&info);
     AssertThrowMPI(ierr);
     MPI_File fh;
     ierr = MPI_File_open(
@@ -8110,13 +8099,7 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
 
   const int myrank = Utilities::MPI::this_mpi_process(comm);
   // And compute the global total
-  int ierr = MPI_Allreduce(local_node_cell_count,
-                           global_node_cell_count,
-                           2,
-                           Utilities::MPI::mpi_type_id_for_type<std::uint64_t>,
-                           MPI_SUM,
-                           comm);
-  AssertThrowMPI(ierr);
+  Utilities::MPI::sum(local_node_cell_count, comm, global_node_cell_count);
 
   // The implementation is a bit complicated because we are supposed to return
   // the correct data on rank 0 and an empty object on all other ranks but all
@@ -8137,7 +8120,8 @@ DataOutInterface<dim, spacedim>::create_xdmf_entry(
   const bool am_i_first_rank_with_data =
     have_data && (Utilities::MPI::this_mpi_process(split_comm) == 0);
 
-  ierr = MPI_Comm_free(&split_comm);
+  int ierr = 0;
+  ierr     = MPI_Comm_free(&split_comm);
   AssertThrowMPI(ierr);
 
   const int tag = 47381;

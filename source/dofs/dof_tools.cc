@@ -2335,26 +2335,13 @@ namespace DoFTools
               dof_handler.n_locally_owned_dofs()),
            ExcInternalError());
 
-    // reduce information from all CPUs
-#ifdef DEAL_II_WITH_MPI
-
+    // Reduce information from all MPI processes:
     if (const parallel::TriangulationBase<dim, spacedim> *tria =
           (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &dof_handler.get_triangulation())))
-      {
-        std::vector<types::global_dof_index> local_dof_count =
-          dofs_per_component;
-
-        const int ierr = MPI_Allreduce(
-          local_dof_count.data(),
-          dofs_per_component.data(),
-          n_target_components,
-          Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
-          MPI_SUM,
-          tria->get_mpi_communicator());
-        AssertThrowMPI(ierr);
-      }
-#endif
+      Utilities::MPI::sum(/* input=*/dofs_per_component,
+                          tria->get_mpi_communicator(),
+                          /* output=*/dofs_per_component);
 
     return dofs_per_component;
   }
@@ -2434,14 +2421,9 @@ namespace DoFTools
           {
             std::vector<types::global_dof_index> local_dof_count =
               dofs_per_block;
-            const int ierr = MPI_Allreduce(
-              local_dof_count.data(),
-              dofs_per_block.data(),
-              n_target_blocks,
-              Utilities::MPI::mpi_type_id_for_type<types::global_dof_index>,
-              MPI_SUM,
-              tria->get_mpi_communicator());
-            AssertThrowMPI(ierr);
+            Utilities::MPI::sum(local_dof_count,
+                                tria->get_mpi_communicator(),
+                                dofs_per_block);
           }
 #endif
       }
