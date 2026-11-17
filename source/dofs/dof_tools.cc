@@ -2335,21 +2335,13 @@ namespace DoFTools
               dof_handler.n_locally_owned_dofs()),
            ExcInternalError());
 
-    // reduce information from all CPUs
-#ifdef DEAL_II_WITH_MPI
-
+    // Reduce information from all MPI processes:
     if (const parallel::TriangulationBase<dim, spacedim> *tria =
           (dynamic_cast<const parallel::TriangulationBase<dim, spacedim> *>(
             &dof_handler.get_triangulation())))
-      {
-        std::vector<types::global_dof_index> local_dof_count =
-          dofs_per_component;
-
-        Utilities::MPI::sum(local_dof_count,
-                            tria->get_mpi_communicator(),
-                            dofs_per_component);
-      }
-#endif
+      Utilities::MPI::sum(/* input=*/dofs_per_component,
+                          tria->get_mpi_communicator(),
+                          /* output=*/dofs_per_component);
 
     return dofs_per_component;
   }
