@@ -1,0 +1,9 @@
+New: The structs Portable::internal::batched::FEEvaluationImpl,
+FEEvaluationImplCollocation and FEEvaluationImplTransformToCollocation
+have been added. They evaluate and integrate values and gradients for a
+batch of cells per team using the batched EvaluatorTensorProduct, with
+the 1d shape data staged in shared memory by the new
+Portable::internal::batched::SharedData struct and the cell range of the
+team described by Portable::internal::batched::BatchedData.
+<br>
+(Ivan Prusak, 2026/11/13)
