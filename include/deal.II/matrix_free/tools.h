@@ -1416,15 +1416,28 @@ namespace MatrixFreeTools
         const int cell     = data->cell_index - gpu_data->first_cell;
 
         constexpr int dofs_per_cell = decltype(fe_eval)::tensor_dofs_per_cell;
-        typename decltype(fe_eval)::value_type
-          diagonal[dofs_per_cell / n_components] = {};
+        constexpr int scalar_dofs_per_cell = dofs_per_cell / n_components;
+        typename decltype(fe_eval)::value_type diagonal[scalar_dofs_per_cell] =
+          {};
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
           {
-            const auto c = i % n_components;
+            // scalar DoF and component of the i-th unit vector
+            const unsigned int scalar_dof = i / n_components;
+            const unsigned int c          = i % n_components;
+
+            // position of (scalar_dof, c) in local_to_global, which is
+            // ordered by component
+            const unsigned int local_index =
+              scalar_dof + scalar_dofs_per_cell * c;
+
+            // Dirichlet constrained DoFs are not written, so their diagonal
+            // entry need not be computed
+            if (gpu_data->local_to_global(local_index, cell) ==
+                numbers::invalid_unsigned_int)
+              continue;
 
             Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(data->team_member,
-                                      dofs_per_cell / n_components),
+              Kokkos::TeamThreadRange(data->team_member, scalar_dofs_per_cell),
               [&](unsigned int j) {
                 typename decltype(fe_eval)::value_type val = {};
 
@@ -1434,7 +1447,7 @@ namespace MatrixFreeTools
                   }
                 else
                   {
-                    val[c] = (i / n_components == j) ? 1 : 0;
+                    val[c] = (scalar_dof == j) ? 1 : 0;
                   }
 
                 fe_eval.submit_dof_value(val, j);
@@ -1469,15 +1482,14 @@ namespace MatrixFreeTools
               if constexpr (n_components == 1)
                 diagonal[i] = fe_eval.get_dof_value(i);
               else
-                diagonal[i / n_components][i % n_components] =
-                  fe_eval.get_dof_value(i / n_components)[i % n_components];
+                diagonal[scalar_dof][c] = fe_eval.get_dof_value(scalar_dof)[c];
             });
 
             data->team_member.team_barrier();
           }
 
         Kokkos::single(Kokkos::PerTeam(data->team_member), [&] {
-          for (unsigned int i = 0; i < dofs_per_cell / n_components; ++i)
+          for (unsigned int i = 0; i < scalar_dofs_per_cell; ++i)
             fe_eval.submit_dof_value(diagonal[i], i);
         });
 
@@ -1490,10 +1502,11 @@ namespace MatrixFreeTools
             Kokkos::parallel_for(
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
-                dst[gpu_data->local_to_global(i, cell)] +=
-                  data->shared_data[m_dof_handler_index].values(
-                    i % (dofs_per_cell / n_components),
-                    i / (dofs_per_cell / n_components));
+                const types::global_dof_index index =
+                  gpu_data->local_to_global(i, cell);
+                if (index != numbers::invalid_unsigned_int)
+                  dst[index] += data->shared_data[m_dof_handler_index].values(
+                    i % scalar_dofs_per_cell, i / scalar_dofs_per_cell);
               });
           }
         else
@@ -1501,11 +1514,13 @@ namespace MatrixFreeTools
             Kokkos::parallel_for(
               Kokkos::TeamThreadRange(data->team_member, dofs_per_cell),
               [&](const int &i) {
-                Kokkos::atomic_add(&dst[gpu_data->local_to_global(i, cell)],
-                                   data->shared_data[m_dof_handler_index]
-                                     .values(i % (dofs_per_cell / n_components),
-                                             i /
-                                               (dofs_per_cell / n_components)));
+                const types::global_dof_index index =
+                  gpu_data->local_to_global(i, cell);
+                if (index != numbers::invalid_unsigned_int)
+                  Kokkos::atomic_add(&dst[index],
+                                     data->shared_data[m_dof_handler_index]
+                                       .values(i % scalar_dofs_per_cell,
+                                               i / scalar_dofs_per_cell));
               });
           }
       };

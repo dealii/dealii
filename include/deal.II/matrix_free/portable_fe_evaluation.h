@@ -416,14 +416,20 @@ namespace Portable
     read_dof_values(const DeviceVector<Number> &src)
   {
     // Populate the scratch memory
-    Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
-                                                 tensor_dofs_per_component),
-                         [&](const int &i) {
-                           for (unsigned int c = 0; c < n_components_; ++c)
-                             shared_data->values(i, c) =
-                               src[precomputed_data->local_to_global(
-                                 i + tensor_dofs_per_component * c, cell_id)];
-                         });
+    Kokkos::parallel_for(
+      Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
+      [&](const int &i) {
+        for (unsigned int c = 0; c < n_components_; ++c)
+          {
+            const types::global_dof_index index =
+              precomputed_data->local_to_global(i +
+                                                  tensor_dofs_per_component * c,
+                                                cell_id);
+            // Dirichlet constrained DoFs read as zero
+            shared_data->values(i, c) =
+              (index == numbers::invalid_unsigned_int) ? Number(0) : src[index];
+          }
+      });
     data->team_member.team_barrier();
 
     for (unsigned int c = 0; c < n_components_; ++c)
@@ -464,14 +470,19 @@ namespace Portable
 
     if (precomputed_data->use_coloring)
       {
-        Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
-          [&](const int &i) {
-            for (unsigned int c = 0; c < n_components_; ++c)
-              dst[precomputed_data->local_to_global(
-                i + tensor_dofs_per_component * c, cell_id)] +=
-                shared_data->values(i, c);
-          });
+        Kokkos::parallel_for(Kokkos::TeamThreadRange(data->team_member,
+                                                     tensor_dofs_per_component),
+                             [&](const int &i) {
+                               for (unsigned int c = 0; c < n_components_; ++c)
+                                 {
+                                   const types::global_dof_index index =
+                                     precomputed_data->local_to_global(
+                                       i + tensor_dofs_per_component * c,
+                                       cell_id);
+                                   if (index != numbers::invalid_unsigned_int)
+                                     dst[index] += shared_data->values(i, c);
+                                 }
+                             });
       }
     else
       {
@@ -479,9 +490,13 @@ namespace Portable
           Kokkos::TeamThreadRange(data->team_member, tensor_dofs_per_component),
           [&](const int &i) {
             for (unsigned int c = 0; c < n_components_; ++c)
-              Kokkos::atomic_add(&dst[precomputed_data->local_to_global(
-                                   i + (tensor_dofs_per_component)*c, cell_id)],
-                                 shared_data->values(i, c));
+              {
+                const types::global_dof_index index =
+                  precomputed_data->local_to_global(
+                    i + tensor_dofs_per_component * c, cell_id);
+                if (index != numbers::invalid_unsigned_int)
+                  Kokkos::atomic_add(&dst[index], shared_data->values(i, c));
+              }
           });
       }
   }
