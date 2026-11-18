@@ -66,9 +66,9 @@ test(const std::string &name, Triangulation<dim> &tria)
 
       const FE_Nothing<dim> fe(reference_cell);
       FEValues<dim>         fe_values(mapping,
-                              fe,
-                              QWitherdenVincentSimplex<dim>(5),
-                              update_jacobians);
+                                      fe,
+                                      QWitherdenVincentSimplex<dim>(5),
+                                      update_jacobians);
 
       unsigned int n_face = 0, n_failed_face = 0, n_cell = 0, n_failed_cell = 0;
 
