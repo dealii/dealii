@@ -1,0 +1,8 @@
+Improved: SolverGMRES and SolverFGMRES now use optimized Kokkos kernels
+for the classical Gram-Schmidt and the delayed classical Gram-Schmidt
+orthogonalization with LinearAlgebra::distributed::Vector in
+MemorySpace::Default. The inner products against all basis vectors are
+computed in a single sweep with a single synchronization and MPI reduction
+per step, and the vector updates are fused into one sweep.
+<br>
+(Martin Kronbichler, 2026/11/17)
