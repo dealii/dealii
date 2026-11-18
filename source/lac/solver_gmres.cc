@@ -61,34 +61,68 @@ namespace internal
         return *this;
       }
     };
-  } // namespace SolverGMRESImplementation
-} // namespace internal
 
-DEAL_II_NAMESPACE_CLOSE
 
-namespace Kokkos
-{
-  template <int block_size, bool delayed_reorthogonalization>
-  struct reduction_identity<
-    dealii::internal::SolverGMRESImplementation::
-      BlockSums<block_size, delayed_reorthogonalization>>
-  {
-    KOKKOS_FORCEINLINE_FUNCTION static dealii::internal::
-      SolverGMRESImplementation::BlockSums<block_size,
-                                           delayed_reorthogonalization>
-      sum()
+
+    /**
+     * Custom Kokkos reducer for BlockSums. We use a reducer class rather
+     * than a specialization of Kokkos::reduction_identity because the latter
+     * would need to be placed in namespace Kokkos, outside of namespace
+     * dealii, which is not compatible with the conversion of this file into
+     * a C++20 module partition (and reduction_identity is not exported by the
+     * Kokkos module).
+     */
+    template <int block_size, bool delayed_reorthogonalization>
+    struct BlockSumsReducer
     {
-      return {};
-    }
-  };
-} // namespace Kokkos
+      using reducer    = BlockSumsReducer;
+      using value_type = BlockSums<block_size, delayed_reorthogonalization>;
+      using result_view_type =
+        Kokkos::View<value_type,
+                     Kokkos::HostSpace,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
 
-DEAL_II_NAMESPACE_OPEN
+      KOKKOS_INLINE_FUNCTION
+      BlockSumsReducer(value_type &result)
+        : value(&result)
+      {}
 
-namespace internal
-{
-  namespace SolverGMRESImplementation
-  {
+      KOKKOS_INLINE_FUNCTION void
+      join(value_type &dest, const value_type &src) const
+      {
+        dest += src;
+      }
+
+      KOKKOS_INLINE_FUNCTION void
+      init(value_type &val) const
+      {
+        val = value_type();
+      }
+
+      KOKKOS_INLINE_FUNCTION value_type &
+      reference() const
+      {
+        return *value;
+      }
+
+      KOKKOS_INLINE_FUNCTION result_view_type
+      view() const
+      {
+        return result_view_type(value);
+      }
+
+      KOKKOS_INLINE_FUNCTION bool
+      references_scalar() const
+      {
+        return true;
+      }
+
+    private:
+      value_type *value;
+    };
+
+
+
     template <bool delayed_reorthogonalization, typename Number>
     void
     do_Tvmult_add_host(const unsigned int             n_vectors,
@@ -563,6 +597,28 @@ namespace internal
 
 
 
+    /**
+     * Return an unmanaged view of the first @p n entries of the
+     * one-dimensional @p view. We use this instead of Kokkos::subview with a
+     * pair of indices because the latter relies on functions that are not
+     * visible when compiling deal.II as a C++20 module with recent Kokkos
+     * versions.
+     */
+    template <typename ViewType>
+    Kokkos::View<typename ViewType::data_type,
+                 typename ViewType::memory_space,
+                 Kokkos::MemoryTraits<Kokkos::Unmanaged>>
+    leading_entries(const ViewType &view, const std::size_t n)
+    {
+      AssertIndexRange(n, view.extent(0) + 1);
+      return Kokkos::View<typename ViewType::data_type,
+                          typename ViewType::memory_space,
+                          Kokkos::MemoryTraits<Kokkos::Unmanaged>>(view.data(),
+                                                                   n);
+    }
+
+
+
     template <typename Number>
     struct DeviceData
     {
@@ -602,10 +658,9 @@ namespace internal
         // in-place update of the last vector in the delayed variant
         for (std::size_t i = 0; i < n_vectors; ++i)
           ptrs_host(i).ptr = const_cast<Number *>(vector_ptrs[i]);
-        const auto range = std::make_pair(std::size_t(0), n_vectors);
         Kokkos::deep_copy(exec,
-                          Kokkos::subview(ptrs, range),
-                          Kokkos::subview(ptrs_host, range));
+                          leading_entries(ptrs, n_vectors),
+                          leading_entries(ptrs_host, n_vectors));
       }
 
       void
@@ -623,10 +678,9 @@ namespace internal
           }
         for (std::size_t i = 0; i < n_coefficients; ++i)
           coefficients_host(i) = h[i];
-        const auto range = std::make_pair(std::size_t(0), n_coefficients);
         Kokkos::deep_copy(exec,
-                          Kokkos::subview(coefficients, range),
-                          Kokkos::subview(coefficients_host, range));
+                          leading_entries(coefficients, n_coefficients),
+                          leading_entries(coefficients_host, n_coefficients));
       }
 
       void
@@ -735,17 +789,21 @@ namespace internal
         KOKKOS_LAMBDA(const Member &team) {
           const std::size_t team_id = team.league_rank();
           const std::size_t begin   = team_id * rows_per_team;
-          const std::size_t end     = Kokkos::min(begin + rows_per_team, size);
+
+          // Would like to use Kokkos::min, but we support Kokkos versions
+          // lower than 3.7, so choose low-level 'min' representation.
+          const std::size_t end =
+            (begin + rows_per_team) < size ? (begin + rows_per_team) : size;
           [[maybe_unused]] const Number *prev = ptrs(n_vectors - 1).ptr;
 
           for (unsigned int block = 0; block < n_blocks; ++block)
             {
               const unsigned int i0 = block * block_size;
               const unsigned int nb =
-                Kokkos::min<unsigned int>(block_size, n_vectors - i0);
+                block_size < (n_vectors - i0) ? block_size : (n_vectors - i0);
 
-              // pad the last block with a valid pointer (data is in caches,
-              // results are discarded) to keep the inner loop unrolled
+              // Pad the last block with a valid pointer (data is in caches,
+              // results are discarded) to keep the inner loop unrolled.
               const Number *v[block_size];
               for (int b = 0; b < block_size; ++b)
                 v[b] = ptrs(i0 + (b < static_cast<int>(nb) ? b : 0)).ptr;
@@ -769,7 +827,8 @@ namespace internal
                   if (delayed_reorthogonalization && block == 0)
                     s.norm_sqr += w_j * w_j;
                 },
-                sums);
+                BlockSumsReducer<block_size, delayed_reorthogonalization>(
+                  sums));
 
               Kokkos::single(Kokkos::PerTeam(team), [&]() {
                 for (unsigned int b = 0; b < nb; ++b)
@@ -798,10 +857,9 @@ namespace internal
           Kokkos::single(Kokkos::PerTeam(team), [&]() { results(i) = sum; });
         });
 
-      const auto range = std::make_pair(0u, n_results);
       Kokkos::deep_copy(exec,
-                        Kokkos::subview(data.results_host, range),
-                        Kokkos::subview(results, range));
+                        leading_entries(data.results_host, n_results),
+                        leading_entries(results, n_results));
       exec.fence();
       for (unsigned int i = 0; i < n_results; ++i)
         h(i) += data.results_host(i);
