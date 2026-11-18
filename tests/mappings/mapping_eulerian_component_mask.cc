@@ -122,9 +122,9 @@ test()
     {
       // The unrelated DG field has no vertex DoFs and a different degree.
       FESystem<dim, spacedim>   fe(FE_Q<dim, spacedim>(degree),
-                                 2 * spacedim + 1,
-                                 FE_DGQ<dim, spacedim>(degree + 1),
-                                 1);
+                                   2 * spacedim + 1,
+                                   FE_DGQ<dim, spacedim>(degree + 1),
+                                   1);
       DoFHandler<dim, spacedim> dofs(tria);
       Vector<double>            displacement;
       std::vector<bool>         selection(fe.n_components(), false);
@@ -139,9 +139,9 @@ test()
                                                           displacement,
                                                           mask);
       MappingQEulerian<dim, Vector<double>, spacedim>  q(degree,
-                                                        dofs,
-                                                        displacement,
-                                                        mask);
+                                                         dofs,
+                                                         displacement,
+                                                         mask);
       check<dim, spacedim>(q, tria, field, selected);
       check<dim, spacedim>(*q.clone(), tria, field, selected);
       if (degree == 1)
@@ -233,9 +233,9 @@ test()
   {
     // A leading DG component changes component-to-vertex DoF indexing.
     FESystem<dim, spacedim>   mixed(FE_DGQ<dim, spacedim>(0),
-                                  1,
-                                  FE_Q<dim, spacedim>(1),
-                                  spacedim);
+                                    1,
+                                    FE_Q<dim, spacedim>(1),
+                                    spacedim);
     FESystem<dim, spacedim>   continuous(FE_Q<dim, spacedim>(1), spacedim + 1);
     DoFHandler<dim, spacedim> dofs(tria);
     Vector<double>            displacement;

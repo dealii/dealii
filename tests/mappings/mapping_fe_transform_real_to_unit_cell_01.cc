@@ -107,9 +107,9 @@ test(const Triangulation<dim> &tria, const FiniteElement<dim> &fe_mapping)
   // All cells have to be valid, i.e., the map is invertible.
   const FE_Nothing<dim> fe(reference_cell);
   FEValues<dim>         fe_values(mapping,
-                          fe,
-                          reference_cell.get_gauss_type_quadrature(5),
-                          update_jacobians);
+                                  fe,
+                                  reference_cell.get_gauss_type_quadrature(5),
+                                  update_jacobians);
 
   unsigned int n_points = 0, n_failed = 0;
   for (const auto &cell : tria.active_cell_iterators())

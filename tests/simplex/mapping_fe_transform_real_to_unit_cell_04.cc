@@ -136,9 +136,9 @@ test(const Manifold<dim> &manifold, const unsigned int n_lattice)
   // the cell is inverted first for larger amplitudes.
   const FE_Nothing<dim> fe(reference_cell);
   FEValues<dim>         fe_values(mapping,
-                          fe,
-                          Quadrature<dim>(lattice),
-                          update_jacobians);
+                                  fe,
+                                  Quadrature<dim>(lattice),
+                                  update_jacobians);
 
   const auto cell = tria.begin_active();
   fe_values.reinit(cell);
