@@ -1,0 +1,6 @@
+
+DEAL:0::dim=2 degree=1 n_components=1: OK
+DEAL:0::dim=2 degree=2 n_components=1: OK
+DEAL:0::dim=2 degree=3 n_components=2: OK
+DEAL:0::dim=3 degree=1 n_components=1: OK
+DEAL:0::dim=3 degree=2 n_components=2: OK
