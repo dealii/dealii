@@ -1,0 +1,9 @@
+Improved: Portable::internal::resolve_hanging_nodes(), which resolves the
+hanging-node constraints in Portable::FEEvaluation, now uses one thread per
+constrained line of degrees of freedom instead of one per degree of
+freedom. It needs no per-thread temporary array of the size of a cell and a
+single team barrier per direction, which considerably speeds up matrix-free
+operators on meshes with hanging nodes, in particular in 3d and for higher
+polynomial degrees.
+<br>
+(Ivan Prusak, 2026/11/16)
