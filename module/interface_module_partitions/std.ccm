@@ -472,6 +472,7 @@ export {
     using std::make_heap;
     using std::max_element;
     using std::memcpy;
+    using std::memmove;
     using std::min_element;
     using std::minmax_element;
     using std::mismatch;
