@@ -282,7 +282,8 @@ namespace Portable
 
       /**
        * Map the position in the local vector to the position in the global
-       * vector.
+       * vector. Degrees of freedom with Dirichlet constraints (constraints
+       * without entries) are stored as numbers::invalid_unsigned_int.
        */
       Kokkos::View<types::global_dof_index **,
                    MemorySpace::Default::kokkos_space>

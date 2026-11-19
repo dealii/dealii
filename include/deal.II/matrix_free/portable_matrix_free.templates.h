@@ -61,10 +61,11 @@ namespace Portable
         const FiniteElement<dim, dim> &fe,
         const Quadrature<1>           &quad,
         const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-                              &shape_info,
-        const DoFHandler<dim> &dof_handler,
-        const UpdateFlags     &update_flags,
-        const unsigned int     dof_handler_index);
+                                        &shape_info,
+        const DoFHandler<dim>           &dof_handler,
+        const AffineConstraints<Number> &constraints,
+        const UpdateFlags               &update_flags,
+        const unsigned int               dof_handler_index);
 
       void
       resize(const unsigned int n_colors);
@@ -78,9 +79,10 @@ namespace Portable
         const std::shared_ptr<const Utilities::MPI::Partitioner> &partitioner);
 
     private:
-      MatrixFree<dim, Number> *data;
-      const unsigned int       dof_handler_index;
-      FEValues<dim>            fe_values;
+      MatrixFree<dim, Number>         *data;
+      const AffineConstraints<Number> &constraints;
+      const unsigned int               dof_handler_index;
+      FEValues<dim>                    fe_values;
       // Convert the default dof numbering to a lexicographic one
       const std::vector<unsigned int> &lexicographic_inv;
       const unsigned int               fe_degree;
@@ -174,11 +176,13 @@ namespace Portable
       const FiniteElement<dim> &fe,
       const Quadrature<1>      &quad,
       const ::dealii::internal::MatrixFreeFunctions::ShapeInfo<Number>
-                            &shape_info,
-      const DoFHandler<dim> &dof_handler,
-      const UpdateFlags     &update_flags,
-      const unsigned int     dof_handler_index)
+                                      &shape_info,
+      const DoFHandler<dim>           &dof_handler,
+      const AffineConstraints<Number> &constraints,
+      const UpdateFlags               &update_flags,
+      const unsigned int               dof_handler_index)
       : data(data)
+      , constraints(constraints)
       , dof_handler_index(dof_handler_index)
       , fe_values(mapping,
                   fe,
@@ -459,8 +463,23 @@ namespace Portable
                                           lexicographic_dof_indices,
                                           cell_id_view);
 
+        // DoFs with a constraint without entries (Dirichlet constraints)
+        // are stored as numbers::invalid_unsigned_int:
+        // FEEvaluation reads them as zero and does not write to them.
         for (unsigned int i = 0; i < dofs_per_cell; ++i)
-          local_to_global_host(i, cell_id) = lexicographic_dof_indices[i];
+          {
+            const types::global_dof_index index = lexicographic_dof_indices[i];
+            const types::global_dof_index global_index =
+              partitioner ? partitioner->local_to_global(index) : index;
+            const auto *entries =
+              constraints.can_store_line(global_index) ?
+                constraints.get_constraint_entries(global_index) :
+                nullptr;
+            local_to_global_host(i, cell_id) =
+              (entries != nullptr && entries->empty()) ?
+                numbers::invalid_unsigned_int :
+                index;
+          }
 
         fe_values.reinit(cell);
 
@@ -1494,6 +1513,7 @@ namespace Portable
                                                    quad,
                                                    shape_info,
                                                    *data.dof_handler,
+                                                   *constraints_[c],
                                                    update_flags,
                                                    c);
 

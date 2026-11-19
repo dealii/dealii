@@ -1,0 +1,8 @@
+Changed: Portable::MatrixFree now stores the indices of degrees of freedom
+with Dirichlet constraints (constraints without entries) as
+numbers::invalid_unsigned_int, like MatrixFree. Portable::FEEvaluation reads
+them as zero in read_dof_values() and skips them in
+distribute_local_to_global(), so that the result of a cell loop no longer
+depends on the values of the source vector at these degrees of freedom.
+<br>
+(Ivan Prusak, 2026/11/18)
