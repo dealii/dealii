@@ -72,7 +72,10 @@ namespace TriangulationDescription
 {
   template <int, int>
   struct Description;
-}
+
+  template <int dim>
+  struct CellData;
+} // namespace TriangulationDescription
 
 namespace GridTools
 {
@@ -4211,6 +4214,18 @@ protected:
    */
   void
   update_periodic_face_map();
+
+  /**
+   * Return a copy of @p cell_infos in which the entries on each level are
+   * sorted first by their coarse-cell index, as given by the function object
+   * @p coarse_cell_id_to_coarse_cell_index, and then by their CellId. The
+   * result is the order in which the cells on each level are enumerated in
+   * the triangulation.
+   */
+  std::vector<std::vector<TriangulationDescription::CellData<dim>>>
+  get_sorted_cell_infos(
+    const std::vector<std::vector<TriangulationDescription::CellData<dim>>>
+      &cell_infos) const;
 
 private:
   /**

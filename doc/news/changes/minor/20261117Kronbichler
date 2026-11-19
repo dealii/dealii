@@ -1,0 +1,5 @@
+Improved: The time for creating a parallel::fullydistributed::Triangulation
+with an TriangulationDescription::Description argument, describing meshes with
+many coarse cells, has been significantly reduced.
+<br>
+(Martin Kronbichler, David Wells, 2026/11/17)
