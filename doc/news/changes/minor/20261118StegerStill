@@ -1,0 +1,4 @@
+Changed: The internal child orientation/rotation logic for triangles has been
+updated so that child cells now similar to their parent element.
+<br>
+(Andreas Steger, Dominik Still, 2026/11/18)
