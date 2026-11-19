@@ -362,6 +362,17 @@ namespace Portable
         const dealii::internal::MatrixFreeFunctions::ConstraintKinds *,
         MemorySpace::Default::kokkos_space>;
 
+      /**
+       * View of the `(fe_degree + 1)^2` 1d interpolation weights in team
+       * scratch memory.
+       */
+      template <typename Number>
+      using ConstraintWeightsView =
+        Kokkos::View<Number *,
+                     MemorySpace::Default::kokkos_space::execution_space::
+                       scratch_memory_space,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
 
 
       /**
@@ -370,7 +381,8 @@ namespace Portable
        * of a batch, whose values are stored cell after cell in @p values
        * with `(fe_degree + 1)^dim` entries each. @p constraint_masks holds
        * the ConstraintKinds of the cells of the batch, of which there are
-       * @p batch_size.
+       * @p batch_size, and @p constraint_weights the 1d interpolation
+       * weights in team scratch memory.
        *
        * As in the cell-wise function, each thread handles one constrained
        * line of one cell, now with the lines of all cells of the batch in a
@@ -386,12 +398,11 @@ namespace Portable
       interpolate_boundary(
         const Kokkos::TeamPolicy<
           MemorySpace::Default::kokkos_space::execution_space>::member_type
-          &team_member,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                                 constraint_weights,
-        const ConstraintMaskView constraint_masks,
-        ViewType                 values,
-        const int                batch_size = 1)
+                                           &team_member,
+        const ConstraintWeightsView<Number> constraint_weights,
+        const ConstraintMaskView            constraint_masks,
+        ViewType                            values,
+        const int                           batch_size = 1)
       {
         static_assert(dim == 2 || dim == 3, "Only implemented for 2d and 3d");
         static_assert(direction >= 0 && direction < dim,
@@ -448,6 +459,9 @@ namespace Portable
           batch_mask |= constraint_masks(cell);
         if ((batch_mask & constrained_faces) == ConstraintKinds::unconstrained)
           return;
+
+        Assert(constraint_weights.size() >= n_dofs_1d * n_dofs_1d,
+               ExcInternalError());
 
         Kokkos::parallel_for(
           Kokkos::TeamVectorRange(team_member, batch_size * n_lines),
@@ -562,7 +576,9 @@ namespace Portable
        * `(fe_degree + 1)^dim` entries each, by applying
        * batched::interpolate_boundary() in all directions one after the
        * other. @p constraint_masks holds the ConstraintKinds of the cells of
-       * the batch, of which there are @p batch_size.
+       * the batch, of which there are @p batch_size, and
+       * @p constraint_weights the 1d interpolation weights in team scratch
+       * memory.
        */
       template <int  dim,
                 int  fe_degree,
@@ -573,12 +589,11 @@ namespace Portable
       resolve_hanging_nodes(
         const Kokkos::TeamPolicy<
           MemorySpace::Default::kokkos_space::execution_space>::member_type
-          &team_member,
-        Kokkos::View<Number *, MemorySpace::Default::kokkos_space>
-                                 constraint_weights,
-        const ConstraintMaskView constraint_masks,
-        ViewType                 values,
-        const int                batch_size = 1)
+                                           &team_member,
+        const ConstraintWeightsView<Number> constraint_weights,
+        const ConstraintMaskView            constraint_masks,
+        ViewType                            values,
+        const int                           batch_size = 1)
       {
         if constexpr (dim == 2)
           {

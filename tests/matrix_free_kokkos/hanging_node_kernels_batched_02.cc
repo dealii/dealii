@@ -20,8 +20,9 @@
 // random as well. The reference kernels resolve one cell per team, like in
 // Portable::FEEvaluation; the batched kernel resolves batches of 1, 3 and 8
 // cells per team, where batches of 3 and 8 cells mix constrained and
-// unconstrained cells and the last batch is shorter. The checksums are the
-// same as in hanging_node_kernels_02.
+// unconstrained cells and the last batch is shorter. The batched kernel
+// reads the weights from team scratch memory, the reference kernels from
+// global memory. The checksums are the same as in hanging_node_kernels_02.
 
 #include <deal.II/base/memory_space.h>
 #include <deal.II/base/utilities.h>
@@ -408,9 +409,10 @@ using ScratchView = Kokkos::View<
 // One team resolves the hanging nodes of the cells [first_cell, first_cell +
 // n_cells_in_batch), staged cell after cell in shared memory, either with the
 // batched kernel, which gets the masks of the batch as a subview of masks,
-// or, for cells_per_team == 1 only, with the reference kernels.
-// Both are called also for unconstrained cells, like in
-// MatrixFreeTools::compute_diagonal().
+// or, for cells_per_team == 1 only, with the reference kernels. For the
+// batched kernel, the weights are copied to shared memory together with the
+// values, before the same barrier. Both kernels are called also for
+// unconstrained cells, like in MatrixFreeTools::compute_diagonal().
 template <int dim, int fe_degree, bool transpose, bool batched>
 struct ResolveBatch
 {
@@ -434,9 +436,19 @@ struct ResolveBatch
     const int offset           = first_cell * n_dofs;
 
     ScratchView values(team_member.team_shmem(), cells_per_team * n_dofs);
+    Portable::internal::batched::ConstraintWeightsView<double> shared_weights;
+    if constexpr (batched)
+      shared_weights =
+        Portable::internal::batched::ConstraintWeightsView<double>(
+          team_member.team_shmem(), weights.size());
 
     Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_values),
                          [&](const int i) { values(i) = src(offset + i); });
+    if constexpr (batched)
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, weights.size()),
+                           [&](const int i) {
+                             shared_weights(i) = weights(i);
+                           });
     team_member.team_barrier();
 
     if constexpr (batched)
@@ -444,7 +456,7 @@ struct ResolveBatch
                                                          fe_degree,
                                                          transpose>(
         team_member,
-        weights,
+        shared_weights,
         Kokkos::subview(
           masks, Kokkos::make_pair(first_cell, first_cell + n_cells_in_batch)),
         values,
@@ -477,7 +489,9 @@ run(const DeviceView<double *>          &weights,
   Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>
     team_policy(exec, n_teams, Kokkos::AUTO);
   team_policy.set_scratch_size(
-    0, Kokkos::PerTeam(ScratchView::shmem_size(cells_per_team * n_dofs)));
+    0,
+    Kokkos::PerTeam(ScratchView::shmem_size(cells_per_team * n_dofs) +
+                    (batched ? ScratchView::shmem_size(weights.size()) : 0)));
 
   Kokkos::parallel_for(team_policy,
                        ResolveBatch<dim, fe_degree, transpose, batched>{

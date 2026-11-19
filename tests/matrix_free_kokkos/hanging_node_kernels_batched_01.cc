@@ -20,7 +20,8 @@
 // teams, once with batches of four cells and once with a single cell per
 // team. The printed values are the ones of the batches of four cells; the
 // ones of a single cell per team must be identical. The interpolation
-// weights are the ones Portable::MatrixFree uses.
+// weights are the ones Portable::MatrixFree uses, staged in team scratch
+// memory.
 
 #include <deal.II/base/memory_space.h>
 
@@ -60,7 +61,8 @@ using ScratchView = Kokkos::View<
 
 
 // One team resolves the hanging nodes of the cells [first, first + n) of its
-// batch, staged cell after cell in shared memory.
+// batch, staged cell after cell in shared memory. The weights are copied to
+// shared memory together with the values, before the same barrier.
 template <int dim, int fe_degree, bool transpose>
 struct ResolveBatch
 {
@@ -84,17 +86,21 @@ struct ResolveBatch
 
     ScratchView shared_values(team_member.team_shmem(),
                               cells_per_team * n_dofs);
+    const Portable::internal::batched::ConstraintWeightsView<double>
+      shared_weights(team_member.team_shmem(), weights.size());
 
     Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, n_values),
                          [&](const int i) {
                            shared_values(i) = values(offset + i);
                          });
+    Kokkos::parallel_for(Kokkos::TeamThreadRange(team_member, weights.size()),
+                         [&](const int i) { shared_weights(i) = weights(i); });
     team_member.team_barrier();
 
     Portable::internal::batched::
       resolve_hanging_nodes<dim, fe_degree, transpose>(
         team_member,
-        weights,
+        shared_weights,
         Kokkos::subview(
           masks, Kokkos::make_pair(first_cell, first_cell + n_cells_in_batch)),
         shared_values,
@@ -146,7 +152,9 @@ run_batched(const AlignedVector<double>        &subface_interpolation_matrix,
   Kokkos::TeamPolicy<MemorySpace::Default::kokkos_space::execution_space>
     team_policy(exec, n_teams, Kokkos::AUTO);
   team_policy.set_scratch_size(
-    0, Kokkos::PerTeam(ScratchView::shmem_size(cells_per_team * n_dofs)));
+    0,
+    Kokkos::PerTeam(ScratchView::shmem_size(cells_per_team * n_dofs) +
+                    ScratchView::shmem_size(weights.size())));
 
   Kokkos::parallel_for(team_policy,
                        ResolveBatch<dim, fe_degree, transpose>{
