@@ -83,11 +83,14 @@ main()
 
   ida.custom_setup = [&](void *memory) {
     ++setup_count;
+
+#if DEAL_II_SUNDIALS_VERSION_GTE(6, 3, 0)
     void *user_data = nullptr;
     Assert(IDAGetUserData(memory, &user_data) == IDA_SUCCESS,
            ExcInternalError());
     Assert(user_data == &ida, ExcInternalError());
     Assert(memory == ida.get_ida_memory(), ExcInternalError());
+#endif
   };
 
   ida.output_step = [](const double,
