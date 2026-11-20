@@ -83,7 +83,7 @@ test_fe(Triangulation<dim> &tr, FiniteElement<dim> &fe)
                          face_quadrature,
                          update_values | update_gradients |
                            update_normal_vectors | update_JxW_values);
-  for (const unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i : cell1->face_indices())
     {
       deallog << "boundary_matrix " << i << std::endl;
       fef1.reinit(cell1, i);

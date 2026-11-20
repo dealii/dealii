@@ -56,7 +56,7 @@ main()
       deallog << "Cell = " << cell << std::endl;
       deallog << "  direction_flag = " << cell->direction_flag() << std::endl;
 
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           deallog << "  face = " << face
                   << "  (neighbor = " << cell->neighbor(face) << ')'

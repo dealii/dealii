@@ -42,11 +42,11 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
   // Set up derivative constraints to
   // make element C1
   std::vector<std::vector<std::vector<double>>> vertex_constraints(
-    GeometryInfo<dim>::vertices_per_cell,
+    fe.reference_cell().n_vertices(),
     std::vector<std::vector<double>>(
       dim + 1, std::vector<double>(fe.dofs_per_cell, 0.)));
 
-  for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+  for (const unsigned int vertex : fe.reference_cell().vertex_indices())
     {
       Point<dim> v;
       for (unsigned int d = 0; d < dim; ++d)
@@ -84,13 +84,12 @@ setup_constraints(const DoFHandler<dim> &dof_handler)
 
       // Do lower left and upper
       // right vertex
-      for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-           face += 2)
+      for (unsigned int face = 0; face < cell->n_faces(); face += 2)
         {
           if (cell->at_boundary(face))
             continue;
           for (unsigned int fvertex = 0;
-               fvertex < GeometryInfo<dim>::vertices_per_face;
+               fvertex < cell->face(face)->n_vertices();
                ++fvertex)
             {
               const unsigned int other_face =

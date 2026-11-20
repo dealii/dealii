@@ -81,7 +81,7 @@ test()
   for (typename DoFHandler<dim>::active_cell_iterator cell = dh.begin_active();
        cell != dh.end();
        ++cell)
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int i : cell->vertex_indices())
       {
         // check that the error is
         // somewhat small. it won't

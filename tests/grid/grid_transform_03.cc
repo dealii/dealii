@@ -75,9 +75,7 @@ main()
   Point<dim> best_pos  = cell->vertex(0);
   double     best_dist = Point<dim>().distance(best_pos);
 
-  for (unsigned int vertex_no = 1;
-       vertex_no < GeometryInfo<dim>::vertices_per_cell;
-       vertex_no++)
+  for (unsigned int vertex_no = 1; vertex_no < cell->n_vertices(); vertex_no++)
     {
       const double dist = Point<dim>().distance(cell->vertex(vertex_no));
       if (dist < best_dist)
@@ -101,10 +99,9 @@ main()
 
   for (; cell != endc; ++cell)
     if (cell->at_boundary() == true)
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->face(face)->at_boundary() == true)
-          for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face;
-               ++v)
+          for (const unsigned int v : cell->face(face)->vertex_indices())
             {
               unsigned int vertex_number = cell->face(face)->vertex_index(v);
               new_points[vertex_number]  = cell->face(face)->vertex(v);

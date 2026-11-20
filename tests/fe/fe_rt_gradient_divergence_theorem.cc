@@ -87,7 +87,7 @@ test(const Triangulation<dim> &tr,
       fe_values.reinit(cell);
 
       deallog << "Cell nodes:" << std::endl;
-      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int i : cell->vertex_indices())
         {
           deallog << i << ": ( ";
           for (unsigned int d = 0; d < dim; ++d)
@@ -98,7 +98,7 @@ test(const Triangulation<dim> &tr,
       // Precompute boundary integrals to avoid frequent
       // fe_face_values.reinit() calls
       boundary_integrals.fill(Tensor<1, dim>());
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           fe_face_values.reinit(cell, face);
           for (unsigned int c = 0; c < fe.n_components(); ++c)
@@ -168,7 +168,7 @@ test_hyper_cube(const double tolerance)
   GridGenerator::hyper_cube(tr);
 
   typename Triangulation<dim>::active_cell_iterator cell = tr.begin_active();
-  for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+  for (const unsigned int i : cell->vertex_indices())
     {
       Point<dim> &point = cell->vertex(i);
       if (std::abs(point[dim - 1] - 1.0) < 1e-5)

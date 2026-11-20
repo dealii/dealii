@@ -58,7 +58,7 @@ test(unsigned int fe_degree)
   auto cell = dofh.begin(1);
   ++cell;
 
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : cell->face_indices())
     if (!cell->at_boundary(f))
       {
         if (!cell->neighbor_is_coarser(f))

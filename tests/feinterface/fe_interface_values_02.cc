@@ -34,7 +34,7 @@ template <int dim, typename IteratorType>
 void
 test(const IteratorType &cell, FEInterfaceValues<dim> &fiv)
 {
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : cell->face_indices())
     if (!cell->at_boundary(f))
       {
         fiv.reinit(cell,

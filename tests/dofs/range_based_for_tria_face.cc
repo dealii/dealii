@@ -36,7 +36,7 @@ check()
     face->set_manifold_id(42);
 
   for (const auto &cell : tr.active_cell_iterators())
-    for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_n : cell->face_indices())
       Assert(cell->face(face_n)->manifold_id() == 42, ExcInternalError());
 
   deallog << "OK" << std::endl;

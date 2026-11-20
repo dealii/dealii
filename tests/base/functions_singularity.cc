@@ -94,7 +94,8 @@ check_function_derivative(const Functions::FlowFunction<dim> &f,
             patches[0].vertices[vertex_number](2) = -1. + 2. * iz;
           ++vertex_number;
         }
-  for (const unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i :
+       ReferenceCells::get_hypercube<dim>().face_indices())
     patches[0].neighbors[i] = numbers::invalid_unsigned_int;
   patches[0].patch_index          = 0;
   patches[0].n_subdivisions       = sub;

@@ -47,7 +47,7 @@ satisfies_level1_at_vertex_rule(const Triangulation<dim> &tr)
          tr.begin_active();
        cell != tr.end();
        ++cell)
-    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int v : cell->vertex_indices())
       {
         min_adjacent_cell_level[cell->vertex_index(v)] =
           std::min<unsigned int>(min_adjacent_cell_level[cell->vertex_index(v)],

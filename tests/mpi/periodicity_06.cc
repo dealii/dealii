@@ -77,7 +77,7 @@ test(const unsigned numRefinementLevels = 2)
 
   // mark faces
   for (auto &cell : triangulation.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       {
         const Point<dim> &face_center = cell->face(f)->center();
         if (cell->face(f)->at_boundary())

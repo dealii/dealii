@@ -33,6 +33,8 @@ template <int dim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   unsigned int myid = Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
 
   if (true)
@@ -75,7 +77,7 @@ test()
                   continue;
                 }
 
-              for (const unsigned int n : GeometryInfo<dim>::face_indices())
+              for (const unsigned int n : cell->face_indices())
                 {
                   if (cell->at_boundary(n))
                     continue;
@@ -94,11 +96,10 @@ test()
           if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
             deallog << "Checksum: " << checksum << std::endl;
 
-          AssertThrow(
-            tr.n_global_active_cells() ==
-              static_cast<unsigned int>(
-                std::pow(1. * GeometryInfo<dim>::max_children_per_cell, i + 1)),
-            ExcInternalError());
+          AssertThrow(tr.n_global_active_cells() ==
+                        static_cast<unsigned int>(std::pow(
+                          1. * reference_cell.n_isotropic_children(), i + 1)),
+                      ExcInternalError());
         }
     }
 

@@ -127,7 +127,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     bool evaluation_point_found                         = false;
     for (; (cell != endc) && !evaluation_point_found; ++cell)
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex : cell->vertex_indices())
         if (cell->vertex(vertex).distance(evaluation_point) <
             cell->diameter() * 1e-8)
           {
@@ -191,7 +191,7 @@ namespace Evaluation
                                                    endc = dof_handler.end();
     unsigned int                                   evaluation_point_hits = 0;
     for (; cell != endc; ++cell)
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex : cell->vertex_indices())
         if (cell->vertex(vertex) == evaluation_point)
           {
             fe_values.reinit(cell);
@@ -1032,7 +1032,8 @@ namespace Data
   void
   Exercise_2_3<2>::create_coarse_grid(Triangulation<2> &coarse_grid)
   {
-    const unsigned int dim = 2;
+    const unsigned int dim            = 2;
+    constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
 
     static const Point<2> vertices_1[] = {
       Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
@@ -1058,7 +1059,7 @@ namespace Data
     const std::vector<Point<dim>> vertices(&vertices_1[0],
                                            &vertices_1[n_vertices]);
 
-    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
+    static const int cell_vertices[][reference_cell.n_vertices()] = {
       {0, 1, 5, 6},
       {1, 2, 6, 7},
       {2, 3, 7, 8},
@@ -1077,7 +1078,7 @@ namespace Data
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int j : reference_cell.vertex_indices())
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       };
@@ -1140,7 +1141,7 @@ namespace DualFunctional
                                                      dof_handler.begin_active(),
                                                    endc = dof_handler.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex : cell->vertex_indices())
         if (cell->vertex(vertex).distance(evaluation_point) <
             cell->diameter() * 1e-8)
           {
@@ -1626,7 +1627,7 @@ namespace LaplaceSolver
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();
          cell != dual_solver.dof_handler.end();
          ++cell)
-      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         face_integrals[cell->face(face_no)] = -1e20;
 
     error_indicators.reinit(
@@ -1647,7 +1648,7 @@ namespace LaplaceSolver
     for (active_cell_iterator cell = dual_solver.dof_handler.begin_active();
          cell != dual_solver.dof_handler.end();
          ++cell, ++present_cell)
-      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           Assert(face_integrals.find(cell->face(face_no)) !=
                    face_integrals.end(),
@@ -1701,7 +1702,7 @@ namespace LaplaceSolver
                             cell_data,
                             error_indicators);
 
-        for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             if (cell->face(face_no)->at_boundary())
               {

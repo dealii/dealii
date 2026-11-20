@@ -59,7 +59,7 @@ main(int argc, char *argv[])
           if (cell->material_id() == 1)
             continue;
 
-          for (unsigned int f = 0; f < GeometryInfo<3>::faces_per_cell; ++f)
+          for (const unsigned int f : cell->face_indices())
             if (cell->at_boundary(f) == false &&
                 cell->neighbor(f)->material_id() == 1)
               cell->set_refine_flag();

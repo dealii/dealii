@@ -145,7 +145,7 @@ main()
   for (auto &cell : tria.cell_iterators())
     {
       bool cell_at_boundary = false;
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f))
           cell_at_boundary = true;
       if (cell_at_boundary == false)

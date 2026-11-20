@@ -83,7 +83,7 @@ test()
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+    for (const unsigned int l : cell->line_indices())
       if (line_already_treated.find(cell->line(l)->index()) ==
           line_already_treated.end())
         // line not yet treated

@@ -70,7 +70,7 @@ test()
              dof_handler.begin_active();
            cell != dof_handler.end();
            ++cell)
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           if (!cell->at_boundary(face))
             {
               Assert(cell->get_fe().dofs_per_face ==

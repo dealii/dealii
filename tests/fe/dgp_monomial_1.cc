@@ -35,7 +35,8 @@ test(const unsigned int degree)
 
   FE_DGPMonomial<dim> fe_q(degree);
 
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < fe_q.reference_cell().n_isotropic_children();
+       ++c)
     {
       const FullMatrix<double> &m = fe_q.get_prolongation_matrix(c);
 

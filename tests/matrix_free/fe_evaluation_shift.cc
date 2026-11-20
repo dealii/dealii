@@ -167,7 +167,8 @@ namespace dealii
         this->matrix_free->get_mapping_info().face_data_by_cells.size(),
       ExcMessage(
         "You must set MatrixFree::AdditionalData::mapping_update_flags_faces_by_cells to use the present reinit method."));
-    AssertIndexRange(face_number, GeometryInfo<dim>::faces_per_cell);
+    AssertIndexRange(face_number,
+                     ReferenceCells::get_hypercube<dim>().n_faces());
     AssertIndexRange(cell_batch_index,
                      this->matrix_free->get_mapping_info().cell_type.size());
     Assert(this->mapped_geometry == nullptr,
@@ -435,8 +436,8 @@ test(const dealii::FE_Poly<dim> &fe)
               deallog << std::endl;
             }
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               face++)
+          for (const unsigned int face :
+               matrix_free.get_cell_iterator(cell, 0)->face_indices())
             {
               deallog << "face " << face << std::endl;
               phi_p.reinit(cell, face);

@@ -125,12 +125,13 @@ test_simple(DoFHandler<dim> &mgdofs)
 
   const DoFHandler<dim>    &dofs = mgdofs;
   const FiniteElement<dim> &fe   = dofs.get_fe();
-  pattern.reinit(dofs.n_dofs(),
-                 dofs.n_dofs(),
-                 (GeometryInfo<dim>::faces_per_cell *
-                    GeometryInfo<dim>::max_children_per_face +
-                  1) *
-                   fe.dofs_per_cell);
+  pattern.reinit(
+    dofs.n_dofs(),
+    dofs.n_dofs(),
+    (fe.reference_cell().n_faces() *
+       fe.reference_cell().face_reference_cell(0).n_isotropic_children() +
+     1) *
+      fe.dofs_per_cell);
   DoFTools::make_flux_sparsity_pattern(dofs, pattern);
   pattern.compress();
   matrix.reinit(pattern);

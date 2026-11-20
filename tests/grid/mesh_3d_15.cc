@@ -48,11 +48,11 @@ check_this(Triangulation<3> &tria)
 
   DoFHandler<3>::active_cell_iterator cell = dof_handler.begin_active();
   for (; cell != dof_handler.end(); ++cell)
-    for (const unsigned int face_no : GeometryInfo<3>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       if (!cell->at_boundary(face_no) &&
           cell->neighbor(face_no)->has_children())
         for (unsigned int subface_no = 0;
-             subface_no < GeometryInfo<3>::max_children_per_face;
+             subface_no < cell->face(face_no)->n_children();
              ++subface_no)
           {
             // get an iterator

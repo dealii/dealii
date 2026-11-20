@@ -191,12 +191,14 @@ void
 create_tria(Triangulation<3> &triangulation,
             const Point<3>   *vertices_parallelograms)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   const std::vector<Point<3>> vertices(&vertices_parallelograms[0],
                                        &vertices_parallelograms[n_vertices]);
 
   // create grid with all possible combinations of face_flip, face_orientation
   // and face_rotation flags
-  static const int cell_vertices[][GeometryInfo<3>::vertices_per_cell] = {
+  static const int cell_vertices[][reference_cell.n_vertices()] = {
     {0, 1, 9, 10, 3, 4, 12, 13},  // cell 1 standard
     {1, 2, 10, 11, 4, 5, 13, 14}, // cell 2 standard
     //{10, 11, 13, 14, 1, 2, 4, 5},       // cell 2 rotated by 270 deg
@@ -213,7 +215,7 @@ create_tria(Triangulation<3> &triangulation,
   std::vector<CellData<3>> cells(n_cells, CellData<3>());
   for (unsigned i = 0; i < cells.size(); ++i)
     {
-      for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -330,7 +332,7 @@ test(const FiniteElement<dim> &fe,
                 }
             }
 
-          for (const unsigned int face : GeometryInfo<dim>::face_indices())
+          for (const unsigned int face : cell->face_indices())
             {
               fe_face_values.reinit(cell, face);
               const std::vector<double> &face_JxW_values =

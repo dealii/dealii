@@ -76,8 +76,7 @@ test()
          dof_handler.begin_active();
        cell != dof_handler.end();
        ++cell)
-    for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
-         ++line)
+    for (const unsigned int line : cell->line_indices())
       if (cell->line(line)->n_active_fe_indices() > 1)
         {
           deallog << "line=" << cell->line(line) << std::endl;

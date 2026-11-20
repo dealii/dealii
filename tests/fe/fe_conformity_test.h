@@ -174,9 +174,7 @@ namespace FEConforimityTest
               << "CellId = " << current_cell_id << std::endl
               << "   {face_index -> face_orientation | face_flip | face_rotation}: "
               << std::endl;
-            for (unsigned int face_index = 0;
-                 face_index < GeometryInfo<3>::faces_per_cell;
-                 ++face_index)
+            for (const unsigned int face_index : cell->face_indices())
               {
                 deallog << "      {" << face_index << " -> "
                         << cell->face_orientation(face_index) << " | "
@@ -185,9 +183,7 @@ namespace FEConforimityTest
               } // face_index
 
             deallog << "   {line_index -> line_orientation}: " << std::endl;
-            for (unsigned int line_index = 0;
-                 line_index < GeometryInfo<3>::lines_per_cell;
-                 ++line_index)
+            for (const unsigned int line_index : cell->line_indices())
               {
                 deallog << "      {" << line_index << " -> "
                         << (cell->line_orientation(line_index) ==
@@ -228,9 +224,7 @@ namespace FEConforimityTest
 
             deallog << "CellId = " << current_cell_id << std::endl
                     << "   {face_index -> face_orientation}: " << std::endl;
-            for (unsigned int face_index = 0;
-                 face_index < GeometryInfo<2>::faces_per_cell;
-                 ++face_index)
+            for (const unsigned int face_index : cell->face_indices())
               {
                 deallog << "      {" << face_index << " -> "
                         << cell->face_orientation(face_index) << "}"
@@ -238,9 +232,7 @@ namespace FEConforimityTest
               } // face_index
 
             deallog << "   {line_index -> line_orientation}: " << std::endl;
-            for (unsigned int line_index = 0;
-                 line_index < GeometryInfo<2>::lines_per_cell;
-                 ++line_index)
+            for (const unsigned int line_index : cell->line_indices())
               {
                 deallog << "      {" << line_index << " -> "
                         << (cell->line_orientation(line_index) ==
@@ -434,9 +426,7 @@ namespace FEConforimityTest
     // appropriate jumps.
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        for (unsigned int face_index = 0;
-             face_index < GeometryInfo<dim>::faces_per_cell;
-             ++face_index)
+        for (const unsigned int face_index : cell->face_indices())
           {
             if (cell->face(face_index)->at_boundary())
               continue;

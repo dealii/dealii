@@ -43,7 +43,7 @@ satisfies_level1_at_vertex_rule(const Triangulation<dim> &tr)
          tr.begin_active();
        cell != tr.end();
        ++cell)
-    for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int v : cell->vertex_indices())
       {
         min_adjacent_cell_level[cell->vertex_index(v)] =
           std::min<unsigned int>(min_adjacent_cell_level[cell->vertex_index(v)],
@@ -71,9 +71,9 @@ test()
   GridGenerator::hyper_cube(triangulation);
   triangulation.refine_global(2);
 
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < triangulation.begin(1)->n_children(); ++c)
     triangulation.begin(1)->child(c)->set_refine_flag();
-  for (unsigned int c = 0; c < GeometryInfo<dim>::max_children_per_cell; ++c)
+  for (unsigned int c = 0; c < (--triangulation.begin(2))->n_children(); ++c)
     (--triangulation.begin(2))->child(c)->set_coarsen_flag();
 
   triangulation.prepare_coarsening_and_refinement();

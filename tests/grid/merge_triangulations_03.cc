@@ -58,7 +58,7 @@ flatten_triangulation(Triangulation<dim> &tria_in, Triangulation<dim> &tria_out)
   unsigned int cell_counter = 0;
   for (; cell != endc; ++cell)
     {
-      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int j : cell->vertex_indices())
         {
           cells[cell_counter].vertices[j] = cell->vertex_index(j);
         }
@@ -90,7 +90,7 @@ mesh_info(const Triangulation<dim> &tria, const std::string &filename)
                                                       endc = tria.end();
     for (; cell != endc; ++cell)
       {
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_id()]++;

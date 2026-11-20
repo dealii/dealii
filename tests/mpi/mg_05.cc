@@ -123,7 +123,7 @@ test()
               {
                 if (cell->level_subdomain_id() != tr.locally_owned_subdomain())
                   continue;
-                for (const unsigned int f : GeometryInfo<dim>::face_indices())
+                for (const unsigned int f : cell->face_indices())
                   {
                     if (cell->at_boundary(f))
                       continue;

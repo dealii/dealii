@@ -41,7 +41,8 @@
 void
 test()
 {
-  const unsigned int dim = 3;
+  const unsigned int dim            = 3;
+  constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
 
   static const Point<3> vertices_1[] = {
     // points on the lower surface
@@ -173,7 +174,7 @@ test()
   const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
   const std::vector<Point<dim>> vertices(&vertices_1[0],
                                          &vertices_1[n_vertices]);
-  static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
+  static const int              cell_vertices[][reference_cell.n_vertices()] = {
     // the three cells in the stem
     {0, 2, 4, 3, 7, 9, 11, 10},
     {6, 0, 5, 4, 13, 7, 12, 11},
@@ -192,7 +193,7 @@ test()
   std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
   for (unsigned int i = 0; i < n_cells; ++i)
     {
-      for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int j : reference_cell.vertex_indices())
         cells[i].vertices[j] = cell_vertices[i][j];
       cells[i].material_id = 0;
     }
@@ -204,7 +205,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if ((cell->face(f)->center()[2] != -4) &&
           (cell->face(f)->center()[2] != 7) && (cell->face(f)->at_boundary()))
         cell->face(f)->set_boundary_id(1);
@@ -215,7 +216,7 @@ test()
          triangulation.begin_active();
        cell != triangulation.end();
        ++cell)
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       AssertThrow(cell->at_boundary(face_no) ==
                     cell->face(face_no)->at_boundary(),
                   ExcInternalError());

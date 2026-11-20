@@ -74,13 +74,11 @@ main()
 
   Triangulation<dim>::face_iterator face;
   for (cell = tria.begin_active(); cell != endc; ++cell)
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       {
         face = cell->face(face_no);
         if (face->at_boundary())
-          for (unsigned int vertex_no = 0;
-               vertex_no < GeometryInfo<dim>::vertices_per_face;
-               ++vertex_no)
+          for (const unsigned int vertex_no : face->vertex_indices())
             {
               const Point<dim> &old_vertex = face->vertex(vertex_no);
 

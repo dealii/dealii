@@ -53,7 +53,7 @@ check(Triangulation<dim, spacedim> &tria)
       AssertDimension(cell1->material_id(), cell2->material_id());
       AssertDimension(cell1->manifold_id(), cell2->manifold_id());
 
-      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int i : cell1->vertex_indices())
         {
           auto obj1 = cell1->vertex_index(i);
           auto obj2 = cell2->vertex_index(i);
@@ -64,7 +64,7 @@ check(Triangulation<dim, spacedim> &tria)
           Assert(p1.distance(p2) == 0, ExcInternalError());
         }
       if (dim == 3)
-        for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell; ++i)
+        for (const unsigned int i : cell1->line_indices())
           {
             auto obj1 = cell1->line(i);
             auto obj2 = cell2->line(i);
@@ -72,7 +72,7 @@ check(Triangulation<dim, spacedim> &tria)
             AssertDimension(obj1->boundary_id(), obj2->boundary_id());
           }
       if (dim > 1)
-        for (const unsigned int i : GeometryInfo<dim>::face_indices())
+        for (const unsigned int i : cell1->face_indices())
           {
             auto obj1 = cell1->face(i);
             auto obj2 = cell2->face(i);

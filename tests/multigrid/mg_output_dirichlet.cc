@@ -70,7 +70,7 @@ refine_mesh(Triangulation<dim> &triangulation)
        cell != triangulation.end();
        ++cell)
     {
-      for (const unsigned int vertex : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex : cell->vertex_indices())
         {
           const Point<dim> p = cell->vertex(vertex);
           const Point<dim> origin =
@@ -126,7 +126,7 @@ initialize(const DoFHandler<dim> &dof, MGLevelObject<Vector<double>> &u)
            ++cell)
         {
           cell->get_mg_dof_indices(dof_indices);
-          for (const unsigned int f : GeometryInfo<dim>::face_indices())
+          for (const unsigned int f : cell->face_indices())
             {
               cell->face(f)->get_mg_dof_indices(cell->level(), face_indices);
               if (cell->face(f)->at_boundary())

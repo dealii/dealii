@@ -39,7 +39,7 @@ test(unsigned int ref = 1)
 
 
   tria.begin_active()->set_manifold_id(3);
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : tria.begin_active()->face_indices())
     tria.begin_active()->face(f)->set_manifold_id(2);
 
   tria.set_manifold(1, FlatManifold<dim, spacedim>());
@@ -52,7 +52,7 @@ test(unsigned int ref = 1)
     {
       deallog << "C: " << cell << ", mid: " << (int)cell->manifold_id()
               << std::endl;
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         deallog << "f: " << cell->face(f)
                 << ", mid: " << (int)cell->face(f)->manifold_id() << std::endl;
     }

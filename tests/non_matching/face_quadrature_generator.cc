@@ -71,6 +71,8 @@ template <int dim>
 void
 test_plane_cuts_through_center()
 {
+  const auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   deallog << "test_vertical_cuts_through_center" << std::endl;
   deallog << "dim=" << dim << std::endl;
 
@@ -85,7 +87,7 @@ test_plane_cuts_through_center()
       const Functions::SignedDistance::Plane<dim> levelset(center, normal);
 
       // Test all faces that are intersected by the plane.
-      for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+      for (unsigned int f = 0; f < reference_cell.n_faces(); ++f)
         {
           const int normal_direction =
             GeometryInfo<dim>::unit_normal_direction[f];
@@ -115,12 +117,13 @@ test_1D()
 {
   deallog << "test_1D" << std::endl;
 
-  const int            dim = 1;
+  const int            dim            = 1;
+  const auto           reference_cell = ReferenceCells::get_hypercube<dim>();
   Point<dim>           center(.5);
   const Tensor<1, dim> normal = Point<dim>::unit_vector(0);
   const Functions::SignedDistance::Plane<dim> levelset(center, normal);
 
-  for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+  for (unsigned int f = 0; f < reference_cell.n_faces(); ++f)
     {
       deallog << "face = " << f << std::endl;
       create_and_print_quadratures(levelset, f);

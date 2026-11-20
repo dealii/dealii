@@ -25,10 +25,12 @@ template <int dim, int spacedim>
 void
 do_test(const Triangulation<dim, spacedim> &tria)
 {
+  AssertThrow(tria.all_reference_cells_are_hyper_cube(), ExcNotImplemented());
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   for (const auto &cell : tria.cell_iterators())
     {
-      std::array<Point<spacedim>, GeometryInfo<dim>::vertices_per_cell>
-        vertices;
+      std::array<Point<spacedim>, reference_cell.n_vertices()> vertices;
       for (const unsigned int v : cell->vertex_indices())
         vertices[v] = cell->vertex(v);
       deallog << "Cell " << cell->id() << " with center " << cell->center()

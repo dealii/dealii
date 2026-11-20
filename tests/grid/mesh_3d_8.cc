@@ -43,7 +43,7 @@ check_this(Triangulation<3> &tria)
        ++cell)
     {
       std::set<Triangulation<3>::line_iterator> lines;
-      for (unsigned int l = 0; l < GeometryInfo<3>::lines_per_cell; ++l)
+      for (const unsigned int l : cell->line_indices())
         {
           AssertThrow(lines.find(cell->line(l)) == lines.end(),
                       ExcInternalError());

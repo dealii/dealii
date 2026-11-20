@@ -152,7 +152,7 @@ curved_grid(std::ostream &out)
   for (const auto &cell : dof_handler.active_cell_iterators())
     {
       // fix all vertices
-      for (const unsigned int vertex_no : GeometryInfo<2>::vertex_indices())
+      for (const unsigned int vertex_no : cell->vertex_indices())
         {
           for (unsigned int i = 0; i < 2; ++i)
             if (m[i].is_constrained(cell->vertex_dof_index(vertex_no, 0)) ==
@@ -161,7 +161,7 @@ curved_grid(std::ostream &out)
         }
 
       if (cell->at_boundary())
-        for (const unsigned int face_no : GeometryInfo<2>::face_indices())
+        for (const unsigned int face_no : cell->face_indices())
           {
             face = cell->face(face_no);
             // insert a modified value for

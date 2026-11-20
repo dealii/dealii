@@ -91,7 +91,7 @@ test()
 
   deallog << "** interface between cell 0 and 1 **\n";
 
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : cell->face_indices())
     if (!cell->at_boundary(f))
       {
         fiv.reinit(cell,

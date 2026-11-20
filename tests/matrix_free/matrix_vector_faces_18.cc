@@ -111,7 +111,7 @@ test()
            triangulation.begin();
          cell != triangulation.end();
          ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->face(f)->at_boundary())
           {
             if (std::abs(cell->face(f)->center()[2]) < 1e-12)

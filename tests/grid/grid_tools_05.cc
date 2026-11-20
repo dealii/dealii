@@ -33,6 +33,8 @@
 void
 generate_grid(Triangulation<2> &triangulation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<2>();
+
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
     Point<2>(+1., -3.),
@@ -48,12 +50,12 @@ generate_grid(Triangulation<2> &triangulation)
   std::vector<CellData<2>> cells(2, CellData<2>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3};
 
   /* cell 1 */
-  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {4, 5, 6, 7};
+  int cell_vertices_1[reference_cell.n_vertices()] = {4, 5, 6, 7};
 
-  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];
@@ -69,7 +71,7 @@ generate_grid(Triangulation<2> &triangulation)
   Triangulation<2>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<2>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
@@ -87,6 +89,8 @@ generate_grid(Triangulation<2> &triangulation)
 void
 generate_grid(Triangulation<3> &triangulation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   Point<3>              vertices_1[] = {Point<3>(-1., -1., -3.),
                                         Point<3>(+1., -1., -3.),
                                         Point<3>(-1., +1., -3.),
@@ -108,14 +112,13 @@ generate_grid(Triangulation<3> &triangulation)
   std::vector<CellData<3>> cells(2, CellData<3>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {
-    0, 1, 2, 3, 4, 5, 6, 7};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3, 4, 5, 6, 7};
 
   /* cell 1 */
-  int cell_vertices_1[GeometryInfo<3>::vertices_per_cell] = {
+  int cell_vertices_1[reference_cell.n_vertices()] = {
     8, 9, 10, 11, 12, 13, 14, 15};
 
-  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];
@@ -132,7 +135,7 @@ generate_grid(Triangulation<3> &triangulation)
   Triangulation<3>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<3>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[2] > 2.9)
         face_1 = cell_1->face(j);
@@ -159,12 +162,12 @@ print_match(const FaceIterator                &face_1,
   static const int dim = FaceIterator::AccessorType::dimension;
 
   deallog << "face 1";
-  for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
+  for (const unsigned int j : face_1->vertex_indices())
     deallog << " :: " << face_1->vertex(j);
   deallog << std::endl;
 
   deallog << "face 2";
-  for (unsigned int j = 0; j < GeometryInfo<dim>::vertices_per_face; ++j)
+  for (const unsigned int j : face_2->vertex_indices())
     deallog << " :: " << face_2->vertex(j);
   deallog << std::endl;
 

@@ -53,7 +53,7 @@ void
 test_embedding(const FiniteElement<dim> &fe)
 {
   const unsigned int n  = fe.dofs_per_cell;
-  const unsigned int nc = GeometryInfo<dim>::max_children_per_cell;
+  const unsigned int nc = fe.reference_cell().n_isotropic_children();
 
   std::vector<std::vector<FullMatrix<double>>> P;
 

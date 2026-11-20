@@ -321,7 +321,7 @@ namespace Step18
            triangulation.begin_active();
          cell != triangulation.end();
          ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->face(f)->at_boundary())
           {
             const Point<dim> face_center = cell->face(f)->center();
@@ -608,7 +608,7 @@ namespace Step18
             cell = dof_handler.begin_active(),
             endc = dof_handler.end();
           for (; cell != endc; ++cell)
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const unsigned int v : cell->vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6)
                 {
                   monitored_vertex_first_dof = cell->vertex_dof_index(v, 0);
@@ -686,7 +686,7 @@ namespace Step18
            dof_handler.begin_active();
          cell != dof_handler.end();
          ++cell)
-      for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         if (vertex_touched[cell->vertex_index(v)] == false)
           {
             vertex_touched[cell->vertex_index(v)] = true;

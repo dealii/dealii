@@ -40,7 +40,7 @@ namespace dealii
                                                       c2 = t2.begin();
     for (; (c1 != t1.end()) && (c2 != t2.end()); ++c1, ++c2)
       {
-        for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int v : c1->vertex_indices())
           {
             if (c1->vertex(v) != c2->vertex(v))
               return false;
@@ -48,7 +48,7 @@ namespace dealii
               return false;
           }
 
-        for (const unsigned int f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : c1->face_indices())
           {
             if (c1->face(f)->at_boundary() != c2->face(f)->at_boundary())
               return false;
@@ -99,7 +99,7 @@ namespace dealii
             if (local_dofs_1 != local_dofs_2)
               return false;
 
-            for (const unsigned int f : GeometryInfo<dim>::face_indices())
+            for (const unsigned int f : c1->face_indices())
               {
                 std::vector<types::global_dof_index> local_dofs_1(
                   c1->get_fe().dofs_per_face);
@@ -136,7 +136,7 @@ do_boundary(Triangulation<dim, spacedim> &t1)
 {
   typename Triangulation<dim, spacedim>::cell_iterator c1 = t1.begin();
   for (; c1 != t1.end(); ++c1)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : c1->face_indices())
       if (c1->at_boundary(f))
         c1->face(f)->set_boundary_id(42);
 }

@@ -54,7 +54,7 @@ test(const Triangulation<dim> &tr, const FiniteElement<dim> &fe)
 
   DoFRenumbering::component_wise(dof);
 
-  for (const unsigned int i : GeometryInfo<dim>::face_indices())
+  for (const unsigned int i : tr.begin_active()->face_indices())
     {
       deallog << "FE=" << fe.get_name() << ", case=" << i << std::endl;
 

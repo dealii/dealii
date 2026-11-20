@@ -59,14 +59,10 @@ test(std::ostream &out)
        cell_pair != map_boundary_to_domain.end();
        ++cell_pair)
     {
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<spacedim>::vertices_per_face;
-           vertex++)
+      for (const unsigned int vertex : cell_pair->first->vertex_indices())
         out << cell_pair->first->vertex(vertex) << std::endl;
       out << "-----------------------" << std::endl;
-      for (unsigned int vertex = 0;
-           vertex < GeometryInfo<spacedim>::vertices_per_face;
-           vertex++)
+      for (const unsigned int vertex : cell_pair->second->vertex_indices())
         out << cell_pair->second->vertex(vertex) << std::endl;
       out << "-----------------------" << std::endl;
       out << cell_pair->first->center() - cell_pair->second->center()

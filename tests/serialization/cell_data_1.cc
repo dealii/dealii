@@ -24,9 +24,11 @@ template <int structdim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<structdim>();
+
   dealii::CellData<structdim> t1;
 
-  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int i : reference_cell.vertex_indices())
     t1.vertices[i] = i;
   t1.material_id = 0;
   t1.boundary_id = 1;
@@ -38,7 +40,7 @@ test()
   }
 
   // test vertices
-  for (const unsigned int i : GeometryInfo<structdim>::vertex_indices())
+  for (const unsigned int i : reference_cell.vertex_indices())
     {
       dealii::CellData<structdim> t2 = t1;
       t2.vertices[i]++;

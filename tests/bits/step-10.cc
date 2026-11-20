@@ -188,7 +188,7 @@ compute_pi_by_perimeter()
                       endc      = dof_handler.end();
           long double perimeter = 0;
           for (; cell != endc; ++cell)
-            for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face_no : cell->face_indices())
               if (cell->face(face_no)->at_boundary())
                 {
                   x_fe_face_values.reinit(cell, face_no);

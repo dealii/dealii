@@ -96,7 +96,7 @@ gmsh_grid(const char *name_v2, const char *name_v4)
                   ExcInternalError());
       std::set<unsigned int> vertices_v2;
       std::set<unsigned int> vertices_v4;
-      for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int i : cell_v2->vertex_indices())
         {
           AssertThrow((tria_v2.get_vertices()[cell_v2->vertex_index(i)] -
                        tria_v4.get_vertices()[cell_v2->vertex_index(i)])
@@ -112,7 +112,7 @@ gmsh_grid(const char *name_v2, const char *name_v4)
       AssertThrow(vertices_v2 == vertices_v4, ExcInternalError());
       std::map<Point<dim>, types::boundary_id, PointComparator<dim>> faces_v2;
       std::map<Point<dim>, types::boundary_id, PointComparator<dim>> faces_v4;
-      for (const unsigned int i : GeometryInfo<dim>::face_indices())
+      for (const unsigned int i : cell_v2->face_indices())
         {
           faces_v2[cell_v2->face(i)->center()] =
             cell_v2->face(i)->boundary_id();
@@ -122,7 +122,7 @@ gmsh_grid(const char *name_v2, const char *name_v4)
       AssertThrow(faces_v2 == faces_v4, ExcInternalError());
       std::map<Point<dim>, types::boundary_id, PointComparator<dim>> lines_v2;
       std::map<Point<dim>, types::boundary_id, PointComparator<dim>> lines_v4;
-      for (unsigned int i = 0; i < GeometryInfo<dim>::lines_per_cell; ++i)
+      for (const unsigned int i : cell_v2->line_indices())
         {
           lines_v2[cell_v2->line(i)->center()] =
             cell_v2->line(i)->boundary_id();

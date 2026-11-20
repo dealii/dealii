@@ -73,7 +73,7 @@ main()
       create_triangulation(case_no, tria);
       const Triangulation<3>::active_cell_iterator cell = tria.begin_active();
       Triangulation<3>::face_iterator              face;
-      for (const unsigned int face_no : GeometryInfo<3>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
@@ -84,8 +84,7 @@ main()
                 Point<3>     p;
                 Tensor<1, 3> normal;
 
-                for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_face;
-                     ++v)
+                for (const unsigned int v : face->vertex_indices())
                   {
                     p += face->vertex(v) *
                          linear_interpolator.shape_value(v, Point<2>(xi, eta));

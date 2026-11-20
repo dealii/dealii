@@ -63,7 +63,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
   Triangulation<3>::cell_iterator cell = tria.begin();
 
   for (; cell != tria.end(); ++cell)
-    for (const unsigned int f : GeometryInfo<3>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       {
         if (!cell->face(f)->at_boundary())
           continue;
@@ -74,7 +74,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
             eps) // z = sqrt(3)x set boundary 2
           {
             cell->face(f)->set_boundary_id(2);
-            for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+            for (const unsigned int j : cell->face(f)->line_indices())
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
@@ -85,7 +85,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                  eps) // z = -sqrt(3)x set boundary 3
           {
             cell->face(f)->set_boundary_id(3);
-            for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+            for (const unsigned int j : cell->face(f)->line_indices())
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
@@ -96,7 +96,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                  eps) // z = sqrt(3)y set boundary 4
           {
             cell->face(f)->set_boundary_id(4);
-            for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+            for (const unsigned int j : cell->face(f)->line_indices())
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
@@ -107,7 +107,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
                  eps) // z = -sqrt(3)y set boundary 5
           {
             cell->face(f)->set_boundary_id(5);
-            for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+            for (const unsigned int j : cell->face(f)->line_indices())
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
                               cell->face(f)->line(j)->vertex(1).norm()) > eps)
@@ -116,7 +116,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
         else if (radius < middle) // inner radius set boundary 0
           {
             cell->face(f)->set_boundary_id(0);
-            for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+            for (const unsigned int j : cell->face(f)->line_indices())
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
                               cell->face(f)->line(j)->vertex(1).norm()) < eps)
@@ -125,7 +125,7 @@ colorize_sixty_deg_hyper_shell(Triangulation<3> &tria,
         else if (radius > middle) // outer radius set boundary 1
           {
             cell->face(f)->set_boundary_id(1);
-            for (unsigned int j = 0; j < GeometryInfo<3>::lines_per_face; ++j)
+            for (const unsigned int j : cell->face(f)->line_indices())
               if (cell->face(f)->line(j)->at_boundary())
                 if (std::fabs(cell->face(f)->line(j)->vertex(0).norm() -
                               cell->face(f)->line(j)->vertex(1).norm()) < eps)

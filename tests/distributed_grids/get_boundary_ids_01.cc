@@ -28,7 +28,7 @@ test()
 
   for (auto &cell : tria.active_cell_iterators())
     if (cell->is_locally_owned())
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           if (std::fabs(cell->face(face)->center()[0] - 0.0) < 1e-12)
             cell->face(face)->set_all_boundary_ids(1);

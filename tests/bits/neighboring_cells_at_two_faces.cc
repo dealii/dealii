@@ -82,7 +82,7 @@ void
 check_neighbors(const Triangulation<2> &tria)
 {
   Triangulation<2>::cell_iterator cell = tria.begin();
-  for (const unsigned int f : GeometryInfo<2>::face_indices())
+  for (const unsigned int f : cell->face_indices())
     if (cell->neighbor(f).state() == IteratorState::valid)
       {
         const unsigned int neighbor_neighbor = cell->neighbor_of_neighbor(f);

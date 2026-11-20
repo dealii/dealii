@@ -143,8 +143,8 @@ test(const unsigned int geometry, const MPI_Comm comm = MPI_COMM_SELF)
 
       for (unsigned int cell = range.first; cell < range.second; ++cell)
         {
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               face++)
+          for (const unsigned int face :
+               matrix_free.get_cell_iterator(cell, 0)->face_indices())
             {
               auto bids =
                 matrix_free.get_faces_by_cells_boundary_id(cell, face);

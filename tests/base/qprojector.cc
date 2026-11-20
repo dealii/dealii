@@ -58,7 +58,8 @@ check_face(Quadrature<1> &q1)
   deallog << "Checking dim " << dim << " 1d-points " << q1.size() << std::endl;
 
   Quadrature<dim - 1> subquadrature(q1);
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f :
+       ReferenceCells::get_hypercube<dim>().face_indices())
     {
       deallog << "Face " << f << std::endl;
 
@@ -71,8 +72,11 @@ check_face(Quadrature<1> &q1)
         deallog << quadrature.point(k) << std::endl;
     }
 
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
-    for (unsigned int s = 0; s < GeometryInfo<dim>::max_children_per_face; ++s)
+  for (const unsigned int f :
+       ReferenceCells::get_hypercube<dim>().face_indices())
+    for (unsigned int s = 0;
+         s < ReferenceCells::get_hypercube<dim - 1>().n_isotropic_children();
+         ++s)
       {
         deallog << "Face " << f << " subface " << s << std::endl;
 
@@ -102,7 +106,8 @@ check_faces(Quadrature<1> &q1)
     QProjector<dim>::project_to_all_faces(ReferenceCells::get_hypercube<dim>(),
                                           subquadrature);
 
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f :
+       ReferenceCells::get_hypercube<dim>().face_indices())
     {
       deallog << "Face " << f << " orientation false" << std::endl;
 

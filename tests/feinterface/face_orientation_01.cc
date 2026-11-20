@@ -59,7 +59,7 @@ test()
 
 
       for (auto cell : dofh.active_cell_iterators())
-        for (const unsigned int f : GeometryInfo<dim>::face_indices())
+        for (const unsigned int f : cell->face_indices())
           if (cell->at_boundary(f) == false)
             {
               fiv.reinit(cell,

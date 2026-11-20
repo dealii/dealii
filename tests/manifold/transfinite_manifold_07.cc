@@ -240,7 +240,7 @@ concentric_disks(Triangulation<2>          &tria,
         1); // not faces ... for Transfinite interpolation
       for (unsigned int k = 0; k < gp.n_balls; ++k)
         {
-          for (const unsigned int f : GeometryInfo<2>::face_indices())
+          for (const unsigned int f : cell->face_indices())
             {
               const Point<2> p0 = cell->face(f)->vertex(0),
                              p1 = cell->face(f)->vertex(1);

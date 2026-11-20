@@ -228,7 +228,7 @@ namespace LinearAdvectionTest
       {
         if (current_cell->is_locally_owned())
           {
-            for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
+            for (const unsigned int face_n : current_cell->face_indices())
               {
                 const int neighbor_index = current_cell->neighbor_index(face_n);
                 if (neighbor_index != -1) // interior face

@@ -55,6 +55,8 @@ template <int dim, int spacedim>
 void
 test()
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<dim>();
+
   Triangulation<dim, spacedim>    tria;
   hp::FECollection<dim, spacedim> fe(FE_DGQ<dim, spacedim>(1),
                                      FE_DGQ<dim, spacedim>(2));
@@ -116,9 +118,8 @@ test()
   double gamma = 100;
 
   using ScratchData = MeshWorker::ScratchData<dim, spacedim>;
-  using CopyData = MeshWorker::CopyData<1 + GeometryInfo<dim>::faces_per_cell,
-                                        1,
-                                        1 + GeometryInfo<dim>::faces_per_cell>;
+  using CopyData    = MeshWorker::
+    CopyData<1 + reference_cell.n_faces(), 1, 1 + reference_cell.n_faces()>;
 
   ScratchData scratch(fe, cell_quad, cell_flags, face_quad, face_flags);
   CopyData    copy(0);
@@ -227,7 +228,8 @@ test()
 
     // We don't necessarily visit all faces, so we have to filter
     // some of them out here.
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f :
+         ReferenceCells::get_hypercube<dim>().face_indices())
       if (c.local_dof_indices[f + 1].size() > 0)
         constraints.distribute_local_to_global(c.matrices[f + 1],
                                                c.local_dof_indices[0],

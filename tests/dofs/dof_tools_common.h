@@ -69,7 +69,7 @@ template <int dim>
 void
 set_boundary_ids(Triangulation<dim> &tria)
 {
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : tria.begin_active()->face_indices())
     tria.begin_active()->face(f)->set_boundary_id(f);
 }
 

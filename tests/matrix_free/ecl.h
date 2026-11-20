@@ -242,8 +242,8 @@ test(const unsigned int geometry      = 0,
             phi.submit_gradient(phi.get_gradient(q), q);
           phi.integrate(EvaluationFlags::gradients);
 
-          for (unsigned int face = 0; face < GeometryInfo<dim>::faces_per_cell;
-               ++face)
+          for (const unsigned int face :
+               matrix_free.get_cell_iterator(cell, 0)->face_indices())
             {
               auto bids =
                 matrix_free.get_faces_by_cells_boundary_id(cell, face);

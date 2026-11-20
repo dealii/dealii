@@ -131,7 +131,7 @@ test()
     for (auto cell = tr.begin_active(); cell != tr.end(); ++cell)
       if (cell->is_locally_owned())
         {
-          for (unsigned int f(0); f < GeometryInfo<2>::faces_per_cell; ++f)
+          for (const unsigned int f : cell->face_indices())
             {
               if (cell->face(f)->at_boundary() &&
                   cell->face(f)->center()[0] < 1e-10)

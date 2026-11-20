@@ -93,7 +93,7 @@ check_grid()
   for (; cell != endc; ++cell)
     {
       deallog << cell << std::endl;
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           deallog << face << ": "
                   << (cell->face_orientation(face) ? "true " : "false ")
@@ -101,8 +101,7 @@ check_grid()
                   << (cell->face_rotation(face) ? "true" : "false")
                   << std::endl;
         }
-      for (unsigned int line = 0; line < GeometryInfo<dim>::lines_per_cell;
-           ++line)
+      for (const unsigned int line : cell->line_indices())
         {
           deallog << line << ": "
                   << (cell->line_orientation(line) ==

@@ -106,7 +106,7 @@ test()
       if (cell_location == NonMatching::LocationToLevelSet::outside)
         continue;
 
-      for (const auto &face : GeometryInfo<dim>::face_indices())
+      for (const auto &face : cell->face_indices())
         {
           if (n_test_cells <= 0)
             continue;

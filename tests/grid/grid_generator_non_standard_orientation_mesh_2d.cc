@@ -38,9 +38,7 @@ plot_all_info(const Triangulation<dim> &tria)
 
       deallog << "CellId = " << current_cell_id << std::endl
               << "   {line_index -> face_orientation}: " << std::endl;
-      for (unsigned int face_index = 0;
-           face_index < GeometryInfo<dim>::faces_per_cell;
-           ++face_index)
+      for (const unsigned int face_index : cell->face_indices())
         {
           deallog << "      {" << face_index << " -> "
                   << cell->face_orientation(face_index) << "} " << std::endl;
@@ -49,9 +47,7 @@ plot_all_info(const Triangulation<dim> &tria)
       // in 2D faces that are not consistently oriented should of course be also
       // lines with the same property
       deallog << "   line orientation: {  ";
-      for (unsigned int line_index = 0;
-           line_index < GeometryInfo<dim>::lines_per_cell;
-           ++line_index)
+      for (const unsigned int line_index : cell->line_indices())
         {
           deallog << (cell->line_orientation(line_index) ==
                       numbers::default_geometric_orientation)

@@ -68,7 +68,7 @@ setup(Triangulation<dim> &tria, const DoFHandler<dim> &dh)
 
           child->set_active_fe_index(1);
 
-          if (counter < 0.5 * GeometryInfo<dim>::max_children_per_cell)
+          if (counter < 0.5 * cell->n_children())
             child->set_refine_flag();
           else
             child->set_coarsen_flag();

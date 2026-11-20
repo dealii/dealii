@@ -77,7 +77,7 @@ evaluate_normal(DoFHandler<2> &dof_handler, Vector<double> &solution)
 
   for (; cell != endc; ++cell)
     {
-      for (const unsigned int f : GeometryInfo<2>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           if (!cell->face(f)->at_boundary())
             {

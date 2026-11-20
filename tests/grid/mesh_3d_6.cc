@@ -53,7 +53,7 @@ check_this(Triangulation<3> &tria)
   for (DoFHandler<3>::cell_iterator cell = dof_handler.begin();
        cell != dof_handler.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<3>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (!cell->at_boundary(f))
         {
           const unsigned int nn = cell->neighbor_of_neighbor(f);

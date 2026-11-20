@@ -55,10 +55,10 @@ do_check(const FiniteElement<dim> &coarse_fe, const FiniteElement<dim> &fine_fe)
                                  coarse_fe.dofs_per_cell);
 
   for (unsigned int child_1 = 0;
-       child_1 < GeometryInfo<dim>::max_children_per_cell;
+       child_1 < coarse_fe.reference_cell().n_isotropic_children();
        ++child_1)
     for (unsigned int child_2 = 0;
-         child_2 < GeometryInfo<dim>::max_children_per_cell;
+         child_2 < coarse_fe.reference_cell().n_isotropic_children();
          ++child_2)
       {
         injection_1 = 0;
@@ -95,7 +95,7 @@ do_check(const FiniteElement<dim> &coarse_fe, const FiniteElement<dim> &fine_fe)
         // reduce output, do so only for the
         // some of the matrices
         if (child_1 ==
-            ((child_2 + 1) % GeometryInfo<dim>::max_children_per_cell))
+            ((child_2 + 1) % coarse_fe.reference_cell().n_isotropic_children()))
           for (unsigned int i = 0; i < fine_fe.dofs_per_cell; ++i)
             for (unsigned int j = 0; j < coarse_fe.dofs_per_cell; ++j)
               deallog << i << ' ' << j << ' ' << injection_1(i, j) << std::endl;

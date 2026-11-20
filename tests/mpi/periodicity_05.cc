@@ -41,7 +41,7 @@ main(int argc, char *argv[])
     endc = triangulation.end();
   for (; cell != endc; ++cell)
     {
-      for (const unsigned int f : GeometryInfo<3>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           const Point<3> face_center = cell->face(f)->center();
           if (cell->face(f)->at_boundary())

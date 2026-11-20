@@ -266,7 +266,8 @@ private:
           local_diagonal_vector[phif.static_dofs_per_cell];
         for (unsigned int i = 0; i < phif.static_dofs_per_cell; ++i)
           local_diagonal_vector[i] = 0.;
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face :
+             data.get_cell_iterator(cell, 0)->face_indices())
           {
             phif.reinit(cell, face);
             VectorizedArray<number> sigmaF =

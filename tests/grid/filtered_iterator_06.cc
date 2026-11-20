@@ -54,7 +54,7 @@ test()
     boundary_face_set, manifold_face_set;
 
   for (const auto &cell : tria.active_cell_iterators())
-    for (const unsigned int face_n : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_n : cell->face_indices())
       if (cell->face(face_n)->at_boundary())
         {
           if (cell->face(face_n)->boundary_id() == boundary_id)

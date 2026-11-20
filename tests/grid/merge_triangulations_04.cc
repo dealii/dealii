@@ -39,7 +39,7 @@ main()
 
       if (cylinder_triangulation_offset == Point<2>())
         {
-          for (const unsigned int vertex_n : GeometryInfo<2>::vertex_indices())
+          for (const unsigned int vertex_n : cell->vertex_indices())
             if (cell->vertex(vertex_n) == Point<2>())
               {
                 // skip two cells in the bottom left corner
@@ -68,8 +68,7 @@ main()
   auto minimal_line_length = [](const Triangulation<2> &tria) -> double {
     double min_line_length = std::numeric_limits<double>::max();
     for (const auto &cell : tria.active_cell_iterators())
-      for (unsigned int line_n = 0; line_n < GeometryInfo<2>::lines_per_cell;
-           ++line_n)
+      for (const unsigned int line_n : cell->line_indices())
         min_line_length = std::min(min_line_length,
                                    (cell->line(line_n)->vertex(0) -
                                     cell->line(line_n)->vertex(1))
@@ -100,7 +99,7 @@ main()
       if (cell->material_id() == 2)
         {
           cell->set_manifold_id(tfi_id);
-          for (const unsigned int face_n : GeometryInfo<2>::face_indices())
+          for (const unsigned int face_n : cell->face_indices())
             {
               if (cell->face(face_n)->at_boundary())
                 cell->face(face_n)->set_manifold_id(polar_id);
@@ -120,7 +119,7 @@ main()
   std::vector<Point<2> *> inner_pointers;
   for (const auto &cell : result_2.active_cell_iterators())
     {
-      for (const unsigned int face_n : GeometryInfo<2>::face_indices())
+      for (const unsigned int face_n : cell->face_indices())
         {
           if (cell->face(face_n)->manifold_id() == polar_id)
             {
@@ -149,7 +148,7 @@ main()
     {
       if (cell->at_boundary())
         {
-          for (const unsigned int face_n : GeometryInfo<2>::face_indices())
+          for (const unsigned int face_n : cell->face_indices())
             {
               auto face = cell->face(face_n);
               if (face->at_boundary())

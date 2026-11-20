@@ -51,7 +51,7 @@ main()
                               update_normal_vectors | update_quadrature_points);
 
   for (auto &cell : tria.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       {
         fe_values.reinit(cell, f);
 

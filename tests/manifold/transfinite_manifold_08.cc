@@ -133,7 +133,7 @@ main()
       for (auto &cell : tria.active_cell_iterators())
         {
           deallog << "Face centers:" << std::endl;
-          for (const unsigned int f : GeometryInfo<dim>::face_indices())
+          for (const unsigned int f : cell->face_indices())
             deallog << cell->face(f)->center(true) << std::endl;
           deallog << std::endl;
         }

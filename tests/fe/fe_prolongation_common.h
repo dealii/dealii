@@ -72,7 +72,7 @@ check_prolongation(FiniteElement<dim> &fe, const char *name)
   deallog << name << '<' << dim << '>' << " constraint " << std::endl;
   print_formatted(fe.constraints(), 8, 10);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
+  for (unsigned int i = 0; i < fe.reference_cell().n_isotropic_children(); ++i)
     {
       deallog << name << '<' << dim << '>' << " prolongation " << i
               << std::endl;

@@ -37,7 +37,7 @@ main()
   tria.set_manifold(0, spherical);
 
   for (auto &cell : tria.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         {
           if (std::abs(cell->face(f)->vertex(1).norm() - 1.) < 1e-1)
@@ -76,7 +76,7 @@ main()
             }
         }
   for (auto &cell : tria.active_cell_iterators())
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->at_boundary(f))
         {
           // the first choice will contain perturbations in the normal because

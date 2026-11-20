@@ -83,7 +83,7 @@ test()
   VectorTools::project(dh, cm, QGauss<dim>(3), approximated_function, v);
 
   for (const auto &cell : dh.active_cell_iterators())
-    for (const unsigned int i : GeometryInfo<dim>::vertex_indices())
+    for (const unsigned int i : cell->vertex_indices())
       {
         deallog << cell->vertex(i) << ' ' << v(cell->vertex_dof_index(i, 0))
                 << std::endl;

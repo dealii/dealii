@@ -88,6 +88,8 @@
 void
 generate_grid(Triangulation<2> &triangulation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<2>();
+
   Point<2> vertices_1[] = {
     Point<2>(-1., -3.),
     Point<2>(+1., -3.),
@@ -103,12 +105,12 @@ generate_grid(Triangulation<2> &triangulation)
   std::vector<CellData<2>> cells(2, CellData<2>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3};
 
   /* cell 1 */
-  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {7, 6, 5, 4};
+  int cell_vertices_1[reference_cell.n_vertices()] = {7, 6, 5, 4};
 
-  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];
@@ -124,7 +126,7 @@ generate_grid(Triangulation<2> &triangulation)
   Triangulation<2>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<2>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);
@@ -139,6 +141,8 @@ generate_grid(Triangulation<2> &triangulation)
 void
 generate_grid(Triangulation<2, 3> &triangulation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<2>();
+
   Point<3> vertices_1[] = {
     Point<3>(-1., -3., 0.),
     Point<3>(+1., -3., 0.),
@@ -154,12 +158,12 @@ generate_grid(Triangulation<2, 3> &triangulation)
   std::vector<CellData<2>> cells(2, CellData<2>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<2>::vertices_per_cell] = {0, 1, 2, 3};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3};
 
   /* cell 1 */
-  int cell_vertices_1[GeometryInfo<2>::vertices_per_cell] = {7, 6, 5, 4};
+  int cell_vertices_1[reference_cell.n_vertices()] = {7, 6, 5, 4};
 
-  for (const unsigned int j : GeometryInfo<2>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[j];
@@ -175,7 +179,7 @@ generate_grid(Triangulation<2, 3> &triangulation)
   Triangulation<2, 3>::face_iterator face_2;
 
   // Look for the two outermost faces:
-  for (const unsigned int j : GeometryInfo<2>::face_indices())
+  for (const unsigned int j : cell_1->face_indices())
     {
       if (cell_1->face(j)->center()[1] > 2.9)
         face_1 = cell_1->face(j);

@@ -262,7 +262,7 @@ test_finite_elements()
       for (unsigned int i = 0; i < fe_data->dofs_per_face; ++i)
         deallog << ' ' << fe_data->face_to_cell_index(i, 0);
       deallog << std::endl;
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : fe_data->reference_cell().face_indices())
         {
           deallog << "face_to_cell_index:";
           for (unsigned int i = 0; i < fe_data->dofs_per_face; ++i)
@@ -270,7 +270,7 @@ test_finite_elements()
           deallog << std::endl;
         }
 
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : fe_data->reference_cell().face_indices())
         {
           deallog << "support on face " << f << ':';
           for (unsigned int s = 0; s < fe_data->dofs_per_cell; ++s)

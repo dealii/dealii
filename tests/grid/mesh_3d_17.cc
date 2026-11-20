@@ -59,7 +59,7 @@ check(Triangulation<3> &tria)
   // active cells on the refined side don't
   // have any children)
   for (unsigned int cell_no = 0; cell != endc; ++cell, ++cell_no)
-    for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       {
         const Triangulation<dim>::face_iterator face = cell->face(face_no);
 
@@ -98,8 +98,7 @@ check(Triangulation<3> &tria)
 
 
             deallog << "  checking subfaces:" << std::endl;
-            for (unsigned int subface_no = 0;
-                 subface_no < GeometryInfo<dim>::max_children_per_face;
+            for (unsigned int subface_no = 0; subface_no < face->n_children();
                  ++subface_no)
               {
                 deallog << "    subface_no=" << subface_no << std::endl;

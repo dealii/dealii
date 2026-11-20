@@ -41,9 +41,9 @@ check(double r1, double r2, unsigned int n)
   for (typename Triangulation<dim>::cell_iterator cell = tria.begin();
        cell != tria.end();
        ++cell)
-    for (const unsigned int f : GeometryInfo<dim>::face_indices())
+    for (const unsigned int f : cell->face_indices())
       if (cell->face(f)->at_boundary())
-        for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_face; ++l)
+        for (const unsigned int l : cell->face(f)->line_indices())
           AssertThrow(cell->face(f)->line(l)->boundary_id() ==
                         cell->face(f)->boundary_id(),
                       ExcInternalError());

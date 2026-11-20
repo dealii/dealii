@@ -386,12 +386,13 @@ DGMethod<dim>::setup_system()
 {
   dof_handler.distribute_dofs(fe);
 
-  sparsity_pattern.reinit(dof_handler.n_dofs(),
-                          dof_handler.n_dofs(),
-                          (GeometryInfo<dim>::faces_per_cell *
-                             GeometryInfo<dim>::max_children_per_face +
-                           1) *
-                            fe.dofs_per_cell);
+  sparsity_pattern.reinit(
+    dof_handler.n_dofs(),
+    dof_handler.n_dofs(),
+    (fe.reference_cell().n_faces() *
+       fe.reference_cell().face_reference_cell(0).n_isotropic_children() +
+     1) *
+      fe.dofs_per_cell);
 
   DoFTools::make_flux_sparsity_pattern(dof_handler, sparsity_pattern);
 
@@ -458,7 +459,7 @@ DGMethod<dim>::assemble_system1()
 
       cell->get_dof_indices(dofs);
 
-      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 
@@ -630,7 +631,7 @@ DGMethod<dim>::assemble_system2()
 
       cell->get_dof_indices(dofs);
 
-      for (const unsigned int face_no : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           typename DoFHandler<dim>::face_iterator face = cell->face(face_no);
 

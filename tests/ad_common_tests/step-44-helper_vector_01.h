@@ -711,7 +711,7 @@ namespace Step44
             cell = dof_handler_ref.begin_active(),
             endc = dof_handler_ref.end();
           for (; cell != endc; ++cell)
-            for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+            for (const unsigned int v : cell->vertex_indices())
               if (cell->vertex(v).distance(soln_pt) < 1e-6 * parameters.scale)
                 {
                   Tensor<1, dim> soln;
@@ -830,7 +830,7 @@ namespace Step44
                                                       endc =
                                                         triangulation.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         {
           if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->center()[1] == 1.0 * parameters.scale)
@@ -1288,7 +1288,7 @@ namespace Step44
                   Assert(i_group <= J_dof, ExcInternalError());
               }
           }
-        for (const unsigned int face : GeometryInfo<dim>::face_indices())
+        for (const unsigned int face : cell->face_indices())
           if (cell->face(face)->at_boundary() == true &&
               cell->face(face)->boundary_id() == 6)
             {

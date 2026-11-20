@@ -188,7 +188,7 @@ test()
                                             endc = dof_handler.end();
     std::vector<bool> vertex_touched(triangulation.n_vertices(), false);
     for (cell = dof_handler.begin_active(); cell != endc; ++cell)
-      for (const unsigned int vertex_no : GeometryInfo<dim>::vertex_indices())
+      for (const unsigned int vertex_no : cell->vertex_indices())
         if (vertex_touched[cell->vertex_index(vertex_no)] == false)
           {
             Point<dim>    &v = cell->vertex(vertex_no);

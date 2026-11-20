@@ -49,7 +49,7 @@ test_vertices_orientation(
       Assert(face->at_boundary(), ExcInternalError());
 
       deallog << "Surface cell: " << cell << " with vertices:" << std::endl;
-      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
+      for (const unsigned int k : cell->vertex_indices())
         {
           deallog << "  " << cell->vertex(k) << std::endl;
           Assert(std::fabs(cell->vertex(k).distance(Point<spacedim>()) - 1) <
@@ -58,7 +58,7 @@ test_vertices_orientation(
         }
 
       deallog << "Volume face: " << face << " with vertices:" << std::endl;
-      for (const unsigned int k : GeometryInfo<s_dim>::vertex_indices())
+      for (const unsigned int k : face->vertex_indices())
         {
           deallog << "  " << face->vertex(k) << std::endl;
           Assert(std::fabs(face->vertex(k).distance(Point<spacedim>()) - 1) <
@@ -105,7 +105,7 @@ main()
            volume_mesh.begin_active();
          cell != volume_mesh.end();
          ++cell)
-      for (const unsigned int f : GeometryInfo<dim>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         if (cell->at_boundary(f))
           cell->face(f)->set_all_boundary_ids(1);
     GridTools::copy_boundary_to_manifold_id(volume_mesh);

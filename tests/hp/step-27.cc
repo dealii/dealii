@@ -342,7 +342,8 @@ namespace Step27
   void
   LaplaceProblem<2>::create_coarse_grid()
   {
-    const unsigned int dim = 2;
+    const unsigned int dim            = 2;
+    constexpr auto     reference_cell = ReferenceCells::get_hypercube<dim>();
 
     static const Point<2> vertices_1[] = {
       Point<2>(-1., -1.),      Point<2>(-1. / 2, -1.),
@@ -366,7 +367,7 @@ namespace Step27
     const unsigned int n_vertices = sizeof(vertices_1) / sizeof(vertices_1[0]);
     const std::vector<Point<dim>> vertices(&vertices_1[0],
                                            &vertices_1[n_vertices]);
-    static const int cell_vertices[][GeometryInfo<dim>::vertices_per_cell] = {
+    static const int cell_vertices[][reference_cell.n_vertices()] = {
       {0, 1, 5, 6},
       {1, 2, 6, 7},
       {2, 3, 7, 8},
@@ -385,7 +386,7 @@ namespace Step27
     std::vector<CellData<dim>> cells(n_cells, CellData<dim>());
     for (unsigned int i = 0; i < n_cells; ++i)
       {
-        for (const unsigned int j : GeometryInfo<dim>::vertex_indices())
+        for (const unsigned int j : reference_cell.vertex_indices())
           cells[i].vertices[j] = cell_vertices[i][j];
         cells[i].material_id = 0;
       }

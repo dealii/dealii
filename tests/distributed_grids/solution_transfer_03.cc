@@ -79,9 +79,7 @@ test(std::ostream & /*out*/)
            ++cell)
         {
           if (cell->has_children() && !(Testing::rand() % 3))
-            for (unsigned int c = 0;
-                 c < GeometryInfo<dim>::max_children_per_cell;
-                 ++c)
+            for (unsigned int c = 0; c < cell->n_children(); ++c)
               if (!cell->child(c)->has_children())
                 cell->child(c)->set_coarsen_flag();
         }

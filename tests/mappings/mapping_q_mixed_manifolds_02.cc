@@ -92,7 +92,7 @@ create_triangulation(Triangulation<2> &tria)
        cell != middle.end();
        ++cell)
     {
-      for (const unsigned int v : GeometryInfo<2>::vertex_indices())
+      for (const unsigned int v : cell->vertex_indices())
         {
           Point<2> &vertex = cell->vertex(v);
           if (std::abs(vertex[0] - X_2) < 1e-10 &&

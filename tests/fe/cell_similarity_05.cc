@@ -155,7 +155,7 @@ test()
   tr.set_manifold(1, boundary);
 
   // set boundary id on cell 1
-  for (const unsigned int f : GeometryInfo<dim>::face_indices())
+  for (const unsigned int f : tr.begin_active()->face_indices())
     if (tr.begin_active()->at_boundary(f))
       tr.begin_active()->face(f)->set_manifold_id(1);
 

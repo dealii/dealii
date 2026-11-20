@@ -69,11 +69,11 @@ main()
       create_triangulation(case_no, tria);
       const Triangulation<2>::active_cell_iterator cell = tria.begin_active();
       Triangulation<2>::face_iterator              face;
-      for (const unsigned int face_no : GeometryInfo<2>::face_indices())
+      for (const unsigned int face_no : cell->face_indices())
         {
           face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v = 0; v < GeometryInfo<2>::vertices_per_face; ++v)
+          for (const unsigned int v : face->vertex_indices())
             AssertThrow((boundary.normal_vector(face, face->vertex(v)) -
                          normals[v] / normals[v].norm())
                             .norm() < 1e-12,

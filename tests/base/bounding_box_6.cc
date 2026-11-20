@@ -130,7 +130,9 @@ test_child()
 
   const BoundingBox<dim> box(lower_upper_corners);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::max_children_per_cell; ++i)
+  for (unsigned int i = 0;
+       i < ReferenceCells::get_hypercube<dim>().n_isotropic_children();
+       ++i)
     {
       deallog << "child " << i << std::endl;
       const BoundingBox<dim> child = box.child(i);
@@ -156,7 +158,8 @@ test_vertex()
 
   const BoundingBox<dim> box(lower_upper_corners);
 
-  for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_cell; ++i)
+  for (const unsigned int i :
+       ReferenceCells::get_hypercube<dim>().vertex_indices())
     {
       deallog << "vertex " << i << " = " << box.vertex(i) << std::endl;
     }

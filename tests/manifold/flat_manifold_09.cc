@@ -102,7 +102,7 @@ check(Triangulation<dim> &tria)
   Tensor<1, dim> n;
   for (const auto &cell : tria.active_cell_iterators())
     {
-      for (const unsigned int face : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face : cell->face_indices())
         if (cell->face(face)->at_boundary())
           {
             fe_face_values.reinit(cell, face);
@@ -132,7 +132,7 @@ test()
       std::cout << "step " << step << std::endl;
       for (auto &cell : tria.active_cell_iterators())
         {
-          for (const unsigned int v : GeometryInfo<dim>::vertex_indices())
+          for (const unsigned int v : cell->vertex_indices())
             {
               if (p.distance(cell->vertex(v)) < 0.03 / (1 << step))
                 {

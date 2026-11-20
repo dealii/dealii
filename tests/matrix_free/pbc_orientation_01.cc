@@ -54,6 +54,8 @@ public:
 void
 generate_grid(Triangulation<3> &triangulation, int orientation)
 {
+  constexpr auto reference_cell = ReferenceCells::get_hypercube<3>();
+
   Point<3>              vertices_1[] = {Point<3>(-0., -0., -0.),
                                         Point<3>(+1., -0., -0.),
                                         Point<3>(-0., +1., -0.),
@@ -71,11 +73,10 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
   std::vector<CellData<3>> cells(2, CellData<3>());
 
   /* cell 0 */
-  int cell_vertices_0[GeometryInfo<3>::vertices_per_cell] = {
-    0, 1, 2, 3, 4, 5, 6, 7};
+  int cell_vertices_0[reference_cell.n_vertices()] = {0, 1, 2, 3, 4, 5, 6, 7};
 
   /* cell 1 */
-  int cell_vertices_1[8][GeometryInfo<3>::vertices_per_cell] = {
+  int cell_vertices_1[8][reference_cell.n_vertices()] = {
     {4, 5, 6, 7, 8, 9, 10, 11},
     {5, 7, 4, 6, 9, 11, 8, 10},
     {7, 6, 5, 4, 11, 10, 9, 8},
@@ -85,7 +86,7 @@ generate_grid(Triangulation<3> &triangulation, int orientation)
     {10, 11, 8, 9, 6, 7, 4, 5},
     {11, 9, 10, 8, 7, 5, 6, 4}};
 
-  for (const unsigned int j : GeometryInfo<3>::vertex_indices())
+  for (const unsigned int j : reference_cell.vertex_indices())
     {
       cells[0].vertices[j] = cell_vertices_0[j];
       cells[1].vertices[j] = cell_vertices_1[orientation][j];

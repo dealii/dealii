@@ -44,7 +44,7 @@ test(const int n_refinements, const int n_subdivisions, MPI_Comm comm)
     auto cell = tria.begin();
     auto endc = tria.end();
     for (; cell != endc; ++cell)
-      for (const unsigned int face_number : GeometryInfo<dim>::face_indices())
+      for (const unsigned int face_number : cell->face_indices())
         if (std::fabs(cell->face(face_number)->center()[0] - left) < 1e-12)
           cell->face(face_number)->set_all_boundary_ids(1);
         else if (std::fabs(cell->face(face_number)->center()[0] - right) <

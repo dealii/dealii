@@ -40,12 +40,12 @@ main()
 
   Triangulation<3>::active_cell_iterator cell = tria.begin_active();
   for (; cell != tria.end(); ++cell)
-    for (const unsigned int face_no : GeometryInfo<3>::face_indices())
+    for (const unsigned int face_no : cell->face_indices())
       if (cell->at_boundary(face_no))
         {
           Triangulation<3>::face_iterator face = cell->face(face_no);
           boundary.get_normals_at_vertices(face, normals);
-          for (unsigned int v = 0; v < GeometryInfo<3>::vertices_per_face; ++v)
+          for (const unsigned int v : face->vertex_indices())
             {
               AssertThrow((boundary.normal_vector(face, face->vertex(v)) -
                            normals[v] / normals[v].norm())

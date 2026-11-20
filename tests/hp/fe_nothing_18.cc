@@ -289,7 +289,8 @@ ElasticProblem<dim>::make_grid()
   shift_vector[0] = 1.0;
   GridTools::shift(shift_vector, triangulationR);
 
-  const unsigned int n_faces_per_cell = GeometryInfo<dim>::faces_per_cell;
+  const unsigned int n_faces_per_cell =
+    triangulationL.begin_active()->n_faces();
 
   triangulationL.begin_active()->set_material_id(0);
   triangulationR.begin_active()->set_material_id(id_of_lagrange_mult);

@@ -37,7 +37,7 @@ test()
     Triangulation<dim>::limit_level_difference_at_vertices,
     parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
   GridGenerator::hyper_cube(tria, 0, 1);
-  for (unsigned int face = 2; face < GeometryInfo<dim>::faces_per_cell; ++face)
+  for (unsigned int face = 2; face < tria.begin()->n_faces(); ++face)
     tria.begin()->face(face)->set_all_boundary_ids(face);
 
   for (unsigned int d = 1; d < dim; ++d)

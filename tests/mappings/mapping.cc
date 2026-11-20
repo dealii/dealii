@@ -101,7 +101,7 @@ plot_faces(Mapping<dim>                            &mapping,
                                           update_JxW_values |
                                           update_normal_vectors));
 
-  for (const unsigned int face_nr : GeometryInfo<dim>::face_indices())
+  for (const unsigned int face_nr : cell->face_indices())
     {
       fe_values.reinit(cell, face_nr);
 

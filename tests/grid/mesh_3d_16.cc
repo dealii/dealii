@@ -59,7 +59,7 @@ check(Triangulation<3> &tria)
 
       // integrate over faces and make sure that the result of the integration
       // is close to zero
-      for (const unsigned int f : GeometryInfo<3>::face_indices())
+      for (const unsigned int f : cell->face_indices())
         {
           fe_face_values.reinit(cell, f);
           for (unsigned int q = 0; q < q_face.size(); ++q)
