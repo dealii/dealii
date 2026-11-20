@@ -2168,6 +2168,29 @@ MatrixFree<dim, Number, VectorizedArrayType>::initialize_indices(
                     contiguous);
       }
 
+    // Furthermore, the shared-memory indices set up below identify a cell by
+    // the first index of its contiguous range in dof_info[0] divided by the
+    // number of unknowns per cell, and multiply this cell index by the number
+    // of unknowns per cell of each dof_info object. This requires that the
+    // cells own disjoint blocks of unknowns, numbered in the same order of
+    // cells for all dof_info objects, as is the case for DG elements. It is
+    // not the case for continuous elements in 1d, whose neighboring cells
+    // share an unknown although the unknowns of each cell are contiguous.
+    if (is_non_buffering_sm_supported)
+      for (const auto &di : dof_info)
+        for (unsigned int cell = 0;
+             cell < n_cell_batches() + n_ghost_cell_batches();
+             ++cell)
+          for (unsigned int v = 0; v < n_active_entries_per_cell_batch(cell);
+               ++v)
+            {
+              const unsigned int index = cell * n_lanes + v;
+              is_non_buffering_sm_supported &=
+                (di.dof_indices_contiguous[2][index] ==
+                 dof_info[0].dof_indices_contiguous[2][index] /
+                   dof_info[0].dofs_per_cell[0] * di.dofs_per_cell[0]);
+            }
+
     is_non_buffering_sm_supported =
       Utilities::MPI::logical_and(is_non_buffering_sm_supported,
                                   task_info.communicator);

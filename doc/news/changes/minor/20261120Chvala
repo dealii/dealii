@@ -1,0 +1,8 @@
+Fixed: MatrixFree no longer sets up the non-buffering shared-memory indices
+when the unknowns of each cell are contiguous but the cells do not own
+disjoint blocks of unknowns in the same order for all DoFHandler objects, as
+for FE_Q in 1d. FEEvaluation then read and wrote another cell's unknowns
+wherever a cell's first index was not a multiple of the unknowns per cell,
+once face data was set up and VectorizedArray had two or more lanes.
+<br>
+(Ondrej Chvala, 2026/11/20)
