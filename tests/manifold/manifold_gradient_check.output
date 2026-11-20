@@ -1,0 +1,7 @@
+
+DEAL::PolarManifold<2>: ok
+DEAL::PolarManifold<3>: ok
+DEAL::CylindricalManifold<3>(axis 2): ok
+DEAL::CylindricalManifold<3>(direction, point): ok
+DEAL::EllipticalManifold<2>: ok
+DEAL::TorusManifold<3>: ok
