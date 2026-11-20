@@ -1,0 +1,6 @@
+Fixed: FEEvaluation::submit_curl() for FE_NedelecNodal in 2d now uses the
+curl of each cell of a cell batch. Previously, it used the curl of the first
+cell for all cells of the batch, so that matrix-free operators with a curl
+term gave wrong results.
+<br>
+(Jordan Hoffart, 2026/11/19)

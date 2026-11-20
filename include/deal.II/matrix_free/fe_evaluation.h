@@ -6342,28 +6342,27 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           else
             DEAL_II_NOT_IMPLEMENTED();
         }
-      switch (dim)
+      if constexpr (dim == 2)
         {
-          case 2:
-            grad[1][0] = curl_temp[0];
-            grad[0][1] = -curl_temp[0];
-            grad[0][0] = 0;
-            grad[1][1] = 0;
-            break;
-          case 3:
-            grad[2][1] = curl_temp[0];
-            grad[1][2] = -curl_temp[0];
-            grad[0][2] = curl_temp[1];
-            grad[2][0] = -curl_temp[1];
-            grad[1][0] = curl_temp[2];
-            grad[0][1] = -curl_temp[2];
-            grad[0][0] = 0;
-            grad[1][1] = 0;
-            grad[2][2] = 0;
-            break;
-          default:
-            DEAL_II_NOT_IMPLEMENTED();
+          grad[1][0] = curl_temp;
+          grad[0][1] = -curl_temp;
+          grad[0][0] = 0;
+          grad[1][1] = 0;
         }
+      else if constexpr (dim == 3)
+        {
+          grad[2][1] = curl_temp[0];
+          grad[1][2] = -curl_temp[0];
+          grad[0][2] = curl_temp[1];
+          grad[2][0] = -curl_temp[1];
+          grad[1][0] = curl_temp[2];
+          grad[0][1] = -curl_temp[2];
+          grad[0][0] = 0;
+          grad[1][1] = 0;
+          grad[2][2] = 0;
+        }
+      else
+        DEAL_II_NOT_IMPLEMENTED();
       for (unsigned int d = 0; d < dim; ++d)
         {
           for (unsigned int comp = 0; comp < n_components; ++comp)
