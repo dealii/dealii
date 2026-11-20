@@ -785,6 +785,19 @@ protected:
   apply_hanging_node_constraints(const bool transpose) const;
 
   /**
+   * For FE_RaviartThomasNodal on cells with a general (non-affine) mapping,
+   * get_gradient() needs the values on the unit cell in addition to the
+   * gradients. Since submit_value() overwrites the values in
+   * FEEvaluationData::values_quad, e.g., when both functions are called for
+   * the same quadrature point, keep a copy of the values in
+   * FEEvaluationData::values_from_gradients_quad after evaluate(), which is
+   * otherwise only written by submit_gradient() and read by integrate().
+   */
+  void
+  store_values_for_gradients(
+    const EvaluationFlags::EvaluationFlags evaluation_flag);
+
+  /**
    * This is the general array for all data fields.
    */
   AlignedVector<VectorizedArrayType> *scratch_data_array;
@@ -3879,6 +3892,27 @@ template <int dim,
           typename Number,
           bool is_face,
           typename VectorizedArrayType>
+inline void
+FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
+  store_values_for_gradients(
+    const EvaluationFlags::EvaluationFlags evaluation_flag)
+{
+  if (this->data->element_type ==
+        internal::MatrixFreeFunctions::ElementType::tensor_raviart_thomas &&
+      evaluation_flag & EvaluationFlags::gradients &&
+      this->cell_type > internal::MatrixFreeFunctions::affine)
+    std::copy_n(this->values_quad,
+                n_components * this->n_quadrature_points,
+                this->values_from_gradients_quad);
+}
+
+
+
+template <int dim,
+          int n_components_,
+          typename Number,
+          bool is_face,
+          typename VectorizedArrayType>
 template <typename VectorType>
 inline void
 FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
@@ -4371,14 +4405,17 @@ inline DEAL_II_ALWAYS_INLINE
                 {
                   for (unsigned int e = 0; e < dim; ++e)
                     tmp[e][d] +=
-                      jac_grad[e][d] * this->values_quad[e * nqp + q_point];
+                      jac_grad[e][d] *
+                      this->values_from_gradients_quad[e * nqp + q_point];
                   for (unsigned int f = 0, r = dim; f < dim; ++f)
                     for (unsigned int k = f + 1; k < dim; ++k, ++r)
                       {
                         tmp[k][d] +=
-                          jac_grad[r][d] * this->values_quad[f * nqp + q_point];
+                          jac_grad[r][d] *
+                          this->values_from_gradients_quad[f * nqp + q_point];
                         tmp[f][d] +=
-                          jac_grad[r][d] * this->values_quad[k * nqp + q_point];
+                          jac_grad[r][d] *
+                          this->values_from_gradients_quad[k * nqp + q_point];
                       }
                 }
 
@@ -4419,10 +4456,12 @@ inline DEAL_II_ALWAYS_INLINE
               VectorizedArrayType tmp2[dim];
               for (unsigned int d = 0; d < dim; ++d)
                 {
-                  tmp2[d] = t_jac[0][d] * this->values_quad[q_point];
+                  tmp2[d] =
+                    t_jac[0][d] * this->values_from_gradients_quad[q_point];
                   for (unsigned e = 1; e < dim; ++e)
                     tmp2[d] +=
-                      t_jac[e][d] * this->values_quad[e * nqp + q_point];
+                      t_jac[e][d] *
+                      this->values_from_gradients_quad[e * nqp + q_point];
                 }
 
               for (unsigned int d = 0; d < dim; ++d)
@@ -7267,6 +7306,8 @@ FEEvaluation<dim,
         *this);
     }
 
+  this->store_values_for_gradients(evaluation_flag);
+
   if constexpr (running_in_debug_mode())
     {
       this->values_quad_initialized =
@@ -7985,6 +8026,8 @@ FEFaceEvaluation<dim,
     internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::evaluate(
       n_components, evaluation_flag_actual, values_array, *this);
 
+  this->store_values_for_gradients(evaluation_flag);
+
   if constexpr (running_in_debug_mode())
     {
       this->values_quad_initialized =
@@ -8120,6 +8163,8 @@ FEFaceEvaluation<dim,
   else
     internal::FEFaceEvaluationFactory<dim, VectorizedArrayType>::
       evaluate_in_face(n_components, evaluation_flag_actual, *this);
+
+  this->store_values_for_gradients(evaluation_flag);
 
   if constexpr (running_in_debug_mode())
     {

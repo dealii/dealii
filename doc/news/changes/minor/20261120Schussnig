@@ -1,0 +1,8 @@
+Fixed: FEEvaluation::get_gradient() for FE_RaviartThomasNodal on cells that
+are not parallelograms used the values on the unit cell, which
+FEEvaluation::submit_value() overwrites. Calling submit_value() before
+get_gradient() for the same quadrature point, as in a loop that submits
+both values and gradients, gave wrong gradients. FEEvaluation and
+FEFaceEvaluation now keep a copy of these values for get_gradient().
+<br>
+(Richard Schussnig, 2026/11/20)

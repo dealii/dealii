@@ -165,5 +165,6 @@ test()
           << std::endl;
   do_test<dim, fe_degree, double>(dof, constraints, TestType::values);
   do_test<dim, fe_degree, double>(dof, constraints, TestType::gradients);
+  do_test<dim, fe_degree, double>(dof, constraints, TestType::values_gradients);
   do_test<dim, fe_degree, double>(dof, constraints, TestType::divergence);
 }
