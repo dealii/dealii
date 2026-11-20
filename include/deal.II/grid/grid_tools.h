@@ -2482,6 +2482,11 @@ namespace GridTools
    * meshes with faces not in the
    * @ref GlossCombinedOrientation "default orientation".
    *
+   * @note This function only supports meshes that consist of hypercube cells
+   * because the meaning of the local face indices above is specific to them.
+   * For all other meshes, use the variant of this function that takes two
+   * boundary ids.
+   *
    * @dealiiConceptRequires{concepts::is_triangulation_or_dof_handler<MeshType>}
    */
   template <typename MeshType>

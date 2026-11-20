@@ -1,0 +1,6 @@
+Fixed: The variant of GridTools::collect_periodic_faces() that takes a single
+boundary id accessed faces by indices that are out of range on simplex meshes.
+The function now throws an exception that points to the variant taking two
+boundary ids.
+<br>
+(Matthias Maier, 2026/11/06)
