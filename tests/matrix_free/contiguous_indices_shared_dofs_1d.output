@@ -1,0 +1,18 @@
+
+DEAL:FE_Q1_boundary_faces::shared-memory cell indices as expected
+DEAL:FE_Q1_boundary_faces::DoFHandler 0: 7 of 7 cells read their own unknowns
+DEAL:FE_Q1_boundary_faces::DoFHandler 0: mass operator relative error below 1e-12
+DEAL:FE_Q1_all_faces::shared-memory cell indices as expected
+DEAL:FE_Q1_all_faces::DoFHandler 0: 7 of 7 cells read their own unknowns
+DEAL:FE_Q1_all_faces::DoFHandler 0: mass operator relative error below 1e-12
+DEAL:FE_Q2_boundary_faces::shared-memory cell indices as expected
+DEAL:FE_Q2_boundary_faces::DoFHandler 0: 7 of 7 cells read their own unknowns
+DEAL:FE_Q2_boundary_faces::DoFHandler 0: mass operator relative error below 1e-12
+DEAL:FE_DGQ1_one_handler::shared-memory cell indices as expected
+DEAL:FE_DGQ1_one_handler::DoFHandler 0: 7 of 7 cells read their own unknowns
+DEAL:FE_DGQ1_one_handler::DoFHandler 0: mass operator relative error below 1e-12
+DEAL:FE_DGQ1_two_handlers::shared-memory cell indices as expected
+DEAL:FE_DGQ1_two_handlers::DoFHandler 0: 7 of 7 cells read their own unknowns
+DEAL:FE_DGQ1_two_handlers::DoFHandler 0: mass operator relative error below 1e-12
+DEAL:FE_DGQ1_two_handlers::DoFHandler 1: 7 of 7 cells read their own unknowns
+DEAL:FE_DGQ1_two_handlers::DoFHandler 1: mass operator relative error below 1e-12
