@@ -2924,6 +2924,14 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
 
   const std::size_t dofs_per_component = this->data->dofs_per_component_on_cell;
 
+  // Whether the n_components copies of a vector-valued quantity live in
+  // n_components separate vectors, one component per vector, as opposed to
+  // being interleaved within a single vector belonging to an FESystem. The
+  // two cases need different index computations and the distinction recurs
+  // several times below, so evaluate it once here.
+  const bool separate_vectors =
+    (n_components == 1 || this->n_fe_components == 1);
+
   if (apply_constraints && this->cell != numbers::invalid_unsigned_int &&
       dof_info.index_storage_variants
           [is_face ? this->dof_access_index :
@@ -2942,7 +2950,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           n_lanes;
 
       std::array<typename VectorType::value_type *, n_components> src_ptrs;
-      if (n_components == 1 || this->n_fe_components == 1)
+      if (separate_vectors)
         for (unsigned int comp = 0; comp < n_components; ++comp)
           src_ptrs[comp] =
             const_cast<typename VectorType::value_type *>(src[comp]->begin());
@@ -2950,7 +2958,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
         src_ptrs[0] =
           const_cast<typename VectorType::value_type *>(src[0]->begin());
 
-      if (n_components == 1 || this->n_fe_components == 1)
+      if (separate_vectors)
         for (unsigned int i = 0; i < dofs_per_component;
              ++i, dof_indices += n_lanes)
           for (unsigned int comp = 0; comp < n_components; ++comp)
@@ -3048,7 +3056,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
   // through the list of DoFs directly
   if (!has_constraints && apply_constraints)
     {
-      if (n_components == 1 || this->n_fe_components == 1)
+      if (separate_vectors)
         {
           for (unsigned int v = 0; v < n_lanes; ++v)
             {
@@ -3117,7 +3125,7 @@ FEEvaluationBase<dim, n_components_, Number, is_face, VectorizedArrayType>::
           next_index_indicators = index_indicators;
         }
 
-      if (n_components == 1 || this->n_fe_components == 1)
+      if (separate_vectors)
         {
           unsigned int ind_local = 0;
           for (; index_indicators != next_index_indicators; ++index_indicators)
