@@ -1,0 +1,494 @@
+<h1>Results</h1>
+
+<h3> example-1: geometry and parameters </h3>
+
+The model geometry file <code>example-1.geo</code> can be read with any text-editor
+or visualized using gmsh
+@code
+> /usr/bin/gmsh example-1.geo
+@endcode
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-1_gmsh_geo.jpg" alt="example-1: conductor and barrier geometry shown in gmsh GUI" height="800"/>
+      <p> example-1: conductor and barrier geometry shown in gmsh GUI</p>
+      </td>
+  </tr>
+</table>
+
+The geometry does not contain any material properties nor boundary value definitions.
+For understanding how this will be done in this tutorial, a look at a list of the models physical groups in the gmsh GUI is useful.
+
+Therefore, in <a href="https://gmsh.info/">Gmsh's</a> <code>Tools</code> menu select menu item <code>Visibility</code>.
+A window will open. Select the <code>List</code> show <code>Physical groups</code> (This can be selected in a dropdown selector besides the <code>search</code>-field.)
+
+The list of physical groups shall show <code>Type</code>, <code>Number</code> (ID resp.) and <code>Name</code> as in the following table.
+Before starting the simulation, material properties have to be assigned to volumes and Dirichlet boundary conditions on surfaces.
+It is summarized in the <code>Properties</code> here but the assignment is not done in the <code>example-1.geo</code> file nor in the gmsh GUI:
+<table>
+<tr>
+    <th>
+        Type
+    </th>
+    <th>
+        Number (=ID)
+    </th>
+    <th>
+        Name
+    </th>
+    <th>
+        representing
+    </th>
+    <th>
+        Properties (in .prm-file only, not in .geo-file for gmsh)
+    </th>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>0</td>
+    <td></td>
+    <td>insulator, default sub-domain $\Omega \setminus \left\{ \Omega_{10}, \Omega_{20}, \Omega_{30} \right\}$</td>
+    <td>conductivity $\conductivity=0$, rel. permittivity $\permittivity_r=1$</td>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>10</td>
+    <td>conductor_1</td>
+    <td>copper conductor, sub-domain $\Omega_{10}$</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
+        rel. permittivity $\permittivity_r=1$</td>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>20</td>
+    <td>conductor_2</td>
+    <td>copper conductor, sub-domain $\Omega_{20}$</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
+        rel. permittivity $\permittivity_r=1$</td>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>30</td>
+    <td>barrier</td>
+    <td>insulator, sub-domain $\Omega_{30}$</td>
+    <td>conductivity $\conductivity=0$, rel. permittivity $\permittivity_r=4$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>11</td>
+    <td>terminal_11</td>
+    <td>terminal/electrode, boundary $\Gamma_{11}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{11} = 1\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>12</td>
+    <td>terminal_12</td>
+    <td>terminal/electrode, boundary $\Gamma_{12}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{12} = 0.5\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>21</td>
+    <td>terminal_21</td>
+    <td>terminal/electrode, boundary $\Gamma_{21}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{21} = 0.5\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>22</td>
+    <td>terminal_22</td>
+    <td>terminal/electrode, boundary $\Gamma_{22}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{22} = -1\,\text{V}$</td>
+</tr>
+</table>
+
+Default boundary $\Gamma_0$ value will be set to ${\Epot}_{0}=0\,\text{V}$.
+The assignment of the properties is done in the parameter file <code>example-1.prm</code>.
+First parameter is the <code>mesh filename</code> (without <code>.msh</code>-suffix.)
+
+The parameter <code>domains</code> is a comma-separated list of entries for the assignment of material properties to volumes.
+and the parameter <code>potentials</code> is a comma-separated list of entries for assigning the electrostatic potential values
+to the surfaces for the Dirichlet boundary conditions.
+
+The final parameter <code>cells output data filename</code> is a filename for writing output data, which
+can be visualized i.e. by using ParaView (as the authors did) or others.
+the file-extension will internally be set to <code>.vtu</code> and has not to be specified here.
+
+The column <code>Number</code> from gmsh physical group list will further be referred to as <code>ID</code>.
+
+Finally, the parameter file is complete:
+@code
+# Listing of Parameters
+# ---------------------
+
+subsection Problem
+
+  # mesh file name
+  set mesh filename = example-1
+
+  # physical domains
+  # each as       ID : Name         : kappa [A/Vm] : epsilon_r
+  set domains   =  0 : default      :   0.0        :       1.0  , \
+                  10 : conductor_1  :  56.0e+6     :       1.0  , \
+                  20 : conductor_2  :  56.0e+6     :       1.0  , \
+                  30 : barrier      :   0.0        :       4.0
+
+  # Dirichlet boundaries (and its electrostatic potentials "phi_e")
+  # each as        ID : Name         : phi_e [V]
+  set potentials =  0 : default      :   0.0     , \
+                   11 : terminal_11  :   1.0     , \
+                   12 : terminal_12  :   0.5     , \
+                   21 : terminal_21  :   0.5     , \
+                   22 : terminal_22  :  -1.0
+
+  # cells output data filename
+  set cells output data filename = example-1_cells_output_data
+
+end
+@endcode
+
+Next section shows how to generate the mesh without opening the gmsh GUI,
+how to start the simulation and a graphical visualization of the output data.
+
+<h3> example-1: results </h3>
+
+Generate a coarse mesh in binary file format, run the program and see the output
+@code
+> /usr/bin/gmsh example-1.geo -clmax 0.3 -bin -3
+> mpirun -bind-to hwthread ./step-92 example-1.prm
+Running with PETSc on 32 MPI rank(s)...
+mesh-file: "example-1.msh"
+setup: number of degrees of freedom: 15015
+set default boundary potential: phi_e_0 = 0 V
+set terminal_11 boundary potential: phi_e_11 = 1 V
+set terminal_12 boundary potential: phi_e_12 = 0.5 V
+set terminal_21 boundary potential: phi_e_21 = 0.5 V
+set terminal_22 boundary potential: phi_e_22 = -1 V
+  system set up.
+  system assembled.
+  solved.
+exported cells solution and output data into file "example-1_cells_output_data.vtu"
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.636s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| 01. make grid                   |         1 |     0.229s |        36% |
+| 02. setup                       |         1 |    0.0142s |       2.2% |
+| 03. assemble                    |         1 |   0.00516s |      0.81% |
+| 04. solve                       |         1 |     0.339s |        53% |
+| 05. post-process                |         1 |    0.0395s |       6.2% |
++---------------------------------+-----------+------------+------------+
+@endcode
+@note
+The mpirun-parameter <code>-bind-to hwthread</code>
+is essential to start the solver on all hardware-threads of the CPU.
+
+
+In this tutorial, ParaView was used to visualize the solver output.
+Light blue lines show electric field lines ($\vEfield$). Colorization of conductor and barrier surfaces
+indicate the electric potential $\Epot$ on those surfaces.
+Yellow lines show electric current density $\vJelfield$.
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-1_field_plot_1.jpg" alt="example-1: 3D visualization of electric field lines and current density" height="800"/>
+      <p> example-1: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using ParaView)</p>
+      </td>
+  </tr>
+</table>
+
+
+<h3> example-2: geometry and parameters </h3>
+
+Similar as for previous example, the model geometry file <code>example-2.geo</code>
+can be read using any text-editor or visualized using gmsh
+@code
+> /usr/bin/gmsh example-2.geo
+@endcode
+
+Be aware, that for this example all dimensions are given in mm.
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-2_gmsh_geo.jpg" alt="example-2: transformer geometry shown in gmsh GUI" height="800"/>
+      <p> example-2: transformer geometry shown in gmsh GUI</p>
+      </td>
+  </tr>
+</table>
+
+Inside of the file <code>example-2.geo</code>, following line is
+forcing gmsh to scale the dimensions in the mesh output to m:
+@code
+Mesh.ScalingFactor = 1.0e-3;
+@endcode
+
+Following properties shall be assigned to volumes and boundary values to surfaces
+<table>
+<tr>
+    <th>
+        Type
+    </th>
+    <th>
+        Number (=ID)
+    </th>
+    <th>
+        Name
+    </th>
+    <th>
+        representing
+    </th>
+    <th>
+        Properties (in .prm-file only, not in .geo-file for gmsh)
+    </th>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>0</td>
+    <td></td>
+    <td>insulator, default sub-domain $\Omega \setminus \left\{ \Omega_{10}, \Omega_{20} \right\}$</td>
+    <td>conductivity $\conductivity=0$, rel. permittivity $\permittivity_r=1$</td>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>10</td>
+    <td>winding_1</td>
+    <td>copper conductor, sub-domain $ \Omega_{10} $</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
+        rel. permittivity $\permittivity_r=1$</td>
+</tr>
+<tr>
+    <td>Volume</td>
+    <td>20</td>
+    <td>winding_2</td>
+    <td>copper conductor, sub-domain $ \Omega_{20} $</td>
+    <td>conductivity $\conductivity=56 \cdot 10^6 \frac{\text{A}}{\text{V m}}$,
+        rel. permittivity $\permittivity_r=1$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>1</td>
+    <td>core</td>
+    <td>core-surface, boundary $\Gamma_{1}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{1} = 0\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>11</td>
+    <td>winding_1_terminal_1</td>
+    <td>terminal/electrode, boundary $\Gamma_{11}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{11} = 1\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>12</td>
+    <td>winding_1_terminal_2</td>
+    <td>terminal/electrode, boundary $\Gamma_{12}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{12} = 0\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>21</td>
+    <td>winding_2_terminal_1</td>
+    <td>terminal/electrode, boundary $\Gamma_{21}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{21} = 0.5\,\text{V}$</td>
+</tr>
+<tr>
+    <td>Surface</td>
+    <td>22</td>
+    <td>winding_2_terminal_2</td>
+    <td>terminal/electrode, boundary $\Gamma_{22}$</td>
+    <td>Dirichlet boundary condition: el. potential ${\Epot}_{22} = -0.5\,\text{V}$</td>
+</tr>
+</table>
+
+
+Default boundary $\Gamma_0$ value is set to ${\Epot}_{0}=0\,\text{V}$.
+The parameter file has the same structure as for previous example,
+but in this case there is a core (as a surface with a boundary value)
+instead of the barrier (as a volume with material properties):
+@code
+# Listing of Parameters
+# ---------------------
+
+subsection Problem
+
+  # mesh file name
+  set mesh filename = example-2
+
+  # physical domains
+  # each as       ID : Name       : kappa [A/Vm] : epsilon_r
+  set domains   =  0 : default    :   0.0        :       1.0 , \
+                  10 : winding_1  :  56.0e+6     :       1.0 , \
+                  20 : winding_2  :  56.0e+6     :       1.0
+
+  # Dirichlet boundaries (and its electrostatic potentials "phi_e")
+  # each as        ID : Name                  : phi_e [V]
+  set potentials =  0 : default               :   0.0     , \
+                    1 : core                  :   0.0     , \
+                   11 : winding_1_terminal_1  :   1.0     , \
+                   12 : winding_1_terminal_2  :   0.0     , \
+                   21 : winding_2_terminal_1  :   0.5     , \
+                   22 : winding_2_terminal_2  :  -0.5
+
+  # cells output data filename
+  set cells output data filename = example-2_cells_output_data
+
+end
+@endcode
+
+The example can now be simulated and evaluated in next section.
+
+
+<h3> example-2: results </h3>
+
+Generate a coarse mesh in binary file format, run the program and see the output
+@code
+> /usr/bin/gmsh example-2.geo -clmax 300 -bin -3
+> mpirun -bind-to hwthread ./step-92 example-2.prm
+Running with PETSc on 32 MPI rank(s)...
+mesh-file: "example-2.msh"
+setup: number of degrees of freedom: 200590
+set default boundary potential: phi_e_0 = 0 V
+set core boundary potential: phi_e_1 = 0 V
+set winding_1_terminal_1 boundary potential: phi_e_11 = 1 V
+set winding_1_terminal_2 boundary potential: phi_e_12 = 0 V
+set winding_2_terminal_1 boundary potential: phi_e_21 = 0.5 V
+set winding_2_terminal_2 boundary potential: phi_e_22 = -0.5 V
+  system set up.
+  system assembled.
+  solved.
+exported cells solution and output data into file "example-2_cells_output_data.vtu"
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      13.8s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| 01. make grid                   |         1 |      6.26s |        45% |
+| 02. setup                       |         1 |    0.0518s |      0.38% |
+| 03. assemble                    |         1 |    0.0413s |       0.3% |
+| 04. solve                       |         1 |      7.27s |        53% |
+| 05. post-process                |         1 |     0.172s |       1.2% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+Again, ParaView is used for visualization of the solvers output.
+Light blue lines show electric field lines ($\vEfield$). Colorization of conductor surfaces
+indicate the electric potential $\Epot$ on those surfaces.
+Yellow lines show electric current density $\vJelfield$.
+
+<table width="100%" align="center">
+  <tr>
+      <td align="center">
+      <img src="../../../examples/step-92/doc/example-2_field_plot_1.jpg" alt="example-2: 3D visualization of electric field lines and current density" height="800"/>
+      <p> example-2: 3D visualization of electric flux lines (light blue), current density (yellow lines) and electric potential on solids surfaces (using ParaView)</p>
+      </td>
+  </tr>
+</table>
+
+
+<h3> example-2: mesh import performance test </h3>
+
+Last example (2) will be used for a test of mesh-import performance.
+
+First, a finer mesh can be generated using gmsh and start the solver
+@code
+> /usr/bin/gmsh example-2.geo -clmax 100 -bin -3
+> mpirun -bind-to hwthread ./step-92 example-2.prm
+@endcode
+@note
+Usually refinement shall be done within the solver and not
+for the initial mesh. Only, the example-2 is still to small for seeing
+the expected effect and therefore
+the size of the grid file is artificially increased
+in order to create conditions closer to initial meshes
+out of real engineering practice.
+
+
+Run the solver and take a look at the output - especially the wall time
+for <code>01. make grid</code> (and <code>02. setup</code>).
+
+Second, slightly modify the solver and compile it for using
+parallel::distributed triangulation instead of parallel::fullydistributed.
+Therefore, edit the source-code file <code>step-92.cc</code>.
+Search for a line containing a definition
+@code
+#define USE_FULLY_DISTRIBUTED_TRIA
+@endcode
+make that definition ineffective, e.g. by commenting it
+@code
+//#define USE_FULLY_DISTRIBUTED_TRIA
+@endcode
+and finally re-compile and run the solver without modifying
+neither mesh nor parameter-file.
+@code
+> make
+> mpirun -bind-to hwthread ./step-92 example-2.prm
+@endcode
+
+
+Following table shows a comparison of wall-times for the two
+simulations of this small test.
+Especially the wall time for <code>01. make grid</code>
+is more than ten times longer when using the parallel::distributed
+triangulation.
+<table>
+<tr>
+    <th>
+    </th>
+    <th>
+        <code>parallel::distributed</code>
+    </th>
+    <th>
+        <code>parallel::fullydistributed</code>
+    </th>
+</tr>
+<tr>
+    <td>
+        01. make grid
+    </td>
+    <td>
+        519 s
+    </td>
+    <td>
+        48.7 s
+    </td>
+</tr>
+<tr>
+    <td>
+        02. setup
+    </td>
+    <td>
+        0.955 s
+    </td>
+    <td>
+        0.286 s
+    </td>
+</tr>
+</table>
+
+
+
+<h3> Possible Extensions </h3>
+
+<ul>
+    <li>
+        Use higher order FE-space. Actually, the FE order is not even a parameter. Order 1 is used.
+    </li>
+    <li>
+        Replace the direct solver with a matrix-free solver.
+    </li>
+    <li>
+        Make usage of the manifolds concept for handling curved shapes from CAD-import (e.g. step-files) and implement AMR.
+
+        E.g.: example-2 contains simplified windings. A more realistic CAD-model could contain spirals, cylinders or discs.
+    </li>
+</ul>
