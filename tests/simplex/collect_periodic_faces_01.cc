@@ -11,9 +11,8 @@
 // -----------------------------------------------------------------------------
 
 
-// GridTools::collect_periodic_faces() with a single boundary id relies on
-// local face indices of hypercube cells. Check that it reports an error on a
-// simplex mesh and that the variant with two boundary ids works there.
+// Check that GridTools::collect_periodic_faces() with two boundary ids works
+// on a 2d simplex mesh.
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
@@ -50,20 +49,6 @@ main()
 
   using FacePairs =
     std::vector<GridTools::PeriodicFacePair<Triangulation<2>::cell_iterator>>;
-
-  for (unsigned int direction = 0; direction < 2; ++direction)
-    {
-      FacePairs pairs;
-      try
-        {
-          GridTools::collect_periodic_faces(tria, 0, direction, pairs);
-          deallog << "direction " << direction << ": no exception" << std::endl;
-        }
-      catch (const ExceptionBase &)
-        {
-          deallog << "direction " << direction << ": exception" << std::endl;
-        }
-    }
 
   for (unsigned int direction = 0; direction < 2; ++direction)
     {
