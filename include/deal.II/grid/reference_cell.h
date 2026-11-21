@@ -23,6 +23,7 @@
 #include <deal.II/base/types.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/grid/refinement_choice.h>
 #include <deal.II/grid/tria_orientation.h>
 
 #include <boost/container/small_vector.hpp>
@@ -423,6 +424,18 @@ public:
    */
   ArrayView<const RefinementCase<dim>>
   refinement_cases() const;
+
+  /**
+   * Return whether or not the current ReferenceCell may be refined with
+   * @p refinement_choice. RefinementChoices::None is compatible with every
+   * ReferenceCell. Hypercubes support every non-tetrahedral RefinementChoice
+   * (e.g., RefinementChoices::CutX or RefinementChoices::Isotropic) and
+   * tetrahedra only support RefinementChoices::Cut49,
+   * RefinementChoices::Cut57, and RefinementChoices::Cut68. All other
+   * ReferenceCells only support RefinementChoices::Isotropic.
+   */
+  constexpr bool
+  is_compatible_with(const RefinementChoice<dim> &refinement_choice) const;
 
   /**
    * Return the reference-cell type of face @p face_index of the current
@@ -2549,6 +2562,35 @@ ReferenceCell<dim>::n_isotropic_refinement_choices() const
 
   DEAL_II_NOT_IMPLEMENTED();
   return numbers::invalid_unsigned_int;
+}
+
+
+
+template <int dim>
+inline constexpr bool
+ReferenceCell<dim>::is_compatible_with(
+  const RefinementChoice<dim> &refinement_choice) const
+{
+  Assert(*this != ReferenceCells::Invalid<dim>, ExcNotImplemented());
+
+  // None is always compatible:
+  if (refinement_choice == RefinementChoices::None<dim>)
+    return true;
+
+  // First cover the special Tetrahedron choices:
+  if constexpr (dim == 3)
+    {
+      if (*this == ReferenceCells::Tetrahedron)
+        return refinement_choice.is_tetrahedral();
+      else if (refinement_choice.is_tetrahedral())
+        return false;
+    }
+
+  // Then hypercubes:
+  if (this->is_hyper_cube())
+    return true;
+  // Finally, Wedge and Pyramid only support isotropic refinement:
+  return refinement_choice == RefinementChoices::Isotropic<dim>;
 }
 
 
