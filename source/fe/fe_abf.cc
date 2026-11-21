@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2003 - 2025 by the deal.II authors
+// Copyright (C) 2003 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -189,13 +189,29 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
   // Therefore they will be initialized at this point.
   std::array<std::unique_ptr<AnisotropicPolynomials<dim>>, dim> polynomials_abf;
 
-  // Generate x_1^{i} x_2^{r+1} ...
+  // Generate the polynomials used by the additional divergence moments.
   for (unsigned int dd = 0; dd < dim; ++dd)
     {
       std::vector<std::vector<Polynomials::Polynomial<double>>> poly(dim);
-      for (unsigned int d = 0; d < dim; ++d)
-        poly[d].push_back(Polynomials::Monomial<double>(deg + 1));
-      poly[dd] = Polynomials::Monomial<double>::generate_complete_basis(deg);
+      if (dim == 3 && deg > 0)
+        {
+          // The additional divergence moments have degree deg+1 in one
+          // coordinate and degree at most deg in every other coordinate.
+          // The higher-degree Legendre factor isolates that coordinate's
+          // divergence from the other vector components.
+          for (unsigned int d = 0; d < dim; ++d)
+            if (d == dd)
+              poly[d].push_back(Polynomials::Legendre(deg + 1));
+            else
+              poly[d] = Polynomials::Legendre::generate_complete_basis(deg);
+        }
+      else
+        {
+          for (unsigned int d = 0; d < dim; ++d)
+            poly[d].push_back(Polynomials::Monomial<double>(deg + 1));
+          poly[dd] =
+            Polynomials::Monomial<double>::generate_complete_basis(deg);
+        }
 
       polynomials_abf[dd] = std::make_unique<AnisotropicPolynomials<dim>>(poly);
     }
@@ -305,10 +321,7 @@ FE_ABF<dim>::initialize_support_points(const unsigned int deg)
   for (unsigned int k = 0; k < cell_quadrature.size(); ++k)
     this->generalized_support_points[current++] = cell_quadrature.point(k);
 
-  // Additional functionality for the ABF elements
-  // TODO: Here the canonical extension of the principle
-  // behind the ABF elements is implemented. It is unclear,
-  // if this really leads to the ABF spaces in 3d!
+  // Additional divergence moments, evaluated through integration by parts.
   interior_weights_abf.reinit(TableIndices<3>(cell_quadrature.size(),
                                               polynomials_abf[0]->n() * dim,
                                               dim));
