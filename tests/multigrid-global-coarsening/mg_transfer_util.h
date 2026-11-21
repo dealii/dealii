@@ -186,6 +186,116 @@ test_transfer_operator(
 }
 
 
+template <int dim,
+          typename Number,
+          typename MeshType,
+          typename SparseMatrixType>
+void
+test_assembled_transfer_operator(
+  const MGTwoLevelTransfer<dim, LinearAlgebra::distributed::Vector<Number>>
+                         &transfer,
+  const SparseMatrixType &restriction_matrix,
+  const SparseMatrixType &prolongation_matrix,
+  const MeshType         &dof_handler_fine,
+  const MeshType         &dof_handler_coarse,
+  const unsigned int      mg_level_fine   = numbers::invalid_unsigned_int,
+  const unsigned int      mg_level_coarse = numbers::invalid_unsigned_int)
+{
+  AffineConstraints<Number> constraint_fine(
+    dof_handler_fine.locally_owned_dofs(),
+    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
+  DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
+  constraint_fine.close();
+
+  // perform prolongation
+  LinearAlgebra::distributed::Vector<Number> src, dst, src_ref, dst_ref;
+
+
+  initialize_dof_vector(dst, dof_handler_fine, mg_level_fine);
+  initialize_dof_vector(src, dof_handler_coarse, mg_level_coarse);
+  initialize_dof_vector(dst_ref, dof_handler_fine, mg_level_fine);
+  initialize_dof_vector(src_ref, dof_handler_coarse, mg_level_coarse);
+
+  // test prolongation
+  {
+    src     = 0.0;
+    src     = 1.0;
+    dst     = 0.0;
+    dst_ref = 0.0;
+    prolongation_matrix.vmult_add(dst, src);
+    transfer.prolongate_and_add(dst_ref, src);
+    // transfer operator sets only non-constrained dofs -> update the rest
+    // via constraint matrix
+    constraint_fine.distribute(dst);
+    constraint_fine.distribute(dst_ref);
+
+    dst_ref -= dst;
+
+    // print norms
+    if (true)
+      {
+        deallog << dst.l2_norm() << std::endl;
+        deallog << "error: " << dst_ref.l2_norm() << std::endl; // error norm
+      }
+
+    // print vectors
+    if (true)
+      {
+        print(src);
+        print(dst);
+      }
+    // print full prolongation matrix
+    if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1 && false)
+      {
+        FullMatrix<Number> full_prolongation_matrix(prolongation_matrix.m(),
+                                                    prolongation_matrix.n());
+        for (unsigned int i = 0; i < prolongation_matrix.m(); ++i)
+          for (unsigned int j = 0; j < prolongation_matrix.n(); ++j)
+            full_prolongation_matrix(i, j) = prolongation_matrix.el(i, j);
+        full_prolongation_matrix.print_formatted(
+          deallog.get_file_stream(), 2, false, 5, "", 1, 1e-5);
+      }
+  }
+
+
+  // test restriction
+  {
+    dst     = 1.0;
+    src     = 0.0;
+    src_ref = 0.0;
+    restriction_matrix.vmult_add(src, dst);
+    transfer.restrict_and_add(src_ref, dst);
+    src_ref -= src;
+
+    // print norms
+    if (true)
+      {
+        deallog << src.l2_norm() << std::endl;
+        deallog << "error: " << src_ref.l2_norm() << std::endl; // error norm
+      }
+
+    // print vectors
+    if (true)
+      {
+        print(dst);
+        print(src);
+      }
+
+    // print full prolongation matrix
+    if (Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD) == 1 && false)
+      {
+        FullMatrix<Number> full_restriction_matrix(restriction_matrix.m(),
+                                                   restriction_matrix.n());
+        for (unsigned int i = 0; i < restriction_matrix.m(); ++i)
+          for (unsigned int j = 0; j < restriction_matrix.n(); ++j)
+            full_restriction_matrix(i, j) = restriction_matrix.el(i, j);
+        full_restriction_matrix.print_formatted(
+          deallog.get_file_stream(), 2, false, 5, "", 1, 1e-5);
+      }
+  }
+}
+
+
 
 template <int dim, typename Number, typename MeshType>
 void
