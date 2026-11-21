@@ -1,0 +1,62 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+// It is very inefficient in the module system to have repeated
+// #includes in many module partition files because when you 'import'
+// those partitions, you also have to load everything they
+// #included. In other words, you get the same content *many times*,
+// once from each imported partition, rather than only once via the
+// old-style #include system. We deal with this by wrapping all of our
+// external packages into partitions that we can 'import' wherever we
+// need.
+
+// This is the file that wraps everything we need from ITK into one
+// module partition.
+
+
+module;
+
+#include <deal.II/base/config.h>
+
+#ifdef DEAL_II_WITH_ITK
+#  include <itkBinaryThresholdImageFilter.h>
+#  include <itkChangeInformationImageFilter.h>
+#  include <itkImage.h>
+#  include <itkImageFileReader.h>
+#  include <itkImageFileWriter.h>
+#  include <itkJPEGImageIOFactory.h>
+#  include <itkLinearInterpolateImageFunction.h>
+#  include <itkNiftiImageIOFactory.h>
+#  include <itkPNGImageIOFactory.h>
+#  include <itkSignedMaurerDistanceMapImageFilter.h>
+#endif
+
+export module dealii.external.itk;
+
+#ifdef DEAL_II_WITH_ITK
+
+export
+{
+  using ::itkBinaryThresholdImageFilter;
+  using ::itkChangeInformationImageFilter.h;
+  using ::itkImage;
+  using ::itkImageFileReader;
+  using ::itkImageFileWriter;
+  using ::itkJPEGImageIOFactory.h;
+  using ::itkLinearInterpolateImageFunction;
+  using ::itkNiftiImageIOFactory.h;
+  using ::itkPNGImageIOFactory.h;
+  using ::itkSignedMaurerDistanceMapImageFilter;
+}
+
+#endif

@@ -1,0 +1,24 @@
+
+DEAL::dim = 3
+DEAL::
+DEAL::test_arbitrary_level_set_sphere
+DEAL::center
+DEAL::point = 50 50 50
+DEAL::value -23.3238
+DEAL::point = 0 50 50
+DEAL::value 25
+DEAL::point = 25 50 50
+DEAL::value -0
+DEAL::point = 35 35 50
+DEAL::value -2.82843
+DEAL::test_arbitrary_level_set_cube
+DEAL::center
+DEAL::point = 50 50 50
+DEAL::value -25
+DEAL::point = 0 50 50
+DEAL::value 25
+DEAL::point = 25 50 50
+DEAL::value -0
+DEAL::point = 35 35 50
+DEAL::value -10
+DEAL::
