@@ -1,0 +1,18 @@
+
+DEAL::hyper_ball_balanced, 2d
+DEAL::  FE_RaviartThomas<2>(0): integrals of the gradients do not match on 0 cells
+DEAL::  FE_RaviartThomasNodal<2>(0): integrals of the gradients do not match on 0 cells
+DEAL::  FE_Nedelec<2>(0): integrals of the gradients do not match on 0 cells, of the Hessians on 0 cells
+DEAL::  FE_RaviartThomas<2>(1): integrals of the gradients do not match on 0 cells
+DEAL::  FE_RaviartThomasNodal<2>(1): integrals of the gradients do not match on 0 cells
+DEAL::  FE_Nedelec<2>(1): integrals of the gradients do not match on 0 cells, of the Hessians on 0 cells
+DEAL::  FE_RaviartThomas<2>(2): integrals of the gradients do not match on 0 cells
+DEAL::  FE_RaviartThomasNodal<2>(2): integrals of the gradients do not match on 0 cells
+DEAL::  FE_Nedelec<2>(2): integrals of the gradients do not match on 0 cells, of the Hessians on 0 cells
+DEAL::deformed cube with rotated cells, 3d
+DEAL::  FE_RaviartThomas<3>(0): integrals of the gradients do not match on 0 cells
+DEAL::  FE_RaviartThomasNodal<3>(0): integrals of the gradients do not match on 0 cells
+DEAL::  FE_Nedelec<3>(0): integrals of the gradients do not match on 0 cells, of the Hessians on 0 cells
+DEAL::  FE_RaviartThomas<3>(1): integrals of the gradients do not match on 0 cells
+DEAL::  FE_RaviartThomasNodal<3>(1): integrals of the gradients do not match on 0 cells
+DEAL::  FE_Nedelec<3>(1): integrals of the gradients do not match on 0 cells, of the Hessians on 0 cells

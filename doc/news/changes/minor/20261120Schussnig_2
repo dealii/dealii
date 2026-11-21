@@ -1,0 +1,9 @@
+Fixed: FEValues computed wrong gradients and Hessians of the shape functions
+of H(div) elements like FE_RaviartThomas and of FE_Nedelec on cells that are
+not parallelograms if the shape function changes sign because of the face or
+edge orientation: The terms coming from the derivatives of the Jacobian were
+computed with the shape values that already contained the sign change, and
+the sum was multiplied by the sign once more. This affected, e.g., the meshes
+of GridGenerator::hyper_ball() and GridGenerator::hyper_ball_balanced().
+<br>
+(Richard Schussnig, 2026/11/20)
