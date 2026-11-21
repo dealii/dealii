@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2013 - 2024 by the deal.II authors
+// Copyright (C) 2013 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -14,40 +14,84 @@
 
 for (S : REAL_SCALARS)
   {
-    template void internal::SolverGMRESImplementation::do_Tvmult_add<false, S>(
-      const unsigned int,
-      const std::size_t,
-      const S *,
-      const std::vector<const S *> &,
-      Vector<double> &);
+    template void internal::SolverGMRESImplementation::
+      do_Tvmult_add<false, MemorySpace::Host, S>(
+        const unsigned int,
+        const std::size_t,
+        const S *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        Vector<double> &);
 
-    template void internal::SolverGMRESImplementation::do_Tvmult_add<true, S>(
-      const unsigned int,
-      const std::size_t,
-      const S *,
-      const std::vector<const S *> &,
-      Vector<double> &);
+    template void internal::SolverGMRESImplementation::
+      do_Tvmult_add<true, MemorySpace::Host, S>(
+        const unsigned int,
+        const std::size_t,
+        const S *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        Vector<double> &);
 
-    template double
-    internal::SolverGMRESImplementation::do_subtract_and_norm<false, S>(
+    template double internal::SolverGMRESImplementation::
+      do_subtract_and_norm<false, MemorySpace::Host, S>(
+        const unsigned int,
+        const std::size_t,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const Vector<double> &,
+        S *);
+
+    template double internal::SolverGMRESImplementation::
+      do_subtract_and_norm<true, MemorySpace::Host, S>(
+        const unsigned int,
+        const std::size_t,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const Vector<double> &,
+        S *);
+
+    template void
+    internal::SolverGMRESImplementation::do_add<MemorySpace::Host, S>(
       const unsigned int,
       const std::size_t,
-      const std::vector<const S *> &,
+      internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
       const Vector<double> &,
+      const bool,
       S *);
 
-    template double
-    internal::SolverGMRESImplementation::do_subtract_and_norm<true, S>(
-      const unsigned int,
-      const std::size_t,
-      const std::vector<const S *> &,
-      const Vector<double> &,
-      S *);
+    template void internal::SolverGMRESImplementation::
+      do_Tvmult_add<false, MemorySpace::Default, S>(
+        const unsigned int,
+        const std::size_t,
+        const S *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        Vector<double> &);
 
-    template void internal::SolverGMRESImplementation::do_add<S>(
+    template void internal::SolverGMRESImplementation::
+      do_Tvmult_add<true, MemorySpace::Default, S>(
+        const unsigned int,
+        const std::size_t,
+        const S *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        Vector<double> &);
+
+    template double internal::SolverGMRESImplementation::
+      do_subtract_and_norm<false, MemorySpace::Default, S>(
+        const unsigned int,
+        const std::size_t,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const Vector<double> &,
+        S *);
+
+    template double internal::SolverGMRESImplementation::
+      do_subtract_and_norm<true, MemorySpace::Default, S>(
+        const unsigned int,
+        const std::size_t,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const Vector<double> &,
+        S *);
+
+    template void
+    internal::SolverGMRESImplementation::do_add<MemorySpace::Default, S>(
       const unsigned int,
       const std::size_t,
-      const std::vector<const S *> &,
+      internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
       const Vector<double> &,
       const bool,
       S *);
