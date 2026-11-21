@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 //
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
-// Copyright (C) 2004 - 2025 by the deal.II authors
+// Copyright (C) 2004 - 2026 by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -49,6 +49,38 @@
 
 #if defined(DEAL_II_WITH_HDF5)
 #  include <hdf5.h>
+#endif
+
+#if defined(DEAL_II_WITH_PETSC)
+#  if DEAL_II_PETSC_VERSION_LT(3, 19, 0)
+#    define PETSC_SUCCESS 0
+#  endif
+
+#  if DEAL_II_PETSC_VERSION_LT(3, 17, 0)
+#    define PetscCall(expression)                               \
+      do                                                        \
+        {                                                       \
+          const PetscErrorCode petsc_error_code = (expression); \
+          if (petsc_error_code != 0)                            \
+            return petsc_error_code;                            \
+        }                                                       \
+      while (false)
+#    define PetscCallMPI(expression)                     \
+      do                                                 \
+        {                                                \
+          const int petsc_mpi_error_code = (expression); \
+          if (petsc_mpi_error_code != MPI_SUCCESS)       \
+            return PETSC_ERR_MPI;                        \
+        }                                                \
+      while (false)
+#    define PetscCallAbort(comm, expression)                      \
+      do                                                          \
+        {                                                         \
+          const PetscErrorCode petsc_error_code = (expression);   \
+          AssertThrow(petsc_error_code == 0, ExcInternalError()); \
+        }                                                         \
+      while (false)
+#  endif
 #endif
 
 
