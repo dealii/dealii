@@ -18,7 +18,7 @@ jobs:
   indent:
     # run the indent checks
 
-    name: indent
+    name: indent clang-23.1.5
     runs-on: ubuntu-26.04
 
     steps:
