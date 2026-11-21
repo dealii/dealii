@@ -35,12 +35,28 @@ for (deal_II_dimension : DIMENSIONS; number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
   }
 
 for (deal_II_dimension : DIMENSIONS;
-     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS_FAD)
   {
     template class SymmetricTensor<2, deal_II_dimension, number>;
 
     template class SymmetricTensor<4, deal_II_dimension, number>;
+  }
 
+for (deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS_RAD)
+  {
+    // Sacado::Rad types do not support the device: do not instantiate them
+    // when compiling for the device.
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
+    template class SymmetricTensor<2, deal_II_dimension, number>;
+
+    template class SymmetricTensor<4, deal_II_dimension, number>;
+#endif
+  }
+
+for (deal_II_dimension : DIMENSIONS;
+     number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+  {
     template std::array<number, deal_II_dimension> eigenvalues(
       const SymmetricTensor<2, deal_II_dimension, number> &);
 
@@ -71,8 +87,18 @@ for (number : DIFFERENTIABLE_ADOLC_REAL_SCALARS)
       const SymmetricTensor<4, 3, number> &t);
   }
 
-for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS)
+for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS_FAD)
   {
     template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
       const SymmetricTensor<4, 3, number> &t);
+  }
+
+for (number : DIFFERENTIABLE_TRILINOS_SACADO_REAL_SCALARS_RAD)
+  {
+    // Sacado::Rad types do not support the device: do not instantiate them
+    // when compiling for the device.
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
+    template DEAL_II_HOST_DEVICE SymmetricTensor<4, 3, number> invert(
+      const SymmetricTensor<4, 3, number> &t);
+#endif
   }
