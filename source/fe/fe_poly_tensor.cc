@@ -912,6 +912,12 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                     mapping_internal,
                     transformed_shape_grads);
 
+                  // The terms below with the derivative of the Jacobian use
+                  // the shape values in output_data, which already contain
+                  // dof_sign, so only the transformed gradient gets dof_sign.
+                  for (unsigned int k = 0; k < n_q_points; ++k)
+                    transformed_shape_grads[k] *= dof_sign;
+
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       for (unsigned int n = 0; n < spacedim; ++n)
@@ -925,7 +931,7 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -959,6 +965,12 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                     mapping_internal,
                     transformed_shape_grads);
 
+                  // The terms below with the derivative of the Jacobian use
+                  // the shape values in output_data, which already contain
+                  // dof_sign, so only the transformed gradient gets dof_sign.
+                  for (unsigned int k = 0; k < n_q_points; ++k)
+                    transformed_shape_grads[k] *= dof_sign;
+
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       for (unsigned int n = 0; n < spacedim; ++n)
@@ -969,7 +981,7 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       output_data.shape_gradients[first + d][k] =
-                        dof_sign * transformed_shape_grads[k][d];
+                        transformed_shape_grads[k][d];
 
                   break;
                 }
@@ -1173,6 +1185,13 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                     mapping_internal,
                     transformed_shape_hessians);
 
+                  // The terms below with the derivatives of the Jacobian use
+                  // the shape values and gradients in output_data, which
+                  // already contain dof_sign, so only the transformed Hessian
+                  // gets dof_sign.
+                  for (unsigned int k = 0; k < n_q_points; ++k)
+                    transformed_shape_hessians[k] *= dof_sign;
+
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       for (unsigned int n = 0; n < spacedim; ++n)
@@ -1245,7 +1264,7 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
@@ -1278,6 +1297,13 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                     mapping_internal,
                     transformed_shape_hessians);
 
+                  // The terms below with the derivatives of the Jacobian use
+                  // the shape values and gradients in output_data, which
+                  // already contain dof_sign, so only the transformed Hessian
+                  // gets dof_sign.
+                  for (unsigned int k = 0; k < n_q_points; ++k)
+                    transformed_shape_hessians[k] *= dof_sign;
+
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       for (unsigned int n = 0; n < spacedim; ++n)
@@ -1303,7 +1329,7 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                   for (unsigned int k = 0; k < n_q_points; ++k)
                     for (unsigned int d = 0; d < spacedim; ++d)
                       output_data.shape_hessians[first + d][k] =
-                        dof_sign * transformed_shape_hessians[k][d];
+                        transformed_shape_hessians[k][d];
 
                   break;
                 }
