@@ -15870,6 +15870,13 @@ unsigned int Triangulation<dim, spacedim>::n_active_cells() const
 
 template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+unsigned int Triangulation<dim, spacedim>::n_locally_owned_active_cells() const
+{
+  return n_active_cells();
+}
+
+template <int dim, int spacedim>
+DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 types::global_cell_index
   Triangulation<dim, spacedim>::n_global_active_cells() const
 {

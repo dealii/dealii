@@ -1,0 +1,4 @@
+New: Triangulation::n_locally_owned_active_cells() is now available for
+serial triangulations as well as parallel triangulations.
+<br>
+(Timo Heister, 2026/11/28)
