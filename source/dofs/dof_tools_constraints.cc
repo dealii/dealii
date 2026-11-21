@@ -3117,6 +3117,26 @@ namespace DoFTools
 
 
 
+  template <typename number, int dim, int spacedim>
+  AffineConstraints<number>
+  make_default_constraints(const DoFHandler<dim, spacedim> &dof_handler)
+  {
+    Assert(dof_handler.has_active_dofs(),
+           ExcMessage(
+             "The given DoFHandler does not have any DoFs. Did you forget to "
+             "call dof_handler.distribute_dofs()?"));
+
+    AffineConstraints<number> constraints(dof_handler.locally_owned_dofs(),
+                                          extract_locally_relevant_dofs(
+                                            dof_handler));
+
+    make_hanging_node_constraints(dof_handler, constraints);
+
+    return constraints;
+  }
+
+
+
   namespace internal
   {
     template <typename FaceIterator, typename number>

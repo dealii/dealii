@@ -761,6 +761,22 @@ namespace DoFTools
                                 AffineConstraints<number>       &constraints);
 
   /**
+   * Create and return an AffineConstraints object initialized with the
+   * locally owned and locally relevant DoFs of @p dof_handler and populated
+   * with hanging node (and hp) constraints via
+   * make_hanging_node_constraints().
+   *
+   * The returned AffineConstraints object is not closed so that additional
+   * constraints (such as Dirichlet or periodic boundary conditions) can be
+   * added before calling AffineConstraints::close().
+   *
+   * @ingroup constraints
+   */
+  template <typename number = double, int dim, int spacedim>
+  AffineConstraints<number>
+  make_default_constraints(const DoFHandler<dim, spacedim> &dof_handler);
+
+  /**
    * This function is used when different variables in a problem are
    * discretized on different grids, where one grid is strictly coarser than
    * the other. An example are optimization problems where the control
