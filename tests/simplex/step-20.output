@@ -3,4 +3,4 @@ DEAL::Number of active cells: 512
 DEAL::Total number of cells: 680
 DEAL::Number of degrees of freedom: 3714 (2178+1536)
 DEAL::33 CG Schur complement iterations to obtain convergence.
-DEAL::Errors: ||e_p||_L2 = 0.00221522,   ||e_u||_L2 = 2.44171e-09
+DEAL::Errors: ||e_p||_L2 = 0.00156474,   ||e_u||_L2 = 2.49054e-09
