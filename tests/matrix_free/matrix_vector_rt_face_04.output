@@ -9,6 +9,9 @@ DEAL:2d::
 DEAL:2d::Testing Gradients 
 DEAL:2d::Norm of difference: 2.06943e-14
 DEAL:2d::
+DEAL:2d::Testing Values and Gradients 
+DEAL:2d::Norm of difference: 1.54319e-14
+DEAL:2d::
 DEAL:2d::Testing Divergence 
 DEAL:2d::Norm of difference: 5.70616e-15
 DEAL:2d::
@@ -22,6 +25,9 @@ DEAL:2d::
 DEAL:2d::Testing Gradients 
 DEAL:2d::Norm of difference: 3.30476e-14
 DEAL:2d::
+DEAL:2d::Testing Values and Gradients 
+DEAL:2d::Norm of difference: 2.62654e-14
+DEAL:2d::
 DEAL:2d::Testing Divergence 
 DEAL:2d::Norm of difference: 3.09657e-14
 DEAL:2d::
@@ -34,6 +40,9 @@ DEAL:3d::Norm of difference: 1.68332e-14
 DEAL:3d::
 DEAL:3d::Testing Gradients 
 DEAL:3d::Norm of difference: 3.15188e-14
+DEAL:3d::
+DEAL:3d::Testing Values and Gradients 
+DEAL:3d::Norm of difference: 4.28645e-14
 DEAL:3d::
 DEAL:3d::Testing Divergence 
 DEAL:3d::Norm of difference: 1.04375e-14
