@@ -289,7 +289,8 @@ namespace SparsityTools
     partition_zoltan(const SparsityPattern           &sparsity_pattern,
                      const std::vector<unsigned int> &cell_weights,
                      const unsigned int               n_partitions,
-                     std::vector<unsigned int>       &partition_indices)
+                     std::vector<unsigned int>       &partition_indices,
+                     std::unique_ptr<Zoltan>         &zz)
     {
       // Make sure that ZOLTAN is actually
       // installed and detected
@@ -306,32 +307,37 @@ namespace SparsityTools
         ExcMessage(
           "The cell weighting functionality for Zoltan has not yet been implemented."));
 
-      // MPI environment must have been initialized by this point.
-      std::unique_ptr<Zoltan> zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
 
       // General parameters
       // DEBUG_LEVEL call must precede the call to LB_METHOD
-      zz->Set_Param("DEBUG_LEVEL", "0"); // set level of debug info
-      zz->Set_Param(
-        "LB_METHOD",
-        "GRAPH"); // graph based partition method (LB-load balancing)
-      zz->Set_Param("NUM_LOCAL_PARTS",
-                    std::to_string(n_partitions)); // set number of partitions
+      if (!zz)
+        {
+          // zz is null:
+          /* MPI environment must have been initialized by this point.*/
+          zz = std::make_unique<Zoltan>(MPI_COMM_SELF);
 
-      // The PHG partitioner is a hypergraph partitioner that Zoltan could use
-      // for graph partitioning.
-      // If number of vertices in hyperedge divided by total vertices in
-      // hypergraph exceeds PHG_EDGE_SIZE_THRESHOLD,
-      // then the hyperedge will be omitted as such (dense) edges will likely
-      // incur high communication costs regardless of the partition.
-      // PHG_EDGE_SIZE_THRESHOLD value is raised to 0.5 from the default
-      // value of 0.25 so that the PHG partitioner doesn't throw warning saying
-      // "PHG_EDGE_SIZE_THRESHOLD is low ..." after removing all dense edges.
-      // For instance, in two dimensions if the triangulation being partitioned
-      // is two quadrilaterals sharing an edge and if PHG_EDGE_SIZE_THRESHOLD
-      // value is set to 0.25, PHG will remove all the edges throwing the
-      // above warning.
-      zz->Set_Param("PHG_EDGE_SIZE_THRESHOLD", "0.5");
+          zz->Set_Param("DEBUG_LEVEL", "0"); // set level of debug info
+          zz->Set_Param(
+            "LB_METHOD",
+            "GRAPH"); // graph based partition method (LB-load balancing)
+          zz->Set_Param("NUM_LOCAL_PARTS",
+                        std::to_string(
+                          n_partitions)); // set number of partitions
+
+          // The PHG partitioner is a hypergraph partitioner that Zoltan could
+          // use for graph partitioning. If number of vertices in hyperedge
+          // divided by total vertices in hypergraph exceeds
+          // PHG_EDGE_SIZE_THRESHOLD, then the hyperedge will be omitted as such
+          // (dense) edges will likely incur high communication costs regardless
+          // of the partition. PHG_EDGE_SIZE_THRESHOLD value is raised to 0.5
+          // from the default value of 0.25 so that the PHG partitioner doesn't
+          // throw warning saying "PHG_EDGE_SIZE_THRESHOLD is low ..." after
+          // removing all dense edges. For instance, in two dimensions if the
+          // triangulation being partitioned is two quadrilaterals sharing an
+          // edge and if PHG_EDGE_SIZE_THRESHOLD value is set to 0.25, PHG will
+          // remove all the edges throwing the above warning.
+          zz->Set_Param("PHG_EDGE_SIZE_THRESHOLD", "0.5");
+        }
 
       // Need a non-const object equal to sparsity_pattern
       SparsityPattern graph;
@@ -407,6 +413,7 @@ namespace SparsityTools
   }
 
 
+
   void
   partition(const SparsityPattern           &sparsity_pattern,
             const std::vector<unsigned int> &cell_weights,
@@ -437,13 +444,62 @@ namespace SparsityTools
                       n_partitions,
                       partition_indices);
     else if (partitioner == Partitioner::zoltan)
-      partition_zoltan(sparsity_pattern,
-                       cell_weights,
-                       n_partitions,
-                       partition_indices);
+      {
+        std::unique_ptr<Zoltan> zz = nullptr;
+        partition_zoltan(
+          sparsity_pattern, cell_weights, n_partitions, partition_indices, zz);
+      }
     else
       AssertThrow(false, ExcInternalError());
   }
+
+
+
+#ifdef DEAL_II_TRILINOS_WITH_ZOLTAN
+  void
+  partition(const SparsityPattern     &sparsity_pattern,
+            const unsigned int         n_partitions,
+            std::vector<unsigned int> &partition_indices,
+            std::unique_ptr<Zoltan>   &zz)
+  {
+    std::vector<unsigned int> cell_weights;
+
+    // Call the other more general function
+    partition(
+      sparsity_pattern, cell_weights, n_partitions, partition_indices, zz);
+  }
+
+
+
+  void
+  partition(const SparsityPattern           &sparsity_pattern,
+            const std::vector<unsigned int> &cell_weights,
+            const unsigned int               n_partitions,
+            std::vector<unsigned int>       &partition_indices,
+            std::unique_ptr<Zoltan>         &zz)
+  {
+    Assert(sparsity_pattern.n_rows() == sparsity_pattern.n_cols(),
+           ExcNotQuadratic());
+    Assert(sparsity_pattern.is_compressed(),
+           SparsityPattern::ExcNotCompressed());
+
+    Assert(n_partitions > 0, ExcInvalidNumberOfPartitions(n_partitions));
+    Assert(partition_indices.size() == sparsity_pattern.n_rows(),
+           ExcInvalidArraySize(partition_indices.size(),
+                               sparsity_pattern.n_rows()));
+
+    // check for an easy return
+    if (n_partitions == 1 || (sparsity_pattern.n_rows() == 1))
+      {
+        std::fill_n(partition_indices.begin(), partition_indices.size(), 0U);
+        return;
+      }
+
+    partition_zoltan(
+      sparsity_pattern, cell_weights, n_partitions, partition_indices, zz);
+  }
+#endif
+
 
 
   unsigned int
