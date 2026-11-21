@@ -333,7 +333,8 @@ BlockIndices::global_to_local(const size_type i) const
   const auto it = std::prev(
     std::upper_bound(std::next(start_indices.begin()), start_indices.end(), i));
 
-  return {std::distance(start_indices.begin(), it), i - *it};
+  return {static_cast<unsigned int>(std::distance(start_indices.begin(), it)),
+          i - *it};
 }
 
 
