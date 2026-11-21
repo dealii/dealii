@@ -1,0 +1,108 @@
+# Start with the quadratic velocity profile throughout the fluid, without
+# an inlet ramp. Initial constraint distribution imposes the boundary
+# values, including zero velocity on the cylinder and channel walls.
+# The start-from-rest version is in turek_hron_fsi2_3d.prm.
+#
+# Three-dimensional extension of the Turek-Hron FSI2 setup using the current
+# step-80 parameter API. The rectangular flag has a finite span of 0.20 m.
+# The span z in [0.10,0.30] follows Failer and Richter (2020), Section 5.1.2:
+# "A Parallel Newton Multigrid Framework for Monolithic Fluid-Structure
+# Interactions", Journal of Scientific Computing 82, 28.
+# https://doi.org/10.1007/s10915-019-01113-y
+#
+# The native channel_with_cylinder generator creates [0,2.2] x [0,0.41]
+# x [0,0.41] and a radius-0.05 cylinder centered at (0.2,0.2,0). The standard
+# 2D benchmark has channel length 2.5; this native grid is 0.3 shorter.
+# Only the flag span is adopted from that 3D benchmark; the channel length,
+# cylinder x-position, inflow profile and material parameters differ.
+# The rectangular flag spans x in [0.25,0.60] and y in [0.19,0.21]; its
+# upstream face is tangent to the cylinder along y=0.2, x=0.25.
+# Step-80 has one density parameter and no separate solid density, so the
+# canonical FSI2 density ratio of 10 is not represented here.
+
+set dimension       = 3
+set space dimension = 3
+subsection Navier-Stokes Immersed Problem
+  set Dirichlet boundary ids                = 0, 2, 3
+  set Final time                            = 20
+  set Number of time steps                  = 10001
+  set Output directory                      = ./turek_hron_fsi2_3d_parabolic/
+  set Output frequency                      = 500
+  subsection Finite element spaces
+    set Velocity            = FE_Q<3>(2)
+    set Pressure            = FE_Q<3>(1)
+    set Displacement        = FE_Q<3>(1)
+    set Lagrange multiplier = FE_Q<3>(1)
+  end
+  subsection Grid generation
+    set Fluid grid generator                     = channel_with_cylinder
+    set Fluid grid generator arguments           = 0.03: 2: 2.0: true
+    set Initial fluid refinement                 = 1
+    # Coarse cell sides are approximately 0.02 m in all three directions.
+    set Solid grid generator                     = subdivided_hyper_rectangle
+    set Solid grid generator arguments           = 18, 1, 10: 0.25, 0.19, 0.10: 0.60, 0.21, 0.30: false
+    set Initial solid refinement                 = 0
+  end
+  subsection Initial displacement and multiplier
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Navier-Stokes boundary conditions
+    set Function constants  = Ubar=1, H=0.41, eps=1e-8
+    set Function expression = x < eps && z > eps && z < H-eps ? 6*Ubar*y*(H-y)/(H*H) : 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Navier-Stokes initial conditions
+    set Function constants  = Ubar=1, H=0.41
+    set Function expression = 6*Ubar*y*(H-y)/(H*H); 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Navier-Stokes right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Physical properties
+    set Density                 = 1000
+    set Lame lambda             = 2e6
+    set Lame mu                 = 5e5
+    set Include convective term = true
+    set Solid model             = linear
+    set Viscosity               = 1
+  end
+  subsection Reference configuration and multiplier
+    set Function constants  =
+    set Function expression = x; y; z; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Refinement and remeshing
+    set Maximum number of cells        = 500000
+    set Refinement coarsening fraction = 0.2
+    set Refinement fraction            = 0.2
+    set Refinement maximal level       = 7
+    set Refinement minimal level       = 1
+    set Refinement step frequency      = 25
+    set Refinement strategy            = fixed_fraction
+  end
+  subsection Solid right hand side
+    set Function constants  =
+    set Function expression = 0; 0; 0; 0; 0; 0
+    set Variable names      = x,y,z,t
+  end
+  subsection Solver parameters
+    set Solver type                                = augmented_split
+    set Use operator augmentation                  = true
+    set Coupling quadrature type                   = gauss
+    set Gamma AL background                        = 1
+    set Gamma AL immersed                          = 0.01
+    set Inner Lagrangian solver maximum iterations = 500
+    set Inner Lagrangian solver tolerance          = 1e-2
+    set Log inner Lagrangian iterations            = false
+    set Inner solver maximum iterations            = 100
+    set Inner solver tolerance                     = 1e-10
+    set Outer solver maximum iterations            = 1000
+    set Outer solver tolerance                     = 1e-6
+    set Outer solver maximum Krylov vectors        = 100
+  end
+end

@@ -1,0 +1,80 @@
+<h1>Results</h1>
+
+This section sketches how to reproduce the validation scenarios discussed in the
+SEMA paper with this code. The program expects a parameter file on the command
+line; if none is provided it will generate a default `parameters.prm` matching
+the current dimension and co-dimension.
+
+<h3>Setup checklist</h3>
+
+- Choose dimension (`dimension`, `space dimension`) and mesh generators for
+  fluid, solid, and tracer particles in `Navier-Stokes Immersed Problem/`.
+- Pick material parameters (`Viscosity`, `Density`, `Lame mu`, `Lame lambda`)
+  consistent with the intended test.
+- Prescribe boundary data in `Navier-Stokes boundary conditions` and initial
+  conditions for fluid and solid.
+- Set `Number of time steps`, `Final time`, and `Output frequency`.
+
+
+<h3>Compressed disk recovery</h3>
+
+A neo-Hookean disk compressed to $\lambda_0 R$ is released in a quiescent box.
+Record:
+- Position of the disk center over time.
+- Volume of the disk versus cumulative fluid flux across the open boundary.
+- Sensitivity to mesh refinement (`Initial fluid/solid refinement`).
+
+
+<h3>Annulus inflation with a point source</h3>
+
+An annulus immersed in a box is inflated by a mass source at the center. Track:
+- Growth of mean normal stress and deformation of the ring.
+- Difference between injected fluid volume and solid volume loss as an error
+  indicator for different refinement levels.
+
+
+<h3>Cylinder and elastic flag benchmarks</h3>
+
+The original FSI2 and FSI3 benchmarks are defined by Turek and Hron
+@cite TurekHron2006. Both are two-dimensional channel-flow problems with an
+elastic flag attached to a rigid cylinder; the numbers identify different
+physical parameter sets. The channel is
+$2.5\,\mathrm{m}$ long and $0.41\,\mathrm{m}$ high, the cylinder has radius
+$0.05\,\mathrm{m}$ and center $(0.2,0.2)\,\mathrm{m}$, and the flag has
+approximate length $0.35\,\mathrm{m}$ and thickness $0.02\,\mathrm{m}$.
+
+The parameter file `turek_hron_fsi2_2d.prm` adapts this geometry and the FSI2
+flow data to the present implementation. The native channel generator gives
+a channel length of $2.2\,\mathrm{m}$, the flag is approximated by a rectangle,
+and the single density parameter does not represent the original FSI2
+solid-to-fluid density ratio of ten. Consequently, this configuration does
+not reproduce the complete original benchmark specification.
+
+For a finite-span three-dimensional flag, Section 5.1.2 of Failer and Richter
+@cite FailerRichter2020 defines a beam of approximate dimensions
+$0.35\times0.02\times0.20\,\mathrm{m}$ in a channel of depth
+$0.41\,\mathrm{m}$, with $0.10<z<0.30\,\mathrm{m}$.
+The file `turek_hron_fsi2_3d.prm` adopts this spanwise extent. Its channel
+length, cylinder position, inflow profile, and material parameters retain the
+present setup, so it is an adaptation of that geometry. The rectangular
+approximation of the attachment to the cylinder is retained in both files.
+
+The variants `turek_hron_fsi2_2d_parabolic.prm` and
+`turek_hron_fsi2_3d_parabolic.prm` start with the quadratic velocity profile
+$u_x=6\bar U y(H-y)/H^2$, with the other velocity components initially zero,
+and prescribe the same inlet profile without a time ramp. In three dimensions
+this profile is independent of $z$. After interpolation, the program distributes
+the fluid constraints to impose the prescribed boundary values, including zero
+velocity on the cylinder and channel walls, before storing the initial state
+for the first time step. The original parameter files retain the start from
+rest and the smooth inlet ramp. Each variant writes to a separate output
+directory.
+
+
+<h3>What to report</h3>
+
+- Plots of the metrics above versus time, including convergence with respect to
+  spatial refinements.
+- Wall-clock timings from `TimerOutput` to compare assembly and solver costs.
+- Notes on stability of the distributed Lagrange multiplier coupling for the
+  chosen parameters.
