@@ -1,0 +1,562 @@
+<i>
+This program was contributed by Chih-Che Chueh (University of Victoria) and
+Wolfgang Bangerth. Results from this program are used and discussed in the
+following publications (in particular in the second one):
+- Chih-Che Chueh, Marc Secanell, Wolfgang Bangerth, Ned Djilali. Multi-level
+  adaptive simulation of transient two-phase flow in heterogeneous porous
+  media. Computers &amp; Fluids, 39:1585-1596, 2010 (see @cite Chueh2010).
+- Chih-Che Chueh, Ned Djilali, Wolfgang Bangerth. An h-adaptive operator
+  splitting method for two-phase flow in 3D heterogeneous porous
+  media. SIAM Journal on Scientific Computing, 35:B149-B175, 2013
+  (see @cite Chueh2013).
+
+The implementation discussed here uses and extends
+parts of the step-21 and step-31 tutorial programs.
+
+The work of the Chih-Che Chueh was funded through the Canada Research Chairs
+Program and the MITACS Network of Centres of Excellence. Parts of the work by
+Wolfgang Bangerth were funded through Award No. KUS-C1-016-04, made by the King
+Abdullah University of Science and Technology, and through an Alfred P. Sloan
+Research Fellowship.
+This material is also in parts based upon work supported by the National
+Science Foundation under Award No. EAR-0426271 and The California Institute of
+Technology; and in a continuation by the National Science
+Foundation under Award No. EAR-0949446 and The University of California
+&ndash; Davis. Any opinions, findings, and conclusions or recommendations
+expressed in this publication are those of the author and do not
+necessarily reflect the views of the National Science Foundation, The
+California Institute of Technology, or of The University of California
+&ndash; Davis.
+</i>
+
+
+<a name="step_102-Intro"></a> <h1>Introduction</h1>
+
+The simulation of multiphase flow in porous media is a ubiquitous problem, and
+we have previously addressed it already in some form in step-20 and
+step-21. However, as was easy to see there, it faces two major difficulties:
+numerical accuracy and efficiency. The first is easy to see in the stationary
+solver step-20: using lowest order Raviart-Thomas elements can not be expected
+to yield highly accurate solutions. We need more accurate methods. The second
+reason is apparent from the time dependent step-21: that program is
+excruciatingly slow, and there is no hope to get highly accurate solutions in
+3d within reasonable time frames.
+
+In this
+program, in order to overcome these two problems, there are five areas which
+we are trying to improve for a high performance simulator:
+
+<ul>
+<li> Higher order spatial discretizations
+<li> Adaptive mesh refinement
+<li> Adaptive time stepping
+<li> Operator splitting
+<li> Efficient solver and preconditioning
+</ul>
+
+Much inspiration for this program comes from step-31 but several of the
+techniques discussed here are original.
+
+
+<h3>Advection-dominated two-phase flow mathematical model</h3>
+
+We consider the flow of a two-phase immiscible, incompressible
+fluid. Capillary and gravity effects are neglected, and viscous
+effects are assumed dominant. The governing equations for such a
+flow that are identical to those used in step-21 and are
+@f{align*}{
+  \mathbf{u}_t &= - \mathbf{K} \lambda_t \left(S\right) \nabla p, \\
+  \nabla \cdot \mathbf{u}_t &= q, \\
+  \epsilon \frac{\partial S}{\partial t} + \nabla \cdot \left( \mathbf{u}_t  F\left( S \right) \right)&=0,
+@f}
+where $S$ is the saturation (volume fraction between zero and one) of the second (wetting) phase, $p$ is the pressure, $\mathbf{K}$ is the permeability tensor, $\lambda_t$ is the total mobility, $\epsilon$ is the porosity, $F$ is the fractional flow of the wetting phase, $q$ is the source term and $\mathbf{u}_t$ is the total velocity. The total mobility, fractional flow of the wetting phase and total velocity are respectively given by
+@f{align*}{
+   \lambda_t(S)&= \lambda_w + \lambda_{nw} = \frac{k_{rw}(S)}{\mu_w} + \frac{k_{rnw}(S)}{\mu_{nw}}, \\
+   F(S) &= \frac{\lambda_w}{\lambda_t} = \frac{\lambda_w}{\lambda_w + \lambda_{nw}} = \frac{k_{rw}(S)/\mu_w}{k_{rw}(S)/\mu_w + k_{rnw}(S)/\mu_{nw}}, \\
+   \mathbf{u}_t &= \mathbf{u}_w + \mathbf{u}_{nw} = -\lambda_t(S)\mathbf{K} \cdot \nabla p,
+@f}
+where subscripts $w, nw$ represent the wetting and non-wetting phases,
+respectively.
+
+For convenience, the
+porosity $\epsilon$ in the saturation equation, which can be considered a
+scaling factor for the time variable, is set to
+one. Following a commonly used prescription for the dependence of the relative
+permeabilities $k_{rw}$ and $k_{rnw}$ on saturation, we use
+@f{align*}{
+   k_{rw}  &= S^2, \qquad&\qquad
+   k_{rnw} &= \left( 1-S \right)^2.
+@f}
+
+The porous media equations above are
+augmented by initial conditions for the saturation and boundary conditions for
+the pressure. Since saturation and the gradient of the pressure uniquely
+determine the velocity, no boundary conditions are necessary for the velocity.
+Since the flow equations do not contain time derivatives, initial conditions for the velocity and pressure
+variables are not required. The flow field separates the boundary into inflow or outflow
+parts. Specifically,
+@f[
+   \mathbf{\Gamma}_{in}(t) = \left\{\mathbf{x} \in \partial \Omega:\mathbf{n} \cdot \mathbf{u}_t<0\right\},
+@f]
+and we arrive at a complete model by also imposing boundary values for the
+saturation variable on the inflow boundary $\mathbf{\Gamma}_{in}$.
+
+
+<h3>Adaptive operator splitting and time stepping</h3>
+
+As seen in step-21, solving the flow equations for velocity and pressure are
+the parts of the program that take far longer than the (explicit) updating
+step for the saturation variable once we know the flow variables. On the other
+hand,  the pressure and velocity depend only weakly on saturation, so one may
+think about only solving for pressure and velocity every few time steps while
+updating the saturation in every step. If we can find a criterion for when the
+flow variables need to be updated, we call this splitting an "adaptive
+operator splitting" scheme.
+
+Here, we use the following a posteriori criterion to decide when to re-compute
+pressure and velocity variables
+(detailed derivations and descriptions can be found in @cite Chueh2013):
+@f{align*}{
+  \theta(n,n_p)
+  =
+    \max_{\kappa\in{\mathbb T}}
+    \left(
+    \left\|
+      \frac 1{\lambda_t\left(S^{(n-1)}\right)}
+      - \frac 1{\lambda_t\left(S^{(n_p)}\right)} \right\|_{L^\infty(\kappa)}
+    \left\|\|\mathbf{K}^{-1}\|_1\right\|_{L^\infty(\kappa)}
+    \right).
+@f}
+where superscripts in parentheses denote the number of the saturation time
+step at which any quantity is defined and $n_p<n$ represents the last step
+where we actually computed the pressure and velocity. If $\theta(n,n_p)$
+exceeds a certain threshold we re-compute the flow variables; otherwise, we
+skip this computation in time step $n$ and only move the saturation variable
+one time step forward.
+
+In short, the algorithm allows us to perform a number of
+saturation time steps of length $\Delta t_c^{(n)}=t^{(n)}_c-t^{(n-1)}_c$ until
+the criterion above tells us to re-compute velocity and pressure
+variables, leading to a macro time step of length
+@f[
+   \Delta t_p^{(n)} = \sum_{i=n_p+1}^{n} \Delta t_c^{(i)}.
+@f]
+We choose the length of (micro) steps subject to the Courant-Friedrichs-Lewy
+(CFL) restriction according to the criterion
+@f[
+  \Delta t_c = \frac{\textrm{min}_{K}h_{K}}{7 \|\mathbf{u}_t\|_{L^{\infty}\left(\Omega\right)}},
+@f]
+which we have confirmed to be stable for the choice of finite element and time
+stepping scheme for the saturation equation discussed below ($h_K$ denotes the
+diameter of cell $K$).
+The result is a scheme where neither micro nor macro time
+steps are of uniform length, and both are chosen adaptively.
+
+
+<h3>Time discretization</h3>
+
+Using this time discretization, we obtain the following set of equations for
+each time step from the IMPES approach (see step-21):
+@f{align*}{
+   \mathbf{u}^{(n)}_t + \lambda_t\left(S^{(n-1)}\right) \mathbf{K} \nabla p^{(n)} =0, \\
+   \nabla \cdot \mathbf{u}^{(n)}_t = q, \\
+   \epsilon \left( \frac{S^{(n-1)}-S^{(n)}}{\Delta t^{(n)}_c} \right) + \mathbf{u}^{(n)}_t \cdot \nabla F\left(S^{(n-1)}\right) + F\left(S^{(n-1)}\right) \nabla \cdot \mathbf{u}^{(n)}_t =0.
+@f}
+
+
+Using the fact that $\nabla \cdot \mathbf{u}_t = q$, the time discrete
+saturation equation becomes
+@f{align*}{
+  &\epsilon \left( \frac{S^{(n)}-S^{(n-1)}}{\Delta t^{(n)}_c} \right) + \mathbf{u}^{(n)}_t \cdot \nabla F\left(S^{(n-1)}\right) + F\left(S^{(n-1)}\right)q=0.
+@f}
+
+
+<h3>Weak form, space discretization for the pressure-velocity part</h3>
+
+By multiplying the equations defining the total velocity $\mathbf u_t^{(n)}$ and
+the equation that expresses its divergence in terms of source terms, with test
+functions $\mathbf{v}$ and $w$
+respectively and then integrating terms by parts as necessary, the weak form
+of the problem reads: Find $\mathbf u, p$ so that for all test functions
+$\mathbf{v}, w$ there holds
+@f{gather*}{
+   \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1} \mathbf{u}^{(n)}_t, \mathbf{v}\right)_{\Omega} - \left(p^{(n)}, \nabla \cdot \mathbf{v}\right)_{\Omega} = -\left(p^{(n)}, \mathbf{n} \cdot \mathbf{v} \right)_{\partial \Omega}, \\
+   - \left( \nabla \cdot \mathbf{u}^{(n)}_t,w\right)_{\Omega} = - \big(q,w\big)_{\Omega}.
+@f}
+Here, $\mathbf{n}$ represents the unit outward normal vector to $\partial
+\Omega$ and the pressure $p^{(n)}$ can be prescribed weakly on the open part
+of the boundary $\partial \Omega$ whereas on those parts where a velocity is
+prescribed (for example impermeable boundaries with $\mathbf n \cdot \mathbf
+u=0$ the term disappears altogether because $\mathbf n \cdot \mathbf
+v=0$.
+
+We use continuous finite elements to discretize the velocity and pressure
+equations. Specifically, we use mixed finite elements to ensure high order approximation
+for both vector (e.g. a fluid velocity) and scalar variables (e.g. pressure)
+simultaneously. For saddle point problems, it is well established that
+the so-called Babuska-Brezzi or Ladyzhenskaya-Babuska-Brezzi (LBB) conditions
+@cite BrezziFortin, @cite Chen2005 need to be satisfied to ensure stability of
+the pressure-velocity system. These stability conditions are satisfied in the
+present work by using elements for velocity that are one order higher than for
+the pressure, i.e. $u_h \in Q^d_{p+1}$ and $p_h \in Q_p$, where $p=1$, $d$ is
+the space dimension, and $Q_s$ denotes the space of tensor product Lagrange
+polynomials of degree $s$ in each variable.
+
+
+<h3>Stabilization, weak form and space discretization for the saturation transport equation</h3>
+
+The chosen $Q_1$ elements for the saturation equation do not lead to a stable
+discretization without upwinding or other kinds of stabilization, and spurious
+oscillations will appear in the numerical solution. Adding an artificial
+diffusion term is one approach to eliminating these oscillations
+@cite Chen2005. On the other hand, adding too much diffusion smears sharp
+fronts in the solution and suffers from grid-orientation difficulties
+@cite Chen2005. To avoid these effects, we use the artificial diffusion
+term proposed by @cite GuermondPasquetti2008 and
+validated in @cite Chueh2013 and
+@cite KHB12, as well as in step-31.
+
+This method modifies the (discrete) weak form of the saturation equation
+to read
+@f{align*}{
+  \left(\epsilon \frac{\partial S_h}{\partial t},\sigma_h\right)
+  -
+  \left(\mathbf{u}_t  F\left( S_h \right),
+    \nabla \sigma_h\right)
+  +
+  \left(\mathbf n \cdot \mathbf{u}_t  \hat F\left( S_h \right),
+    \sigma_h\right)_{\partial\Omega}
+  +
+  (\nu(S_h) \nabla S_h, \nabla \sigma_h)
+  &=0
+  \qquad
+  \forall \sigma_h,
+@f}
+where $\nu$ is the artificial diffusion parameter and $\hat F$ is an
+appropriately chosen numerical flux on the boundary of the domain (we choose
+the obvious full upwind flux for this).
+
+Following @cite GuermondPasquetti2008 (and as detailed in
+@cite Chueh2013), we use
+the parameter as a piecewise
+constant function set on each cell $K$ with the diameter $h_{K}$ as
+@f[
+   \nu(S_h)|_{K} = \beta \| \mathbf{u}_t \max\{F'(S_h),1\} \|_{L^{\infty}(K)} \textrm{min} \left\{ h_{K},h^{\alpha}_{K} \frac{\|\textrm{Res}(S_h)\|_{L^{\infty}(K)}}{c(\mathbf{u}_t,S)} \right\}
+@f]
+where $\alpha$ is a stabilization exponent and $\beta$ is a dimensionless
+user-defined stabilization constant. Following @cite GuermondPasquetti2008
+as well as the implementation in step-31, the velocity and saturation global
+normalization constant, $c(\mathbf{u}_t,S)$, and the residual $\textrm{Res}(S)$
+are respectively given by
+@f[
+   c(\mathbf{u}_t,S) = c_R \|\mathbf{u}_t \max\{F'(S),1\}\|_{L^{\infty}(\Omega)} \textrm{var}(S)^\alpha | \textrm{diam} (\Omega) |^{\alpha - 2}
+@f]
+and
+@f[
+   \textrm{Res}(S) = \left( \epsilon \frac{\partial S}{\partial t} + \mathbf{u}_t \cdot \nabla F(S) + F(S)q \right) \cdot S^{\alpha - 1}
+@f]
+where $c_R$ is a second dimensionless user-defined constant,
+$\textrm{diam}(\Omega)$ is the diameter of the domain and $\textrm{var}(S) =
+\textrm{max}_{\Omega} S - \textrm{min}_{\Omega} S$ is the range of the present
+saturation values in the entire computational domain $\Omega$.
+
+This stabilization scheme has a number of advantages over simpler schemes such
+as finite volume (or discontinuous Galerkin) methods or streamline upwind
+Petrov Galerkin (SUPG) discretizations. In particular, the artificial
+diffusion term acts primarily in the vicinity of discontinuities
+since the residual is small in areas where the saturation is smooth. It
+therefore provides for a higher degree of accuracy. On the other hand, it is
+nonlinear since $\nu$ depends on the saturation $S$. We avoid this difficulty
+by treating all nonlinear terms explicitly, which leads to the following
+fully discrete problem at time step $n$:
+@f{align*}{
+   &\left( \epsilon S_h^{(n)},\sigma_h\right)_{\Omega} - \Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\mathbf{u}^{*}_t,\nabla\sigma_h\Big)_{\Omega} + \Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{*}_t\right),\sigma_h\Big)_{\partial\Omega} \nonumber \\
+   & \quad = \left( \epsilon S_h^{(n-1)},\sigma_h\right)_{\Omega} - \Delta t^{(n)}_c \bigg(\nu\left(S_h^{(n-1)}\right)\nabla S_h^{(n-1)},\nabla\sigma_h\bigg)_{\Omega} \nonumber \\
+   & \qquad + \Delta t^{(n)}_c \bigg(\mathbf{n}\cdot\nu\left(S_h^{(n-1)}\right)\nabla S^{(n-1)},\sigma_h\bigg)_{\partial\Omega}
+@f}
+where $\mathbf{u}_t^{*}$ is the velocity linearly extrapolated from
+$\mathbf{u}^{(n_p)}_t$ and $\mathbf{u}^{(n_{pp})}_t$ to the current time $t^{(n)}$ if $\theta<\theta^*$ while $\mathbf{u}_t^{*}$ is $\mathbf{u}^{(n_p)}_t$ if $\theta>\theta^*$.
+Consequently, the equation is linear in $S_h^{(n)}$ and all that is required
+is to solve with a @ref GlossMassMatrix "mass matrix" on the saturation space.
+
+Since the Dirichlet boundary conditions for saturation are only imposed on the
+inflow boundaries, the third term on the left hand side of the equation above
+needs to be split further into two parts:
+@f{align*}{
+  &\Delta t^{(n)}_c \Big(F\left(S_h^{(n-1)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_t\right),\sigma_h\Big)_{\partial\Omega} \nonumber \\
+  &\qquad= \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(+)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(+)}\right),\sigma_h\Big)_{\partial\Omega_{(+)}} + \Delta t^{(n)}_c \Big(F\left(S^{(n-1)}_{(-)}\right)\left(\mathbf{n}\cdot\mathbf{u}^{(n)}_{t(-)}\right),\sigma_h\Big)_{\partial\Omega_{(-)}}
+@f}
+where $\partial\Omega_{(-)} = \left\{\mathbf{x} \in \partial\Omega : \mathbf{n}
+  \cdot \mathbf{u}_t<0\right\}$ and
+$\partial\Omega_{(+)} = \left\{\mathbf{x} \in \partial\Omega : \mathbf{n} \cdot
+  \mathbf{u}_t>0\right\}$ represent inflow and outflow boundaries,
+respectively. We choose values using an
+upwind formulation, i.e. $S^{(n-1)}_{(+)}$ and $\mathbf{u}^{(n)}_{t(+)}$
+correspond to the values taken from the present cell, while the values of
+$S^{(n-1)}_{(-)}$ and $\mathbf{u}^{(n)}_{t(-)}$ are those taken from the
+neighboring boundary $\partial\Omega_{(-)}$.
+
+
+<h3>Adaptive mesh refinement</h3>
+
+Choosing meshes adaptively to resolve sharp
+saturation fronts is an essential ingredient to achieve efficiency in our
+algorithm. Here, we use the same shock-type refinement approach used in
+@cite Chueh2013 to select those cells that should be refined or
+coarsened. The refinement indicator for each cell $K$ of the triangulation is
+computed by
+@f[
+   \eta_{K} = |\nabla S_h(\mathbf x_K)|
+@f]
+where $\nabla S_h(\mathbf x_K)$ is the gradient of the discrete saturation
+variable evaluated at the center $\mathbf x_K$ of cell $K$. This approach is
+analogous to ones frequently used in compressible flow problems, where density
+gradients are used to indicate refinement. That said, as we will
+discuss at the end of the @ref step_102-ResultsSection "results section", this turns
+out to not be a very useful criterion since it leads to refinement basically
+everywhere. We only show it here for illustrative purposes.
+
+
+<h3>The linear system and its preconditioning</h3>
+
+Following the discretization of the governing equations
+discussed above, we
+obtain a linear system of equations in time step $(n)$ of the following form:
+@f[
+ \left(
+  \begin{array}{ccc}
+   \mathbf{M}^{\mathbf{u}} & \mathbf{B}^{T} & \mathbf{0}  \\
+   \mathbf{B}           & \mathbf{0}     & \mathbf{0}   \\
+   \mathbf{H}           & \mathbf{0}     & \mathbf{M}^{S}
+  \end{array}
+ \right)
+ \left(
+  \begin{array}{c}
+   \mathbf{U}^{(n)} \\
+   \mathbf{P}^{(n)} \\
+   \mathbf{S}^{(n)}
+  \end{array}
+ \right)
+ =
+ \left(
+  \begin{array}{c}
+   0 \\
+   \mathbf{F}_{2} \\
+   \mathbf{F}_{3}
+  \end{array}
+ \right)
+@f]
+where the individual matrices and vectors are defined as follows using shape functions $\mathbf{v}_i$ for velocity, and $\phi_i$ for both pressure and saturation:
+@f{align*}{
+  \mathbf{M}^{\mathbf{u}}_{ij}
+  &= \left( \left( \mathbf{K} \lambda_t\left(S^{(n-1)}\right) \right)^{-1}
+  \mathbf{v}_{i},\mathbf{v}_{j}\right)_{\Omega},
+  &
+  \mathbf{M}^{S}_{ij}           &= \left(\epsilon \phi_i,\phi_j\right)_{\Omega}
+  \\
+  \mathbf{B}_{ij}
+  &= - \left( \nabla \cdot \mathbf{v}_{j},\phi_{i}\right)_{\Omega},
+  &
+  \mathbf{H}_{ij}
+  &= - \Delta t^{(n)}_c \Big( F\left(S^{(n-1)}\right) \mathbf{v}_i,\nabla\phi_j\Big)_{\Omega}
+  \\
+  \left(\mathbf{F}_{2}\right)_i
+  &= - \big(F\left(S^{(n-1)}\right)q,\phi_i\big)_{\Omega},
+@f}
+and $\mathbf{F}_{3}$ as given in the definition of the stabilized transport
+equation.
+
+The linear system above is of block triangular form if we consider the top
+left $2\times 2$ panel of matrices as one block. We can therefore first solve
+for the velocity and pressure (unless we decide to use $\mathbf U^{(n_p)}$ in
+place of the velocity)
+followed by a solve for the saturation variable. The first of these steps
+requires us to solve
+@f[
+ \left(
+  \begin{array}{cc}
+   \mathbf{M}^{\mathbf{u}} & \mathbf{B}^{T}  \\
+   \mathbf{B}           & \mathbf{0}
+  \end{array}
+ \right)
+ \left(
+  \begin{array}{c}
+   \mathbf{U}^{(n)} \\
+   \mathbf{P}^{(n)}
+  \end{array}
+ \right)
+ =
+ \left(
+  \begin{array}{c}
+   0 \\
+   \mathbf{F}_{2}
+  \end{array}
+ \right)
+@f]
+We apply the Generalized Minimal Residual (GMRES) method
+@cite Saad1986
+to this linear system. The ideal preconditioner for the
+velocity-pressure system is
+@f{align*}{
+\mathbf{P} =
+ \left(
+  \begin{array}{cc}
+   \mathbf{M}^{\mathbf{u}} &  \mathbf{0}  \\
+   \mathbf{B}           & -\mathbf{S}
+  \end{array}
+ \right),
+ & \qquad
+ \mathbf{P}^{-1} =
+ \left(
+  \begin{array}{cc}
+   \left(\mathbf{M}^{\mathbf{u}}\right)^{-1}                              &  \mathbf{0}  \\
+   \mathbf{S}^{-1} \mathbf{B} \left(\mathbf{M}^{\mathbf{u}}\right)^{-1}   & -\mathbf{S}^{-1}
+  \end{array}
+ \right)
+ @f}
+where
+$\mathbf{S}=\mathbf{B}\left(\mathbf{M}^{\mathbf{u}}\right)^{-1}\mathbf{B}^T$ is
+the Schur complement @cite Zhang2005 of the system. This preconditioner is
+optimal since
+@f{align*}{
+ \mathbf{P}^{-1}
+ \left(
+  \begin{array}{cc}
+   \mathbf{M}^{\mathbf{u}} & \mathbf{B}^{T}  \\
+   \mathbf{B}           & \mathbf{0}
+  \end{array}
+ \right)
+ =
+  \left(
+  \begin{array}{cc}
+   \mathbf{I}         &  \left(\mathbf{M}^{\mathbf{u}}\right)^{-1} \mathbf{B}^{T}  \\
+   \mathbf{0}         &  \mathbf{I}
+  \end{array}
+ \right),
+@f}
+for which it can be shown that GMRES converges in two iterations.
+
+However, we cannot of course expect to use exact inverses of the
+velocity mass matrix and the Schur complement. We therefore follow the
+approach by @cite SW94 originally proposed for
+the Stokes system. (See also the note in the "Possibilities for extensions"
+section of step-22.) Adapting it to the current set of equations yield the
+preconditioner
+@f{align*}{
+ \mathbf{\tilde{P}}^{-1} =
+ \left(
+  \begin{array}{cc}
+   \widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}
+                              &  \mathbf{0}  \\
+   \widetilde{\mathbf{{S}}^{-1}} \mathbf{B} \widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}   & -\widetilde{\mathbf{{S}}^{-1}}
+  \end{array}
+ \right)
+@f}
+where a tilde indicates an approximation of the exact inverse matrix. In
+particular, since $\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}=\left( \left(
+    \mathbf{K} \lambda_t \right)^{-1}
+  \mathbf{v}_{i},\mathbf{v}_{j}\right)_{\Omega}$
+is a sparse symmetric and positive definite matrix, we choose for
+$\widetilde{\left(\mathbf{{M}}^{\mathbf{u}}\right)^{-1}}$ a single application of
+a sparse incomplete Cholesky decomposition of this matrix
+@cite GolubVanLoan.
+We note that the Schur complement that corresponds to the porous
+media flow operator in non-mixed form, $-\nabla \cdot [\mathbf K
+\lambda_t(S)]\nabla$ and
+$\mathbf{\tilde {S}} = \left( \left( \mathbf{K} \lambda_t \right) \nabla \phi_{i},\nabla \phi_{j}\right)_{\Omega}$
+should be a good approximation of the actual Schur complement matrix $\mathbf
+S$. Since both of these matrices are again symmetric and positive definite, we
+use an incomplete Cholesky decomposition of $\mathbf{\tilde S}$ for $\widetilde
+{\mathbf{{S}}^{-1}}$. It is important to note that $\mathbf{\tilde S}$ needs
+to be built with Dirichlet boundary conditions to ensure its invertibility.
+
+Once the velocity $\mathbf{U}^{(n)} \equiv \mathbf{u}^*_t$  is available, we
+can assemble $\mathbf{H}$ and
+$\mathbf{F}_{3}$ and solve for the saturations using
+@f{align*}{
+  \mathbf{M}^{S} \mathbf{S}^{(n)} = \mathbf{F}_{3} - \mathbf{H} \mathbf{U}^{(n)}.
+@f}
+where the mass matrix $\mathbf{M}^{S}$ is solved by the conjugate gradient
+method, using an incomplete Cholesky decomposition as preconditioner once
+more.
+
+
+<h3>The test cases</h3>
+
+@note
+The implementation discussed here uses and extends
+parts of the step-21, step-31 and step-33 tutorial programs of this
+library. In particular, if you want to understand how it works, please
+consult step-21 for a discussion of the mathematical problem, and
+step-31 from which most of the implementation is derived. We will not
+discuss aspects of the implementation that have already been discussed
+in step-31.
+
+We show numerical results for some two-phase flow equations augmented by
+appropriate initial and boundary conditions in conjunction with two different
+choices of the permeability model. In the problems considered, there is no
+internal source term ($q=0$). As mentioned above, quantitative numerical
+results are presented in @cite Chueh2013.
+
+For simplicity, we choose $\Omega=[0,1]^d,d=2,3$, though all methods (as well
+as our implementation) should work equally well on general unstructured meshes.
+
+Initial conditions are only required for the saturation variable, and we
+choose $S(\mathbf{x},0)=0.2$, i.e. the porous medium is initially filled by a
+mixture of the non-wetting (80%) and wetting (20%) phases. This differs from
+the initial condition in step-21 where we had taken $S(\mathbf{x},0)=0$, but
+for complicated mathematical reasons that are mentioned there in a longish
+remark, the current method using an entropy-based artificial diffusion term
+does not converge to the viscosity solution with this initial condition
+without additional modifications to the method. We therefore choose this
+modified version for the current program.
+
+Furthermore, we prescribe a linear pressure on
+the boundaries:
+@f[
+   p(\mathbf{x},t) = 1 - x \qquad
+   \textrm{on} \quad \partial \Omega \times [0,T].
+@f]
+Pressure and saturation uniquely
+determine a velocity, and the velocity determines whether a boundary segment
+is an inflow or outflow boundary. On the inflow part of the boundary,
+$\mathbf{\Gamma}_{in}(t)$, we impose
+@f{align*}{
+   S(\mathbf{x},t) = 1 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \cap \left\{x = 0\right\}, \\
+   S(\mathbf{x},t) = 0 \qquad & \textrm{on} \quad \mathbf{\Gamma}_{in}(t) \backslash \left\{x = 0\right\}.
+@f}
+In other words, the domain is flooded by the wetting phase from the left.
+No boundary conditions for the saturation are required for the outflow parts
+of the boundary.
+
+All the numerical and physical parameters used for the 2D/3D
+cases are listed in the following table:
+
+<table align="center" class="tutorial" width="50%">
+<tr>
+    <th>Parameter                           </th><th>Symbol          </th><th>Value               </th><th>units     </th></tr><tr>
+    <td>Porosity                            </td><td>$\epsilon$      </td><td>1.0                 </td><td>-                   </td></tr><tr>
+    <td>Viscosity (wetting)                 </td><td>$\mu_w$         </td><td>0.2                 </td><td>$kg \cdot m^{-1} \cdot sec^{-1}$   </td></tr><tr>
+    <td>Viscosity (nonwetting)              </td><td>$\mu_{nw}$      </td><td>1.0                 </td><td>$kg \cdot m^{-1} \cdot sec^{-1}$      </td></tr><tr>
+    <td>Stabilization exponent              </td><td>$\alpha$        </td><td>1.0                 </td><td>-     </td></tr><tr>
+    <td>Stabilization constant              </td><td>$\beta$         </td><td>2D: 0.3; 3D: 0.27   </td><td>- </td></tr><tr>
+    <td>Normalization constant              </td><td>$c_R$           </td><td>1.0                 </td><td>- </td></tr><tr>
+    <td>Number of high-permeability regions </td><td>$N$             </td><td>50; 200             </td><td>- </td></tr><tr>
+    <td>Operator splitting threshold        </td><td>$\theta^\ast$   </td><td>5.0              </td><td>- </td></tr>
+</table>
+
+
+
+<h3>A note on the implementation</h3>
+
+We have mentioned many areas above in which this program improves over the step-20
+and step-21 programs upon which it is based. It also uses the Trilinos interfaces
+for its vectors and matrices; this specifically has the advantage that we can use
+an excellent implementation of the Incomplete Cholesky method we use as preconditioners
+for both the top left and bottom right blocks of the $2\times 2$ matrix that describes
+the flow portion of the coupled problem.
+
+We note that while we use the TrilinosWrappers::MPI::BlockVector class to store
+vectors, the program does not actually use MPI (or any other way to run in
+parallel): There is no non-MPI vector class in the TrilinosWrappers namespace,
+but we can use the MPI version to also run a sequential code as we do here.
