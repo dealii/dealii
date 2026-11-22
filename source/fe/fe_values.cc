@@ -194,6 +194,23 @@ FEValues<dim, spacedim>::initialize(const UpdateFlags update_flags)
                       "triangulation it refers to is embedded in a higher "
                       "dimensional space."));
 
+  // Tensor-product quadrature formulas such as QGauss are defined on the
+  // hypercube and can not be used on other reference cells (simplices,
+  // wedges, pyramids). We exclude quadrature formulas with a single point,
+  // since these are also used to evaluate solutions at arbitrary points.
+  Assert(this->fe->reference_cell().is_hyper_cube() ||
+           quadrature.is_tensor_product() == false || quadrature.size() == 1,
+         ExcMessage(
+           "You are trying to use a tensor-product quadrature formula "
+           "(e.g., QGauss) with a finite element defined on the reference "
+           "cell " +
+           this->fe->reference_cell().to_string() +
+           ". Tensor-product quadrature formulas are only valid on "
+           "hypercube cells. Use a quadrature formula suitable for this "
+           "reference cell instead, e.g., QGaussSimplex, QGaussWedge, "
+           "QGaussPyramid, or the one returned by "
+           "ReferenceCell::get_gauss_type_quadrature()."));
+
   const UpdateFlags flags = this->compute_update_flags(update_flags);
 
   // initialize the base classes

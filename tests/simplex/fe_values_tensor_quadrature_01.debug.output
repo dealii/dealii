@@ -1,0 +1,15 @@
+
+DEAL::FE_SimplexP<2>(1) with 4 quadrature points: assertion triggered
+DEAL::FE_SimplexP<2>(1) with 4 quadrature points: OK
+DEAL::FE_SimplexP<3>(1) with 8 quadrature points: assertion triggered
+DEAL::FE_SimplexP<3>(1) with 6 quadrature points: OK
+DEAL::FE_SimplexP<2>(2) with 9 quadrature points: assertion triggered
+DEAL::FE_SimplexP<2>(2) with 7 quadrature points: OK
+DEAL::FE_SimplexP<3>(2) with 27 quadrature points: assertion triggered
+DEAL::FE_SimplexP<3>(2) with 14 quadrature points: OK
+DEAL::FE_WedgeP<3>(1) with 8 quadrature points: assertion triggered
+DEAL::FE_WedgeP<3>(1) with 8 quadrature points: OK
+DEAL::FE_PyramidP<3>(1) with 8 quadrature points: assertion triggered
+DEAL::FE_PyramidP<3>(1) with 8 quadrature points: OK
+DEAL::FE_SimplexP<2>(1) with 1 quadrature points: OK
+DEAL::FE_SimplexP<2>(1) with 3 quadrature points: OK
