@@ -915,10 +915,17 @@ namespace Step104
 
     mf_data = std::make_shared<Portable::MatrixFree<dim, Number>>();
 
-    const QGauss<1> quad(degree_p + 2);
-    typename Portable::MatrixFree<dim, Number>::AdditionalData additional_data;
-    additional_data.mapping_update_flags = update_values | update_gradients;
-    mf_data->reinit(mapping, dof_handlers, constraints, quad, additional_data);
+    {
+      const QGauss<1> quad(degree_p + 2);
+      typename Portable::MatrixFree<dim, Number>::AdditionalData
+        additional_data;
+      additional_data.mapping_update_flags = update_values | update_gradients;
+#ifdef DEAL_II_MPI_WITH_DEVICE_SUPPORT
+      additional_data.overlap_communication_computation = true;
+#endif
+      mf_data->reinit(
+        mapping, dof_handlers, constraints, quad, additional_data);
+    }
 
     {
       // create the right hand side on the host and move to device:
@@ -1019,11 +1026,6 @@ namespace Step104
         DoFTools::make_zero_boundary_constraints(dof_handler, constraint);
         constraint.close();
 
-        typename Portable::MatrixFree<dim, Number>::AdditionalData
-          additional_data;
-        additional_data.mapping_update_flags =
-          update_JxW_values | update_gradients;
-
         if (level == max_level)
           // On the finest level we can reuse the MatrixFree object from the
           // Stokes operator. This way we can solve significantly larger
@@ -1031,6 +1033,14 @@ namespace Step104
           mf_data_levels.emplace_back(mf_data);
         else
           {
+            typename Portable::MatrixFree<dim, Number>::AdditionalData
+              additional_data;
+            additional_data.mapping_update_flags =
+              update_JxW_values | update_gradients;
+#ifdef DEAL_II_MPI_WITH_DEVICE_SUPPORT
+            additional_data.overlap_communication_computation = true;
+#endif
+
             const QGauss<1> quad(degree_p + 2);
             mf_data_levels.emplace_back(
               std::make_shared<Portable::MatrixFree<dim, Number>>());
