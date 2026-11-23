@@ -91,6 +91,14 @@ namespace LinearAlgebra
     Vector<double, ::dealii::MemorySpace::Default>::reinit<double>(
       const Vector<double, ::dealii::MemorySpace::Default> &,
       const bool);
+    template void
+    Vector<float, ::dealii::MemorySpace::Default>::reinit<double>(
+      const Vector<double, ::dealii::MemorySpace::Default> &,
+      const bool);
+    template void
+    Vector<double, ::dealii::MemorySpace::Default>::reinit<float>(
+      const Vector<float, ::dealii::MemorySpace::Default> &,
+      const bool);
 
     template float
     Vector<float, ::dealii::MemorySpace::Default>::inner_product_local<float>(

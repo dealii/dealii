@@ -32,10 +32,12 @@
 #include <boost/signals2/signal.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <complex>
 #include <limits>
 #include <memory>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -122,10 +124,16 @@ namespace internal
        * Get vector number @p i. Allocate it if necessary.
        *
        * If a vector must be allocated, @p temp is used to reinit it to the
-       * proper dimensions.
+       * proper dimensions. The number type of @p temp can differ from
+       * @p VectorType, as long as @p VectorType provides a function
+       * <code>reinit(const OtherVectorType &, const bool)</code>, as is the
+       * case for deal.II's own vector classes that only differ in the number
+       * type, e.g., LinearAlgebra::distributed::Vector<float> and
+       * LinearAlgebra::distributed::Vector<double>.
        */
+      template <typename OtherVectorType = VectorType>
       VectorType &
-      operator()(const unsigned int i, const VectorType &temp);
+      operator()(const unsigned int i, const OtherVectorType &temp);
 
       /**
        * Return size of data vector. It is used in the solver to store
@@ -133,7 +141,6 @@ namespace internal
        */
       unsigned int
       size() const;
-
 
     private:
       /**
@@ -199,6 +206,35 @@ namespace internal
       orthonormalize_nth_vector(
         const unsigned int                        n,
         TmpVectors<VectorType>                   &orthogonal_vectors,
+        const unsigned int                        accumulated_iterations = 0,
+        const boost::signals2::signal<void(int)> &reorthogonalize_signal =
+          boost::signals2::signal<void(int)>());
+
+      /**
+       * Variant of the function above where the vector to be orthonormalized
+       * is passed as a separate argument @p vv, rather than being the
+       * <tt>n</tt>-th entry of @p orthogonal_vectors. The arithmetic of the
+       * orthogonalization is done on @p vv (and in double precision for the
+       * inner products), whereas the orthonormal basis can be stored in a
+       * different vector type @p BasisVectorType, typically one with a
+       * lower-precision number type such as <tt>float</tt>, to reduce the
+       * memory transfer, see the discussion in the documentation of
+       * SolverGMRES. After the function returns, @p vv contains the
+       * (preliminary, in the case of delayed classical Gram-Schmidt)
+       * orthonormalized vector, and a copy of it (converted to the number
+       * type of @p BasisVectorType) is stored at position @p n in
+       * @p orthogonal_vectors, allocating that vector if necessary.
+       *
+       * If @p VectorType and @p BasisVectorType are different, both must be
+       * deal.II vector types with the same memory space, for which the
+       * optimized orthogonalization kernels of this class are available.
+       */
+      template <typename VectorType, typename BasisVectorType>
+      double
+      orthonormalize_nth_vector(
+        const unsigned int                        n,
+        VectorType                               &vv,
+        TmpVectors<BasisVectorType>              &orthogonal_vectors,
         const unsigned int                        accumulated_iterations = 0,
         const boost::signals2::signal<void(int)> &reorthogonalize_signal =
           boost::signals2::signal<void(int)>());
@@ -286,7 +322,7 @@ namespace internal
        * rotations, and the associated right hand side to minimize the norm of
        * the solution in the Krylov subspace.
        *
-       * More precisely, this function is called once a new column is added to
+       * This function is called once a new column is added to
        * the Hessenberg matrix and performs all necessary steps for that
        * column. First, all evaluations with the Givens rotations resulting
        * from the previous elimination steps are performed. Then, the single
@@ -434,9 +470,84 @@ namespace internal
  * can be obtained by connecting a function as a slot using @p
  * connect_condition_number_slot and @p connect_eigenvalues_slot. These slots
  * will then be called from the solver with the estimates as argument.
+ *
+ *
+ * <h3>Storing the Arnoldi basis in a different (lower) precision</h3>
+ *
+ * For large linear systems, the run time of GMRES is often dominated by the
+ * memory transfer of the orthonormal basis of the Krylov space: in the $k$-th
+ * iteration of the Arnoldi process, the inner products against and the
+ * subtraction of the $k$ previous basis vectors need to load all these
+ * vectors from main memory, which quickly exceeds the cost of the
+ * matrix-vector product and the preconditioner, at least for basis sizes of
+ * 20 or more or when using matrix-free methods with fast matrix-vector
+ * multiplication and fast preconditioners. The same holds for the update of
+ * the solution at the end of each restart cycle. Following the ideas of the
+ * "compressed basis GMRES" by @cite Aliaga2022, the second template argument
+ * @p BasisVectorType allows to select a different vector type for the storage
+ * of the Arnoldi basis, while the solution, the right-hand side, the
+ * matrix-vector products and preconditioner applications, as well as all
+ * arithmetic operations, are done with @p VectorType. The canonical example
+ * is
+ * @code
+ * SolverGMRES<LinearAlgebra::distributed::Vector<double>,
+ *             LinearAlgebra::distributed::Vector<float>>
+ *   solver(control, additional_data);
+ * solver.solve(matrix, solution, rhs, preconditioner);
+ * @endcode
+ * which halves the memory transfer for the basis vectors and the memory
+ * consumption of the basis. In this case, the new vector of the Krylov
+ * space is computed and orthogonalized in double precision, i.e., the
+ * entries of the basis vectors are converted to double precision when
+ * loaded from memory, and only the final (normalized) vector is rounded to
+ * single precision when it is appended to the basis. The projected
+ * Hessenberg matrix and the least-squares problem are always handled in
+ * double precision. Note that the gain is highest for orthogonalization
+ * strategy being either LinearAlgebra::OrthogonalizationStrategy::
+ * delayed_classical_gram_schmidt or
+ * LinearAlgebra::OrthogonalizationStrategy:: classical_gram_schmidt.
+ *
+ *
+ * As the basis vectors are only orthonormal up to the accuracy of the
+ * reduced precision, the residual estimate computed within the Arnoldi
+ * process (the default residual used as convergence criterion) can be
+ * smaller than the actual residual once the latter approaches the
+ * precision of the basis. When the estimated residual indicates
+ * convergence, the solver hence computes the actual residual (with the
+ * preconditioner in case of left preconditioning) with @p VectorType from
+ * the updated solution and continues with another restart cycle in case
+ * the tolerance is not met. This means that the attainable accuracy is
+ * determined by @p VectorType, similarly to iterative refinement, at the
+ * price of additional iterations for tight tolerances. As a consequence,
+ * the solver checks the tolerance twice for the last iteration, which is
+ * visible in the iteration history of SolverControl. Furthermore, the
+ * residual estimate stagnates once it has been reduced by approximately the
+ * machine epsilon of the number type of @p BasisVectorType relative to the
+ * residual at the start of a restart cycle, because the orthogonality of the
+ * basis cannot be maintained at a higher level. Therefore, the solver
+ * performs a restart as soon as the residual estimate falls below ten times
+ * that epsilon times the initial residual of the cycle, irrespective of
+ * AdditionalData::max_basis_size.
+ *
+ * Mixed vector types are currently supported for
+ * LinearAlgebra::distributed::Vector, LinearAlgebra::distributed::BlockVector
+ * (both with MemorySpace::Host and MemorySpace::Default), and
+ * dealii::Vector, which must agree in all aspects except the number type
+ * (and must hence have the same memory space). The vector type
+ * @p BasisVectorType must provide a
+ * <code>reinit(const VectorType &, const bool)</code>
+ * function to create the basis vectors with the same layout as the solution
+ * vector. If @p BasisVectorType is the same as @p VectorType, which is the
+ * default, the memory for the basis is taken from the VectorMemory object
+ * passed to the constructor. In the mixed case, the basis vectors are
+ * allocated from a GrowingVectorMemory object of type @p BasisVectorType, and
+ * the solver needs two additional vectors of @p VectorType to hold the most
+ * recent vector of the Krylov space in full precision.
  */
-template <typename VectorType = Vector<double>>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType      = Vector<double>,
+          typename BasisVectorType = VectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 class SolverGMRES : public SolverBase<VectorType>
 {
 public:
@@ -544,7 +655,7 @@ public:
   /**
    * The copy constructor is deleted.
    */
-  SolverGMRES(const SolverGMRES<VectorType> &) = delete;
+  SolverGMRES(const SolverGMRES<VectorType, BasisVectorType> &) = delete;
 
   /**
    * Solve the linear system $Ax=b$ for x.
@@ -599,8 +710,8 @@ public:
    */
   boost::signals2::connection
   connect_krylov_space_slot(
-    const std::function<
-      void(const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)>
+    const std::function<void(
+      const internal::SolverGMRESImplementation::TmpVectors<BasisVectorType> &)>
       &slot);
 
 
@@ -668,7 +779,7 @@ protected:
    * when all iterations are ended.
    */
   boost::signals2::signal<void(
-    const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)>
+    const internal::SolverGMRESImplementation::TmpVectors<BasisVectorType> &)>
     krylov_space_signal;
 
   /**
@@ -711,7 +822,7 @@ protected:
    * projected linear system.
    */
   internal::SolverGMRESImplementation::ArnoldiProcess<
-    typename VectorType::value_type>
+    typename BasisVectorType::value_type>
     arnoldi_process;
 };
 
@@ -777,10 +888,26 @@ protected:
  * vectors. Otherwise, FGMRES requires roughly the same number of
  * operations per iteration compared to GMRES, except one application of
  * the preconditioner less at each restart and at the end of solve().
+ *
+ * Similarly to SolverGMRES, the second template argument @p BasisVectorType
+ * allows to store the orthonormal basis of the Arnoldi process in a
+ * different vector type, typically with a lower-precision number type such
+ * as <tt>float</tt>, see the section "Storing the Arnoldi basis in a
+ * different (lower) precision" in the documentation of SolverGMRES for the
+ * details and the supported vector types. Only the orthonormal basis is
+ * stored with @p BasisVectorType, whereas the preconditioned vectors that
+ * enter the update of the solution are kept with @p VectorType: the former
+ * are accessed in every iteration of the orthogonalization, while the
+ * latter are only read once per restart cycle, and their full precision
+ * keeps the solution update accurate. When the preconditioner needs to be
+ * applied to a basis vector other than the most recent one, as is the case
+ * for the MPGMRES strategies with more than one preconditioner, the basis
+ * vector is converted to @p VectorType first.
  */
-
-template <typename VectorType = Vector<double>>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType      = Vector<double>,
+          typename BasisVectorType = VectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 class SolverMPGMRES : public SolverBase<VectorType>
 {
 public:
@@ -887,8 +1014,16 @@ private:
    * projected linear system.
    */
   internal::SolverGMRESImplementation::ArnoldiProcess<
-    typename VectorType::value_type>
+    typename BasisVectorType::value_type>
     arnoldi_process;
+
+  /**
+   * Temporary data for the optimized kernels in the update of the solution
+   * from the preconditioned vectors, which are stored with VectorType.
+   */
+  internal::SolverGMRESImplementation::OrthogonalizationData<
+    typename VectorType::value_type>
+    solution_update_data;
 };
 
 
@@ -917,10 +1052,16 @@ private:
  * vectors. Otherwise, FGMRES requires roughly the same number of
  * operations per iteration compared to GMRES, except one application of
  * the preconditioner less at each restart and at the end of solve().
+ *
+ * The orthonormal basis can be stored with a different vector type
+ * @p BasisVectorType, e.g. with single precision, see the documentation of
+ * SolverMPGMRES and SolverGMRES.
  */
-template <typename VectorType = Vector<double>>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-class SolverFGMRES : public SolverMPGMRES<VectorType>
+template <typename VectorType      = Vector<double>,
+          typename BasisVectorType = VectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+class SolverFGMRES : public SolverMPGMRES<VectorType, BasisVectorType>
 {
 public:
   /**
@@ -986,9 +1127,10 @@ public:
 
 #ifndef DOXYGEN
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+inline SolverGMRES<VectorType, BasisVectorType>::AdditionalData::AdditionalData(
   const unsigned int                             max_basis_size,
   const bool                                     right_preconditioning,
   const bool                                     use_default_residual,
@@ -1010,11 +1152,13 @@ inline SolverGMRES<VectorType>::AdditionalData::AdditionalData(
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
-                                     VectorMemory<VectorType> &mem,
-                                     const AdditionalData     &data)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+SolverGMRES<VectorType, BasisVectorType>::SolverGMRES(
+  SolverControl            &cn,
+  VectorMemory<VectorType> &mem,
+  const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
   , solver_control(cn)
@@ -1022,10 +1166,12 @@ SolverGMRES<VectorType>::SolverGMRES(SolverControl            &cn,
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverGMRES<VectorType>::SolverGMRES(SolverControl        &cn,
-                                     const AdditionalData &data)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+SolverGMRES<VectorType, BasisVectorType>::SolverGMRES(
+  SolverControl        &cn,
+  const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
   , solver_control(cn)
@@ -1059,9 +1205,10 @@ namespace internal
 
 
     template <typename VectorType>
+    template <typename OtherVectorType>
     inline VectorType &
-    TmpVectors<VectorType>::operator()(const unsigned int i,
-                                       const VectorType  &temp)
+    TmpVectors<VectorType>::operator()(const unsigned int     i,
+                                       const OtherVectorType &temp)
     {
       AssertIndexRange(i, data.size());
       if (data[i] == nullptr)
@@ -1199,6 +1346,81 @@ namespace internal
 
 
 
+    /**
+     * Check that the two vector types @p VectorType (used for the arithmetic
+     * in GMRES) and @p BasisVectorType (used to store the Arnoldi basis) can
+     * be used together. If the two types are the same, any vector type is
+     * supported, whereas different types are only supported for deal.II's
+     * own vector types with optimized kernels with the same memory space.
+     */
+    template <typename VectorType, typename BasisVectorType>
+    constexpr bool
+    check_compatible_basis_vector_type()
+    {
+      if constexpr (!std::is_same_v<VectorType, BasisVectorType>)
+        {
+          static_assert(
+            !use_generic_implementation<VectorType> &&
+              !use_generic_implementation<BasisVectorType>,
+            "Using a different vector type for the Arnoldi basis in "
+            "SolverGMRES is only supported for deal.II's own vector types "
+            "LinearAlgebra::distributed::Vector, "
+            "LinearAlgebra::distributed::BlockVector, and Vector.");
+          static_assert(is_dealii_device_vector<VectorType>::value ==
+                          is_dealii_device_vector<BasisVectorType>::value,
+                        "The vector types for the arithmetic and the Arnoldi "
+                        "basis in SolverGMRES must use the same memory space.");
+          static_assert(IsBlockVector<VectorType>::value ==
+                          IsBlockVector<BasisVectorType>::value,
+                        "The vector types for the arithmetic and the Arnoldi "
+                        "basis in SolverGMRES must either both be block "
+                        "vectors or both be non-block vectors.");
+        }
+      return true;
+    }
+
+
+
+    /**
+     * Copy the locally owned entries of the vector @p src into @p dst,
+     * converting the number type if necessary.
+     */
+    template <typename VectorType, typename VectorType2>
+    void
+    copy_vector(VectorType &dst, const VectorType2 &src)
+    {
+      if constexpr (std::is_same_v<VectorType, VectorType2> ||
+                    std::is_same_v<VectorType,
+                                   Vector<typename VectorType::value_type>>)
+        dst = src;
+      else
+        dst.copy_locally_owned_data_from(src);
+    }
+
+
+
+    /**
+     * Collect the pointers to the local data of block @p b of the vectors
+     * with indices <tt>first, ..., first + n - 1</tt> in @p orthogonal_vectors
+     * in the field @p vector_ptrs of @p temp_data.
+     */
+    template <typename BasisVectorType>
+    void
+    collect_vector_pointers(
+      const unsigned int                 first,
+      const unsigned int                 n,
+      const unsigned int                 b,
+      const TmpVectors<BasisVectorType> &orthogonal_vectors,
+      OrthogonalizationData<typename BasisVectorType::value_type> &temp_data)
+    {
+      temp_data.vector_ptrs.resize(n);
+      for (unsigned int i = 0; i < n; ++i)
+        temp_data.vector_ptrs[i] =
+          block(orthogonal_vectors[first + i], b).begin();
+    }
+
+
+
     template <bool delayed_reorthogonalization,
               typename VectorType,
               std::enable_if_t<use_generic_implementation<VectorType>,
@@ -1222,41 +1444,51 @@ namespace internal
 
 
 
-    // worker method for deal.II's vector types implemented in the .cc file
+    // worker method for deal.II's vector types implemented in the .cc file;
+    // the current vector can have a different number type than the
+    // orthogonal vectors stored in temp_data
     template <bool delayed_reorthogonalization,
               typename MemorySpace,
-              typename Number>
+              typename Number,
+              typename BasisNumber>
     void
-    do_Tvmult_add(const unsigned int             n_vectors,
-                  const std::size_t              locally_owned_size,
-                  const Number                  *current_vector,
-                  OrthogonalizationData<Number> &temp_data,
-                  Vector<double>                &b);
+    do_Tvmult_add(const unsigned int                  n_vectors,
+                  const std::size_t                   locally_owned_size,
+                  const Number                       *current_vector,
+                  OrthogonalizationData<BasisNumber> &temp_data,
+                  Vector<double>                     &b);
 
 
 
+    /**
+     * Compute the inner products of @p vv against the @p n orthogonal
+     * vectors with indices <tt>first, ..., first + n - 1</tt> and add them
+     * to @p h. For the delayed variant, also compute the inner products of
+     * the last of those vectors with all of them and the norm of @p vv.
+     */
     template <bool delayed_reorthogonalization,
               typename VectorType,
+              typename BasisVectorType,
               std::enable_if_t<!use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     void
     Tvmult_add(
-      const unsigned int            n,
-      const VectorType             &vv,
-      const TmpVectors<VectorType> &orthogonal_vectors,
-      Vector<double>               &h,
-      OrthogonalizationData<typename VectorType::value_type> &temp_data)
+      const unsigned int                 n,
+      const VectorType                  &vv,
+      const TmpVectors<BasisVectorType> &orthogonal_vectors,
+      Vector<double>                    &h,
+      OrthogonalizationData<typename BasisVectorType::value_type> &temp_data,
+      const unsigned int                                           first = 0)
     {
+      static_assert(
+        check_compatible_basis_vector_type<VectorType, BasisVectorType>());
       using MemorySpace =
         std::conditional_t<is_dealii_device_vector<VectorType>::value,
                            MemorySpace::Default,
                            MemorySpace::Host>;
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          temp_data.vector_ptrs.resize(n);
-          for (unsigned int i = 0; i < n; ++i)
-            temp_data.vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
-
+          collect_vector_pointers(first, n, b, orthogonal_vectors, temp_data);
           do_Tvmult_add<delayed_reorthogonalization, MemorySpace>(
             n,
             block(vv, b).end() - block(vv, b).begin(),
@@ -1318,32 +1550,94 @@ namespace internal
 
 
 
-    // worker method for deal.II's host vector types implemented in the .cc
-    // file
+    // worker method for deal.II's vector types implemented in the .cc file;
+    // the current vector can have a different number type than the
+    // orthogonal vectors stored in temp_data
     template <bool delayed_reorthogonalization,
               typename MemorySpace,
-              typename Number>
+              typename Number,
+              typename BasisNumber>
     double
-    do_subtract_and_norm(const unsigned int             n_vectors,
-                         const std::size_t              locally_owned_size,
-                         OrthogonalizationData<Number> &temp_data,
-                         const Vector<double>          &h,
-                         Number                        *current_vector);
+    do_subtract_and_norm(const unsigned int                  n_vectors,
+                         const std::size_t                   locally_owned_size,
+                         OrthogonalizationData<BasisNumber> &temp_data,
+                         const Vector<double>               &h,
+                         Number                             *current_vector,
+                         BasisNumber                        *basis_output);
 
 
 
+    // worker method for deal.II's vector types implemented in the .cc file
+    template <typename MemorySpace, typename Number, typename BasisNumber>
+    void
+    do_scale_and_copy(const std::size_t locally_owned_size,
+                      const double      factor,
+                      Number           *vector,
+                      BasisNumber      *basis_output);
+
+
+
+    /**
+     * Multiply the vector @p vv by @p factor and store the result both in
+     * @p vv and in @p basis_vector, converting to the number type of the
+     * latter, with a single pass through memory.
+     */
+    template <typename VectorType, typename BasisVectorType>
+    void
+    scale_and_copy(VectorType      &vv,
+                   const double     factor,
+                   BasisVectorType &basis_vector)
+    {
+      static_assert(
+        check_compatible_basis_vector_type<VectorType, BasisVectorType>());
+      using MemorySpace =
+        std::conditional_t<is_dealii_device_vector<VectorType>::value,
+                           MemorySpace::Default,
+                           MemorySpace::Host>;
+      for (unsigned int b = 0; b < n_blocks(vv); ++b)
+        {
+          AssertDimension(block(vv, b).end() - block(vv, b).begin(),
+                          block(basis_vector, b).end() -
+                            block(basis_vector, b).begin());
+          do_scale_and_copy<MemorySpace>(block(vv, b).end() -
+                                           block(vv, b).begin(),
+                                         factor,
+                                         block(vv, b).begin(),
+                                         block(basis_vector, b).begin());
+        }
+    }
+
+
+
+    /**
+     * Subtract the projections onto the @p n orthogonal vectors with indices
+     * <tt>first, ..., first + n - 1</tt> from @p vv, using the coefficients
+     * in @p h, and return the norm of the resulting vector. For the delayed
+     * variant, the last orthogonal vector is corrected and normalized in
+     * place, and no norm is computed. In the delayed variant, the final
+     * values of @p vv can additionally be written to the vector
+     * @p basis_output (in the number type of the basis), which avoids a
+     * separate pass through memory to copy the vector into the basis.
+     */
     template <bool delayed_reorthogonalization,
               typename VectorType,
+              typename BasisVectorType,
               std::enable_if_t<!use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     double
     subtract_and_norm(
-      const unsigned int            n,
-      const TmpVectors<VectorType> &orthogonal_vectors,
-      const Vector<double>         &h,
-      VectorType                   &vv,
-      OrthogonalizationData<typename VectorType::value_type> &temp_data)
+      const unsigned int                 n,
+      const TmpVectors<BasisVectorType> &orthogonal_vectors,
+      const Vector<double>              &h,
+      VectorType                        &vv,
+      OrthogonalizationData<typename BasisVectorType::value_type> &temp_data,
+      const unsigned int                                           first = 0,
+      BasisVectorType *basis_output = nullptr)
     {
+      static_assert(
+        check_compatible_basis_vector_type<VectorType, BasisVectorType>());
+      Assert(delayed_reorthogonalization || basis_output == nullptr,
+             ExcInternalError());
       using MemorySpace =
         std::conditional_t<is_dealii_device_vector<VectorType>::value,
                            MemorySpace::Default,
@@ -1352,18 +1646,22 @@ namespace internal
 
       for (unsigned int b = 0; b < n_blocks(vv); ++b)
         {
-          temp_data.vector_ptrs.resize(n);
-          for (unsigned int i = 0; i < n; ++i)
-            temp_data.vector_ptrs[i] = block(orthogonal_vectors[i], b).begin();
-
+          collect_vector_pointers(first, n, b, orthogonal_vectors, temp_data);
           norm_vv_temp +=
             do_subtract_and_norm<delayed_reorthogonalization, MemorySpace>(
               n,
               block(vv, b).end() - block(vv, b).begin(),
               temp_data,
               h,
-              block(vv, b).begin());
+              block(vv, b).begin(),
+              basis_output != nullptr ? block(*basis_output, b).begin() :
+                                        nullptr);
         }
+
+      // the delayed variant computes the norm from other quantities, so we
+      // can skip the global reduction
+      if constexpr (delayed_reorthogonalization)
+        return std::numeric_limits<double>::signaling_NaN();
 
       return std::sqrt(
         Utilities::MPI::sum(norm_vv_temp, block(vv, 0).get_mpi_communicator()));
@@ -1393,39 +1691,41 @@ namespace internal
 
 
 
-    // worker method for deal.II's host vector types implemented in the .cc
-    // file
-    template <typename MemorySpace, typename Number>
+    // worker method for deal.II's vector types implemented in the .cc file;
+    // the output vector can have a different number type than the
+    // orthogonal vectors stored in temp_data
+    template <typename MemorySpace, typename Number, typename BasisNumber>
     void
-    do_add(const unsigned int             n_vectors,
-           const std::size_t              locally_owned_size,
-           OrthogonalizationData<Number> &temp_data,
-           const Vector<double>          &h,
-           const bool                     zero_out,
-           Number                        *output);
+    do_add(const unsigned int                  n_vectors,
+           const std::size_t                   locally_owned_size,
+           OrthogonalizationData<BasisNumber> &temp_data,
+           const Vector<double>               &h,
+           const bool                          zero_out,
+           Number                             *output);
 
 
 
     template <typename VectorType,
+              typename BasisVectorType,
               std::enable_if_t<!use_generic_implementation<VectorType>,
                                VectorType> * = nullptr>
     void
-    add(VectorType                                             &p,
-        const unsigned int                                      n,
-        const Vector<double>                                   &h,
-        const TmpVectors<VectorType>                           &tmp_vectors,
-        const bool                                              zero_out,
-        OrthogonalizationData<typename VectorType::value_type> &temp_data)
+    add(VectorType                        &p,
+        const unsigned int                 n,
+        const Vector<double>              &h,
+        const TmpVectors<BasisVectorType> &tmp_vectors,
+        const bool                         zero_out,
+        OrthogonalizationData<typename BasisVectorType::value_type> &temp_data)
     {
+      static_assert(
+        check_compatible_basis_vector_type<VectorType, BasisVectorType>());
       using MemorySpace =
         std::conditional_t<is_dealii_device_vector<VectorType>::value,
                            MemorySpace::Default,
                            MemorySpace::Host>;
       for (unsigned int b = 0; b < n_blocks(p); ++b)
         {
-          temp_data.vector_ptrs.resize(n);
-          for (unsigned int i = 0; i < n; ++i)
-            temp_data.vector_ptrs[i] = block(tmp_vectors[i], b).begin();
+          collect_vector_pointers(0, n, b, tmp_vectors, temp_data);
           do_add<MemorySpace>(n,
                               block(p, b).end() - block(p, b).begin(),
                               temp_data,
@@ -1434,8 +1734,6 @@ namespace internal
                               block(p, b).begin());
         }
     }
-
-
 
     template <typename Number>
     inline void
@@ -1473,17 +1771,49 @@ namespace internal
       const unsigned int                        accumulated_iterations,
       const boost::signals2::signal<void(int)> &reorthogonalize_signal)
     {
+      return orthonormalize_nth_vector(n,
+                                       orthogonal_vectors[n],
+                                       orthogonal_vectors,
+                                       accumulated_iterations,
+                                       reorthogonalize_signal);
+    }
+
+
+
+    template <typename Number>
+    template <typename VectorType, typename BasisVectorType>
+    inline double
+    ArnoldiProcess<Number>::orthonormalize_nth_vector(
+      const unsigned int                        n,
+      VectorType                               &vv,
+      TmpVectors<BasisVectorType>              &orthogonal_vectors,
+      const unsigned int                        accumulated_iterations,
+      const boost::signals2::signal<void(int)> &reorthogonalize_signal)
+    {
+      static_assert(
+        std::is_same_v<Number, typename BasisVectorType::value_type>,
+        "The number type of the Arnoldi process must match the number type "
+        "of the vectors storing the orthonormal basis.");
+      static_assert(
+        check_compatible_basis_vector_type<VectorType, BasisVectorType>());
+
       AssertIndexRange(n, hessenberg_matrix.m());
       AssertIndexRange(n, orthogonal_vectors.size() + 1);
 
-      VectorType &vv = orthogonal_vectors[n];
+      constexpr bool separate_basis_type =
+        !std::is_same_v<VectorType, BasisVectorType>;
 
       double residual_estimate = std::numeric_limits<double>::signaling_NaN();
       if (n == 0)
         {
           givens_rotations.clear();
           residual_estimate = vv.l2_norm();
-          if (residual_estimate != 0.)
+          if constexpr (separate_basis_type)
+            scale_and_copy(vv,
+                           residual_estimate != 0. ? 1. / residual_estimate :
+                                                     1.,
+                           orthogonal_vectors(n, vv));
+          else if (residual_estimate != 0.)
             vv /= residual_estimate;
           projected_rhs(0) = residual_estimate;
         }
@@ -1554,7 +1884,16 @@ namespace internal
           // values and correct the actual norm in the Hessenberg matrix in
           // high precision in the next iteration.
           h(n + n) = hessenberg_matrix(n, n - 1);
-          subtract_and_norm<true>(n, orthogonal_vectors, h, vv, temp_data);
+          if constexpr (separate_basis_type)
+            subtract_and_norm<true>(n,
+                                    orthogonal_vectors,
+                                    h,
+                                    vv,
+                                    temp_data,
+                                    0,
+                                    &orthogonal_vectors(n, vv));
+          else
+            subtract_and_norm<true>(n, orthogonal_vectors, h, vv, temp_data);
 
           // transform new column of upper Hessenberg matrix into upper
           // triangular form by computing the respective factor
@@ -1582,18 +1921,40 @@ namespace internal
                   LinearAlgebra::OrthogonalizationStrategy::
                     modified_gram_schmidt)
                 {
-                  double htmp = vv * orthogonal_vectors[0];
-                  h(0) += htmp;
-                  for (unsigned int i = 1; i < n; ++i)
+                  if constexpr (!separate_basis_type)
                     {
-                      htmp = vv.add_and_dot(-htmp,
-                                            orthogonal_vectors[i - 1],
-                                            orthogonal_vectors[i]);
-                      h(i) += htmp;
-                    }
+                      double htmp = vv * orthogonal_vectors[0];
+                      h(0) += htmp;
+                      for (unsigned int i = 1; i < n; ++i)
+                        {
+                          htmp = vv.add_and_dot(-htmp,
+                                                orthogonal_vectors[i - 1],
+                                                orthogonal_vectors[i]);
+                          h(i) += htmp;
+                        }
 
-                  norm_vv = std::sqrt(
-                    vv.add_and_dot(-htmp, orthogonal_vectors[n - 1], vv));
+                      norm_vv = std::sqrt(
+                        vv.add_and_dot(-htmp, orthogonal_vectors[n - 1], vv));
+                    }
+                  else
+                    {
+                      // The vector operations add_and_dot() and operator*
+                      // do not support mixed number types, so we use the
+                      // kernels of the classical Gram-Schmidt for a single
+                      // vector at a time. Compared to the fused variant
+                      // above, this involves one additional global
+                      // reduction per vector for the norm.
+                      Vector<double> h_single(1);
+                      for (unsigned int i = 0; i < n; ++i)
+                        {
+                          h_single(0) = 0.;
+                          Tvmult_add<false>(
+                            1, vv, orthogonal_vectors, h_single, temp_data, i);
+                          h(i) += h_single(0);
+                          norm_vv = subtract_and_norm<false>(
+                            1, orthogonal_vectors, h_single, vv, temp_data, i);
+                        }
+                    }
                 }
               else if (orthogonalization_strategy ==
                        LinearAlgebra::OrthogonalizationStrategy::
@@ -1645,11 +2006,25 @@ namespace internal
 
           // norm_vv is a lucky breakdown, the solver will reach convergence,
           // but we must not divide by zero here.
-          if (norm_vv != 0)
+          if constexpr (separate_basis_type)
+            scale_and_copy(vv,
+                           norm_vv != 0. ? 1. / norm_vv : 1.,
+                           orthogonal_vectors(n, vv));
+          else if (norm_vv != 0)
             vv /= norm_vv;
 
           residual_estimate = do_givens_rotation(
             false, n - 1, triangular_matrix, givens_rotations, projected_rhs);
+        }
+
+      // Store the new vector in the basis, unless the vector already is the
+      // n-th basis vector. If the types differ, this has already been done
+      // by the fused kernels above while writing the final values of vv.
+      if constexpr (!separate_basis_type)
+        {
+          VectorType &basis_vector = orthogonal_vectors(n, vv);
+          if (&basis_vector != &vv)
+            basis_vector = vv;
         }
 
       return residual_estimate;
@@ -1853,9 +2228,10 @@ namespace internal
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-inline void SolverGMRES<VectorType>::compute_eigs_and_cond(
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+inline void SolverGMRES<VectorType, BasisVectorType>::compute_eigs_and_cond(
   const FullMatrix<double> &H_orig,
   const unsigned int        n,
   const boost::signals2::signal<void(const std::vector<std::complex<double>> &)>
@@ -1905,16 +2281,18 @@ inline void SolverGMRES<VectorType>::compute_eigs_and_cond(
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 template <typename MatrixType, typename PreconditionerType>
 DEAL_II_CXX20_REQUIRES(
   (concepts::is_linear_operator_on<MatrixType, VectorType> &&
    concepts::is_linear_operator_on<PreconditionerType, VectorType>))
-void SolverGMRES<VectorType>::solve(const MatrixType         &A,
-                                    VectorType               &x,
-                                    const VectorType         &b,
-                                    const PreconditionerType &preconditioner)
+void SolverGMRES<VectorType, BasisVectorType>::solve(
+  const MatrixType         &A,
+  VectorType               &x,
+  const VectorType         &b,
+  const PreconditionerType &preconditioner)
 {
   std::unique_ptr<LogStream::Prefix> prefix;
   if (!additional_data.batched_mode)
@@ -1927,9 +2305,52 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
        additional_data.max_basis_size :
        std::max(additional_data.max_n_tmp_vectors, 3u) - 2);
 
+  // Check whether the orthonormal basis is stored with a different vector
+  // type than the one used for the arithmetic operations.
+  constexpr bool separate_basis_type =
+    !std::is_same_v<VectorType, BasisVectorType>;
+  static_assert(
+    internal::SolverGMRESImplementation::
+      check_compatible_basis_vector_type<VectorType, BasisVectorType>());
+
+  // Memory pool for the basis vectors: in the regular case, use the pool of
+  // the solver, otherwise a pool for the separate basis vector type. The
+  // reinterpret case done here is safe because it only happens if the types
+  // are equal.
+  GrowingVectorMemory<BasisVectorType> separate_basis_memory;
+  VectorMemory<BasisVectorType>       &basis_memory =
+    separate_basis_type ?
+      static_cast<VectorMemory<BasisVectorType> &>(separate_basis_memory) :
+      reinterpret_cast<VectorMemory<BasisVectorType> &>(this->memory);
+
   // Generate an object where basis vectors are stored.
-  internal::SolverGMRESImplementation::TmpVectors<VectorType> basis_vectors(
-    basis_size + 2, this->memory);
+  internal::SolverGMRESImplementation::TmpVectors<BasisVectorType>
+    basis_vectors(basis_size + 2, basis_memory);
+
+  // In case the basis is stored with a separate vector type, we need two
+  // vectors with VectorType to keep the two most recent vectors of the Krylov
+  // space in full precision (the vector that is currently orthogonalized and
+  // the vector that was used as input to the matrix-vector product), plus
+  // one temporary vector.
+  std::array<typename VectorMemory<VectorType>::Pointer,
+             separate_basis_type ? 3 : 0>
+    full_precision_vectors;
+  for (auto &vector : full_precision_vectors)
+    {
+      vector =
+        std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
+      vector->reinit(x, true);
+    }
+
+  // Return the vector with index n in the Krylov space with VectorType: in the
+  // regular case, this is the basis vector itself, otherwise it alternates
+  // between the two full-precision vectors.
+  const auto krylov_vector = [&](const unsigned int n) -> VectorType & {
+    if constexpr (separate_basis_type)
+      return *full_precision_vectors[n % 2];
+    else
+      return basis_vectors(n, x);
+  };
 
   // number of the present iteration; this number is not reset to zero upon a
   // restart
@@ -1954,8 +2375,32 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // residual as stopping criterion.
   const bool use_default_residual = additional_data.use_default_residual;
 
+  // In case of a separate basis vector type, the convergence detected by the
+  // residual estimate of the Arnoldi process is verified by computing the
+  // actual residual. If the verification fails, the residual computed there
+  // is used as the starting point of the next restart cycle, and this flag
+  // indicates that the residual has already been computed and checked.
+  bool residual_computed_and_checked = false;
+
+  // In case of a separate basis vector type with lower precision, the
+  // residual estimate from the Arnoldi process stagnates once it has been
+  // reduced by roughly the machine precision of the basis vectors compared
+  // to the residual at the start of the restart cycle, as the orthogonality
+  // of the basis cannot be maintained to a higher level. In that case, we
+  // restart the cycle, which recomputes the residual with the full precision
+  // of VectorType. The factor 10 has been found to work well in experiments,
+  // with little sensitivity in the range between 3 and 100.
+  const double restart_threshold_factor =
+    separate_basis_type ?
+      10. *
+        std::numeric_limits<typename BasisVectorType::value_type>::epsilon() :
+      0.;
+
   // define an alias
-  VectorType &p = basis_vectors(basis_size + 1, x);
+  VectorType &p =
+    separate_basis_type ?
+      *full_precision_vectors[2] :
+      reinterpret_cast<VectorType &>(basis_vectors(basis_size + 1, x));
 
   // Following vectors are needed when we are not using the default residuals
   // as stopping criterion
@@ -1979,7 +2424,7 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
   // restart
   do
     {
-      VectorType &v = basis_vectors(0, x);
+      VectorType &v = krylov_vector(0);
 
       // Compute the preconditioned/unpreconditioned residual for left/right
       // preconditioning. If 'x' is the zero vector, then we can bypass the
@@ -1988,7 +2433,11 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
       // worth checking for this in the first iteration. (Calling all_zero()
       // costs as much in memory transfer and communication as computing the
       // norm of a vector.)
-      if (left_precondition)
+      if (residual_computed_and_checked)
+        {
+          // nothing to do, the residual is already in v
+        }
+      else if (left_precondition)
         {
           if (accumulated_iterations == 0 && x.all_zero())
             preconditioner.vmult(v, b);
@@ -2011,7 +2460,7 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
         }
 
       const double norm_v = arnoldi_process.orthonormalize_nth_vector(
-        0, basis_vectors, accumulated_iterations, re_orthogonalize_signal);
+        0, v, basis_vectors, accumulated_iterations, re_orthogonalize_signal);
 
       // check the residual here as well since it may be that we got the exact
       // (or an almost exact) solution vector at the outset. if we wouldn't
@@ -2019,14 +2468,20 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
       if (use_default_residual)
         {
           res = norm_v;
-          if (additional_data.batched_mode)
-            iteration_state = solver_control.check(accumulated_iterations, res);
+          if (residual_computed_and_checked)
+            residual_computed_and_checked = false;
           else
-            iteration_state =
-              this->iteration_status(accumulated_iterations, res, x);
+            {
+              if (additional_data.batched_mode)
+                iteration_state =
+                  solver_control.check(accumulated_iterations, res);
+              else
+                iteration_state =
+                  this->iteration_status(accumulated_iterations, res, x);
 
-          if (iteration_state != SolverControl::iterate)
-            break;
+              if (iteration_state != SolverControl::iterate)
+                break;
+            }
         }
       else
         {
@@ -2053,31 +2508,39 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
 
       // inner iteration doing at most as many steps as the size of the
       // Arnoldi basis
-      unsigned int inner_iteration = 0;
+      const double restart_threshold = restart_threshold_factor * norm_v;
+      bool         restart_cycle     = false;
+      unsigned int inner_iteration   = 0;
       for (; (inner_iteration < basis_size &&
-              iteration_state == SolverControl::iterate);
+              iteration_state == SolverControl::iterate && !restart_cycle);
            ++inner_iteration)
         {
           ++accumulated_iterations;
           // yet another alias
-          VectorType &vv = basis_vectors(inner_iteration + 1, x);
+          VectorType &vv = krylov_vector(inner_iteration + 1);
+
+          // the input to the matrix-vector product is the most recent vector
+          // of the Krylov space
+          const VectorType &last_vector = krylov_vector(inner_iteration);
 
           if (left_precondition)
             {
-              A.vmult(p, basis_vectors[inner_iteration]);
+              A.vmult(p, last_vector);
               preconditioner.vmult(vv, p);
             }
           else
             {
-              preconditioner.vmult(p, basis_vectors[inner_iteration]);
+              preconditioner.vmult(p, last_vector);
               A.vmult(vv, p);
             }
 
           res =
             arnoldi_process.orthonormalize_nth_vector(inner_iteration + 1,
+                                                      vv,
                                                       basis_vectors,
                                                       accumulated_iterations,
                                                       re_orthogonalize_signal);
+          restart_cycle = (res < restart_threshold);
 
           if (use_default_residual)
             {
@@ -2098,13 +2561,22 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
                 arnoldi_process.solve_projected_system(false);
 
               if (left_precondition)
-                for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-                  x_->add(projected_solution(i), basis_vectors[i]);
+                dealii::internal::SolverGMRESImplementation::add(
+                  *x_,
+                  inner_iteration + 1,
+                  projected_solution,
+                  basis_vectors,
+                  false,
+                  arnoldi_process.temp_data);
               else
                 {
-                  p = 0.;
-                  for (unsigned int i = 0; i < inner_iteration + 1; ++i)
-                    p.add(projected_solution(i), basis_vectors[i]);
+                  dealii::internal::SolverGMRESImplementation::add(
+                    p,
+                    inner_iteration + 1,
+                    projected_solution,
+                    basis_vectors,
+                    true,
+                    arnoldi_process.temp_data);
                   preconditioner.vmult(*r, p);
                   x_->add(1., *r);
                 };
@@ -2166,6 +2638,36 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
           x.add(1., v);
         }
 
+      // With a basis stored in a separate (typically lower) precision, the
+      // residual estimate of the Arnoldi process can underestimate the actual
+      // residual. Thus, verify the convergence with the actual residual,
+      // keeping it in v as the starting point of the next restart cycle.
+      if (separate_basis_type && use_default_residual &&
+          iteration_state == SolverControl::success)
+        {
+          if (left_precondition)
+            {
+              A.vmult(p, x);
+              p.sadd(-1., 1., b);
+              preconditioner.vmult(v, p);
+            }
+          else
+            {
+              A.vmult(v, x);
+              v.sadd(-1., 1., b);
+            }
+          res = v.l2_norm();
+
+          if (additional_data.batched_mode)
+            iteration_state = solver_control.check(accumulated_iterations, res);
+          else
+            iteration_state =
+              this->iteration_status(accumulated_iterations, res, x);
+
+          residual_computed_and_checked =
+            (iteration_state == SolverControl::iterate);
+        }
+
       // in the last round, print the eigenvalues from the last Arnoldi step
       if (iteration_state != SolverControl::iterate)
         {
@@ -2192,10 +2694,11 @@ void SolverGMRES<VectorType>::solve(const MatrixType         &A,
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 boost::signals2::connection
-  SolverGMRES<VectorType>::connect_condition_number_slot(
+  SolverGMRES<VectorType, BasisVectorType>::connect_condition_number_slot(
     const std::function<void(double)> &slot,
     const bool                         every_iteration)
 {
@@ -2211,11 +2714,13 @@ boost::signals2::connection
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-boost::signals2::connection SolverGMRES<VectorType>::connect_eigenvalues_slot(
-  const std::function<void(const std::vector<std::complex<double>> &)> &slot,
-  const bool every_iteration)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+boost::signals2::connection
+  SolverGMRES<VectorType, BasisVectorType>::connect_eigenvalues_slot(
+    const std::function<void(const std::vector<std::complex<double>> &)> &slot,
+    const bool every_iteration)
 {
   if (every_iteration)
     {
@@ -2229,11 +2734,13 @@ boost::signals2::connection SolverGMRES<VectorType>::connect_eigenvalues_slot(
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-boost::signals2::connection SolverGMRES<VectorType>::connect_hessenberg_slot(
-  const std::function<void(const FullMatrix<double> &)> &slot,
-  const bool                                             every_iteration)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+boost::signals2::connection
+  SolverGMRES<VectorType, BasisVectorType>::connect_hessenberg_slot(
+    const std::function<void(const FullMatrix<double> &)> &slot,
+    const bool                                             every_iteration)
 {
   if (every_iteration)
     {
@@ -2247,21 +2754,25 @@ boost::signals2::connection SolverGMRES<VectorType>::connect_hessenberg_slot(
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-boost::signals2::connection SolverGMRES<VectorType>::connect_krylov_space_slot(
-  const std::function<void(
-    const internal::SolverGMRESImplementation::TmpVectors<VectorType> &)> &slot)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+boost::signals2::connection
+  SolverGMRES<VectorType, BasisVectorType>::connect_krylov_space_slot(
+    const std::function<void(
+      const internal::SolverGMRESImplementation::TmpVectors<BasisVectorType> &)>
+      &slot)
 {
   return krylov_space_signal.connect(slot);
 }
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 boost::signals2::connection
-  SolverGMRES<VectorType>::connect_re_orthogonalization_slot(
+  SolverGMRES<VectorType, BasisVectorType>::connect_re_orthogonalization_slot(
     const std::function<void(int)> &slot)
 {
   return re_orthogonalize_signal.connect(slot);
@@ -2269,9 +2780,10 @@ boost::signals2::connection
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-double SolverGMRES<VectorType>::criterion()
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+double SolverGMRES<VectorType, BasisVectorType>::criterion()
 {
   // dummy implementation. this function is not needed for the present
   // implementation of gmres
@@ -2285,34 +2797,39 @@ double SolverGMRES<VectorType>::criterion()
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl            &cn,
-                                         VectorMemory<VectorType> &mem,
-                                         const AdditionalData     &data)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+SolverMPGMRES<VectorType, BasisVectorType>::SolverMPGMRES(
+  SolverControl            &cn,
+  VectorMemory<VectorType> &mem,
+  const AdditionalData     &data)
   : SolverBase<VectorType>(cn, mem)
   , additional_data(data)
 {}
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverMPGMRES<VectorType>::SolverMPGMRES(SolverControl        &cn,
-                                         const AdditionalData &data)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+SolverMPGMRES<VectorType, BasisVectorType>::SolverMPGMRES(
+  SolverControl        &cn,
+  const AdditionalData &data)
   : SolverBase<VectorType>(cn)
   , additional_data(data)
 {}
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 template <typename MatrixType, typename... PreconditionerTypes>
 DEAL_II_CXX20_REQUIRES(
   (concepts::is_linear_operator_on<MatrixType, VectorType> &&
    (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
-void SolverMPGMRES<VectorType>::solve(
+void SolverMPGMRES<VectorType, BasisVectorType>::solve(
   const MatrixType &A,
   VectorType       &x,
   const VectorType &b,
@@ -2321,19 +2838,20 @@ void SolverMPGMRES<VectorType>::solve(
   LogStream::Prefix prefix("MPGMRES");
 
   if (additional_data.use_truncated_mpgmres_strategy)
-    SolverMPGMRES<VectorType>::solve_internal(
+    SolverMPGMRES<VectorType, BasisVectorType>::solve_internal(
       A, x, b, IndexingStrategy::truncated_mpgmres, preconditioners...);
   else
-    SolverMPGMRES<VectorType>::solve_internal(
+    SolverMPGMRES<VectorType, BasisVectorType>::solve_internal(
       A, x, b, IndexingStrategy::full_mpgmres, preconditioners...);
 }
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 template <typename MatrixType, typename... PreconditionerTypes>
-void SolverMPGMRES<VectorType>::solve_internal(
+void SolverMPGMRES<VectorType, BasisVectorType>::solve_internal(
   const MatrixType       &A,
   VectorType             &x,
   const VectorType       &b,
@@ -2419,11 +2937,89 @@ void SolverMPGMRES<VectorType>::solve_internal(
 
   const unsigned int basis_size = additional_data.max_basis_size;
 
-  // Generate an object where basis vectors are stored.
-  typename internal::SolverGMRESImplementation::TmpVectors<VectorType> v(
-    basis_size + 1, this->memory);
+  // Check whether the orthonormal basis is stored with a different vector
+  // type than the one used for the arithmetic operations, see SolverGMRES
+  // for the details of the implementation.
+  constexpr bool separate_basis_type =
+    !std::is_same_v<VectorType, BasisVectorType>;
+  static_assert(
+    internal::SolverGMRESImplementation::
+      check_compatible_basis_vector_type<VectorType, BasisVectorType>());
+
+  // Memory pool for the basis vectors: in the regular case, use the pool of
+  // the solver, otherwise a pool for the separate basis vector type
+  GrowingVectorMemory<BasisVectorType> separate_basis_memory;
+  VectorMemory<BasisVectorType>       &basis_memory =
+    separate_basis_type ?
+      static_cast<VectorMemory<BasisVectorType> &>(separate_basis_memory) :
+      reinterpret_cast<VectorMemory<BasisVectorType> &>(this->memory);
+
+  // Generate an object where basis vectors are stored (v) and one for the
+  // preconditioned vectors (z), which are always stored with VectorType.
+  typename internal::SolverGMRESImplementation::TmpVectors<BasisVectorType> v(
+    basis_size + 1, basis_memory);
   typename internal::SolverGMRESImplementation::TmpVectors<VectorType> z(
     basis_size, this->memory);
+
+  // In case of a separate basis vector type, keep the two most recent
+  // vectors of the Krylov space with VectorType, plus one vector to convert
+  // older basis vectors to VectorType.
+  std::array<typename VectorMemory<VectorType>::Pointer,
+             separate_basis_type ? 3 : 0>
+    full_precision_vectors;
+  for (auto &vector : full_precision_vectors)
+    {
+      vector =
+        std::move(typename VectorMemory<VectorType>::Pointer(this->memory));
+      vector->reinit(x, true);
+    }
+
+  // Return the vector with index n in the Krylov space with VectorType: in
+  // the regular case, this is the basis vector itself, for mixed precisions
+  // it alternates between the two full-precision vectors.
+  const auto krylov_vector = [&](const unsigned int n) -> VectorType & {
+    if constexpr (separate_basis_type)
+      return *full_precision_vectors[n % 2];
+    else
+      return v(n, x);
+  };
+
+  // Return the basis vector with index n as VectorType, to be used as input
+  // for the preconditioner. The most recent vector with index
+  // 'latest_index' is available in full precision, whereas the other ones
+  // need to be converted in case of a separate basis vector type.
+  const auto basis_vector_as_vector_type =
+    [&](const unsigned int n,
+        const unsigned int latest_index) -> const VectorType & {
+    if constexpr (separate_basis_type)
+      {
+        if (n == latest_index)
+          return *full_precision_vectors[n % 2];
+        internal::SolverGMRESImplementation::copy_vector(
+          *full_precision_vectors[2], v[n]);
+        return *full_precision_vectors[2];
+      }
+    else
+      {
+        (void)latest_index;
+        return v[n];
+      }
+  };
+
+  // With a separate basis vector type of lower precision, restart the
+  // cycle once the residual estimate stagnates, see SolverGMRES.
+  const double restart_threshold_factor =
+    separate_basis_type ?
+      10. *
+        std::numeric_limits<typename BasisVectorType::value_type>::epsilon() :
+      0.;
+
+  // In case of a separate basis vector type, the convergence detected by the
+  // residual estimate of the Arnoldi process is verified by computing the
+  // actual residual. If the verification fails, the residual computed there
+  // is used as the starting point of the next restart cycle, and this flag
+  // indicates that the residual has already been computed and checked.
+  bool residual_computed_and_checked = false;
 
   // number of the present iteration; this number is not reset to zero upon a
   // restart
@@ -2439,36 +3035,56 @@ void SolverMPGMRES<VectorType>::solve_internal(
 
   do
     {
+      VectorType &r = krylov_vector(0);
+
       // Compute the residual. If 'x' is the zero vector, then we can bypass
       // the full computation. But 'x' is only likely to be the zero vector if
       // that's what the user provided as the starting guess, so it's only
       // worth checking for this in the first iteration. (Calling all_zero()
       // costs as much in memory transfer and communication as computing the
       // norm of a vector.)
-      if (accumulated_iterations == 0 && x.all_zero())
-        v(0, x) = b;
+      if (residual_computed_and_checked)
+        {
+          // nothing to do, the residual is already in r
+        }
+      else if (accumulated_iterations == 0 && x.all_zero())
+        r = b;
       else
         {
-          A.vmult(v(0, x), x);
-          v[0].sadd(-1., 1., b);
+          A.vmult(r, x);
+          r.sadd(-1., 1., b);
         }
 
-      res             = arnoldi_process.orthonormalize_nth_vector(0, v);
-      iteration_state = this->iteration_status(accumulated_iterations, res, x);
-      if (iteration_state == SolverControl::success)
-        break;
+      res = arnoldi_process.orthonormalize_nth_vector(0, r, v);
+      if (residual_computed_and_checked)
+        residual_computed_and_checked = false;
+      else
+        {
+          iteration_state =
+            this->iteration_status(accumulated_iterations, res, x);
+          if (iteration_state == SolverControl::success)
+            break;
+        }
 
-      unsigned int inner_iteration = 0;
+      const double restart_threshold = restart_threshold_factor * res;
+      bool         restart_cycle     = false;
+      unsigned int inner_iteration   = 0;
       for (; (inner_iteration < basis_size &&
-              iteration_state == SolverControl::iterate);
+              iteration_state == SolverControl::iterate && !restart_cycle);
            ++inner_iteration)
         {
-          preconditioner_vmult(z(inner_iteration, x),
-                               v[previous_vector_index(inner_iteration)]);
-          A.vmult(v(inner_iteration + 1, x), z[inner_iteration]);
+          preconditioner_vmult(
+            z(inner_iteration, x),
+            basis_vector_as_vector_type(previous_vector_index(inner_iteration),
+                                        inner_iteration));
 
-          res =
-            arnoldi_process.orthonormalize_nth_vector(inner_iteration + 1, v);
+          VectorType &vv = krylov_vector(inner_iteration + 1);
+          A.vmult(vv, z[inner_iteration]);
+
+          res = arnoldi_process.orthonormalize_nth_vector(inner_iteration + 1,
+                                                          vv,
+                                                          v);
+          restart_cycle = (res < restart_threshold);
 
           // check convergence. note that the vector 'x' we pass to the
           // criterion is not the final solution we compute if we
@@ -2483,12 +3099,21 @@ void SolverMPGMRES<VectorType>::solve_internal(
       const Vector<double> &projected_solution =
         arnoldi_process.solve_projected_system(true);
       dealii::internal::SolverGMRESImplementation::add(
-        x,
-        inner_iteration,
-        projected_solution,
-        z,
-        false,
-        arnoldi_process.temp_data);
+        x, inner_iteration, projected_solution, z, false, solution_update_data);
+
+      // With a basis stored in a separate (typically lower) precision,
+      // verify the convergence with the actual residual, keeping it in r as
+      // the starting point of the next restart cycle.
+      if (separate_basis_type && iteration_state == SolverControl::success)
+        {
+          A.vmult(r, x);
+          r.sadd(-1., 1., b);
+          res = r.l2_norm();
+          iteration_state =
+            this->iteration_status(accumulated_iterations, res, x);
+          residual_computed_and_checked =
+            (iteration_state == SolverControl::iterate);
+        }
     }
   while (iteration_state == SolverControl::iterate);
 
@@ -2504,15 +3129,17 @@ void SolverMPGMRES<VectorType>::solve_internal(
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
-                                       VectorMemory<VectorType> &mem,
-                                       const AdditionalData     &data)
-  : SolverMPGMRES<VectorType>(
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+SolverFGMRES<VectorType, BasisVectorType>::SolverFGMRES(
+  SolverControl            &cn,
+  VectorMemory<VectorType> &mem,
+  const AdditionalData     &data)
+  : SolverMPGMRES<VectorType, BasisVectorType>(
       cn,
       mem,
-      typename SolverMPGMRES<VectorType>::AdditionalData{
+      typename SolverMPGMRES<VectorType, BasisVectorType>::AdditionalData{
         data.max_basis_size,
         data.orthogonalization_strategy,
         true})
@@ -2520,13 +3147,15 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl            &cn,
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
-SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
-                                       const AdditionalData &data)
-  : SolverMPGMRES<VectorType>(
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
+SolverFGMRES<VectorType, BasisVectorType>::SolverFGMRES(
+  SolverControl        &cn,
+  const AdditionalData &data)
+  : SolverMPGMRES<VectorType, BasisVectorType>(
       cn,
-      typename SolverMPGMRES<VectorType>::AdditionalData{
+      typename SolverMPGMRES<VectorType, BasisVectorType>::AdditionalData{
         data.max_basis_size,
         data.orthogonalization_strategy,
         true})
@@ -2534,20 +3163,21 @@ SolverFGMRES<VectorType>::SolverFGMRES(SolverControl        &cn,
 
 
 
-template <typename VectorType>
-DEAL_II_CXX20_REQUIRES(concepts::is_vector_space_vector<VectorType>)
+template <typename VectorType, typename BasisVectorType>
+DEAL_II_CXX20_REQUIRES((concepts::is_vector_space_vector<VectorType> &&
+                        concepts::is_vector_space_vector<BasisVectorType>))
 template <typename MatrixType, typename... PreconditionerTypes>
 DEAL_II_CXX20_REQUIRES(
   (concepts::is_linear_operator_on<MatrixType, VectorType> &&
    (concepts::is_linear_operator_on<PreconditionerTypes, VectorType> && ...)))
-void SolverFGMRES<VectorType>::solve(
+void SolverFGMRES<VectorType, BasisVectorType>::solve(
   const MatrixType &A,
   VectorType       &x,
   const VectorType &b,
   const PreconditionerTypes &...preconditioners)
 {
   LogStream::Prefix prefix("FGMRES");
-  SolverMPGMRES<VectorType>::solve_internal(
+  SolverMPGMRES<VectorType, BasisVectorType>::solve_internal(
     A, x, b, SolverFGMRES::IndexingStrategy::fgmres, preconditioners...);
 }
 

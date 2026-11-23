@@ -12,87 +12,103 @@
 
 
 
-for (S : REAL_SCALARS)
+for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
   {
     template void internal::SolverGMRESImplementation::
-      do_Tvmult_add<false, MemorySpace::Host, S>(
+      do_Tvmult_add<false, MemorySpace::Host, S1, S2>(
         const unsigned int,
         const std::size_t,
-        const S *,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const S1 *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         Vector<double> &);
 
     template void internal::SolverGMRESImplementation::
-      do_Tvmult_add<true, MemorySpace::Host, S>(
+      do_Tvmult_add<true, MemorySpace::Host, S1, S2>(
         const unsigned int,
         const std::size_t,
-        const S *,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const S1 *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         Vector<double> &);
 
     template double internal::SolverGMRESImplementation::
-      do_subtract_and_norm<false, MemorySpace::Host, S>(
+      do_subtract_and_norm<false, MemorySpace::Host, S1, S2>(
         const unsigned int,
         const std::size_t,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         const Vector<double> &,
-        S *);
+        S1 *,
+        S2 *);
 
     template double internal::SolverGMRESImplementation::
-      do_subtract_and_norm<true, MemorySpace::Host, S>(
+      do_subtract_and_norm<true, MemorySpace::Host, S1, S2>(
         const unsigned int,
         const std::size_t,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         const Vector<double> &,
-        S *);
+        S1 *,
+        S2 *);
+
+    template void internal::SolverGMRESImplementation::
+      do_scale_and_copy<MemorySpace::Host, S1, S2>(const std::size_t,
+                                                   const double,
+                                                   S1 *,
+                                                   S2 *);
 
     template void
-    internal::SolverGMRESImplementation::do_add<MemorySpace::Host, S>(
+    internal::SolverGMRESImplementation::do_add<MemorySpace::Host, S1, S2>(
       const unsigned int,
       const std::size_t,
-      internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+      internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
       const Vector<double> &,
       const bool,
-      S *);
+      S1 *);
 
     template void internal::SolverGMRESImplementation::
-      do_Tvmult_add<false, MemorySpace::Default, S>(
+      do_Tvmult_add<false, MemorySpace::Default, S1, S2>(
         const unsigned int,
         const std::size_t,
-        const S *,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const S1 *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         Vector<double> &);
 
     template void internal::SolverGMRESImplementation::
-      do_Tvmult_add<true, MemorySpace::Default, S>(
+      do_Tvmult_add<true, MemorySpace::Default, S1, S2>(
         const unsigned int,
         const std::size_t,
-        const S *,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        const S1 *,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         Vector<double> &);
 
     template double internal::SolverGMRESImplementation::
-      do_subtract_and_norm<false, MemorySpace::Default, S>(
+      do_subtract_and_norm<false, MemorySpace::Default, S1, S2>(
         const unsigned int,
         const std::size_t,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         const Vector<double> &,
-        S *);
+        S1 *,
+        S2 *);
 
     template double internal::SolverGMRESImplementation::
-      do_subtract_and_norm<true, MemorySpace::Default, S>(
+      do_subtract_and_norm<true, MemorySpace::Default, S1, S2>(
         const unsigned int,
         const std::size_t,
-        internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+        internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
         const Vector<double> &,
-        S *);
+        S1 *,
+        S2 *);
+
+    template void internal::SolverGMRESImplementation::
+      do_scale_and_copy<MemorySpace::Default, S1, S2>(const std::size_t,
+                                                      const double,
+                                                      S1 *,
+                                                      S2 *);
 
     template void
-    internal::SolverGMRESImplementation::do_add<MemorySpace::Default, S>(
+    internal::SolverGMRESImplementation::do_add<MemorySpace::Default, S1, S2>(
       const unsigned int,
       const std::size_t,
-      internal::SolverGMRESImplementation::OrthogonalizationData<S> &,
+      internal::SolverGMRESImplementation::OrthogonalizationData<S2> &,
       const Vector<double> &,
       const bool,
-      S *);
+      S1 *);
   }
