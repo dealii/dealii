@@ -115,19 +115,19 @@ with up to 8 H100 GPUs:
 
 | Refinement | DoFs        | 1 GPU (s) | 2 GPU (s) | 4 GPU (s) | 8 GPU (s) |
 |----------: |-----------: |---------: |---------: |---------: |---------: |
-| 0          | 2,312       | .065      | .074      | .078      | .077      |
-| 1          | 15,468      | .16       | .21       | .21       | .21       |
-| 2          | 112,724     | .49       | 1.10      | .98       | .81       |
-| 3          | 859,812     | 2.9       | 4.1       | 3.4       | 3.3       |
-| 4          | 6,714,692   | 25        | 30        | 18        | 14        |
-| 5          | 53,070,468  | 210       | 280       | 160       | 100       |
-| 6          | 421,991,684 | -         | -         | 1500      | 970       |
+| 0          | 2,312       | 0.03      | 0.04      | 0.05      | 0.09      |
+| 1          | 15,468      | 0.07      | 0.12      | 0.18      | 0.33      |
+| 2          | 112,724     | 0.13      | 0.18      | 0.27      | 0.54      |
+| 3          | 859,812     | 0.27      | 0.29      | 0.37      | 0.69      |
+| 4          | 6,714,692   | 1.20      | 0.81      | 0.66      | 0.91      |
+| 5          | 53,070,468  | 8.75      | 4.72      | 2.91      | 2.74      |
+| 6          | 421,991,684 | -         | -         | 18.26     | 10.91     |
 
-Notice that we can solve larger problems with 4 or more GPUs compared to a single GPU. On
-the one hand, we also have some reduction in time to solution, at least for the larger problem sizes.
-On the other hand, notice that time to solution does not scale linearly. This is likely
-due to additional communication overhead, which we will investigate and improve
-in the future.
+Notice that we can solve larger problems with 4 or more GPUs compared to a single GPU.
+For larger problems, using multiple GPUs also reduces the time to solution. For example,
+the 53-million-DoF problem runs about 3.2 times faster on 8 GPUs than on one. Smaller
+problems do not benefit from additional GPUs, and the time to solution does not scale
+linearly, likely in part because of communication overhead.
 
 <h3> Possibilities for extensions </h3>
 
