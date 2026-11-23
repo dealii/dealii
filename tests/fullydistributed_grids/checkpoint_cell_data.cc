@@ -84,7 +84,8 @@ main(int argc, char **argv)
           AssertThrow(std::all_of(data.begin(),
                                   data.end(),
                                   [&](const char value) {
-                                    return value == cell->material_id() + 7;
+                                    return value == static_cast<char>(
+                                                      cell->material_id() + 7);
                                   }),
                       ExcMessage("Checkpoint changed cell data values."));
           ++unpacked;
