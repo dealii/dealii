@@ -1353,7 +1353,7 @@ namespace LinearAlgebra
               if (values[i] != 0)
                 {
                   AssertIsFinite(values[i]);
-                  AssertIndexRange(n_columns, n_zero_entries);
+                  AssertIndexRange(n_columns, n_cols - n_zero_entries);
                   col_indices_array[n_columns] = col_indices[i];
                   values_array[n_columns]      = values[i];
                   ++n_columns;
