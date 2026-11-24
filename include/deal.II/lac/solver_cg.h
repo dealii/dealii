@@ -34,7 +34,12 @@ DEAL_II_NAMESPACE_OPEN
 
 // forward declaration
 #ifndef DOXYGEN
+
 class PreconditionIdentity;
+
+template <typename VectorType>
+class DiagonalMatrix;
+
 namespace LinearAlgebra
 {
   namespace distributed
@@ -43,6 +48,7 @@ namespace LinearAlgebra
     class Vector;
   }
 } // namespace LinearAlgebra
+
 #endif
 
 
@@ -911,6 +917,30 @@ namespace internal
           this->alpha * (-2. * scalar_sums[4] + this->alpha * scalar_sums[5]));
       }
 
+      DEAL_II_ALWAYS_INLINE
+      static VectorizedArray<Number>
+      apply_preconditioner(const ::dealii::DiagonalMatrix<VectorType> &diagonal,
+                           const unsigned int                          j,
+                           const VectorizedArray<Number>               value)
+      {
+        VectorizedArray<Number> diag;
+        diag.load(diagonal.get_vector().get_values() + j);
+        return diag * value;
+      }
+
+      template <typename PreconditionerTypeSelected>
+      DEAL_II_ALWAYS_INLINE static VectorizedArray<Number>
+      apply_preconditioner(const PreconditionerTypeSelected &preconditioner,
+                           const unsigned int                j,
+                           const VectorizedArray<Number>     value)
+      {
+        VectorizedArray<Number> result;
+        DEAL_II_OPENMP_SIMD_PRAGMA
+        for (unsigned int l = 0; l < VectorizedArray<Number>::size(); ++l)
+          result[l] = preconditioner.apply(j + l, value[l]);
+        return result;
+      }
+
       // Function that we use if the PreconditionerType implements an apply()
       // function
       template <typename U = void>
@@ -935,11 +965,10 @@ namespace internal
             // DEAL_II_OPENMP_SIMD_PRAGMA
             for (unsigned int j = start_range; j < end_regular; j += n_lanes)
               {
-                VectorizedArray<Number> rj, pj;
+                VectorizedArray<Number> rj;
                 rj.load(r + j);
-                DEAL_II_OPENMP_SIMD_PRAGMA
-                for (unsigned int l = 0; l < n_lanes; ++l)
-                  pj[l] = this->preconditioner.apply(j + l, rj[l]);
+                const VectorizedArray<Number> pj =
+                  apply_preconditioner(this->preconditioner, j, rj);
                 pj.store(p + j);
                 rj = VectorizedArray<Number>();
                 rj.store(v + j);
@@ -954,14 +983,13 @@ namespace internal
           {
             for (unsigned int j = start_range; j < end_regular; j += n_lanes)
               {
-                VectorizedArray<Number> rj, vj, pj, prec_rj;
+                VectorizedArray<Number> rj, vj, pj;
                 rj.load(r + j);
                 vj.load(v + j);
                 rj -= alpha * vj;
                 rj.store(r + j);
-                DEAL_II_OPENMP_SIMD_PRAGMA
-                for (unsigned int l = 0; l < n_lanes; ++l)
-                  prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
+                const VectorizedArray<Number> prec_rj =
+                  apply_preconditioner(this->preconditioner, j, rj);
                 pj.load(p + j);
                 pj = beta * pj + prec_rj;
                 pj.store(p + j);
@@ -982,7 +1010,7 @@ namespace internal
             // before termination
             for (unsigned int j = start_range; j < end_regular; j += n_lanes)
               {
-                VectorizedArray<Number> rj, xj, vj, pj, prec_rj;
+                VectorizedArray<Number> rj, xj, vj, pj;
                 rj.load(r + j);
                 vj.load(v + j);
                 xj.load(x + j);
@@ -991,9 +1019,8 @@ namespace internal
                 xj.store(x + j);
                 rj -= alpha * vj;
                 rj.store(r + j);
-                DEAL_II_OPENMP_SIMD_PRAGMA
-                for (unsigned int l = 0; l < n_lanes; ++l)
-                  prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
+                const VectorizedArray<Number> prec_rj =
+                  apply_preconditioner(this->preconditioner, j, rj);
                 prec_rj.store(p + j);
                 rj = VectorizedArray<Number>();
                 rj.store(v + j);
@@ -1014,18 +1041,16 @@ namespace internal
               this->previous_alpha / this->previous_beta;
             for (unsigned int j = start_range; j < end_regular; j += n_lanes)
               {
-                VectorizedArray<Number> rj, vj, pj, xj, prec_rj, prec_vj;
+                VectorizedArray<Number> rj, vj, pj, xj;
                 xj.load(x + j);
                 pj.load(p + j);
                 xj += alpha_plus_previous_alpha_over_beta * pj;
                 rj.load(r + j);
                 vj.load(v + j);
-                DEAL_II_OPENMP_SIMD_PRAGMA
-                for (unsigned int l = 0; l < n_lanes; ++l)
-                  {
-                    prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
-                    prec_vj[l] = this->preconditioner.apply(j + l, vj[l]);
-                  }
+                VectorizedArray<Number> prec_rj =
+                  apply_preconditioner(this->preconditioner, j, rj);
+                const VectorizedArray<Number> prec_vj =
+                  apply_preconditioner(this->preconditioner, j, vj);
                 xj -= previous_alpha_over_beta * prec_rj;
                 xj.store(x + j);
                 rj -= alpha * vj;
@@ -1066,16 +1091,14 @@ namespace internal
           start_range + (end_range - start_range) / n_lanes * n_lanes;
         for (unsigned int j = start_range; j < end_regular; j += n_lanes)
           {
-            VectorizedArray<Number> pj, vj, rj, prec_vj, prec_rj;
+            VectorizedArray<Number> pj, vj, rj;
             pj.load(p + j);
             vj.load(v + j);
             rj.load(r + j);
-            DEAL_II_OPENMP_SIMD_PRAGMA
-            for (unsigned int l = 0; l < n_lanes; ++l)
-              {
-                prec_vj[l] = this->preconditioner.apply(j + l, vj[l]);
-                prec_rj[l] = this->preconditioner.apply(j + l, rj[l]);
-              }
+            const VectorizedArray<Number> prec_rj =
+              apply_preconditioner(this->preconditioner, j, rj);
+            const VectorizedArray<Number> prec_vj =
+              apply_preconditioner(this->preconditioner, j, vj);
             my_sums[0] += pj * vj;
             my_sums[1] += vj * vj;
             my_sums[2] += rj * vj;
