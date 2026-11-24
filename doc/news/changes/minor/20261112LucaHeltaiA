@@ -1,0 +1,7 @@
+Fixed: Saving and loading a parallel::fullydistributed::Triangulation with
+attached cell data now passes offsets in cells to the cell-data serializer.
+Previously, offsets on nonzero MPI ranks were incorrectly converted to bytes,
+which could corrupt fixed- and variable-size cell data in
+checkpoints.
+<br>
+(Luca Heltai, 2026/11/12)

@@ -515,8 +515,6 @@ namespace parallel
                             this->mpi_communicator);
       AssertThrowMPI(ierr);
 
-      global_first_cell *= sizeof(unsigned int);
-
 
       if (myrank == 0)
         {
@@ -741,8 +739,6 @@ namespace parallel
                             MPI_SUM,
                             this->mpi_communicator);
       AssertThrowMPI(ierr);
-
-      global_first_cell *= sizeof(unsigned int);
 
       Assert(this->n_global_active_cells() == n_global_active_cells,
              ExcMessage("Number of global active cells differ!"));
