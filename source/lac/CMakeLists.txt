@@ -29,6 +29,7 @@ set(_unity_include_src
   relaxation_block.cc
   read_write_vector.cc
   solver.cc
+  solver_cg.cc
   solver_control.cc
   solver_gmres.cc
   sparse_decomposition.cc
@@ -71,6 +72,7 @@ set(_inst
   relaxation_block.inst.in
   read_write_vector.inst.in
   solver.inst.in
+  solver_cg.inst.in
   solver_gmres.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
