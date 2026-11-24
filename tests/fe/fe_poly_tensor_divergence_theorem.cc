@@ -20,9 +20,7 @@
 // GridGenerator::hyper_ball_balanced() in 2d and a deformed cube mesh in 3d
 // whose cells are rotated such that all face and line orientations appear.
 // The terms of the gradients and Hessians that come from the derivatives of
-// the Jacobian did not get the sign change. The Hessians are only checked for
-// FE_Nedelec: those of the H(div) elements are not correct on cells that are
-// not parallelograms, also without a sign change.
+// the Jacobian did not get the sign change.
 
 #include <deal.II/base/quadrature_lib.h>
 
@@ -121,9 +119,7 @@ create_rotated_cube(Triangulation<3> &tria)
 
 template <int dim>
 void
-test(const Triangulation<dim> &tria,
-     const FiniteElement<dim> &fe,
-     const bool                check_hessians)
+test(const Triangulation<dim> &tria, const FiniteElement<dim> &fe)
 {
   // a linear mapping, such that the cells are not parallelograms. The
   // integrands are then not polynomials: the quadrature formulas below use
@@ -137,16 +133,13 @@ test(const Triangulation<dim> &tria,
   FEValues<dim>     fe_values(mapping,
                               fe,
                               QGauss<dim>(n_points),
-                              update_gradients | update_JxW_values |
-                                (check_hessians ? update_hessians :
-                                                  update_default));
+                              update_gradients | update_hessians |
+                                update_JxW_values);
   FEFaceValues<dim> fe_face_values(mapping,
                                    fe,
                                    QGauss<dim - 1>(n_points),
-                                   update_values | update_normal_vectors |
-                                     update_JxW_values |
-                                     (check_hessians ? update_gradients :
-                                                       update_default));
+                                   update_values | update_gradients |
+                                     update_normal_vectors | update_JxW_values);
 
   const FEValuesExtractors::Vector vector(0);
   std::vector<Tensor<2, dim>>      boundary_gradients(fe.n_dofs_per_cell());
@@ -171,11 +164,10 @@ test(const Triangulation<dim> &tria,
                   outer_product(fe_face_values[vector].value(i, q),
                                 fe_face_values.normal_vector(q)) *
                   fe_face_values.JxW(q);
-                if (check_hessians)
-                  boundary_hessians[i] +=
-                    outer_product(fe_face_values[vector].gradient(i, q),
-                                  fe_face_values.normal_vector(q)) *
-                    fe_face_values.JxW(q);
+                boundary_hessians[i] +=
+                  outer_product(fe_face_values[vector].gradient(i, q),
+                                fe_face_values.normal_vector(q)) *
+                  fe_face_values.JxW(q);
               }
         }
 
@@ -189,9 +181,8 @@ test(const Triangulation<dim> &tria,
             {
               bulk_gradient +=
                 fe_values[vector].gradient(i, q) * fe_values.JxW(q);
-              if (check_hessians)
-                bulk_hessian +=
-                  fe_values[vector].hessian(i, q) * fe_values.JxW(q);
+              bulk_hessian +=
+                fe_values[vector].hessian(i, q) * fe_values.JxW(q);
             }
           if ((bulk_gradient - boundary_gradients[i]).norm() >
               1e-8 * std::max(boundary_gradients[i].norm(), 1e-6))
@@ -207,10 +198,8 @@ test(const Triangulation<dim> &tria,
     }
 
   deallog << "  " << fe.get_name() << ": integrals of the gradients do not "
-          << "match on " << n_failed_cells_gradients << " cells";
-  if (check_hessians)
-    deallog << ", of the Hessians on " << n_failed_cells_hessians << " cells";
-  deallog << std::endl;
+          << "match on " << n_failed_cells_gradients << " cells, of the "
+          << "Hessians on " << n_failed_cells_hessians << " cells" << std::endl;
 }
 
 
@@ -226,9 +215,9 @@ main()
     deallog << "hyper_ball_balanced, 2d" << std::endl;
     for (unsigned int degree = 0; degree < 3; ++degree)
       {
-        test<2>(tria, FE_RaviartThomas<2>(degree), false);
-        test<2>(tria, FE_RaviartThomasNodal<2>(degree), false);
-        test<2>(tria, FE_Nedelec<2>(degree), true);
+        test<2>(tria, FE_RaviartThomas<2>(degree));
+        test<2>(tria, FE_RaviartThomasNodal<2>(degree));
+        test<2>(tria, FE_Nedelec<2>(degree));
       }
   }
   {
@@ -237,9 +226,9 @@ main()
     deallog << "deformed cube with rotated cells, 3d" << std::endl;
     for (unsigned int degree = 0; degree < 2; ++degree)
       {
-        test<3>(tria, FE_RaviartThomas<3>(degree), false);
-        test<3>(tria, FE_RaviartThomasNodal<3>(degree), false);
-        test<3>(tria, FE_Nedelec<3>(degree), true);
+        test<3>(tria, FE_RaviartThomas<3>(degree));
+        test<3>(tria, FE_RaviartThomasNodal<3>(degree));
+        test<3>(tria, FE_Nedelec<3>(degree));
       }
   }
 }
