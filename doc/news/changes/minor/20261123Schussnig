@@ -1,0 +1,7 @@
+Fixed: FEValues computed wrong Hessians of the shape functions of H(div)
+elements like FE_RaviartThomas, FE_RaviartThomasNodal, FE_BDM, and FE_ABF on
+cells that are not parallelograms: The terms coming from the second
+derivative of the Jacobian determinant in the Piola transformation were
+partly missing and partly counted twice.
+<br>
+(Richard Schussnig, 2026/11/23)

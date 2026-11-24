@@ -1243,6 +1243,8 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                                                                      [n] *
                                      output_data.shape_values(first + n, k));
 
+                                  // terms from the derivatives of the
+                                  // Jacobian determinant
                                   transformed_shape_hessians[k][d][i][j] +=
                                     (mapping_data
                                        .jacobian_pushed_forward_grads[k][n][i]
@@ -1252,11 +1254,25 @@ FE_PolyTensor<dim, spacedim>::compute_fill(
                                                                      [j] *
                                      output_data.shape_values(first + d, k)) +
                                     (mapping_data
-                                       .jacobian_pushed_forward_grads[k][n][m]
+                                       .jacobian_pushed_forward_grads[k][n][n]
                                                                      [j] *
                                      mapping_data
-                                       .jacobian_pushed_forward_grads[k][m][i]
-                                                                     [n] *
+                                       .jacobian_pushed_forward_grads[k][d][m]
+                                                                     [i] *
+                                     output_data.shape_values(first + m, k)) +
+                                    (mapping_data
+                                       .jacobian_pushed_forward_grads[k][n][n]
+                                                                     [i] *
+                                     mapping_data
+                                       .jacobian_pushed_forward_grads[k][d][m]
+                                                                     [j] *
+                                     output_data.shape_values(first + m, k)) -
+                                    (mapping_data
+                                       .jacobian_pushed_forward_grads[k][n][n]
+                                                                     [j] *
+                                     mapping_data
+                                       .jacobian_pushed_forward_grads[k][m][m]
+                                                                     [i] *
                                      output_data.shape_values(first + d, k));
                                 }
                             }
