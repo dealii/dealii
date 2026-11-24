@@ -892,21 +892,12 @@ namespace Step104
     dof_u.distribute_dofs(fe_u);
     dof_p.distribute_dofs(fe_p);
 
-    const IndexSet &owned_set_u = dof_u.locally_owned_dofs();
-    const IndexSet  relevant_set_u =
-      DoFTools::extract_locally_relevant_dofs(dof_u);
-    constraints_u.reinit(owned_set_u, relevant_set_u);
-    DoFTools::make_hanging_node_constraints(dof_u, constraints_u);
+    constraints_u = DoFTools::make_default_constraints<Number>(dof_u);
     VectorTools::interpolate_boundary_values(
       dof_u, 0, Functions::ZeroFunction<dim, Number>(dim), constraints_u);
     constraints_u.close();
 
-    const IndexSet &owned_set_p = dof_p.locally_owned_dofs();
-    const IndexSet  relevant_set_p =
-      DoFTools::extract_locally_relevant_dofs(dof_p);
-
-    constraints_p.reinit(owned_set_p, relevant_set_p);
-    DoFTools::make_hanging_node_constraints(dof_p, constraints_p);
+    constraints_p = DoFTools::make_default_constraints<Number>(dof_p);
     constraints_p.close();
 
     std::vector<const DoFHandler<dim> *> dof_handlers = {&dof_u, &dof_p};
@@ -1019,10 +1010,7 @@ namespace Step104
         dof_handler.reinit(*coarse_grid_triangulations[level]);
         dof_handler.distribute_dofs(fe_u);
 
-        constraint.reinit(dof_handler.locally_owned_dofs(),
-                          DoFTools::extract_locally_relevant_dofs(dof_handler));
-
-        DoFTools::make_hanging_node_constraints(dof_handler, constraint);
+        constraint = DoFTools::make_default_constraints<Number>(dof_handler);
         DoFTools::make_zero_boundary_constraints(dof_handler, constraint);
         constraint.close();
 

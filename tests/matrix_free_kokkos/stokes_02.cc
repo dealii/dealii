@@ -228,22 +228,14 @@ test(unsigned int n_refinements)
   dof_u.distribute_dofs(fe_u);
   dof_p.distribute_dofs(fe_p);
 
-  const IndexSet &owned_set_u = dof_u.locally_owned_dofs();
-  const IndexSet  relevant_set_u =
-    DoFTools::extract_locally_relevant_dofs(dof_u);
-  AffineConstraints<double> constraints_u(owned_set_u, relevant_set_u);
-  DoFTools::make_hanging_node_constraints(dof_u, constraints_u);
+  auto constraints_u = DoFTools::make_default_constraints<Number>(dof_u);
   VectorTools::interpolate_boundary_values(dof_u,
                                            0,
                                            Functions::ZeroFunction<dim>(dim),
                                            constraints_u);
   constraints_u.close();
 
-  const IndexSet &owned_set_p = dof_p.locally_owned_dofs();
-  const IndexSet  relevant_set_p =
-    DoFTools::extract_locally_relevant_dofs(dof_p);
-  AffineConstraints<double> constraints_p(owned_set_p, relevant_set_p);
-  DoFTools::make_hanging_node_constraints(dof_p, constraints_p);
+  auto constraints_p = DoFTools::make_default_constraints<Number>(dof_p);
   constraints_p.close();
 
   std::vector<const DoFHandler<dim> *> dof_handlers          = {&dof_u, &dof_p};
