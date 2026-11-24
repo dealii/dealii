@@ -1,0 +1,11 @@
+Changed: FE_RaviartThomasNodal now numbers the degrees of freedom on faces 2
+and 3 of the reference cell in 3d with the z-coordinate running fastest, like
+FE_Q and the face orientation tables. Before, the x-coordinate ran fastest,
+and the normal component was not continuous across faces where face 2 or 3 of
+one cell meets a face with a non-standard orientation, e.g., on the mesh of
+GridGenerator::hyper_ball_balanced(). This changes the order of the degrees of
+freedom of FE_RaviartThomasNodal in 3d. The new function
+FE_RaviartThomasNodal::get_lexicographic_numbering() returns this numbering,
+which MatrixFree now uses for this element.
+<br>
+(Richard Schussnig, 2026/11/21)

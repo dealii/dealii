@@ -66,10 +66,9 @@ template <int dim, int spacedim>
 FE_RaviartThomasNodal<dim, spacedim>::FE_RaviartThomasNodal(
   const unsigned int degree)
   : FE_PolyTensor<dim, spacedim>(
-      PolynomialsVectorAnisotropic<dim>(
-        degree + 1,
-        degree,
-        FE_RaviartThomas<dim>::get_lexicographic_numbering(degree)),
+      PolynomialsVectorAnisotropic<dim>(degree + 1,
+                                        degree,
+                                        get_lexicographic_numbering(degree)),
       FiniteElementData<dim>(get_rt_dpo_vector(dim, degree),
                              spacedim,
                              degree + 1,
@@ -84,7 +83,7 @@ FE_RaviartThomasNodal<dim, spacedim>::FE_RaviartThomasNodal(
   this->mapping_kind = {mapping_raviart_thomas};
 
   const std::vector<unsigned int> numbering =
-    FE_RaviartThomas<dim>::get_lexicographic_numbering(degree);
+    get_lexicographic_numbering(degree);
 
   // First, initialize the generalized support points and quadrature weights,
   // since they are required for interpolation.
@@ -160,6 +159,33 @@ std::unique_ptr<FiniteElement<dim, spacedim>>
 FE_RaviartThomasNodal<dim, spacedim>::clone() const
 {
   return std::make_unique<FE_RaviartThomasNodal<dim, spacedim>>(*this);
+}
+
+
+
+template <int dim, int spacedim>
+std::vector<unsigned int>
+FE_RaviartThomasNodal<dim, spacedim>::get_lexicographic_numbering(
+  const unsigned int degree)
+{
+  std::vector<unsigned int> numbering =
+    FE_RaviartThomas<dim>::get_lexicographic_numbering(degree);
+
+  // FE_RaviartThomas numbers the degrees of freedom on faces 2 and 3 in 3d
+  // with the x-coordinate running fastest, so transpose them to let the
+  // z-coordinate run fastest
+  if (dim == 3)
+    {
+      const unsigned int n = degree + 1;
+      for (unsigned int &index : numbering)
+        if (index >= 2 * n * n && index < 4 * n * n)
+          {
+            const unsigned int face  = index / (n * n);
+            const unsigned int local = index % (n * n);
+            index = face * n * n + (local / n) + (local % n) * n;
+          }
+    }
+  return numbering;
 }
 
 

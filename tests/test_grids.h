@@ -18,6 +18,8 @@
 #include <deal.II/grid/tria_description.h>
 #include <deal.II/grid/tria_iterator.h>
 
+#include <algorithm>
+#include <array>
 #include <vector>
 
 #include "tests.h"
@@ -185,5 +187,67 @@ namespace TestGrids
   {
     for (auto &cell : cells)
       std::swap(cell.vertices[2], cell.vertices[3]);
+  }
+
+  /**
+   * Return the 24 rotations of the reference cube, i.e., the signed
+   * permutations of the coordinates with determinant 1, as maps of the
+   * lexicographic vertex numbering: rotation <tt>r</tt> moves vertex
+   * <tt>v</tt> to vertex <tt>r[v]</tt>. Together with rotate_cell(), this
+   * gives meshes with all face and line orientations.
+   */
+  inline std::vector<std::array<unsigned int, 8>>
+  hypercube_rotations()
+  {
+    std::vector<std::array<unsigned int, 8>> result;
+    std::array<unsigned int, 3>              perm = {{0, 1, 2}};
+    do
+      {
+        int parity = 1;
+        for (unsigned int a = 0; a < 3; ++a)
+          for (unsigned int b = a + 1; b < 3; ++b)
+            if (perm[a] > perm[b])
+              parity = -parity;
+        for (unsigned int signs = 0; signs < 8; ++signs)
+          {
+            int det = parity;
+            for (unsigned int d = 0; d < 3; ++d)
+              if (signs & (1u << d))
+                det = -det;
+            if (det < 0)
+              continue;
+            std::array<unsigned int, 8> map;
+            for (unsigned int v = 0; v < 8; ++v)
+              {
+                unsigned int w = 0;
+                for (unsigned int d = 0; d < 3; ++d)
+                  {
+                    unsigned int bit = (v >> perm[d]) & 1;
+                    if (signs & (1u << d))
+                      bit = 1 - bit;
+                    w |= bit << d;
+                  }
+                map[v] = w;
+              }
+            result.push_back(map);
+          }
+      }
+    while (std::next_permutation(perm.begin(), perm.end()));
+    return result;
+  }
+
+  /**
+   * Renumber the vertices of a hex cell by one of the rotations returned by
+   * hypercube_rotations(): the vertex at local position <tt>v</tt> moves to
+   * local position <tt>rotation[v]</tt>. The cell keeps its shape, but its
+   * local coordinate system is rotated.
+   */
+  inline void
+  rotate_cell(CellData<3> &cell, const std::array<unsigned int, 8> &rotation)
+  {
+    AssertDimension(cell.vertices.size(), 8);
+    const auto original = cell.vertices;
+    for (unsigned int v = 0; v < 8; ++v)
+      cell.vertices[rotation[v]] = original[v];
   }
 } // namespace TestGrids

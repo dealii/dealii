@@ -390,6 +390,18 @@ public:
   virtual std::unique_ptr<FiniteElement<dim, spacedim>>
   clone() const override;
 
+  /**
+   * Compute the lexicographic to hierarchic numbering underlying this class.
+   * This is the numbering of FE_RaviartThomas::get_lexicographic_numbering(),
+   * except that in 3d the degrees of freedom on faces 2 and 3 are numbered
+   * with the z-coordinate running fastest. This is the coordinate system of
+   * these faces in standard orientation (see the QProjector class and the
+   * documentation of GeometryInfo), which the face orientation tables set up
+   * by this class rely on.
+   */
+  static std::vector<unsigned int>
+  get_lexicographic_numbering(const unsigned int degree);
+
   virtual void
   get_face_interpolation_matrix(const FiniteElement<dim, spacedim> &source,
                                 FullMatrix<double>                 &matrix,

@@ -38,53 +38,10 @@
 #include <deal.II/grid/tria.h>
 
 #include <algorithm>
-#include <array>
 
 #include "../tests.h"
 
-
-// all rotations of the unit cube as maps of the lexicographic vertex
-// numbering, i.e., signed permutations of the coordinates with determinant 1
-std::vector<std::array<unsigned int, 8>>
-rotations()
-{
-  std::vector<std::array<unsigned int, 8>> result;
-  std::array<unsigned int, 3>              perm = {{0, 1, 2}};
-  do
-    {
-      int parity = 1;
-      for (unsigned int a = 0; a < 3; ++a)
-        for (unsigned int b = a + 1; b < 3; ++b)
-          if (perm[a] > perm[b])
-            parity = -parity;
-      for (unsigned int signs = 0; signs < 8; ++signs)
-        {
-          int det = parity;
-          for (unsigned int d = 0; d < 3; ++d)
-            if (signs & (1u << d))
-              det = -det;
-          if (det < 0)
-            continue;
-          std::array<unsigned int, 8> map;
-          for (unsigned int v = 0; v < 8; ++v)
-            {
-              unsigned int w = 0;
-              for (unsigned int d = 0; d < 3; ++d)
-                {
-                  unsigned int bit = (v >> perm[d]) & 1;
-                  if (signs & (1u << d))
-                    bit = 1 - bit;
-                  w |= bit << d;
-                }
-              map[v] = w;
-            }
-          result.push_back(map);
-        }
-    }
-  while (std::next_permutation(perm.begin(), perm.end()));
-  return result;
-}
-
+#include "../test_grids.h"
 
 
 void
@@ -103,17 +60,10 @@ create_rotated_cube(Triangulation<3> &tria)
     cube);
   auto [vertices, cells, subcell_data] =
     GridTools::get_coarse_mesh_description(cube);
-  const auto   rots    = rotations();
+  const auto   rots    = TestGrids::hypercube_rotations();
   unsigned int counter = 0;
   for (auto &cell : cells)
-    {
-      const auto &rotation = rots[(7 * counter++ + 3) % rots.size()];
-      std::array<unsigned int, 8> original;
-      for (unsigned int v = 0; v < 8; ++v)
-        original[v] = cell.vertices[v];
-      for (unsigned int v = 0; v < 8; ++v)
-        cell.vertices[rotation[v]] = original[v];
-    }
+    TestGrids::rotate_cell(cell, rots[(7 * counter++ + 3) % rots.size()]);
   tria.create_triangulation(vertices, cells, SubCellData());
 }
 
