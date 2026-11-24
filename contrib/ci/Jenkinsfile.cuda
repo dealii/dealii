@@ -96,9 +96,13 @@ pipeline
               sh '''#!/bin/bash
                     set -e
                     set -x
+                    source ~/libs-candi-9.8.0-cuda-v1/configuration/enable.sh
                     mkdir build && cd build
                     cmake \
+                      -D DEAL_II_WITH_64BIT_INDICES=ON \
                       -D DEAL_II_WITH_MPI=ON \
+                      -D DEAL_II_WITH_P4EST=ON \
+                      -D DEAL_II_WITH_TRILINOS=ON \
                       -D CMAKE_CXX_COMPILER=${KOKKOS_DIR}/bin/nvcc_wrapper \
                       -D DEAL_II_EARLY_DEPRECATIONS=ON \
                       -D CMAKE_BUILD_TYPE=Debug \
@@ -108,7 +112,7 @@ pipeline
                       -G Ninja \
                       $WORKSPACE/
                     ninja -j 10 # 14 gives OOM
-                    ninja setup_tests_matrix_free_kokkos
+                    ninja setup_tests_matrix_free_kokkos setup_tests_trilinos_tpetra
                     ctest -j 14 --output-on-failure --schedule-random --no-compress-output -T test
                  '''
               githubNotify context: 'Jenkins: CUDA', description: 'OK',  status: 'SUCCESS'
