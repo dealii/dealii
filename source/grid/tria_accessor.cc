@@ -2210,6 +2210,59 @@ CellAccessor<dim, spacedim>::set_direction_flag(
 
 
 template <int dim, int spacedim>
+std::uint8_t
+CellAccessor<dim, spacedim>::best_tetrahedral_refine_choice() const
+{
+  Assert(this->reference_cell() == ReferenceCells::Tetrahedron,
+         ExcMessage("This function only makes sense for tetrahedra."));
+  if constexpr (dim == 3)
+    {
+      // There are three possibilities for the new interior line: (4, 9), (5,
+      // 7), and (6, 8), in which vertices 4 - 9 are the midpoints of the parent
+      // cell's lines. Pick the shortest line to guarantee the best possible
+      // aspect ratios.
+      //
+      // Since those vertices do not exist until we refine the cell, we
+      // calculate the lengths of the corresponding lines (which would connect
+      // those pairs of vertices) by finding distances between centers of lines
+      // on the parent cell (e.g., the center of line 2 will be vertex 6 and the
+      // center of line 4 will be vertex 8).
+      //
+      // Unlike other places, for backwards compatibility we loop through these
+      // cuts in the reverse order so that we obtain the same output for equal
+      // line lengths (e.g., if all line lengths are equal then we should cut
+      // along (6, 8)).
+      constexpr ndarray<unsigned int, 3, 2> line_pairs = {
+        {{{2, 4}}, {{1, 3}}, {{0, 5}}}};
+      constexpr std::array<IsotropicRefinementChoice, 3> choices = {
+        {IsotropicRefinementChoice::cut_tet_68,
+         IsotropicRefinementChoice::cut_tet_57,
+         IsotropicRefinementChoice::cut_tet_49}};
+
+      unsigned int line_pair_no = 0;
+      double       min_distance = std::numeric_limits<double>::infinity();
+      for (unsigned int i = 0; i < line_pairs.size(); ++i)
+        {
+          const double current_distance =
+            this->line(line_pairs[i][0])
+              ->center(true)
+              .distance(this->line(line_pairs[i][1])->center(true));
+          if (current_distance < min_distance)
+            {
+              line_pair_no = i;
+              min_distance = current_distance;
+            }
+        }
+      return static_cast<std::uint8_t>(choices[line_pair_no]);
+    }
+
+  DEAL_II_ASSERT_UNREACHABLE();
+  return std::numeric_limits<std::uint8_t>::max();
+}
+
+
+
+template <int dim, int spacedim>
 void
 CellAccessor<dim, spacedim>::set_parent(const unsigned int parent_index)
 {
