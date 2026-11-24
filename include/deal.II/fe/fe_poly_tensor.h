@@ -205,6 +205,24 @@ public:
                             const Point<dim>  &p,
                             const unsigned int component) const override;
 
+  /**
+   * Compute for each degree of freedom on the given @p cell the factor +1 or
+   * -1 by which FEValues multiplies the respective shape function. Depending
+   * on the orientation of the faces (and, for H(curl) conforming elements, of
+   * the lines) relative to the neighboring cells, some shape functions need
+   * to change their sign to obtain a conforming finite element space. Values
+   * of degrees of freedom computed on the reference cell, e.g., by
+   * FiniteElement::convert_generalized_support_point_values_to_dof_values(),
+   * need to be multiplied by these factors to obtain the values of the
+   * degrees of freedom of the global function.
+   *
+   * @p dof_signs is resized to the number of degrees of freedom per cell.
+   */
+  void
+  get_dof_sign_changes(
+    const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+    std::vector<double> &dof_signs) const;
+
 protected:
 #ifndef DOXYGEN
   class InternalData;

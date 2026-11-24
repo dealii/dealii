@@ -1,0 +1,27 @@
+
+DEAL::hyper_ball_balanced, 2d, smooth field
+DEAL::  FE_RaviartThomas<2>(0)                     L2 error interpolation 3.358e-01, projection 3.041e-01
+DEAL::  FE_RaviartThomasNodal<2>(0)                L2 error interpolation 3.358e-01, projection 3.041e-01
+DEAL::  FESystem<2>[FE_RaviartThomas<2>(0)]        L2 error interpolation 3.358e-01, projection 3.041e-01
+DEAL::  FE_RaviartThomas<2>(1)                     L2 error interpolation 3.284e-02, projection 3.109e-02
+DEAL::  FE_RaviartThomasNodal<2>(1)                L2 error interpolation 7.136e-02, projection 3.109e-02
+DEAL::  FESystem<2>[FE_RaviartThomas<2>(1)]        L2 error interpolation 3.284e-02, projection 3.109e-02
+DEAL::  FE_RaviartThomas<2>(2)                     L2 error interpolation 3.297e-03, projection 3.089e-03
+DEAL::  FE_RaviartThomasNodal<2>(2)                L2 error interpolation 5.482e-03, projection 3.089e-03
+DEAL::  FESystem<2>[FE_RaviartThomas<2>(2)]        L2 error interpolation 3.297e-03, projection 3.089e-03
+DEAL::hyper_ball_balanced, 3d, smooth field
+DEAL::  FE_RaviartThomas<3>(0)                     L2 error interpolation 9.901e-01, projection 8.893e-01
+DEAL::  FE_RaviartThomasNodal<3>(0)                L2 error interpolation 9.901e-01, projection 8.893e-01
+DEAL::  FESystem<3>[FE_RaviartThomas<3>(0)]        L2 error interpolation 9.901e-01, projection 8.893e-01
+DEAL::  FE_RaviartThomas<3>(1)                     L2 error interpolation 2.065e-01, projection 1.771e-01
+DEAL::  FE_RaviartThomasNodal<3>(1)                L2 error interpolation 3.913e-01, projection 1.771e-01
+DEAL::  FESystem<3>[FE_RaviartThomas<3>(1)]        L2 error interpolation 2.065e-01, projection 1.771e-01
+DEAL::cube with rotated cells, 3d, field in the finite element space
+DEAL::  FE_RaviartThomas<3>(0)                     L2 error interpolation 2.006e-16
+DEAL::  FE_RaviartThomasNodal<3>(0)                L2 error interpolation 2.006e-16
+DEAL::  FESystem<3>[FE_RaviartThomas<3>(0)]        L2 error interpolation 2.006e-16
+DEAL::  FE_Nedelec<3>(0)                           L2 error interpolation 2.263e-16
+DEAL::  FE_RaviartThomas<3>(1)                     L2 error interpolation 3.218e-16
+DEAL::  FE_RaviartThomasNodal<3>(1)                L2 error interpolation 2.049e-16
+DEAL::  FESystem<3>[FE_RaviartThomas<3>(1)]        L2 error interpolation 3.218e-16
+DEAL::  FE_Nedelec<3>(1)                           L2 error interpolation 1.641e-16
