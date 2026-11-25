@@ -1,0 +1,6 @@
+
+DEAL::[0,100000) with grain size 1: OK
+DEAL::[13,100000) with grain size 1000: OK
+DEAL::[0,10) with grain size 100: OK
+DEAL::[5,5) with grain size 1: OK
+DEAL::OK
