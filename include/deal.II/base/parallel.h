@@ -300,54 +300,36 @@ namespace parallel
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
         tf::Taskflow  taskflow;
 
-        if constexpr (std::is_integral_v<Iterator>)
-          {
-            // Integral "iterator" types (e.g., int): use plain arithmetic
-            using integral_type = Iterator;
+        taskflow.for_each_by_index(
+          tf::IndexRange<std::size_t>(0, n, 1),
+          [&, begin](const tf::IndexRange<std::size_t> &subrange) {
+            //
+            // Translate the index subrange into bounds of type Iterator.
+            // Integral types use plain arithmetic, iterators std::next().
+            //
+            Iterator subrange_begin = begin;
+            Iterator subrange_end   = begin;
+            if constexpr (std::is_integral_v<Iterator>)
+              {
+                subrange_begin += static_cast<Iterator>(subrange.begin());
+                subrange_end =
+                  subrange_begin + static_cast<Iterator>(subrange.size());
+              }
+            else
+              {
+                subrange_begin = std::next(begin, subrange.begin());
+                subrange_end   = std::next(subrange_begin, subrange.size());
+              }
 
-            tf::IndexRange<integral_type> range(0, n, 1);
+            f(subrange_begin, subrange_end);
+          },
+          tf::GuidedPartitioner(grainsize));
 
-            taskflow.for_each_by_index(
-              range,
-              [&, begin](const tf::IndexRange<integral_type> &subrange) {
-                integral_type subrange_begin =
-                  begin + static_cast<integral_type>(subrange.begin());
-
-                integral_type subrange_end =
-                  subrange_begin + static_cast<integral_type>(subrange.size());
-
-                f(subrange_begin, subrange_end);
-              },
-              tf::GuidedPartitioner(grainsize));
-          }
-        else
-          {
-            // Non-integral iterator types: advance from 'begin' using
-            // std::distance/std::advance
-            using diff_t =
-              typename std::iterator_traits<Iterator>::difference_type;
-
-            tf::IndexRange<std::size_t> range(0, n, 1);
-
-            taskflow.for_each_by_index(
-              range,
-              [&, begin](const tf::IndexRange<std::size_t> &subrange) {
-                Iterator subrange_begin = begin;
-                std::advance(subrange_begin,
-                             static_cast<diff_t>(subrange.begin()));
-
-                Iterator subrange_end = subrange_begin;
-                std::advance(subrange_end,
-                             static_cast<diff_t>(subrange.size()));
-
-                f(subrange_begin, subrange_end);
-              },
-              tf::GuidedPartitioner(grainsize));
-          }
-
-        // Schedule the work. If we are within a task, we are required to use
-        // corun() without wait() to avoid a potential deadlock as described in
-        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+        //
+        // Schedule the work. If we are within a task, we have to use corun()
+        // instead of run().wait() to avoid a potential deadlock, see
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker
+        //
         if (executor.this_worker_id() != -1)
           executor.corun(taskflow);
         else
