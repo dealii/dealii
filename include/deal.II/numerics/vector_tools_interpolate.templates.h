@@ -465,13 +465,17 @@ namespace VectorTools
             // functions of the reference cell. FEValues changes the sign of
             // some shape functions of H(div) and H(curl) conforming elements
             // depending on the orientation of faces and lines, which the
-            // values of the degrees of freedom need to follow.
+            // values of the degrees of freedom need to follow. Only the
+            // values that change sign are touched: FESystem sets the values
+            // of base elements without generalized support points to
+            // signaling NaNs, which must not enter arithmetic operations.
             get_dof_sign_changes(
               fe[fe_index],
               typename Triangulation<dim, spacedim>::cell_iterator(cell),
               dof_signs);
             for (unsigned int i = 0; i < n_dofs; ++i)
-              dof_values[i] *= dof_signs[i];
+              if (dof_signs[i] < 0.)
+                dof_values[i] = -dof_values[i];
           }
 
         for (unsigned int i = 0; i < n_dofs; ++i)
