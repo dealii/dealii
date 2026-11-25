@@ -25,8 +25,10 @@
 
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <memory>
 #include <tuple>
+#include <type_traits>
 
 #ifdef DEAL_II_WITH_TASKFLOW
 
@@ -187,6 +189,20 @@ namespace parallel
       f(range.begin(), range.end());
     }
 #endif
+
+    /**
+     * Return the number of elements in the range <code>[begin,end)</code>,
+     * where @p Iterator is either an integral type or an iterator.
+     */
+    template <typename Iterator>
+    std::size_t
+    n_elements_in_range(const Iterator &begin, const Iterator &end)
+    {
+      if constexpr (std::is_integral_v<Iterator>)
+        return static_cast<std::size_t>(end - begin);
+      else
+        return static_cast<std::size_t>(std::distance(begin, end));
+    }
   } // namespace internal
 
 
@@ -271,12 +287,7 @@ namespace parallel
     Assert(grainsize > 0, ExcMessage("Grainsize must be a positive number."));
 
     // Count elements in the range
-    const std::size_t n = [&]() -> auto {
-      if constexpr (std::is_integral_v<Iterator>)
-        return static_cast<std::size_t>(end - begin);
-      else
-        return static_cast<std::size_t>(std::distance(begin, end));
-    }();
+    const std::size_t n = internal::n_elements_in_range<Iterator>(begin, end);
 
     const bool worth_doing_in_parallel =
       (MultithreadInfo::n_threads() > 1) && (n > grainsize);
