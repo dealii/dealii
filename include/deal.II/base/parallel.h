@@ -27,12 +27,14 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <tuple>
 #include <type_traits>
 
 #ifdef DEAL_II_WITH_TASKFLOW
 
 #  include <taskflow/algorithm/for_each.hpp>
+#  include <taskflow/algorithm/reduce.hpp>
 #  include <taskflow/taskflow.hpp>
 #endif
 
@@ -514,7 +516,75 @@ namespace parallel
                               const std_cxx20::type_identity_t<Iterator> &end,
                               const unsigned int grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
+    Assert(grainsize > 0, ExcMessage("Grainsize must be a positive number."));
+
+#ifdef DEAL_II_WITH_TASKFLOW
+    const std::size_t n = internal::n_elements_in_range<Iterator>(begin, end);
+
+    if ((MultithreadInfo::n_threads() > 1) && (n > grainsize))
+      {
+        tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+        tf::Taskflow  taskflow;
+
+        ResultType result(0);
+
+        taskflow.reduce_by_index(
+          tf::IndexRange<std::size_t>(0, n, 1),
+          result,
+          //
+          // The local reduction: Taskflow calls this function for
+          // consecutive subranges handled by the same worker and passes the
+          // running total of that worker, which is empty for the first
+          // subrange. We add the result of f() on the subrange to it.
+          //
+          [&f, begin](const tf::IndexRange<std::size_t> &subrange,
+                      std::optional<ResultType>          running_total) {
+            //
+            // Translate the index subrange into bounds of type Iterator.
+            // Integral types use plain arithmetic, iterators std::next().
+            //
+            Iterator subrange_begin = begin;
+            Iterator subrange_end   = begin;
+            if constexpr (std::is_integral_v<Iterator>)
+              {
+                subrange_begin += static_cast<Iterator>(subrange.begin());
+                subrange_end =
+                  subrange_begin + static_cast<Iterator>(subrange.size());
+              }
+            else
+              {
+                subrange_begin = std::next(begin, subrange.begin());
+                subrange_end   = std::next(subrange_begin, subrange.size());
+              }
+
+            ResultType value =
+              running_total.has_value() ? *running_total : ResultType(0);
+            value += f(subrange_begin, subrange_end);
+            return value;
+          },
+          //
+          // The global reduction: combine the running totals of all workers
+          // into the final result.
+          //
+          std::plus<ResultType>(),
+          tf::GuidedPartitioner(grainsize));
+
+        //
+        // Schedule the work. If we are within a task, we have to use corun()
+        // instead of run().wait() to avoid a potential deadlock, see
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker
+        //
+        if (executor.this_worker_id() != -1)
+          executor.corun(taskflow);
+        else
+          executor.run(taskflow).wait();
+
+        return result;
+      }
+
+    return f(begin, end);
+
+#elif !defined(DEAL_II_WITH_TBB)
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;

@@ -1,0 +1,5 @@
+Improved: parallel::accumulate_from_subranges() and
+parallel::ParallelForInteger::apply_parallel() now run in parallel when
+deal.II is configured with Taskflow.
+<br>
+(Matthias Maier, 2026/11/24)
