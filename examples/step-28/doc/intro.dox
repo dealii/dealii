@@ -580,7 +580,7 @@ This whole arrangement would make the description or spatially dependent
 material parameters very complicated. It will not become much simpler, but we
 will make one approximation: we merge the volume inhabited by each cylindrical
 rod and the surrounding water into volumes of quadratic cross section into
-so-called `pin cells' for which homogenized material data are obtained with
+so-called ``pin cells'' for which homogenized material data are obtained with
 nuclear database and knowledge of neutron spectrum. The homogenization makes
 all material data piecewise constant on the solution domain for a reactor with
 fresh fuel. Spatially dependent material parameters are then looked up for the
