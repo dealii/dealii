@@ -1352,16 +1352,12 @@ namespace MatrixFreeTools
         is_face ? Utilities::pow(n_q_points_1d, dim - 1) :
                   Utilities::pow(n_q_points_1d, dim);
 
-      unsigned int active_fe_index = 0;
-      if (!is_face)
-        active_fe_index =
+      const unsigned int active_fe_index =
+        is_face ?
+          matrix_free.get_face_active_fe_index(range,
+                                               is_interior_face,
+                                               dof_handler_index) :
           matrix_free.get_cell_active_fe_index(range, dof_handler_index);
-      else if (is_interior_face)
-        active_fe_index =
-          matrix_free.get_face_range_category(range, dof_handler_index).first;
-      else
-        active_fe_index =
-          matrix_free.get_face_range_category(range, dof_handler_index).second;
 
       const auto init_data = dealii::internal::
         extract_initialization_data<is_face, dim, Number, VectorizedArrayType>(

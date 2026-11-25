@@ -7671,7 +7671,8 @@ inline FEFaceEvaluation<dim,
                      quadrature_index,
                      first_selected_component,
                      matrix_free.get_face_active_fe_index(range,
-                                                          is_interior_face),
+                                                          is_interior_face,
+                                                          dof_handler_index),
                      numbers::invalid_unsigned_int,
                      matrix_free.get_face_info(range.first).face_type)
 {}
