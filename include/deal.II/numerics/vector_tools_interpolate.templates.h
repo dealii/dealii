@@ -17,6 +17,7 @@
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_nothing.h>
+#include <deal.II/fe/fe_poly_tensor.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 
@@ -218,6 +219,40 @@ namespace VectorTools
     }
 
 
+    // Compute the factors +1 or -1 by which FEValues multiplies the shape
+    // functions of @p fe on @p cell, see
+    // FE_PolyTensor::get_dof_sign_changes(). Only elements derived from
+    // FE_PolyTensor change signs; FESystem is handled recursively.
+    template <int dim, int spacedim>
+    void
+    get_dof_sign_changes(
+      const FiniteElement<dim, spacedim>                         &fe,
+      const typename Triangulation<dim, spacedim>::cell_iterator &cell,
+      std::vector<double>                                        &dof_signs)
+    {
+      dof_signs.assign(fe.n_dofs_per_cell(), 1.0);
+      // FE_PolyTensor is only instantiated for these combinations
+      if constexpr (dim == spacedim || (dim == 2 && spacedim == 3))
+        if (const auto fe_poly_tensor =
+              dynamic_cast<const FE_PolyTensor<dim, spacedim> *>(&fe))
+          {
+            fe_poly_tensor->get_dof_sign_changes(cell, dof_signs);
+            return;
+          }
+      if (dynamic_cast<const FESystem<dim, spacedim> *>(&fe) != nullptr)
+        {
+          std::vector<std::vector<double>> base_signs(fe.n_base_elements());
+          for (unsigned int b = 0; b < fe.n_base_elements(); ++b)
+            get_dof_sign_changes(fe.base_element(b), cell, base_signs[b]);
+          for (unsigned int i = 0; i < fe.n_dofs_per_cell(); ++i)
+            {
+              const auto index = fe.system_to_base_index(i);
+              dof_signs[i]     = base_signs[index.first.first][index.second];
+            }
+        }
+    }
+
+
     // Internal implementation of interpolate that takes a generic functor
     // function such that function(cell) is of type
     // Function<spacedim, typename VectorType::value_type>*
@@ -298,6 +333,7 @@ namespace VectorTools
 
       std::vector<std::vector<Vector<number>>> fe_function_values(fe.size());
       std::vector<std::vector<number>>         fe_dof_values(fe.size());
+      std::vector<double>                      dof_signs;
 
       // We will need two temporary global vectors that store the new values
       // and weights.
@@ -424,6 +460,22 @@ namespace VectorTools
 
             FETools::convert_generalized_support_point_values_to_dof_values(
               fe[fe_index], function_values, dof_values);
+
+            // These are the values of the degrees of freedom for the shape
+            // functions of the reference cell. FEValues changes the sign of
+            // some shape functions of H(div) and H(curl) conforming elements
+            // depending on the orientation of faces and lines, which the
+            // values of the degrees of freedom need to follow. Only the
+            // values that change sign are touched: FESystem sets the values
+            // of base elements without generalized support points to
+            // signaling NaNs, which must not enter arithmetic operations.
+            get_dof_sign_changes(
+              fe[fe_index],
+              typename Triangulation<dim, spacedim>::cell_iterator(cell),
+              dof_signs);
+            for (unsigned int i = 0; i < n_dofs; ++i)
+              if (dof_signs[i] < 0.)
+                dof_values[i] = -dof_values[i];
           }
 
         for (unsigned int i = 0; i < n_dofs; ++i)

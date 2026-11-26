@@ -1,0 +1,11 @@
+Fixed: VectorTools::interpolate() did not change the sign of the degrees of
+freedom of H(div) and H(curl) conforming elements, e.g., FE_RaviartThomas,
+FE_RaviartThomasNodal, and FE_Nedelec, on cells where FEValues changes the
+sign of the respective shape functions because of the orientation of faces
+and lines. On such meshes, e.g., the ones of GridGenerator::hyper_ball() and
+GridGenerator::hyper_ball_balanced(), the contributions of the two cells
+sharing a face cancelled. The new function
+FE_PolyTensor::get_dof_sign_changes() returns these signs, and FEValues and
+VectorTools::interpolate() now both use it.
+<br>
+(Richard Schussnig, 2026/11/23)
