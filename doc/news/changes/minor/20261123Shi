@@ -1,0 +1,5 @@
+Fixed: In debug mode, LinearAlgebra::TpetraWrappers::SparseMatrix::add(row,
+n_cols, col_indices, values) aborted with a wrong assertion whenever the row
+had more nonzero than zero entries. This is now fixed.
+<br>
+(Qingyuan Shi, 2026/11/23)
