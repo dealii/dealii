@@ -25,6 +25,18 @@ if(DEAL_II_WITH_CGAL)
     APPEND PROPERTY COMPILE_OPTIONS "${_flag}"
     )
 
+  #
+  # Similarly, gcc-15 and gcc-16 issue false positive -Wmaybe-uninitialized
+  # warnings in CGAL's code that is instantiated in these files. Guarding
+  # the includes by DEAL_II_DISABLE_EXTRA_DIAGNOSTICS does not help because
+  # the warnings are issued for out-of-line instances of CGAL templates
+  # after inlining.
+  #
+  enable_if_supported(_flag_uninitialized "-Wno-maybe-uninitialized")
+  set_property(SOURCE "intersections.cc" "polygon.cc"
+    APPEND PROPERTY COMPILE_OPTIONS "${_flag_uninitialized}"
+    )
+
   set(_src
     ${_src}
     surface_mesh.cc
