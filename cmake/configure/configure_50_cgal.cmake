@@ -56,21 +56,24 @@ macro(feature_cgal_configure_external)
   # Similarly to the DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS check run
   # in configure_20_boost.cmake we have to check whether cgal includes
   # a deprecated boost header. If yes, disable the boost deprecated header
-  # warning as well.
+  # warning as well. As there, only compile the test: linking it would
+  # additionally require the libraries CGAL depends on (such as GMP).
 
   list(APPEND CMAKE_REQUIRED_INCLUDES
     ${BOOST_INCLUDE_DIRS} ${BOOST_BUNDLED_INCLUDE_DIRS} ${CGAL_INCLUDE_DIRS}
     )
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
   check_cxx_compiler_bug(
     "
     #define BOOST_CONFIG_HEADER_DEPRECATED_HPP_INCLUDED
-    #define BOOST_HEADER_DEPRECATED(a) _Pragma(\"GCC error \\\"stop compilation\\\"\");
+    #define BOOST_HEADER_DEPRECATED(a) static_assert(false);
     #include <CGAL/make_mesh_3.h>
     int main() { return 0; }
     "
     DEAL_II_CGAL_HAS_DEPRECATED_BOOST_INCLUDES)
 
+  unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
   reset_cmake_required()
 endmacro()
 

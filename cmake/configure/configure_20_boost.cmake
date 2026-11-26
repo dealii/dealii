@@ -92,16 +92,23 @@ macro(feature_boost_configure_external)
   # include other BOOST headers that are deprecated, and this then leads to
   # warnings. That's rather annoying.
   #
+  # We only need to know whether the test compiles, so do not try to link
+  # an executable. Also avoid nested string literals in the test: the
+  # escaped quotes do not survive the macro argument expansion and Clang
+  # then rejects the test for an unrelated reason.
+  #
   list(APPEND CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIRS})
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
   check_cxx_compiler_bug(
     "
     #define BOOST_CONFIG_HEADER_DEPRECATED_HPP_INCLUDED
-    #define BOOST_HEADER_DEPRECATED(a) _Pragma(\"GCC error \\\"stop compilation\\\"\");
+    #define BOOST_HEADER_DEPRECATED(a) static_assert(false);
     #include <boost/geometry/index/rtree.hpp>
     int main() { return 0; }
     "
     DEAL_II_BOOST_HAS_BROKEN_HEADER_DEPRECATIONS)
+  unset(CMAKE_TRY_COMPILE_TARGET_TYPE)
   reset_cmake_required()
 endmacro()
 
