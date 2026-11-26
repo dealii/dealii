@@ -4018,7 +4018,14 @@ namespace internal
             // create key
             const ArrayView<const unsigned int> indices = crs[o];
             key.assign(indices.begin(), indices.end());
-            std::sort(key.begin(), key.end());
+            // Sort the (at most four) indices with an insertion sort.
+            // This is faster than std::sort() for such short ranges, and
+            // it avoids a -Warray-bounds false positive of GCC 16 about the
+            // code path std::sort() uses for long ranges.
+            for (auto it = key.begin(); it != key.end(); ++it)
+              std::rotate(std::upper_bound(key.begin(), it, *it),
+                          it,
+                          std::next(it));
 
             // is subcelldata provided? -> binary search
             const auto subcell_object =
