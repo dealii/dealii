@@ -333,6 +333,22 @@ def get_dealii_includes(lines):
     return dealii_include_list
 
 
+# DEAL_II_(DIS|EN)ABLE_EXTRA_DIAGNOSTICS expand to _Pragma statements, which
+# are not allowed in the global module fragment. Remove them from all lines
+# before DEAL_II_NAMESPACE_OPEN.
+match_extra_diagnostics_macros = re.compile(
+    r"^ *DEAL_II_(DISABLE|ENABLE)_EXTRA_DIAGNOSTICS *$"
+)
+
+
+def remove_extra_diagnostics_macros(lines):
+    n = 0
+    while n < len(lines) and "DEAL_II_NAMESPACE_OPEN" not in lines[n]:
+        n += 1
+    gmf = [l for l in lines[:n] if not match_extra_diagnostics_macros.match(l)]
+    return gmf + lines[n:]
+
+
 # Return whether a line in a header or source file matches an #include
 # statement for any of the recognized external projects that we wrap
 # in module partitions:

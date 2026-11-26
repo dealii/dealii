@@ -77,6 +77,8 @@ assert lines[-1].startswith(
 lines.pop()
 
 
+lines = header_to_partition_maps.remove_extra_diagnostics_macros(lines)
+
 # Then scan through the file and collect the deal.II headers that are
 # '#include'd, excluding "config.h" and "exception_macros.h", both of
 # which declare macros and so much be #included rather than imported:
