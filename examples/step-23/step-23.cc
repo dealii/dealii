@@ -330,7 +330,7 @@ namespace Step23
     // correct value. The final line closes the hanging node constraints
     // object. Since we work on a uniformly refined mesh, no constraints exist
     // or have been computed (i.e. there was no need to call
-    // DoFTools::make_hanging_node_constraints as in other programs), but we
+    // DoFTools::make_default_constraints as in other programs), but we
     // need a constraints object in one place further down below anyway.
     solution_u.reinit(dof_handler.n_dofs());
     solution_v.reinit(dof_handler.n_dofs());

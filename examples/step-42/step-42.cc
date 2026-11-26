@@ -987,10 +987,8 @@ namespace Step42
     /* setup hanging nodes and Dirichlet constraints */
     {
       TimerOutput::Scope t(computing_timer, "Setup: constraints");
-      constraints_hanging_nodes.reinit(locally_owned_dofs,
-                                       locally_relevant_dofs);
-      DoFTools::make_hanging_node_constraints(dof_handler,
-                                              constraints_hanging_nodes);
+      constraints_hanging_nodes =
+        DoFTools::make_default_constraints(dof_handler);
       constraints_hanging_nodes.close();
 
       pcout << "   Number of active cells: "

@@ -230,8 +230,7 @@ namespace Step26
               << std::endl
               << std::endl;
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());

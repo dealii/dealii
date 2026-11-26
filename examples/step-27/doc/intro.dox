@@ -169,10 +169,10 @@ finite element field to ensure that it is continuous. This is
 conceptually very similar to how we compute hanging node constraints,
 and in fact the code looks exactly the same:
 @code
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof_handler);
 @endcode
-In other words, the DoFTools::make_hanging_node_constraints deals not
+In other words, DoFTools::make_default_constraints() deals not
 only with hanging node constraints, but also with $hp$-constraints at
 the same time.
 

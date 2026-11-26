@@ -294,9 +294,7 @@ namespace Step65
     {
       TimerOutput::Scope scope(timer, "Compute constraints");
 
-      constraints.clear();
-
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(
         mapping, dof_handler, 0, ExactSolution<dim>(), constraints);
 

@@ -503,10 +503,8 @@ namespace Step100
               << dof_handler_test.n_dofs() << std::endl;
     error_table.add_value("dofs_test", dof_handler_test.n_dofs());
 
-    constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler_trial_skeleton,
-                                            constraints);
+    constraints =
+      DoFTools::make_default_constraints(dof_handler_trial_skeleton);
 
     const BoundaryValues<dim> boundary_values(wavenumber, theta);
 

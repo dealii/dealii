@@ -496,8 +496,7 @@ namespace Step50
 
     solution.reinit(locally_owned_dofs, mpi_communicator);
     right_hand_side.reinit(locally_owned_dofs, mpi_communicator);
-    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     VectorTools::interpolate_boundary_values(
       mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);

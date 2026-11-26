@@ -801,9 +801,7 @@ namespace Step18
 
     // The next step is to set up constraints due to hanging nodes. This has
     // been handled many times before:
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
+    hanging_node_constraints = DoFTools::make_default_constraints(dof_handler);
     hanging_node_constraints.close();
 
     // And then we have to set up the matrix. Here we deviate from step-17, in

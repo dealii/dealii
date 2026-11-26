@@ -555,10 +555,7 @@ namespace Step66
     dof_handler.distribute_dofs(fe);
     dof_handler.distribute_mg_dofs();
 
-    constraints.clear();
-    constraints.reinit(dof_handler.locally_owned_dofs(),
-                       DoFTools::extract_locally_relevant_dofs(dof_handler));
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(),

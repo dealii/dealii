@@ -172,12 +172,9 @@ void Step6<dim>::setup_system()
   solution.reinit(dof_handler.n_dofs());
   system_rhs.reinit(dof_handler.n_dofs());
 
-  // We may now populate the AffineConstraints object with the hanging node
-  // constraints. Since we will call this function in a loop we first clear
-  // the current set of constraints from the last system and then compute new
-  // ones:
-  constraints.clear();
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  // Create an open AffineConstraints object containing the hanging node
+  // constraints for the current mesh:
+  constraints = DoFTools::make_default_constraints(dof_handler);
 
 
   // Now we are ready to interpolate the boundary values with indicator 0 (the

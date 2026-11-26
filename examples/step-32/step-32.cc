@@ -1900,12 +1900,8 @@ namespace Step32
     // degrees of freedom, so this is what we use to initialize the constraint
     // objects.
     {
-      stokes_constraints.clear();
-      stokes_constraints.reinit(stokes_locally_owned_index_set,
-                                stokes_locally_relevant_set);
-
-      DoFTools::make_hanging_node_constraints(stokes_dof_handler,
-                                              stokes_constraints);
+      stokes_constraints =
+        DoFTools::make_default_constraints(stokes_dof_handler);
 
       const FEValuesExtractors::Vector velocity_components(0);
       VectorTools::interpolate_boundary_values(
@@ -1925,12 +1921,8 @@ namespace Step32
       stokes_constraints.close();
     }
     {
-      temperature_constraints.clear();
-      temperature_constraints.reinit(temperature_partitioning,
-                                     temperature_relevant_partitioning);
-
-      DoFTools::make_hanging_node_constraints(temperature_dof_handler,
-                                              temperature_constraints);
+      temperature_constraints =
+        DoFTools::make_default_constraints(temperature_dof_handler);
       VectorTools::interpolate_boundary_values(
         temperature_dof_handler,
         0,

@@ -377,12 +377,10 @@ namespace Step45
       relevant_partitioning.push_back(
         locally_relevant_dofs.get_view(n_u, n_u + n_p));
 
-      constraints.clear();
-      constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
 
       const FEValuesExtractors::Vector velocities(0);
 
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(mapping,
                                                dof_handler,
                                                0,

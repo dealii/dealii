@@ -560,7 +560,7 @@ namespace Step56
       // The following makes use of a component mask for interpolation of the
       // boundary values for the velocity only, which is further explained in
       // the vector valued dealii step-20 tutorial.
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                0,
                                                Solution<dim>(),

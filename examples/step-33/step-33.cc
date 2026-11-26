@@ -1507,7 +1507,7 @@ namespace Step33
           // strongly (as in all previous tutorial programs so far whenever we
           // used continuous finite elements -- this enforcement is done by the
           // AffineConstraints class together with
-          // DoFTools::make_hanging_node_constraints). In the current program,
+          // DoFTools::make_default_constraints). In the current program,
           // however, we opt to enforce continuity weakly at faces between cells
           // of different refinement level, for two reasons: (i) because we can,
           // and more importantly (ii) because we would have to thread the
@@ -2270,8 +2270,8 @@ namespace Step33
     // SolutionTransfer class to transfer to the next mesh:
     {
       AffineConstraints<double> hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints(dof_handler,
-                                              hanging_node_constraints);
+      hanging_node_constraints =
+        DoFTools::make_default_constraints(dof_handler);
       hanging_node_constraints.close();
 
       hanging_node_constraints.distribute(old_solution);

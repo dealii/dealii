@@ -761,10 +761,7 @@ namespace Step37
       pcout << "Number of degrees of freedom: " << dof_handler.n_dofs()
             << std::endl;
 
-      constraints.clear();
-      constraints.reinit(dof_handler.locally_owned_dofs(),
-                         DoFTools::extract_locally_relevant_dofs(dof_handler));
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(
         mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraints);
       constraints.close();

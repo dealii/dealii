@@ -210,8 +210,7 @@ namespace Step47
     std::cout << "   Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl;
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,

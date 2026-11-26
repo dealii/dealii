@@ -213,7 +213,7 @@ number of unknowns in a DoFHandler. For example,
 DoFTools::make_sparsity_pattern() takes a DoFHandler and expects that
 the sparsity pattern has as many rows and columns as there are DoFs in
 the DoFHandler. So does
-DoFTools::make_hanging_node_constraints(). VectorTools::interpolate_boundary_values()
+DoFTools::make_default_constraints(). VectorTools::interpolate_boundary_values()
 uses the same convention. Many many other functions do too, and they
 all in fact check that this is true and will terminate the program if
 it is not. This is because one can find many many bugs in codes this

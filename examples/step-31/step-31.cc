@@ -857,9 +857,8 @@ namespace Step31
       stokes_dof_handler.distribute_dofs(stokes_fe);
       DoFRenumbering::component_wise(stokes_dof_handler, stokes_sub_blocks);
 
-      stokes_constraints.clear();
-      DoFTools::make_hanging_node_constraints(stokes_dof_handler,
-                                              stokes_constraints);
+      stokes_constraints =
+        DoFTools::make_default_constraints(stokes_dof_handler);
       const std::set<types::boundary_id> no_normal_flux_boundaries = {0};
       VectorTools::compute_no_normal_flux_constraints(stokes_dof_handler,
                                                       0,
@@ -870,9 +869,8 @@ namespace Step31
     {
       temperature_dof_handler.distribute_dofs(temperature_fe);
 
-      temperature_constraints.clear();
-      DoFTools::make_hanging_node_constraints(temperature_dof_handler,
-                                              temperature_constraints);
+      temperature_constraints =
+        DoFTools::make_default_constraints(temperature_dof_handler);
       temperature_constraints.close();
     }
 

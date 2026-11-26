@@ -715,9 +715,7 @@ namespace BaseClasses
   // conditions.
   void BaseSolver::setup()
   {
-    constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     if (stage == 1)
       VectorTools::interpolate_boundary_values(MappingQ<2>(mapping_degree),
@@ -883,9 +881,7 @@ namespace BaseClasses
       {
         AffineConstraints<double> constraints_empty;
 
-        constraints_empty.clear();
-
-        DoFTools::make_hanging_node_constraints(dof_handler, constraints_empty);
+        constraints_empty = DoFTools::make_default_constraints(dof_handler);
 
         constraints_empty.close();
 

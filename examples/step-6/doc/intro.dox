@@ -258,7 +258,7 @@ The steps you need to make this work are essentially like this:
   nodes. (Below we will also briefly mention that we will also put
   boundary values into this same object, but that is a separate matter.)
 - You have to fill this object using the function
-  DoFTools::make_hanging_node_constraints() to ensure continuity of
+  DoFTools::make_default_constraints() to ensure continuity of
   the elements of the finite element space.
 - You have to use this object when you copy the local contributions to
   the matrix and right hand side into the global objects, by using

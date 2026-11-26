@@ -387,8 +387,7 @@ namespace BlackScholesSolver
 
     time_step = maturity_time / n_time_steps;
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     constraints.close();
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
     DoFTools::make_sparsity_pattern(dof_handler,
