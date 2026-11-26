@@ -1,0 +1,9 @@
+Fixed: MatrixFree::get_face_active_fe_index() returned the cell vectorization
+category instead of 0 without hp-adaptivity if
+MatrixFree::AdditionalData::cell_vectorization_category was set, as opposed to
+MatrixFree::get_cell_active_fe_index(). The FEFaceEvaluation constructor taking
+a face range and MatrixFreeTools::compute_diagonal() and
+MatrixFreeTools::compute_matrix() with face integrals then accessed the shape
+information out of bounds. Now, both functions return 0 without hp-adaptivity.
+<br>
+(Richard Schussnig, 2026/11/26)
