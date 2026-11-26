@@ -99,8 +99,8 @@ check()
   // not couple, so use pattern
   SparsityPattern sparsity(dof.n_dofs(), dof.n_dofs());
   DoFTools::make_sparsity_pattern(dof, sparsity);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
   constraints.condense(sparsity);
   sparsity.compress();

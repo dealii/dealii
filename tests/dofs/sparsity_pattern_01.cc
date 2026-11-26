@@ -112,8 +112,8 @@ check()
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
 
   // create sparsity pattern. note

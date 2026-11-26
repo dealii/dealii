@@ -101,8 +101,8 @@ main()
 
   dof_handler.distribute_dofs(fe);
 
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof_handler);
   constraints.close();
 
   const auto print = [](const auto &label, const auto &matrix_free) {

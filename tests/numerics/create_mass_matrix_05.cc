@@ -89,8 +89,8 @@ check()
     for (unsigned int j = 0; j < dim; ++j)
       mask[dim + i][dim + j] = DoFTools::always;
   DoFTools::make_sparsity_pattern(dof, mask, sparsity);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
   constraints.condense(sparsity);
   sparsity.compress();

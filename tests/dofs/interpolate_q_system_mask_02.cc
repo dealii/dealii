@@ -102,8 +102,8 @@ test()
       mask2.set(1, true);
       mask2.set(2, true);
 
-      AffineConstraints<double> constraints;
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      AffineConstraints<double> constraints =
+        DoFTools::make_default_constraints(dof_handler);
       constraints.close();
 
       Vector<double> interpolant(dof_handler.n_dofs());

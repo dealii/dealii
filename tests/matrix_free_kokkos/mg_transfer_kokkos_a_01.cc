@@ -80,13 +80,12 @@ do_test(const FiniteElement<dim> &fe_fine, const FiniteElement<dim> &fe_coarse)
   dof_handler_coarse.distribute_dofs(fe_coarse);
 
   // setup constraints
-  AffineConstraints<Number> constraint_coarse;
-  DoFTools::make_hanging_node_constraints(dof_handler_coarse,
-                                          constraint_coarse);
+  AffineConstraints<Number> constraint_coarse =
+    DoFTools::make_default_constraints<Number>(dof_handler_coarse);
   constraint_coarse.close();
 
-  AffineConstraints<Number> constraint_fine;
-  DoFTools::make_hanging_node_constraints(dof_handler_fine, constraint_fine);
+  AffineConstraints<Number> constraint_fine =
+    DoFTools::make_default_constraints<Number>(dof_handler_fine);
   constraint_fine.close();
 
   // setup transfer operator

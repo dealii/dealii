@@ -62,8 +62,8 @@ sub_test()
       tria.execute_coarsening_and_refinement();
 
       dof.distribute_dofs(fe);
-      AffineConstraints<double> constraints;
-      DoFTools::make_hanging_node_constraints(dof, constraints);
+      AffineConstraints<double> constraints =
+        DoFTools::make_default_constraints(dof);
       VectorTools::interpolate_boundary_values(dof,
                                                0,
                                                Functions::ZeroFunction<dim>(),
