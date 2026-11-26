@@ -136,13 +136,9 @@ test(const unsigned int n_refinements,
       dof_handler.distribute_dofs(*fe);
 
       // set up constraints
-      const IndexSet locally_relevant_dofs =
-        DoFTools::extract_locally_relevant_dofs(dof_handler);
-      constraint.reinit(dof_handler.locally_owned_dofs(),
-                        locally_relevant_dofs);
+      constraint = DoFTools::make_default_constraints<Number>(dof_handler);
       VectorTools::interpolate_boundary_values(
         *mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);
-      DoFTools::make_hanging_node_constraints(dof_handler, constraint);
       constraint.close();
 
       // set up operator

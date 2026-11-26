@@ -53,7 +53,8 @@ main()
   DoFHandler<2>      dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  AffineConstraints<double> constraints;
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof_handler);
   VectorTools::interpolate_boundary_values(
     MappingCartesian<2>(),
     dof_handler,
@@ -61,7 +62,6 @@ main()
     Functions::ConstantFunction<2>(42.0, n_components),
     constraints,
     ComponentMask({true, true, false, false, false}));
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
 
   Table<2, DoFTools::Coupling> coupling(n_components, n_components);
   for (unsigned int c = 0; c < n_components; ++c)

@@ -82,17 +82,13 @@ test(const unsigned int n_refinements,
   fine_dof_handler.distribute_dofs(*fe);
   DoFRenumbering::Cuthill_McKee(fine_dof_handler);
 
-  AffineConstraints<Number> fine_constraints;
-  const IndexSet            locally_relevant_dofs =
-    DoFTools::extract_locally_relevant_dofs(fine_dof_handler);
-  fine_constraints.reinit(fine_dof_handler.locally_owned_dofs(),
-                          locally_relevant_dofs);
+  AffineConstraints<Number> fine_constraints =
+    DoFTools::make_default_constraints<Number>(fine_dof_handler);
   VectorTools::interpolate_boundary_values(*mapping,
                                            fine_dof_handler,
                                            0,
                                            Functions::ZeroFunction<dim>(),
                                            fine_constraints);
-  DoFTools::make_hanging_node_constraints(fine_dof_handler, fine_constraints);
   fine_constraints.close();
 
   // set up operator
@@ -149,13 +145,9 @@ test(const unsigned int n_refinements,
       dof_handler.distribute_dofs(*fe);
 
       // set up constraints
-      const IndexSet locally_relevant_dofs =
-        DoFTools::extract_locally_relevant_dofs(dof_handler);
-      constraint.reinit(dof_handler.locally_owned_dofs(),
-                        locally_relevant_dofs);
+      constraint = DoFTools::make_default_constraints<Number>(dof_handler);
       VectorTools::interpolate_boundary_values(
         *mapping, dof_handler, 0, Functions::ZeroFunction<dim>(), constraint);
-      DoFTools::make_hanging_node_constraints(dof_handler, constraint);
       constraint.close();
 
       // set up operator
