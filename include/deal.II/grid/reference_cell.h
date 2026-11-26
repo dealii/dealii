@@ -936,10 +936,23 @@ public:
    * but only the first (n_faces(), n_lines()) entries are used, with the rest
    * being set to numbers::invalid_unsigned_int.
    *
-   * The chosen isotropic refinement (see
-   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
-   * @p refinement_choice .
+   * The chosen isotropic refinement is provided by @p refinement_choice,
+   * which must be compatible with the current ReferenceCell (see
+   * is_compatible_with()) and not RefinementChoices::None.
    */
+  const ndarray<unsigned int, 13, 4> &
+  new_isotropic_child_face_lines(
+    const RefinementChoice<dim> &refinement_choice) const;
+
+  /**
+   * Same as above, but with the refinement choice given by its index (see
+   * get_isotropic_refinement_choice()).
+   *
+   * @deprecated Use the version of this function which takes a
+   * RefinementChoice instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a RefinementChoice instead.")
   const ndarray<unsigned int, 13, 4> &
   new_isotropic_child_face_lines(const unsigned int refinement_choice) const;
 
@@ -952,10 +965,23 @@ public:
    * (see occurrences within execute_refinement_isotropic() in tria.cc for more
    * details).
    *
-   * The chosen isotropic refinement (see
-   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
-   * @p refinement_choice .
+   * The chosen isotropic refinement is provided by @p refinement_choice,
+   * which must be compatible with the current ReferenceCell (see
+   * is_compatible_with()) and not RefinementChoices::None.
    */
+  const ndarray<unsigned int, 13, 4, 2> &
+  new_isotropic_child_face_line_vertices(
+    const RefinementChoice<dim> &refinement_choice) const;
+
+  /**
+   * Same as above, but with the refinement choice given by its index (see
+   * get_isotropic_refinement_choice()).
+   *
+   * @deprecated Use the version of this function which takes a
+   * RefinementChoice instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a RefinementChoice instead.")
   const ndarray<unsigned int, 13, 4, 2> &
   new_isotropic_child_face_line_vertices(
     const unsigned int refinement_choice) const;
@@ -967,10 +993,23 @@ public:
    * n_faces() entries are used, with the rest being set to
    * numbers::invalid_unsigned_int.
    *
-   * The chosen isotropic refinement (see
-   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
-   * @p refinement_choice .
+   * The chosen isotropic refinement is provided by @p refinement_choice,
+   * which must be compatible with the current ReferenceCell (see
+   * is_compatible_with()) and not RefinementChoices::None.
    */
+  const ndarray<unsigned int, 10, 6> &
+  new_isotropic_child_cell_faces(
+    const RefinementChoice<dim> &refinement_choice) const;
+
+  /**
+   * Same as above, but with the refinement choice given by its index (see
+   * get_isotropic_refinement_choice()).
+   *
+   * @deprecated Use the version of this function which takes a
+   * RefinementChoice instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a RefinementChoice instead.")
   const ndarray<unsigned int, 10, 6> &
   new_isotropic_child_cell_faces(const unsigned int refinement_choice) const;
 
@@ -981,10 +1020,23 @@ public:
    * n_vertices() entries are used, with the rest being set to
    * numbers::invalid_unsigned_int.
    *
-   * The chosen isotropic refinement (see
-   * ReferenceCell<dim>::get_isotropic_refinement_choice) is provided by
-   * @p refinement_choice .
+   * The chosen isotropic refinement is provided by @p refinement_choice,
+   * which must be compatible with the current ReferenceCell (see
+   * is_compatible_with()) and not RefinementChoices::None.
    */
+  const ndarray<unsigned int, 10, 8> &
+  new_isotropic_child_cell_vertices(
+    const RefinementChoice<dim> &refinement_choice) const;
+
+  /**
+   * Same as above, but with the refinement choice given by its index (see
+   * get_isotropic_refinement_choice()).
+   *
+   * @deprecated Use the version of this function which takes a
+   * RefinementChoice instead.
+   */
+  DEAL_II_DEPRECATED_EARLY_WITH_COMMENT(
+    "Use the version of this function which takes a RefinementChoice instead.")
   const ndarray<unsigned int, 10, 8> &
   new_isotropic_child_cell_vertices(const unsigned int refinement_choice) const;
 
@@ -1147,6 +1199,13 @@ public:
    */
 
 private:
+  /**
+   * Convert an index into the old list of isotropic refinement choices
+   * (see get_isotropic_refinement_choice()) into a RefinementChoice.
+   */
+  RefinementChoice<dim>
+  isotropic_refinement_choice_from_index(const unsigned int index) const;
+
   /**
    * The variable that stores what this object actually corresponds to.
    */
@@ -1589,9 +1648,12 @@ ReferenceCell<dim>::faces_for_given_vertex(const unsigned int vertex) const
 template <int dim>
 const ndarray<unsigned int, 13, 4> &
 ReferenceCell<dim>::new_isotropic_child_face_lines(
-  const unsigned int refinement_choice) const
+  const RefinementChoice<dim> &refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  Assert(refinement_choice != RefinementChoices::None<dim> &&
+           is_compatible_with(refinement_choice),
+         ExcMessage("The given RefinementChoice is not valid for this "
+                    "ReferenceCell."));
 
   const unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
@@ -1599,7 +1661,7 @@ ReferenceCell<dim>::new_isotropic_child_face_lines(
       switch (this->kind)
         {
           case ReferenceCells::Tetrahedron:
-            switch (refinement_choice)
+            switch (refinement_choice.new_tetrahedron_line())
               {
                 case 0:
                   {
@@ -1735,11 +1797,25 @@ ReferenceCell<dim>::new_isotropic_child_face_lines(
 
 
 template <int dim>
-const ndarray<unsigned int, 13, 4, 2> &
-ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
+inline const ndarray<unsigned int, 13, 4> &
+ReferenceCell<dim>::new_isotropic_child_face_lines(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  return new_isotropic_child_face_lines(
+    isotropic_refinement_choice_from_index(refinement_choice));
+}
+
+
+
+template <int dim>
+const ndarray<unsigned int, 13, 4, 2> &
+ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
+  const RefinementChoice<dim> &refinement_choice) const
+{
+  Assert(refinement_choice != RefinementChoices::None<dim> &&
+           is_compatible_with(refinement_choice),
+         ExcMessage("The given RefinementChoice is not valid for this "
+                    "ReferenceCell."));
 
   const unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
@@ -1747,7 +1823,7 @@ ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
       switch (this->kind)
         {
           case ReferenceCells::Tetrahedron:
-            switch (refinement_choice)
+            switch (refinement_choice.new_tetrahedron_line())
               {
                 case 0:
                   {
@@ -1893,11 +1969,25 @@ ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
 
 
 template <int dim>
-const ndarray<unsigned int, 10, 6> &
-ReferenceCell<dim>::new_isotropic_child_cell_faces(
+inline const ndarray<unsigned int, 13, 4, 2> &
+ReferenceCell<dim>::new_isotropic_child_face_line_vertices(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  return new_isotropic_child_face_line_vertices(
+    isotropic_refinement_choice_from_index(refinement_choice));
+}
+
+
+
+template <int dim>
+const ndarray<unsigned int, 10, 6> &
+ReferenceCell<dim>::new_isotropic_child_cell_faces(
+  const RefinementChoice<dim> &refinement_choice) const
+{
+  Assert(refinement_choice != RefinementChoices::None<dim> &&
+           is_compatible_with(refinement_choice),
+         ExcMessage("The given RefinementChoice is not valid for this "
+                    "ReferenceCell."));
 
   const unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
@@ -1905,7 +1995,7 @@ ReferenceCell<dim>::new_isotropic_child_cell_faces(
       switch (this->kind)
         {
           case ReferenceCells::Tetrahedron:
-            switch (refinement_choice)
+            switch (refinement_choice.new_tetrahedron_line())
               {
                 case 0:
                   {
@@ -2036,11 +2126,25 @@ ReferenceCell<dim>::new_isotropic_child_cell_faces(
 
 
 template <int dim>
-const ndarray<unsigned int, 10, 8> &
-ReferenceCell<dim>::new_isotropic_child_cell_vertices(
+inline const ndarray<unsigned int, 10, 6> &
+ReferenceCell<dim>::new_isotropic_child_cell_faces(
   const unsigned int refinement_choice) const
 {
-  AssertIndexRange(refinement_choice, n_isotropic_refinement_choices());
+  return new_isotropic_child_cell_faces(
+    isotropic_refinement_choice_from_index(refinement_choice));
+}
+
+
+
+template <int dim>
+const ndarray<unsigned int, 10, 8> &
+ReferenceCell<dim>::new_isotropic_child_cell_vertices(
+  const RefinementChoice<dim> &refinement_choice) const
+{
+  Assert(refinement_choice != RefinementChoices::None<dim> &&
+           is_compatible_with(refinement_choice),
+         ExcMessage("The given RefinementChoice is not valid for this "
+                    "ReferenceCell."));
 
   constexpr unsigned int X = numbers::invalid_unsigned_int;
   if constexpr (dim == 3)
@@ -2048,7 +2152,7 @@ ReferenceCell<dim>::new_isotropic_child_cell_vertices(
       switch (this->kind)
         {
           case ReferenceCells::Tetrahedron:
-            switch (refinement_choice)
+            switch (refinement_choice.new_tetrahedron_line())
               {
                 case 0:
                   {
@@ -2169,6 +2273,17 @@ ReferenceCell<dim>::new_isotropic_child_cell_vertices(
 
   static constexpr ndarray<unsigned int, 10, 8> empty{};
   return empty;
+}
+
+
+
+template <int dim>
+inline const ndarray<unsigned int, 10, 8> &
+ReferenceCell<dim>::new_isotropic_child_cell_vertices(
+  const unsigned int refinement_choice) const
+{
+  return new_isotropic_child_cell_vertices(
+    isotropic_refinement_choice_from_index(refinement_choice));
 }
 
 
@@ -2591,6 +2706,29 @@ ReferenceCell<dim>::is_compatible_with(
     return true;
   // Finally, Wedge and Pyramid only support isotropic refinement:
   return refinement_choice == RefinementChoices::Isotropic<dim>;
+}
+
+
+
+template <int dim>
+inline RefinementChoice<dim>
+ReferenceCell<dim>::isotropic_refinement_choice_from_index(
+  const unsigned int index) const
+{
+  if constexpr (dim == 3)
+    if (*this == ReferenceCells::Tetrahedron)
+      {
+        AssertIndexRange(index, 3);
+        constexpr std::array<RefinementChoice<3>, 3> choices = {
+          {RefinementChoices::Cut68<3>,
+           RefinementChoices::Cut57<3>,
+           RefinementChoices::Cut49<3>}};
+        return choices[index];
+      }
+
+  // All other ReferenceCells support exactly one kind of isotropic refinement
+  AssertIndexRange(index, 1);
+  return RefinementChoices::Isotropic<dim>;
 }
 
 
