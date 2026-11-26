@@ -27,13 +27,19 @@
 #include <type_traits>
 
 // Forward-declare the automatic differentiation types so we can add prototypes
-// for our own wrappers.
+// for our own wrappers. Module builds include the ADOL-C headers instead
+// because forward declarations are not allowed in the global module fragment.
 #ifdef DEAL_II_WITH_ADOLC
+#  ifdef DEAL_II_BUILDING_CXX20_MODULE
+#    include <adolc/adouble.h>
+#    include <adolc/adtl.h>
+#  else
 class adouble;
 namespace adtl
 {
   class adouble;
 }
+#  endif
 #endif
 
 DEAL_II_NAMESPACE_OPEN
