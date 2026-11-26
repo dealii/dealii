@@ -6251,20 +6251,29 @@ template <int structdim, int dim, int spacedim>
 double
 TriaAccessor<structdim, dim, spacedim>::diameter() const
 {
-  std_cxx26::inplace_vector<Point<spacedim>,
+  // A line always has exactly two vertices. Return their distance directly
+  // rather than going through the general code path below, for which some
+  // compilers (GCC 10 and 11) cannot see that both vertices have been set
+  // and warn about the use of uninitialized values.
+  if constexpr (structdim == 1)
+    return (this->vertex(1) - this->vertex(0)).norm();
+  else
+    {
+      std_cxx26::inplace_vector<Point<spacedim>,
 #  ifndef _MSC_VER
-                            ReferenceCells::max_n_vertices<structdim>()
+                                ReferenceCells::max_n_vertices<structdim>()
 #  else
-                            GeometryInfo<structdim>::vertices_per_cell
+                                GeometryInfo<structdim>::vertices_per_cell
 #  endif
-                            >
-    vertices(this->n_vertices());
+                                >
+        vertices(this->n_vertices());
 
-  for (unsigned int v = 0; v < vertices.size(); ++v)
-    vertices[v] = this->vertex(v);
+      for (unsigned int v = 0; v < vertices.size(); ++v)
+        vertices[v] = this->vertex(v);
 
-  return internal::TriaAccessorImplementation::diameter<structdim, spacedim>(
-    vertices);
+      return internal::TriaAccessorImplementation::diameter<structdim,
+                                                            spacedim>(vertices);
+    }
 }
 
 
