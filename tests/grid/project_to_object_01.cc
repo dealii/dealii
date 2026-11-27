@@ -37,12 +37,13 @@ main()
 
     constexpr int  structdim      = 2;
     constexpr auto reference_cell = ReferenceCells::get_hypercube<structdim>();
+    constexpr unsigned int n_vertices = reference_cell.n_vertices();
 
-    auto objective = [](const Tensor<1, reference_cell.n_vertices()> &weights) {
+    auto objective = [](const Tensor<1, n_vertices> &weights) {
       return std::sin(2.0 * weights[0]) * std::cos(3.0 * weights[1]) +
              std::cos(weights[2]);
     };
-    Tensor<1, reference_cell.n_vertices()> c0;
+    Tensor<1, n_vertices> c0;
     for (const unsigned int row_n : reference_cell.vertex_indices())
       c0[row_n] = 1.0;
 
