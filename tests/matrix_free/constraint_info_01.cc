@@ -54,10 +54,10 @@ main()
   dof_handler.reinit(tria);
   dof_handler.distribute_dofs(fe);
 
-  AffineConstraints<Number> constraints;
+  AffineConstraints<Number> constraints =
+    DoFTools::make_default_constraints<Number>(dof_handler);
 
   DoFTools::make_zero_boundary_constraints(dof_handler, constraints);
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
   constraints.close();
 
   typename MatrixFree<dim, Number, VectorizedArrayType>::AdditionalData

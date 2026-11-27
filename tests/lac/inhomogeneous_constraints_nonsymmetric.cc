@@ -133,8 +133,8 @@ AdvectionProblem<dim>::setup_system()
   reference_rhs.reinit(dof_handler.n_dofs());
   test_rhs.reinit(dof_handler.n_dofs());
 
-  hanging_nodes_only.clear();
-  test_all_constraints.clear();
+  hanging_nodes_only   = DoFTools::make_default_constraints(dof_handler);
+  test_all_constraints = DoFTools::make_default_constraints(dof_handler);
 
   // add boundary conditions as
   // inhomogeneous constraints here. just
@@ -149,14 +149,13 @@ AdvectionProblem<dim>::setup_system()
     std::map<types::global_dof_index, double>::const_iterator boundary_value =
       boundary_values.begin();
     for (; boundary_value != boundary_values.end(); ++boundary_value)
-      {
-        test_all_constraints.constrain_dof_to_zero(boundary_value->first);
-        test_all_constraints.set_inhomogeneity(boundary_value->first,
-                                               boundary_value->second);
-      }
+      if (!test_all_constraints.is_constrained(boundary_value->first))
+        {
+          test_all_constraints.constrain_dof_to_zero(boundary_value->first);
+          test_all_constraints.set_inhomogeneity(boundary_value->first,
+                                                 boundary_value->second);
+        }
   }
-  DoFTools::make_hanging_node_constraints(dof_handler, hanging_nodes_only);
-  DoFTools::make_hanging_node_constraints(dof_handler, test_all_constraints);
   hanging_nodes_only.close();
   test_all_constraints.close();
 
