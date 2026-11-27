@@ -63,8 +63,8 @@ test()
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
 
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
 
 

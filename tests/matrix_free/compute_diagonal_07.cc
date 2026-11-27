@@ -42,14 +42,13 @@ test(const unsigned int first_vector_component)
   DoFHandler<dim> dof_handler_system(tria);
   dof_handler_system.distribute_dofs(fe_system);
 
-  AffineConstraints<Number> constraints_q;
-  DoFTools::make_hanging_node_constraints(dof_handler_q, constraints_q);
+  AffineConstraints<Number> constraints_q =
+    DoFTools::make_default_constraints<Number>(dof_handler_q);
   DoFTools::make_zero_boundary_constraints(dof_handler_q, constraints_q);
   constraints_q.close();
 
-  AffineConstraints<Number> constraints_system;
-  DoFTools::make_hanging_node_constraints(dof_handler_system,
-                                          constraints_system);
+  AffineConstraints<Number> constraints_system =
+    DoFTools::make_default_constraints<Number>(dof_handler_system);
   DoFTools::make_zero_boundary_constraints(dof_handler_system,
                                            constraints_system);
   constraints_system.close();

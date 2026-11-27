@@ -55,8 +55,8 @@ test(bool use_categorization = false)
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(fe);
 
-  AffineConstraints<Number> constraint;
-  DoFTools::make_hanging_node_constraints(dof_handler, constraint);
+  AffineConstraints<Number> constraint =
+    DoFTools::make_default_constraints<Number>(dof_handler);
 
   VectorTools::interpolate_boundary_values(dof_handler,
                                            0,

@@ -135,8 +135,8 @@ test()
 
   // setup DoFs
   dof.distribute_dofs(fe_collection);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   VectorTools::interpolate_boundary_values(dof,
                                            0,
                                            Functions::ZeroFunction<dim>(),

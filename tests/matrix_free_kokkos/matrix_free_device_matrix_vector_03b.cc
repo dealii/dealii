@@ -53,8 +53,8 @@ test()
   FE_Q<dim>       fe(fe_degree);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  AffineConstraints<Number> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<Number> constraints =
+    DoFTools::make_default_constraints<Number>(dof);
 
   VectorTools::interpolate_boundary_values(dof,
                                            0,

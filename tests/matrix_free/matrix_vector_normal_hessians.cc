@@ -71,8 +71,8 @@ test_hessians(const unsigned int                             degree,
 
   MappingQGeneric<dim> mapping(1);
 
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof_handler);
   VectorTools::interpolate_boundary_values(
     mapping,
     dof_handler,

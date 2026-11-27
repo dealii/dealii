@@ -60,17 +60,12 @@ do_test(const FiniteElement<dim> &fe_fine,
   AffineConstraints<Number> constraints_dummy;
   constraints_dummy.close();
 
-  AffineConstraints<Number> constraints_coarse(
-    dof_handler_coarse.locally_owned_dofs(),
-    DoFTools::extract_locally_relevant_dofs(dof_handler_coarse));
-  DoFTools::make_hanging_node_constraints(dof_handler_coarse,
-                                          constraints_coarse);
+  AffineConstraints<Number> constraints_coarse =
+    DoFTools::make_default_constraints<Number>(dof_handler_coarse);
   constraints_coarse.close();
 
-  AffineConstraints<Number> constraints_fine(
-    dof_handler_fine.locally_owned_dofs(),
-    DoFTools::extract_locally_relevant_dofs(dof_handler_fine));
-  DoFTools::make_hanging_node_constraints(dof_handler_fine, constraints_fine);
+  AffineConstraints<Number> constraints_fine =
+    DoFTools::make_default_constraints<Number>(dof_handler_fine);
   constraints_fine.close();
 
   // setup transfer operator

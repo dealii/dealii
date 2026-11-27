@@ -84,8 +84,8 @@ check()
   MappingQ<dim> mapping(3);
   QGauss<dim>   quadrature(6);
 
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   VectorTools::interpolate_boundary_values(
     dof, 0, Functions::ConstantFunction<dim>(1., 2), constraints);
   constraints.close();

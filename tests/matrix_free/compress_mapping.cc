@@ -70,8 +70,8 @@ test()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
 
   const QGauss<1>                          quad(2);
@@ -107,8 +107,8 @@ test_cube()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
 
   const QGauss<1>                          quad(2);
@@ -150,8 +150,8 @@ test_parallelogram()
   FE_Q<dim>       fe(1);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
 
   const QGauss<1>                          quad(2);
@@ -220,8 +220,8 @@ test_deformed_cube()
   FE_Q<dim>       fe(2);
   DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
-  AffineConstraints<double> constraints;
-  DoFTools::make_hanging_node_constraints(dof, constraints);
+  AffineConstraints<double> constraints =
+    DoFTools::make_default_constraints(dof);
   constraints.close();
 
   const QGauss<1>                          quad(3);
