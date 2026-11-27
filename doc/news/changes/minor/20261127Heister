@@ -1,0 +1,7 @@
+New: MatrixFreeTools::compute_matrix() now has an overload for
+Portable::MatrixFree that assembles a Tpetra sparse matrix on the device
+from a quadrature-point operation. It handles hanging-node constraints and
+sets constrained diagonal entries to one. Currently, this overload supports
+only a single MPI process.
+<br>
+(Timo Heister, 2026/11/27)
