@@ -21,6 +21,7 @@
 
 #include <deal.II/lac/trilinos_tpetra_precondition.h>
 #include <deal.II/lac/trilinos_tpetra_sparse_matrix.h>
+#include <deal.II/lac/trilinos_tpetra_vector.h>
 
 #include <iostream>
 
@@ -56,7 +57,10 @@ test(
   m.copy_from(m2);
   m.add(0.12, m3);
 
-  Vector<double> src(m.m()), dst(m.m());
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> src(
+    m.locally_owned_domain_indices(), m.get_mpi_communicator());
+  LinearAlgebra::TpetraWrappers::Vector<double, MemorySpace::Default> dst(
+    m.locally_owned_range_indices(), m.get_mpi_communicator());
   src = 1.;
 
   LinearAlgebra::TpetraWrappers::PreconditionJacobi<double,
