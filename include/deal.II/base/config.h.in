@@ -61,7 +61,7 @@ enum class LibraryBuildMode
  * library you are trying to compile against is a debug or a release
  * mode build.
  */
-constexpr LibraryBuildMode library_build_mode
+inline constexpr LibraryBuildMode library_build_mode
 #ifdef DEBUG
  = LibraryBuildMode::debug;
 #else

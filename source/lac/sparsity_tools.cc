@@ -31,10 +31,8 @@
 #endif
 
 #ifdef DEAL_II_WITH_METIS
-extern "C"
-{
+// metis.h declares its functions in an extern "C" { } block
 #  include <metis.h>
-}
 #endif
 
 #ifdef DEAL_II_TRILINOS_WITH_ZOLTAN

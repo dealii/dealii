@@ -29,10 +29,8 @@ module;
 #include <deal.II/base/config.h>
 
 #ifdef DEAL_II_WITH_METIS
-extern "C"
-{
+// metis.h declares its functions in an extern "C" { } block
 #  include <metis.h>
-}
 #endif
 
 

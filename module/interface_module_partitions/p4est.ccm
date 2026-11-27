@@ -194,25 +194,24 @@ export {
   using ::sc_finalize;
   using ::sc_init;
 
-  // The following functions are declared as a 'static inline'
-  // function and so can't be exported. Wrap them via a function
-  // implemented in namespace dealii:
+  // The following functions are declared 'static inline' and so can't be
+  // exported. Wrap them via non-inline functions in namespace dealii:
   namespace dealii
   {
-    inline void *
+    void *
     sc_array_index(sc_array_t *array, size_t iz)
     {
       return ::sc_array_index(array, iz);
     }
 
-    inline void *
+    void *
     sc_array_index_ssize_t(sc_array_t *array, ssize_t iz)
     {
       return ::sc_array_index_ssize_t(array, iz);
     }
 
 
-    inline void *
+    void *
     sc_array_push(::sc_array_t *array)
     {
       return ::sc_array_push(array);

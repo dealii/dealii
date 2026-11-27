@@ -17,7 +17,9 @@
 
 #include <deal.II/lac/affine_constraints.h>
 
+#ifndef DEAL_II_BUILDING_CXX20_MODULE
 DEAL_II_WARNING("This file is deprecated."
                 "Use deal.II/lac/affine_constraints.h instead.")
+#endif
 
 #endif

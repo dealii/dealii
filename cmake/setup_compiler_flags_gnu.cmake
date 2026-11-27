@@ -149,6 +149,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel
   # Let us simply disable the warning for now.
   #
   enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-pass-failed")
+
+  #
+  # Clang's SIMD intrinsics are static inline functions. Using them in
+  # exported inline functions triggers -WTU-local-entity-exposure.
+  #
+  if(DEAL_II_WITH_CXX20_MODULE)
+    enable_if_supported(DEAL_II_WARNING_FLAGS "-Wno-TU-local-entity-exposure")
+  endif()
 endif()
 
 

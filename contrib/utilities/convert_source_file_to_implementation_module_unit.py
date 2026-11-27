@@ -47,6 +47,8 @@ input.close()
 
 match_dealii_open = re.compile(r" *DEAL_II_NAMESPACE_OPEN *")
 
+lines = header_to_partition_maps.remove_extra_diagnostics_macros(lines)
+
 # Then scan through it and collect the deal.II headers that are
 # '#include'd, excluding "config.h" and "exception_macros.h", both of
 # which declare macros and so much be #included rather than imported:

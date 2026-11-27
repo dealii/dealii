@@ -22,12 +22,18 @@
 
 #include <memory>
 
+// Forward-declare tf::Executor from <taskflow/taskflow.hpp>. Module builds
+// include the header instead because forward declarations are not allowed in
+// the global module fragment.
 #ifdef DEAL_II_WITH_TASKFLOW
-// forward declaration from <taskflow/taskflow.hpp>
+#  ifdef DEAL_II_BUILDING_CXX20_MODULE
+#    include <taskflow/core/executor.hpp>
+#  else
 namespace tf
 {
   class Executor;
 }
+#  endif
 #endif
 
 
