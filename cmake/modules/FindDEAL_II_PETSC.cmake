@@ -172,6 +172,10 @@ if(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
     elseif(_token MATCHES "^-l")
       # Search for every library that was specified with -l:
       string(REGEX REPLACE "^-l" "" _token "${_token}")
+      # The linker option -l:<file name> requests a library by its exact
+      # file name (for example, -l:libunwind.so). find_library() accepts
+      # full file names as well, so simply drop the colon:
+      string(REGEX REPLACE "^:" "" _token "${_token}")
 
       if(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s|clang_rt)")
         list(APPEND _cleanup_variables PETSC_LIBRARY_${_token})

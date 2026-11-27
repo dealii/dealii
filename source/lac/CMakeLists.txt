@@ -118,10 +118,24 @@ if(DEAL_II_WITH_SLEPC)
 endif()
 
 if(DEAL_II_WITH_GINKGO)
-  set(_unity_include_src
-    ${_unity_include_src}
+  set(_separate_src
+    ${_separate_src}
     ginkgo_solver.cc
   )
+
+  #
+  # Ginkgo's solver classes call self()->get_executor() in the constructor
+  # of a base class (EnableSolverBase), i.e., they access a sibling base
+  # class subobject of the derived class that has already been constructed.
+  # gcc-16 cannot see this when compiling the base class constructor out of
+  # line and issues false positive -Wuninitialized warnings. Compile the
+  # file without this warning (and separately from the unity build files
+  # so that the flag applies).
+  #
+  enable_if_supported(_flag_uninitialized "-Wno-uninitialized")
+  set_property(SOURCE "ginkgo_solver.cc"
+    APPEND PROPERTY COMPILE_OPTIONS "${_flag_uninitialized}"
+    )
 endif()
 
 # Also add Trilinos wrapper files

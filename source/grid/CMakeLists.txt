@@ -25,6 +25,13 @@ if(DEAL_II_WITH_CGAL)
   set_property(SOURCE "grid_generator_cgal.cc" "grid_tools.cc"
     APPEND PROPERTY COMPILE_OPTIONS "${_flag}"
     )
+
+  # Similarly, gcc-15 issues a false positive -Wmaybe-uninitialized warning
+  # in CGAL code that is instantiated in grid_generator_cgal.cc.
+  enable_if_supported(_flag_uninitialized "-Wno-maybe-uninitialized")
+  set_property(SOURCE "grid_generator_cgal.cc"
+    APPEND PROPERTY COMPILE_OPTIONS "${_flag_uninitialized}"
+    )
 endif()
 
 set(_unity_include_src
