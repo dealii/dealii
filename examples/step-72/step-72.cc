@@ -216,12 +216,11 @@ namespace Step72
     newton_update.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    zero_constraints.clear();
+    zero_constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              zero_constraints);
-    DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
     zero_constraints.close();
 
     nonzero_constraints.clear();

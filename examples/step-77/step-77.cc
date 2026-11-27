@@ -165,22 +165,20 @@ namespace Step77
     dof_handler.distribute_dofs(fe);
     current_solution.reinit(dof_handler.n_dofs());
 
-    zero_constraints.clear();
+    zero_constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(),
                                              zero_constraints);
 
-    DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
     zero_constraints.close();
 
-    nonzero_constraints.clear();
+    nonzero_constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              BoundaryValues<dim>(),
                                              nonzero_constraints);
 
-    DoFTools::make_hanging_node_constraints(dof_handler, nonzero_constraints);
     nonzero_constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs());
