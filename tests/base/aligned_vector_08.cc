@@ -19,6 +19,7 @@
 
 #include <deal.II/base/aligned_vector.h>
 
+#include <atomic>
 #include <string>
 #include <vector>
 
@@ -26,10 +27,11 @@
 
 
 // A non-trivially copyable type that tracks the number of live objects so
-// that we can detect leaks and double destructions.
+// that we can detect leaks and double destructions. AlignedVector moves and
+// copies large arrays in parallel, so the counter has to be atomic.
 struct Tracked
 {
-  static int n_alive;
+  static std::atomic<int> n_alive;
 
   Tracked(const int v = 0)
     : value(std::to_string(v))
@@ -66,7 +68,7 @@ struct Tracked
   std::string value;
 };
 
-int Tracked::n_alive = 0;
+std::atomic<int> Tracked::n_alive = 0;
 
 
 
@@ -178,5 +180,5 @@ main()
 
   deallog << "Tracked" << std::endl;
   test_repeated_insert<Tracked>();
-  deallog << "live objects: " << Tracked::n_alive << std::endl;
+  deallog << "live objects: " << Tracked::n_alive.load() << std::endl;
 }
