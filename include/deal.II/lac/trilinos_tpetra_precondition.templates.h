@@ -187,6 +187,9 @@ namespace LinearAlgebra
 
       // 5. Finally, apply our preconditioner
       preconditioner->apply(tpetra_src, tpetra_dst);
+
+      // Copy any device updates back to dst through its host view.
+      dual_dst.sync_host();
     }
 
 
@@ -243,6 +246,9 @@ namespace LinearAlgebra
 
       // 5. Finally, apply our preconditioner
       preconditioner->apply(tpetra_src, tpetra_dst, Teuchos::TRANS);
+
+      // Copy any device updates back to dst through its host view.
+      dual_dst.sync_host();
     }
 
 
