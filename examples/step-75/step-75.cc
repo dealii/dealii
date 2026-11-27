@@ -324,12 +324,8 @@ namespace Step75
     // operator is applied to a vector with only the Dirichlet values set. The
     // result is the negative right-hand-side vector.
     {
-      AffineConstraints<number> constraints_without_dbc(
-        dof_handler.locally_owned_dofs(),
-        DoFTools::extract_locally_relevant_dofs(dof_handler));
-
-      DoFTools::make_hanging_node_constraints(dof_handler,
-                                              constraints_without_dbc);
+      AffineConstraints<number> constraints_without_dbc =
+        DoFTools::make_default_constraints<number>(dof_handler);
       constraints_without_dbc.close();
 
       VectorType b, x;
@@ -782,10 +778,9 @@ namespace Step75
         const auto &dof_handler = dof_handlers[level];
         auto       &constraint  = constraints[level];
 
-        constraint.reinit(dof_handler.locally_owned_dofs(),
-                          DoFTools::extract_locally_relevant_dofs(dof_handler));
-
-        DoFTools::make_hanging_node_constraints(dof_handler, constraint);
+        constraint =
+          DoFTools::make_default_constraints<typename VectorType::value_type>(
+            dof_handler);
         VectorTools::interpolate_boundary_values(mapping_collection,
                                                  dof_handler,
                                                  0,
@@ -1125,9 +1120,7 @@ namespace Step75
                                      mpi_communicator);
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
-    constraints.clear();
-    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(
       mapping_collection, dof_handler, 0, Solution<dim>(), constraints);
     constraints.close();

@@ -537,9 +537,7 @@ namespace Step81
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,

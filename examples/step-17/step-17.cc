@@ -327,14 +327,9 @@ namespace Step17
     DoFRenumbering::subdomain_wise(dof_handler);
 
     // We need to initialize the objects denoting hanging node constraints for
-    // the present grid. As with the triangulation and DoFHandler objects, we
-    // will simply store <i>all</i> constraints on each process; again, this
-    // will not scale, but we show in step-40 how one can work around this by
-    // only storing on each MPI process the constraints for degrees of freedom
-    // that actually matter on this particular process.
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
+    // the present grid. The helper initializes the constraints using the
+    // locally owned and relevant degrees of freedom.
+    hanging_node_constraints = DoFTools::make_default_constraints(dof_handler);
     hanging_node_constraints.close();
 
     // Now we create the sparsity pattern for the system matrix. Note that we

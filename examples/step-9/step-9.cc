@@ -458,9 +458,7 @@ namespace Step9
   void AdvectionProblem<dim>::setup_system()
   {
     dof_handler.distribute_dofs(fe);
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
+    hanging_node_constraints = DoFTools::make_default_constraints(dof_handler);
     hanging_node_constraints.close();
 
     DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());

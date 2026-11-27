@@ -574,9 +574,7 @@ namespace Step28
   {
     const unsigned int n_dofs = dof_handler.n_dofs();
 
-    hanging_node_constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
+    hanging_node_constraints = DoFTools::make_default_constraints(dof_handler);
     hanging_node_constraints.close();
 
     system_matrix.clear();

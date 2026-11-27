@@ -315,7 +315,7 @@ Springer, 2014) comes close.
   an element that has degrees of freedom on vertices, edges, and faces
   (like the FE_Q element used here) represents finite element functions
   on a triangulation that have certain continuity properties. Calling
-  DoFTools::make_hanging_node_constraints() and putting the corresponding
+  DoFTools::make_default_constraints() and putting the corresponding
   output into an AffineConstraints object allows one to enforce
   these assumptions when one calls AffineConstraints::distribute()
   at the end of the function that solves linear systems -- this call

@@ -664,26 +664,21 @@ namespace Step43
       DoFRenumbering::Cuthill_McKee(darcy_dof_handler);
       DoFRenumbering::component_wise(darcy_dof_handler, darcy_block_component);
 
-      darcy_constraints.clear();
-      DoFTools::make_hanging_node_constraints(darcy_dof_handler,
-                                              darcy_constraints);
+      darcy_constraints = DoFTools::make_default_constraints(darcy_dof_handler);
       darcy_constraints.close();
     }
     {
       saturation_dof_handler.distribute_dofs(saturation_fe);
 
-      saturation_constraints.clear();
-      DoFTools::make_hanging_node_constraints(saturation_dof_handler,
-                                              saturation_constraints);
+      saturation_constraints =
+        DoFTools::make_default_constraints(saturation_dof_handler);
       saturation_constraints.close();
     }
     {
-      darcy_preconditioner_constraints.clear();
-
       const FEValuesExtractors::Scalar pressure(dim);
 
-      DoFTools::make_hanging_node_constraints(darcy_dof_handler,
-                                              darcy_preconditioner_constraints);
+      darcy_preconditioner_constraints =
+        DoFTools::make_default_constraints(darcy_dof_handler);
       DoFTools::make_zero_boundary_constraints(darcy_dof_handler,
                                                darcy_preconditioner_constraints,
                                                darcy_fe.component_mask(

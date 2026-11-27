@@ -485,10 +485,8 @@ namespace Step22
     // hanging nodes (in three space dimensions), where the hanging node needs
     // to dominate the Dirichlet boundary values.
     {
-      constraints.clear();
-
       const FEValuesExtractors::Vector velocities(0);
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                1,
                                                BoundaryValues<dim>(),

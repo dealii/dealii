@@ -662,13 +662,10 @@ namespace Step90
 
     active_fe_indicator.reinit(triangulation.n_active_cells());
     level_set_dof_handler.distribute_dofs(level_set_fe);
-    level_set_constraints.clear();
     const IndexSet level_set_locally_relevant_dofs =
       DoFTools::extract_locally_relevant_dofs(level_set_dof_handler);
-    level_set_constraints.reinit(level_set_dof_handler.locally_owned_dofs(),
-                                 level_set_locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(level_set_dof_handler,
-                                            level_set_constraints);
+    level_set_constraints =
+      DoFTools::make_default_constraints(level_set_dof_handler);
     level_set_constraints.close();
 
     // Here is where the geometric information enters the code. Next, using the
@@ -781,9 +778,7 @@ namespace Step90
     DynamicSparsityPattern dsp(dof_handler.n_dofs(),
                                dof_handler.n_dofs(),
                                locally_relevant_dofs);
-    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     constraints.close();
     DoFTools::make_sparsity_pattern(dof_handler, dsp, constraints);
 

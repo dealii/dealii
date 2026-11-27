@@ -411,8 +411,7 @@ namespace Step51
     solution_local.reinit(dof_handler_local.n_dofs());
     solution_u_post.reinit(dof_handler_u_post.n_dofs());
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     std::map<types::boundary_id, const Function<dim> *> boundary_functions;
     Solution<dim>                                       solution_function;
     boundary_functions[0] = &solution_function;

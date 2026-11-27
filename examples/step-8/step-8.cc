@@ -236,8 +236,7 @@ namespace Step8
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              types::boundary_id(0),
                                              Functions::ZeroFunction<dim>(dim),

@@ -279,31 +279,13 @@ namespace Step40
     // constraints, which we combine into a single object storing all
     // constraints.
     //
-    // As with all other things in %parallel, the mantra must be that no
-    // processor can store all information about the entire universe. As a
-    // consequence, we need to tell the AffineConstraints object for which
-    // degrees of freedom it can store constraints and for which it may not
-    // expect any information to store. In our case, as explained in the
-    // @ref distributed topic, the degrees of freedom we need to care about on
-    // each processor are the locally relevant ones, so we pass this to the
-    // AffineConstraints::reinit() function as a second argument. A further
-    // optimization, AffineConstraint can avoid certain operations if you also
-    // provide it with the set of locally owned degrees of freedom -- the
-    // first argument to AffineConstraints::reinit().
-    //
-    // (What would happen if we didn't pass this information to
-    // AffineConstraints, for example if we called the argument-less version of
-    // AffineConstraints::reinit() typically used in non-parallel codes? In that
-    // case, the AffineConstraints class will allocate an array
-    // with length equal to the largest DoF index it has seen so far. For
-    // processors with large numbers of MPI processes, this may be very large --
-    // maybe on the order of billions. The program would then allocate more
-    // memory than for likely all other operations combined for this single
-    // array. Fortunately, recent versions of deal.II would trigger an assertion
-    // that tells you that this is considered a bug.)
-    constraints.clear();
-    constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    // The helper function initializes the constraint object with the
+    // locally owned and locally relevant degrees of freedom to only
+    // store data needed on this MPI rank. It then adds constraints
+    // for hanging nodes, as one could do manually by calling
+    // DoFTools::make_hanging_node_constraints(). We then add the
+    // boundary conditions and close the object.
+    constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(),

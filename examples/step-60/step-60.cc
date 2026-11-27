@@ -854,7 +854,7 @@ namespace Step60
       parameters.embedding_space_finite_element_degree);
     space_dh->distribute_dofs(*space_fe);
 
-    DoFTools::make_hanging_node_constraints(*space_dh, constraints);
+    constraints = DoFTools::make_default_constraints(*space_dh);
     for (const types::boundary_id id : parameters.dirichlet_ids)
       {
         VectorTools::interpolate_boundary_values(

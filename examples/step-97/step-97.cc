@@ -594,9 +594,7 @@ namespace SolverT
     dof_handler.reinit(triangulation);
     dof_handler.distribute_dofs(fe);
 
-    constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     VectorTools::project_boundary_values_curl_conforming_l2(
       dof_handler,
@@ -1023,9 +1021,7 @@ namespace SolverA
     dof_handler.reinit(triangulation_T);
     dof_handler.distribute_dofs(fe);
 
-    constraints.clear();
-
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     if (Settings::boundary_condition_type_A == Dirichlet)
       VectorTools::project_boundary_values_curl_conforming_l2(
@@ -1710,10 +1706,8 @@ namespace ProjectorHcurlToHdiv
       {
         AffineConstraints<double> constraints_empty;
 
-        constraints_empty.clear();
-
-        DoFTools::make_hanging_node_constraints(dof_handler_Hdiv,
-                                                constraints_empty);
+        constraints_empty =
+          DoFTools::make_default_constraints(dof_handler_Hdiv);
 
         constraints_empty.close();
 

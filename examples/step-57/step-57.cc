@@ -298,9 +298,7 @@ namespace Step57
     // constraint objects.
     const FEValuesExtractors::Vector velocities(0);
     {
-      nonzero_constraints.clear();
-
-      DoFTools::make_hanging_node_constraints(dof_handler, nonzero_constraints);
+      nonzero_constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                0,
                                                BoundaryValues<dim>(),
@@ -310,9 +308,7 @@ namespace Step57
     nonzero_constraints.close();
 
     {
-      zero_constraints.clear();
-
-      DoFTools::make_hanging_node_constraints(dof_handler, zero_constraints);
+      zero_constraints = DoFTools::make_default_constraints(dof_handler);
       VectorTools::interpolate_boundary_values(dof_handler,
                                                0,
                                                Functions::ZeroFunction<dim>(

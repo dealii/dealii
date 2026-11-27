@@ -620,36 +620,15 @@ namespace Step14
     // approach is generally the same as the one we have used in
     // <code>Solver::assemble_linear_system()</code> above.
     //
-    // Note that taking the address of the
-    // <code>DoFTools::make_hanging_node_constraints</code> function
-    // is a little tricky, since there are actually three functions of
-    // this name, one for each supported space dimension. Taking
-    // addresses of overloaded functions is somewhat complicated in
-    // C++, since the address-of operator <code>&</code> in that case
-    // returns a set of values (the addresses of all
-    // functions with that name), and selecting the right one is then
-    // the next step. If the context dictates which one to take (for
-    // example by assigning to a function pointer of known type), then
-    // the compiler can do that by itself, but if this set of pointers
-    // shall be given as the argument to a function that takes a
-    // template, the compiler could choose all without having a
-    // preference for one. We therefore have to make it clear to the
-    // compiler which one we would like to have; for this, we could
-    // use a cast, but for more clarity, we assign it to a temporary
-    // <code>mhnc_p</code> (short for <code>pointer to
-    // make_hanging_node_constraints</code>) with the right type, and
-    // using this pointer instead.
+    // The side task returns the default constraints while the main thread
+    // constructs the sparsity pattern.
     template <int dim>
     Solver<dim>::LinearSystem::LinearSystem(const DoFHandler<dim> &dof_handler)
     {
-      hanging_node_constraints.clear();
-
-      void (*mhnc_p)(const DoFHandler<dim> &, AffineConstraints<double> &) =
-        &DoFTools::make_hanging_node_constraints;
-
-      // Start a side task then continue on the main thread
-      Threads::Task<void> side_task =
-        Threads::new_task(mhnc_p, dof_handler, hanging_node_constraints);
+      // Start a side task then continue on the main thread.
+      auto side_task = Threads::new_task([&dof_handler]() {
+        return DoFTools::make_default_constraints(dof_handler);
+      });
 
       DynamicSparsityPattern dsp(dof_handler.n_dofs(), dof_handler.n_dofs());
       DoFTools::make_sparsity_pattern(dof_handler, dsp);
@@ -657,7 +636,7 @@ namespace Step14
 
 
       // Wait for the side task to be done before going further
-      side_task.join();
+      hanging_node_constraints = std::move(side_task.return_value());
 
       hanging_node_constraints.close();
       hanging_node_constraints.condense(dsp);
@@ -2079,8 +2058,8 @@ namespace Step14
     void WeightedResidual<dim>::output_solution() const
     {
       AffineConstraints<double> primal_hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints(PrimalSolver<dim>::dof_handler,
-                                              primal_hanging_node_constraints);
+      primal_hanging_node_constraints =
+        DoFTools::make_default_constraints(PrimalSolver<dim>::dof_handler);
       primal_hanging_node_constraints.close();
       Vector<double> dual_solution(PrimalSolver<dim>::dof_handler.n_dofs());
       FETools::interpolate(DualSolver<dim>::dof_handler,
@@ -2134,8 +2113,8 @@ namespace Step14
       // to create an AffineConstraints object including the hanging node
       // constraints, but this time of the dual finite element space.
       AffineConstraints<double> dual_hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints(DualSolver<dim>::dof_handler,
-                                              dual_hanging_node_constraints);
+      dual_hanging_node_constraints =
+        DoFTools::make_default_constraints(DualSolver<dim>::dof_handler);
       dual_hanging_node_constraints.close();
       Vector<double> primal_solution(DualSolver<dim>::dof_handler.n_dofs());
       FETools::interpolate(PrimalSolver<dim>::dof_handler,
@@ -2150,8 +2129,8 @@ namespace Step14
       // <code>interpolate_difference</code> function, that gives (z-I_hz) in
       // the element space of the dual solution.
       AffineConstraints<double> primal_hanging_node_constraints;
-      DoFTools::make_hanging_node_constraints(PrimalSolver<dim>::dof_handler,
-                                              primal_hanging_node_constraints);
+      primal_hanging_node_constraints =
+        DoFTools::make_default_constraints(PrimalSolver<dim>::dof_handler);
       primal_hanging_node_constraints.close();
       Vector<double> dual_weights(DualSolver<dim>::dof_handler.n_dofs());
       FETools::interpolation_difference(DualSolver<dim>::dof_handler,

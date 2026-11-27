@@ -324,8 +324,7 @@ namespace Step46
     dof_handler.distribute_dofs(fe_collection);
 
     {
-      constraints.clear();
-      DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+      constraints = DoFTools::make_default_constraints(dof_handler);
 
       const FEValuesExtractors::Vector velocities(0);
       VectorTools::interpolate_boundary_values(dof_handler,

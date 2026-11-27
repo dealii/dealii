@@ -396,8 +396,7 @@ namespace Step93
     // and we do not need to exclude these solution components
     // explicitly when calling
     // VectorTools::interpolate_boundary_values()
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
     VectorTools::interpolate_boundary_values(dof_handler,
                                              0,
                                              Functions::ZeroFunction<dim>(3),

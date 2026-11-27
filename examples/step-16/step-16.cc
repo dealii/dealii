@@ -235,8 +235,7 @@ namespace Step16
     solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
-    constraints.clear();
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     std::set<types::boundary_id> dirichlet_boundary_ids = {0};
     Functions::ZeroFunction<dim> homogeneous_dirichlet_bc;

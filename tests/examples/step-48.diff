@@ -6,10 +6,6 @@
 <     , final_time(10.)
 ---
 >     , final_time(-5.)
-497c497
-< 
----
->     (void)timestep_number;
 521,533d520
 <     {
 <       pcout << "Number of MPI ranks:            "

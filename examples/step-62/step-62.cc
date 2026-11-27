@@ -754,9 +754,7 @@ namespace step62
 
     system_rhs.reinit(locally_owned_dofs, mpi_communicator);
 
-    constraints.clear();
-    constraints.reinit(locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler, constraints);
+    constraints = DoFTools::make_default_constraints(dof_handler);
 
     constraints.close();
 

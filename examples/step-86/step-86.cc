@@ -340,10 +340,7 @@ namespace Step86
       DoFTools::extract_locally_relevant_dofs(dof_handler);
 
 
-    hanging_node_constraints.clear();
-    hanging_node_constraints.reinit(locally_owned_dofs, locally_relevant_dofs);
-    DoFTools::make_hanging_node_constraints(dof_handler,
-                                            hanging_node_constraints);
+    hanging_node_constraints = DoFTools::make_default_constraints(dof_handler);
     hanging_node_constraints.make_consistent_in_parallel(locally_owned_dofs,
                                                          locally_relevant_dofs,
                                                          mpi_communicator);
