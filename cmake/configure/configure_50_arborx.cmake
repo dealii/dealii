@@ -90,7 +90,9 @@ macro(feature_arborx_find_external var)
     endif()
   endif()
 
-  set(DEAL_II_ARBORX_WITH_MPI ${ARBORX_WITH_MPI})
+  if(${var})
+    set(DEAL_II_ARBORX_WITH_MPI ${ARBORX_WITH_MPI})
+  endif()
 endmacro()
 
 configure_feature(ARBORX)
