@@ -1,0 +1,9 @@
+Improved: SolverCG now runs a pipelined variant of the conjugate gradient
+method for LinearAlgebra::distributed::Vector with MemorySpace::Default when
+the preconditioner is PreconditionIdentity or a DiagonalMatrix. All vector
+updates of an iteration are fused into a single device kernel before the
+matrix-vector product, and all inner products into a single kernel after it.
+This needs only one global reduction per iteration instead of three, reduces
+the number of kernel calls by design, and reduces the memory access.
+<br>
+(Martin Kronbichler, 2026/11/24)

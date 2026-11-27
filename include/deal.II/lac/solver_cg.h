@@ -35,6 +35,8 @@ DEAL_II_NAMESPACE_OPEN
 // forward declaration
 #ifndef DOXYGEN
 class PreconditionIdentity;
+template <typename VectorType>
+class DiagonalMatrix;
 namespace LinearAlgebra
 {
   namespace distributed
@@ -109,8 +111,8 @@ namespace LinearAlgebra
  * This class enables to embed the vector updates into the matrix-vector
  * product in case the `MatrixType` and `PreconditionerType` support such a
  * mode of operation. To this end, the `VectorType` needs to be
- * LinearAlgebra::distributed::Vector, the class `MatrixType` needs to provide
- * a function with the signature
+ * LinearAlgebra::distributed::Vector with MemorySpace::Host, the
+ * class `MatrixType` needs to provide a function with the signature
  * @code
  * void MatrixType::vmult(
  *    VectorType &,
@@ -173,6 +175,23 @@ namespace LinearAlgebra
  * run the updates on the vectors according to a variant presented in
  * Algorithm 2.2 of @cite Chronopoulos1989 (but for a preconditioner), whereas
  * the operation after the loop performs a total of 7 reductions in parallel.
+ *
+ * <h4>Optimized operations for vectors in MemorySpace::Default</h4>
+ *
+ * For `VectorType` equal to LinearAlgebra::distributed::Vector with
+ * MemorySpace::Default, the same algorithm is used when the
+ * `PreconditionerType` is PreconditionIdentity or DiagonalMatrix (with the
+ * same vector type). The parallelization model of devices does not allow to
+ * interleave the vector updates with the matrix-vector product, so the solver
+ * instead runs a single kernel for all vector updates before the
+ * matrix-vector product and a single kernel for the 7 inner products after
+ * the matrix-vector product, which needs only one global reduction (and one
+ * synchronization between the device and the host) per iteration. In this
+ * case, `MatrixType` only needs to provide the usual function
+ * `vmult(VectorType &, const VectorType &)`. Note that the residual norm is
+ * computed from the inner products via a recurrence formula in this variant,
+ * and AdditionalData::use_default_residual is ignored, as in the variant with
+ * the vector updates embedded into the matrix-vector product described above.
  *
  * <h3>Preconditioned residual</h3>
  *
@@ -812,9 +831,113 @@ namespace internal
       is_supported_operation<apply_t, PreconditionerType>;
 
 
-    // Internal function to run one iteration of the conjugate gradient solver
-    // for matrices and preconditioners that support interleaving the vector
-    // updates with the matrix-vector product.
+    // Base class for the variants of the conjugate gradient method that merge
+    // the vector updates of the CG iteration into the matrix-vector product
+    // (on the host) or into a single kernel before and after the
+    // matrix-vector product (on devices) in the form of a pipelined
+    // operation. This requires the preconditioner to act point-wise on the
+    // vector entries, i.e., to be a diagonal matrix. The algorithm works with
+    // the following steps:
+    //
+    // - Before the matrix-vector product, the residual vector r gets updated
+    //   by the matrix-vector product computed during the previous iteration as
+    //   r <- r - alpha * v, and the new search direction is computed as
+    //   p <- beta * p + P^{-1} r. In order to save some memory transfer, the
+    //   solution vector x is only updated in every other iteration, where the
+    //   previous search direction can be re-constructed from the current one
+    //   and the preconditioned residual.
+    //
+    // - After the matrix-vector product v = A p, seven inner products are
+    //   computed in a single sweep through the vectors, from which we can
+    //   compute the step length alpha and the residual norm of the next
+    //   iteration as well as the value of r^T P^{-1} r needed for the next
+    //   beta (by using the update formula r <- r - alpha * v, which will only
+    //   be applied in the next iteration). This approach needs a single
+    //   global reduction per iteration.
+    //
+    // This class collects the scalar part of the algorithm that is shared
+    // by the implementations on the host and the device, while the derived
+    // classes implement the operations on the vectors.
+    template <typename VectorType,
+              typename MatrixType,
+              typename PreconditionerType>
+    struct PipelinedIterationWorkerBase
+      : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
+    {
+      using Number = typename VectorType::value_type;
+
+      Number next_r_dot_preconditioner_dot_r;
+      Number previous_beta;
+
+      PipelinedIterationWorkerBase(const MatrixType         &A,
+                                   const PreconditionerType &preconditioner,
+                                   const bool                flexible,
+                                   VectorMemory<VectorType> &memory,
+                                   VectorType               &x,
+                                   const VectorType         &b,
+                                   const bool &use_default_residual)
+        : IterationWorkerBase<VectorType, MatrixType, PreconditionerType>(
+            A,
+            preconditioner,
+            flexible,
+            memory,
+            x,
+            b,
+            use_default_residual)
+        , next_r_dot_preconditioner_dot_r(0.)
+        , previous_beta(0.)
+      {}
+
+      // Compute the coefficient beta for the update of the search direction
+      // from the quantities computed in the previous iteration.
+      void
+      start_iteration(const unsigned int iteration_index)
+      {
+        if (iteration_index > 1)
+          {
+            previous_beta = this->beta;
+            this->beta    = next_r_dot_preconditioner_dot_r /
+                            this->r_dot_preconditioner_dot_r;
+          }
+      }
+
+      // Sum the seven local inner products over all MPI ranks and compute the
+      // step length alpha, the residual norm, and the value of r^T P^{-1} r
+      // for the next iteration. The entries of @p sums contain the following
+      // quantities:
+      // [0]: p^T v, [1]: v^T v, [2]: r^T v, [3]: r^T r, [4]: r^T P^{-1} v,
+      // [5]: v^T P^{-1} v, [6]: r^T P^{-1} r.
+      void
+      finish_iteration(std::array<Number, 7> &sums)
+      {
+        Utilities::MPI::sum(dealii::ArrayView<const Number>(sums.data(), 7),
+                            this->r.get_mpi_communicator(),
+                            dealii::ArrayView<Number>(sums.data(), 7));
+
+        this->r_dot_preconditioner_dot_r = sums[6];
+
+        const Number p_dot_A_dot_p = sums[0];
+        Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
+
+        this->previous_alpha = this->alpha;
+        this->alpha          = this->r_dot_preconditioner_dot_r / p_dot_A_dot_p;
+
+        // Round-off errors near zero might yield negative values, so take
+        // the absolute value in the next two formulas
+        this->residual_norm = std::sqrt(std::abs(
+          sums[3] + this->alpha * (-2. * sums[2] + this->alpha * sums[1])));
+
+        next_r_dot_preconditioner_dot_r =
+          std::abs(this->r_dot_preconditioner_dot_r +
+                   this->alpha * (-2. * sums[4] + this->alpha * sums[5]));
+      }
+    };
+
+
+
+    // Internal function to run one iteration of the pipelined conjugate
+    // gradient solver for matrices and preconditioners that support
+    // interleaving the vector updates with the matrix-vector product.
     template <typename VectorType,
               typename MatrixType,
               typename PreconditionerType>
@@ -830,12 +953,11 @@ namespace internal
                                           typename VectorType::value_type,
                                           MemorySpace::Host>>,
                        int>>
-      : public IterationWorkerBase<VectorType, MatrixType, PreconditionerType>
+      : public PipelinedIterationWorkerBase<VectorType,
+                                            MatrixType,
+                                            PreconditionerType>
     {
       using Number = typename VectorType::value_type;
-
-      Number next_r_dot_preconditioner_dot_r;
-      Number previous_beta;
 
       IterationWorker(const MatrixType         &A,
                       const PreconditionerType &preconditioner,
@@ -844,16 +966,15 @@ namespace internal
                       VectorType               &x,
                       const VectorType         &b,
                       const bool               &use_default_residual)
-        : IterationWorkerBase<VectorType, MatrixType, PreconditionerType>(
-            A,
-            preconditioner,
-            flexible,
-            memory,
-            x,
-            b,
-            use_default_residual)
-        , next_r_dot_preconditioner_dot_r(0.)
-        , previous_beta(0.)
+        : PipelinedIterationWorkerBase<VectorType,
+                                       MatrixType,
+                                       PreconditionerType>(A,
+                                                           preconditioner,
+                                                           flexible,
+                                                           memory,
+                                                           x,
+                                                           b,
+                                                           use_default_residual)
       {}
 
       // This is the main iteration function, that will use some of the
@@ -861,12 +982,7 @@ namespace internal
       void
       do_iteration(const unsigned int iteration_index)
       {
-        if (iteration_index > 1)
-          {
-            previous_beta = this->beta;
-            this->beta    = next_r_dot_preconditioner_dot_r /
-                            this->r_dot_preconditioner_dot_r;
-          }
+        this->start_iteration(iteration_index);
 
         std::array<VectorizedArray<Number>, 7> vectorized_sums = {};
 
@@ -887,28 +1003,7 @@ namespace internal
           for (unsigned int i = 0; i < 7; ++i)
             scalar_sums[i] += vectorized_sums[i][l];
 
-        Utilities::MPI::sum(dealii::ArrayView<const Number>(scalar_sums.data(),
-                                                            7),
-                            this->r.get_mpi_communicator(),
-                            dealii::ArrayView<Number>(scalar_sums.data(), 7));
-
-        this->r_dot_preconditioner_dot_r = scalar_sums[6];
-
-        const Number p_dot_A_dot_p = scalar_sums[0];
-        Assert(std::abs(p_dot_A_dot_p) != 0., ExcDivideByZero());
-
-        this->previous_alpha = this->alpha;
-        this->alpha          = this->r_dot_preconditioner_dot_r / p_dot_A_dot_p;
-
-        // Round-off errors near zero might yield negative values, so take
-        // the absolute value in the next two formulas
-        this->residual_norm = std::sqrt(std::abs(
-          scalar_sums[3] +
-          this->alpha * (-2. * scalar_sums[2] + this->alpha * scalar_sums[1])));
-
-        next_r_dot_preconditioner_dot_r = std::abs(
-          this->r_dot_preconditioner_dot_r +
-          this->alpha * (-2. * scalar_sums[4] + this->alpha * scalar_sums[5]));
+        this->finish_iteration(scalar_sums);
       }
 
       // Function that we use if the PreconditionerType implements an apply()
@@ -1375,6 +1470,171 @@ namespace internal
                 p += length;
               }
           }
+      }
+    };
+
+
+
+    // Device kernel for the vector updates of the pipelined CG variant
+    // before the matrix-vector product, see the function
+    // operation_before_loop() of the host variant for the operations. The
+    // variable @p diagonal contains the diagonal of the preconditioner, or
+    // nullptr for the identity matrix. Implemented in solver_cg.cc.
+    template <typename Number>
+    void
+    do_vector_updates_device(const unsigned int iteration_index,
+                             const std::size_t  locally_owned_size,
+                             const Number       alpha,
+                             const Number       beta,
+                             const Number       previous_alpha,
+                             const Number       previous_beta,
+                             const Number      *diagonal,
+                             Number            *x,
+                             Number            *r,
+                             Number            *p,
+                             const Number      *v);
+
+
+
+    // Device kernel for the seven inner products of the pipelined CG
+    // variant after the matrix-vector product, see
+    // PipelinedIterationWorkerBase::finish_iteration() for the meaning of
+    // the entries of the returned array. The result only contains the
+    // contributions of the locally owned entries and still needs to be
+    // summed over all MPI ranks. Implemented in solver_cg.cc.
+    template <typename Number>
+    std::array<Number, 7>
+    do_reductions_device(const std::size_t locally_owned_size,
+                         const Number     *diagonal,
+                         const Number     *p,
+                         const Number     *v,
+                         const Number     *r);
+
+
+
+    // Device kernel for the final update of the solution vector after
+    // convergence in case the update of the last but one iteration has not
+    // been applied yet. Implemented in solver_cg.cc.
+    template <typename Number>
+    void
+    do_finalize_device(const std::size_t locally_owned_size,
+                       const Number      alpha_plus_previous_alpha_over_beta,
+                       const Number      previous_alpha_over_beta,
+                       const Number     *diagonal,
+                       Number           *x,
+                       const Number     *r,
+                       const Number     *p);
+
+
+
+    // Implementation of the pipelined conjugate gradient method for vectors
+    // in MemorySpace::Default with a point-wise preconditioner. Since the
+    // parallelization model of devices does not allow to interleave the
+    // vector updates with the matrix-vector product, we instead run one
+    // kernel for all vector updates before the matrix-vector product and
+    // another one for all inner products after it. This approach can be
+    // used with any matrix type that provides a vmult() function.
+    template <typename VectorType,
+              typename MatrixType,
+              typename PreconditionerType>
+    struct IterationWorker<
+      VectorType,
+      MatrixType,
+      PreconditionerType,
+      std::enable_if_t<
+        (std::is_same_v<PreconditionerType,
+                        ::dealii::DiagonalMatrix<VectorType>> ||
+         std::is_same_v<PreconditionerType, PreconditionIdentity>) &&
+          std::is_same_v<
+            VectorType,
+            LinearAlgebra::distributed::Vector<typename VectorType::value_type,
+                                               MemorySpace::Default>>,
+        int>> : public PipelinedIterationWorkerBase<VectorType,
+                                                    MatrixType,
+                                                    PreconditionerType>
+    {
+      using Number = typename VectorType::value_type;
+
+      const Number *diagonal;
+
+      static constexpr Number *
+      get_diagonal(const dealii::DiagonalMatrix<VectorType> &preconditioner,
+                   const VectorType                         &vector)
+      {
+        AssertDimension(preconditioner.get_vector().locally_owned_size(),
+                        vector.locally_owned_size());
+        return preconditioner.get_vector().get_values();
+      }
+
+      static constexpr Number *
+      get_diagonal(const dealii::PreconditionIdentity &, const VectorType &)
+      {
+        return nullptr;
+      }
+
+      IterationWorker(const MatrixType         &A,
+                      const PreconditionerType &preconditioner,
+                      const bool                flexible,
+                      VectorMemory<VectorType> &memory,
+                      VectorType               &x,
+                      const VectorType         &b,
+                      const bool               &use_default_residual)
+        : PipelinedIterationWorkerBase<VectorType,
+                                       MatrixType,
+                                       PreconditionerType>(A,
+                                                           preconditioner,
+                                                           flexible,
+                                                           memory,
+                                                           x,
+                                                           b,
+                                                           use_default_residual)
+        , diagonal(get_diagonal(preconditioner, x))
+      {}
+
+      void
+      do_iteration(const unsigned int iteration_index)
+      {
+        this->start_iteration(iteration_index);
+
+        const std::size_t size = this->x.locally_owned_size();
+        do_vector_updates_device(iteration_index,
+                                 size,
+                                 this->alpha,
+                                 this->beta,
+                                 this->previous_alpha,
+                                 this->previous_beta,
+                                 diagonal,
+                                 this->x.get_values(),
+                                 this->r.get_values(),
+                                 this->p.get_values(),
+                                 this->v.get_values());
+
+        this->A.vmult(this->v, this->p);
+
+        std::array<Number, 7> sums = do_reductions_device(size,
+                                                          diagonal,
+                                                          this->p.get_values(),
+                                                          this->v.get_values(),
+                                                          this->r.get_values());
+
+        this->finish_iteration(sums);
+      }
+
+      void
+      finalize_after_convergence(const unsigned int iteration_index)
+      {
+        if (iteration_index % 2 == 1 || this->beta == Number())
+          this->x.add(this->alpha, this->p);
+        else
+          // Note that we use 'beta' here rather than 'previous_beta', see
+          // the host variant above
+          do_finalize_device(this->x.locally_owned_size(),
+                             this->alpha + this->previous_alpha / this->beta,
+                             this->previous_alpha / this->beta,
+                             diagonal,
+                             this->x.get_values(),
+                             this->r.get_values(),
+                             this->p.get_values());
       }
     };
   } // namespace SolverCG

@@ -1,0 +1,40 @@
+// -----------------------------------------------------------------------------
+//
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception OR LGPL-2.1-or-later
+// Copyright (C) 2026 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// Detailed license information governing the source code and contributions
+// can be found in LICENSE.md and CONTRIBUTING.md at the top level directory.
+//
+// -----------------------------------------------------------------------------
+
+
+
+for (S : REAL_SCALARS)
+  {
+    template void internal::SolverCG::do_vector_updates_device<S>(
+      const unsigned int,
+      const std::size_t,
+      const S,
+      const S,
+      const S,
+      const S,
+      const S *,
+      S *,
+      S *,
+      S *,
+      const S *);
+
+    template std::array<S, 7> internal::SolverCG::do_reductions_device<S>(
+      const std::size_t, const S *, const S *, const S *, const S *);
+
+    template void internal::SolverCG::do_finalize_device<S>(const std::size_t,
+                                                            const S,
+                                                            const S,
+                                                            const S *,
+                                                            S *,
+                                                            const S *,
+                                                            const S *);
+  }
