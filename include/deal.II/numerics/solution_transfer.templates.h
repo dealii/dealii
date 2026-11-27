@@ -531,6 +531,13 @@ namespace Legacy
              "parallel::distributed::Triangulation. This will not "
              "work for parallel computations. You probably want to "
              "use the parallel::distributed::SolutionTransfer class."));
+    if (const auto shared_tria =
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler->get_triangulation()))
+      Assert(!shared_tria->with_artificial_cells(),
+             ExcMessage("Legacy::SolutionTransfer does not work with a "
+                        "parallel::shared::Triangulation with artificial "
+                        "cells. Use dealii::SolutionTransfer instead."));
   }
 
 
@@ -565,18 +572,6 @@ namespace Legacy
            ExcAlreadyPrepForCoarseAndRef());
 
     clear();
-
-    // We need to access dof indices on the entire domain. For
-    // parallel::shared::Triangulations, ownership of cells might change. If
-    // they allow artificial cells, we need to restore the "true" cell owners
-    // temporarily.
-    // We use the TemporarilyRestoreSubdomainIds class for this purpose: we save
-    // the current set of subdomain ids, set subdomain ids to the "true" owner
-    // of each cell upon construction of the TemporarilyRestoreSubdomainIds
-    // object, and later restore these flags when it is destroyed.
-    const dealii::internal::parallel::shared::
-      TemporarilyRestoreSubdomainIds<dim, spacedim>
-        subdomain_modifier(dof_handler->get_triangulation());
 
     const unsigned int n_active_cells =
       dof_handler->get_triangulation().n_active_cells();
@@ -619,18 +614,6 @@ namespace Legacy
     Assert(&in != &out,
            ExcMessage("Vectors cannot be used as input and output"
                       " at the same time!"));
-
-    // We need to access dof indices on the entire domain. For
-    // parallel::shared::Triangulations, ownership of cells might change. If
-    // they allow artificial cells, we need to restore the "true" cell owners
-    // temporarily.
-    // We use the TemporarilyRestoreSubdomainIds class for this purpose: we save
-    // the current set of subdomain ids, set subdomain ids to the "true" owner
-    // of each cell upon construction of the TemporarilyRestoreSubdomainIds
-    // object, and later restore these flags when it is destroyed.
-    const dealii::internal::parallel::shared::
-      TemporarilyRestoreSubdomainIds<dim, spacedim>
-        subdomain_modifier(dof_handler->get_triangulation());
 
     Vector<typename VectorType::value_type> local_values(0);
 
@@ -778,18 +761,6 @@ namespace Legacy
                    ExcDimensionMismatch(all_in[i].size(), n_dofs_old));
           }
       }
-
-    // We need to access dof indices on the entire domain. For
-    // parallel::shared::Triangulations, ownership of cells might change. If
-    // they allow artificial cells, we need to restore the "true" cell owners
-    // temporarily.
-    // We use the TemporarilyRestoreSubdomainIds class for this purpose: we save
-    // the current set of subdomain ids, set subdomain ids to the "true" owner
-    // of each cell upon construction of the TemporarilyRestoreSubdomainIds
-    // object, and later restore these flags when it is destroyed.
-    const dealii::internal::parallel::shared::
-      TemporarilyRestoreSubdomainIds<dim, spacedim>
-        subdomain_modifier(dof_handler->get_triangulation());
 
     // first count the number
     // of cells that will be coarsened
@@ -946,18 +917,6 @@ namespace Legacy
                    ExcMessage("Vectors cannot be used as input and output"
                               " at the same time!"));
       }
-
-    // We need to access dof indices on the entire domain. For
-    // parallel::shared::Triangulations, ownership of cells might change. If
-    // they allow artificial cells, we need to restore the "true" cell owners
-    // temporarily.
-    // We use the TemporarilyRestoreSubdomainIds class for this purpose: we save
-    // the current set of subdomain ids, set subdomain ids to the "true" owner
-    // of each cell upon construction of the TemporarilyRestoreSubdomainIds
-    // object, and later restore these flags when it is destroyed.
-    const dealii::internal::parallel::shared::
-      TemporarilyRestoreSubdomainIds<dim, spacedim>
-        subdomain_modifier(dof_handler->get_triangulation());
 
     Vector<typename VectorType::value_type> local_values;
     std::vector<types::global_dof_index>    dofs;
