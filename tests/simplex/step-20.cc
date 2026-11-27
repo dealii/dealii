@@ -430,9 +430,8 @@ namespace Step20
     PrescribedSolution::ExactSolution<dim> exact_solution;
     Vector<double> cellwise_errors(triangulation.n_active_cells());
 
-    QTrapezoid<1>  q_trapez;
-    QIterated<dim> quadrature(q_trapez, degree + 2);
-    MappingFE<dim> mapping(FE_SimplexDGP<dim>(1));
+    QIteratedSimplex<dim> quadrature(QGaussSimplex<dim>(degree + 1), 2);
+    MappingFE<dim>        mapping(FE_SimplexDGP<dim>(1));
 
     VectorTools::integrate_difference(mapping,
                                       dof_handler,

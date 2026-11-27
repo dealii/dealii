@@ -483,12 +483,17 @@ namespace Step12
 
     {
       Vector<float> values(triangulation.n_active_cells());
+#ifdef HEX
+      const QGauss<dim> quadrature(fe.degree + 1);
+#else
+      const QGaussSimplex<dim> quadrature(fe.degree + 1);
+#endif
       VectorTools::integrate_difference(mapping,
                                         dof_handler,
                                         solution,
                                         Functions::ZeroFunction<dim>(),
                                         values,
-                                        QGauss<dim>(fe.degree + 1),
+                                        quadrature,
                                         VectorTools::Linfty_norm);
       const double l_infty =
         VectorTools::compute_global_error(triangulation,
