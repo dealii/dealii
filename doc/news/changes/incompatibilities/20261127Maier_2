@@ -1,0 +1,12 @@
+Changed: A parallel::shared::Triangulation with artificial cells now packs
+data attached to cells (e.g., by SolutionTransfer) on locally owned cells
+only and sends it to the new owners after mesh refinement. This is what
+parallel::distributed::Triangulation already does, and it fixes the
+transfer of data if cells change their owner. As a consequence,
+SolutionTransfer now requires distributed vectors with ghost entries on such
+triangulations. In addition, the METIS and Zoltan partitioners now assign
+all children of a cell to the same owner if they are all active, so that
+they can be coarsened on one process. A user defined partition
+(partition_custom_signal) has to do this itself.
+<br>
+(Matthias Maier, 2026/11/27)

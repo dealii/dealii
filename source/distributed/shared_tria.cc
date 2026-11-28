@@ -25,6 +25,10 @@
 
 #include <deal.II/lac/sparsity_tools.h>
 
+#include <algorithm>
+#include <map>
+#include <set>
+#include <tuple>
 #include <type_traits>
 
 
@@ -154,6 +158,10 @@ namespace parallel
           AssertThrow(false, ExcInternalError());
         }
 
+      // A custom partition has to keep siblings together itself.
+      if (partition_settings != partition_custom_signal)
+        group_siblings();
+
       // do not partition multigrid levels if user is
       // defining a custom partition
       if ((settings & construct_multigrid_hierarchy) &&
@@ -193,6 +201,37 @@ namespace parallel
               Assert(total_cells == this->n_cells(),
                      ExcMessage("Not all cells are assigned to a processor."));
             }
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::group_siblings()
+    {
+      const auto is_active = [](const auto &cell) { return cell->is_active(); };
+      const auto by_count  = [](const auto &a, const auto &b) {
+        return a.second < b.second;
+      };
+
+      for (const auto &cell : this->cell_iterators())
+        {
+          const auto children = cell->child_iterators();
+          if (cell->is_active() ||
+              !std::all_of(children.begin(), children.end(), is_active))
+            continue;
+
+          std::map<types::subdomain_id, unsigned int> n_children;
+          for (const auto &child : children)
+            ++n_children[child->subdomain_id()];
+
+          const auto owner =
+            std::max_element(n_children.begin(), n_children.end(), by_count)
+              ->first;
+
+          for (const auto &child : children)
+            child->set_subdomain_id(owner);
         }
     }
 
@@ -449,6 +488,101 @@ namespace parallel
       dealii::Triangulation<dim, spacedim>::execute_coarsening_and_refinement();
       partition();
       this->update_number_cache();
+
+      if (allow_artificial_cells &&
+          this->cell_attached_data.n_attached_data_sets > 0)
+        execute_transfer();
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::execute_transfer()
+    {
+      auto &serializer = this->data_serializer;
+
+      const unsigned int size_fixed = serializer.sizes_fixed_cumulative.back();
+      const bool         variable_size = serializer.variable_size_data_stored;
+
+      // For every receiving process: the level and index of each cell,
+      // followed by the fixed size data, the sizes of the variable size
+      // data, and the variable size data of these cells.
+      using Message = std::tuple<std::vector<int>,
+                                 std::vector<char>,
+                                 std::vector<int>,
+                                 std::vector<char>>;
+      std::map<unsigned int, Message> messages;
+
+      // local_cell_relations holds the cells packed by this process. For
+      // refined cells it holds the first child, for coarsened cells the
+      // parent.
+      auto data_variable = serializer.src_data_variable.cbegin();
+      for (unsigned int i = 0; i < this->local_cell_relations.size(); ++i)
+        {
+          const auto &[cell, status] = this->local_cell_relations[i];
+
+          std::set<types::subdomain_id> receivers;
+          if (status == CellStatus::cell_will_be_refined)
+            for (const auto &child : cell->parent()->child_iterators())
+              receivers.insert(
+                true_subdomain_ids_of_cells[child->active_cell_index()]);
+          else if (status != CellStatus::cell_invalid)
+            receivers.insert(
+              true_subdomain_ids_of_cells[cell->active_cell_index()]);
+
+          const auto data_fixed =
+            serializer.src_data_fixed.cbegin() + i * size_fixed;
+          const int size_variable =
+            variable_size ? serializer.src_sizes_variable[i] : 0;
+
+          for (const auto receiver : receivers)
+            {
+              auto &[cells, fixed, sizes, data] = messages[receiver];
+              cells.push_back(cell->level());
+              cells.push_back(cell->index());
+              fixed.insert(fixed.end(), data_fixed, data_fixed + size_fixed);
+              if (variable_size)
+                {
+                  sizes.push_back(size_variable);
+                  data.insert(data.end(),
+                              data_variable,
+                              data_variable + size_variable);
+                }
+            }
+
+          data_variable += size_variable;
+        }
+
+      const auto received =
+        Utilities::MPI::some_to_some(this->get_mpi_communicator(), messages);
+
+      // Rebuild the cell relations and the receive buffers in the order of
+      // the received messages. The cell status is part of the fixed size
+      // data.
+      this->local_cell_relations.clear();
+      serializer.dest_data_fixed.clear();
+      serializer.dest_sizes_variable.clear();
+      serializer.dest_data_variable.clear();
+      for (const auto &[sender, message] : received)
+        {
+          const auto &[cells, fixed, sizes, data] = message;
+          for (unsigned int i = 0; i < cells.size(); i += 2)
+            {
+              const cell_iterator cell(this, cells[i], cells[i + 1]);
+              this->local_cell_relations.emplace_back(cell,
+                                                      CellStatus::cell_invalid);
+            }
+          serializer.dest_data_fixed.insert(serializer.dest_data_fixed.end(),
+                                            fixed.begin(),
+                                            fixed.end());
+          serializer.dest_sizes_variable.insert(
+            serializer.dest_sizes_variable.end(), sizes.begin(), sizes.end());
+          serializer.dest_data_variable.insert(
+            serializer.dest_data_variable.end(), data.begin(), data.end());
+        }
+
+      serializer.unpack_cell_status(this->local_cell_relations);
     }
 
 

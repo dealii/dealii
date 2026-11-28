@@ -21,13 +21,14 @@
 #include <deal.II/distributed/shared_tria.h>
 
 #include <deal.II/dofs/dof_handler.h>
+#include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_q.h>
 
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria.h>
 
-#include <deal.II/lac/vector.h>
+#include <deal.II/lac/la_parallel_vector.h>
 
 #include <deal.II/numerics/solution_transfer.h>
 
@@ -50,19 +51,25 @@ test(const bool allow_artificial_cells)
   tria.begin_active()->set_refine_flag();
   tria.prepare_coarsening_and_refinement();
 
-  Vector<double> sol_old(dh.n_dofs());
+  using VectorType = LinearAlgebra::distributed::Vector<double>;
+  VectorType sol_old(dh.locally_owned_dofs(),
+                     DoFTools::extract_locally_relevant_dofs(dh),
+                     MPI_COMM_WORLD);
   sol_old = 1.;
+  sol_old.update_ghost_values();
 
-  SolutionTransfer<dim> soltrans(dh);
+  SolutionTransfer<dim, VectorType> soltrans(dh);
   soltrans.prepare_for_coarsening_and_refinement(sol_old);
 
   tria.execute_coarsening_and_refinement();
   dh.distribute_dofs(fe);
 
-  Vector<double> sol_new(dh.n_dofs());
+  VectorType sol_new(dh.locally_owned_dofs(),
+                     DoFTools::extract_locally_relevant_dofs(dh),
+                     MPI_COMM_WORLD);
   soltrans.interpolate(sol_new);
 
-  for (unsigned int i = 0; i < sol_new.size(); ++i)
+  for (const auto i : sol_new.locally_owned_elements())
     AssertThrow(sol_new[i] == 1., ExcInternalError());
 
   deallog << "OK" << std::endl;

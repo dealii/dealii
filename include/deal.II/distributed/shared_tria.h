@@ -215,6 +215,11 @@ namespace parallel
          * @note If you plan to use a custom partition with geometric multigrid,
          * you must manually partition the level cells in addition to the active
          * cells.
+         *
+         * @note If artificial cells are allowed and data is attached to
+         * cells (for example by SolutionTransfer), the user defined function
+         * must assign all children of a cell to the same process if they are
+         * all active. The other partitioning schemes do this automatically.
          */
         partition_custom_signal = 0x4,
 
@@ -438,6 +443,14 @@ namespace parallel
       partition();
 
       /**
+       * Assign all children of a cell to the same owner if they are all
+       * active, so that they can be coarsened on one process. The owner is
+       * the process that owns most of the children.
+       */
+      void
+      group_siblings();
+
+      /**
        * Store the true subdomain ids of all cells and, if requested in the
        * constructor of the class, mark all cells that are neither locally
        * owned nor part of the ghost layer as artificial.
@@ -454,6 +467,15 @@ namespace parallel
        */
       void
       communicate_coarsening_and_refinement_flags();
+
+      /**
+       * Send the data that was attached to locally owned cells before
+       * refinement and partitioning to the processes that own these cells
+       * (or, for refined cells, any of their children) afterwards. Only used
+       * with artificial cells.
+       */
+      void
+      execute_transfer();
 
       /**
        * A vector containing subdomain IDs of cells obtained by partitioning

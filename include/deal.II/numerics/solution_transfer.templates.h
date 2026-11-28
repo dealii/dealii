@@ -483,14 +483,38 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
         "The transferred data was packed with a different number of dofs than "
         "the currently registered FE object assigned to the DoFHandler has."));
 
+  // When averaging, only add to locally owned cells. The contributions of
+  // all other cells are added by the processes that own them.
+  const auto distribute =
+    [&](const Vector<typename VectorType::value_type> &local_values,
+        VectorType                                    &vector) {
+      if (cell->is_active())
+        {
+          if (cell->is_locally_owned())
+            cell->distribute_local_to_global_by_interpolation(local_values,
+                                                              vector,
+                                                              fe_index);
+          return;
+        }
+
+      const auto &fe = dof_handler->get_fe(fe_index);
+      Vector<typename VectorType::value_type> child_values(dofs_per_cell);
+      for (unsigned int c = 0; c < cell->n_children(); ++c)
+        if (cell->child(c)->is_locally_owned())
+          {
+            fe.get_prolongation_matrix(c, cell->refinement_case())
+              .vmult(child_values, local_values);
+            cell->child(c)->distribute_local_to_global_by_interpolation(
+              child_values, vector, fe_index);
+          }
+    };
+
   // distribute data for each registered vector on mesh
   auto it_input  = cell_dof_values.cbegin();
   auto it_output = all_out.begin();
   for (; it_input != cell_dof_values.cend(); ++it_input, ++it_output)
     if (average_values)
-      cell->distribute_local_to_global_by_interpolation(*it_input,
-                                                        *(*it_output),
-                                                        fe_index);
+      distribute(*it_input, *(*it_output));
     else
       cell->set_dof_values_by_interpolation(*it_input,
                                             *(*it_output),
@@ -504,9 +528,7 @@ SolutionTransfer<dim, VectorType, spacedim>::unpack_callback(
       auto &ones = cell_dof_values.back();
       ones       = 1.0;
 
-      cell->distribute_local_to_global_by_interpolation(ones,
-                                                        valence,
-                                                        fe_index);
+      distribute(ones, valence);
     }
 }
 
