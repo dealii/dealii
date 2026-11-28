@@ -2353,9 +2353,18 @@ template <int dim, int spacedim>
 DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
 void DoFHandler<dim, spacedim>::setup_policy()
 {
-  // decide whether we need a sequential or a parallel distributed policy
-  if (dynamic_cast<const dealii::parallel::shared::Triangulation<dim, spacedim>
-                     *>(&this->get_triangulation()) != nullptr)
+  // decide whether we need a sequential or a parallel distributed policy.
+  // A parallel::shared::Triangulation with artificial cells has exactly one
+  // layer of ghost cells, just like a distributed triangulation, and uses the
+  // parallel distributed policy.
+  const auto shared_tria = dynamic_cast<
+    const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+    &this->get_triangulation());
+  if (shared_tria != nullptr && shared_tria->with_artificial_cells())
+    this->policy =
+      std::make_unique<internal::DoFHandlerImplementation::Policy::
+                         ParallelDistributed<dim, spacedim>>(*this);
+  else if (shared_tria != nullptr)
     this->policy = std::make_unique<internal::DoFHandlerImplementation::Policy::
                                       ParallelShared<dim, spacedim>>(*this);
   else if (dynamic_cast<
@@ -2487,16 +2496,17 @@ void DoFHandler<dim, spacedim>::renumber_dofs(
 
       if constexpr (running_in_debug_mode())
         {
-          if (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim>
-                             *>(&*this->tria) != nullptr)
+          const auto shared_tria = dynamic_cast<
+            const parallel::shared::Triangulation<dim, spacedim> *>(
+            &*this->tria);
+          if (shared_tria != nullptr && !shared_tria->with_artificial_cells())
             {
               Assert(new_numbers.size() == this->n_dofs() ||
                        new_numbers.size() == this->n_locally_owned_dofs(),
                      ExcMessage("Incorrect size of the input array."));
             }
-          else if (dynamic_cast<
-                     const parallel::DistributedTriangulationBase<dim, spacedim>
-                       *>(&*this->tria) != nullptr)
+          else if (dynamic_cast<const parallel::TriangulationBase<dim, spacedim>
+                                  *>(&*this->tria) != nullptr)
             {
               AssertDimension(new_numbers.size(), this->n_locally_owned_dofs());
             }

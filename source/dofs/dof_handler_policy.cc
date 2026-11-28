@@ -1070,9 +1070,13 @@ namespace internal
           // have already treated
           std::vector<bool> include_vertex(
             dof_handler.get_triangulation().n_vertices(), false);
-          if (dynamic_cast<const dealii::parallel::
-                             DistributedTriangulationBase<dim, spacedim> *>(
-                &dof_handler.get_triangulation()) != nullptr)
+          const auto shared_tria = dynamic_cast<
+            const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation());
+          if ((dynamic_cast<const dealii::parallel::
+                              DistributedTriangulationBase<dim, spacedim> *>(
+                 &dof_handler.get_triangulation()) != nullptr) ||
+              (shared_tria != nullptr && shared_tria->with_artificial_cells()))
             for (const auto &cell : dof_handler.active_cell_iterators())
               if (cell->is_ghost())
                 for (const unsigned int v : cell->vertex_indices())
