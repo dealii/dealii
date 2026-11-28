@@ -3969,6 +3969,16 @@ public:
    * no longer for callbacks with status
    * `CellStatus::children_will_be_coarsened`.
    *
+   * @note If the status is `CellStatus::cell_will_be_refined`, the
+   * children of the cell are not necessarily all locally owned. The
+   * callback is then called with the same data on every process that owns
+   * at least one of the children. It *must* store the data on its locally
+   * owned children. It may also *set* values on the other children
+   * (VectorOperation::insert), provided that they are identical to the
+   * values the owning process sets. It must not *add* to them
+   * (VectorOperation::add): the owning process adds its own contribution,
+   * so these values would be counted twice.
+   *
    * The first argument to this function, `handle`, corresponds to
    * the return value of register_data_attach(). (The precise
    * meaning of what the numeric value of this handle is supposed

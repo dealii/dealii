@@ -469,6 +469,15 @@ namespace parallel
       communicate_coarsening_and_refinement_flags();
 
       /**
+       * Send the data that was attached to locally owned cells before
+       * refinement and partitioning to the processes that own these cells
+       * (or, for refined cells, any of their children) afterwards. Only used
+       * with artificial cells.
+       */
+      void
+      execute_transfer();
+
+      /**
        * A vector containing subdomain IDs of cells obtained by partitioning
        * using either zorder, METIS, or a user-defined partitioning scheme.
        * In case allow_artificial_cells is false, this vector is
