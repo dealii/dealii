@@ -420,7 +420,9 @@ public:
    * distributed computation).
    *
    * The vector has to have the right size before being passed to this
-   * function.
+   * function. If some of the degrees of freedom of this object are not
+   * stored, which happens on objects of artificial cells, all entries are set
+   * to numbers::invalid_dof_index.
    *
    * The last argument denotes the finite element index. For the standard
    * ::DoFHandler class, this value must be equal to its default value since
@@ -2371,115 +2373,34 @@ namespace internal
         boost::container::small_vector<dealii::types::global_dof_index, 100>;
 
       /**
-       * Process the @p local_index-th degree of freedom corresponding to the
-       * finite element specified by @p fe_index on the vertex with global
-       * number @p vertex_index to @p global_index.
+       * Return a pointer to the @p local_index-th degree of freedom
+       * corresponding to the finite element specified by @p fe_index on the
+       * object with level @p obj_level and index @p obj_index. Return a null
+       * pointer if the object does not store any degrees of freedom. This is
+       * the case for objects that are only adjacent to artificial cells.
        *
        * The template argument `structdim` indicates the
        * dimensionality of the object on which we seek to know the DoF
        * index. For example, if `structdim==0`, then we are looking to
        * get a DoF index on a vertex of the indicated cell.
        */
-      template <int dim,
-                int spacedim,
-                int structdim,
-                typename GlobalIndexType,
-                typename DoFPProcessor>
-      static void
-      process_dof_index(const DoFHandler<dim, spacedim> &dof_handler,
-                        const unsigned int               obj_level,
-                        const unsigned int               obj_index,
-                        const types::fe_index            fe_index,
-                        const unsigned int               local_index,
-                        const std::integral_constant<int, structdim> &,
-                        GlobalIndexType     &global_index,
-                        const DoFPProcessor &process)
+      template <int dim, int spacedim, int structdim>
+      static types::global_dof_index *
+      find_dof_index(const DoFHandler<dim, spacedim>              &dof_handler,
+                     const unsigned int                            obj_level,
+                     const unsigned int                            obj_index,
+                     const types::fe_index                         fe_index,
+                     const unsigned int                            local_index,
+                     const std::integral_constant<int, structdim> &dd)
       {
-        Assert(structdim == dim || obj_level == 0, ExcNotImplemented());
+        const auto [first, n_dofs] =
+          process_object_range(dof_handler, obj_level, obj_index, fe_index, dd);
+        if (n_dofs == 0)
+          return nullptr;
 
-        // 1) no hp used -> fe_index == 0
-        if (dof_handler.hp_capability_enabled == false)
-          {
-            AssertDimension(fe_index,
-                            (DoFHandler<dim, spacedim>::default_fe_index));
-
-            process(
-              dof_handler.object_dof_indices
-                [obj_level][structdim]
-                [dof_handler.object_dof_ptr[obj_level][structdim][obj_index] +
-                 local_index],
-              global_index);
-
-            return;
-          }
-
-        // 2) cell and hp is used -> there is only one fe_index
-        if (structdim == dim)
-          {
-            process(
-              dof_handler.object_dof_indices
-                [obj_level][structdim]
-                [dof_handler.object_dof_ptr[obj_level][structdim][obj_index] +
-                 local_index],
-              global_index);
-            return;
-          }
-
-        // 3) general entity and hp is used
-        AssertIndexRange(obj_level, dof_handler.object_dof_indices.size());
-        AssertIndexRange(structdim,
-                         dof_handler.object_dof_indices[obj_level].size());
-
-        Assert(dof_handler.hp_capability_enabled, ExcInternalError());
-
-        AssertIndexRange(structdim, dof_handler.hp_object_fe_ptr.size());
-        AssertIndexRange(obj_index,
-                         dof_handler.hp_object_fe_ptr[structdim].size());
-
-        const auto ptr =
-          std::find(dof_handler.hp_object_fe_indices[structdim].begin() +
-                      dof_handler.hp_object_fe_ptr[structdim][obj_index],
-                    dof_handler.hp_object_fe_indices[structdim].begin() +
-                      dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
-                    fe_index);
-
-        Assert(ptr != dof_handler.hp_object_fe_indices[structdim].begin() +
-                        dof_handler.hp_object_fe_ptr[structdim][obj_index + 1],
-               ExcMessage(
-                 "You are requesting an active FE index that is not assigned "
-                 "to any of the cells connected to this entity."));
-
-        const types::fe_index fe_index_ =
-          std::distance(dof_handler.hp_object_fe_indices[structdim].begin() +
-                          dof_handler.hp_object_fe_ptr[structdim][obj_index],
-                        ptr);
-
-        AssertIndexRange(
-          dof_handler.hp_capability_enabled ?
-            (dof_handler.hp_object_fe_ptr[structdim][obj_index] + fe_index_) :
-            obj_index,
-          dof_handler.object_dof_ptr[obj_level][structdim].size());
-
-        AssertIndexRange(
-          dof_handler.object_dof_ptr
-              [obj_level][structdim]
-              [dof_handler.hp_capability_enabled ?
-                 (dof_handler.hp_object_fe_ptr[structdim][obj_index] +
-                  fe_index_) :
-                 obj_index] +
-            local_index,
-          dof_handler.object_dof_indices[obj_level][structdim].size());
-
-        process(dof_handler.object_dof_indices
-                  [obj_level][structdim]
-                  [dof_handler.object_dof_ptr
-                     [obj_level][structdim]
-                     [dof_handler.hp_capability_enabled ?
-                        (dof_handler.hp_object_fe_ptr[structdim][obj_index] +
-                         fe_index_) :
-                        obj_index] +
-                   local_index],
-                global_index);
+        AssertIndexRange(local_index, n_dofs);
+        return &dof_handler.object_dof_indices[obj_level][structdim]
+                                              [first + local_index];
       }
 
       /**
@@ -2536,6 +2457,12 @@ namespace internal
         AssertIndexRange(structdim, dof_handler.hp_object_fe_ptr.size());
         AssertIndexRange(obj_index,
                          dof_handler.hp_object_fe_ptr[structdim].size());
+
+        // Objects that are only adjacent to artificial cells have no finite
+        // element and do not store any degrees of freedom.
+        if (dof_handler.hp_object_fe_ptr[structdim][obj_index] ==
+            dof_handler.hp_object_fe_ptr[structdim][obj_index + 1])
+          return {0, 0};
 
         const auto fe_index_local_ptr =
           std::find(dof_handler.hp_object_fe_indices[structdim].begin() +
@@ -2677,14 +2604,12 @@ namespace internal
                     const std::integral_constant<int, structdim> &dd,
                     const types::global_dof_index                 global_index)
       {
-        process_dof_index(dof_handler,
-                          obj_level,
-                          obj_index,
-                          fe_index,
-                          local_index,
-                          dd,
-                          global_index,
-                          [](auto &ptr, const auto &value) { ptr = value; });
+        const auto dof_index = find_dof_index(
+          dof_handler, obj_level, obj_index, fe_index, local_index, dd);
+        Assert(dof_index != nullptr,
+               ExcMessage("This object does not store degrees of freedom. "
+                          "It is only adjacent to artificial cells."));
+        *dof_index = global_index;
       }
 
 
@@ -2707,16 +2632,9 @@ namespace internal
                     const unsigned int                            local_index,
                     const std::integral_constant<int, structdim> &dd)
       {
-        types::global_dof_index global_index;
-        process_dof_index(dof_handler,
-                          obj_level,
-                          obj_index,
-                          fe_index,
-                          local_index,
-                          dd,
-                          global_index,
-                          [](const auto &ptr, auto &value) { value = ptr; });
-        return global_index;
+        const auto dof_index = find_dof_index(
+          dof_handler, obj_level, obj_index, fe_index, local_index, dd);
+        return dof_index != nullptr ? *dof_index : numbers::invalid_dof_index;
       }
 
 
@@ -3269,12 +3187,13 @@ namespace internal
                             dof_indices_ptr - get_array_ptr(const_dof_indices));
           }
 
-        // PM: This is a part that should not be reached since it indicates that
-        // an object (and/or its subobjects) is not active. However,
-        // unfortunately this function is called by
-        // DoFTools::set_periodicity_constraints() indirectly by
-        // get_dof_indices() also for artificial faces to determine if a face
-        // is artificial.
+        // Objects that are only adjacent to artificial cells do not store any
+        // degrees of freedom and are skipped above. If any of them was
+        // skipped, report all degrees of freedom of this object as invalid.
+        // DoFTools::set_periodicity_constraints() relies on this to detect
+        // faces of artificial cells.
+        if (dof_indices_ptr != end_dof_indices)
+          dof_indices_ptr = get_array_ptr(const_dof_indices);
         types::global_dof_index invalid_index = numbers::invalid_dof_index;
         for (; dof_indices_ptr < end_dof_indices; ++dof_indices_ptr)
           dof_processor(invalid_index, dof_indices_ptr);
