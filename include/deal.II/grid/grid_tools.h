@@ -1807,13 +1807,8 @@ namespace GridTools
     const typename Triangulation<dim, spacedim>::active_cell_iterator &cell,
     const Point<spacedim>                                             &position,
     const Mapping<dim, spacedim>                                      &mapping =
-      (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-         .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
-         ));
+      ReferenceCells::get_hypercube<dim>()
+        .template get_default_linear_mapping<spacedim>());
 
   /**
    * Compute a globally unique index for each vertex and hanging node
