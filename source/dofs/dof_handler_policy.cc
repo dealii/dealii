@@ -2364,9 +2364,6 @@ namespace internal
          * the then the vector of new numbers do not relate to the old
          * DoF number but instead to the index of the old DoF number
          * within the set of locally owned DoFs.
-         *
-         * (The IndexSet argument is not used in 1d because we only need
-         * it for parallel meshes and 1d doesn't support that right now.)
          */
         template <int dim, int space_dim>
         static void
@@ -2375,9 +2372,6 @@ namespace internal
                       const DoFHandler<dim, space_dim> &dof_handler,
                       const bool                        check_validity)
         {
-          if (dim == 1)
-            Assert(indices_we_care_about == IndexSet(0), ExcNotImplemented());
-
           // renumber DoF indices on vertices, cells, and faces. this
           // can be done in parallel because the respective functions
           // work on separate data structures
