@@ -1,0 +1,16 @@
+Changed: A DoFHandler on a parallel::shared::Triangulation with artificial
+cells now enumerates degrees of freedom in the same way as on a
+parallel::distributed::Triangulation: only locally owned and ghost cells
+carry degree of freedom indices, artificial cells do not. Previously, all
+cells carried valid indices. As a consequence, the numbering of degrees of
+freedom within the locally owned ranges changes. The following functions
+are no longer available for such triangulations, because they need the
+degrees of freedom on all cells: DoFTools::get_subdomain_association(),
+DoFTools::count_dofs_with_subdomain_association(),
+DoFTools::locally_owned_dofs_per_subdomain(),
+DoFTools::locally_relevant_dofs_per_subdomain(),
+DoFRenumbering::subdomain_wise(), and Legacy::SolutionTransfer. Use
+Utilities::MPI::all_gather() on DoFHandler::locally_owned_dofs() and
+SolutionTransfer instead. Without artificial cells, nothing changes.
+<br>
+(Matthias Maier, 2026/11/27)

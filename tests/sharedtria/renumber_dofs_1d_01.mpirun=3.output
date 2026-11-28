@@ -1,0 +1,8 @@
+
+DEAL:0::n_dofs: 33, n_locally_owned_dofs: 11, n_ghost_cells: 1
+
+DEAL:1::n_dofs: 33, n_locally_owned_dofs: 10, n_ghost_cells: 2
+
+
+DEAL:2::n_dofs: 33, n_locally_owned_dofs: 12, n_ghost_cells: 1
+
