@@ -2259,17 +2259,6 @@ void DoFHandler<dim, spacedim>::distribute_dofs(
     }
 
   {
-    // We would like to enumerate all dofs for shared::Triangulations. If an
-    // underlying shared::Tria allows artificial cells, we need to restore the
-    // true cell owners temporarily.
-    // We use the TemporarilyRestoreSubdomainIds class for this purpose: we save
-    // the current set of subdomain ids, set subdomain ids to the "true" owner
-    // of each cell upon construction of the TemporarilyRestoreSubdomainIds
-    // object, and later restore these flags when it is destroyed.
-    const internal::parallel::shared::TemporarilyRestoreSubdomainIds<dim,
-                                                                     spacedim>
-      subdomain_modifier(this->get_triangulation());
-
     // Adjust size of levels to the triangulation. Note that we still have to
     // allocate space for all degrees of freedom on this mesh (including ghost
     // and cells that are entirely stored on different processors), though we
