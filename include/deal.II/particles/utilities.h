@@ -318,12 +318,7 @@ namespace Particles
       const ComponentMask                             &field_comps = {},
       const Mapping<dim, spacedim>                    &mapping =
         (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-           .template get_default_linear_mapping<spacedim>()
-#else
-           .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
-           ))
+           .template get_default_linear_mapping<spacedim>()))
     {
       if (particle_handler.n_locally_owned_particles() == 0)
         {

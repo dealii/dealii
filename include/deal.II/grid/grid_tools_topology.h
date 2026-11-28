@@ -205,12 +205,7 @@ namespace GridTools
     const Triangulation<dim, spacedim> &tria,
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-         .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
-         ));
+         .template get_default_linear_mapping<spacedim>()));
 
   /**
    * Remove hanging nodes from a grid. If the @p isotropic parameter is set
@@ -322,12 +317,8 @@ namespace GridTools
   extract_used_vertices(const Triangulation<dim, spacedim> &container,
                         const Mapping<dim, spacedim>       &mapping =
                           (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
                              .template get_default_linear_mapping<spacedim>()
-#else
-                             .ReferenceCell<dim>::get_default_linear_mapping<
-                               spacedim>()
-#endif
+
                              ));
 
   /**

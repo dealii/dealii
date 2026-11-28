@@ -125,12 +125,8 @@ namespace GridTools
   minimal_cell_diameter(const Triangulation<dim, spacedim> &triangulation,
                         const Mapping<dim, spacedim>       &mapping =
                           (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
                              .template get_default_linear_mapping<spacedim>()
-#else
-                             .ReferenceCell<dim>::get_default_linear_mapping<
-                               spacedim>()
-#endif
+
                              ));
 
   /**
@@ -148,13 +144,7 @@ namespace GridTools
   maximal_cell_diameter(const Triangulation<dim, spacedim> &triangulation,
                         const Mapping<dim, spacedim>       &mapping =
                           (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-                             .template get_default_linear_mapping<spacedim>()
-#else
-                             .ReferenceCell<dim>::get_default_linear_mapping<
-                               spacedim>()
-#endif
-                             ));
+                             .template get_default_linear_mapping<spacedim>()));
 
   /**
    * Given a list of vertices (typically obtained using

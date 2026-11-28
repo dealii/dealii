@@ -290,12 +290,7 @@ namespace VectorTools
     AffineConstraints<double>    &constraints,
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-         .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
-         ),
+         .template get_default_linear_mapping<spacedim>()),
     const bool use_manifold_for_normal = true);
 
   /**
@@ -318,11 +313,8 @@ namespace VectorTools
     AffineConstraints<double>    &constraints,
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
          .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
+
          ),
     const IndexSet    &refinement_edge_indices = IndexSet(),
     const unsigned int level                   = numbers::invalid_unsigned_int,
@@ -353,12 +345,7 @@ namespace VectorTools
     AffineConstraints<number>          &constraints,
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-         .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
-         ),
+         .template get_default_linear_mapping<spacedim>()),
     const bool use_manifold_for_normal = true);
 
   /**
@@ -386,11 +373,8 @@ namespace VectorTools
     AffineConstraints<double>          &constraints,
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
          .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
+
          ),
     const IndexSet    &refinement_edge_indices = IndexSet(),
     const unsigned int level                   = numbers::invalid_unsigned_int,
@@ -430,11 +414,8 @@ namespace VectorTools
     AffineConstraints<double>    &constraints,
     const Mapping<dim, spacedim> &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
          .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
+
          ),
     const bool use_manifold_for_normal = true);
 
@@ -455,12 +436,7 @@ namespace VectorTools
     AffineConstraints<double>          &constraints,
     const Mapping<dim, spacedim>       &mapping =
       (ReferenceCells::get_hypercube<dim>()
-#ifndef _MSC_VER
-         .template get_default_linear_mapping<spacedim>()
-#else
-         .ReferenceCell<dim>::get_default_linear_mapping<spacedim>()
-#endif
-         ),
+         .template get_default_linear_mapping<spacedim>()),
     const bool use_manifold_for_normal = true);
 
   /** @} */
