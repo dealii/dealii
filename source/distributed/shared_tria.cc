@@ -25,6 +25,8 @@
 
 #include <deal.II/lac/sparsity_tools.h>
 
+#include <algorithm>
+#include <map>
 #include <type_traits>
 
 
@@ -154,6 +156,10 @@ namespace parallel
           AssertThrow(false, ExcInternalError());
         }
 
+      // A custom partition has to keep siblings together itself.
+      if (partition_settings != partition_custom_signal)
+        group_siblings();
+
       // do not partition multigrid levels if user is
       // defining a custom partition
       if ((settings & construct_multigrid_hierarchy) &&
@@ -193,6 +199,37 @@ namespace parallel
               Assert(total_cells == this->n_cells(),
                      ExcMessage("Not all cells are assigned to a processor."));
             }
+        }
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::group_siblings()
+    {
+      const auto is_active = [](const auto &cell) { return cell->is_active(); };
+      const auto by_count  = [](const auto &a, const auto &b) {
+        return a.second < b.second;
+      };
+
+      for (const auto &cell : this->cell_iterators())
+        {
+          const auto children = cell->child_iterators();
+          if (cell->is_active() ||
+              !std::all_of(children.begin(), children.end(), is_active))
+            continue;
+
+          std::map<types::subdomain_id, unsigned int> n_children;
+          for (const auto &child : children)
+            ++n_children[child->subdomain_id()];
+
+          const auto owner =
+            std::max_element(n_children.begin(), n_children.end(), by_count)
+              ->first;
+
+          for (const auto &child : children)
+            child->set_subdomain_id(owner);
         }
     }
 
