@@ -117,6 +117,12 @@ endif()
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
   list(APPEND DEAL_II_DEFINITIONS_DEBUG "DEBUG")
 
-  # generate some debug info:
-  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd /Od")
+  #
+  # Generate debug info, but optimize for size: An unoptimized debug build
+  # of deal.II produces a static library that exceeds the 4GB size limit
+  # of the MSVC librarian (LNK1248). /Zo improves the debug information
+  # for optimized code, /Zc:inline removes unreferenced inline functions
+  # and data from object files.
+  #
+  enable_if_supported(DEAL_II_CXX_FLAGS_DEBUG "/Zi /MDd /O1 /Zo /Zc:inline")
 endif()
