@@ -1,0 +1,6 @@
+
+DEAL::integral: 5001650000
+DEAL::random access: OK
+DEAL::bidirectional: 10000
+DEAL::small and empty ranges: OK
+DEAL::OK

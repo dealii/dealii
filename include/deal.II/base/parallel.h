@@ -25,12 +25,16 @@
 
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <memory>
+#include <optional>
 #include <tuple>
+#include <type_traits>
 
 #ifdef DEAL_II_WITH_TASKFLOW
 
 #  include <taskflow/algorithm/for_each.hpp>
+#  include <taskflow/algorithm/reduce.hpp>
 #  include <taskflow/taskflow.hpp>
 #endif
 
@@ -187,6 +191,20 @@ namespace parallel
       f(range.begin(), range.end());
     }
 #endif
+
+    /**
+     * Return the number of elements in the range <code>[begin,end)</code>,
+     * where @p Iterator is either an integral type or an iterator.
+     */
+    template <typename Iterator>
+    std::size_t
+    n_elements_in_range(const Iterator &begin, const Iterator &end)
+    {
+      if constexpr (std::is_integral_v<Iterator>)
+        return static_cast<std::size_t>(end - begin);
+      else
+        return static_cast<std::size_t>(std::distance(begin, end));
+    }
   } // namespace internal
 
 
@@ -271,12 +289,7 @@ namespace parallel
     Assert(grainsize > 0, ExcMessage("Grainsize must be a positive number."));
 
     // Count elements in the range
-    const std::size_t n = [&]() -> auto {
-      if constexpr (std::is_integral_v<Iterator>)
-        return static_cast<std::size_t>(end - begin);
-      else
-        return static_cast<std::size_t>(std::distance(begin, end));
-    }();
+    const std::size_t n = internal::n_elements_in_range<Iterator>(begin, end);
 
     const bool worth_doing_in_parallel =
       (MultithreadInfo::n_threads() > 1) && (n > grainsize);
@@ -287,54 +300,36 @@ namespace parallel
         tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
         tf::Taskflow  taskflow;
 
-        if constexpr (std::is_integral_v<Iterator>)
-          {
-            // Integral "iterator" types (e.g., int): use plain arithmetic
-            using integral_type = Iterator;
+        taskflow.for_each_by_index(
+          tf::IndexRange<std::size_t>(0, n, 1),
+          [&, begin](const tf::IndexRange<std::size_t> &subrange) {
+            //
+            // Translate the index subrange into bounds of type Iterator.
+            // Integral types use plain arithmetic, iterators std::next().
+            //
+            Iterator subrange_begin = begin;
+            Iterator subrange_end   = begin;
+            if constexpr (std::is_integral_v<Iterator>)
+              {
+                subrange_begin += static_cast<Iterator>(subrange.begin());
+                subrange_end =
+                  subrange_begin + static_cast<Iterator>(subrange.size());
+              }
+            else
+              {
+                subrange_begin = std::next(begin, subrange.begin());
+                subrange_end   = std::next(subrange_begin, subrange.size());
+              }
 
-            tf::IndexRange<integral_type> range(0, n, 1);
+            f(subrange_begin, subrange_end);
+          },
+          tf::GuidedPartitioner(grainsize));
 
-            taskflow.for_each_by_index(
-              range,
-              [&, begin](const tf::IndexRange<integral_type> &subrange) {
-                integral_type subrange_begin =
-                  begin + static_cast<integral_type>(subrange.begin());
-
-                integral_type subrange_end =
-                  subrange_begin + static_cast<integral_type>(subrange.size());
-
-                f(subrange_begin, subrange_end);
-              },
-              tf::GuidedPartitioner(grainsize));
-          }
-        else
-          {
-            // Non-integral iterator types: advance from 'begin' using
-            // std::distance/std::advance
-            using diff_t =
-              typename std::iterator_traits<Iterator>::difference_type;
-
-            tf::IndexRange<std::size_t> range(0, n, 1);
-
-            taskflow.for_each_by_index(
-              range,
-              [&, begin](const tf::IndexRange<std::size_t> &subrange) {
-                Iterator subrange_begin = begin;
-                std::advance(subrange_begin,
-                             static_cast<diff_t>(subrange.begin()));
-
-                Iterator subrange_end = subrange_begin;
-                std::advance(subrange_end,
-                             static_cast<diff_t>(subrange.size()));
-
-                f(subrange_begin, subrange_end);
-              },
-              tf::GuidedPartitioner(grainsize));
-          }
-
-        // Schedule the work. If we are within a task, we are required to use
-        // corun() without wait() to avoid a potential deadlock as described in
-        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+        //
+        // Schedule the work. If we are within a task, we have to use corun()
+        // instead of run().wait() to avoid a potential deadlock, see
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker
+        //
         if (executor.this_worker_id() != -1)
           executor.corun(taskflow);
         else
@@ -384,14 +379,14 @@ namespace parallel
    * copy or arithmetic operations on an array of pointers. In that case,
    * apply_to_subranges will generate a lot of code (or rather, a lot of
    * symbols) because it passes the long names generated by std::bind to the
-   * templated parallel for functions in TBB. This can considerably increase
-   * compile times and the size of the object code. Similarly, the incorrect
-   * use of std::bind often results in very cryptic error messages, which can
-   * be avoided by this class (only a virtual function needs to be defined in
-   * a derived class). Finally, the additional cost of a virtual function is
-   * negligible in the context of parallel functions: It is much more
-   * expensive to actually issue the work onto a thread, which in turn should
-   * be much less than the actual work done in the for loop.
+   * templated parallel for functions of the threading backend. This can
+   * considerably increase compile times and the size of the object code.
+   * Similarly, the incorrect use of std::bind often results in very cryptic
+   * error messages, which can be avoided by this class (only a virtual function
+   * needs to be defined in a derived class). Finally, the additional cost of a
+   * virtual function is negligible in the context of parallel functions: It is
+   * much more expensive to actually issue the work onto a thread, which in turn
+   * should be much less than the actual work done in the for loop.
    */
   struct ParallelForInteger
   {
@@ -503,7 +498,75 @@ namespace parallel
                               const std_cxx20::type_identity_t<Iterator> &end,
                               const unsigned int grainsize)
   {
-#ifndef DEAL_II_WITH_TBB
+    Assert(grainsize > 0, ExcMessage("Grainsize must be a positive number."));
+
+#ifdef DEAL_II_WITH_TASKFLOW
+    const std::size_t n = internal::n_elements_in_range<Iterator>(begin, end);
+
+    if ((MultithreadInfo::n_threads() > 1) && (n > grainsize))
+      {
+        tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+        tf::Taskflow  taskflow;
+
+        ResultType result(0);
+
+        taskflow.reduce_by_index(
+          tf::IndexRange<std::size_t>(0, n, 1),
+          result,
+          //
+          // The local reduction: Taskflow calls this function for
+          // consecutive subranges handled by the same worker and passes the
+          // running total of that worker, which is empty for the first
+          // subrange. We add the result of f() on the subrange to it.
+          //
+          [&f, begin](const tf::IndexRange<std::size_t> &subrange,
+                      std::optional<ResultType>          running_total) {
+            //
+            // Translate the index subrange into bounds of type Iterator.
+            // Integral types use plain arithmetic, iterators std::next().
+            //
+            Iterator subrange_begin = begin;
+            Iterator subrange_end   = begin;
+            if constexpr (std::is_integral_v<Iterator>)
+              {
+                subrange_begin += static_cast<Iterator>(subrange.begin());
+                subrange_end =
+                  subrange_begin + static_cast<Iterator>(subrange.size());
+              }
+            else
+              {
+                subrange_begin = std::next(begin, subrange.begin());
+                subrange_end   = std::next(subrange_begin, subrange.size());
+              }
+
+            ResultType value =
+              running_total.has_value() ? *running_total : ResultType(0);
+            value += f(subrange_begin, subrange_end);
+            return value;
+          },
+          //
+          // The global reduction: combine the running totals of all workers
+          // into the final result.
+          //
+          std::plus<ResultType>(),
+          tf::GuidedPartitioner(grainsize));
+
+        //
+        // Schedule the work. If we are within a task, we have to use corun()
+        // instead of run().wait() to avoid a potential deadlock, see
+        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker
+        //
+        if (executor.this_worker_id() != -1)
+          executor.corun(taskflow);
+        else
+          executor.run(taskflow).wait();
+
+        return result;
+      }
+
+    return f(begin, end);
+
+#elif !defined(DEAL_II_WITH_TBB)
     // make sure we don't get compiler
     // warnings about unused arguments
     (void)grainsize;
@@ -638,21 +701,15 @@ namespace parallel
     const std::size_t end,
     const std::size_t minimum_parallel_grain_size) const
   {
-#ifndef DEAL_II_WITH_TBB
-    // make sure we don't get compiler
-    // warnings about unused arguments
-    (void)minimum_parallel_grain_size;
-
-    apply_to_subrange(begin, end);
-#else
-    internal::parallel_for(
+    // Defer to apply_to_subranges(), which dispatches to taskflow, TBB, or
+    // runs sequentially, depending on the configuration:
+    parallel::apply_to_subranges(
       begin,
       end,
-      [this](const tbb::blocked_range<std::size_t> &range) {
-        apply_to_subrange(range.begin(), range.end());
+      [this](const std::size_t subrange_begin, const std::size_t subrange_end) {
+        apply_to_subrange(subrange_begin, subrange_end);
       },
-      minimum_parallel_grain_size);
-#endif
+      static_cast<unsigned int>(minimum_parallel_grain_size));
   }
 
 } // end of namespace parallel
