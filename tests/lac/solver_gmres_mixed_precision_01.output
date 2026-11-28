@@ -1,0 +1,76 @@
+
+DEAL:double basis:CGS::left converged in 94 steps, error ok
+DEAL:double basis:CGS::right converged in 94 steps, error ok
+DEAL:double basis:CGS::left, explicit residual converged in 94 steps, error ok
+DEAL:double basis:CGS::left, no restart converged in 75 steps, error ok
+DEAL:double basis:CGS::right, no restart converged in 75 steps, error ok
+DEAL:double basis:DCGS::left converged in 94 steps, error ok
+DEAL:double basis:DCGS::right converged in 94 steps, error ok
+DEAL:double basis:DCGS::left, explicit residual converged in 94 steps, error ok
+DEAL:double basis:DCGS::left, no restart converged in 75 steps, error ok
+DEAL:double basis:DCGS::right, no restart converged in 75 steps, error ok
+DEAL:double basis:MGS::left converged in 94 steps, error ok
+DEAL:double basis:MGS::right converged in 94 steps, error ok
+DEAL:double basis:MGS::left, explicit residual converged in 94 steps, error ok
+DEAL:double basis:MGS::left, no restart converged in 75 steps, error ok
+DEAL:double basis:MGS::right, no restart converged in 75 steps, error ok
+DEAL:float basis:CGS::left converged in 94 steps, error ok
+DEAL:float basis:CGS::right converged in 94 steps, error ok
+DEAL:float basis:CGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis:CGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis:CGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis:DCGS::left converged in 94 steps, error ok
+DEAL:float basis:DCGS::right converged in 94 steps, error ok
+DEAL:float basis:DCGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis:DCGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis:DCGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis:MGS::left converged in 94 steps, error ok
+DEAL:float basis:MGS::right converged in 94 steps, error ok
+DEAL:float basis:MGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis:MGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis:MGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis default:CGS::left converged in 94 steps, error ok
+DEAL:float basis default:CGS::right converged in 94 steps, error ok
+DEAL:float basis default:CGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis default:CGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis default:CGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis default:DCGS::left converged in 94 steps, error ok
+DEAL:float basis default:DCGS::right converged in 94 steps, error ok
+DEAL:float basis default:DCGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis default:DCGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis default:DCGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis default:MGS::left converged in 94 steps, error ok
+DEAL:float basis default:MGS::right converged in 94 steps, error ok
+DEAL:float basis default:MGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis default:MGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis default:MGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis block:CGS::left converged in 94 steps, error ok
+DEAL:float basis block:CGS::right converged in 94 steps, error ok
+DEAL:float basis block:CGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis block:CGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis block:CGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis block:DCGS::left converged in 94 steps, error ok
+DEAL:float basis block:DCGS::right converged in 94 steps, error ok
+DEAL:float basis block:DCGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis block:DCGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis block:DCGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis block:MGS::left converged in 94 steps, error ok
+DEAL:float basis block:MGS::right converged in 94 steps, error ok
+DEAL:float basis block:MGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis block:MGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis block:MGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis serial:CGS::left converged in 94 steps, error ok
+DEAL:float basis serial:CGS::right converged in 94 steps, error ok
+DEAL:float basis serial:CGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis serial:CGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis serial:CGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis serial:DCGS::left converged in 94 steps, error ok
+DEAL:float basis serial:DCGS::right converged in 94 steps, error ok
+DEAL:float basis serial:DCGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis serial:DCGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis serial:DCGS::right, no restart converged in 87 steps, error ok
+DEAL:float basis serial:MGS::left converged in 94 steps, error ok
+DEAL:float basis serial:MGS::right converged in 94 steps, error ok
+DEAL:float basis serial:MGS::left, explicit residual converged in 94 steps, error ok
+DEAL:float basis serial:MGS::left, no restart converged in 87 steps, error ok
+DEAL:float basis serial:MGS::right, no restart converged in 87 steps, error ok

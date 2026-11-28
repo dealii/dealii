@@ -1,0 +1,11 @@
+New: SolverGMRES, SolverFGMRES, and SolverMPGMRES have now a second template
+argument BasisVectorType for the vectors storing the orthonormal Arnoldi
+basis, which defaults to the vector type used for the solution. This change
+allows to store the basis in lower precision, e.g., with
+SolverGMRES<LinearAlgebra::distributed::Vector<double>,
+LinearAlgebra::distributed::Vector<float>>, which reduces the memory transfer
+of the orthogonalization step, while the attainable accuracy is still
+determined by the solution vector type. This approach is inspired by the
+"compressed basis GMRES" by Aliaga et al. @cite Aliaga2022.
+<br>
+(Martin Kronbichler, 2026/11/23)

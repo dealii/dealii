@@ -1,0 +1,61 @@
+
+DEAL:double basis:CGS::FGMRES converged in 94 steps, error ok
+DEAL:double basis:CGS::FGMRES, no restart converged in 75 steps, error ok
+DEAL:double basis:CGS::MPGMRES converged in 16 steps, error ok
+DEAL:double basis:CGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:double basis:DCGS::FGMRES converged in 94 steps, error ok
+DEAL:double basis:DCGS::FGMRES, no restart converged in 75 steps, error ok
+DEAL:double basis:DCGS::MPGMRES converged in 16 steps, error ok
+DEAL:double basis:DCGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:double basis:MGS::FGMRES converged in 94 steps, error ok
+DEAL:double basis:MGS::FGMRES, no restart converged in 75 steps, error ok
+DEAL:double basis:MGS::MPGMRES converged in 16 steps, error ok
+DEAL:double basis:MGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis:CGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis:CGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis:CGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis:CGS::MPGMRES, no restart converged in 18 steps, error ok
+DEAL:float basis:DCGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis:DCGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis:DCGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis:DCGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis:MGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis:MGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis:MGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis:MGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis default:CGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis default:CGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis default:CGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis default:CGS::MPGMRES, no restart converged in 18 steps, error ok
+DEAL:float basis default:DCGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis default:DCGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis default:DCGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis default:DCGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis default:MGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis default:MGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis default:MGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis default:MGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis block:CGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis block:CGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis block:CGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis block:CGS::MPGMRES, no restart converged in 18 steps, error ok
+DEAL:float basis block:DCGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis block:DCGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis block:DCGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis block:DCGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis block:MGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis block:MGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis block:MGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis block:MGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis serial:CGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis serial:CGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis serial:CGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis serial:CGS::MPGMRES, no restart converged in 18 steps, error ok
+DEAL:float basis serial:DCGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis serial:DCGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis serial:DCGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis serial:DCGS::MPGMRES, no restart converged in 16 steps, error ok
+DEAL:float basis serial:MGS::FGMRES converged in 94 steps, error ok
+DEAL:float basis serial:MGS::FGMRES, no restart converged in 87 steps, error ok
+DEAL:float basis serial:MGS::MPGMRES converged in 16 steps, error ok
+DEAL:float basis serial:MGS::MPGMRES, no restart converged in 16 steps, error ok

@@ -123,13 +123,15 @@ namespace internal
 
 
 
-    template <bool delayed_reorthogonalization, typename Number>
+    template <bool delayed_reorthogonalization,
+              typename Number,
+              typename BasisNumber>
     void
-    do_Tvmult_add_host(const unsigned int             n_vectors,
-                       const std::size_t              locally_owned_size,
-                       const Number                  *current_vector,
-                       OrthogonalizationData<Number> &temp_data,
-                       Vector<double>                &h)
+    do_Tvmult_add_host(const unsigned int                  n_vectors,
+                       const std::size_t                   locally_owned_size,
+                       const Number                       *current_vector,
+                       OrthogonalizationData<BasisNumber> &temp_data,
+                       Vector<double>                     &h)
     {
       unsigned int j                  = 0;
       const auto  &orthogonal_vectors = temp_data.vector_ptrs;
@@ -342,19 +344,24 @@ namespace internal
 
 
 
-    template <bool delayed_reorthogonalization, typename Number>
+    template <bool delayed_reorthogonalization,
+              typename Number,
+              typename BasisNumber>
     double
-    do_subtract_and_norm_host(const unsigned int             n_vectors,
-                              const std::size_t              locally_owned_size,
-                              OrthogonalizationData<Number> &temp_data,
-                              const Vector<double>          &h,
-                              Number                        *current_vector)
+    do_subtract_and_norm_host(const unsigned int n_vectors,
+                              const std::size_t  locally_owned_size,
+                              OrthogonalizationData<BasisNumber> &temp_data,
+                              const Vector<double>               &h,
+                              Number      *current_vector,
+                              BasisNumber *basis_output)
     {
+      Assert(delayed_reorthogonalization || basis_output == nullptr,
+             ExcInternalError());
       const auto &orthogonal_vectors = temp_data.vector_ptrs;
       double      norm_vv_temp       = 0;
 
-      Number *previous_vector =
-        const_cast<Number *>(orthogonal_vectors[n_vectors - 1]);
+      BasisNumber *previous_vector =
+        const_cast<BasisNumber *>(orthogonal_vectors[n_vectors - 1]);
       const double inverse_norm_previous =
         delayed_reorthogonalization ? 1. / h(n_vectors + n_vectors - 1) : 0.;
       const double scaling_factor_vv =
@@ -422,6 +429,8 @@ namespace internal
                         temp[k] -= last_factor * prev_vector[k];
                         temp[k] = temp[k] * scaling_factor_vv;
                         temp[k].store(current_vector + j + k * n_lanes);
+                        if (basis_output != nullptr)
+                          temp[k].store(basis_output + j + k * n_lanes);
                       }
                   else
                     for (unsigned int k = 0; k < inner_batch_size; ++k)
@@ -471,6 +480,8 @@ namespace internal
               temp -= h(n_vectors - 1) * prev_vector;
               temp = temp * scaling_factor_vv;
               temp.store(current_vector + j);
+              if (basis_output != nullptr)
+                temp.store(basis_output + j);
             }
           else
             {
@@ -495,7 +506,7 @@ namespace internal
                   prev_vector -= h(n_vectors + i) * vec;
                 }
               prev_vector *= inverse_norm_previous;
-              previous_vector[j] = prev_vector;
+              previous_vector[j] = static_cast<BasisNumber>(prev_vector);
               temp -= h(n_vectors - 1) * prev_vector;
               temp *= scaling_factor_vv;
             }
@@ -507,6 +518,8 @@ namespace internal
               norm_vv_temp += temp * temp;
             }
           current_vector[j] = temp;
+          if (basis_output != nullptr)
+            basis_output[j] = static_cast<BasisNumber>(temp);
         }
 
       return norm_vv_temp;
@@ -514,14 +527,14 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename BasisNumber>
     void
-    do_add_host(const unsigned int             n_vectors,
-                const std::size_t              locally_owned_size,
-                OrthogonalizationData<Number> &temp_data,
-                const Vector<double>          &h,
-                const bool                     zero_out,
-                Number                        *output)
+    do_add_host(const unsigned int                  n_vectors,
+                const std::size_t                   locally_owned_size,
+                OrthogonalizationData<BasisNumber> &temp_data,
+                const Vector<double>               &h,
+                const bool                          zero_out,
+                Number                             *output)
     {
       const auto &orthogonal_vectors = temp_data.vector_ptrs;
 
@@ -734,15 +747,17 @@ namespace internal
 
 
 
-    template <bool delayed_reorthogonalization, typename Number>
+    template <bool delayed_reorthogonalization,
+              typename Number,
+              typename BasisNumber>
     void
-    do_Tvmult_add_device(const unsigned int             n_vectors,
-                         const std::size_t              locally_owned_size,
-                         const Number                  *current_vector,
-                         OrthogonalizationData<Number> &temp_data,
-                         Vector<double>                &h)
+    do_Tvmult_add_device(const unsigned int                  n_vectors,
+                         const std::size_t                   locally_owned_size,
+                         const Number                       *current_vector,
+                         OrthogonalizationData<BasisNumber> &temp_data,
+                         Vector<double>                     &h)
     {
-      using Data                          = DeviceData<Number>;
+      using Data                          = DeviceData<BasisNumber>;
       constexpr int         block_size    = Data::block_size;
       constexpr std::size_t rows_per_team = Data::rows_per_team;
 
@@ -794,7 +809,7 @@ namespace internal
           // lower than 3.7, so choose low-level 'min' representation.
           const std::size_t end =
             (begin + rows_per_team) < size ? (begin + rows_per_team) : size;
-          [[maybe_unused]] const Number *prev = ptrs(n_vectors - 1).ptr;
+          [[maybe_unused]] const BasisNumber *prev = ptrs(n_vectors - 1).ptr;
 
           for (unsigned int block = 0; block < n_blocks; ++block)
             {
@@ -804,7 +819,7 @@ namespace internal
 
               // Pad the last block with a valid pointer (data is in caches,
               // results are discarded) to keep the inner loop unrolled.
-              const Number *v[block_size];
+              const BasisNumber *v[block_size];
               for (int b = 0; b < block_size; ++b)
                 v[b] = ptrs(i0 + (b < static_cast<int>(nb) ? b : 0)).ptr;
 
@@ -867,15 +882,20 @@ namespace internal
 
 
 
-    template <bool delayed_reorthogonalization, typename Number>
+    template <bool delayed_reorthogonalization,
+              typename Number,
+              typename BasisNumber>
     double
     do_subtract_and_norm_device(const unsigned int n_vectors,
                                 const std::size_t  locally_owned_size,
-                                OrthogonalizationData<Number> &temp_data,
-                                const Vector<double>          &h,
-                                Number                        *current_vector)
+                                OrthogonalizationData<BasisNumber> &temp_data,
+                                const Vector<double>               &h,
+                                Number      *current_vector,
+                                BasisNumber *basis_output)
     {
-      using Data   = DeviceData<Number>;
+      Assert(delayed_reorthogonalization || basis_output == nullptr,
+             ExcInternalError());
+      using Data   = DeviceData<BasisNumber>;
       using Policy = Kokkos::RangePolicy<typename Data::ExecutionSpace,
                                          Kokkos::IndexType<std::size_t>>;
 
@@ -912,9 +932,9 @@ namespace internal
             "dealii::gmres_subtract_delayed",
             Policy(exec, 0, locally_owned_size),
             KOKKOS_LAMBDA(const std::size_t j) {
-              Number *previous_vector = ptrs(n_vectors - 1).ptr;
-              double  temp            = current_vector[j];
-              double  prev            = previous_vector[j];
+              BasisNumber *previous_vector = ptrs(n_vectors - 1).ptr;
+              double       temp            = current_vector[j];
+              double       prev            = previous_vector[j];
               for (unsigned int i = 0; i + 1 < n_vectors; ++i)
                 {
                   const double vec = ptrs(i).ptr[j];
@@ -922,9 +942,12 @@ namespace internal
                   prev -= coeffs(n_vectors + i) * vec;
                 }
               prev *= inverse_norm_previous;
-              previous_vector[j] = prev;
+              previous_vector[j] = static_cast<BasisNumber>(prev);
               temp -= last_factor * prev;
-              current_vector[j] = temp * scaling_factor_vv;
+              temp *= scaling_factor_vv;
+              current_vector[j] = static_cast<Number>(temp);
+              if (basis_output != nullptr)
+                basis_output[j] = static_cast<BasisNumber>(temp);
             });
 
           // the norm is computed from other quantities in the delayed
@@ -941,7 +964,7 @@ namespace internal
               double temp = current_vector[j];
               for (unsigned int i = 0; i < n_vectors; ++i)
                 temp -= coeffs(i) * ptrs(i).ptr[j];
-              current_vector[j] = temp;
+              current_vector[j] = static_cast<Number>(temp);
               sum += temp * temp;
             },
             norm_sqr);
@@ -951,16 +974,16 @@ namespace internal
 
 
 
-    template <typename Number>
+    template <typename Number, typename BasisNumber>
     void
-    do_add_device(const unsigned int             n_vectors,
-                  const std::size_t              locally_owned_size,
-                  OrthogonalizationData<Number> &temp_data,
-                  const Vector<double>          &h,
-                  const bool                     zero_out,
-                  Number                        *output)
+    do_add_device(const unsigned int                  n_vectors,
+                  const std::size_t                   locally_owned_size,
+                  OrthogonalizationData<BasisNumber> &temp_data,
+                  const Vector<double>               &h,
+                  const bool                          zero_out,
+                  Number                             *output)
     {
-      using Data = DeviceData<Number>;
+      using Data = DeviceData<BasisNumber>;
 
       AssertDimension(temp_data.vector_ptrs.size(), n_vectors);
       AssertIndexRange(n_vectors, h.size() + 1);
@@ -985,7 +1008,7 @@ namespace internal
           double temp = zero_out ? 0. : static_cast<double>(output[j]);
           for (unsigned int i = 0; i < n_vectors; ++i)
             temp += coeffs(i) * ptrs(i).ptr[j];
-          output[j] = temp;
+          output[j] = static_cast<Number>(temp);
         });
     }
 
@@ -993,13 +1016,14 @@ namespace internal
 
     template <bool delayed_reorthogonalization,
               typename MemorySpace,
-              typename Number>
+              typename Number,
+              typename BasisNumber>
     void
-    do_Tvmult_add(const unsigned int             n_vectors,
-                  const std::size_t              locally_owned_size,
-                  const Number                  *current_vector,
-                  OrthogonalizationData<Number> &temp_data,
-                  Vector<double>                &h)
+    do_Tvmult_add(const unsigned int                  n_vectors,
+                  const std::size_t                   locally_owned_size,
+                  const Number                       *current_vector,
+                  OrthogonalizationData<BasisNumber> &temp_data,
+                  Vector<double>                     &h)
     {
       if constexpr (std::is_same_v<MemorySpace, dealii::MemorySpace::Default>)
         do_Tvmult_add_device<delayed_reorthogonalization>(
@@ -1013,32 +1037,83 @@ namespace internal
 
     template <bool delayed_reorthogonalization,
               typename MemorySpace,
-              typename Number>
+              typename Number,
+              typename BasisNumber>
     double
-    do_subtract_and_norm(const unsigned int             n_vectors,
-                         const std::size_t              locally_owned_size,
-                         OrthogonalizationData<Number> &temp_data,
-                         const Vector<double>          &h,
-                         Number                        *current_vector)
+    do_subtract_and_norm(const unsigned int                  n_vectors,
+                         const std::size_t                   locally_owned_size,
+                         OrthogonalizationData<BasisNumber> &temp_data,
+                         const Vector<double>               &h,
+                         Number                             *current_vector,
+                         BasisNumber                        *basis_output)
     {
       if constexpr (std::is_same_v<MemorySpace, dealii::MemorySpace::Default>)
         return do_subtract_and_norm_device<delayed_reorthogonalization>(
-          n_vectors, locally_owned_size, temp_data, h, current_vector);
+          n_vectors,
+          locally_owned_size,
+          temp_data,
+          h,
+          current_vector,
+          basis_output);
       else
         return do_subtract_and_norm_host<delayed_reorthogonalization>(
-          n_vectors, locally_owned_size, temp_data, h, current_vector);
+          n_vectors,
+          locally_owned_size,
+          temp_data,
+          h,
+          current_vector,
+          basis_output);
     }
 
 
 
-    template <typename MemorySpace, typename Number>
+    template <typename MemorySpace, typename Number, typename BasisNumber>
     void
-    do_add(const unsigned int             n_vectors,
-           const std::size_t              locally_owned_size,
-           OrthogonalizationData<Number> &temp_data,
-           const Vector<double>          &h,
-           const bool                     zero_out,
-           Number                        *output)
+    do_scale_and_copy(const std::size_t locally_owned_size,
+                      const double      factor,
+                      Number           *vector,
+                      BasisNumber      *basis_output)
+    {
+      if (locally_owned_size == 0)
+        return;
+
+      if constexpr (std::is_same_v<MemorySpace, dealii::MemorySpace::Default>)
+        {
+          using ExecutionSpace =
+            dealii::MemorySpace::Default::kokkos_space::execution_space;
+          ExecutionSpace exec;
+          Kokkos::parallel_for(
+            "dealii::gmres_scale_and_copy",
+            Kokkos::RangePolicy<ExecutionSpace, Kokkos::IndexType<std::size_t>>(
+              exec, 0, locally_owned_size),
+            KOKKOS_LAMBDA(const std::size_t j) {
+              const double value = factor * vector[j];
+              vector[j]          = static_cast<Number>(value);
+              basis_output[j]    = static_cast<BasisNumber>(value);
+            });
+        }
+      else
+        {
+          DEAL_II_OPENMP_SIMD_PRAGMA
+          for (std::size_t j = 0; j < locally_owned_size; ++j)
+            {
+              const double value = factor * vector[j];
+              vector[j]          = static_cast<Number>(value);
+              basis_output[j]    = static_cast<BasisNumber>(value);
+            }
+        }
+    }
+
+
+
+    template <typename MemorySpace, typename Number, typename BasisNumber>
+    void
+    do_add(const unsigned int                  n_vectors,
+           const std::size_t                   locally_owned_size,
+           OrthogonalizationData<BasisNumber> &temp_data,
+           const Vector<double>               &h,
+           const bool                          zero_out,
+           Number                             *output)
     {
       if constexpr (std::is_same_v<MemorySpace, dealii::MemorySpace::Default>)
         do_add_device(
@@ -1050,6 +1125,119 @@ namespace internal
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
+
+// explicit instantiations for Number == BasisNumber
+
 #include "lac/solver_gmres.inst"
+
+// explicit instantiations for the double, float pair
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<false, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<true, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<false, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<true, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_scale_and_copy<MemorySpace::Host, double, float>(const std::size_t,
+                                                      const double,
+                                                      double *,
+                                                      float *);
+
+template void
+internal::SolverGMRESImplementation::do_add<MemorySpace::Host, double, float>(
+  const unsigned int,
+  const std::size_t,
+  internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+  const Vector<double> &,
+  const bool,
+  double *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<false, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<true, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<false, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<true, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_scale_and_copy<MemorySpace::Default, double, float>(const std::size_t,
+                                                         const double,
+                                                         double *,
+                                                         float *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_add<MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    const bool,
+    double *);
 
 DEAL_II_NAMESPACE_CLOSE
