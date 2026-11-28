@@ -65,7 +65,7 @@ if(DEFINED DEAL_II_HAVE_TESTS_DIRECTORY)
   #
   # Write minimalistic CTestTestfile.cmake files to CMAKE_BINARY_DIR:
   #
-  file(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "subdirs(tests)\n")
+  file(WRITE ${CMAKE_BINARY_DIR}/CTestTestfile.cmake "add_subdirectory(tests)\n")
 
   set(_options "-DDEAL_II_DIR=${CMAKE_BINARY_DIR}")
 endif()
@@ -85,6 +85,11 @@ foreach(_var
     list(APPEND _options "-D${_var}=${${_var}}")
   endif()
 endforeach()
+
+#
+# Preserve the currently used CXX compiler
+#
+list(APPEND _options "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 
 #
 # Find all testsuite subprojects, i.e., every directory that contains a
