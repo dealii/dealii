@@ -463,9 +463,8 @@ namespace parallel
        * triangulation class. When allow_artificial_cells is true, cells which
        * are artificial will have cell->subdomain_id() == numbers::artificial;
        *
-       * The original partition information is stored to allow using sequential
-       * DoF distribution and partitioning functions with semi-artificial
-       * cells.
+       * The original partition information is stored because artificial
+       * cells do not store their owner.
        */
       std::vector<types::subdomain_id> true_subdomain_ids_of_cells;
 
@@ -473,9 +472,8 @@ namespace parallel
        * A vector containing level subdomain IDs of cells obtained by
        * partitioning each level.
        *
-       * The original partition information is stored to allow using sequential
-       * DoF distribution and partitioning functions with semi-artificial
-       * cells.
+       * The original partition information is stored because artificial
+       * cells do not store their owner.
        */
       std::vector<std::vector<types::subdomain_id>>
         true_level_subdomain_ids_of_cells;
