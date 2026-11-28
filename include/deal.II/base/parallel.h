@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <memory>
 #include <tuple>
 
@@ -172,6 +173,24 @@ namespace parallel
 
   namespace internal
   {
+    template <typename Iterator>
+    using random_access_category_t = std::enable_if_t<std::is_base_of_v<
+      std::random_access_iterator_tag,
+      typename std::iterator_traits<Iterator>::iterator_category>>;
+
+    /**
+     * Whether @p Iterator is a random access iterator. Not all of them satisfy
+     * the C++20 concept (e.g., those of FullMatrix), and in C++20 the
+     * iterators of std::ranges::iota_view report std::input_iterator_tag.
+     */
+    template <typename Iterator>
+    constexpr bool is_random_access_iterator =
+#ifdef DEAL_II_HAVE_CXX20
+      std::random_access_iterator<Iterator> ||
+#endif
+      dealii::internal::is_supported_operation<random_access_category_t,
+                                               Iterator>;
+
 #ifdef DEAL_II_WITH_TBB
     /**
      * Take a range argument and call the given function with its begin and
@@ -270,6 +289,74 @@ namespace parallel
   {
     Assert(grainsize > 0, ExcMessage("Grainsize must be a positive number."));
 
+#ifdef DEAL_II_WITH_TASKFLOW
+    if constexpr (std::is_integral_v<Iterator> ||
+                  internal::is_random_access_iterator<Iterator>)
+      {
+        const std::size_t n = static_cast<std::size_t>(end - begin);
+
+        const bool worth_doing_in_parallel =
+          (MultithreadInfo::n_threads() > 1) && (n > grainsize);
+
+        if (worth_doing_in_parallel)
+          {
+            tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
+            tf::Taskflow  taskflow;
+
+            if constexpr (std::is_integral_v<Iterator>)
+              {
+                // Integral "iterator" types (e.g., int): use plain arithmetic
+                using integral_type = Iterator;
+
+                tf::IndexRange<integral_type> range(0, n, 1);
+
+                taskflow.for_each_by_index(
+                  range,
+                  [&, begin](const tf::IndexRange<integral_type> &subrange) {
+                    const integral_type subrange_begin =
+                      begin + static_cast<integral_type>(subrange.begin());
+
+                    const integral_type subrange_end =
+                      subrange_begin +
+                      static_cast<integral_type>(subrange.size());
+
+                    f(subrange_begin, subrange_end);
+                  },
+                  tf::GuidedPartitioner(grainsize));
+              }
+            else
+              {
+                using diff_t = decltype(end - begin);
+
+                tf::IndexRange<std::size_t> range(0, n, 1);
+
+                taskflow.for_each_by_index(
+                  range,
+                  [&, begin](const tf::IndexRange<std::size_t> &subrange) {
+                    const Iterator subrange_begin =
+                      begin + static_cast<diff_t>(subrange.begin());
+
+                    const Iterator subrange_end =
+                      subrange_begin + static_cast<diff_t>(subrange.size());
+
+                    f(subrange_begin, subrange_end);
+                  },
+                  tf::GuidedPartitioner(grainsize));
+              }
+
+            // Schedule the work. If we are within a task, we are required to
+            // use corun() without wait() to avoid a potential deadlock as
+            // described in
+            // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
+            if (executor.this_worker_id() != -1)
+              executor.corun(taskflow);
+            else
+              executor.run(taskflow).wait();
+
+            return;
+          }
+      }
+#elif defined(DEAL_II_WITH_TBB)
     // Count elements in the range
     const std::size_t n = [&]() -> auto {
       if constexpr (std::is_integral_v<Iterator>)
@@ -281,68 +368,6 @@ namespace parallel
     const bool worth_doing_in_parallel =
       (MultithreadInfo::n_threads() > 1) && (n > grainsize);
 
-#ifdef DEAL_II_WITH_TASKFLOW
-    if (worth_doing_in_parallel)
-      {
-        tf::Executor &executor = MultithreadInfo::get_taskflow_executor();
-        tf::Taskflow  taskflow;
-
-        if constexpr (std::is_integral_v<Iterator>)
-          {
-            // Integral "iterator" types (e.g., int): use plain arithmetic
-            using integral_type = Iterator;
-
-            tf::IndexRange<integral_type> range(0, n, 1);
-
-            taskflow.for_each_by_index(
-              range,
-              [&, begin](const tf::IndexRange<integral_type> &subrange) {
-                integral_type subrange_begin =
-                  begin + static_cast<integral_type>(subrange.begin());
-
-                integral_type subrange_end =
-                  subrange_begin + static_cast<integral_type>(subrange.size());
-
-                f(subrange_begin, subrange_end);
-              },
-              tf::GuidedPartitioner(grainsize));
-          }
-        else
-          {
-            // Non-integral iterator types: advance from 'begin' using
-            // std::distance/std::advance
-            using diff_t =
-              typename std::iterator_traits<Iterator>::difference_type;
-
-            tf::IndexRange<std::size_t> range(0, n, 1);
-
-            taskflow.for_each_by_index(
-              range,
-              [&, begin](const tf::IndexRange<std::size_t> &subrange) {
-                Iterator subrange_begin = begin;
-                std::advance(subrange_begin,
-                             static_cast<diff_t>(subrange.begin()));
-
-                Iterator subrange_end = subrange_begin;
-                std::advance(subrange_end,
-                             static_cast<diff_t>(subrange.size()));
-
-                f(subrange_begin, subrange_end);
-              },
-              tf::GuidedPartitioner(grainsize));
-          }
-
-        // Schedule the work. If we are within a task, we are required to use
-        // corun() without wait() to avoid a potential deadlock as described in
-        // https://taskflow.github.io/taskflow/ExecuteTaskflow.html#ExecuteATaskflowFromAnInternalWorker:
-        if (executor.this_worker_id() != -1)
-          executor.corun(taskflow);
-        else
-          executor.run(taskflow).wait();
-
-        return;
-      }
-#elif defined(DEAL_II_WITH_TBB)
     if (worth_doing_in_parallel)
       {
         internal::parallel_for(
@@ -355,12 +380,11 @@ namespace parallel
 
         return;
       }
-#else
-    (void)worth_doing_in_parallel;
 #endif
 
-    // Without library support (taskflow or TBB) or if not worth running in
-    // parallel, we just call the function directly with the whole range:
+    // Without library support (taskflow or TBB), if not worth running in
+    // parallel, or (with Taskflow) if Iterator is not random access, we just
+    // call the function directly with the whole range:
     f(begin, end);
   }
 

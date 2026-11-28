@@ -1,0 +1,6 @@
+Fixed: With Taskflow, parallel::apply_to_subranges() used std::advance() to
+get to the beginning of each subrange, which is O(N) for iterators that are
+not random access, such as Triangulation::active_cell_iterator. Ranges of such
+iterators are now no longer split into subranges.
+<br>
+(Qingyuan Shi, 2026/11/22)
