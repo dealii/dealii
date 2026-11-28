@@ -1,0 +1,5 @@
+Changed: Debug builds of deal.II with MSVC are now compiled with
+/O1 instead of /Od. An unoptimized debug build produces a static
+library that exceeds the 4GB size limit of the MSVC librarian.
+<br>
+(Matthias Maier, 2026/11/28)
