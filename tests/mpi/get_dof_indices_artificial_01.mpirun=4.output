@@ -1,0 +1,15 @@
+
+DEAL:0:2d::faces of artificial cells with partial storage: 4, without storage: 22
+DEAL:0:3d::faces of artificial cells with partial storage: 16, without storage: 34
+
+DEAL:1:2d::faces of artificial cells with partial storage: 8, without storage: 20
+DEAL:1:3d::faces of artificial cells with partial storage: 32, without storage: 32
+
+
+DEAL:2:2d::faces of artificial cells with partial storage: 8, without storage: 20
+DEAL:2:3d::faces of artificial cells with partial storage: 32, without storage: 32
+
+
+DEAL:3:2d::faces of artificial cells with partial storage: 4, without storage: 22
+DEAL:3:3d::faces of artificial cells with partial storage: 16, without storage: 34
+
