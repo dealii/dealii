@@ -3380,6 +3380,15 @@ public:
   n_active_cells() const;
 
   /**
+   * Return the number of locally owned active cells. For a serial
+   * triangulation, all active cells are locally owned, so this is equal to
+   * n_active_cells(). Parallel triangulations exclude ghost and artificial
+   * cells.
+   */
+  virtual unsigned int
+  n_locally_owned_active_cells() const;
+
+  /**
    * Return the total number of active cells in the triangulation.
    *
    * For the serial ::Triangulation class, this function returns the same

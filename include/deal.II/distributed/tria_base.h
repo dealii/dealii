@@ -126,15 +126,14 @@ namespace parallel
      * respect to the 2:1 size ratio of adjacent cells.
      *
      * As a consequence of the remark above, the result of this function is
-     * always smaller or equal to the result of the function with the same
-     * name in the ::Triangulation base class, which includes the active ghost
+     * always smaller or equal to n_active_cells(), which includes active ghost
      * and artificial cells (see also
      * @ref GlossArtificialCell
      * and
      * @ref GlossGhostCell).
      */
-    unsigned int
-    n_locally_owned_active_cells() const;
+    virtual unsigned int
+    n_locally_owned_active_cells() const override;
 
     /**
      * Return the total number of active cells in the triangulation.
