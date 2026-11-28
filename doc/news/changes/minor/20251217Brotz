@@ -1,0 +1,4 @@
+Add: Extend the ParticleHandler with two new query methods that identify
+particles in descendant active cells of parent cells on arbitrary levels.
+<br>
+(Julian Brotz, Bruno Blais and Magdalena Schreter-Fleischhacker, 2025/12/17)
