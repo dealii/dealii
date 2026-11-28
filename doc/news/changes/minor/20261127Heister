@@ -1,0 +1,5 @@
+Fixed: LinearAlgebra::TpetraWrappers::PreconditionBase::vmult() and Tvmult()
+now copy results back to the host when applied to dealii::Vector objects
+with a GPU backend.
+<br>
+(Timo Heister, 2026/11/27)
