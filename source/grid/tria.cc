@@ -23,6 +23,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
+#include <deal.II/distributed/shared_tria.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/distributed/tria_base.h>
 
@@ -16444,6 +16445,14 @@ void Triangulation<dim, spacedim>::pack_data_serial()
         this))
     return;
 
+  // A parallel::shared::Triangulation with artificial cells only packs data
+  // on locally owned cells and sends it to the new owners after
+  // partitioning.
+  const auto shared_tria =
+    dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(this);
+  const bool pack_locally_owned_cells_only =
+    shared_tria != nullptr && shared_tria->with_artificial_cells();
+
   // pack data before triangulation gets updated
   if (this->cell_attached_data.n_attached_data_sets > 0)
     {
@@ -16451,8 +16460,17 @@ void Triangulation<dim, spacedim>::pack_data_serial()
 
       for (const auto &cell : this->active_cell_iterators())
         {
+          if (pack_locally_owned_cells_only && !cell->is_locally_owned())
+            continue;
+
           const bool children_will_be_coarsened =
             (cell->level() > 0) && (cell->coarsen_flag_set());
+
+          if (pack_locally_owned_cells_only && children_will_be_coarsened)
+            for (const auto &child : cell->parent()->child_iterators())
+              Assert(child->is_locally_owned(),
+                     ExcMessage("All children of a cell that are coarsened "
+                                "must have the same owner."));
 
           if (children_will_be_coarsened == false)
             {
