@@ -1976,28 +1976,6 @@ namespace DoFTools
     // structures were quite set up yet.
     Assert(dof_handler.n_dofs() > 0, ExcInternalError());
 
-    // In case this function is executed with parallel::shared::Triangulation
-    // with possibly artificial cells, we need to take "true" subdomain IDs
-    // (i.e. without artificial cells). Otherwise we are good to use
-    // subdomain_id as stored in cell->subdomain_id().
-    std::vector<types::subdomain_id> cell_owners(
-      dof_handler.get_triangulation().n_active_cells());
-    if (const parallel::shared::Triangulation<dim, spacedim> *tr =
-          (dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
-            &dof_handler.get_triangulation())))
-      {
-        cell_owners = tr->get_true_subdomain_ids_of_cells();
-        Assert(tr->get_true_subdomain_ids_of_cells().size() ==
-                 tr->n_active_cells(),
-               ExcInternalError());
-      }
-    else
-      {
-        for (const auto &cell : dof_handler.active_cell_iterators() |
-                                  IteratorFilters::LocallyOwnedCell())
-          cell_owners[cell->active_cell_index()] = cell->subdomain_id();
-      }
-
     // preset all values by an invalid value
     std::fill_n(subdomain_association.begin(),
                 dof_handler.n_dofs(),
@@ -2011,8 +1989,7 @@ namespace DoFTools
     // give to the smaller subdomain_id in case it is on an interface
     for (const auto &cell : dof_handler.active_cell_iterators())
       {
-        const types::subdomain_id subdomain_id =
-          cell_owners[cell->active_cell_index()];
+        const types::subdomain_id subdomain_id = cell->subdomain_id();
         const unsigned int dofs_per_cell = cell->get_fe().n_dofs_per_cell();
         local_dof_indices.resize(dofs_per_cell);
         cell->get_dof_indices(local_dof_indices);
