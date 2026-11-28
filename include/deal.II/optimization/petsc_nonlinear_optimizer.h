@@ -256,12 +256,10 @@ namespace PETScWrappers
             typename MatrixType = PETScWrappers::MatrixBase>
 #    if defined(DEAL_II_HAVE_CXX20) && \
       !defined(DEAL_II_DOXYGEN_DO_NOT_PARSE_REQUIRES_CLAUSES)
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
 #    endif
   class NonlinearOptimizer
   {

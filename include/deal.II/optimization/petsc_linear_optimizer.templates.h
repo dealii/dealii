@@ -66,12 +66,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   LinearOptimizer<VectorType, MatrixType>::LinearOptimizer(
     const AdditionalData &data,
     const MPI_Comm        mpi_comm)
@@ -81,12 +79,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   unsigned int LinearOptimizer<VectorType, MatrixType>::solve(
     VectorType                              &solution,
     const VectorType                        &objective,
@@ -262,12 +258,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   Tao LinearOptimizer<VectorType, MatrixType>::petsc_tao()
   {
     return optimizer.petsc_tao();

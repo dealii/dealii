@@ -99,12 +99,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   NonlinearOptimizer<VectorType, MatrixType>::NonlinearOptimizer(
     const AdditionalData &data,
     const MPI_Comm        mpi_comm)
@@ -121,12 +119,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   void NonlinearOptimizer<VectorType, MatrixType>::initialize_tao()
   {
     internal::assert_nonlinear_optimizer_petsc(TaoCreate(mpi_comm, &tao));
@@ -170,12 +166,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   NonlinearOptimizer<VectorType, MatrixType>::~NonlinearOptimizer()
   {
     internal::assert_nonlinear_optimizer_petsc(TaoDestroy(&tao));
@@ -184,12 +178,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   unsigned int NonlinearOptimizer<VectorType, MatrixType>::solve(
     VectorType                       &solution,
     MatrixType                       &hessian_matrix,
@@ -496,12 +488,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   Tao NonlinearOptimizer<VectorType, MatrixType>::petsc_tao()
   {
     return tao;
@@ -510,12 +500,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode NonlinearOptimizer<VectorType, MatrixType>::objective_callback(
     Tao,
     Vec        x,
@@ -533,12 +521,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode
     NonlinearOptimizer<VectorType, MatrixType>::gradient_callback(Tao,
                                                                   Vec x,
@@ -557,12 +543,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode NonlinearOptimizer<VectorType, MatrixType>::hessian_callback(
     Tao,
     Vec   x,
@@ -583,12 +567,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode
     NonlinearOptimizer<VectorType, MatrixType>::equality_constraints_callback(
       Tao,
@@ -608,12 +590,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode
     NonlinearOptimizer<VectorType, MatrixType>::equality_jacobian_callback(
       Tao,
@@ -637,12 +617,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode
     NonlinearOptimizer<VectorType, MatrixType>::inequality_constraints_callback(
       Tao,
@@ -662,12 +640,10 @@ namespace PETScWrappers
 
 
   template <typename VectorType, typename MatrixType>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   PetscErrorCode
     NonlinearOptimizer<VectorType, MatrixType>::inequality_jacobian_callback(
       Tao,

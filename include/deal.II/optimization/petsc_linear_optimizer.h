@@ -165,12 +165,10 @@ namespace PETScWrappers
    */
   template <typename VectorType = PETScWrappers::VectorBase,
             typename MatrixType = PETScWrappers::MatrixBase>
-  DEAL_II_CXX20_REQUIRES(
-    (concepts::is_dealii_petsc_vector_type<VectorType> ||
-     std::constructible_from<
-       VectorType,
-       Vec>)&&(concepts::is_dealii_petsc_matrix_type<MatrixType> ||
-               std::constructible_from<MatrixType, Mat>))
+  DEAL_II_CXX20_REQUIRES((concepts::is_dealii_petsc_vector_type<VectorType> ||
+                          std::constructible_from<VectorType, Vec>) &&
+                         (concepts::is_dealii_petsc_matrix_type<MatrixType> ||
+                          std::constructible_from<MatrixType, Mat>))
   class LinearOptimizer
   {
   public:

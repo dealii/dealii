@@ -34,9 +34,9 @@ namespace
     const PetscInt first =
       2 * Utilities::MPI::this_mpi_process(PetscObjectComm((PetscObject)x));
     local_value         = .5 * ((PetscRealPart(entries[0]) - (first + 1.)) *
-                          (PetscRealPart(entries[0]) - (first + 1.)) +
-                        (PetscRealPart(entries[1]) - (first + 2.)) *
-                          (PetscRealPart(entries[1]) - (first + 2.)));
+                                  (PetscRealPart(entries[0]) - (first + 1.)) +
+                                (PetscRealPart(entries[1]) - (first + 2.)) *
+                                  (PetscRealPart(entries[1]) - (first + 2.)));
     PetscReal local_sum = PetscRealPart(entries[0]) + PetscRealPart(entries[1]);
     PetscReal sum;
     PetscCall(VecRestoreArrayRead(x, &entries));
