@@ -1965,6 +1965,15 @@ namespace DoFTools
              "For parallel::distributed::Triangulation objects and "
              "associated DoF handler objects, asking for any subdomain other "
              "than the locally owned one does not make sense."));
+    if (const auto shared_tria =
+          dynamic_cast<const parallel::shared::Triangulation<dim, spacedim> *>(
+            &dof_handler.get_triangulation()))
+      Assert(!shared_tria->with_artificial_cells(),
+             ExcMessage(
+               "For parallel::shared::Triangulation objects with artificial "
+               "cells and associated DoF handler objects, asking for any "
+               "subdomain other than the locally owned one does not make "
+               "sense."));
 
     Assert(subdomain_association.size() == dof_handler.n_dofs(),
            ExcDimensionMismatch(subdomain_association.size(),
