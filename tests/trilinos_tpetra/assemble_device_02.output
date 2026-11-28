@@ -1,0 +1,13 @@
+
+DEAL::dim=2 degree=1 coloring=0 deform=0: OK
+DEAL::dim=2 degree=2 coloring=0 deform=1: OK
+DEAL::dim=3 degree=1 coloring=0 deform=0: OK
+DEAL::dim=3 degree=2 coloring=0 deform=1: OK
+DEAL::dim=2 degree=2 coloring=0 deform=1 components=2 adaptive=1: OK
+DEAL::dim=2 degree=2 coloring=0 deform=1 adaptive=1: OK
+DEAL::dim=2 degree=1 coloring=1 deform=0: OK
+DEAL::dim=2 degree=2 coloring=1 deform=1: OK
+DEAL::dim=3 degree=1 coloring=1 deform=0: OK
+DEAL::dim=3 degree=2 coloring=1 deform=1: OK
+DEAL::dim=2 degree=2 coloring=1 deform=1 components=2 adaptive=1: OK
+DEAL::dim=2 degree=2 coloring=1 deform=1 adaptive=1: OK

@@ -321,6 +321,41 @@ namespace MatrixFreeTools
     const unsigned int quadrature_index         = 0,
     const unsigned int first_selected_component = 0);
 
+  /**
+   * Compute the matrix representation of a linear operator using
+   * Portable::MatrixFree. The arguments follow the portable compute_diagonal()
+   * overload: @p quad_operation is a device-callable functor taking a pointer
+   * to Portable::FEEvaluation and a quadrature point index. Evaluation and
+   * integration are performed with the supplied flags.
+   *
+   * The matrix must be an initialized
+   * LinearAlgebra::TpetraWrappers::SparseMatrix with MemorySpace::Default and a
+   * sparsity pattern containing all cell couplings after constraint
+   * elimination.
+   *
+   * Existing matrix entries are cleared. Constrained diagonal entries are set
+   * to one and the matrix is compressed before returning.
+   *
+   * Currently, only matrices on a single MPI process are supported.
+   * @p quadrature_index and @p first_selected_component must be zero.
+   */
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename MatrixType,
+            typename QuadOperation>
+  void
+  compute_matrix(const Portable::MatrixFree<dim, Number> &matrix_free,
+                 MatrixType                              &matrix,
+                 const QuadOperation                     &quad_operation,
+                 EvaluationFlags::EvaluationFlags         evaluation_flags,
+                 EvaluationFlags::EvaluationFlags         integration_flags,
+                 const unsigned int                       dof_handler_index = 0,
+                 const unsigned int                       quadrature_index  = 0,
+                 const unsigned int first_selected_component = 0);
+
 
   namespace internal
   {
@@ -1531,7 +1566,202 @@ namespace MatrixFreeTools
       const EvaluationFlags::EvaluationFlags m_integration_flags;
     };
 
+    /**
+     * Assemble columns of a portable cell operator directly into a device
+     * matrix. The maps translate MatrixFree's indices to Tpetra local indices.
+     */
+    template <int dim,
+              int fe_degree,
+              int n_q_points_1d,
+              int n_components,
+              typename Number,
+              typename QuadOperation,
+              typename LocalMatrix,
+              typename LocalMap>
+    struct ComputeMatrixCellAction
+    {
+      static constexpr unsigned int n_q_points =
+        Utilities::pow(n_q_points_1d, dim);
+
+      unsigned int                     dof_handler_index;
+      QuadOperation                    quad_operation;
+      EvaluationFlags::EvaluationFlags evaluation_flags;
+      EvaluationFlags::EvaluationFlags integration_flags;
+      LocalMatrix                      matrix;
+      LocalMap                         row_map;
+      LocalMap                         column_map;
+
+      DEAL_II_HOST_DEVICE void
+      operator()(const typename Portable::MatrixFree<dim, Number>::Data *data,
+                 const Portable::DeviceVector<Number> &,
+                 Portable::DeviceVector<Number> &) const
+      {
+        Portable::
+          FEEvaluation<dim, fe_degree, n_q_points_1d, n_components, Number>
+                               phi(data, dof_handler_index);
+        constexpr unsigned int scalar_dofs =
+          decltype(phi)::tensor_dofs_per_cell / n_components;
+        constexpr unsigned int dofs_per_cell =
+          decltype(phi)::tensor_dofs_per_cell;
+        const auto &team        = data->team_member;
+        const auto &cell_data   = data->precomputed_data[dof_handler_index];
+        const unsigned int cell = team.league_rank();
+
+        // local_to_global is ordered by component, with lexicographic scalar
+        // DoFs within each component. All team members process each column.
+        for (unsigned int j = 0; j < dofs_per_cell; ++j)
+          {
+            const auto index = cell_data.local_to_global(j, cell);
+            if (index == numbers::invalid_unsigned_int)
+              continue;
+            const unsigned int component = j / scalar_dofs;
+            Kokkos::parallel_for(
+              Kokkos::TeamThreadRange(team, scalar_dofs),
+              [&](const unsigned int i) {
+                typename decltype(phi)::value_type value = {};
+                if constexpr (n_components == 1)
+                  value = (i == j) ? Number(1.) : Number();
+                else
+                  value[component] =
+                    (i == j % scalar_dofs) ? Number(1.) : Number();
+                phi.submit_dof_value(value, i);
+              });
+            team.team_barrier();
+
+            Portable::internal::
+              resolve_hanging_nodes<dim, fe_degree, false, Number>(
+                team,
+                cell_data.constraint_weights,
+                cell_data.constraint_mask(cell * n_components + component),
+                Kokkos::subview(data->shared_data[dof_handler_index].values,
+                                Kokkos::ALL,
+                                component));
+
+            phi.evaluate(evaluation_flags);
+            data->for_each_quad_point(
+              [&](const int q) { quad_operation(&phi, q); });
+            phi.integrate(integration_flags);
+
+            // The operator can couple components, so transpose the constraint
+            // interpolation for every output component.
+            for (unsigned int c = 0; c < n_components; ++c)
+              Portable::internal::
+                resolve_hanging_nodes<dim, fe_degree, true, Number>(
+                  team,
+                  cell_data.constraint_weights,
+                  cell_data.constraint_mask(cell * n_components + c),
+                  Kokkos::subview(data->shared_data[dof_handler_index].values,
+                                  Kokkos::ALL,
+                                  c));
+
+            const auto column = column_map.getLocalElement(index);
+            Kokkos::parallel_for(
+              Kokkos::TeamThreadRange(team, dofs_per_cell),
+              [&](const unsigned int i) {
+                const auto row_index = cell_data.local_to_global(i, cell);
+                if (row_index != numbers::invalid_unsigned_int)
+                  {
+                    const auto   row = row_map.getLocalElement(row_index);
+                    const Number value =
+                      data->shared_data[dof_handler_index].values(
+                        i % scalar_dofs, i / scalar_dofs);
+                    matrix.sumIntoValues(row, &column, 1, &value, false, true);
+                  }
+              });
+            // Do not overwrite the shared values until this column is read.
+            team.team_barrier();
+          }
+      }
+    };
+
   } // namespace internal
+
+
+
+  template <int dim,
+            int fe_degree,
+            int n_q_points_1d,
+            int n_components,
+            typename Number,
+            typename MatrixType,
+            typename QuadOperation>
+  void
+  compute_matrix(const Portable::MatrixFree<dim, Number> &matrix_free,
+                 MatrixType                              &matrix,
+                 const QuadOperation                     &quad_operation,
+                 EvaluationFlags::EvaluationFlags         evaluation_flags,
+                 EvaluationFlags::EvaluationFlags         integration_flags,
+                 const unsigned int                       dof_handler_index,
+                 const unsigned int                       quadrature_index,
+                 const unsigned int first_selected_component)
+  {
+    AssertThrow(quadrature_index == 0, ExcNotImplemented());
+    AssertThrow(first_selected_component == 0, ExcNotImplemented());
+    AssertThrow(
+      Utilities::MPI::n_mpi_processes(matrix.get_mpi_communicator()) == 1,
+      ExcMessage("Portable compute_matrix() currently requires a single MPI "
+                 "process."));
+    static_assert(fe_degree >= 0);
+    static_assert(n_q_points_1d >= fe_degree + 1);
+
+    LinearAlgebra::distributed::Vector<Number, MemorySpace::Default> dst;
+    matrix_free.initialize_dof_vector(dst, dof_handler_index);
+    AssertDimension(matrix.m(), dst.size());
+    AssertDimension(matrix.n(), dst.size());
+    // MatrixFree indices must be global indices for the Tpetra map lookup.
+    const auto &partitioner =
+      matrix_free.get_vector_partitioner(dof_handler_index);
+    AssertThrow(!partitioner || partitioner->locally_owned_size() == dst.size(),
+                ExcMessage("Portable compute_matrix() requires all DoFs to be "
+                           "locally owned."));
+
+    matrix = 0.;
+    matrix.resume_fill();
+    {
+      // Tpetra requires releasing device views before subsequent host access.
+      const auto local_matrix = matrix.trilinos_matrix().getLocalMatrixDevice();
+      const auto row_map = matrix.trilinos_matrix().getRowMap()->getLocalMap();
+      const auto column_map =
+        matrix.trilinos_matrix().getColMap()->getLocalMap();
+      internal::ComputeMatrixCellAction<dim,
+                                        fe_degree,
+                                        n_q_points_1d,
+                                        n_components,
+                                        Number,
+                                        QuadOperation,
+                                        decltype(local_matrix),
+                                        decltype(row_map)>
+        cell_action{dof_handler_index,
+                    quad_operation,
+                    evaluation_flags,
+                    integration_flags,
+                    local_matrix,
+                    row_map,
+                    column_map};
+      matrix_free.cell_loop(cell_action, dst, dst);
+
+      // Use MatrixFree's stored constraints, just as compute_diagonal() does.
+      // The cell action above leaves all entries as 0.
+      matrix_free.set_constrained_values(Number(1.), dst, dof_handler_index);
+      const auto constrained = dst.get_values();
+      Kokkos::parallel_for(
+        "MatrixFreeTools::compute_matrix constrained diagonal",
+        Kokkos::RangePolicy<
+          typename MemorySpace::Default::kokkos_space::execution_space>(
+          0, dst.locally_owned_size()),
+        KOKKOS_LAMBDA(const unsigned int i) {
+          if (constrained[i] != Number())
+            {
+              const auto   row    = row_map.getLocalElement(i);
+              const auto   column = column_map.getLocalElement(i);
+              const Number one    = Number(1.);
+              local_matrix.replaceValues(row, &column, 1, &one);
+            }
+        });
+      Kokkos::fence();
+    }
+    matrix.compress(VectorOperation::add);
+  }
 
 
 
