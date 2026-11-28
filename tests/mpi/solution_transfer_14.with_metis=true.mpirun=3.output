@@ -1,0 +1,29 @@
+
+DEAL:0:2d::cells: 103
+DEAL:0:2d::OK
+DEAL:0:2d::cells: 103
+DEAL:0:2d::OK
+DEAL:0:3d::cells: 757
+DEAL:0:3d::OK
+DEAL:0:3d::cells: 757
+DEAL:0:3d::OK
+
+DEAL:1:2d::cells: 103
+DEAL:1:2d::OK
+DEAL:1:2d::cells: 103
+DEAL:1:2d::OK
+DEAL:1:3d::cells: 757
+DEAL:1:3d::OK
+DEAL:1:3d::cells: 757
+DEAL:1:3d::OK
+
+
+DEAL:2:2d::cells: 103
+DEAL:2:2d::OK
+DEAL:2:2d::cells: 103
+DEAL:2:2d::OK
+DEAL:2:3d::cells: 757
+DEAL:2:3d::OK
+DEAL:2:3d::cells: 757
+DEAL:2:3d::OK
+

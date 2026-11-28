@@ -25,6 +25,10 @@
 
 #include <deal.II/lac/sparsity_tools.h>
 
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+
+#include <fstream>
 #include <type_traits>
 
 
@@ -449,6 +453,210 @@ namespace parallel
       dealii::Triangulation<dim, spacedim>::execute_coarsening_and_refinement();
       partition();
       this->update_number_cache();
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::save(
+      const std::string &file_basename) const
+    {
+      if (allow_artificial_cells == false)
+        {
+          dealii::Triangulation<dim, spacedim>::save(file_basename);
+          return;
+        }
+
+      using Serializer =
+        dealii::internal::CellAttachedDataSerializer<dim, spacedim>;
+      const unsigned int my_rank =
+        Utilities::MPI::this_mpi_process(this->get_mpi_communicator());
+
+      if (my_rank == 0)
+        {
+          std::ofstream ofs_tria(file_basename + "_triangulation.data");
+          AssertThrow(ofs_tria.fail() == false, ExcIO());
+          boost::archive::text_oarchive oa(ofs_tria, boost::archive::no_header);
+          this->save(oa, Serializer::version_number);
+
+          std::ofstream ofs_info(file_basename + ".info");
+          ofs_info << "version nproc n_attached_fixed_size_objs "
+                      "n_attached_variable_size_objs n_active_cells"
+                   << std::endl
+                   << Serializer::version_number << " " << 1 << " "
+                   << this->cell_attached_data.pack_callbacks_fixed.size()
+                   << " "
+                   << this->cell_attached_data.pack_callbacks_variable.size()
+                   << " " << this->n_global_active_cells() << std::endl;
+        }
+
+      auto tria = const_cast<Triangulation<dim, spacedim> *>(this);
+      if (this->cell_attached_data.n_attached_data_sets > 0)
+        {
+          // Pack the data of the locally owned cells and send it to the first
+          // process:
+          tria->local_cell_relations.clear();
+          for (const auto &cell : this->active_cell_iterators())
+            if (cell->is_locally_owned())
+              tria->local_cell_relations.emplace_back(
+                cell, CellStatus::cell_will_persist);
+
+          auto &serializer = tria->data_serializer;
+          serializer.pack_data(this->local_cell_relations,
+                               this->cell_attached_data.pack_callbacks_fixed,
+                               this->cell_attached_data.pack_callbacks_variable,
+                               this->get_mpi_communicator());
+
+          tria->transfer_attached_data(
+            [](const cell_iterator &, const CellStatus) {
+              return std::set<types::subdomain_id>{0};
+            });
+
+          // The first process writes the data of all cells in the order of
+          // the active cells, the same format as for a serial
+          // Triangulation:
+          if (my_rank == 0)
+            {
+              const unsigned int size_fixed =
+                serializer.sizes_fixed_cumulative.back();
+              const bool variable_size = serializer.variable_size_data_stored;
+              AssertDimension(this->local_cell_relations.size(),
+                              this->n_active_cells());
+
+              std::vector<unsigned int> position(this->n_active_cells());
+              std::vector<std::size_t>  offset_variable(
+                this->local_cell_relations.size() + 1, 0);
+              for (unsigned int i = 0; i < this->local_cell_relations.size();
+                   ++i)
+                {
+                  position[this->local_cell_relations[i]
+                             .first->active_cell_index()] = i;
+                  offset_variable[i + 1] =
+                    offset_variable[i] +
+                    (variable_size ? serializer.dest_sizes_variable[i] : 0);
+                }
+
+              serializer.src_data_fixed.clear();
+              serializer.src_sizes_variable.clear();
+              serializer.src_data_variable.clear();
+              for (const unsigned int i : position)
+                {
+                  const auto data_fixed =
+                    serializer.dest_data_fixed.cbegin() + i * size_fixed;
+                  serializer.src_data_fixed.insert(
+                    serializer.src_data_fixed.end(),
+                    data_fixed,
+                    data_fixed + size_fixed);
+                  if (variable_size)
+                    {
+                      serializer.src_sizes_variable.push_back(
+                        serializer.dest_sizes_variable[i]);
+                      serializer.src_data_variable.insert(
+                        serializer.src_data_variable.end(),
+                        serializer.dest_data_variable.cbegin() +
+                          offset_variable[i],
+                        serializer.dest_data_variable.cbegin() +
+                          offset_variable[i + 1]);
+                    }
+                }
+
+              serializer.save(0,
+                              this->n_global_active_cells(),
+                              file_basename,
+                              MPI_COMM_SELF);
+            }
+
+          serializer.clear();
+        }
+
+      // Clear all of the callback data, as explained in the documentation of
+      // register_data_attach():
+      tria->cell_attached_data.n_attached_data_sets = 0;
+      tria->cell_attached_data.pack_callbacks_fixed.clear();
+      tria->cell_attached_data.pack_callbacks_variable.clear();
+
+      // Make sure that the files are complete before any process reads them:
+      const int ierr = MPI_Barrier(this->get_mpi_communicator());
+      AssertThrowMPI(ierr);
+    }
+
+
+
+    template <int dim, int spacedim>
+    DEAL_II_CXX20_REQUIRES((concepts::is_valid_dim_spacedim<dim, spacedim>))
+    void Triangulation<dim, spacedim>::load(const std::string &file_basename)
+    {
+      using Serializer =
+        dealii::internal::CellAttachedDataSerializer<dim, spacedim>;
+
+      // This is dealii::Triangulation::load(), except that it calls the
+      // load() function of this class for the archive, which partitions the
+      // triangulation.
+      this->clear();
+      {
+        std::ifstream ifs_tria(file_basename + "_triangulation.data");
+        AssertThrow(ifs_tria.fail() == false, ExcIO());
+        boost::archive::text_iarchive ia(ifs_tria, boost::archive::no_header);
+        this->load(ia, Serializer::version_number);
+      }
+
+      unsigned int version, n_processes, n_attached_fixed, n_attached_variable,
+        n_global_active_cells;
+      {
+        std::ifstream ifs_info(file_basename + ".info");
+        AssertThrow(ifs_info.fail() == false, ExcIO());
+        std::string first_line;
+        std::getline(ifs_info, first_line);
+        ifs_info >> version >> n_processes >> n_attached_fixed >>
+          n_attached_variable >> n_global_active_cells;
+      }
+      AssertThrow(n_processes == 1,
+                  ExcMessage("Incompatible number of CPUs found in .info "
+                             "file."));
+      AssertThrow(version == Serializer::version_number,
+                  ExcMessage("The file was written with an incompatible "
+                             "file format version."));
+      AssertThrow(n_global_active_cells == this->n_global_active_cells(),
+                  ExcMessage("The number of cells of the triangulation "
+                             "differs from the number of cells written into "
+                             "the .info file."));
+
+      this->cell_attached_data.n_attached_data_sets = 0;
+      this->cell_attached_data.n_attached_deserialize =
+        n_attached_fixed + n_attached_variable;
+      this->update_cell_relations();
+
+      // Every process reads the data of all cells:
+      if (this->cell_attached_data.n_attached_deserialize > 0)
+        {
+          this->data_serializer.load(0,
+                                     this->n_global_active_cells(),
+                                     this->n_active_cells(),
+                                     file_basename,
+                                     n_attached_fixed,
+                                     n_attached_variable,
+                                     MPI_COMM_SELF);
+          this->data_serializer.unpack_cell_status(this->local_cell_relations);
+        }
+
+      if (allow_artificial_cells == false ||
+          this->cell_attached_data.n_attached_deserialize == 0)
+        return;
+
+      // Keep the data of the locally owned cells only:
+      auto &serializer              = this->data_serializer;
+      serializer.src_data_fixed     = std::move(serializer.dest_data_fixed);
+      serializer.src_sizes_variable = std::move(serializer.dest_sizes_variable);
+      serializer.src_data_variable  = std::move(serializer.dest_data_variable);
+
+      const types::subdomain_id my_subdomain = this->locally_owned_subdomain();
+      transfer_attached_data(
+        [my_subdomain](const cell_iterator &cell, const CellStatus) {
+          if (cell->is_locally_owned())
+            return std::set<types::subdomain_id>{my_subdomain};
+          return std::set<types::subdomain_id>{};
+        });
     }
 
 

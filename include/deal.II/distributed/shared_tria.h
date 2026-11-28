@@ -362,21 +362,34 @@ namespace parallel
       BOOST_SERIALIZATION_SPLIT_MEMBER()
 #  endif
 
+      using parallel::TriangulationBase<dim, spacedim>::save;
+
       /**
        * Save the triangulation into the given file. This file needs to be
        * reachable from all nodes in the computation on a shared network file
        * system. See the SolutionTransfer class on how to store solution vectors
        * into this file. Additional cell-based data can be saved using
        * register_data_attach().
+       *
+       * If artificial cells are allowed, every process packs the data of its
+       * locally owned cells, and the first process writes the data of all
+       * cells into the file.
        */
-      using parallel::TriangulationBase<dim, spacedim>::save;
+      virtual void
+      save(const std::string &file_basename) const override;
+
+      using parallel::TriangulationBase<dim, spacedim>::load;
 
       /**
        * Load the triangulation saved with save() back in. Cell-based data that
        * was saved with register_data_attach() can be read in with
        * notify_ready_to_unpack() after calling load().
+       *
+       * If artificial cells are allowed, every process unpacks only the data of
+       * its locally owned cells.
        */
-      using parallel::TriangulationBase<dim, spacedim>::load;
+      virtual void
+      load(const std::string &file_basename) override;
 
       /**
        * Read the data of this object from a stream for the purpose of
