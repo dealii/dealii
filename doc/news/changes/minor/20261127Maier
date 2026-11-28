@@ -1,0 +1,11 @@
+Fixed: DoFAccessor::dof_index() and DoFAccessor::vertex_dof_index()
+returned the degree of freedom of a different object, or accessed memory out
+of bounds, when called on an object that is only adjacent to artificial
+cells. With hp capabilities, they triggered an assertion instead. The same
+applied to DoFAccessor::get_dof_indices() for vertices in 1d. These
+functions now return numbers::invalid_dof_index for such objects.
+DoFAccessor::get_dof_indices() on a face or line of an artificial cell moved
+degrees of freedom to the wrong position if only some of them were stored.
+It now returns numbers::invalid_dof_index for all of them.
+<br>
+(Matthias Maier, 2026/11/27)
