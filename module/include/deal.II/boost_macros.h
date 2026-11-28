@@ -33,4 +33,12 @@
     }
 #endif
 
+// The std and BOOST partitions re-export the global allocation functions via
+// 'using ::operator new'. Clang 22 then redeclares them in importing units,
+// which makes __builtin_operator_new() in libc++ ambiguous. Including <new>
+// in the global module fragment avoids this.
+#ifdef __clang__
+#  include <new>
+#endif
+
 #endif

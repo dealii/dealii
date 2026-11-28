@@ -614,6 +614,7 @@ export {
       using std::filesystem::exists;
       using std::filesystem::file_size;
       using std::filesystem::is_directory;
+      using std::filesystem::is_regular_file;
       using std::filesystem::path;
       using std::filesystem::recursive_directory_iterator;
       using std::filesystem::remove;

@@ -295,6 +295,17 @@ if(DEAL_II_WITH_CXX20_MODULE)
       )
 
     #
+    # Work around GCC 16 bugs: duplicate ABI compatibility aliases ("conflicts
+    # with a previous mangle") and broken lazy loading of compiled module
+    # interfaces. Public, because importing units are affected as well.
+    #
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+      target_compile_options(${DEAL_II_TARGET_NAME}_module_${build_lowercase}
+        PUBLIC "-fabi-compat-version=0" "-fno-module-lazy"
+        )
+    endif()
+
+    #
     # Say what the source files for the library are. These are all of
     # the interface and implementation partition units we have created
     # above (including the ones that wrap external libraries), plus
