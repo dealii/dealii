@@ -251,10 +251,6 @@ void
 SolutionTransfer<dim, VectorType, spacedim>::interpolate(
   std::vector<VectorType *> &all_out)
 {
-  const dealii::internal::parallel::shared::
-    TemporarilyRestoreSubdomainIds<dim, spacedim>
-      subdomain_modifier(dof_handler->get_triangulation());
-
   Assert(input_vectors.size() == all_out.size(),
          ExcDimensionMismatch(input_vectors.size(), all_out.size()));
   for (unsigned int i = 0; i < all_out.size(); ++i)

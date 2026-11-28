@@ -1,0 +1,7 @@
+New: parallel::shared::Triangulation with artificial cells now behaves like
+parallel::distributed::Triangulation: degrees of freedom are only enumerated
+on locally owned and ghost cells, and SolutionTransfer sends data to the new
+owners of cells after repartitioning. This makes adaptive mesh refinement
+with SolutionTransfer work on such triangulations.
+<br>
+(Matthias Maier, 2026/11/28)
