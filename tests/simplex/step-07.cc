@@ -434,9 +434,11 @@ namespace Step7
     Vector<float> difference_per_cell(triangulation.n_active_cells());
 
 #ifdef USE_SIMPLEX
-    MappingFE<dim> mapping(FE_SimplexP<dim>(1));
+    MappingFE<dim>     mapping(FE_SimplexP<dim>(1));
+    QGaussSimplex<dim> quadrature_formula(fe->degree + 1);
 #else
     MappingFE<dim> mapping(FE_Q<dim>(1));
+    QGauss<dim>    quadrature_formula(fe->degree + 1);
 #endif
 
     VectorTools::integrate_difference(mapping,
@@ -444,7 +446,7 @@ namespace Step7
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(fe->degree + 1),
+                                      quadrature_formula,
                                       VectorTools::L2_norm);
     const double L2_error =
       VectorTools::compute_global_error(triangulation,
@@ -456,15 +458,19 @@ namespace Step7
                                       solution,
                                       Solution<dim>(),
                                       difference_per_cell,
-                                      QGauss<dim>(fe->degree + 1),
+                                      quadrature_formula,
                                       VectorTools::H1_seminorm);
     const double H1_error =
       VectorTools::compute_global_error(triangulation,
                                         difference_per_cell,
                                         VectorTools::H1_seminorm);
 
+#ifdef USE_SIMPLEX
+    const QIteratedSimplex<dim> q_iterated(QGaussSimplex<dim>(2), 4);
+#else
     const QTrapezoid<1>  q_trapez;
     const QIterated<dim> q_iterated(q_trapez, fe->degree * 2 + 1);
+#endif
     VectorTools::integrate_difference(mapping,
                                       dof_handler,
                                       solution,
