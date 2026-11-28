@@ -3638,15 +3638,24 @@ public:
   refine_choice() const;
 
   /**
-   * Set the @p IsotropicRefinementChoices this cell is flagged to be refined
+   * Set the @p IsotropicRefinementChoice with which this cell shall be refined.
    * with.
+   *
+   * @note IsotropicRefinementChoice values are only stored for tetrahedra: for
+   * all other ReferenceCell kinds this function does nothing.
    */
   void
-  set_refine_choice(const std::uint8_t refinement_choice = static_cast<char>(
-                      IsotropicRefinementChoice::isotropic_refinement)) const;
+  set_refine_choice(const std::uint8_t refinement_choice) const;
 
   /**
-   * Clear the @p IsotropicRefinementChoices flag.
+   * Set the IsotropicRefinementChoice of a cell to the one with the best aspect
+   * ratio.
+   */
+  void
+  set_refine_choice() const;
+
+  /**
+   * Clear the @p IsotropicRefinementChoice.
    */
   void
   clear_refine_choice() const;
@@ -4222,6 +4231,14 @@ private:
    */
   void
   set_direction_flag(const bool new_direction_flag) const;
+
+  /**
+   * For tetrahedral cells, return the IsotropicRefinementChoice which creates
+   * children with the best aspect ratios, i.e., the one whose new interior
+   * line is shortest.
+   */
+  std::uint8_t
+  best_tetrahedral_refine_choice() const;
 
   friend class Triangulation<dim, spacedim>;
 
@@ -7683,6 +7700,20 @@ CellAccessor<dim, spacedim>::set_refine_flag(
 
   this->tria->levels[this->level()]->refine_flags[this->present_index] =
     refinement_case;
+
+  // For Tetrahedra, also pick the IsotropicRefinementChoice:
+  if (refinement_case != RefinementCase<dim>::no_refinement &&
+      this->tria->levels[this->level()]->refine_choice.size() != 0)
+    {
+      const std::uint8_t choice = refine_choice();
+      if (choice !=
+            static_cast<std::uint8_t>(IsotropicRefinementChoice::cut_tet_68) &&
+          choice !=
+            static_cast<std::uint8_t>(IsotropicRefinementChoice::cut_tet_57) &&
+          choice !=
+            static_cast<std::uint8_t>(IsotropicRefinementChoice::cut_tet_49))
+        set_refine_choice();
+    }
 }
 
 
@@ -7703,7 +7734,7 @@ CellAccessor<dim, spacedim>::refine_choice() const
 {
   Assert(this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   if (this->tria->levels[this->level()]->refine_choice.size() == 0)
-    return 0U;
+    return std::numeric_limits<std::uint8_t>::max();
   return this->tria->levels[this->level()]->refine_choice[this->present_index];
 }
 
@@ -7722,12 +7753,24 @@ CellAccessor<dim, spacedim>::set_refine_choice(
 
 template <int dim, int spacedim>
 inline void
+CellAccessor<dim, spacedim>::set_refine_choice() const
+{
+  Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
+  if (this->tria->levels[this->level()]->refine_choice.size() != 0 &&
+      this->reference_cell() == ReferenceCells::Tetrahedron)
+    this->tria->levels[this->level()]->refine_choice[this->present_index] =
+      best_tetrahedral_refine_choice();
+}
+
+
+template <int dim, int spacedim>
+inline void
 CellAccessor<dim, spacedim>::clear_refine_choice() const
 {
   Assert(this->used() && this->is_active(), ExcRefineCellNotActive());
   if (this->tria->levels[this->level()]->refine_choice.size() != 0)
     this->tria->levels[this->level()]->refine_choice[this->present_index] =
-      static_cast<char>(IsotropicRefinementChoice::isotropic_refinement);
+      std::numeric_limits<std::uint8_t>::max();
 }
 
 

@@ -134,11 +134,11 @@ namespace internal
       if (has_tetrahedra)
         {
           refine_choice.reserve(total_cells);
-          refine_choice.insert(
-            refine_choice.end(),
-            total_cells - refine_choice.size(),
-            static_cast<std::uint8_t>(
-              IsotropicRefinementChoice::isotropic_refinement));
+          // Initialize with a value which doesn't correspond to a valid
+          // IsotropicRefinementChoice.
+          refine_choice.insert(refine_choice.end(),
+                               total_cells - refine_choice.size(),
+                               std::numeric_limits<std::uint8_t>::max());
         }
 
       coarsen_flags.reserve(total_cells);
