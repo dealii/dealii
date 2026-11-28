@@ -1125,6 +1125,119 @@ namespace internal
   } // namespace SolverGMRESImplementation
 } // namespace internal
 
+
+// explicit instantiations for Number == BasisNumber
+
 #include "lac/solver_gmres.inst"
+
+// explicit instantiations for the double, float pair
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<false, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<true, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<false, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<true, MemorySpace::Host, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_scale_and_copy<MemorySpace::Host, double, float>(const std::size_t,
+                                                      const double,
+                                                      double *,
+                                                      float *);
+
+template void
+internal::SolverGMRESImplementation::do_add<MemorySpace::Host, double, float>(
+  const unsigned int,
+  const std::size_t,
+  internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+  const Vector<double> &,
+  const bool,
+  double *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<false, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template void
+internal::SolverGMRESImplementation::
+  do_Tvmult_add<true, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    const double *,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    Vector<double> &);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<false, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template double
+internal::SolverGMRESImplementation::
+  do_subtract_and_norm<true, MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    double *,
+    float *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_scale_and_copy<MemorySpace::Default, double, float>(const std::size_t,
+                                                         const double,
+                                                         double *,
+                                                         float *);
+
+template void
+internal::SolverGMRESImplementation::
+  do_add<MemorySpace::Default, double, float>(
+    const unsigned int,
+    const std::size_t,
+    internal::SolverGMRESImplementation::OrthogonalizationData<float> &,
+    const Vector<double> &,
+    const bool,
+    double *);
 
 DEAL_II_NAMESPACE_CLOSE
