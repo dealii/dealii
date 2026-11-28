@@ -1,0 +1,23 @@
+
+DEAL:0:2d::hp: 0, invalid vertex DoF indices on artificial cells: 24
+DEAL:0:2d::hp: 1, invalid vertex DoF indices on artificial cells: 24
+DEAL:0:3d::hp: 0, invalid vertex DoF indices on artificial cells: 56
+DEAL:0:3d::hp: 1, invalid vertex DoF indices on artificial cells: 56
+
+DEAL:1:2d::hp: 0, invalid vertex DoF indices on artificial cells: 24
+DEAL:1:2d::hp: 1, invalid vertex DoF indices on artificial cells: 24
+DEAL:1:3d::hp: 0, invalid vertex DoF indices on artificial cells: 64
+DEAL:1:3d::hp: 1, invalid vertex DoF indices on artificial cells: 64
+
+
+DEAL:2:2d::hp: 0, invalid vertex DoF indices on artificial cells: 24
+DEAL:2:2d::hp: 1, invalid vertex DoF indices on artificial cells: 24
+DEAL:2:3d::hp: 0, invalid vertex DoF indices on artificial cells: 64
+DEAL:2:3d::hp: 1, invalid vertex DoF indices on artificial cells: 64
+
+
+DEAL:3:2d::hp: 0, invalid vertex DoF indices on artificial cells: 24
+DEAL:3:2d::hp: 1, invalid vertex DoF indices on artificial cells: 24
+DEAL:3:3d::hp: 0, invalid vertex DoF indices on artificial cells: 56
+DEAL:3:3d::hp: 1, invalid vertex DoF indices on artificial cells: 56
+
