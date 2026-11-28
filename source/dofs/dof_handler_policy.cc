@@ -3648,12 +3648,10 @@ namespace internal
         return NumberCache();
 #else
 
-        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-          *triangulation =
-            (dynamic_cast<
-              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
-              const_cast<dealii::Triangulation<dim, spacedim> *>(
-                &dof_handler->get_triangulation())));
+        dealii::parallel::TriangulationBase<dim, spacedim> *triangulation =
+          (dynamic_cast<dealii::parallel::TriangulationBase<dim, spacedim> *>(
+            const_cast<dealii::Triangulation<dim, spacedim> *>(
+              &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         const types::subdomain_id subdomain_id =
@@ -3858,12 +3856,10 @@ namespace internal
         return std::vector<NumberCache>();
 #else
 
-        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-          *triangulation =
-            (dynamic_cast<
-              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
-              const_cast<dealii::Triangulation<dim, spacedim> *>(
-                &dof_handler->get_triangulation())));
+        dealii::parallel::TriangulationBase<dim, spacedim> *triangulation =
+          (dynamic_cast<dealii::parallel::TriangulationBase<dim, spacedim> *>(
+            const_cast<dealii::Triangulation<dim, spacedim> *>(
+              &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         AssertThrow((triangulation->is_multilevel_hierarchy_constructed()),
@@ -4043,12 +4039,10 @@ namespace internal
         return NumberCache();
 #else
 
-        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-          *triangulation =
-            (dynamic_cast<
-              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
-              const_cast<dealii::Triangulation<dim, spacedim> *>(
-                &dof_handler->get_triangulation())));
+        dealii::parallel::TriangulationBase<dim, spacedim> *triangulation =
+          (dynamic_cast<dealii::parallel::TriangulationBase<dim, spacedim> *>(
+            const_cast<dealii::Triangulation<dim, spacedim> *>(
+              &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
 
@@ -4178,12 +4172,10 @@ namespace internal
         return NumberCache();
 #else
 
-        dealii::parallel::DistributedTriangulationBase<dim, spacedim>
-          *triangulation =
-            (dynamic_cast<
-              dealii::parallel::DistributedTriangulationBase<dim, spacedim> *>(
-              const_cast<dealii::Triangulation<dim, spacedim> *>(
-                &dof_handler->get_triangulation())));
+        dealii::parallel::TriangulationBase<dim, spacedim> *triangulation =
+          (dynamic_cast<dealii::parallel::TriangulationBase<dim, spacedim> *>(
+            const_cast<dealii::Triangulation<dim, spacedim> *>(
+              &dof_handler->get_triangulation())));
         Assert(triangulation != nullptr, ExcInternalError());
 
         // This code is very close to the respective code in renumber_dofs,
