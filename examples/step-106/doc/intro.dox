@@ -1,0 +1,258 @@
+<i>This program was contributed by Arthur Bawin (Polytechnique Montréal).
+<br>
+This material is based upon work partly supported by the Natural Sciences and Engineering Research Council of Canada (NSERC) through
+Discovery Grant RGPIN-2025-05020.
+</i>
+
+// @dealiiTutorialDOI{}
+
+@note As a prerequisite of this program, you need to have both PETSc and the
+p4est library installed. The installation of deal.II
+together with these two additional libraries is described in the <a
+href="../../readme.html" target="body">README</a> file.
+
+<a name="step_106.Intro"></a>
+
+<h1>Introduction</h1>
+
+<h3>Navier Stokes equations with Lagrange multiplier</h3>
+
+In this tutorial, we are interested in solving the unsteady incompressible Navier-Stokes
+equations in a domain \f$\Omega \subset \mathbb{R}^{d}, d=2,3 \f$.
+Instead of enforcing no-slip boundary conditions as Dirichlet conditions as usual,
+we would instead like to enforce these constraints weakly, using a Lagrange multiplier
+defined on the relevant boundaries. By doing so, the Lagrange multiplier is identified to the flux
+of the associated variable, which for the Stokes or Navier-Stokes equations allows
+to recover the fluid force on those boundaries.
+
+We consider the Navier-Stokes system, and the problem of finding
+a velocity \f$\textbf{u}(\textbf{x}, t)\f$ and a pressure \f$\textbf{p}(\textbf{x}, t)\f$ fields
+satisfying
+@f{align}{
+  \rho \left(\partial_t\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \textbf{f}\right)
+  - \nabla \cdot \boldsymbol{\sigma}(p, \mathbf{u})
+  %+ \nabla p - \nu (\nabla\textbf{u} + (\nabla\textbf{u})^T)
+  &= 0\quad \text{in } \Omega, \\
+  -\nabla \cdot \mathbf{u} &= 0 \quad \text{in } \Omega, \\
+  \mathbf{u} &= \mathbf{g} \quad \text{on } \Gamma_D,\\
+  \boldsymbol{\sigma}(p, \mathbf{u}) &= -p\mathbf{I} + \mu (\nabla\textbf{u} + (\nabla\textbf{u})^T),
+@f}
+together with suitable boundary conditions on \f$\Gamma_N := \partial\Omega / \Gamma_D\f$,
+and an initial velocity \f$\mathbf{u}(\mathbf{x},0) = \mathbf{u}_0(\mathbf{x})\f$.
+To derive the weak formulation,
+we multiply the momentum equation by a velocity test function \f$\mathbf{v}\f$
+and the mass equation by a pressure test function \f$q\f$,
+integrate over the domain,
+and write, after integrating by parts the stress terms:
+@f{align}{
+  \left(\mathbf{v}, \rho\left[\partial_t\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u}
+  + \textbf{f}\right]\right)_\Omega
+  %- (\nabla \cdot \mathbf{v}, p) - \nu (\nabla\textbf{u} + (\nabla\textbf{u})^T)
+  + (\nabla \mathbf{v}, \boldsymbol{\sigma})_\Omega
+  - (\mathbf{v}, \boldsymbol{\sigma} \cdot \hat{\boldsymbol{n}})_{\partial\Omega}
+  &= 0, \\
+  -(q, \nabla \cdot \mathbf{u})_\Omega &= 0.
+@f}
+When the Dirichlet condition \f$\mathbf{u} = \mathbf{g}\f$ is strongly enforced,
+the test function \f$\mathbf{v}\f$ is zero on the associated boundary,
+and the boundary term \f$(\mathbf{v}, \boldsymbol{\sigma} \cdot \hat{\boldsymbol{n}})_\Omega\f$
+reduces to \f$(\mathbf{v}, \boldsymbol{\sigma} \cdot \hat{\boldsymbol{n}})_{\Gamma_N}\f$,
+on the parts of the boundary where a Neumann condition is applied.
+In the Lagrange multiplier framework,
+the boundary condition \f$\mathbf{u} = \mathbf{g}\f$ is a constraint that becomes
+a part of the system of PDEs, and we introduce on \f$\Gamma_D\f$ an
+auxiliary variable \f$\boldsymbol{\lambda}(\mathbf{x},t)\f$, whose role is to enforce this constraint.
+The constraint equation is then also multiplied by the Lagrange multiplier test function
+\f$\hat{\boldsymbol{\lambda}}\f$, and
+the modified system takes the form
+
+@f{align}{
+  \left(\mathbf{v}, \rho\left[\partial_t\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \textbf{f}\right]\right)_\Omega
+  %- (\nabla \cdot \mathbf{v}, p) - \nu (\nabla\textbf{u} + (\nabla\textbf{u})^T)
+  + (\nabla \mathbf{v}, \boldsymbol{\sigma})_\Omega
+  - (\mathbf{v}, \boldsymbol{\sigma} \cdot \hat{\boldsymbol{n}})_{\Gamma_N}
+  - (\mathbf{v}, \boldsymbol{\lambda})_{\Gamma_D}
+  &= 0, \\
+  -(q, \nabla \cdot \mathbf{u})_\Omega &= 0, \\
+  - (\hat{\boldsymbol{\lambda}}, \mathbf{u} - \mathbf{g})_{\Gamma_D} &= 0.\\
+@f}
+
+By introducing \f$\boldsymbol{\lambda}\f$ this way,
+it is identified to the stress vector \f$\boldsymbol{t}(\hat{\mathbf{n}}) := \boldsymbol{\sigma} \cdot \hat{\mathbf{n}}\f$
+on the fluid from the cylinder, which is up to sign the stress vector on the cylinder from
+the fluid, since their normal vectors are the opposite of one another.
+This provides a handy way of postprocessing the fluid forces on boundaries where
+no-slip condition are enforced this way, as we can simply take the integral
+of the Lagrange multiplier required to satisfy this constraint.
+This is, of course, at the cost of an extra variable on \f$\Gamma_D\f$ to handle and solve for.
+
+@note In other tutorial steps solving the incompressible (Navier-)Stokes equations (e.g., step 57),
+the divergence of the viscous term
+\f$\mu \nabla \cdot (\nabla \mathbf{u} + (\nabla \mathbf{u})^T) = \mu (\Delta \mathbf{u} + \nabla(\nabla \cdot \mathbf{u}))\f$
+is usually simplified to \f$\mu \Delta \mathbf{u}\f$, taking advantage of the incompressibility constraint.
+Here, however, both terms must be kept if we want to identify \f$\boldsymbol{\lambda}\f$
+to the full stress vector, and obtain the complete fluid forces.
+
+<h3>Newton-Raphson method</h3>
+
+The system above can be recast into finding the triplet \f$U := (\mathbf{u}, p, \boldsymbol{\lambda})\f$
+such that the following nonlinear functional vanishes:
+@f{equation}{
+\text{NL}(U) :=
+\left(\mathbf{v}, \rho\left[\partial_t\textbf{u} + (\textbf{u} \cdot \nabla)\textbf{u} + \textbf{f}\right]\right)_\Omega
+  + (\nabla \mathbf{v}, \boldsymbol{\sigma})_\Omega
+  - (\mathbf{v}, \boldsymbol{\sigma} \cdot \hat{\boldsymbol{n}})_{\Gamma_N}
+  - (\mathbf{v}, \boldsymbol{\lambda})_{\Gamma_D}
+  -(q, \nabla \cdot \mathbf{u})_\Omega
+  - (\hat{\boldsymbol{\lambda}}, \mathbf{u} - \mathbf{g})_{\Gamma_D} = 0.
+\f}
+
+This problem is solved using Newton-Raphson's method,
+which determines at each time step the solution \f$U^n\f$ satisfying
+\f$\text{NL}(U^n) = 0\f$ up to a prescribed tolerance.
+This is done, as in step 57, by computing a sequence of increments \f$\Delta U^n_k\f$, obtained by solving
+at each iteration the linear system
+
+@f{equation}{
+J(U^n_k) \Delta U^n_k = -\text{NL}(U^n_k),
+\f}
+
+where \f$J(U^n_k)\f$ is the Jacobian matrix of \f$\text{NL}\f$ evaluated at the current solution.
+Since the Jacobian matrix is easy to obtain for the system of interest,
+we use in this tutorial the exact Jacobian, but automatic differentiation tools exist to
+compute an approximation of the matrix when it becomes too cumbersome to compute (see e.g. step 72).
+The exact Jacobian matrix is typically computed by discretizing the Gateaux derivative of \f$\text{NL}(U)\f$
+in the direction of a variation of a component of \f$U\f$, which is essentially the function-valued
+directional derivative:
+
+@f{equation}{
+J(U) \Delta U := \delta\text{NL}(U, \delta U)
+= \frac{d}{d\epsilon}\text{NL}(U + \epsilon \delta U)\biggr\vert_{\epsilon = 0}.
+\f}
+
+For instance, the variation of the convective part \f$\rho\left((\textbf{u} \cdot \nabla)\textbf{u}\right)\f$ of \f$\text{NL}(U)\f$ in the direction of a
+velocity variation \f$\delta U = (\delta \mathbf{u}, 0, 0)\f$ writes
+
+@f{align}{
+\frac{d}{d\epsilon}\text{NL}(U + \epsilon \delta \mathbf{u})\biggr\vert_{\epsilon = 0}
+&=
+\frac{d}{d\epsilon} \left(\mathbf{v}, \rho \left[((\mathbf{u} + \epsilon \delta \mathbf{u}) \cdot \nabla)
+(\mathbf{u} + \epsilon \delta \mathbf{u})\right] \right)\biggr\vert_{\epsilon = 0}\\
+&= \left(\mathbf{v}, \rho \left[(\delta \mathbf{u} \cdot \nabla) \mathbf{u} + (\mathbf{u} \cdot \nabla) \delta \mathbf{u}\right] \right),
+\f}
+
+where \f$\mathbf{u}\f$ is the known current velocity field, and \f$\delta \mathbf{u}\f$
+is the unknown increment we would like to compute.
+Introducing the spatial discretization
+\f$\delta \mathbf{u}_h = \sum_{j = 0}^{N_\text{dofs}} U_j \boldsymbol{\varphi}_j\f$
+and using a continuous Galerkin projection (i.e., \f$\mathbf{v} = \boldsymbol{\varphi}_i\f$),
+this yields the convection matrix
+
+@f{align}{
+J_{\text{conv}, ij} = \left(\boldsymbol{\varphi}_i, \rho
+  \left[(\boldsymbol{\varphi}_j \cdot \nabla) \mathbf{u}_h
+    + (\mathbf{u}_h \cdot \nabla) \boldsymbol{\varphi}_j\right] \right),
+\f}
+
+Because the convective term is nonlinear, this matrix involves the current velocity field
+in addition to the shape functions,,
+and thus needs to be updated at each Newton iteration to ensure optimal convergence.
+In practice, heuristics can be used to limit its recomputation while maintaining acceptable convergence,
+see e.g. the discussion in step XX, but in this tutorial, we will assemble it at each iteration.
+All the other terms in \f$\text{NL}(U)\f$ are linear, and the associated Jacobian matrices
+thus involve only the shape functions, not the solution itself.
+
+<h3>Implicit time stepping</h3>
+
+To obtain a fully discrete scheme, it remains to approximate the velocity time derivative.
+We consider a time discretization using
+a backward differentiation formula (BDF) method, which for an order \f$p\f$ method
+uses the solutions at times \f$t_n\f$ (i.e., the current solution) to \f$t_{n-p}\f$:
+
+@f{equation}{
+\partial_t\mathbf{u} = \sum_{i = 0}^p c_i \mathbf{u}^{n-c}
+\f}
+
+In this tutorial, we will use a simple BDF1 method, a.k.a the implicit Euler scheme, which only requires
+the solution at the previous time step.
+At time \f$t_n\f$, we thus start the Newton-Raphson loop with the solution at time \f$t_{n-1}\f$ as initial
+candidate, and seek the increment \f$\Delta U^n\f$ to obtain \f$U^n = U^{n-1} + \Delta U^n\f$ at convergence.
+Then, we postprocess the solution and move on to the next time step.
+
+<h3>Handling the Lagrange multiplier field</h3>
+
+The Lagrange multiplier \f$\boldsymbol{\lambda}\f$ is defined on a boundary (or boundaries) \f$\Gamma_D\f$,
+a codimension 1 entity.
+The <code>FESystem</code> machinery, however, only allows juxtaposing finite element spaces
+of identical dimension.
+To keep things simple, a solution is to define \f$\boldsymbol{\lambda}\f$ on the whole domain,
+and only use its values on the boundaries of interest, while constraining the remaining degrees of freedom
+to an arbitrary, unused value, like zero.
+This greatly simplifies the implementation, and avoids to manipulate two DoFHandlers,
+at the cost of a whole extra (vector-valued) variable to store and solve for.
+When using an iterative solver, these extra constrained dofs are luckily not a huge deal,
+but in this tutorial, we will solve the coupled system with a direct solver, which <i>is</i> affected
+by the extra dofs.
+
+A more elegant alternative to the current approach is to take advantage of the <i>hp-</i>machinery,
+to assign different finite element spaces on cells touching the boundaries of interest,
+similarly to what is done in step XX.
+This way, we can define an <code>FESystem</code> with the Lagrange multiplier
+only on cells with faces on \f$\Gamma_D\f$, and use an <code>FESystem</code>
+with an <code>FENothing</code> to represent \f$\boldsymbol{\lambda}\f$ in the rest
+of the domain, which does not add any additional unused dofs.
+This is mentioned in the "Possibilities for extension" section below.
+
+<h3>Linear solver</h3>
+
+We use the parallel direct solver Mumps to solve the linear system obtained at each Newton iteration.
+Thus, the effort put into the linear solves is minimal, but the drawback is that it won't scale well,
+and will only allow for problems with a modest number of degrees of freedom, especially in 3D.
+
+<h3>The testcase</h3>
+
+The considered testcase is the well-known incompressible flow around a circular cylinder, in 2D and 3D,
+and without source term \f$(\mathbf{f} = 0)\f$.
+The computational domain is a cylinder of diameter \f$D\f$
+inside a rectangular box of dimensions \f$[(8 + 1 + 24)D, (8 + 1 + 8)D]\f$.
+We consider a Newtonian fluid with constant density \f$\rho\f$ and viscosity \f$\mu\f$,
+and to simplify, we divide the momentum equation by \f$\rho\f$.
+As a result, both the pressure and the Lagrange multiplier are scaled by the density,
+and we will need to multiply back by \f$\rho\f$ the integral of the Lagrange multiplier
+to evaluate the fluid force on the cylinder.
+The Reynolds number of the flow is set to \f$Re := \rho UD/\mu = UD/\nu = 200\f$,
+which is achieved by taking \f$U = 1, D = 1, \rho = 1, \nu = 1/Re = 0.005\f$.
+
+On the cylinder, the no-slip boundary condition \f$\mathbf{u} = 0\f$ is weakly enforced,
+which amounts to take \f$\mathbf{g} = 0\f$ in the system above.
+The remaining boundary conditions are the following:
+- On the inlet, the velocity is set to a uniform flow \f$\mathbf{u} = (1, 0)\f$ or \f$\mathbf{u} = (1, 0, 0)\f$,
+- On the outlet, we set an outflow (a.k.a a zero traction or do-nothing) boundary condition, which amounts to enforce \f$\boldsymbol{\sigma} \cdot \hat{\mathbf{n}} = 0\f$,
+- On the top and bottom planes, we set a slip condition \f$\mathbf{u} \cdot \hat{\mathbf{n}} = 0\f$,
+- In 3D, the front and back planes are periodic.
+
+The initial condition for the velocity is the uniform flow, i.e.,
+\f$\mathbf{u}_0(\mathbf{x}) = (1,0)\f$ or \f$(1,0,0)\f$.
+
+Since we consider the nonstabilized Navier-Stokes equation,
+the choice of discrete spaces for the velocity and pressure is subject to an inf-sup stability
+condition, which is satisfied by the Taylor-Hood pair \f$Q^k-Q^{k-1}\f$.
+Here, we will simply use the low order pair \f$Q^2-Q^1\f$, but this can easily be modified in the program.
+Adding a Lagrange multiplier yields an additional saddle-point type problem,
+which comes with its own inf-sup condition on the velocity-lambda discrete pair to ensure
+existence and uniqueness of a discrete solution.
+This condition, however, is not nearly as well documented, which makes it less straightforward to
+select a discrete pair.
+In practice, there is no issue with an equal-order approximation in 2D for this benchmark.
+This is appealing, because in that case, there is the same number of
+velocity and lambda degrees of freedom on the cylinder,
+and the no-slip constraints is actually enforced exactly (that is, up to the
+precision of the linear solver),
+whereas for a Taylor-Hood pair for \f$(\mathbf{u}_h, \boldsymbol{\lambda}_h)\f$,
+the constraint enforcement converges with the mesh.
+In 3D, we observe oscillations in \f$\boldsymbol{\lambda}_h\f$ when using an equal order pair,
+exactly like the checkerboard-like pressure instability when using an equal-order velocity-pressure pair.
+We observe, however, that \f$(i)\f$ the no-slip condition is still enforced exactly, and \f$(ii)\f$ the integral of lambda
+(i.e., the fluid forces) converges with the expected rate nonetheless.
+Thus, the example program below uses an equal-order \f$Q^2\f$ approximation for the Lagrange multiplier by default,
+but you should feel free to try different pair combinations.
