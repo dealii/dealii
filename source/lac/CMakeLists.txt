@@ -152,6 +152,7 @@ if(DEAL_II_TRILINOS_WITH_EPETRA)
     trilinos_sparse_matrix.cc
     trilinos_sparsity_pattern.cc
     trilinos_vector.cc
+
   )
 
   set(_inst
@@ -167,6 +168,7 @@ if(DEAL_II_TRILINOS_WITH_MUELU)
     trilinos_precondition_muelu.cc
   )
 endif()
+
 
 if(DEAL_II_TRILINOS_WITH_TPETRA)
   set(_unity_include_src
@@ -186,6 +188,14 @@ if(DEAL_II_TRILINOS_WITH_TPETRA)
     trilinos_tpetra_block_sparse_matrix.inst.in
     trilinos_tpetra_sparse_matrix.inst.in
   )
+
+  if(DEAL_II_TRILINOS_WITH_ANASAZI)
+    set(_unity_include_src
+      ${_unity_include_src}
+      anasazi_solver.cc
+
+    )
+  endif()
 
   if(DEAL_II_TRILINOS_WITH_TPETRA_MUELU)
     set(_separate_src
