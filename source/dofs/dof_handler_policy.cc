@@ -2925,17 +2925,6 @@ namespace internal
         const unsigned int n_procs =
           Utilities::MPI::n_mpi_processes(tr->get_mpi_communicator());
 
-        // If an underlying shared::Tria allows artificial cells, we need to
-        // restore the true cell owners temporarily.
-        // We use the TemporarilyRestoreSubdomainIds class for this purpose: we
-        // save the current set of subdomain ids, set subdomain ids to the
-        // "true" owner of each cell upon construction of the
-        // TemporarilyRestoreSubdomainIds object, and later restore these flags
-        // when it is destroyed.
-        const internal::parallel::shared::
-          TemporarilyRestoreSubdomainIds<dim, spacedim>
-            subdomain_modifier(*tr);
-
         // first let the sequential algorithm do its magic. it is going to
         // enumerate DoFs on all cells, regardless of owner
         const types::global_dof_index n_initial_dofs =
@@ -3261,18 +3250,11 @@ namespace internal
         DEAL_II_NOT_IMPLEMENTED();
         return NumberCache();
 #else
-        // Similar to distribute_dofs() we need to have a special treatment in
-        // case artificial cells are present.
         const dealii::parallel::shared::Triangulation<dim, spacedim> *tr =
           (dynamic_cast<
             const dealii::parallel::shared::Triangulation<dim, spacedim> *>(
             &this->dof_handler->get_triangulation()));
         Assert(tr != nullptr, ExcInternalError());
-
-        // Set subdomain IDs to the "true" owner of each cell.
-        const internal::parallel::shared::
-          TemporarilyRestoreSubdomainIds<dim, spacedim>
-            subdomain_modifier(*tr);
 
         std::vector<types::global_dof_index> global_gathered_numbers(
           this->dof_handler->n_dofs(), 0);
