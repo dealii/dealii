@@ -24,19 +24,4 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS)
 #endif
       \}
     \}
-
-    namespace internal
-    \{
-      namespace parallel
-      \{
-        namespace shared
-        \{
-#if deal_II_dimension <= deal_II_space_dimension
-          template class TemporarilyRestoreSubdomainIds<
-            deal_II_dimension,
-            deal_II_space_dimension>;
-#endif
-        \}
-      \}
-    \}
   }
